@@ -162,6 +162,10 @@ public final class StartGamePanel extends JPanel implements ActionListener {
 
         chatArea.setEditable(false);
 
+        // Disable while not implemented.
+        mapSizeLabel.setEnabled(false);
+        mapSize.setEnabled(false);
+
         optionsPanel.add(mapSize);
         optionsPanel.add(mapSizeLabel);
         add(optionsPanel);
@@ -222,6 +226,8 @@ public final class StartGamePanel extends JPanel implements ActionListener {
             readyBox.setSelected(thisPlayer.isReady());
         }
 
+        chatArea.setText("");
+
         setEnabled(true);
     }
 
@@ -242,7 +248,10 @@ public final class StartGamePanel extends JPanel implements ActionListener {
 
         components = optionsPanel.getComponents();
         for (int i = 0; i < components.length; i++) {
-            components[i].setEnabled(enabled);
+            //components[i].setEnabled(enabled);
+
+            // Disable while not implemented.
+            components[i].setEnabled(false);
         }
 
         components = chatPanel.getComponents();
