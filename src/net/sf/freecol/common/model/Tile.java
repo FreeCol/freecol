@@ -842,30 +842,32 @@ public final class Tile extends FreeColGameObject implements Location {
         }
 
         if (hasBonus()) {
-            if (getAddition() == ADD_MOUNTAINS && goods == Goods.SILVER) {
-                basepotential += 2;
-            } else if (getAddition() == ADD_HILLS && goods == Goods.ORE) {
-                basepotential += 6;
-            } else if (getType() == PLAINS && goods == Goods.FOOD) {
-                basepotential += 4;
-            } else if (getType() == SAVANNAH && goods == Goods.SUGAR) {
-                basepotential += 7;
-            } else if (getType() == GRASSLANDS && goods == Goods.TOBACCO) {
-                basepotential += 6;
-            } else if (getType() == PRAIRIE && goods == Goods.COTTON) {
-                basepotential += 6;
-            } else if (isForested()) {
-                if (getType() == GRASSLANDS || getType() == SAVANNAH) {
-                    if (goods == Goods.LUMBER) {
-                        basepotential += 6;
+            if (addition_type <= ADD_RIVER_MAJOR) {
+                if (isForested()) {
+                    if (getType() == GRASSLANDS || getType() == SAVANNAH) {
+                        if (goods == Goods.LUMBER) {
+                            basepotential += 6;
+                        }
+                    } else {
+                        if (goods == Goods.FURS) {
+                            basepotential += 6;
+                        }
                     }
-                } else {
-                    if (goods == Goods.FURS) {
-                        basepotential += 6;
-                    }
+                } else if (getType() == PLAINS && goods == Goods.FOOD) {
+                    basepotential += 4;
+                } else if (getType() == SAVANNAH && goods == Goods.SUGAR) {
+                    basepotential += 7;
+                } else if (getType() == GRASSLANDS && goods == Goods.TOBACCO) {
+                    basepotential += 6;
+                } else if (getType() == PRAIRIE && goods == Goods.COTTON) {
+                    basepotential += 6;
+                } else if (getType() == OCEAN && goods == Goods.FOOD) {
+                    basepotential += 5;
                 }
-            } else if (getType() == OCEAN && goods == Goods.FOOD) {
-                basepotential += 5;
+            } else if (addition_type == ADD_HILLS && goods == Goods.ORE) {
+                basepotential += 6;
+            } else if (addition_type == ADD_MOUNTAINS && goods == Goods.SILVER) {
+                basepotential += 2;
             }
         }
 
