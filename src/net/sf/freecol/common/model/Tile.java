@@ -53,6 +53,10 @@ public final class Tile extends FreeColGameObject implements Location {
                             ADD_HILLS = 3,
                             ADD_MOUNTAINS = 4;
 
+    // Indians' claims on the tile may be one of the following:                    
+    public static final int CLAIM_NONE = 0,
+                            CLAIM_VISITED = 1,
+                            CLAIM_CLAIMED = 2;
 
     private boolean road,
                     plowed,
@@ -65,6 +69,8 @@ public final class Tile extends FreeColGameObject implements Location {
 
     private int     x,
                     y;
+                    
+    private int     indianClaim;
 
     /** A pointer to the settlement located on this tile or 'null' if there is no settlement on this tile. */
     private Settlement settlement;
@@ -108,6 +114,7 @@ public final class Tile extends FreeColGameObject implements Location {
         unitContainer = new UnitContainer(game, this);
         this.type = type;
         this.addition_type = ADD_NONE;
+        this.indianClaim = CLAIM_NONE;
         
         road = false;
         plowed = false;
@@ -331,7 +338,23 @@ public final class Tile extends FreeColGameObject implements Location {
         addition_type = addition;
     }
 
-
+    /**
+    * Returns the claim on this Tile.
+    *
+    * @return The claim on this Tile.
+    */
+    public int getClaim() {
+        return indianClaim;
+    }
+    
+    /**
+    * Sets the claim on this Tile. 
+    * @param claim The claim on this Tile.
+    */
+    public void setClaim(int claim) {
+        indianClaim = claim;
+    }
+    
     /**
     * Puts a <code>Settlement</code> on this <code>Tile</code>.
     * A <code>Tile</code> can only have one <code>Settlement</code>
@@ -768,7 +791,7 @@ public final class Tile extends FreeColGameObject implements Location {
 
         // Check if there is a settlement on this tile: Do not show enemy units hidden in a settlement:
         // Check if the player can see the tile: Do not show enemy units on a tile out-of-sight.
-        if ((settlement == null || settlement.getOwner().equals(player)) && player.canSee(this)) {
+        if ((settlement == null || settlement instanceof IndianSettlement || settlement.getOwner().equals(player)) && player.canSee(this)) {
             tileElement.appendChild(unitContainer.toXMLElement(player, document));
         } else {
             UnitContainer emptyUnitContainer = new UnitContainer(getGame(), this);

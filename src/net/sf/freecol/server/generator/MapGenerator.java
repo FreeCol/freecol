@@ -57,16 +57,188 @@ public class MapGenerator {
         TerrainGenerator terrainGenerator = new TerrainGenerator(landMap);
         Map map = terrainGenerator.createMap();
 
-
+        createIndianSettlements(map);
         
         createEuropeanUnits(map, width, height, players);
 
         return map;
     }
     
-    
-    
-    
+    /**
+     * Create the Indian settlements, at least a capital for every nation and
+     * random numbers of other settlements.
+     * @throws FreeColException if thrown by a called method
+     */
+    private void createIndianSettlements(Map map) throws FreeColException {
+        Iterator incaIterator = map.getFloodFillIterator
+                                                (getRandomStartingPos(map));
+        Iterator aztecIterator = map.getFloodFillIterator
+                                                (getRandomStartingPos(map));
+        Iterator arawakIterator = map.getFloodFillIterator
+                                                (getRandomStartingPos(map));
+        Iterator cherokeeIterator = map.getFloodFillIterator
+                                                (getRandomStartingPos(map));
+        Iterator iroquoisIterator = map.getFloodFillIterator
+                                                (getRandomStartingPos(map));
+        Iterator siouxIterator = map.getFloodFillIterator
+                                                (getRandomStartingPos(map));
+        Iterator apacheIterator = map.getFloodFillIterator
+                                                (getRandomStartingPos(map));
+        Iterator tupiIterator = map.getFloodFillIterator
+                                                (getRandomStartingPos(map));
+
+        placeIndianSettlement(IndianSettlement.INCA,
+                              IndianSettlement.CITY,
+                              true, incaIterator, map);
+        placeIndianSettlement(IndianSettlement.AZTEC,
+                              IndianSettlement.CITY,
+                              true, aztecIterator, map);
+        placeIndianSettlement(IndianSettlement.ARAWAK,
+                              IndianSettlement.VILLAGE,
+                              true, arawakIterator, map);
+        placeIndianSettlement(IndianSettlement.CHEROKEE,
+                              IndianSettlement.VILLAGE,
+                              true, cherokeeIterator, map);
+        placeIndianSettlement(IndianSettlement.IROQUOIS,
+                              IndianSettlement.VILLAGE,
+                              true, iroquoisIterator, map);
+        placeIndianSettlement(IndianSettlement.SIOUX,
+                              IndianSettlement.CAMP, 
+                              true, siouxIterator, map);
+        placeIndianSettlement(IndianSettlement.APACHE,
+                              IndianSettlement.CAMP,
+                              true, apacheIterator, map);
+        placeIndianSettlement(IndianSettlement.TUPI,
+                              IndianSettlement.CAMP,
+                              true, tupiIterator, map);
+
+        while (incaIterator.hasNext() || aztecIterator.hasNext() ||
+                arawakIterator.hasNext() || cherokeeIterator.hasNext() ||
+                iroquoisIterator.hasNext() || siouxIterator.hasNext() ||
+                apacheIterator.hasNext() || tupiIterator.hasNext()) {
+            if (incaIterator.hasNext() && random.nextInt(5) != 0)
+                placeIndianSettlement(IndianSettlement.INCA,
+                                      IndianSettlement.CITY,
+                                      false, incaIterator, map);
+            if (aztecIterator.hasNext() && random.nextInt(5) != 0)
+                placeIndianSettlement(IndianSettlement.AZTEC,
+                                      IndianSettlement.CITY,
+                                      false, aztecIterator, map);
+            if (arawakIterator.hasNext() && random.nextInt(3) != 0)
+                placeIndianSettlement(IndianSettlement.ARAWAK,
+                                      IndianSettlement.VILLAGE,
+                                      false, arawakIterator, map);
+            if (cherokeeIterator.hasNext() && random.nextInt(4) != 0)
+                placeIndianSettlement(IndianSettlement.CHEROKEE,
+                                      IndianSettlement.VILLAGE,
+                                      false, cherokeeIterator, map);
+            if (iroquoisIterator.hasNext() && random.nextInt(4) != 0)
+                placeIndianSettlement(IndianSettlement.IROQUOIS,
+                                      IndianSettlement.VILLAGE,
+                                      false, iroquoisIterator, map);
+            if (siouxIterator.hasNext() && random.nextInt(4) != 0)
+                placeIndianSettlement(IndianSettlement.SIOUX,
+                                      IndianSettlement.CAMP,
+                                      false, siouxIterator, map);
+            if (apacheIterator.hasNext() && random.nextInt(3) != 0)
+                placeIndianSettlement(IndianSettlement.APACHE,
+                                      IndianSettlement.CAMP,
+                                      false, apacheIterator, map);
+            if (tupiIterator.hasNext() && random.nextInt(2) != 0)
+                placeIndianSettlement(IndianSettlement.TUPI,
+                                      IndianSettlement.CAMP,
+                                      false, tupiIterator, map);
+        }
+    }
+
+    /**
+     * Finds a suitable location for a settlement and builds it there. If no
+     * location can be found (the iterator is exhausted) the settlement will
+     * be discarded.
+     * @param settlement The settlement to place
+     * @param iterator The nation's iterator to use
+     * @throws FreeColException if thrown by a called method
+     */
+    private void placeIndianSettlement(int owner, int type,
+                                       boolean capital,
+                                       Iterator iterator, Map map)
+                                throws FreeColException {
+        while (iterator.hasNext()) {
+            Position position = (Position)iterator.next();
+            int radius = (type == IndianSettlement.CITY) ? 2 : 1;
+            if (isIndianSettlementCandidate(position, radius + 1, map) &&
+                        random.nextInt(2) != 0) {
+                //System.out.println("Setting indian settlement at "
+                //                   + position.getX() + "x" + position.getY());
+                
+                //TODO: Make the player not null!
+                map.getTile(position).setSettlement(
+                    new IndianSettlement(game, null, map.getTile(position), owner, type, capital));
+                map.getTile(position).setClaim(Tile.CLAIM_CLAIMED);
+                map.getTile(position).setOwner(map.getTile(position).getSettlement());
+                Iterator circleIterator = map.getCircleIterator
+                                                (position, true, radius);
+                while (circleIterator.hasNext()) {
+                    Position adjPos = (Position)circleIterator.next();
+                    map.getTile(adjPos).setClaim(Tile.CLAIM_CLAIMED);
+                    map.getTile(adjPos).setOwner(map.getTile(position).getSettlement());
+                }
+                
+                //TODO: Place braves into settlements once player != null
+                return;
+            }
+        }
+    }
+
+    /**
+     * Check to see if it is possible to build an Indian settlement at a
+     * given map position. A city (Incas and Aztecs) needs a free radius
+     * of two tiles, a village or camp needs one tile in every direction.
+     * There must be at least three productive tiles in the area including
+     * the settlement tile.
+     * @param position Candidate position
+     * @param radius necessary radius
+     * @return True if position suitable for settlement
+     * @throws FreeColException if thrown by a called method
+     */
+    private boolean isIndianSettlementCandidate(Position position, int radius, Map map)
+                        throws FreeColException {
+        if (map.getTile(position).getClaim() == Tile.CLAIM_NONE) {
+            map.getTile(position).setClaim(Tile.CLAIM_VISITED);
+            if (map.getTile(position).isSettleable()) {
+                int numSettleableNeighbors = 0;
+                Iterator iterator = map.getCircleIterator(position, true,
+                                                                radius);
+                while (iterator.hasNext()) {
+                    Position adjPos = (Position)iterator.next();
+                    if (map.getTile(adjPos).getClaim() == Tile.CLAIM_CLAIMED) {
+                        return false;
+                    }
+                    if (map.getTile(adjPos).isSettleable() &&
+                        map.getDistance(position.getX(), position.getY(),
+                                        adjPos.getX(), adjPos.getY()) == 1) {
+                        numSettleableNeighbors++;
+                    }
+                }
+                return numSettleableNeighbors >= 2;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Select a random position on the map to use as a starting position.
+     * @return Position selected
+     */
+    private Position getRandomStartingPos(Map map) {
+        int x = 0;
+        int y = 0;
+        while (!map.getTile(x, y).isLand()) {
+            x = random.nextInt(width - 20) + 10;
+            y = random.nextInt(height - 20) + 10;
+        }
+        return new Map.Position(x, y);
+    }    
     
     /**
      * Create two ships, one with a colonist, for each player, and
@@ -159,8 +331,8 @@ public class MapGenerator {
         private static final int MAX_DISTANCE_TO_EDGE = 12;
 
         private boolean[][] landMap;
-	
-	private Random tileType;
+        
+        private Random tileType;
 
 
         TerrainGenerator(boolean[][] landMap) {
@@ -175,33 +347,33 @@ public class MapGenerator {
           if (max > 99) max = 99;
           int thisValue = tileType.nextInt(max - min) + min;
           thisValue /= 10; // Gives a number from 0-3.
-	  int minWoD = 0;
-	  int maxWoD = 99;
-	  int dryOrWet = tileType.nextInt(maxWoD - minWoD) + minWoD;
-	  dryOrWet /= 33;
+          int minWoD = 0;
+          int maxWoD = 99;
+          int dryOrWet = tileType.nextInt(maxWoD - minWoD) + minWoD;
+          dryOrWet /= 33;
           switch(thisValue) {
-	    case 0: return Tile.ARCTIC;
-	    case 1: case 2: switch (dryOrWet) {
-	      case 0: return Tile.TUNDRA;
-	      case 1: default: return Tile.TUNDRA;
-	      case 2: return Tile.MARSH;
-	    }
-	    case 3: case 4: case 5: case 6: default: switch (dryOrWet) {
-	      case 0: return Tile.PLAINS;
-	      case 1: default: return Tile.PRAIRIE;
-	      case 2: return Tile.SWAMP;
-	    }
-	    case 7: case 8: case 9: switch (dryOrWet) {
-	      case 0: return Tile.GRASSLANDS;
-	      case 1: default: return Tile.SAVANNAH;
-	      case 2: return Tile.DESERT;
-	    }
+            case 0: return Tile.ARCTIC;
+            case 1: case 2: switch (dryOrWet) {
+              case 0: return Tile.TUNDRA;
+              case 1: default: return Tile.TUNDRA;
+              case 2: return Tile.MARSH;
+            }
+            case 3: case 4: case 5: case 6: default: switch (dryOrWet) {
+              case 0: return Tile.PLAINS;
+              case 1: default: return Tile.PRAIRIE;
+              case 2: return Tile.SWAMP;
+            }
+            case 7: case 8: case 9: switch (dryOrWet) {
+              case 0: return Tile.GRASSLANDS;
+              case 1: default: return Tile.SAVANNAH;
+              case 2: return Tile.DESERT;
+            }
           }
         }
 
         public Map createMap() {
             Vector columns = new Vector(width);
-	    tileType = new Random();
+            tileType = new Random();
             for (int i = 0; i < width; i++) {
                 Vector v = new Vector(height);
                 for (int j = 0; j < height; j++) {

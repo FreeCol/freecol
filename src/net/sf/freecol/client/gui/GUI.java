@@ -676,7 +676,7 @@ public final class GUI {
                 if (map.isValid(p)) {
                     Tile borderingTile = map.getTile(p);
 
-                    if (tile.getType() == borderingTile.getType() ||
+                   if (tile.getType() == borderingTile.getType() ||
                         !borderingTile.isLand() ||
                         !borderingTile.isExplored()) {
                         // Equal tiles, sea tiles and unexplored tiles have no effect
@@ -756,6 +756,21 @@ public final class GUI {
 
                     // Draw image of colony in center of the tile.
                     g.drawImage(lib.getColonyImage(type), x + (lib.getTerrainImageWidth(tile.getType()) - lib.getColonyImageWidth(type)) / 2, y + (lib.getTerrainImageHeight(tile.getType()) - lib.getColonyImageHeight(type)) / 2, null);
+                    
+                    // The 5 here is arbitrary -sjm
+                    g.drawImage(lib.getColorChip(((Colony)settlement).getOwner().getColor()), x + STATE_OFFSET_X, y + 5, null);
+                    String populationString = Integer.toString(((Colony)settlement).getUnitCount());
+                    if (((Colony)settlement).getOwner().getColor() == Color.BLACK) {
+                        g.setColor(Color.WHITE);
+                    } else {
+                        g.setColor(Color.BLACK);
+                    }
+                    g.drawString(populationString, x + TEXT_OFFSET_X + STATE_OFFSET_X, y + 5 + TEXT_OFFSET_Y);
+                    
+                    g.setColor(Color.BLACK);
+                    
+                    String nameString = ((Colony)settlement).getName();
+                    g.drawString(nameString, x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(nameString))/2, y + (lib.getTerrainImageHeight(tile.getType()) - lib.getColonyImageHeight(type)) / 2);
                 } else if (settlement instanceof IndianSettlement) {
                     int type = lib.getSettlementGraphicsType(settlement);
 
