@@ -21,6 +21,8 @@
 package net.sf.freecol.common.model;
 
 import java.awt.Color;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Vector;
 import java.util.Iterator;
 import java.util.ArrayList;
@@ -89,6 +91,13 @@ public class Player extends FreeColGameObject {
     private int             crosses;
     private int             bells;
     private boolean         dead = false;
+    
+    // any founding fathers in this Player's congress
+    private boolean[]       fathers;
+    private int             currentFather;
+    
+    // 0 = pre-rebels; 1 = in rebellion; 2 = independence granted 
+    private int             rebellionState;
 
 
     private Location entryLocation;
@@ -145,6 +154,10 @@ public class Player extends FreeColGameObject {
 
         crosses = 0;
         bells = 0;
+        
+        fathers = new boolean[FoundingFather.FATHER_COUNT];
+        currentFather = -1;
+        rebellionState = 0;
     }
 
 
@@ -161,8 +174,6 @@ public class Player extends FreeColGameObject {
 
         readFromXMLElement(element);
     }
-
-
 
 
 
@@ -242,6 +253,69 @@ public class Player extends FreeColGameObject {
         }
 
         return false;
+    }
+    
+    
+    /**
+    * Returns the state of this players rebellion status.
+    * <pre>0 = Have not declared independence
+    * 1 = Declared independence, at war with king
+    * 2 = Independence granted</pre>  
+    * @return
+    */
+    public int getRebellionState() {
+        return rebellionState;
+    }
+    
+    
+    /**
+    * Sets the rebellion status.
+    * @param state The state of this player's rebellion
+    * @see getRebellionState()
+    */
+    public void setRebellionState(int state) {
+        rebellionState = state;
+    }
+    
+    /**
+    * Adds a founding father to this players continental congress 
+    * @param type The type of Founding Father to add
+    * @see FoundingFather
+    */
+    public void addFather(int type) {
+        fathers[type] = true;
+    }
+    
+    /**
+    * Determines whether this player has a certain Founding father.
+    * @return Whether this player has a Founding father of <code>type</code>
+    * @see FoundingFather 
+    */
+    public boolean hasFather(int type) {
+        return fathers[type];
+    }
+    
+    /**
+    * Returns the number of founding fathers in this players congress. Used to calculate number
+    * of bells needed to recruit new fathers. 
+    * @return The number of founding fathers in this players congress
+    */
+    public int getFatherCount() {
+        int count = 0;
+        for(int i = 0; i < fathers.length; i++)
+            if(fathers[i] == true)
+                count++;
+        return count;
+    }
+    
+    /**
+    * Sets this players liberty bell production to work towards recruiting <code>father</code>
+    * to its congress 
+    * @param father The type of FoundingFather to recruit
+    * @see FoundingFather
+    */
+    public void setCurrentFather(int father) {
+        currentFather = father;
     }
 
 
@@ -631,7 +705,21 @@ public class Player extends FreeColGameObject {
     */
     public void incrementBells(int num) {
         bells += num;
-        //TODO: founding fathers
+        if(currentFather == -1)
+            promptNewFather();            
+            
+        //TODO: founding fathers - need real formula to calculate req. number of bells for next father
+        if( bells >= (getFatherCount() * 100) + 200 ) {
+            // add father
+            fathers[currentFather] = true;
+            promptNewFather();
+        }
+    }
+    
+    private void promptNewFather() {
+        // TODO: this really shouldn't be here
+        // prompt with GUI message to ask for the next founding father
+        currentFather++;
     }
 
 
@@ -662,6 +750,12 @@ public class Player extends FreeColGameObject {
         playerElement.setAttribute("bells", Integer.toString(bells));
         playerElement.setAttribute("ready", Boolean.toString(ready));
         playerElement.setAttribute("dead", Boolean.toString(dead));
+        
+        char[] fatherCharArray = new char[FoundingFather.FATHER_COUNT];
+        for(int i = 0; i < fathers.length; i++)
+            fatherCharArray[i] = (fathers[i] ? '1' : '0');
+        String fatherStr = new String(fatherCharArray);
+        playerElement.setAttribute("foundingFathers", fatherStr);
 
         playerElement.setAttribute("ai", Boolean.toString(ai));
 
@@ -694,6 +788,10 @@ public class Player extends FreeColGameObject {
         ready = (new Boolean(playerElement.getAttribute("ready"))).booleanValue();
         ai = (new Boolean(playerElement.getAttribute("ai"))).booleanValue();
         dead = (new Boolean(playerElement.getAttribute("dead"))).booleanValue();
+        
+        String fatherStr = playerElement.getAttribute("foundingFathers");
+        for(int i = 0; i < fatherStr.length(); i++)
+            fathers[i] = ( (fatherStr.charAt(i) == '1') ? true : false );
 
         if (playerElement.hasAttribute("entryLocation")) {
             entryLocation = (Location) getGame().getFreeColGameObject(playerElement.getAttribute("entryLocation"));
