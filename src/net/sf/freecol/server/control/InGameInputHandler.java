@@ -134,7 +134,7 @@ public final class InGameInputHandler extends InputHandler {
             logger.warning(sw.toString());
 
             Element reconnect = Message.createNewRootElement("reconnect");
-            
+
             try {
                 connection.send(reconnect);
             } catch (IOException ex) {
@@ -158,10 +158,10 @@ public final class InGameInputHandler extends InputHandler {
     private Element setNewLandName(Connection connection, Element element) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         player.setNewLandName(element.getAttribute("newLandName"));
-        
+
         return null;
     }
-    
+
 
     /**
     * Handles a "createUnit"-message from a client.
@@ -215,7 +215,7 @@ public final class InGameInputHandler extends InputHandler {
 
         return reply;
     }
-    
+
 
     /**
     * Handles a "getVacantEntryLocation"-message from a client.
@@ -792,7 +792,7 @@ public final class InGameInputHandler extends InputHandler {
                         updateElement.appendChild(t.toXMLElement(player, reply.getOwnerDocument()));
                     }
                 }
-                
+
                 reply.appendChild(updateElement);
             }
 
@@ -845,22 +845,27 @@ public final class InGameInputHandler extends InputHandler {
         Player player = getFreeColServer().getPlayer(connection);
         Europe europe = player.getEurope();
 
-        int slot = Integer.parseInt(emigrateUnitInEuropeElement.getAttribute("slot"));
+        int slot;
+        if (player.hasFather(FoundingFather.WILLIAM_BREWSTER)) {
+            slot = Integer.parseInt(emigrateUnitInEuropeElement.getAttribute("slot"));
+        }
+        else {
+            slot = (int) ((Math.random() * 3) + 1);
+        }
+
         int recruitable = europe.getRecruitable(slot);
         int newRecruitable = player.generateRecruitable();
 
         Unit unit = new Unit(game, player, recruitable);
 
         Element reply = Message.createNewRootElement("emigrateUnitInEuropeConfirmed");
+        if (!player.hasFather(FoundingFather.WILLIAM_BREWSTER)) {
+            reply.setAttribute("slot", Integer.toString(slot));
+        }
         reply.setAttribute("newRecruitable", Integer.toString(newRecruitable));
-        reply.setAttribute("slot", Integer.toString(slot));
         reply.appendChild(unit.toXMLElement(player, reply.getOwnerDocument()));
 
-        if (player.hasFather(FoundingFather.WILLIAM_BREWSTER)) {
-            europe.emigrate(slot, unit, newRecruitable);
-        } else {
-            europe.emigrate((int) ((Math.random() * 3) + 1), unit, newRecruitable);
-        }
+        europe.emigrate(slot, unit, newRecruitable);
 
         return reply;
     }
@@ -1117,7 +1122,7 @@ public final class InGameInputHandler extends InputHandler {
         return null;
     }
 
-    
+
     /**
     * Handles a "logout"-message.
     *
@@ -1128,7 +1133,7 @@ public final class InGameInputHandler extends InputHandler {
     protected Element logout(Connection connection, Element logoutElement) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
 
-        logger.info("Logout by: " + connection + ((player != null) ? " (" + player.getName() + ") " : ""));        
+        logger.info("Logout by: " + connection + ((player != null) ? " (" + player.getName() + ") " : ""));
 
         // TODO
 
@@ -1158,7 +1163,7 @@ public final class InGameInputHandler extends InputHandler {
         return null;
     }
 
-    
+
     private boolean isHumanPlayersLeft() {
         Iterator playerIterator = getFreeColServer().getGame().getPlayerIterator();
         while (playerIterator.hasNext()) {
@@ -1168,7 +1173,7 @@ public final class InGameInputHandler extends InputHandler {
                 return true;
             }
         }
-        
+
         return false;
     }
 

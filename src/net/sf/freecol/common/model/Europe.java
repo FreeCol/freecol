@@ -32,7 +32,7 @@ public final class Europe extends FreeColGameObject implements Location {
     * exactly 3 elements and element 0 corresponds to recruit slot 1.
     */
     private int[] recruitables = {-1, -1, -1};
-    
+
     private int artilleryPrice;
 
     /**
@@ -106,6 +106,9 @@ public final class Europe extends FreeColGameObject implements Location {
         if ((slot > 0) && (slot < 4) && (type >= 0) && (type < Unit.UNIT_COUNT)) {
             recruitables[slot - 1] = type;
         }
+        else {
+            logger.warning("setRecruitable: invalid slot(" + slot + ") or type(" + type + ") given.");
+        }
     }
 
     /**
@@ -157,9 +160,15 @@ public final class Europe extends FreeColGameObject implements Location {
         }
 
         unit.setLocation(this);
+        // TODO: shouldn't we subtract a certain amount of crosses instead of just removing all
+        //       crosses? I'm not sure how this was done in the original.
         unit.getOwner().setCrosses(0);
 
-        addModelMessage(this, "model.europe.emigrate", new String[][] {{"%unit%", unit.getName()}});
+        if (!unit.getOwner().hasFather(FoundingFather.WILLIAM_BREWSTER)) {
+            addModelMessage(this, "model.europe.emigrate", new String[][] {{"%unit%", unit.getName()}});
+        }
+        // In case William Brewster is in the congress we don't need to show a message to the
+        // user because he has already been busy picking a unit.
 
         setRecruitable(slot, newRecruitable);
     }
@@ -214,12 +223,12 @@ public final class Europe extends FreeColGameObject implements Location {
         }
     }
 
-    
+
     public GoodsContainer getGoodsContainer() {
         return null;
     }
 
-    
+
     /**
     * Checks wether or not the specified locatable may be added to this
     * <code>Location</code>.
@@ -268,7 +277,7 @@ public final class Europe extends FreeColGameObject implements Location {
     public Unit getLastUnit() {
         return unitContainer.getLastUnit();
     }
-    
+
 
     /**
     * Trains a unit in Europe.
@@ -288,10 +297,10 @@ public final class Europe extends FreeColGameObject implements Location {
 
         unit.getOwner().modifyGold(-unit.getPrice());
         unit.setLocation(this);
-        
+
         if (unit.getType() == Unit.ARTILLERY) {
             artilleryPrice += 100;
-        }        
+        }
     }
 
 
@@ -302,7 +311,7 @@ public final class Europe extends FreeColGameObject implements Location {
         return artilleryPrice;
     }
 
-    
+
     /**
     * Gets the <code>Player</code> using this <code>Europe</code>.
     */
@@ -310,7 +319,7 @@ public final class Europe extends FreeColGameObject implements Location {
         return owner;
     }
 
-    
+
     /**
     * Prepares this object for a new turn.
     */

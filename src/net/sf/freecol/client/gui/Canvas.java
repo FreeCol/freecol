@@ -34,6 +34,7 @@ import net.sf.freecol.client.gui.panel.StatusPanel;
 import net.sf.freecol.client.gui.panel.VictoryPanel;
 import net.sf.freecol.client.gui.panel.ChooseFoundingFatherDialog;
 import net.sf.freecol.client.gui.panel.EventPanel;
+import net.sf.freecol.client.gui.panel.EmigrationPanel;
 
 import net.sf.freecol.client.gui.panel.MapControls;
 
@@ -96,6 +97,7 @@ public final class Canvas extends JLayeredPane {
     private static final Logger logger = Logger.getLogger(Canvas.class.getName());
 
     private final FreeColClient     freeColClient;
+
     private final MainPanel         mainPanel;
     private final NewPanel          newPanel;
     private final ErrorPanel        errorPanel;
@@ -110,6 +112,7 @@ public final class Canvas extends JLayeredPane {
     private final VictoryPanel      victoryPanel;
     private final ChooseFoundingFatherDialog chooseFoundingFatherDialog;
     private final EventPanel        eventPanel;
+    private final EmigrationPanel   emigrationPanel;
     private TakeFocusThread         takeFocusThread;
     private MapControls             mapControls;
     private JMenuBar                jMenuBar;
@@ -148,6 +151,7 @@ public final class Canvas extends JLayeredPane {
         victoryPanel = new VictoryPanel(this, freeColClient);
         chooseFoundingFatherDialog = new ChooseFoundingFatherDialog(this);
         eventPanel = new EventPanel(this, freeColClient);
+        emigrationPanel = new EmigrationPanel();
 
         showMainPanel();
 
@@ -362,7 +366,7 @@ public final class Canvas extends JLayeredPane {
         return response;
     }
 
-    
+
     /**
     * Displays a dialog where the user may choose a file.
     *
@@ -382,15 +386,15 @@ public final class Canvas extends JLayeredPane {
 
         return response;
     }
-    
-    
+
+
     /**
     * Displays a dialog where the user may choose a filename.
     *
     * @param directory The directory containing the files in which the
     *                  user may overwrite.
-    * @return The <code>File</code>.    
-    * @see FreeColDialog    
+    * @return The <code>File</code>.
+    * @see FreeColDialog
     */
     public File showSaveDialog(File directory) {
         FreeColDialog saveDialog = FreeColDialog.createSaveDialog(directory);
@@ -403,8 +407,8 @@ public final class Canvas extends JLayeredPane {
         remove(saveDialog);
 
         return response;
-    }    
-        
+    }
+
 
     /**
     * Displays a dialog with a text field and a ok/cancel option.
@@ -422,7 +426,7 @@ public final class Canvas extends JLayeredPane {
         try {
             text = Messages.message(text);
             okText = Messages.message(okText);
-            
+
             if (cancelText != null) {
                 cancelText = Messages.message(cancelText);
             }
@@ -436,7 +440,7 @@ public final class Canvas extends JLayeredPane {
         inputDialog.requestFocus();
 
         String response = (String) inputDialog.getResponse();
-        
+
         // checks if the user entered some text.
         if((response != null) && (response.length() == 0)) {
             String okTxt = "ok";
@@ -448,10 +452,10 @@ public final class Canvas extends JLayeredPane {
             catch(MissingResourceException e) {
                 logger.warning("could not find message with id: " + txt + " or " + okTxt + ".");
             }
-            
+
             FreeColDialog informationDialog = FreeColDialog.createInformationDialog(txt, okTxt);
             informationDialog.setLocation(getWidth() / 2 - informationDialog.getWidth() / 2, getHeight() / 2 - informationDialog.getHeight() / 2);
-            
+
             do {
                 remove(inputDialog);
                 add(informationDialog, new Integer(POPUP_LAYER.intValue() - 1));
@@ -459,7 +463,7 @@ public final class Canvas extends JLayeredPane {
 
                 informationDialog.getResponse();
                 remove(informationDialog);
-                
+
                 add(inputDialog, new Integer(POPUP_LAYER.intValue() - 1));
                 inputDialog.requestFocus();
 
@@ -478,7 +482,7 @@ public final class Canvas extends JLayeredPane {
     * The panel will be removed when another component
     * is added to this <code>Canvas</code>. This includes
     * all the <code>showXXX</code>-methods. In addition,
-    * {@link #closeStatusPanel} and {@link #closeMenus} 
+    * {@link #closeStatusPanel} and {@link #closeMenus}
     * also removes this panel.
     *
     * @param message The text message to display on the
@@ -492,7 +496,7 @@ public final class Canvas extends JLayeredPane {
         add(statusPanel, new Integer(POPUP_LAYER.intValue() - 10));
     }
 
-    
+
     /**
     * Closes the <code>StatusPanel</code>.
     * @see #showStatusPanel
@@ -516,13 +520,13 @@ public final class Canvas extends JLayeredPane {
         chooseFoundingFatherDialog.requestFocus();
 
         int response = chooseFoundingFatherDialog.getResponseInt();
-        
+
         remove(chooseFoundingFatherDialog);
 
         return response;
     }
-    
-    
+
+
     /**
     * Shows the {@link EventPanel}.
     */
@@ -534,7 +538,7 @@ public final class Canvas extends JLayeredPane {
         eventPanel.requestFocus();
 
         boolean response = eventPanel.getResponseBoolean();
-        
+
         remove(eventPanel);
 
         return response;
@@ -584,7 +588,28 @@ public final class Canvas extends JLayeredPane {
         colonyPanel.requestFocus();
     }
 
-    
+
+    /**
+    * Shows the panel that allows the user to choose which unit will emigrate
+    * from Europe. This method may only be called if the user has William Brewster
+    * in congress.
+    * @return The emigrant that was chosen by the user (1, 2 or 3).
+    */
+    public int showEmigrationPanel() {
+        emigrationPanel.initialize(freeColClient.getMyPlayer().getEurope());
+
+        emigrationPanel.setLocation(getWidth() / 2 - emigrationPanel.getWidth() / 2, getHeight() / 2 - emigrationPanel.getHeight() / 2);
+        add(emigrationPanel, new Integer(PALETTE_LAYER.intValue() - 1));
+        emigrationPanel.requestFocus();
+
+        int response = emigrationPanel.getResponseInt();
+
+        remove(emigrationPanel);
+
+        return response;
+    }
+
+
     /**
     * Updates the menu bar.
     */
@@ -613,7 +638,7 @@ public final class Canvas extends JLayeredPane {
             if (takeFocus) {
                 takeFocus();
             }
-            
+
             updateJMenuBar();
 
             repaint(bounds.x, bounds.y, bounds.width, bounds.height);
@@ -634,10 +659,10 @@ public final class Canvas extends JLayeredPane {
         if (comp != statusPanel && !(comp instanceof JMenuItem) && !(comp instanceof FreeColDialog)) {
             remove(statusPanel);
         }
-        
+
         Component c = super.add(comp);
         updateJMenuBar();
-        
+
         return c;
     }
 
@@ -700,15 +725,15 @@ public final class Canvas extends JLayeredPane {
     public ColonyPanel getColonyPanel() {
         return colonyPanel;
     }
-    
-    
+
+
     /**
     * Gets the <code>EuropePanel</code>.
     */
     public EuropePanel getEuropePanel() {
         return europePanel;
     }
-    
+
 
     /**
     * Enables or disables this component depending on the given argument.
@@ -1020,7 +1045,7 @@ public final class Canvas extends JLayeredPane {
     * Displays a "Are you sure you want to quit"-dialog
     * in which the user may choose to quit or cancel.
     *
-    * @return <i>true</i> if the user desides to quit and 
+    * @return <i>true</i> if the user desides to quit and
     *         <i>false</i> otherwise.
     */
     public boolean confirmQuitDialog() {

@@ -48,12 +48,12 @@ public final class InGameController {
     * Opens a dialog where the user should specify the filename
     * and saves the game.
     */
-    public void saveGame() {    
+    public void saveGame() {
         final Canvas canvas = freeColClient.getCanvas();
-        
+
         if (freeColClient.getMyPlayer().isAdmin() && freeColClient.getFreeColServer() != null) {
             final File file = canvas.showSaveDialog(FreeCol.getSaveDirectory());
-            
+
             if (file != null) {
                 canvas.showStatusPanel(Messages.message("status.savingGame"));
                 Thread t = new Thread() {
@@ -79,27 +79,27 @@ public final class InGameController {
         }
     }
 
-    
+
     /**
     * Opens a dialog where the user should specify the filename
     * and loads the game.
-    */  
-    public void loadGame() {  
+    */
+    public void loadGame() {
         Canvas canvas = freeColClient.getCanvas();
-        
+
         File file = canvas.showLoadDialog(FreeCol.getSaveDirectory());
-        
+
         if(file == null || !canvas.showConfirmDialog("stopCurrentGame.text", "stopCurrentGame.yes", "stopCurrentGame.no")) {
             return;
-        }                    
-      
+        }
+
         freeColClient.getConnectController().quitGame(true);
-        canvas.removeInGameComponents();    
+        canvas.removeInGameComponents();
 
         freeColClient.getConnectController().loadGame(file);
-    }    
-    
-    
+    }
+
+
     /**
     * Sets the "debug mode" to be active or not. Calls
     * {@link FreeCol#setInDebugMode} and reinitialize the
@@ -136,7 +136,10 @@ public final class InGameController {
             freeColClient.getCanvas().setEnabled(true);
             freeColClient.getCanvas().closeMenus();
             if (currentPlayer.checkEmigrate()) {
-                freeColClient.getInGameController().emigrateUnitInEurope((int) ((Math.random() * 3) + 1));
+                emigrateUnitInEurope(
+                        currentPlayer.hasFather(FoundingFather.WILLIAM_BREWSTER)
+                        ? freeColClient.getCanvas().showEmigrationPanel() : 0
+                    );
             }
             freeColClient.getInGameController().nextActiveUnit();
         }
@@ -159,7 +162,7 @@ public final class InGameController {
         }
     }
 
-    
+
     /**
     * Uses the active unit to build a colony.
     */
@@ -339,7 +342,7 @@ public final class InGameController {
         Element updateElement = (Element) attackResultElement.getElementsByTagName("update").item(0);
         if (updateElement != null) {
             freeColClient.getInGameInputHandler().handle(client.getConnection(), updateElement);
-        }        
+        }
 
         if (unit.getMovesLeft() <= 0) {
             nextActiveUnit(unit.getTile());
@@ -373,7 +376,7 @@ public final class InGameController {
             }
         }
     }
-    
+
 
     /**
      * Embarks the specified unit in a specified direction.
@@ -426,7 +429,7 @@ public final class InGameController {
     *
     * @param unit The unit who is going to board the carrier.
     * @param carrier The carrier.
-    * @return <i>true</i> if the <code>unit</code> actually gets 
+    * @return <i>true</i> if the <code>unit</code> actually gets
     *         on the <code>carrier</code>.
     */
     public boolean boardShip(Unit unit, Unit carrier) {
@@ -447,9 +450,9 @@ public final class InGameController {
             return false;
         }
 
-        if (unit.getTile() == null || unit.getTile().getColony() == null || 
+        if (unit.getTile() == null || unit.getTile().getColony() == null ||
                 unit.getTile().getColony().getUnitCount() > 1 ||
-                !(unit.getLocation() instanceof Colony || unit.getLocation() instanceof Building || 
+                !(unit.getLocation() instanceof Colony || unit.getLocation() instanceof Building ||
                 unit.getLocation() instanceof ColonyTile) ||
                 freeColClient.getCanvas().showConfirmDialog("abandonColony.text", "abandonColony.yes", "abandonColony.no")) {
 
@@ -462,7 +465,7 @@ public final class InGameController {
             unit.boardShip(carrier);
 
             client.send(boardShipElement);
-            
+
             return true;
         } else {
             return false;
@@ -610,7 +613,7 @@ public final class InGameController {
         Client client = freeColClient.getClient();
         Player player = freeColClient.getMyPlayer();
 
-        freeColClient.playSound(SfxLibrary.SELL_CARGO);        
+        freeColClient.playSound(SfxLibrary.SELL_CARGO);
 
         goods.adjustAmount();
 
@@ -638,7 +641,7 @@ public final class InGameController {
             leaveShip(unit);
         }
 
-        if (unit.getTile() == null || unit.getTile().getColony() == null || unit.getTile().getColony().getUnitCount() > 1 || 
+        if (unit.getTile() == null || unit.getTile().getColony() == null || unit.getTile().getColony().getUnitCount() > 1 ||
                 !(unit.getLocation() instanceof Colony || unit.getLocation() instanceof Building || unit.getLocation() instanceof ColonyTile)
                 || freeColClient.getCanvas().showConfirmDialog("abandonColony.text", "abandonColony.yes", "abandonColony.no")) {
             // Equip the unit first.
@@ -712,7 +715,7 @@ public final class InGameController {
     public boolean putOutsideColony(Unit unit) {
         return putOutsideColony(unit, false);
     }
-    
+
     /**
     * Puts the specified unit outside the colony.
     * @param unit The <code>Unit</code>
@@ -753,7 +756,7 @@ public final class InGameController {
 
         client.send(changeWorkTypeElement);
     }
-    
+
     /**
     * Changes the current construction project of a <code>Colony</code>.
     * @param colony The <code>Colony</code>
@@ -797,9 +800,9 @@ public final class InGameController {
             freeColClient.getCanvas().refresh();
         }
 
-        client.send(changeStateElement);                
+        client.send(changeStateElement);
     }
-    
+
     /**
      * Moves the specified unit in the "high seas" in a specified direction.
      * This may result in an ordinary move or a move to europe.
@@ -813,9 +816,9 @@ public final class InGameController {
 
         if (unit.getTile() == null || map.getNeighbourOrNull(direction, unit.getTile()) == null
             || canvas.showConfirmDialog("highseas.text", "highseas.yes", "highseas.no")) {
-            
+
             moveToEurope(unit);
-            nextActiveUnit();            
+            nextActiveUnit();
         } else {
             reallyMove(unit, direction);
         }
@@ -837,7 +840,7 @@ public final class InGameController {
         client.send(moveToEuropeElement);
     }
 
-    
+
     /**
      * Moves the specified unit to America.
      * @param unit The unit to be moved to America.
@@ -884,7 +887,7 @@ public final class InGameController {
         }
     }
 
-    
+
     /**
     * Recruit a unit from a specified "slot" in Europe.
     * @param slot The slot to recruit the unit from. Either 1, 2 or 3.
@@ -916,10 +919,13 @@ public final class InGameController {
 
 
     /**
-    * Cause a unit to emigrate from a specified "slot" in Europe.
-    * @param slot The slot from which the unit emigrates. Either 1, 2 or 3.
+    * Cause a unit to emigrate from a specified "slot" in Europe. If the player doesn't have
+    * William Brewster in the congress then the value of the slot parameter is not important
+    * (it won't be used).
+    * @param slot The slot from which the unit emigrates. Either 1, 2 or 3 if William Brewster
+    * is in the congress.
     */
-    public void emigrateUnitInEurope(int slot) {
+    private void emigrateUnitInEurope(int slot) {
         Client client = freeColClient.getClient();
         Canvas canvas = freeColClient.getCanvas();
         Game game = freeColClient.getGame();
@@ -927,15 +933,20 @@ public final class InGameController {
         Europe europe = myPlayer.getEurope();
 
         Element emigrateUnitInEuropeElement = Message.createNewRootElement("emigrateUnitInEurope");
-        emigrateUnitInEuropeElement.setAttribute("slot", Integer.toString(slot));
+        if (myPlayer.hasFather(FoundingFather.WILLIAM_BREWSTER)) {
+            emigrateUnitInEuropeElement.setAttribute("slot", Integer.toString(slot));
+        }
 
         Element reply = client.ask(emigrateUnitInEuropeElement);
-        
+
         if (!reply.getTagName().equals("emigrateUnitInEuropeConfirmed")) {
             throw new IllegalStateException();
         }
 
-        slot = Integer.parseInt(reply.getAttribute("slot")); // The server may have changed the slot.
+        if (!myPlayer.hasFather(FoundingFather.WILLIAM_BREWSTER)) {
+            slot = Integer.parseInt(reply.getAttribute("slot"));
+        }
+
         Unit unit = new Unit(game, (Element) reply.getChildNodes().item(0));
         int newRecruitable = Integer.parseInt(reply.getAttribute("newRecruitable"));
         europe.emigrate(slot, unit, newRecruitable);
@@ -962,7 +973,7 @@ public final class InGameController {
         if (unit != null) {
             unit.skip();
         }
-        
+
         nextActiveUnit();
     }
 
@@ -979,7 +990,7 @@ public final class InGameController {
 
     /**
     * Makes a new unit active.
-    */    
+    */
     public void nextActiveUnit() {
         nextActiveUnit(null);
     }
@@ -1008,7 +1019,7 @@ public final class InGameController {
         }
     }
 
-    
+
     /**
     * Displays the next <code>ModelMessage</code>.
     * @see net.sf.freecol.common.model.ModelMessage ModelMessage
@@ -1064,9 +1075,9 @@ public final class InGameController {
         Element endTurnElement = Message.createNewRootElement("endTurn");
         client.send(endTurnElement);
     }
-    
-    
-    
+
+
+
 
     /**
     * Convenience method: returns the first child element with the
