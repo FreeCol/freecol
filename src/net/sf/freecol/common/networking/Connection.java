@@ -115,11 +115,20 @@ public class Connection {
     * @throws IOException
     */
     public void reallyClose() throws IOException {
-        thread.stopWorking();
+        if (out != null) {
+            out.close();
+        }
 
-        out.close();
-        in.close();
-        socket.close();
+        //in.close();   <-- Closed by the 'ReceivingThread'
+        if (socket != null) {
+            socket.close();
+        }
+        
+        if (thread != null) {
+            thread.stopWorking();
+        }
+        
+        logger.info("Connection closed.");
     }
 
 

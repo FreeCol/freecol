@@ -114,7 +114,7 @@ final class ReceivingThread extends Thread {
                 buffer.setLength(0);
                 
                 int i = reader.read();
-                while (i != -1 && ((char) i) != '\0') {
+                while (!halt && i != -1 && ((char) i) != '\0') {
                     buffer.append(((char) i));
                     i = reader.read();
                 }
@@ -123,6 +123,7 @@ final class ReceivingThread extends Thread {
                     break;
                 } else {
                     // Just close the connection for now.
+                    halt = true;
                     break;
                 }
             } catch(IOException e) {
@@ -131,6 +132,8 @@ final class ReceivingThread extends Thread {
                 } else {
                     logger.warning("Could not read from socket.");
                     e.printStackTrace();
+                    halt = true;
+                    break;
                 }
             }
 
@@ -196,5 +199,11 @@ final class ReceivingThread extends Thread {
     */
     void stopWorking() {
         halt = true;
+
+        try {
+            reader.close();
+        } catch (IOException e) {
+            logger.warning("Could not close input stream!");
+        }
     }
 }

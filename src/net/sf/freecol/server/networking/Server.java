@@ -16,6 +16,9 @@ import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.server.control.UserConnectionHandler;
 import net.sf.freecol.server.FreeColServer;
 
+import java.io.StringWriter;
+import java.io.PrintWriter;
+
 import org.w3c.dom.Element;
 
 
@@ -106,7 +109,10 @@ public final class Server extends Thread {
                     Connection connection = new Connection(clientSocket, freeColServer.getUserConnectionHandler());
                     connections.put(clientSocket, connection);
                 } catch (IOException e) {
-                    logger.warning("Accept/connect exception " + e.toString());
+                    StringWriter sw = new StringWriter();
+                    e.printStackTrace(new PrintWriter(sw));
+
+                    logger.warning(sw.toString());
                 }
             }
         }
@@ -195,6 +201,21 @@ public final class Server extends Thread {
             // Nothing to do here... just waiting for the server thread to finish.
             // For more info see the run() method
         }
+        
+        Iterator connectionsIterator = connections.values().iterator();
+        while (connectionsIterator.hasNext()) {
+            Connection c = (Connection) connectionsIterator.next();
+            
+            try {
+                if (c != null) {
+                    c.reallyClose();
+                }
+            } catch (IOException e) {
+                logger.warning("Could not close the connection.");
+            }
+        }
+        
+        logger.info("Server shutdown.");
     }
 
 

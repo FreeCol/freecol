@@ -51,8 +51,7 @@ public abstract class Controller {
 
             server.shutdown();
             freeColServer = null;
-        }
-        else {
+        } else {
             logger.warning("Server object is null while trying to shut down server.");
 
             freeColServer = null;

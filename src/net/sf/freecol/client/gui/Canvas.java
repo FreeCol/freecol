@@ -887,8 +887,9 @@ public final class Canvas extends JLayeredPane {
      * Displays a quit dialog and, if desired, logouts the current game and shows the new game panel.
      */
     public void newGame() {
-        if(!confirmQuitDialog())
+        if(!confirmQuitDialog()) {
             return;
+        }
 
         freeColClient.getConnectController().quitGame(true);
         removeInGameComponents();

@@ -257,7 +257,7 @@ public final class ConnectController {
                 freeColClient.setLoggedIn(false);
             }
         }
-        
+
         if (freeColClient.isLoggedIn()) {
             logout(notifyServer);
         }
