@@ -90,7 +90,7 @@ public final class UserConnectionHandler implements MessageHandler {
 
 
         if (!element.getAttribute("freeColVersion").equals(FreeCol.getVersion())) {
-            return Message.createError("server.wrongFreeColVersion", "The game versions does not match.");
+            return Message.createError("server.wrongFreeColVersion", "The game versions do not match.");
         }
 
 
@@ -110,7 +110,8 @@ public final class UserConnectionHandler implements MessageHandler {
 
 
         // Create and add the new player:
-        ServerPlayer newPlayer = new ServerPlayer(freeColServer.getGame(), username, false, connection.getSocket(), connection);
+        boolean admin = (freeColServer.getGame().getPlayers().size() == 0);
+        ServerPlayer newPlayer = new ServerPlayer(freeColServer.getGame(), username, admin, connection.getSocket(), connection);
         freeColServer.getGame().addPlayer(newPlayer);
 
         // Send message to all players except to the new player:
@@ -122,7 +123,7 @@ public final class UserConnectionHandler implements MessageHandler {
 
         // Make the reply:
         Element reply = Message.createNewRootElement("loginConfirmed");
-        reply.setAttribute("admin", "false");
+        reply.setAttribute("admin", (admin ? "true" : "false"));
         reply.appendChild(freeColServer.getGame().toXMLElement(newPlayer, reply.getOwnerDocument()));
         
         return reply;

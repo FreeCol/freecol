@@ -3,6 +3,8 @@ package net.sf.freecol.server.control;
 
 import java.awt.Color;
 import java.net.Socket;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Vector;
 import java.util.logging.Logger;
 import org.w3c.dom.Element;
@@ -160,9 +162,57 @@ public final class PreGameInputHandler implements MessageHandler {
     * @param element The element containing the request.
     */
     private Element requestLaunch(Connection connection, Element element) {
-        // TODO: Check if launching player is an admin
-        // TODO: Check that no two players have the same color or nation
 
+        ServerPlayer launchingPlayer = freeColServer.getPlayer(connection);
+        
+        // Check if launching player is an admin.
+        if (!launchingPlayer.isAdmin()) {
+            Element reply = Message.createNewRootElement("error");
+            reply.setAttribute("message", "Sorry, only the server admin can launch the game.");
+            reply.setAttribute("messageID", "server.onlyAdminCanLaunch");
+
+            return reply;
+        }
+        
+        // Check that no two players have the same color or nation
+        Iterator playerIterator = freeColServer.getGame().getPlayerIterator();
+        
+        LinkedList nations = new LinkedList();
+        LinkedList colors = new LinkedList();
+        
+        while (playerIterator.hasNext()) {
+            ServerPlayer player = (ServerPlayer) playerIterator.next();
+            
+            final int nation = player.getNation();
+            final Color color = player.getColor();
+            
+            // Check the nation.
+            for (int i = 0; i < nations.size(); i++) {
+                if (((Integer)nations.get(i)).intValue() == nation) {
+                    Element reply = Message.createNewRootElement("error");
+                    reply.setAttribute("message",
+                        "All players need to pick a unique nation before the game can start.");
+                    reply.setAttribute("messageID", "server.invalidPlayerNations");
+
+                    return reply;
+                }
+            }
+            nations.add(new Integer(nation));
+            
+            // Check the color.
+            for (int i = 0; i < colors.size(); i++) {
+                if (((Color)colors.get(i)) == color) {
+                    Element reply = Message.createNewRootElement("error");
+                    reply.setAttribute("message",
+                        "All players need to pick a unique color before the game can start.");
+                    reply.setAttribute("messageID", "server.invalidPlayerColors");
+
+                    return reply;
+                }
+            }
+            colors.add(color);
+        }
+        
         // Check if all players are ready.
         if (!freeColServer.getGame().isAllPlayersReadyToLaunch()) {
             Element reply = Message.createNewRootElement("error");
