@@ -1839,7 +1839,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     * Returns the amount of units/cargo that this unit can carry.
     * @return The amount of units/cargo that this unit can carry.
     */
-    private int getInitialSpaceLeft() {
+    public int getInitialSpaceLeft() {
         switch (type) {
             case CARAVEL:
                 return 2;
@@ -2353,6 +2353,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             }
         } else if (isNaval()) {
             //TODO: seizure of cargo and the like. For now just sink.
+            Iterator iter = defender.getGoodsIterator();
+            while(iter.hasNext())
+            {
+                //addModelMessage();
+            }
             defender.dispose();
         } else if (!(defender.isArmed()) && !(defender.getType() == ARTILLERY) && !(defender.getType() == DAMAGED_ARTILLERY)) {
             if (defender.isMounted()) {
