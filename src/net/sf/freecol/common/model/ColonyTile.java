@@ -333,12 +333,11 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation {
                 amount = 0;
             }
 
-            if (amount > 0) {
+            /*if (amount > 0) {
                 amount += colony.getProductionBonus();
-                return amount;
-            }
-
-            return 0;
+            }*/
+            
+            return Math.max(0, amount);
         } else {
             if (goodsType == Goods.FOOD) {
                 return workTile.potential(Goods.FOOD);
