@@ -17,6 +17,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.JScrollPane;
 import javax.swing.border.BevelBorder;
 
@@ -345,6 +346,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         // Place new components on the panels.
         //
 
+        UnitLabel carrier = null;
         Iterator unitIterator = europe.getUnitIterator();
         while (unitIterator.hasNext()) {
             Unit unit = (Unit) unitIterator.next();
@@ -356,6 +358,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             if (((unit.getState() == Unit.ACTIVE) || (unit.getState() == Unit.SENTRY)) && (!unit.isNaval())) {
                 docksPanel.add(unitLabel, false);
             } else if (unit.getState() == Unit.ACTIVE) {
+                carrier = unitLabel;
                 inPortPanel.add(unitLabel);
             } else if (unit.getState() == Unit.TO_EUROPE) {
                 toEuropePanel.add(unitLabel, false);
@@ -371,14 +374,24 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             ((JPanel)marketPanel).add(marketLabel);
         }
 
-
-        setSelectedUnit(null);
+        setSelectedUnit(carrier);
+        updateGoldLabel();
+    }
+    
+    
+    /**
+    * Updates the gold label.
+    */
+    public void updateGoldLabel() {
         goldLabel.setText("Gold: " + freeColClient.getMyPlayer().getGold());
     }
 
-    
+
+    /**
+    * Reinitializes the panel, but keeps the currently selected unit.
+    */
     public void reinitialize() {
-        UnitLabel selectedUnit = this.selectedUnit;
+        final UnitLabel selectedUnit = this.selectedUnit;
         initialize(europe, game);
         setSelectedUnit(selectedUnit);
     }
@@ -881,9 +894,9 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         }
     }
 
-    
-    
-    
+
+
+
 
     /**
     * A panel that holds units and goods that represent Units and cargo that are
@@ -916,6 +929,10 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         * @return The component argument.
         */
         public Component add(Component comp, boolean editState) {
+            if (selectedUnit == null) {
+                return null;
+            }
+
             if (editState) {
                 if (comp instanceof UnitLabel) {
                     comp.getParent().remove(comp);
@@ -1106,13 +1123,11 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         public void initialize() {
             if ((game != null) && (freeColClient.getMyPlayer() != null)) {
                 price.setText(Integer.toString(freeColClient.getMyPlayer().getRecruitPrice()) + " gold");
-                try {
-                    person1.setText(Unit.getName(europe.getRecruitable(1)));
-                    person2.setText(Unit.getName(europe.getRecruitable(2)));
-                    person3.setText(Unit.getName(europe.getRecruitable(3)));
-                } catch (FreeColException e) {
-                    e.printStackTrace();
-                }
+
+                person1.setText(Unit.getName(europe.getRecruitable(1)));
+                person2.setText(Unit.getName(europe.getRecruitable(2)));
+                person3.setText(Unit.getName(europe.getRecruitable(3)));
+
 
                 if (freeColClient.getMyPlayer().getRecruitPrice() > freeColClient.getMyPlayer().getGold()) {
                     person1.setEnabled(false);
@@ -1157,18 +1172,12 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     frigateLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.FRIGATE)));
             JButton cancel = new JButton("Cancel");
 
-            try {
-                artilleryButton = new JButton(Unit.getName(Unit.ARTILLERY));
-                caravelButton = new JButton(Unit.getName(Unit.CARAVEL));
-                merchantmanButton = new JButton(Unit.getName(Unit.MERCHANTMAN));
-                galleonButton = new JButton(Unit.getName(Unit.GALLEON));
-                privateerButton = new JButton(Unit.getName(Unit.PRIVATEER));
-                frigateButton = new JButton(Unit.getName(Unit.FRIGATE));
-            }
-            catch (FreeColException e) {
-                e.printStackTrace();
-                return;
-            }
+            artilleryButton = new JButton(Unit.getName(Unit.ARTILLERY));
+            caravelButton = new JButton(Unit.getName(Unit.CARAVEL));
+            merchantmanButton = new JButton(Unit.getName(Unit.MERCHANTMAN));
+            galleonButton = new JButton(Unit.getName(Unit.GALLEON));
+            privateerButton = new JButton(Unit.getName(Unit.PRIVATEER));
+            frigateButton = new JButton(Unit.getName(Unit.FRIGATE));
 
             question.setSize(300, 20);
             question2.setSize(300, 20);
@@ -1347,28 +1356,23 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     veteranSoldierLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.VETERAN_SOLDIER)));
             JButton cancel = new JButton("Cancel");
 
-            try {
-                expertOreMinerButton = new JButton(Unit.getName(Unit.EXPERT_ORE_MINER));
-                expertLumberJackButton = new JButton(Unit.getName(Unit.EXPERT_LUMBER_JACK));
-                masterGunsmithButton = new JButton(Unit.getName(Unit.MASTER_GUNSMITH));
-                expertSilverMinerButton = new JButton(Unit.getName(Unit.EXPERT_SILVER_MINER));
-                masterFurTraderButton = new JButton(Unit.getName(Unit.MASTER_FUR_TRADER));
-                masterCarpenterButton = new JButton(Unit.getName(Unit.MASTER_CARPENTER));
-                expertFishermanButton = new JButton(Unit.getName(Unit.EXPERT_FISHERMAN));
-                masterBlacksmithButton = new JButton(Unit.getName(Unit.MASTER_BLACKSMITH));
-                expertFarmerButton = new JButton(Unit.getName(Unit.EXPERT_FARMER));
-                masterDistillerButton = new JButton(Unit.getName(Unit.MASTER_DISTILLER));
-                hardyPioneerButton = new JButton(Unit.getName(Unit.HARDY_PIONEER));
-                masterTobacconistButton = new JButton(Unit.getName(Unit.MASTER_TOBACCONIST));
-                masterWeaverButton = new JButton(Unit.getName(Unit.MASTER_WEAVER));
-                jesuitMissionaryButton = new JButton(Unit.getName(Unit.JESUIT_MISSIONARY));
-                firebrandPreacherButton = new JButton(Unit.getName(Unit.FIREBRAND_PREACHER));
-                elderStatesmanButton = new JButton(Unit.getName(Unit.ELDER_STATESMAN));
-                veteranSoldierButton = new JButton(Unit.getName(Unit.VETERAN_SOLDIER));
-            } catch (FreeColException e) {
-                e.printStackTrace();
-                return;
-            }
+            expertOreMinerButton = new JButton(Unit.getName(Unit.EXPERT_ORE_MINER));
+            expertLumberJackButton = new JButton(Unit.getName(Unit.EXPERT_LUMBER_JACK));
+            masterGunsmithButton = new JButton(Unit.getName(Unit.MASTER_GUNSMITH));
+            expertSilverMinerButton = new JButton(Unit.getName(Unit.EXPERT_SILVER_MINER));
+            masterFurTraderButton = new JButton(Unit.getName(Unit.MASTER_FUR_TRADER));
+            masterCarpenterButton = new JButton(Unit.getName(Unit.MASTER_CARPENTER));
+            expertFishermanButton = new JButton(Unit.getName(Unit.EXPERT_FISHERMAN));
+            masterBlacksmithButton = new JButton(Unit.getName(Unit.MASTER_BLACKSMITH));
+            expertFarmerButton = new JButton(Unit.getName(Unit.EXPERT_FARMER));
+            masterDistillerButton = new JButton(Unit.getName(Unit.MASTER_DISTILLER));
+            hardyPioneerButton = new JButton(Unit.getName(Unit.HARDY_PIONEER));
+            masterTobacconistButton = new JButton(Unit.getName(Unit.MASTER_TOBACCONIST));
+            masterWeaverButton = new JButton(Unit.getName(Unit.MASTER_WEAVER));
+            jesuitMissionaryButton = new JButton(Unit.getName(Unit.JESUIT_MISSIONARY));
+            firebrandPreacherButton = new JButton(Unit.getName(Unit.FIREBRAND_PREACHER));
+            elderStatesmanButton = new JButton(Unit.getName(Unit.ELDER_STATESMAN));
+            veteranSoldierButton = new JButton(Unit.getName(Unit.VETERAN_SOLDIER));
 
             question.setSize(300, 20);
             question2.setSize(300, 20);

@@ -131,7 +131,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
     public void paintComponent(Graphics g) {
         if (selected) {
             setEnabled(true);
-        } else if (unit.isNaval()) {
+        } else if (unit.isCarrier()) {
             setEnabled(false);
         } else {
             setEnabled(true);
@@ -198,9 +198,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
                         inGameController.equipUnit(unit, Goods.HORSES, ((unit.isMounted()) ? 0 : 50));
                         break;
                     case TOOLS:
-                        if (!unit.isArmed() && !unit.isMounted()) {
-                          inGameController.equipUnit(unit, Goods.TOOLS, ((unit.isPioneer()) ? 0 : 100));
-                        }
+                        inGameController.equipUnit(unit, Goods.TOOLS, ((unit.isPioneer()) ? 0 : 100));
                         break;
                     case DRESS:
                         inGameController.equipUnit(unit, Goods.CROSSES, ((unit.isMissionary()) ? 0 : 1));
@@ -237,26 +235,26 @@ public final class UnitLabel extends JLabel implements ActionListener {
                 Component uc = getParent();
                 while (uc != null) {
                     if (uc instanceof ColonyPanel) {
-                        ((ColonyPanel) uc).reinitialize();
+                        if (unit.getTile() != null && unit.getTile().getColony() == null) {
+                            parent.remove(uc);
+                            parent.showMapControls();
+                        } else {
+                            ((ColonyPanel) uc).reinitialize();
+                        }
+
                         break;
                     } else if (uc instanceof EuropePanel) {
-                        ((EuropePanel) uc).reinitialize();
+                        //((EuropePanel) uc).reinitialize();
+                        EuropePanel ep = (EuropePanel) uc;
+                        ep.updateGoldLabel();
                         break;
                     }
 
                     uc = uc.getParent();
                 }
 
-                if (unit.getTile() != null && unit.getTile().getColony() == null) {
-                    parent.remove(uc);
-                    parent.showMapControls();
-                }
-
-                repaint(0, 0, getWidth(), getHeight());
-
-
-                // TODO: Refresh the gold label when goods have prices.
-                //goldLabel.repaint(0, 0, goldLabel.getWidth(), goldLabel.getHeight());
+                //repaint(0, 0, getWidth(), getHeight());
+                //uc.refresh();
             }
         }
         catch (NumberFormatException e) {

@@ -21,9 +21,9 @@ public final class FullScreenFrame extends JFrame {
     private final BufferStrategy bufferStrategy;
     private Canvas canvas;
 
-    
-    
-    
+
+
+
 
     /**
     * The constructor to use.
@@ -31,12 +31,13 @@ public final class FullScreenFrame extends JFrame {
     public FullScreenFrame(GraphicsDevice gd) {
         super(gd.getDefaultConfiguration());
         logger.info("FullScreenFrame's JFrame created.");
-        
+
         setUndecorated(true);
         //setIgnoreRepaint(true);
 
         gd.setFullScreenWindow(this);
         logger.info("Switched to full screen mode.");
+
         createBufferStrategy(2);
         bufferStrategy = getBufferStrategy();
 
@@ -46,8 +47,8 @@ public final class FullScreenFrame extends JFrame {
     }
 
 
-    
-    
+
+
 
     public void setCanvas(Canvas canvas) {
         this.canvas = canvas;
@@ -61,20 +62,20 @@ public final class FullScreenFrame extends JFrame {
     public void display() {
         if (bufferStrategy != null) {
             Graphics2D g = (Graphics2D)bufferStrategy.getDrawGraphics();
-            
+
             if (!bufferStrategy.contentsLost()) {
                 super.paint(g);
                 /*if (canvas != null) {
                     canvas.paintComponent(g);
                 }*/
-                
+
                 bufferStrategy.show();
                 g.dispose();
             }
         }
     }
-    
-    
+
+
     /**
     * Draws this frame on the screen. Should never be called manually. It will be
     * called by Swing whenever needed.
@@ -83,7 +84,7 @@ public final class FullScreenFrame extends JFrame {
     public void paint(Graphics g) {
         display();
     }
-    
+
 
     /**
     * Adds a component to this FullScreenFrame.
@@ -92,4 +93,5 @@ public final class FullScreenFrame extends JFrame {
     public void addComponent(JComponent c) {
         canvas.add(c);
     }
+
 }

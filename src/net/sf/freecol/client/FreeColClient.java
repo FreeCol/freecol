@@ -79,7 +79,7 @@ public final class FreeColClient {
 
 
     /**
-    * Creates a new <code>FreeColClient</code>. Creates the control 
+    * Creates a new <code>FreeColClient</code>. Creates the control
     * objects and starts the GUI.
     */
     public FreeColClient(boolean windowed, ImageLibrary imageLibrary, MusicLibrary musicLibrary, SfxLibrary sfxLibrary) {
@@ -97,6 +97,7 @@ public final class FreeColClient {
 
         // Gui:
         startGUI(windowed, imageLibrary, musicLibrary, sfxLibrary);
+
     }
 
 
@@ -107,8 +108,6 @@ public final class FreeColClient {
     * Starts the GUI by creating and displaying the GUI-objects.
     */
     private void startGUI(boolean windowed, ImageLibrary lib, MusicLibrary musicLibrary, SfxLibrary sfxLibrary) {
-        // TODO: Show splash-screen
-
         if (musicLibrary != null) {
             musicPlayer = new SoundPlayer(false, true, true);
         } else {
@@ -127,11 +126,12 @@ public final class FreeColClient {
         if (GraphicsEnvironment.isHeadless()) {
             logger.info("It seems that the GraphicsEnvironment is headless!");
         }
-
+        
+        GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+        
         if (windowed) {
             frame = new WindowedFrame();
         } else {
-            GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
             if (!gd.isFullScreenSupported()) {
                 logger.warning("It seems that full screen mode is not supported for this GraphicsDevice! Using windowed mode instead.");
 
@@ -154,11 +154,11 @@ public final class FreeColClient {
 
         frame.getContentPane().add(canvas);
 
-        if (!windowed) {
-            frame.repaint();
-        }
-        
         frame.setVisible(true);
+        
+        if (!windowed) {
+            ((FullScreenFrame) frame).display();
+        }
     }
 
 

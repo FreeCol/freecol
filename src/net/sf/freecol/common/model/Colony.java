@@ -26,6 +26,7 @@ public final class Colony extends Settlement implements Location {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
+    public static final int BUILDING_UNIT_ADDITION = 1000;
 
     /** The name of the colony. */
     private String name;
@@ -37,6 +38,13 @@ public final class Colony extends Settlement implements Location {
 
     private int hammers;
     private int bells;
+    
+    /**
+    * The type of the "Building" that is beeing built,
+    * or if <code>currentlyBuilding >= BUILDING_UNIT_ADDITION</code>
+    * the type of the <code>Unit</code> (+BUILDING_UNIT_ADDITION)
+    * that is currently beeing build
+    */
     private int currentlyBuilding;
 
     /**
@@ -131,7 +139,7 @@ public final class Colony extends Settlement implements Location {
         while (unitIterator.hasNext()) {
             ((Unit)unitIterator.next()).setOwner(owner);
         }
-        
+
         Iterator tileUnitIterator = getTile().getUnitIterator();
         while (tileUnitIterator.hasNext()) {
             Unit target = (Unit) tileUnitIterator.next();
@@ -290,7 +298,7 @@ public final class Colony extends Settlement implements Location {
 
                 logger.warning("Could not find a 'WorkLocation' for " + locatable + " in " + this);
             } else {
-                getTile().add(locatable);
+                locatable.setLocation(getTile());
             }
         } else if (locatable instanceof Goods) {
             goodsContainer.addGoods((Goods)locatable);
@@ -429,6 +437,12 @@ public final class Colony extends Settlement implements Location {
         int required = 0;
         int tools = 0;
 
+        // Building a unit:
+        if (currentlyBuilding >= BUILDING_UNIT_ADDITION) {
+            hammers += amount;
+            return;
+        }
+
         if (getBuilding(currentlyBuilding).getNextPop() > getUnitCount()) {
             // TODO: Show error: not enough colonists to build the given building.
             return;
@@ -458,13 +472,14 @@ public final class Colony extends Settlement implements Location {
     
     /**
     * Adds the given unit to this colony. If <code>unit.isColonist()</code>
-    * then 300 food is removed, else hammers is set to 0.
+    * then 300 food is removed, else hammers and tools are removed.
     */
     public void createUnit(Unit unit) {
         if (unit.isColonist()) {
             removeGoods(Goods.FOOD, 300);
         } else {
             hammers = 0;
+            removeGoods(Goods.TOOLS, Unit.getNextTools(unit.getType()));
         }
 
         unit.setLocation(this);

@@ -155,7 +155,7 @@ public final class InGameController {
 
         unit.move(direction);
 
-        if (unit.getTile().getSettlement() != null) {
+        if (unit.getTile().getSettlement() != null && unit.isCarrier()) {
             canvas.showColonyPanel((Colony) unit.getTile().getSettlement());
         } else if (unit.getMovesLeft() > 0) {
             gui.setActiveUnit(unit);
@@ -482,10 +482,15 @@ public final class InGameController {
 
         if (unit.getLocation() instanceof ColonyTile || unit.getLocation() instanceof Building) {
             if (!putOutsideColony(unit)) {
+                unit.setMissionary(false);
+                unit.setArmed(false);
+                unit.setMounted(false);
+                unit.setNumberOfTools(0);
+
                 return;
             }
         }
-        
+
         if (carrier != null) {
             boardShip(unit, carrier);
         }

@@ -224,8 +224,9 @@ public final class InGameInputHandler implements MessageHandler {
         int total_probability = attack_power + defender.getDefensePower(unit);
         int result = Unit.ATTACKER_LOSS; // Assume this until otherwise calculated.
 
-        if ((attackCalculator.nextInt(total_probability)) <= attack_power) {
+        if ((attackCalculator.nextInt(total_probability+1)) <= attack_power) {
             result = Unit.ATTACKER_WIN;
+        } else {
         }
 
         // Inform the other players (other then the player attacking) about the attack:
@@ -810,7 +811,7 @@ public final class InGameInputHandler implements MessageHandler {
             Element newTurnElement = Message.createNewRootElement("newTurn");
             freeColServer.getServer().sendToAll(newTurnElement, null);
 
-            createColonistsInColonies();
+            createUnitsInColonies();
         }
 
         game.setCurrentPlayer(nextPlayer);
@@ -833,9 +834,10 @@ public final class InGameInputHandler implements MessageHandler {
 
 
     /**
-    * Creates a colonist in every colony having more than 300 food.
+    * Creates a colonist in every colony having more than 300 food
+    * and builds a unit if choosen and completed.
     */
-    private void createColonistsInColonies() {
+    private void createUnitsInColonies() {
         Game game = freeColServer.getGame();
         Map map = game.getMap();
 
@@ -849,7 +851,7 @@ public final class InGameInputHandler implements MessageHandler {
                 Element createUnitElement = Message.createNewRootElement("createUnit");
                 createUnitElement.setAttribute("location", colony.getID());
                 createUnitElement.appendChild(unit.toXMLElement(colony.getOwner(), createUnitElement.getOwnerDocument()));
-                
+
                 colony.createUnit(unit);
 
                 ServerPlayer player = ((ServerPlayer) colony.getOwner());
@@ -858,6 +860,31 @@ public final class InGameInputHandler implements MessageHandler {
                     player.getConnection().send(createUnitElement);
                 } catch (IOException e) {
                     logger.warning("Could not send message to: " + player.getName() + " with connection " + player.getConnection());
+                }
+            }
+
+            if (tile.getColony() != null && tile.getColony().getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) {
+                int unitType = tile.getColony().getCurrentlyBuilding() - Colony.BUILDING_UNIT_ADDITION;
+                
+                if (Unit.getNextHammers(unitType) <= tile.getColony().getHammers() &&
+                    Unit.getNextTools(unitType) <= tile.getColony().getGoodsCount(Goods.TOOLS)) {
+
+                    Colony colony = tile.getColony();
+                    Unit unit = new Unit(game, null, colony.getOwner(), unitType, Unit.ACTIVE);
+
+                    Element createUnitElement = Message.createNewRootElement("createUnit");
+                    createUnitElement.setAttribute("location", colony.getID());
+                    createUnitElement.appendChild(unit.toXMLElement(colony.getOwner(), createUnitElement.getOwnerDocument()));
+
+                    colony.createUnit(unit);
+
+                    ServerPlayer player = ((ServerPlayer) colony.getOwner());
+
+                    try {
+                        player.getConnection().send(createUnitElement);
+                    } catch (IOException e) {
+                        logger.warning("Could not send message to: " + player.getName() + " with connection " + player.getConnection());
+                    }
                 }
             }
         }

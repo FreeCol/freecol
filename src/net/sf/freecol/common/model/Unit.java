@@ -322,11 +322,16 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         }
 
         // Check for an 'attack' instead of 'move'.
-        if ((target.getUnitCount() > 0) && 
+        if ((target.getUnitCount() > 0) &&
             (target.getDefendingUnit(this) != null) &&
             (target.getDefendingUnit(this).getNation() != getNation())
             && ((target.isLand() && !isNaval()) || (isNaval() && !target.isLand()))) {
-            return ATTACK;
+
+            if (getOffensePower(target.getDefendingUnit(this)) == 0) {
+                return ILLEGAL_MOVE;
+            } else {
+                return ATTACK;
+            }
         }
 
         // Check for disembark.
@@ -371,7 +376,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         return MOVE;
     }
 
-    
+
     /**
     * Gets the amount of space this <code>Unit</code> takes when put on a carrier.
     *
@@ -525,9 +530,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     */
     public void add(Locatable locatable) {
         if (isCarrier()) {
-
             if (locatable instanceof Unit) {
-                if (getSpaceLeft() <= 0) {
+                if (getSpaceLeft() <= 0 || getType() == WAGON_TRAIN) {
                     throw new IllegalStateException();
                 }
 
@@ -603,6 +607,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     */
     public boolean canAdd(Locatable locatable) {
         if (isCarrier()) {
+            if (getType() == WAGON_TRAIN && locatable instanceof Unit) {
+                return false;
+            }
+
             return getSpaceLeft() >= locatable.getTakeSpace();
         } else {
             return false;
@@ -656,7 +664,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     * @return The <code>Iterator</code>.
     */
     public Iterator getUnitIterator() {
-        if (isCarrier()) {
+        if (isCarrier() && getType() != WAGON_TRAIN) {
             return unitContainer.getUnitIterator();
         } else { // TODO: Make a better solution:
             return (new ArrayList()).iterator();
@@ -742,6 +750,45 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         }
     }
 
+    
+    /**
+    * Checks if this unit can be armed in the current location.
+    */
+    public boolean canArm() {
+        return isArmed() || getGoodsDumpLocation() != null && getGoodsDumpLocation().getGoodsCount(Goods.MUSKETS) >= 50 ||
+               (location instanceof Europe || location instanceof Unit && ((Unit) location).getLocation() instanceof Europe) &&
+               getOwner().getGold() >= getGame().getMarket().getBidPrice(Goods.MUSKETS, 50);
+    }
+
+
+    /**
+    * Checks if this unit can be mounted in the current location.
+    */
+    public boolean canMount() {
+        return isMounted() || getGoodsDumpLocation() != null && getGoodsDumpLocation().getGoodsCount(Goods.HORSES) >= 50 ||
+               (location instanceof Europe || location instanceof Unit && ((Unit) location).getLocation() instanceof Europe)
+               && getOwner().getGold() >= getGame().getMarket().getBidPrice(Goods.HORSES, 50);
+    }
+
+
+    /**
+    * Checks if this unit can be equiped with tools in the current location.
+    */
+    public boolean canEquipWithTools() {
+        return isPioneer() || getGoodsDumpLocation() != null && getGoodsDumpLocation().getGoodsCount(Goods.TOOLS) >= 20 ||
+               (location instanceof Europe || location instanceof Unit && ((Unit) location).getLocation() instanceof Europe)
+               && getOwner().getGold() >= getGame().getMarket().getBidPrice(Goods.TOOLS, 20);
+    }
+
+
+    /**
+    * Checks if this unit can be dressed as a missionary at the current location.
+    */
+    public boolean canDressAsMissionary() {
+        return isMissionary() || ((location instanceof Europe || location instanceof Unit && ((Unit) location).getLocation() 
+               instanceof Europe) || getTile() != null && getTile().getColony().getBuilding(Building.CHURCH).isBuilt());
+    }
+
 
     /**
     * Sets the armed attribute of this unit.
@@ -758,7 +805,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             if (isPioneer()) {
                 setNumberOfTools(0);
             }
-            
+
             if (isMissionary()) {
                 setMissionary(false);
             }
@@ -1026,10 +1073,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     * otherwise.
     */
     public static boolean isCarrier(int type) {
-        if ((type == CARAVEL) || (type == GALLEON) || (type == FRIGATE) || (type == MAN_O_WAR) || (type == MERCHANTMAN) || (type == PRIVATEER)) {
+        if ((type == CARAVEL) || (type == GALLEON) || (type == FRIGATE) || (type == MAN_O_WAR) || (type == MERCHANTMAN) || (type == PRIVATEER) || (type == WAGON_TRAIN)) {
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
@@ -1111,9 +1157,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     * value can be used when communicating with the user.
     *
     * @return The given unit type as a String
-    * @throws FreeColException
+    * @throws IllegalArgumentException
     */
-    public static String getName(int someType) throws FreeColException {
+    public static String getName(int someType) {
         // TODO: Use i18n:
 
         switch (someType) {
@@ -1198,7 +1244,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             case MILKMAID:
                 return "Milkmaid";
             default:
-                throw new FreeColException("Unit has an invalid type.");
+                throw new IllegalArgumentException("Unit has an invalid type.");
         }
     }
 
@@ -1576,12 +1622,14 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                 return 4;
             case PRIVATEER:
                 return 2;
+            case WAGON_TRAIN:
+                return 2;
             default:
                 return 0;
         }
     }
-    
-  
+
+
     /**
     * Move the given unit to the front of this carrier (make sure
     * it'll be the first unit in this unit's unit list).
@@ -1913,29 +1961,29 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                 base_power++;
             }
         }
-        
+
         int modified_power = base_power;
-        
+
         //TODO: <1 move point movement penalty
-        
+
         if (isNaval()) {
             if (getGoodsCount() > 0) {
                 modified_power -= ((base_power * getGoodsCount()) / 8); // -12.5% penalty for every unit of cargo.
             }
             return modified_power;
         }
-        
+
+        if (getState() == FORTIFY) {
+            modified_power += (base_power / 2); // 50% fortify bonus
+        }
+
         if ((getTile() != null) && (getTile().getSettlement() != null) && (getTile().getSettlement() instanceof Colony) ) {
             Colony colony = ((Colony)getTile().getSettlement());
             switch(colony.getBuilding(Building.STOCKADE).getLevel()) {
                 case Building.NOT_BUILT:
                 default:
-                    if (getState() == FORTIFY) {
-                        modified_power += base_power; // 50% colony bonus + 50% fortify bonus = 100% bonus
-                    } else {
-                        modified_power += (base_power / 2); // 50% colony bonus
-                    }
-                    break;
+                    modified_power += (base_power / 2); // 50% colony bonus
+                     break;
                 case Building.HOUSE:
                     modified_power += base_power; // 100% stockade bonus
                     break;
@@ -1952,7 +2000,12 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             // Terrain defensive bonus.
             modified_power += ((base_power * getTile().defenseBonus()) / 100);
         }
-        
+
+        // Indian settlement defensive bonus.
+        if (getTile() != null && getTile().getSettlement() != null && getTile().getSettlement() instanceof IndianSettlement) {
+            modified_power += (base_power / 2); // 50% bonus
+        }
+
         if ((getType() == ARTILLERY) || (getType() == DAMAGED_ARTILLERY)) {
             if ((attacker.getType() == BRAVE) && (getTile().getSettlement() != null)) {
                 modified_power += base_power; // 100% defense bonus against an Indian raid
@@ -1961,8 +2014,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                 modified_power -= ((base_power * 3) / 4); // -75% Artillery in the Open penalty
             }
         }
-        
-        return base_power;
+
+        return modified_power;
     }
 
 
@@ -1978,7 +2031,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                 base_power = 1;
                 break;
             case VETERAN_SOLDIER:
-                base_power = 2;
+                if (isArmed()) {
+                    base_power = 2;
+                } else {
+                    base_power = 0;
+                }
                 break;
             case COLONIAL_REGULAR:
                 base_power = 3;
@@ -2303,6 +2360,24 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         }
 
         return base;
+    }
+
+    
+    public static int getNextHammers(int type) {
+        if (type == WAGON_TRAIN) {
+            return 40;
+        } else {
+            return -1;
+        }
+    }
+    
+    
+    public static int getNextTools(int type) {
+        if (type == WAGON_TRAIN) {
+            return 0;
+        } else {
+            return -1;
+        }
     }
 
 

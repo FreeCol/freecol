@@ -30,6 +30,7 @@ import org.w3c.dom.Element;
 import java.util.logging.Logger;
 import java.util.Iterator;
 import java.awt.Color;
+import javax.swing.SwingUtilities;
 
 
 
@@ -120,6 +121,7 @@ public final class InGameInputHandler implements MessageHandler {
 
         // TODO: Refresh only the updated tiles:
         freeColClient.getCanvas().refresh();
+
         return null;
     }
 
@@ -144,8 +146,8 @@ public final class InGameInputHandler implements MessageHandler {
                 logger.warning("Could not find 'FreeColGameObject' with ID: " + element.getAttribute("ID"));
             }
         }
-        
-        // TODO: Refresh only the updated tiles:        
+
+        // TODO: Refresh only the updated tiles:
         freeColClient.getCanvas().refresh();
         return null;
     }
@@ -160,14 +162,14 @@ public final class InGameInputHandler implements MessageHandler {
     private Element opponentMove(Element opponentMoveElement) {
         Game game = freeColClient.getGame();
         Map map = game.getMap();
-        
+
         Player currentPlayer = freeColClient.getMyPlayer();
 
         int direction = Integer.parseInt(opponentMoveElement.getAttribute("direction"));
 
         if (!opponentMoveElement.hasAttribute("tile")) {
             Unit unit = (Unit) game.getFreeColGameObject(opponentMoveElement.getAttribute("unit"));
-            
+
             if (unit == null) {
                 //throw new NullPointerException();
                 logger.warning("Could not find the 'unit' in 'opponentMove'.");
@@ -184,7 +186,7 @@ public final class InGameInputHandler implements MessageHandler {
 
             NodeList nl = opponentMoveElement.getElementsByTagName(Unit.getXMLElementTagName());
             Unit unit = new Unit(game, (Element) nl.item(0));
-            
+
             if (game.getFreeColGameObject(tileID) == null) {
                 logger.warning("Could not find tile with id: " + tileID);
             }
@@ -193,7 +195,7 @@ public final class InGameInputHandler implements MessageHandler {
 
         return null;
     }
-    
+
 
     /**
     * Handles an "opponentAttack"-message.
@@ -211,19 +213,19 @@ public final class InGameInputHandler implements MessageHandler {
         Unit unit = (Unit) game.getFreeColGameObject(opponentAttackElement.getAttribute("unit"));
         Unit defender = map.getNeighbourOrNull(direction, unit.getTile()).getDefendingUnit(unit);
         Player player = unit.getOwner();
-        
+
         if (result == Unit.ATTACKER_LOSS) {
             unit.loseAttack();
         } else {
             unit.winAttack(defender);
         }
-        
+
         freeColClient.getCanvas().refresh();
 
         return null;
     }
-    
-    
+
+
     /**
     * Handles a "setCurrentPlayer"-message.
     *
@@ -250,7 +252,7 @@ public final class InGameInputHandler implements MessageHandler {
         return null;
     }
 
-    
+
     private void removeUnitsOutsideLOS() {
         Player player = freeColClient.getMyPlayer();
         Map map = freeColClient.getGame().getMap();
@@ -288,7 +290,7 @@ public final class InGameInputHandler implements MessageHandler {
     */
     private Element newTurn(Element newTurnElement) {
         freeColClient.getGame().newTurn();
-        
+
         return null;
     }
 
@@ -303,7 +305,7 @@ public final class InGameInputHandler implements MessageHandler {
         Game game = freeColClient.getGame();
         Player player = (Player) game.getFreeColGameObject(element.getAttribute("player"));
         player.setDead(true);
-        
+
         return null;
     }
 
@@ -316,7 +318,7 @@ public final class InGameInputHandler implements MessageHandler {
     */
     private Element createUnit(Element element) {
         Game game = freeColClient.getGame();
-        
+
         Location location = (Location) game.getFreeColGameObject(element.getAttribute("location"));
         Unit unit = new Unit(game, (Element) element.getChildNodes().item(0));
 
@@ -324,10 +326,10 @@ public final class InGameInputHandler implements MessageHandler {
         //                           in order to make it possible to produce units
         //                           other places than the colonies.
         ((Colony) location).createUnit(unit);
-        
+
         return null;
     }
-    
+
 
     /**
     * Handles an "error"-message.

@@ -47,63 +47,16 @@ public final class DragListener extends MouseAdapter {
     */
     public void mousePressed(MouseEvent e) {
         JComponent comp = (JComponent)e.getSource();
-        
+
         //Does not work on some platforms:
         //if (e.isPopupTrigger() && (comp instanceof UnitLabel)) {
         if (e.getButton() == MouseEvent.BUTTON3 && (comp instanceof UnitLabel)) {
             UnitLabel unitLabel = (UnitLabel)comp;
             Unit tempUnit = unitLabel.getUnit();
 
-            // if (!tempUnit.isCarrier()) {
             if (tempUnit.isColonist()) {
                 JPopupMenu menu = new JPopupMenu("Unit");
                 JMenuItem menuItem;
-
-                if (!tempUnit.isPioneer() && !tempUnit.isMissionary()) {
-                    if (tempUnit.isArmed()) {
-                        menuItem = new JMenuItem("Disarm");
-                    } else {
-                        menuItem = new JMenuItem("Arm");
-                    }
-                    menuItem.setActionCommand(String.valueOf(UnitLabel.ARM));
-                    menuItem.addActionListener(unitLabel);
-                    menu.add(menuItem);
-                }
-
-                if (!tempUnit.isPioneer() && !tempUnit.isMissionary()) {
-                    if (tempUnit.isMounted()) {
-                        menuItem = new JMenuItem("Remove Horses");
-                    } else {
-                        menuItem = new JMenuItem("Mount");
-                    }
-                    menuItem.setActionCommand(String.valueOf(UnitLabel.MOUNT));
-                    menuItem.addActionListener(unitLabel);
-                    menu.add(menuItem);
-                }
-
-                if (!tempUnit.isArmed() && !tempUnit.isMounted() && !tempUnit.isMissionary()) {
-                    if (tempUnit.isPioneer()) {
-                        menuItem = new JMenuItem("Remove Tools");
-                    } else {
-                        menuItem = new JMenuItem("Equip with Tools");
-                    }
-                    menuItem.setActionCommand(String.valueOf(UnitLabel.TOOLS));
-                    menuItem.addActionListener(unitLabel);
-                    menu.add(menuItem);
-                }
-
-                if (!tempUnit.isArmed() && !tempUnit.isMounted() && !tempUnit.isPioneer() && (tempUnit.getLocation()
-                        instanceof Europe || tempUnit.getTile() != null && tempUnit.getTile().getColony().getBuilding(Building.CHURCH).isBuilt())) {
-
-                    if (tempUnit.isMissionary()) {
-                        menuItem = new JMenuItem("Take Off Silly Clothes");
-                    } else {
-                        menuItem = new JMenuItem("Dress as Missionaries");
-                    }
-                    menuItem.setActionCommand(String.valueOf(UnitLabel.DRESS));
-                    menuItem.addActionListener(unitLabel);
-                    menu.add(menuItem);
-                }
 
                 if (tempUnit.getLocation() instanceof ColonyTile) {
                     menuItem = new JMenuItem("Be a Farmer");
@@ -138,6 +91,54 @@ public final class DragListener extends MouseAdapter {
                     menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_SILVER));
                     menuItem.addActionListener(unitLabel);
                     menu.add(menuItem);
+
+                    menu.addSeparator();
+                }
+
+
+                if (!tempUnit.isPioneer() && !tempUnit.isMissionary() && tempUnit.canArm()) {
+                    if (tempUnit.isArmed()) {
+                        menuItem = new JMenuItem("Disarm");
+                    } else {
+                        menuItem = new JMenuItem("Arm");
+                    }
+                    menuItem.setActionCommand(String.valueOf(UnitLabel.ARM));
+                    menuItem.addActionListener(unitLabel);
+                    menu.add(menuItem);
+                }
+
+                if (!tempUnit.isPioneer() && !tempUnit.isMissionary() && tempUnit.canMount()) {
+                    if (tempUnit.isMounted()) {
+                        menuItem = new JMenuItem("Remove Horses");
+                    } else {
+                        menuItem = new JMenuItem("Mount");
+                    }
+                    menuItem.setActionCommand(String.valueOf(UnitLabel.MOUNT));
+                    menuItem.addActionListener(unitLabel);
+                    menu.add(menuItem);
+                }
+
+                if (!tempUnit.isArmed() && !tempUnit.isMounted() && !tempUnit.isMissionary() && tempUnit.canEquipWithTools()) {
+                    if (tempUnit.isPioneer()) {
+                        menuItem = new JMenuItem("Remove Tools");
+                    } else {
+                        menuItem = new JMenuItem("Equip with Tools");
+                    }
+                    menuItem.setActionCommand(String.valueOf(UnitLabel.TOOLS));
+                    menuItem.addActionListener(unitLabel);
+                    menu.add(menuItem);
+                }
+
+                if (!tempUnit.isArmed() && !tempUnit.isMounted() && !tempUnit.isPioneer() && tempUnit.canDressAsMissionary()) {
+
+                    if (tempUnit.isMissionary()) {
+                        menuItem = new JMenuItem("Take Off Silly Clothes");
+                    } else {
+                        menuItem = new JMenuItem("Dress as Missionaries");
+                    }
+                    menuItem.setActionCommand(String.valueOf(UnitLabel.DRESS));
+                    menuItem.addActionListener(unitLabel);
+                    menu.add(menuItem);
                 }
 
                 menu.show(comp, e.getX(), e.getY());
@@ -146,7 +147,7 @@ public final class DragListener extends MouseAdapter {
             TransferHandler handler = comp.getTransferHandler();
             handler.exportAsDrag(comp, e, TransferHandler.COPY);
 
-            if ((comp instanceof UnitLabel) && (((UnitLabel)comp).getUnit().isNaval())) {
+            if ((comp instanceof UnitLabel) && (((UnitLabel)comp).getUnit().isCarrier())) {
                 if (parentPanel instanceof EuropePanel) {
                     ((EuropePanel) parentPanel).setSelectedUnit((UnitLabel)comp);
                 } else if (parentPanel instanceof ColonyPanel) {

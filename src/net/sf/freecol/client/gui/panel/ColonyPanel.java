@@ -269,7 +269,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             unitLabel.addMouseListener(pressListener);
 
             //if (((unit.getState() == Unit.ACTIVE) || (unit.getState() == Unit.SENTRY)) && (!unit.isNaval())) {
-            if (!unit.isNaval() && !unit.isType(Unit.WAGON_TRAIN)) {
+            if (!unit.isCarrier()) {
                 outsideColonyPanel.add(unitLabel, false);
             } else {
                 inPortPanel.add(unitLabel);
@@ -310,7 +310,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     public void reinitialize() {
         initialize(colony, game);
     }
-    
+
 
     /**
     * Updates the label that is placed above the cargo panel. It shows the name
@@ -334,15 +334,19 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     */
     private void updateSoLLabel() {
         solLabel.setText("SoL: " + colony.getSoL() + "% (" + ((colony.getUnitCount() * colony.getSoL()) / 100) +
-                         "), Tory: " + colony.getTory() + "% (" + 
+                         "), Tory: " + colony.getTory() + "% (" +
                          (colony.getUnitCount() - ((colony.getUnitCount() * colony.getSoL()) / 100)) + ")");
     }
-    
+
     /**
     * Updates the building progress label.
     */
     private void updateProgressLabel() {
-        progressLabel.setText("Hammers: " + colony.getHammers() + "/" + colony.getBuilding(colony.getCurrentlyBuilding()).getNextHammers());
+        if (colony.getCurrentlyBuilding() < Colony.BUILDING_UNIT_ADDITION) {
+            progressLabel.setText("Hammers: " + colony.getHammers() + "/" + colony.getBuilding(colony.getCurrentlyBuilding()).getNextHammers());
+        } else {
+            progressLabel.setText("Hammers: " + colony.getHammers() + "/" + Unit.getNextHammers(colony.getCurrentlyBuilding() - Colony.BUILDING_UNIT_ADDITION));
+        }
     }
 
 
@@ -777,6 +781,10 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         * @return The component argument.
         */
         public Component add(Component comp, boolean editState) {
+            if (selectedUnit == null) {
+                return null;
+            }
+                    
             if (editState) {
                 if (comp instanceof UnitLabel) {
                     comp.getParent().remove(comp);
@@ -1006,12 +1014,12 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         public BuildingBox(ColonyPanel colonyPanel) {
             super();
             this.colonyPanel = colonyPanel;
-            
+
             buildingBoxListener = new BuildingBoxListener(this, colonyPanel);
             super.addActionListener(buildingBoxListener);
             super.setRenderer(new BuildingBoxRenderer());
         }
-        
+
         /**
         * Sets up the BuildingBox such that it contains the appropriate buildings.
         */
@@ -1029,13 +1037,13 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                         " (" +
                         Integer.toString(colonyPanel.getColony().getBuilding(i).getNextHammers()) +
                         " hammers");
-                        
+
                     if (colonyPanel.getColony().getBuilding(i).getNextTools() > 0) {
                         theText += ", " + Integer.toString(colony.getBuilding(i).getNextTools()) + " tools";
                     }
 
                     theText += ")";
-                    
+
                     BuildingBoxItem nextItem = new BuildingBoxItem(theText, i);
                     this.addItem(nextItem);
                     if (i == colonyPanel.getColony().getCurrentlyBuilding()) {
@@ -1043,18 +1051,36 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                     }
                 }
             }
+
+            String theText = new String(Unit.getName(Unit.WAGON_TRAIN) +
+                " (" + Unit.getNextHammers(Unit.WAGON_TRAIN) + " hammers");
+
+            if (Unit.getNextTools(Unit.WAGON_TRAIN) > 0) {
+                theText += ", " + Integer.toString(Unit.getNextTools(Unit.WAGON_TRAIN)) + " tools";
+            }
+
+            theText += ")";
+
+            int i = Unit.WAGON_TRAIN + Colony.BUILDING_UNIT_ADDITION;
+            BuildingBoxItem wagonTrainItem = new BuildingBoxItem(theText, i);
+            addItem(wagonTrainItem);
+            if (i == colonyPanel.getColony().getCurrentlyBuilding()) {
+                toSelect = wagonTrainItem;
+            }
+
             this.setSelectedItem(toSelect);
             super.addActionListener(buildingBoxListener);
             colonyPanel.updateProgressLabel();
         }
-        
+
         /**
         * Represents a type of building, and the text of the next building in that type.
         */
         public final class BuildingBoxItem {
             private final String text;
             private final int type;
-            
+
+
             /**
             * Sets up the text and the type.
             */
@@ -1062,7 +1088,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 this.text = text;
                 this.type = type;
             }
-            
+
             /**
             * Gets the text associated with this item.
             * @returns The text associated with this item.
@@ -1070,7 +1096,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             public String getText() {
                 return text;
             }
-            
+
             /**
             * Gets the building type associated with that item.
             * @returns The building type associated with this item.
@@ -1079,15 +1105,15 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 return type;
             }
         }
-        
+
         /**
         * The ActionListener for the BuildingBox.
         */
         public final class BuildingBoxListener implements ActionListener {
-        
+
             private ColonyPanel colonyPanel;
             private BuildingBox buildingBox;
-            
+
             /**
             * Sets up this BuildingBoxListener's buildingBox and colonyPanel.
             */
@@ -1096,7 +1122,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 this.buildingBox = buildingBox;
                 this.colonyPanel = colonyPanel;
             }
-            
+
             /**
             * Sets the ColonyPanel's Colony's type of building.
             */
@@ -1105,7 +1131,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 colonyPanel.updateProgressLabel();
             }
         }
-        
+
         /**
         * The ListCellRenderer for the BuildingBox.
         */
@@ -1118,7 +1144,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 setHorizontalAlignment(LEFT);
                 setVerticalAlignment(CENTER);
             }
-        
+
             /*
             * Displays the string associated with the BuildingBoxItem.
             */
@@ -1128,7 +1154,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                                             int index,
                                             boolean isSelected,
                                             boolean cellHasFocus) {
-                                            
+
                 if (isSelected) {
                     setBackground(list.getSelectionBackground());
                     setForeground(list.getSelectionForeground());
@@ -1136,15 +1162,15 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                     setBackground(list.getBackground());
                     setForeground(list.getForeground());
                 }
-                                            
+
                 if (value instanceof BuildingBoxItem) {
                     setText(((BuildingBoxItem)value).getText());
                 } else {
                     super.setText("---INVALID ITEM---");
                 }
-                
+
                 setFont(list.getFont());
-        
+
                 return this;
             }
         }
