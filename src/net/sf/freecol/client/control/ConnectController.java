@@ -242,17 +242,18 @@ public final class ConnectController {
     * message.
     */
     public void quitGame(boolean bStopServer, boolean notifyServer) {
-        if (freeColClient.isLoggedIn()) {
-            logout(notifyServer);
-        }
-
         if (bStopServer) {
             final FreeColServer server = freeColClient.getFreeColServer();
             if (server != null) {
                 server.getController().shutdown();
 
                 freeColClient.setFreeColServer(null);
+                freeColClient.setLoggedIn(false);
             }
+        }
+        
+        if (freeColClient.isLoggedIn()) {
+            logout(notifyServer);
         }
     }
 
