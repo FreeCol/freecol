@@ -1,6 +1,7 @@
 
 package net.sf.freecol.server.control;
 
+import java.util.ArrayList;
 import java.util.Vector;
 import java.util.logging.Logger;
 import java.util.Iterator;
@@ -12,6 +13,7 @@ import java.io.StringWriter;
 import java.io.PrintWriter;
 
 import net.sf.freecol.common.model.*;
+import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.NetworkConstants;
@@ -87,6 +89,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                         reply = boardShip(connection, element);
                     } else if (type.equals("learnSkillAtSettlement")) {
                         reply = learnSkillAtSettlement(connection, element);
+                    } else if (type.equals("scoutIndianSettlement")) {
+                        reply = scoutIndianSettlement(connection, element);
                     } else if (type.equals("leaveShip")) {
                         reply = leaveShip(connection, element);
                     } else if (type.equals("loadCargo")) {
@@ -737,9 +741,129 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (!cancelAction) {
             unit.setType(settlement.getLearnableSkill());
             settlement.setLearnableSkill(IndianSettlement.NONE);
+
+            // Set the Tile.PlayerExploredTile attribute.
+            Tile.PlayerExploredTile playerExploredTile = settlement.getTile().getPlayerExploredTile(player);
+            playerExploredTile.setSkill(IndianSettlement.NONE);
+
         }
 
         return null;
+    }
+
+
+    /**
+    * Handles a "scoutIndianSettlement"-message from a client.
+    *
+    * @param connection The connection the message came from.
+    * @param element The element containing the request.
+    */
+    private Element scoutIndianSettlement(Connection connection, Element element) {
+        FreeColServer freeColServer = getFreeColServer();
+        Game game = freeColServer.getGame();
+        Map map = game.getMap();
+        ServerPlayer player = freeColServer.getPlayer(connection);
+
+        Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
+        int direction = Integer.parseInt(element.getAttribute("direction"));
+        String action = element.getAttribute("action");
+        IndianSettlement settlement;
+
+        if (action.equals("basic")) {
+            settlement = (IndianSettlement) map.getNeighbourOrNull(direction, unit.getTile()).getSettlement();
+            // Move the unit onto the settlement's Tile.
+            unit.setLocation(settlement.getTile());
+            unit.setMovesLeft(0);
+        }
+        else {
+            settlement = (IndianSettlement) unit.getTile().getSettlement();
+            // Move the unit back to its original Tile.
+            unit.setLocation(map.getNeighbourOrNull(Map.getReverseDirection(direction), unit.getTile()));
+        }
+
+        Element reply = Message.createNewRootElement("scoutIndianSettlementResult");
+
+        if (action.equals("basic")) {
+            // Just return the skill and wanted goods.
+            reply.setAttribute("skill", Integer.toString(settlement.getLearnableSkill()));
+            reply.setAttribute("highlyWantedGoods", Integer.toString(settlement.getHighlyWantedGoods()));
+            reply.setAttribute("wantedGoods1", Integer.toString(settlement.getWantedGoods1()));
+            reply.setAttribute("wantedGoods2", Integer.toString(settlement.getWantedGoods2()));
+
+            // Set the Tile.PlayerExploredTile attribute.
+            Tile.PlayerExploredTile playerExploredTile = settlement.getTile().getPlayerExploredTile(player);
+            playerExploredTile.setSkill(settlement.getLearnableSkill());
+            playerExploredTile.setHighlyWantedGoods(settlement.getHighlyWantedGoods());
+            playerExploredTile.setWantedGoods1(settlement.getWantedGoods1());
+            playerExploredTile.setWantedGoods2(settlement.getWantedGoods2());
+        }
+        else if (action.equals("speak")) {
+            if (!settlement.hasBeenVisited()) {
+                // This can probably be randomized, I don't think the AI needs to do anything here.
+                double random = Math.random();
+                if (random < 0.33) {
+                    reply.setAttribute("result", "tales");
+                    Element update = reply.getOwnerDocument().createElement("update");
+
+                    Position center = new Position(settlement.getTile().getX(), settlement.getTile().getY());
+                    ArrayList surroundingTiles = new ArrayList();
+
+                    Iterator circleIterator = map.getCircleIterator(center, true, 4);
+                    while (circleIterator.hasNext()) {
+                        Position position = (Position)circleIterator.next();
+                        if ((!position.equals(center)) && map.getTile(position).isLand()) {
+                            surroundingTiles.add(map.getTile(position));
+                        }
+                    }
+
+                    for (int i = 0; i < surroundingTiles.size(); i++) {
+                        Tile t = (Tile) surroundingTiles.get(i);
+                        // For now we're not setting the showAll at true. It would show the units on
+                        // the tiles (was this done in the original?).
+                        update.appendChild(t.toXMLElement(player, update.getOwnerDocument()));
+                    }
+
+                    reply.appendChild(update);
+                }
+                else if (random < 0.66) {
+                    reply.setAttribute("result", "beads");
+                    reply.setAttribute("amount", "100");
+                    player.modifyGold(100);
+                }
+                else {
+                    reply.setAttribute("result", "die");
+                    unit.dispose();
+                }
+                settlement.setVisited();
+            }
+            else {
+                reply.setAttribute("result", "nothing");
+            }
+        }
+        else if (action.equals("tribute")) {
+            // TODO: the AI needs to determine whether or not we want to pay and how much.
+            double random = Math.random();
+            if (random < 0.5) {
+                reply.setAttribute("result", "agree");
+                reply.setAttribute("amount", "100");
+                player.modifyGold(100);
+            }
+            else {
+                reply.setAttribute("result", "disagree");
+            }
+            // TODO: make the tribe slightly more angry towards that player.
+        }
+        else if (action.equals("attack")) {
+            // The movesLeft has been set to 0 when the scout initiated its action.
+            // If it wants to attack then it can and it will need some moves to do it.
+            unit.setMovesLeft(1);
+            return null;
+        }
+        else if (action.equals("cancel")) {
+            return null;
+        }
+
+        return reply;
     }
 
 

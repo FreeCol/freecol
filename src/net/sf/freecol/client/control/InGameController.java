@@ -17,6 +17,7 @@ import net.sf.freecol.client.gui.sound.*;
 import net.sf.freecol.client.gui.panel.EventPanel;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.FreeColDialog;
 
 import net.sf.freecol.common.model.*;
 import net.sf.freecol.common.networking.Message;
@@ -264,8 +265,7 @@ public final class InGameController implements NetworkConstants {
             case Unit.EMBARK:           embark(unit, direction); break;
             case Unit.MOVE_HIGH_SEAS:   moveHighSeas(unit, direction); break;
             case Unit.ENTER_INDIAN_VILLAGE_WITH_SCOUT:
-                                        // TODO demand tribute or attack village are other possibilities
-                                        speakWithChiefAtIndianSettlement(unit, direction); break;
+                                        scoutIndianSettlement(unit, direction); break;
             case Unit.ENTER_INDIAN_VILLAGE_WITH_MISSIONARY:
                                         // TODO
                                         freeColClient.playSound(SfxLibrary.ILLEGAL_MOVE); break;
@@ -1125,45 +1125,104 @@ public final class InGameController implements NetworkConstants {
 
 
     /**
-     * Moves the specified scout into an Indian settlement to speak with chief.
+     * Moves the specified scout into an Indian settlement to speak with the chief
+     * or demand a tribute etc.
      * Of course, the scout won't physically get into the village, it will
      * just stay where it is.
      *
-     * @param unit The unit that will speak.
+     * @param unit The unit that will speak, attack or ask tribute.
      * @param direction The direction in which the Indian settlement lies.
      */
-    private void speakWithChiefAtIndianSettlement(Unit unit, int direction) {
+    private void scoutIndianSettlement(Unit unit, int direction) {
         Client client = freeColClient.getClient();
         Canvas canvas = freeColClient.getCanvas();
         Map map = freeColClient.getGame().getMap();
         IndianSettlement settlement = (IndianSettlement) map.getNeighbourOrNull(direction, unit.getTile()).getSettlement();
 
+        // The scout loses his moves because the skill data and tradeable goods data is fetched
+        // from the server and the moves are the price we have to pay to obtain that data.
         unit.setMovesLeft(0);
 
-        String skillName;
+        Element scoutMessage = Message.createNewRootElement("scoutIndianSettlement");
+        scoutMessage.setAttribute("unit", unit.getID());
+        scoutMessage.setAttribute("direction", Integer.toString(direction));
+        scoutMessage.setAttribute("action", "basic");
+        Element reply = client.ask(scoutMessage);
 
-        Element askSkill = Message.createNewRootElement("askSkill");
-        askSkill.setAttribute("unit", unit.getID());
-        askSkill.setAttribute("direction", Integer.toString(direction));
-
-        Element reply = client.ask(askSkill);
-        int skill;
-
-        if (reply.getTagName().equals("provideSkill")) {
-            skill = Integer.parseInt(reply.getAttribute("skill"));
-            if (skill < 0) {
-                skillName = null;
-            } else {
-                skillName = Unit.getName(skill);
-            }
+        if (reply.getTagName().equals("scoutIndianSettlementResult")) {
+            int skill = Integer.parseInt(reply.getAttribute("skill")),
+                highlyWantedGoods = Integer.parseInt(reply.getAttribute("highlyWantedGoods")),
+                wantedGoods1 = Integer.parseInt(reply.getAttribute("wantedGoods1")),
+                wantedGoods2 = Integer.parseInt(reply.getAttribute("wantedGoods2"));
+            settlement.setLearnableSkill(skill);
+            settlement.setHighlyWantedGoods(highlyWantedGoods);
+            settlement.setWantedGoods1(wantedGoods1);
+            settlement.setWantedGoods2(wantedGoods2);
         } else {
             logger.warning("Server gave an invalid reply to an askSkill message");
             return;
         }
 
-        settlement.setLearnableSkill(skill);
+        int userAction = canvas.showScoutIndianSettlementDialog(settlement);
 
-        canvas.showIndianSettlementPanel(settlement);
+        switch (userAction) {
+            case FreeColDialog.SCOUT_INDIAN_SETTLEMENT_ATTACK:
+                scoutMessage.setAttribute("action", "attack");
+                client.send(scoutMessage);
+                attack(unit, direction);
+            case FreeColDialog.SCOUT_INDIAN_SETTLEMENT_CANCEL:
+                scoutMessage.setAttribute("action", "cancel");
+                client.send(scoutMessage);
+                return;
+            case FreeColDialog.SCOUT_INDIAN_SETTLEMENT_SPEAK:
+                scoutMessage.setAttribute("action", "speak");
+                reply = client.ask(scoutMessage);
+                break;
+            case FreeColDialog.SCOUT_INDIAN_SETTLEMENT_TRIBUTE:
+                scoutMessage.setAttribute("action", "tribute");
+                reply = client.ask(scoutMessage);
+                break;
+            default:
+                logger.warning("Incorrect response returned from Canvas.showScoutIndianSettlementDialog()");
+                return;
+        }
+
+        if (reply.getTagName().equals("scoutIndianSettlementResult")) {
+            String result = reply.getAttribute("result"),
+                action = scoutMessage.getAttribute("action");
+            if (action.equals("speak") && result.equals("tales")) {
+                // Parse the tiles.
+                Element updateElement = getChildElement(reply, "update");
+                if (updateElement != null) {
+                    freeColClient.getInGameInputHandler().handle(client.getConnection(), updateElement);
+                }
+
+                canvas.showInformationMessage("scoutSettlement.speakTales");
+            }
+            else if (action.equals("speak") && result.equals("beads")) {
+                String amount = reply.getAttribute("amount");
+                unit.getOwner().modifyGold(Integer.parseInt(amount));
+                canvas.showInformationMessage("scoutSettlement.speakBeads", amount);
+            }
+            else if (action.equals("speak") && result.equals("nothing")) {
+                canvas.showInformationMessage("scoutSettlement.speakNothing");
+            }
+            else if (action.equals("speak") && result.equals("die")) {
+                unit.dispose();
+                canvas.showInformationMessage("scoutSettlement.speakDie");
+            }
+            else if (action.equals("tribute") && result.equals("agree")) {
+                String amount = reply.getAttribute("amount");
+                unit.getOwner().modifyGold(Integer.parseInt(amount));
+                canvas.showInformationMessage("scoutSettlement.tributeAgree", amount);
+            }
+            else if (action.equals("tribute") && result.equals("disagree")) {
+                canvas.showInformationMessage("scoutSettlement.tributeDisagree");
+            }
+        } else {
+            logger.warning("Server gave an invalid reply to an askSkill message");
+            return;
+        }
 
         nextActiveUnit(unit.getTile());
     }

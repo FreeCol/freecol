@@ -41,6 +41,8 @@ public class IndianSettlement extends Settlement {
 
     // These are the learnable skills for an Indian settlement.
     // They are fully compatible with the types from the Unit class!
+    //
+    // Note: UNKNOWN is used for both 'skill' and 'wanted goods'
     public static final int UNKNOWN = -2,
                             NONE = -1,
                             EXPERT_FARMER = Unit.EXPERT_FARMER,
@@ -71,8 +73,14 @@ public class IndianSettlement extends Settlement {
     * The value NONE is used when the skill has already been taught to a European.
     */
     private int learnableSkill;
-    
-    private boolean isCapital;
+
+    private int highlyWantedGoods,
+                wantedGoods1,
+                wantedGoods2;
+
+    private boolean isCapital,
+                    isVisited; /* true if a European player has asked to speak with the chief. */
+
     private UnitContainer unitContainer;
     private GoodsContainer goodsContainer;
 
@@ -92,7 +100,10 @@ public class IndianSettlement extends Settlement {
      * @param learnableSkill The skill that can be learned by Europeans at this settlement.
      * @exception IllegalArgumentException if an invalid tribe or kind is given
      */
-    public IndianSettlement(Game game, Player player, Tile tile, int tribe, int kind, boolean isCapital, int learnableSkill) {
+    public IndianSettlement(Game game, Player player, Tile tile, int tribe, int kind,
+            boolean isCapital, int learnableSkill, int highlyWantedGoods, int wantedGoods1,
+            int wantedGoods2, boolean isVisited) {
+
         // TODO: Change 'null' to the indian AI-player:
 
         super(game, player, tile);
@@ -117,9 +128,14 @@ public class IndianSettlement extends Settlement {
         this.kind = kind;
         this.learnableSkill = learnableSkill;
         this.isCapital = isCapital;
-        
+
+        this.highlyWantedGoods = highlyWantedGoods;
+        this.wantedGoods1 = wantedGoods1;
+        this.wantedGoods2 = wantedGoods2;
+        this.isVisited = isVisited;
+
         for (int goodsType=0; goodsType<Goods.NUMBER_OF_TYPES; goodsType++) {
-            if (goodsType == Goods.LUMBER || goodsType == Goods.HORSES || goodsType == Goods.MUSKETS 
+            if (goodsType == Goods.LUMBER || goodsType == Goods.HORSES || goodsType == Goods.MUSKETS
                     || goodsType == Goods.TRADE_GOODS || goodsType == Goods.TOOLS) {
                 continue;
             }
@@ -128,7 +144,6 @@ public class IndianSettlement extends Settlement {
 
         goodsContainer.addGoods(Goods.LUMBER, 300);
     }
-
 
 
     /**
@@ -141,13 +156,23 @@ public class IndianSettlement extends Settlement {
     public IndianSettlement(Game game, Element element) {
         super(game, element);
 
-        // The client doesn't know the skill at first.
+        // The client doesn't know a lot at first.
         this.learnableSkill = UNKNOWN;
+        this.highlyWantedGoods = UNKNOWN;
+        this.wantedGoods1 = UNKNOWN;
+        this.wantedGoods2 = UNKNOWN;
+        isVisited = false;
 
         readFromXMLElement(element);
     }
 
-
+    /**
+    * Returns true if a European player has visited this settlement to speak with the chief.
+    * @return true if a European player has visited this settlement to speak with the chief.
+    */
+    public boolean hasBeenVisited() {
+        return isVisited;
+    }
 
     /**
     * Adds the given <code>Unit</code> to the list of units that belongs to this
@@ -162,8 +187,8 @@ public class IndianSettlement extends Settlement {
             ownedUnits.add(u);
         }
     }
-    
-    
+
+
     /**
     * Gets an iterator over all the units this <code>IndianSettlement</code> is owning.
     */
@@ -171,7 +196,7 @@ public class IndianSettlement extends Settlement {
         return ownedUnits.iterator();
     }
 
-    
+
     /**
     * Removes the given <code>Unit</code> to the list of units that belongs to this
     * <code>IndianSettlement</code>.
@@ -195,6 +220,69 @@ public class IndianSettlement extends Settlement {
     */
     public int getLearnableSkill() {
         return learnableSkill;
+    }
+
+
+    /**
+    * Returns this settlement's highly wanted goods.
+    * @return This settlement's highly wanted goods.
+    */
+    public int getHighlyWantedGoods() {
+        return highlyWantedGoods;
+    }
+
+
+    /**
+    * Returns this settlement's wanted goods 1.
+    * @return This settlement's wanted goods 1.
+    */
+    public int getWantedGoods1() {
+        return wantedGoods1;
+    }
+
+
+    /**
+    * Returns this settlement's wanted goods 2.
+    * @return This settlement's wanted goods 2.
+    */
+    public int getWantedGoods2() {
+        return wantedGoods2;
+    }
+
+
+    /**
+    * Sets the visited status of this settlement to true, indicating that a European has had
+    * a chat with the chief.
+    */
+    public void setVisited() {
+        this.isVisited = true;
+    }
+
+
+    /**
+    * Sets this settlement's highly wanted goods.
+    * @param goods This settlement's highly wanted goods.
+    */
+    public void setHighlyWantedGoods(int goods) {
+        highlyWantedGoods = goods;
+    }
+
+
+    /**
+    * Sets this settlement's wanted goods 1.
+    * @param goods This settlement's wanted goods 1.
+    */
+    public void setWantedGoods1(int goods) {
+        wantedGoods1 = goods;
+    }
+
+
+    /**
+    * Sets this settlement's wanted goods 2.
+    * @param goods This settlement's wanted goods 2.
+    */
+    public void setWantedGoods2(int goods) {
+        wantedGoods2 = goods;
     }
 
 
@@ -401,7 +489,7 @@ public class IndianSettlement extends Settlement {
         return returnPrice;
     }
 
-    
+
     /**
     * Get the extra bonus if this is a <code>VILLAGE</code>,
     * <code>CITY</code> or a capital.
@@ -484,7 +572,7 @@ public class IndianSettlement extends Settlement {
         // TODO: Create a unit if food>=200, but not if a maximum number of units is reaced.
     }
 
-    
+
     private void consumeGoods(int type, int amount) {
         if (goodsContainer.getGoodsCount(type) > 0) {
             goodsContainer.removeGoods(type, Math.min(amount, goodsContainer.getGoodsCount(type)));
@@ -528,8 +616,12 @@ public class IndianSettlement extends Settlement {
             indianSettlementElement.setAttribute("ownedUnits", ownedUnitsString);
         }
 
-        if (showAll || player == getOwner()) {
+        if (showAll || player == getOwner() || toSavedGame) {
             indianSettlementElement.setAttribute("learnableSkill", Integer.toString(learnableSkill));
+            indianSettlementElement.setAttribute("highlyWantedGoods", Integer.toString(highlyWantedGoods));
+            indianSettlementElement.setAttribute("wantedGoods1", Integer.toString(wantedGoods1));
+            indianSettlementElement.setAttribute("wantedGoods2", Integer.toString(wantedGoods2));
+            indianSettlementElement.setAttribute("hasBeenVisted", Boolean.toString(isVisited));
         }
 
         if (showAll || player == getOwner()) {
@@ -576,6 +668,18 @@ public class IndianSettlement extends Settlement {
 
         if (indianSettlementElement.hasAttribute("learnableSkill")) {
             learnableSkill = Integer.parseInt(indianSettlementElement.getAttribute("learnableSkill"));
+        }
+        if (indianSettlementElement.hasAttribute("highlyWantedGoods")) {
+            highlyWantedGoods = Integer.parseInt(indianSettlementElement.getAttribute("highlyWantedGoods"));
+        }
+        if (indianSettlementElement.hasAttribute("wantedGoods1")) {
+            wantedGoods1 = Integer.parseInt(indianSettlementElement.getAttribute("wantedGoods1"));
+        }
+        if (indianSettlementElement.hasAttribute("wantedGoods2")) {
+            wantedGoods2 = Integer.parseInt(indianSettlementElement.getAttribute("wantedGoods2"));
+        }
+        if (indianSettlementElement.hasAttribute("hasBeenVisited")) {
+            isVisited = Boolean.getBoolean(indianSettlementElement.getAttribute("hasBeenVisited"));
         }
 
         Element unitContainerElement = getChildElement(indianSettlementElement, UnitContainer.getXMLElementTagName());

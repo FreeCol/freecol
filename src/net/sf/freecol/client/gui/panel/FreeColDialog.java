@@ -10,7 +10,13 @@ import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.filechooser.FileFilter;
 import java.io.*;
+
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Unit;
+
+import cz.autel.dmi.HIGLayout;
 
 
 /**
@@ -23,6 +29,11 @@ public class FreeColDialog extends FreeColPanel {
     public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
+
+    public static final int     SCOUT_INDIAN_SETTLEMENT_CANCEL = 0,
+                                SCOUT_INDIAN_SETTLEMENT_SPEAK = 1,
+                                SCOUT_INDIAN_SETTLEMENT_TRIBUTE = 2,
+                                SCOUT_INDIAN_SETTLEMENT_ATTACK = 3;
 
     // Stores the response from the user:
     private Object response = null;
@@ -279,6 +290,115 @@ public class FreeColDialog extends FreeColPanel {
         }
 
         return confirmDialog;
+    }
+
+
+    /**
+    * Returns an information dialog that shows the given text and an "OK" button.
+    * @return An information dialog that shows the given text and an "OK" button.
+    */
+    public static FreeColDialog createInformationDialog(String text) {
+        final JLabel theText = new JLabel("<html><body>" + text + "</body></html>");
+        final JButton theButton = new JButton(Messages.message("ok"));
+        final FreeColDialog informationDialog = new FreeColDialog() {
+            public void requestFocus() {
+                theButton.requestFocus();
+            }
+        };
+
+        int w1[] = {10, 90, 80, 90, 10};
+        int h1[] = {10, 100, 10, 20, 10};
+        HIGLayout layout = new HIGLayout(w1, h1);
+        higConst.clearCorrection();
+        layout.setRowWeight(2,1);
+        informationDialog.setLayout(layout);
+
+        theButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                informationDialog.setResponse(null);
+            }
+        });
+
+        informationDialog.add(theText, higConst.rcwh(2, 2, 3, 1));
+        informationDialog.add(theButton, higConst.rc(4, 3));
+
+        informationDialog.setSize(informationDialog.getPreferredSize());
+
+        return informationDialog;
+    }
+
+
+    /**
+    * Creates a dialog that asks the user what he wants to do with his scout in the indian
+    * settlement. Options are: speak with chief, demand tribute, attack or cancel.
+    * The possible responses are integers that are defined in this class as finals.
+    *
+    * @param settlement The indian settlement that is being scouted.
+    *
+    * @return The FreeColDialog that asks the question to the user.
+    */
+    public static FreeColDialog createScoutIndianSettlementDialog(IndianSettlement settlement) {
+        String mainText;
+        int skill = settlement.getLearnableSkill();
+        if (skill >= 0) {
+            mainText = Messages.message("scoutSettlement.question1").replaceAll("%replace_skill%", Unit.getName(skill).toLowerCase());
+        }
+        else {
+            mainText = Messages.message("scoutSettlement.question2");
+        }
+        mainText = mainText.replaceAll("%replace_good1%", Goods.getName(settlement.getHighlyWantedGoods()).toLowerCase());
+        mainText = mainText.replaceAll("%replace_good2%", Goods.getName(settlement.getWantedGoods1()).toLowerCase());
+        mainText = mainText.replaceAll("%replace_good3%", Goods.getName(settlement.getWantedGoods2()).toLowerCase());
+
+        final JLabel question = new JLabel("<html><body>" + mainText + "</body></html>");
+        final JButton speak = new JButton(Messages.message("scoutSettlement.speak")),
+                demand = new JButton(Messages.message("scoutSettlement.tribute")),
+                attack = new JButton(Messages.message("scoutSettlement.attack")),
+                cancel = new JButton(Messages.message("scoutSettlement.cancel"));
+
+        final FreeColDialog scoutDialog = new FreeColDialog() {
+            public void requestFocus() {
+                cancel.requestFocus();
+            }
+        };
+
+        int w1[] = {10, 30, 200, 30, 10};
+        int h1[] = {10, 100, 10, 20, 10, 20, 10, 20, 10, 20, 10};
+        HIGLayout layout = new HIGLayout(w1, h1);
+        higConst.clearCorrection();
+        layout.setRowWeight(2,1);
+        scoutDialog.setLayout(layout);
+
+        speak.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                scoutDialog.setResponse(new Integer(SCOUT_INDIAN_SETTLEMENT_SPEAK));
+            }
+        });
+        demand.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                scoutDialog.setResponse(new Integer(SCOUT_INDIAN_SETTLEMENT_TRIBUTE));
+            }
+        });
+        attack.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                scoutDialog.setResponse(new Integer(SCOUT_INDIAN_SETTLEMENT_ATTACK));
+            }
+        });
+        cancel.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                scoutDialog.setResponse(new Integer(SCOUT_INDIAN_SETTLEMENT_CANCEL));
+            }
+        });
+
+        scoutDialog.add(question, higConst.rcwh(2, 2, 3, 1));
+        scoutDialog.add(speak, higConst.rc(4, 3));
+        scoutDialog.add(demand, higConst.rc(6, 3));
+        scoutDialog.add(attack, higConst.rc(8, 3));
+        scoutDialog.add(cancel, higConst.rc(10, 3));
+
+        scoutDialog.setSize(scoutDialog.getPreferredSize());
+
+        return scoutDialog;
     }
 
 

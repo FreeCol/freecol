@@ -122,7 +122,7 @@ public class MapGenerator {
                               IndianSettlement.VILLAGE,
                               true, iroquoisIterator, map, players);
         placeIndianSettlement(IndianSettlement.SIOUX,
-                              IndianSettlement.CAMP, 
+                              IndianSettlement.CAMP,
                               true, siouxIterator, map, players);
         placeIndianSettlement(IndianSettlement.APACHE,
                               IndianSettlement.CAMP,
@@ -169,7 +169,7 @@ public class MapGenerator {
                                       false, tupiIterator, map, players);
         }
     }
-    
+
 
     /**
     * Gets the Indian player of the appropriate tribe.
@@ -204,17 +204,23 @@ public class MapGenerator {
             int radius = (type == IndianSettlement.CITY) ? 2 : 1;
             if (isIndianSettlementCandidate(position, radius + 1, map) &&
                         random.nextInt(2) != 0) {
-                        
+
                 ServerPlayer player = getIndianPlayer(owner, players);
                 //System.out.println("Setting indian settlement at "
                 //                   + position.getX() + "x" + position.getY());
-                
+
+                ArrayList list = generateWantedGoodsForLocation(map, map.getTile(position));
+
                 map.getTile(position).setSettlement(
-                    new IndianSettlement(game, player, 
-                                         map.getTile(position), owner, type, capital, 
-                                         generateSkillForLocation(map, map.getTile(position)))
+                    new IndianSettlement(game, player,
+                                         map.getTile(position), owner, type, capital,
+                                         generateSkillForLocation(map, map.getTile(position)),
+                                         ((Integer)list.get(0)).intValue(),
+                                         ((Integer)list.get(1)).intValue(),
+                                         ((Integer)list.get(2)).intValue(),
+                                         false)
                 );
-                
+
                 map.getTile(position).setClaim(Tile.CLAIM_CLAIMED);
                 map.getTile(position).setOwner(map.getTile(position).getSettlement());
                 Iterator circleIterator = map.getCircleIterator
@@ -225,7 +231,7 @@ public class MapGenerator {
                     // TODO: Implement this later:
                     //map.getTile(adjPos).setOwner(map.getTile(position).getSettlement());
                 }
-                
+
                 for (int i = 0; i < (type * 2) + 4; i++) {
                     Unit unit = new Unit(game, player, Unit.BRAVE);
                     unit.setIndianSettlement((IndianSettlement) map.getTile(position).getSettlement());
@@ -234,15 +240,37 @@ public class MapGenerator {
                     } else {
                         unit.setLocation(map.getTile(position).getSettlement());
                     }
-                    
+
                 }
 
                 return;
             }
         }
     }
-    
-    
+
+
+    /**
+    * Generates some goods that are wanted by the natives that have a settlement at the given
+    * location.
+    * TODO: This method should be properly implemented. The surrounding terrain
+    *       should be taken into account and it should be partially randomized.
+    * @param tile The tile where the settlement will be located.
+    * @return An ArrayList with three Integer elements: element 0 will be the highly wanted goods,
+    *         element 1 will be the first wanted goods and element 2 will be the second wanted goods.
+    *         The ints inside the Integers will represent valid goods numbers from the Goods class.
+    */
+    private ArrayList generateWantedGoodsForLocation(Map map, Tile tile) {
+        ArrayList returnList = new ArrayList(3);
+
+        // TODO: implement this method!
+        returnList.add(new Integer(Goods.RUM));
+        returnList.add(new Integer(Goods.COATS));
+        returnList.add(new Integer(Goods.CIGARS));
+
+        return returnList;
+    }
+
+
     /**
     * Generates a skill that could be taught from a settlement on the given Tile.
     * TODO: This method should be properly implemented. The surrounding terrain
@@ -342,7 +370,7 @@ public class MapGenerator {
                 throw new IllegalArgumentException("Invalid tile provided: Tile type is invalid");
         }
     }
-    
+
 
 
     /**
@@ -394,9 +422,9 @@ public class MapGenerator {
             y = random.nextInt(height - 20) + 10;
         }
         return new Map.Position(x, y);
-    }    
+    }
 
-    
+
     /**
      * Create two ships, one with a colonist, for each player, and
      * select suitable starting positions.
@@ -473,7 +501,7 @@ public class MapGenerator {
         return new Position(x, y);
     }
 
-    
+
 
     protected boolean isValid(int x, int y) {
         return x>=0 && x < width && y >= 0 && y < height;
@@ -483,8 +511,8 @@ public class MapGenerator {
         return isValid(p.getX(), p.getY());
     }
 
-    
-    
+
+
     /**
     * Class for making a <code>Map</code> based upon a land map.
     */
@@ -494,7 +522,7 @@ public class MapGenerator {
         private static final int MAX_DISTANCE_TO_EDGE = 12;
 
         private boolean[][] landMap;
-        
+
         private Random tileType;
 
 
@@ -502,7 +530,7 @@ public class MapGenerator {
         * Creates a new <code>TerrainGenerator</code>.
         * @param landMap Determines wether there should be land
         *                or ocean on a given tile. This array also
-        *                specifies the size of the map that is going 
+        *                specifies the size of the map that is going
         *                to be created.
         * @see #createMap
         */
@@ -544,7 +572,7 @@ public class MapGenerator {
           }
         }
 
-        
+
         /**
         * Creates the map.
         */
@@ -569,7 +597,7 @@ public class MapGenerator {
                                 t.setAddition(Tile.ADD_HILLS);
                             }
                         }
-                        
+
                         // Terrain bonus:
                         if (tileType.nextInt(10) == 0 && (t.getType() != Tile.ARCTIC && (t.getType() != Tile.TUNDRA || t.isForested())
                                 && t.getType() != Tile.HIGH_SEAS && t.getType() != Tile.DESERT && t.getType() != Tile.MARSH
@@ -578,7 +606,7 @@ public class MapGenerator {
                         }
                     } else {
                         t = new Tile(game, Tile.OCEAN, i, j);
-                        
+
                         // Terrain bonus:
                         int adjacentLand = 0;
                         for (int k=0; k<8; k++) {
@@ -586,8 +614,8 @@ public class MapGenerator {
                             if (isValid(mp) && landMap[mp.getX()][mp.getY()]) {
                                 adjacentLand++;
                             }
-                        }                                                
-                        
+                        }
+
                         if (adjacentLand > 1 && tileType.nextInt(10 - adjacentLand) == 0) {
                             t.setBonus(true);
                         }
@@ -653,7 +681,7 @@ public class MapGenerator {
 
         /**
         * Creates a new land map. That is; an array
-        * where <i>true</i> means land and <i>false</i> 
+        * where <i>true</i> means land and <i>false</i>
         * means ocean.
         */
         boolean[][] createLandMap() {
@@ -734,7 +762,7 @@ public class MapGenerator {
             return (u>0 ? u : 0);
         }
 
-        
+
         private void setLand(int x, int y) {
             if (visited[x][y]) {
                 return;

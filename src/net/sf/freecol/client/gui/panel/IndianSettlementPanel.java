@@ -3,6 +3,7 @@ package net.sf.freecol.client.gui.panel;
 
 import net.sf.freecol.client.gui.i18n.Messages;
 
+import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.IndianSettlement;
 
 import java.awt.event.ActionEvent;
@@ -27,7 +28,9 @@ public final class IndianSettlementPanel extends FreeColDialog implements Action
 
     private static final int OK = 0;
 
-    private final JLabel  skillLabel;
+    private final JLabel  skillLabel,
+                          highlyWantedLabel,
+                          otherWantedLabel;
     private final JButton okButton;
 
     /**
@@ -36,7 +39,7 @@ public final class IndianSettlementPanel extends FreeColDialog implements Action
     */
     public IndianSettlementPanel() {
         int[] w = {10, 0, 0, 10};
-        int[] h = {10, 0, 10, 0, 10};
+        int[] h = {10, 0, 5, 0, 5, 0, 10, 0, 10};
         setLayout(new HIGLayout(w, h));
 
         okButton = new JButton(Messages.message("ok"));
@@ -44,10 +47,16 @@ public final class IndianSettlementPanel extends FreeColDialog implements Action
         okButton.addActionListener(this);
 
         skillLabel = new JLabel();
+        highlyWantedLabel = new JLabel();
+        otherWantedLabel = new JLabel();
 
         add(new JLabel(Messages.message("indianSettlement.learnableSkill") + " "), higConst.rc(2, 2));
         add(skillLabel, higConst.rc(2, 3));
-        add(okButton, higConst.rc(4, 3));
+        add(new JLabel(Messages.message("indianSettlement.highlyWanted") + " "), higConst.rc(4, 2));
+        add(highlyWantedLabel, higConst.rc(4, 3));
+        add(new JLabel(Messages.message("indianSettlement.otherWanted") + " "), higConst.rc(6, 2));
+        add(otherWantedLabel, higConst.rc(6, 3));
+        add(okButton, higConst.rc(8, 3));
     }
 
 
@@ -102,6 +111,8 @@ public final class IndianSettlementPanel extends FreeColDialog implements Action
             default:
                 logger.warning("Invalid learnable skill returned from settlement.");
         }
+        highlyWantedLabel.setText(Goods.getName(settlement.getHighlyWantedGoods()));
+        otherWantedLabel.setText(Goods.getName(settlement.getWantedGoods1()) + ", " + Goods.getName(settlement.getWantedGoods2()));
         setSize(getPreferredSize());
     }
 

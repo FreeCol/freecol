@@ -982,8 +982,7 @@ public final class Tile extends FreeColGameObject implements Location {
             tileElement.appendChild(emptyUnitContainer.toXMLElement(player, document, showAll, toSavedGame));
         }
 
-        //if (!showAll && !player.canSee(this)) {
-        if (!showAll) {
+        if (!showAll && !player.canSee(this)) {
             if (player != null) {
                 playerExploredTiles[player.getNation()].setAttributes(tileElement);
             } else {
@@ -1133,9 +1132,12 @@ public final class Tile extends FreeColGameObject implements Location {
                         bonus;
 
         // Settlement data:
-        private int     colonyUnitCount;
-        private int     colonyStockadeLevel;
-        private int     skill;
+        private int     colonyUnitCount,
+                        colonyStockadeLevel,
+                        skill,
+                        highlyWantedGoods,
+                        wantedGoods1,
+                        wantedGoods2;
 
         //private Settlement settlement;
 
@@ -1194,8 +1196,24 @@ public final class Tile extends FreeColGameObject implements Location {
             this.explored = explored;
         }
 
+
         public void setSkill(int newSkill) {
             this.skill = newSkill;
+        }
+
+
+        public void setHighlyWantedGoods(int highlyWantedGoods) {
+            this.highlyWantedGoods = highlyWantedGoods;
+        }
+
+
+        public void setWantedGoods1(int wantedGoods1) {
+            this.wantedGoods1 = wantedGoods1;
+        }
+
+
+        public void setWantedGoods2(int wantedGoods1) {
+            this.wantedGoods1 = wantedGoods1;
         }
 
 
@@ -1248,10 +1266,11 @@ public final class Tile extends FreeColGameObject implements Location {
                     colonyElement.getParentNode().removeChild(colonyElement);
                 }
             }
-            /*else if (getSettlement() != null) {
-                Element settlementElement = (Element) tileElement.getElementsByTagName(Settlement.getXMLElementTagName());
+            else if (getSettlement() != null) {
+                Element settlementElement = (Element) tileElement.getElementsByTagName(IndianSettlement.getXMLElementTagName());
                 settlementElement.setAttribute("learnableSkill", Integer.toString(skill));
-            }*/
+                // wanted goods
+            }
         }
 
 
@@ -1285,6 +1304,9 @@ public final class Tile extends FreeColGameObject implements Location {
             tileElement.setAttribute("colonyUnitCount", Integer.toString(colonyUnitCount));
             tileElement.setAttribute("colonyStockadeLevel", Integer.toString(colonyStockadeLevel));
             tileElement.setAttribute("learnableSkill", Integer.toString(skill));
+            tileElement.setAttribute("highlyWantedGoods", Integer.toString(highlyWantedGoods));
+            tileElement.setAttribute("wantedGoods1", Integer.toString(wantedGoods1));
+            tileElement.setAttribute("wantedGoods2", Integer.toString(wantedGoods2));
 
             return tileElement;
         }
@@ -1308,6 +1330,9 @@ public final class Tile extends FreeColGameObject implements Location {
             colonyUnitCount = Integer.parseInt(tileElement.getAttribute("colonyUnitCount"));
             colonyStockadeLevel = Integer.parseInt(tileElement.getAttribute("colonyStockadeLevel"));
             skill = Integer.parseInt(tileElement.getAttribute("learnableSkill"));
+            highlyWantedGoods = Integer.parseInt(tileElement.getAttribute("highlyWantedGoods"));
+            wantedGoods1 = Integer.parseInt(tileElement.getAttribute("wantedGoods1"));
+            wantedGoods2 = Integer.parseInt(tileElement.getAttribute("wantedGoods2"));
         }
 
 

@@ -555,39 +555,35 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
 
 
         // Check for an 'attack' instead of 'move'.
-        if (target.getSettlement() != null && target.getSettlement().getOwner() != getOwner()
-                || (target.getUnitCount() > 0) && (target.getDefendingUnit(this) != null) &&
-                (target.getDefendingUnit(this).getNation() != getNation())
-                && ((target.isLand() && !isNaval()) || (isNaval() && !target.isLand()))) {
+        if ((target.getSettlement() != null && target.getSettlement().getOwner() != getOwner())
+                || ((target.getUnitCount() > 0) && (target.getDefendingUnit(this) != null)
+                && (target.getDefendingUnit(this).getNation() != getNation())
+                && ((target.isLand() && !isNaval()) || (isNaval() && !target.isLand())))) {
 
-            if (isScout() && target.getSettlement() != null) {
-                if (target.getSettlement() instanceof IndianSettlement) {
-                    return ENTER_INDIAN_VILLAGE_WITH_SCOUT;
-                } else if (target.getSettlement().getOwner() != getOwner()) {
-                    return ENTER_FOREIGN_COLONY_WITH_SCOUT;
-                }
-            } else if (isOffensiveUnit()) {
-                return ATTACK;
-            } else {
-                // Check for entering indian village.
-                if ((target.getSettlement() != null)
-                        && (target.getSettlement() instanceof IndianSettlement)
-                        && (getNumberOfTools() == 0)
-                        /* TODO: CHECK IF YOU'RE ALLOWED IN THE VILLAGE (=no war with indians) */) {
-                    if (isMounted()) {
+            Settlement settlement = target.getSettlement();
+
+            if ((settlement != null) && (!isOffensiveUnit() || isScout())) {
+                // Entering indian village or colony.
+                if (isScout()) {
+                    if (settlement instanceof IndianSettlement) {
                         return ENTER_INDIAN_VILLAGE_WITH_SCOUT;
-                    } else if (isMissionary()) {
-                        return ENTER_INDIAN_VILLAGE_WITH_MISSIONARY;
-                    } else if ((getType() == FREE_COLONIST) || (getType() == INDENTURED_SERVANT)) {
-                        return ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST;
-                    } else if (isCarrier() && goodsContainer.getGoodsCount() > 0) {
-                        return ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS;
-                    } else {
-                        return ILLEGAL_MOVE;
                     }
-                } else {
+                    else {
+                        return ENTER_FOREIGN_COLONY_WITH_SCOUT;
+                    }
+                }
+                else if (isMissionary() && (settlement instanceof IndianSettlement)) {
+                    return ENTER_INDIAN_VILLAGE_WITH_MISSIONARY;
+                }
+                else if (((getType() == FREE_COLONIST) || (getType() == INDENTURED_SERVANT)) && (settlement instanceof IndianSettlement)) {
+                    return ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST;
+                }
+                else {
                     return ILLEGAL_MOVE;
                 }
+            }
+            else {
+                return ATTACK;
             }
         }
 
@@ -677,7 +673,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             return false;
         }
     }
-    
+
 
     /**
     * Moves this unit in the specified direction.
@@ -1051,7 +1047,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         getOwner().setExplored(this);
     }
 
-    
+
     /**
     * Sets the <code>IndianSettlement</code> that owns this unit.
     */
@@ -1061,7 +1057,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         }
 
         this.indianSettlement = indianSettlement;
-        
+
         if (indianSettlement != null) {
             indianSettlement.addOwnedUnit(this);
         }

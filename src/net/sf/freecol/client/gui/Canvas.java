@@ -456,6 +456,31 @@ public final class Canvas extends JLayeredPane {
 
 
     /**
+    * Displays a dialog that asks the user what he wants to do with his scout in the indian
+    * settlement.
+    *
+    * @param settlement The indian settlement that is being scouted.
+    *
+    * @return FreeColDialog.SCOUT_INDIAN_SETTLEMENT_CANCEL if the action was cancelled,
+    *         FreeColDialog.SCOUT_INDIAN_SETTLEMENT_SPEAK if he wants to speak with the chief,
+    *         FreeColDialog.SCOUT_INDIAN_SETTLEMENT_TRIBUTE if he wants to demand tribute,
+    *         FreeColDialog.SCOUT_INDIAN_SETTLEMENT_ATTACK if he wants to attack the settlement.
+    */
+    public int showScoutIndianSettlementDialog(IndianSettlement settlement) {
+        FreeColDialog scoutDialog = FreeColDialog.createScoutIndianSettlementDialog(settlement);
+        scoutDialog.setLocation(getWidth() / 2 - scoutDialog.getWidth() / 2, getHeight() / 2 - scoutDialog.getHeight() / 2);
+        add(scoutDialog, new Integer(POPUP_LAYER.intValue() - 1));
+        scoutDialog.requestFocus();
+
+        int response = scoutDialog.getResponseInt();
+
+        remove(scoutDialog);
+
+        return response;
+    }
+
+
+    /**
     * Displays a dialog with a text field and a ok/cancel option.
     *
     * @param text The text that explains the action to the user.
@@ -615,7 +640,7 @@ public final class Canvas extends JLayeredPane {
         colopediaPanel.requestFocus();
     }
 
-    
+
     /**
     * Shows a panel where the player may choose the next founding father to recruit.
     * @param possibleFoundingFathers The different founding fathers the player may choose.
@@ -642,7 +667,7 @@ public final class Canvas extends JLayeredPane {
     public ChooseFoundingFatherDialog getChooseFoundingFatherDialog() {
         return chooseFoundingFatherDialog;
     }
-    
+
 
     /**
     * Shows the {@link EventPanel}.
@@ -992,25 +1017,39 @@ public final class Canvas extends JLayeredPane {
         add(errorPanel, JLayeredPane.MODAL_LAYER);
         errorPanel.requestFocus();
         errorPanel.getResponse();
-        remove(errorPanel);
+        closeErrorPanel();
     }
 
 
     /**
-    * Shows a message with some information and
-    * a "Ok"-button.
+    * Shows a message with some information and an "OK"-button.
+    * @param messageId The messageId of the message to display.
     */
     public void showInformationMessage(String messageId) {
-        errorMessage(messageId);
+        showInformationMessage(messageId, null);
     }
 
 
     /**
-    * Shows a message with some information and
-    * a "Ok"-button.
+    * Shows a message with some information and an "OK"-button.
+    * @param messageId The messageId of the message to display.
+    * @replaceString The string that we need to use to replace all occurences of %replace% in the
+    *     message.
     */
-    public void showInformationMessage(String messageId, String message) {
-        errorMessage(messageId, message);
+    public void showInformationMessage(String messageId, String replaceString) {
+        String text = Messages.message(messageId);
+        if (replaceString != null) {
+            text = text.replaceAll("%replace%", replaceString);
+        }
+        FreeColDialog infoDialog = FreeColDialog.createInformationDialog(text);
+
+        infoDialog.setLocation(getWidth() / 2 - infoDialog.getWidth() / 2, getHeight() / 2 - infoDialog.getHeight() / 2);
+        add(infoDialog, new Integer(POPUP_LAYER.intValue() - 1));
+        infoDialog.requestFocus();
+
+        Object response = infoDialog.getResponse();
+
+        remove(infoDialog);
     }
 
 
