@@ -2551,11 +2551,14 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                         Unit tTrain = getGame().getModelController().createUnit(
                                 getID()+"indianTreasure"+getID(), newTile, getOwner(), Unit.TREASURE_TRAIN);
 
+                        // Larger treasure if Hernan Cortes is present in the congress:
+                        int bonus = (getOwner().hasFather(FoundingFather.HERNAN_CORTES)) ? 2 : 1;
+
                         // Incan and Aztecs give more gold
                         if (settlementOwner.getNation() == Player.INCA || settlementOwner.getNation() == Player.AZTEC) {
-                            tTrain.setTreasureAmount(randomTreasure * 500 + 10000);
+                            tTrain.setTreasureAmount(randomTreasure * 500 * bonus + 10000);
                         } else {
-                            tTrain.setTreasureAmount(randomTreasure * 50 + 300);
+                            tTrain.setTreasureAmount(randomTreasure * 50 * bonus + 300);
                         }
 
                         // capitals give more gold
