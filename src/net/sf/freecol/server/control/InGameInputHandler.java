@@ -303,12 +303,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         boolean disembark = !unit.getTile().isLand() && game.getMap().getNeighbourOrNull(direction, unit.getTile()).isLand();
-
-        Tile oldTile = unit.getTile();
-
-        unit.move(direction);
-
-        Tile newTile = unit.getTile();
+        Tile newTile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
 
         Iterator enemyPlayerIterator = game.getPlayerIterator();
         while (enemyPlayerIterator.hasNext()) {
@@ -319,15 +314,15 @@ public final class InGameInputHandler extends InputHandler {
             }
 
             try {
-                if (enemyPlayer.canSee(oldTile) && !disembark) {
+                if (unit.isVisibleTo(enemyPlayer) && !disembark) {
                     Element opponentMoveElement = Message.createNewRootElement("opponentMove");
                     opponentMoveElement.setAttribute("direction", Integer.toString(direction));
                     opponentMoveElement.setAttribute("unit", unit.getID());
                     enemyPlayer.getConnection().send(opponentMoveElement);
-                } else if (enemyPlayer.canSee(newTile)) {
+                } else if (enemyPlayer.canSee(newTile) && newTile.getSettlement() == null) {
                     Element opponentMoveElement = Message.createNewRootElement("opponentMove");
                     opponentMoveElement.setAttribute("direction", Integer.toString(direction));
-                    opponentMoveElement.setAttribute("tile", unit.getTile().getID());
+                    opponentMoveElement.setAttribute("tile", newTile.getID());
                     opponentMoveElement.appendChild(unit.toXMLElement(enemyPlayer, opponentMoveElement.getOwnerDocument()));
                     enemyPlayer.getConnection().send(opponentMoveElement);
                 }
@@ -336,13 +331,13 @@ public final class InGameInputHandler extends InputHandler {
             }
         }
 
+        unit.move(direction);
 
         Element reply = Message.createNewRootElement("update");
         Vector surroundingTiles = game.getMap().getSurroundingTiles(unit.getTile(), unit.getLineOfSight());
 
         for (int i=0; i<surroundingTiles.size(); i++) {
             Tile t = (Tile) surroundingTiles.get(i);
-            player.setExplored(t);
             reply.appendChild(t.toXMLElement(player, reply.getOwnerDocument()));
         }
 
@@ -421,9 +416,13 @@ public final class InGameInputHandler extends InputHandler {
         Game game = freeColServer.getGame();
         ServerPlayer player = freeColServer.getPlayer(connection);
 
+
+        // Get parameters:
         Unit unit = (Unit) game.getFreeColGameObject(attackElement.getAttribute("unit"));
         int direction = Integer.parseInt(attackElement.getAttribute("direction"));
 
+
+        // Test the parameters:
         if (unit == null) {
             throw new IllegalArgumentException("Could not find 'Unit' with specified ID: " + attackElement.getAttribute("unit"));
         }
@@ -448,13 +447,12 @@ public final class InGameInputHandler extends InputHandler {
             throw new IllegalStateException("Nothing to attack in direction " + direction + " from unit with ID " + attackElement.getAttribute("unit"));
         }
 
-        // Calculate the result:
-        int attack_power = unit.getOffensePower(defender);
-        int total_probability = attack_power + defender.getDefensePower(unit);
-        int result = Unit.ATTACKER_LOSS; // Assume this until otherwise calculated.
 
-        if ((attackCalculator.nextInt(total_probability+1)) <= attack_power) {
-            result = Unit.ATTACKER_WIN;
+        int result = generateAttackResult(unit, defender);
+        int plunderGold = -1;
+
+        if (result == Unit.ATTACK_DONE_SETTLEMENT) {
+            plunderGold = newTile.getSettlement().getOwner().getGold()/10; // 10% of their gold
         }
 
         // Inform the other players (other then the player attacking) about the attack:
@@ -466,31 +464,18 @@ public final class InGameInputHandler extends InputHandler {
                 continue;
             }
 
-            // Send
-            if (enemyPlayer.canSee(oldTile) || enemyPlayer.canSee(newTile)) {
+            if (unit.isVisibleTo(enemyPlayer) || defender.isVisibleTo(enemyPlayer)) {
                 Element opponentAttackElement = Message.createNewRootElement("opponentAttack");
                 opponentAttackElement.setAttribute("direction", Integer.toString(direction));
                 opponentAttackElement.setAttribute("result", Integer.toString(result));
+                opponentAttackElement.setAttribute("plunderGold", Integer.toString(plunderGold));
                 opponentAttackElement.setAttribute("unit", unit.getID());
+                opponentAttackElement.setAttribute("defender", defender.getID());
 
-                if (enemyPlayer != unit.getOwner() && enemyPlayer != defender.getOwner()) {
-                    if (!enemyPlayer.canSee(oldTile)) {
-                        Element updateElement = Message.createNewRootElement("update");
-                        updateElement.appendChild(oldTile.toXMLElement(enemyPlayer, updateElement.getOwnerDocument()));
-                        try {
-                            enemyPlayer.getConnection().send(updateElement);
-                        } catch (IOException e) {
-                            logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection " + enemyPlayer.getConnection());
-                        }
-                    } else if (!enemyPlayer.canSee(newTile)) {
-                        Element updateElement = Message.createNewRootElement("update");
-                        updateElement.appendChild(newTile.toXMLElement(enemyPlayer, updateElement.getOwnerDocument()));
-                        try {
-                            enemyPlayer.getConnection().send(updateElement);
-                        } catch (IOException e) {
-                            logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection " + enemyPlayer.getConnection());
-                        }
-                    }
+                if (!defender.isVisibleTo(enemyPlayer)) {
+                    opponentAttackElement.appendChild(defender.toXMLElement(enemyPlayer, opponentAttackElement.getOwnerDocument()));
+                } else if (!unit.isVisibleTo(enemyPlayer)) {
+                    opponentAttackElement.appendChild(unit.toXMLElement(enemyPlayer, opponentAttackElement.getOwnerDocument()));
                 }
 
                 try {
@@ -501,20 +486,19 @@ public final class InGameInputHandler extends InputHandler {
             }
         }
 
-        // Create the reply:
+
+        // Create the reply for the attacking player:
         Element reply = Message.createNewRootElement("attackResult");
         reply.setAttribute("result", Integer.toString(result));
+        reply.setAttribute("plunderGold", Integer.toString(plunderGold));
 
-        // If a colony has been won, send an updated tile:
-        if (result == Unit.ATTACKER_WIN && newTile.getColony() != null && defender.getLocation() != defender.getTile()) {
+        if (result == Unit.ATTACK_DONE_SETTLEMENT && newTile.getColony() != null) { // If a colony will been won, send an updated tile:
             reply.appendChild(newTile.toXMLElement(newTile.getColony().getOwner(), reply.getOwnerDocument()));
+        } else if (!defender.isVisibleTo(player)) {
+            reply.appendChild(defender.toXMLElement(player, reply.getOwnerDocument()));
         }
 
-        if (result == Unit.ATTACKER_LOSS) {
-            unit.loseAttack();
-        } else {
-            unit.winAttack(defender);
-        }
+        unit.attack(defender, result, plunderGold);
 
         if (unit.getTile().equals(newTile)) { // In other words, we moved...
             Element update = reply.getOwnerDocument().createElement("update");
@@ -522,7 +506,6 @@ public final class InGameInputHandler extends InputHandler {
 
             for (int i=0; i<surroundingTiles.size(); i++) {
                 Tile t = (Tile) surroundingTiles.get(i);
-                player.setExplored(t);
                 update.appendChild(t.toXMLElement(player, update.getOwnerDocument()));
             }
 
@@ -531,6 +514,61 @@ public final class InGameInputHandler extends InputHandler {
 
         return reply;
     }
+    
+    
+    /**
+    * Generates a result of an attack.
+    */
+    private int generateAttackResult(Unit unit, Unit defender) {
+        int attackPower = unit.getOffensePower(defender);
+        int totalProbability = attackPower + defender.getDefensePower(unit);
+        int result;
+        int r = attackCalculator.nextInt(totalProbability+1);
+        if (r > attackPower) {
+            result = Unit.ATTACK_LOSS;
+        } else if(r == attackPower) {
+            if (defender.isNaval()) {
+                result = Unit.ATTACK_EVADES;
+            } else {
+                result = Unit.ATTACK_WIN;
+            }
+        } else { // (r < attackPower)
+            result = Unit.ATTACK_WIN;
+        }
+
+        if (result == Unit.ATTACK_WIN) {
+            int diff = defender.getDefensePower(unit)*2-attackPower;
+            int r2 = attackCalculator.nextInt((diff<3) ? 3 : diff);
+
+            if (r2 == 0) {
+                result = Unit.ATTACK_GREAT_WIN;
+            } else {
+                result = Unit.ATTACK_WIN;
+            }
+        }
+        
+        if (result == Unit.ATTACK_LOSS) {
+            int diff = attackPower*2-defender.getDefensePower(unit);
+            int r2 = attackCalculator.nextInt((diff<3) ? 3 : diff);
+
+            if (r2 == 0) {
+                result = Unit.ATTACK_GREAT_LOSS;
+            } else {
+                result = Unit.ATTACK_LOSS;
+            }
+        }
+
+        if ((result == Unit.ATTACK_WIN || result == Unit.ATTACK_GREAT_WIN) && (
+                defender.getTile().getSettlement() != null && defender.getTile().getSettlement() instanceof IndianSettlement
+                && ((IndianSettlement) defender.getTile().getSettlement()).getUnitCount()+defender.getTile().getUnitCount() <= 1
+                || defender.getTile().getColony() != null && !defender.isArmed() && !defender.isMounted() && defender.getType() != Unit.ARTILLERY
+                && defender.getType() != Unit.DAMAGED_ARTILLERY && !defender.isMounted())) {
+            result = Unit.ATTACK_DONE_SETTLEMENT;
+        }
+
+        return result;
+    }
+
 
     /**
     * Handles an "embark"-message from a client.
@@ -903,7 +941,6 @@ public final class InGameInputHandler extends InputHandler {
                 for (int i=0; i<surroundingTiles.size(); i++) {
                     Tile t = (Tile) surroundingTiles.get(i);
                     if (t != unit.getTile()) {
-                        player.setExplored(t);
                         updateElement.appendChild(t.toXMLElement(player, reply.getOwnerDocument()));
                     }
                 }

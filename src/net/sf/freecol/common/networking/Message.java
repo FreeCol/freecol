@@ -12,8 +12,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import org.w3c.dom.*;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -29,7 +28,7 @@ public final class Message {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    private static final String FREECOL_PROTOCOL_VERSION = "0.0.1";
+    private static final String FREECOL_PROTOCOL_VERSION = "0.0.2";
 
 
     /** The actual Message data. */
@@ -250,6 +249,54 @@ public final class Message {
         }
 
         document.appendChild(newRoot);
+    }
+
+
+    /**
+    * Convenience method: returns the first child element with the
+    * specified tagname.
+    *
+    * @param element The <code>Element</code> to search for the child element.
+    * @param tagName The tag name of the child element to be found.
+    */
+    public static Element getChildElement(Element element, String tagName) {
+        NodeList n = element.getChildNodes();
+        for (int i=0; i<n.getLength(); i++) {
+            if (((Element) n.item(i)).getTagName().equals(tagName)) {
+                return (Element) n.item(i);
+            }
+        }
+
+        return null;
+    }
+    
+    
+    /**
+    * Reads an XML-representation of an array.
+    */
+    public static boolean[][] readFromArrayElement(String tagName, Element arrayElement, boolean[][] arrayType) {
+        boolean[][] array = new boolean[Integer.parseInt(arrayElement.getAttribute("xLength"))][Integer.parseInt(arrayElement.getAttribute("yLength"))];
+
+        String data = null;
+        if (arrayElement.hasAttribute("data")) {
+            data = arrayElement.getAttribute("data");
+        } 
+        
+        for (int x=0; x<array.length; x++) {
+            for (int y=0; y<array[0].length; y++) {
+                if (data != null) {
+                    if (data.charAt(x*array[0].length+y) == '1') {
+                        array[x][y] = true;
+                    } else {
+                        array[x][y] = false;
+                    }
+                } else { // Old type of storing booleans:
+                    array[x][y] = Boolean.valueOf(arrayElement.getAttribute("x" + Integer.toString(x) + "y" + Integer.toString(y))).booleanValue();
+                }
+            }
+        }
+
+        return array;
     }
 
 

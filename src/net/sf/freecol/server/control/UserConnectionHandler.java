@@ -119,6 +119,20 @@ public final class UserConnectionHandler implements MessageHandler {
             return reply;
         }
 
+        // Wait until the game has been created:
+        int timeOut = 20000;
+        while (freeColServer.getGame() == null) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {}
+    
+            timeOut -= 1000;                
+            
+            if (timeOut <= 0) {
+                return Message.createError("server.timeOut", "Timeout when connecting to the server.");
+            }
+        }
+
         if (!freeColServer.getGame().canAddNewPlayer()) {
             return Message.createError("server.maximumPlayers", "Sorry, the maximum number of players reached.");
         }

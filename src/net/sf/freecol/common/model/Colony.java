@@ -37,10 +37,6 @@ public final class Colony extends Settlement implements Location {
     private int hammers;
     private int bells;
     
-    // Will only be used on enemy colonies:
-    private int unitCount = -1;
-    private Unit defendingUnit = null;
-    
     /**
     * The type of the "Building" that is beeing built,
     * or if <code>currentlyBuilding >= BUILDING_UNIT_ADDITION</code>
@@ -48,6 +44,9 @@ public final class Colony extends Settlement implements Location {
     * that is currently beeing build
     */
     private int currentlyBuilding;
+
+    // Will only be used on enemy colonies:
+    private int unitCount = -1;
 
     // Temporary variable:
     private int lastVisited = -1;
@@ -62,6 +61,19 @@ public final class Colony extends Settlement implements Location {
     * @param tile The location of the <code>Colony</code>.
     */
     public Colony(Game game, Player owner, String name, Tile tile) {
+        this(game, owner, name, tile, true);
+    }
+
+
+    /**
+    * Creates a new <code>Colony</code>.
+    *
+    * @param game The <code>Game</code> in which this object belongs.
+    * @param owner The <code>Player</code> owning this <code>Colony</code>.
+    * @param name The name of the new <code>Colony</code>.
+    * @param tile The location of the <code>Colony</code>.
+    */
+    public Colony(Game game, Player owner, String name, Tile tile, boolean initializeWorkLocations) {
         super(game, owner, tile);
 
         goodsContainer = new GoodsContainer(game, this);
@@ -72,32 +84,34 @@ public final class Colony extends Settlement implements Location {
         bells = 0;
         currentlyBuilding = Building.DOCK;
 
-        workLocations.add(new ColonyTile(getGame(), this, tile));
-        workLocations.add(new ColonyTile(getGame(), this, getGame().getMap().getNeighbourOrNull(Map.N, tile)));
-        workLocations.add(new ColonyTile(getGame(),this, getGame().getMap().getNeighbourOrNull(Map.NE, tile)));
-        workLocations.add(new ColonyTile(getGame(),this, getGame().getMap().getNeighbourOrNull(Map.E, tile)));
-        workLocations.add(new ColonyTile(getGame(),this, getGame().getMap().getNeighbourOrNull(Map.NW, tile)));
-        workLocations.add(new ColonyTile(getGame(),this, getGame().getMap().getNeighbourOrNull(Map.SE, tile)));
-        workLocations.add(new ColonyTile(getGame(),this, getGame().getMap().getNeighbourOrNull(Map.W, tile)));
-        workLocations.add(new ColonyTile(getGame(),this, getGame().getMap().getNeighbourOrNull(Map.SW, tile)));
-        workLocations.add(new ColonyTile(getGame(),this, getGame().getMap().getNeighbourOrNull(Map.S, tile)));
+        if (initializeWorkLocations) {
+            workLocations.add(new ColonyTile(getGame(), this, tile));
+            workLocations.add(new ColonyTile(getGame(), this, getGame().getMap().getNeighbourOrNull(Map.N, tile)));
+            workLocations.add(new ColonyTile(getGame(),this, getGame().getMap().getNeighbourOrNull(Map.NE, tile)));
+            workLocations.add(new ColonyTile(getGame(),this, getGame().getMap().getNeighbourOrNull(Map.E, tile)));
+            workLocations.add(new ColonyTile(getGame(),this, getGame().getMap().getNeighbourOrNull(Map.NW, tile)));
+            workLocations.add(new ColonyTile(getGame(),this, getGame().getMap().getNeighbourOrNull(Map.SE, tile)));
+            workLocations.add(new ColonyTile(getGame(),this, getGame().getMap().getNeighbourOrNull(Map.W, tile)));
+            workLocations.add(new ColonyTile(getGame(),this, getGame().getMap().getNeighbourOrNull(Map.SW, tile)));
+            workLocations.add(new ColonyTile(getGame(),this, getGame().getMap().getNeighbourOrNull(Map.S, tile)));
 
-        workLocations.add(new Building(getGame(),this, Building.TOWN_HALL, Building.HOUSE));
-        workLocations.add(new Building(getGame(),this, Building.CARPENTER, Building.HOUSE));
-        workLocations.add(new Building(getGame(),this, Building.BLACKSMITH, Building.HOUSE));
-        workLocations.add(new Building(getGame(),this, Building.TOBACCONIST, Building.HOUSE));
-        workLocations.add(new Building(getGame(),this, Building.WEAVER, Building.HOUSE));
-        workLocations.add(new Building(getGame(),this, Building.DISTILLER, Building.HOUSE));
-        workLocations.add(new Building(getGame(),this, Building.FUR_TRADER, Building.HOUSE));
-        workLocations.add(new Building(getGame(),this, Building.STOCKADE, Building.NOT_BUILT));
-        workLocations.add(new Building(getGame(),this, Building.ARMORY, Building.NOT_BUILT));
-        workLocations.add(new Building(getGame(),this, Building.DOCK, Building.NOT_BUILT));
-        workLocations.add(new Building(getGame(),this, Building.SCHOOLHOUSE, Building.NOT_BUILT));
-        workLocations.add(new Building(getGame(),this, Building.WAREHOUSE, Building.NOT_BUILT));
-        workLocations.add(new Building(getGame(),this, Building.STABLES, Building.NOT_BUILT));
-        workLocations.add(new Building(getGame(),this, Building.CHURCH, Building.NOT_BUILT));
-        workLocations.add(new Building(getGame(),this, Building.PRINTING_PRESS, Building.NOT_BUILT));
-        workLocations.add(new Building(getGame(),this, Building.CUSTOM_HOUSE, Building.NOT_BUILT));
+            workLocations.add(new Building(getGame(),this, Building.TOWN_HALL, Building.HOUSE));
+            workLocations.add(new Building(getGame(),this, Building.CARPENTER, Building.HOUSE));
+            workLocations.add(new Building(getGame(),this, Building.BLACKSMITH, Building.HOUSE));
+            workLocations.add(new Building(getGame(),this, Building.TOBACCONIST, Building.HOUSE));
+            workLocations.add(new Building(getGame(),this, Building.WEAVER, Building.HOUSE));
+            workLocations.add(new Building(getGame(),this, Building.DISTILLER, Building.HOUSE));
+            workLocations.add(new Building(getGame(),this, Building.FUR_TRADER, Building.HOUSE));
+            workLocations.add(new Building(getGame(),this, Building.STOCKADE, Building.NOT_BUILT));
+            workLocations.add(new Building(getGame(),this, Building.ARMORY, Building.NOT_BUILT));
+            workLocations.add(new Building(getGame(),this, Building.DOCK, Building.NOT_BUILT));
+            workLocations.add(new Building(getGame(),this, Building.SCHOOLHOUSE, Building.NOT_BUILT));
+            workLocations.add(new Building(getGame(),this, Building.WAREHOUSE, Building.NOT_BUILT));
+            workLocations.add(new Building(getGame(),this, Building.STABLES, Building.NOT_BUILT));
+            workLocations.add(new Building(getGame(),this, Building.CHURCH, Building.NOT_BUILT));
+            workLocations.add(new Building(getGame(),this, Building.PRINTING_PRESS, Building.NOT_BUILT));
+            workLocations.add(new Building(getGame(),this, Building.CUSTOM_HOUSE, Building.NOT_BUILT));
+        }
     }
 
 
@@ -458,11 +472,7 @@ public final class Colony extends Settlement implements Location {
     * @return The <code>Unit</code> that has been choosen to defend this colony.
     */
     public Unit getDefendingUnit() {
-        if (defendingUnit == null) {
-            return (Unit) getUnitIterator().next();
-        } else {
-            return defendingUnit;
-        }
+        return (Unit) getUnitIterator().next();
     }
 
     /**
@@ -915,7 +925,6 @@ public final class Colony extends Settlement implements Location {
             }
         } else {
             colonyElement.setAttribute("unitCount", Integer.toString(getUnitCount()));
-            colonyElement.appendChild(getDefendingUnit().toXMLElement(player, document, showAll, toSavedGame));
             colonyElement.appendChild(getBuilding(Building.STOCKADE).toXMLElement(player, document, showAll, toSavedGame));
         }
 
@@ -935,7 +944,6 @@ public final class Colony extends Settlement implements Location {
         name = colonyElement.getAttribute("name");
         owner = (Player) getGame().getFreeColGameObject(colonyElement.getAttribute("owner"));
         tile = (Tile) getGame().getFreeColGameObject(colonyElement.getAttribute("tile"));
-        defendingUnit = null;
 
         if (colonyElement.hasAttribute("hammers")) {
             hammers = Integer.parseInt(colonyElement.getAttribute("hammers"));
@@ -989,9 +997,7 @@ public final class Colony extends Settlement implements Location {
                 } else {
                     goodsContainer = new GoodsContainer(getGame(), this, childElement);
                 }
-            } else if (childElement.getTagName().equals(Unit.getXMLElementTagName())) {
-                defendingUnit = new Unit(getGame(), childElement);
-            }
+            } 
         }
     }
 

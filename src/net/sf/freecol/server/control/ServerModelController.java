@@ -122,6 +122,7 @@ public class ServerModelController implements ModelController {
         }
 
         unit.setLocation(entryLocation);
+        unit.setState(Unit.ACTIVE);
 
         // Display the tiles surrounding the Unit:
         Element updateElement = Message.createNewRootElement("update");
@@ -129,7 +130,6 @@ public class ServerModelController implements ModelController {
 
         for (int i=0; i<surroundingTiles.size(); i++) {
             Tile t = (Tile) surroundingTiles.get(i);
-            player.setExplored(t);
             updateElement.appendChild(t.toXMLElement(player, updateElement.getOwnerDocument()));
         }
 
@@ -160,7 +160,6 @@ public class ServerModelController implements ModelController {
         Element updateElement = Message.createNewRootElement("update");
         for (int i=0; i<tiles.size(); i++) {
             Tile t = (Tile) tiles.get(i);
-            ((ServerPlayer) player).setExplored(t);
             updateElement.appendChild(t.toXMLElement(((ServerPlayer) player), updateElement.getOwnerDocument()));
         }
 

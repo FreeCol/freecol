@@ -233,15 +233,42 @@ public final class InGameInputHandler extends InputHandler {
 
         int direction = Integer.parseInt(opponentAttackElement.getAttribute("direction"));
         int result = Integer.parseInt(opponentAttackElement.getAttribute("result"));
+        int plunderGold = Integer.parseInt(opponentAttackElement.getAttribute("plunderGold"));
 
         Unit unit = (Unit) game.getFreeColGameObject(opponentAttackElement.getAttribute("unit"));
-        Unit defender = map.getNeighbourOrNull(direction, unit.getTile()).getDefendingUnit(unit);
-        Player player = unit.getOwner();
+        Unit defender = (Unit) game.getFreeColGameObject(opponentAttackElement.getAttribute("defender"));
+        
+        if (unit == null && defender == null) {
+            logger.warning("Both \"unit\" and \"defender\" is \"null\"!");
+            throw new NullPointerException();
+        }
 
-        if (result == Unit.ATTACKER_LOSS) {
-            unit.loseAttack();
-        } else {
-            unit.winAttack(defender);
+        if (unit == null) {
+            unit = new Unit(game, Message.getChildElement(opponentAttackElement, Unit.getXMLElementTagName()));
+            unit.setLocation(unit.getTile());
+
+            if (unit.getTile() == null) {
+                logger.warning("unit.getTile() == null");
+                throw new NullPointerException();
+            }
+        } else if (defender == null) {
+            defender = new Unit(game, Message.getChildElement(opponentAttackElement, Unit.getXMLElementTagName()));
+            defender.setLocation(defender.getTile());
+
+            if (defender.getTile() == null) {
+                logger.warning("defender.getTile() == null");
+                throw new NullPointerException();
+            }
+        }
+
+        unit.attack(defender, result, plunderGold);
+
+        if (!unit.isVisibleTo(getFreeColClient().getMyPlayer())) {
+            unit.dispose();
+        }
+
+        if (!defender.isVisibleTo(getFreeColClient().getMyPlayer())) {
+            defender.dispose();
         }
 
         getFreeColClient().getCanvas().refresh();

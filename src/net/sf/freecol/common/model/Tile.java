@@ -9,8 +9,7 @@ import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Position;
 
-import org.w3c.dom.Element;
-import org.w3c.dom.Document;
+import org.w3c.dom.*;
 
 
 
@@ -79,6 +78,7 @@ public final class Tile extends FreeColGameObject implements Location {
     */
     private Settlement owner;
 
+    private PlayerExploredTile[] playerExploredTiles = new PlayerExploredTile[Player.NUMBER_OF_NATIONS];
 
 
 
@@ -120,6 +120,11 @@ public final class Tile extends FreeColGameObject implements Location {
 
         owner = null;
         settlement = null;
+        
+        for (int i=0; i<playerExploredTiles.length; i++) {
+            playerExploredTiles[i] = new PlayerExploredTile(game, i);
+            updatePlayerExploredTile(i);
+        }
     }
 
 
@@ -253,11 +258,7 @@ public final class Tile extends FreeColGameObject implements Location {
                 return defender;
             }
         } else {
-            if (defender != null) {
-                return defender;
-            } else {
-                return null;
-            }
+            return defender;
         }
     }
 
@@ -759,9 +760,9 @@ public final class Tile extends FreeColGameObject implements Location {
     * @return The amount of units at this <code>Location</code>.
     */
     public int getUnitCount() {
-        if (settlement != null) {
+        /*if (settlement != null) {
             return settlement.getUnitCount() + unitContainer.getUnitCount();
-        }
+        }*/
         return unitContainer.getUnitCount();
     }
 
@@ -924,7 +925,7 @@ public final class Tile extends FreeColGameObject implements Location {
         }
         return defenseTable[type][(forested ? 1 : 0)];
     } 
-    
+
     /**
     * Prepares this <code>Tile</code> for a new turn.
     */
@@ -951,7 +952,7 @@ public final class Tile extends FreeColGameObject implements Location {
         tileElement.setAttribute("plowed", Boolean.toString(plowed));
         tileElement.setAttribute("forested", Boolean.toString(forested));
         tileElement.setAttribute("bonus", Boolean.toString(bonus));
-        
+
         if (owner != null) {
             tileElement.setAttribute("owner", owner.getID());
         }
@@ -960,11 +961,8 @@ public final class Tile extends FreeColGameObject implements Location {
             tileElement.appendChild(settlement.toXMLElement(player, document, showAll, toSavedGame));
         }
 
-        // TODO: Check if there is a settlement on this tile: Do not show enemy units hidden in a settlement.
-        //       Needs to store a "defendingUnit" if the unitContainer is hidden.
-
         // Check if the player can see the tile: Do not show enemy units on a tile out-of-sight.
-        if (showAll || player.canSee(this)) {
+        if (showAll || (player.canSee(this) && (settlement == null || settlement.getOwner() == player))) {
             tileElement.appendChild(unitContainer.toXMLElement(player, document, showAll, toSavedGame));
         } else {
             UnitContainer emptyUnitContainer = new UnitContainer(getGame(), this);
@@ -972,12 +970,26 @@ public final class Tile extends FreeColGameObject implements Location {
             tileElement.appendChild(emptyUnitContainer.toXMLElement(player, document, showAll, toSavedGame));
         }
 
+        if (!showAll && !player.canSee(this)) {
+            if (player != null) {
+                playerExploredTiles[player.getNation()].setAttributes(tileElement);
+            } else {
+                logger.warning("player == null");
+            }
+        }
+
+        if (toSavedGame) {
+            for (int i=0; i<playerExploredTiles.length; i++) {
+                tileElement.appendChild(playerExploredTiles[i].toXMLElement(player, document, showAll, toSavedGame));
+            }
+        }
+
         return tileElement;
     }
 
+
     /**
     * Initialize this object from an XML-representation of this object.
-    *
     * @param tileElement The DOM-element ("Document Object Model") made to represent this "Tile".
     */
     public void readFromXMLElement(Element tileElement) {
@@ -991,7 +1003,7 @@ public final class Tile extends FreeColGameObject implements Location {
         plowed = Boolean.valueOf(tileElement.getAttribute("plowed")).booleanValue();
         forested = Boolean.valueOf(tileElement.getAttribute("forested")).booleanValue();
         bonus = Boolean.valueOf(tileElement.getAttribute("bonus")).booleanValue();
-        
+
         if (tileElement.hasAttribute("owner")) {
             owner = (Settlement) getGame().getFreeColGameObject(tileElement.getAttribute("owner"));
         }
@@ -1015,7 +1027,7 @@ public final class Tile extends FreeColGameObject implements Location {
         }
 
         Element unitContainerElement = getChildElement(tileElement, UnitContainer.getXMLElementTagName());
-        
+
         if (unitContainerElement == null) {
             throw new NullPointerException();
         }
@@ -1025,15 +1037,252 @@ public final class Tile extends FreeColGameObject implements Location {
         } else {
             unitContainer = new UnitContainer(getGame(), this, unitContainerElement);
         }
+        
+        // Only from a savegame:
+        NodeList nl = tileElement.getElementsByTagName("playerExploredTile");
+        for (int i=0; i<nl.getLength(); i++) {
+            Element petElement = (Element) nl.item(i);
+            if (playerExploredTiles[Integer.parseInt(petElement.getAttribute("nation"))] == null) {
+                PlayerExploredTile pet = new PlayerExploredTile(getGame(), petElement);
+                playerExploredTiles[pet.getNation()] = pet;
+            } else {
+                playerExploredTiles[Integer.parseInt(petElement.getAttribute("nation"))].readFromXMLElement(petElement);
+            }
+        }
     }
 
 
     /**
     * Returns the tag name of the root element representing this object.
     *
-    * @return the tag name.
+    * @return "tile".
     */
     public static String getXMLElementTagName() {
         return "tile";
+    }
+
+    
+    
+    public PlayerExploredTile getPlayerExploredTile(Player player) {
+        return playerExploredTiles[player.getNation()];
+    }
+    
+    
+    public void createPlayerExploredTile(Player player) {
+        playerExploredTiles[player.getNation()] = new PlayerExploredTile(getGame(), player.getNation());
+    }
+    
+    
+    public void updatePlayerExploredTile(Player player) {
+        updatePlayerExploredTile(player.getNation());
+    }
+
+    public void updatePlayerExploredTile(int nation) {
+        playerExploredTiles[nation].setRoad(road);
+        playerExploredTiles[nation].setPlowed(plowed);
+        playerExploredTiles[nation].setForested(forested);
+        playerExploredTiles[nation].setBonus(bonus);
+
+        if (getColony() != null) {
+            playerExploredTiles[nation].setColonyUnitCount(getSettlement().getUnitCount());
+            playerExploredTiles[nation].setColonyStockadeLevel(getColony().getBuilding(Building.STOCKADE).getLevel());
+        }
+    }
+    
+
+
+    /**
+    * This class contains the data visible to a specific player.
+    *
+    * <br><br> 
+    *
+    * Sometimes a tile contains information that should not be given to
+    * a player. For instance; a settlement that was built after the player
+    * last viewed the tile.
+    *
+    * <br><br>
+    *
+    * The <code>toXMLElement</code> of {@link Tile} uses {@link #setAttributes}
+    * in this class to hide information that is not available.
+    */
+    public class PlayerExploredTile extends FreeColGameObject {
+
+        private int nation;
+        private boolean explored;
+
+        // Tile data:
+        private boolean road,
+                        plowed,
+                        forested,
+                        bonus;
+        
+        // Settlement data:
+        private int     colonyUnitCount;
+        private int     colonyStockadeLevel;
+
+        //private Settlement settlement;
+
+
+        /**
+        * Creates a new <code>PlayerExploredTile</code>.
+        */
+        public PlayerExploredTile(Game game, int nation) {
+            super(game);
+
+            this.nation = nation;
+        }
+
+
+        /**
+        * Initialize this object from an XML-representation of this object.
+        * @param element The DOM-element ("Document Object Model") made to represent this "PlayerExploredTile".
+        */
+        public PlayerExploredTile(Game game, Element element) {
+            super(game, element);
+            readFromXMLElement(element);
+        }
+
+
+        public void setColonyUnitCount(int colonyUnitCount) {
+            this.colonyUnitCount = colonyUnitCount;
+        }
+        
+        
+        public void setColonyStockadeLevel(int colonyStockadeLevel) {
+            this.colonyStockadeLevel = colonyStockadeLevel;
+        }
+
+
+        public void setRoad(boolean road) {
+            this.road = road;
+        }
+
+
+        public void setPlowed(boolean plowed) {
+            this.plowed = plowed;
+        }
+
+
+        public void setForested(boolean forested) {
+            this.forested = forested;
+        }
+
+
+        public void setBonus(boolean robonus) {
+            this.bonus = bonus;
+        }
+
+
+        public void setExplored(boolean explored) {
+            this.explored = explored;
+        }
+
+
+        /**
+        * Returns <i>true</i> if the tile has been explored.
+        */
+        public boolean isExplored() {
+            return explored;
+        }
+
+
+        /**
+        * Returns the nation of this <code>PlayerExploredTile</code>.
+        */
+        public int getNation() {
+            return nation;
+        }
+
+
+        /**
+        * Hides the unvisible features of the given <code>tileElement</code>.
+        */
+        public void setAttributes(Element tileElement) {
+            tileElement.setAttribute("road", Boolean.toString(road));
+            tileElement.setAttribute("plowed", Boolean.toString(plowed));
+            tileElement.setAttribute("forested", Boolean.toString(forested));
+            tileElement.setAttribute("bonus", Boolean.toString(bonus));
+
+            if (getColony() != null) {
+                Element colonyElement = (Element) tileElement.getElementsByTagName(Colony.getXMLElementTagName());
+                colonyElement.setAttribute("unitCount", Integer.toString(colonyUnitCount));
+
+                NodeList childNodes = colonyElement.getChildNodes();
+                for (int i=0; i<childNodes.getLength(); i++) {
+                    Element childElement = (Element) childNodes.item(i);
+
+                    if (childElement.getTagName().equals(Building.getXMLElementTagName())) {
+                        Building b = (Building) getGame().getFreeColGameObject(childElement.getAttribute("ID"));
+
+                        if (b.getType() == Building.STOCKADE) {
+                            childElement.setAttribute("level", Integer.toString(colonyStockadeLevel));
+                        }
+                    }
+                }
+            }
+        }
+
+
+        /**
+        * Empty method.
+        */
+        public void newTurn() {
+            // Nothing to do.
+        }
+
+
+        /**
+        * Make a XML-representation of this object.
+        *
+        * @param document The document to use when creating new componenets.
+        * @return The DOM-element ("Document Object Model") made to represent this "PlayerExploredTile".
+        */
+        public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
+            Element tileElement = document.createElement("playerExploredTile");
+
+            tileElement.setAttribute("ID", getID());
+
+            tileElement.setAttribute("explored", Boolean.toString(explored));
+            tileElement.setAttribute("nation", Integer.toString(nation));
+
+            tileElement.setAttribute("road", Boolean.toString(road));
+            tileElement.setAttribute("plowed", Boolean.toString(plowed));
+            tileElement.setAttribute("forested", Boolean.toString(forested));
+            tileElement.setAttribute("bonus", Boolean.toString(bonus));
+
+            tileElement.setAttribute("colonyUnitCount", Integer.toString(colonyUnitCount));
+            tileElement.setAttribute("colonyStockadeLevel", Integer.toString(colonyStockadeLevel));
+
+            return tileElement;
+        }
+
+
+        /**
+        * Initialize this object from an XML-representation of this object.
+        * @param tileElement The DOM-element ("Document Object Model") made to represent this "PlayerExploredTile".
+        */
+        public void readFromXMLElement(Element tileElement) {
+            setID(tileElement.getAttribute("ID"));
+            
+            explored = Boolean.valueOf(tileElement.getAttribute("explored")).booleanValue();
+            nation = Integer.parseInt(tileElement.getAttribute("nation"));
+
+            road = Boolean.valueOf(tileElement.getAttribute("road")).booleanValue();
+            plowed = Boolean.valueOf(tileElement.getAttribute("plowed")).booleanValue();
+            forested = Boolean.valueOf(tileElement.getAttribute("forested")).booleanValue();
+            bonus = Boolean.valueOf(tileElement.getAttribute("bonus")).booleanValue();
+            
+            colonyUnitCount = Integer.parseInt(tileElement.getAttribute("colonyUnitCount"));
+            colonyStockadeLevel = Integer.parseInt(tileElement.getAttribute("colonyStockadeLevel"));
+        }
+
+
+        /**
+        * Returns the tag name of the root element representing this object.
+        * @return "playerExploredTile".
+        */
+        /*public static String getXMLElementTagName() {
+            return "playerExploredTile";
+        }*/
     }
 }

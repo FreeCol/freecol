@@ -87,7 +87,7 @@ public class AIPlayer extends AIObject {
                 IndianSettlement is = (IndianSettlement) it.next();
                 
                 if (is.getUnitCount() > 2) {
-                    int defenders = is.getTile().getUnitCount() - is.getUnitCount();
+                    int defenders = is.getTile().getUnitCount();
                     int threat = 0;
 
                     Iterator positionIterator = map.getCircleIterator(is.getTile().getPosition(), true, 2);
@@ -108,6 +108,7 @@ public class AIPlayer extends AIObject {
 
                     if (threat > defenders) {
                         Unit newDefender = is.getFirstUnit();
+                        newDefender.setState(Unit.ACTIVE);                        
                         newDefender.setLocation(is.getTile());
                         AIUnit newDefenderAI = (AIUnit) getAIMain().getAIObject(newDefender);
                         newDefenderAI.setMission(new UnitWanderHostileMission(newDefenderAI));

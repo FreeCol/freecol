@@ -157,13 +157,20 @@ public final class InGameController {
         Player player = freeColClient.getMyPlayer();
         Map map = freeColClient.getGame().getMap();
 
+        player.resetCanSeeTiles();
+        
         Iterator tileIterator = map.getWholeMapIterator();
         while (tileIterator.hasNext()) {
             Tile t = map.getTile((Map.Position) tileIterator.next());
             if (t != null && !player.canSee(t) && t.getFirstUnit() != null) {
+                if (t.getFirstUnit().getOwner() == player) {
+                    logger.warning("Could not see one of my own units!");
+                }
                 t.disposeAllUnits();
             }
         }
+        
+        player.resetCanSeeTiles();
     }
 
 
@@ -338,6 +345,8 @@ public final class InGameController {
         Element attackResultElement = client.ask(attackElement);
 
         int result = Integer.parseInt(attackResultElement.getAttribute("result"));
+        int plunderGold = Integer.parseInt(attackResultElement.getAttribute("plunderGold"));
+        Tile newTile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
 
         // If a successful attack against a colony, we need to update the tile:
         Element utElement = getChildElement(attackResultElement, Tile.getXMLElementTagName());
@@ -346,15 +355,23 @@ public final class InGameController {
             updateTile.readFromXMLElement(utElement);
         }
 
-        Unit defender = map.getNeighbourOrNull(direction, unit.getTile()).getDefendingUnit(unit);
-
-        if (result == Unit.ATTACKER_LOSS) {
-            unit.loseAttack();
+        // Get the defender:
+        Unit defender;
+        Element unitElement = getChildElement(attackResultElement, Unit.getXMLElementTagName());
+        if (unitElement != null) {
+            defender = new Unit(game, unitElement);
+            defender.setLocation(newTile);
         } else {
-            unit.winAttack(defender);
+            defender = map.getNeighbourOrNull(direction, unit.getTile()).getDefendingUnit(unit);
         }
 
-        Element updateElement = (Element) attackResultElement.getElementsByTagName("update").item(0);
+        unit.attack(defender, result, plunderGold);
+
+        if (!defender.isVisibleTo(freeColClient.getMyPlayer())) {
+            defender.dispose();
+        }
+
+        Element updateElement = getChildElement(attackResultElement, "update");
         if (updateElement != null) {
             freeColClient.getInGameInputHandler().handle(client.getConnection(), updateElement);
         }

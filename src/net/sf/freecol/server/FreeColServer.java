@@ -204,26 +204,20 @@ public final class FreeColServer {
         // Add the AIObjects:
         savedGameElement.appendChild(aiMain.toXMLElement(document));
         
-        // Convert the XML Element to a human-readable XML string.
-        String xml;
+        // Write the XML Element to the file:
         try {
             TransformerFactory factory = TransformerFactory.newInstance();
             Transformer xmlTransformer = factory.newTransformer();
             xmlTransformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 
-            StringWriter stringWriter = new StringWriter();
-            xmlTransformer.transform(new DOMSource(savedGameElement), new StreamResult(stringWriter));
-            xml = stringWriter.toString();
-        }
-        catch (TransformerException e) {
+            //PrintWriter out = new PrintWriter(new DeflaterOutputStream(new FileOutputStream(file)));
+            DeflaterOutputStream out = new DeflaterOutputStream(new FileOutputStream(file));
+            xmlTransformer.transform(new DOMSource(savedGameElement), new StreamResult(out));
+            out.close();
+        } catch (TransformerException e) {
             e.printStackTrace();
             return;
         }
-
-        // Write the string to file.
-        PrintWriter out = new PrintWriter(new DeflaterOutputStream(new FileOutputStream(file)));
-        out.print(xml);
-        out.close();
     }
     
     
@@ -240,17 +234,20 @@ public final class FreeColServer {
         //Message message = new Message(in);
 
         Element savedGameElement = message.getDocument().getDocumentElement();
+        String version = savedGameElement.getAttribute("version");
         Element serverObjectsElement = (Element) savedGameElement.getElementsByTagName("serverObjects").item(0);
 
         singleplayer = Boolean.valueOf(savedGameElement.getAttribute("singleplayer")).booleanValue();
 
         // Read the ServerAdditionObjects:
         ArrayList serverObjects = new ArrayList();
+        ArrayList serverPlayerElements = new ArrayList();
         NodeList serverObjectsNodeList = serverObjectsElement.getChildNodes();
         for (int i=0; i<serverObjectsNodeList.getLength(); i++) {
             Element element = (Element) serverObjectsNodeList.item(i);
             if (element.getTagName().equals(ServerPlayer.getServerAdditionXMLElementTagName())) {
                 serverObjects.add(new ServerPlayer(element));
+                serverPlayerElements.add(element);
             }
         }
 
@@ -258,6 +255,26 @@ public final class FreeColServer {
         Element gameElement = (Element) savedGameElement.getElementsByTagName(Game.getXMLElementTagName()).item(0);
         game = new Game(aiMain, getModelController(), gameElement, (FreeColGameObject[]) serverObjects.toArray(new FreeColGameObject[0]));
         game.setCurrentPlayer(null);
+
+        // Support for pre-0.0.2 protocols:
+        if (version.compareTo(Message.getFreeColProtocolVersion()) < 0) {
+            for (int k=0; k<serverPlayerElements.size(); k++) {
+                Element spElement = (Element) serverPlayerElements.get(k);
+                ServerPlayer sp = (ServerPlayer) game.getFreeColGameObject(spElement.getAttribute("ID"));
+
+                Element exploredTileElement = Message.getChildElement(spElement, "exploredTiles");
+                if (exploredTileElement != null) {
+                    boolean[][] exploredTiles = Message.readFromArrayElement("exploredTiles", exploredTileElement, new boolean[0][0]);
+                    for (int i=0; i<exploredTiles.length; i++) {
+                        for (int j=0; j<exploredTiles[0].length; j++) {
+                            game.getMap().getTile(i, j).createPlayerExploredTile(sp);
+                            game.getMap().getTile(i, j).getPlayerExploredTile(sp).setExplored(exploredTiles[i][j]);
+                        }
+                    }
+                }
+
+            }
+        }
 
         gameState = IN_GAME;
 

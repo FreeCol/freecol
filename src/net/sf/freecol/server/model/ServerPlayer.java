@@ -40,9 +40,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
     private boolean connected = false;
 
     /** Stores information about which tiles this player has explored. */
-    private boolean[][] exploredTiles;
+    //private boolean[][] exploredTiles;
 
-    private boolean[][] canSeeTiles = null;
+//    private boolean[][] canSeeTiles = null;
 
     private String serverID;
 
@@ -125,26 +125,24 @@ public class ServerPlayer extends Player implements ServerModelObject {
     */
     public void resetExploredTiles(Map map) {
         if (map != null) {
-            exploredTiles = new boolean[map.getWidth()][map.getHeight()];
+            //exploredTiles = new boolean[map.getWidth()][map.getHeight()];
 
             Iterator unitIterator = getUnitIterator();
             while (unitIterator.hasNext()) {
                 Unit unit = (Unit) unitIterator.next();
 
-                Map.Position position = unit.getTile().getPosition();
-                exploredTiles[position.getX()][position.getY()] = true;
+                setExplored(unit.getTile());
 
                 Iterator positionIterator;
-
                 if (unit.getTile().getColony() != null) {
-                    positionIterator = map.getCircleIterator(position, true, 2);
+                    positionIterator = map.getCircleIterator(unit.getTile().getPosition(), true, 2);
                 } else {
-                    positionIterator = map.getCircleIterator(position, true, unit.getLineOfSight());
+                    positionIterator = map.getCircleIterator(unit.getTile().getPosition(), true, unit.getLineOfSight());
                 }
 
                 while (positionIterator.hasNext()) {
                     Map.Position p = (Map.Position) positionIterator.next();
-                    exploredTiles[p.getX()][p.getY()] = true;
+                    setExplored(map.getTile(p));
                 }
             }
 
@@ -152,121 +150,27 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
     }
 
-
+    
     /**
-    * Resets this player's "can see"-tiles. This is done by setting
-    * all the tiles within a {@link Unit}s line of sight visible.
-    * The other tiles are made unvisible.
-    */
-    public void resetCanSeeTiles() {
-        Map map = getGame().getMap();
-
-        if (map != null) {
-            canSeeTiles = new boolean[map.getWidth()][map.getHeight()];
-
-            Iterator unitIterator = getUnitIterator();
-            while (unitIterator.hasNext()) {
-                Unit unit = (Unit) unitIterator.next();
-
-                Map.Position position = unit.getTile().getPosition();
-                canSeeTiles[position.getX()][position.getY()] = true;
-
-                Iterator positionIterator = map.getCircleIterator(position, true, unit.getLineOfSight());
-                while (positionIterator.hasNext()) {
-                    Map.Position p = (Map.Position) positionIterator.next();
-                    canSeeTiles[p.getX()][p.getY()] = true;
-                }
-            }
-            
-            Iterator colonyIterator = getColonyIterator();
-            while (colonyIterator.hasNext()) {
-                Colony colony = (Colony) colonyIterator.next();
-                
-                Map.Position position = colony.getTile().getPosition();
-                canSeeTiles[position.getX()][position.getY()] = true;
-
-                Iterator positionIterator = map.getCircleIterator(position, true, colony.getLineOfSight());
-                while (positionIterator.hasNext()) {
-                    Map.Position p = (Map.Position) positionIterator.next();
-                    canSeeTiles[p.getX()][p.getY()] = true;
-                }
-            }
-        }
-    }
-
-
-    /**
-    * Gets called when this player's turn has ended.
-    */
-    public void endTurn() {
-        super.endTurn();
-        resetCanSeeTiles();
-    }
-
-
-    /**
-    * Checks if this <code>Player</code> can see the given
-    * <code>Tile</code>. The <code>Tile</code> can be seen if
-    * it is in a {@link Unit}'s line of sight.
-    *
-    * @param The given <code>Tile</code>.
-    * @return <i>true</i> if the <code>Player</code> can see
-    *         the given <code>Tile</code> and <i>false</i>
-    *         otherwise.
-    */
-    public boolean canSee(Tile tile) {
-        if (tile == null) {
-            return false;
-        }
-        
-        if (canSeeTiles == null) {
-            resetCanSeeTiles();
-        }
-
-        return canSeeTiles[tile.getX()][tile.getY()];
-    }
-
-
-    /**
-    * (DEBUG ONLY) Makes the entire map visible.
-    */
-    public void revealMap() {
-        for (int i=0; i<exploredTiles.length; i++) {
-            for (int j=0; j<exploredTiles[0].length; j++) {
-                exploredTiles[i][j] = true;
-            }
-        }
-    }
-
-
-    /**
-    * Checks if this player has explored the given <code>Tile</code>.
-    *
-    * @param  The <code>Tile</code> to check the visibillity of.
+    * Checks if this <code>Player</code> has explored the given <code>Tile</code>.
+    * @param tile The <code>Tile</code>.
     * @return <i>true</i> if the <code>Tile</code> has been explored and
     *         <i>false</i> otherwise.
-    * @see #setExplored(Tile)
-    * @see #setExplored(Unit)
     */
     public boolean hasExplored(Tile tile) {
-        return exploredTiles[tile.getX()][tile.getY()];
+        return tile.getPlayerExploredTile(this).isExplored();
     }
 
 
     /**
-    * Sets the given <code>Tile</code> to be explored by this player.
+    * Sets the given tile to be explored by this player and updates the player's
+    * information about the tile.
     *
-    * @param tile The <code>Tile</code> to set as explored.
-    * @see #hasExplored
-    * @see #setExplored(Unit)
+    * @see Tile#updatePlayerExploredTile
     */
     public void setExplored(Tile tile) {
-        if (canSeeTiles == null) {
-            resetCanSeeTiles();
-        }
-            
-        exploredTiles[tile.getX()][tile.getY()] = true;
-        canSeeTiles[tile.getX()][tile.getY()] = true;
+        tile.getPlayerExploredTile(this).setExplored(true);
+        tile.updatePlayerExploredTile(this);
     }
 
 
@@ -279,19 +183,35 @@ public class ServerPlayer extends Player implements ServerModelObject {
     * @see #hasExplored
     */
     public void setExplored(Unit unit) {
-        if (unit.getTile() == null) {
+        if (getGame() == null || getGame().getMap() == null || unit == null || unit.getLocation() == null || unit.getTile() == null) {
             return;
         }
 
         if (canSeeTiles == null) {
             resetCanSeeTiles();
         }
-                
+
+        setExplored(unit.getTile());
+        canSeeTiles[unit.getTile().getPosition().getX()][unit.getTile().getPosition().getY()] = true;
+
         Iterator positionIterator = getGame().getMap().getCircleIterator(unit.getTile().getPosition(), true, unit.getLineOfSight());
         while (positionIterator.hasNext()) {
             Map.Position p = (Map.Position) positionIterator.next();
-            exploredTiles[p.getX()][p.getY()] = true;
+            setExplored(getGame().getMap().getTile(p));
             canSeeTiles[p.getX()][p.getY()] = true;
+        }
+    }
+    
+
+    /**
+    * (DEBUG ONLY) Makes the entire map visible.
+    */
+    public void revealMap() {
+        Iterator positionIterator = getGame().getMap().getWholeMapIterator();
+
+        while (positionIterator.hasNext()) {
+            Map.Position p = (Map.Position) positionIterator.next();
+            setExplored(getGame().getMap().getTile(p));
         }
     }
 
@@ -327,7 +247,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         Element element = document.createElement(getServerAdditionXMLElementTagName());
 
         element.setAttribute("ID", getID());
-        element.appendChild(toArrayElement("exploredTiles", exploredTiles, document));
+        
+        //element.appendChild(toArrayElement("exploredTiles", exploredTiles, document));
 
         return element;
     }
@@ -339,9 +260,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
     
     
     public void readFromServerAdditionElement(Element element) {
-        serverID = element.getAttribute("ID");
-        exploredTiles = readFromArrayElement("exploredTiles", getChildElement(element, "exploredTiles"), new boolean[0][0]);
-    }    
+        serverID = element.getAttribute("ID");                
+    }
     
     
     /**

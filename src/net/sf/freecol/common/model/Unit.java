@@ -95,8 +95,12 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                             ENTER_INDIAN_VILLAGE_WITH_MISSIONARY = 7,
                             ILLEGAL_MOVE = 8;
 
-    public static final int ATTACKER_LOSS = 0,
-                            ATTACKER_WIN  = 1;
+    public static final int ATTACK_GREAT_LOSS = -2,
+                            ATTACK_LOSS = -1,
+                            ATTACK_EVADES = 0,
+                            ATTACK_WIN  = 1,
+                            ATTACK_GREAT_WIN = 2,
+                            ATTACK_DONE_SETTLEMENT = 3; // The last defender of the settlement has died.
 
 
     private int             type;
@@ -436,36 +440,33 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             return ILLEGAL_MOVE;
         }
 
-        // Check for entering indian village.
-        if ((target.getSettlement() != null)
-                && (target.getSettlement() instanceof IndianSettlement)
-                && !isArmed()
-                && (getNumberOfTools() == 0)
-                /* TODO: CHECK IF YOU'RE ALLOWED IN THE VILLAGE (=no war with indians) */) {
-            if (isMounted()) {
-                return ENTER_INDIAN_VILLAGE_WITH_SCOUT;
-            }
-            else if (isMissionary()) {
-                return ENTER_INDIAN_VILLAGE_WITH_MISSIONARY;
-            }
-            else if ((getType() == FREE_COLONIST) || (getType() == INDENTURED_SERVANT)) {
-                return ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST;
-            }
-            else {
-                return ILLEGAL_MOVE;
-            }
-        }
 
         // Check for an 'attack' instead of 'move'.
-        if ((target.getUnitCount() > 0) &&
-            (target.getDefendingUnit(this) != null) &&
-            (target.getDefendingUnit(this).getNation() != getNation())
-            && ((target.isLand() && !isNaval()) || (isNaval() && !target.isLand()))) {
+        if (target.getSettlement() != null && target.getSettlement().getOwner() != getOwner()
+                || (target.getUnitCount() > 0) && (target.getDefendingUnit(this) != null) &&
+                (target.getDefendingUnit(this).getNation() != getNation())
+                && ((target.isLand() && !isNaval()) || (isNaval() && !target.isLand()))) {
 
-            if (getOffensePower(target.getDefendingUnit(this)) == 0) {
-                return ILLEGAL_MOVE;
-            } else {
+            if (isOffensiveUnit()) {
                 return ATTACK;
+            } else {
+                // Check for entering indian village.
+                if ((target.getSettlement() != null)
+                        && (target.getSettlement() instanceof IndianSettlement)
+                        && (getNumberOfTools() == 0)
+                        /* TODO: CHECK IF YOU'RE ALLOWED IN THE VILLAGE (=no war with indians) */) {
+                    if (isMounted()) {
+                        return ENTER_INDIAN_VILLAGE_WITH_SCOUT;
+                    } else if (isMissionary()) {
+                        return ENTER_INDIAN_VILLAGE_WITH_MISSIONARY;
+                    } else if ((getType() == FREE_COLONIST) || (getType() == INDENTURED_SERVANT)) {
+                        return ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST;
+                    } else {
+                        return ILLEGAL_MOVE;
+                    }
+                } else {
+                    return ILLEGAL_MOVE;
+                }
             }
         }
 
@@ -803,6 +804,15 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         }
     }
 
+    
+    /**
+    * Checks if this unit is visible to the given player.
+    */
+    public boolean isVisibleTo(Player player) {
+        return (getTile() != null && player.canSee(getTile()) && (getTile().getSettlement() == null
+                || getTile().getSettlement().getOwner() == player));
+    }
+
 
     /**
     * Gets the last <code>Unit</code> beeing carried by this <code>Unit</code>.
@@ -934,6 +944,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                 }
             }
         }
+        
+        getOwner().setExplored(this);
     }
 
 
@@ -1764,10 +1776,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             if (!ok) {
                 throw new IllegalStateException("It is not allowed to move units to europe from the tile where this unit is located.");
             }
-        }
 
-        // Do the HARD work of moving this unit to europe:
-        if (!(getLocation() instanceof Europe)) { // Perpetual europedom bug fixed.. -sjm
             setEntryLocation(getLocation());
         }
 
@@ -2290,6 +2299,16 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         return modified_power;
     }
 
+    
+    /**
+    * Checks if this is an offensive unit.
+    * That is a unit capable of attacking another unit.
+    */
+    public boolean isOffensiveUnit() {
+        // TODO: Make this look prettier ;-)
+        return (getOffensePower(this) > 0);
+    }
+
 
     /**
     * Returns the current offensive power of this unit.
@@ -2387,184 +2406,217 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         return modified_power;
     }
 
+
     /**
-    * Carries out the winning of an attack.
-    * @param defender The target of the attack.
+    * Attack a unit with the given outcome.
+    *
+    * @param defender The <code>Unit</code> defending against attack.
+    * @param result The result of the attack.
+    * @param plunderGold The amount of gold to plunder in case of
+    *        a successful attack on a <code>Settlement</cdoe>.
     */
-    public void winAttack(Unit defender) {
+    public void attack(Unit defender, int result, int plunderGold) {
         if (defender == null) {
             throw new NullPointerException();
         }
 
+        movesLeft = 0;
+
         Tile newTile = defender.getTile();
 
-        getOwner().modifyTension(defender.getOwner(), -Player.TENSION_ADD_MINOR);
-
-        // Increases the defender's tension levels:
-        if (defender.getOwner().isAI()) {
-            if (defender.getTile().getSettlement() != null) {
-                if (defender.getTile().getSettlement() instanceof IndianSettlement && ((IndianSettlement) defender.getTile().getSettlement()).isCapital()) {
-                    defender.getOwner().modifyTension(getOwner(), Player.TENSION_ADD_MAJOR);
-                } else {
-                    defender.getOwner().modifyTension(getOwner(), Player.TENSION_ADD_NORMAL);
+        if (result == ATTACK_EVADES) {
+            if (!isNaval()) {
+                logger.warning("Non-naval unit evades!");
+            }
+        } else if (result == ATTACK_LOSS || result == ATTACK_GREAT_LOSS) {
+            if (getType() == BRAVE) {
+                dispose();
+            } else if (isNaval()) {
+                if (result == ATTACK_LOSS) {
+                    // TODO: Add damage. For now just move to Europe:
+                    moveToEurope();
+                } else { // ATTACK_GREAT_LOSS:
+                    dispose();
                 }
+            } else if (!(isArmed()) && !(getType() == ARTILLERY) && !(getType() == DAMAGED_ARTILLERY)) {
+                dispose(); // Only scouts should ever reach this point. Nobody else should be able to attack.
             } else {
-                defender.getOwner().modifyTension(getOwner(), Player.TENSION_ADD_MINOR);
+                if (isMounted()) {
+                    setMounted(false, true);
+                    if (defender.getType() == BRAVE && result == ATTACK_GREAT_LOSS) {
+                        defender.setMounted(true, true);
+                    }
+                } else if (getType() == ARTILLERY) {
+                    setType(DAMAGED_ARTILLERY);
+                } else if ((getType() == KINGS_REGULAR) || (getType() == DAMAGED_ARTILLERY)) {
+                    dispose();
+                } else {
+                    setArmed(false, true);
+                    if (defender.getType() == BRAVE && result == ATTACK_GREAT_LOSS) {
+                        defender.setArmed(true, true);
+                    }
+                }
             }
-        }
 
-        movesLeft = 0;
-        if (defender.getType() == BRAVE) {
-            defender.dispose();
+            if (defender.getOwner().hasFather(FoundingFather.GEORGE_WASHINGTON) || result == ATTACK_GREAT_LOSS) {
+                String oldName = defender.getName();
 
-            if (newTile.getSettlement() != null) {
-                if (newTile.getSettlement().getUnitCount() <= 0 && newTile.getSettlement() instanceof IndianSettlement) {
-                    Player settlementOwner = newTile.getSettlement().getOwner();
-                    boolean wasCapital = ((IndianSettlement)newTile.getSettlement()).isCapital();
-                    newTile.getSettlement().dispose();
+                if (defender.getType() == PETTY_CRIMINAL) {
+                    defender.setType(INDENTURED_SERVANT);
+                } else if (defender.getType() == INDENTURED_SERVANT) {
+                    defender.setType(FREE_COLONIST);
+                } else if (getType() == FREE_COLONIST) {
+                    defender.setType(VETERAN_SOLDIER);
+                } else if (defender.getType() == VETERAN_SOLDIER && defender.getOwner().getRebellionState() > 1) {
+                    defender.setType(COLONIAL_REGULAR);
+                }
 
-                    settlementOwner.modifyTension(getOwner(), Player.TENSION_ADD_MAJOR);
+                if (!defender.getName().equals(oldName)) {
+                    addModelMessage(defender, "model.unit.unitImproved", new String[][] {{"%oldName%", oldName}, {"%newName%", defender.getName()}});
+                }
+            }
+        } else if (result == ATTACK_WIN || result == ATTACK_GREAT_WIN || result == ATTACK_DONE_SETTLEMENT) {
+            getOwner().modifyTension(defender.getOwner(), -Player.TENSION_ADD_MINOR);
 
-                    int randomTreasure = getGame().getModelController().getRandom(getID()+"indianTreasureRandom"+getID(), 11);
-
-                    Unit tTrain = getGame().getModelController().createUnit(
-                            getID()+"indianTreasure"+getID(), newTile, getOwner(), Unit.TREASURE_TRAIN);
-
-                    // Incan and Aztecs give more gold
-                    if(settlementOwner.getNation() == Player.INCA || settlementOwner.getNation() == Player.AZTEC) {
-                        tTrain.setTreasureAmount(randomTreasure * 500 + 10000);
+            // Increases the defender's tension levels:
+            if (defender.getOwner().isAI()) {
+                if (defender.getTile().getSettlement() != null) {
+                    if (defender.getTile().getSettlement() instanceof IndianSettlement && ((IndianSettlement) defender.getTile().getSettlement()).isCapital()) {
+                        defender.getOwner().modifyTension(getOwner(), Player.TENSION_ADD_MAJOR);
                     } else {
-                        tTrain.setTreasureAmount(randomTreasure * 50 + 300);
+                        defender.getOwner().modifyTension(getOwner(), Player.TENSION_ADD_NORMAL);
                     }
-
-                    // capitals give more gold
-                    if(wasCapital) {
-                        tTrain.setTreasureAmount((int) (tTrain.getTreasureAmount()*1.6f));
-                    }
-
-                    addModelMessage(this, "model.unit.indianTreasure", new String[][] {{"%indian%", settlementOwner.getNationAsString()}, {"%amount%", Integer.toString(tTrain.getTreasureAmount())}});
-                    setLocation(newTile);
+                } else {
+                    defender.getOwner().modifyTension(getOwner(), Player.TENSION_ADD_MINOR);
                 }
             }
-        } else if (isNaval()) {
-            if(type==PRIVATEER || type==FRIGATE || type==MAN_O_WAR) { // can capture goods; regardless attacking/defending
-                Iterator iter = defender.getGoodsIterator();
-                if(iter.hasNext()) {
-                    //TODO: show CaptureGoodsDialog
-                }
-            }
-            defender.dispose();
-        } else if (!(defender.isArmed()) && !(defender.getType() == ARTILLERY) && !(defender.getType() == DAMAGED_ARTILLERY)) {
-            if (defender.isMounted()) {
-                defender.dispose(); // Scouts die if they lose.
-            }
-            Colony targetcolony = null;
-            boolean captureColony = ((newTile.getSettlement() != null) && (newTile.getSettlement() instanceof Colony));
-            if (captureColony) {
-                defender.getOwner().modifyTension(getOwner(), Player.TENSION_ADD_MAJOR);
 
-                if (getOwner().isEuropean()) {
-                    int plunderGold = (int) (newTile.getSettlement().getOwner().getGold() * 0.1); // 10% of their gold
-                    getOwner().modifyGold(plunderGold);
-                    newTile.getSettlement().getOwner().modifyGold(-plunderGold);
 
-                    targetcolony = (Colony)(newTile.getSettlement());
-                    targetcolony.setOwner(getOwner()); // This also changes over all of the units...
-                    setLocation(newTile);
-                    addModelMessage(this, "model.unit.colonyCaptured", new String[][] {{"%colony%", newTile.getColony().getName()}, {"%amount%", Integer.toString(plunderGold)}});
-                } else { // Indian:
-                    if (newTile.getSettlement() instanceof Colony && newTile.getColony().getUnitCount() <= 1) {
-                        int plunderGold = (int) (newTile.getSettlement().getOwner().getGold() * 0.1); // 10% of their gold
-                        getOwner().modifyGold(plunderGold);
-                        newTile.getSettlement().getOwner().modifyGold(-plunderGold);
-                        addModelMessage(newTile.getSettlement().getOwner(), "model.unit.colonyBurning", new String[][] {{"%colony%", newTile.getColony().getName()}, {"%amount%", Integer.toString(plunderGold)}});
+            if (defender.getType() == BRAVE) {
+                defender.dispose();
+
+                if (newTile.getSettlement() != null) {
+                    if (result == ATTACK_DONE_SETTLEMENT) { // (defender==BRAVE): Can only be an indian settlmenet:
+                        Player settlementOwner = newTile.getSettlement().getOwner();
+                        boolean wasCapital = ((IndianSettlement)newTile.getSettlement()).isCapital();
                         newTile.getSettlement().dispose();
-                    } else {
-                        addModelMessage(newTile.getSettlement(), "model.unit.colonistSlaughtered", new String[][] {{"%colony%", newTile.getColony().getName()}, {"%unit%", newTile.getColony().getRandomUnit().getName()}});
-                        newTile.getColony().getRandomUnit().dispose();
+
+                        settlementOwner.modifyTension(getOwner(), Player.TENSION_ADD_MAJOR);
+
+                        int randomTreasure = getGame().getModelController().getRandom(getID()+"indianTreasureRandom"+getID(), 11);
+
+                        Unit tTrain = getGame().getModelController().createUnit(
+                                getID()+"indianTreasure"+getID(), newTile, getOwner(), Unit.TREASURE_TRAIN);
+
+                        // Incan and Aztecs give more gold
+                        if (settlementOwner.getNation() == Player.INCA || settlementOwner.getNation() == Player.AZTEC) {
+                            tTrain.setTreasureAmount(randomTreasure * 500 + 10000);
+                        } else {
+                            tTrain.setTreasureAmount(randomTreasure * 50 + 300);
+                        }
+
+                        // capitals give more gold
+                        if (wasCapital) {
+                            tTrain.setTreasureAmount((tTrain.getTreasureAmount()*3)/2);
+                        }
+
+                        addModelMessage(this, "model.unit.indianTreasure", new String[][] {{"%indian%", settlementOwner.getNationAsString()}, {"%amount%", Integer.toString(tTrain.getTreasureAmount())}});
+                        setLocation(newTile);
                     }
                 }
-            } else {
-                if (getOwner().isEuropean()) {
-                    defender.setLocation(getTile());
-                    defender.setOwner(getOwner());
-                } else {
+            } else if (isNaval()) {
+                if (type==PRIVATEER || type==FRIGATE || type==MAN_O_WAR) { // can capture goods; regardless attacking/defending
+                    Iterator iter = defender.getGoodsIterator();
+                    if(iter.hasNext()) {
+                        //TODO: show CaptureGoodsDialog
+                    }
+                }
+
+                if (result == ATTACK_WIN) {
+                    // TODO: Add damage. For now just move to Europe:
+                    defender.moveToEurope();
+                } else { // ATTACK_GREAT_WIN:
                     defender.dispose();
                 }
-            }
+            } else if (!defender.isArmed() && defender.getType() != ARTILLERY && defender.getType() != DAMAGED_ARTILLERY) {
+                if (defender.isMounted()) {
+                    defender.dispose(); // Scouts die if they lose.
+                } else {
+                    Colony targetcolony = null;
+                    boolean captureColony = ((result == ATTACK_DONE_SETTLEMENT) && (newTile.getSettlement() instanceof Colony));
+                    if (captureColony) {
 
-            // Colonists get captured if they lose.
-            /*
-            Iterator unitIterator = newTile.getUnitsClone().iterator();
-            while (unitIterator.hasNext()) {
-                Unit target = (Unit)unitIterator.next();
-                target.setOwner(getOwner());
-                if (!captureColony) target.setLocation(getTile());
-            }
-            */
-        } else {
-            if (defender.isMounted()) {
-                defender.setMounted(false, true);
-                if (getType() == BRAVE) {
-                   //TODO: don't always do this. Have some random chance.
-                   setMounted(true, true);
+                        defender.getOwner().modifyTension(getOwner(), Player.TENSION_ADD_MAJOR);
+
+                        if (getOwner().isEuropean()) {
+                            getOwner().modifyGold(plunderGold);
+                            
+                            try {
+                                newTile.getSettlement().getOwner().modifyGold(-plunderGold);
+                            } catch (IllegalArgumentException e) {}
+
+                            targetcolony = (Colony)(newTile.getSettlement());
+                            targetcolony.setOwner(getOwner()); // This also changes over all of the units...
+                            setLocation(newTile);
+                            addModelMessage(this, "model.unit.colonyCaptured", new String[][] {{"%colony%", newTile.getColony().getName()}, {"%amount%", Integer.toString(plunderGold)}});
+                        } else { // Indian:
+                            if (newTile.getSettlement() instanceof Colony && newTile.getColony().getUnitCount() <= 1) {
+                                getOwner().modifyGold(plunderGold);
+                                newTile.getSettlement().getOwner().modifyGold(-plunderGold);
+                                addModelMessage(newTile.getSettlement().getOwner(), "model.unit.colonyBurning", new String[][] {{"%colony%", newTile.getColony().getName()}, {"%amount%", Integer.toString(plunderGold)}});
+                                newTile.getSettlement().dispose();
+                            } else {
+                                addModelMessage(newTile.getSettlement(), "model.unit.colonistSlaughtered", new String[][] {{"%colony%", newTile.getColony().getName()}, {"%unit%", newTile.getColony().getRandomUnit().getName()}});
+                                newTile.getColony().getRandomUnit().dispose();
+                            }
+                        }
+                    } else {
+                        if (getOwner().isEuropean()) {
+                            defender.setLocation(getTile());
+                            defender.setOwner(getOwner());
+                        } else {
+                            defender.dispose();
+                        }
+                    }
                 }
-            } else if ((defender.getType() == ARTILLERY)) {
-                defender.setType(DAMAGED_ARTILLERY);
-            } else if ((defender.getType() == KINGS_REGULAR) || (defender.getType() == DAMAGED_ARTILLERY)) {
-                defender.dispose();
             } else {
-                defender.setArmed(false, true);
-                if (getType() == BRAVE) {
-                   //TODO: don't always do this. Have some random chance.
-                   //      ATTACKER_LOSS_MUSKETS.
-                   setArmed(true, true);
+                if (defender.isMounted()) {
+                    defender.setMounted(false, true);
+                    if (getType() == BRAVE && result == ATTACK_GREAT_WIN) {
+                        setMounted(true, true);
+                    }
+                } else if ((defender.getType() == ARTILLERY)) {
+                    defender.setType(DAMAGED_ARTILLERY);
+                } else if ((defender.getType() == KINGS_REGULAR) || (defender.getType() == DAMAGED_ARTILLERY)) {
+                    defender.dispose();
+                } else {
+                    defender.setArmed(false, true);
+                    if (getType() == BRAVE && result == ATTACK_GREAT_WIN) {
+                        setArmed(true, true);
+                    }
                 }
             }
-        }
 
-        if (getOwner().hasFather(FoundingFather.GEORGE_WASHINGTON)) { // || randomChance == true
-            String oldName = getName();
+            if (getOwner().hasFather(FoundingFather.GEORGE_WASHINGTON) || result == ATTACK_GREAT_WIN) {
+                String oldName = getName();
 
-            if (getType() == PETTY_CRIMINAL) {
-                setType(INDENTURED_SERVANT);
-            } else if (getType() == INDENTURED_SERVANT) {
-                setType(FREE_COLONIST);
-            } else if (getType() == FREE_COLONIST) {
-                setType(VETERAN_SOLDIER);
-            } else if (getType() == VETERAN_SOLDIER && getOwner().getRebellionState() > 1) {
-                setType(COLONIAL_REGULAR);
+                if (getType() == PETTY_CRIMINAL) {
+                    setType(INDENTURED_SERVANT);
+                } else if (getType() == INDENTURED_SERVANT) {
+                    setType(FREE_COLONIST);
+                } else if (getType() == FREE_COLONIST) {
+                    setType(VETERAN_SOLDIER);
+                } else if (getType() == VETERAN_SOLDIER && getOwner().getRebellionState() > 1) {
+                    setType(COLONIAL_REGULAR);
+                }
+
+                if (!getName().equals(oldName)) {
+                    addModelMessage(this, "model.unit.unitImproved", new String[][] {{"%oldName%", oldName}, {"%newName%", getName()}});
+                }
             }
-
-            if (!getName().equals(oldName)) {
-                addModelMessage(this, "model.unit.unitImproved", new String[][] {{"%oldName%", oldName}, {"%newName%", getName()}});
-            }
-        }
-    }
-
-
-    /**
-    * Carries out the loss of an attack.
-    */
-    public void loseAttack() {
-        movesLeft = 0;
-        if (getType() == BRAVE) {
-            dispose();
-        } else if (isNaval()) {
-            //TODO: evasion and the like. For now just sink.
-            dispose();
-        } else if (!(isArmed()) && !(getType() == ARTILLERY) && !(getType() == DAMAGED_ARTILLERY)) {
-            dispose(); // Only scouts should ever reach this point. Nobody else should be able to attack.
         } else {
-            if (isMounted()) {
-                setMounted(false, true);
-            } else if (getType() == ARTILLERY) {
-                setType(DAMAGED_ARTILLERY);
-            } else if ((getType() == KINGS_REGULAR) || (getType() == DAMAGED_ARTILLERY)) {
-                dispose();
-            } else {
-                setArmed(false, true);
-            }
+            logger.warning("Illegal result of attack!");
+            throw new IllegalArgumentException("Illegal result of attack!");
         }
     }
 

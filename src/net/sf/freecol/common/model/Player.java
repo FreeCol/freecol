@@ -65,6 +65,8 @@ public class Player extends FreeColGameObject {
     /** An array holding all the Native American tribes in String form. */
     public static final String[] TRIBES = {"Apache", "Arawak", "Aztec", "Cherokee",
                                         "Inca", "Iroquois", "Sioux", "Tupi"};
+                                        
+    public static final int NUMBER_OF_NATIONS = TRIBES.length + NATIONS.length;
 
     /** The maximum line of sight a unit can have in the game. */
     public static final int MAX_LINE_OF_SIGHT = 2;
@@ -72,13 +74,13 @@ public class Player extends FreeColGameObject {
     /**
     * Contains booleans to see which tribes this player has met:
     */
-    private boolean[] contacted = new boolean[TRIBES.length + NATIONS.length];
+    private boolean[] contacted = new boolean[NUMBER_OF_NATIONS];
 
     /**
     * Only used by AI - stores the tension levels,
     * 0-100 with 100 maximum hostillity:
     */
-    private int[] tension = new int[TRIBES.length + NATIONS.length];
+    private int[] tension = new int[NUMBER_OF_NATIONS];
 
     private static final Color defaultNationColors[] = {
         Color.ORANGE,
@@ -133,6 +135,9 @@ public class Player extends FreeColGameObject {
 
     private Iterator nextActiveUnitIterator = new NextActiveUnitIterator(this);
 
+    
+    // Temporary variables:
+    protected boolean[][] canSeeTiles = null;
 
 
     /**
@@ -265,6 +270,7 @@ public class Player extends FreeColGameObject {
         return contacted[type];
     }
 
+
     /**
      * Sets whether this player has contacted <code>type</code>
      */
@@ -355,6 +361,84 @@ public class Player extends FreeColGameObject {
 
 
     /**
+    * Sets the given tile to be explored by this player and updates the player's
+    * information about the tile.
+    *
+    * @see Tile#updatePlayerExploredTile
+    */
+    public void setExplored(Tile tile) {
+        // Implemented by ServerPlayer.
+    }
+
+
+    /**
+    * Sets the tiles within the given <code>Unit</code>'s line of
+    * sight to be explored by this player.
+    *
+    * @param unit The <code>Unit</code>.
+    * @see #setExplored(Tile)
+    * @see #hasExplored
+    */
+    public void setExplored(Unit unit) {
+        if (getGame() == null || getGame().getMap() == null || unit == null || unit.getLocation() == null || unit.getTile() == null) {
+            return;
+        }
+
+        if (canSeeTiles == null) {
+            resetCanSeeTiles();
+        }
+
+        Iterator positionIterator = getGame().getMap().getCircleIterator(unit.getTile().getPosition(), true, unit.getLineOfSight());
+        while (positionIterator.hasNext()) {
+            Map.Position p = (Map.Position) positionIterator.next();
+            canSeeTiles[p.getX()][p.getY()] = true;
+        }
+    }
+
+
+    /**
+    * Resets this player's "can see"-tiles. This is done by setting
+    * all the tiles within a {@link Unit}s line of sight visible.
+    * The other tiles are made unvisible.
+    */
+    public void resetCanSeeTiles() {
+        Map map = getGame().getMap();
+
+        if (map != null) {
+            canSeeTiles = new boolean[map.getWidth()][map.getHeight()];
+
+            Iterator unitIterator = getUnitIterator();
+            while (unitIterator.hasNext()) {
+                Unit unit = (Unit) unitIterator.next();
+
+                Map.Position position = unit.getTile().getPosition();
+                canSeeTiles[position.getX()][position.getY()] = true;
+
+                Iterator positionIterator = map.getCircleIterator(position, true, unit.getLineOfSight());
+                while (positionIterator.hasNext()) {
+                    Map.Position p = (Map.Position) positionIterator.next();
+                    canSeeTiles[p.getX()][p.getY()] = true;
+                }
+            }
+            
+            Iterator colonyIterator = getColonyIterator();
+            while (colonyIterator.hasNext()) {
+                Colony colony = (Colony) colonyIterator.next();
+                
+                Map.Position position = colony.getTile().getPosition();
+                canSeeTiles[position.getX()][position.getY()] = true;
+
+                Iterator positionIterator = map.getCircleIterator(position, true, colony.getLineOfSight());
+                while (positionIterator.hasNext()) {
+                    Map.Position p = (Map.Position) positionIterator.next();
+                    canSeeTiles[p.getX()][p.getY()] = true;
+                }
+            }
+        }
+    }
+
+
+    /**
     * Checks if this <code>Player</code> can see the given
     * <code>Tile</code>. The <code>Tile</code> can be seen if
     * it is in a {@link Unit}'s line of sight.
@@ -364,7 +448,7 @@ public class Player extends FreeColGameObject {
     *         the given <code>Tile</code> and <i>false</i>
     *         otherwise.
     */
-    public boolean canSee(Tile tile) {
+    /*public boolean canSee(Tile tile) {
         if (tile == null) {
             return false;
         }
@@ -400,9 +484,32 @@ public class Player extends FreeColGameObject {
         }
 
         return false;
+    }*/
+
+
+    /**
+    * Checks if this <code>Player</code> can see the given
+    * <code>Tile</code>. The <code>Tile</code> can be seen if
+    * it is in a {@link Unit}'s line of sight.
+    *
+    * @param The given <code>Tile</code>.
+    * @return <i>true</i> if the <code>Player</code> can see
+    *         the given <code>Tile</code> and <i>false</i>
+    *         otherwise.
+    */
+    public boolean canSee(Tile tile) {
+        if (tile == null) {
+            return false;
+        }
+        
+        if (canSeeTiles == null) {
+            resetCanSeeTiles();
+        }
+
+        return canSeeTiles[tile.getX()][tile.getY()];
     }
-
-
+    
+        
     /**
     * Returns the state of this players rebellion status.
     * <pre>0 = Have not declared independence
@@ -488,6 +595,7 @@ public class Player extends FreeColGameObject {
     */
     public void endTurn() {
         getGame().removeModelMessagesFor(this);
+        resetCanSeeTiles();
     }
 
 
@@ -1058,7 +1166,7 @@ public class Player extends FreeColGameObject {
             }
             playerElement.setAttribute("contacted", sb.toString());
         } else {
-            playerElement.setAttribute("gold", Integer.toString(-1));
+            playerElement.setAttribute("gold", Integer.toString(-1));        
             playerElement.setAttribute("crosses", Integer.toString(-1));
             playerElement.setAttribute("bells", Integer.toString(-1));
             playerElement.setAttribute("currentFather", Integer.toString(-1));
@@ -1142,6 +1250,8 @@ public class Player extends FreeColGameObject {
                 europe = new Europe(getGame(), europeElement);
             }
         }
+        
+        resetCanSeeTiles();        
     }
 
 

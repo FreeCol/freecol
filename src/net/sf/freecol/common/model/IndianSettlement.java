@@ -324,16 +324,20 @@ public class IndianSettlement extends Settlement {
         indianSettlementElement.setAttribute("owner", owner.getID());
         indianSettlementElement.setAttribute("tribe", Integer.toString(tribe));
         indianSettlementElement.setAttribute("kind", Integer.toString(kind));
-        // By default learnableSkill is not sent over the network. The user needs to visit
-        // the settlement with a free colonist or a scout in order to obtain this information.
         indianSettlementElement.setAttribute("isCapital", Boolean.toString(isCapital));
-        indianSettlementElement.setAttribute("food", Integer.toString(food));
 
         if (showAll || player == getOwner()) {
+            indianSettlementElement.setAttribute("food", Integer.toString(food));
             indianSettlementElement.setAttribute("learnableSkill", Integer.toString(learnableSkill));    
+        } 
+
+        if (showAll || player == getOwner()) {
+            indianSettlementElement.appendChild(unitContainer.toXMLElement(player, document, showAll, toSavedGame));
+        } else {
+            UnitContainer emptyUnitContainer = new UnitContainer(getGame(), this);
+            emptyUnitContainer.setFakeID(unitContainer.getID());
+            indianSettlementElement.appendChild(emptyUnitContainer.toXMLElement(player, document, showAll, toSavedGame));
         }
-        
-        indianSettlementElement.appendChild(unitContainer.toXMLElement(player, document, showAll, toSavedGame));
 
         return indianSettlementElement;
     }
@@ -351,7 +355,6 @@ public class IndianSettlement extends Settlement {
         owner = (Player)getGame().getFreeColGameObject(indianSettlementElement.getAttribute("owner"));
         tribe = Integer.parseInt(indianSettlementElement.getAttribute("tribe"));
         kind = Integer.parseInt(indianSettlementElement.getAttribute("kind"));
-        // learnableSkill is not in the network message. See toXMLElement for details.
         isCapital = (new Boolean(indianSettlementElement.getAttribute("isCapital"))).booleanValue();
 
         if (indianSettlementElement.hasAttribute("food")) {

@@ -29,7 +29,7 @@ abstract public class FreeColGameObject {
 
 
     public FreeColGameObject() {    
-    
+        logger.info("FreeColGameObject without ID created.");
     }
     
 

@@ -1397,7 +1397,8 @@ public final class GUI {
                     occupationString = "R";
                     break;
                 default:
-                    throw new FreeColException("Unit has an invalid occpuation.");
+                    occupationString = "?";
+                    logger.warning("Unit has an invalid occpuation: " + unit.getState());
             }
             if (unit.getOwner().getColor() == Color.BLACK) {
                 g.setColor(Color.WHITE);

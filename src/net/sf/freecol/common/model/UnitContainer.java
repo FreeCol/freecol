@@ -260,7 +260,6 @@ public class UnitContainer extends FreeColGameObject {
             } else {
                 u = new Unit(getGame(), unitElement);
                 units.add(u);
-                //u.setLocation(parent);
             }
         }
     }
