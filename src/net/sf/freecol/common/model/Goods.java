@@ -78,6 +78,39 @@ public final class Goods implements Locatable {
         readFromXMLElement(element);
     }
 
+    /**
+     * Returns a textual representation of the Good of type <code>type<code>.
+     * @param type  The type of good to return
+     * @return
+     *
+     * TODO - needs to be completed
+     */
+    public static String getName(int type) {
+        switch(type) {
+            case FOOD: return "Food";
+            case SUGAR: return "Sugar";
+            case TOBACCO: return "Tobacco";
+            case COTTON: return "Cotton";
+            case FURS: return "Furs";
+            case LUMBER: return "Lumber";
+            case ORE:return "Ore";
+            case SILVER: return "Silver";
+            case HORSES: return "Horses";
+            case RUM: return "Rum";
+            case CIGARS: return "Cigars";
+            case CLOTH: return "Cloth";
+            case COATS: return "Coats";
+            case TRADE_GOODS: return "Trade Goods";
+            case TOOLS: return "Tools";
+            case MUSKETS: return "Muskets";
+            case FISH: return "Fish";// = 16, // Stored as food.
+            case BELLS: return "Bells";
+            case CROSSES: return "Crosses";
+            case HAMMERS: return "Hammers";
+            default: return "Unknown";
+        }
+    }
+
 
     /**
     * Sets the location of the goods.
