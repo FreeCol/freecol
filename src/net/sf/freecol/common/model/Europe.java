@@ -142,15 +142,23 @@ public final class Europe extends FreeColGameObject implements Location {
     *             for setting a new recruitable to this slot.
     * @param unit The recruited unit.
     * @param newRecruitable The recruitable that will fill the now empty slot.
-    * @exception NullPointerException if <code>unit == null</code>.
+    * @exception NullPointerException If <code>unit == null</code>.
+    * @exception IllegalStateException If there is not enough crosses to
+    *             emigrate the <code>Unit</code>.
     */
     public void emigrate(int slot, Unit unit, int newRecruitable) {
         if (unit == null) {
             throw new NullPointerException();
         }
 
+        if (!unit.getOwner().checkEmigrate()) {
+            throw new IllegalStateException("Not enough crosses to emigrate unit: " + unit.getOwner().getCrosses() + "/" + unit.getOwner().getCrossesRequired());
+        }
+
         unit.setLocation(this);
         unit.getOwner().setCrosses(0);
+
+        addModelMessage(this, "model.europe.emigrate", new String[][] {{"%unit%", unit.getName()}});
 
         setRecruitable(slot, newRecruitable);
     }

@@ -64,8 +64,6 @@ public final class InGameInputHandler extends InputHandler {
                 reply = opponentAttack(element);
             } else if (type.equals("setCurrentPlayer")) {
                 reply = setCurrentPlayer(element);
-            } else if (type.equals("emigrateUnitInEuropeConfirmed")) {
-                reply = emigrateUnitInEuropeConfirmed(element);
             } else if (type.equals("newTurn")) {
                 reply = newTurn(element);
             } else if (type.equals("setDead")) {
@@ -231,22 +229,6 @@ public final class InGameInputHandler extends InputHandler {
 
         freeColClient.getInGameController().setCurrentPlayer(currentPlayer);
 
-        return null;
-    }
-
-    
-    /**
-    * Handles an "emigrateUnitInEuropeConfirmed"-message.
-    *
-    * @param setCurrentPlayerElement The element (root element in a DOM-parsed XML tree) that
-    *                holds all the information.
-    */
-    private Element emigrateUnitInEuropeConfirmed(Element emigrateUnitInEuropeConfirmedElement) {
-        Game game = getFreeColClient().getGame();
-        Unit unit = new Unit(game, (Element) emigrateUnitInEuropeConfirmedElement.getChildNodes().item(0));
-        getFreeColClient().getMyPlayer().getEurope().emigrate(Integer.parseInt(emigrateUnitInEuropeConfirmedElement.getAttribute("slot")),
-                                                         unit,
-                                                         Integer.parseInt(emigrateUnitInEuropeConfirmedElement.getAttribute("newRecruitable")));
         return null;
     }
 

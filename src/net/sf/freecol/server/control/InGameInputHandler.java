@@ -805,12 +805,7 @@ public final class InGameInputHandler extends InputHandler {
             europe.emigrate((int) ((Math.random() * 3) + 1), unit, newRecruitable);
         }
 
-        try {
-            connection.send(reply);
-        } catch (IOException e) {
-            logger.warning("Can't send the player an emigrateUnitInEuropeConfirmed element.");
-        }
-        return null;
+        return reply;
     }
 
     /**

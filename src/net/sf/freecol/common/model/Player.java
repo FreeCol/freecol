@@ -650,6 +650,16 @@ public class Player extends FreeColGameObject {
     public void setCrosses(int crosses) {
         this.crosses = crosses;
     }
+    
+    
+    /**
+    * Gets the number of crosses this player possess.
+    * @return The number.
+    * @see setCrosses
+    */
+    public int getCrosses() {
+        return crosses;
+    }
 
 
     /**
@@ -658,10 +668,10 @@ public class Player extends FreeColGameObject {
     */
     public boolean checkEmigrate() {
         if (crosses >= getCrossesRequired()) {
-            crosses -= getCrossesRequired();
             return true;
+        } else {
+            return false;
         }
-        return false;
     }
 
 

@@ -813,6 +813,7 @@ public final class InGameController {
         }
     }
 
+
     /**
     * Cause a unit to emigrate from a specified "slot" in Europe.
     * @param slot The slot from which the unit emigrates. Either 1, 2 or 3.
@@ -827,8 +828,18 @@ public final class InGameController {
         Element emigrateUnitInEuropeElement = Message.createNewRootElement("emigrateUnitInEurope");
         emigrateUnitInEuropeElement.setAttribute("slot", Integer.toString(slot));
 
-        client.send(emigrateUnitInEuropeElement);
+        Element reply = client.ask(emigrateUnitInEuropeElement);
+        
+        if (!reply.getTagName().equals("emigrateUnitInEuropeConfirmed")) {
+            throw new IllegalStateException();
+        }
+
+        slot = Integer.parseInt(reply.getAttribute("slot")); // The server may have changed the slot.
+        Unit unit = new Unit(game, (Element) reply.getChildNodes().item(0));
+        int newRecruitable = Integer.parseInt(reply.getAttribute("newRecruitable"));
+        europe.emigrate(slot, unit, newRecruitable);
     }
+
 
     /**
     * Purchases a unit of a specified type in Europe.
