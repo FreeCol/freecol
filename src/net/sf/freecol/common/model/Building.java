@@ -65,7 +65,25 @@ public final class Building extends FreeColGameObject implements WorkLocation {
                             SHOP = 2,
                             FACTORY = 3;
 
-    private static final String[][] buildingNames = {{"Town hall", null, null}, {"Carpenter's house", "Lumber mill", null}, {"Blacksmith's house", "Blacksmith's shop", "Iron works"}, {"Tobacconist's house", "Tobacconist's shop", "Cigar factory"}, {"Weaver's house", "Weaver's shop", "Textile mill"}, {"Distiller's house", "Rum distillery", "Rum factory"}, {"Fur trader's house", "Fur trading post", "Fur factory"}, {"Stockade", "Fort", "Fortress"}, {"Armory", "Magazine", "Arsenal"}, {"Docks", "Drydock", "Shipyard"}, {"Schoolhouse", "College", "University"}, {"Warehouse", "Warehouse expansion", null}, {"Stables", null, null}, {"Church", "Cathedral", null}, {"Printing press", "Newspaper", null}, {"Custom house", null, null}};
+    //private static final String[][] buildingNames = {{"Town hall", null, null}, {"Carpenter's house", "Lumber mill", null}, {"Blacksmith's house", "Blacksmith's shop", "Iron works"}, {"Tobacconist's house", "Tobacconist's shop", "Cigar factory"}, {"Weaver's house", "Weaver's shop", "Textile mill"}, {"Distiller's house", "Rum distillery", "Rum factory"}, {"Fur trader's house", "Fur trading post", "Fur factory"}, {"Stockade", "Fort", "Fortress"}, {"Armory", "Magazine", "Arsenal"}, {"Docks", "Drydock", "Shipyard"}, {"Schoolhouse", "College", "University"}, {"Warehouse", "Warehouse expansion", null}, {"Stables", null, null}, {"Church", "Cathedral", null}, {"Printing press", "Newspaper", null}, {"Custom house", null, null}};
+    private static final String[][] buildingNames = {
+        {"Town hall", null, null},
+        {"Carpenter's house", "Lumber mill", null},
+        {"Blacksmith's house", "Blacksmith's shop", "Iron works"},
+        {"Tobacconist's house", "Tobacconist's shop", "Cigar factory"},
+        {"Weaver's house", "Weaver's shop", "Textile mill"},
+        {"Distiller's house", "Rum distillery", "Rum factory"},
+        {"Fur trader's house", "Fur trading post", "Fur factory"},
+        {"Schoolhouse", "College", "University"},
+        {"Armory", "Magazine", "Arsenal"},
+        {"Church", "Cathedral", null},
+        {"Stockade", "Fort", "Fortress"},
+        {"Warehouse", "Warehouse expansion", null},
+        {"Stables", null, null},
+        {"Docks", "Drydock", "Shipyard"},
+        {"Printing press", "Newspaper", null},
+        {"Custom house", null, null}
+    };
 
     // Sets the maximum number of units in one building (will become a non-constant later):
     private static final int MAX_UNITS = 3;
@@ -303,6 +321,8 @@ public final class Building extends FreeColGameObject implements WorkLocation {
         if (type == STOCKADE || type == DOCK || type == WAREHOUSE ||
                 type == STABLES || type == PRINTING_PRESS || type == CUSTOM_HOUSE) {
             return 0;
+        } else if (type == SCHOOLHOUSE) {
+            return getLevel();
         } else {
             return MAX_UNITS;
         }
@@ -330,6 +350,14 @@ public final class Building extends FreeColGameObject implements WorkLocation {
         }
 
         if (!(locatable instanceof Unit)) {
+            return false;
+        }
+
+        if (getType() == SCHOOLHOUSE && (getLevel() < Unit.getSkillLevel(((Unit) locatable).getType())
+                || ((Unit) locatable).getType() == Unit.INDIAN_CONVERT
+                || ((Unit) locatable).getType() == Unit.FREE_COLONIST
+                || ((Unit) locatable).getType() == Unit.INDENTURED_SERVANT
+                || ((Unit) locatable).getType() == Unit.PETTY_CRIMINAL)) {
             return false;
         }
 
@@ -427,6 +455,71 @@ public final class Building extends FreeColGameObject implements WorkLocation {
         return units.iterator();
     }
 
+
+    /**
+    * Gets the best unit to train for the given unit type.
+    *
+    * @param unitType The unit type to train for.
+    * @return The <code>Unit</code>.
+    */
+    private Unit getUnitToTrain(int unitType) {
+        Unit bestUnit = null;
+        int bestScore = 0;
+
+        Iterator i = colony.getUnitIterator();
+        while (i.hasNext()) {
+            Unit unit = (Unit) i.next();
+
+            if (unit.getTrainingType() != -1 && unit.getNeededTurnsOfTraining() <= unit.getTurnsOfTraining()) {
+                continue;
+            }
+
+            if (unit.getType() == Unit.FREE_COLONIST && unit.getTrainingType() == unitType) {
+                if (bestUnit == null || unit.getTurnsOfTraining() > bestUnit.getTurnsOfTraining()) {
+                    bestUnit = unit;
+                    bestScore = 5;
+                }
+            } else if (unit.getType() == Unit.FREE_COLONIST && unit.getTurnsOfTraining() == 0) {
+                if (bestScore < 4) {
+                    bestUnit = unit;
+                    bestScore = 4;
+                }
+            } else if (unit.getType() == Unit.INDENTURED_SERVANT) {
+                if (bestScore < 3) {
+                    bestUnit = unit;
+                    bestScore = 3;
+                }
+            } else if (unit.getType() == Unit.PETTY_CRIMINAL) {
+                if (bestScore < 2) {
+                    bestUnit = unit;
+                    bestScore = 2;
+                }
+            } else if (unit.getType() == Unit.FREE_COLONIST && getTeacher(unitType) == null) {
+                if (bestScore < 1) {
+                    bestUnit = unit;
+                    bestScore = 1;
+                }
+            }
+        }
+
+        return bestUnit;
+    }
+
+    
+    private Unit getTeacher(int unitType) {
+        Iterator i = colony.getUnitIterator();
+        while (i.hasNext()) {
+            Unit unit = (Unit) i.next();
+            
+            if (unit.getType() == unitType) {
+                return unit;
+            }
+        }
+        
+        return null;
+    }
+
+
     /**
     * Prepares this <code>Building</code> for a new turn.
     */
@@ -438,6 +531,40 @@ public final class Building extends FreeColGameObject implements WorkLocation {
         int goodsOutputType = -1;
 
         if ((level == NOT_BUILT) && (type != CHURCH)) return; // Don't do anything if the building does not exist.
+
+        if (type == SCHOOLHOUSE) {
+            Iterator i = getUnitIterator();
+            while (i.hasNext()) {
+                Unit teacher = (Unit) i.next();
+                Unit student = getUnitToTrain(teacher.getType());
+
+                if (student != null) {
+                    if (student.getTrainingType() != teacher.getType() && student.getTrainingType() != Unit.FREE_COLONIST) {
+                        student.setTrainingType(teacher.getType());
+                        student.setTurnsOfTraining(0);
+                    }
+
+                    student.setTurnsOfTraining(student.getTurnsOfTraining() + ((colony.getSoL() == 100) ? 2 : 1));
+
+                    if (student.getTurnsOfTraining() >= student.getNeededTurnsOfTraining()) {
+                        if (student.getType() == Unit.INDENTURED_SERVANT) {
+                            student.setType(Unit.FREE_COLONIST);
+                        } else if (student.getType() == Unit.PETTY_CRIMINAL) {
+                            student.setType(Unit.INDENTURED_SERVANT);
+                        } else {
+                            student.setType(student.getTrainingType());
+                        }
+
+                        // TODO: Add message about unit beeing trained.
+
+                        student.setTrainingType(-1);
+                        student.setTurnsOfTraining(0);
+                    }
+                }
+            }
+
+            return;
+        }
 
         // Figure out what's produced here and what it requires to do so.
         switch(type) {
@@ -504,6 +631,11 @@ public final class Building extends FreeColGameObject implements WorkLocation {
                 goodsOutput = (goodsInput * 3) / 2;
             }
         }
+        
+        if (goodsOutputType == Goods.BELLS) {
+            goodsOutput += goodsOutput * colony.getBuilding(Building.PRINTING_PRESS).getLevel();
+        }
+
         if (goodsOutput <= 0) return;
 
         // Actually produce the goods.

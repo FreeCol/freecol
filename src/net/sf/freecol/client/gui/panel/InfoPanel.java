@@ -116,6 +116,7 @@ public final class InfoPanel extends JPanel {
             unitLabel.setIcon(null);
             unitNameLabel.setText("");
             unitMovesLabel.setText("");
+            unitToolsLabel.setText("");
         }
 
         goldLabel.setText("Gold: " + freeColClient.getMyPlayer().getGold());

@@ -110,6 +110,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     private Location        location;
 
     private int             workType; // What type of goods this unit produces in its occupation.
+    
+    private int             turnsOfTraining = 0;
+    private int             trainingType = -1;
+
 
     /**
     * Initiate a new <code>Unit</code> of a specified type with the state set
@@ -195,7 +199,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     /*public Unit(Game game, Location location, Player owner, int type, int movesLeft, int s, int id) {
         super(game);
 
-        unitContainer = new UnitContainer(game, this);        
+        unitContainer = new UnitContainer(game, this);
 
         this.location = location;
         location.add(this);
@@ -269,6 +273,112 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     }
 
 
+    /**
+    * Gets the number of turns this unit has to train to
+    * become the current {@link #getTrainingType training type}.
+    *
+    * @return The turns of training needed to become the current
+    *         training type, or <code>Integer.MAX_VALUE</code> if
+    *         if no training type is specified.
+    * @see #getTrainingType
+    * @see #getTurnsOfTraining
+    */
+    public int getNeededTurnsOfTraining() {
+        if (trainingType != -1) {
+            return 2 + getSkillLevel(trainingType);
+        } else {
+            return Integer.MAX_VALUE;
+        }
+    }
+
+
+    /**
+    * Gets the skill level.
+    */
+    public static int getSkillLevel(int unitType) {
+        switch (unitType) {
+            case FREE_COLONIST:
+                return 0;
+            case EXPERT_FISHERMAN:
+            case EXPERT_FARMER:
+            case EXPERT_FUR_TRAPPER:
+            case EXPERT_SILVER_MINER:
+            case EXPERT_LUMBER_JACK:
+            case EXPERT_ORE_MINER:
+            case MASTER_CARPENTER:
+            case SEASONED_SCOUT:
+            case HARDY_PIONEER:
+                return 1;
+            case MASTER_SUGAR_PLANTER:
+            case MASTER_COTTON_PLANTER:
+            case MASTER_TOBACCO_PLANTER:
+            case MASTER_GUNSMITH:
+            case MASTER_FUR_TRADER:
+            case MASTER_BLACKSMITH:
+            case MASTER_DISTILLER:
+            case MASTER_WEAVER:
+            case MASTER_TOBACCONIST:
+            case VETERAN_SOLDIER:
+                return 2;
+            case FIREBRAND_PREACHER:
+            case ELDER_STATESMAN:
+            case JESUIT_MISSIONARY:
+                return 3;
+            default:
+                throw new IllegalStateException();
+        }
+    }
+
+
+    /**
+    * Gets the number of turns this unit has been training.
+    *
+    * @see #setTurnsOfTraining
+    * @see #getTrainingType
+    * @see #getNeededTurnsOfTraining
+    */
+    public int getTurnsOfTraining() {
+        return turnsOfTraining;
+    }
+
+
+    /**
+    * Sets the number of turns this unit has been training.
+    * @see #getNeededTurnsOfTraining
+    */
+    public void setTurnsOfTraining(int turnsOfTraining) {
+        this.turnsOfTraining = turnsOfTraining;
+    }
+
+
+
+    /**
+    * Gets the unit type this <code>Unit</code> is training for.
+    *
+    * @see #getTurnsOfTraining
+    * @see #setTrainingType
+    */
+    public int getTrainingType() {
+        return trainingType;
+    }
+
+
+    /**
+    * Sets the unit type this <code>Unit</code> is training for.
+    * Use <code>-1</code> for no type at all.
+    *
+    * @see #getTurnsOfTraining
+    * @see #getTrainingType
+    */
+    public void setTrainingType(int trainingType) {
+        if (getType() == PETTY_CRIMINAL || getType() == INDENTURED_SERVANT) {
+            this.trainingType = FREE_COLONIST;
+        } else {
+            this.trainingType = trainingType;
+        }
+    }
+
+
      /**
      * Gets the type of goods this unit is producing in its current occupation.
      * @return The type of goods this unit would produce.
@@ -290,7 +400,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         workType = type;
     }
 
-    
+
     /**
      * Gets the type of a move made in a specified direction.
      *
@@ -481,7 +591,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     * @exception IllegalStateException If the carrier is on another tile than this unit.
     */
     public void boardShip(Unit carrier) {
-        if (getTile() == carrier.getTile()) {
+        if (getTile() == carrier.getTile() && carrier.getState() != TO_EUROPE && carrier.getState() != TO_AMERICA) {
             setLocation(carrier);
             setState(SENTRY);
         } else {
@@ -499,14 +609,13 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     * @exception ClassCastException If not this unit is located on a ship.
     */
     public void leaveShip() {
-        Location l = ((Unit) getLocation()).getLocation();
+        Unit carrier = (Unit) getLocation();
+        Location l = carrier.getLocation();
 
-        if (l instanceof Europe) {
+        if (l instanceof Europe && carrier.getState() != TO_EUROPE && carrier.getState() != TO_AMERICA) {
             setLocation(l);
-            setState(ACTIVE);
         } else if (getTile().getSettlement() != null) {
             setLocation(getTile());
-            setState(ACTIVE);
         } else {
             throw new IllegalStateException("A unit may only leave a ship while in a harbour.");
         }
@@ -970,7 +1079,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     * @param The amount of goods to buy.
     */
     public void buyGoods(int type, int amount) {
-        if (!isCarrier() || !(getLocation() instanceof Europe)) {
+        if (!isCarrier() || !(getLocation() instanceof Europe && getState() != TO_EUROPE && getState() != TO_AMERICA)) {
             throw new IllegalStateException("Cannot buy goods when not a carrier or in Europe.");
         }
 
@@ -978,7 +1087,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         goodsContainer.addGoods(type, amount);
     }
 
-    
+
     /**
     * Sets how many tools this unit is carrying.
     * @param numberOfTools The number to set it to.
@@ -992,10 +1101,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             if (isArmed()) {
                 setArmed(false);
             }
-            
+
             if (isMissionary()) {
                 setMissionary(false);
-            }            
+            }
         }
 
         int changeAmount = 0;
@@ -2573,6 +2682,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         unitElement.setAttribute("workLeft", Integer.toString(workLeft));
         unitElement.setAttribute("numberOfTools", Integer.toString(numberOfTools));
         unitElement.setAttribute("owner", owner.getID());
+        unitElement.setAttribute("turnsOfTraining", Integer.toString(turnsOfTraining));
+        unitElement.setAttribute("trainingType", Integer.toString(trainingType));
 
         if (entryLocation != null) {
             unitElement.setAttribute("entryLocation", entryLocation.getID());
@@ -2622,7 +2733,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         workLeft = Integer.parseInt(unitElement.getAttribute("workLeft"));
         numberOfTools = Integer.parseInt(unitElement.getAttribute("numberOfTools"));
         owner = getGame().getPlayerByID(unitElement.getAttribute("owner"));
-        
+        turnsOfTraining = Integer.parseInt(unitElement.getAttribute("turnsOfTraining"));
+        trainingType = Integer.parseInt(unitElement.getAttribute("trainingType"));
+
         if (owner == null) {
             logger.warning("VERY BAD: Can't find player with ID " + unitElement.getAttribute("owner") + "!");
         }
