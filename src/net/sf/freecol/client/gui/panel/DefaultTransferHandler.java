@@ -98,12 +98,17 @@ public final class DefaultTransferHandler extends TransferHandler {
     public boolean importData(JComponent comp, Transferable t) {
         try {
             JLabel data;
-            
+
             // Check flavor.
             if (t.isDataFlavorSupported(this.flavor)) {
                 data = (JLabel)t.getTransferData(this.flavor);
             } else {
                 logger.warning("Data flavor is not supported!");
+                return false;
+            }
+
+            // Do not allow a transferable to be dropped upon itself:
+            if (comp == data) {
                 return false;
             }
 
@@ -135,7 +140,6 @@ public final class DefaultTransferHandler extends TransferHandler {
                             comp = (JComponent)comp.getParent();
                         }
                     } catch (ClassCastException e) {}
-
                 }
             } else if ((comp instanceof GoodsLabel) || (comp instanceof MarketLabel)) {
 
@@ -145,6 +149,11 @@ public final class DefaultTransferHandler extends TransferHandler {
                 } catch (ClassCastException e) {
                     return false;
                 }
+            }
+
+            // t is already in comp:
+            if (data.getParent() == comp) {
+                return false;
             }
 
             if (data instanceof UnitLabel) {
@@ -158,6 +167,14 @@ public final class DefaultTransferHandler extends TransferHandler {
                 }
 
                 if ((unit.getState() == Unit.TO_EUROPE) && (!(comp instanceof EuropePanel.ToAmericaPanel))) {
+                    return false;
+                }
+                
+                if ((unit.getState() != Unit.TO_AMERICA) && ((comp instanceof EuropePanel.ToEuropePanel))) {
+                    return false;
+                }
+
+                if (unit.isCarrier() && (comp instanceof EuropePanel.CargoPanel || comp instanceof ColonyPanel.CargoPanel)) {
                     return false;
                 }
 

@@ -180,6 +180,10 @@ public final class InGameInputHandler implements MessageHandler {
 
             NodeList nl = opponentMoveElement.getElementsByTagName(Unit.getXMLElementTagName());
             Unit unit = new Unit(game, (Element) nl.item(0));
+            
+            if (game.getFreeColGameObject(tileID) == null) {
+                logger.warning("Could not find tile with id: " + tileID);
+            }
             unit.setLocation((Tile) game.getFreeColGameObject(tileID));
         }
 

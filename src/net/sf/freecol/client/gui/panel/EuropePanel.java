@@ -376,7 +376,9 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
 
     
     public void reinitialize() {
+        UnitLabel selectedUnit = this.selectedUnit;
         initialize(europe, game);
+        setSelectedUnit(selectedUnit);
     }
 
     /**
@@ -1136,6 +1138,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                                 galleonButton,
                                 privateerButton,
                                 frigateButton;
+        private JLabel artilleryLabel = new JLabel("?");
 
         /**
         * The constructor to use.
@@ -1144,7 +1147,6 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         public PurchasePanel(ActionListener actionListener) {
             JLabel  question = new JLabel("Click one of the following items to"),
                     question2 = new JLabel("purchase them."),
-                    artilleryLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.ARTILLERY))),
                     caravelLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.CARAVEL))),
                     merchantmanLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.MERCHANTMAN))),
                     galleonLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.GALLEON))),
@@ -1239,7 +1241,6 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             setSize(320, 255);
         }
 
-        
 
         /**
         * Updates this panel's labels so that the information it displays is up to date.
@@ -1248,7 +1249,9 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             if ((game != null) && (freeColClient.getMyPlayer() != null)) {
                 Player gameOwner = freeColClient.getMyPlayer();
 
-                if (Unit.getPrice(Unit.ARTILLERY) > gameOwner.getGold()) {
+                artilleryLabel.setText(Integer.toString(europe.getArtilleryPrice()));
+
+                if (europe.getArtilleryPrice() > gameOwner.getGold()) {
                     artilleryButton.setEnabled(false);
                 } else {
                     artilleryButton.setEnabled(true);

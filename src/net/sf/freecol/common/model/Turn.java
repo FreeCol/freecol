@@ -43,6 +43,14 @@ public class Turn {
         return turn;
     }
 
+    
+    /**
+    * Sets the turn number.
+    */
+    public void setNumber(int turn) {
+        this.turn = turn;
+    }
+
 
     /**
     * Checks if this turn is equal to another turn.

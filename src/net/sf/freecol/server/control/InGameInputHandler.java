@@ -139,6 +139,8 @@ public final class InGameInputHandler implements MessageHandler {
             throw new IllegalArgumentException("Could not find 'Unit' with specified ID: " + moveElement.getAttribute("unit"));
         }
 
+        boolean disembark = (unit.getMoveType(direction) == Unit.DISEMBARK);
+
         Tile oldTile = unit.getTile();
 
         unit.move(direction);
@@ -154,7 +156,7 @@ public final class InGameInputHandler implements MessageHandler {
             }
 
             try {
-                if (enemyPlayer.canSee(oldTile)) {
+                if (enemyPlayer.canSee(oldTile) && !disembark) {
                     Element opponentMoveElement = Message.createNewRootElement("opponentMove");
                     opponentMoveElement.setAttribute("direction", Integer.toString(direction));
                     opponentMoveElement.setAttribute("unit", unit.getID());
@@ -613,11 +615,6 @@ public final class InGameInputHandler implements MessageHandler {
 
         int unitType = Integer.parseInt(trainUnitInEuropeElement.getAttribute("unitType"));
 
-        if (player.getGold() < Unit.getPrice(unitType)) {
-            logger.warning("Received a request from a client to train a unit in europe, but the player does not have enough money!");
-            return null;
-        }
-
         Unit unit = new Unit(game, player, unitType);
 
         Element reply = Message.createNewRootElement("trainUnitInEuropeConfirmed");
@@ -795,7 +792,7 @@ public final class InGameInputHandler implements MessageHandler {
     private Element endTurn(Connection connection, Element moveElement) {
         Game game = freeColServer.getGame();
 
-        Player nextPlayer = game.getNextPlayer();
+        ServerPlayer nextPlayer = (ServerPlayer) game.getNextPlayer();
 
         while (checkForDeath(nextPlayer)) {
             nextPlayer.setDead(true);
@@ -803,7 +800,7 @@ public final class InGameInputHandler implements MessageHandler {
             setDeadElement.setAttribute("player", nextPlayer.getID());
             freeColServer.getServer().sendToAll(setDeadElement, null);
 
-            nextPlayer = game.getNextPlayer();
+            nextPlayer = (ServerPlayer) game.getNextPlayer();
         }
 
         if (game.isNextPlayerInNewTurn()) {
@@ -814,6 +811,15 @@ public final class InGameInputHandler implements MessageHandler {
         }
 
         game.setCurrentPlayer(nextPlayer);
+
+        // TODO: Remove when each player has it's own market:
+        try {
+            Element updateElement = Message.createNewRootElement("update");
+            updateElement.appendChild(game.getMarket().toXMLElement(nextPlayer, updateElement.getOwnerDocument()));
+            nextPlayer.getConnection().send(updateElement);
+        } catch (IOException e) {
+            logger.warning("Could not send message to: " + nextPlayer.getName() + " with connection " + nextPlayer.getConnection());
+        }
 
         Element setCurrentPlayerElement = Message.createNewRootElement("setCurrentPlayer");
         setCurrentPlayerElement.setAttribute("player", nextPlayer.getID());

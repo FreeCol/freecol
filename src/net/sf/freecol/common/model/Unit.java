@@ -149,11 +149,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         this.type = type;
         this.movesLeft = getInitialMovesLeft();
 
-        this.armed = armed;
-        this.mounted = mounted;
-        this.missionary = missionary;
-        this.numberOfTools = numberOfTools;
-
         state = s;
         workLeft = -1;
         workType = Goods.FOOD;
@@ -175,8 +170,14 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         } else {
             numberOfTools = 0;
         }
+
+        if (type == JESUIT_MISSIONARY) {
+            missionary = true;
+        } else {
+            missionary = false;
+        }
     }
-    
+
 
 
 
@@ -1784,9 +1785,13 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     * @return The price of this unit when trained in Europe. '-1' is returned in case the unit cannot be bought.
     */
     public int getPrice() {
-        return getPrice(getType());
+        if (getType() == ARTILLERY) {
+            return getOwner().getEurope().getArtilleryPrice();
+        } else {
+            return getPrice(getType());
+        }
     }
-    
+
 
     /**
     * Returns the price of a trained unit in Europe.
@@ -1828,7 +1833,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             case VETERAN_SOLDIER:
                 return 2000;
             case ARTILLERY:
-                return 500;
+                throw new IllegalStateException();
             case CARAVEL:
                 return 1000;
             case MERCHANTMAN:
@@ -2085,14 +2090,20 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                 targetcolony = (Colony)(newTile.getSettlement());
                 targetcolony.setOwner(getOwner()); // This also changes over all of the units...
                 setLocation(newTile);
+            } else {
+                defender.setLocation(getTile());
+                defender.setOwner(getOwner());
             }
+
             // Colonists get captured if they lose.
+            /*
             Iterator unitIterator = newTile.getUnitsClone().iterator();
             while (unitIterator.hasNext()) {
                 Unit target = (Unit)unitIterator.next();
                 target.setOwner(getOwner());
                 if (!captureColony) target.setLocation(getTile());
             }
+            */
         } else {
             if (defender.isMounted()) {
                 defender.setMounted(false, true);
@@ -2114,6 +2125,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             }
         }
     }
+
 
     /**
     * Carries out the loss of an attack.
@@ -2233,13 +2245,13 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         int base = tile.potential(goods);
         switch (type) {
             case EXPERT_FARMER:
-                if ((goods == Goods.FOOD) && ((tile.getType() != Tile.OCEAN) && (tile.getType() != Tile.HIGH_SEAS))) {
+                if ((goods == Goods.FOOD) && !tile.isLand()) {
                     //TODO: Special tile stuff. He gets +6/+4 for wheat/deer tiles respectively...
                     base += 2;
                 }
                 break;
             case EXPERT_FISHERMAN:
-                if ((goods == Goods.FOOD) && ((tile.getType() == Tile.OCEAN) || (tile.getType() == Tile.HIGH_SEAS))) {
+                if ((goods == Goods.FOOD) && !tile.isLand()) {
                     //TODO: Special tile stuff. He gets +6 for a fishery tile.
                     base += 2;
                 }
@@ -2288,10 +2300,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             default: // Beats me who or what is working here, but he doesn't get a bonus.
                 break;
         }
+        
         return base;
     }
 
-    
+
     /**
     * Removes all references to this object.
     */

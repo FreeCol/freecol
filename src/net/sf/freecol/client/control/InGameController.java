@@ -306,7 +306,7 @@ public final class InGameController {
             return;
         }
 
-        freeColClient.playSound(SfxLibrary.LOAD_CARGO);        
+        freeColClient.playSound(SfxLibrary.LOAD_CARGO);
 
         unit.boardShip(carrier);
 
@@ -443,6 +443,16 @@ public final class InGameController {
     public void equipUnit(Unit unit, int type, int amount) {
         Client client = freeColClient.getClient();
 
+        Unit carrier = null;
+        if (unit.getLocation() instanceof Unit) {
+            carrier = (Unit) unit.getLocation();
+            leaveShip(unit);
+        }
+        
+        if (unit.getLocation() instanceof ColonyTile || unit.getLocation() instanceof Building) {
+            putOutsideColony(unit);
+        }
+
         Element equipUnitElement = Message.createNewRootElement("equipunit");
         equipUnitElement.setAttribute("unit", unit.getID());
         equipUnitElement.setAttribute("type", Integer.toString(type));
@@ -473,6 +483,10 @@ public final class InGameController {
         }
 
         client.send(equipUnitElement);
+        
+        if (carrier != null) {
+            boardShip(unit, carrier);
+        }
     }
 
 
@@ -638,7 +652,8 @@ public final class InGameController {
         Player myPlayer = freeColClient.getMyPlayer();
         Europe europe = myPlayer.getEurope();
 
-        if (myPlayer.getGold() < Unit.getPrice(unitType)) {
+        if (unitType != Unit.ARTILLERY && myPlayer.getGold() < Unit.getPrice(unitType) ||
+                myPlayer.getGold() < europe.getArtilleryPrice()) {
             canvas.errorMessage("notEnoughGold");
             return;
         }

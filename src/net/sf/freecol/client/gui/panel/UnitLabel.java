@@ -15,6 +15,8 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
+import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.ColonyTile;
@@ -139,8 +141,20 @@ public final class UnitLabel extends JLabel implements ActionListener {
 
 
         if (unit.getLocation() instanceof ColonyTile) {
-            ImageIcon goodsIcon = parent.getImageProvider().getGoodsImageIcon(unit.getWorkType());
+            ImageIcon goodsIcon;
+
+            if (unit.getWorkType() == Goods.FOOD && unit.getLocation() instanceof ColonyTile
+                    && !((ColonyTile) unit.getLocation()).getWorkTile().isLand()) {
+                goodsIcon = parent.getImageProvider().getGoodsImageIcon(Goods.FISH);
+            } else {
+                goodsIcon = parent.getImageProvider().getGoodsImageIcon(unit.getWorkType());
+            }
+
             int production = unit.getFarmedPotential(unit.getWorkType(), ((ColonyTile) unit.getLocation()).getWorkTile());
+            if (unit.getLocation() instanceof ColonyTile && !((ColonyTile) unit.getLocation()).getWorkTile().isLand()
+                    && !((ColonyTile) unit.getLocation()).getColony().getBuilding(Building.DOCK).isBuilt()) {
+                production = 0;
+            }
 
             if (production > 0) {
                 int p = getWidth() / production;

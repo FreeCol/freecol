@@ -277,7 +277,7 @@ public final class Tile extends FreeColGameObject implements Location {
         }
     }
 
-
+    
     /**
     * Returns 'true' if this Tile has a road.
     * @return 'true' if this Tile has a road.
@@ -507,7 +507,7 @@ public final class Tile extends FreeColGameObject implements Location {
     public boolean isSettleable() {
         int type = getType();
 
-        if (type == ARCTIC || type == OCEAN || type == HIGH_SEAS) {
+        if (type == ARCTIC || type == OCEAN || type == HIGH_SEAS || getAddition() == ADD_MOUNTAINS) {
             return false;
         } else {
             return true;
@@ -703,7 +703,7 @@ public final class Tile extends FreeColGameObject implements Location {
           {{2,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {4,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Hills
           {{0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {3,0}, {1,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}  // Mountains
       };
-      
+
       int basepotential = 0;
       if (addition_type <= ADD_RIVER_MAJOR) {
           basepotential = potentialtable[type][goods][(forested ? 1 : 0)];

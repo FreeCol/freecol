@@ -464,6 +464,7 @@ public class Game extends FreeColGameObject {
         Element gameElement = document.createElement(getXMLElementTagName());
 
         gameElement.setAttribute("ID", getID());
+        gameElement.setAttribute("turn", Integer.toString(getTurn().getNumber()));
 
         if (map != null) {
             gameElement.appendChild(map.toXMLElement(player, document));
@@ -496,6 +497,8 @@ public class Game extends FreeColGameObject {
         }
 
         setID(gameElement.getAttribute("ID"));
+        
+        getTurn().setNumber(Integer.parseInt(gameElement.getAttribute("turn")));
 
         // Get the map:
         Element mapElement = getChildElement(gameElement, Map.getXMLElementTagName());

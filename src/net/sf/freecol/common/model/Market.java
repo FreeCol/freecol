@@ -35,22 +35,22 @@ public final class Market extends FreeColGameObject {
 
         /* seed these objects with the initial amount of each type of good */
         int[]  initialAmounts = {
-          1000, // FOOD
-           200, // SUGAR
-           200, // TOBACCO
-           200, // COTTON
-           200, // FURS
-           800, // LUMBER
-           500, // ORE
-             0, // SILVER
-           800, // HORSES
-           100, // RUM
-           100, // CIGARS
-           100, // CLOTH
-           100, // COATS
-          1000, // TRADE_GOODS
-           400, // TOOLS
-           300  // MUSKETS
+          10000, // FOOD
+           2000, // SUGAR
+           2000, // TOBACCO
+           2000, // COTTON
+           2000, // FURS
+           8000, // LUMBER
+           5000, // ORE
+            500, // SILVER
+           8000, // HORSES
+           1000, // RUM
+           1000, // CIGARS
+           1000, // CLOTH
+           1000, // COATS
+          10000, // TRADE_GOODS
+           4000, // TOOLS
+           3000  // MUSKETS
         };
         for (int i = 0; i < initialAmounts.length; i++) {
             dataForGoodType[i].amountInMarket = initialAmounts[i];
@@ -71,7 +71,7 @@ public final class Market extends FreeColGameObject {
 
     /**
      * Determines the cost to buy a single unit of a particular type of good.
-     * 
+     *
      * @param  typeOfGood  the type of good for which to obtain a price
      * @throws  NullPointerException  if the argument is <TT>null</TT>
      */
@@ -84,12 +84,11 @@ public final class Market extends FreeColGameObject {
     /**
      * Determines the price paid for the sale of a single unit of a particular
      * type of good.
-     * 
+     *
      * @param  typeOfGood  The Goods for which to obtain a price.
      * @throws  NullPointerException  if the argument is <TT>null</TT>
      */
     public int paidForSale(int typeOfGood) {
-
         return dataForGoodType[typeOfGood].paidForSale;
     }
 
@@ -97,48 +96,26 @@ public final class Market extends FreeColGameObject {
     /**
      * Sells a particular amount of a particular type of good with the proceeds
      * of the sale being paid to a particular player.
-     * 
-     * @param  typeOfGood  The Goods object being sold.
-     * @param  player      the player selling the goods
-     * @throws  NullPointerException  if either (typeOfGood) or (player) is
-     *                                <TT>null</TT>
+     *
+     * @param  type   The type of goods to be sold.
+     * @param  amount The amount of goods to be sold.
+     * @param  player The player selling the goods
      */
-    /*public void sell(Goods typeOfGood, Player player) {
-        Data  data = dataForGoodType[typeOfGood.getType()];
-        int originalamount = typeOfGood.getAmount(), amount = originalamount;
-        switch(typeOfGood.getType()) {
-          case Goods.SILVER:
-               amount *= 4; // No bitshifts in Java? Should be << 2 - sjm
-               break;
-          case Goods.SUGAR:
-          case Goods.TOBACCO:
-          case Goods.COTTON:
-          case Goods.FURS:
-          case Goods.RUM:
-          case Goods.CIGARS:
-          case Goods.CLOTH:
-          case Goods.COATS:
-              amount *= 2;
-          break;
-          default:
-              break;
-        }
-        if (player.getNation() == Player.DUTCH) amount /= 2;
-        data.amountInMarket += amount;
-        player.modifyGold(originalamount * data.paidForSale);
-
-        typeOfGood.getLocation().remove(typeOfGood);
-
-        priceGoods();
-    }*/
-
-    
     public void sell(int type, int amount, Player player) {
         player.modifyGold(getSalePrice(type, amount));
         add(type, (player.getNation() == Player.DUTCH) ? (amount/2) : amount);
     }
-    
-    
+
+
+    /**
+     * Sells a particular amount of a particular type of good with the proceeds
+     * of the sale being paid to a particular player.
+     *
+     * @param  goods  The Goods object being sold.
+     * @param  player      the player selling the goods
+     * @throws  NullPointerException  if either (goods) or (player) is
+     *                                <TT>null</TT>
+     */
     public void sell(Goods goods, Player player) {
         sell(goods.getType(), goods.getAmount(), player);
         goods.setLocation(null);
@@ -149,33 +126,12 @@ public final class Market extends FreeColGameObject {
      * Buys a particular amount of a particular type of good with the cost
      * being met by a particular player.
      *
-     * @param  typeOfGood  the type of good that is being bought
+     * @param  type  the type of good that is being bought
      * @param  amount      the number of units of goods that are being bought
      * @param  player      the player buying the goods
-     * @throws  NullPointerException  if either (typeOfGood) or (player) is
-     *                                <TT>null</TT>
+     * @throws IllegalStateException If the <code>player</code> cannot afford
+     *                               to buy the goods.
      */
-/*
-    public Goods buy(int typeOfGood, int amount, Player player) {
-
-        Data  data = dataForGoodType[typeOfGood];
-        data.amountInMarket -= ((player.getNation() == Player.DUTCH) ? (amount / 2) : amount);
-*/
-        /* this is a bottomless market: goods cannot be owed by the market */
-/*
-        if (data.amountInMarket < 0) {
-            data.amountInMarket = 0;
-        }
-
-        player.modifyGold( -(amount * data.costToBuy));
-
-        priceGoods();
-
-        return new Goods(player.getGame(), null, typeOfGood, amount);
-    }
-*/
-
-
     public void buy(int type, int amount, Player player) {
         if (getBidPrice(type, amount) > player.getGold()) {
             throw new IllegalStateException();
@@ -185,7 +141,7 @@ public final class Market extends FreeColGameObject {
         remove(type, ((player.getNation() == Player.DUTCH) ? (amount / 2) : amount));
     }
 
-    
+
     /**
     * Add the given <code>Goods</code> to this <code>Market</code>.
     */
@@ -209,7 +165,7 @@ public final class Market extends FreeColGameObject {
           default:
               break;
         }
-        
+
         data.amountInMarket += amount;
         priceGoods();
     }
@@ -226,7 +182,7 @@ public final class Market extends FreeColGameObject {
         if (data.amountInMarket < 0) {
             data.amountInMarket = 0;
         }
-        
+
         priceGoods();
     }
 
@@ -241,7 +197,7 @@ public final class Market extends FreeColGameObject {
         return (amount * data.costToBuy);
     }
 
-    
+
     /**
     * Gets the price of a given goods when the <code>Player</code> sales.
     *
@@ -271,8 +227,9 @@ public final class Market extends FreeColGameObject {
             Data  data = dataForGoodType[i];
 
             /* scale sale prices from 1 to 19 and place buy prices one above */
-            data.paidForSale =
-                (10 * ((totalGoods / 30) + 1)) / (data.amountInMarket + 1);
+            data.paidForSale = (10 * ((totalGoods / 30) + 1)) / (data.amountInMarket + 1);
+
+            //data.paidForSale = 19 - 18 * (data.amountInMarket / (totalGoods + 1));
 
             if (data.paidForSale > 19) data.paidForSale = 19;
             if (data.paidForSale < 1) data.paidForSale = 1;
@@ -304,7 +261,7 @@ public final class Market extends FreeColGameObject {
 
         return marketElement;
     }
-    
+
     public void newTurn() {
         // Shift market goods around a bit?
     }
@@ -325,7 +282,7 @@ public final class Market extends FreeColGameObject {
 
             dataForGoodType[i] = new Data(getGame(), dataElement);
         }
-        
+
         priceGoods();
     }
 
@@ -375,9 +332,8 @@ public final class Market extends FreeColGameObject {
             Element dataElement = document.createElement(getXMLElementTagName());
 
             dataElement.setAttribute("ID", getID());
-            dataElement.setAttribute("buy", Integer.toString(costToBuy));
-            dataElement.setAttribute("sell", Integer.toString(paidForSale));
-            dataElement.setAttribute("amount", Integer.toString(paidForSale));
+
+            dataElement.setAttribute("amount", Integer.toString(amountInMarket));
 
             return dataElement;
         }
@@ -391,9 +347,7 @@ public final class Market extends FreeColGameObject {
         public void readFromXMLElement(Element dataElement) {
             setID(dataElement.getAttribute("ID"));
 
-            costToBuy = Integer.parseInt(dataElement.getAttribute("buy"));
-            costToBuy = Integer.parseInt(dataElement.getAttribute("sell"));
-            costToBuy = Integer.parseInt(dataElement.getAttribute("amount"));
+            amountInMarket = Integer.parseInt(dataElement.getAttribute("amount"));
         }
 
         /**

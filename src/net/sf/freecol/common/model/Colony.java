@@ -130,6 +130,12 @@ public final class Colony extends Settlement implements Location {
         while (unitIterator.hasNext()) {
             ((Unit)unitIterator.next()).setOwner(owner);
         }
+        
+        Iterator tileUnitIterator = getTile().getUnitIterator();
+        while (tileUnitIterator.hasNext()) {
+            Unit target = (Unit) tileUnitIterator.next();
+            target.setOwner(getOwner());
+        }
     }
 
 

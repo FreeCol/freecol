@@ -182,8 +182,9 @@ public final class ImageLibrary extends ImageProvider {
                             GOODS_TRADE_GOODS = 13,
                             GOODS_TOOLS = 14,
                             GOODS_MUSKETS = 15,
-                            
-                            GOODS_COUNT = 16;
+                            GOODS_FISH = 16,
+
+                            GOODS_COUNT = 17;
 
     /**
      * The filename of the graphical representation of a specific unit is the following:
@@ -617,7 +618,7 @@ public final class ImageLibrary extends ImageProvider {
         loadColorChip(gc, Color.RED);
         loadColorChip(gc, Color.WHITE);
         loadColorChip(gc, Color.YELLOW);
-        
+
         //FIXME: these same colours are found in the server PreGameController!
         // They need to be unified into one location!
         loadColorChip(gc, IndianSettlement.indianColors[0]);
@@ -885,6 +886,9 @@ public final class ImageLibrary extends ImageProvider {
         } else {  // IndianSettlement
             IndianSettlement indianSettlement = (IndianSettlement) settlement;
 
+            return INDIAN_SETTLEMENT_CAMP;
+
+            /* TODO: Use when we have graphics:
             if (indianSettlement.getKind() == IndianSettlement.CAMP) {
                 return INDIAN_SETTLEMENT_CAMP;
             } else if (indianSettlement.getKind() == IndianSettlement.VILLAGE) {
@@ -895,6 +899,7 @@ public final class ImageLibrary extends ImageProvider {
                 else // INCA
                     return INDIAN_SETTLEMENT_INCA;
             }
+            */
         }
     }
 

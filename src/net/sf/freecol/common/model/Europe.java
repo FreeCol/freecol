@@ -13,7 +13,7 @@ import org.w3c.dom.Document;
 
 /**
 * Represents Europe in the game. Each <code>Player</code> has it's own
-* <code>Europe</code>. 
+* <code>Europe</code>.
 *
 * <br><br>
 *
@@ -35,6 +35,8 @@ public final class Europe extends FreeColGameObject implements Location {
     * exactly 3 elements and element 0 corresponds to recruit slot 1.
     */
     private int[] recruitables = {-1, -1, -1};
+    
+    private int artilleryPrice;
 
     /**
     * Contains the units on this location.
@@ -56,6 +58,8 @@ public final class Europe extends FreeColGameObject implements Location {
         setRecruitable(1, Unit.generateRecruitable());
         setRecruitable(2, Unit.generateRecruitable());
         setRecruitable(3, Unit.generateRecruitable());
+        
+        artilleryPrice = 500;
     }
 
 
@@ -148,7 +152,7 @@ public final class Europe extends FreeColGameObject implements Location {
         }
 
         unit.setLocation(this);
-        unit.getOwner().setCrosses(0);        
+        unit.getOwner().setCrosses(0);
 
         setRecruitable(slot, newRecruitable);
     }
@@ -272,6 +276,18 @@ public final class Europe extends FreeColGameObject implements Location {
 
         unit.getOwner().modifyGold(-unit.getPrice());
         unit.setLocation(this);
+        
+        if (unit.getType() == Unit.ARTILLERY) {
+            artilleryPrice += 100;
+        }        
+    }
+
+
+    /**
+    * Gets the current price for an artillery.
+    */
+    public int getArtilleryPrice() {
+        return artilleryPrice;
     }
 
     
@@ -296,6 +312,7 @@ public final class Europe extends FreeColGameObject implements Location {
         europeElement.setAttribute("recruit0", Integer.toString(recruitables[0]));
         europeElement.setAttribute("recruit1", Integer.toString(recruitables[1]));
         europeElement.setAttribute("recruit2", Integer.toString(recruitables[2]));
+        europeElement.setAttribute("artilleryPrice", Integer.toString(artilleryPrice));
 
         europeElement.appendChild(unitContainer.toXMLElement(player, document));
 
@@ -313,6 +330,7 @@ public final class Europe extends FreeColGameObject implements Location {
         recruitables[0] = Integer.parseInt(europeElement.getAttribute("recruit0"));
         recruitables[1] = Integer.parseInt(europeElement.getAttribute("recruit1"));
         recruitables[2] = Integer.parseInt(europeElement.getAttribute("recruit2"));
+        artilleryPrice = Integer.parseInt(europeElement.getAttribute("artilleryPrice"));
 
         Element unitContainerElement = getChildElement(europeElement, UnitContainer.getXMLElementTagName());
         if (unitContainer != null) {

@@ -210,6 +210,7 @@ public final class NewPanel extends JPanel implements ActionListener {
                     break;
                 case CANCEL:
                     parent.remove(this);
+                    parent.showMainPanel();
                     break;
                 case SINGLE:
                     ipLabel.setEnabled(false);

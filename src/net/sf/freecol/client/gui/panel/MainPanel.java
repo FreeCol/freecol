@@ -131,6 +131,7 @@ public final class MainPanel extends JPanel implements ActionListener {
             switch (Integer.valueOf(command).intValue()) {
                 case NEW:
                     parent.showNewGamePanel();
+                    parent.remove(this);
                     break;
                 case OPEN:
                     parent.showOpenGamePanel();

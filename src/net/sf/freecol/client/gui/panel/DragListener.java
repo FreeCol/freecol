@@ -48,7 +48,9 @@ public final class DragListener extends MouseAdapter {
     public void mousePressed(MouseEvent e) {
         JComponent comp = (JComponent)e.getSource();
         
-        if (e.isPopupTrigger() && (comp instanceof UnitLabel)) {
+        //Does not work on some platforms:
+        //if (e.isPopupTrigger() && (comp instanceof UnitLabel)) {
+        if (e.getButton() == MouseEvent.BUTTON3 && (comp instanceof UnitLabel)) {
             UnitLabel unitLabel = (UnitLabel)comp;
             Unit tempUnit = unitLabel.getUnit();
 
@@ -90,8 +92,8 @@ public final class DragListener extends MouseAdapter {
                     menu.add(menuItem);
                 }
 
-                if (!tempUnit.isArmed() && !tempUnit.isMounted() && !tempUnit.isPioneer() && (tempUnit.getLocation() 
-                        instanceof Europe || tempUnit.getTile().getColony().getBuilding(Building.CHURCH).isBuilt())) {
+                if (!tempUnit.isArmed() && !tempUnit.isMounted() && !tempUnit.isPioneer() && (tempUnit.getLocation()
+                        instanceof Europe || tempUnit.getTile() != null && tempUnit.getTile().getColony().getBuilding(Building.CHURCH).isBuilt())) {
 
                     if (tempUnit.isMissionary()) {
                         menuItem = new JMenuItem("Take Off Silly Clothes");
