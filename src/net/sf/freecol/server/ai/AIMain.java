@@ -55,7 +55,13 @@ public class AIMain implements FreeColGameObjectListener {
     }
 
     
-    
+
+    /**
+    * Returns the game.
+    */
+    public Game getGame() {
+        return freeColServer.getGame();
+    }
 
 
     /**
@@ -100,7 +106,7 @@ public class AIMain implements FreeColGameObjectListener {
 
     /**
     * Adds a reference to the given <code>AIObject</code>.
-    * 
+    *
     * @param id The ID of the <code>FreeColGameObject</code> the
     *        <code>AIObject</code> is connected to.
     * @param aiObject The <code>AIObject</code> to store a reference
@@ -108,6 +114,17 @@ public class AIMain implements FreeColGameObjectListener {
     */
     public void addAIObject(String id, AIObject aiObject) {
         aiObjects.put(id, aiObject);
+    }
+
+    
+    /**
+    * Removes a reference to the given <code>AIObject</code>.
+    *
+    * @param id The ID of the <code>FreeColGameObject</code> the
+    *        <code>AIObject</code> is connected to.
+    */
+    public void removeAIObject(String id) {
+        aiObjects.remove(id);
     }
 
 
@@ -140,6 +157,17 @@ public class AIMain implements FreeColGameObjectListener {
         } else if (freeColGameObject instanceof ServerPlayer) {
             addAIObject(id, new AIPlayer(this, (ServerPlayer) freeColGameObject));
         }
+    }
+
+    
+    /**
+    * Removes the <code>AIObject</code> for the given <code>FreeColGameObject</code>.
+    * @param id The ID of the <code>FreeColGameObject</code>.
+    */
+    public void removeFreeColGameObject(String id) {
+        //AIObject o = getAIObject(id);
+        //o.dispose();
+        removeAIObject(id);
     }
 
 

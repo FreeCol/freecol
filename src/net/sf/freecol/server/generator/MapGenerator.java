@@ -228,6 +228,7 @@ public class MapGenerator {
                 
                 for (int i = 0; i < (type * 2) + 4; i++) {
                     Unit unit = new Unit(game, player, Unit.BRAVE);
+                    unit.setIndianSettlement((IndianSettlement) map.getTile(position).getSettlement());
                     if (i == 0) {
                         unit.setLocation(map.getTile(position));
                     } else {

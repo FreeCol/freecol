@@ -243,8 +243,11 @@ public class Game extends FreeColGameObject {
             throw new NullPointerException();
         }
 
-        //return (FreeColGameObject) freeColGameObjects.remove(id);
-        return null;
+        if (freeColGameObjectListener != null) {
+            freeColGameObjectListener.removeFreeColGameObject(id);
+        }
+
+        return (FreeColGameObject) freeColGameObjects.remove(id);
     }
 
 

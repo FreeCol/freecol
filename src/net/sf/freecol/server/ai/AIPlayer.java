@@ -8,6 +8,7 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.*;
 import net.sf.freecol.server.model.*;
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.server.networking.DummyConnection;
 
 import org.w3c.dom.*;
@@ -21,6 +22,10 @@ public class AIPlayer extends AIObject {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
+    /* Stores temporary information for sessions (trading with another player etc). */
+    private HashMap sessionRegister = new HashMap();
+    
+    private Random random = new Random();
 
     /**
     * The FreeColGameObject this AIObject contains AI-information for:
@@ -61,10 +66,69 @@ public class AIPlayer extends AIObject {
     * when this method returns.
     */
     public void startWorking() {
+        Iterator aiUnitsIterator, playerIterator;
+
+        sessionRegister.clear();
+
+        // Determines the stance towards the other players:
+        playerIterator = getGame().getPlayerIterator();
+        while (playerIterator.hasNext()) {
+            Player p = (Player) playerIterator.next();
+            if (getPlayer().getTension(p) >= Player.TENSION_ADD_NORMAL) {
+                getPlayer().setStance(p, Player.WAR);
+            } else {
+                getPlayer().setStance(p, Player.PEACE);
+            }
+        }
+
+        // Abort missions that are no longer valid:
+        aiUnitsIterator = getAIUnitIterator();
+        while (aiUnitsIterator.hasNext()) {
+            AIUnit aiUnit = (AIUnit) aiUnitsIterator.next();
+            if (!aiUnit.getMission().isValid() || aiUnit.getMission() instanceof UnitWanderHostileMission
+                    || aiUnit.getMission() instanceof UnitWanderMission) {
+                aiUnit.setMission(null);
+            }
+        }
+
         secureSettlements();
 
+        // Bring gifts to nice players:
+        if (!player.isEuropean()) {
+            playerIterator = getGame().getPlayerIterator();
+            while (playerIterator.hasNext()) {
+                Player targetPlayer = (Player) playerIterator.next();
+                if (targetPlayer.isEuropean() && IndianBringGiftMission.isValidMission(getPlayer(), targetPlayer) && getPlayer().getTension(targetPlayer) <= Player.TENSION_HAPPY) {
+                    Settlement targetSettlement = targetPlayer.getRandomSettlement();
+                    if (targetSettlement != null) {
+                        Iterator unitIterator = player.getUnitIterator();
+                        AIUnit bestUnit = null;
+                        int shortestDistance = Integer.MAX_VALUE;
+                        while (unitIterator.hasNext()) {
+                            AIUnit u = (AIUnit) getAIMain().getAIObject((Unit) unitIterator.next());
+                            if (!u.hasMission() && u.getUnit().getTile().getDistanceTo(targetSettlement.getTile()) < shortestDistance) {
+                                bestUnit = u;
+                            }
+                        }
+                        if (bestUnit != null) {
+                            bestUnit.setMission(new IndianBringGiftMission(getAIMain(), bestUnit, targetPlayer));
+                        }
+                    }
+                }
+            }
+        }
+
+        // Assign a mission to every unit:
+        aiUnitsIterator = getAIUnitIterator();
+        while (aiUnitsIterator.hasNext()) {
+            AIUnit aiUnit = (AIUnit) aiUnitsIterator.next();
+            if (!aiUnit.hasMission()) {
+                aiUnit.setMission(new UnitWanderHostileMission(getAIMain(), aiUnit));
+            }
+        }
+
         // Make every unit perform their mission:
-        Iterator aiUnitsIterator = getAIUnitIterator();
+        aiUnitsIterator = getAIUnitIterator();
         while (aiUnitsIterator.hasNext()) {
             AIUnit aiUnit = (AIUnit) aiUnitsIterator.next();
             aiUnit.doMission(getConnection());
@@ -111,10 +175,65 @@ public class AIPlayer extends AIObject {
                         newDefender.setState(Unit.ACTIVE);                        
                         newDefender.setLocation(is.getTile());
                         AIUnit newDefenderAI = (AIUnit) getAIMain().getAIObject(newDefender);
-                        newDefenderAI.setMission(new UnitWanderHostileMission(newDefenderAI));
+                        // TODO: Use a mission like; InterceptUnitMission, SeekAndDestroyMission....
+                        newDefenderAI.setMission(new UnitWanderHostileMission(getAIMain(), newDefenderAI));
                     }
                 }
             }
+        }
+    }
+
+
+    /**
+    * Called when another <code>Player</code> proposes a trade.
+    *
+    * @param unit The foreign <code>Unit</code> trying to trade.
+    * @param settlement The <code>Settlement</code> this player owns
+    *             and which the given <code>Unit</code> if trying to sell
+    *             goods.
+    * @param goods The goods the given <code>Unit</code> is trying to sell.
+    * @param gold The suggested price.
+    */
+    public int tradeProposition(Unit unit, Settlement settlement, Goods goods, int gold) {
+        if (settlement instanceof IndianSettlement) {
+            int price;
+            if (sessionRegister.containsKey("tradeGold#"+unit.getID())) {
+                price = ((Integer) sessionRegister.get("tradeGold#"+unit.getID())).intValue();
+
+                if (price <= 0) {
+                    return price;
+                }
+            } else {
+                price = ((IndianSettlement) settlement).getPrice(goods) - player.getTension(unit.getOwner());
+                price = Math.min(price, player.getGold()/2);
+                if (price <= 0) {
+                    return 0;
+                }
+                sessionRegister.put("tradeGold#"+unit.getID(), new Integer(price));
+            }
+
+            if (gold < 0 || price == gold) {
+                return price;
+            } else if (gold > (player.getGold()*3)/4) {
+                sessionRegister.put("tradeGold#"+unit.getID(), new Integer(-1));
+                return NetworkConstants.NO_TRADE;
+            } else {
+                int haggling = 1;
+                if (sessionRegister.containsKey("tradeHaggling#"+unit.getID())) {
+                    haggling = ((Integer) sessionRegister.get("tradeHaggling#"+unit.getID())).intValue();
+                }
+
+                if (random.nextInt(3+haggling) <= 3) {
+                    sessionRegister.put("tradeGold#"+unit.getID(), new Integer(gold));
+                    sessionRegister.put("tradeHaggling#"+unit.getID(), new Integer(haggling+1));
+                    return gold;
+                } else {
+                    sessionRegister.put("tradeGold#"+unit.getID(), new Integer(-1));
+                    return NetworkConstants.NO_TRADE;
+                }
+            }
+        } else {
+            throw new IllegalStateException("Trade with colonies not yet implemented!");
         }
     }
 
@@ -138,6 +257,14 @@ public class AIPlayer extends AIObject {
     }
 
     
+    /**
+    * Returns the <code>Player</code> this <code>AIPlayer</code> is controlling.
+    */
+    public Player getPlayer() {
+        return player;
+    }
+
+
     /**
     * Gets the connection to the server.
     *

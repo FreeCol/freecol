@@ -2,7 +2,9 @@
 package net.sf.freecol.common.model;
 
 import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.logging.Logger;
+import java.util.StringTokenizer;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -34,6 +36,9 @@ public class IndianSettlement extends Settlement {
     public static final int CITY = 2;
     public static final int LAST_KIND = 2;
 
+    /** The amount of goods a brave can produce a single turn. */
+    private static final int WORK_AMOUNT = 5;
+
     // These are the learnable skills for an Indian settlement.
     // They are fully compatible with the types from the Unit class!
     public static final int UNKNOWN = -2,
@@ -55,8 +60,6 @@ public class IndianSettlement extends Settlement {
               exist yet). */
     private int kind;
 
-    private int food = 0;
-
     /** The tribe that owns this settlement. */
     private int tribe;
 
@@ -68,10 +71,12 @@ public class IndianSettlement extends Settlement {
     * The value NONE is used when the skill has already been taught to a European.
     */
     private int learnableSkill;
-
+    
     private boolean isCapital;
     private UnitContainer unitContainer;
+    private GoodsContainer goodsContainer;
 
+    private ArrayList ownedUnits = new ArrayList();
 
 
 
@@ -97,6 +102,7 @@ public class IndianSettlement extends Settlement {
         }
 
         unitContainer = new UnitContainer(game, this);
+        goodsContainer = new GoodsContainer(game, this);
 
         if (tribe < 0 || tribe > LAST_TRIBE) {
             throw new IllegalArgumentException("Invalid tribe provided");
@@ -111,6 +117,16 @@ public class IndianSettlement extends Settlement {
         this.kind = kind;
         this.learnableSkill = learnableSkill;
         this.isCapital = isCapital;
+        
+        for (int goodsType=0; goodsType<Goods.NUMBER_OF_TYPES; goodsType++) {
+            if (goodsType == Goods.LUMBER || goodsType == Goods.HORSES || goodsType == Goods.MUSKETS 
+                    || goodsType == Goods.TRADE_GOODS || goodsType == Goods.TOOLS) {
+                continue;
+            }
+            goodsContainer.addGoods(goodsType, (int) Math.random() * 300);
+        }
+
+        goodsContainer.addGoods(Goods.LUMBER, 300);
     }
 
 
@@ -132,6 +148,45 @@ public class IndianSettlement extends Settlement {
     }
 
 
+
+    /**
+    * Adds the given <code>Unit</code> to the list of units that belongs to this
+    * <code>IndianSettlement</code>.
+    */
+    public void addOwnedUnit(Unit u) {
+        if (u == null) {
+            throw new NullPointerException();
+        }
+
+        if (!ownedUnits.contains(u)) {
+            ownedUnits.add(u);
+        }
+    }
+    
+    
+    /**
+    * Gets an iterator over all the units this <code>IndianSettlement</code> is owning.
+    */
+    public Iterator getOwnedUnitsIterator() {
+        return ownedUnits.iterator();
+    }
+
+    
+    /**
+    * Removes the given <code>Unit</code> to the list of units that belongs to this
+    * <code>IndianSettlement</code>.
+    */
+    public void removeOwnedUnit(Unit u) {
+        if (u == null) {
+            throw new NullPointerException();
+        }
+
+        int index = ownedUnits.indexOf(u);
+
+        if (index >= 0) {
+            ownedUnits.remove(index);
+        }
+    }
 
 
     /**
@@ -198,6 +253,8 @@ public class IndianSettlement extends Settlement {
     public void add(Locatable locatable) {
         if (locatable instanceof Unit) {
             unitContainer.addUnit((Unit) locatable);
+        } else if (locatable instanceof Goods) {
+            goodsContainer.addGoods((Goods)locatable);
         } else {
             logger.warning("Tried to add an unrecognized 'Locatable' to a IndianSettlement.");
         }
@@ -271,6 +328,91 @@ public class IndianSettlement extends Settlement {
     }
 
 
+    /**
+    * Gets the amount of gold this <code>IndianSettlment</code>
+    * is willing to pay for the given <code>Goods</code>.
+    *
+    * @param goods THe <code>Goods</code> to price.
+    * @return The price.
+    */
+    public int getPrice(Goods goods) {
+        int returnPrice = 0;
+
+        if (goods.getAmount() > 100) {
+            throw new IllegalArgumentException();
+        }
+
+        if (goods.getType() == Goods.MUSKETS) {
+            int need = 0;
+            int supply = 0;
+            supply += goodsContainer.getGoodsCount(Goods.MUSKETS) / Unit.MUSKETS_TO_ARM_INDIAN;
+            for (int i=0; i<ownedUnits.size(); i++) {
+                need += Unit.MUSKETS_TO_ARM_INDIAN;
+                if (((Unit) ownedUnits.get(i)).isArmed()) {
+                    supply += Unit.MUSKETS_TO_ARM_INDIAN;
+                }
+            }
+
+            int sets = ((goodsContainer.getGoodsCount(Goods.MUSKETS) + goods.getAmount()) / Unit.MUSKETS_TO_ARM_INDIAN)
+                        - (goodsContainer.getGoodsCount(Goods.MUSKETS) / Unit.MUSKETS_TO_ARM_INDIAN);
+            int startPrice = (19+getPriceAddition()) - (supply / Unit.MUSKETS_TO_ARM_INDIAN);
+            for (int i=0; i<sets; i++) {
+                if ((startPrice-i) < 8 && (need > supply || goodsContainer.getGoodsCount(Goods.MUSKETS) < Unit.MUSKETS_TO_ARM_INDIAN * 2)) {
+                    startPrice = 8+i;
+                }
+                returnPrice += 25 * (startPrice-i);
+            }
+        } else if (goods.getType() == Goods.HORSES) {
+            int need = 0;
+            int supply = 0;
+            supply += goodsContainer.getGoodsCount(Goods.HORSES) / Unit.HORSES_TO_MOUNT_INDIAN;
+            for (int i=0; i<ownedUnits.size(); i++) {
+                need += Unit.HORSES_TO_MOUNT_INDIAN;
+                if (((Unit) ownedUnits.get(i)).isMounted()) {
+                    supply += Unit.HORSES_TO_MOUNT_INDIAN;
+                }
+            }
+
+            int sets = (goodsContainer.getGoodsCount(Goods.HORSES) + goods.getAmount()) / Unit.HORSES_TO_MOUNT_INDIAN
+                        - (goodsContainer.getGoodsCount(Goods.HORSES) / Unit.HORSES_TO_MOUNT_INDIAN);
+            int startPrice = (24+getPriceAddition()) - (supply/Unit.HORSES_TO_MOUNT_INDIAN);
+
+            for (int i=0; i<sets; i++) {
+                if ((startPrice-(i*4)) < 4 && (need > supply || goodsContainer.getGoodsCount(Goods.HORSES) < Unit.HORSES_TO_MOUNT_INDIAN * 2)) {
+                    startPrice = 4+(i*4);
+                }
+                returnPrice += 25 * (startPrice-(i*4));
+            }
+        } else if (goods.getType() == Goods.FOOD || goods.getType() == Goods.LUMBER || goods.getType() == Goods.SUGAR ||
+                goods.getType() == Goods.TOBACCO || goods.getType() == Goods.COTTON || goods.getType() == Goods.FURS ||
+                goods.getType() == Goods.ORE || goods.getType() == Goods.SILVER) {
+            returnPrice = 0;
+        } else {
+            int currentGoods = goodsContainer.getGoodsCount(goods.getType());
+            int valueGoods = Math.min(currentGoods + goods.getAmount(), 200) - currentGoods;
+            if (valueGoods < 0) {
+                valueGoods = 0;
+            }
+
+            returnPrice = (int) (((20.0+getPriceAddition())-(0.05*(currentGoods+valueGoods)))*(currentGoods+valueGoods)
+                        - ((20.0+getPriceAddition())-(0.05*(currentGoods)))*(currentGoods));
+        }
+
+        return returnPrice;
+    }
+
+    
+    /**
+    * Get the extra bonus if this is a <code>VILLAGE</code>,
+    * <code>CITY</code> or a capital.
+    */
+    private int getPriceAddition() {
+        int addition = getKind();
+        if (isCapital()) {
+            addition++;
+        }
+        return addition;
+    }
 
 
     public boolean contains(Locatable locatable) {
@@ -288,22 +430,72 @@ public class IndianSettlement extends Settlement {
 
 
     public void newTurn() {
-        int workers = unitContainer.getUnitCount();
-        for (int direction=0; direction<8 && workers > 0; direction++) {
-            if (getGame().getMap().getNeighbourOrNull(direction, getTile()) != null &&
-                    (getGame().getMap().getNeighbourOrNull(direction, getTile()).getOwner() == null
-                    || getGame().getMap().getNeighbourOrNull(direction, getTile()).getOwner() == this)) {
-                food += 5;
-                workers--;
+        /* Determine the maximum possible production of each type of goods: */
+        int[] potential = new int[Goods.NUMBER_OF_TYPES];
+        Iterator it = getGame().getMap().getCircleIterator(getTile().getPosition(), true, getRadius());
+        while (it.hasNext()) {
+            Tile workTile = getGame().getMap().getTile((Map.Position) it.next());
+            if (workTile.getOwner() == null || workTile.getOwner() == this) {
+                for (int i=0; i<Goods.NUMBER_OF_TYPES;i++) {
+                    potential[i] += workTile.potential(i);
+                }
             }
         }
 
-        // TODO: Create a unit if food>=300, but not if a maximum number of units is reaced.
+        /* Produce goods: */
+        int workers = ownedUnits.size();
+        goodsContainer.addGoods(Goods.FOOD, Math.min(potential[Goods.FOOD], workers*3));
+        for (int i=0; i<workers*WORK_AMOUNT; i++) {
+            int typeWithSmallestAmount = -1;
+            for (int j=1; j<Goods.NUMBER_OF_TYPES; j++) {
+                if (potential[j] > 0 && (typeWithSmallestAmount == -1 ||
+                        goodsContainer.getGoodsCount(j) < goodsContainer.getGoodsCount(typeWithSmallestAmount))) {
+                    typeWithSmallestAmount = j;
+                }
+            }
+            if (typeWithSmallestAmount != -1) {
+                if (goodsContainer.getGoodsCount(Goods.TOOLS) > 0) {
+                    goodsContainer.addGoods(typeWithSmallestAmount, 3);
+                    goodsContainer.removeGoods(Goods.TOOLS, 1);
+                } else {
+                    goodsContainer.addGoods(typeWithSmallestAmount, 1);
+                }
+            }
+        }
+
+        /* Consume goods: */
+        for (int i=0; i<workers; i++) {
+            consumeGoods(Goods.FOOD, 2);
+            consumeGoods(Goods.TOBACCO, 1);
+            consumeGoods(Goods.COTTON, 1);
+            consumeGoods(Goods.FURS, 1);
+            consumeGoods(Goods.ORE, 1);
+            consumeGoods(Goods.SILVER, 1);
+            consumeGoods(Goods.SILVER, 1);
+            consumeGoods(Goods.RUM, 2);
+            consumeGoods(Goods.CIGARS, 1);
+            consumeGoods(Goods.COATS, 1);
+            consumeGoods(Goods.CLOTH, 1);
+            consumeGoods(Goods.TRADE_GOODS, 5);
+        }
+
+        goodsContainer.removeAbove(300);
+
+        // TODO: Create a unit if food>=200, but not if a maximum number of units is reaced.
+    }
+
+    
+    private void consumeGoods(int type, int amount) {
+        if (goodsContainer.getGoodsCount(type) > 0) {
+            goodsContainer.removeGoods(type, Math.min(amount, goodsContainer.getGoodsCount(type)));
+            getOwner().modifyGold(Math.min(amount, goodsContainer.getGoodsCount(type)));
+        }
     }
 
 
     public void dispose() {
         unitContainer.dispose();
+        goodsContainer.dispose();
         getTile().setSettlement(null);
         super.dispose();
     }
@@ -325,26 +517,32 @@ public class IndianSettlement extends Settlement {
         indianSettlementElement.setAttribute("kind", Integer.toString(kind));
         indianSettlementElement.setAttribute("isCapital", Boolean.toString(isCapital));
 
+        String ownedUnitsString = "";
+        for (int i=0; i<ownedUnits.size(); i++) {
+            ownedUnitsString += ((Unit) ownedUnits.get(i)).getID();
+            if (i != ownedUnits.size() - 1) {
+                ownedUnitsString += ", ";
+            }
+        }
+        if (!ownedUnitsString.equals("")) {
+            indianSettlementElement.setAttribute("ownedUnits", ownedUnitsString);
+        }
+
         if (showAll || player == getOwner()) {
-            indianSettlementElement.setAttribute("food", Integer.toString(food));
             indianSettlementElement.setAttribute("learnableSkill", Integer.toString(learnableSkill));
         }
 
-        // TODO: This method is always used when we need an XML element of an IndianSettlement,
-        //       which is wrong. In case we're saving the game then we can use this this version,
-        //       but if , for example, the settlement data is sent to the client after a loadGame
-        //       then we are NOT allowed to send the latest version of the IndianSettlement.
-        //       In that case PlayerExploredTile should be used instead.
-        //       The problem is that after a loadGame the learnableSkill should only be sent to
-        //       the client in case that client has knowledge of that skill in that settlement.
-        //       See toXMLElement for a solution to this problem.
-
         if (showAll || player == getOwner()) {
             indianSettlementElement.appendChild(unitContainer.toXMLElement(player, document, showAll, toSavedGame));
+            indianSettlementElement.appendChild(goodsContainer.toXMLElement(player, document, showAll, toSavedGame));
         } else {
             UnitContainer emptyUnitContainer = new UnitContainer(getGame(), this);
             emptyUnitContainer.setFakeID(unitContainer.getID());
             indianSettlementElement.appendChild(emptyUnitContainer.toXMLElement(player, document, showAll, toSavedGame));
+
+            GoodsContainer emptyGoodsContainer = new GoodsContainer(getGame(), this);
+            emptyGoodsContainer.setFakeID(goodsContainer.getID());
+            indianSettlementElement.appendChild(emptyGoodsContainer.toXMLElement(player, document, showAll, toSavedGame));
         }
 
         return indianSettlementElement;
@@ -365,10 +563,15 @@ public class IndianSettlement extends Settlement {
         kind = Integer.parseInt(indianSettlementElement.getAttribute("kind"));
         isCapital = (new Boolean(indianSettlementElement.getAttribute("isCapital"))).booleanValue();
 
-        if (indianSettlementElement.hasAttribute("food")) {
-            food = Integer.parseInt(indianSettlementElement.getAttribute("food"));
-        } else {
-            food = 0;
+        ownedUnits.clear();
+        if (indianSettlementElement.hasAttribute("ownedUnits")) {
+            StringTokenizer st = new StringTokenizer(indianSettlementElement.getAttribute("ownedUnits"), ", ", false);
+            while (st.hasMoreTokens()) {
+                Unit u = (Unit) getGame().getFreeColGameObject(st.nextToken());
+                if (u != null) {
+                    ownedUnits.add(u);
+                }
+            }
         }
 
         if (indianSettlementElement.hasAttribute("learnableSkill")) {
@@ -380,6 +583,17 @@ public class IndianSettlement extends Settlement {
             unitContainer.readFromXMLElement(unitContainerElement);
         } else {
             unitContainer = new UnitContainer(getGame(), this, unitContainerElement);
+        }
+
+        Element goodsContainerElement = getChildElement(indianSettlementElement, GoodsContainer.getXMLElementTagName());
+        if (goodsContainerElement != null) {  // "if" used to ensure compatibility with PRE-0.0.3 FreeCol-protocols.
+            GoodsContainer gc = (GoodsContainer) getGame().getFreeColGameObject(goodsContainerElement.getAttribute("ID"));
+
+            if (gc != null) {
+                goodsContainer.readFromXMLElement(goodsContainerElement);
+            } else {
+                goodsContainer = new GoodsContainer(getGame(), this, goodsContainerElement);
+            }
         }
     }
 

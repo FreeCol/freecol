@@ -28,8 +28,17 @@ public class UnitWanderMission extends Mission {
     * @param aiUnit The <code>AIUnit</code> this mission
     *        is created for.
     */
-    public UnitWanderMission(AIUnit aiUnit) {
-        super(aiUnit);
+    public UnitWanderMission(AIMain aiMain, AIUnit aiUnit) {
+        super(aiMain, aiUnit);
+    }
+
+    
+    /**
+    * Loads a mission from the given element.
+    */
+    public UnitWanderMission(AIMain aiMain, Element element) {
+        super(aiMain);
+        readFromXMLElement(element);
     }
 
     
@@ -65,4 +74,25 @@ public class UnitWanderMission extends Mission {
     }
     
 
+    public Element toXMLElement(Document document) {
+        Element element = document.createElement(getXMLElementTagName());
+
+        element.setAttribute("unit", getUnit().getID());
+
+        return element;
+    }
+
+
+    public void readFromXMLElement(Element element) {
+        setAIUnit((AIUnit) getAIMain().getAIObject(element.getAttribute("unit")));
+    }
+
+
+    /**
+    * Returns the tag name of the root element representing this object.
+    * @return The <code>String</code> "unitWanderMission".
+    */
+    public static String getXMLElementTagName() {
+        return "unitWanderMission";
+    }
 }

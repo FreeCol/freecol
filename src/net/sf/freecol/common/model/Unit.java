@@ -94,7 +94,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                             ENTER_INDIAN_VILLAGE_WITH_SCOUT = 6,
                             ENTER_INDIAN_VILLAGE_WITH_MISSIONARY = 7,
                             ENTER_FOREIGN_COLONY_WITH_SCOUT = 8,
-                            ILLEGAL_MOVE = 9;
+                            ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS = 9,
+                            ILLEGAL_MOVE = 10;
 
     public static final int ATTACK_GREAT_LOSS = -2,
                             ATTACK_LOSS = -1,
@@ -102,6 +103,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                             ATTACK_WIN  = 1,
                             ATTACK_GREAT_WIN = 2,
                             ATTACK_DONE_SETTLEMENT = 3; // The last defender of the settlement has died.
+
+    public static final int MUSKETS_TO_ARM_INDIAN = 25,
+                            HORSES_TO_MOUNT_INDIAN = 25;
 
 
     private int             type;
@@ -118,6 +122,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     private GoodsContainer  goodsContainer;
     private Location        entryLocation;
     private Location        location;
+    private IndianSettlement indianSettlement = null; // only used by BRAVE.
 
     // to be used only for type == TREASURE_TRAIN
     private int             treasureAmount;
@@ -240,6 +245,72 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             this.treasureAmount = amt;
         } else {
             throw new IllegalStateException();
+        }
+    }
+
+
+    /**
+    * Sells the given goods from this unit to the given settlement.
+    * The owner of this unit gets the gold and the owner of
+    * the settlement is charged for the deal.
+    */
+    public void trade(Settlement settlement, Goods goods, int gold) {
+        if (getTile().getDistanceTo(settlement.getTile()) > 1) {
+            logger.warning("Unit not adjacent to settlement!");
+            throw new IllegalStateException("Unit not adjacent to settlement!");
+        }
+        if (goods.getLocation() != this) {
+            logger.warning("Goods not onboard this unit!");
+            throw new IllegalStateException("Goods not onboard this unit!");
+        }
+        if (getMovesLeft() <= 0) {
+            logger.warning("No more moves!");
+            throw new IllegalStateException("No more moves left!");
+        }
+
+        goods.setLocation(settlement);
+
+        /*
+         Value already tested. This test is needed because the opponent's
+         amount of gold is hidden for the client:
+        */
+        if (settlement.getOwner().getGold() - gold >= 0) {
+            settlement.getOwner().modifyGold(-gold);
+        }
+
+        setMovesLeft(0);
+        getOwner().modifyGold(gold);
+
+        if (settlement instanceof IndianSettlement) {
+            int value = ((IndianSettlement) settlement).getPrice(goods) / 1000;
+            settlement.getOwner().modifyTension(getOwner(), -value);
+        }
+    }
+
+
+    /**
+    * Transfers the given goods from this unit to the given settlement.
+    */
+    public void deliverGift(Settlement settlement, Goods goods) {
+        if (getTile().getDistanceTo(settlement.getTile()) > 1) {
+            logger.warning("Unit not adjacent to settlement!");
+            throw new IllegalStateException("Unit not adjacent to settlement!");
+        }
+        if (goods.getLocation() != this) {
+            logger.warning("Goods not onboard this unit!");
+            throw new IllegalStateException("Goods not onboard this unit!");
+        }
+        if (getMovesLeft() <= 0) {
+            logger.warning("No more moves left!");
+            throw new IllegalStateException("No more moves left!");
+        }
+
+        goods.setLocation(settlement);
+        setMovesLeft(0);
+
+        if (settlement instanceof IndianSettlement) {
+            int value = ((IndianSettlement) settlement).getPrice(goods) / 100;
+            settlement.getOwner().modifyTension(getOwner(), -value);
         }
     }
 
@@ -456,6 +527,12 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         if (isNaval() && target.isLand()) {
             if (target.getSettlement() != null && target.getSettlement().getOwner() == getOwner()) {
                 return MOVE;
+            } else if (target.getSettlement() != null && target.getSettlement().getOwner() != getOwner()) {
+                if (isCarrier() && goodsContainer.getGoodsCount() > 0) {
+                    return ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS;
+                } else {
+                    return ILLEGAL_MOVE;
+                }
             } else if (target.getDefendingUnit(this) != null && target.getDefendingUnit(this).getOwner() != getOwner()) {
                 return ILLEGAL_MOVE;
             }
@@ -503,6 +580,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                         return ENTER_INDIAN_VILLAGE_WITH_MISSIONARY;
                     } else if ((getType() == FREE_COLONIST) || (getType() == INDENTURED_SERVANT)) {
                         return ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST;
+                    } else if (isCarrier() && goodsContainer.getGoodsCount() > 0) {
+                        return ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS;
                     } else {
                         return ILLEGAL_MOVE;
                     }
@@ -598,7 +677,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             return false;
         }
     }
-
+    
 
     /**
     * Moves this unit in the specified direction.
@@ -799,7 +878,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     */
     public boolean canAdd(Locatable locatable) {
         if (isCarrier()) {
-            if (getType() == WAGON_TRAIN && locatable instanceof Unit) {
+            if ((getType() == WAGON_TRAIN || getType() == BRAVE) && locatable instanceof Unit) {
                 return false;
             }
 
@@ -972,6 +1051,21 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         getOwner().setExplored(this);
     }
 
+    
+    /**
+    * Sets the <code>IndianSettlement</code> that owns this unit.
+    */
+    public void setIndianSettlement(IndianSettlement indianSettlement) {
+        if (this.indianSettlement != null) {
+            this.indianSettlement.removeOwnedUnit(this);
+        }
+
+        this.indianSettlement = indianSettlement;
+        
+        if (indianSettlement != null) {
+            indianSettlement.addOwnedUnit(this);
+        }
+    }
 
     /**
     * Gets the location of this Unit.
@@ -1339,7 +1433,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     * otherwise.
     */
     public static boolean isCarrier(int type) {
-        if ((type == CARAVEL) || (type == GALLEON) || (type == FRIGATE) || (type == MAN_O_WAR) || (type == MERCHANTMAN) || (type == PRIVATEER) || (type == WAGON_TRAIN)) {
+        /* WAGON_TRAIN and BRAVE can only carry goods */
+        if ((type == CARAVEL) || (type == GALLEON) || (type == FRIGATE) || (type == MAN_O_WAR)
+                || (type == MERCHANTMAN) || (type == PRIVATEER) || (type == WAGON_TRAIN)
+                || (type == BRAVE)) {
             return true;
         } else {
             return false;
@@ -1785,7 +1882,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     */
     public void setState(int s) {
         if (!checkSetState(s)) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Illegal state: " + s);
         }
 
         switch (s) {
@@ -1957,7 +2054,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     *         it is located and <code>false</code> otherwise.
     */
     public boolean canBuildColony() {
-        if (getTile() == null || !getTile().isColonizeable() || !isColonist()) {
+        if (getTile() == null || !getTile().isColonizeable() || !isColonist() || getMovesLeft() <= 0) {
             return false;
         } else {
             return true;
@@ -2032,6 +2129,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                 return 2;
             case WAGON_TRAIN:
                 return 2;
+            case BRAVE:
+                return 1;
             default:
                 return 0;
         }
@@ -3047,6 +3146,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             location.remove(this);
         }
 
+        setIndianSettlement(null);
+
         super.dispose();
     }
 
@@ -3084,6 +3185,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         unitElement.setAttribute("workType", Integer.toString(workType));
         unitElement.setAttribute("treasureAmount", Integer.toString(treasureAmount));
         unitElement.setAttribute("hitpoints", Integer.toString(hitpoints));
+
+        if (indianSettlement != null) {
+            unitElement.setAttribute("indianSettlement", indianSettlement.getID());
+        }
 
         if (entryLocation != null) {
             unitElement.setAttribute("entryLocation", entryLocation.getID());
@@ -3135,6 +3240,12 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         owner = (Player) getGame().getFreeColGameObject(unitElement.getAttribute("owner"));
         turnsOfTraining = Integer.parseInt(unitElement.getAttribute("turnsOfTraining"));
         trainingType = Integer.parseInt(unitElement.getAttribute("trainingType"));
+
+        if (unitElement.hasAttribute("indianSettlement")) {
+            indianSettlement = (IndianSettlement) getGame().getFreeColGameObject(unitElement.getAttribute("indianSettlement"));
+        } else {
+            setIndianSettlement(null);
+        }
 
         if (unitElement.hasAttribute("hitpoints")) {
             hitpoints = Integer.parseInt(unitElement.getAttribute("hitpoints"));

@@ -14,8 +14,10 @@ import java.io.PrintWriter;
 import net.sf.freecol.common.model.*;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.NetworkConstants;
 
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
 
@@ -23,7 +25,7 @@ import net.sf.freecol.server.model.ServerPlayer;
 * Handles the network messages that arrives while
 * {@link FreeColServer#IN_GAME in game}.
 */
-public final class InGameInputHandler extends InputHandler {
+public final class InGameInputHandler extends InputHandler implements NetworkConstants {
     private static Logger logger = Logger.getLogger(InGameInputHandler.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
@@ -129,6 +131,13 @@ public final class InGameInputHandler extends InputHandler {
                         reply = disbandUnit(connection, element);
                     } else if (type.equals("cashInTreasureTrain")) {
                         reply = cashInTreasureTrain(connection, element);
+                    } else if (type.equals("tradeProposition")) {
+                        reply = tradeProposition(connection, element);
+                    } else if (type.equals("trade")) {
+                        reply = trade(connection, element);
+                    } else if (type.equals("deliverGift")) {
+                        reply = deliverGift(connection, element);
+
                     } else {
                         logger.warning("Unknown request from client " + element.getTagName());
                     }
@@ -1333,6 +1342,155 @@ public final class InGameInputHandler extends InputHandler {
         unit.cashInTreasureTrain();
 
         sendUpdatedTileToAll(oldTile, player);
+
+        return null;
+    }
+
+
+    /**
+     * Handles a "tradeProposition"-message.
+     *
+     * @param connection The <code>Connection</code> the message was received on.
+     * @param element The element containing the request.
+     */
+    private Element tradeProposition(Connection connection, Element element) {
+        Game game = getFreeColServer().getGame();
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
+        
+        Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
+        Settlement settlement = (Settlement) game.getFreeColGameObject(element.getAttribute("settlement"));
+        Goods goods = new Goods(game, Message.getChildElement(element, Goods.getXMLElementTagName()));
+        int gold = -1;
+        if (element.hasAttribute("gold")) {
+             gold = Integer.parseInt(element.getAttribute("gold"));
+        }
+
+        if (goods.getAmount() > 100) {
+            throw new IllegalArgumentException();
+        }
+
+        if (unit == null) {
+            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: " + element.getAttribute("unit"));
+        }
+
+        if (unit.getMovesLeft() <= 0) {
+            throw new IllegalStateException("No moves left!");
+        }
+
+        if (settlement == null) {
+            throw new IllegalArgumentException("Could not find 'Settlement' with specified ID: " + element.getAttribute("settlement"));
+        }
+
+        if (unit.getOwner() != player) {
+            throw new IllegalStateException("Not your unit!");
+        }
+
+        if (unit.getTile().getDistanceTo(settlement.getTile()) > 1) {
+            throw new IllegalStateException("Not adjacent to settlemen!");
+        }
+
+        int returnGold = ((AIPlayer) getFreeColServer().getAIMain().getAIObject(settlement.getOwner())).tradeProposition(unit, settlement, goods, gold);
+
+        Element tpaElement = Message.createNewRootElement("tradePropositionAnswer");
+        tpaElement.setAttribute("gold", Integer.toString(returnGold));
+
+        return tpaElement;
+    }
+
+
+    /**
+     * Handles a "trade"-message.
+     *
+     * @param connection The <code>Connection</code> the message was received on.
+     * @param element The element containing the request.
+     */
+    private Element trade(Connection connection, Element element) {
+        Game game = getFreeColServer().getGame();
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
+        
+        Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
+        Settlement settlement = (Settlement) game.getFreeColGameObject(element.getAttribute("settlement"));
+        Goods goods = new Goods(game, Message.getChildElement(element, Goods.getXMLElementTagName()));
+        int gold = Integer.parseInt(element.getAttribute("gold"));
+        
+        if (gold <= 0) {
+            throw new IllegalArgumentException();
+        }
+
+        if (goods.getAmount() > 100) {
+            throw new IllegalArgumentException();
+        }
+
+        if (unit == null) {
+            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: " + element.getAttribute("unit"));
+        }
+
+        if (unit.getMovesLeft() <= 0) {
+            throw new IllegalStateException("No moves left!");
+        }
+
+        if (settlement == null) {
+            throw new IllegalArgumentException("Could not find 'Settlement' with specified ID: " + element.getAttribute("settlement"));
+        }
+
+        if (unit.getOwner() != player) {
+            throw new IllegalStateException("Not your unit!");
+        }
+
+        if (unit.getTile().getDistanceTo(settlement.getTile()) > 1) {
+            throw new IllegalStateException("Not adjacent to settlemen!");
+        }
+
+        int returnGold = ((AIPlayer) getFreeColServer().getAIMain().getAIObject(settlement.getOwner())).tradeProposition(unit, settlement, goods, gold);
+        if (returnGold != gold) {
+            throw new IllegalArgumentException("This was not the price we agreed upon! Cheater?");
+        }
+
+        unit.trade(settlement, goods, gold);
+
+        return null;
+    }
+
+    
+    /**
+     * Handles a "deliverGift"-message.
+     *
+     * @param connection The <code>Connection</code> the message was received on.
+     * @param element The element containing the request.
+     */
+    private Element deliverGift(Connection connection, Element element) {
+        Game game = getFreeColServer().getGame();
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
+        
+        Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
+        Settlement settlement = (Settlement) game.getFreeColGameObject(element.getAttribute("settlement"));
+        Goods goods = new Goods(game, Message.getChildElement(element, Goods.getXMLElementTagName()));
+
+        if (goods.getAmount() > 100) {
+            throw new IllegalArgumentException();
+        }
+
+        if (unit == null) {
+            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: " + element.getAttribute("unit"));
+        }
+
+        if (unit.getMovesLeft() <= 0) {
+            throw new IllegalStateException("No moves left!");
+        }
+
+        if (settlement == null) {
+            throw new IllegalArgumentException("Could not find 'Settlement' with specified ID: " + element.getAttribute("settlement"));
+        }
+
+        if (unit.getOwner() != player) {
+            throw new IllegalStateException("Not your unit!");
+        }
+
+        if (unit.getTile().getDistanceTo(settlement.getTile()) > 1) {
+            throw new IllegalStateException("Not adjacent to settlemen!");
+        }
+
+        unit.deliverGift(settlement, goods);
 
         return null;
     }

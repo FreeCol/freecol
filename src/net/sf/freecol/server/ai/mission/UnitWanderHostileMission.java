@@ -15,7 +15,7 @@ import org.w3c.dom.*;
 /**
 * Mission for attacking any unit owned by a player we do not like that is within
 * a radius of 1 tile. If no such unit can be found; just wander
-* around.
+* around. 
 */
 public class UnitWanderHostileMission extends Mission {
     private static final Logger logger = Logger.getLogger(UnitWanderHostileMission.class.getName());
@@ -30,9 +30,19 @@ public class UnitWanderHostileMission extends Mission {
     * @param aiUnit The <code>AIUnit</code> this mission
     *        is created for.
     */
-    public UnitWanderHostileMission(AIUnit aiUnit) {
-        super(aiUnit);
+    public UnitWanderHostileMission(AIMain aiMain, AIUnit aiUnit) {
+        super(aiMain, aiUnit);
     }
+
+
+    /**
+    * Loads a mission from the given element.
+    */
+    public UnitWanderHostileMission(AIMain aiMain, Element element) {
+        super(aiMain);
+        readFromXMLElement(element);
+    }
+    
 
 
     /**
@@ -45,7 +55,7 @@ public class UnitWanderHostileMission extends Mission {
     public void doMission(Connection connection) {
         Tile thisTile = getUnit().getTile();
         Unit unit = getUnit();
-        Map map = unit.getGame().getMap();
+        Map map = getGame().getMap();
 
         while(unit.getMovesLeft() > 0) {
             // Create an array of the 8 directions in random order:
@@ -54,7 +64,7 @@ public class UnitWanderHostileMission extends Mission {
             // Search for a target:
             boolean hasAttacked = false;
             for (int j = 0; j < 8; j++) {
-                if (unit.getMoveType(directions[j]) == Unit.ATTACK && unit.getOwner().getTension(unit.getGame().getMap().getNeighbourOrNull(directions[j], unit.getTile()).getDefendingUnit(unit).getOwner()) >= Player.TENSION_ADD_NORMAL) {
+                if (unit.getMoveType(directions[j]) == Unit.ATTACK && unit.getOwner().getStance(unit.getGame().getMap().getNeighbourOrNull(directions[j], unit.getTile()).getDefendingUnit(unit).getOwner()) == Player.WAR) {
                     Element element = Message.createNewRootElement("attack");
                     element.setAttribute("unit", unit.getID());
                     element.setAttribute("direction", Integer.toString(directions[j]));
@@ -90,5 +100,26 @@ public class UnitWanderHostileMission extends Mission {
         }
     }
 
+    
+    public Element toXMLElement(Document document) {
+        Element element = document.createElement(getXMLElementTagName());
+        
+        element.setAttribute("unit", getUnit().getID());
 
+        return element;
+    }
+
+
+    public void readFromXMLElement(Element element) {
+        setAIUnit((AIUnit) getAIMain().getAIObject(element.getAttribute("unit")));
+    }
+
+
+    /**
+    * Returns the tag name of the root element representing this object.
+    * @return The <code>String</code> "unitWanderHostileMission".
+    */
+    public static String getXMLElementTagName() {
+        return "unitWanderHostileMission";
+    }
 }

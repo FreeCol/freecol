@@ -1,0 +1,138 @@
+
+package net.sf.freecol.server.ai.mission;
+
+import java.io.IOException;
+import java.util.logging.Logger;
+
+import net.sf.freecol.server.ai.*;
+import net.sf.freecol.common.model.*;
+import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.Connection;
+
+import org.w3c.dom.*;
+
+
+/**
+* Mission for bringing a gift to a specified player.
+*
+* <BR><BR>
+*
+* The mission has three different tasks to perform:
+* <ol>
+*     <li>Get the gift (goods) from the {@link IndianSettlement} that owns the unit.
+*     <li>Transport this gift to the closest {@link Settlement} of the target player.
+*     <li>Complete the mission by delivering the gift.
+* </ol>
+*/
+public class IndianBringGiftMission extends Mission {
+    private static final Logger logger = Logger.getLogger(IndianBringGiftMission.class.getName());
+
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
+    public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
+    public static final String  REVISION = "$Revision$";
+
+    /** The <code>Player</code> receiving the gift. */
+    private Player targetPlayer;
+    
+    /** Desides wether this mission has been completed or not. */
+    private boolean giftDelivered;
+
+
+    /**
+    * Creates a mission for the given <code>AIUnit</code>.
+    * @param aiUnit The <code>AIUnit</code> this mission
+    *        is created for.
+    */
+    public IndianBringGiftMission(AIMain aiMain, AIUnit aiUnit, Player targetPlayer) {
+        super(aiMain, aiUnit);
+        
+        this.targetPlayer = targetPlayer;
+
+        if (getUnit().getType() != Unit.BRAVE) {
+            logger.warning("Only an indian brave can be given the mission: IndianBringGiftMission");
+            throw new IllegalArgumentException("Only an indian brave can be given the mission: IndianBringGiftMission");
+        }
+    }
+
+    
+    /**
+    * Loads a mission from the given element.
+    */
+    public IndianBringGiftMission(AIMain aiMain, Element element) {
+        super(aiMain);
+        readFromXMLElement(element);
+    }
+
+    
+    /**
+    * Performs the mission.
+    * @param connection The <code>Connection</code> to the server.
+    */
+    public void doMission(Connection connection) {
+        if (!hasGift()) {
+            // Move to the owning settlement
+        } else {
+            // Move to the target's colony and deliver
+        }
+    }
+    
+    
+    /**
+    * Checks if the unit is carrying a gift (goods).
+    * @return <i>true</i> if <code>getUnit().getSpaceLeft() == 0</code> and false otherwise.
+    */
+    private boolean hasGift() {
+        return (getUnit().getSpaceLeft() == 0);
+    }
+
+    
+    /**
+    * Checks if this mission is still valid to perform.
+    *
+    * <BR><BR>
+    *
+    * This mission will be invalidated when the gift has been delivered.
+    * In case of the stances {@link Player#WAR WAR} or {@link Player#CEASE_FIRE CEASE_FIRE} towards the target player,
+    * the mission would be invalidated as well.
+    */
+    public boolean isValid() {
+        return (!giftDelivered && isValidMission(getUnit().getOwner(), targetPlayer));
+    }
+    
+    
+    /**
+    * Checks if the player <code>owner</code> can bring a gift to the
+    * <code>targetPlayer</code>.
+    */
+    public static boolean isValidMission(Player owner, Player targetPlayer) {
+        int stance = owner.getStance(targetPlayer);
+        return (stance != Player.WAR && stance != Player.CEASE_FIRE);
+    }
+
+
+    public Element toXMLElement(Document document) {
+        Element element = document.createElement(getXMLElementTagName());
+
+        element.setAttribute("unit", getUnit().getID());
+        element.setAttribute("targetPlayer", targetPlayer.getID());
+        element.setAttribute("giftDelivered", Boolean.toString(giftDelivered));
+
+        return element;
+    }
+
+
+    public void readFromXMLElement(Element element) {
+        setAIUnit((AIUnit) getAIMain().getAIObject(element.getAttribute("unit")));
+        targetPlayer = (Player) getGame().getFreeColGameObject(element.getAttribute("targetPlayer"));
+        giftDelivered = Boolean.valueOf(element.getAttribute("giftDelivered")).booleanValue();
+    }
+
+
+    /**
+    * Returns the tag name of the root element representing this object.
+    * @return The <code>String</code> "indianBringGiftMission".
+    */
+    public static String getXMLElementTagName() {
+        return "indianBringGiftMission";
+    }
+}

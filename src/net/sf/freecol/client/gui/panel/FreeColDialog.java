@@ -1,7 +1,8 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.util.logging.Logger;
-
+import java.util.Iterator;
+import java.util.ArrayList;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -160,6 +161,63 @@ public class FreeColDialog extends FreeColPanel {
         informationDialog.setCancelComponent(okButton);
 
         return informationDialog;
+    }
+
+
+    /**
+    * Creates a new <code>FreeColDialog</code> with a text and a cancel-button,
+    * in addition to buttons for each of the objects in the given array.
+    *
+    * @param text The text that explains the choice for the user.
+    * @param cancelText The text displayed on the "cancel"-button.
+    * @param objects The objects.
+    * @return The <code>FreeColDialog</code>.
+    * @see ChoiceItem
+    */
+    public static FreeColDialog createChoiceDialog(String text, String cancelText, Object[] objects) {
+        final JButton cancelButton = new JButton(cancelText);
+
+        final FreeColDialog choiceDialog = new FreeColDialog() {
+            public void requestFocus() {
+                cancelButton.requestFocus();
+            }
+        };
+
+        cancelButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                choiceDialog.setResponse(null);
+            }
+        });
+
+        choiceDialog.setLayout(new BorderLayout());
+        JLabel l = new JLabel(text);
+
+        int height = l.getMinimumSize().height + cancelButton.getMinimumSize().height + 40;
+
+        choiceDialog.add(l, BorderLayout.NORTH);
+
+        JPanel objectsPanel = new JPanel(new GridLayout(objects.length+1, 1, 10,10));
+        objectsPanel.setBorder(new CompoundBorder(objectsPanel.getBorder(), new EmptyBorder(10,20,10,20)));
+        int width = Math.max(l.getMinimumSize().width, objectsPanel.getPreferredSize().width) + 20;
+
+        for (int i=0; i<objects.length; i++) {
+            final Object object = objects[i];
+            final JButton objectButton = new JButton(object.toString());
+            objectButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    choiceDialog.setResponse(object);
+                }
+            });
+            objectsPanel.add(objectButton);
+            height += objectButton.getMinimumSize().height;
+        }
+        objectsPanel.add(cancelButton);
+        choiceDialog.add(objectsPanel, BorderLayout.CENTER);
+
+        choiceDialog.setSize(width, height);
+        choiceDialog.setCancelComponent(cancelButton);
+
+        return choiceDialog;
     }
 
 

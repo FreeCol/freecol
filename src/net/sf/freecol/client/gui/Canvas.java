@@ -11,6 +11,9 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.MissingResourceException;
 import java.util.logging.Logger;
+import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.io.File;
 
 import javax.swing.JComponent;
@@ -520,6 +523,58 @@ public final class Canvas extends JLayeredPane {
 
 
     /**
+    * Displays a dialog with a text and a cancel-button,
+    * in addition to buttons for each of the objects returned for the given
+    * <code>Iterator</code>.
+    *
+    * @param text The text that explains the choice for the user.
+    * @param cancelText The text displayed on the "cancel"-button.
+    * @param iterator The <code>Iterator</code> containing the objects to create
+    *            buttons for.
+    * @return The choosen object, or <i>null</i> for the cancel-button.
+    */
+    public Object showChoiceDialog(String text, String cancelText, Iterator iterator) {
+        ArrayList a = new ArrayList();
+        while (iterator.hasNext()) {
+            a.add(iterator.next());
+        }
+
+        return showChoiceDialog(text, cancelText, a.toArray());
+    }
+
+
+    /**
+    * Displays a dialog with a text and a cancel-button,
+    * in addition to buttons for each of the objects in the array.
+    *
+    * @param text The text that explains the choice for the user.
+    * @param cancelText The text displayed on the "cancel"-button.
+    * @param objects The array containing the objects to create
+    *            buttons for.
+    * @return The choosen object, or <i>null</i> for the cancel-button.
+    */
+    public Object showChoiceDialog(String text, String cancelText, Object[] objects) {
+        //return showChoiceDialog(text, cancelText, Arrays.asList(objects).iterator());
+        try {
+            text = Messages.message(text);
+            cancelText = Messages.message(cancelText);
+        } catch (MissingResourceException e) {
+            logger.warning("could not find message with id: " + text + " or " + cancelText + ".");
+        }
+
+        FreeColDialog choiceDialog = FreeColDialog.createChoiceDialog(text, cancelText, objects);
+        choiceDialog.setLocation(getWidth() / 2 - choiceDialog.getWidth() / 2, getHeight() / 2 - choiceDialog.getHeight() / 2);
+        add(choiceDialog, new Integer(POPUP_LAYER.intValue() - 1));
+        choiceDialog.requestFocus();
+
+        Object response = choiceDialog.getResponse();
+        remove(choiceDialog);
+
+        return response;
+    }
+
+
+    /**
     * Shows a status message that cannot be dismissed.
     * The panel will be removed when another component
     * is added to this <code>Canvas</code>. This includes
@@ -948,6 +1003,16 @@ public final class Canvas extends JLayeredPane {
     public void showInformationMessage(String messageId) {
         errorMessage(messageId);
     }
+
+
+    /**
+    * Shows a message with some information and
+    * a "Ok"-button.
+    */
+    public void showInformationMessage(String messageId, String message) {
+        errorMessage(messageId, message);
+    }
+
 
     /**
     * Closes the <code>ErrorPanel</code>.

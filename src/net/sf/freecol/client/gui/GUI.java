@@ -55,6 +55,7 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
     private Map.Position focus = null;
     private Unit activeUnit;
 
+    /** This <code>Random</code>-object should only be used by {@link #drawRoad}. */
     private Random roadRandom = new Random();
 
     // Helper variables for displaying the map.

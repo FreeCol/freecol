@@ -31,9 +31,21 @@ public class Player extends FreeColGameObject {
     /**
     * Constants for adding to the tension levels.
     */
-    public static final int TENSION_ADD_MINOR = 10,
-                            TENSION_ADD_NORMAL = 20,
-                            TENSION_ADD_MAJOR = 30;
+    public static final int TENSION_ADD_MINOR = 100,    // Unit destroyed, etc
+                            TENSION_ADD_NORMAL = 200,   // Unit destroyed in a Settlement, etc
+                            TENSION_ADD_MAJOR = 300;    // Unit destroyed in a capital, etc
+                            
+    /** The AI player is happy if <code>tension <= TENSION_HAPPY</code>. */
+    public static final int TENSION_HAPPY = 100;
+
+
+    /**
+    * Contants for describing the stance towards a player.
+    */
+    public static final int WAR = -2,
+                            CEASE_FIRE = -1,
+                            PEACE = 0,
+                            ALLIANCE = 1;
 
     /** The nations a player can play. */
     public static final int DUTCH = 0,
@@ -78,9 +90,16 @@ public class Player extends FreeColGameObject {
 
     /**
     * Only used by AI - stores the tension levels,
-    * 0-100 with 100 maximum hostillity:
+    * 0-1000 with 1000 maximum hostillity:
     */
     private int[] tension = new int[NUMBER_OF_NATIONS];
+
+    /**
+    * Stores the stance towards the other players. One of:
+    * WAR, CEASE_FIRE, PEACE and ALLIANCE.
+    */
+    private int[] stance = new int[NUMBER_OF_NATIONS];
+
 
     private static final Color defaultNationColors[] = {
         Color.ORANGE,
@@ -637,7 +656,8 @@ public class Player extends FreeColGameObject {
         if ((gold + amount) >= 0) {
             gold += amount;
         } else {
-            throw new IllegalArgumentException();
+            /* REMEMBER: The opponents' amount of gold is hidden for the clients */
+            throw new IllegalArgumentException("The resulting amount would be negative.");
         }
     }
 
@@ -958,6 +978,32 @@ public class Player extends FreeColGameObject {
 
         return indianSettlements.iterator();
     }
+    
+    
+    /**
+    * Returns a random settlement, or <i>null</i> if this
+    * player does not own a single settlement.
+    */
+    public Settlement getRandomSettlement() {
+        ArrayList settlements = new ArrayList();
+        Map map = getGame().getMap();
+
+        Iterator tileIterator = map.getWholeMapIterator();
+        while (tileIterator.hasNext()) {
+            Tile t = map.getTile((Map.Position) tileIterator.next());
+
+            if (t != null && t.getSettlement() != null && t.getSettlement().getOwner() == this) {
+                settlements.add(t.getSettlement());
+            }
+        }
+        
+        if (settlements.size() == 0) {
+            return null;
+        }
+        
+        return (Settlement) settlements.get((int) (Math.random() * settlements.size()));
+    }
+
 
     /**
     * Increments the player's cross count, with benefits thereof.
@@ -1074,13 +1120,12 @@ public class Player extends FreeColGameObject {
     *
     * @param player The <code>Player</code>.
     * @param addToTension The amount to add to the current tension level.
-    * @exception IllegalArgumentException if <code>addToTension < 0</code>.
     */
     public void modifyTension(Player player, int addToTension) {
         tension[player.getNation()] += addToTension;
         
-        if (tension[player.getNation()]>100) {
-            tension[player.getNation()] = 100;
+        if (tension[player.getNation()]>1000) {
+            tension[player.getNation()] = 1000;
         }
     }
 
@@ -1090,6 +1135,30 @@ public class Player extends FreeColGameObject {
     */
     public int getTension(Player player) {
         return tension[player.getNation()];
+    }
+
+
+    /**
+    * Returns the stance towards a given player.
+    *
+    * <BR><BR>
+    *
+    * One of: WAR, CEASE_FIRE, PEACE and ALLIANCE.
+    */
+    public int getStance(Player player) {
+        return stance[player.getNation()];
+    }
+    
+    
+    /**
+    * Sets the stance towards a given player.
+    *
+    * <BR><BR>
+    *
+    * One of: WAR, CEASE_FIRE, PEACE and ALLIANCE.
+    */
+    public void setStance(Player player, int theStance) {
+        stance[player.getNation()] = theStance;
     }
 
 
@@ -1187,6 +1256,7 @@ public class Player extends FreeColGameObject {
         playerElement.setAttribute("rebellionState", Integer.toString(rebellionState));
         playerElement.setAttribute("ai", Boolean.toString(ai));
         playerElement.appendChild(toArrayElement("tension", tension, document));
+        playerElement.appendChild(toArrayElement("stance", stance, document));
 
         if (showAll || equals(player)) {
             playerElement.setAttribute("gold", Integer.toString(gold));
@@ -1259,6 +1329,12 @@ public class Player extends FreeColGameObject {
             tension = readFromArrayElement("tension", getChildElement(playerElement, "tension"), new int[0]);
         } else {
             tension = new int[TRIBES.length + NATIONS.length];
+        }
+        
+        if (getChildElement(playerElement, "stance") != null) {
+            stance = readFromArrayElement("stance", getChildElement(playerElement, "stance"), new int[0]);
+        } else {
+            stance = new int[TRIBES.length + NATIONS.length];
         }
 
         if (playerElement.hasAttribute("contacted")) {

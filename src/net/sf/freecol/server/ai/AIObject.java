@@ -31,13 +31,22 @@ public abstract class AIObject {
     public AIMain getAIMain() {
         return aiMain;
     }
-    
+
 
     public abstract Element toXMLElement(Document document);
 
     
     public abstract void readFromXMLElement(Element element);
     
+    
+    
+    /**
+    * Returns the game.
+    */
+    public Game getGame() {
+        return aiMain.getGame();
+    }
+
 
     /**
     * Returns the tag name of the root element representing this object.

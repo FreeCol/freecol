@@ -15,10 +15,12 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.FreeColMenuBar;
 import net.sf.freecol.client.gui.sound.*;
 import net.sf.freecol.client.gui.panel.EventPanel;
+import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.i18n.Messages;
 
 import net.sf.freecol.common.model.*;
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.NetworkConstants;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -27,7 +29,7 @@ import org.w3c.dom.NodeList;
 /**
 * The controller that will be used while the game is played.
 */
-public final class InGameController {
+public final class InGameController implements NetworkConstants {
     private static final Logger logger = Logger.getLogger(InGameController.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
@@ -272,6 +274,8 @@ public final class InGameController {
             case Unit.ENTER_FOREIGN_COLONY_WITH_SCOUT:
                                         // TODO
                                         freeColClient.playSound(SfxLibrary.ILLEGAL_MOVE); break;
+            case Unit.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS:
+                                        tradeWithSettlement(unit, direction);
             case Unit.ILLEGAL_MOVE:     freeColClient.playSound(SfxLibrary.ILLEGAL_MOVE); break;
             default:                    throw new RuntimeException("unrecognised move: " + move);
         }
@@ -286,6 +290,137 @@ public final class InGameController {
 
         freeColClient.getCanvas().getMapControls().update();
         freeColClient.getCanvas().updateJMenuBar();
+    }
+
+
+    /**
+    * Uses the given unit to trade with a <code>Settlement</code> in
+    * the given direction.
+    *
+    * @param unit The <code>Unit</code> that is a carrier containing goods.
+    * @param direction The direction the unit could move in order to enter
+    *            the <code>Settlement</code>.
+    * @exception IllegalArgumentException if the unit is not a carrier, or
+    *            if there is no <code>Settlement</code> in the given direction.
+    * @see Settlement
+    */
+    private void tradeWithSettlement(Unit unit, int direction) {
+        Canvas canvas = freeColClient.getCanvas();
+        Map map = freeColClient.getGame().getMap();
+        Client client = freeColClient.getClient();
+
+        if (!unit.isCarrier()) {
+            throw new IllegalArgumentException("The unit has to be a carrier in order to trade!");
+        }
+
+        Settlement settlement = map.getNeighbourOrNull(direction, unit.getTile()).getSettlement();
+        if (settlement == null) {
+            throw new IllegalArgumentException("No settlement in given direction!");
+        }
+
+        if (unit.getGoodsCount() == 0) {
+            canvas.errorMessage("noGoodsOnboard");
+            return;
+        }
+
+        Goods goods = (Goods) canvas.showChoiceDialog("tradeProposition.text", "tradeProposition.cancel", unit.getGoodsIterator());
+        if (goods == null) { // == Trade aborted by the player.
+            return;
+        }
+
+        Element tradePropositionElement = Message.createNewRootElement("tradeProposition");
+        tradePropositionElement.setAttribute("unit", unit.getID());
+        tradePropositionElement.setAttribute("settlement", settlement.getID());
+        tradePropositionElement.appendChild(goods.toXMLElement(null, tradePropositionElement.getOwnerDocument()));
+
+        Element reply = client.ask(tradePropositionElement);
+        while (reply != null) {
+            if (!reply.getTagName().equals("tradePropositionAnswer")) {
+                logger.warning("Illegal reply.");
+                throw new IllegalStateException();
+            }
+
+            int gold = Integer.parseInt(reply.getAttribute("gold"));
+            if (gold == NO_NEED_FOR_THE_GOODS) {
+                canvas.showInformationMessage(null, Messages.message("noNeedForTheGoods").replaceAll("%goods%", goods.getName()));
+                return;
+            } else if (gold <= NO_TRADE) {
+                canvas.showInformationMessage("noTrade");
+                return;
+            } else {
+                ChoiceItem[] objects = {
+                    new ChoiceItem(Messages.message("trade.takeOffer"), 1),
+                    new ChoiceItem(Messages.message("trade.moreGold"), 2),
+                    new ChoiceItem(Messages.message("trade.gift").replaceAll("%goods%", goods.getName()), 0),
+                };
+
+                String text = Messages.message("trade.text").replaceAll("%nation%", settlement.getOwner().getNationAsString());
+                text = text.replaceAll("%goods%", goods.getName());
+                text = text.replaceAll("%gold%", Integer.toString(gold));
+                ChoiceItem ci = (ChoiceItem) canvas.showChoiceDialog(text, Messages.message("trade.cancel"), objects);
+                if (ci == null) { // == Trade aborted by the player.
+                    return;
+                }
+                int ret = ci.getChoice();
+                if (ret == 1) {
+                    tradeWithSettlement(unit, settlement, goods, gold);
+                    return;
+                } else if (ret == 0) {
+                    deliverGiftToSettlement(unit, settlement, goods);
+                    return;
+                }
+            } // Ask for more gold (ret == 2):
+
+            tradePropositionElement = Message.createNewRootElement("tradeProposition");
+            tradePropositionElement.setAttribute("unit", unit.getID());
+            tradePropositionElement.setAttribute("settlement", settlement.getID());
+            tradePropositionElement.appendChild(goods.toXMLElement(null, tradePropositionElement.getOwnerDocument()));
+            tradePropositionElement.setAttribute("gold", Integer.toString((gold*11)/10));
+
+            reply = client.ask(tradePropositionElement);
+        }
+
+        if (reply == null) {
+            logger.warning("reply == null");
+        }
+    }
+
+
+    /**
+    * Trades the given goods. The goods gets transferred
+    * from the given <code>Unit</code> to the given <code>Settlement</code>,
+    * and the {@link Unit#getOwner unit's owner} collects the payment.
+    */
+    private void tradeWithSettlement(Unit unit, Settlement settlement, Goods goods, int gold) {
+        Client client = freeColClient.getClient();
+
+        Element tradeElement = Message.createNewRootElement("trade");
+        tradeElement.setAttribute("unit", unit.getID());
+        tradeElement.setAttribute("settlement", settlement.getID());
+        tradeElement.setAttribute("gold", Integer.toString(gold));
+        tradeElement.appendChild(goods.toXMLElement(null, tradeElement.getOwnerDocument()));
+        
+        client.send(tradeElement);
+        
+        unit.trade(settlement, goods, gold);
+    }
+
+    
+    /**
+    * Trades the given goods. The goods gets transferred
+    * from the given <code>Unit</code> to the given <code>Settlement</code>.
+    */
+    private void deliverGiftToSettlement(Unit unit, Settlement settlement, Goods goods) {
+        Client client = freeColClient.getClient();
+
+        Element deliverGiftElement = Message.createNewRootElement("deliverGift");
+        deliverGiftElement.setAttribute("unit", unit.getID());
+        deliverGiftElement.setAttribute("settlement", settlement.getID());
+        deliverGiftElement.appendChild(goods.toXMLElement(null, deliverGiftElement.getOwnerDocument()));
+
+        client.send(deliverGiftElement);
+
+        unit.deliverGift(settlement, goods);
     }
 
 
@@ -457,6 +592,7 @@ public final class InGameController {
         Game game = freeColClient.getGame();
         Client client = freeColClient.getClient();
         GUI gui = freeColClient.getGUI();
+        Canvas canvas = freeColClient.getCanvas();
 
         Tile destinationTile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
         Unit destinationUnit = null;
@@ -464,13 +600,23 @@ public final class InGameController {
         if (destinationTile.getUnitCount() == 1) {
             destinationUnit = destinationTile.getFirstUnit();
         } else {
-            // TODO: Present the user with a choice:
+            ArrayList choices = new ArrayList();
             Iterator unitIterator = destinationTile.getUnitIterator();
             while (unitIterator.hasNext()) {
                 Unit nextUnit = (Unit) unitIterator.next();
                 if (nextUnit.getSpaceLeft() >= unit.getTakeSpace()) {
-                    destinationUnit = nextUnit;
-                    break;
+                    choices.add(nextUnit);
+                }
+            }
+
+            if (choices.size() == 1) {
+                destinationUnit = (Unit) choices.get(0);
+            } else if (choices.size() == 0) {
+                throw new IllegalStateException();
+            } else {
+                destinationUnit = (Unit) canvas.showChoiceDialog("embark.text", "embark.cancel", choices.iterator());
+                if (destinationUnit == null) { // == user cancelled
+                    return;
                 }
             }
         }

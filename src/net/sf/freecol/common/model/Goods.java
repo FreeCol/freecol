@@ -79,6 +79,17 @@ public final class Goods implements Locatable {
     }
 
 
+    /**
+    * Returns a textual representation of this object.
+    * @return A <code>String</code> with the format:
+    *         <br>AMOUNT GOODSTYPE
+    *         <br><br>Example:
+    *         <br>15 Cotton
+    */
+    public String toString() {
+        return Integer.toString(amount) + " " + getName();
+    }
+
 
     /**
     * Returns the name of this type of goods.
