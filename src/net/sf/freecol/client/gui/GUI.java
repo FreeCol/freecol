@@ -1353,8 +1353,13 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
 
 
     /**
-    * Breaks a line between two words. THe breaking point
+    * Breaks a line between two words. The breaking point
     * is as close to the center as possible.
+    *
+    * @param string The line for which we should determine a
+    *               breaking point.
+    * @return The best breaking point or <code>-1</code> if there
+    *         are none.
     */
     public int getBreakingPoint(String string) {
         int center = string.length() / 2;
@@ -1518,6 +1523,7 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
     /**
      * Converts the given screen coordinates to Map coordinates.
      * It checks to see to which Tile the given pixel 'belongs'.
+     *
      * @param x The x-coordinate in pixels.
      * @param y The y-coordinate in pixels.
      * @return The map coordinates of the Tile that is located at

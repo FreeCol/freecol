@@ -88,12 +88,16 @@ public final class InfoPanel extends FreeColPanel {
     * @param graphics The Graphics context in which to draw this component.
     */
     public void paintComponent(Graphics graphics) {
-        if (unitInfoPanel.getUnit() != null && !unitInfoPanel.isVisible()) {
-            unitInfoPanel.setVisible(true);
-            endTurnPanel.setVisible(false);
-        } else if (!freeColClient.getMyPlayer().hasNextActiveUnit() && !endTurnPanel.isVisible()) {
-            endTurnPanel.setVisible(true);
-            unitInfoPanel.setVisible(false);
+        if (unitInfoPanel.getUnit() != null) {
+            if (!unitInfoPanel.isVisible()) {
+                unitInfoPanel.setVisible(true);
+                endTurnPanel.setVisible(false);
+            }
+        } else if (!freeColClient.getMyPlayer().hasNextActiveUnit()) {
+            if (!endTurnPanel.isVisible()) {
+                endTurnPanel.setVisible(true);
+                unitInfoPanel.setVisible(false);
+            }
         }
 
         super.paintComponent(graphics);
