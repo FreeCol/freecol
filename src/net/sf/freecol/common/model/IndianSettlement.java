@@ -44,7 +44,10 @@ public class IndianSettlement extends Settlement {
                             MASTER_SUGAR_PLANTER = Unit.MASTER_SUGAR_PLANTER,
                             MASTER_COTTON_PLANTER = Unit.MASTER_COTTON_PLANTER,
                             MASTER_TOBACCO_PLANTER = Unit.MASTER_TOBACCO_PLANTER,
-                            SEASONED_SCOUT = Unit.SEASONED_SCOUT;
+                            SEASONED_SCOUT = Unit.SEASONED_SCOUT,
+                            EXPERT_ORE_MINER = Unit.EXPERT_ORE_MINER,
+                            EXPERT_LUMBER_JACK = Unit.EXPERT_LUMBER_JACK,
+                            EXPERT_FUR_TRAPPER = Unit.EXPERT_FUR_TRAPPER;
 
 
     /** The kind of settlement this is.
@@ -134,39 +137,96 @@ public class IndianSettlement extends Settlement {
     * @return A skill that can be taught to Europeans.
     */
     private int generateSkillForLocation(Tile tile) {
-        int skill;
+        int rand = getGame().getModelController().getRandom(getID()+"generateIndianSkillRandom"+getID(), 2);
+
+        Iterator iter = tile.getMap().getAdjacentIterator(tile.getPosition());
+        while (iter.hasNext()) {
+            Map.Position p = (Map.Position)iter.next();
+            Tile t = tile.getMap().getTile(p);
+
+            // has bonus but no forest
+            if (!t.isForested() && t.hasBonus() && t.getAddition()<=Tile.ADD_RIVER_MAJOR) {
+                switch (t.getType()) {
+                    case Tile.PLAINS:
+                        return MASTER_COTTON_PLANTER;
+                    case Tile.GRASSLANDS:
+                        return MASTER_TOBACCO_PLANTER;
+                    case Tile.PRAIRIE:
+                        return MASTER_COTTON_PLANTER;
+                    case Tile.SAVANNAH:
+                        return MASTER_SUGAR_PLANTER;
+                    case Tile.MARSH:
+                        return EXPERT_ORE_MINER;
+                    case Tile.SWAMP:
+                        return MASTER_TOBACCO_PLANTER;
+                    case Tile.DESERT:
+                        return SEASONED_SCOUT;
+                    case Tile.TUNDRA:
+                        return (rand==0 ? EXPERT_SILVER_MINER : EXPERT_ORE_MINER);
+                    case Tile.ARCTIC:
+                    case Tile.OCEAN:
+                        return EXPERT_FISHERMAN;
+                    default:
+                        throw new IllegalArgumentException("Invalid tile provided: Tile type is invalid");
+                }
+            }
+            // has bonus and forest
+            else if (t.isForested() && t.hasBonus() && t.getAddition()<=Tile.ADD_RIVER_MAJOR) {
+                switch (t.getType()) {
+                    case Tile.PLAINS:
+                    case Tile.PRAIRIE:
+                    case Tile.TUNDRA:
+                        return EXPERT_FUR_TRAPPER;
+                    case Tile.GRASSLANDS:
+                    case Tile.SAVANNAH:
+                        return EXPERT_LUMBER_JACK;
+                    case Tile.MARSH:
+                        return (rand==0 ? EXPERT_SILVER_MINER : EXPERT_ORE_MINER);
+                    case Tile.SWAMP:
+                        return (rand==0 ? EXPERT_SILVER_MINER : EXPERT_ORE_MINER);
+                    case Tile.DESERT:
+                        return (rand==0 ? EXPERT_LUMBER_JACK : EXPERT_FARMER);
+                    default:
+                        throw new IllegalArgumentException("Invalid tile provided: Tile type is invalid");
+                }
+            }
+            // is hills
+            else if (t.getAddition() == Tile.ADD_HILLS) {
+                return EXPERT_ORE_MINER;
+            }
+            // has mountains
+            else if (t.getAddition() == Tile.ADD_MOUNTAINS) {
+                if(t.hasBonus())
+                    return EXPERT_SILVER_MINER;
+                else
+                    return (rand==0 ? EXPERT_ORE_MINER : EXPERT_SILVER_MINER);
+            }
+        }
+
+        // has no bonuses so use base tile
         switch (tile.getType()) {
             case Tile.PLAINS:
-                skill = MASTER_COTTON_PLANTER;
-                break;
+                return MASTER_COTTON_PLANTER;
             case Tile.GRASSLANDS:
-                skill = MASTER_TOBACCO_PLANTER;
-                break;
+                return MASTER_TOBACCO_PLANTER;
             case Tile.PRAIRIE:
-                skill = MASTER_COTTON_PLANTER;
-                break;
+                return MASTER_COTTON_PLANTER;
             case Tile.SAVANNAH:
-                skill = MASTER_SUGAR_PLANTER;
-                break;
+                return MASTER_SUGAR_PLANTER;
             case Tile.MARSH:
-                skill = EXPERT_FARMER;
-                break;
+                return EXPERT_ORE_MINER;
             case Tile.SWAMP:
-                skill = MASTER_TOBACCO_PLANTER;
-                break;
+                return MASTER_TOBACCO_PLANTER;
             case Tile.DESERT:
-                skill = SEASONED_SCOUT;
-                break;
+                return SEASONED_SCOUT;
             case Tile.TUNDRA:
-                skill = EXPERT_SILVER_MINER;
-                break;
+                return (rand==0 ? EXPERT_SILVER_MINER : EXPERT_ORE_MINER);
             case Tile.ARCTIC:
-                skill = EXPERT_FISHERMAN;
-                break;
+            case Tile.OCEAN:
+                return EXPERT_FISHERMAN;
             default:
                 throw new IllegalArgumentException("Invalid tile provided: Tile type is invalid");
         }
-        return skill;
     }
 
 
