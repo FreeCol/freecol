@@ -42,44 +42,23 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     public static final int COLOPEDIA_BUILDING = 4;
     public static final int COLOPEDIA_FATHER  = 5;
     
-    // This is copied from net.sf.freecol.common.model.Building where it is private 
-    private static final String[][] buildingNames = {
-        {"Town hall", null, null},
-        {"Carpenter's house", "Lumber mill", null},
-        {"Blacksmith's house", "Blacksmith's shop", "Iron works"},
-        {"Tobacconist's house", "Tobacconist's shop", "Cigar factory"},
-        {"Weaver's house", "Weaver's shop", "Textile mill"},
-        {"Distiller's house", "Rum distillery", "Rum factory"},
-        {"Fur trader's house", "Fur trading post", "Fur factory"},
+    private static final String[][] buildingCalls = {
+        {"TownHall", null, null},
+        {"CarpenterHouse", "LumberMill", null},
+        {"BlacksmithHouse", "BlacksmithShop", "IronWorks"},
+        {"TobacconistHouse", "TobacconistShop", "CigarFactory"},
+        {"WeaverHouse", "WeaverShop", "TextileMill"},
+        {"DistillerHouse", "RumDistillery", "RumFactory"},
+        {"FurTraderHouse", "FurTradingPost", "FurFactory"},
         {"Schoolhouse", "College", "University"},
         {"Armory", "Magazine", "Arsenal"},
         {"Church", "Cathedral", null},
         {"Stockade", "Fort", "Fortress"},
-        {"Warehouse", "Warehouse expansion", null},
+        {"Warehouse", "WarehouseExpansion", null},
         {"Stables", null, null},
         {"Docks", "Drydock", "Shipyard"},
-        {"Printing press", "Newspaper", null},
-        {"Custom house", null, null}
-    };
-
-    // This is copied from net.sf.freecol.common.model.Building where it is private 
-    private static final int requiredTable[][][] = {
-        {{  0,  0,  1},{ -1, -1, -1},{ -1, -1, -1},{ -1, -1, -1}}, // TOWNHALL
-        {{  0,  0,  1},{ 52,  0,  3},{ -1, -1, -1},{ -1, -1, -1}}, // CARPENTER
-        {{  0,  0,  1},{ 64, 20,  1},{240,100,  8},{ -1, -1, -1}}, // BLACKSMITH
-        {{  0,  0,  1},{ 64, 20,  1},{160,100,  8},{ -1, -1, -1}}, // TOBACCONIST
-        {{  0,  0,  1},{ 64, 20,  1},{160,100,  8},{ -1, -1, -1}}, // WEAVER
-        {{  0,  0,  1},{ 64, 20,  1},{160,100,  8},{ -1, -1, -1}}, // DISTILLER
-        {{  0,  0,  1},{ 56, 20,  1},{160,100,  6},{ -1, -1, -1}}, // FUR_TRADER
-        {{ 64,  0,  4},{160, 50,  8},{200,100, 10},{ -1, -1, -1}}, // SCHOOLHOUSE
-        {{ 52,  0,  1},{120, 50,  8},{240,100,  8},{ -1, -1, -1}}, // ARMORY
-        {{ 64,  0,  3},{176,100,  8},{ -1, -1, -1},{ -1, -1, -1}}, // CHURCH
-        {{ 64,  0,  3},{120,100,  3},{320,200,  8},{ -1, -1, -1}}, // STOCKADE
-        {{ 80,  0,  1},{ 80, 20,  1},{ -1, -1, -1},{ -1, -1, -1}}, // WAREHOUSE
-        {{ 64,  0,  1},{ -1, -1, -1},{ -1, -1, -1},{ -1, -1, -1}}, // STABLES
-        {{ 52,  0,  1},{ 80, 50,  4},{240,100,  8},{ -1, -1, -1}}, // DOCK
-        {{ 52, 20,  1},{120, 50,  4},{ -1, -1, -1},{ -1, -1, -1}}, // PRINTING_PRESS
-        {{160, 50,  1},{ -1, -1, -1},{ -1, -1, -1},{ -1, -1, -1}}  // CUSTOM_HOUSE
+        {"PrintingPress", "Newspaper", null},
+        {"CustomHouse", null, null}
     };
 
     // This is copied from net.sf.freecol.client.gui.ImageLibrary where it is private 
@@ -116,7 +95,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
                             FREE_COLONIST_WITH_TOOLS = 26,
                             INDENTURED_SERVANT = 27,
                             PETTY_CRIMINAL = 28,
-                        
+
                             INDIAN_CONVERT = 29,
                             BRAVE = 30,
                         
@@ -170,9 +149,9 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     public int type;
     
     /**
-    * The constructor that will add the items to this panel.
-    * @param parent The parent of this panel.
-    */
+     * The constructor that will add the items to this panel.
+     * @param parent The parent of this panel.
+     */
     public ColopediaPanel(Canvas parent) {
         super(new FlowLayout(FlowLayout.CENTER, 1000, 10));
         this.parent = parent;
@@ -208,6 +187,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     
     /**
      * Prepares this panel to be displayed.
+     * @param type - the panel type
      */
     public void initialize(int type) {
         this.type = type;
@@ -246,7 +226,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     }
 
     /**
-     * 
+     * Builds the buttons for all the terrains.
      */
     private void buildTerrainList() {
         listPanel.setLayout(new GridLayout(7, 2));
@@ -267,7 +247,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     }
 
     /**
-     *
+     * Builds the buttons for all the units.
      */
     private void buildUnitList() {
         listPanel.setLayout(new GridLayout(8, 2));
@@ -291,7 +271,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     }
 
     /**
-     * 
+     * Builds the buttons for all the goods.
      */
     private void buildGoodsList() {
         listPanel.setLayout(new GridLayout(8, 2));
@@ -314,7 +294,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     }
 
     /**
-     * 
+     * Builds the buttons for all the skills.
      */
     private void buildSkillsList() {
         listPanel.setLayout(new GridLayout(11, 2));
@@ -343,7 +323,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     }
 
     /**
-     * 
+     * Builds the buttons for all the buildings.
      */
     private void buildBuildingList() {
         listPanel.setLayout(new GridLayout(19, 2));
@@ -387,7 +367,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     }
 
     /**
-     * 
+     * Builds the buttons for all the founding fathers.
      */
     private void buildFatherList() {
         listPanel.setLayout(new GridLayout((FoundingFather.FATHER_COUNT+1)/2, 2));
@@ -397,6 +377,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     }
 
     /**
+     * Builds the button for the given terrain.
      * @param name
      * @param terrain
      */
@@ -410,6 +391,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     }
 
     /**
+     * Builds the button for the given unit.
      * @param unit
      * @param unitIcon
      */
@@ -432,6 +414,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     }
 
     /**
+     * Builds the button for the given goods.
      * @param goods
      * @param goodsIcon
      */
@@ -446,11 +429,12 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     }
     
     /**
+     * Builds the button for the given building.
      * @param building
      * @param level
      */
     private void buildBuildingButton(int building, int level) {
-        String name = buildingNames[building][level-1];
+        String name = Messages.message("colopedia.buildings.name." + buildingCalls[building][level-1]);
         JButton button = new JButton(name);
         button.setActionCommand(String.valueOf(((building << 2) | (level-1))));
         button.addActionListener(this);
@@ -458,6 +442,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     }
 
     /**
+     * Builds the button for the given founding father.
      * @param foundingFather
      */
     private void buildFatherButton(int foundingFather) {
@@ -469,6 +454,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     }
 
     /**
+     * Builds the details panel for the given terrain.
      * @param terrain
      */
     private void buildTerrainDetail(int terrain) {
@@ -540,6 +526,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     }
     
     /**
+     * Builds the details panel for the given unit.
      * @param unit
      */
     private void buildUnitDetail(int unit) {
@@ -567,6 +554,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     }
 
     /**
+     * Builds the details panel for the given goods.
      * @param goods
      */
     private void buildGoodsDetail(int goods) {
@@ -594,6 +582,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     }
 
     /**
+     * Builds the details panel for the given building.
      * @param action
      */
     private void buildBuildingDetail(int action) {
@@ -698,26 +687,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             {15, -1, -1}                // Custom house
         };
 
-        String[][] buildingCalls = {
-            {"TownHall", null, null},
-            {"CarpenterHouse", "LumberMill", null},
-            {"BlacksmithHouse", "BlacksmithShop", "IronWorks"},
-            {"TobacconistHouse", "TobacconistShop", "CigarFactory"},
-            {"WeaverHouse", "WeaverShop", "TextileMill"},
-            {"DistillerHouse", "RumDistillery", "RumFactory"},
-            {"FurTraderHouse", "FurTradingPost", "FurFactory"},
-            {"Schoolhouse", "College", "University"},
-            {"Armory", "Magazine", "Arsenal"},
-            {"Church", "Cathedral", null},
-            {"Stockade", "Fort", "Fortress"},
-            {"Warehouse", "WarehouseExpansion", null},
-            {"Stables", null, null},
-            {"Docks", "Drydock", "Shipyard"},
-            {"PrintingPress", "Newspaper", null},
-            {"CustomHouse", null, null}
-        };
-
-        JLabel name = new JLabel(buildingNames[building][level], JLabel.CENTER);
+        JLabel name = new JLabel(Messages.message("colopedia.buildings.name." + buildingCalls[building][level]), JLabel.CENTER);
         name.setFont(((Font) UIManager.get("HeaderFont")).deriveFont(0, 24));
         name.setPreferredSize(new Dimension(detailPanel.getWidth(), 50));
         detailPanel.add(name);
@@ -734,9 +704,10 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         requires.setWrapStyleWord(true);
         requires.setFocusable(false);
         requires.setFont(requires.getFont().deriveFont(Font.BOLD));
-        String requiresText = requiredTable[building][level][2] + " colonists";
+        String requiresText = Building.requiredTable[building][level][2] + " colonists";
         if (level > 0) {
-          requiresText = requiresText + "\n" + buildingNames[building][level-1];
+          requiresText = requiresText + "\n" +
+                         Messages.message("colopedia.buildings.name." + buildingCalls[building][level-1]);
         }
         if (level > 1 && (building==Building.BLACKSMITH ||
                           building==Building.TOBACCONIST ||
@@ -755,8 +726,8 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         overview.add(new JLabel(Messages.message("colopedia.buildings.cost")));
         JPanel costs = new JPanel();
         costs.setLayout(new FlowLayout(FlowLayout.LEFT));
-        costs.add(new JLabel(Integer.toString(requiredTable[building][level][0]), library.getGoodsImageIcon(ImageLibrary.GOODS_HAMMERS), JLabel.LEFT));
-        costs.add(new JLabel(Integer.toString(requiredTable[building][level][1]), library.getGoodsImageIcon(ImageLibrary.GOODS_TOOLS), JLabel.LEFT));
+        costs.add(new JLabel(Integer.toString(Building.requiredTable[building][level][0]), library.getGoodsImageIcon(ImageLibrary.GOODS_HAMMERS), JLabel.LEFT));
+        costs.add(new JLabel(Integer.toString(Building.requiredTable[building][level][1]), library.getGoodsImageIcon(ImageLibrary.GOODS_TOOLS), JLabel.LEFT));
         overview.add(costs);
         // Specialist
         overview.add(new JLabel(Messages.message("colopedia.buildings.specialist")));
@@ -809,6 +780,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     }
 
     /**
+     * Builds the details panel for the given founding father.
      * @param foundingFather
      */
     private void buildFatherDetail(int foundingFather) {

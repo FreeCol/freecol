@@ -86,7 +86,7 @@ public final class Building extends FreeColGameObject implements WorkLocation {
     // Sets the maximum number of units in one building (will become a non-constant later):
     private static final int MAX_UNITS = 3;
 
-    private static final int requiredTable[][][] = {
+    public static final int requiredTable[][][] = {
         {{  0,  0,  1},{ -1, -1, -1},{ -1, -1, -1},{ -1, -1, -1}}, // TOWNHALL
         {{  0,  0,  1},{ 52,  0,  3},{ -1, -1, -1},{ -1, -1, -1}}, // CARPENTER
         {{  0,  0,  1},{ 64, 20,  1},{240,100,  8},{ -1, -1, -1}}, // BLACKSMITH
