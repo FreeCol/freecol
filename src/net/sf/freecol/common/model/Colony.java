@@ -97,6 +97,15 @@ public final class Colony extends Settlement implements Location {
     }
 
 
+    public void updatePopulation() {
+        if (getUnitCount() >= 3 && getOwner().hasFather(FoundingFather.LA_SALLE)) {
+            if (!getBuilding(Building.STOCKADE).isBuilt()) {
+                getBuilding(Building.STOCKADE).setLevel(Building.HOUSE);
+            }
+        }
+    }
+    
+
     /**
     * Initiates a new <code>Colony</code> from an <code>Element</code>.
     *
@@ -282,6 +291,7 @@ public final class Colony extends Settlement implements Location {
                 WorkLocation w = getVacantColonyTileFor(((Unit) locatable), Goods.FOOD);
                 if (w.canAdd(locatable)) {
                     locatable.setLocation(w);
+                    updatePopulation();
                     return;
                 }
 
@@ -290,6 +300,7 @@ public final class Colony extends Settlement implements Location {
                     w = (WorkLocation) i.next();
                     if (w.canAdd(locatable)) {
                         locatable.setLocation(w);
+                        updatePopulation();
                         return;
                     }
                 }
@@ -298,6 +309,8 @@ public final class Colony extends Settlement implements Location {
             } else {
                 locatable.setLocation(getTile());
             }
+            
+            updatePopulation();
         } else if (locatable instanceof Goods) {
             goodsContainer.addGoods((Goods)locatable);
         } else {
@@ -317,6 +330,7 @@ public final class Colony extends Settlement implements Location {
                 WorkLocation w = (WorkLocation) i.next();
                 if (w.contains(locatable)) {
                     w.remove(locatable);
+                    updatePopulation();
                     return;
                 }
             }
@@ -566,7 +580,7 @@ public final class Colony extends Settlement implements Location {
     */
     public void addBells(int amount) {
         bells += amount;
-        bells -= (getSoL() * getUnitCount()) / 100;
+
         if (bells >= ((getUnitCount() + 1) * 50)) {
             bells = ((getUnitCount() + 1) * 50) * 100;
         } else if (bells <= 0) {
@@ -574,6 +588,16 @@ public final class Colony extends Settlement implements Location {
         }
     }
     
+    
+    /**
+    * Adds to the bell count of the colony.
+    * @param amount The percentage of SoL to add.
+    */
+    public void addSoL(int amount) {
+        bells += (bells * amount) / 100;
+    }
+
+
     /**
     * Returns the bell count of the colony.
     * @return The current bell count of the colony.
@@ -813,6 +837,12 @@ public final class Colony extends Settlement implements Location {
         // Throw away goods there is no room for.
         int capacity = 100 + getBuilding(Building.WAREHOUSE).getLevel() * 100;
         goodsContainer.removeAbove(capacity);
+        
+        // Remove bells:
+        bells -= (getSoL() * getUnitCount()) / 100;
+        if (bells < 0) {
+            bells = 0;
+        }
     }
 
 

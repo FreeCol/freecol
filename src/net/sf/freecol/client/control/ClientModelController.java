@@ -7,6 +7,7 @@ import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.model.*;
 import net.sf.freecol.client.FreeColClient;
 import java.util.logging.Logger;
+import java.util.ArrayList;
 import org.w3c.dom.*;
 
 
@@ -69,6 +70,11 @@ public class ClientModelController implements ModelController {
         unit.setLocation(entryLocation);
 
         return entryLocation;
+    }
+
+    
+    public void exploreTiles(Player player, ArrayList tiles) {
+        // Nothing to do on the client side.
     }
 
 

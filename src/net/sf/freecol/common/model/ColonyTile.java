@@ -167,6 +167,8 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation {
         }
 
         setUnit((Unit) locatable);
+        
+        getColony().updatePopulation();
     }
 
 
@@ -182,6 +184,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation {
         }
 
         setUnit(null);
+        getColony().updatePopulation();
     }
 
 
@@ -243,8 +246,8 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation {
             }
 
             if (amount > 0) {
-                amount += colony.getProductionBonus();
-                if (amount < 1) amount = 1;
+                //amount += colony.getProductionBonus();
+                //if (amount < 1) amount = 1;
                 colony.addGoods(getUnit().getWorkType(), amount);
             }
         } else {

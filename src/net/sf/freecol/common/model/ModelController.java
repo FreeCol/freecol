@@ -1,6 +1,7 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
 
 /**
 * The <code>ModelController</code> is used by the model to perform
@@ -44,4 +45,12 @@ public interface ModelController {
     * change (that is; not caused by the control) has occured in the model.
     */
     //public void update(Tile tile);
+    
+
+    /**
+    * Explores the given tiles for the given player.
+    * @param player The <code>Player</code> that should see more tiles.
+    * @param tiles The tiles to explore.
+    */
+    public void exploreTiles(Player player, ArrayList tiles);
 }

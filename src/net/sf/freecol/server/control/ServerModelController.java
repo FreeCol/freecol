@@ -98,8 +98,30 @@ public class ServerModelController implements ModelController {
         return entryLocation;
     }
 
+    
     public void update(Tile tile) {
         update(tile, null);
+    }
+
+
+    /**
+    * Explores the given tiles for the given player.
+    * @param player The <code>Player</code> that should see more tiles.
+    * @param tiles The tiles to explore.
+    */
+    public void exploreTiles(Player player, ArrayList tiles) {
+        Element updateElement = Message.createNewRootElement("update");
+        for (int i=0; i<tiles.size(); i++) {
+            Tile t = (Tile) tiles.get(i);
+            ((ServerPlayer) player).setExplored(t);
+            updateElement.appendChild(t.toXMLElement(((ServerPlayer) player), updateElement.getOwnerDocument()));
+        }
+        
+        try {
+            ((ServerPlayer) player).getConnection().send(updateElement);
+        } catch (IOException e) {
+            logger.warning("Could not send message to: " + ((ServerPlayer) player).getName() + " with connection " + ((ServerPlayer) player).getConnection());
+        }
     }
 
 
@@ -128,3 +150,4 @@ public class ServerModelController implements ModelController {
         }
     }
 }
+

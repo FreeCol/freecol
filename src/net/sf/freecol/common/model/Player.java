@@ -805,6 +805,40 @@ public class Player extends FreeColGameObject {
                         u.setType(Unit.FREE_COLONIST);
                     }
                 }
+            } else if (currentFather == FoundingFather.FRANSICO_DE_CORONADO) {
+                ArrayList tiles = new ArrayList();
+                
+                Iterator tileIterator = getGame().getMap().getWholeMapIterator();
+                while (tileIterator.hasNext()) {
+                    Tile tile = (Tile) tileIterator.next();
+                    if (tile.getColony() != null) {
+                        tiles.add(tile);
+                        for (int i=0; i<8; i++) {
+                            Tile addTile = getGame().getMap().getNeighbourOrNull(i, tile);
+                            if (addTile != null) {
+                                tiles.add(addTile);
+                            }
+                        }
+                    }
+                }
+
+                getGame().getModelController().exploreTiles(this, tiles);
+            } else if (currentFather == FoundingFather.LA_SALLE) {
+                Iterator tileIterator = getGame().getMap().getWholeMapIterator();
+                while (tileIterator.hasNext()) {
+                    Tile tile = (Tile) tileIterator.next();
+                    if (tile.getColony() != null) {
+                        tile.getColony().updatePopulation();
+                    }
+                }
+            } else if (currentFather == FoundingFather.SIMON_BOLIVAR) {
+                Iterator tileIterator = getGame().getMap().getWholeMapIterator();
+                while (tileIterator.hasNext()) {
+                    Tile tile = (Tile) tileIterator.next();
+                    if (tile.getColony() != null) {
+                        tile.getColony().addSol(20);
+                    }
+                }
             }
 
             addModelMessage(this, "model.player.foundingFatherJoinedCongress", new String[][] {{"%foundingFather%", Messages.message(FoundingFather.getName(currentFather))}});

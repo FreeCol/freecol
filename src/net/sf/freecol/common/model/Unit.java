@@ -2110,6 +2110,13 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                 base_power = 1;
                 break;
         }
+        
+        if (getOwner().hasFather(FoundingFather.PAUL_REVERE) && getTile() != null && getTile().getColony() != null) {
+            if (isColonist() && base_power == 1 && (getLocation() instanceof ColonyTile || getLocation() instanceof Building)) {
+                base_power = 2;
+            }
+        }
+
         if (isArmed()) {
             base_power++;
         }
@@ -2553,7 +2560,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             return 0;
         }
 
-        base += getTile().getColony().getProductionBonus();
+        //base += getTile().getColony().getProductionBonus();
         return Math.max(base, 1);
     }
 
@@ -2634,6 +2641,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
 
         if (base == 0) {
             return 0;
+        }
+
+        if (goods == Goods.FURS && getOwner().hasFather(FoundingFather.HENRY_HUDSON)) {
+            base *= 2;
         }
 
         base += getTile().getColony().getProductionBonus();

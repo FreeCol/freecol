@@ -259,7 +259,7 @@ public class ServerPlayer extends Player {
         exploredTiles[tile.getX()][tile.getY()] = true;
         canSeeTiles[tile.getX()][tile.getY()] = true;
     }
-
+    
 
     /**
     * Sets the tiles within the given <code>Unit</code>'s line of

@@ -394,6 +394,7 @@ public final class Building extends FreeColGameObject implements WorkLocation {
         }
 
         units.add((Unit) locatable);
+        getColony().updatePopulation();
     }
 
 
@@ -412,6 +413,7 @@ public final class Building extends FreeColGameObject implements WorkLocation {
 
         if (index != -1) {
             units.remove(index);
+            getColony().updatePopulation();
         }
     }
 
@@ -766,7 +768,16 @@ public final class Building extends FreeColGameObject implements WorkLocation {
 
         if (goodsOutputType == Goods.BELLS) {
             goodsOutput += goodsOutput * colony.getBuilding(Building.PRINTING_PRESS).getLevel();
+            
+            if (getColony().getOwner().hasFather(FoundingFather.THOMAS_JEFFERSON)) {
+                goodsOutput += goodsOutput/2;
+            }
         }
+        
+        if (goodsOutputType == Goods.CROSSES && getColony().getOwner().hasFather(FoundingFather.WILLIAM_PENN)) {
+            goodsOutput += goodsOutput/2;
+        }
+
 
         return goodsOutput;
     }
