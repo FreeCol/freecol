@@ -1,22 +1,3 @@
-/*
- *  Settlement.java - Holds all information about an Indian settlement.
- *
- *  Copyright (C) 2003  The FreeCol Team
- *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU Library General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- */
 
 package net.sf.freecol.common.model;
 
@@ -32,6 +13,10 @@ import org.w3c.dom.Element;
  */
 public class IndianSettlement extends Settlement {
     private static final Logger logger = Logger.getLogger(IndianSettlement.class.getName());
+
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
+    public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
+    public static final String  REVISION = "$Revision$";
 
     public static final int INCA = 0;
     public static final int AZTEC = 1;

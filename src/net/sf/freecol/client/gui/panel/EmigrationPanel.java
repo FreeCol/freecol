@@ -18,6 +18,10 @@ import net.sf.freecol.common.model.Unit;
 public final class EmigrationPanel extends FreeColDialog implements ActionListener {
     private static final Logger logger = Logger.getLogger(EmigrationPanel.class.getName());
 
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
+    public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
+    public static final String  REVISION = "$Revision$";
+
     private final JButton   person1,
                             person2,
                             person3;

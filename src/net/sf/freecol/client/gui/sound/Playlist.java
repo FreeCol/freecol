@@ -8,6 +8,10 @@ import java.util.Arrays;
 * certain order as defined by the Playlists playmodes.
 */
 public final class Playlist {
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
+    public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
+    public static final String  REVISION = "$Revision$";
+    
     /**
     * This const represents a way in which successive sounds can be played.
     */

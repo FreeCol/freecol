@@ -1,6 +1,3 @@
-/*
- *  Tile.java - A tile from the map.
- */
 
 package net.sf.freecol.common.model;
 
@@ -25,7 +22,7 @@ import org.w3c.dom.Document;
 public final class Tile extends FreeColGameObject implements Location {
     private static final Logger logger = Logger.getLogger(Tile.class.getName());
 
-    public static final String  COPYRIGHT = "Copyright (C) 2003 The FreeCol Team";
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 

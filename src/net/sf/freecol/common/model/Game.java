@@ -16,7 +16,7 @@ import org.w3c.dom.Document;
 * The main component of the game model.
 */
 public class Game extends FreeColGameObject {
-    public static final String  COPYRIGHT = "Copyright (C) 2003 The FreeCol Team";
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 

@@ -19,6 +19,10 @@ import net.sf.freecol.client.gui.i18n.Messages;
 public class FreeColDialog extends FreeColPanel {
     private static final Logger logger = Logger.getLogger(FreeColDialog.class.getName());
 
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
+    public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
+    public static final String  REVISION = "$Revision$";
+
     // Stores the response from the user:
     private Object response = null;
 

@@ -6,7 +6,6 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 
 import net.sf.freecol.common.model.Unit;
-//import net.sf.freecol.client.control.UserInputHandler;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.FreeColClient;
@@ -22,7 +21,7 @@ import java.awt.event.ActionEvent;
 * be placed on a JComponent in order to be useable.
 */
 public final class UnitButton extends JButton {
-    public static final String  COPYRIGHT = "Copyright (C) 2003 The FreeCol Team";
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
     public static final int EUROPE = 2;

@@ -11,7 +11,10 @@ import java.awt.Image;
 * background image.
 */
 public class FreeColMenuBarUI extends BasicMenuBarUI {
-
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
+    public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
+    public static final String  REVISION = "$Revision$";
+    
     private static FreeColMenuBarUI sharedInstance = new FreeColMenuBarUI();
     
 

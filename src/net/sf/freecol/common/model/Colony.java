@@ -20,7 +20,7 @@ import net.sf.freecol.common.model.Settlement;
 public final class Colony extends Settlement implements Location {
     private static final Logger logger = Logger.getLogger(Colony.class.getName());
 
-    public static final String  COPYRIGHT = "Copyright (C) 2003 The FreeCol Team";
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 

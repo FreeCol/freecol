@@ -30,6 +30,9 @@ import net.sf.freecol.server.FreeColServer;
 public final class ConnectController {
     private static final Logger logger = Logger.getLogger(ConnectController.class.getName());
 
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
+    public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
+    public static final String  REVISION = "$Revision$";
 
     private final FreeColClient freeColClient;
 

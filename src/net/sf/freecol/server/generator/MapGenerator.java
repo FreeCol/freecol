@@ -16,8 +16,11 @@ import java.util.logging.Logger;
 * Creates random maps and sets the starting locations for the players.
 */
 public class MapGenerator {
-
     private static final Logger logger = Logger.getLogger(MapGenerator.class.getName());
+
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
+    public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
+    public static final String  REVISION = "$Revision$";
 
     // The directions a Unit can move to.
     protected static final int N = 0,

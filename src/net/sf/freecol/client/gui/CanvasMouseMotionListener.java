@@ -10,6 +10,10 @@ import java.awt.event.MouseEvent;
  * Listens to the mouse being moved at the level of the Canvas.
  */
 public final class CanvasMouseMotionListener implements MouseMotionListener {
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
+    public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
+    public static final String  REVISION = "$Revision$";
+
     private final GUI gui;
     private final Map map;
     private ScrollThread scrollThread;

@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 * Represents a given turn in the game.
 */
 public class Turn {
-    public static final String  COPYRIGHT = "Copyright (C) 2003 The FreeCol Team";
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 

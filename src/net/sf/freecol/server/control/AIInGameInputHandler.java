@@ -26,9 +26,11 @@ import java.io.IOException;
 * Handles the network messages that arrives while in the game.
 */
 public final class AIInGameInputHandler implements MessageHandler {
-    private static final Logger logger
-                            = Logger.getLogger(AIInGameInputHandler.class.getName());
+    private static final Logger logger = Logger.getLogger(AIInGameInputHandler.class.getName());
 
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
+    public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
+    public static final String  REVISION = "$Revision$";
 
     /** The player for whom I work. */
     private final ServerPlayer me;
