@@ -19,7 +19,18 @@ if [ "$JAVA_HOME" ] ; then
     JAVACMD="$JAVA_HOME/bin/java"
   fi
 
-  $JAVACMD -jar /usr/share/java/freecol.jar "$@"
+  FOUND="false"
+  for X in $@; do
+      if [ "$X" == "--freecol-data" ]; then
+          FOUND="true"
+      fi
+  done
+
+  if [ "$FOUND" == "true" ]; then
+      $JAVACMD -jar /usr/share/java/freecol.jar "$@"
+  else
+      $JAVACMD -jar /usr/share/java/freecol.jar "$@" --freecol-data /usr/share/freecol/data
+  fi
 
 else
   echo "No JVM found to run FreeCol."
