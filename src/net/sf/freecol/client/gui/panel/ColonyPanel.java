@@ -390,12 +390,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         try {
             switch (Integer.valueOf(command).intValue()) {
                 case EXIT:
-                    parent.remove(this);
-                    parent.showMapControls();
-                    freeColClient.getInGameController().nextModelMessage();
-                    if (parent.getGUI().getActiveUnit() == null) {
-                        freeColClient.getInGameController().nextActiveUnit();
-                    }
+                    closeColonyPanel();
                     break;
                 default:
                     logger.warning("Invalid action");
@@ -406,6 +401,19 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     }
 
 
+    /**
+    * Closes the <code>ColonyPanel</code>.
+    */
+    public void closeColonyPanel() {
+        parent.remove(this);
+        parent.showMapControls();
+        freeColClient.getInGameController().nextModelMessage();
+        if (parent.getGUI().getActiveUnit() == null) {
+            freeColClient.getInGameController().nextActiveUnit();
+        }
+    }
+
+    
     /**
     * Paints this component.
     * @param g The graphics context in which to paint.
@@ -789,8 +797,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                     }
 
                     if (unit.getTile().getColony() == null) {
-                        parent.remove(colonyPanel);
-                        parent.showMapControls();
+                        closeColonyPanel();
                         return null;
                     } else if (!(unit.getLocation() instanceof Tile) && !(unit.getLocation() instanceof Unit)) {
                         return null;
@@ -954,19 +961,23 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                     oldParent.remove(comp);
                     Unit unit = ((UnitLabel)comp).getUnit();
                     if (!unit.isCarrier()) {// No, you cannot load ships onto other ships.
-                      if(!selectedUnit.getUnit().canAdd(unit)) {
-                          oldParent.add(comp);
-                          return null;
-                      }
+                        if(!selectedUnit.getUnit().canAdd(unit)) {
+                            oldParent.add(comp);
+                            return null;
+                        }
 
-                      ((UnitLabel) comp).setSmall(false);
-                      if (inGameController.boardShip(unit, selectedUnit.getUnit())) {
-                        updateBuildingBox();
-                        colonyPanel.updateSoLLabel();
-                      } else {
-                        oldParent.add(comp);
-                        return null;
-                      }
+                        ((UnitLabel) comp).setSmall(false);
+                        if (inGameController.boardShip(unit, selectedUnit.getUnit())) {
+                            if (unit.getTile().getSettlement() == null) {
+                                closeColonyPanel();
+                            }
+
+                            updateBuildingBox();
+                            colonyPanel.updateSoLLabel();
+                        } else {
+                            oldParent.add(comp);
+                            return null;
+                        }
                     } else {
                       oldParent.add(comp);
                       return null;

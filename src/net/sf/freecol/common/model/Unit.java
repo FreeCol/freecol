@@ -605,9 +605,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             throw new IllegalStateException("It is not allowed to board a ship on another tile.");
         }
 
-        /*if (getTile() != null && getTile().getColony() != null && getTile().getColony().getUnitCount() <= 0) {
+        if (getTile() != null && getTile().getColony() != null && getTile().getColony().getUnitCount() <= 0) {
             getTile().getColony().dispose();
-        }*/
+        }
     }
 
 

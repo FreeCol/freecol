@@ -426,6 +426,8 @@ public final class InGameController {
     *
     * @param unit The unit who is going to board the carrier.
     * @param carrier The carrier.
+    * @return <i>true</i> if the <code>unit</code> actually gets 
+    *         on the <code>carrier</code>.
     */
     public boolean boardShip(Unit unit, Unit carrier) {
         if (unit == null) {
