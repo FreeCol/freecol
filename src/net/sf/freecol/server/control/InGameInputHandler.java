@@ -29,7 +29,7 @@ public final class InGameInputHandler extends InputHandler {
     public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
-    
+
     public static Random attackCalculator;
 
 
@@ -75,12 +75,16 @@ public final class InGameInputHandler extends InputHandler {
                         reply = chat(connection, element);
                     } else if (type.equals("move")) {
                         reply = move(connection, element);
+                    } else if (type.equals("askSkill")) {
+                        reply = askSkill(connection, element);
                     } else if (type.equals("attack")) {
                         reply = attack(connection, element);
                     } else if (type.equals("embark")) {
                         reply = embark(connection, element);
                     } else if (type.equals("boardShip")) {
                         reply = boardShip(connection, element);
+                    } else if (type.equals("learnSkillAtSettlement")) {
+                        reply = learnSkillAtSettlement(connection, element);
                     } else if (type.equals("leaveShip")) {
                         reply = leaveShip(connection, element);
                     } else if (type.equals("loadCargo")) {
@@ -166,7 +170,7 @@ public final class InGameInputHandler extends InputHandler {
         player.setNewLandName(element.getAttribute("newLandName"));
 
         // TODO: Send name to all other players.
-        
+
         return null;
     }
 
@@ -342,6 +346,68 @@ public final class InGameInputHandler extends InputHandler {
 
         return reply;
     }
+
+
+    /**
+    * Handles an "askSkill"-message from a client.
+    *
+    * @param connection The connection the message came from.
+    * @param element The element containing the request.
+    *
+    * @exception IllegalArgumentException If the data format of the message is invalid.
+    * @exception IllegalStateException If the request is not accepted by the model.
+    */
+    private Element askSkill(Connection connection, Element element) {
+        FreeColServer freeColServer = getFreeColServer();
+        Game game = freeColServer.getGame();
+        Map map = game.getMap();
+        ServerPlayer player = freeColServer.getPlayer(connection);
+
+        Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
+        int direction = Integer.parseInt(element.getAttribute("direction"));
+
+        if (unit == null) {
+            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: " + element.getAttribute("unit"));
+        }
+
+        if (unit.getMovesLeft() == 0) {
+            throw new IllegalArgumentException("Unit has no moves left.");
+        }
+
+        if (unit.getTile() == null) {
+            throw new IllegalArgumentException("'Unit' not on map: ID: " + element.getAttribute("unit"));
+        }
+
+        if (unit.getOwner() != player) {
+            throw new IllegalStateException("Not your unit!");
+        }
+
+        IndianSettlement settlement = (IndianSettlement) map.getNeighbourOrNull(direction, unit.getTile()).getSettlement();
+
+        if (settlement.getLearnableSkill() != IndianSettlement.UNKNOWN) {
+            unit.setMovesLeft(0);
+
+            if (settlement.getLearnableSkill() != IndianSettlement.NONE) {
+                // We now put the unit on the indian settlement. Normally we shouldn't have
+                // to this, but the movesLeft are set to 0 for unit and if the player decides
+                // to learn a skill with a learnSkillAtSettlement message then we have to be
+                // able to check if the unit can learn the skill.
+                unit.setLocation(settlement);
+            }
+
+            Element reply = Message.createNewRootElement("provideSkill");
+            reply.setAttribute("skill", Integer.toString(settlement.getLearnableSkill()));
+
+            // TODO: Keep the data that says that we've sent 'skill' to 'player'.
+            //       Used when saving/loading the game.
+
+            return reply;
+        }
+        else {
+            throw new IllegalStateException("Learnable skill from Indian settlement is unknown at server.");
+        }
+    }
+
 
     /**
     * Handles an "attack"-message from a client.
@@ -578,6 +644,48 @@ public final class InGameInputHandler extends InputHandler {
                     logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection " + enemyPlayer.getConnection());
                 }
             }
+        }
+
+        return null;
+    }
+
+
+    /**
+    * Handles a "learnSkillAtSettlement"-message from a client.
+    *
+    * @param connection The connection the message came from.
+    * @param element The element containing the request.
+    */
+    private Element learnSkillAtSettlement(Connection connection, Element element) {
+        FreeColServer freeColServer = getFreeColServer();
+        Game game = freeColServer.getGame();
+        Map map = game.getMap();
+        ServerPlayer player = freeColServer.getPlayer(connection);
+
+        Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
+        int direction = Integer.parseInt(element.getAttribute("direction"));
+        boolean cancelAction = false;
+
+        if (element.getAttribute("action").equals("cancel")) {
+            cancelAction = true;
+        }
+
+        if (unit.getTile() == null) {
+            throw new IllegalArgumentException("'Unit' not on map: ID: " + element.getAttribute("unit"));
+        }
+
+        if (unit.getOwner() != player) {
+            throw new IllegalStateException("Not your unit!");
+        }
+
+        // The unit was relocated to the indian settlement. See askSkill for more info.
+        IndianSettlement settlement = (IndianSettlement) unit.getLocation();
+        Tile tile = map.getNeighbourOrNull(Map.getReverseDirection(direction), unit.getTile());
+        unit.setLocation(tile);
+
+        if (!cancelAction) {
+            unit.setType(settlement.getLearnableSkill());
+            settlement.setLearnableSkill(IndianSettlement.NONE);
         }
 
         return null;
@@ -1133,7 +1241,7 @@ public final class InGameInputHandler extends InputHandler {
 
     /**
      * Handles a "disbandUnit"-message.
-     * 
+     *
      * @param connection The <code>Connection</code> the message was received on.
      * @param element The element containing the request.
      */
@@ -1141,7 +1249,7 @@ public final class InGameInputHandler extends InputHandler {
         Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
-        
+
         if (unit == null) {
             throw new IllegalArgumentException("Could not find 'Unit' with specified ID: " + element.getAttribute("unit"));
         }
@@ -1151,11 +1259,11 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         Tile oldTile = unit.getTile();
-        
+
         unit.dispose();
-        
+
         sendUpdatedTileToAll(oldTile, player);
-        
+
         return null;
     }
 

@@ -253,6 +253,14 @@ public final class InGameController {
             case Unit.DISEMBARK:        disembark(unit, direction); break;
             case Unit.EMBARK:           embark(unit, direction); break;
             case Unit.MOVE_HIGH_SEAS:   moveHighSeas(unit, direction); break;
+            case Unit.ENTER_INDIAN_VILLAGE_WITH_SCOUT:
+                                        // TODO
+                                        freeColClient.playSound(SfxLibrary.ILLEGAL_MOVE); break;
+            case Unit.ENTER_INDIAN_VILLAGE_WITH_MISSIONARY:
+                                        // TODO
+                                        freeColClient.playSound(SfxLibrary.ILLEGAL_MOVE); break;
+            case Unit.ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST:
+                                        learnSkillAtIndianSettlement(unit, direction); break;
             case Unit.ILLEGAL_MOVE:     freeColClient.playSound(SfxLibrary.ILLEGAL_MOVE); break;
             default:                    throw new RuntimeException("unrecognised move: " + move);
         }
@@ -833,6 +841,95 @@ public final class InGameController {
 
 
     /**
+     * Moves the specified free colonist into an Indian settlement to learn a skill.
+     * Of course, the colonist won't physically get into the village, it will
+     * just stay where it is and gain the skill.
+     *
+     * @param unit The unit to learn the skill.
+     * @param direction The direction in which the Indian settlement lies.
+     */
+    private void learnSkillAtIndianSettlement(Unit unit, int direction) {
+        Client client = freeColClient.getClient();
+        Canvas canvas = freeColClient.getCanvas();
+        Map map = freeColClient.getGame().getMap();
+        IndianSettlement settlement = (IndianSettlement) map.getNeighbourOrNull(direction, unit.getTile()).getSettlement();
+
+        if (settlement.getLearnableSkill() != IndianSettlement.NONE) {
+            unit.setMovesLeft(0);
+
+            String skillName;
+
+            Element askSkill = Message.createNewRootElement("askSkill");
+            askSkill.setAttribute("unit", unit.getID());
+            askSkill.setAttribute("direction", Integer.toString(direction));
+
+            Element reply = client.ask(askSkill);
+            int skill;
+
+            if (reply.getTagName().equals("provideSkill")) {
+                skill = Integer.parseInt(reply.getAttribute("skill"));
+                switch (skill) {
+                    case IndianSettlement.NONE:
+                        skillName = null;
+                        break;
+                    case IndianSettlement.EXPERT_FARMER:
+                        skillName = Messages.message("indianSettlement.skillExpertFarmer");
+                        break;
+                    case IndianSettlement.EXPERT_FISHERMAN:
+                        skillName = Messages.message("indianSettlement.skillExpertFisherman");
+                        break;
+                    case IndianSettlement.EXPERT_SILVER_MINER:
+                        skillName = Messages.message("indianSettlement.skillExpertSilverMiner");
+                        break;
+                    case IndianSettlement.MASTER_SUGAR_PLANTER:
+                        skillName = Messages.message("indianSettlement.skillMasterSugarPlanter");
+                        break;
+                    case IndianSettlement.MASTER_COTTON_PLANTER:
+                        skillName = Messages.message("indianSettlement.skillMasterCottonPlanter");
+                        break;
+                    case IndianSettlement.MASTER_TOBACCO_PLANTER:
+                        skillName = Messages.message("indianSettlement.skillMasterTobaccoPlanter");
+                        break;
+                    case IndianSettlement.SEASONED_SCOUT:
+                        skillName = Messages.message("indianSettlement.skillSeasonedScout");
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Invalid skill found in provideSkill message.");
+                }
+            }
+            else {
+                logger.warning("Server gave an invalid reply to an askSkill message");
+                return;
+            }
+
+            settlement.setLearnableSkill(skill);
+
+            if (skillName == null) {
+                canvas.errorMessage("indianSettlement.noMoreSkill");
+            }
+            else {
+                Element learnSkill = Message.createNewRootElement("learnSkillAtSettlement");
+                learnSkill.setAttribute("unit", unit.getID());
+                learnSkill.setAttribute("direction", Integer.toString(direction));
+
+                if (canvas.showConfirmDialog("learnSkill.text", "learnSkill.yes", "learnSkill.no", skillName)) {
+                    unit.setType(skill);
+                    settlement.setLearnableSkill(IndianSettlement.NONE);
+                }
+                else {
+                    learnSkill.setAttribute("action", "cancel");
+                }
+
+                client.send(learnSkill);
+            }
+        }
+        else {
+            canvas.errorMessage("indianSettlement.noMoreSkill");
+        }
+    }
+
+
+    /**
      * Moves the specified unit to Europe.
      * @param unit The unit to be moved to Europe.
      */
@@ -983,7 +1080,7 @@ public final class InGameController {
 
         nextActiveUnit();
     }
-    
+
     /**
      * Disbands the active unit.
      */
@@ -991,22 +1088,22 @@ public final class InGameController {
         GUI gui = freeColClient.getGUI();
         Unit unit = gui.getActiveUnit();
         Client client = freeColClient.getClient();
-        
+
         if(unit == null) {
             return;
         }
-        
+
         if(!freeColClient.getCanvas().showConfirmDialog("disbandUnit.text", "disbandUnit.yes", "disbandUnit.no")) {
             return;
         }
-        
+
         Element disbandUnit = Message.createNewRootElement("disbandUnit");
         disbandUnit.setAttribute("unit", unit.getID());
-        
+
         unit.dispose();
-        
+
         nextActiveUnit();
-        
+
         client.send(disbandUnit);
     }
 

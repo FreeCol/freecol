@@ -3,6 +3,8 @@ package net.sf.freecol.client.gui.panel;
 
 import net.sf.freecol.client.gui.Canvas;
 
+import net.sf.freecol.client.gui.i18n.Messages;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.NumberFormatException;
@@ -19,28 +21,28 @@ public final class ErrorPanel extends FreeColDialog implements ActionListener {
     public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
-    
+
     private static final Logger logger = Logger.getLogger(ErrorPanel.class.getName());
-    
+
     private static final int OK = 0;
-    
+
     private static final int lineWidth = 320;
-    
+
     private final Canvas parent;
-    
+
     private LinkedList errorLabels; // A LinkedList of JLabel objects.
     private JButton errorButton;
-    
+
     /**
     * The constructor that will add the items to this panel.
     * @param parent The parent of this panel.
     */
     public ErrorPanel(Canvas parent) {
         this.parent = parent;
-        
+
         setLayout(null);
 
-        errorButton = new JButton("OK");
+        errorButton = new JButton(Messages.message("ok"));
         errorButton.setSize(80, 20);
         errorButton.setActionCommand(String.valueOf(OK));
         errorButton.addActionListener(this);
@@ -49,8 +51,8 @@ public final class ErrorPanel extends FreeColDialog implements ActionListener {
 
         add(errorButton);
     }
-    
-    
+
+
     public void requestFocus() {
         errorButton.requestFocus();
     }
@@ -81,7 +83,7 @@ public final class ErrorPanel extends FreeColDialog implements ActionListener {
                     break;
                 }
             }
-            
+
             if ((previousIndex >= 0) && (spaceIndex >= 0)) {
                 lines.add(message.substring(0, previousIndex));
                 if (previousIndex + 1 < message.length()) {
@@ -97,16 +99,16 @@ public final class ErrorPanel extends FreeColDialog implements ActionListener {
                 break;
             }
         }
-        
+
         if (message.trim().length() > 0) {
             lines.add(message);
         }
-        
+
         if (errorLabels != null) {
             for (int i = 0; i < errorLabels.size(); i++) {
                 remove((JLabel)errorLabels.get(i));
             }
-            
+
             errorLabels.clear();
         }
         else {
@@ -123,10 +125,10 @@ public final class ErrorPanel extends FreeColDialog implements ActionListener {
 
         errorButton.setLocation(130, 25 + (lines.size() - 1) * 20);
         add(errorButton);
-        
+
         setSize(340, 50 + (lines.size() - 1) * 20);
     }
-    
+
     /**
     * This function analyses an event and calls the right methods to take
     * care of the user's requests.

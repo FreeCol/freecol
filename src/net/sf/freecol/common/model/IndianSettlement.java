@@ -27,14 +27,46 @@ public class IndianSettlement extends Settlement {
     public static final int APACHE = 6;
     public static final int TUPI = 7;
     public static final int LAST_TRIBE = 7;
+
+
     public static final int CAMP = 0;
     public static final int VILLAGE = 1;
     public static final int CITY = 2;
     public static final int LAST_KIND = 2;
 
+    // These are the learnable skills for an Indian settlement.
+    // They are fully compatible with the types from the Unit class!
+    public static final int UNKNOWN = -2,
+                            NONE = -1,
+                            EXPERT_FARMER = Unit.EXPERT_FARMER,
+                            EXPERT_FISHERMAN = Unit.EXPERT_FISHERMAN,
+                            EXPERT_SILVER_MINER = Unit.EXPERT_SILVER_MINER,
+                            MASTER_SUGAR_PLANTER = Unit.MASTER_SUGAR_PLANTER,
+                            MASTER_COTTON_PLANTER = Unit.MASTER_COTTON_PLANTER,
+                            MASTER_TOBACCO_PLANTER = Unit.MASTER_TOBACCO_PLANTER,
+                            SEASONED_SCOUT = Unit.SEASONED_SCOUT;
+
+
+    /** The kind of settlement this is.
+        TODO: this information should be moved to the IndianPlayer class (that doesn't
+              exist yet). */
+
     private int food = 0;
+
     private int kind;
+
+    /** The tribe that owns this settlement. */
     private int tribe;
+
+    /**
+    * This is the skill that can be learned by Europeans at this settlement.
+    * At the server side its value will always be NONE or any of the skills above.
+    * At the client side the value UNKNOWN is also possible in case the player hasn't
+    * checked out the settlement yet.
+    * The value NONE is used when the skill has already been taught to a European.
+    */
+    private int learnableSkill;
+
     private boolean isCapital;
     private UnitContainer unitContainer;
 
@@ -70,6 +102,7 @@ public class IndianSettlement extends Settlement {
         }
 
         this.kind = kind;
+        this.learnableSkill = generateSkillForLocation(tile);
         this.isCapital = isCapital;
     }
 
@@ -86,10 +119,73 @@ public class IndianSettlement extends Settlement {
         super(game, element);
 
         readFromXMLElement(element);
+
+        // The client doesn't know the skill at first.
+        this.learnableSkill = UNKNOWN;
     }
 
 
 
+    /**
+    * Generates a skill that could be taught from a settlement on the given Tile.
+    * TODO: This method should be properly implemented. The surrounding terrain
+    *       should be taken into account and it should be partially randomized.
+    * @param tile The tile where the settlement will be located.
+    * @return A skill that can be taught to Europeans.
+    */
+    private int generateSkillForLocation(Tile tile) {
+        int skill;
+        switch (tile.getType()) {
+            case Tile.PLAINS:
+                skill = MASTER_COTTON_PLANTER;
+                break;
+            case Tile.GRASSLANDS:
+                skill = MASTER_TOBACCO_PLANTER;
+                break;
+            case Tile.PRAIRIE:
+                skill = MASTER_COTTON_PLANTER;
+                break;
+            case Tile.SAVANNAH:
+                skill = MASTER_SUGAR_PLANTER;
+                break;
+            case Tile.MARSH:
+                skill = EXPERT_FARMER;
+                break;
+            case Tile.SWAMP:
+                skill = MASTER_TOBACCO_PLANTER;
+                break;
+            case Tile.DESERT:
+                skill = SEASONED_SCOUT;
+                break;
+            case Tile.TUNDRA:
+                skill = EXPERT_SILVER_MINER;
+                break;
+            case Tile.ARCTIC:
+                skill = EXPERT_FISHERMAN;
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid tile provided: Tile type is invalid");
+        }
+        return skill;
+    }
+
+
+    /**
+    * Returns the skill that can be learned at this settlement.
+    * @return The skill that can be learned at this settlement.
+    */
+    public int getLearnableSkill() {
+        return learnableSkill;
+    }
+
+
+    /**
+    * Sets the learnable skill for this Indian settlement.
+    * @param skill The new learnable skill for this Indian settlement.
+    */
+    public void setLearnableSkill(int skill) {
+        learnableSkill = skill;
+    }
 
 
     /**
@@ -126,7 +222,7 @@ public class IndianSettlement extends Settlement {
     public boolean isCapital() {
         return isCapital;
     }
-    
+
     public void setCapital(boolean isCapital) {
         this.isCapital = isCapital;
     }
@@ -171,8 +267,8 @@ public class IndianSettlement extends Settlement {
     public Iterator getUnitIterator() {
         return unitContainer.getUnitIterator();
     }
-    
-    
+
+
 
     public Unit getFirstUnit() {
         return unitContainer.getFirstUnit();
@@ -221,7 +317,7 @@ public class IndianSettlement extends Settlement {
         }
     }
 
-    
+
     public boolean canAdd(Locatable locatable) {
         return true;
     }
@@ -237,17 +333,17 @@ public class IndianSettlement extends Settlement {
                 workers--;
             }
         }
-    
+
         // TODO: Create a unit if food>=300, but not if a maximum number of units is reaced.
     }
-    
-    
+
+
     public void dispose() {
         unitContainer.dispose();
         getTile().setSettlement(null);
         super.dispose();
     }
-    
+
 
     /**
     * Make a XML-representation of this object.
@@ -263,6 +359,8 @@ public class IndianSettlement extends Settlement {
         indianSettlementElement.setAttribute("owner", owner.getID());
         indianSettlementElement.setAttribute("tribe", Integer.toString(tribe));
         indianSettlementElement.setAttribute("kind", Integer.toString(kind));
+        // By default learnableSkill is not sent over the network. The user needs to visit
+        // the settlement with a free colonist or a scout in order to obtain this information.
         indianSettlementElement.setAttribute("isCapital", Boolean.toString(isCapital));
         indianSettlementElement.setAttribute("food", Integer.toString(food));
 
@@ -284,8 +382,9 @@ public class IndianSettlement extends Settlement {
         owner = (Player)getGame().getFreeColGameObject(indianSettlementElement.getAttribute("owner"));
         tribe = Integer.parseInt(indianSettlementElement.getAttribute("tribe"));
         kind = Integer.parseInt(indianSettlementElement.getAttribute("kind"));
+        // learnableSkill is not in the network message. See toXMLElement for details.
         isCapital = (new Boolean(indianSettlementElement.getAttribute("isCapital"))).booleanValue();
-        
+
         if (indianSettlementElement.hasAttribute("food")) {
             food = Integer.parseInt(indianSettlementElement.getAttribute("food"));
         } else {

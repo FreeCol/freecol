@@ -111,7 +111,7 @@ public class Map extends FreeColGameObject {
                 return true;
             }
         }
-        
+
         return false;
     }
 
@@ -187,8 +187,8 @@ public class Map extends FreeColGameObject {
             throw new IllegalArgumentException("Illegal coordinate (" + x + ", " + y + ")");
         }
     }
-    
-    
+
+
     /**
     * Sets the given tile the the given coordinates.
     *
@@ -298,7 +298,7 @@ public class Map extends FreeColGameObject {
         return result;
     }
 
-    
+
     /**
     * Creates an array of the eight directions in a random order.
     * @return The array.
@@ -315,8 +315,37 @@ public class Map extends FreeColGameObject {
             directions[r1] = directions[r2];
             directions[r2] = temp;
         }
-        
+
         return directions;
+    }
+
+
+    /**
+    * Returns the reverse direction of the given direction.
+    * @param direction The direction to get the reverse of.
+    * @return The reverse direction of the given direction.
+    */
+    public static int getReverseDirection(int direction) {
+        switch (direction) {
+            case N:
+                return S;
+            case NE:
+                return SW;
+            case E:
+                return W;
+            case SE:
+                return NW;
+            case S:
+                return N;
+            case SW:
+                return NE;
+            case W:
+                return E;
+            case NW:
+                return SE;
+            default:
+                throw new IllegalArgumentException("Invalid direction received.");
+        }
     }
 
 
@@ -414,7 +443,7 @@ public class Map extends FreeColGameObject {
         return ((x >= 0) && (x < getWidth()) && (y >= 0) && (y < getHeight()));
     }
 
-    
+
     /**
      * Gets the distance in tiles between two map positions.
      * With an isometric map this is a non-trivial task.  The formula
@@ -461,7 +490,7 @@ public class Map extends FreeColGameObject {
     public static final class Position {
         private final int x, y;
 
-        
+
 
         /**
          * Creates a new object with the given position.
@@ -473,7 +502,7 @@ public class Map extends FreeColGameObject {
             y = posY;
         }
 
-        
+
 
         /**
          * Returns the x-coordinate of this Position.
@@ -616,8 +645,8 @@ public class Map extends FreeColGameObject {
     }
 
 
-    
-    
+
+
 
     private final class AdjacentIterator extends MapIterator {
         // The starting tile position
@@ -664,8 +693,8 @@ public class Map extends FreeColGameObject {
     }
 
 
-    
-    
+
+
 
     private final class FloodFillIterator extends MapIterator {
         // The center of the circles to use
@@ -713,8 +742,8 @@ public class Map extends FreeColGameObject {
         }
     }
 
-    
-    
+
+
 
 
     private final class CircleIterator extends MapIterator {
@@ -765,7 +794,7 @@ public class Map extends FreeColGameObject {
                 normal(p, type - 1, r);
                 normal(p, type+1==8?0:type+1, r);
                 p = getAdjacent(p, type);
-                
+
                 if (isFilled && isValid(p)) {
                     positions.add(p);
                 }
@@ -799,7 +828,7 @@ public class Map extends FreeColGameObject {
             return positionIterator.hasNext();
         }
 
-        
+
         /**
          * Obtain the next position to iterate over.
          * @return Next position
@@ -809,8 +838,8 @@ public class Map extends FreeColGameObject {
         }
     }
 
-    
-    
+
+
 
 
     private final class BorderAdjacentIterator extends MapIterator {
@@ -858,13 +887,13 @@ public class Map extends FreeColGameObject {
         }
     }
 
-    
+
 
     public void newTurn() {
 
     }
-        
-    
+
+
     /**
     * Make a XML-representation of this object.
     *
@@ -881,7 +910,7 @@ public class Map extends FreeColGameObject {
         Iterator tileIterator = getWholeMapIterator();
         while (tileIterator.hasNext()) {
             Tile tile = getTile((Position) tileIterator.next());
-            
+
             if (showAll || player.hasExplored(tile)) {
                 mapElement.appendChild(tile.toXMLElement(player, document, showAll, toSavedGame));
             } else {

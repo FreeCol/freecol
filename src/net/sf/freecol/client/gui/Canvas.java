@@ -35,6 +35,7 @@ import net.sf.freecol.client.gui.panel.VictoryPanel;
 import net.sf.freecol.client.gui.panel.ChooseFoundingFatherDialog;
 import net.sf.freecol.client.gui.panel.EventPanel;
 import net.sf.freecol.client.gui.panel.EmigrationPanel;
+import net.sf.freecol.client.gui.panel.IndianSettlementPanel;
 
 import net.sf.freecol.client.gui.panel.MapControls;
 
@@ -51,6 +52,7 @@ import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.ModelMessage;
+import net.sf.freecol.common.model.IndianSettlement;
 
 import net.sf.freecol.client.FreeColClient;
 
@@ -108,6 +110,7 @@ public final class Canvas extends JLayeredPane {
     private final StartGamePanel    startGamePanel;
     private final QuitDialog        quitDialog;
     private final ColonyPanel       colonyPanel;
+    private final IndianSettlementPanel indianSettlementPanel;
     private final EuropePanel       europePanel;
     private final StatusPanel       statusPanel;
     private final ChatPanel         chatPanel;
@@ -147,6 +150,7 @@ public final class Canvas extends JLayeredPane {
         startGamePanel = new StartGamePanel(this, freeColClient);
         quitDialog = new QuitDialog(this);
         colonyPanel = new ColonyPanel(this, freeColClient);
+        indianSettlementPanel = new IndianSettlementPanel();
 
         europePanel = new EuropePanel(this, freeColClient, freeColClient.getInGameController());
         statusPanel = new StatusPanel(this);
@@ -363,8 +367,27 @@ public final class Canvas extends JLayeredPane {
     * @see FreeColDialog
     */
     public boolean showConfirmDialog(String text, String okText, String cancelText) {
+        return showConfirmDialog(text, okText, cancelText, null);
+    }
+
+
+    /**
+    * Displays a dialog with a text and a ok/cancel option.
+    *
+    * @param text The text that explains the choice for the user.
+    * @param okText The text displayed on the "ok"-button.
+    * @param cancelText The text displayed on the "cancel"-button.
+    * @param textParameter A string that will be inserted somewhere in the text.
+    * @return <i>true</i> if the user clicked the "ok"-button
+    *         and <i>false</i> otherwise.
+    * @see FreeColDialog
+    */
+    public boolean showConfirmDialog(String text, String okText, String cancelText, String textParameter) {
         try {
             text = Messages.message(text);
+            if (textParameter != null) {
+                text = text.replaceAll("%replace%", textParameter);
+            }
             okText = Messages.message(okText);
             cancelText = Messages.message(cancelText);
         } catch (MissingResourceException e) {
@@ -603,6 +626,29 @@ public final class Canvas extends JLayeredPane {
         add(colonyPanel);
 
         colonyPanel.requestFocus();
+    }
+
+
+    /**
+    * Displays the indian settlement panel of the given <code>IndianSettlement</code>.
+    * @param settlement The indian settlement whose panel needs to be displayed.
+    * @see IndianSettlement
+    */
+    public void showIndianSettlementPanel(IndianSettlement settlement) {
+        closeMenus();
+
+        indianSettlementPanel.initialize(settlement);
+        indianSettlementPanel.setLocation(
+                                getWidth() / 2 - indianSettlementPanel.getWidth() / 2,
+                                getHeight() / 2 - indianSettlementPanel.getHeight() / 2);
+
+        add(indianSettlementPanel);
+
+        indianSettlementPanel.requestFocus();
+
+        indianSettlementPanel.getResponseBoolean();
+
+        remove(indianSettlementPanel);
     }
 
 

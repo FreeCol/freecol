@@ -84,12 +84,16 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                             TO_AMERICA = 8;
 
 
+    // The move types
     public static final int MOVE = 0,
                             MOVE_HIGH_SEAS = 1,
                             ATTACK = 2,
                             EMBARK = 3,
                             DISEMBARK = 4,
-                            ILLEGAL_MOVE = 5;
+                            ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST = 5,
+                            ENTER_INDIAN_VILLAGE_WITH_SCOUT = 6,
+                            ENTER_INDIAN_VILLAGE_WITH_MISSIONARY = 7,
+                            ILLEGAL_MOVE = 8;
 
     public static final int ATTACKER_LOSS = 0,
                             ATTACKER_WIN  = 1;
@@ -118,15 +122,15 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     private int             trainingType = -1;
 
 
-    
+
     /**
     * This constructor should only be used by subclasses.
     */
     protected Unit() {
-    
+
     }
 
-    
+
     /**
     * Initiate a new <code>Unit</code> of a specified type with the state set
     * to {@link #ACTIVE} if a carrier and {@link #SENTRY} otherwise. The
@@ -161,7 +165,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         this.movesLeft = getInitialMovesLeft();
 
         setLocation(location);
-                
+
         state = s;
         workLeft = -1;
         workType = Goods.FOOD;
@@ -218,7 +222,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         }
     }
 
-    
+
     /**
      * the current amount of treasure in this unit.
      * Should be type of TREASURE_TRAIN.
@@ -231,8 +235,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             throw new IllegalStateException();
         }
     }
-    
-    
+
+
     /**
     * Checks if this <code>Unit</code> is a colonist. A <code>Unit</code>
     * is a colonist if it can build a new <code>Colony</code>.
@@ -430,6 +434,26 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
 
         if (target.getMoveCost(getTile()) > getMovesLeft() + 1 && getMovesLeft() < getInitialMovesLeft()) {
             return ILLEGAL_MOVE;
+        }
+
+        // Check for entering indian village.
+        if ((target.getSettlement() != null)
+                && (target.getSettlement() instanceof IndianSettlement)
+                && !isArmed()
+                && (getNumberOfTools() == 0)
+                /* TODO: CHECK IF YOU'RE ALLOWED IN THE VILLAGE (=no war with indians) */) {
+            if (isMounted()) {
+                return ENTER_INDIAN_VILLAGE_WITH_SCOUT;
+            }
+            else if (isMissionary()) {
+                return ENTER_INDIAN_VILLAGE_WITH_MISSIONARY;
+            }
+            else if (getType() == FREE_COLONIST) {
+                return ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST;
+            }
+            else {
+                return ILLEGAL_MOVE;
+            }
         }
 
         // Check for an 'attack' instead of 'move'.
@@ -630,7 +654,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         } else {
             throw new IllegalStateException("A unit may only leave a ship while in a harbour.");
         }
-        
+
         setState(ACTIVE);
     }
 
@@ -765,7 +789,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             return 0;
         }
     }
-    
+
 
     /**
     * Gets the first <code>Unit</code> beeing carried by this <code>Unit</code>.
@@ -820,18 +844,18 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             return (new ArrayList()).iterator();
         }
     }
-        
+
     public GoodsContainer getGoodsContainer() {
         return goodsContainer;
     }
-        
+
     /**
-    * Sets this <code>Unit</code> to work in the 
+    * Sets this <code>Unit</code> to work in the
     * specified <code>WorkLocation</code>.
     *
     * @param workLocation The place where this <code>Unit</code> shall
     *                     be out to work.
-    * @exception IllegalStateException If the <code>workLocation</code> is 
+    * @exception IllegalStateException If the <code>workLocation</code> is
     *            on another {@link Tile} than this <code>Unit</code>.
     */
     public void work(WorkLocation workLocation) {
@@ -867,7 +891,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             Iterator tileIterator = getGame().getMap().getAdjacentIterator(getTile().getPosition());
             while (tileIterator.hasNext()) {
                 Tile t = getGame().getMap().getTile((Position) tileIterator.next());
-                
+
                 if (t == null) {
                     continue;
                 }
@@ -877,7 +901,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                     System.out.println("Tile: " + t);
                     System.out.flush();
                 }
-                
+
                 if (getOwner() == null) {
                     throw new NullPointerException();
                 }
@@ -920,7 +944,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         }
     }
 
-    
+
     /**
     * Checks if this unit can be armed in the current location.
     */
@@ -955,7 +979,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     * Checks if this unit can be dressed as a missionary at the current location.
     */
     public boolean canDressAsMissionary() {
-        return isMissionary() || ((location instanceof Europe || location instanceof Unit && ((Unit) location).getLocation() 
+        return isMissionary() || ((location instanceof Europe || location instanceof Unit && ((Unit) location).getLocation()
                instanceof Europe) || getTile() != null && getTile().getColony().getBuilding(Building.CHURCH).isBuilt());
     }
 
@@ -967,7 +991,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     */
     public void setArmed(boolean b, boolean isCombat) {
         setMovesLeft(0);
-        
+
         if (isCombat) {
             armed = b; // No questions asked.
             return;
@@ -1034,7 +1058,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     */
     public void setMounted(boolean b, boolean isCombat) {
         setMovesLeft(0);
-        
+
         if (isCombat) {
             mounted = b; // No questions asked.
             return;
@@ -1044,7 +1068,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             if (isPioneer()) {
                 setNumberOfTools(0);
             }
-            
+
             if (isMissionary()) {
                 setMissionary(false);
             }
@@ -1131,10 +1155,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         return missionary;
     }
 
-    
+
     /**
     * Buys goods of a specified type and amount and adds it to this <code>Unit</code>.
-    * Can only be used when the <code>Unit</code> is a carrier and is located in 
+    * Can only be used when the <code>Unit</code> is a carrier and is located in
     * {@link Europe}.
     *
     * @param type The type of goods to buy.
@@ -1182,7 +1206,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         if (numberOfTools > 100) {
             numberOfTools = 100;
         }
-        
+
         if ((numberOfTools % 20) != 0) {
             //logger.warning("Attempting to give a pioneer a number of tools that is not a multiple of 20!");
             numberOfTools -= (numberOfTools % 20);
@@ -1594,7 +1618,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         if (movesLeft%3 == 0 || movesLeft/3 > 0) {
             moves += Integer.toString(movesLeft/3);
         }
-        
+
         if (movesLeft%3 != 0) {
             if (movesLeft/3 > 0) {
                 moves += " ";
@@ -1629,7 +1653,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     public int getState() {
         return state;
     }
-    
+
 
     /**
     * Sets a new state for this Unit.
@@ -1832,7 +1856,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
 
         getTile().setSettlement(colony);
         setLocation(colony);
-        
+
         if (isArmed()) setArmed(false);
         if (isMounted()) setMounted(false);
         if (isPioneer()) setNumberOfTools(0);
@@ -1979,7 +2003,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         }
     }
 
-    
+
     /**
     * Gets the <code>Location</code> in which this unit will be put
     * when returning from {@link Europe}. If this <code>Unit</code>
@@ -2048,7 +2072,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                 return false;
         }
     }
-    
+
 
     /**
     * Returns the price of this unit in Europe.
@@ -2173,7 +2197,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                 base_power = 1;
                 break;
         }
-        
+
         if (getOwner().hasFather(FoundingFather.PAUL_REVERE) && getTile() != null && getTile().getColony() != null) {
             if (isColonist() && base_power == 1 && (getLocation() instanceof ColonyTile || getLocation() instanceof Building)) {
                 base_power = 2;
@@ -2534,7 +2558,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         if (location == null) {
             return null;
         }
-        
+
         if (!(location instanceof Colony)) {
             return null;
         } else {
@@ -2542,7 +2566,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         }
     }
 
-    
+
     /**
     * Clear the speciality of a <code>Unit</code>. That is, makes it a
     * <code>FREE_COLONIST</code>
@@ -2665,13 +2689,13 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                     base = 3;
                 } else {
                     base = 0; // Can't work if you're not a colonist.
-                }                
+                }
         }
 
         if (base == 0) {
             return 0;
         }
-        
+
         //base += getTile().getColony().getProductionBonus();
         return Math.max(base, 1);
     }
@@ -2689,7 +2713,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         if (tile == null) {
             throw new NullPointerException();
         }
-        
+
         int base = tile.potential(goods);
         switch (type) {
             case EXPERT_FARMER:
@@ -2908,13 +2932,13 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         owner = (Player) getGame().getFreeColGameObject(unitElement.getAttribute("owner"));
         turnsOfTraining = Integer.parseInt(unitElement.getAttribute("turnsOfTraining"));
         trainingType = Integer.parseInt(unitElement.getAttribute("trainingType"));
-        
+
         if (unitElement.hasAttribute("treasureAmount")) {
             treasureAmount = Integer.parseInt(unitElement.getAttribute("treasureAmount"));
         } else {
             treasureAmount = 0;
         }
-        
+
         if (unitElement.hasAttribute("workType")) {
             workType = Integer.parseInt(unitElement.getAttribute("workType"));
         }
@@ -2922,14 +2946,14 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         if (owner == null) {
             logger.warning("VERY BAD: Can't find player with ID " + unitElement.getAttribute("owner") + "!");
         }
-        
+
         if (unitElement.hasAttribute("entryLocation")) {
             entryLocation = (Location) getGame().getFreeColGameObject(unitElement.getAttribute("entryLocation"));
         }
 
         if (unitElement.hasAttribute("location")) {
             location = (Location) getGame().getFreeColGameObject(unitElement.getAttribute("location"));
-            
+
             /*
              In this case, 'location == null' can only occur if the location specified in the
              XML-Element does not exists:

@@ -33,8 +33,8 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
     private boolean hasAnItem = false;
 
 
-    
-    
+
+
 
 
     /**
@@ -54,21 +54,27 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
         while (unitIterator.hasNext()) {
             Unit u = (Unit) unitIterator.next();
             addUnit(u);
-            
+
             Iterator childUnitIterator = u.getUnitIterator();
             while (childUnitIterator.hasNext()) {
                 addUnit((Unit) childUnitIterator.next());
             }
         }
 
-        if (tile.getSettlement() != null && (tile.getSettlement().getOwner() == freeColClient.getMyPlayer())) {
-            addColony(((Colony) tile.getSettlement()));
+        Settlement settlement = tile.getSettlement();
+        if (settlement != null) {
+            if (settlement.getOwner() == freeColClient.getMyPlayer()) {
+                addColony(((Colony) settlement));
+            }
+            else if (settlement instanceof IndianSettlement) {
+                addIndianSettlement((IndianSettlement) settlement);
+            }
         }
     }
 
-    
-    
-    
+
+
+
 
     /**
     * Adds a unit entry to this popup.
@@ -94,8 +100,27 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
         add(menuItem);
         hasAnItem = true;
     }
-    
-    
+
+
+    /**
+    * Adds an indian settlement entry to this popup.
+    * @param settlement The Indian settlement that will be represented on the popup.
+    */
+    private void addIndianSettlement(IndianSettlement settlement) {
+        JMenuItem menuItem = new JMenuItem(
+                settlement.getOwner().getNationAsString() + " settlement");
+        menuItem.setActionCommand("indianSettlement");
+        menuItem.addActionListener(this);
+        add(menuItem);
+        hasAnItem = true;
+    }
+
+
+    /**
+    * Returns true if this popup has at least one menuitem so that we know that we can
+    * show it to the user. Returns false if there are no menuitems.
+    * @return true if this popup has at least one menuitem, false otherwise.
+    */
     public boolean hasItem() {
         return hasAnItem;
     }
@@ -120,6 +145,8 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
             gui.setActiveUnit((Unit) freeColClient.getGame().getFreeColGameObject(unitId));
         } else if (command == "colony") {
             canvas.showColonyPanel((Colony) tile.getSettlement());
+        } else if (command == "indianSettlement") {
+            canvas.showIndianSettlementPanel((IndianSettlement) tile.getSettlement());
         } else {
             logger.warning("Invalid actioncommand.");
         }

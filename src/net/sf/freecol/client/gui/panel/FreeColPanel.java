@@ -21,22 +21,22 @@ public class FreeColPanel extends JPanel {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    public static final HIGConstraints higConst = new HIGConstraints();
+    protected static final HIGConstraints higConst = new HIGConstraints();
 
     private static final int cancelKeyCode = KeyEvent.VK_ESCAPE;
-    
+
     /**
     * Default constructor.
     */
     public FreeColPanel() {
         this(new FlowLayout());
     }
-    
-    
+
+
     /**
     * Default constructor.
     */
-    public FreeColPanel(LayoutManager layout) {    
+    public FreeColPanel(LayoutManager layout) {
         super(layout);
 
         setFocusCycleRoot(true);
@@ -44,7 +44,7 @@ public class FreeColPanel extends JPanel {
         setBorder( new CompoundBorder(new BevelBorder(BevelBorder.RAISED), new EmptyBorder(5,5,5,5)) );
     }
 
-    
+
     public void setCancelComponent(AbstractButton c) {
         if (c == null) {
             throw new NullPointerException();
