@@ -315,7 +315,11 @@ public class FreeColDialog extends FreeColPanel {
 
         okButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                loadDialog.setResponse(((FileList.FileListEntry) fileList.getSelectedValue()).getFile());
+                if (fileList.getModel().getSize() > 0) {
+                    loadDialog.setResponse(((FileList.FileListEntry) fileList.getSelectedValue()).getFile());
+                } else {
+                    loadDialog.setResponse(null);
+                }
             }
         });
 
