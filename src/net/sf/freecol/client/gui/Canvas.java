@@ -809,7 +809,9 @@ public final class Canvas extends JLayeredPane {
             mapControls.removeFromComponent(this);
         }
 
-        remove(jMenuBar);
+        if (jMenuBar != null) {
+            remove(jMenuBar);
+        }
     }
 
 
