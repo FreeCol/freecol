@@ -21,10 +21,7 @@ public final class ServerUnit extends Unit implements ServerModelObject {
     
     /** What we want this unit to do. */
     private int mission = MISSION_STAND;
-    
-    /** Where to send our actions. */
-    private DummyConnection connection;
-    
+
     private String serverID;
 
 
@@ -36,11 +33,10 @@ public final class ServerUnit extends Unit implements ServerModelObject {
     * @param The <code>Game</code> in which this <code>Unit</code> belong.
     * @param owner The Player owning the unit.
     * @param type The type of the unit.
-    * @param connection The connection to send data through.
     */
 
-    public ServerUnit(Game game, Player owner, int type, DummyConnection connection) {
-        this(game, null, owner, type, isCarrier(type)?ACTIVE:SENTRY, connection);
+    public ServerUnit(Game game, Player owner, int type) {
+        this(game, null, owner, type, isCarrier(type)?ACTIVE:SENTRY);
     }
 
     /**
@@ -53,24 +49,7 @@ public final class ServerUnit extends Unit implements ServerModelObject {
     * @param s The initial state for this Unit (one of {@link #ACTIVE}, {@link #FORTIFY}...).
     */
     public ServerUnit(Game game, Location location, Player owner, int type, int s) {
-        this(game, location, owner, type, s, null);
-    }
-
-
-    /**
-    * Initiate a new <code>Unit</code> with the specified parameters.
-    *
-    * @param The <code>Game</code> in which this <code>Unit</code> belong.
-    * @param location The <code>Location/code> to place this <code>Unit</code> upon.
-    * @param owner The <code>Player</code> owning this unit.
-    * @param type The type of the unit.
-    * @param s The initial state for this Unit (one of {@link #ACTIVE}, {@link #FORTIFY}...).
-    * @param connection The connection to send data through.
-    */
-    public ServerUnit(Game game, Location location, Player owner, int type, int s, DummyConnection connection) {
         super(game, location, owner, type, s);
-        
-        this.connection = connection;
     }
 
     
@@ -119,7 +98,7 @@ public final class ServerUnit extends Unit implements ServerModelObject {
                     Element moveElement = Message.createNewRootElement("move");
                     moveElement.setAttribute("unit", this.getID());
                     moveElement.setAttribute("direction", Integer.toString(direction));
-                    connection.handleAndSendReply(moveElement);
+                    ((ServerPlayer) getOwner()).getConnection().handleAndSendReply(moveElement);
                 }
                 return;
         }

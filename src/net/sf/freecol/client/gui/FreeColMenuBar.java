@@ -55,14 +55,13 @@ public class FreeColMenuBar extends JMenuBar {
             }
         });
 
-        JMenuItem openMenuItem = new JMenuItem("Load");
+        JMenuItem openMenuItem = new JMenuItem("Open");
         openMenuItem.setOpaque(false);
         openMenuItem.setMnemonic(KeyEvent.VK_O);
         openMenuItem.setAccelerator(KeyStroke.getKeyStroke('O', InputEvent.CTRL_MASK));
         gameMenu.add(openMenuItem);
         openMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // TODO: show a confirmation dialog and quit the game
                 freeColClient.getInGameController().loadGame();
             }
         });
@@ -79,6 +78,19 @@ public class FreeColMenuBar extends JMenuBar {
         });
         inGameOptions.add(saveMenuItem);
         
+        gameMenu.addSeparator();
+
+        JMenuItem reconnectMenuItem = new JMenuItem("Reconnect");
+        reconnectMenuItem.setOpaque(false);
+        reconnectMenuItem.setMnemonic(KeyEvent.VK_R);
+        reconnectMenuItem.setAccelerator(KeyStroke.getKeyStroke('R', InputEvent.CTRL_MASK));
+        gameMenu.add(reconnectMenuItem);
+        reconnectMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                freeColClient.getConnectController().reconnect();
+            }
+        });
+
         gameMenu.addSeparator();
 
         JMenuItem quitMenuItem = new JMenuItem("Quit");
@@ -117,6 +129,19 @@ public class FreeColMenuBar extends JMenuBar {
         });
         inGameOptions.add(mcMenuItem);
         mapControlOptions.add(mcMenuItem);
+
+        final JCheckBoxMenuItem dtnMenuItem = new JCheckBoxMenuItem("Display tile names");
+        dtnMenuItem.setOpaque(false);
+        dtnMenuItem.setMnemonic(KeyEvent.VK_D);
+        dtnMenuItem.setAccelerator(KeyStroke.getKeyStroke('D', InputEvent.CTRL_MASK));
+        viewMenu.add(dtnMenuItem);
+        dtnMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                freeColClient.getGUI().setDisplayTileNames(((JCheckBoxMenuItem) e.getSource()).isSelected());
+                freeColClient.getCanvas().refresh();
+            }
+        });
+        inGameOptions.add(dtnMenuItem);
 
         viewMenu.addSeparator();
 
@@ -176,6 +201,10 @@ public class FreeColMenuBar extends JMenuBar {
     * Updates this <code>FreeColMenuBar</code>.
     */
     public void update() {
+        if (!freeColClient.getGUI().isInGame()) {
+            return;
+        }
+
         boolean enabled = (freeColClient.getGUI().getActiveUnit() != null)
                           && !canvas.getColonyPanel().isShowing()
                           && !canvas.getEuropePanel().isShowing();

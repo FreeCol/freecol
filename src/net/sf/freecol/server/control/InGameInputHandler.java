@@ -128,11 +128,18 @@ public final class InGameInputHandler extends InputHandler {
                 }
             }
         } catch (Exception e) {
-            // TODO: Force the client to reconnect.
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
 
             logger.warning(sw.toString());
+
+            Element reconnect = Message.createNewRootElement("reconnect");
+            
+            try {
+                connection.send(reconnect);
+            } catch (IOException ex) {
+                logger.warning("Could not send reconnect message!");
+            }
 
             return null;
         }
@@ -1119,11 +1126,26 @@ public final class InGameInputHandler extends InputHandler {
         */
         player.setConnected(false);
 
-        if (getFreeColServer().getGame().getCurrentPlayer() == player) {
+
+        if (getFreeColServer().getGame().getCurrentPlayer() == player && !getFreeColServer().isSingleplayer() && isHumanPlayersLeft()) {
             getFreeColServer().getInGameController().endTurn(player);
         }
 
         return null;
+    }
+
+    
+    private boolean isHumanPlayersLeft() {
+        Iterator playerIterator = getFreeColServer().getGame().getPlayerIterator();
+        while (playerIterator.hasNext()) {
+            Player p = (Player) playerIterator.next();
+
+            if (!p.isDead() && !p.isAI()) {
+                return true;
+            }
+        }
+        
+        return false;
     }
 
 

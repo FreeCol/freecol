@@ -13,6 +13,7 @@ import org.w3c.dom.*;
 // Networking:
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.server.networking.DummyConnection;
 
 // Control:
 import net.sf.freecol.server.control.Controller;
@@ -22,6 +23,7 @@ import net.sf.freecol.server.control.PreGameInputHandler;
 import net.sf.freecol.server.control.InGameInputHandler;
 import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.control.ServerModelController;
+import net.sf.freecol.server.control.AIInGameInputHandler;
 
 // Model:
 import net.sf.freecol.server.networking.Server;
@@ -130,8 +132,6 @@ public final class FreeColServer {
 
         modelController = new ServerModelController(this);
 
-        owner = loadGame(file);
-
         userConnectionHandler = new UserConnectionHandler(this);
         preGameController = new PreGameController(this);
         preGameInputHandler = new PreGameInputHandler(this);
@@ -145,6 +145,8 @@ public final class FreeColServer {
             logger.warning("Exception while starting server: " + e);
             throw e;
         }
+        
+        owner = loadGame(file);
     }    
 
 
@@ -172,6 +174,7 @@ public final class FreeColServer {
         Document document = savedGameElement.getOwnerDocument();
         
         savedGameElement.setAttribute("owner", username);
+        savedGameElement.setAttribute("singleplayer", Boolean.toString(singleplayer));
                 
         // Add server side model information:
         Element serverObjectsElement = document.createElement("serverObjects");
@@ -206,6 +209,8 @@ public final class FreeColServer {
         Element savedGameElement = message.getDocument().getDocumentElement();
         Element serverObjectsElement = (Element) savedGameElement.getElementsByTagName("serverObjects").item(0);
         
+        singleplayer = Boolean.valueOf(savedGameElement.getAttribute("singleplayer")).booleanValue();
+
         ArrayList serverObjects = new ArrayList();
         
         NodeList serverObjectsNodeList = serverObjectsElement.getChildNodes();
@@ -223,9 +228,21 @@ public final class FreeColServer {
         
         gameState = IN_GAME;
         
+        Iterator playerIterator = game.getPlayerIterator();
+        while (playerIterator.hasNext()) {
+            ServerPlayer player = (ServerPlayer) playerIterator.next();
+            if (player.isAI()) {
+                DummyConnection theConnection = new DummyConnection(getInGameInputHandler(), null);
+                theConnection.setOutgoingMessageHandler(new AIInGameInputHandler(this, player));
+                getServer().addConnection(theConnection, -1);
+                player.setConnection(theConnection);
+                player.setConnected(true);
+            }
+        }
+
         return savedGameElement.getAttribute("owner");
-    }    
-    
+    }
+
         
     /**
     * Sets the mode of the game: singleplayer/multiplayer.

@@ -90,12 +90,14 @@ public final class InGameController extends Controller {
             freeColServer.getServer().sendToAll(newTurnElement, null);
         }
 
-        try {
-            Element updateElement = Message.createNewRootElement("update");
-            updateElement.appendChild(game.getMarket().toXMLElement(nextPlayer, updateElement.getOwnerDocument()));
-            nextPlayer.getConnection().send(updateElement);
-        } catch (IOException e) {
-            logger.warning("Could not send message to: " + nextPlayer.getName() + " with connection " + nextPlayer.getConnection());
+        if (nextPlayer.isEuropean()) {
+            try {
+                Element updateElement = Message.createNewRootElement("update");
+                updateElement.appendChild(game.getMarket().toXMLElement(nextPlayer, updateElement.getOwnerDocument()));
+                nextPlayer.getConnection().send(updateElement);
+            } catch (IOException e) {
+                logger.warning("Could not send message to: " + nextPlayer.getName() + " with connection " + nextPlayer.getConnection());
+            }
         }
 
         game.setCurrentPlayer(nextPlayer);
@@ -103,7 +105,7 @@ public final class InGameController extends Controller {
         Element setCurrentPlayerElement = Message.createNewRootElement("setCurrentPlayer");
         setCurrentPlayerElement.setAttribute("player", nextPlayer.getID());
         freeColServer.getServer().sendToAll(setCurrentPlayerElement, null);
-        
+
         // Ask the player to choose a founding father if none has been choosen:
         if (nextPlayer.isEuropean() && nextPlayer.getCurrentFather() == -1) {
             chooseFoundingFather(nextPlayer);

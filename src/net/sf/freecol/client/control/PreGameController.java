@@ -159,7 +159,9 @@ public final class PreGameController {
 
         Unit activeUnit = freeColClient.getMyPlayer().getNextActiveUnit();
         gui.setActiveUnit(activeUnit);
-        gui.setFocus(activeUnit.getTile().getPosition());
+        if (activeUnit != null) {
+            gui.setFocus(activeUnit.getTile().getPosition());
+        }
 
         canvas.addKeyListener(new CanvasKeyListener(canvas, inGameController, mapControls));
         canvas.addMouseListener(new CanvasMouseListener(canvas, gui));

@@ -92,6 +92,8 @@ public final class GUI {
     MESSAGE_COUNT = 3,
     MESSAGE_AGE = 10000; // The amount of time before a message gets deleted (in milliseconds).
 
+    private boolean displayTileNames = false;
+
     // Debug variables:
     boolean displayCoordinates = false;
 
@@ -1174,6 +1176,28 @@ public final class GUI {
             }
         }
 
+        if (displayTileNames) {
+            String tileName = tile.getName();
+            g.setColor(Color.BLACK);
+            int b = getBreakingPoint(tileName);
+            if (b == -1) {
+                g.drawString(tileName, x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(tileName))/2, y + (lib.getTerrainImageHeight(tile.getType())/2));
+                /* Takes to much resources:
+                BufferedImage stringImage = createStringImage(g, tileName, Color.BLACK, lib.getTerrainImageWidth(tile.getType()), 10);
+                g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType())/2 - stringImage.getHeight()/2, null);
+                */
+            } else {
+                g.drawString(tileName.substring(0, b), x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(tileName.substring(0, b)))/2, y + lib.getTerrainImageHeight(tile.getType())/2 - (g.getFontMetrics().getAscent()*2)/3);
+                g.drawString(tileName.substring(b+1), x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(tileName.substring(b+1)))/2, y + lib.getTerrainImageHeight(tile.getType())/2 + (g.getFontMetrics().getAscent()*2)/3);
+                /* Takes to much resources:
+                BufferedImage stringImage = createStringImage(g, tileName.substring(0, b), Color.BLACK, lib.getTerrainImageWidth(tile.getType()), 10);
+                g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType())/2 - (stringImage.getHeight()) - 5, null);
+                stringImage = createStringImage(g, tileName.substring(b+1), Color.BLACK, lib.getTerrainImageWidth(tile.getType()), 10);
+                g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType())/2 - 5, null);
+                */
+            }
+        }
+
         if (tile.getPosition().equals(selectedTile)) {
             g.drawImage(lib.getMiscImage(ImageLibrary.UNIT_SELECT), x, y, null);
         }
@@ -1181,6 +1205,39 @@ public final class GUI {
         if (displayCoordinates) {
             String posString = tile.getX() + ", " + tile.getY();
             g.drawString(posString, x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(posString))/2, y + (lib.getTerrainImageHeight(tile.getType()) - g.getFontMetrics().getAscent())/2);
+        }
+    }
+
+
+    /**
+    * If set to <i>true</i> then tile names are drawn on the map.
+    */
+    public void setDisplayTileNames(boolean displayTileNames) {
+        this.displayTileNames = displayTileNames;
+    }
+    
+
+    /**
+    * Breaks a line between two words. THe breaking point
+    * is as close to the center as possible.
+    */
+    public int getBreakingPoint(String string) {
+        int center = string.length() / 2;
+        int bestIndex = string.indexOf(' ');
+        
+        int index = 0;
+        while (index != -1 && index != bestIndex) {
+            if (Math.abs(center-index) < Math.abs(center-bestIndex)) {
+                bestIndex = index;
+            }
+            
+            index = string.indexOf(' ', bestIndex);
+        }
+        
+        if (bestIndex == 0 || bestIndex == string.length()) {
+            return -1;
+        } else {
+            return bestIndex;
         }
     }
 

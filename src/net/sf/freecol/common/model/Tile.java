@@ -137,6 +137,78 @@ public final class Tile extends FreeColGameObject implements Location {
     }
 
 
+    /**
+    * Gets the name of this tile. The value of the name depends
+    * on the {@link #getType type}, {@link #isForested forested}
+    * and {@link #getAddition addition} of the tile.
+    *
+    * @return The name as a <code>String</code>.
+    */
+    public String getName() {
+        if (getAddition() == ADD_MOUNTAINS) {
+            return "Mountains";
+        } else if (getAddition() == ADD_HILLS) {
+            return "Hills";
+        } else if (getType() == UNEXPLORED) {
+            return "Unexplored";
+        } else if (getType() == PLAINS) {
+            if (isForested()) {
+                return "Mixed forest";
+            } else {
+                return "Plains";
+            }
+        } else if (getType() == GRASSLANDS) {
+            if (isForested()) {
+                return "Conifer forest";
+            } else {
+                return "Grassland";
+            }
+        } else if (getType() == PRAIRIE) {
+            if (isForested()) {
+                return "Broadleaf forest";
+            } else {
+                return "Prairie";
+            }
+        } else if (getType() == SAVANNAH) {
+            if (isForested()) {
+                return "Tropical forest";
+            } else {
+                return "Savannah";
+            }
+        } else if (getType() == MARSH) {
+            if (isForested()) {
+                return "Wetland forest";
+            } else {
+                return "Marsh";
+            }
+        } else if (getType() == SWAMP) {
+            if (isForested()) {
+                return "Rain forest";
+            } else {
+                return "Swamp";
+            }
+        } else if (getType() == DESERT) {
+            if (isForested()) {
+                return "Scrub forest";
+            } else {
+                return "Desert";
+            }
+        } else if (getType() == TUNDRA) {
+            if (isForested()) {
+                return "Boreal forest";
+            } else {
+                return "Tundra";
+            }
+        } else if (getType() == ARCTIC) {
+            return "Arctic";
+        } else if (getType() == OCEAN) {
+            return "Ocean";
+        } else if (getType() == HIGH_SEAS) {
+            return "High seas";
+        }
+        
+        return "Unknown";
+    }
 
 
     /**

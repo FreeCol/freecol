@@ -21,7 +21,8 @@ public final class Client {
     */
     private final Connection c;
 
-
+    private String host;
+    private int port;
 
 
     /**
@@ -34,12 +35,23 @@ public final class Client {
     *         a new {@link Connection}.
     */
     public Client(String host, int port, MessageHandler handler) throws IOException {
+        this.host = host;
+        this.port = port;
         c = new Connection(host, port, handler);
     }
 
 
 
-
+    public String getHost() {
+        return host;
+    }
+    
+    
+    public int getPort() {
+        return port;
+    }
+    
+    
     /**
     * Sends the specified message to the server.
     *

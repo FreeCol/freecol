@@ -20,7 +20,7 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Element;
 
 import java.util.logging.Logger;
-
+import javax.swing.SwingUtilities;
 
 
 /**
@@ -80,6 +80,8 @@ public final class InGameInputHandler extends InputHandler {
                 reply = error(element);
             } else if (type.equals("chooseFoundingFather")) {
                 reply = chooseFoundingFather(element);
+            } else if (type.equals("reconnect")) {
+                reply = reconnect(element);
             } else {
                 logger.warning("Message is of unsupported type \"" + type + "\".");
             }
@@ -88,6 +90,28 @@ public final class InGameInputHandler extends InputHandler {
         return reply;
     }
 
+
+    /**
+    * Handles an "reconnect"-message.
+    *
+    * @param element The element (root element in a DOM-parsed XML tree) that
+    *                holds all the information.
+    */
+    private Element reconnect(Element element) {
+        final FreeColClient freeColClient = getFreeColClient();
+        if (freeColClient.getCanvas().showConfirmDialog("reconnect.text", "reconnect.yes", "reconnect.no")) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    freeColClient.getConnectController().reconnect();
+                }
+            });
+        } else {
+            getFreeColClient().getCanvas().reallyQuit();
+        }
+
+        return null;
+    }
+    
 
     /**
     * Handles an "update"-message.

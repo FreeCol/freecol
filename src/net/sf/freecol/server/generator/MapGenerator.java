@@ -208,7 +208,7 @@ public class MapGenerator {
                 }
                 
                 for (int i = 0; i < (type * 2) + 4; i++) {
-                    ServerUnit unit = new ServerUnit(game, player, Unit.BRAVE, (DummyConnection)player.getConnection());
+                    ServerUnit unit = new ServerUnit(game, player, Unit.BRAVE);
                     if (i == 0) {
                         unit.setMission(ServerUnit.MISSION_WANDER);
                         unit.setLocation(map.getTile(position));
@@ -374,14 +374,25 @@ public class MapGenerator {
             this.landMap = landMap;
         }
 
+
+        /**
+        * Gets a random tile type based on the given percentage.
+        *
+        * @param percent The location of the tile, where 0% is the center on
+        *        the y-axis and 100% is on the top/bottom of the map.
+        */
         private int getRandomTileType(int percent) {
           // Do by percent +- 10.
+          /*
           int min = (percent - 10);
           int max = (percent + 10);
           if (min < 0) min = 0;
           if (max > 99) max = 99;
           int thisValue = tileType.nextInt(max - min) + min;
           thisValue /= 10; // Gives a number from 0-3.
+          */
+          int thisValue = (Math.abs(percent - tileType.nextInt(20) - 1)) / 10;
+
           int minWoD = 0;
           int maxWoD = 99;
           int dryOrWet = tileType.nextInt(maxWoD - minWoD) + minWoD;
@@ -393,19 +404,23 @@ public class MapGenerator {
               case 1: default: return Tile.TUNDRA;
               case 2: return Tile.MARSH;
             }
-            case 3: case 4: case 5: case 6: default: switch (dryOrWet) {
+            case 3: case 4: case 5: default: switch (dryOrWet) {
               case 0: return Tile.PLAINS;
               case 1: default: return Tile.PRAIRIE;
-              case 2: return Tile.SWAMP;
+              case 2: return Tile.DESERT;
             }
-            case 7: case 8: case 9: switch (dryOrWet) {
+            case 6: case 7: case 8: case 9: switch (dryOrWet) {
               case 0: return Tile.GRASSLANDS;
               case 1: default: return Tile.SAVANNAH;
-              case 2: return Tile.DESERT;
+              case 2: return Tile.SWAMP;
             }
           }
         }
 
+        
+        /**
+        * Creates the map.
+        */
         public Map createMap() {
             Vector columns = new Vector(width);
             tileType = new Random();
@@ -415,8 +430,8 @@ public class MapGenerator {
                     Tile t;
 
                     if (landMap[i][j]) {
-                        t = new Tile(game, getRandomTileType(((Math.min(j, height - j) * 100) / height)), i, j);
-                        //if ((t.getType() != t.ARCTIC) && (tileType.nextInt(3) > 0)) {
+                        t = new Tile(game, getRandomTileType(((Math.min(j, height - j) * 200) / height)), i, j);
+
                         if ((t.getType() != Tile.ARCTIC) && (tileType.nextInt(3) > 1)) {
                             t.setForested(true);
                         } else if ((t.getType() != Tile.ARCTIC) && (t.getType() != Tile.TUNDRA)) {

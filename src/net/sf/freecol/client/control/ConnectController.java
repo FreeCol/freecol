@@ -202,6 +202,21 @@ public final class ConnectController {
         return true;
     }
 
+    
+    /**
+    * Reconnects to the server.
+    */
+    public void reconnect() {
+        String username = freeColClient.getMyPlayer().getUsername();
+        String host = freeColClient.getClient().getHost();
+        int port = freeColClient.getClient().getPort();
+
+        freeColClient.getCanvas().removeInGameComponents();
+        logout(true);
+
+        login(username, host, port);
+    }
+
 
     /**
     * Opens a dialog where the user should specify the filename
@@ -262,6 +277,12 @@ public final class ConnectController {
             logoutMessage.setAttribute("reason", "User has quit the client.");
 
             freeColClient.getClient().send(logoutMessage);
+        }
+
+        try {
+            freeColClient.getClient().getConnection().close();
+        } catch (IOException e) {
+            logger.warning("Could not close connection!");
         }
 
         freeColClient.getGUI().setInGame(false);
