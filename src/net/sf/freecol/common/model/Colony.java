@@ -806,6 +806,17 @@ public final class Colony extends Settlement implements Location {
         }
     }
 
+    
+    /**
+    * Returns a random unit from this colony.
+    *
+    * At this moment, this method always returns the first unit
+    * in the colony.
+    */
+    public Unit getRandomUnit() {
+        return ((Unit) getUnitIterator().next());
+    }
+
 
     /**
     * Prepares this <code>Colony</code> for a new turn.
@@ -822,7 +833,7 @@ public final class Colony extends Settlement implements Location {
 
         if (eat > food) {
             // Kill a colonist:
-            ((Unit) getUnitIterator().next()).dispose();
+            getRandomUnit().dispose();
             removeGoods(Goods.FOOD, food);
             addModelMessage(this, "model.colony.colonistStarved", new String[][] {{"%colony%", getName()}});
         } else {

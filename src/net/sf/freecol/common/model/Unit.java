@@ -125,7 +125,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     protected Unit() {
     
     }
-    
+
     
     /**
     * Initiate a new <code>Unit</code> of a specified type with the state set
@@ -2420,14 +2420,27 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             if (captureColony) {
                 defender.getOwner().modifyTension(getOwner(), Player.TENSION_ADD_MAJOR);
 
-                int plunderGold = (int) (newTile.getSettlement().getOwner().getGold() * 0.1); // 10% of their gold
-                getOwner().modifyGold(plunderGold);
-                newTile.getSettlement().getOwner().modifyGold(-plunderGold);
+                if (getOwner().isEuropean()) {
+                    int plunderGold = (int) (newTile.getSettlement().getOwner().getGold() * 0.1); // 10% of their gold
+                    getOwner().modifyGold(plunderGold);
+                    newTile.getSettlement().getOwner().modifyGold(-plunderGold);
 
-                targetcolony = (Colony)(newTile.getSettlement());
-                targetcolony.setOwner(getOwner()); // This also changes over all of the units...
-                setLocation(newTile);
-                addModelMessage(this, "model.unit.colonyCaptured", new String[][] {{"%colony%", newTile.getColony().getName()}, {"%amount%", Integer.toString(plunderGold)}});
+                    targetcolony = (Colony)(newTile.getSettlement());
+                    targetcolony.setOwner(getOwner()); // This also changes over all of the units...
+                    setLocation(newTile);
+                    addModelMessage(this, "model.unit.colonyCaptured", new String[][] {{"%colony%", newTile.getColony().getName()}, {"%amount%", Integer.toString(plunderGold)}});
+                } else { // Indian:
+                    if (newTile.getSettlement() instanceof Colony && newTile.getColony().getUnitCount() <= 1) {
+                        int plunderGold = (int) (newTile.getSettlement().getOwner().getGold() * 0.1); // 10% of their gold
+                        getOwner().modifyGold(plunderGold);
+                        newTile.getSettlement().getOwner().modifyGold(-plunderGold);
+                        addModelMessage(newTile.getSettlement().getOwner(), "model.unit.colonyBurning", new String[][] {{"%colony%", newTile.getColony().getName()}, {"%amount%", Integer.toString(plunderGold)}});
+                        newTile.getSettlement().dispose();
+                    } else {
+                        addModelMessage(newTile.getSettlement(), "model.unit.colonistSlaughtered", new String[][] {{"%colony%", newTile.getColony().getName()}, {"%unit%", newTile.getColony().getRandomUnit().getName()}});
+                        newTile.getColony().getRandomUnit().dispose();
+                    }
+                }
             } else {
                 if (getOwner().isEuropean()) {
                     defender.setLocation(getTile());
