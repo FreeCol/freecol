@@ -293,7 +293,9 @@ public final class GUI {
 
         this.activeUnit = activeUnit;
 
-        freeColClient.getInGameController().clearOrders(activeUnit);
+        if (activeUnit != null && freeColClient.getGame().getCurrentPlayer() == freeColClient.getMyPlayer() && activeUnit.getState() != Unit.ACTIVE) {
+            freeColClient.getInGameController().clearOrders(activeUnit);
+        }
 
         //freeColClient.getCanvas().getMapControls().updateMoves(activeUnit);
         freeColClient.getCanvas().getMapControls().update();

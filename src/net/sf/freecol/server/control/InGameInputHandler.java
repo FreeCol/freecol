@@ -135,6 +135,8 @@ public final class InGameInputHandler extends InputHandler {
                     // it was sent when it was not the sender's turn.
                     reply = Message.createNewRootElement("error");
                     reply.setAttribute("message", "Not your turn.");
+                    
+                    logger.warning("Received message when not in turn: " + element.getTagName());
                 }
             }
         } catch (Exception e) {

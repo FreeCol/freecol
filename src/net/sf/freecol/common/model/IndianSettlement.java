@@ -85,13 +85,18 @@ public class IndianSettlement extends Settlement {
      * @param tribe Tribe of settlement
      * @param kind Kind of settlement
      * @param isCapital True if settlement is tribe's capital
+     * @param learnableSkill The skill that can be learned by Europeans at this settlement.
      * @exception IllegalArgumentException if an invalid tribe or kind is given
      */
-    public IndianSettlement(Game game, Player player, Tile tile, int tribe, int kind, boolean isCapital) {
+    public IndianSettlement(Game game, Player player, Tile tile, int tribe, int kind, boolean isCapital, int learnableSkill) {
         // TODO: Change 'null' to the indian AI-player:
 
         super(game, player, tile);
 
+        if (tile == null) {
+            throw new NullPointerException();
+        }
+        
         unitContainer = new UnitContainer(game, this);
 
         if (tribe < 0 || tribe > LAST_TRIBE) {
@@ -105,7 +110,7 @@ public class IndianSettlement extends Settlement {
         }
 
         this.kind = kind;
-        this.learnableSkill = generateSkillForLocation(tile);
+        this.learnableSkill = learnableSkill;
         this.isCapital = isCapital;
     }
 
@@ -128,106 +133,6 @@ public class IndianSettlement extends Settlement {
     }
 
 
-
-    /**
-    * Generates a skill that could be taught from a settlement on the given Tile.
-    * TODO: This method should be properly implemented. The surrounding terrain
-    *       should be taken into account and it should be partially randomized.
-    * @param tile The tile where the settlement will be located.
-    * @return A skill that can be taught to Europeans.
-    */
-    private int generateSkillForLocation(Tile tile) {
-        int rand = getGame().getModelController().getRandom(getID()+"generateIndianSkillRandom"+getID(), 2);
-
-        Iterator iter = tile.getMap().getAdjacentIterator(tile.getPosition());
-        while (iter.hasNext()) {
-            Map.Position p = (Map.Position)iter.next();
-            Tile t = tile.getMap().getTile(p);
-
-            // has bonus but no forest
-            if (!t.isForested() && t.hasBonus() && t.getAddition()<=Tile.ADD_RIVER_MAJOR) {
-                switch (t.getType()) {
-                    case Tile.PLAINS:
-                        return MASTER_COTTON_PLANTER;
-                    case Tile.GRASSLANDS:
-                        return MASTER_TOBACCO_PLANTER;
-                    case Tile.PRAIRIE:
-                        return MASTER_COTTON_PLANTER;
-                    case Tile.SAVANNAH:
-                        return MASTER_SUGAR_PLANTER;
-                    case Tile.MARSH:
-                        return EXPERT_ORE_MINER;
-                    case Tile.SWAMP:
-                        return MASTER_TOBACCO_PLANTER;
-                    case Tile.DESERT:
-                        return SEASONED_SCOUT;
-                    case Tile.TUNDRA:
-                        return (rand==0 ? EXPERT_SILVER_MINER : EXPERT_ORE_MINER);
-                    case Tile.ARCTIC:
-                    case Tile.OCEAN:
-                        return EXPERT_FISHERMAN;
-                    default:
-                        throw new IllegalArgumentException("Invalid tile provided: Tile type is invalid");
-                }
-            }
-            // has bonus and forest
-            else if (t.isForested() && t.hasBonus() && t.getAddition()<=Tile.ADD_RIVER_MAJOR) {
-                switch (t.getType()) {
-                    case Tile.PLAINS:
-                    case Tile.PRAIRIE:
-                    case Tile.TUNDRA:
-                        return EXPERT_FUR_TRAPPER;
-                    case Tile.GRASSLANDS:
-                    case Tile.SAVANNAH:
-                        return EXPERT_LUMBER_JACK;
-                    case Tile.MARSH:
-                        return (rand==0 ? EXPERT_SILVER_MINER : EXPERT_ORE_MINER);
-                    case Tile.SWAMP:
-                        return (rand==0 ? EXPERT_SILVER_MINER : EXPERT_ORE_MINER);
-                    case Tile.DESERT:
-                        return (rand==0 ? EXPERT_LUMBER_JACK : EXPERT_FARMER);
-                    default:
-                        throw new IllegalArgumentException("Invalid tile provided: Tile type is invalid");
-                }
-            }
-            // is hills
-            else if (t.getAddition() == Tile.ADD_HILLS) {
-                return EXPERT_ORE_MINER;
-            }
-            // has mountains
-            else if (t.getAddition() == Tile.ADD_MOUNTAINS) {
-                if(t.hasBonus())
-                    return EXPERT_SILVER_MINER;
-                else
-                    return (rand==0 ? EXPERT_ORE_MINER : EXPERT_SILVER_MINER);
-            }
-        }
-
-        // has no bonuses so use base tile
-        switch (tile.getType()) {
-            case Tile.PLAINS:
-                return MASTER_COTTON_PLANTER;
-            case Tile.GRASSLANDS:
-                return MASTER_TOBACCO_PLANTER;
-            case Tile.PRAIRIE:
-                return MASTER_COTTON_PLANTER;
-            case Tile.SAVANNAH:
-                return MASTER_SUGAR_PLANTER;
-            case Tile.MARSH:
-                return EXPERT_ORE_MINER;
-            case Tile.SWAMP:
-                return MASTER_TOBACCO_PLANTER;
-            case Tile.DESERT:
-                return SEASONED_SCOUT;
-            case Tile.TUNDRA:
-                return (rand==0 ? EXPERT_SILVER_MINER : EXPERT_ORE_MINER);
-            case Tile.ARCTIC:
-            case Tile.OCEAN:
-                return EXPERT_FISHERMAN;
-            default:
-                throw new IllegalArgumentException("Invalid tile provided: Tile type is invalid");
-        }
-    }
 
 
     /**
