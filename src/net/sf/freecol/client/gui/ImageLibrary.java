@@ -29,7 +29,8 @@ public final class ImageLibrary extends ImageProvider {
     public static final String REVISION = "$Revision$";
 
     public static final int UNIT_SELECT = 0,
-                            MISC_COUNT = 4;
+                            PLOWED = 4,
+                            MISC_COUNT = 5;
 
     /**
      * These finals represent the EXTRA terrain graphics; the ones that
@@ -156,7 +157,7 @@ public final class ImageLibrary extends ImageProvider {
                             COLONY_STOCKADE = 3,
                             COLONY_FORT = 4,
                             COLONY_FORTRESS = 5,
-                            
+
                             COLONY_COUNT = 6,
 
                             INDIAN_SETTLEMENT_CAMP = 0,
@@ -165,7 +166,7 @@ public final class ImageLibrary extends ImageProvider {
                             INDIAN_SETTLEMENT_INCA = 3,
 
                             INDIAN_COUNT = 4;
-                            
+
     public static final int GOODS_FOOD = 0,
                             GOODS_SUGAR = 1,
                             GOODS_TOBACCO = 2,
@@ -339,6 +340,7 @@ public final class ImageLibrary extends ImageProvider {
             if (i < 10) {
                 numberString = "0" + numberString;
             }
+            
             char lastChar;
             if (i == BEACH) {
                 lastChar = 'h';

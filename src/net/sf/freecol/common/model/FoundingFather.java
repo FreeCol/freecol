@@ -56,11 +56,11 @@ public class FoundingFather {
 
     
     public static String getDescription(int foundingFather) {
-        return getPrefix + ".description";
+        return getPrefix(foundingFather) + ".description";
     }
 
 
-    private static String getPrefix() {
+    private static String getPrefix(int foundingFather) {
         switch (foundingFather) {
             case ADAM_SMITH: return "foundingFather.adamSmith";
             case JACOB_FUGGER: return "foundingFather.jacobFugger";

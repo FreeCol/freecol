@@ -895,6 +895,10 @@ public final class GUI {
             } else if (tile.getAddition() == Tile.ADD_MOUNTAINS) {
                 g.drawImage(lib.getTerrainImage(ImageLibrary.MOUNTAINS, tile.getX(), tile.getY()), x, y - 32, null);
             }
+            
+            if (tile.isPlowed()) {
+                g.drawImage(lib.getMiscImage(ImageLibrary.PLOWED), x, y, null);
+            }
 
             if (tile.isLand()) {
                 for (int i = 0; i < 8; i++) {
