@@ -546,6 +546,7 @@ public final class InGameController {
         Client client = freeColClient.getClient();
 
         if (!(unit.checkSetState(state))) {
+            logger.warning("Can't set state " + state);
             return; // Don't bother.
         }
         unit.setState(state);

@@ -657,7 +657,7 @@ public final class GUI {
                     Tile tile = map.getTile(tileX, tileY);
                     if (tile.getSettlement() instanceof Colony) {
                         Colony colony = (Colony) map.getTile(tileX, tileY).getSettlement();
-                        BufferedImage stringImage = createStringImage(g, colony.getName(), colony.getOwner().getColor(), lib.getTerrainImageWidth(tile.getType()) * 4/3);
+                        BufferedImage stringImage = createStringImage(g, colony.getName(), colony.getOwner().getColor(), lib.getTerrainImageWidth(tile.getType()) * 4/3, 16);
                         g.drawImage(stringImage, xx + (lib.getTerrainImageWidth(tile.getType()) - stringImage.getWidth())/2 + 1, yy + (lib.getColonyImageHeight(lib.getSettlementGraphicsType(colony))) + 1, null);
                     }
                 }
@@ -685,7 +685,6 @@ public final class GUI {
         }
     }
 
-
     /**
     * Creates an image with a string of a given color and with a black border around the glyphs.
     *
@@ -693,15 +692,15 @@ public final class GUI {
     * @param color The <code>Color</code> to use when displaying the <code>nameString</code>.
     * @param maxWidth The maximum width of the image. The size of the <code>Font</code> will be
     *                 adjusted if the image gets larger than this value.
+    * @param preferredFontSize The preferred font size.
     */
-    public BufferedImage createStringImage(Graphics2D g, String nameString, Color color, int maxWidth) {
+    public BufferedImage createStringImage(Graphics2D g, String nameString, Color color, int maxWidth, int preferredFontSize) {
 
         Font nameFont = null;
         FontMetrics nameFontMetrics = null;
         BufferedImage bi = null;
-
-        int fontSize = 16;
         Font origFont = g.getFont();
+        int fontSize = preferredFontSize;
         do {
             nameFont = origFont.deriveFont(Font.BOLD, fontSize);
             g.setFont(nameFont);
@@ -850,16 +849,20 @@ public final class GUI {
                     // Draw image of colony in center of the tile.
                     g.drawImage(lib.getColonyImage(type), x + (lib.getTerrainImageWidth(tile.getType()) - lib.getColonyImageWidth(type)) / 2, y + (lib.getTerrainImageHeight(tile.getType()) - lib.getColonyImageHeight(type)) / 2, null);
 
-                    // The 5 here is arbitrary -sjm
-                    g.drawImage(lib.getColorChip(((Colony)settlement).getOwner().getColor()), x + STATE_OFFSET_X, y + 10, null);
                     String populationString = Integer.toString(((Colony)settlement).getUnitCount());
-                    if (((Colony)settlement).getOwner().getColor() == Color.BLACK) {
-                        g.setColor(Color.WHITE);
-                    } else {
-                        g.setColor(Color.BLACK);
+                    Color theColor = Color.WHITE;
+                    
+                    int sol = ((Colony)settlement).getSoL();
+                    
+                    if (sol >= 100) {
+                        theColor = Color.BLUE;
+                    } else if (sol >= 50) {
+                        theColor = Color.GREEN;
                     }
+                    
+                    BufferedImage stringImage = createStringImage(g, populationString, theColor, lib.getTerrainImageWidth(tile.getType()), 12);
+                    g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType()) - stringImage.getWidth())/2 + 1, y + ((lib.getColonyImageHeight(lib.getSettlementGraphicsType(((Colony)settlement)))) / 2) + 1, null);
 
-                    g.drawString(populationString, x + TEXT_OFFSET_X + STATE_OFFSET_X, y + 10 + TEXT_OFFSET_Y);
                     g.setColor(Color.BLACK);
                 } else if (settlement instanceof IndianSettlement) {
                     int type = lib.getSettlementGraphicsType(settlement);

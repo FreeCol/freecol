@@ -745,6 +745,7 @@ public final class InGameInputHandler implements MessageHandler {
         if (!unit.checkSetState(state)) {
             // Oh, really, Mr. Client? I'll show YOU!
             // kickPlayer(player);
+            logger.warning("Can't set state " + state + ". Possible cheating attempt?");
             return null;
         }
         unit.setState(state);

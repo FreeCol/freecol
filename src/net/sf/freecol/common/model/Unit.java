@@ -2052,13 +2052,18 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         movesLeft = 0;
         if (defender.getType() == BRAVE) {
             defender.dispose();
+            boolean slaughter = true;
             if (newTile.getSettlement() != null) {
+                logger.info("Units remaining: " + newTile.getSettlement().getUnitCount());
                 if (newTile.getSettlement().getUnitCount() <= 0) {
                     //TODO: Burn the camp. Get treasure.
                     newTile.getSettlement().dispose();
                     //setLocation(newTile);
+                } else {
+                    slaughter = false;
                 }
-            } else {
+            }
+            if (slaughter) {
                 Iterator unitIterator = newTile.getUnitIterator();
                 while (unitIterator.hasNext()) {
                     ((Unit)unitIterator.next()).dispose();
