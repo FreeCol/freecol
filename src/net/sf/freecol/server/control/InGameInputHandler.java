@@ -127,6 +127,8 @@ public final class InGameInputHandler extends InputHandler {
                         reply = endTurn(connection, element);
                     } else if (type.equals("disbandUnit")) {
                         reply = disbandUnit(connection, element);
+                    } else if (type.equals("cashInTreasureTrain")) {
+                        reply = cashInTreasureTrain(connection, element);
                     } else {
                         logger.warning("Unknown request from client " + element.getTagName());
                     }
@@ -1278,6 +1280,7 @@ public final class InGameInputHandler extends InputHandler {
         return null;
     }
 
+
     /**
      * Handles a "disbandUnit"-message.
      *
@@ -1305,6 +1308,35 @@ public final class InGameInputHandler extends InputHandler {
 
         return null;
     }
+
+
+    /**
+     * Handles a "cashInTreasureTrain"-message.
+     *
+     * @param connection The <code>Connection</code> the message was received on.
+     * @param element The element containing the request.
+     */
+    private Element cashInTreasureTrain(Connection connection, Element element) {
+        Game game = getFreeColServer().getGame();
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
+        Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
+
+        if (unit == null) {
+            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: " + element.getAttribute("unit"));
+        }
+
+        if (unit.getOwner() != player) {
+            throw new IllegalStateException("Not your unit!");
+        }
+
+        Tile oldTile = unit.getTile();
+        unit.cashInTreasureTrain();
+
+        sendUpdatedTileToAll(oldTile, player);
+
+        return null;
+    }
+
 
     /**
     * Handles a "logout"-message.

@@ -241,6 +241,7 @@ public final class InGameController {
      */
     public void move(Unit unit, int direction) {
         Game game = freeColClient.getGame();
+        Canvas canvas = freeColClient.getCanvas();
 
         // Be certain the tile we are about to move into has been updated by the server:
         // Can be removed if we use 'client.ask' when moving:
@@ -275,8 +276,41 @@ public final class InGameController {
             default:                    throw new RuntimeException("unrecognised move: " + move);
         }
 
+        // Display a "cash in"-dialog if a treasure train have been moved into a colony:
+        if (unit.getLocation() != null && unit.getLocation() instanceof Tile && unit.getLocation().getTile().getColony() != null) {
+            String message = (unit.getOwner().hasFather(FoundingFather.HERNAN_CORTES)) ? "cashInTreasureTrain.text.free" : "cashInTreasureTrain.text.pay";
+            if (canvas.showConfirmDialog(message, "cashInTreasureTrain.yes", "cashInTreasureTrain.no")) {
+                cashInTreasureTrain(unit);
+            }
+        }
+
         freeColClient.getCanvas().getMapControls().update();
         freeColClient.getCanvas().updateJMenuBar();
+    }
+
+
+    /**
+     * Transfers the gold carried by this unit to the {@link Player owner}.
+     *
+     * @exception IllegalStateException if this unit is not a treasure train.
+     *                                  or if it cannot be cashed in at it's current
+     *                                  location.
+     */
+    private void cashInTreasureTrain(Unit unit) {
+        Client client = freeColClient.getClient();
+
+        if (unit.getType() != Unit.TREASURE_TRAIN) {
+            throw new IllegalStateException("Not a treasure train");
+        }
+
+        // Inform the server:
+        Element cashInTreasureTrainElement = Message.createNewRootElement("cashInTreasureTrain");
+        cashInTreasureTrainElement.setAttribute("unit", unit.getID());
+
+        client.send(cashInTreasureTrainElement);
+
+        unit.cashInTreasureTrain();
+        nextModelMessage();
     }
 
 

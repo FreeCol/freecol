@@ -243,6 +243,35 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
 
 
     /**
+     * Transfers the gold carried by this unit to the {@link Player owner}.
+     *
+     * @exception IllegalStateException if this unit is not a treasure train.
+     *                                  or if it cannot be cashed in at it's current
+     *                                  location.
+     */
+    public void cashInTreasureTrain() {
+        if (getType() != TREASURE_TRAIN) {
+            throw new IllegalStateException("Not a treasure train");
+        }
+
+        if (location instanceof Tile && getTile().getColony() != null ||
+                (getLocation() instanceof Unit && ((Unit) getLocation()).getLocation() instanceof Europe)) {
+            boolean inEurope = (getLocation() instanceof Unit && ((Unit) getLocation()).getLocation() instanceof Europe);
+            int cashInAmount = (getOwner().hasFather(FoundingFather.HERNAN_CORTES) || inEurope) ? getTreasureAmount() : getTreasureAmount() / 2; // TODO: Use tax
+            FreeColGameObject o = getOwner();
+            if (inEurope) {
+                o = getOwner().getEurope();
+            }
+            getOwner().modifyGold(cashInAmount);
+            addModelMessage(o, "model.unit.cashInTreasureTrain", new String[][] {{"%amount%", Integer.toString(getTreasureAmount())}, {"%cashInAmount%", Integer.toString(cashInAmount)}});
+            dispose();
+        } else {
+            throw new IllegalStateException("Cannot cash in treasure train at the current location.");
+        }
+    }
+
+
+    /**
     * Checks if this <code>Unit</code> is a colonist. A <code>Unit</code>
     * is a colonist if it can build a new <code>Colony</code>.
     *
@@ -923,31 +952,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                 } else if (t.isLand() && t.getFirstUnit() != null && !t.getFirstUnit().getOwner().hasContacted(getOwner().getNation())) {
                     t.getFirstUnit().getOwner().setContacted(getOwner(), true);
                     getOwner().setContacted(t.getFirstUnit().getOwner(), true);
-                }
-            }
-        }
-
-        // treasure train moved onto a settlment. do you want to cash it in?
-        if (getGame().getMap() != null && location != null) {
-            // its a settlement
-            if (location instanceof Tile && getType()==TREASURE_TRAIN && location.getTile().getSettlement()!=null) {
-                if (getOwner().hasFather(FoundingFather.HERNAN_CORTES)) {
-                    // todo -show confirm dialog "Do you wish for the King's
-                    // galleon to transport your treasure, deducting
-                    // the current tax rate of %TAX_RATE% for a profit of %AMT_AFTER_TAX%?"
-                } else {
-                    // todo -show confirm dialog "Do you wish for the King's galleon
-                    // transport your treasure, deducting 50% and the current tax rate of %TAX_RATE%
-                    // for a profit of %AMT_AFTER_TAX_AND_SHARE%?"
-                }
-            } else if (location instanceof Europe && getType()==GALLEON) {
-                Iterator iter = getUnitIterator();
-                while (iter.hasNext()) {
-                    Unit u = (Unit)iter.next();
-                    if(u.getType()==TREASURE_TRAIN) {
-                        // todo -show confirm dialog "Do you wish to deposit your treasure, deducting
-                        // the current tax rate of %TAX_RATE% for a profit of %AMT_AFTER_TAX%?"
-                    }
                 }
             }
         }
@@ -1992,6 +1996,16 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                 switch (state) {
                     case TO_EUROPE:
                         addModelMessage(getOwner().getEurope(), "model.unit.arriveInEurope", null);
+                        if (getType() == GALLEON) {
+                            Iterator iter = getUnitIterator();
+                            Unit u = (Unit) iter.next();
+                            while (iter.hasNext() && u.getType() != TREASURE_TRAIN) {
+                                u = (Unit) iter.next();
+                            }
+                            if (u != null && u.getType() == TREASURE_TRAIN) {
+                                u.cashInTreasureTrain();
+                            }
+                        }
                         break;
                     case TO_AMERICA:
                         getGame().getModelController().setToVacantEntryLocation(this);
