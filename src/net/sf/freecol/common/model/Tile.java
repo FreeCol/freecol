@@ -188,6 +188,14 @@ public final class Tile extends FreeColGameObject implements Location {
 
 
     /**
+    * Disposes all units on this <code>Tile</code>.
+    */
+    public void disposeAllUnits() {
+        unitContainer.disposeAllUnits();
+    }
+    
+
+    /**
     * Gets the first <code>Unit</code> on this tile.
     * @return The first <code>Unit</code> on this tile.
     */

@@ -193,12 +193,18 @@ public class UnitContainer extends FreeColGameObject {
     * Removes all references to this object.
     */
     public void dispose() {
-        Iterator i = getUnitIterator();
-        while (i.hasNext()) {
-            ((Unit) i.next()).dispose();
-        }
-
+        disposeAllUnits();
         super.dispose();
+    }
+
+
+    /**
+    * Disposes all units in this <code>UnitContainer</code>.
+    */
+    public void disposeAllUnits() {
+        for (int i=units.size()-1; i>=0; i--) {
+            ((Unit) units.get(i)).dispose();
+        }
     }
 
 

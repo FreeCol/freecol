@@ -230,6 +230,7 @@ public final class InGameInputHandler implements MessageHandler {
         game.setCurrentPlayer(currentPlayer);
 
         if (freeColClient.getMyPlayer().equals(currentPlayer)) {
+            removeUnitsOutsideLOS();
             freeColClient.getCanvas().setEnabled(true);
             freeColClient.getCanvas().closeMenus();
             freeColClient.getInGameController().nextActiveUnit();
@@ -240,6 +241,21 @@ public final class InGameInputHandler implements MessageHandler {
 
         return null;
     }
+
+    
+    private void removeUnitsOutsideLOS() {
+        Player player = freeColClient.getMyPlayer();
+        Map map = freeColClient.getGame().getMap();
+
+        Iterator tileIterator = map.getWholeMapIterator();
+        while (tileIterator.hasNext()) {
+            Tile t = map.getTile((Map.Position) tileIterator.next());
+            if (t != null && !player.canSee(t) && t.getFirstUnit() != null) {
+                t.disposeAllUnits();
+            }
+        }
+    }
+
 
     /**
     * Handles an "emigrateUnitInEuropeConfirmed"-message.
