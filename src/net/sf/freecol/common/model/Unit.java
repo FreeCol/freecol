@@ -2012,6 +2012,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                     return false;
                 }
             case SENTRY:
+                /*
                 if (getTile() == null) {
                     return true;
                 } else if (!getTile().isLand()) {
@@ -2023,7 +2024,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                     else {
                         return false;
                     }
-                }
+                }*/
+                return true;
             case TO_EUROPE:
                 if (!isNaval()) {
                     return false;

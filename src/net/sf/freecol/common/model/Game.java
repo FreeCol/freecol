@@ -337,7 +337,7 @@ public class Game extends FreeColGameObject {
 
     
     /**
-    * Gets the player after then given player.
+    * Gets the player after the given player.
     * @see #getNextPlayer
     */
     public Player getPlayerAfter(Player beforePlayer) {
@@ -489,7 +489,7 @@ public class Game extends FreeColGameObject {
         }
     }
 
-
+    
     /**
     * Checks if all players are ready to launch.
     *
