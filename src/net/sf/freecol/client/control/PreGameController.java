@@ -103,7 +103,7 @@ public final class PreGameController {
         freeColClient.getClient().send(colorElement);
     }
 
-    
+
     /**
     * Requests the game to be started. This will only be successful
     * if all players are ready to start the game.
@@ -136,7 +136,7 @@ public final class PreGameController {
 
         freeColClient.getClient().send(chatElement);
     }
-    
+
 
     /**
     * Starts the game.
@@ -161,6 +161,7 @@ public final class PreGameController {
         canvas.setMapControls(mapControls);
 
         Unit activeUnit = freeColClient.getMyPlayer().getNextActiveUnit();
+        freeColClient.getMyPlayer().updateCrossesRequired();
         gui.setActiveUnit(activeUnit);
         if (activeUnit != null) {
             gui.setFocus(activeUnit.getTile().getPosition());

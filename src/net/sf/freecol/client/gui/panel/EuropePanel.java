@@ -62,9 +62,9 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
     private final DocksPanel                docksPanel;
     private final CargoPanel                cargoPanel;
     private final MarketPanel               marketPanel;
-    private final RecruitDialog              recruitDialog;
-    private final PurchaseDialog             purchaseDialog;
-    private final TrainDialog                trainDialog;
+    private final RecruitDialog             recruitDialog;
+    private final PurchaseDialog            purchaseDialog;
+    private final TrainDialog               trainDialog;
     private final DefaultTransferHandler    defaultTransferHandler;
     private final MouseListener             pressListener;
 
@@ -87,7 +87,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         this.inGameController = inGameController;
 
         setFocusCycleRoot(true);
-        
+
         toAmericaPanel = new ToAmericaPanel(this);
         toEuropePanel = new ToEuropePanel(this);
         inPortPanel = new InPortPanel();
@@ -595,8 +595,8 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             europePanel.refresh();
             return c;
         }
-        
-        
+
+
         public String getUIClassID() {
             return "ToEuropePanelUI";
         }
@@ -621,8 +621,8 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         public Component add(Component comp) {
             return super.add(comp);
         }
-        
-        
+
+
         public String getUIClassID() {
             return "InPortPanelUI";
         }
@@ -679,7 +679,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             europePanel.refresh();
             return c;
         }
-        
+
         public String getUIClassID() {
             return "DocksPanelUI";
         }
@@ -761,7 +761,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             return (getSelectedUnit() != null);
         }
 
-        
+
         public String getUIClassID() {
             return "CargoPanelUI";
         }
@@ -804,11 +804,11 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     europePanel.getCargoPanel().revalidate();
                     revalidate();
                     europePanel.refresh();
-                    
+
                     // TODO: Make this look prettier :-)
                     UnitLabel t = selectedUnit;
                     selectedUnit = null;
-                    setSelectedUnit(t);                    
+                    setSelectedUnit(t);
 
                     return comp;
                 } else {
@@ -852,7 +852,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
     * Displays the <code>RecruitDialog</code>. Does not return from this
     * method before the panel is closed.
     */
-    public void showRecruitDialog() {
+    private void showRecruitDialog() {
         recruitDialog.initialize();
         recruitDialog.setLocation(getWidth() / 2 - recruitDialog.getWidth() / 2, getHeight() / 2 - recruitDialog.getHeight() / 2);
         add(recruitDialog, JLayeredPane.PALETTE_LAYER);

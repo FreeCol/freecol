@@ -35,7 +35,7 @@ public final class PreGameController extends Controller {
     public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
-    
+
 
     /**
     * The constructor to use.
@@ -102,8 +102,16 @@ public final class PreGameController extends Controller {
             // Set the map and inform the clients:
             setMap(map);
 
+            // Initialise the crosses required values.
+            Iterator playerIterator = game.getPlayerIterator();
+            while (playerIterator.hasNext()) {
+                Player p = (Player) playerIterator.next();
+                p.updateCrossesRequired();
+            }
+
             // Start the game:
             freeColServer.setGameState(FreeColServer.IN_GAME);
+
             Element startGameElement = Message.createNewRootElement("startGame");
             freeColServer.getServer().sendToAll(startGameElement);
             freeColServer.getServer().setMessageHandlerToAllConnections(freeColServer.getInGameInputHandler());

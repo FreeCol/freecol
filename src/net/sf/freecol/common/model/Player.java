@@ -27,7 +27,7 @@ public class Player extends FreeColGameObject {
     public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
-    
+
     /** The nations a player can play. */
     public static final int DUTCH = 0,
                             ENGLISH = 1,
@@ -112,7 +112,7 @@ public class Player extends FreeColGameObject {
     public static final int REBELLION_IN_WAR = 1;
     public static final int REBELLION_POST_WAR = 2;
 
-    private int             crossesRequired = 1000000000; // Not allowed to recruit unit in the first round. ;-)
+    private int             crossesRequired = -1;
 
 
     private Location entryLocation;
@@ -300,7 +300,7 @@ public class Player extends FreeColGameObject {
         if (type == getNation()) {
             return;
         }
-            
+
         contacted[type] = b;
     }
 
@@ -835,7 +835,7 @@ public class Player extends FreeColGameObject {
     * Updates the amount of crosses needed to emigrate a <code>Unit</code>
     * from <code>Europe</code>.
     */
-    private void updateCrossesRequired() {
+    public void updateCrossesRequired() {
         // The book I have tells me the crosses needed is:
         // [(colonist count in colonies + total colonist count) * 2] + 8.
         // So every unit counts as 2 unless they're in a colony,
@@ -995,7 +995,7 @@ public class Player extends FreeColGameObject {
                     sb.append('0');
                 }
             }
-            playerElement.setAttribute("contacted", sb.toString());            
+            playerElement.setAttribute("contacted", sb.toString());
         } else {
             playerElement.setAttribute("gold", Integer.toString(-1));
             playerElement.setAttribute("crosses", Integer.toString(-1));
