@@ -53,10 +53,9 @@ public class IndianSettlement extends Settlement {
     /** The kind of settlement this is.
         TODO: this information should be moved to the IndianPlayer class (that doesn't
               exist yet). */
+    private int kind;
 
     private int food = 0;
-
-    private int kind;
 
     /** The tribe that owns this settlement. */
     private int tribe;
@@ -96,7 +95,7 @@ public class IndianSettlement extends Settlement {
         if (tile == null) {
             throw new NullPointerException();
         }
-        
+
         unitContainer = new UnitContainer(game, this);
 
         if (tribe < 0 || tribe > LAST_TRIBE) {
@@ -127,8 +126,8 @@ public class IndianSettlement extends Settlement {
         super(game, element);
 
         // The client doesn't know the skill at first.
-        this.learnableSkill = UNKNOWN;        
-        
+        this.learnableSkill = UNKNOWN;
+
         readFromXMLElement(element);
     }
 
@@ -328,8 +327,20 @@ public class IndianSettlement extends Settlement {
 
         if (showAll || player == getOwner()) {
             indianSettlementElement.setAttribute("food", Integer.toString(food));
-            indianSettlementElement.setAttribute("learnableSkill", Integer.toString(learnableSkill));    
-        } 
+        }
+
+        // TODO: This method is always used when we need an XML element of an IndianSettlement,
+        //       which is wrong. In case we're saving the game then we can use this this version,
+        //       but if , for example, the settlement data is sent to the client after a loadGame
+        //       then we are NOT allowed to send the latest version of the IndianSettlement.
+        //       In that case PlayerExploredTile should be used instead.
+        //       The problem is that after a loadGame the learnableSkill should only be sent to
+        //       the client in case that client has knowledge of that skill in that settlement.
+        //       See toXMLElement for a solution to this problem.
+        // NOTE: Under normal circumstances the learnableSkill should only be added to the XML
+        //       if showAll is true OR player == getOwner()
+        //       just like the food attribute.
+        indianSettlementElement.setAttribute("learnableSkill", Integer.toString(learnableSkill));
 
         if (showAll || player == getOwner()) {
             indianSettlementElement.appendChild(unitContainer.toXMLElement(player, document, showAll, toSavedGame));
@@ -362,10 +373,10 @@ public class IndianSettlement extends Settlement {
         } else {
             food = 0;
         }
-        
+
         if (indianSettlementElement.hasAttribute("learnableSkill")) {
             learnableSkill = Integer.parseInt(indianSettlementElement.getAttribute("learnableSkill"));
-        }       
+        }
 
         Element unitContainerElement = getChildElement(indianSettlementElement, UnitContainer.getXMLElementTagName());
         if (unitContainer != null) {

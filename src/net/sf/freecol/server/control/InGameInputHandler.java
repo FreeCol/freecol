@@ -135,7 +135,7 @@ public final class InGameInputHandler extends InputHandler {
                     // it was sent when it was not the sender's turn.
                     reply = Message.createNewRootElement("error");
                     reply.setAttribute("message", "Not your turn.");
-                    
+
                     logger.warning("Received message when not in turn: " + element.getTagName());
                 }
             }
@@ -395,6 +395,10 @@ public final class InGameInputHandler extends InputHandler {
             Element reply = Message.createNewRootElement("provideSkill");
             reply.setAttribute("skill", Integer.toString(settlement.getLearnableSkill()));
 
+            // Set the Tile.PlayerExploredTile attribute.
+            Tile.PlayerExploredTile playerExploredTile = settlement.getTile().getPlayerExploredTile(player);
+            playerExploredTile.setSkill(settlement.getLearnableSkill());
+
             return reply;
         } else {
             throw new IllegalStateException("Learnable skill from Indian settlement is unknown at server.");
@@ -514,8 +518,8 @@ public final class InGameInputHandler extends InputHandler {
 
         return reply;
     }
-    
-    
+
+
     /**
     * Generates a result of an attack.
     */
@@ -546,7 +550,7 @@ public final class InGameInputHandler extends InputHandler {
                 result = Unit.ATTACK_WIN;
             }
         }
-        
+
         if (result == Unit.ATTACK_LOSS) {
             int diff = attackPower*2-defender.getDefensePower(unit);
             int r2 = attackCalculator.nextInt((diff<3) ? 3 : diff);

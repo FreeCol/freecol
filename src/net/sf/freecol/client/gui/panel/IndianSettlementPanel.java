@@ -90,6 +90,15 @@ public final class IndianSettlementPanel extends FreeColDialog implements Action
             case IndianSettlement.SEASONED_SCOUT:
                 skillLabel.setText(Messages.message("indianSettlement.skillSeasonedScout"));
                 break;
+            case IndianSettlement.EXPERT_ORE_MINER:
+                skillLabel.setText(Messages.message("indianSettlement.skillExpertOreMiner"));
+                break;
+            case IndianSettlement.EXPERT_LUMBER_JACK:
+                skillLabel.setText(Messages.message("indianSettlement.skillExpertLumberJack"));
+                break;
+            case IndianSettlement.EXPERT_FUR_TRAPPER:
+                skillLabel.setText(Messages.message("indianSettlement.skillExpertFurTrapper"));
+                break;
             default:
                 logger.warning("Invalid learnable skill returned from settlement.");
         }

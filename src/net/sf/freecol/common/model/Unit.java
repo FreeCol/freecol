@@ -811,7 +811,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         }
     }
 
-    
+
     /**
     * Checks if this unit is visible to the given player.
     */
@@ -951,7 +951,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                 }
             }
         }
-        
+
         getOwner().setExplored(this);
     }
 
@@ -1475,6 +1475,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     * @throws IllegalArgumentException
     */
     public static String getName(int someType) {
+        // TODO: USE i18n !
+
         switch (someType) {
             case FREE_COLONIST:
                 return "Free Colonist";
@@ -2330,7 +2332,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         return modified_power;
     }
 
-    
+
     /**
     * Checks if this is an offensive unit.
     * That is a unit capable of attacking another unit.
@@ -2581,7 +2583,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
 
                         if (getOwner().isEuropean()) {
                             getOwner().modifyGold(plunderGold);
-                            
+
                             try {
                                 newTile.getSettlement().getOwner().modifyGold(-plunderGold);
                             } catch (IllegalArgumentException e) {}

@@ -74,7 +74,7 @@ public final class UserConnectionHandler implements MessageHandler {
     */
     private Element login(Connection connection, Element element) {
         // TODO: Do not allow more than one (human) player to connect to a singleplayer game.
-        
+
         Game game = freeColServer.getGame();
 
         if (!element.hasAttribute("username")) {
@@ -96,7 +96,7 @@ public final class UserConnectionHandler implements MessageHandler {
             if (game.getPlayerByName(username) == null) {
                 return Message.createError("server.alreadyStarted", "The game has already been started!");
             }
-            
+
             ServerPlayer player = (ServerPlayer) game.getPlayerByName(username);
             player.setConnection(connection);
             player.setConnected(true);
@@ -125,9 +125,9 @@ public final class UserConnectionHandler implements MessageHandler {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {}
-    
-            timeOut -= 1000;                
-            
+
+            timeOut -= 1000;
+
             if (timeOut <= 0) {
                 return Message.createError("server.timeOut", "Timeout when connecting to the server.");
             }
@@ -158,7 +158,7 @@ public final class UserConnectionHandler implements MessageHandler {
         Element reply = Message.createNewRootElement("loginConfirmed");
         reply.setAttribute("admin", (admin ? "true" : "false"));
         reply.appendChild(freeColServer.getGame().toXMLElement(newPlayer, reply.getOwnerDocument()));
-        
+
         return reply;
     }
 }

@@ -83,7 +83,7 @@ public final class FreeColServer {
     private Game game;
     private AIMain aiMain;
     private boolean singleplayer;
-    
+
     // The username of the player owning this server.
     private String owner;
 
@@ -126,7 +126,7 @@ public final class FreeColServer {
         }
     }
 
-    
+
     /**
     * Starts a new server in a specified mode and with a specified port
     * and loads the game from the given file.
@@ -156,12 +156,12 @@ public final class FreeColServer {
             logger.warning("Exception while starting server: " + e);
             throw e;
         }
-        
+
         owner = loadGame(file);
-    }    
+    }
 
 
-    
+
     /**
     * The owner of the game is the player that have loaded the
     * game.
@@ -170,8 +170,8 @@ public final class FreeColServer {
     public String getOwner() {
         return owner;
     }
-    
-    
+
+
     /**
     * Saves a game.
     * @param file The file where the data will be written.
@@ -200,17 +200,18 @@ public final class FreeColServer {
 
         // Add the game:
         savedGameElement.appendChild(game.toSavedXMLElement(document));
-        
+
         // Add the AIObjects:
         savedGameElement.appendChild(aiMain.toXMLElement(document));
-        
+
         // Write the XML Element to the file:
         try {
             TransformerFactory factory = TransformerFactory.newInstance();
             Transformer xmlTransformer = factory.newTransformer();
             xmlTransformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 
-            //PrintWriter out = new PrintWriter(new DeflaterOutputStream(new FileOutputStream(file)));
+            // For debugging (without compression):
+            //PrintWriter out = new PrintWriter(new FileOutputStream(file));
             DeflaterOutputStream out = new DeflaterOutputStream(new FileOutputStream(file));
             xmlTransformer.transform(new DOMSource(savedGameElement), new StreamResult(out));
             out.close();
@@ -219,8 +220,8 @@ public final class FreeColServer {
             return;
         }
     }
-    
-    
+
+
     /**
     * Loads a game.
     * @param file The file where the game data is located.
@@ -228,10 +229,10 @@ public final class FreeColServer {
     */
     public String loadGame(File file) throws IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(new InflaterInputStream(new FileInputStream(file))));
-        //InputStreamReader in = new InputStreamReader(new InflaterInputStream(new FileInputStream(file)), "ISO-8859-1");
+        // For debugging (without compression):
+        //BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
 
         Message message = new Message(in.readLine());
-        //Message message = new Message(in);
 
         Element savedGameElement = message.getDocument().getDocumentElement();
         String version = savedGameElement.getAttribute("version");
@@ -285,7 +286,7 @@ public final class FreeColServer {
         } else {
             aiMain = new AIMain(this);
         }
-        
+
         // Connect the AI-players:
         Iterator playerIterator = game.getPlayerIterator();
         while (playerIterator.hasNext()) {
@@ -407,12 +408,12 @@ public final class FreeColServer {
     public InGameController getInGameController() {
         return inGameController;
     }
-    
+
 
     public ServerModelController getModelController() {
         return modelController;
     }
-    
+
 
     /**
     * Gets the <code>Game</code> that is beeing played.
@@ -423,12 +424,12 @@ public final class FreeColServer {
         return game;
     }
 
-    
+
     public void setAIMain(AIMain aiMain) {
         this.aiMain = aiMain;
     }
 
-    
+
     public AIMain getAIMain() {
         return aiMain;
     }

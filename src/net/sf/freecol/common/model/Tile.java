@@ -38,15 +38,15 @@ public final class Tile extends FreeColGameObject implements Location {
                             ARCTIC = 9,
                             OCEAN = 10,
                             HIGH_SEAS = 11;
-                      
-    // An addition onto the tile can be one of the following:                             
+
+    // An addition onto the tile can be one of the following:
     public static final int ADD_NONE = 0,
                             ADD_RIVER_MINOR = 1,
                             ADD_RIVER_MAJOR = 2,
                             ADD_HILLS = 3,
                             ADD_MOUNTAINS = 4;
 
-    // Indians' claims on the tile may be one of the following:                    
+    // Indians' claims on the tile may be one of the following:
     public static final int CLAIM_NONE = 0,
                             CLAIM_VISITED = 1,
                             CLAIM_CLAIMED = 2;
@@ -57,12 +57,12 @@ public final class Tile extends FreeColGameObject implements Location {
                     bonus;
 
     private int     type;
-    
+
     private int     addition_type;
 
     private int     x,
                     y;
-                    
+
     private int     indianClaim;
 
     /** A pointer to the settlement located on this tile or 'null' if there is no settlement on this tile. */
@@ -109,7 +109,7 @@ public final class Tile extends FreeColGameObject implements Location {
         this.type = type;
         this.addition_type = ADD_NONE;
         this.indianClaim = CLAIM_NONE;
-        
+
         road = false;
         plowed = false;
         forested = false;
@@ -120,7 +120,7 @@ public final class Tile extends FreeColGameObject implements Location {
 
         owner = null;
         settlement = null;
-        
+
         for (int i=0; i<playerExploredTiles.length; i++) {
             playerExploredTiles[i] = new PlayerExploredTile(game, i);
             updatePlayerExploredTile(i);
@@ -208,7 +208,7 @@ public final class Tile extends FreeColGameObject implements Location {
         } else if (getType() == HIGH_SEAS) {
             return "High seas";
         }
-        
+
         return "Unknown";
     }
 
@@ -224,11 +224,11 @@ public final class Tile extends FreeColGameObject implements Location {
         return getGame().getMap().getDistance(getPosition(), tile.getPosition());
     }
 
-    
+
     public GoodsContainer getGoodsContainer() {
         return null;
     }
-        
+
 
     /**
     * Gets the <code>Unit</code> that is currently defending this <code>Tile</code>.
@@ -250,7 +250,7 @@ public final class Tile extends FreeColGameObject implements Location {
                 defender = nextUnit;
             }
         }
-        
+
         if (settlement != null) {
             if (defender == null || defender.isColonist() && !defender.isArmed() && !defender.isMounted()) {
                 return settlement.getDefendingUnit(attacker);
@@ -262,7 +262,7 @@ public final class Tile extends FreeColGameObject implements Location {
         }
     }
 
-    
+
     public int getMoveCost(Tile fromTile) {
         if (!isLand()) {
             return 3;
@@ -305,7 +305,7 @@ public final class Tile extends FreeColGameObject implements Location {
     public void disposeAllUnits() {
         unitContainer.disposeAllUnits();
     }
-    
+
 
     /**
     * Gets the first <code>Unit</code> on this tile.
@@ -389,7 +389,7 @@ public final class Tile extends FreeColGameObject implements Location {
         }
     }
 
-    
+
     /**
     * Returns 'true' if this Tile has a road.
     * @return 'true' if this Tile has a road.
@@ -437,16 +437,16 @@ public final class Tile extends FreeColGameObject implements Location {
     }
 
     /**
-    * Returns the addition on this Tile. 
+    * Returns the addition on this Tile.
     *
     * @return The addition on this Tile.
     */
     public int getAddition() {
         return addition_type;
     }
-    
+
     /**
-    * Sets the addition on this Tile. 
+    * Sets the addition on this Tile.
     * @param addition The addition on this Tile.
     */
     public void setAddition(int addition) {
@@ -462,15 +462,15 @@ public final class Tile extends FreeColGameObject implements Location {
     public int getClaim() {
         return indianClaim;
     }
-    
+
     /**
-    * Sets the claim on this Tile. 
+    * Sets the claim on this Tile.
     * @param claim The claim on this Tile.
     */
     public void setClaim(int claim) {
         indianClaim = claim;
     }
-    
+
     /**
     * Puts a <code>Settlement</code> on this <code>Tile</code>.
     * A <code>Tile</code> can only have one <code>Settlement</code>
@@ -545,7 +545,7 @@ public final class Tile extends FreeColGameObject implements Location {
     */
     public void setForested(boolean value) {
         forested = value;
-        bonus = false;        
+        bonus = false;
     }
 
     /**
@@ -555,7 +555,7 @@ public final class Tile extends FreeColGameObject implements Location {
     public void setPlowed(boolean value) {
         plowed = value;
     }
-    
+
     /**
     * Sets whether the tile has a road or not.
     * @param Value new value for forested
@@ -563,7 +563,7 @@ public final class Tile extends FreeColGameObject implements Location {
     public void setRoad(boolean value) {
         road = value;
     }
-    
+
     /**
     * Sets whether the tile has a bonus or not.
     * @param Value new value for bonus
@@ -581,8 +581,8 @@ public final class Tile extends FreeColGameObject implements Location {
         if(t < UNEXPLORED || t > HIGH_SEAS)
             throw new IllegalStateException("Tile type must be valid");
         type = t;
-        bonus = false; 
-        
+        bonus = false;
+
         if (!isLand()) {
             settlement = null;
             road = false;
@@ -670,7 +670,7 @@ public final class Tile extends FreeColGameObject implements Location {
     * a <code>Unit</code> not currently preforming any work.
     *
     * @return A <code>Unit</code> with <code>movesLeft > 0</code> or
-    *         <i>null</i> if no such <code>Unit</code> is located on this 
+    *         <i>null</i> if no such <code>Unit</code> is located on this
     *         <code>Tile</code>.
     */
     public Unit getMovableUnit() {
@@ -786,7 +786,7 @@ public final class Tile extends FreeColGameObject implements Location {
     public ArrayList getUnitsClone() {
         return unitContainer.getUnitsClone();
     }
-    
+
     /**
     * Checks wether or not the specified locatable may be added to this
     * <code>Location</code>.
@@ -797,7 +797,7 @@ public final class Tile extends FreeColGameObject implements Location {
     public boolean canAdd(Locatable locatable) {
         return true;
     }
-    
+
     /**
     * The potential of this tile to produce a certain type of goods.
     *
@@ -899,7 +899,7 @@ public final class Tile extends FreeColGameObject implements Location {
                 return Goods.ORE;
         }
     }
-    
+
     /**
     * The defense/ambush bonus of this tile.
     * @return The defense modifier (in percent) of this tile.
@@ -919,14 +919,14 @@ public final class Tile extends FreeColGameObject implements Location {
             { 0, 0}, // Ocean
             { 0, 0} // High seas
         };
-        
+
         if (addition_type == ADD_HILLS) {
             return 100;
         } else if (addition_type == ADD_MOUNTAINS) {
             return 150;
         }
         return defenseTable[type][(forested ? 1 : 0)];
-    } 
+    }
 
     /**
     * Prepares this <code>Tile</code> for a new turn.
@@ -943,6 +943,16 @@ public final class Tile extends FreeColGameObject implements Location {
     * @return The DOM-element ("Document Object Model") made to represent this "Tile".
     */
     public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
+        // TODO: This method always generates an XML with the latest version of this Tile,
+        //       but this method is called for each Tile after loading a game when updating
+        //       the map for each client so all players always end up receiving the very
+        //       latest version of a Tile after loadGame (even if they didn't visit the Tile
+        //       in ages).
+        //       To solve this problem we could add an extra toXMLElement method with a parameter
+        //       that indicates whether we should use the Tile data in the XML element or the
+        //       ExploredTile data of 'player'. The toXMLElement method of IndianSettlement
+        //       should also be expanded in the same way and the parameter should be passed on
+        //       to that method. (Create new class PlayerExploredIndianSettlement?)
         Element tileElement = document.createElement(getXMLElementTagName());
 
         tileElement.setAttribute("ID", getID());
@@ -972,7 +982,8 @@ public final class Tile extends FreeColGameObject implements Location {
             tileElement.appendChild(emptyUnitContainer.toXMLElement(player, document, showAll, toSavedGame));
         }
 
-        if (!showAll && !player.canSee(this)) {
+        //if (!showAll && !player.canSee(this)) {
+        if (!showAll) {
             if (player != null) {
                 playerExploredTiles[player.getNation()].setAttributes(tileElement);
             } else {
@@ -1039,7 +1050,7 @@ public final class Tile extends FreeColGameObject implements Location {
         } else {
             unitContainer = new UnitContainer(getGame(), this, unitContainerElement);
         }
-        
+
         // Only from a savegame:
         NodeList nl = tileElement.getElementsByTagName("playerExploredTile");
         for (int i=0; i<nl.getLength(); i++) {
@@ -1063,18 +1074,18 @@ public final class Tile extends FreeColGameObject implements Location {
         return "tile";
     }
 
-    
-    
+
+
     public PlayerExploredTile getPlayerExploredTile(Player player) {
         return playerExploredTiles[player.getNation()];
     }
-    
-    
+
+
     public void createPlayerExploredTile(Player player) {
         playerExploredTiles[player.getNation()] = new PlayerExploredTile(getGame(), player.getNation());
     }
-    
-    
+
+
     public void updatePlayerExploredTile(Player player) {
         updatePlayerExploredTile(player.getNation());
     }
@@ -1089,14 +1100,17 @@ public final class Tile extends FreeColGameObject implements Location {
             playerExploredTiles[nation].setColonyUnitCount(getSettlement().getUnitCount());
             playerExploredTiles[nation].setColonyStockadeLevel(getColony().getBuilding(Building.STOCKADE).getLevel());
         }
+        else if (getSettlement() != null) {
+            // Do nothing
+        }
     }
-    
+
 
 
     /**
     * This class contains the data visible to a specific player.
     *
-    * <br><br> 
+    * <br><br>
     *
     * Sometimes a tile contains information that should not be given to
     * a player. For instance; a settlement that was built after the player
@@ -1117,10 +1131,11 @@ public final class Tile extends FreeColGameObject implements Location {
                         plowed,
                         forested,
                         bonus;
-        
+
         // Settlement data:
         private int     colonyUnitCount;
         private int     colonyStockadeLevel;
+        private int     skill;
 
         //private Settlement settlement;
 
@@ -1148,8 +1163,8 @@ public final class Tile extends FreeColGameObject implements Location {
         public void setColonyUnitCount(int colonyUnitCount) {
             this.colonyUnitCount = colonyUnitCount;
         }
-        
-        
+
+
         public void setColonyStockadeLevel(int colonyStockadeLevel) {
             this.colonyStockadeLevel = colonyStockadeLevel;
         }
@@ -1179,6 +1194,10 @@ public final class Tile extends FreeColGameObject implements Location {
             this.explored = explored;
         }
 
+        public void setSkill(int newSkill) {
+            this.skill = newSkill;
+        }
+
 
         /**
         * Returns <i>true</i> if the tile has been explored.
@@ -1197,7 +1216,7 @@ public final class Tile extends FreeColGameObject implements Location {
 
 
         /**
-        * Hides the unvisible features of the given <code>tileElement</code>.
+        * Hides the invisible features of the given <code>tileElement</code>.
         */
         public void setAttributes(Element tileElement) {
             tileElement.setAttribute("road", Boolean.toString(road));
@@ -1222,6 +1241,10 @@ public final class Tile extends FreeColGameObject implements Location {
                     }
                 }
             }
+            /*else if (getSettlement() != null) {
+                Element settlementElement = (Element) tileElement.getElementsByTagName(Settlement.getXMLElementTagName());
+                settlementElement.setAttribute("learnableSkill", Integer.toString(skill));
+            }*/
         }
 
 
@@ -1254,6 +1277,7 @@ public final class Tile extends FreeColGameObject implements Location {
 
             tileElement.setAttribute("colonyUnitCount", Integer.toString(colonyUnitCount));
             tileElement.setAttribute("colonyStockadeLevel", Integer.toString(colonyStockadeLevel));
+            tileElement.setAttribute("learnableSkill", Integer.toString(skill));
 
             return tileElement;
         }
@@ -1265,7 +1289,7 @@ public final class Tile extends FreeColGameObject implements Location {
         */
         public void readFromXMLElement(Element tileElement) {
             setID(tileElement.getAttribute("ID"));
-            
+
             explored = Boolean.valueOf(tileElement.getAttribute("explored")).booleanValue();
             nation = Integer.parseInt(tileElement.getAttribute("nation"));
 
@@ -1273,9 +1297,10 @@ public final class Tile extends FreeColGameObject implements Location {
             plowed = Boolean.valueOf(tileElement.getAttribute("plowed")).booleanValue();
             forested = Boolean.valueOf(tileElement.getAttribute("forested")).booleanValue();
             bonus = Boolean.valueOf(tileElement.getAttribute("bonus")).booleanValue();
-            
+
             colonyUnitCount = Integer.parseInt(tileElement.getAttribute("colonyUnitCount"));
             colonyStockadeLevel = Integer.parseInt(tileElement.getAttribute("colonyStockadeLevel"));
+            skill = Integer.parseInt(tileElement.getAttribute("learnableSkill"));
         }
 
 

@@ -158,7 +158,7 @@ public final class InGameController {
         Map map = freeColClient.getGame().getMap();
 
         player.resetCanSeeTiles();
-        
+
         Iterator tileIterator = map.getWholeMapIterator();
         while (tileIterator.hasNext()) {
             Tile t = map.getTile((Map.Position) tileIterator.next());
@@ -169,7 +169,7 @@ public final class InGameController {
                 t.disposeAllUnits();
             }
         }
-        
+
         player.resetCanSeeTiles();
     }
 
@@ -838,7 +838,7 @@ public final class InGameController {
         client.send(changeStateElement);
     }
 
-    
+
     /**
     * Clears the orders of the given <code>Unit</code>.
     * The orders are cleared by making the unit {@link Unit#ACTIVE}.
@@ -905,10 +905,12 @@ public final class InGameController {
                 skill = Integer.parseInt(reply.getAttribute("skill"));
                 if (skill < 0) {
                     skillName = null;
-                } else {
+                }
+                else {
                     skillName = Unit.getName(skill);
                 }
-            } else {
+            }
+            else {
                 logger.warning("Server gave an invalid reply to an askSkill message");
                 return;
             }
@@ -917,7 +919,8 @@ public final class InGameController {
 
             if (skillName == null) {
                 canvas.errorMessage("indianSettlement.noMoreSkill");
-            } else {
+            }
+            else {
                 Element learnSkill = Message.createNewRootElement("learnSkillAtSettlement");
                 learnSkill.setAttribute("unit", unit.getID());
                 learnSkill.setAttribute("direction", Integer.toString(direction));
@@ -925,13 +928,15 @@ public final class InGameController {
                 if (canvas.showConfirmDialog("learnSkill.text", "learnSkill.yes", "learnSkill.no", skillName)) {
                     unit.setType(skill);
                     settlement.setLearnableSkill(IndianSettlement.NONE);
-                } else {
+                }
+                else {
                     learnSkill.setAttribute("action", "cancel");
                 }
 
                 client.send(learnSkill);
             }
-        } else {
+        }
+        else {
             canvas.errorMessage("indianSettlement.noMoreSkill");
         }
 

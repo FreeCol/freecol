@@ -204,7 +204,7 @@ public final class ConnectController {
         return true;
     }
 
-    
+
     /**
     * Reconnects to the server.
     */
@@ -223,15 +223,15 @@ public final class ConnectController {
     /**
     * Opens a dialog where the user should specify the filename
     * and loads the game.
-    */  
-    public void loadGame() {     
-        File file = freeColClient.getCanvas().showLoadDialog(FreeCol.getSaveDirectory());  
-        if (file != null) {               
+    */
+    public void loadGame() {
+        File file = freeColClient.getCanvas().showLoadDialog(FreeCol.getSaveDirectory());
+        if (file != null) {
             loadGame(file);
         }
     }
-    
-        
+
+
     /**
     * Loads a game from the given file.
     * @param file The <code>File</code>.
@@ -249,7 +249,7 @@ public final class ConnectController {
         }
 
         canvas.showStatusPanel(Messages.message("status.loadingGame"));
-        
+
         final File theFile = file;
         Thread t = new Thread() {
             public void run() {
@@ -260,7 +260,7 @@ public final class ConnectController {
                     final String username = freeColServer.getOwner();
 
                     freeColClient.setSingleplayer(freeColServer.isSingleplayer());
-                    
+
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             login(username, "127.0.0.1", 3541);
@@ -284,8 +284,8 @@ public final class ConnectController {
         };
         t.start();
     }
-    
-        
+
+
     /**
     * Sends a logout message to the server.
     *
