@@ -3,6 +3,7 @@ package net.sf.freecol.client;
 import java.util.logging.Logger;
 
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -38,6 +39,7 @@ public final class FreeColClient {
 
 
     // Gui:
+    private GraphicsDevice gd;
     private JFrame frame;
     private Canvas canvas;
     private GUI gui;
@@ -97,8 +99,15 @@ public final class FreeColClient {
         modelController = new ClientModelController(this);
 
         // Gui:
-        startGUI(windowed, imageLibrary, musicLibrary, sfxLibrary);
-
+        final boolean theWindowed = windowed;
+        final ImageLibrary theImageLibrary = imageLibrary;
+        final MusicLibrary theMusicLibrary = musicLibrary;
+        final SfxLibrary theSfxLibrary = sfxLibrary;
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                startGUI(theWindowed, theImageLibrary, theMusicLibrary, theSfxLibrary);
+            }
+        });
     }
 
 
@@ -128,7 +137,7 @@ public final class FreeColClient {
             logger.info("It seems that the GraphicsEnvironment is headless!");
         }
 
-        GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+        gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 
         if (windowed) {
             frame = new WindowedFrame();
@@ -154,12 +163,7 @@ public final class FreeColClient {
         }
 
         frame.getContentPane().add(canvas);
-
         frame.setVisible(true);
-
-        if (!windowed) {
-            ((FullScreenFrame) frame).display();
-        }
     }
 
 
@@ -245,6 +249,11 @@ public final class FreeColClient {
     */
     public void quit() {
         getConnectController().quitGame(true);
+        
+        if (!windowed) {
+            gd.setFullScreenWindow(null);
+        }
+
         System.exit(0);
     }
 

@@ -8,6 +8,7 @@ import java.awt.image.BufferStrategy;
 import java.awt.GraphicsDevice;
 import java.awt.Graphics2D;
 import java.awt.Graphics;
+import java.awt.Color;
 import java.util.logging.Logger;
 
 
@@ -18,7 +19,7 @@ import java.util.logging.Logger;
 */
 public final class FullScreenFrame extends JFrame {
     private static final Logger logger = Logger.getLogger(FullScreenFrame.class.getName());
-    private final BufferStrategy bufferStrategy;
+    //private final BufferStrategy bufferStrategy;
     private Canvas canvas;
 
 
@@ -36,10 +37,11 @@ public final class FullScreenFrame extends JFrame {
         //setIgnoreRepaint(true);
 
         gd.setFullScreenWindow(this);
+
         logger.info("Switched to full screen mode.");
 
-        createBufferStrategy(2);
-        bufferStrategy = getBufferStrategy();
+        //createBufferStrategy(2);
+        //bufferStrategy = getBufferStrategy();
 
         getContentPane().setLayout(null);
 
@@ -59,21 +61,22 @@ public final class FullScreenFrame extends JFrame {
     * Draws this frame on the screen. Should be called whenever something has changed
     * visually and should be updated immediately.
     */
-    public void display() {
+    /*public void display()
         if (bufferStrategy != null) {
             Graphics2D g = (Graphics2D)bufferStrategy.getDrawGraphics();
 
             if (!bufferStrategy.contentsLost()) {
-                super.paint(g);
-                /*if (canvas != null) {
-                    canvas.paintComponent(g);
-                }*/
+                try {
+                    super.paint(g);
+                } finally {
+                    g.dispose();
+                }
 
                 bufferStrategy.show();
-                g.dispose();
+
             }
         }
-    }
+    }*/
 
 
     /**
@@ -81,9 +84,9 @@ public final class FullScreenFrame extends JFrame {
     * called by Swing whenever needed.
     * @param g The Graphics context in which to paint this frame.
     */
-    public void paint(Graphics g) {
+    /*public void paint(Graphics g) {
         display();
-    }
+    }*/
 
 
     /**

@@ -2771,6 +2771,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         unitElement.setAttribute("owner", owner.getID());
         unitElement.setAttribute("turnsOfTraining", Integer.toString(turnsOfTraining));
         unitElement.setAttribute("trainingType", Integer.toString(trainingType));
+        unitElement.setAttribute("workType", Integer.toString(workType));
 
         if (entryLocation != null) {
             unitElement.setAttribute("entryLocation", entryLocation.getID());
@@ -2822,6 +2823,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         owner = (Player) getGame().getFreeColGameObject(unitElement.getAttribute("owner"));
         turnsOfTraining = Integer.parseInt(unitElement.getAttribute("turnsOfTraining"));
         trainingType = Integer.parseInt(unitElement.getAttribute("trainingType"));
+        
+        if (unitElement.hasAttribute("workType")) {
+            workType = Integer.parseInt(unitElement.getAttribute("workType"));
+        }
 
         if (owner == null) {
             logger.warning("VERY BAD: Can't find player with ID " + unitElement.getAttribute("owner") + "!");

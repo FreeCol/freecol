@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.UIManager;
+import javax.swing.SwingUtilities;
 
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.logging.DefaultHandler;
@@ -129,19 +130,23 @@ public final class FreeCol {
                 System.exit(-1);
             }
         } else {
-            try {
-                UIManager.setLookAndFeel(new FreeColLookAndFeel(dataFolder));
-            } catch (UnsupportedLookAndFeelException e) {
-                logger.warning("Could not load the \"FreeCol Look and Feel\"");
-            } catch (FreeColException e) {
-                e.printStackTrace();
-                System.out.println("\nThe data files could not be found by FreeCol. Please make sure");
-                System.out.println("they are present. If FreeCol is looking in the wrong directory");
-                System.out.println("then run the game with a command-line parameter:");
-                System.out.println("");
-                printUsage();
-                return;
-            }
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    try {
+                        UIManager.setLookAndFeel(new FreeColLookAndFeel(dataFolder));
+                    } catch (UnsupportedLookAndFeelException e) {
+                        logger.warning("Could not load the \"FreeCol Look and Feel\"");
+                    } catch (FreeColException e) {
+                        e.printStackTrace();
+                        System.out.println("\nThe data files could not be found by FreeCol. Please make sure");
+                        System.out.println("they are present. If FreeCol is looking in the wrong directory");
+                        System.out.println("then run the game with a command-line parameter:");
+                        System.out.println("");
+                        printUsage();
+                        return;
+                    }
+                }
+            });
 
             // TODO: don't use same datafolder for both images and music because the images are best kept inside the .JAR file.
 
