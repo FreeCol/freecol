@@ -729,7 +729,11 @@ public final class GUI {
                 for (int cX=-1; cX <=1; cX++) {
                     for (int cY=-1; cY <=1; cY++) {
                         if (biX+cX >= 0 && biY+cY >= 0 && biX+cX < bi.getWidth() && biY+cY < bi.getHeight() && bi.getRGB(biX + cX, biY + cY) == playerColor) {
-                            bi.setRGB(biX, biY, Color.BLACK.getRGB());
+                            if (playerColor != Color.BLACK.getRGB()) {
+                                bi.setRGB(biX, biY, Color.BLACK.getRGB());
+                            } else {
+                                bi.setRGB(biX, biY, Color.WHITE.getRGB());
+                            }
                             continue;
                         }
                     }

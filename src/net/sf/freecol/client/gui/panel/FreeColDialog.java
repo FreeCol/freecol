@@ -65,11 +65,21 @@ public class FreeColDialog extends JPanel {
         try {
             if (SwingUtilities.isEventDispatchThread()) {
                 EventQueue theQueue = getToolkit().getSystemEventQueue();
+
                 while (!responseGiven) {
                     // This is essentially the body of EventDispatchThread
                     AWTEvent event = theQueue.getNextEvent();
                     Object src = event.getSource();
-                    
+
+                    // Block 'MouseEvent' beeing sent to other components:
+                    if (event instanceof MouseEvent) {
+                        MouseEvent me = (MouseEvent) event;
+                        Component dc = SwingUtilities.getDeepestComponentAt(((ComponentEvent) event).getComponent(), me.getX(), me.getY());
+                        if (!SwingUtilities.isDescendingFrom(dc, this)) {
+                            continue;
+                        }
+                    }
+
                     // We cannot call theQueue.dispatchEvent, so I pasted its body here:
                     if (event instanceof ActiveEvent) {
                         ((ActiveEvent) event).dispatch();
@@ -95,7 +105,7 @@ public class FreeColDialog extends JPanel {
         return tempResponse;
     }
 
-    
+
     /**
     * Convenience method for {@link #getResponse}.
     */
@@ -110,7 +120,7 @@ public class FreeColDialog extends JPanel {
     public int getResponseInt() {
         return ((Integer) getResponse()).intValue();
     }
-    
+
 
     /**
     * Creates a new <code>FreeColDialog</code> with a text and a ok/cancel option.
@@ -123,7 +133,14 @@ public class FreeColDialog extends JPanel {
     * @return The <code>FreeColDialog</code>.
     */
     public static FreeColDialog createConfirmDialog(String text, String okText, String cancelText) {
-        final FreeColDialog confirmDialog = new FreeColDialog();
+        final JButton okButton = new JButton(okText);
+
+        final FreeColDialog confirmDialog = new FreeColDialog() {
+            public void requestFocus() {
+                okButton.requestFocus();
+            }
+        };
+
         confirmDialog.setLayout(new BorderLayout());
 
         JPanel labelPanel = new JPanel(new FlowLayout());
@@ -131,7 +148,6 @@ public class FreeColDialog extends JPanel {
 
         JPanel p1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-        JButton okButton = new JButton(okText);
         JButton cancelButton = new JButton(cancelText);
 
         okButton.addActionListener(new ActionListener() {
@@ -173,7 +189,14 @@ public class FreeColDialog extends JPanel {
     * @return The <code>FreeColDialog</code>.
     */
     public static FreeColDialog createInputDialog(String text, String defaultValue, String okText, String cancelText) {
-        final FreeColDialog inputDialog = new FreeColDialog();
+        final JTextField input = new JTextField(defaultValue);
+
+        final FreeColDialog inputDialog = new FreeColDialog()  {
+            public void requestFocus() {
+                input.requestFocus();
+            }
+        };
+
         inputDialog.setLayout(new GridLayout(3, 1));
 
         JPanel buttons = new JPanel(new GridLayout(1, 2));
@@ -181,7 +204,11 @@ public class FreeColDialog extends JPanel {
         JButton okButton = new JButton(okText);
         JButton cancelButton = new JButton(cancelText);
 
-        final JTextField input = new JTextField(defaultValue);
+        input.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                inputDialog.setResponse(input.getText());
+            }
+        });
 
         okButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {

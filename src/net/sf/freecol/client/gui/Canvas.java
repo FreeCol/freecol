@@ -265,13 +265,12 @@ public final class Canvas extends JLayeredPane {
 
         FreeColDialog confirmDialog = FreeColDialog.createConfirmDialog(text, okText, cancelText);
         confirmDialog.setLocation(getWidth() / 2 - confirmDialog.getWidth() / 2, getHeight() / 2 - confirmDialog.getHeight() / 2);
-        setEnabled(false);
         add(confirmDialog, new Integer(POPUP_LAYER.intValue() - 1));
+        confirmDialog.requestFocus();
 
         boolean response = confirmDialog.getResponseBoolean();
 
         remove(confirmDialog);
-        setEnabled(true);
 
         return response;
     }
@@ -298,13 +297,12 @@ public final class Canvas extends JLayeredPane {
 
         FreeColDialog inputDialog = FreeColDialog.createInputDialog(text, defaultValue, okText, cancelText);
         inputDialog.setLocation(getWidth() / 2 - inputDialog.getWidth() / 2, getHeight() / 2 - inputDialog.getHeight() / 2);
-        setEnabled(false);
         add(inputDialog, new Integer(POPUP_LAYER.intValue() - 1));
+        inputDialog.requestFocus();
 
         String response = (String) inputDialog.getResponse();
 
         remove(inputDialog);
-        setEnabled(true);
 
         return response;
     }
@@ -371,10 +369,19 @@ public final class Canvas extends JLayeredPane {
     * @param comp The component to remove from this Container.
     */
     public void remove(Component comp) {
+        boolean takeFocus = true;
+        if (comp == statusPanel) {
+            takeFocus = false;
+        }
+
         Rectangle bounds = comp.getBounds();
         setEnabled(true);
         super.remove(comp);
-        takeFocus();
+        
+        if (takeFocus) {
+            takeFocus();
+        }
+
         repaint(bounds.x, bounds.y, bounds.width, bounds.height);
     }
 
@@ -777,5 +784,5 @@ public final class Canvas extends JLayeredPane {
             }
         }
     }
-    
+
 }
