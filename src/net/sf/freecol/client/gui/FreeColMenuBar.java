@@ -45,7 +45,7 @@ public class FreeColMenuBar extends JMenuBar {
         gameMenu.add(newMenuItem);
         newMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                canvas.showNewGamePanel();
+                canvas.newGame();
             }
         });
 
@@ -55,6 +55,7 @@ public class FreeColMenuBar extends JMenuBar {
         gameMenu.add(openMenuItem);
         openMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                // TODO: show a confirmation dialog and quit the game
                 canvas.showOpenGamePanel();
             }
         });

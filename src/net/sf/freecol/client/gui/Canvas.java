@@ -838,6 +838,17 @@ public final class Canvas extends JLayeredPane {
     public FreeColClient getClient() {
       return freeColClient;
     }
+    
+    /**
+     * Displays a quit dialog and, if desired, logouts the current game and shows the new game panel.
+     */
+    public void newGame() {
+        if(!confirmQuitDialog())
+            return;
+        
+        freeColClient.getConnectController().quitGame(true);
+        showNewGamePanel();
+    }
 
     /**
     * Makes sure that old chat messages are removed in time.
