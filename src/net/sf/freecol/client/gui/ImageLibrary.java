@@ -192,7 +192,7 @@ public final class ImageLibrary extends ImageProvider {
      * homeDirectory + path + unitsDirectory + unitsName + UNITTYPE + extension
      * where '+' is the concatenation of Strings. and UNITTYPE is the type of the unit (as in the Unit class).
      */
-    private static final String path = new String("images/"),
+    private static final String path = new String("data/images/"),
                                 unitsDirectory = new String("units/"),
                                 unitsName = new String("Unit"),
                                 terrainDirectory = new String("terrain/"),

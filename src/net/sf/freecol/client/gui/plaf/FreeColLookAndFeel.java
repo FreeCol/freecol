@@ -45,7 +45,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
         super();
         
         if(dataFolder.equals("")) { // lookup is necessary
-            URL uiDir = resourceLocator.getResource("images/ui");
+            URL uiDir = resourceLocator.getResource("data/images/ui");
             if(uiDir == null)
                 throw new FreeColException("ui directory not found !");
         }
@@ -156,7 +156,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
             
             else {
                 URL url;
-                String uiFolder = "images/ui/";
+                String uiFolder = "data/images/ui/";
                 
                 url = resourceLocator.getResource(uiFolder + "bg.png");
                 if (url != null) {

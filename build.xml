@@ -2,7 +2,7 @@
 
 <project name="FreeCol" default="package">
   <property environment="env"/>
-  <property name="freecol.image.dir" value="${basedir}/data/images"/>
+  <property name="freecol.data.dir" value="${basedir}/data"/>
   <property name="freecol.src.dir" value="${basedir}/src"/>
   <property name="freecol.build.dir" value="${basedir}/src/classes"/>
   <property name="freecol.javadoc.dir" value="${basedir}/javadoc"/>
@@ -14,11 +14,6 @@
 
   <target name="compile" depends="init">
     <mkdir dir="${freecol.build.dir}"/>
-    <copy todir="${freecol.build.dir}/net/sf/freecol/images">
-      <fileset dir="${freecol.image.dir}">
-        <exclude name="**/CVS/**"/>
-      </fileset>
-    </copy>
     <javac srcdir="${freecol.src.dir}"
            destdir="${freecol.build.dir}"
            debug="on"
@@ -26,13 +21,21 @@
            deprecation="off"
            source="1.4"
     />
+  </target>
+
+  <target name="build" depends="init,compile">
+    <copy todir="${freecol.build.dir}/net/sf/freecol/data">
+      <fileset dir="${freecol.data.dir}">
+        <exclude name="**/CVS/**"/>
+      </fileset>
+    </copy>
     <copy todir="${freecol.build.dir}">
         <fileset dir="${freecol.src.dir}" includes="**/*.properties"
         	excludes="classes/**" />
     </copy>
   </target>
-
-  <target name="package" depends="init,compile">
+	
+  <target name="package" depends="init,build">
     <jar jarfile="${freecol.jar.file}"
          basedir="${freecol.build.dir}"
          manifest="${basedir}/src/MANIFEST.MF"
@@ -47,6 +50,7 @@
     </delete>
     <delete quiet="true" file="${freecol.jar.file}"/>
     <delete quiet="true" dir="${freecol.javadoc.dir}"/>
+  	<delete quiet="true" dir="${freecol.build.dir}"/>
   </target>
   
   <target name="fix" depends="init">
