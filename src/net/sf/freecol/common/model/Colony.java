@@ -512,7 +512,8 @@ public final class Colony extends Settlement implements Location {
             buildableUnits.add(new Integer(Unit.GALLEON));
             buildableUnits.add(new Integer(Unit.PRIVATEER));
             buildableUnits.add(new Integer(Unit.FRIGATE));
-            // TODO-LATER: Add "MAN_OF_WAR" if independent.
+            if(owner.getRebellionState() >= Player.REBELLION_IN_WAR)
+                buildableUnits.add(new Integer(Unit.MAN_O_WAR));
         }
         
         return buildableUnits.iterator();

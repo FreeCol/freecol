@@ -102,6 +102,10 @@ public class Player extends FreeColGameObject {
     // 0 = pre-rebels; 1 = in rebellion; 2 = independence granted
     private int             rebellionState;
 
+    public static final int REBELLION_PRE_WAR = 0;
+    public static final int REBELLION_IN_WAR = 1;
+    public static final int REBELLION_POST_WAR = 2;
+
     private int             crossesRequired = 1000000000; // Not allowed to recruit unit in the first round. ;-)
 
 
