@@ -6,7 +6,7 @@ import java.util.logging.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-//extends FreeColGameObject
+
 /**
 * Represents a locatable goods of a specified type and amount.
 */
@@ -198,6 +198,10 @@ public final class Goods implements Locatable {
         if (getLocation() == null) {
             throw new IllegalStateException("The goods need to be taken from a place, but 'location == null'.");
         } else if ((getLocation().getTile() == carrier.getTile())) {
+            if (carrier.getLocation() instanceof Europe && (carrier.getState() == Unit.TO_EUROPE || carrier.getState() == Unit.TO_AMERICA)) {
+                throw new IllegalStateException("Unloading cargo from a ship that is not in port in Europe.");
+            }
+
             setLocation(carrier);
         } else {
             throw new IllegalStateException("It is not allowed to load cargo onto a ship on another tile.");
@@ -216,6 +220,10 @@ public final class Goods implements Locatable {
 
         logger.info("Unloading cargo from a ship.");
         if (l instanceof Europe) {
+            if ((((Unit) getLocation()).getState() == Unit.TO_EUROPE || ((Unit) getLocation()).getState() == Unit.TO_AMERICA)) {
+                throw new IllegalStateException("Unloading cargo from a ship that is not in port in Europe.");
+            }
+
             setLocation(l);
         } else if (l.getTile().getSettlement() != null && l.getTile().getSettlement() instanceof Colony) {
             setLocation(l.getTile().getSettlement());
