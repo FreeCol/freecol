@@ -391,7 +391,9 @@ public class FreeColMenuBar extends JMenuBar {
 
         boolean enabled = (freeColClient.getGUI().getActiveUnit() != null)
                           && !canvas.getColonyPanel().isShowing()
-                          && !canvas.getEuropePanel().isShowing();
+                          && !canvas.getEuropePanel().isShowing()
+                          && !canvas.getChooseFoundingFatherDialog().isShowing()
+                          && !canvas.getEventPanel().isShowing();
 
         Iterator componentIterator = mapControlOptions.iterator();
         while (componentIterator.hasNext()) {

@@ -262,8 +262,10 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         }
 
         table.setEnabled(enabled);
-        
-        start.setEnabled(freeColClient.isAdmin());
+
+        if (enabled) {
+            start.setEnabled(freeColClient.isAdmin());
+        }
     }
 
 

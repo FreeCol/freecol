@@ -557,15 +557,22 @@ public final class Canvas extends JLayeredPane {
 
         chooseFoundingFatherDialog.setLocation(getWidth() / 2 - chooseFoundingFatherDialog.getWidth() / 2, getHeight() / 2 - chooseFoundingFatherDialog.getHeight() / 2);
         add(chooseFoundingFatherDialog, new Integer(POPUP_LAYER.intValue() - 1));
+        setEnabled(false);
         chooseFoundingFatherDialog.requestFocus();
 
         int response = chooseFoundingFatherDialog.getResponseInt();
 
         remove(chooseFoundingFatherDialog);
+        setEnabled(true);
 
         return response;
     }
 
+
+    public ChooseFoundingFatherDialog getChooseFoundingFatherDialog() {
+        return chooseFoundingFatherDialog;
+    }
+    
 
     /**
     * Shows the {@link EventPanel}.
@@ -575,13 +582,20 @@ public final class Canvas extends JLayeredPane {
 
         eventPanel.setLocation(getWidth() / 2 - eventPanel.getWidth() / 2, getHeight() / 2 - eventPanel.getHeight() / 2);
         add(eventPanel, new Integer(POPUP_LAYER.intValue() - 1));
+        setEnabled(false);
         eventPanel.requestFocus();
 
         boolean response = eventPanel.getResponseBoolean();
 
         remove(eventPanel);
+        setEnabled(true);
 
         return response;
+    }
+
+
+    public EventPanel getEventPanel() {
+        return eventPanel;
     }
 
 

@@ -2504,7 +2504,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             }
         }
 
-        if (getOwner().hasFather(FoundingFather.GEORGE_WASHINGTION)) { // || randomChance == true
+        if (getOwner().hasFather(FoundingFather.GEORGE_WASHINGTON)) { // || randomChance == true
             String oldName = getName();
 
             if (getType() == PETTY_CRIMINAL) {

@@ -105,6 +105,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
         
         private JLabel header;
         private JTextArea description;
+        private JTextArea text;
         private JButton ok;
         private JPanel p1;
         
@@ -130,7 +131,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
             p1.setLayout(new BorderLayout(20, 20));
             p1.setOpaque(false);
             p1.setBorder(new EmptyBorder(20, 20, 20, 20));
-            
+
             Image image = null;
             switch (type) {
                 case 0: image = (Image) UIManager.get("FoundingFather.trade"); break;
@@ -139,7 +140,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
                 case 3: image = (Image) UIManager.get("FoundingFather.political"); break;
                 case 4: image = (Image) UIManager.get("FoundingFather.religious"); break;
             }
-            
+
             JLabel imageLabel;
             if (image != null) {
                 imageLabel = new JLabel(new ImageIcon(image));
@@ -149,8 +150,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
 
             p1.add(imageLabel, BorderLayout.WEST);
 
-            JPanel p2 = new JPanel();
-            p2.setLayout(new BorderLayout());
+            JPanel p2 = new JPanel(new BorderLayout());
             p2.setOpaque(false);
 
             description = new JTextArea();
@@ -160,16 +160,29 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
             description.setEditable(false);
             description.setWrapStyleWord(true);
             description.setFocusable(false);
-            description.setSize(250, 60);
+            //description.setFont(description.getFont().deriveFont(Font.BOLD+Font.ITALIC));
             p2.add(description, BorderLayout.NORTH);
 
+            text = new JTextArea();
+            text.setBorder(null);
+            text.setOpaque(false);
+            text.setLineWrap(true);
+            text.setEditable(false);
+            text.setWrapStyleWord(true);
+            text.setFocusable(false);
+            p2.add(text, BorderLayout.CENTER);
+
+            JPanel p3 = new JPanel(new BorderLayout());
+            p3.setOpaque(false);
+            p3.setBorder(new EmptyBorder(0, 160, 20, 160));
             ok = new JButton(Messages.message("chooseThisFoundingFather"));
             ok.addActionListener(chooseFoundingFatherDialog);
             ok.setSize(ok.getPreferredSize());
-            p2.add(ok, BorderLayout.SOUTH);
+            p3.add(ok, BorderLayout.CENTER);
 
             p1.add(p2, BorderLayout.CENTER);
             add(p1, BorderLayout.CENTER);
+            add(p3, BorderLayout.SOUTH);
         }
 
 
@@ -178,24 +191,25 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
         }
 
         public Dimension getPreferredSize() {
-            return new Dimension(550, super.getPreferredSize().height);
+            return new Dimension(570, super.getPreferredSize().height);
         }
 
-        
+
         /**
         * Prepares this panel to be displayed.
         */
         public void initialize(int foundingFather) {
             this.foundingFather = foundingFather;
-            
+
             if (foundingFather != -1) {
                 header.setText(Messages.message(FoundingFather.getName(foundingFather)));
                 description.setText(Messages.message(FoundingFather.getDescription(foundingFather)));
+                text.setText("\n" + "[" + Messages.message(FoundingFather.getBirthAndDeath(foundingFather)) + "] " + Messages.message(FoundingFather.getText(foundingFather)));
                 ok.setActionCommand(Integer.toString(foundingFather));
             }
         }
-        
-        
+
+
         public boolean isEnabled() {
             if (foundingFather != -1) {
                 return true;

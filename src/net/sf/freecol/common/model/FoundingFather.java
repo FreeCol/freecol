@@ -22,7 +22,7 @@ public class FoundingFather {
                             HENRY_HUDSON = 8,
                             LA_SALLE = 9,
                             HERNAN_CORTES = 10,//TODO
-                            GEORGE_WASHINGTION = 11,
+                            GEORGE_WASHINGTON = 11,
                             PAUL_REVERE = 12,
                             FRANCIS_DRAKE = 13,
                             JOHN_PAUL_JONES = 14,
@@ -57,6 +57,16 @@ public class FoundingFather {
     }
 
 
+    public static String getText(int foundingFather) {
+        return getPrefix(foundingFather) + ".text";
+    }
+
+
+    public static String getBirthAndDeath(int foundingFather) {
+        return getPrefix(foundingFather) + ".birthAndDeath";
+    }
+
+
     private static String getPrefix(int foundingFather) {
         switch (foundingFather) {
             case ADAM_SMITH: return "foundingFather.adamSmith";
@@ -70,7 +80,7 @@ public class FoundingFather {
             case HENRY_HUDSON: return "foundingFather.henryHudson";
             case LA_SALLE: return "foundingFather.laSalle";
             case HERNAN_CORTES: return "foundingFather.hernanCortes";
-            case GEORGE_WASHINGTION: return "foundingFather.georgeWashingtion";
+            case GEORGE_WASHINGTON: return "foundingFather.georgeWashington";
             case PAUL_REVERE: return "foundingFather.paulRevere";
             case FRANCIS_DRAKE: return "foundingFather.francisDrake";
             case JOHN_PAUL_JONES: return "foundingFather.johnPaulJones";
@@ -103,7 +113,7 @@ public class FoundingFather {
             case HENRY_HUDSON: return EXPLORATION;
             case LA_SALLE: return EXPLORATION;
             case HERNAN_CORTES: return MILITARY;
-            case GEORGE_WASHINGTION: return MILITARY;
+            case GEORGE_WASHINGTON: return MILITARY;
             case PAUL_REVERE: return MILITARY;
             case FRANCIS_DRAKE: return MILITARY;
             case JOHN_PAUL_JONES: return MILITARY;
@@ -167,7 +177,7 @@ public class FoundingFather {
             case HENRY_HUDSON: return 10;
             case LA_SALLE: return 7;
             case HERNAN_CORTES: return 6;
-            case GEORGE_WASHINGTION: return 0;
+            case GEORGE_WASHINGTON: return 0;
             case PAUL_REVERE: return 10;
             case FRANCIS_DRAKE: return 4;
             case JOHN_PAUL_JONES: return 0;
@@ -200,7 +210,7 @@ public class FoundingFather {
             case HENRY_HUDSON: return 1;
             case LA_SALLE: return 5;
             case HERNAN_CORTES: return 5;
-            case GEORGE_WASHINGTION: return 4;
+            case GEORGE_WASHINGTON: return 4;
             case PAUL_REVERE: return 2;
             case FRANCIS_DRAKE: return 8;
             case JOHN_PAUL_JONES: return 6;
@@ -233,7 +243,7 @@ public class FoundingFather {
             case HENRY_HUDSON: return 1; // 0
             case LA_SALLE: return 3;
             case HERNAN_CORTES: return 1;
-            case GEORGE_WASHINGTION: return 10;
+            case GEORGE_WASHINGTON: return 10;
             case PAUL_REVERE: return 1;
             case FRANCIS_DRAKE: return 6;
             case JOHN_PAUL_JONES: return 7;
