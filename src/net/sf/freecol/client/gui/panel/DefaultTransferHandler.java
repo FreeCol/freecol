@@ -426,7 +426,7 @@ public final class DefaultTransferHandler extends TransferHandler {
 
     /**
      * This is the default drag handler for drag and drop operations that
-     * use the &ltcode&gtTransferHandler</code>.
+     * use the <code>TransferHandler</code>.
      */
     private static class FreeColDragHandler implements DragGestureListener, DragSourceListener {
 
@@ -442,7 +442,7 @@ public final class DefaultTransferHandler extends TransferHandler {
             JComponent c = (JComponent) dge.getComponent();
             DefaultTransferHandler th = (DefaultTransferHandler) c.getTransferHandler();
             Transferable t = th.createTransferable(c);
-            
+
             if (t != null) {
                 scrolls = c.getAutoscrolls();
                 c.setAutoscrolls(false);
@@ -464,11 +464,13 @@ public final class DefaultTransferHandler extends TransferHandler {
                             image = imageIcon.getImage().getScaledInstance(-1, bestSize.height, Image.SCALE_DEFAULT);
                         }
 
-                        dge.startDrag(tk.createCustomCursor(image, new Point(0,0), "freeColDragIcon"), t, this);
+                        //Point point = new Point(0, 0);
+                        Point point = new Point(bestSize.width / 2, bestSize.height / 2);
+                        dge.startDrag(tk.createCustomCursor(image, point, "freeColDragIcon"), t, this);
                     } else {
                         dge.startDrag(null, t, this);
                     }
-                    
+
                     return;
                 } catch (RuntimeException re) {
                     c.setAutoscrolls(scrolls);
