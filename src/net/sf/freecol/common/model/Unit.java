@@ -1628,10 +1628,75 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
     * @return A random unit type of a unit that is recruitable in Europe.
     */
     public static int generateRecruitable() {
-        // There MUST be a better way to do this.
-        int random = (int)(Math.random() * UNIT_COUNT);
+        // Here's the old way of doing this:
+/*        int random = (int)(Math.random() * UNIT_COUNT);
         while (!Unit.isRecruitable(random)) {
             random = (int)(Math.random() * UNIT_COUNT);
+        }*/
+        //...and here's my way of doing this: -sjm
+        int chance = (int)(Math.random() * 100);
+        int random = PETTY_CRIMINAL;
+        if (chance < 40) {
+             random = PETTY_CRIMINAL;
+        } else if (chance < 55) {
+             random = INDENTURED_SERVANT;
+        } else if (chance < 67) {
+             random = FREE_COLONIST;
+        } else {
+            switch ((int) ((chance - 67) / 2)) {
+            default:
+            case 0:
+                random = EXPERT_ORE_MINER;
+                break;
+            case 1:
+                random = EXPERT_LUMBER_JACK;
+                break;
+            case 2:
+                random = MASTER_GUNSMITH;
+                break;
+            case 3:
+                random = EXPERT_SILVER_MINER;
+                break;
+            case 4:
+                random = MASTER_FUR_TRADER;
+                break;
+            case 5:
+                random = MASTER_CARPENTER;
+                break;
+            case 6:
+                random = EXPERT_FISHERMAN;
+                break;
+            case 7:
+                random = MASTER_BLACKSMITH;
+                break;
+            case 8:
+                random = EXPERT_FARMER;
+                break;
+            case 9:
+                random = MASTER_DISTILLER;
+                break;
+            case 10:
+                random = HARDY_PIONEER;
+                break;
+            case 11:
+                random = MASTER_TOBACCONIST;
+                break;
+            case 12:
+                random = MASTER_WEAVER;
+                break;
+            case 13:
+                random = JESUIT_MISSIONARY;
+                break;
+            case 14:
+                random = FIREBRAND_PREACHER;
+                break;
+            case 15:
+                random = ELDER_STATESMAN;
+                break;
+            case 16:
+                random = VETERAN_SOLDIER;
+                break;
+            }
         }
         return random;
     }
@@ -2065,6 +2130,12 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
                 return 3;
             case MASTER_GUNSMITH:
                 if (goods == Goods.MUSKETS) return 6;
+                return 3;
+            case ELDER_STATESMAN:
+                if (goods == Goods.BELLS) return 6;
+                return 3;
+            case FIREBRAND_PREACHER:
+                if (goods == Goods.CROSSES) return 6;
                 return 3;
             case INDENTURED_SERVANT:
                 return 2;

@@ -65,6 +65,9 @@ public class Player extends FreeColGameObject {
     private int             gold;
     private Europe          europe;
     private boolean         ready;
+    
+    private int             crosses;
+    private int             bells;
 
 
     private Location entryLocation;
@@ -105,6 +108,9 @@ public class Player extends FreeColGameObject {
 
         // TODO (this is for testing only): Set to 0
         gold = 10000;
+        
+        crosses = 0;
+        bells = 0;
     }
 
 
@@ -407,8 +413,84 @@ public class Player extends FreeColGameObject {
 
         return units.iterator();
     }
+    
+    /**
+    * Increments the player's cross count, with benefits thereof.
+    * @param num The number of crosses to add.
+    */
+    public void incrementCrosses(int num) {
+        crosses += num;
+        updateRecruitmentPrice();
+    }
+    
+    /**
+    * Checks to see whether or not a colonist can emigrate, and does so if possible.
+    * @return Whether a new colonist should immigrate.
+    */
+    public boolean checkEmigrate() {
+        if (crosses >= getCrossesRequired()) {
+            crosses -= getCrossesRequired();
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+    * Gets the number of crosses required to cause a new colonist to emigrate.
+    * @return The number of crosses required to cause a new colonist to emigrate.
+    */
+    public int getCrossesRequired() {
+        // The book I have tells me the crosses needed is:
+        // [(colonist count in colonies + total colonist count) * 2] + 8.
+        // So every unit counts as 2 unless they're in a colony,
+        // wherein they count as 4.
+        // This does that, I think. -sjm
+        int count = 8;
+        
+        ArrayList units = new ArrayList();
+        Map map = getGame().getMap();
 
+        Iterator tileIterator = map.getWholeMapIterator();
+        while (tileIterator.hasNext()) {
+            Tile t = map.getTile((Map.Position) tileIterator.next());
 
+            if (t != null && t.getFirstUnit() != null && t.getFirstUnit().getOwner().equals(this)) {
+                Iterator unitIterator = t.getUnitIterator();
+                while (unitIterator.hasNext()) {
+                    Unit u = (Unit) unitIterator.next();
+
+                    Iterator childUnitIterator = u.getUnitIterator();
+                    while (childUnitIterator.hasNext()) {
+                        Unit childUnit = (Unit) childUnitIterator.next();
+                        units.add(childUnit);
+                    }
+
+                    count += 2;
+                }
+            } else if (t != null && t.getSettlement() != null && (t.getSettlement() instanceof Colony)) {
+              count += (((Colony)t.getSettlement()).getUnitCount()) * 4; // Units in colonies count doubly. -sjm
+            }
+        }
+        
+        if (nation == ENGLISH) count = (count * 2) / 3;
+        
+        return count;
+    }
+    
+    public void updateRecruitmentPrice() {
+        int newprice = 250 - ((crosses * 150) / getCrossesRequired());
+        europe.setRecruitPrice(newprice);
+    }
+
+    /**
+    * Increments the player's bell count, with benefits thereof.
+    * @param num The number of bells to add.
+    */
+    public void incrementBells(int num) {
+        bells += num;
+        //TODO: founding fathers
+    }
+    
     /**
     * Prepares this <code>Player</code> for a new turn.
     */
@@ -432,6 +514,8 @@ public class Player extends FreeColGameObject {
         playerElement.setAttribute("color", Integer.toString(color.getRGB()));
         playerElement.setAttribute("admin", Boolean.toString(admin));
         playerElement.setAttribute("gold", Integer.toString(gold));
+        playerElement.setAttribute("crosses", Integer.toString(crosses));
+        playerElement.setAttribute("bells", Integer.toString(bells));
         playerElement.setAttribute("ready", Boolean.toString(ready));
         
         if (entryLocation != null) {
@@ -458,6 +542,8 @@ public class Player extends FreeColGameObject {
         color = new Color(Integer.parseInt(playerElement.getAttribute("color")));
         admin = (new Boolean(playerElement.getAttribute("admin"))).booleanValue();
         gold = Integer.parseInt(playerElement.getAttribute("gold"));
+        crosses = Integer.parseInt(playerElement.getAttribute("crosses"));
+        bells = Integer.parseInt(playerElement.getAttribute("bells"));
         ready = (new Boolean(playerElement.getAttribute("ready"))).booleanValue();
         
         if (playerElement.hasAttribute("entryLocation")) {

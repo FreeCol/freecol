@@ -351,7 +351,7 @@ public final class Building extends FreeColGameObject implements WorkLocation {
 
 	Goods thepackage;
 
-        if (level == NOT_BUILT) return; // Don't do anything if the building does not exist.
+        if ((level == NOT_BUILT) && (type != CHURCH)) return; // Don't do anything if the building does not exist.
 
         // Figure out what's produced here and what it requires to do so.
         switch(type) {
@@ -379,7 +379,15 @@ public final class Building extends FreeColGameObject implements WorkLocation {
                 goodsInputType = Goods.TOOLS;
                 goodsOutputType = Goods.MUSKETS;
                 break;
-           default:
+            case CHURCH:
+                goodsOutputType = Goods.CROSSES;
+                goodsOutput = 1;
+                break;
+            case TOWN_HALL:
+                goodsOutputType = Goods.BELLS;
+                goodsOutput = 1;
+                break;
+            default:
                 break;
         }
         if (goodsOutputType < 0) return;
@@ -390,9 +398,9 @@ public final class Building extends FreeColGameObject implements WorkLocation {
             goodsOutput += ((Unit) unitIterator.next()).getProducedAmount(goodsOutputType);
         }
         goodsInput = goodsOutput;
-        goodsOutput *= level;
+        goodsOutput *= (type == CHURCH) ? level + 1 : level;
         goodsInput *= ((level > SHOP) ? SHOP : level); // Factories don't need the extra 3 units.
-        if (colony.getGoodsCount(goodsInputType) < goodsInput) // Not enough goods to do this?
+        if ((goodsInputType > -1) && (colony.getGoodsCount(goodsInputType) < goodsInput)) // Not enough goods to do this?
         {
             goodsInput = colony.getGoodsCount(goodsInputType);
             if (level < FACTORY) {
@@ -404,6 +412,14 @@ public final class Building extends FreeColGameObject implements WorkLocation {
         if (goodsOutput <= 0) return;
 
         // Actually produce the goods.
+        if (goodsOutputType == Goods.CROSSES) {
+            colony.getOwner().incrementCrosses(goodsOutput);
+            return;
+        } else if (goodsOutputType == Goods.BELLS) {
+            colony.getOwner().incrementBells(goodsOutput);
+            //TODO: SoL membership
+            return;
+        }
         colony.removeAmountAndTypeOfGoods(goodsInputType, goodsInput);
         thepackage = new Goods(getGame(), null, goodsOutputType, goodsOutput);
 	thepackage.setLocation(colony);

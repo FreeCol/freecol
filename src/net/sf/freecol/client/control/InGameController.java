@@ -625,6 +625,22 @@ public final class InGameController {
         }
     }
 
+    /**
+    * Cause a unit to emigrate from a specified "slot" in Europe.
+    * @param slot The slot from which the unit emigrates. Either 1, 2 or 3.
+    */
+    public void emigrateUnitInEurope(int slot) {
+        Client client = freeColClient.getClient();
+        Canvas canvas = freeColClient.getCanvas();
+        Game game = freeColClient.getGame();
+        Player myPlayer = freeColClient.getMyPlayer();
+        Europe europe = myPlayer.getEurope();
+
+        Element emigrateUnitInEuropeElement = Message.createNewRootElement("emigrateUnitInEurope");
+        emigrateUnitInEuropeElement.setAttribute("slot", Integer.toString(slot));
+
+        client.send(emigrateUnitInEuropeElement);
+    }
 
     /**
     * Purchases a unit of a specified type in Europe.

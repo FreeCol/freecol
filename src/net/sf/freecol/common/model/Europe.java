@@ -58,7 +58,7 @@ public final class Europe extends FreeColGameObject implements Location {
 
         unitContainer = new UnitContainer(game, this);
 
-        setRecruitPrice(100);
+        setRecruitPrice(250); // Base price is 250 with no crosses. -sjm
 
         setRecruitable(1, Unit.generateRecruitable());
         setRecruitable(2, Unit.generateRecruitable());
@@ -156,9 +156,31 @@ public final class Europe extends FreeColGameObject implements Location {
         
         //setRecruitable(slot, Unit.generateRecruitable());
         setRecruitable(slot, newRecruitable);
-        setRecruitPrice(getRecruitPrice() * 2);
+        //Note that the player object causes this to change -sjm
+        //setRecruitPrice(getRecruitPrice() * 2);
     }
 
+    /**
+    * Causes a unit to emigrate from Europe.
+    *
+    * @param slot The slot the emigrated unit(type) came from. This is needed
+    *             for setting a new recruitable to this slot.
+    * @param unit The recruited unit.
+    * @param newRecruitable The recruitable that will fill the now empty slot.
+    * @exception NullPointerException if <code>unit == null</code>.
+    */
+    public void emigrate(int slot, Unit unit, int newRecruitable) {
+        if (unit == null) {
+            throw new NullPointerException();
+        }
+
+        unit.setLocation(this);
+        
+        //setRecruitable(slot, Unit.generateRecruitable());
+        setRecruitable(slot, newRecruitable);
+        //Note that the player object causes this to change -sjm
+        //setRecruitPrice(getRecruitPrice() * 2);
+    }
 
     /**
     * Returns <i>null</i>.

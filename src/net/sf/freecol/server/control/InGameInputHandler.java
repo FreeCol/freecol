@@ -87,6 +87,8 @@ public final class InGameInputHandler implements MessageHandler {
                     reply = buildColony(connection, element);
                 } else if (type.equals("recruitUnitInEurope")) {
                     reply = recruitUnitInEurope(connection, element);
+                } else if (type.equals("emigrateUnitInEurope")) {
+                    reply = emigrateUnitInEurope(connection, element);
                 } else if (type.equals("trainUnitInEurope")) {
                     reply = trainUnitInEurope(connection, element);
                 } else if (type.equals("equipunit")) {
@@ -591,6 +593,37 @@ public final class InGameInputHandler implements MessageHandler {
         return reply;
     }
 
+    /**
+    * Handles an "emigrateUnitInEurope"-request from a client.
+    *
+    * @param connection The connection the message came from.
+    * @param element The element containing the request.
+    */
+    private Element emigrateUnitInEurope(Connection connection, Element emigrateUnitInEuropeElement) {
+        Game game = freeColServer.getGame();
+        Player player = freeColServer.getPlayer(connection);
+        Europe europe = player.getEurope();
+
+        int slot = Integer.parseInt(emigrateUnitInEuropeElement.getAttribute("slot"));
+        int recruitable = europe.getRecruitable(slot);
+        int newRecruitable = Unit.generateRecruitable();
+
+        Unit unit = new Unit(game, player, recruitable);
+
+        Element reply = Message.createNewRootElement("emigrateUnitInEuropeConfirmed");
+        reply.setAttribute("newRecruitable", Integer.toString(newRecruitable));
+        reply.setAttribute("slot", Integer.toString(slot));
+        reply.appendChild(unit.toXMLElement(player, reply.getOwnerDocument()));
+
+        europe.emigrate(slot, unit, newRecruitable);
+
+        try {
+            connection.send(reply);
+        } catch (IOException e) {
+            logger.warning("Can't send the player an emigrateUnitInEuropeConfirmed element.");
+        }
+        return null;
+    }
 
     /**
     * Handles a "trainUnitInEurope"-request from a client.

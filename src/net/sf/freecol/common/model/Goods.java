@@ -35,9 +35,12 @@ public final class Goods extends FreeColGameObject implements Locatable {
                             COATS = 12,
                             TRADE_GOODS = 13,
                             TOOLS = 14,
-                            MUSKETS = 15;
+                            MUSKETS = 15,
+                            //FISH = 16; //Probably not needed except for graphical purposes -sjm
+                            BELLS = 17,
+                            CROSSES = 18;
     
-    public static final int NUMBER_OF_TYPES = 16;
+    public static final int NUMBER_OF_TYPES = 16; // Anything past this point can't be stored -sjm
 
 
     private int type;
