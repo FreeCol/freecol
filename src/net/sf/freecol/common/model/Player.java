@@ -410,8 +410,9 @@ public class Player extends FreeColGameObject {
     public String getColorAsString() {
         final String[] colorNames = {"Black", "Blue", "Cyan", "Gray", "Green", "Magenta",
                 "Orange", "Pink", "Red", "White", "Yellow"};
-        final Color[] colors = {Color.BLACK, Color.BLUE, Color.CYAN, Color.GRAY, Color.GREEN,
-                Color.MAGENTA, Color.ORANGE, Color.PINK, Color.RED, Color.WHITE, Color.YELLOW};
+        final Color[] colors = {Color.BLACK, Color.BLUE, Color.CYAN, Color.GRAY,
+                Color.GREEN, Color.MAGENTA, Color.ORANGE, Color.PINK, Color.RED,
+                Color.WHITE, Color.YELLOW};
 
         for (int i = 0; i < colors.length; i++) {
             if (color.equals(colors[i])) {
@@ -436,17 +437,18 @@ public class Player extends FreeColGameObject {
     * @throw FreeColException In case the given nation is invalid.
     */
     public void setNation(String n) throws FreeColException {
-        if (n.toLowerCase().equals("dutch")) {
-            setNation(DUTCH);
-        } else if (n.toLowerCase().equals("english")) {
-            setNation(ENGLISH);
-        } else if (n.toLowerCase().equals("french")) {
-            setNation(FRENCH);
-        } else if (n.toLowerCase().equals("spanish")) {
-            setNation(SPANISH);
-        } else {
-            throw new FreeColException("Invalid nation '" + n + "'.");
+        final String[] nationNames = {"dutch", "english", "french", "spanish", "apache",
+                "arawak", "aztec", "cherokee", "inca", "iroquois", "sioux", "tupi"};
+        final int[] nations = {DUTCH, ENGLISH, FRENCH, SPANISH, APACHE, ARAWAK, AZTEC,
+                CHEROKEE, INCA, IROQUOIS, SIOUX, TUPI};
+
+        for (int i = 0; i < nationNames.length; i++) {
+            if (n.toLowerCase().equals(nationNames[i])) {
+                setNation(nations[i]);
+            }
         }
+
+        throw new FreeColException("Invalid nation '" + n + "'.");
     }
 
     /**

@@ -51,7 +51,9 @@ public final class StartGamePanel extends JPanel implements ActionListener {
                                 CHAT = 4;
 
     private final String[]  mapSizes = {"Small", "Medium", "Large", "Huge"};
-    private final String[]  nations = {"Dutch", "French", "English", "Spanish"};
+    private static final String[]  nations = {"Dutch", "French", "English", "Spanish"};
+    private static final String[]  tribes = {"Apache", "Arawak", "Aztec", "Cherokee",
+                                        "Inca", "Iroquois", "Sioux", "Tupi"};
     private final String[]  colors = {"Black", "Blue", "Cyan", "Gray", "Green", "Magenta",
                                         "Orange", "Pink", "Red", "White", "Yellow"};
 
@@ -89,14 +91,21 @@ public final class StartGamePanel extends JPanel implements ActionListener {
     }
 
 
-    private final class ComboBoxRenderer extends JComboBox implements TableCellRenderer {
-        public ComboBoxRenderer(String[] items) {
-            super(items);
+    private static final JComboBox standardNationsComboBox = new JComboBox(nations);
+    private static final JComboBox indianTribesComboBox = new JComboBox(tribes);
+
+    private final class ComboBoxRenderer implements TableCellRenderer {
+        public ComboBoxRenderer() {
         }
 
         public Component getTableCellRendererComponent(JTable table, Object value,
                 boolean isSelected, boolean hasFocus, int row, int column) {
-            /* if (isSelected) draw the component in another way */
+
+            if (column == 2) {
+                JComboBox myBox = new JComboBox(colors);
+                myBox.setSelectedItem(value);
+                return myBox;
+            }
 
             Player player = (Player)freeColClient.getGame().getPlayers().get(row);
             if (player.isAI()) {
@@ -105,26 +114,23 @@ public final class StartGamePanel extends JPanel implements ActionListener {
                         && (nation != Player.FRENCH) && (nation != Player.SPANISH)) {
                     // This is an indian AI player.
 
-                    // TODO: Return a combobox for indian players as well.
-
-                    JTextField jtf = new JTextField(player.getNationAsString());
-                    jtf.setForeground(Color.LIGHT_GRAY);
-                    return jtf;
+                    indianTribesComboBox.setForeground(Color.LIGHT_GRAY);
+                    return indianTribesComboBox;
                 }
                 else {
-                    setForeground(Color.LIGHT_GRAY);
+                    standardNationsComboBox.setForeground(Color.LIGHT_GRAY);
                 }
             }
             else if (player.isReady()) {
-                setForeground(Color.GRAY);
+                standardNationsComboBox.setForeground(Color.GRAY);
             }
             else {
-                setForeground(table.getForeground());
+                standardNationsComboBox.setForeground(table.getForeground());
             }
-            setBackground(table.getBackground());
+            standardNationsComboBox.setBackground(table.getBackground());
 
-            setSelectedItem(value);
-            return this;
+            standardNationsComboBox.setSelectedItem(value);
+            return standardNationsComboBox;
         }
     }
 
@@ -159,9 +165,9 @@ public final class StartGamePanel extends JPanel implements ActionListener {
         TableColumn nationsColumn = table.getColumnModel().getColumn(1),
                     colorsColumn = table.getColumnModel().getColumn(2);
         nationsColumn.setCellEditor(new NationEditor());
-        nationsColumn.setCellRenderer(new ComboBoxRenderer(nations));
+        nationsColumn.setCellRenderer(new ComboBoxRenderer());
         colorsColumn.setCellEditor(new ColorEditor());
-        colorsColumn.setCellRenderer(new ComboBoxRenderer(colors));
+        colorsColumn.setCellRenderer(new ComboBoxRenderer());
 
         table.setRowHeight(22);
         table.setCellSelectionEnabled(false);
