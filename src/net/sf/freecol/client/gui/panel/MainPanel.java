@@ -131,7 +131,7 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
                     parent.remove(this);
                     break;
                 case OPEN:
-                    freeColClient.getInGameController().loadGame();
+                    freeColClient.getConnectController().loadGame();
                     break;
                 case QUIT:
                     parent.quit();

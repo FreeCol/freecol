@@ -207,7 +207,7 @@ public final class ConnectController {
     * Opens a dialog where the user should specify the filename
     * and loads the game.
     */  
-    public void loadGame() {  
+    public void loadGame() {     
         File file = freeColClient.getCanvas().showLoadDialog(FreeCol.getSaveDirectory());  
         if (file != null) {               
             loadGame(file);
