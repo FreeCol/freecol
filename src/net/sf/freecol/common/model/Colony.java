@@ -279,6 +279,8 @@ public final class Colony extends Settlement implements Location {
                     return;
                 }
             }
+            
+            logger.warning("Could not find a 'WorkLocation' for " + locatable + " in " + this);
         } else if (locatable instanceof Goods) {
             goodsContainer.addGoods((Goods)locatable);
         } else {

@@ -37,11 +37,6 @@ public final class Europe extends FreeColGameObject implements Location {
     private int[] recruitables = {-1, -1, -1};
 
     /**
-    * The price that needs to be paid when recruiting units (changes all the time!).
-    */
-    private int recruitPrice = -1;
-
-    /**
     * Contains the units on this location.
     */
     private UnitContainer unitContainer;
@@ -57,8 +52,6 @@ public final class Europe extends FreeColGameObject implements Location {
         super(game);
 
         unitContainer = new UnitContainer(game, this);
-
-        setRecruitPrice(250); // Base price is 250 with no crosses. -sjm
 
         setRecruitable(1, Unit.generateRecruitable());
         setRecruitable(2, Unit.generateRecruitable());
@@ -113,25 +106,6 @@ public final class Europe extends FreeColGameObject implements Location {
         }
     }
 
-
-    /**
-    * Sets the recruitment price (for recruiting units in Europe).
-    * @param price The new recruitment price.
-    */
-    public void setRecruitPrice(int price) {
-        recruitPrice = price;
-    }
-
-
-    /**
-    * Returns the price that needs to be paid in order to recruit units in Europe.
-    * @return The price that needs to be paid in order to recruit units in Europe.
-    */
-    public int getRecruitPrice() {
-        return recruitPrice;
-    }
-
-
     /**
     * Recruits a unit from Europe.
     *
@@ -147,17 +121,15 @@ public final class Europe extends FreeColGameObject implements Location {
             throw new NullPointerException();
         }
 
-        if (getRecruitPrice() > unit.getOwner().getGold()) {
+        if (unit.getOwner().getRecruitPrice() > unit.getOwner().getGold()) {
             throw new IllegalStateException();
         }
 
-        unit.getOwner().modifyGold(-getRecruitPrice());
+        unit.getOwner().modifyGold(-unit.getOwner().getRecruitPrice());
+        unit.getOwner().setCrosses(0);
         unit.setLocation(this);
-        
-        //setRecruitable(slot, Unit.generateRecruitable());
+
         setRecruitable(slot, newRecruitable);
-        //Note that the player object causes this to change -sjm
-        //setRecruitPrice(getRecruitPrice() * 2);
     }
 
 
@@ -176,11 +148,9 @@ public final class Europe extends FreeColGameObject implements Location {
         }
 
         unit.setLocation(this);
-        
-        //setRecruitable(slot, Unit.generateRecruitable());
+        unit.getOwner().setCrosses(0);        
+
         setRecruitable(slot, newRecruitable);
-        //Note that the player object causes this to change -sjm
-        //setRecruitPrice(getRecruitPrice() * 2);
     }
 
 
@@ -323,7 +293,6 @@ public final class Europe extends FreeColGameObject implements Location {
         Element europeElement = document.createElement(getXMLElementTagName());
 
         europeElement.setAttribute("ID", getID());
-        europeElement.setAttribute("recruitPrice", Integer.toString(recruitPrice));
         europeElement.setAttribute("recruit0", Integer.toString(recruitables[0]));
         europeElement.setAttribute("recruit1", Integer.toString(recruitables[1]));
         europeElement.setAttribute("recruit2", Integer.toString(recruitables[2]));
@@ -341,7 +310,6 @@ public final class Europe extends FreeColGameObject implements Location {
     public void readFromXMLElement(Element europeElement) {
         setID(europeElement.getAttribute("ID"));
 
-        recruitPrice = Integer.parseInt(europeElement.getAttribute("recruitPrice"));
         recruitables[0] = Integer.parseInt(europeElement.getAttribute("recruit0"));
         recruitables[1] = Integer.parseInt(europeElement.getAttribute("recruit1"));
         recruitables[2] = Integer.parseInt(europeElement.getAttribute("recruit2"));

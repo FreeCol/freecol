@@ -181,6 +181,10 @@ public class ServerPlayer extends Player {
     *         otherwise.
     */
     public boolean canSee(Tile tile) {
+        if (tile == null) {
+            return false;
+        }
+        
         if (canSeeTiles == null) {
             resetCanSeeTiles();
         }

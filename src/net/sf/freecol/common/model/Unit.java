@@ -707,11 +707,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             location.remove(this);
         }
 
-        if (newLocation != null) {
-            newLocation.add(this);
-        }
-
         location = newLocation;
+
+        if (location != null) {
+            location.add(this);
+        }
     }
 
 

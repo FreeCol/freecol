@@ -427,6 +427,7 @@ public class Player extends FreeColGameObject {
         }
     }
 
+    
     /**
     * Checks if this <code>Player</code> is ready to start the game.
     */
@@ -476,14 +477,20 @@ public class Player extends FreeColGameObject {
         return units.iterator();
     }
     
+
     /**
     * Increments the player's cross count, with benefits thereof.
     * @param num The number of crosses to add.
     */
     public void incrementCrosses(int num) {
         crosses += num;
-        updateRecruitmentPrice();
     }
+
+    
+    public void setCrosses(int crosses) {
+        this.crosses = crosses;
+    }
+
     
     /**
     * Checks to see whether or not a colonist can emigrate, and does so if possible.
@@ -496,7 +503,8 @@ public class Player extends FreeColGameObject {
         }
         return false;
     }
-    
+
+
     /**
     * Gets the number of crosses required to cause a new colonist to emigrate.
     * @return The number of crosses required to cause a new colonist to emigrate.
@@ -509,7 +517,7 @@ public class Player extends FreeColGameObject {
         // This does that, I think. -sjm
         int count = 8;
 
-        ArrayList units = new ArrayList();
+        //ArrayList units = new ArrayList();
         Map map = getGame().getMap();
 
         Iterator tileIterator = map.getWholeMapIterator();
@@ -524,7 +532,8 @@ public class Player extends FreeColGameObject {
                     Iterator childUnitIterator = u.getUnitIterator();
                     while (childUnitIterator.hasNext()) {
                         Unit childUnit = (Unit) childUnitIterator.next();
-                        units.add(childUnit);
+                        //units.add(childUnit);
+                        count += 2;
                     }
 
                     count += 2;
@@ -534,15 +543,25 @@ public class Player extends FreeColGameObject {
             }
         }
         
+        Iterator europeUnitIterator = getEurope().getUnitIterator();
+        while (europeUnitIterator.hasNext()) {
+            europeUnitIterator.next();
+            count += 2;
+        }
+
         if (nation == ENGLISH) count = (count * 2) / 3;
-        
+
         return count;
     }
+
     
-    public void updateRecruitmentPrice() {
-        int newprice = 250 - ((crosses * 150) / getCrossesRequired());
-        europe.setRecruitPrice(newprice);
+    /**
+    * Gets the price for a recruit in europe.
+    */
+    public int getRecruitPrice() {
+        return (getCrossesRequired() - crosses) * 10;
     }
+
 
     /**
     * Increments the player's bell count, with benefits thereof.
@@ -552,13 +571,15 @@ public class Player extends FreeColGameObject {
         bells += num;
         //TODO: founding fathers
     }
-    
+
+
     /**
     * Prepares this <code>Player</code> for a new turn.
     */
     public void newTurn() {
         // Nothing to do.
     }
+
 
     /**
     * Makes an XML-representation of this object.

@@ -102,15 +102,14 @@ public final class DefaultTransferHandler extends TransferHandler {
             // Check flavor.
             if (t.isDataFlavorSupported(this.flavor)) {
                 data = (JLabel)t.getTransferData(this.flavor);
-            }
-            else {
+            } else {
                 logger.warning("Data flavor is not supported!");
                 return false;
             }
 
             // Make sure we don't drop onto other Labels.
             if (comp instanceof UnitLabel) {
-            
+
                 /*
                   If the unit/cargo is dropped on a carrier in port (EuropePanel.InPortPanel),
                   then the ship is selected and the unit is added to its cargo.

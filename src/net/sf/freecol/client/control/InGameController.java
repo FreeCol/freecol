@@ -668,7 +668,7 @@ public final class InGameController {
         Player myPlayer = freeColClient.getMyPlayer();
         Europe europe = myPlayer.getEurope();
 
-        if (myPlayer.getGold() < europe.getRecruitPrice()) {
+        if (myPlayer.getGold() < myPlayer.getRecruitPrice()) {
             canvas.errorMessage("notEnoughGold");
             return;
         }

@@ -393,7 +393,9 @@ public final class InGameInputHandler implements MessageHandler {
         unit.leaveShip();
         Tile newTile = unit.getTile();
 
-        sendUpdatedTileToAll(unit.getTile(), player);
+        if (newTile != null) {
+            sendUpdatedTileToAll(newTile, player);
+        }
 
         return null;
     }
@@ -844,7 +846,7 @@ public final class InGameInputHandler implements MessageHandler {
 
         if (player.getNation() >= 0 && player.getNation() <= 3) {
             if (game.getTurn().getNumber() > 20 || player.getEurope().getFirstUnit() == null
-                    && player.getGold() < 600 && player.getGold() < player.getEurope().getRecruitPrice()) {
+                    && player.getGold() < 600 && player.getGold() < player.getRecruitPrice()) {
                 return true;
             } else {
                 return false;

@@ -1,4 +1,5 @@
 
+
 package net.sf.freecol.client.gui.panel;
 
 
@@ -1099,7 +1100,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         */
         public void initialize() {
             if ((game != null) && (freeColClient.getMyPlayer() != null)) {
-                price.setText(Integer.toString(europe.getRecruitPrice()) + " gold");
+                price.setText(Integer.toString(freeColClient.getMyPlayer().getRecruitPrice()) + " gold");
                 try {
                     person1.setText(Unit.getName(europe.getRecruitable(1)));
                     person2.setText(Unit.getName(europe.getRecruitable(2)));
@@ -1108,7 +1109,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     e.printStackTrace();
                 }
 
-                if (europe.getRecruitPrice() > freeColClient.getMyPlayer().getGold()) {
+                if (freeColClient.getMyPlayer().getRecruitPrice() > freeColClient.getMyPlayer().getGold()) {
                     person1.setEnabled(false);
                     person2.setEnabled(false);
                     person3.setEnabled(false);

@@ -843,7 +843,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
         public void initialize() {
             GUI gui = ((Canvas) parent).getGUI();
-            int layer = 1;
+            int layer = 2;
 
             for (int x=0; x<3; x++) {
                 for (int y=0; y<3; y++) {
@@ -856,10 +856,18 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
 
         public void paintComponent(Graphics g) {
+            GUI gui = parent.getGUI();
+            ImageLibrary lib = parent.getGUI().getImageLibrary();
+
             g.setColor(Color.black);
             g.fillRect(0, 0, getWidth(), getHeight());
-        }
 
+            for (int x=0; x<3; x++) {
+                for (int y=0; y<3; y++) {
+                    gui.displayTile((Graphics2D) g, game.getMap(), colony.getTile(x, y), ((2-x)+y)*lib.getTerrainImageWidth(1)/2, (x+y)*lib.getTerrainImageHeight(1)/2);
+                }
+            }
+        }
 
 
         public final class ASingleTilePanel extends JPanel {
@@ -884,19 +892,17 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                     unitLabel.addMouseListener(pressListener);
 
                     add(unitLabel);
-
-                    staticGoodsLabel = new JLabel(parent.getImageProvider().getGoodsImageIcon(unit.getWorkType()));
-                    staticGoodsLabel.setText(Integer.toString(unit.getFarmedPotential(unit.getWorkType(), colonyTile.getWorkTile())));
-                    add(staticGoodsLabel);
                 }
 
                 if (colonyTile.isColonyCenterTile()) {
+
                     staticGoodsLabel = new JLabel(parent.getImageProvider().getGoodsImageIcon(Goods.FOOD));
                     staticGoodsLabel.setText(Integer.toString(colonyTile.getTile().potential(Goods.FOOD)));
                     add(staticGoodsLabel);
                     staticGoodsLabel = new JLabel(parent.getImageProvider().getGoodsImageIcon(colonyTile.getTile().secondaryGoods()));
                     staticGoodsLabel.setText(Integer.toString(colonyTile.getTile().potential(colonyTile.getTile().secondaryGoods())));
                     add(staticGoodsLabel);
+
                 }
 
                 setTransferHandler(defaultTransferHandler);
@@ -904,16 +910,14 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
                 // Size and position:
                 ImageLibrary lib = ((Canvas)parent).getGUI().getImageLibrary();
+
                 setSize(lib.getTerrainImageWidth(1), lib.getTerrainImageHeight(1));
                 setLocation(((2-x)+y)*lib.getTerrainImageWidth(1)/2, (x+y)*lib.getTerrainImageHeight(1)/2);
             }
 
 
             public void paintComponent(Graphics g) {
-                GUI gui = parent.getGUI();
-                ImageLibrary lib = parent.getGUI().getImageLibrary();
-
-                gui.displayTile((Graphics2D) g, game.getMap(), colony.getTile(x, y), 0, 0);
+            
             }
 
 
@@ -938,15 +942,6 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                             inGameController.work(unit, colonyTile);
 
                             ((UnitLabel) comp).setSmall(false);
-
-                            if (staticGoodsLabel != null) {
-                                super.remove(staticGoodsLabel);
-                                staticGoodsLabel = null;
-                            }
-                            staticGoodsLabel = new JLabel(parent.getImageProvider().getGoodsImageIcon(unit.getWorkType()));
-                            staticGoodsLabel.setText(Integer.toString(unit.getFarmedPotential(unit.getWorkType(), colonyTile.getWorkTile())));
-                            add(staticGoodsLabel);
-
                             colonyPanel.updateSoLLabel();
                         } else {
                             return null;
@@ -962,11 +957,10 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 refresh();
                 return c;
             }
-            
+
             public void remove(Component comp) {
                 if (comp instanceof UnitLabel) {
-                    super.remove(staticGoodsLabel);
-                    staticGoodsLabel = null;
+                    ((UnitLabel) comp).setSmall(false);
                 }
                 super.remove(comp);
             }
@@ -978,7 +972,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     * A combo box that contains a list of all the buildings that can be built in this colony.
     */
     public final class BuildingBox extends JComboBox {
-    
+
         private final ColonyPanel colonyPanel;
         private final BuildingBoxListener buildingBoxListener;
         

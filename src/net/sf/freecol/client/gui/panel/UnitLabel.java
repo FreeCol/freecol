@@ -2,7 +2,10 @@
 package net.sf.freecol.client.gui.panel;
 
 
+import java.awt.image.BufferedImage;
+import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -14,6 +17,7 @@ import javax.swing.JLabel;
 
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.client.gui.Canvas;
 
 import net.sf.freecol.client.control.InGameController;
@@ -28,6 +32,10 @@ public final class UnitLabel extends JLabel implements ActionListener {
     public static final String  REVISION = "$Revision$";
 
     private static Logger logger = Logger.getLogger(UnitLabel.class.getName());
+
+    // The space between the top of this 'UnitLabel' and the top of the production images.
+    //private static final int STP = 10;
+    private static final int STP = 0;
 
     public static final int ARM = 0,
                             MOUNT = 1,
@@ -59,6 +67,8 @@ public final class UnitLabel extends JLabel implements ActionListener {
         this.parent = parent;
         selected = false;
 
+        setSmall(false);
+
         this.inGameController = parent.getClient().getInGameController();
     }
 
@@ -82,7 +92,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
         return unit;
     }
 
-    
+
     /**
     * Sets whether or not this unit should be selected.
     * @param b Whether or not this unit should be selected.
@@ -97,9 +107,16 @@ public final class UnitLabel extends JLabel implements ActionListener {
     */
     public void setSmall(boolean isSmall) {
         if (isSmall) {
+            setPreferredSize(null);
             ImageIcon imageIcon = (parent.getImageProvider().getUnitImageIcon(parent.getImageProvider().getUnitGraphicsType(unit)));
             setIcon(new ImageIcon(imageIcon.getImage().getScaledInstance(imageIcon.getIconWidth() / 2, imageIcon.getIconHeight() / 2, Image.SCALE_DEFAULT)));
         } else {
+            if (unit.getLocation() instanceof ColonyTile) {
+                setPreferredSize(new java.awt.Dimension(parent.getImageProvider().getTerrainImageWidth(0)*3/4, parent.getImageProvider().getUnitImageHeight(parent.getImageProvider().getUnitGraphicsType(unit))));
+            } else {
+                setPreferredSize(null);
+            }
+
             setIcon(parent.getImageProvider().getUnitImageIcon(parent.getImageProvider().getUnitGraphicsType(unit)));
         }
     }
@@ -119,6 +136,35 @@ public final class UnitLabel extends JLabel implements ActionListener {
         }
 
         super.paintComponent(g);
+
+
+        if (unit.getLocation() instanceof ColonyTile) {
+            ImageIcon goodsIcon = parent.getImageProvider().getGoodsImageIcon(unit.getWorkType());
+            int production = unit.getFarmedPotential(unit.getWorkType(), ((ColonyTile) unit.getLocation()).getWorkTile());
+
+            if (production > 0) {
+                int p = getWidth() / production;
+                if (p-goodsIcon.getIconWidth() < 0) {
+                    p = (getWidth() - goodsIcon.getIconWidth()) / production;
+                }
+
+                if (production > 6) { // TODO: Or the user chooses it:
+                    goodsIcon.paintIcon(this, g, getWidth()/2 - goodsIcon.getIconWidth()/2, STP);
+                    BufferedImage stringImage = parent.getGUI().createStringImage((Graphics2D) g, Integer.toString(production), Color.WHITE, goodsIcon.getIconWidth()*2, 12);
+                    g.drawImage(stringImage, getWidth()/2-stringImage.getWidth()/2, goodsIcon.getIconHeight()/2 - stringImage.getHeight()/2+STP, null);
+                } else {
+                    for (int i=0; i<production; i++) {
+                        goodsIcon.paintIcon(this, g, i*p, STP);
+                    }
+                }
+
+            } else {
+                goodsIcon.paintIcon(this, g, getWidth()/2 - goodsIcon.getIconWidth()/2, STP);
+                BufferedImage stringImage = parent.getGUI().createStringImage((Graphics2D) g, "0", Color.WHITE, goodsIcon.getIconWidth()*2, 12);
+                g.drawImage(stringImage, getWidth()/2-stringImage.getWidth()/2, goodsIcon.getIconHeight()/2 - stringImage.getHeight()/2+STP, null);
+            }
+        }
+
     }
 
     /**
