@@ -41,13 +41,14 @@ public class ServerModelController implements ModelController {
     * Returns a pseudorandom int, uniformly distributed between 0
     * (inclusive) and the specified value (exclusive).
     */
-    public int getRandom(String taskID, int n) {
+    public synchronized int getRandom(String taskID, int n) {
         String extendedTaskID = taskID + Integer.toString(freeColServer.getGame().getTurn().getNumber());
         
         logger.info("Entering getRandom");
         
         if (taskRegister.containsKey(extendedTaskID)) {
-            return ((Integer) taskRegister.remove(extendedTaskID)).intValue();
+            //return ((Integer) taskRegister.remove(extendedTaskID)).intValue();
+            return ((Integer) taskRegister.get(extendedTaskID)).intValue();
         } else {
             int value = random.nextInt(n);
             taskRegister.put(extendedTaskID, new Integer(value));
@@ -77,7 +78,7 @@ public class ServerModelController implements ModelController {
     }
 
 
-    public Unit createUnit(String taskID, Location location, Player owner, int type) {
+    public synchronized Unit createUnit(String taskID, Location location, Player owner, int type) {
         String extendedTaskID = taskID + owner.getID() + Integer.toString(freeColServer.getGame().getTurn().getNumber());
         ServerUnit unit;
 
@@ -96,7 +97,7 @@ public class ServerModelController implements ModelController {
                 return null;
             }
 
-            taskRegister.remove(extendedTaskID);
+            //taskRegister.remove(extendedTaskID);
         } else {
             unit = new ServerUnit(freeColServer.getGame(), location, owner, type, Unit.ACTIVE);
             taskRegister.put(extendedTaskID, unit);
@@ -106,7 +107,7 @@ public class ServerModelController implements ModelController {
     }
 
 
-    public Location setToVacantEntryLocation(Unit unit) {
+    public synchronized Location setToVacantEntryLocation(Unit unit) {
         Game game = freeColServer.getGame();
         ServerPlayer player = (ServerPlayer) unit.getOwner();
         Location entryLocation;
@@ -114,7 +115,7 @@ public class ServerModelController implements ModelController {
 
         if (taskRegister.containsKey(taskID)) {
             entryLocation = (Location) taskRegister.get(taskID);
-            taskRegister.remove(taskID);
+            //taskRegister.remove(taskID);
         } else {
             entryLocation = unit.getVacantEntryLocation();
             taskRegister.put(taskID, entryLocation);

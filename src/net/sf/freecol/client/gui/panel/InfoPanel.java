@@ -110,6 +110,8 @@ public final class InfoPanel extends FreeColPanel {
             unitMovesLabel.setText("Moves: " + unit.getMovesAsString());
             if (unit.isPioneer()) {
                 unitToolsLabel.setText("Tools: " + unit.getNumberOfTools());
+            } else if (unit.getType() == Unit.TREASURE_TRAIN) {
+                unitToolsLabel.setText("Gold: " + unit.getTreasureAmount());
             } else {
                 unitToolsLabel.setText("");
             }

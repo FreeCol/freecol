@@ -53,8 +53,8 @@ public class ClientModelController implements ModelController {
             logger.warning("Wrong tag name.");
             throw new IllegalStateException();
         }
-
-        return Integer.parseInt(getRandomElement.getAttribute("number"));
+        
+        return Integer.parseInt(reply.getAttribute("result"));
     }
     
 

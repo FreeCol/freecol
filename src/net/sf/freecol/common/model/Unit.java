@@ -156,12 +156,12 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         unitContainer = new UnitContainer(game, this);
         goodsContainer = new GoodsContainer(game, this);
 
-        setLocation(location);
-
         this.owner = owner;
         this.type = type;
         this.movesLeft = getInitialMovesLeft();
 
+        setLocation(location);
+                
         state = s;
         workLeft = -1;
         workType = Goods.FOOD;
@@ -867,6 +867,21 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             Iterator tileIterator = getGame().getMap().getAdjacentIterator(getTile().getPosition());
             while (tileIterator.hasNext()) {
                 Tile t = getGame().getMap().getTile((Position) tileIterator.next());
+                
+                if (t == null) {
+                    continue;
+                }
+
+                if (t.getFirstUnit() != null && t.getFirstUnit().getOwner() == null) {
+                    System.out.println("My owner: " + getOwner());
+                    System.out.println("Tile: " + t);
+                    System.out.flush();
+                }
+                
+                if (getOwner() == null) {
+                    throw new NullPointerException();
+                }
+
                 if (t.getSettlement() != null && !t.getSettlement().getOwner().hasContacted(getOwner().getNation())) {
                     t.getSettlement().getOwner().setContacted(getOwner(), true);
                     getOwner().setContacted(t.getSettlement().getOwner(), true);
@@ -2345,31 +2360,32 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             defender.dispose();
 
             if (newTile.getSettlement() != null) {
-                if(newTile.getSettlement().getUnitCount() <= 0 && newTile.getSettlement() instanceof IndianSettlement) {
+                if (newTile.getSettlement().getUnitCount() <= 0 && newTile.getSettlement() instanceof IndianSettlement) {
+                        Player settlementOwner = newTile.getSettlement().getOwner();
+                        boolean wasCapital = ((IndianSettlement)newTile.getSettlement()).isCapital();
                         newTile.getSettlement().dispose();
 
-                        int rand = getGame().getModelController().getRandom(getID()+"indianTreasureRandom", 11);
+                        int randomTreasure = getGame().getModelController().getRandom(getID()+"indianTreasureRandom"+getID(), 11);
+
                         Unit tTrain = getGame().getModelController().createUnit(
-                                getID()+"indianTreasure", newTile, owner, Unit.TREASURE_TRAIN);
+                                getID()+"indianTreasure"+getID(), newTile, getOwner(), Unit.TREASURE_TRAIN);
 
                         // Incan and Aztecs give more gold
-                        if(newTile.getSettlement().getOwner().getNation() == Player.INCA ||
-                                newTile.getSettlement().getOwner().getNation() == Player.AZTEC) {
-                            tTrain.setTreasureAmount( (rand+1) * 10000);
+                        if(settlementOwner.getNation() == Player.INCA || settlementOwner.getNation() == Player.AZTEC) {
+                            tTrain.setTreasureAmount(randomTreasure * 500 + 10000);
                         } else {
-                            if(rand < 2)
-                                rand = 2;
-                            tTrain.setTreasureAmount((rand+1) * 100);
+                            tTrain.setTreasureAmount(randomTreasure * 50 + 300);
                         }
 
                         // capitals give more gold
-                        if( ((IndianSettlement)newTile.getSettlement()).isCapital() )
-                            tTrain.setTreasureAmount( (int) (tTrain.getTreasureAmount()*1.6f));
+                        if(wasCapital) {
+                            tTrain.setTreasureAmount((int) (tTrain.getTreasureAmount()*1.6f));
+                        }
 
-                        addModelMessage(this, "model.unit.indianTreasure", new String[][] {{"%indian%", newTile.getSettlement().getOwner().getNationAsString()}, {"%amount%", Integer.toString(tTrain.getTreasureAmount())}});
+                        addModelMessage(this, "model.unit.indianTreasure", new String[][] {{"%indian%", settlementOwner.getNationAsString()}, {"%amount%", Integer.toString(tTrain.getTreasureAmount())}});
                         setLocation(newTile);
                     }
-                }*/
+                }
         } else if (isNaval()) {
             if(type==PRIVATEER || type==FRIGATE || type==MAN_O_WAR) { // can capture goods; regardless attacking/defending
                 Iterator iter = defender.getGoodsIterator();
@@ -2804,6 +2820,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         unitElement.setAttribute("turnsOfTraining", Integer.toString(turnsOfTraining));
         unitElement.setAttribute("trainingType", Integer.toString(trainingType));
         unitElement.setAttribute("workType", Integer.toString(workType));
+        unitElement.setAttribute("treasureAmount", Integer.toString(treasureAmount));
 
         if (entryLocation != null) {
             unitElement.setAttribute("entryLocation", entryLocation.getID());
@@ -2855,6 +2872,12 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         owner = (Player) getGame().getFreeColGameObject(unitElement.getAttribute("owner"));
         turnsOfTraining = Integer.parseInt(unitElement.getAttribute("turnsOfTraining"));
         trainingType = Integer.parseInt(unitElement.getAttribute("trainingType"));
+        
+        if (unitElement.hasAttribute("treasureAmount")) {
+            treasureAmount = Integer.parseInt(unitElement.getAttribute("treasureAmount"));
+        } else {
+            treasureAmount = 0;
+        }
         
         if (unitElement.hasAttribute("workType")) {
             workType = Integer.parseInt(unitElement.getAttribute("workType"));

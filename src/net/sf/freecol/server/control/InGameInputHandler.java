@@ -219,6 +219,7 @@ public final class InGameInputHandler extends InputHandler {
         Element reply = Message.createNewRootElement("getRandomConfirmed");
         reply.setAttribute("result", Integer.toString(result));
 
+        logger.info("Result: " + result);
         return reply;
     }
 
