@@ -43,7 +43,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
         setOpaque(false);
 
         tb = new JTabbedPane(JTabbedPane.TOP);
-        
+
         for (int i=0; i<foundingFatherPanels.length; i++) {
             foundingFatherPanels[i] = new FoundingFatherPanel(i);
             tb.addTab(FoundingFather.getTypeAsString(i), null, foundingFatherPanels[i], null);
@@ -156,6 +156,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
             description.setLineWrap(true);
             description.setEditable(false);
             description.setWrapStyleWord(true);
+            description.setFocusable(false);
             description.setSize(250, 60);
             p2.add(description, BorderLayout.NORTH);
 
@@ -167,7 +168,11 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
             p1.add(p2, BorderLayout.CENTER);
             add(p1, BorderLayout.CENTER);
         }
-        
+
+
+        public void requestFocus() {
+            ok.requestFocus();
+        }
 
         public Dimension getPreferredSize() {
             return new Dimension(550, super.getPreferredSize().height);

@@ -19,6 +19,8 @@ public final class SfxLibrary extends SoundLibrary {
     public static final int ATTACK = 1;
     public static final int ILLEGAL_MOVE = 2;
     public static final int LOAD_CARGO = 3;
+    public static final int SELL_CARGO = 4;
+    public static final int ARTILLERY = 5;
 
     
     /**

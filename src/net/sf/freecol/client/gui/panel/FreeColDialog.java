@@ -12,7 +12,7 @@ import javax.swing.border.BevelBorder;
 * Superclass for all dialogs in FreeCol. This class also contains
 * methods to create simple dialogs.
 */
-public class FreeColDialog extends JPanel {
+public class FreeColDialog extends FreeColPanel {
     private static final Logger logger = Logger.getLogger(FreeColDialog.class.getName());
 
     // Stores the response from the user:
@@ -22,16 +22,11 @@ public class FreeColDialog extends JPanel {
     private boolean responseGiven = false;
 
 
-
-
     /**
     * Default constructor.
     */
     public FreeColDialog() {
-        try {
-            BevelBorder border = new BevelBorder(BevelBorder.RAISED);
-            setBorder(border);
-        } catch(Exception e) {}
+        super();
     }
 
 
@@ -152,6 +147,8 @@ public class FreeColDialog extends JPanel {
 
         informationDialog.setSize(width + 10, l.getMinimumSize().height + okButton.getMinimumSize().height + 30);
 
+        informationDialog.setCancelComponent(okButton);
+
         return informationDialog;
     }
 
@@ -206,7 +203,13 @@ public class FreeColDialog extends JPanel {
 
         labelPanel.setOpaque(false);
         p1.setOpaque(false);
-        
+
+        if (cancelButton != null) {
+            confirmDialog.setCancelComponent(cancelButton);
+        } else {
+            confirmDialog.setCancelComponent(okButton);
+        }
+
         return confirmDialog;
     }
 
@@ -275,6 +278,12 @@ public class FreeColDialog extends JPanel {
         inputDialog.setSize(inputDialog.getPreferredSize());
 
         buttons.setOpaque(false);
+        
+        if (cancelButton != null) {
+            inputDialog.setCancelComponent(cancelButton);
+        } else {
+            inputDialog.setCancelComponent(okButton);
+        }
 
         return inputDialog;
     }

@@ -41,7 +41,7 @@ import net.sf.freecol.client.gui.Canvas;
 /**
 * This panel gets displayed to the player who have won the game.
 */
-public final class VictoryPanel extends JPanel implements ActionListener {
+public final class VictoryPanel extends FreeColPanel implements ActionListener {
     private static final Logger logger = Logger.getLogger(VictoryPanel.class.getName());
     private static final int    OK = 0;
 
@@ -58,6 +58,8 @@ public final class VictoryPanel extends JPanel implements ActionListener {
     public VictoryPanel(Canvas parent) {
         super(new FlowLayout(FlowLayout.CENTER, 1000, 10));
         this.parent = parent;
+        
+        setCancelComponent(ok);
 
         JLabel victoryLabel = new JLabel(Messages.message("victory.text"));
         Font font = (Font) UIManager.get("HeaderFont");
@@ -79,15 +81,9 @@ public final class VictoryPanel extends JPanel implements ActionListener {
         ok.setActionCommand(String.valueOf(OK));
         ok.addActionListener(this);
 
-        try {
-            BevelBorder border = new BevelBorder(BevelBorder.RAISED);
-            setBorder(border);
-        } catch(Exception e) {}
-
         setSize(victoryLabel.getPreferredSize().width + 20, victoryLabel.getPreferredSize().height +
                                                             imageLabel.getPreferredSize().height +
                                                             ok.getPreferredSize().height + 50);
-        //setSize(400, 400);
     }
 
     

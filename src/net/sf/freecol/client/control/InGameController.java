@@ -190,10 +190,6 @@ public final class InGameController {
             case Unit.EMBARK:           embark(unit, direction); break;
             case Unit.MOVE_HIGH_SEAS:   moveHighSeas(unit, direction); break;
             case Unit.ILLEGAL_MOVE:     freeColClient.playSound(SfxLibrary.ILLEGAL_MOVE); break;
-                                        /*if (sfxPlayer != null) {
-                                            sfxPlayer.play(sfxLibrary.get(sfxLibrary.ILLEGAL_MOVE));
-                                            break;
-                                        }*/
             default:                    throw new RuntimeException("unrecognised move: " + move);
         }
 
@@ -253,6 +249,10 @@ public final class InGameController {
         Client client = freeColClient.getClient();
         Game game = freeColClient.getGame();
         Map map = game.getMap();
+
+        if (unit.getType() == Unit.ARTILLERY || unit.getType() == Unit.DAMAGED_ARTILLERY) {
+            freeColClient.playSound(SfxLibrary.ARTILLERY);
+        }
 
         Element attackElement = Message.createNewRootElement("attack");
         attackElement.setAttribute("unit", unit.getID());
@@ -533,6 +533,8 @@ public final class InGameController {
     public void sellGoods(Goods goods) {
         Client client = freeColClient.getClient();
         Player player = freeColClient.getMyPlayer();
+
+        freeColClient.playSound(SfxLibrary.SELL_CARGO);        
 
         goods.adjustAmount();
 

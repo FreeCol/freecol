@@ -20,7 +20,7 @@ import net.sf.freecol.client.FreeColClient;
  * other players. There is no close button because it closes as soon as the user
  * presses enter in the textfield.
  */
-public final class ChatPanel extends JPanel implements ActionListener {
+public final class ChatPanel extends FreeColPanel implements ActionListener {
     public static final String  COPYRIGHT = "Copyright (C) 2003 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
@@ -64,14 +64,9 @@ public final class ChatPanel extends JPanel implements ActionListener {
         add(label);
         add(field);
 
-        setFocusable(false);
+        //setFocusable(false);
         label.setFocusable(false);
         field.setFocusable(true);
-
-        try {
-            BevelBorder border = new BevelBorder(BevelBorder.RAISED);
-            setBorder(border);
-        } catch(Exception e) {}
 
         setSize(450, 40);
     }

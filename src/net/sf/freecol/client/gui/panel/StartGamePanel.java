@@ -32,7 +32,7 @@ import net.sf.freecol.common.model.Game;
 /**
 * The panel where you choose your nation and color and connected players are shown.
 */
-public final class StartGamePanel extends JPanel implements ActionListener {
+public final class StartGamePanel extends FreeColPanel implements ActionListener {
 
     public static final String  COPYRIGHT = "Copyright (C) 2003 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
@@ -83,6 +83,8 @@ public final class StartGamePanel extends JPanel implements ActionListener {
         JLabel      mapSizeLabel = new JLabel("Map Size");
         JScrollPane chatScroll,
                     tableScroll;
+
+        setCancelComponent(cancel);
 
         start = new JButton("Start Game");
 
@@ -179,8 +181,6 @@ public final class StartGamePanel extends JPanel implements ActionListener {
         add(chatPanel);
 
         try {
-            BevelBorder border1 = new BevelBorder(BevelBorder.RAISED);
-            setBorder(border1);
             TitledBorder border2 = new TitledBorder("Options");
             optionsPanel.setBorder(border2);
         } catch(Exception e) {}

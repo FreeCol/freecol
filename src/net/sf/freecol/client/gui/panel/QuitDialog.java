@@ -40,7 +40,7 @@ public final class QuitDialog extends FreeColDialog implements ActionListener {
 
     private final Canvas    parent;
     private JButton         ok = new JButton("Yes");
-
+    private JButton         cancel;
     
     
     
@@ -51,7 +51,7 @@ public final class QuitDialog extends FreeColDialog implements ActionListener {
     public QuitDialog(Canvas parent) {
         this.parent = parent;
 
-        JButton         cancel = new JButton("No");
+        cancel = new JButton("No");
         JLabel          qLabel = new JLabel("Are you sure you want to Quit?");
 
         qLabel.setSize(200, 20);
@@ -70,6 +70,8 @@ public final class QuitDialog extends FreeColDialog implements ActionListener {
         ok.addActionListener(this);
         cancel.addActionListener(this);
         
+        setCancelComponent(cancel);          
+
         add(qLabel);
         add(ok);
         add(cancel);

@@ -64,11 +64,6 @@ public final class EventPanel extends FreeColDialog implements ActionListener {
         okButton.addActionListener(this);
         p1.add(okButton);
 
-        try {
-            BevelBorder border = new BevelBorder(BevelBorder.RAISED);
-            setBorder(border);
-        } catch(Exception e) {}
-
         add(header, BorderLayout.NORTH);
         add(imageLabel, BorderLayout.CENTER);
         add(p1, BorderLayout.SOUTH);

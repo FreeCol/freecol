@@ -31,7 +31,7 @@ import net.sf.freecol.client.gui.Canvas;
 /**
 * A <code>Panel</code> for showing status information on screen.
 */
-public final class StatusPanel extends JPanel {
+public final class StatusPanel extends FreeColPanel {
     private static final Logger logger = Logger.getLogger(StatusPanel.class.getName());
 
 
@@ -49,17 +49,14 @@ public final class StatusPanel extends JPanel {
     public StatusPanel(Canvas parent) {
         super(new FlowLayout());
 
+        setFocusCycleRoot(false);
+        setFocusable(false);
+        
         this.parent = parent;
 
         statusLabel = new JLabel();
         add(statusLabel);
 
-        try {
-            BevelBorder border = new BevelBorder(BevelBorder.RAISED);
-            setBorder(border);
-        } catch(Exception e) {}
-
-        //setSize(260, 235);
         setSize(260, 60);
     }
     

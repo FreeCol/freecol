@@ -93,6 +93,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         this.freeColClient = freeColClient;
         this.inGameController = freeColClient.getInGameController();
 
+        setFocusCycleRoot(true);
+        
         productionPanel = new ProductionPanel(this);
         outsideColonyPanel = new OutsideColonyPanel(this);
         inPortPanel = new InPortPanel();

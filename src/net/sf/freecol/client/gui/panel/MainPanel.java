@@ -41,7 +41,7 @@ import javax.swing.UIManager;
 /**
 * A panel filled with 'main' items.
 */
-public final class MainPanel extends JPanel implements ActionListener {
+public final class MainPanel extends FreeColPanel implements ActionListener {
     private static final Logger logger = Logger.getLogger(MainPanel.class.getName());
     
     public static final int     NEW = 0,
@@ -64,8 +64,9 @@ public final class MainPanel extends JPanel implements ActionListener {
         JButton         openButton = new JButton("Open"),
                         quitButton = new JButton("Quit");
         
+        setCancelComponent(quitButton);
         newButton = new JButton("New");
-        
+
         newButton.setActionCommand(String.valueOf(NEW));
         openButton.setActionCommand(String.valueOf(OPEN));
         quitButton.setActionCommand(String.valueOf(QUIT));
@@ -91,14 +92,6 @@ public final class MainPanel extends JPanel implements ActionListener {
 
         add(buttons, BorderLayout.SOUTH);
 
-        try {
-            BevelBorder border = new BevelBorder(BevelBorder.RAISED);
-            setBorder(border);
-        } catch(Exception e) {
-            logger.warning("EXCEPTION: " + e);
-        }
-
-        //setSize(100, 115);
         setSize(getPreferredSize());
     }
 

@@ -19,7 +19,7 @@ import net.sf.freecol.common.model.Unit;
  * and the tile it stands on. It also shows the amount of gold the player has left
  * and stuff like that.
  */
-public final class InfoPanel extends JPanel {
+public final class InfoPanel extends FreeColPanel {
     public static final String  COPYRIGHT = "Copyright (C) 2003 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
@@ -51,6 +51,9 @@ public final class InfoPanel extends JPanel {
         this.freeColClient = freeColClient;
         this.game = game;
         this.imageProvider = imageProvider;
+
+        setFocusCycleRoot(false);
+        setFocusable(false);
 
         unitLabel = new JLabel();
         unitNameLabel = new JLabel();
@@ -90,11 +93,6 @@ public final class InfoPanel extends JPanel {
         unitToolsLabel.setFocusable(false);
         goldLabel.setFocusable(false);
         turnLabel.setFocusable(false);
-
-        try {
-            BevelBorder border = new BevelBorder(BevelBorder.RAISED);
-            setBorder(border);
-        } catch(Exception e) {}
 
         setSize(256, 128);
     }

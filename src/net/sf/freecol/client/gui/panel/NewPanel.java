@@ -34,7 +34,7 @@ import net.sf.freecol.client.control.ConnectController;
 /**
 * A panel filled with 'new game' items.
 */
-public final class NewPanel extends JPanel implements ActionListener {
+public final class NewPanel extends FreeColPanel implements ActionListener {
     private static final Logger logger = Logger.getLogger(NewPanel.class.getName());
 
     private static final int    OK = 0,
@@ -71,6 +71,8 @@ public final class NewPanel extends JPanel implements ActionListener {
         JButton         cancel = new JButton("Cancel");
         ButtonGroup     group = new ButtonGroup();
         JLabel          nameLabel = new JLabel("Name");
+        
+        setCancelComponent(cancel);
 
         ipLabel = new JLabel("Host");
         port1Label = new JLabel("Port");
@@ -149,11 +151,6 @@ public final class NewPanel extends JPanel implements ActionListener {
         add(start);
         add(port2Label);
         add(port2);
-
-        try {
-            BevelBorder border = new BevelBorder(BevelBorder.RAISED);
-            setBorder(border);
-        } catch(Exception e) {}
 
         setSize(260, 235);
     }

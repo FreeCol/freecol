@@ -115,6 +115,8 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         this.freeColClient = freeColClient;
         this.inGameController = inGameController;
 
+        setFocusCycleRoot(true);
+        
         toAmericaPanel = new ToAmericaPanel(this);
         toEuropePanel = new ToEuropePanel(this);
         inPortPanel = new InPortPanel();
@@ -506,11 +508,13 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     recruitPanel.initialize();
                     recruitPanel.setLocation(getWidth() / 2 - recruitPanel.getWidth() / 2, getHeight() / 2 - recruitPanel.getHeight() / 2);
                     add(recruitPanel, JLayeredPane.PALETTE_LAYER);
+                    recruitPanel.requestFocus();
                     break;
                 case RECRUIT_CANCEL:
                     remove(recruitPanel);
                     revalidate();
                     repaint(recruitPanel.getX(), recruitPanel.getY(), recruitPanel.getWidth(), recruitPanel.getHeight());
+                    requestFocus();
                     break;
                 case RECRUIT_1:
                     inGameController.recruitUnitInEurope(1);
@@ -518,6 +522,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     revalidate();
                     repaint(recruitPanel.getX(), recruitPanel.getY(), recruitPanel.getWidth(), recruitPanel.getHeight());
                     refreshBuyRecruit();
+                    requestFocus();
                     break;
                 case RECRUIT_2:
                     inGameController.recruitUnitInEurope(2);
@@ -525,6 +530,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     revalidate();
                     repaint(recruitPanel.getX(), recruitPanel.getY(), recruitPanel.getWidth(), recruitPanel.getHeight());
                     refreshBuyRecruit();
+                    requestFocus();
                     break;
                 case RECRUIT_3:
                     inGameController.recruitUnitInEurope(3);
@@ -532,16 +538,19 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     revalidate();
                     repaint(recruitPanel.getX(), recruitPanel.getY(), recruitPanel.getWidth(), recruitPanel.getHeight());
                     refreshBuyRecruit();
+                    requestFocus();
                     break;
                 case PURCHASE:
                     purchasePanel.initialize();
                     purchasePanel.setLocation(getWidth() / 2 - purchasePanel.getWidth() / 2, getHeight() / 2 - purchasePanel.getHeight() / 2);
                     add(purchasePanel, JLayeredPane.PALETTE_LAYER);
+                    purchasePanel.requestFocus();
                     break;
                 case PURCHASE_CANCEL:
                     remove(purchasePanel);
                     revalidate();
                     repaint(purchasePanel.getX(), purchasePanel.getY(), purchasePanel.getWidth(), purchasePanel.getHeight());
+                    requestFocus();
                     break;
                 case PURCHASE_ARTILLERY:
                     inGameController.purchaseUnitFromEurope(Unit.ARTILLERY);
@@ -549,6 +558,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     revalidate();
                     repaint(purchasePanel.getX(), purchasePanel.getY(), purchasePanel.getWidth(), purchasePanel.getHeight());
                     refreshBuyPurchase(Unit.ARTILLERY);
+                    requestFocus();
                     break;
                 case PURCHASE_CARAVEL:
                     inGameController.purchaseUnitFromEurope(Unit.CARAVEL);
@@ -556,6 +566,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     revalidate();
                     repaint(purchasePanel.getX(), purchasePanel.getY(), purchasePanel.getWidth(), purchasePanel.getHeight());
                     refreshBuyPurchase(Unit.CARAVEL);
+                    requestFocus();
                     break;
                 case PURCHASE_MERCHANTMAN:
                     inGameController.purchaseUnitFromEurope(Unit.MERCHANTMAN);
@@ -563,6 +574,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     revalidate();
                     repaint(purchasePanel.getX(), purchasePanel.getY(), purchasePanel.getWidth(), purchasePanel.getHeight());
                     refreshBuyPurchase(Unit.MERCHANTMAN);
+                    requestFocus();
                     break;
                 case PURCHASE_GALLEON:
                     inGameController.purchaseUnitFromEurope(Unit.GALLEON);
@@ -570,6 +582,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     revalidate();
                     repaint(purchasePanel.getX(), purchasePanel.getY(), purchasePanel.getWidth(), purchasePanel.getHeight());
                     refreshBuyPurchase(Unit.GALLEON);
+                    requestFocus();
                     break;
                 case PURCHASE_PRIVATEER:
                     inGameController.purchaseUnitFromEurope(Unit.PRIVATEER);
@@ -577,6 +590,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     revalidate();
                     repaint(purchasePanel.getX(), purchasePanel.getY(), purchasePanel.getWidth(), purchasePanel.getHeight());
                     refreshBuyPurchase(Unit.PRIVATEER);
+                    requestFocus();
                     break;
                 case PURCHASE_FRIGATE:
                     inGameController.purchaseUnitFromEurope(Unit.FRIGATE);
@@ -584,16 +598,19 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     revalidate();
                     repaint(purchasePanel.getX(), purchasePanel.getY(), purchasePanel.getWidth(), purchasePanel.getHeight());
                     refreshBuyPurchase(Unit.FRIGATE);
+                    requestFocus();
                     break;
                 case TRAIN:
                     trainPanel.initialize();
                     trainPanel.setLocation(getWidth() / 2 - trainPanel.getWidth() / 2, getHeight() / 2 - trainPanel.getHeight() / 2);
                     add(trainPanel, JLayeredPane.PALETTE_LAYER);
+                    trainPanel.requestFocus();
                     break;
                 case TRAIN_CANCEL:
                     remove(trainPanel);
                     revalidate();
                     repaint(trainPanel.getX(), trainPanel.getY(), trainPanel.getWidth(), trainPanel.getHeight());
+                    requestFocus();
                     break;
                 case TRAIN_EXPERT_ORE_MINER:
                     inGameController.trainUnitInEurope(Unit.EXPERT_ORE_MINER);
@@ -601,6 +618,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     revalidate();
                     repaint(trainPanel.getX(), trainPanel.getY(), trainPanel.getWidth(), trainPanel.getHeight());
                     refreshBuyRecruit();
+                    requestFocus();
                     break;
                 case TRAIN_EXPERT_LUMBER_JACK:
                     inGameController.trainUnitInEurope(Unit.EXPERT_LUMBER_JACK);
@@ -608,6 +626,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     revalidate();
                     repaint(trainPanel.getX(), trainPanel.getY(), trainPanel.getWidth(), trainPanel.getHeight());
                     refreshBuyRecruit();
+                    requestFocus();
                     break;
                 case TRAIN_MASTER_GUNSMITH:
                     inGameController.trainUnitInEurope(Unit.MASTER_GUNSMITH);
@@ -615,6 +634,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     revalidate();
                     repaint(trainPanel.getX(), trainPanel.getY(), trainPanel.getWidth(), trainPanel.getHeight());
                     refreshBuyRecruit();
+                    requestFocus();
                     break;
                 case TRAIN_EXPERT_SILVER_MINER:
                     inGameController.trainUnitInEurope(Unit.EXPERT_SILVER_MINER);
@@ -622,6 +642,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     revalidate();
                     repaint(trainPanel.getX(), trainPanel.getY(), trainPanel.getWidth(), trainPanel.getHeight());
                     refreshBuyRecruit();
+                    requestFocus();
                     break;
                 case TRAIN_MASTER_FUR_TRADER:
                     inGameController.trainUnitInEurope(Unit.MASTER_FUR_TRADER);
@@ -629,6 +650,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     revalidate();
                     repaint(trainPanel.getX(), trainPanel.getY(), trainPanel.getWidth(), trainPanel.getHeight());
                     refreshBuyRecruit();
+                    requestFocus();
                     break;
                 case TRAIN_MASTER_CARPENTER:
                     inGameController.trainUnitInEurope(Unit.MASTER_CARPENTER);
@@ -636,6 +658,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     revalidate();
                     repaint(trainPanel.getX(), trainPanel.getY(), trainPanel.getWidth(), trainPanel.getHeight());
                     refreshBuyRecruit();
+                    requestFocus();
                     break;
                 case TRAIN_EXPERT_FISHERMAN:
                     inGameController.trainUnitInEurope(Unit.EXPERT_FISHERMAN);
@@ -643,6 +666,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     revalidate();
                     repaint(trainPanel.getX(), trainPanel.getY(), trainPanel.getWidth(), trainPanel.getHeight());
                     refreshBuyRecruit();
+                    requestFocus();
                     break;
                 case TRAIN_MASTER_BLACKSMITH:
                     inGameController.trainUnitInEurope(Unit.MASTER_BLACKSMITH);
@@ -650,6 +674,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     revalidate();
                     repaint(trainPanel.getX(), trainPanel.getY(), trainPanel.getWidth(), trainPanel.getHeight());
                     refreshBuyRecruit();
+                    requestFocus();
                     break;
                 case TRAIN_EXPERT_FARMER:
                     inGameController.trainUnitInEurope(Unit.EXPERT_FARMER);
@@ -657,6 +682,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     revalidate();
                     repaint(trainPanel.getX(), trainPanel.getY(), trainPanel.getWidth(), trainPanel.getHeight());
                     refreshBuyRecruit();
+                    requestFocus();
                     break;
                 case TRAIN_MASTER_DISTILLER:
                     inGameController.trainUnitInEurope(Unit.MASTER_DISTILLER);
@@ -664,6 +690,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     revalidate();
                     repaint(trainPanel.getX(), trainPanel.getY(), trainPanel.getWidth(), trainPanel.getHeight());
                     refreshBuyRecruit();
+                    requestFocus();
                     break;
                 case TRAIN_HARDY_PIONEER:
                     inGameController.trainUnitInEurope(Unit.HARDY_PIONEER);
@@ -671,6 +698,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     revalidate();
                     repaint(trainPanel.getX(), trainPanel.getY(), trainPanel.getWidth(), trainPanel.getHeight());
                     refreshBuyRecruit();
+                    requestFocus();
                     break;
                 case TRAIN_MASTER_TOBACCONIST:
                     inGameController.trainUnitInEurope(Unit.MASTER_TOBACCONIST);
@@ -678,6 +706,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     revalidate();
                     repaint(trainPanel.getX(), trainPanel.getY(), trainPanel.getWidth(), trainPanel.getHeight());
                     refreshBuyRecruit();
+                    requestFocus();
                     break;
                 case TRAIN_MASTER_WEAVER:
                     inGameController.trainUnitInEurope(Unit.MASTER_WEAVER);
@@ -685,6 +714,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     revalidate();
                     repaint(trainPanel.getX(), trainPanel.getY(), trainPanel.getWidth(), trainPanel.getHeight());
                     refreshBuyRecruit();
+                    requestFocus();
                     break;
                 case TRAIN_JESUIT_MISSIONARY:
                     inGameController.trainUnitInEurope(Unit.JESUIT_MISSIONARY);
@@ -692,6 +722,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     revalidate();
                     repaint(trainPanel.getX(), trainPanel.getY(), trainPanel.getWidth(), trainPanel.getHeight());
                     refreshBuyRecruit();
+                    requestFocus();
                     break;
                 case TRAIN_FIREBRAND_PREACHER:
                     inGameController.trainUnitInEurope(Unit.FIREBRAND_PREACHER);
@@ -699,6 +730,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     revalidate();
                     repaint(trainPanel.getX(), trainPanel.getY(), trainPanel.getWidth(), trainPanel.getHeight());
                     refreshBuyRecruit();
+                    requestFocus();
                     break;
                 case TRAIN_ELDER_STATESMAN:
                     inGameController.trainUnitInEurope(Unit.ELDER_STATESMAN);
@@ -706,6 +738,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     revalidate();
                     repaint(trainPanel.getX(), trainPanel.getY(), trainPanel.getWidth(), trainPanel.getHeight());
                     refreshBuyRecruit();
+                    requestFocus();
                     break;
                 case TRAIN_VETERAN_SOLDIER:
                     inGameController.trainUnitInEurope(Unit.VETERAN_SOLDIER);
@@ -713,6 +746,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     revalidate();
                     repaint(trainPanel.getX(), trainPanel.getY(), trainPanel.getWidth(), trainPanel.getHeight());
                     refreshBuyRecruit();
+                    requestFocus();
                     break;
                 default:
                     logger.warning("Invalid action command");
@@ -1085,16 +1119,19 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         private final JButton   person1,
                                 person2,
                                 person3;
+        private final JButton cancel;
 
         /**
         * The constructor to use.
         * @param actionListener The ActionListener for this panel's buttons.
         */
         public RecruitPanel(ActionListener actionListener) {
+            setFocusCycleRoot(true);
+
             JLabel  question = new JLabel("Click one of the following individuals to"),
                     question2 = new JLabel("recruit them."),
                     priceLabel = new JLabel("Their price:");
-            JButton cancel = new JButton("Cancel");
+            cancel = new JButton("Cancel");
 
             price = new JLabel();
             person1 = new JButton();
@@ -1153,6 +1190,11 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         }
 
 
+        public void requestFocus() {
+            cancel.requestFocus();
+        }
+        
+
         /**
         * Updates this panel's labels so that the information it displays is up to date.
         */
@@ -1192,6 +1234,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                                 galleonButton,
                                 privateerButton,
                                 frigateButton;
+        private JButton cancel;
         private JLabel artilleryLabel = new JLabel("?");
 
         /**
@@ -1199,6 +1242,8 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         * @param actionListener The ActionListener for this panel's buttons.
         */
         public PurchasePanel(ActionListener actionListener) {
+            setFocusCycleRoot(true);
+
             JLabel  question = new JLabel("Click one of the following items to"),
                     question2 = new JLabel("purchase them."),
                     caravelLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.CARAVEL))),
@@ -1206,7 +1251,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     galleonLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.GALLEON))),
                     privateerLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.PRIVATEER))),
                     frigateLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.FRIGATE)));
-            JButton cancel = new JButton("Cancel");
+            cancel = new JButton("Cancel");
 
             artilleryButton = new JButton(Unit.getName(Unit.ARTILLERY));
             caravelButton = new JButton(Unit.getName(Unit.CARAVEL));
@@ -1290,6 +1335,11 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         }
 
 
+        public void requestFocus() {
+            cancel.requestFocus();
+        }
+
+
         /**
         * Updates this panel's labels so that the information it displays is up to date.
         */
@@ -1363,6 +1413,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                           firebrandPreacherButton,
                           elderStatesmanButton,
                           veteranSoldierButton;
+        private JButton cancel;
 
 
 
@@ -1371,6 +1422,8 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         * @param actionListener The ActionListener for this panel's buttons.
         */
         public TrainPanel(ActionListener actionListener) {
+            setFocusCycleRoot(true);
+
             JLabel  question = new JLabel("Click one of the following individuals to"),
                     question2 = new JLabel("train them."),
                     expertOreMinerLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.EXPERT_ORE_MINER))),
@@ -1390,7 +1443,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     firebrandPreacherLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.FIREBRAND_PREACHER))),
                     elderStatesmanLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.ELDER_STATESMAN))),
                     veteranSoldierLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.VETERAN_SOLDIER)));
-            JButton cancel = new JButton("Cancel");
+            cancel = new JButton("Cancel");
 
             expertOreMinerButton = new JButton(Unit.getName(Unit.EXPERT_ORE_MINER));
             expertLumberJackButton = new JButton(Unit.getName(Unit.EXPERT_LUMBER_JACK));
@@ -1570,6 +1623,11 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             } catch(Exception e) {}
 
             setSize(320, 530);
+        }
+
+
+        public void requestFocus() {
+            cancel.requestFocus();
         }
 
 
