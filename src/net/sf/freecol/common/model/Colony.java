@@ -496,11 +496,11 @@ public final class Colony extends Settlement implements Location {
             }
 
             if (getBuilding(currentlyBuilding).getNextHammers() == -1) {
-                addModelMessage(this, "model.colony.alreadyBuilt", new String[][] {{"%colony%", getName()}, {"%building%", getBuilding(currentlyBuilding).getNextName()}});
+                addModelMessage(this, "model.colony.alreadyBuilt", new String[][] {{"%colony%", getName()}, {"%building%", getBuilding(currentlyBuilding).getName()}});
             }
         }
         
-        hammers += amount;        
+        hammers += amount;
         checkBuildingComplete();
     }
 

@@ -322,8 +322,10 @@ public final class Canvas extends JLayeredPane {
             String[][] data = m.getData();
             if (data != null) {
                 for (int i=0; i<data.length; i++) {
-                    if (data[i][0] == null || data[i][1] == null) {
-                        logger.warning("Data in model message is 'null': " + data[i][0] + ", " + data[i][1]);
+                    if (data[i] == null) {
+                        logger.warning("Data has a wrong format for message: " + message);
+                    } else if (data[i][0] == null || data[i][1] == null) {
+                        logger.warning("Data in model message is 'null': " + message + ", " + data[i][0] + ", " + data[i][1]);
                     } else {
                         message = message.replaceAll(data[i][0], data[i][1]);
                     }

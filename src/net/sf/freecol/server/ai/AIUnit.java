@@ -102,6 +102,10 @@ public class AIUnit extends AIObject {
     public void readFromXMLElement(Element element) {
         unit = (Unit) getAIMain().getFreeColGameObject(element.getAttribute("ID"));
 
+        if (unit == null) {
+            logger.warning("Could not find unit: " + unit);
+        }
+
         Element missionElement = (Element) element.getChildNodes().item(0);
         if (missionElement != null) {
             if (missionElement.getTagName().equals(UnitWanderHostileMission.getXMLElementTagName())) {

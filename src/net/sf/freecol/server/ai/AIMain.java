@@ -185,6 +185,13 @@ public class AIMain implements FreeColGameObjectListener {
         Iterator i = aiObjects.values().iterator();
         while (i.hasNext()) {
             AIObject aio = (AIObject) i.next();
+
+            // TODO: Remove debugging line:
+            if (aio instanceof AIUnit && ((AIUnit) aio).getUnit() == null) {
+                logger.warning("aoi.getUnit() == null");
+                continue;
+            }
+
             element.appendChild(aio.toXMLElement(document));
         }
 
