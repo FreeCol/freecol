@@ -561,7 +561,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     return null;
                 }
             }
-            setSelectedUnit(null);
+            setSelectedUnitLabel(null);
             Component c = add(comp);
             europePanel.refresh();
             return c;
@@ -616,7 +616,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     return null;
                 }
             }
-            setSelectedUnit(null);
+            setSelectedUnitLabel(null);
             Component c = add(comp);
             europePanel.refresh();
             return c;
