@@ -40,6 +40,12 @@
       </fileset>
     </copy>
 
+    <copy todir="${freecol.build.dir}/net/sf/freecol/data/fonts">
+      <fileset dir="${freecol.data.dir}/fonts">
+        <exclude name="**/CVS/**"/>
+      </fileset>
+    </copy>
+    
     <!-- Copy the sound files unless the "nosound" property has been defined -->
     <antcall target="copy-sound-files"/>
   </target>
