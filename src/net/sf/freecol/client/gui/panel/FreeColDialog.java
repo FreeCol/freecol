@@ -390,6 +390,7 @@ public class FreeColDialog extends FreeColPanel {
                 }
             }
         });
+        fileChooser.setFileHidingEnabled(false);
         saveDialog.setLayout(new BorderLayout());
         saveDialog.add(fileChooser);
         saveDialog.setSize(480, 320);

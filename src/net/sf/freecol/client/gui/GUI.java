@@ -1,22 +1,23 @@
 
 package net.sf.freecol.client.gui;
 
-import java.awt.Rectangle;
-import java.awt.Graphics2D;
-import java.awt.Color;
-import java.awt.Image;
-import java.awt.MediaTracker;
 import java.util.*;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.UIManager;
 
+import java.awt.Rectangle;
+import java.awt.Graphics2D;
+import java.awt.Color;
+import java.awt.Image;
+import java.awt.MediaTracker;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.image.BufferedImage;
 import java.awt.AlphaComposite;
 import java.awt.Polygon;
 import java.awt.Composite;
+import java.awt.geom.GeneralPath;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.FreeCol;
@@ -93,6 +94,8 @@ public final class GUI {
     MESSAGE_AGE = 10000; // The amount of time before a message gets deleted (in milliseconds).
 
     private boolean displayTileNames = false;
+    private boolean displayGrid = false;
+    private GeneralPath gridPath = null;
 
     // Debug variables:
     boolean displayCoordinates = false;
@@ -392,12 +395,12 @@ public final class GUI {
             displayMap(g);
         } else {
             Image bgImage = (Image) UIManager.get("CanvasBackgroundImage");
-          
-            if (bgImage != null) {               
+
+            if (bgImage != null) {
                 if (bgImage.getWidth(null) != bounds.width || bgImage.getHeight(null) != bounds.height) {
                     bgImage = bgImage.getScaledInstance(bounds.width, bounds.height, Image.SCALE_SMOOTH);
                     UIManager.put("CanvasBackgroundImage", bgImage);
-                                        
+
                     /*
                       We have to use a MediaTracker to ensure that the
                       image has been scaled before we paint it.
@@ -406,15 +409,15 @@ public final class GUI {
                     mt.addImage(bgImage, 0, bounds.width, bounds.height);
 
                     try {
-                        mt.waitForID(0);                
+                        mt.waitForID(0);
                     } catch (InterruptedException e) {
                         g.setColor(Color.black);
                         g.fillRect(0, 0, bounds.width, bounds.height);
                         return;
                     }
-                                        
-                }                
-                                   
+
+                }
+
                 g.drawImage(bgImage, 0, 0, null);
             } else {
                 g.setColor(Color.black);
@@ -611,7 +614,7 @@ public final class GUI {
 
         /*
         PART 1a
-        ======
+        =======
         Determine which tiles need to be redrawn.
         */
         int clipTopRow = (clipBounds.y - topRowY) / (tileHeight / 2) - 1;
@@ -629,6 +632,29 @@ public final class GUI {
         clipRightCol = leftColumn + clipRightCol;
 
         /*
+        PART 1b
+        =======
+        Create a GeneralPath to draw the grid with, if needed.
+        */
+        if (displayGrid) {
+            gridPath = new GeneralPath();
+            gridPath.moveTo(0, 0);
+            int nextX = tileWidth / 2;
+            int nextY = - (tileHeight / 2);
+
+            for (int i = 0; i <= ((clipRightCol - clipLeftCol) * 2 + 1); i++) {
+                gridPath.lineTo(nextX, nextY);
+                nextX += tileWidth / 2;
+                if (nextY == - (tileHeight / 2)) {
+                    nextY = 0;
+                }
+                else {
+                    nextY = - (tileHeight / 2);
+                }
+            }
+        }
+
+        /*
         PART 2
         ======
         Display the Tiles and the Units.
@@ -639,18 +665,39 @@ public final class GUI {
         int xx;
         int yy = clipTopY;
         Map map = gameData.getMap();
+
         // Row per row; start with the top modified row
         for (int tileY = clipTopRow; tileY <= clipBottomRow; tileY++) {
             xx = clipLeftX;
             if ((tileY % 2) != 0) {
                 xx += tileWidth / 2;
             }
-            // Column per column; start at the left side
+
+            // Column per column; start at the left side to display the tiles.
             for (int tileX = clipLeftCol; tileX <= clipRightCol; tileX++) {
                 if (map.isValid(tileX, tileY)) {
                     // Display the Tile:
                     displayTile(g, map, map.getTile(tileX, tileY), xx, yy);
+                }
+                xx += tileWidth;
+            }
 
+            xx = clipLeftX;
+            if ((tileY % 2) != 0) {
+                xx += tileWidth / 2;
+            }
+
+            if (displayGrid) {
+                // Display the grid.
+                g.translate(xx, yy + (tileHeight / 2));
+                g.setColor(Color.BLACK);
+                g.draw(gridPath);
+                g.translate(- xx, - (yy + (tileHeight / 2)));
+            }
+
+            // Again, column per column starting at the left side. Now display the units
+            for (int tileX = clipLeftCol; tileX <= clipRightCol; tileX++) {
+                if (map.isValid(tileX, tileY)) {
                     // Display any units on that Tile:
                     Tile unitTile = map.getTile(tileX, tileY);
                     if (unitTile != null && unitTile.getUnitCount() > 0 && (unitTile.getSettlement() == null || (activeUnit != null && unitTile.contains(activeUnit)))) {
@@ -663,6 +710,7 @@ public final class GUI {
                 }
                 xx += tileWidth;
             }
+
             yy += tileHeight / 2;
         }
 
@@ -860,7 +908,7 @@ public final class GUI {
         int xCorr = 0;
         int yCorr = 0;
         int lastDiff = 1;
-        
+
         g.setColor(new Color(128, 64, 0));
         g.drawLine(baseX, baseY, baseX, baseY);
 
@@ -901,7 +949,7 @@ public final class GUI {
                         oldYCorr = corr+lastDiff;
                     }
                 }
-                
+
                 g.setColor(new Color(128, 128, 0));
                 g.drawLine(baseX+(int) (j*addX)+oldXCorr, baseY+(int) (j*addY)+oldYCorr, baseX+(int) (j*addX)+oldXCorr, baseY+(int) (j*addY)+oldYCorr);
             }
@@ -948,7 +996,7 @@ public final class GUI {
             g.drawImage(lib.getMiscImage(ImageLibrary.TILE_TAKEN), x, y, null);
         }
     }
-    
+
 
     /**
      * Displays the given Tile onto the given Graphics2D object at the
@@ -968,7 +1016,7 @@ public final class GUI {
     public void displayTile(Graphics2D g, Map map, Tile tile, int x, int y) {
         displayTile(g, map, tile, x, y, true);
     }
-    
+
 
     /**
      * Displays the given Tile onto the given Graphics2D object at the
@@ -1052,7 +1100,7 @@ public final class GUI {
             if (tile.isPlowed()) {
                 g.drawImage(lib.getMiscImage(ImageLibrary.PLOWED), x, y, null);
             }
-            
+
             if (tile.hasBonus()) {
                 Image bonusImage = lib.getBonusImage(tile);
                 if (bonusImage != null) {
@@ -1093,7 +1141,7 @@ public final class GUI {
                             connectedRoad =  true;
                             int nx = x + tileWidth/2;
                             int ny = y + tileHeight/2;
-                                                        
+
                             switch (i) {
                                 case 0: nx = x + tileWidth/2; ny = y; break;
                                 case 1: nx = x + (tileWidth*3)/4; ny = y + tileHeight/4; break;
@@ -1109,7 +1157,7 @@ public final class GUI {
                         }
                     }
                 }
-                
+
                 if (!connectedRoad) {
                     drawRoad(g, seed, x + tileWidth/2 - 10, y + tileHeight/2, x + tileWidth/2 + 10, y + tileHeight/2);
                     drawRoad(g, seed, x + tileWidth/2, y + tileHeight/2 - 10, x + tileWidth/2, y + tileHeight/2 + 10);
@@ -1166,7 +1214,7 @@ public final class GUI {
                 g.fill(pol);
                 g.setComposite(oldComposite);
             }
-            
+
             if (drawUnexploredBorders) {
                 for (int i = 3; i < 6; i++) {
                     Map.Position p = map.getAdjacent(pos, i);
@@ -1222,7 +1270,15 @@ public final class GUI {
     public void setDisplayTileNames(boolean displayTileNames) {
         this.displayTileNames = displayTileNames;
     }
-    
+
+
+    /**
+    * If set to <i>true</i> then a grid is drawn on the map.
+    */
+    public void setDisplayGrid(boolean displayGrid) {
+        this.displayGrid = displayGrid;
+    }
+
 
     /**
     * Breaks a line between two words. THe breaking point
@@ -1231,16 +1287,16 @@ public final class GUI {
     public int getBreakingPoint(String string) {
         int center = string.length() / 2;
         int bestIndex = string.indexOf(' ');
-        
+
         int index = 0;
         while (index != -1 && index != bestIndex) {
             if (Math.abs(center-index) < Math.abs(center-bestIndex)) {
                 bestIndex = index;
             }
-            
+
             index = string.indexOf(' ', bestIndex);
         }
-        
+
         if (bestIndex == 0 || bestIndex == string.length()) {
             return -1;
         } else {

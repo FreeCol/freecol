@@ -33,7 +33,7 @@ public class FreeColMenuBar extends JMenuBar {
     */
     public FreeColMenuBar(FreeColClient f, Canvas c, GUI g) {
         super();
-        
+
         this.freeColClient = f;
         this.canvas = c;
         this.gui = g;
@@ -65,7 +65,7 @@ public class FreeColMenuBar extends JMenuBar {
                 freeColClient.getInGameController().loadGame();
             }
         });
-        
+
         saveMenuItem = new JMenuItem("Save");
         saveMenuItem.setOpaque(false);
         saveMenuItem.setMnemonic(KeyEvent.VK_S);
@@ -77,7 +77,7 @@ public class FreeColMenuBar extends JMenuBar {
             }
         });
         inGameOptions.add(saveMenuItem);
-        
+
         gameMenu.addSeparator();
 
         JMenuItem reconnectMenuItem = new JMenuItem("Reconnect");
@@ -142,6 +142,19 @@ public class FreeColMenuBar extends JMenuBar {
             }
         });
         inGameOptions.add(dtnMenuItem);
+
+        final JCheckBoxMenuItem dgMenuItem = new JCheckBoxMenuItem("Display grid");
+        dgMenuItem.setOpaque(false);
+        dgMenuItem.setMnemonic(KeyEvent.VK_G);
+        dgMenuItem.setAccelerator(KeyStroke.getKeyStroke('G', InputEvent.CTRL_MASK));
+        viewMenu.add(dgMenuItem);
+        dgMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                freeColClient.getGUI().setDisplayGrid(((JCheckBoxMenuItem) e.getSource()).isSelected());
+                freeColClient.getCanvas().refresh();
+            }
+        });
+        inGameOptions.add(dgMenuItem);
 
         viewMenu.addSeparator();
 
@@ -213,7 +226,7 @@ public class FreeColMenuBar extends JMenuBar {
         while (componentIterator.hasNext()) {
             ((JComponent) componentIterator.next()).setEnabled(enabled);
         }
-        
+
         saveMenuItem.setEnabled(freeColClient.getMyPlayer().isAdmin() && freeColClient.getFreeColServer() != null);
     }
 
@@ -227,7 +240,7 @@ public class FreeColMenuBar extends JMenuBar {
         while (componentIterator.hasNext()) {
             ((JComponent) componentIterator.next()).setEnabled(enabled);
         }
-        
+
         update();
     }
 }
