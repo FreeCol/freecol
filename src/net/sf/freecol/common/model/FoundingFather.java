@@ -27,37 +27,36 @@ package net.sf.freecol.common.model;
 public class FoundingFather {
 
     public static final int ADAM_SMITH = 0,
-							JACOB_FUGGER = 1,
-							PETER_MINUIT = 2,
-							PETER_STUYVESANT = 3,
-							JAN_DE_WITT = 4,
-							FERDINAND_MAGELLAN = 5,
-							FRANSICO_DE_CORONADO = 6,
-							HERNANDO_DE_SOTO = 7,
-							HENRY_HUDSON = 8,
-							LA_SALLE = 9,
-							HERNAN_CORTES = 10,
-							GEORGE_WASHINGTION = 11,
-							PAUL_REVERE = 12,
-							FRANCIS_DRAKE = 13,
-							JOHN_PAUL_JONES = 14,
-							THOMAS_JEFFERSON = 15,
-							POCAHONTAS = 16,
-							THOMAS_PAINE = 17,
-							SIMON_BOLIVAR = 18,
-							BENJAMIN_FRANKLIN = 19,
-							WILLIAM_BREWSTER = 20,
-							WILLIAM_PENN = 21,
-							FATHER_JEAN_DE_BREBEUF = 22,
-							JUAN_DE_SEPULVEDA = 23,
-							BARTOLOME_DE_LAS_CASAS = 24,
-                            
+                            JACOB_FUGGER = 1,
+                            PETER_MINUIT = 2,
+                            PETER_STUYVESANT = 3,
+                            JAN_DE_WITT = 4,
+                            FERDINAND_MAGELLAN = 5,
+                            FRANSICO_DE_CORONADO = 6,
+                            HERNANDO_DE_SOTO = 7,
+                            HENRY_HUDSON = 8,
+                            LA_SALLE = 9,
+                            HERNAN_CORTES = 10,
+                            GEORGE_WASHINGTION = 11,
+                            PAUL_REVERE = 12,
+                            FRANCIS_DRAKE = 13,
+                            JOHN_PAUL_JONES = 14,
+                            THOMAS_JEFFERSON = 15,
+                            POCAHONTAS = 16,
+                            THOMAS_PAINE = 17,
+                            SIMON_BOLIVAR = 18,
+                            BENJAMIN_FRANKLIN = 19,
+                            WILLIAM_BREWSTER = 20,
+                            WILLIAM_PENN = 21,
+                            FATHER_JEAN_DE_BREBEUF = 22,
+                            JUAN_DE_SEPULVEDA = 23,
+                            BARTOLOME_DE_LAS_CASAS = 24,
+
                             FATHER_COUNT = 25;
-							
-	public static String getDescription(int type) {
-		switch( type )
-		{
-			case ADAM_SMITH: return "Factories produce 1.5 manufactured goods per 1 raw material";
+
+    public static String getDescription(int foundingFather) {
+        switch (foundingFather) {
+            case ADAM_SMITH: return "Factories produce 1.5 manufactured goods per 1 raw material";
             case JACOB_FUGGER: return "All boycotts currently in effect are dropped";
             case PETER_MINUIT: return "Indians no longer demand payment for their land";
             case PETER_STUYVESANT: return "The construction of custom houses becomes possible";
@@ -82,8 +81,8 @@ public class FoundingFather {
             case FATHER_JEAN_DE_BREBEUF: return "All missionaries function as experts";
             case JUAN_DE_SEPULVEDA: return "Increases chance that a subjugated Indian settlement will \"convert\" and join a colony";
             case BARTOLOME_DE_LAS_CASAS: return "All existing Indian converts are converted to free colonists";
-            default: 
+            default:
                 throw new IllegalArgumentException("FoundingFather has invalid type.");
-		}
-	}    
+        }
+    }
 }

@@ -93,10 +93,10 @@ public class Player extends FreeColGameObject {
     private boolean         dead = false;
     
     // any founding fathers in this Player's congress
-    private boolean[]       fathers;
+    private boolean[]       fathers = new boolean[FoundingFather.FATHER_COUNT];
     private int             currentFather;
-    
-    // 0 = pre-rebels; 1 = in rebellion; 2 = independence granted 
+
+    // 0 = pre-rebels; 1 = in rebellion; 2 = independence granted
     private int             rebellionState;
 
 
@@ -155,7 +155,6 @@ public class Player extends FreeColGameObject {
         crosses = 0;
         bells = 0;
         
-        fathers = new boolean[FoundingFather.FATHER_COUNT];
         currentFather = -1;
         rebellionState = 0;
     }
@@ -519,6 +518,7 @@ public class Player extends FreeColGameObject {
         for (int i = 0; i < nationNames.length; i++) {
             if (n.toLowerCase().equals(nationNames[i])) {
                 setNation(nations[i]);
+                return;
             }
         }
 
@@ -750,7 +750,9 @@ public class Player extends FreeColGameObject {
         playerElement.setAttribute("bells", Integer.toString(bells));
         playerElement.setAttribute("ready", Boolean.toString(ready));
         playerElement.setAttribute("dead", Boolean.toString(dead));
-        
+        playerElement.setAttribute("rebellionState", Integer.toString(rebellionState));
+        playerElement.setAttribute("currentFather", Integer.toString(currentFather));
+
         char[] fatherCharArray = new char[FoundingFather.FATHER_COUNT];
         for(int i = 0; i < fathers.length; i++)
             fatherCharArray[i] = (fathers[i] ? '1' : '0');
@@ -788,10 +790,13 @@ public class Player extends FreeColGameObject {
         ready = (new Boolean(playerElement.getAttribute("ready"))).booleanValue();
         ai = (new Boolean(playerElement.getAttribute("ai"))).booleanValue();
         dead = (new Boolean(playerElement.getAttribute("dead"))).booleanValue();
-        
+        rebellionState = Integer.parseInt(playerElement.getAttribute("rebellionState"));
+        currentFather = Integer.parseInt(playerElement.getAttribute("currentFather"));
+
         String fatherStr = playerElement.getAttribute("foundingFathers");
-        for(int i = 0; i < fatherStr.length(); i++)
+        for(int i = 0; i < fatherStr.length(); i++) {
             fathers[i] = ( (fatherStr.charAt(i) == '1') ? true : false );
+        }
 
         if (playerElement.hasAttribute("entryLocation")) {
             entryLocation = (Location) getGame().getFreeColGameObject(playerElement.getAttribute("entryLocation"));

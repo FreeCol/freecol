@@ -773,6 +773,23 @@ public final class GUI {
     * @return The image.
     */
     public BufferedImage createProductionImage(ImageIcon goodsIcon, int production, int width, int height) {
+        return createProductionImage(goodsIcon, production,  width,  height, 6);
+    }
+    
+
+    /**
+    * Creates an illustration for a goods production.
+    *
+    * @param goodsIcon The icon representing the goods.
+    * @param production The amount of goods that is beeing produced.
+    * @param width The width of the image to deliver.
+    * @param height The height of the image to deliver.
+    * @param limit The maximum amount of goods icons to display.
+    *              if the production is above this limit, a number 
+    *              is used instead.
+    * @return The image.
+    */
+    public BufferedImage createProductionImage(ImageIcon goodsIcon, int production, int width, int height, int limit) {
         BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = bi.createGraphics();
 
@@ -782,7 +799,7 @@ public final class GUI {
                 p = (width - goodsIcon.getIconWidth()) / production;
             }
 
-            if (production > 6) { // TODO: Or the user chooses it:
+            if (production > limit) { // TODO: Or the user chooses it:
                 goodsIcon.paintIcon(null, g, width/2 - goodsIcon.getIconWidth()/2, 0);
                 BufferedImage stringImage = createStringImage((Graphics2D) g, Integer.toString(production), Color.WHITE, goodsIcon.getIconWidth()*2, 12);
                 g.drawImage(stringImage, width/2-stringImage.getWidth()/2, goodsIcon.getIconHeight()/2 - stringImage.getHeight()/2, null);

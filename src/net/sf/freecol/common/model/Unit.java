@@ -1,7 +1,6 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.Random;
 import java.util.Vector;
 import java.util.HashMap;
 import java.util.ArrayList;
@@ -96,6 +95,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
 
     public static final int ATTACKER_LOSS = 0,
                             ATTACKER_WIN  = 1;
+
 
     private int             type;
     private boolean         armed,
@@ -263,11 +263,15 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
 
     /**
     * Returns the current amount of treasure in this unit.
-    * Should be type of TREASURE_TRAIN. 
+    * Should be type of TREASURE_TRAIN.
     * @return The amount of treasure.
     */
     public int getTreasureAmount() {
-        return treasureAmount;
+        if (getType() == TREASURE_TRAIN) {
+            return treasureAmount;
+        } else {
+            throw new IllegalStateException();
+        }
     }
     
     /**
@@ -276,7 +280,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
      * @param amt    The amount of treasure
      */
     public void setTreasureAmount(int amt) {
-        this.treasureAmount = amt;
+        if (getType() == TREASURE_TRAIN) {
+            this.treasureAmount = amt;
+        } else {
+            throw new IllegalStateException();
+        }
     }
     
     
@@ -2313,7 +2321,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             if (getGoodsCount() > 0) {
                 modified_power -= ((base_power * getGoodsCount()) / 8); // -12.5% penalty for every unit of cargo.
             }
-            if (getOwner().hasFather(FoundingFather.FRANCIS_DRAKE)) {
+            if (getType() == PRIVATEER && getOwner().hasFather(FoundingFather.FRANCIS_DRAKE)) {
                 modified_power += (base_power * 3) / 2;
             }
             return modified_power;
@@ -2356,32 +2364,27 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         movesLeft = 0;
         if (defender.getType() == BRAVE) {
             defender.dispose();
-            
+
             if (newTile.getSettlement() != null) {
-                Random rand = new Random();
+                //Random rand = new Random(); // Support for random numbers in the model has not yet been added.
                 if (newTile.getSettlement().getUnitCount() <= 0 && newTile.getSettlement() instanceof IndianSettlement) {
+                    /* Support for adding FreeColGameObjects from the model has not yet been added:
                     Unit treasure = new Unit(getGame(), owner, Unit.TREASURE_TRAIN);
-                    int amt = 1;
                     if(newTile.getSettlement().getOwner().getNation() == Player.INCA ||
-                       newTile.getSettlement().getOwner().getNation() == Player.AZTEC) {
-                        treasure.setTreasureAmount( (rand.nextInt(10)+1) * 10000);
-                        if ( ((IndianSettlement)newTile.getSettlement()).isCapital() )
+                            newTile.getSettlement().getOwner().getNation() == Player.AZTEC) {
+                        treasure.setTreasureAmount((rand.nextInt(10)+1) * 10000);
+                        if (((IndianSettlement) newTile.getSettlement()).isCapital() ) {
                             treasure.setTreasureAmount(treasure.getTreasureAmount()+10000);
-                    }
-                    else {
+                        }
+                    } else {
                         treasure.setTreasureAmount((rand.nextInt(20)+1) * 100);
                     }
-                    
+
+                    addModelMessage(this, "model.unit.indianTreasure", new String[][] {{"%indian%", newTile.getSettlement().getOwner().getNationAsString()}, {"%amount%", Integer.toString(treasure.getTreasureAmount())}});
+                    */
                     newTile.getSettlement().dispose();
-                    // TODO: notify of treasure gain
-                    newTile.add(treasure);
+                    //newTile.add(treasure);
                     setLocation(newTile);
-                }
-                else if (newTile.getSettlement().getUnitCount() <= 0 && newTile.getSettlement() instanceof Colony) {
-                    // TODO: notify of plundering
-                    int gold = (int) (newTile.getSettlement().getOwner().getGold() * 0.1);
-                    getOwner().modifyGold(gold); // 10% of their gold
-                    newTile.getSettlement().getOwner().modifyGold(gold);
                 }
             }
         } else if (isNaval()) {
@@ -2394,9 +2397,14 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             Colony targetcolony = null;
             boolean captureColony = ((newTile.getSettlement() != null) && (newTile.getSettlement() instanceof Colony));
             if (captureColony) {
+                int plunderGold = (int) (newTile.getSettlement().getOwner().getGold() * 0.1); // 10% of their gold
+                getOwner().modifyGold(plunderGold);
+                newTile.getSettlement().getOwner().modifyGold(-plunderGold);
+
                 targetcolony = (Colony)(newTile.getSettlement());
                 targetcolony.setOwner(getOwner()); // This also changes over all of the units...
                 setLocation(newTile);
+                addModelMessage(this, "model.unit.colonyCaptured", new String[][] {{"%colony%", newTile.getColony().getName()}, {"%amount%", Integer.toString(plunderGold)}});
             } else {
                 defender.setLocation(getTile());
                 defender.setOwner(getOwner());
@@ -2431,17 +2439,24 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                 }
             }
         }
-        
+
         // TODO: all of these require GUI message updates to the user
-        if (getOwner().hasFather(FoundingFather.GEORGE_WASHINGTION)) {
-            if (getType() == PETTY_CRIMINAL)
+        if (getOwner().hasFather(FoundingFather.GEORGE_WASHINGTION)) { // || randomChance == true
+            String oldName = getName();
+
+            if (getType() == PETTY_CRIMINAL) {
                 setType(INDENTURED_SERVANT);
-            else if (getType() == INDENTURED_SERVANT)
+            } else if (getType() == INDENTURED_SERVANT) {
                 setType(FREE_COLONIST);
-            else if (getType() == FREE_COLONIST)
+            } else if (getType() == FREE_COLONIST) {
                 setType(VETERAN_SOLDIER);
-            else if (getType() == VETERAN_SOLDIER && getOwner().getRebellionState() > 1)
+            } else if (getType() == VETERAN_SOLDIER && getOwner().getRebellionState() > 1) {
                 setType(COLONIAL_REGULAR);
+            }
+
+            if (!getName().equals(oldName)) {
+                addModelMessage(this, "model.unit.unitImproved", new String[][] {{"%oldName%", oldName}, {"%newName%", getName()}});
+            }
         }
     }
 

@@ -628,21 +628,24 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         public ProductionPanel(ColonyPanel colonyPanel) {
             this.colonyPanel = colonyPanel;
         }
-        
+
         public void paintComponent(Graphics g) {
-            //int production = colony.getFoodProduction();
-            //int surplus = production - colony.getUnitCount() * 2;
             int need = colony.getUnitCount() * 2;
             int surplus = colony.getFoodProduction() - need;
 
             ImageIcon goodsIcon = parent.getImageProvider().getGoodsImageIcon(Goods.FOOD);
 
-            int nextX = Math.min(need, 8) * goodsIcon.getIconWidth();
-            BufferedImage productionImage = parent.getGUI().createProductionImage(goodsIcon, need, nextX, getHeight());
+            int nextX = (need > 14) ? goodsIcon.getIconWidth() : Math.min(need, 6) * goodsIcon.getIconWidth();
+            BufferedImage productionImage = parent.getGUI().createProductionImage(goodsIcon, need, nextX, getHeight(), 14);
             g.drawImage(productionImage, 0, 0, null);
 
             if (surplus != 0) {
-                productionImage = parent.getGUI().createProductionImage(goodsIcon, surplus, goodsIcon.getIconWidth() * 3, getHeight());
+                if (surplus > 7) {
+                    productionImage = parent.getGUI().createProductionImage(goodsIcon, surplus, goodsIcon.getIconWidth(), getHeight(), 7);
+                } else {
+                    productionImage = parent.getGUI().createProductionImage(goodsIcon, surplus, goodsIcon.getIconWidth() * 3, getHeight(), 7);
+                }
+
                 g.drawImage(productionImage, nextX + goodsIcon.getIconWidth(), 0, null);
             }
         }

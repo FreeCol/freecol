@@ -65,6 +65,7 @@ public final class PreGameController {
         freeColClient.getClient().send(readyElement);
     }
 
+
     /**
     * Sets this client's player's nation.
     * @param nation Which nation this player wishes to set.
@@ -85,6 +86,7 @@ public final class PreGameController {
         freeColClient.getClient().send(nationElement);
     }
 
+
     /**
     * Sets this client's player's color.
     * @param color Which color this player wishes to set.
@@ -100,6 +102,7 @@ public final class PreGameController {
         freeColClient.getClient().send(colorElement);
     }
 
+    
     /**
     * Requests the game to be started. This will only be successful
     * if all players are ready to start the game.
