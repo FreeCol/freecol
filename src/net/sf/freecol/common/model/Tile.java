@@ -722,8 +722,9 @@ public final class Tile extends FreeColGameObject implements Location {
     */
     public int secondaryGoods()
     {
-	if (isForested()) return Goods.FURS;
-	switch(getType()) {
+        if (isForested()) return Goods.FURS;
+        if (getAddition() >= ADD_HILLS) return Goods.ORE;
+        switch(getType()) {
             case PLAINS:
             case PRAIRIE:
             case DESERT:
@@ -739,7 +740,7 @@ public final class Tile extends FreeColGameObject implements Location {
             case ARCTIC:
             default:
                 return Goods.ORE;
-	}
+        }
     }
     
     /**

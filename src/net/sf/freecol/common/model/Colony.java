@@ -582,8 +582,8 @@ public final class Colony extends Settlement implements Location {
         while (workLocationIterator.hasNext()) {
             colonyElement.appendChild(((FreeColGameObject) workLocationIterator.next()).toXMLElement(player, document));
         }
-	
-	colonyElement.appendChild(goodsContainer.toXMLElement(player, document));
+        
+        colonyElement.appendChild(goodsContainer.toXMLElement(player, document));
 
         return colonyElement;
     }
@@ -631,7 +631,7 @@ public final class Colony extends Settlement implements Location {
                 } else {
                     goodsContainer = new GoodsContainer(getGame(), this, childElement);
                 }
-	    }
+            }
         }
     }
 

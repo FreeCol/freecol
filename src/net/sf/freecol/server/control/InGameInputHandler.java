@@ -333,11 +333,11 @@ public final class InGameInputHandler implements MessageHandler {
         Unit carrier = (Unit) game.getFreeColGameObject(boardShipElement.getAttribute("carrier"));
 
         Tile oldTile = unit.getTile();
-	
-	if (unit.isCarrier()) {
-	  logger.warning("Tried to load a carrier onto another carrier.");
-	  return null;
-	}
+        
+        if (unit.isCarrier()) {
+          logger.warning("Tried to load a carrier onto another carrier.");
+          return null;
+        }
 
         unit.boardShip(carrier);
 

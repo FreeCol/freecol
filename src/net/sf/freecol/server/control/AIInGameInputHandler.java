@@ -108,9 +108,7 @@ public final class AIInGameInputHandler implements MessageHandler {
                  if (theUnit instanceof ServerUnit) {
                      ((ServerUnit)theUnit).doMission();
                  }
-                 System.out.println("Doing a unit");
              }
-             System.out.println("Stopping");
              reply = Message.createNewRootElement("endTurn");
              if (connection instanceof DummyConnection) {
                  ((DummyConnection)connection).handleAndSendReply(reply);
@@ -119,7 +117,6 @@ public final class AIInGameInputHandler implements MessageHandler {
                     connection.send(reply);
                  } catch (IOException e) {}
              }
-             System.out.println("Trying to send back the endTurn() element");
         }
 
         return null;

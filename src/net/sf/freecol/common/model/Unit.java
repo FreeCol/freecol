@@ -2382,7 +2382,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         owner = getGame().getPlayerByID(unitElement.getAttribute("owner"));
         
         if (owner == null) {
-            System.out.println("VERY BAD: Can't find player with ID " + unitElement.getAttribute("owner") + "!");
+            logger.warning("VERY BAD: Can't find player with ID " + unitElement.getAttribute("owner") + "!");
         }
         
         if (unitElement.hasAttribute("entryLocation")) {

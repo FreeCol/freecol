@@ -144,13 +144,13 @@ final class ReceivingThread extends Thread {
                 }
 
                 // START DEBUG-LINES:
-		if (msg.getType().equals("invalid")) {
-		  System.out.println("--INVALID MESSAGE RECIEVED--");
-		} else {
-                  System.out.println(msg);
-		}
-                System.out.println();
-                System.out.flush();
+                if (msg.getType().equals("invalid")) {
+                  logger.warning("--INVALID MESSAGE RECIEVED--");
+                } else {
+                  logger.info("Recieved message as follows: \"" + msg + "\"");
+                }
+                //System.out.println();
+                //System.out.flush();
                 // END DEBUB
 
                 if (msg.isType("reply")) { // == this is a reply-message:

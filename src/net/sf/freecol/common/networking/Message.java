@@ -5,6 +5,8 @@ package net.sf.freecol.common.networking;
 import java.io.IOException;
 import java.io.StringReader;
 
+import java.util.logging.Logger;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -20,12 +22,10 @@ import org.xml.sax.SAXException;
 * Class for parsing raw message data into an XML-tree and for creating new XML-trees.
 */
 public final class Message {
+    private static final Logger logger = Logger.getLogger(Message.class.getName());
 
     /** The actual Message data. */
     private final Document document;
-
-
-    
 
     /**
     * Constructs a new Message with data from the given String. The constructor
@@ -47,10 +47,7 @@ public final class Message {
                 x = sxe.getException();
             }
             x.printStackTrace();
-            System.out.println();
-            System.out.println("The bad message is as follows:");
-            System.out.println(msg);
-            System.out.println("--END--");
+            logger.warning("Invalid message received: \"" + msg + "\"");
         } catch (ParserConfigurationException pce) {
             // Parser with specified options can't be built
             pce.printStackTrace();

@@ -780,8 +780,7 @@ public final class GUI {
                     g.drawImage(lib.getColorChip(((IndianSettlement)settlement).getOwner().getColor()), x + STATE_OFFSET_X, y + 10, null);
                     g.drawString("-", x + TEXT_OFFSET_X + STATE_OFFSET_X, y + 10 + TEXT_OFFSET_Y);
                 } else {
-                    // TODO: Make this a log message:
-                    System.err.println("Requested to draw unknown settlement type.");
+                    logger.warning("Requested to draw unknown settlement type.");
                 }
             }
         }

@@ -275,7 +275,7 @@ public final class Market extends FreeColGameObject {
                 (10 * ((totalGoods / 30) + 1)) / (data.amountInMarket + 1);
 
             if (data.paidForSale > 19) data.paidForSale = 19;
-	    if (data.paidForSale < 1) data.paidForSale = 1;
+            if (data.paidForSale < 1) data.paidForSale = 1;
 
             if (i == Goods.FOOD) {
               data.costToBuy = data.paidForSale + 7;

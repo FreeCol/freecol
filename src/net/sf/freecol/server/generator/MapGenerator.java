@@ -10,12 +10,15 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.FreeColException;
 
+import java.util.logging.Logger;
 
 
 /**
 * Creates random maps and sets the starting locations for the players.
 */
 public class MapGenerator {
+
+    private static final Logger logger = Logger.getLogger(MapGenerator.class.getName());
 
     // The directions a Unit can move to.
     public static final int N = 0,
@@ -164,7 +167,7 @@ public class MapGenerator {
                 return player;
             }
         }
-        System.out.println("VERY BAD: Can't find indian player for Indian tribe " + owner);
+        logger.warning("VERY BAD: Can't find indian player for Indian tribe " + owner);
         return null;
     }
 

@@ -136,7 +136,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         inPortPanel.setTransferHandler(defaultTransferHandler);
         docksPanel.setTransferHandler(defaultTransferHandler);
         cargoPanel.setTransferHandler(defaultTransferHandler);
-	marketPanel.setTransferHandler(defaultTransferHandler);
+        marketPanel.setTransferHandler(defaultTransferHandler);
 
         pressListener = new DragListener(this);
         MouseListener releaseListener = new DropListener();
@@ -145,7 +145,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         inPortPanel.addMouseListener(releaseListener);
         docksPanel.addMouseListener(releaseListener);
         cargoPanel.addMouseListener(releaseListener);
-	marketPanel.addMouseListener(releaseListener);
+        marketPanel.addMouseListener(releaseListener);
 
         toAmericaPanel.setLayout(new GridLayout(0 , 2));
         toEuropePanel.setLayout(new GridLayout(0 , 2));
@@ -165,7 +165,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     inPortScroll = new JScrollPane(inPortPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER),
                     docksScroll = new JScrollPane(docksPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER),
                     cargoScroll = new JScrollPane(cargoPanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED),
-		    marketScroll = new JScrollPane(marketPanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                    marketScroll = new JScrollPane(marketPanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         JLabel  toAmericaLabel = new JLabel("Going to America"),
                 toEuropeLabel = new JLabel("Going to Europe"),
                 inPortLabel = new JLabel("In port"),
@@ -180,7 +180,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         inPortScroll.setSize(200, 300);
         docksScroll.setSize(200, 300);
         cargoScroll.setSize(410, 96);
-	marketScroll.setSize(620, 114);
+        marketScroll.setSize(620, 114);
         toAmericaLabel.setSize(200, 20);
         toEuropeLabel.setSize(200, 20);
         inPortLabel.setSize(200, 20);
@@ -197,7 +197,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         inPortScroll.setLocation(430, 35);
         docksScroll.setLocation(640, 250);
         cargoScroll.setLocation(220, 370);
-	marketScroll.setLocation(10, 476);
+        marketScroll.setLocation(10, 476);
         toAmericaLabel.setLocation(10, 10);
         toEuropeLabel.setLocation(220, 10);
         inPortLabel.setLocation(430, 10);
@@ -226,7 +226,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         add(inPortScroll);
         add(docksScroll);
         add(cargoScroll);
-	add(marketScroll);
+        add(marketScroll);
         add(toAmericaLabel);
         add(toEuropeLabel);
         add(inPortLabel);
