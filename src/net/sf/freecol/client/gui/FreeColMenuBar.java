@@ -57,12 +57,12 @@ public class FreeColMenuBar extends JMenuBar {
         this.gui = g;
 
         // --> Game
-        JMenu gameMenu = new JMenu("Game");
+        JMenu gameMenu = new JMenu(Messages.message("menuBar.game"));
         gameMenu.setOpaque(false);
         gameMenu.setMnemonic(KeyEvent.VK_G);
         add(gameMenu);
 
-        JMenuItem newMenuItem = new JMenuItem("New");
+        JMenuItem newMenuItem = new JMenuItem(Messages.message("menuBar.game.new"));
         newMenuItem.setOpaque(false);
         newMenuItem.setMnemonic(KeyEvent.VK_N);
         newMenuItem.setAccelerator(KeyStroke.getKeyStroke('N', InputEvent.CTRL_MASK));
@@ -73,7 +73,7 @@ public class FreeColMenuBar extends JMenuBar {
             }
         });
 
-        JMenuItem openMenuItem = new JMenuItem("Open");
+        JMenuItem openMenuItem = new JMenuItem(Messages.message("menuBar.game.open"));
         openMenuItem.setOpaque(false);
         openMenuItem.setMnemonic(KeyEvent.VK_O);
         openMenuItem.setAccelerator(KeyStroke.getKeyStroke('O', InputEvent.CTRL_MASK));
@@ -84,7 +84,7 @@ public class FreeColMenuBar extends JMenuBar {
             }
         });
 
-        saveMenuItem = new JMenuItem("Save");
+        saveMenuItem = new JMenuItem(Messages.message("menuBar.game.save"));
         saveMenuItem.setOpaque(false);
         saveMenuItem.setMnemonic(KeyEvent.VK_S);
         saveMenuItem.setAccelerator(KeyStroke.getKeyStroke('S', InputEvent.CTRL_MASK));
@@ -98,7 +98,7 @@ public class FreeColMenuBar extends JMenuBar {
 
         gameMenu.addSeparator();
 
-        JMenuItem reconnectMenuItem = new JMenuItem("Reconnect");
+        JMenuItem reconnectMenuItem = new JMenuItem(Messages.message("menuBar.game.reconnect"));
         reconnectMenuItem.setOpaque(false);
         reconnectMenuItem.setMnemonic(KeyEvent.VK_R);
         reconnectMenuItem.setAccelerator(KeyStroke.getKeyStroke('R', InputEvent.CTRL_MASK));
@@ -111,7 +111,7 @@ public class FreeColMenuBar extends JMenuBar {
 
         gameMenu.addSeparator();
 
-        JMenuItem quitMenuItem = new JMenuItem("Quit");
+        JMenuItem quitMenuItem = new JMenuItem(Messages.message("menuBar.game.quit"));
         quitMenuItem.setOpaque(false);
         quitMenuItem.setMnemonic(KeyEvent.VK_Q);
         quitMenuItem.setAccelerator(KeyStroke.getKeyStroke('Q', InputEvent.CTRL_MASK));
@@ -124,13 +124,13 @@ public class FreeColMenuBar extends JMenuBar {
 
         // --> View
 
-        JMenu viewMenu = new JMenu("View");
+        JMenu viewMenu = new JMenu(Messages.message("menuBar.view"));
         viewMenu.setOpaque(false);
         viewMenu.setMnemonic(KeyEvent.VK_V);
         add(viewMenu);
         inGameOptions.add(viewMenu);
 
-        final JCheckBoxMenuItem mcMenuItem = new JCheckBoxMenuItem("Map controls", true);
+        final JCheckBoxMenuItem mcMenuItem = new JCheckBoxMenuItem(Messages.message("menuBar.view.mapControls"), true);
         mcMenuItem.setOpaque(false);
         mcMenuItem.setMnemonic(KeyEvent.VK_M);
         mcMenuItem.setAccelerator(KeyStroke.getKeyStroke('M', InputEvent.CTRL_MASK));
@@ -148,7 +148,7 @@ public class FreeColMenuBar extends JMenuBar {
         inGameOptions.add(mcMenuItem);
         mapControlOptions.add(mcMenuItem);
 
-        final JCheckBoxMenuItem dtnMenuItem = new JCheckBoxMenuItem("Display tile names");
+        final JCheckBoxMenuItem dtnMenuItem = new JCheckBoxMenuItem(Messages.message("menuBar.view.displayTileNames"));
         dtnMenuItem.setOpaque(false);
         dtnMenuItem.setMnemonic(KeyEvent.VK_D);
         dtnMenuItem.setAccelerator(KeyStroke.getKeyStroke('D', InputEvent.CTRL_MASK));
@@ -161,7 +161,7 @@ public class FreeColMenuBar extends JMenuBar {
         });
         inGameOptions.add(dtnMenuItem);
 
-        final JCheckBoxMenuItem dgMenuItem = new JCheckBoxMenuItem("Display grid");
+        final JCheckBoxMenuItem dgMenuItem = new JCheckBoxMenuItem(Messages.message("menuBar.view.displayGrid"));
         dgMenuItem.setOpaque(false);
         dgMenuItem.setMnemonic(KeyEvent.VK_G);
         dgMenuItem.setAccelerator(KeyStroke.getKeyStroke('G', InputEvent.CTRL_MASK));
@@ -176,7 +176,7 @@ public class FreeColMenuBar extends JMenuBar {
 
         viewMenu.addSeparator();
 
-        final JMenuItem europeMenuItem = new JMenuItem("Europe");
+        final JMenuItem europeMenuItem = new JMenuItem(Messages.message("menuBar.view.europe"));
         europeMenuItem.setOpaque(false);
         europeMenuItem.setMnemonic(KeyEvent.VK_E);
         //europeMenuItem.setAccelerator(KeyStroke.getKeyStroke('E'));
@@ -189,7 +189,7 @@ public class FreeColMenuBar extends JMenuBar {
         inGameOptions.add(europeMenuItem);
 
         // --> Orders
-        JMenu ordersMenu = new JMenu("Orders");
+        JMenu ordersMenu = new JMenu(Messages.message("menuBar.orders"));
         ordersMenu.setOpaque(false);
         ordersMenu.setMnemonic(KeyEvent.VK_O);
         add(ordersMenu);
@@ -307,13 +307,13 @@ public class FreeColMenuBar extends JMenuBar {
         
         // --> Debug
         if (FreeCol.isInDebugMode()) {
-            JMenu debugMenu = new JMenu("Debug");
+            JMenu debugMenu = new JMenu(Messages.message("menuBar.debug"));
             debugMenu.setOpaque(false);
             debugMenu.setMnemonic(KeyEvent.VK_D);
             add(debugMenu);
             inGameOptions.add(debugMenu);
 
-            JCheckBoxMenuItem sc = new JCheckBoxMenuItem("Show coordinates");
+            JCheckBoxMenuItem sc = new JCheckBoxMenuItem(Messages.message("menuBar.debug.showCoordinates"));
             sc.setOpaque(false);
             sc.setMnemonic(KeyEvent.VK_S);
             debugMenu.add(sc);
@@ -326,7 +326,7 @@ public class FreeColMenuBar extends JMenuBar {
                 }
             });
 
-            final JMenuItem reveal = new JCheckBoxMenuItem("Reveal entire map");
+            final JMenuItem reveal = new JCheckBoxMenuItem(Messages.message("menuBar.debug.revealEntireMap"));
             reveal.setOpaque(false);
             reveal.setMnemonic(KeyEvent.VK_R);
             debugMenu.add(reveal);
