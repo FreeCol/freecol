@@ -695,7 +695,7 @@ public final class InGameInputHandler implements MessageHandler {
 
         int slot = Integer.parseInt(recruitUnitInEuropeElement.getAttribute("slot"));
         int recruitable = europe.getRecruitable(slot);
-        int newRecruitable = Unit.generateRecruitable();
+        int newRecruitable = player.generateRecruitable();
 
         Unit unit = new Unit(game, player, recruitable);
 
@@ -721,7 +721,7 @@ public final class InGameInputHandler implements MessageHandler {
 
         int slot = Integer.parseInt(emigrateUnitInEuropeElement.getAttribute("slot"));
         int recruitable = europe.getRecruitable(slot);
-        int newRecruitable = Unit.generateRecruitable();
+        int newRecruitable = player.generateRecruitable();
 
         Unit unit = new Unit(game, player, recruitable);
 

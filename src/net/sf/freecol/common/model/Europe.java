@@ -56,9 +56,9 @@ public final class Europe extends FreeColGameObject implements Location {
 
         unitContainer = new UnitContainer(game, this);
 
-        setRecruitable(1, Unit.generateRecruitable());
-        setRecruitable(2, Unit.generateRecruitable());
-        setRecruitable(3, Unit.generateRecruitable());
+        setRecruitable(1, owner.generateRecruitable());
+        setRecruitable(2, owner.generateRecruitable());
+        setRecruitable(3, owner.generateRecruitable());
 
         artilleryPrice = 500;
     }

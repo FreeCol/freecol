@@ -841,6 +841,89 @@ public class Player extends FreeColGameObject {
 
 
     /**
+        * Generates a random unit type. The unit type that is returned represents
+        * the type of a unit that is recruitable in Europe.
+        * @return A random unit type of a unit that is recruitable in Europe.
+        */
+        public int generateRecruitable() {
+            // Here's the old way of doing this:
+            /*int random = (int)(Math.random() * UNIT_COUNT);
+            while (!Unit.isRecruitable(random)) {
+                random = (int)(Math.random() * UNIT_COUNT);
+            }*/
+            //...and here's my way of doing this: -sjm
+            int chance = (int)(Math.random() * 100);
+            int random = Unit.PETTY_CRIMINAL;
+            if (chance < 20 && !hasFather(FoundingFather.WILLIAM_BREWSTER)) {
+                 random = Unit.PETTY_CRIMINAL;
+            } else if (chance < 45 && !hasFather(FoundingFather.WILLIAM_BREWSTER)) {
+                 random = Unit.INDENTURED_SERVANT;
+            } else if (chance < 67 && !hasFather(FoundingFather.WILLIAM_BREWSTER)) {
+                 random = Unit.FREE_COLONIST;
+            } else {
+                switch ((int) ((chance - 67) / 2)) {
+                default:
+                case 0:
+                    random = Unit.EXPERT_ORE_MINER;
+                    break;
+                case 1:
+                    random = Unit.EXPERT_LUMBER_JACK;
+                    break;
+                case 2:
+                    random = Unit.MASTER_GUNSMITH;
+                    break;
+                case 3:
+                    random = Unit.EXPERT_SILVER_MINER;
+                    break;
+                case 4:
+                    random = Unit.MASTER_FUR_TRADER;
+                    break;
+                case 5:
+                    random = Unit.MASTER_CARPENTER;
+                    break;
+                case 6:
+                    random = Unit.EXPERT_FISHERMAN;
+                    break;
+                case 7:
+                    random = Unit.MASTER_BLACKSMITH;
+                    break;
+                case 8:
+                    random = Unit.EXPERT_FARMER;
+                    break;
+                case 9:
+                    random = Unit.MASTER_DISTILLER;
+                    break;
+                case 10:
+                    random = Unit.HARDY_PIONEER;
+                    break;
+                case 11:
+                    random = Unit.MASTER_TOBACCONIST;
+                    break;
+                case 12:
+                    random = Unit.MASTER_WEAVER;
+                    break;
+                case 13:
+                    random = Unit.JESUIT_MISSIONARY;
+                    break;
+                case 14:
+                    random = Unit.FIREBRAND_PREACHER;
+                    break;
+                case 15:
+                    random = Unit.ELDER_STATESMAN;
+                    break;
+                case 16:
+                    random = Unit.VETERAN_SOLDIER;
+                    break;
+                }
+            }
+            return random;
+        }
+
+
+
+
+
+    /**
     * An <code>Iterator</code> of {@link Unit}s that can be made active.
     */
     public class NextActiveUnitIterator implements Iterator {
