@@ -45,7 +45,8 @@ public final class FreeCol {
     private static final String  FILE_SEP = System.getProperty("file.separator");
 
     private static boolean  windowed = false,
-                            sound = true;
+                            sound = true,
+                            javaCheck = true;
     private static Rectangle windowSize = new Rectangle(-1, -1);
     private static String   dataFolder = "";
     private static FreeColClient freeColClient;
@@ -68,11 +69,16 @@ public final class FreeCol {
      * @param args The command-line arguments.
      */
     public static void main(String args[]) {
-        if (!checkJavaVersion()) {
-            System.err.println("Java version " + MIN_JDK_VERSION +
-                               " or better is required in order to run FreeCol.");
-            return;
-        }
+
+        handleArgs(args);
+
+        if (javaCheck)
+            if (!checkJavaVersion()) {
+                System.err.println("Java version " + MIN_JDK_VERSION +
+                                   " or better is recommended in order to run FreeCol." +
+                                   " Use --no-java-check to skip this check.");
+                return;
+            }
 
         final Logger baseLogger = Logger.getLogger("");
         final Handler[] handlers = baseLogger.getHandlers();
@@ -87,7 +93,6 @@ public final class FreeCol {
         }
 
 
-        handleArgs(args);
         
         // TODO: The location of the save directory should be determined by the installer.
         saveDirectory = new File(System.getProperty("user.home"));
@@ -217,6 +222,8 @@ public final class FreeCol {
                     printUsage();
                     System.exit(0);
                 }
+            } else if (args[i].equals("--no-java-check")) {
+                javaCheck = false;
             } else if (args[i].length() >= 10 && args[i].substring(0, 10).equals("--windowed")) {
                 if (args[i].length() > 10 && args[i].charAt(10) != ' ') {
                     // TODO: Check if the input values are legal.
@@ -319,6 +326,8 @@ public final class FreeCol {
         System.out.println("  runs FreeCol in windowed mode instead of full screen mode");
         System.out.println("--no-sound");
         System.out.println("  runs FreeCol without sound");
+        System.out.println("--no-java-check");
+        System.out.println("  skips the java version check");
         System.out.println("--usage");
         System.out.println("  displays this help screen");
         System.out.println("--version");
