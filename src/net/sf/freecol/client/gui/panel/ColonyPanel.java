@@ -985,7 +985,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
             for (int x=0; x<3; x++) {
                 for (int y=0; y<3; y++) {
-                    gui.displayTile((Graphics2D) g, game.getMap(), colony.getTile(x, y), ((2-x)+y)*lib.getTerrainImageWidth(1)/2, (x+y)*lib.getTerrainImageHeight(1)/2);
+                    gui.displayTile((Graphics2D) g, game.getMap(), colony.getTile(x, y), ((2-x)+y)*lib.getTerrainImageWidth(1)/2, (x+y)*lib.getTerrainImageHeight(1)/2, false);
                 }
             }
         }

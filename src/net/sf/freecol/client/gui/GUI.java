@@ -833,6 +833,8 @@ public final class GUI {
      * location specified by the coordinates. Everything located on the
      * Tile will also be drawn except for units because their image can
      * be larger than a Tile.
+     *
+     * <br><br>The same as calling <code>displayTile(g, map, tile, x, y, true);</code>.
      * @param g The Graphics2D object on which to draw the Tile.
      * @param map The map.
      * @param tile The Tile to draw.
@@ -842,6 +844,26 @@ public final class GUI {
      * (in pixels).
      */
     public void displayTile(Graphics2D g, Map map, Tile tile, int x, int y) {
+        displayTile(g, map, tile, x, y, true);
+    }
+    
+
+    /**
+     * Displays the given Tile onto the given Graphics2D object at the
+     * location specified by the coordinates. Everything located on the
+     * Tile will also be drawn except for units because their image can
+     * be larger than a Tile.
+     * @param g The Graphics2D object on which to draw the Tile.
+     * @param map The map.
+     * @param tile The Tile to draw.
+     * @param x The x-coordinate of the location where to draw the Tile
+     * (in pixels).
+     * @param y The y-coordinate of the location where to draw the Tile
+     * (in pixels).
+     * @param drawUnexploredBorders If true; draws border between explored and
+     *        unexplored terrain.
+     */
+    public void displayTile(Graphics2D g, Map map, Tile tile, int x, int y, boolean drawUnexploredBorders) {
         g.drawImage(lib.getTerrainImage(tile.getType(), tile.getX(), tile.getY()), x, y, null);
 
         Map.Position pos = new Map.Position(tile.getX(), tile.getY());
@@ -851,8 +873,12 @@ public final class GUI {
             if (map.isValid(p)) {
                 Tile borderingTile = map.getTile(p);
 
+                if (!drawUnexploredBorders && !borderingTile.isExplored()) {
+                    continue;
+                }
+
                 if (tile.getType() == borderingTile.getType() || !borderingTile.isLand() && borderingTile.getType() != Tile.OCEAN){
-                    // Equal tiles, sea tiles and unexplored tiles have no effect
+                    // Equal tiles and sea tiles have no effect
                     continue;
                 }
 
