@@ -31,24 +31,29 @@
       </fileset>
     </copy>
   </target>
-	
-  <target name="build" depends="init,compile">
-  	<!-- Copy the image files -->
+
+  <target name="copy-data-files" depends="init" unless="nodata">
+    <!-- Copy the image files -->
     <copy todir="${freecol.build.dir}/net/sf/freecol/data/images">
       <fileset dir="${freecol.data.dir}/images">
         <exclude name="**/CVS/**"/>
       </fileset>
     </copy>
-  	
-  	<!-- Copy the sound files unless the "nosound" property has been defined -->
-  	<antcall target="copy-sound-files"/>
+
+    <!-- Copy the sound files unless the "nosound" property has been defined -->
+    <antcall target="copy-sound-files"/>
+  </target>
+
+  <target name="build" depends="init,compile">
+    <!-- Copy the data files unless the "nodata" property has been defined -->
+    <antcall target="copy-data-files"/>
     
-  	<copy todir="${freecol.build.dir}">
+    <copy todir="${freecol.build.dir}">
         <fileset dir="${freecol.src.dir}" includes="**/*.properties"
-        	excludes="classes/**" />
+            excludes="classes/**" />
     </copy>
   </target>
-	
+
   <target name="package" depends="init,build">
     <jar jarfile="${freecol.jar.file}"
          basedir="${freecol.build.dir}"
@@ -64,7 +69,7 @@
     </delete>
     <delete quiet="true" file="${freecol.jar.file}"/>
     <delete quiet="true" dir="${freecol.javadoc.dir}"/>
-  	<delete quiet="true" dir="${freecol.build.dir}"/>
+    <delete quiet="true" dir="${freecol.build.dir}"/>
   </target>
   
   <target name="fix" depends="init">
