@@ -1,0 +1,18 @@
+Source: freecol
+Section: contrib/games
+Priority: optional
+Maintainer: Jean Lepropre <jean_lepropre@users.sourceforge.net>
+Build-Depends-Indep: debhelper (>= 4.1.46), cdbs (>= 0.4.21-0.1), j2sdk1.4 | java2-compiler, ant (>= 1.6)
+Standards-Version: 3.6.1.1
+
+Package: freecol
+Architecture: all
+Depends: j2re1.4 | java-virtual-machine, j2re1.4 | java2-runtime 
+Description: Colonization turn based strategy game
+ FreeCol is a free clone of the turn based strategy game Colonization.
+ In this game, each player becomes leader of an European nation, fighting
+ to obtain the independence of the mother country.
+ .
+ A multiplayer mode has been added to the original game.
+ .
+ Homepage: http://freecol.sourceforge.net/

@@ -1,0 +1,22 @@
+freecol for Debian
+------------------
+
+Java version 1.4 or better is required in order to run FreeCol.
+
+A manual page and an executable have been added to the original sources to 
+conform to the Debian Policy. The executable script looks for a JVM in the
+following directories (if JAVA_HOME is not set):
+	- /usr/lib/j2se/1.4
+	- /usr/lib/j2sdk1.4
+	- /usr/local/lib/jdk
+	- /usr/local/lib/j2sdk1.4
+	- /usr/local/lib/j2se/1.4
+
+If your JVM isn't found, you can set the JAVA_HOME variable with the command:
+	$ export JAVA_HOME="path_to_your_JVM"
+Note that this command only works if you use BASH.
+
+To run the game, type freecol in a term. The Jar file which contains the game
+is in /usr/share/java.
+
+ -- Jean Lepropre <jean_lepropre@users.sourceforge.net>, Wed, 28 Jul 2004 16:39:25 +0200

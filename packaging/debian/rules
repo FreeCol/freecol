@@ -1,0 +1,25 @@
+#!/usr/bin/make -f
+# debian/rules for freecol (uses CDBS)
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+# This is the debhelper compatibility version to use.
+#export DH_COMPAT=4
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/class/ant.mk
+
+JAVA_HOME_DIRS := /usr/local/lib/jdk /usr/local/lib/j2sdk1.4.2 /usr/local/lib/j2se/1.4 /usr/lib/jdk /usr/lib/j2sdk1.4.2 /usr/lib/j2se/1.4
+ANT_HOME := /usr/share/ant1.6
+DEB_ANT_BUILD_TARGET := package javadoc
+DEB_ANT_CLEAN_TARGET := clean
+DEB_JARS := $(ANT_HOME)/lib/ant-launcher.jar
+
+SOFTWARE := freecol
+VERSION := 0.3.0
+
+install/freecol::
+	install -m 644 FreeCol.jar debian/$(cdbs_curpkg)/usr/share/java/$(SOFTWARE)-$(VERSION).jar
+	ln -s $(SOFTWARE)-$(VERSION).jar debian/$(cdbs_curpkg)/usr/share/java/$(SOFTWARE).jar
+	install debian/$(SOFTWARE).sh debian/$(cdbs_curpkg)/usr/bin/$(SOFTWARE)
