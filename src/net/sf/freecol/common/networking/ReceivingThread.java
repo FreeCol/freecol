@@ -184,16 +184,12 @@ final class ReceivingThread extends Thread {
                       TODO: The tag "urgent" should be used to mark messages
                             that should be processed in a separate thread:
                     */
-                    if (theMsg.isType("question")) {
-                        Thread t = new Thread() {
-                            public void run() {
-                                connection.handleAndSendReply(theMsg);
-                            }
-                        };
-                        t.start();
-                    } else {
-                        connection.handleAndSendReply(theMsg);
-                    }
+                    Thread t = new Thread() {
+                        public void run() {
+                            connection.handleAndSendReply(theMsg);
+                        }
+                    };
+                    t.start();
                 }
             }
 

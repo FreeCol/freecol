@@ -78,6 +78,8 @@ public final class InGameController extends Controller {
             return;
         }
 
+        freeColServer.getModelController().clearTaskRegister();
+        
         if (game.isNextPlayerInNewTurn()) {
             game.newTurn();
 

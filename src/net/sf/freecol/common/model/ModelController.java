@@ -53,4 +53,11 @@ public interface ModelController {
     * @param tiles The tiles to explore.
     */
     public void exploreTiles(Player player, ArrayList tiles);
+    
+    
+    /**
+    * Returns a pseudorandom int, uniformly distributed between 0
+    * (inclusive) and the specified value (exclusive).
+    */
+    public int getRandom(String taskID, int n);
 }

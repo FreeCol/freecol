@@ -22,6 +22,7 @@ public class ServerModelController implements ModelController {
     private final FreeColServer freeColServer;
 
     private HashMap taskRegister = new HashMap();
+    private final Random random = new Random();
 
 
     /**
@@ -33,8 +34,48 @@ public class ServerModelController implements ModelController {
     }
 
 
-    public Unit createUnit(String taskID, Location location, Player owner, int type) {
+    /**
+    * Returns a pseudorandom int, uniformly distributed between 0
+    * (inclusive) and the specified value (exclusive).
+    */
+    public int getRandom(String taskID, int n) {
         String extendedTaskID = taskID + Integer.toString(freeColServer.getGame().getTurn().getNumber());
+        
+        logger.info("Entering getRandom");
+        
+        if (taskRegister.containsKey(extendedTaskID)) {
+            return ((Integer) taskRegister.remove(extendedTaskID)).intValue();
+        } else {
+            int value = random.nextInt(n);
+            taskRegister.put(extendedTaskID, new Integer(value));
+            return value;
+        }
+
+    }
+
+    
+    public void clearTaskRegister() {
+        String log = null;
+        Iterator it = taskRegister.keySet().iterator();
+        
+        if (it.hasNext()) {
+            log = "Clearing the task register. Removing the following items: ";
+        }
+
+        while (it.hasNext()) {
+            log += it.next().toString() + " ";
+        }
+        
+        if (log != null) {
+            logger.info(log);
+        }
+
+        taskRegister.clear();
+    }
+
+
+    public Unit createUnit(String taskID, Location location, Player owner, int type) {
+        String extendedTaskID = taskID + owner.getID() + Integer.toString(freeColServer.getGame().getTurn().getNumber());
         ServerUnit unit;
 
         logger.info("Entering createUnit.");
@@ -100,7 +141,7 @@ public class ServerModelController implements ModelController {
         return entryLocation;
     }
 
-    
+
     public void update(Tile tile) {
         update(tile, null);
     }
@@ -118,7 +159,7 @@ public class ServerModelController implements ModelController {
             ((ServerPlayer) player).setExplored(t);
             updateElement.appendChild(t.toXMLElement(((ServerPlayer) player), updateElement.getOwnerDocument()));
         }
-        
+
         try {
             ((ServerPlayer) player).getConnection().send(updateElement);
         } catch (IOException e) {
@@ -151,7 +192,7 @@ public class ServerModelController implements ModelController {
             }
         }
     }
-    
-   
+
+
 }
 

@@ -29,6 +29,30 @@ public class ClientModelController implements ModelController {
     }
     
     
+    /**
+    * Returns a pseudorandom int, uniformly distributed between 0
+    * (inclusive) and the specified value (exclusive).
+    */
+    public int getRandom(String taskID, int n) {
+        Client client = freeColClient.getClient();
+
+        Element getRandomElement = Message.createNewRootElement("getRandom");
+        getRandomElement.setAttribute("taskID", taskID);
+        getRandomElement.setAttribute("n", Integer.toString(n));
+
+        logger.info("Waiting for the server to reply...");
+        Element reply = client.ask(getRandomElement);
+        logger.info("Reply received from server.");
+
+        if (!reply.getTagName().equals("getRandomConfirmed")) {
+            logger.warning("Wrong tag name.");
+            throw new IllegalStateException();
+        }
+
+        return Integer.parseInt(getRandomElement.getAttribute("number"));
+    }
+    
+
     public Unit createUnit(String taskID, Location location, Player owner, int type) {
         Client client = freeColClient.getClient();
 

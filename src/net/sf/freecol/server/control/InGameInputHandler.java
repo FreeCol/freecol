@@ -60,6 +60,8 @@ public final class InGameInputHandler extends InputHandler {
                     reply = logout(connection, element);
                 } else if (type.equals("createUnit")) {
                     reply = createUnit(connection, element);
+                } else if (type.equals("getRandom")) {
+                    reply = getRandom(connection, element);
                 } else if (type.equals("getVacantEntryLocation")) {
                     reply = getVacantEntryLocation(connection, element);
                 } else if (type.equals("disconnect")) {
@@ -170,7 +172,7 @@ public final class InGameInputHandler extends InputHandler {
     */
     private Element createUnit(Connection connection, Element element) {
         Game game = getFreeColServer().getGame();
-        
+
         logger.info("Receiving \"createUnit\"-request.");
 
         String taskID = element.getAttribute("taskID");
@@ -190,6 +192,30 @@ public final class InGameInputHandler extends InputHandler {
         return reply;
     }
 
+
+    /**
+    * Handles a "getRandom"-message from a client.
+    *
+    * @param connection The connection the message came from.
+    * @param element The element containing the request.
+    *
+    */
+    private Element getRandom(Connection connection, Element element) {
+        Game game = getFreeColServer().getGame();
+
+        logger.info("Receiving \"getRandom\"-request.");
+
+        String taskID = element.getAttribute("taskID");
+        int n = Integer.parseInt(element.getAttribute("n"));
+
+        int result = getFreeColServer().getModelController().getRandom(taskID, n);
+
+        Element reply = Message.createNewRootElement("getRandomConfirmed");
+        reply.setAttribute("result", Integer.toString(result));
+
+        return reply;
+    }
+    
 
     /**
     * Handles a "getVacantEntryLocation"-message from a client.
