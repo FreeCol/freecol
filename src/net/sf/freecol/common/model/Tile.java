@@ -137,9 +137,10 @@ public final class Tile extends FreeColGameObject implements Location {
 
     /**
     * Gets the <code>Unit</code> that is currently defending this <code>Tile</code>.
+    * @param attacker The target that would be attacking this tile.
     * @return The <code>Unit</code> that has been choosen to defend this tile.
     */
-    public Unit getDefendingUnit() {
+    public Unit getDefendingUnit(Unit attacker) {
         Iterator unitIterator = getUnitIterator();
 
         Unit defender;
@@ -152,7 +153,7 @@ public final class Tile extends FreeColGameObject implements Location {
         while (unitIterator.hasNext()) {
             Unit nextUnit = (Unit) unitIterator.next();
 
-            if (nextUnit.getDefensePower() > defender.getDefensePower()) {
+            if (nextUnit.getDefensePower(attacker) > defender.getDefensePower(attacker)) {
                 defender = nextUnit;
             }
         }
@@ -639,6 +640,31 @@ public final class Tile extends FreeColGameObject implements Location {
                 return Goods.ORE;
 	}
     }
+    
+    /**
+    * The defense/ambush bonus of this tile.
+    * @return The defense modifier (in percent) of this tile.
+    */
+    public int defenseBonus ()
+    {
+        int defenseTable[][] =
+        {
+            { 0, 0}, // Unexp
+            { 0,50}, // Plains
+            { 0,50}, // Grasslands
+            { 0,50}, // Prairie
+            { 0,50}, // Savannah
+            {25,50}, // Marsh
+            { 0,75}, // Swamp
+            { 0,50}, // Desert
+            { 0,50}, // Tundra
+            { 0, 0}, // Arctic
+            { 0, 0}, // Ocean
+            { 0, 0}  // High seas            
+        };
+        
+        return defenseTable[type][(forested ? 1 : 0)];
+    } 
     
     /**
     * Prepares this <code>Tile</code> for a new turn.

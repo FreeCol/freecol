@@ -320,7 +320,7 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
         }
 
         // Check for an 'attack' instead of 'move'.
-        if ((target.getUnitCount() > 0) && (target.getDefendingUnit().getNation() != getNation())
+        if ((target.getUnitCount() > 0) && (target.getDefendingUnit(this).getNation() != getNation())
             && ((target.isLand() && !isNaval()) || (isNaval() && !target.isLand()))) {
             return ATTACK;
         }
@@ -1661,39 +1661,206 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
     /**
     * Returns the current defensive power of this unit. The tile on which this
     * unit is located will be taken into account.
+    * @param attacker The attacker of this unit.
     * @return The current defensive power of this unit.
     */
-    public int getDefensePower() {
-        // Each unit in the game defends with power 5.
-        // TODO: write this method
-        return 5;
+    public int getDefensePower(Unit attacker) {
+        int base_power = 1;
+        switch(getType()) {
+            case TREASURE_TRAIN:
+                base_power = 0;
+                break;
+            case BRAVE:
+                base_power = 1;
+                break;
+            case VETERAN_SOLDIER:
+                base_power = 2;
+                break;
+            case COLONIAL_REGULAR:
+                base_power = 3;
+                break;
+            case KINGS_REGULAR:
+                base_power = 4;
+                break;
+            case CARAVEL:
+                base_power = 2;
+                break;
+            case MERCHANTMAN:
+                base_power = 6;
+                break;
+            case GALLEON:
+                base_power = 10;
+                break;
+            case PRIVATEER:
+                base_power = 8;
+                break;
+            case FRIGATE:
+                base_power = 16;
+                break;
+            case MAN_O_WAR:
+                base_power = 24;
+                break;
+            case DAMAGED_ARTILLERY:
+                base_power = 3;
+                break;
+            case ARTILLERY:
+                base_power = 5;
+                break;
+            default:
+                base_power = 1;
+                break;
+        }
+        if (isArmed()) {
+            base_power++;
+        }
+        if (isMounted()) {
+            if (!isArmed() && getType() != BRAVE) {
+                base_power = 1;
+            } else {
+                base_power++;
+            }
+        }
+        
+        int modified_power = base_power;
+        
+        //TODO: <1 move point movement penalty
+        
+        if (isNaval()) {
+            if (getGoodsSpace() > 0) {
+                modified_power -= ((base_power * getGoodsSpace()) / 8); // -12.5% penalty for every unit of cargo.
+            }
+            return modified_power;
+        }
+        
+        if ((getTile() != null) && (getTile().getSettlement() != null) && (getTile().getSettlement() instanceof Colony) ) {
+            Colony colony = ((Colony)getTile().getSettlement());
+            switch(colony.getBuilding(Building.STOCKADE).getLevel()) {
+                case Building.NOT_BUILT:
+                default:
+                    if (getState() == FORTIFY) {
+                        modified_power += base_power; // 50% colony bonus + 50% fortify bonus = 100% bonus
+                    } else {
+                        modified_power += (base_power / 2); // 50% colony bonus
+                    }
+                    break;
+                case Building.HOUSE:
+                    modified_power += base_power; // 100% stockade bonus
+                    break;
+                case Building.SHOP:
+                    modified_power += ((base_power * 3) / 2); // 150% fort bonus
+                    break;
+                case Building.FACTORY:
+                    modified_power += (base_power * 2); // 200% fortress bonus
+                    break;
+            }
+        } else if (!(((attacker.getType() != BRAVE) && (getType() == KINGS_REGULAR)) ||  // TODO: check for REF artillery pieces
+            ((attacker.getType() == BRAVE) && (getType() != KINGS_REGULAR))) &&
+            (getTile() != null)) {
+            // Terrain defensive bonus.
+            modified_power += ((base_power * getTile().defenseBonus()) / 100);
+        }
+        
+        if ((getType() == ARTILLERY) || (getType() == DAMAGED_ARTILLERY)) {
+            if ((attacker.getType() == BRAVE) && (getTile().getSettlement() != null)) {
+                modified_power += base_power; // 100% defense bonus against an Indian raid
+            }
+            if (((getTile().getSettlement()) == null) && (getState() != FORTIFY)) {
+                modified_power -= ((base_power * 3) / 4); // -75% Artillery in the Open penalty
+            }
+        }
+        
+        return base_power;
     }
 
 
     /**
     * Returns the current offensive power of this unit.
+    * @param target The target of the attack.
     * @return The current offensive power of this unit.
     */
-    public int getOffensePower() {
-        // TODO: write this method
-
-        // For now we'll just return '1' for the units that can attack and '0' for the ones that can't attack.
-        if (isCarrier()) {
-            if ((getType() == FRIGATE) || (getType() == MAN_O_WAR) || (getType() == PRIVATEER)) {
-                return 1;
-            }
-            else {
-                return 0;
+    public int getOffensePower(Unit target) {
+        int base_power = 1;
+        switch(getType()) {
+            case BRAVE:
+                base_power = 1;
+                break;
+            case VETERAN_SOLDIER:
+                base_power = 2;
+                break;
+            case COLONIAL_REGULAR:
+                base_power = 3;
+                break;
+            case KINGS_REGULAR:
+                base_power = 4;
+                break;
+            case PRIVATEER:
+                base_power = 8;
+                break;
+            case FRIGATE:
+                base_power = 16;
+                break;
+            case MAN_O_WAR:
+                base_power = 24;
+                break;
+            case DAMAGED_ARTILLERY:
+                base_power = 5;
+                break;
+            case ARTILLERY:
+                base_power = 7;
+                break;
+            default:
+                base_power = 0;
+                break;
+        }
+        
+        if (isArmed()) {
+            if (base_power == 0) {
+                base_power = 2;
+            } else {
+                base_power++;
             }
         }
-        else {
-            if (isArmed() || isMounted()) {
-                return 1;
-            }
-            else {
-                return 0;
+        if (isMounted()) {
+            if ((!isArmed()) && (getType() != BRAVE)) {
+                base_power = 1;
+            } else {
+                base_power++;
             }
         }
+        
+        int modified_power = (base_power * 3) / 2; // 50% attack bonus
+        
+        //TODO: <1 move point movement penalty
+        
+        if (isNaval()) {
+            if (getGoodsSpace() > 0) {
+                modified_power -= ((base_power * getGoodsSpace()) / 8); // -12.5% penalty for every unit of cargo.
+            }
+            //TODO: Drake bonus
+            return modified_power;
+        }
+        
+        if ((((getType() != BRAVE) && (target.getType() == KINGS_REGULAR)) ||  // TODO: check for REF artillery pieces
+            ((getType() == BRAVE) && (target.getType() != KINGS_REGULAR))) &&
+            (target.getTile() != null) &&
+            (target.getTile().getSettlement() == null)) {
+            // Ambush bonus.
+            modified_power += ((base_power * target.getTile().defenseBonus()) / 100);
+        }
+        
+        if (((getType() == KINGS_REGULAR)) && // TODO: check for REF artillery pieces
+            (target.getTile() != null) &&
+            (target.getTile().getSettlement() == null))
+        {
+            modified_power += (base_power / 2); // REF bombardment bonus
+        }
+        
+        if ((getType() == ARTILLERY) || (getType() == DAMAGED_ARTILLERY)) {
+          if ((target.getTile() != null) && (target.getTile().getSettlement()) == null) {
+            modified_power -= ((base_power * 3) / 4); // -75% Artillery in the Open penalty
+          }
+        }
+        return modified_power;
     }
 
 
