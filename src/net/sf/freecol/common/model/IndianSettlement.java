@@ -106,7 +106,7 @@ public class IndianSettlement extends Settlement {
      * @exception IllegalArgumentException if an invalid tribe or kind is given
      */
     public IndianSettlement(Game game, Player player, Tile tile, int tribe, int kind,
-            boolean isCapital, int learnableSkill, boolean isVisited, Unit missionary) {
+            boolean isCapital, int learnableSkill, int highlyWantedGoods, int wantedGoods1, int wantedGoods2, boolean isVisited, Unit missionary) {
 
         // TODO: Change 'null' to the indian AI-player:
 
@@ -131,6 +131,9 @@ public class IndianSettlement extends Settlement {
 
         this.kind = kind;
         this.learnableSkill = learnableSkill;
+        this.highlyWantedGoods = highlyWantedGoods;
+        this.wantedGoods1 = wantedGoods1;
+        this.wantedGoods2 = wantedGoods2;
         this.isCapital = isCapital;
         this.isVisited = isVisited;
         this.missionary = missionary;

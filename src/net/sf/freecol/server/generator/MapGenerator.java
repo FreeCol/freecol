@@ -209,10 +209,15 @@ public class MapGenerator {
                 //System.out.println("Setting indian settlement at "
                 //                   + position.getX() + "x" + position.getY());
 
+                int[] wantedGoods = generateWantedGoodsForLocation(map,map.getTile(position));
+
                 map.getTile(position).setSettlement(
                     new IndianSettlement(game, player,
                                          map.getTile(position), owner, type, capital,
                                          generateSkillForLocation(map, map.getTile(position)),
+                                         wantedGoods[0],
+                                         wantedGoods[1],
+                                         wantedGoods[2],
                                          false, null)
                 );
 
@@ -243,6 +248,156 @@ public class MapGenerator {
         }
     }
 
+
+    /**
+    * Generates wanted goods for a given location (indian settlement)
+
+    * @param tile The tile where the settlement is located.
+    * @return An int array containing the 3 wanted goods.
+    */
+
+    private int[] generateWantedGoodsForLocation(Map map, Tile mainTile) {
+
+        Iterator iter = map.getAdjacentIterator(mainTile.getPosition());
+  
+        logger.info("creating want list for settlement");
+
+        /* this probably needs finetuning. 
+           The indians should prefer manufactured goods.
+
+           TODO: take hills and mountains into consideration
+        
+        */
+
+        // for every good there's a counter, some of them are randomized
+        // depending on the surrounding fields, the values are decremented
+
+        int[] goodsTable=new int[16];
+
+        goodsTable[Goods.FOOD]=20;
+        goodsTable[Goods.SUGAR]=10;
+        goodsTable[Goods.TOBACCO]=10;
+        goodsTable[Goods.COTTON]=10;
+        goodsTable[Goods.FURS]=10;
+        goodsTable[Goods.LUMBER]=10;
+        goodsTable[Goods.ORE]=10;
+        goodsTable[Goods.SILVER]=10;
+        goodsTable[Goods.HORSES]=7+random.nextInt(10);
+        goodsTable[Goods.RUM]=8+random.nextInt(10);
+        goodsTable[Goods.CIGARS]=8+random.nextInt(10);
+        goodsTable[Goods.CLOTH]=7+random.nextInt(10);
+        goodsTable[Goods.COATS]=7+random.nextInt(10);
+        goodsTable[Goods.TRADE_GOODS]=7+random.nextInt(10);
+        goodsTable[Goods.TOOLS]=10;
+        goodsTable[Goods.MUSKETS]=5+random.nextInt(10);
+
+        while (iter.hasNext()) {
+        
+            Map.Position p = (Map.Position)iter.next();
+            Tile tile = map.getTile(p);
+        
+            int forested=0;
+        
+            if (tile.isForested()) forested=1;
+            
+            switch (tile.getType()) {
+                case Tile.PLAINS:     goodsTable[Goods.FOOD]-=4;
+                                      goodsTable[Goods.COTTON]-=2;
+                                      goodsTable[Goods.CLOTH]-=2;
+                                      goodsTable[Goods.ORE]-=1;
+                                      goodsTable[Goods.MUSKETS]-=1;
+                                      goodsTable[Goods.LUMBER]-=forested*3;
+                                      break;
+                case Tile.DESERT:     goodsTable[Goods.FOOD]--;
+                                      goodsTable[Goods.COTTON]--;
+                                      goodsTable[Goods.CLOTH]--;
+                                      goodsTable[Goods.ORE]-=2;
+                                      goodsTable[Goods.MUSKETS]-=1;
+                                      goodsTable[Goods.LUMBER]-=forested*1;
+                                      break;
+                case Tile.TUNDRA:     goodsTable[Goods.FOOD]-=2;
+                                      goodsTable[Goods.ORE]-=2;
+                                      goodsTable[Goods.MUSKETS]-=1;
+                                      goodsTable[Goods.LUMBER]-=forested*2;
+                                      break;
+                case Tile.PRAIRIE:    goodsTable[Goods.FOOD]-=2;
+                                      goodsTable[Goods.COTTON]-=3;
+                                      goodsTable[Goods.CLOTH]-=3;
+                                      goodsTable[Goods.LUMBER]-=forested*2;
+                                      break;
+                case Tile.GRASSLANDS: goodsTable[Goods.FOOD]-=2;
+                                      goodsTable[Goods.TOBACCO]-=3;
+                                      goodsTable[Goods.CIGARS]-=3;
+                                      goodsTable[Goods.LUMBER]-=forested*3;
+                                      break;
+                case Tile.SAVANNAH:   goodsTable[Goods.FOOD]-=3;
+                                      goodsTable[Goods.SUGAR]-=3;
+                                      goodsTable[Goods.RUM]-=3;
+                                      goodsTable[Goods.LUMBER]-=forested*2;
+                                      break;
+                case Tile.MARSH:      goodsTable[Goods.FOOD]-=2;
+                                      goodsTable[Goods.TOBACCO]-=2;
+                                      goodsTable[Goods.CIGARS]-=2;
+                                      goodsTable[Goods.ORE]-=2;
+                                      goodsTable[Goods.MUSKETS]-=1;
+                                      goodsTable[Goods.LUMBER]-=forested*2;
+                                      break;
+                case Tile.SWAMP:      goodsTable[Goods.FOOD]-=2;
+                                      goodsTable[Goods.SUGAR]-=2;
+                                      goodsTable[Goods.RUM]-=2;
+                                      goodsTable[Goods.ORE]-=2;
+                                      goodsTable[Goods.MUSKETS]-=1;
+                                      goodsTable[Goods.LUMBER]-=forested*2;
+            }
+            /*System.out.print("tile type: "+ tile.getType());
+            System.out.println(" forested: "+forested);
+            System.out.println("FD  |SG  |TB  |CT  |FU  |LU  |OR  |SI  |HO  |  RU|CI  |CL  |CA  |TG  |TO  |MU");
+            for (int i=0;i<=15;i++) {
+                if (goodsTable[i]>9||goodsTable[i]<0) System.out.print(goodsTable[i]+"  |");
+                if (goodsTable[i]<10&&goodsTable[i]>-1) System.out.print(goodsTable[i]+"   |");
+            }*/
+        }       
+        
+        int good,good1,good2;
+        good=good1=good2=0;
+        int curval;
+
+        for (int i=0;i<=15;i++) {
+        
+                curval=goodsTable[i];
+                
+                // found a good that is the greatest so far
+                if (curval>=goodsTable[good]) {
+                        good2=good1;
+                        good1=good;
+                        good=i;
+                }       
+
+                // found a good that is > good1 but <good
+                if (curval>=goodsTable[good1] && curval<goodsTable[good]) {
+                        good2=good1;
+                        good1=i;
+                }
+
+                // found a good that is > good2 but <good1
+                if (curval>=goodsTable[good2] && curval<goodsTable[good1]) {
+                        good2=i;
+                }
+                
+        }
+
+        logger.info("the indians choose: "+good+" and "+good1+" and "+good2);
+        logger.info("===============");
+        
+        // constructs the return array
+        int rv[] = new int[3];
+        rv[0]=good;
+        rv[1]=good1;
+        rv[2]=good2;
+
+        return rv;
+        
+    }
 
     /**
     * Generates a skill that could be taught from a settlement on the given Tile.
