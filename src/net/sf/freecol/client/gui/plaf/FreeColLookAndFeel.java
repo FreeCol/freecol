@@ -4,16 +4,21 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.plaf.*;
 import javax.swing.plaf.metal.*;
+
+import net.sf.freecol.common.FreeColException;
+
 import java.io.File;
+import java.net.URL;
 
 
 /**
-* Implements the "FreeCol Look and Feel".
-*/
+ * Implements the "FreeCol Look and Feel".
+ */
 public class FreeColLookAndFeel extends MetalLookAndFeel {
 
+    private final static Class resourceLocator = net.sf.freecol.FreeCol.class;
     private File uiDirectory;
-
+    
     private static final Color PRIMARY_1 = new Color(122, 109, 82),
                                BG_COLOR_SELECT = new Color(255, 244, 195),
                                PRIMARY_3 = new Color(203, 182, 136),
@@ -22,25 +27,34 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
                                BG_COLOR = new Color(216, 194, 145);
 
     /**
+     * Initiates a new "FreeCol Look and Feel".
+     *
+     * @exception FreeColException If the ui directory could not be found.
+     */
+    public FreeColLookAndFeel() throws FreeColException {
+        this("");
+    }
+    
+   /**
     * Initiates a new "FreeCol Look and Feel".
     *
-    * @param uiDirectory The directory containing the UI-graphics.
-    * @exception IllegalArgumentException if the <code>uiDirectory</code>
-    *            does not exists.
+    * @param dataFolder The home of the FreeCol data files.
+    * @exception FreeColException If the ui directory could not be found.
     */
-    public FreeColLookAndFeel(File uiDirectory) {
+    public FreeColLookAndFeel(String dataFolder) throws FreeColException {
         super();
-
-        if (!uiDirectory.exists()) {
-            throw new IllegalArgumentException("The file \"" + uiDirectory.getName() + "\" does not exist.");
+        
+        if(dataFolder.equals("")) { // lookup is necessary
+            URL uiDir = resourceLocator.getResource("images/ui");
+            if(uiDir == null)
+                throw new FreeColException("ui directory not found !");
         }
-
-        if (!uiDirectory.isDirectory()) {
-            throw new IllegalArgumentException("The file \"" + uiDirectory.getName() + "\" is not a directory.");
+        else {
+            uiDirectory = new File(dataFolder + "images" + System.getProperty("file.separator") + "ui");
+            if(!uiDirectory.exists() || !uiDirectory.isDirectory())
+                throw new FreeColException("ui directory not found !");
         }
-
-        this.uiDirectory = uiDirectory;
-
+        
         setCurrentTheme(new DefaultMetalTheme() {
             protected ColorUIResource getPrimary1() {
                 return new ColorUIResource(PRIMARY_1);
@@ -68,10 +82,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
         });
     }
 
-
-
-
-    /**
+   /**
     * Creates the look and feel specific defaults table.
     * @return The defaults table.
     */
@@ -112,33 +123,67 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
             u.put("net.sf.freecol.client.gui.plaf.FreeColScrollPaneUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColScrollPaneUI"));
 
             // Add other UI resources:
-            File file;
+            if(uiDirectory != null) { // no lookup
+                File file;
 
-            file = new File(uiDirectory, "bg.png");
-            if (file.exists()) {
-                u.put("BackgroundImage", new ImageIcon(file.toString()));
-            }
+                file = new File(uiDirectory, "bg.png");
+                if (file.exists()) {
+                    u.put("BackgroundImage", new ImageIcon(file.toString()));
+                }
 
-            file = new File(uiDirectory, "bg2.png");
-            if (file.exists()) {
-                u.put("BackgroundImage2", new ImageIcon(file.toString()));
-            } else {
-                u.put("BackgroundImage2", u.get("BackgroundImage"));
-            }
+                file = new File(uiDirectory, "bg2.png");
+                if (file.exists()) {
+                    u.put("BackgroundImage2", new ImageIcon(file.toString()));
+                } else {
+                    u.put("BackgroundImage2", u.get("BackgroundImage"));
+                }
 
-            file = new File(uiDirectory, "bg_map1.jpg");
-            if (file.exists()) {
-                u.put("CanvasBackgroundImage", new ImageIcon(file.toString()));
-            }
+                file = new File(uiDirectory, "bg_map1.jpg");
+                if (file.exists()) {
+                    u.put("CanvasBackgroundImage", new ImageIcon(file.toString()));
+                }
 
-            file = new File(uiDirectory, "freecol.png");
-            if (file.exists()) {
-                u.put("TitleImage", new ImageIcon(file.toString()));
+                file = new File(uiDirectory, "freecol.png");
+                if (file.exists()) {
+                    u.put("TitleImage", new ImageIcon(file.toString()));
+                }
+            
+                file = new File(uiDirectory, "victory.png");
+                if (file.exists()) {
+                    u.put("VictoryImage", new ImageIcon(file.toString()));
+                }
             }
             
-            file = new File(uiDirectory, "victory.png");
-            if (file.exists()) {
-                u.put("VictoryImage", new ImageIcon(file.toString()));
+            else {
+                URL url;
+                String uiFolder = "images/ui/";
+                
+                url = resourceLocator.getResource(uiFolder + "bg.png");
+                if (url != null) {
+                    u.put("BackgroundImage", new ImageIcon(url));
+                }
+
+                url = resourceLocator.getResource(uiFolder + "bg2.png");
+                if (url != null) {
+                    u.put("BackgroundImage2", new ImageIcon(url));
+                } else {
+                    u.put("BackgroundImage2", u.get("BackgroundImage"));
+                }
+
+                url = resourceLocator.getResource(uiFolder + "bg_map1.jpg");
+                if (url != null) {
+                    u.put("CanvasBackgroundImage", new ImageIcon(url));
+                }
+
+                url = resourceLocator.getResource(uiFolder + "freecol.png");
+                if (url != null) {
+                    u.put("TitleImage", new ImageIcon(url));
+                }
+            
+                url = resourceLocator.getResource(uiFolder + "victory.png");
+                if (url != null) {
+                    u.put("VictoryImage", new ImageIcon(url));
+                }
             }
         } catch (ClassNotFoundException e) {
             System.err.println(e);

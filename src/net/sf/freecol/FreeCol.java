@@ -27,7 +27,6 @@ import java.util.logging.Logger;
 
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.UIManager;
-import java.io.File;
 
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.logging.DefaultHandler;
@@ -109,9 +108,19 @@ public final class FreeCol {
             }
         } else {
             try {
-                UIManager.setLookAndFeel(new FreeColLookAndFeel(new File(dataFolder + "images" + FILE_SEP + "ui")));
-            } catch (UnsupportedLookAndFeelException e) {
+                UIManager.setLookAndFeel(new FreeColLookAndFeel(dataFolder));
+            }
+            catch (UnsupportedLookAndFeelException e) {
                 logger.warning("Could not load the \"FreeCol Look and Feel\"");
+            }
+            catch (FreeColException e) {
+                e.printStackTrace();
+                System.out.println("\nThe data files could not be found by FreeCol. Please make sure");
+                System.out.println("they are present. If FreeCol is looking in the wrong directory");
+                System.out.println("then run the game with a command-line parameter:");
+                System.out.println("");
+                printUsage();
+                return;
             }
 
             /*
