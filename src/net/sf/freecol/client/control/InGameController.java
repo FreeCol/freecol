@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 import java.util.Iterator;
 import java.util.ArrayList;
 import java.io.*;
+import javax.swing.SwingUtilities;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
@@ -14,6 +15,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.FreeColMenuBar;
 import net.sf.freecol.client.gui.sound.*;
 import net.sf.freecol.client.gui.panel.EventPanel;
+import net.sf.freecol.client.gui.i18n.Messages;
 
 import net.sf.freecol.common.model.*;
 import net.sf.freecol.common.networking.Message;
@@ -29,7 +31,7 @@ public final class InGameController {
     private static final Logger logger = Logger.getLogger(InGameController.class.getName());
 
 
-    private FreeColClient freeColClient;
+    private final FreeColClient freeColClient;
 
 
 
@@ -47,16 +49,34 @@ public final class InGameController {
     * and saves the game.
     */
     public void saveGame() {    
-        Canvas canvas = freeColClient.getCanvas();
+        final Canvas canvas = freeColClient.getCanvas();
         
-        if (freeColClient.getMyPlayer().isAdmin() && freeColClient.getFreeColServer() != null) {               
-            File file = canvas.showSaveDialog(FreeCol.getSaveDirectory());
-            try {
-                freeColClient.getFreeColServer().saveGame(file, freeColClient.getMyPlayer().getUsername());                              
-            } catch (IOException e) {
-                canvas.errorMessage("couldNotSaveGame");
+        if (freeColClient.getMyPlayer().isAdmin() && freeColClient.getFreeColServer() != null) {
+            final File file = canvas.showSaveDialog(FreeCol.getSaveDirectory());
+            
+            if (file != null) {
+                canvas.showStatusPanel(Messages.message("status.savingGame"));
+                Thread t = new Thread() {
+                    public void run() {
+                        try {
+                            freeColClient.getFreeColServer().saveGame(file, freeColClient.getMyPlayer().getUsername());
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    canvas.closeStatusPanel();
+                                }
+                            });
+                        } catch (IOException e) {
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    canvas.errorMessage("couldNotSaveGame");
+                                }
+                            });
+                        }
+                    }
+                };
+                t.start();
             }
-        }    
+        }
     }
 
     

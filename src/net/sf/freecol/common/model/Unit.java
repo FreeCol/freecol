@@ -122,7 +122,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     /**
     * This constructor should only be used by subclasses.
     */
-    public Unit() {
+    protected Unit() {
     
     }
     

@@ -5,11 +5,13 @@ package net.sf.freecol.client.control;
 import java.io.*;
 import java.net.ConnectException;
 import java.util.logging.Logger;
+import javax.swing.SwingUtilities;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.i18n.Messages;
 
 import net.sf.freecol.common.model.*;
 import net.sf.freecol.common.networking.Message;
@@ -29,7 +31,7 @@ public final class ConnectController {
     private static final Logger logger = Logger.getLogger(ConnectController.class.getName());
 
 
-    private FreeColClient freeColClient;
+    private final FreeColClient freeColClient;
 
 
 
@@ -235,9 +237,9 @@ public final class ConnectController {
     * @param file The <code>File</code>.
     */
     public void loadGame(File file) {
-        Canvas canvas = freeColClient.getCanvas();
-        int port = 3541;
-        
+        final Canvas canvas = freeColClient.getCanvas();
+        final int port = 3541;
+
         if (freeColClient.getFreeColServer() != null && freeColClient.getFreeColServer().getServer().getPort() == port) {
             if (freeColClient.getCanvas().showConfirmDialog("stopServer.text", "stopServer.yes", "stopServer.no")) {
                 freeColClient.getFreeColServer().getController().shutdown();
@@ -245,22 +247,42 @@ public final class ConnectController {
                 return;
             }
         }
+
+        canvas.showStatusPanel(Messages.message("status.loadingGame"));
         
-        try {
-            FreeColServer freeColServer = new FreeColServer(file, port);
-            freeColClient.setFreeColServer(freeColServer);
-            
-            String username = freeColServer.getOwner();
-            
-            freeColClient.setSingleplayer(freeColServer.isSingleplayer());
-            login(username, "127.0.0.1", 3541);            
-        } catch (FileNotFoundException fe) {
-            canvas.errorMessage("fileNotFound");
-            return;
-        } catch (IOException e) {
-            freeColClient.getCanvas().errorMessage("server.couldNotStart");
-            return;
-        }                                       
+        final File theFile = file;
+        Thread t = new Thread() {
+            public void run() {
+                try {
+                    FreeColServer freeColServer = new FreeColServer(theFile, port);
+                    freeColClient.setFreeColServer(freeColServer);
+
+                    final String username = freeColServer.getOwner();
+
+                    freeColClient.setSingleplayer(freeColServer.isSingleplayer());
+                    
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            login(username, "127.0.0.1", 3541);
+                            canvas.closeStatusPanel();
+                        }
+                    });
+                } catch (FileNotFoundException fe) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            canvas.errorMessage("fileNotFound");
+                        }
+                    });
+                } catch (IOException e) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            freeColClient.getCanvas().errorMessage("server.couldNotStart");
+                        }
+                    });
+                }
+            }
+        };
+        t.start();
     }
     
         

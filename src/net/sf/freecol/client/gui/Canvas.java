@@ -478,7 +478,8 @@ public final class Canvas extends JLayeredPane {
     * The panel will be removed when another component
     * is added to this <code>Canvas</code>. This includes
     * all the <code>showXXX</code>-methods. In addition,
-    * {@link #closeMenus} also removes this panel.
+    * {@link #closeStatusPanel} and {@link #closeMenus} 
+    * also removes this panel.
     *
     * @param message The text message to display on the
     *                status panel.
@@ -489,6 +490,15 @@ public final class Canvas extends JLayeredPane {
 
         statusPanel.setLocation(getWidth() / 2 - statusPanel.getWidth() / 2, getHeight() / 2 - statusPanel.getHeight() / 2);
         add(statusPanel, new Integer(POPUP_LAYER.intValue() - 10));
+    }
+
+    
+    /**
+    * Closes the <code>StatusPanel</code>.
+    * @see #showStatusPanel
+    */
+    public void closeStatusPanel() {
+        remove(statusPanel);
     }
 
 

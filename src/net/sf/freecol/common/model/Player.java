@@ -130,7 +130,7 @@ public class Player extends FreeColGameObject {
     /**
     * This constructor should only be used by subclasses.
     */
-    public Player() {
+    protected Player() {
     
     }    
 

@@ -331,7 +331,9 @@ public class FreeColDialog extends FreeColPanel {
         buttons.add(cancelButton);
         buttons.setOpaque(false);
         
-        loadDialog.add(fileList, BorderLayout.CENTER);
+        JScrollPane sp = new JScrollPane(fileList);
+        sp.setBorder(null);
+        loadDialog.add(sp, BorderLayout.CENTER);
         loadDialog.add(buttons, BorderLayout.SOUTH);
        
         loadDialog.setSize(400, 200);        
@@ -402,8 +404,10 @@ public class FreeColDialog extends FreeColPanel {
         JPanel p1 = new JPanel(new GridLayout(2, 1));
         p1.add(new JScrollPane(input));
         p1.add(buttons);
-        
-        saveDialog.add(fileList, BorderLayout.CENTER);
+
+        JScrollPane sp = new JScrollPane(fileList);
+        sp.setBorder(null);
+        saveDialog.add(sp, BorderLayout.CENTER);
         saveDialog.add(p1, BorderLayout.SOUTH);        
        
         saveDialog.setSize(400, 200);        
