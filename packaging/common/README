@@ -65,13 +65,18 @@ In case the command could not be found, check your Java installation
 and make sure that the java (*nix) or java.exe (Windows) file is in
 your PATH.
 
-Windows users may be able to just double click the file
-'FreeCol.jar' from within Windows Explorer.
+You may ignore the message:
+  "The music files could not be loaded by FreeCol. Disabling music."
+because there is no music available yet for FreeCol.
 
 
 IV.  Troubleshooting
 =================================
-<Will be written when common problems are known>
+Q: I get the following error:
+     The data file "data/images/units/Unit0.png" could not be found.
+A: Use the command-line option --freecol-data to specify the location
+   of the 'data' directory.
+   For example: java -jar FreeCol.jar --freecol-data C:\Games\FreeCol\data
 
 
 V.   Help, Feedback & Bug Reports

@@ -5,8 +5,9 @@
 # This script generates a .tar.gz file that is fit for distribution to the user.
 #
 # It will add the following files to the archive:
-#   - the jar file
+#   - the source files
 #   - the data files (images, music & sounds)
+#   - the build.xml file
 #   - all files from the freecol/packaging/common directory
 #           (these files will be put in the archive under the freecol directory to make them easily
 #           accessible by the user)
@@ -54,8 +55,9 @@ cp $copyFiles freecol
 # Step 3: Find the files that should be added to the archive. These will be passed on to 'tar'.
 #
 filesToArchive=`\
+    find freecol/src ! -name '*.class' ! -path '*CVS*' ! -path '*classes*' -type f -printf '%p ';\
     find freecol/data ! -path '*CVS*' -type f -printf '%p ';\
-    find freecol/FreeCol.jar -type f -printf '%p '`
+    find freecol/build.xml -type f -printf '%p '`
 for i in $commonFiles; do
     filesToArchive="$filesToArchive freecol/$i"
 done
@@ -63,7 +65,7 @@ done
 #
 # Step 4: Create the 'tar.gz' file.
 #
-tar -cvzf $OLD_PWD/freecol-$VERSION.tar.gz $filesToArchive
+tar -cvzf $OLD_PWD/freecol-$VERSION-src.tar.gz $filesToArchive
 
 #
 # Step 5: Remove the common files that were copied in Step 2.

@@ -2,7 +2,7 @@
 
 #######################################################################################################
 #
-# This script generates a .tar.gz file that is fit for distribution to the user.
+# This script generates a .zip file that is fit for distribution to the user.
 #
 # It will add the following files to the archive:
 #   - the jar file
@@ -51,7 +51,7 @@ copyFiles=`find freecol/packaging/common ! -path '*CVS*' -type f -printf '%p '`
 cp $copyFiles freecol
 
 #
-# Step 3: Find the files that should be added to the archive. These will be passed on to 'tar'.
+# Step 3: Find the files that should be added to the archive. These will be passed on to 'zip'.
 #
 filesToArchive=`\
     find freecol/data ! -path '*CVS*' -type f -printf '%p ';\
@@ -61,9 +61,9 @@ for i in $commonFiles; do
 done
 
 #
-# Step 4: Create the 'tar.gz' file.
+# Step 4: Create the 'zip' file.
 #
-tar -cvzf $OLD_PWD/freecol-$VERSION.tar.gz $filesToArchive
+zip $OLD_PWD/freecol-$VERSION.zip $filesToArchive
 
 #
 # Step 5: Remove the common files that were copied in Step 2.
