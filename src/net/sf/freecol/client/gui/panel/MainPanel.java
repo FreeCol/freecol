@@ -85,7 +85,7 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
             add(logoLabel, BorderLayout.CENTER);
         }
 
-        JPanel buttons = new JPanel(new GridLayout(3, 1, 50, 5));
+        JPanel buttons = new JPanel(new GridLayout(3, 1, 50, 10));
 
         buttons.add(newButton);
         buttons.add(openButton);

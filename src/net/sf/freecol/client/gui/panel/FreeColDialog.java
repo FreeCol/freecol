@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.filechooser.FileFilter;
 import java.io.*;
@@ -182,7 +183,7 @@ public class FreeColDialog extends FreeColPanel {
         JPanel labelPanel = new JPanel(new FlowLayout());
         labelPanel.add(new JLabel(text));
 
-        JPanel p1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel p1 = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
         JButton cancelButton = new JButton(cancelText);
 
@@ -239,9 +240,11 @@ public class FreeColDialog extends FreeColPanel {
             }
         };
 
-        inputDialog.setLayout(new GridLayout(3, 1));
+        inputDialog.setLayout(new GridLayout(3, 1, 10,10));
 
-        JPanel buttons = new JPanel(new GridLayout(1, 2));
+        inputDialog.setBorder(new CompoundBorder(inputDialog.getBorder(), new EmptyBorder(3,10,10,10)));
+
+        JPanel buttons = new JPanel(new GridLayout(1, 2,10,10));
 
         JButton okButton = new JButton(okText);
 

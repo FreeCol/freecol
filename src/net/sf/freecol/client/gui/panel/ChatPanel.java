@@ -3,6 +3,7 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.*;
 import java.lang.NumberFormatException;
 import java.util.logging.Logger;
 
@@ -47,13 +48,13 @@ public final class ChatPanel extends FreeColPanel implements ActionListener {
 
         field = new JTextField("");
 
-        label.setSize(65, 20);
+        /*label.setSize(65, 20);
         field.setSize(355, 20);
 
         label.setLocation(10, 10);
-        field.setLocation(85, 10);
+        field.setLocation(85, 10);*/
 
-        setLayout(null);
+        setLayout(new BorderLayout(10, 10));
 
         field.setActionCommand(String.valueOf(CHAT));
 
