@@ -8,6 +8,7 @@ import javax.swing.plaf.basic.*;
 import java.io.File;
 
 import net.sf.freecol.client.gui.plaf.FreeColCheckBoxUI;
+import net.sf.freecol.client.gui.plaf.FreeColComboBoxUI;
 import net.sf.freecol.client.gui.plaf.FreeColRadioButtonUI;
 import net.sf.freecol.client.gui.plaf.FreeColButtonUI;
 import net.sf.freecol.client.gui.plaf.FreeColPanelUI;
@@ -25,7 +26,12 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
 
     private File uiDirectory;
 
-
+    private static final Color PRIMARY_1 = new Color(122, 109, 82),
+                               BG_COLOR_SELECT = new Color(255, 244, 195),
+                               PRIMARY_3 = new Color(203, 182, 136),
+                               SECONDARY_1 = new Color(10, 10, 10),
+                               DISABLED_COLOR = new Color(166, 144, 95),
+                               BG_COLOR = new Color(216, 194, 145);
 
     /**
     * Initiates a new "FreeCol Look and Feel".
@@ -48,8 +54,28 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
         this.uiDirectory = uiDirectory;
 
         setCurrentTheme(new DefaultMetalTheme() {
+            protected ColorUIResource getPrimary1() {
+                return new ColorUIResource(PRIMARY_1);
+            }
+
+            protected ColorUIResource getPrimary2() {
+                return new ColorUIResource(BG_COLOR_SELECT);
+            }
+
+            protected ColorUIResource getPrimary3() {
+                return new ColorUIResource(PRIMARY_3);
+            }
+
+            protected ColorUIResource getSecondary1() {
+                return new ColorUIResource(SECONDARY_1);
+            }
+
+            protected ColorUIResource getSecondary2() {
+                return new ColorUIResource(DISABLED_COLOR);
+            }
+
             protected ColorUIResource getSecondary3() {
-                return new ColorUIResource(new Color(216, 194, 145));
+                return new ColorUIResource(BG_COLOR);
             }
         });
     }
@@ -68,6 +94,8 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
             // Add ComponentUI classes:
             u.put("CheckBoxUI", "net.sf.freecol.client.gui.plaf.FreeColCheckBoxUI");
             u.put("net.sf.freecol.client.gui.plaf.FreeColCheckBoxUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColCheckBoxUI"));
+            u.put("ComboBoxUI", "net.sf.freecol.client.gui.plaf.FreeColComboBoxUI");
+            u.put("net.sf.freecol.client.gui.plaf.FreeColComboBoxUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColComboBoxUI"));
             u.put("RadioButtonUI", "net.sf.freecol.client.gui.plaf.FreeColRadioButtonUI");
             u.put("net.sf.freecol.client.gui.plaf.FreeColRadioButtonUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColRadioButtonUI"));
             u.put("ButtonUI", "net.sf.freecol.client.gui.plaf.FreeColButtonUI");

@@ -372,6 +372,22 @@ public class Player extends FreeColGameObject {
                 return "French";
             case SPANISH:
                 return "Spanish";
+            case INCA:
+                return "Inca";
+            case AZTEC:
+                return "Aztec";
+            case ARAWAK:
+                return "Arawak";
+            case CHEROKEE:
+                return "Cherokee";
+            case IROQUOIS:
+                return "Iroquois";
+            case SIOUX:
+                return "Sioux";
+            case APACHE:
+                return "Apache";
+            case TUPI:
+                return "Tupi";
             default:
                 return "INVALID";
         }

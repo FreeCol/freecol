@@ -90,20 +90,30 @@ public final class StartGamePanel extends JPanel implements ActionListener {
 
 
     private final class ComboBoxRenderer extends JComboBox implements TableCellRenderer {
-        private Vector players;
-
-        public ComboBoxRenderer(String[] items, Vector players) {
+        public ComboBoxRenderer(String[] items) {
             super(items);
-            this.players = players;
         }
 
         public Component getTableCellRendererComponent(JTable table, Object value,
                 boolean isSelected, boolean hasFocus, int row, int column) {
             /* if (isSelected) draw the component in another way */
 
-            Player player = (Player)players.get(row);
+            Player player = (Player)freeColClient.getGame().getPlayers().get(row);
             if (player.isAI()) {
-                setForeground(Color.LIGHT_GRAY);
+                int nation = player.getNation();
+                if ((column == 1) && (nation != Player.DUTCH) && (nation != Player.ENGLISH)
+                        && (nation != Player.FRENCH) && (nation != Player.SPANISH)) {
+                    // This is an indian AI player.
+
+                    // TODO: Return a combobox for indian players as well.
+
+                    JTextField jtf = new JTextField(player.getNationAsString());
+                    jtf.setForeground(Color.LIGHT_GRAY);
+                    return jtf;
+                }
+                else {
+                    setForeground(Color.LIGHT_GRAY);
+                }
             }
             else if (player.isReady()) {
                 setForeground(Color.GRAY);
@@ -149,9 +159,9 @@ public final class StartGamePanel extends JPanel implements ActionListener {
         TableColumn nationsColumn = table.getColumnModel().getColumn(1),
                     colorsColumn = table.getColumnModel().getColumn(2);
         nationsColumn.setCellEditor(new NationEditor());
-        nationsColumn.setCellRenderer(new ComboBoxRenderer(nations, new Vector()));
+        nationsColumn.setCellRenderer(new ComboBoxRenderer(nations));
         colorsColumn.setCellEditor(new ColorEditor());
-        colorsColumn.setCellRenderer(new ComboBoxRenderer(colors, new Vector()));
+        colorsColumn.setCellRenderer(new ComboBoxRenderer(colors));
 
         table.setRowHeight(22);
         table.setCellSelectionEnabled(false);
@@ -243,13 +253,6 @@ public final class StartGamePanel extends JPanel implements ActionListener {
         this.singlePlayerGame = singlePlayerGame;
         game = freeColClient.getGame();
         thisPlayer = freeColClient.getMyPlayer();
-
-        TableColumn nationsColumn = table.getColumnModel().getColumn(1),
-                    colorsColumn = table.getColumnModel().getColumn(2);
-        nationsColumn.setCellRenderer(new ComboBoxRenderer(nations,
-                freeColClient.getGame().getPlayers()));
-        colorsColumn.setCellRenderer(new ComboBoxRenderer(colors,
-                freeColClient.getGame().getPlayers()));
 
         tableModel.setData(game.getPlayers(), thisPlayer);
 
