@@ -261,13 +261,16 @@ public final class InGameController {
             case Unit.EMBARK:           embark(unit, direction); break;
             case Unit.MOVE_HIGH_SEAS:   moveHighSeas(unit, direction); break;
             case Unit.ENTER_INDIAN_VILLAGE_WITH_SCOUT:
-                                        // TODO
-                                        freeColClient.playSound(SfxLibrary.ILLEGAL_MOVE); break;
+                                        // TODO demand tribute or attack village are other possibilities
+                                        speakWithChiefAtIndianSettlement(unit, direction); break;
             case Unit.ENTER_INDIAN_VILLAGE_WITH_MISSIONARY:
                                         // TODO
                                         freeColClient.playSound(SfxLibrary.ILLEGAL_MOVE); break;
             case Unit.ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST:
                                         learnSkillAtIndianSettlement(unit, direction); break;
+            case Unit.ENTER_FOREIGN_COLONY_WITH_SCOUT:
+                                        // TODO
+                                        freeColClient.playSound(SfxLibrary.ILLEGAL_MOVE); break;
             case Unit.ILLEGAL_MOVE:     freeColClient.playSound(SfxLibrary.ILLEGAL_MOVE); break;
             default:                    throw new RuntimeException("unrecognised move: " + move);
         }
@@ -935,6 +938,50 @@ public final class InGameController {
         nextActiveUnit(unit.getTile());
     }
 
+
+    /**
+     * Moves the specified scout into an Indian settlement to speak with chief.
+     * Of course, the scout won't physically get into the village, it will
+     * just stay where it is.
+     *
+     * @param unit The unit that will speak.
+     * @param direction The direction in which the Indian settlement lies.
+     */
+    private void speakWithChiefAtIndianSettlement(Unit unit, int direction) {
+        Client client = freeColClient.getClient();
+        Canvas canvas = freeColClient.getCanvas();
+        Map map = freeColClient.getGame().getMap();
+        IndianSettlement settlement = (IndianSettlement) map.getNeighbourOrNull(direction, unit.getTile()).getSettlement();
+
+        unit.setMovesLeft(0);
+
+        String skillName;
+
+        Element askSkill = Message.createNewRootElement("askSkill");
+        askSkill.setAttribute("unit", unit.getID());
+        askSkill.setAttribute("direction", Integer.toString(direction));
+
+        Element reply = client.ask(askSkill);
+        int skill;
+
+        if (reply.getTagName().equals("provideSkill")) {
+            skill = Integer.parseInt(reply.getAttribute("skill"));
+            if (skill < 0) {
+                skillName = null;
+            } else {
+                skillName = Unit.getName(skill);
+            }
+        } else {
+            logger.warning("Server gave an invalid reply to an askSkill message");
+            return;
+        }
+
+        settlement.setLearnableSkill(skill);
+
+        canvas.showIndianSettlementPanel(settlement);
+
+        nextActiveUnit(unit.getTile());
+    }
 
     /**
      * Moves the specified unit to Europe.

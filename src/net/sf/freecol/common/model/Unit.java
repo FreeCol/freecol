@@ -93,7 +93,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                             ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST = 5,
                             ENTER_INDIAN_VILLAGE_WITH_SCOUT = 6,
                             ENTER_INDIAN_VILLAGE_WITH_MISSIONARY = 7,
-                            ILLEGAL_MOVE = 8;
+                            ENTER_FOREIGN_COLONY_WITH_SCOUT = 8,
+                            ILLEGAL_MOVE = 9;
 
     public static final int ATTACK_GREAT_LOSS = -2,
                             ATTACK_LOSS = -1,
@@ -447,7 +448,13 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                 (target.getDefendingUnit(this).getNation() != getNation())
                 && ((target.isLand() && !isNaval()) || (isNaval() && !target.isLand()))) {
 
-            if (isOffensiveUnit()) {
+            if (isScout() && target.getSettlement() != null) {
+                if (target.getSettlement() instanceof IndianSettlement) {
+                    return ENTER_INDIAN_VILLAGE_WITH_SCOUT;
+                } else if (target.getSettlement().getOwner() != getOwner()) {
+                    return ENTER_FOREIGN_COLONY_WITH_SCOUT;
+                }
+            } else if (isOffensiveUnit()) {
                 return ATTACK;
             } else {
                 // Check for entering indian village.
