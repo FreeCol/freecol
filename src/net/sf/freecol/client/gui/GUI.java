@@ -4,6 +4,8 @@ package net.sf.freecol.client.gui;
 import java.awt.Rectangle;
 import java.awt.Graphics2D;
 import java.awt.Color;
+import java.awt.Image;
+import java.awt.MediaTracker;
 import java.util.*;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
@@ -387,10 +389,31 @@ public final class GUI {
                 && inGame) {
             displayMap(g);
         } else {
-            ImageIcon bgImage = (ImageIcon) UIManager.get("CanvasBackgroundImage");
+            Image bgImage = (Image) UIManager.get("CanvasBackgroundImage");
+          
+            if (bgImage != null) {               
+                if (bgImage.getWidth(null) != bounds.width || bgImage.getHeight(null) != bounds.height) {
+                    bgImage = bgImage.getScaledInstance(bounds.width, bounds.height, Image.SCALE_SMOOTH);
+                    UIManager.put("CanvasBackgroundImage", bgImage);
+                                        
+                    /*
+                      We have to use a MediaTracker to ensure that the
+                      image has been scaled before we paint it.
+                    */
+                    MediaTracker mt = new MediaTracker(freeColClient.getCanvas());
+                    mt.addImage(bgImage, 0, bounds.width, bounds.height);
 
-            if (bgImage != null) {
-                g.drawImage(bgImage.getImage(), 0, 0, null);
+                    try {
+                        mt.waitForID(0);                
+                    } catch (InterruptedException e) {
+                        g.setColor(Color.black);
+                        g.fillRect(0, 0, bounds.width, bounds.height);
+                        return;
+                    }
+                                        
+                }                
+                                   
+                g.drawImage(bgImage, 0, 0, null);
             } else {
                 g.setColor(Color.black);
                 g.fillRect(0, 0, bounds.width, bounds.height);

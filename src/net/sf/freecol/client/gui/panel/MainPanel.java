@@ -27,6 +27,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.GridLayout;
 import java.awt.BorderLayout;
+import java.awt.Image;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
@@ -73,10 +74,10 @@ public final class MainPanel extends JPanel implements ActionListener {
         openButton.addActionListener(this);
         quitButton.addActionListener(this);
 
-        ImageIcon tempImage = (ImageIcon) UIManager.get("TitleImage");
+        Image tempImage = (Image) UIManager.get("TitleImage");
 
         if (tempImage != null) {
-            add(new JLabel(tempImage), BorderLayout.CENTER);
+            add(new JLabel(new ImageIcon(tempImage)), BorderLayout.CENTER);
         }
 
         JPanel buttons = new JPanel(new GridLayout(3, 1, 50, 5));

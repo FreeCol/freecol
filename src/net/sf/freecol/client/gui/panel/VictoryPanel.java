@@ -1,5 +1,5 @@
 /*
- *  QuitPanel.java - Asks the user if he's sure he wants to quit.
+ *  VictoryPanel.java - This panel gets displayed to the player who have won the game.
  *
  *  Copyright (C) 2002  The FreeCol Team
  *
@@ -23,6 +23,7 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.FlowLayout;
+import java.awt.Image;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
@@ -61,10 +62,10 @@ public final class VictoryPanel extends JPanel implements ActionListener {
         victoryLabel.setFont(victoryLabel.getFont().deriveFont(0, 36));
         add(victoryLabel);
 
-        ImageIcon tempImage = (ImageIcon) UIManager.get("VictoryImage");
+        Image tempImage = (Image) UIManager.get("VictoryImage");
 
         if (tempImage != null) {
-            add(new JLabel(tempImage));
+            add(new JLabel(new ImageIcon(tempImage)));
         }
 
         add(ok);

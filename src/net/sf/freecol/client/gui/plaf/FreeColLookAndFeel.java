@@ -9,13 +9,15 @@ import net.sf.freecol.common.FreeColException;
 
 import java.io.File;
 import java.net.URL;
+import java.util.logging.Logger;
 
 
 /**
  * Implements the "FreeCol Look and Feel".
  */
 public class FreeColLookAndFeel extends MetalLookAndFeel {
-
+    private static final Logger logger = Logger.getLogger(FreeColLookAndFeel.class.getName());
+    
     private final static Class resourceLocator = net.sf.freecol.FreeCol.class;
     private File uiDirectory;
     
@@ -136,67 +138,40 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
             u.put("ScrollPaneUI", "net.sf.freecol.client.gui.plaf.FreeColScrollPaneUI");
             u.put("net.sf.freecol.client.gui.plaf.FreeColScrollPaneUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColScrollPaneUI"));
 
+            
             // Add other UI resources:
-            if(uiDirectory != null) { // no lookup
-                File file;
-
-                file = new File(uiDirectory, "bg.png");
-                if (file.exists()) {
-                    u.put("BackgroundImage", new ImageIcon(file.toString()));
-                }
-
-                file = new File(uiDirectory, "bg2.png");
-                if (file.exists()) {
-                    u.put("BackgroundImage2", new ImageIcon(file.toString()));
-                } else {
-                    u.put("BackgroundImage2", u.get("BackgroundImage"));
-                }
-
-                file = new File(uiDirectory, "bg_map1.jpg");
-                if (file.exists()) {
-                    u.put("CanvasBackgroundImage", new ImageIcon(file.toString()));
-                }
-
-                file = new File(uiDirectory, "freecol.png");
-                if (file.exists()) {
-                    u.put("TitleImage", new ImageIcon(file.toString()));
-                }
+            String [][] resources = {                
+                {"BackgroundImage", "bg.png"},
+                {"BackgroundImage2", "bg2.png"},
+                {"CanvasBackgroundImage", "bg_map1.jpg"},
+                {"TitleImage", "freecol.png"},                                                
+                {"VictoryImage", "victory.png"}                                                                                       
+            };                       
             
-                file = new File(uiDirectory, "victory.png");
-                if (file.exists()) {
-                    u.put("VictoryImage", new ImageIcon(file.toString()));
-                }
-            } else {
-                URL url;
-                String uiFolder = "data/images/ui/";
-                
-                url = resourceLocator.getResource(uiFolder + "bg.png");
-                if (url != null) {
-                    u.put("BackgroundImage", new ImageIcon(url));
-                }
-
-                url = resourceLocator.getResource(uiFolder + "bg2.png");
-                if (url != null) {
-                    u.put("BackgroundImage2", new ImageIcon(url));
-                } else {
-                    u.put("BackgroundImage2", u.get("BackgroundImage"));
-                }
-
-                url = resourceLocator.getResource(uiFolder + "bg_map1.jpg");
-                if (url != null) {
-                    u.put("CanvasBackgroundImage", new ImageIcon(url));
-                }
-
-                url = resourceLocator.getResource(uiFolder + "freecol.png");
-                if (url != null) {
-                    u.put("TitleImage", new ImageIcon(url));
-                }
             
-                url = resourceLocator.getResource(uiFolder + "victory.png");
-                if (url != null) {
-                    u.put("VictoryImage", new ImageIcon(url));
+            /*
+              Use a media tracker to ensure that the resources are loaded
+              before we start the GUI.
+            */
+            MediaTracker mt = new MediaTracker(new Component() {});
+            
+            for (int i=0; i<resources.length; i++) {
+                Image image;                
+                if (uiDirectory != null) {
+                    image = Toolkit.getDefaultToolkit().getImage(uiDirectory + resources[i][1]);    
+                } else {
+                    image = Toolkit.getDefaultToolkit().getImage(resourceLocator.getResource("data/images/ui/"+  resources[i][1]));    
                 }
+
+                mt.addImage(image, 0);
+                u.put(resources[i][0], image);
             }
+            
+            try {
+                mt.waitForID(0, 15000); // Wait a maximum of 15 seconds for the images to load.
+            } catch (InterruptedException e) {
+                logger.warning("Interrupted while loading resources!");
+            }    
         } catch (ClassNotFoundException e) {
             System.err.println(e);
             System.exit(-1);
@@ -205,7 +180,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
         return u;
     }
 
-
+    
     /**
     * Gets a one line description of this Look and Feel.
     * @return "The default Look and Feel for FreeCol"

@@ -3,8 +3,8 @@ package net.sf.freecol.client.gui.plaf;
 import         javax.swing.plaf.basic.BasicPanelUI;
 import         javax.swing.plaf.*;
 import         javax.swing.*;
+import java.awt.Image;
 
-import javax.swing.ImageIcon;
 import javax.swing.UIManager;
 
 
@@ -27,12 +27,12 @@ public class FreeColPanelUI extends BasicPanelUI {
             int width = c.getWidth();
             int height = c.getHeight();
 
-            ImageIcon tempImage = (ImageIcon) UIManager.get("BackgroundImage");
+            Image tempImage = (Image) UIManager.get("BackgroundImage");
 
             if (tempImage != null) {
-                for (int x=0; x<width; x+=tempImage.getIconWidth()) {
-                    for (int y=0; y<height; y+=tempImage.getIconHeight()) {
-                        g.drawImage(tempImage.getImage(), x, y, null);
+                for (int x=0; x<width; x+=tempImage.getWidth(null)) {
+                    for (int y=0; y<height; y+=tempImage.getHeight(null)) {
+                        g.drawImage(tempImage, x, y, null);
                     }
                 }
             } else {
