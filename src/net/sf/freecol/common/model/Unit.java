@@ -1118,8 +1118,12 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             throw new IllegalStateException("Cannot buy goods when not a carrier or in Europe.");
         }
 
-        getGame().getMarket().buy(type, amount, getOwner());
-        goodsContainer.addGoods(type, amount);
+        try {
+            getGame().getMarket().buy(type, amount, getOwner());
+            goodsContainer.addGoods(type, amount);
+        } catch(IllegalStateException ise) {
+            this.addModelMessage(this, "notEnoughGold", null);
+        }
     }
 
 
@@ -1480,22 +1484,25 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     */
     public int getInitialMovesLeft() {
         if (isNaval()) {
+            int fMagellan = 0;
+            if(owner.hasFather(FoundingFather.FERDINAND_MAGELLAN))
+                fMagellan++;
             switch (getType()) {
                 case CARAVEL:
-                    return 4;
+                    return 4+fMagellan;
                 case FRIGATE:
-                    return 6;
+                    return 6+fMagellan;
                 case GALLEON:
-                    return 6;
+                    return 6+fMagellan;
                 case MAN_O_WAR:
-                    return 6;
+                    return 6+fMagellan;
                 case MERCHANTMAN:
-                    return 5;
+                    return 5+fMagellan;
                 case PRIVATEER:
-                    return 8;
+                    return 8+fMagellan;
                 default:
                     logger.warning("Unit.getInitialMovesLeft(): Unit has invalid naval type.");
-                    return 3;
+                    return 3+fMagellan;
             }
         } else {
             if (isMounted()) {
@@ -1995,6 +2002,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             random = (int)(Math.random() * UNIT_COUNT);
         }*/
         //...and here's my way of doing this: -sjm
+        // TODO-William Brewster support
         int chance = (int)(Math.random() * 100);
         int random = PETTY_CRIMINAL;
         if (chance < 40) {

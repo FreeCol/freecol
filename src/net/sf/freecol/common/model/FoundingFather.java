@@ -26,30 +26,30 @@ package net.sf.freecol.common.model;
 */
 public class FoundingFather {
 
-    public static final int ADAM_SMITH = 0,
-                            JACOB_FUGGER = 1,
-                            PETER_MINUIT = 2,
-                            PETER_STUYVESANT = 3,
-                            JAN_DE_WITT = 4,
-                            FERDINAND_MAGELLAN = 5,
-                            FRANSICO_DE_CORONADO = 6,
-                            HERNANDO_DE_SOTO = 7,
-                            HENRY_HUDSON = 8,
-                            LA_SALLE = 9,
-                            HERNAN_CORTES = 10,
+    public static final int ADAM_SMITH = 0, //TODO
+                            JACOB_FUGGER = 1, //TODO
+                            PETER_MINUIT = 2, //TODO
+                            PETER_STUYVESANT = 3, //TODO
+                            JAN_DE_WITT = 4, //TODO
+                            FERDINAND_MAGELLAN = 5, //TODO - decreased sailing time to europe
+                            FRANSICO_DE_CORONADO = 6, //TODO
+                            HERNANDO_DE_SOTO = 7, //TODO
+                            HENRY_HUDSON = 8,//TODO
+                            LA_SALLE = 9,//TODO
+                            HERNAN_CORTES = 10,//TODO
                             GEORGE_WASHINGTION = 11,
-                            PAUL_REVERE = 12,
+                            PAUL_REVERE = 12,//TODO
                             FRANCIS_DRAKE = 13,
                             JOHN_PAUL_JONES = 14,
-                            THOMAS_JEFFERSON = 15,
-                            POCAHONTAS = 16,
-                            THOMAS_PAINE = 17,
-                            SIMON_BOLIVAR = 18,
-                            BENJAMIN_FRANKLIN = 19,
-                            WILLIAM_BREWSTER = 20,
-                            WILLIAM_PENN = 21,
-                            FATHER_JEAN_DE_BREBEUF = 22,
-                            JUAN_DE_SEPULVEDA = 23,
+                            THOMAS_JEFFERSON = 15,//TODO
+                            POCAHONTAS = 16,//TODO
+                            THOMAS_PAINE = 17,//TODO
+                            SIMON_BOLIVAR = 18,//TODO
+                            BENJAMIN_FRANKLIN = 19,//TODO
+                            WILLIAM_BREWSTER = 20,//TODO
+                            WILLIAM_PENN = 21,//TODO
+                            FATHER_JEAN_DE_BREBEUF = 22,//TODO
+                            JUAN_DE_SEPULVEDA = 23,//TODO
                             BARTOLOME_DE_LAS_CASAS = 24,
 
                             FATHER_COUNT = 25;

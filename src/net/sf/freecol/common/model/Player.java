@@ -705,20 +705,28 @@ public class Player extends FreeColGameObject {
     */
     public void incrementBells(int num) {
         bells += num;
-        if(currentFather == -1)
-            promptNewFather();            
-            
-        //TODO: founding fathers - need real formula to calculate req. number of bells for next father
-        if( bells >= (getFatherCount() * 100) + 200 ) {
-            // add father
-            fathers[currentFather] = true;
-            promptNewFather();
-        }
     }
     
+    /**
+    * Handles the <code>Player</code>-based changes such as adding units, adding bells, etc
+    * Also requests for next founding father to try to recruit via a GUI message
+    */
     private void promptNewFather() {
-        // TODO: this really shouldn't be here
-        // prompt with GUI message to ask for the next founding father
+        if (currentFather == FoundingFather.JOHN_PAUL_JONES) {
+            // inGameController.purchaseUnitFromEurope(Unit.FRIGATE);
+        }
+        else if (currentFather == FoundingFather.BARTOLOME_DE_LAS_CASAS) {
+            for(Iterator iter = getUnitIterator(); iter.hasNext(); ) {
+                Unit u = (Unit)iter.next();
+                if(u.getType() == Unit.INDIAN_CONVERT)
+                    u.setType(Unit.FREE_COLONIST);
+            }
+        }
+        else if (currentFather == FoundingFather.SIMON_BOLIVAR) {
+            //this.get
+        }
+
+        // TODO: prompt with GUI message to ask for the next founding father
         currentFather++;
     }
 
@@ -727,7 +735,14 @@ public class Player extends FreeColGameObject {
     * Prepares this <code>Player</code> for a new turn.
     */
     public void newTurn() {
-        // Nothing to do.
+        if(currentFather == -1)
+            promptNewFather();     
+        //TODO: founding fathers - need real formula to calculate req. number of bells for next father
+        if( bells >= (getFatherCount() * 100) + 200 ) {
+            // add father
+            fathers[currentFather] = true;
+            promptNewFather();
+        }
     }
 
 
