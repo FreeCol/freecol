@@ -67,6 +67,14 @@ public final class InGameInputHandler implements MessageHandler {
                     reply = boardShip(connection, element);
                 } else if (type.equals("leaveShip")) {
                     reply = leaveShip(connection, element);
+                } else if (type.equals("loadCargo")) {
+                    reply = loadCargo(connection, element);
+                } else if (type.equals("unloadCargo")) {
+                    reply = unloadCargo(connection, element);
+                } else if (type.equals("buyGoods")) {
+                    reply = buyGoods(connection, element);
+                } else if (type.equals("sellGoods")) {
+                    reply = sellGoods(connection, element);
                 } else if (type.equals("moveToEurope")) {
                     reply = moveToEurope(connection, element);
                 } else if (type.equals("moveToAmerica")) {
@@ -79,6 +87,8 @@ public final class InGameInputHandler implements MessageHandler {
                     reply = trainUnitInEurope(connection, element);
                 } else if (type.equals("work")) {
                     reply = work(connection, element);
+                } else if (type.equals("worktype")) {
+                    reply = workType(connection, element);
                 } else if (type.equals("putOutsideColony")) {
                     reply = putOutsideColony(connection, element);
                 } else if (type.equals("endTurn")) {
@@ -226,6 +236,11 @@ public final class InGameInputHandler implements MessageHandler {
         Unit carrier = (Unit) game.getFreeColGameObject(boardShipElement.getAttribute("carrier"));
 
         Tile oldTile = unit.getTile();
+	
+	if (unit.isCarrier()) {
+	  logger.warning("Tried to load a carrier onto another carrier.");
+	  return null;
+	}
 
         unit.boardShip(carrier);
 
@@ -276,7 +291,121 @@ public final class InGameInputHandler implements MessageHandler {
         return null;
     }
 
+    /**
+    * Handles a "loadCargo"-message from a client.
+    *
+    * @param connection The connection the message came from.
+    * @param loadCargoElement The element containing the request.
+    */
+    private Element loadCargo(Connection connection, Element loadCargoElement) {
+        Game game = freeColServer.getGame();
+        ServerPlayer player = freeColServer.getPlayer(connection);
 
+        Goods goods = (Goods) game.getFreeColGameObject(loadCargoElement.getAttribute("goods"));
+        Unit carrier = (Unit) game.getFreeColGameObject(loadCargoElement.getAttribute("carrier"));
+
+	
+        Tile oldTile;
+	if (goods.getLocation() != null) {
+	    oldTile = goods.getLocation().getTile();
+	} else {
+	    oldTile = null;
+	}
+
+        goods.Load(carrier);
+
+        Iterator enemyPlayerIterator = game.getPlayerIterator();
+        while (enemyPlayerIterator.hasNext()) {
+            ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
+
+            if (player.equals(enemyPlayer)) {
+                continue;
+            }
+
+            try {
+                if (enemyPlayer.canSee(oldTile)) {
+                    Element removeElement = Message.createNewRootElement("remove");
+
+                    Element removeGoods = removeElement.getOwnerDocument().createElement("removeObject");
+                    removeGoods.setAttribute("ID", goods.getID());
+                    removeElement.appendChild(removeGoods);
+
+                    enemyPlayer.getConnection().send(removeElement);
+                }
+            } catch (IOException e) {
+                logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection " + enemyPlayer.getConnection());
+            }
+        }
+
+	if (oldTile != null) {
+            sendUpdatedTileToAll(oldTile, player);
+	}
+
+        return null;
+    }
+
+    
+    /**
+    * Handles an "unloadCargo"-message from a client.
+    *
+    * @param connection The connection the message came from.
+    * @param unloadCargoElement The element containing the request.
+    */
+    private Element unloadCargo(Connection connection, Element unloadCargoElement) {
+        Game game = freeColServer.getGame();
+        ServerPlayer player = freeColServer.getPlayer(connection);
+
+        Goods goods = (Goods) game.getFreeColGameObject(unloadCargoElement.getAttribute("goods"));
+
+        goods.Unload();
+        Tile newTile = goods.getLocation().getTile();
+
+        sendUpdatedTileToAll(newTile, player);
+
+        return null;
+    }
+    
+    /**
+    * Handles a "buyGoods"-message from a client.
+    *
+    * @param connection The connection the message came from.
+    * @param boardShipElement The element containing the request.
+    */
+    private Element buyGoods(Connection connection, Element buyGoodsElement) {
+        Game game = freeColServer.getGame();
+        ServerPlayer player = freeColServer.getPlayer(connection);
+
+        int type = Integer.parseInt(buyGoodsElement.getAttribute("type"));
+        Unit carrier = (Unit) game.getFreeColGameObject(buyGoodsElement.getAttribute("carrier"));
+        Player theplayer = (Player) game.getFreeColGameObject(buyGoodsElement.getAttribute("player"));
+
+        if (theplayer.getGold() >= (game.getMarket().costToBuy(type) * 100)) {
+            (game.getMarket().buy(type, 100, theplayer)).setLocation(carrier);
+        } else {
+            logger.warning("A client is buying goods, but does not have enough money to do so???");
+        }
+        return null;
+    }
+
+    
+    /**
+    * Handles a "sellGoods"-message from a client.
+    *
+    * @param connection The connection the message came from.
+    * @param leaveShipElement The element containing the request.
+    */
+    private Element sellGoods(Connection connection, Element sellGoodsElement) {
+        Game game = freeColServer.getGame();
+        ServerPlayer player = freeColServer.getPlayer(connection);
+
+        Goods goods = (Goods) game.getFreeColGameObject(sellGoodsElement.getAttribute("goods"));
+        Player theplayer = (Player) game.getFreeColGameObject(sellGoodsElement.getAttribute("player"));
+
+        game.getMarket().sell(goods, theplayer);
+
+        return null;
+    }
+    
     /**
     * Handles a "moveToEurope"-message from a client.
     *
@@ -291,29 +420,6 @@ public final class InGameInputHandler implements MessageHandler {
         
         Tile oldTile = unit.getTile();
         unit.moveToEurope();
-        
-        Iterator enemyPlayerIterator = game.getPlayerIterator();
-        while (enemyPlayerIterator.hasNext()) {
-            ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
-
-            if (player.equals(enemyPlayer)) {
-                continue;
-            }
-
-            try {
-                if (enemyPlayer.canSee(oldTile)) {
-                    Element removeElement = Message.createNewRootElement("remove");
-
-                    Element removeUnit = removeElement.getOwnerDocument().createElement("removeObject");
-                    removeUnit.setAttribute("ID", unit.getID());
-                    removeElement.appendChild(removeUnit);
-
-                    enemyPlayer.getConnection().send(removeElement);
-                }
-            } catch (IOException e) {
-                logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection " + enemyPlayer.getConnection());
-            }
-        }
 
         return null;
     }
@@ -435,6 +541,23 @@ public final class InGameInputHandler implements MessageHandler {
         WorkLocation workLocation = (WorkLocation) game.getFreeColGameObject(workElement.getAttribute("workLocation"));
         
         unit.work(workLocation);
+
+        return null;
+    }
+
+    /**
+    * Handles a "worktype"-request from a client.
+    *
+    * @param connection The connection the message came from.
+    * @param workElement The element containing the request.
+    */
+    private Element workType(Connection connection, Element workElement) {
+        Game game = freeColServer.getGame();
+
+        Unit unit = (Unit) game.getFreeColGameObject(workElement.getAttribute("unit"));
+        int workType = Integer.parseInt(workElement.getAttribute("worktype"));
+        
+        unit.setWorkType(workType);
 
         return null;
     }

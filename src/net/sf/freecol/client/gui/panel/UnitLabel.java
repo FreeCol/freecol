@@ -15,6 +15,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.client.gui.Canvas;
 
+import net.sf.freecol.client.control.InGameController;
 
 /**
  * This label holds Unit data in addition to the JLabel data, which makes
@@ -30,11 +31,21 @@ public final class UnitLabel extends JLabel implements ActionListener {
     public static final int ARM = 0,
                             MOUNT = 1,
                             TOOLS = 2,
-                            DRESS = 3;
+                            DRESS = 3,
+                            WORKTYPE_FOOD = 4,
+                            WORKTYPE_SUGAR = 5,
+                            WORKTYPE_TOBACCO = 6,
+                            WORKTYPE_COTTON = 7,
+                            WORKTYPE_FURS = 8,
+                            WORKTYPE_LUMBER = 9,
+                            WORKTYPE_ORE = 10,
+                            WORKTYPE_SILVER = 11;
 
     private final Unit unit;
     private final Canvas parent;
     private boolean selected;
+
+    private InGameController inGameController;
 
     /**
     * Initializes this JLabel with the given unit data.
@@ -46,6 +57,8 @@ public final class UnitLabel extends JLabel implements ActionListener {
         this.unit = unit;
         this.parent = parent;
         selected = false;
+
+        this.inGameController = parent.getClient().getInGameController();
     }
 
     
@@ -56,7 +69,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
     */
     public UnitLabel(Unit unit, Canvas parent, boolean isSmall) {
         this(unit, parent);
-        setSmall(true);
+        setSmall(isSmall);
     }
 
 
@@ -129,11 +142,36 @@ public final class UnitLabel extends JLabel implements ActionListener {
                     case DRESS:
                         //parent.dressAsMissionary(unit);
                         break;
+                    case WORKTYPE_FOOD:
+                        inGameController.changeWorkType(unit, Goods.FOOD);
+                        break;
+                    case WORKTYPE_SUGAR:
+                        inGameController.changeWorkType(unit, Goods.SUGAR);
+                        break;
+                    case WORKTYPE_TOBACCO:
+                        inGameController.changeWorkType(unit, Goods.TOBACCO);
+                        break;
+                    case WORKTYPE_COTTON:
+                        inGameController.changeWorkType(unit, Goods.COTTON);
+                        break;
+                    case WORKTYPE_FURS:
+                        inGameController.changeWorkType(unit, Goods.FURS);
+                        break;
+                    case WORKTYPE_LUMBER:
+                        inGameController.changeWorkType(unit, Goods.LUMBER);
+                        break;
+                    case WORKTYPE_ORE:
+                        inGameController.changeWorkType(unit, Goods.ORE);
+                        break;
+                    case WORKTYPE_SILVER:
+                        inGameController.changeWorkType(unit, Goods.SILVER);
+                        break;
                     default:
                         logger.warning("Invalid action");
                 }
                 setIcon(parent.getImageProvider().getUnitImageIcon(parent.getImageProvider().getUnitGraphicsType(unit)));
                 repaint(0, 0, getWidth(), getHeight());
+
                 
                 // TODO: Refresh the gold label when goods have prices.
                 //goldLabel.repaint(0, 0, goldLabel.getWidth(), goldLabel.getHeight());

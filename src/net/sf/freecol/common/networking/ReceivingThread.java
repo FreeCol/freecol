@@ -144,7 +144,11 @@ final class ReceivingThread extends Thread {
                 }
 
                 // START DEBUG-LINES:
-                System.out.println(msg);
+		if (msg.getType().equals("invalid")) {
+		  System.out.println("--INVALID MESSAGE RECIEVED--");
+		} else {
+                  System.out.println(msg);
+		}
                 System.out.println();
                 System.out.flush();
                 // END DEBUB
@@ -167,7 +171,7 @@ final class ReceivingThread extends Thread {
                         logger.warning("Could not find networkReplyId=" + msg.getAttribute("networkReplyId"));
                     }
 
-                } else { // == this is not a reply-message:
+                } else if (!msg.getType().equals("invalid")) { // == this is not a reply-message:
                     connection.handleAndSendReply(msg);
                 }
             }

@@ -38,7 +38,7 @@ public final class ImageSelection implements Transferable {
     * the data is not of the given flavor.
     */
     public Object getTransferData(DataFlavor flavor) {
-        if (isDataFlavorSupported(flavors[0])) {
+        if (isDataFlavorSupported(flavor)) {
             return label;
         }
         return null;

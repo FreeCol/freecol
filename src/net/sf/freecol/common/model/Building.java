@@ -3,6 +3,7 @@ package net.sf.freecol.common.model;
 
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Goods;
 
 import net.sf.freecol.common.FreeColException;
 
@@ -342,7 +343,72 @@ public final class Building extends FreeColGameObject implements WorkLocation {
     * Prepares this <code>Building</code> for a new turn.
     */
     public void newTurn() {
+    
+        int goodsInput = 0;
+        int goodsOutput = 0;
+        int goodsInputType = -1;
+        int goodsOutputType = -1;
+	
+	Goods thepackage;
+        
+        if (level == NOT_BUILT) return; // Don't do anything if the building does not exist.
 
+        // Figure out what's produced here and what it requires to do so.
+        switch(type) {
+            case BLACKSMITH:
+                goodsInputType = Goods.ORE;
+                goodsOutputType = Goods.TOOLS;
+                break;
+            case TOBACCONIST:
+                goodsInputType = Goods.TOBACCO;
+                goodsOutputType = Goods.CIGARS;
+                break;
+            case WEAVER:
+                goodsInputType = Goods.COTTON;
+                goodsOutputType = Goods.CLOTH;
+                break;
+            case DISTILLER:
+                goodsInputType = Goods.SUGAR;
+                goodsOutputType = Goods.RUM;
+                break;
+            case FUR_TRADER:
+                goodsInputType = Goods.FURS;
+                goodsOutputType = Goods.COATS;
+                break;
+            case ARMORY:
+                goodsInputType = Goods.TOOLS;
+                goodsOutputType = Goods.MUSKETS;
+                break;
+           default:
+                break;
+        }
+        if (goodsOutputType < 0) return;
+
+        Iterator unitIterator = getUnitIterator();
+        while (unitIterator.hasNext())
+        {
+            goodsOutput += ((Unit) unitIterator.next()).getProducedAmount(goodsOutputType);
+        }
+        goodsInput = goodsOutput;
+        goodsOutput *= level;
+        goodsInput *= ((level > SHOP) ? SHOP : level); // Factories don't need the extra 3 units.
+        if (colony.getGoodsCount(goodsInputType) < goodsInput) // Not enough goods to do this?
+        {
+            goodsInput = colony.getGoodsCount(goodsInputType);
+            if (level < FACTORY) {
+                goodsOutput = goodsInput;
+            } else {
+                goodsOutput = (goodsInput * 3) / 2;
+            }
+        }
+        if (goodsOutput <= 0) return;
+        
+        // Actually produce the goods.
+        colony.removeAmountAndTypeOfGoods(goodsInputType, goodsInput);
+        thepackage = new Goods(getGame(), null, goodsOutputType, goodsOutput);
+	thepackage.setLocation(colony);
+        //colony.add(thepackage);
+        getGame().mustRestartNewTurn = true;
     }
 
 

@@ -30,6 +30,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Goods;
 
 
 /**
@@ -89,6 +90,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
     private final InPortPanel               inPortPanel;
     private final DocksPanel                docksPanel;
     private final CargoPanel                cargoPanel;
+    private final MarketPanel               marketPanel;
     private final RecruitPanel              recruitPanel;
     private final PurchasePanel             purchasePanel;
     private final TrainPanel                trainPanel;
@@ -117,6 +119,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         inPortPanel = new InPortPanel();
         docksPanel = new DocksPanel(this);
         cargoPanel = new CargoPanel(this);
+        marketPanel = new MarketPanel(this);
         recruitPanel = new RecruitPanel(this);
         purchasePanel = new PurchasePanel(this);
         trainPanel = new TrainPanel(this);
@@ -133,6 +136,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         inPortPanel.setTransferHandler(defaultTransferHandler);
         docksPanel.setTransferHandler(defaultTransferHandler);
         cargoPanel.setTransferHandler(defaultTransferHandler);
+	marketPanel.setTransferHandler(defaultTransferHandler);
 
         pressListener = new DragListener(this);
         MouseListener releaseListener = new DropListener();
@@ -141,6 +145,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         inPortPanel.addMouseListener(releaseListener);
         docksPanel.addMouseListener(releaseListener);
         cargoPanel.addMouseListener(releaseListener);
+	marketPanel.addMouseListener(releaseListener);
 
         toAmericaPanel.setLayout(new GridLayout(0 , 2));
         toEuropePanel.setLayout(new GridLayout(0 , 2));
@@ -159,7 +164,8 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     toEuropeScroll = new JScrollPane(toEuropePanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER),
                     inPortScroll = new JScrollPane(inPortPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER),
                     docksScroll = new JScrollPane(docksPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER),
-                    cargoScroll = new JScrollPane(cargoPanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                    cargoScroll = new JScrollPane(cargoPanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED),
+		    marketScroll = new JScrollPane(marketPanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         JLabel  toAmericaLabel = new JLabel("Going to America"),
                 toEuropeLabel = new JLabel("Going to Europe"),
                 inPortLabel = new JLabel("In port"),
@@ -174,6 +180,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         inPortScroll.setSize(200, 300);
         docksScroll.setSize(200, 300);
         cargoScroll.setSize(410, 96);
+	marketScroll.setSize(620, 114);
         toAmericaLabel.setSize(200, 20);
         toEuropeLabel.setSize(200, 20);
         inPortLabel.setSize(200, 20);
@@ -190,6 +197,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         inPortScroll.setLocation(430, 35);
         docksScroll.setLocation(640, 250);
         cargoScroll.setLocation(220, 370);
+	marketScroll.setLocation(10, 476);
         toAmericaLabel.setLocation(10, 10);
         toEuropeLabel.setLocation(220, 10);
         inPortLabel.setLocation(430, 10);
@@ -218,6 +226,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         add(inPortScroll);
         add(docksScroll);
         add(cargoScroll);
+	add(marketScroll);
         add(toAmericaLabel);
         add(toEuropeLabel);
         add(inPortLabel);
@@ -326,6 +335,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         toEuropePanel.removeAll();
         inPortPanel.removeAll();
         cargoPanel.removeAll();
+	marketPanel.removeAll();
         docksPanel.removeAll();
 
         //
@@ -350,6 +360,15 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                 toAmericaPanel.add(unitLabel, false);
             }
         }
+	
+        for (int i = 0; i < Goods.NUMBER_OF_TYPES; i++)
+        {
+            MarketLabel marketLabel = new MarketLabel(i, game.getMarket(), parent);
+            marketLabel.setTransferHandler(defaultTransferHandler);
+            marketLabel.addMouseListener(pressListener);
+            ((JPanel)marketPanel).add(marketLabel);
+        }
+
 
         setSelectedUnit(null);
         goldLabel.setText("Gold: " + freeColClient.getMyPlayer().getGold());
@@ -378,6 +397,17 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     Unit unit = (Unit) unitIterator.next();
 
                     UnitLabel label = new UnitLabel(unit, parent);
+                    label.setTransferHandler(defaultTransferHandler);
+                    label.addMouseListener(pressListener);
+
+                    cargoPanel.add(label, false);
+                }
+
+                Iterator goodsIterator = selUnit.getGoodsIterator();
+                while (goodsIterator.hasNext()) {
+                    Goods g = (Goods) goodsIterator.next();
+
+                    GoodsLabel label = new GoodsLabel(g, parent);
                     label.setTransferHandler(defaultTransferHandler);
                     label.addMouseListener(pressListener);
 
@@ -714,6 +744,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             europePanel.refresh();
             return c;
         }
+        
     }
 
     
@@ -877,8 +908,18 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                 if (comp instanceof UnitLabel) {
                     Unit unit = ((UnitLabel)comp).getUnit();
                     inGameController.boardShip(unit, selectedUnit.getUnit());
-                }
-                else {
+                } else if (comp instanceof MarketLabel) {
+                    if ((freeColClient.getMyPlayer().getGold() >= (game.getMarket().costToBuy(((MarketLabel)comp).getType()) * 100))) {
+                        inGameController.buyGoods(((MarketLabel)comp).getType(), selectedUnit.getUnit(), freeColClient.getMyPlayer());   
+                    }
+                    updateCargoLabel();
+                    goldLabel.setText("Gold: " + freeColClient.getMyPlayer().getGold());
+                    goldLabel.repaint(0, 0, goldLabel.getWidth(), goldLabel.getHeight());
+		    europePanel.getMarketPanel().revalidate();
+		    revalidate();
+                    europePanel.refresh();
+                    return comp;
+                } else {
                     logger.warning("An invalid component got dropped on this CargoPanel.");
                 }
             }
@@ -886,6 +927,53 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             Component c = add(comp);
             europePanel.refresh();
             return c;
+        }
+    }
+
+/**
+    * A panel that shows goods available for purchase in Europe.
+    */
+    public final class MarketPanel extends JPanel {
+        private final EuropePanel europePanel;
+
+        /**
+        * Creates this MarketPanel.
+        * @param europePanel The panel that holds this CargoPanel.
+        */
+        public MarketPanel(EuropePanel europePanel) {
+            this.europePanel = europePanel;
+        }
+
+        /**
+        * If a GoodsLabel is dropped here, sell the goods.
+        * @param comp The component to add to this MarketPanel.
+        * @param editState Must be set to 'true' if the state of the component
+        * that is added (which should be a dropped component representing goods)
+        * should be sold.
+        * @return The component argument.
+        */
+        public Component add(Component comp, boolean editState) {
+            if (editState) {
+                if (comp instanceof GoodsLabel) {
+                    //getGame().getMarket().sell(((GoodsLabel)comp).getGoods(), freeColClient.getMyPlayer());
+                    inGameController.sellGoods(((GoodsLabel)comp).getGoods(), freeColClient.getMyPlayer());
+                    updateCargoLabel();
+                    goldLabel.setText("Gold: " + freeColClient.getMyPlayer().getGold());
+                    goldLabel.repaint(0, 0, goldLabel.getWidth(), goldLabel.getHeight());
+		    europePanel.getCargoPanel().revalidate();
+		    revalidate();
+                    europePanel.refresh();
+                    return comp;
+                }
+                else {
+                    logger.warning("An invalid component got dropped on this MarketPanel.");
+                }
+            }
+            europePanel.refresh();
+            return comp;
+        }
+        public void remove(Component comp) {
+          // Don't remove the marketLabel.
         }
     }
 
@@ -897,9 +985,13 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         return cargoPanel;
     }
 
+    /**
+    * Returns a pointer to the <code>marketPanel</code>-object in use.
+    */
+    public final MarketPanel getMarketPanel() {
+        return marketPanel;
+    }    
     
-    
-
 
     /**
     * The panel that allows a user to recruit people in Europe.

@@ -37,6 +37,20 @@ public abstract class ImageProvider {
     * @param index The type of the graphic of which we need the Image.
     * @return The Image of the graphic with the given type.
     */
+    public abstract Image getGoodsImage(int type);
+
+    /**
+    * Should return the Image of the graphic with the given type.
+    * @param index The type of the graphic of which we need the Image.
+    * @return The Image of the graphic with the given type.
+    */
+    public abstract ImageIcon getGoodsImageIcon(int type);
+
+    /**
+    * Should return the Image of the graphic with the given type.
+    * @param index The type of the graphic of which we need the Image.
+    * @return The Image of the graphic with the given type.
+    */
     public abstract Image getMiscImage(int type);
     
     /**

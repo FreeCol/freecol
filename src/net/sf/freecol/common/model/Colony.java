@@ -19,7 +19,7 @@ import net.sf.freecol.common.FreeColException;
 * The latter represents the tiles around the <code>Colony</code> where working is
 * possible.
 */
-public final class Colony extends Settlement {
+public final class Colony extends Settlement implements Location {
     private static final Logger logger = Logger.getLogger(Colony.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003 The FreeCol Team";
@@ -33,7 +33,7 @@ public final class Colony extends Settlement {
     /** Places a unit may work. Either a <code>Building</code> or a <code>ColonyTile</code>. */
     private ArrayList workLocations = new ArrayList();
 
-
+    private GoodsContainer goodsContainer;
 
 
 
@@ -47,6 +47,8 @@ public final class Colony extends Settlement {
     */
     public Colony(Game game, Player owner, String name, Tile tile) {
         super(game, owner, tile);
+
+        goodsContainer = new GoodsContainer(game, this);
 
         this.name = name;
 
@@ -171,7 +173,14 @@ public final class Colony extends Settlement {
         return null;
     }
 
-
+    /**
+    * Gets a <code>Tile</code> of this<code>Colony</code>
+    * @return The <code>Tile</code>.
+    */
+    public Tile getTile() {
+            return tile;
+    }
+    
     /**
     * Gets a <code>Tile</code> from the neighbourhood of this <code>Colony</code>
     * @return The <code>Tile</code>.
@@ -235,6 +244,8 @@ public final class Colony extends Settlement {
                     return;
                 }
             }
+        } else if (locatable instanceof Goods) {
+            goodsContainer.addGoods((Goods)locatable);
         } else {
             logger.warning("Tried to add an unrecognized 'Locatable' to a 'Colony'.");
         }
@@ -255,6 +266,8 @@ public final class Colony extends Settlement {
                     return;
                 }
             }
+        } else if (locatable instanceof Goods) {
+            goodsContainer.removeGoods((Goods)locatable);
         } else {
             logger.warning("Tried to remove an unrecognized 'Locatable' from a 'Colony'.");
         }
@@ -279,11 +292,42 @@ public final class Colony extends Settlement {
         return count;
     }
 
+    /**
+    * Gets the amount of one type of Goods at this Colony. 
+    *
+    * @param type The type of goods to look for.
+    * @return The amount of this type of Goods at this Location.
+    */
+    public int getGoodsCount(int type) {
+        return goodsContainer.getGoodsCount(type);
+    }
+    
+    /**
+    * Gets the total amount of all types of Goods at this Colony. 
+    * @return The total amount of all types of Goods at this Location.
+    */
+    public int getTotalGoodsCount() {
+        return goodsContainer.getTotalGoodsCount();
+    }
+    
+    /**
+    * Removes a specified amount of a type of Goods from this containter.
+    *
+    * @param type The type of Goods to remove from this container.
+    * @param amount The amount of Goods to remove from this container.
+    * @return The goods that have been removed from this container (if any).
+    */
+    public Goods removeAmountAndTypeOfGoods(int type, int amount) {
+        return goodsContainer.removeAmountAndTypeOfGoods(type, amount);
+    }
 
     public Iterator getUnitIterator() {
         throw new UnsupportedOperationException();
     }
 
+    public Iterator getGoodsIterator() {
+        return goodsContainer.getGoodsIterator();
+    }
 
     public boolean contains(Locatable locatable) {
         throw new UnsupportedOperationException();
@@ -343,6 +387,8 @@ public final class Colony extends Settlement {
         while (workLocationIterator.hasNext()) {
             colonyElement.appendChild(((FreeColGameObject) workLocationIterator.next()).toXMLElement(player, document));
         }
+	
+	colonyElement.appendChild(goodsContainer.toXMLElement(player, document));
 
         return colonyElement;
     }
@@ -379,7 +425,15 @@ public final class Colony extends Settlement {
                 } else {
                     workLocations.add(new Building(getGame(), childElement));
                 }
-            }
+            } else if (childElement.getTagName().equals(GoodsContainer.getXMLElementTagName())) {
+                GoodsContainer gc = (GoodsContainer) getGame().getFreeColGameObject(childElement.getAttribute("ID"));
+
+                if (gc != null) {
+                    goodsContainer.readFromXMLElement(childElement);
+                } else {
+                    goodsContainer = new GoodsContainer(getGame(), this);
+                }
+	    }
         }
     }
 

@@ -350,7 +350,22 @@ public final class Tile extends FreeColGameObject implements Location {
         forested = value;
     }
 
-
+    /**
+    * Sets whether the tile is plowed or not.
+    * @param Value new value for forested
+    */
+    public void setPlowed(boolean value) {
+        plowed = value;
+    }
+    
+    /**
+    * Sets whether the tile has a road or not.
+    * @param Value new value for forested
+    */
+    public void setRoad(boolean value) {
+        road = value;
+    }
+    
     /**
     * Sets whether the tile has a bonus or not.
     * @param Value new value for bonus
@@ -563,8 +578,68 @@ public final class Tile extends FreeColGameObject implements Location {
     public boolean canAdd(Locatable locatable) {
         return true;
     }
+    
+    /**
+    * The potential of this tile to produce a certain type of goods.
+    *
+    * @param goods The type of goods to check the potential for.
+    * @return The normal potential of this tile to produce that amount of goods.
+    */
+    public int potential (int goods)
+    {
+      // Please someone tell me they want to put this data into a separate file... -sjm
+      // Twelve tile types, sixteen goods types, and forested/unforested.
+      int potentialtable[][][] =
+      {
+       // Food    Sugar  Tobac  Cotton Furs   Wood   Ore    Silver Horses Rum    Cigars Cloth  Coats  T.G.   Tools  Musket
+          {{0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Unexp
+          {{5,3}, {0,0}, {0,0}, {2,1}, {0,3}, {0,6}, {1,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Plains
+          {{3,2}, {0,0}, {3,1}, {0,0}, {0,2}, {0,4}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Grasslands
+          {{3,2}, {0,0}, {0,0}, {3,1}, {0,2}, {0,6}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Prairie
+          {{4,3}, {3,1}, {0,0}, {0,0}, {0,2}, {0,4}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Savannah
+          {{3,2}, {0,0}, {0,0}, {0,0}, {0,2}, {0,4}, {2,1}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Marsh
+          {{3,2}, {2,1}, {2,1}, {0,0}, {0,1}, {0,4}, {2,1}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Swamp
+          {{2,2}, {0,0}, {0,0}, {1,1}, {0,2}, {0,2}, {2,1}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Desert
+          {{3,2}, {0,0}, {0,0}, {0,0}, {0,3}, {0,4}, {2,1}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Tundra
+          {{0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Arctic
+          {{4,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Ocean
+          {{4,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}   // High seas
+      };
+      
+      int basepotential = potentialtable[type][goods][(forested ? 1 : 0)];
+      if (basepotential > 0) {
+        if (plowed) basepotential++;
+        if (road) basepotential++;
+      }
+      
+      return basepotential;
+    }
 
-
+    /**
+    * The type of secondary good this tile produces best (used for Town Commons squares).
+    * @returns The type of secondary good best produced by this tile.
+    */
+    public int secondaryGoods()
+    {
+	if (isForested()) return Goods.FURS;
+	switch(getType()) {
+            case PLAINS:
+            case PRAIRIE:
+                return Goods.COTTON;
+            case GRASSLANDS:
+                return Goods.TOBACCO;
+            case SAVANNAH:
+                return Goods.SUGAR;
+            case MARSH:
+            case SWAMP:
+            case DESERT:
+            case TUNDRA:
+            case ARCTIC:
+            default:
+                return Goods.ORE;
+	}
+    }
+    
     /**
     * Prepares this <code>Tile</code> for a new turn.
     */
@@ -610,8 +685,7 @@ public final class Tile extends FreeColGameObject implements Location {
 
         return tileElement;
     }
-
-
+    
     /**
     * Initialize this object from an XML-representation of this object.
     *

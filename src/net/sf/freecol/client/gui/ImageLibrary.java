@@ -162,6 +162,25 @@ public final class ImageLibrary extends ImageProvider {
                             INDIAN_SETTLEMENT_INCA = 3,
 
                             INDIAN_COUNT = 4;
+                            
+    public static final int GOODS_FOOD = 0,
+                            GOODS_SUGAR = 1,
+                            GOODS_TOBACCO = 2,
+                            GOODS_COTTON = 3,
+                            GOODS_FURS = 4,
+                            GOODS_LUMBER = 5,
+                            GOODS_ORE = 6,
+                            GOODS_SILVER = 7,
+                            GOODS_HORSES = 8,
+                            GOODS_RUM = 9,
+                            GOODS_CIGARS = 10,
+                            GOODS_CLOTH = 11,
+                            GOODS_COATS = 12,
+                            GOODS_TRADE_GOODS = 13,
+                            GOODS_TOOLS = 14,
+                            GOODS_MUSKETS = 15,
+                            
+                            GOODS_COUNT = 16;
 
     /**
      * The filename of the graphical representation of a specific unit is the following:
@@ -181,6 +200,8 @@ public final class ImageLibrary extends ImageProvider {
                                 colonyName = new String("Colony"),
                                 indianDirectory = new String("indians/"),
                                 indianName = new String("Indians"),
+                                goodsDirectory = new String("goods/"),
+                                goodsName = new String("Goods"),
                                 extension = new String(".png");
     private final String dataDirectory;
 
@@ -192,7 +213,8 @@ public final class ImageLibrary extends ImageProvider {
                    terrain2, // Holds Vectors that hold ImageIcon objects
                    misc, // Holds ImageIcon objects
                    colonies, //Holds ImageIcon objects
-                   indians; //Holds ImageIcon objects
+                   indians, //Holds ImageIcon objects
+                   goods; //Holds ImageIcon objects
     private Vector[] unitButtons; //Holds the unit-order buttons
     private Hashtable colorChips;  // Color is key, BufferedImage is value
 
@@ -243,6 +265,7 @@ public final class ImageLibrary extends ImageProvider {
         loadUnitButtons(gc, resourceLocator, doLookup);
         loadColonies(gc, resourceLocator, doLookup);
         loadIndians(gc, resourceLocator, doLookup);
+        loadGoods(gc, resourceLocator, doLookup);
         loadColorChips(gc);
     }
 
@@ -526,6 +549,50 @@ public final class ImageLibrary extends ImageProvider {
             indians.add(tempImage);
         }
     }
+    
+     /**
+     * Loads the goods-images from file into memory.
+     * @param gc The GraphicsConfiguration is needed to create images that are compatible with the
+     * local environment.
+     * @param resourceLocator The class that is used to locate data files.
+     * @param doLookup Must be set to 'false' if the path to the image files
+     * has been manually provided by the user. If set to 'true' then a
+     * lookup will be done to search for image files from net.sf.freecol,
+     * in this case the images need to be placed in net/sf/freecol/images.
+     * @throws FreeColException If one of the data files could not be found.
+     */
+    private void loadGoods(GraphicsConfiguration gc, Class resourceLocator, boolean doLookup) throws FreeColException {
+        goods = new Vector(GOODS_COUNT);
+
+        for (int i = 0; i < GOODS_COUNT; i++) {
+            String filePath = dataDirectory + path + goodsDirectory + goodsName + i + extension;
+            ImageIcon tempImage;
+            if (doLookup) {
+                URL url = resourceLocator.getResource(filePath);
+                if (url == null) {
+                    throw new FreeColException("The data file \"" + filePath + "\" could not be found.");
+                }
+                tempImage = new ImageIcon(url);
+            } else {
+                File tmpFile = new File(filePath);
+                if ((tmpFile == null) || !tmpFile.exists() || !tmpFile.isFile() || !tmpFile.canRead()) {
+                    throw new FreeColException("The data file \"" + filePath + "\" could not be found.");
+                }
+                tempImage = new ImageIcon(filePath);
+            }
+            goods.add(tempImage);
+        }
+
+        /*
+        If all units are patched together in one graphics file then this is the way to load
+        them into different images:
+
+        Image unitsImage = new ImageIcon(url).getImage();
+        BufferedImage tempImage = gc.createCompatibleImage(42, 63, Transparency.TRANSLUCENT);
+        tempImage.getGraphics().drawImage(unitsImage, 0, 0, null);
+        units.add(tempImage);
+        */
+    }
 
     /**
      * Generates color chip images and stores them in memory. Color chips
@@ -664,6 +731,24 @@ public final class ImageLibrary extends ImageProvider {
      */
     public Image getIndianSettlementImage(int index) {
         return ((ImageIcon) indians.get(index)).getImage();
+    }
+    
+    /**
+     * Returns the goods-image at the given index.
+     * @param index The index of the goods-image to return.
+     * @return The goods-image at the given index.
+     */
+    public Image getGoodsImage(int index) {
+        return ((ImageIcon) goods.get(index)).getImage();
+    }
+    
+    /**
+     * Returns the goods-image at the given index.
+     * @param index The index of the goods-image to return.
+     * @return The goods-image at the given index.
+     */
+    public ImageIcon getGoodsImageIcon(int index) {
+        return ((ImageIcon) goods.get(index));
     }
 
     /**

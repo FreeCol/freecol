@@ -104,10 +104,11 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
     private int             numberOfTools;
     private Player          owner;
     private UnitContainer   unitContainer;
+    private GoodsContainer  goodsContainer;
     private Location        entryLocation;
     private Location        location;
 
-
+    private int             workType; // What type of goods this unit produces in its occupation.
 
     /**
     * Initiate a new <code>Unit</code> of a specified type with the state set
@@ -139,6 +140,7 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
         super(game);
 
         unitContainer = new UnitContainer(game, this);
+        goodsContainer = new GoodsContainer(game, this);
 
         setLocation(location);
 
@@ -153,6 +155,7 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
 
         state = s;
         workLeft = -1;
+        workType = Goods.FOOD;
 
         if (type == VETERAN_SOLDIER) {
             armed = true;
@@ -277,6 +280,26 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
         return getMoveType(target);
     }
 
+     /**
+     * Gets the type of goods this unit is producing in its current occupation.
+     * @return The type of goods this unit would produce.
+     */
+    public int getWorkType() {
+        if (getLocation() instanceof Building) {
+	  // TODO: code me.
+	  return 0;
+	} else {
+	  return workType;
+	}
+    }
+    
+     /**
+     * Sets the type of goods this unit is producing in its current occupation.
+     * @param type The type of goods to attempt to produce.
+     */
+    public void setWorkType(int type) {
+        workType = type;
+    }
 
     /**
      * Gets the type of a move that is made when moving to the
@@ -503,8 +526,7 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
             if (locatable instanceof Unit) {
                 unitContainer.addUnit((Unit) locatable);
             } else if (locatable instanceof Goods) {
-                // TODO: Implement:
-                logger.warning("Tried to use unimplemeneted feature in 'Unit': add(goods)");
+                goodsContainer.addGoods((Goods) locatable);
             } else {
                 logger.warning("Tried to add an unrecognized 'Locatable' to a unit.");
             }
@@ -523,8 +545,7 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
             if (locatable instanceof Unit) {
                 unitContainer.removeUnit((Unit) locatable);
             } else if (locatable instanceof Goods) {
-                // TODO: Implement:
-                logger.warning("Tried to use unimplemeneted feature in 'Unit': remove(goods)");
+                goodsContainer.removeGoods((Goods) locatable);
             } else {
                 logger.warning("Tried to remove an unrecognized 'Locatable' from a unit.");
             }
@@ -550,6 +571,8 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
         if (isCarrier()) {
             if (locatable instanceof Unit) {
                 return unitContainer.contains((Unit) locatable);
+            } else if (locatable instanceof Goods) {
+                return goodsContainer.contains((Goods) locatable);
             } else {
                 return false;
             }
@@ -584,6 +607,23 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
     public int getUnitCount() {
         if (isCarrier()) {
             return unitContainer.getUnitCount();
+        } else {
+            return 0;
+        }
+    }
+    
+    /**
+    * Gets the storage room of all Goods at this location.
+    * @return The total storage room of all Goods at this location.
+    */
+    public int getGoodsSpace() {
+        if (isCarrier()) {
+	    int space = 0;
+            Iterator goodsIterator = goodsContainer.getGoodsIterator();
+	    while (goodsIterator.hasNext()) {
+	      space += ((Goods) goodsIterator.next()).getTakeSpace();
+	    }
+	    return space;
         } else {
             return 0;
         }
@@ -630,7 +670,20 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
         }
     }
 
-    
+    /**
+    * Gets a <code>Iterator</code> of every <code>Unit</code> directly located on this
+    * <code>Location</code>.
+    *
+    * @return The <code>Iterator</code>.
+    */
+    public Iterator getGoodsIterator() {
+        if (isCarrier()) {
+            return goodsContainer.getGoodsIterator();
+        } else { // TODO: Make a better solution:
+            return (new ArrayList()).iterator();
+        }
+    }
+        
     /**
     * Sets this <code>Unit</code> to work in the 
     * specified <code>WorkLocation</code>.
@@ -1094,6 +1147,21 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
             case FORTIFY:
                 workLeft = -1;
                 break;
+            case BUILD_ROAD:
+            case PLOW:
+	        switch(getTile().getType()) {
+                    case Tile.DESERT:
+                    case Tile.PLAINS:
+                    case Tile.PRAIRIE:
+                    case Tile.GRASSLANDS:
+                    case Tile.SAVANNAH: workLeft = ((getTile().isForested()) ? 4 : 3); break;
+                    case Tile.MARSH: workLeft = ((getTile().isForested()) ? 6 : 5); break;
+                    case Tile.SWAMP: workLeft = 7; break;
+                    case Tile.ARCTIC:
+                    case Tile.TUNDRA: workLeft = 4; break;
+                    default: workLeft = -1; break;
+                }
+                if (s == BUILD_ROAD) workLeft /= 2;
             case TO_EUROPE:
                 if ((state == ACTIVE) && (!(location instanceof Europe))) {
                     workLeft = 3;
@@ -1146,7 +1214,8 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
         }
 
         // Do the HARD work of moving this unit to europe:
-        setEntryLocation(getLocation());
+	if (!(getLocation() instanceof Europe)) // Perpetual europedom bug fixed.. -sjm
+          setEntryLocation(getLocation());
         setState(TO_EUROPE);
         setLocation(getOwner().getEurope());
     }
@@ -1177,9 +1246,12 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
         switch (s) {
             case ACTIVE:
                 return true;
-            case IN_COLONY:
             case PLOW:
+                if (!((getTile().isForested()) || !(getTile().isPlowed()))) return false;
             case BUILD_ROAD:
+	        if ((s == BUILD_ROAD) && (getTile().hasRoad())) return false;
+		if (getNumberOfTools() < 20) return false;
+            case IN_COLONY:
                 if (isNaval()) {
                     return false;
                 }
@@ -1266,7 +1338,7 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
     * @return The amount of units/goods than can be moved onto this Unit.
     */
     public int getSpaceLeft() {
-        return getInitialSpaceLeft() - getUnitCount();
+        return getInitialSpaceLeft() - (getUnitCount() + getGoodsSpace());
     }
 
 
@@ -1334,6 +1406,15 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
                 switch (state) {
                     case TO_EUROPE:     break;
                     case TO_AMERICA:    setLocation(getEntryLocation()); break;
+                    case BUILD_ROAD:    getTile().setRoad(true); numberOfTools -= 20; break;
+		    case PLOW:
+		        if (getTile().isForested()) {
+			    getTile().setForested(false);
+			} else {
+			    getTile().setPlowed(true);
+			}
+			numberOfTools -= 20;
+			break;
                     default:            logger.warning("Unkown work completed. State: " + state);
                 }
 
@@ -1538,14 +1619,123 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
             return (Colony) location;
         }
     }
+    
+    /**
+    * Given a type of goods to produce in a building, returns the unit's potential to do so.
+    * @param goods The type of goods to be produced.
+    * @return The potential amount of goods to be manufactured.
+    */
+    public int getProducedAmount(int goods)
+    {
+        switch (type) {
+            case MASTER_DISTILLER:
+                if (goods == Goods.RUM) return 6;
+                return 3;
+            case MASTER_WEAVER:
+                if (goods == Goods.CLOTH) return 6;
+                return 3;
+            case MASTER_TOBACCONIST:
+                if (goods == Goods.CIGARS) return 6;
+                return 3;
+            case MASTER_FUR_TRADER:
+                if (goods == Goods.COATS) return 6;
+                return 3;
+            case MASTER_BLACKSMITH:
+                if (goods == Goods.TOOLS) return 6;
+                return 3;
+            case MASTER_GUNSMITH:
+                if (goods == Goods.MUSKETS) return 6;
+                return 3;
+            case INDENTURED_SERVANT:
+                return 2;
+            case PETTY_CRIMINAL:
+            case INDIAN_CONVERT:
+                return 1;
+            default: // Beats me who or what is working here, but he doesn't get a bonus.
+                if (isColonist())
+                    return 3; 
+                else
+                    return 0; // Can't work if you're not a colonist.
+        }
+    }
 
+    /**
+    * Given a type of goods to produce in the field and a tile, returns the unit's potential to produce goods.
+    * @param goods The type of goods to be produced.
+    * @param tile The tile which is being worked.
+    * @return The potential amount of goods to be farmed.
+    */
+    public int getFarmedPotential(int goods, Tile tile)
+    {
+        int base = tile.potential(goods);
+        switch (type) {
+            case EXPERT_FARMER:
+                if ((goods == Goods.FOOD) && ((tile.getType() != Tile.OCEAN) && (tile.getType() != Tile.HIGH_SEAS))) {
+                    //TODO: Special tile stuff. He gets +6/+4 for wheat/deer tiles respectively...
+                    base += 2;
+                }
+                break;
+            case EXPERT_FISHERMAN:
+                if ((goods == Goods.FOOD) && ((tile.getType() == Tile.OCEAN) || (tile.getType() == Tile.HIGH_SEAS))) {
+                    //TODO: Special tile stuff. He gets +6 for a fishery tile.
+                    base += 2;
+                }
+                break;
+            case EXPERT_FUR_TRAPPER:
+                if (goods == Goods.FURS) {
+                    base *= 2;
+                }
+                break;
+            case EXPERT_SILVER_MINER:
+                if (goods == Goods.SILVER) {
+                    //TODO: Mountain should be +1, not *2, but mountain didn't exist at type of writing.
+                    base *= 2;
+                }
+                break;
+            case EXPERT_LUMBER_JACK:
+                if (goods == Goods.LUMBER) {
+                    base *= 2;
+                }
+                break;
+            case EXPERT_ORE_MINER:
+                if (goods == Goods.ORE) {
+                    base *= 2;
+                }
+                break;
+            case MASTER_SUGAR_PLANTER:
+                if (goods == Goods.SUGAR) {
+                    base *= 2;
+                }
+                break;
+            case MASTER_COTTON_PLANTER:
+                if (goods == Goods.COTTON) {
+                    base *= 2;
+                }
+                break;
+            case MASTER_TOBACCO_PLANTER:
+                if (goods == Goods.TOBACCO) {
+                    base *= 2;
+                }
+                break;
+            case INDIAN_CONVERT:
+                if ((goods == Goods.FOOD) || (goods == Goods.SUGAR) || (goods == Goods.COTTON) || (goods == Goods.TOBACCO) || (goods == Goods.FURS)) {
+                    base += 1;
+                }
+                break;
+            default: // Beats me who or what is working here, but he doesn't get a bonus.
+                break;
+        }
+	return base;
+    }
 
+    
     /**
     * Removes all references to this object.
     */
     public void dispose() {
         if (isCarrier()) {
             unitContainer.dispose();
+            goodsContainer.dispose();
         }
 
         if (location != null) {
@@ -1597,10 +1787,14 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
         if (isCarrier()) {
             if (getOwner().equals(player)) {
                 unitElement.appendChild(unitContainer.toXMLElement(player, document));
+                unitElement.appendChild(goodsContainer.toXMLElement(player, document));
             } else {
                 UnitContainer emptyUnitContainer = new UnitContainer(getGame(), this);
                 emptyUnitContainer.setID(unitContainer.getID());
                 unitElement.appendChild(emptyUnitContainer.toXMLElement(player, document));
+                GoodsContainer emptyGoodsContainer = new GoodsContainer(getGame(), this);
+                emptyGoodsContainer.setID(unitContainer.getID());
+                unitElement.appendChild(emptyGoodsContainer.toXMLElement(player, document));
             }
         }
 
@@ -1640,6 +1834,12 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
                 unitContainer.readFromXMLElement(unitContainerElement);
             } else {
                 unitContainer = new UnitContainer(getGame(), this, unitContainerElement);
+            }
+            Element goodsContainerElement = (Element) unitElement.getElementsByTagName(GoodsContainer.getXMLElementTagName()).item(0);
+            if (goodsContainer != null) {
+                goodsContainer.readFromXMLElement(goodsContainerElement);
+            } else {
+                goodsContainer = new GoodsContainer(getGame(), this, goodsContainerElement);
             }
         }
     }

@@ -77,13 +77,14 @@ public final class Goods extends FreeColGameObject implements Locatable {
 
 
 
-
     /**
     * Sets the location of the goods.
     * @param location The new location of the goods,
     */
     public void setLocation(Location location) {
-        this.location.remove(this);
+        if ((this.location != null)) {
+	    this.location.remove(this);
+	}
         
         if (location != null) {
             location.add(this);
@@ -107,9 +108,32 @@ public final class Goods extends FreeColGameObject implements Locatable {
     * @return The amount.
     */
     public int getTakeSpace() {
-        return 1;
+        return (((amount - 1) / 100) + 1);
+    } 
+    
+    /**
+    * Gets the value <code>amount</code>.
+    * @return The current value of amount.
+    */
+    public int getAmount() {
+        return amount;
     }
     
+    /**
+    * Sets the value <code>amount</code>.
+    * @param a The new value for amount.
+    */
+    public void setAmount(int a) {
+        amount = a;
+    }
+    
+    /**
+    * Gets the value <code>type</code>. Note that type of goods should NEVER change.
+    * @return The current value of type.
+    */
+    public int getType() {
+        return type;
+    }
     
     /**
     * Prepares the <code>Goods</code> for a new turn.
@@ -117,7 +141,41 @@ public final class Goods extends FreeColGameObject implements Locatable {
     public void newTurn() {
     
     }
-    
+
+    /**
+    * Loads the cargo onto a carrier that is on the same tile.
+    *
+    * @param carrier The carrier this unit shall embark.
+    * @exception IllegalStateException If the carrier is on another tile than this unit.
+    */
+    public void Load(Unit carrier) {
+        if ((getLocation() == null) || (getLocation().getTile() == carrier.getTile())) {
+            setLocation(carrier);
+        } else {
+            throw new IllegalStateException("It is not allowed to board a ship on another tile.");
+        }
+    }
+
+
+    /**
+    * Unload the goods from the ship. This method should only be invoked if the ship is in a harbour.
+    *
+    * @exception IllegalStateException If not in harbour.
+    * @exception ClassCastException If not located on a ship.
+    */
+    public void Unload() {
+        Location l = ((Unit) getLocation()).getLocation();
+
+        logger.warning("Unloading cargo from a ship.");
+        if (l instanceof Europe) {
+            //TODO: sell the goods. But for now...
+            setLocation(l);
+        } else if (l.getTile().getSettlement() != null && l.getTile().getSettlement() instanceof Colony) {
+            setLocation(l.getTile().getSettlement());
+        } else {
+            throw new IllegalStateException("Goods may only leave a ship while in a harbour.");
+        }
+    }    
     
     /**
     * Removes all references to this object.

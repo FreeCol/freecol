@@ -44,10 +44,11 @@ public class Game extends FreeColGameObject {
     
     /** Indicates wether or not this object may give ID's */
     private boolean canGiveID;
+    
+    /* The market for Europe. */
+    private Market market;
 
-
-
-
+    public boolean mustRestartNewTurn;
 
     /**
     * Creates a new game model.
@@ -55,6 +56,7 @@ public class Game extends FreeColGameObject {
     public Game() {
         super(null);
 
+//        market = new Market(this);
         currentPlayer = null;
         canGiveID = true;
     }
@@ -71,8 +73,20 @@ public class Game extends FreeColGameObject {
         readFromXMLElement(element);
     }
 
-
-
+    /**
+    * Returns this Game's Market.
+    * @return This game's Market.
+    */
+    public Market getMarket() {
+        return market;
+    }
+    
+    /**
+    * Resets this game's Market.
+    */
+    public void reinitialiseMarket() {
+        market = new Market(this);
+    }
 
     /**
     * Get a unique ID to identify a <code>FreeColGameObject</code>.
@@ -396,9 +410,25 @@ public class Game extends FreeColGameObject {
     public void newTurn() {
         Iterator iterator = getFreeColGameObjectIterator();
 
+        mustRestartNewTurn = true;
+
         while (iterator.hasNext()) {
             FreeColGameObject freeColGameObject = (FreeColGameObject) iterator.next();
-            freeColGameObject.newTurn();
+            freeColGameObject.hasDoneNewTurn = false;
+        }
+        
+        while (mustRestartNewTurn)
+        {
+          mustRestartNewTurn = false;
+          iterator = getFreeColGameObjectIterator();
+          while ((iterator.hasNext()) && (!mustRestartNewTurn)) {
+              FreeColGameObject freeColGameObject = (FreeColGameObject) iterator.next();
+              if (!freeColGameObject.hasDoneNewTurn)
+              {
+                freeColGameObject.hasDoneNewTurn = true;
+                freeColGameObject.newTurn();
+              }
+          }
         }
     }
 
@@ -422,6 +452,10 @@ public class Game extends FreeColGameObject {
         while (playerIterator.hasNext()) {
             Player p = (Player) playerIterator.next();
             gameElement.appendChild(p.toXMLElement(player, document));
+        }
+
+        if (market != null) {
+            gameElement.appendChild(market.toXMLElement(player, document));
         }
 
         if (currentPlayer != null) {
@@ -467,6 +501,17 @@ public class Game extends FreeColGameObject {
                 player = new Player(this, playerElement);
                 players.add(player);
             }
+        }
+
+        if (gameElement.hasAttribute("market")) {
+            Element marketElement = (Element) gameElement.getElementsByTagName("market").item(0);
+            if (market != null) {
+                market.readFromXMLElement(marketElement);
+            } else {
+                market = new Market(this, marketElement);
+            }
+        } else {
+            market = new Market(this);
         }
 
         if (gameElement.hasAttribute("currentPlayer")) {

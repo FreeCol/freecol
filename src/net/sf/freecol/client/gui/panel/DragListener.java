@@ -12,6 +12,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.TransferHandler;
 
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.ColonyTile;
 
 /**
 * A DragListener should be attached to Swing components that have a
@@ -88,6 +89,41 @@ public final class DragListener extends MouseAdapter {
                 menuItem.setActionCommand(String.valueOf(UnitLabel.DRESS));
                 menuItem.addActionListener(unitLabel);
                 menu.add(menuItem);
+
+                if (tempUnit.getLocation() instanceof ColonyTile) {
+                    menuItem = new JMenuItem("Be a Farmer");
+                    menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_FOOD));
+                    menuItem.addActionListener(unitLabel);
+                    menu.add(menuItem);
+                    menuItem = new JMenuItem("Be a Sugar Planter");
+                    menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_SUGAR));
+                    menuItem.addActionListener(unitLabel);
+                    menu.add(menuItem);
+                    menuItem = new JMenuItem("Be a Tobacco Planter");
+                    menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_TOBACCO));
+                    menuItem.addActionListener(unitLabel);
+                    menu.add(menuItem);
+                    menuItem = new JMenuItem("Be a Cotton Planter");
+                    menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_COTTON));
+                    menuItem.addActionListener(unitLabel);
+                    menu.add(menuItem);
+                    menuItem = new JMenuItem("Be a Fur Trapper");
+                    menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_FURS));
+                    menuItem.addActionListener(unitLabel);
+                    menu.add(menuItem);
+                    menuItem = new JMenuItem("Be a Lumberjack");
+                    menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_LUMBER));
+                    menuItem.addActionListener(unitLabel);
+                    menu.add(menuItem);
+                    menuItem = new JMenuItem("Be an Ore Miner");
+                    menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_ORE));
+                    menuItem.addActionListener(unitLabel);
+                    menu.add(menuItem);
+                    menuItem = new JMenuItem("Be a Silver Miner");
+                    menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_SILVER));
+                    menuItem.addActionListener(unitLabel);
+                    menu.add(menuItem);
+                }
 
                 menu.show(comp, e.getX(), e.getY());
             }

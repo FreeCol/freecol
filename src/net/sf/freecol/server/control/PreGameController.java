@@ -103,6 +103,8 @@ public final class PreGameController {
 
         game.setMap(map);
 
+        game.reinitialiseMarket(); // Do this here because game is restarting. -sjm
+
         Iterator playerIterator = game.getPlayerIterator();
         while (playerIterator.hasNext()) {
             ServerPlayer player = (ServerPlayer) playerIterator.next();

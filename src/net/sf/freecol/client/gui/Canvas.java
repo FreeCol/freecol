@@ -685,7 +685,12 @@ public final class Canvas extends JLayeredPane {
         return gui;
     }
 
-
+    /** Returns the freeColClient.
+    * @returns The <code>freeColClient</code> associated with this <code>Canvas</code>.
+    */
+    public FreeColClient getClient() {
+      return freeColClient;
+    }
 
     /**
     * Makes sure that old chat messages are removed in time.
@@ -772,4 +777,5 @@ public final class Canvas extends JLayeredPane {
             }
         }
     }
+    
 }

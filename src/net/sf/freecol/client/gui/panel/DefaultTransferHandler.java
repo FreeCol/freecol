@@ -15,6 +15,7 @@ import javax.swing.TransferHandler;
 
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Goods;
 
 /**
 * The transferhandler that is capable of creating ImageSelection objects.
@@ -58,7 +59,7 @@ public final class DefaultTransferHandler extends TransferHandler {
     * flavor that is indicated by the second parameter, 'false' otherwise.
     */
     public boolean canImport(JComponent comp, DataFlavor flavor[]) {
-        if (!(comp instanceof UnitLabel) && !(comp instanceof JPanel) && !(comp instanceof JLabel)) {
+        if (!(comp instanceof UnitLabel) && !(comp instanceof GoodsLabel) && !(comp instanceof MarketLabel) && !(comp instanceof JPanel) && !(comp instanceof JLabel)) {
             return false;
         }
         for (int i = 0; i < flavor.length; i++) {
@@ -79,6 +80,10 @@ public final class DefaultTransferHandler extends TransferHandler {
     public Transferable createTransferable(JComponent comp) {
         if (comp instanceof UnitLabel) {
             return new ImageSelection((UnitLabel)comp);
+        } else if (comp instanceof GoodsLabel) {
+            return new ImageSelection((GoodsLabel)comp);
+        } else if (comp instanceof MarketLabel) {
+            return new ImageSelection((MarketLabel)comp);
         }
         return null;
     }
@@ -102,9 +107,8 @@ public final class DefaultTransferHandler extends TransferHandler {
                 logger.warning("Data flavor is not supported!");
                 return false;
             }
-            
-            // Make sure we don't drop onto other UnitLabels.
 
+	    // Make sure we don't drop onto other Labels.            
             if (comp instanceof UnitLabel) {
             
                 /*
@@ -134,7 +138,15 @@ public final class DefaultTransferHandler extends TransferHandler {
                     } catch (ClassCastException e) {}
 
                 }
+            } else if ((comp instanceof GoodsLabel) || (comp instanceof MarketLabel)) {
+                try {
+                    comp = (JComponent)comp.getParent();
+                } catch (ClassCastException e) {
+                    return false;
+                }
             }
+
+            if (data instanceof UnitLabel) {
 
             // Check if the unit can be dragged to comp.
             
@@ -199,7 +211,65 @@ public final class DefaultTransferHandler extends TransferHandler {
                 comp.revalidate();
                 return true;
             }
+            }
+            if (data instanceof GoodsLabel) {
 
+            // Check if the unit can be dragged to comp.
+            
+            //Goods g = ((GoodsLabel)data).getGoods();
+            
+            // Import the data.
+
+
+            if (comp instanceof JLabel) {
+                logger.warning("Oops, I thought we didn't have to write this part.");
+                return true;
+            } else if (comp instanceof JPanel) {
+                data.getParent().remove(data);
+                
+                if (comp instanceof ColonyPanel.WarehousePanel) {
+                    ((ColonyPanel.WarehousePanel)comp).add(data, true);
+                } else if (comp instanceof ColonyPanel.CargoPanel) {
+                    ((ColonyPanel.CargoPanel)comp).add(data, true);
+                } else if (comp instanceof EuropePanel.MarketPanel) {
+                    ((EuropePanel.MarketPanel)comp).add(data, true);
+                } else {
+                    logger.warning("The receiving component is of an invalid type.");
+                    return false;
+                }
+                
+                comp.revalidate();
+                return true;
+            }
+	    }
+            if (data instanceof MarketLabel) {
+
+            // Check if the unit can be dragged to comp.
+            
+            //Goods g = ((GoodsLabel)data).getGoods();
+            
+            // Import the data.
+
+
+            if (comp instanceof JLabel) {
+                logger.warning("Oops, I thought we didn't have to write this part.");
+                return true;
+            } else if (comp instanceof JPanel) {
+                // Be not removing MarketLabels from their home. -sjm
+                //data.getParent().remove(data);
+                
+                if (comp instanceof EuropePanel.CargoPanel) {
+                    ((EuropePanel.CargoPanel)comp).add(data, true);
+                } else {
+                    logger.warning("The receiving component is of an invalid type.");
+                    return false;
+                }
+                
+                comp.revalidate();
+                return true;
+            }
+	    }
+            logger.warning("The dragged component is of an invalid type.");
         } catch (UnsupportedFlavorException ignored) {
         } catch (IOException ignored) {}
 

@@ -48,7 +48,9 @@ public final class Message {
             }
             x.printStackTrace();
             System.out.println();
+	    System.out.println("The bad message is as follows:");
             System.out.println(msg);
+	    System.out.println("--END--");
         } catch (ParserConfigurationException pce) {
             // Parser with specified options can't be built
             pce.printStackTrace();
@@ -140,7 +142,11 @@ public final class Message {
     * @return The type of this Message.
     */
     public String getType() {
-        return document.getDocumentElement().getTagName();
+        if (document != null)
+	  if (document.getDocumentElement() != null)
+            return document.getDocumentElement().getTagName();
+	    
+	return new String("invalid");
     }
     
 

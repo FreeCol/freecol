@@ -257,6 +257,11 @@ public final class InGameController {
         }
 
         Client client = freeColClient.getClient();
+	
+	if (unit.isCarrier()) {
+	    logger.warning("Trying to load a carrier onto another carrier.");
+	    return;
+	}
         
         unit.boardShip(carrier);
 
@@ -285,6 +290,91 @@ public final class InGameController {
         client.send(leaveShipElement);
     }
 
+    /**
+    * Loads a cargo onto a carrier.
+    *
+    * @param goods The goods which are going aboard the carrier.
+    * @param carrier The carrier.
+    */
+    public void loadCargo(Goods goods, Unit carrier) {
+        if (carrier == null) {
+            throw new NullPointerException();
+        }
+
+        Client client = freeColClient.getClient();
+        
+        goods.Load(carrier);
+
+        Element loadCargoElement = Message.createNewRootElement("loadCargo");
+        loadCargoElement.setAttribute("goods", goods.getID());
+        loadCargoElement.setAttribute("carrier", carrier.getID());
+
+        client.send(loadCargoElement);
+    }
+
+
+    /**
+    * Unload cargo. This method should only be invoked if the unit carrying the
+    * cargo is in a harbour.
+    *
+    * @param unit The goods which are going to leave the ship where it is located.
+    */
+    public void unloadCargo(Goods goods) {
+        Client client = freeColClient.getClient();
+
+        goods.Unload();
+
+        Element leaveShipElement = Message.createNewRootElement("unloadCargo");
+        leaveShipElement.setAttribute("goods", goods.getID());
+
+	logger.warning("Sending unloadCargoElement");
+        client.send(leaveShipElement);
+    }
+    
+    /**
+    * Buys goods in Europe.
+    *
+    * @param unit The unit who is going to board the carrier.
+    * @param carrier The carrier.
+    * @param player The player doing the buying.
+    */
+    public void buyGoods(int type, Unit carrier, Player player) {
+        if (carrier == null) {
+            throw new NullPointerException();
+        }
+
+        Client client = freeColClient.getClient();
+        
+        if (carrier.getSpaceLeft() <= 0) return;
+
+        (player.getGame().getMarket().buy(type, 100, player)).setLocation(carrier);
+
+        Element buyGoodsElement = Message.createNewRootElement("buyGoods");
+        buyGoodsElement.setAttribute("type", Integer.toString(type));
+        buyGoodsElement.setAttribute("carrier", carrier.getID());
+        buyGoodsElement.setAttribute("player", player.getID());
+
+        client.send(buyGoodsElement);
+    }
+
+
+    /**
+    * Sells goods in Europe.
+    *
+    * @param goods The goods to be sold.
+    * @param player The player selling the goods.
+    */
+    public void sellGoods(Goods goods, Player player) {
+        Client client = freeColClient.getClient();
+
+        player.getGame().getMarket().sell(goods, player);
+
+        Element sellGoodsElement = Message.createNewRootElement("sellGoods");
+        sellGoodsElement.setAttribute("goods", goods.getID());
+	sellGoodsElement.setAttribute("player", player.getID());
+
+        client.send(sellGoodsElement);
+    }
     
     /**
     * Moves a <code>Unit</code> to a <code>WorkLocation</code>.
@@ -320,7 +410,24 @@ public final class InGameController {
         client.send(putOutsideColonyElement);
     }
 
+    /**
+    * Changes the worktype of this <code>Unit</code>.
+    * @param unit The <code>Unit</code>
+    * @param workType The new work type.
+    */
+    public void changeWorkType(Unit unit, int workType) {
+        Client client = freeColClient.getClient();
 
+        unit.setWorkType(workType);
+
+        Element changeWorkTypeElement = Message.createNewRootElement("changeWorkType");
+        changeWorkTypeElement.setAttribute("unit", unit.getID());
+        changeWorkTypeElement.setAttribute("worktype", Integer.toString(workType));
+
+        client.send(changeWorkTypeElement);
+    }
+
+    
     /**
      * Moves the specified unit in the "high seas" in a specified direction.
      * This may result in an ordinary move or a move to europe.

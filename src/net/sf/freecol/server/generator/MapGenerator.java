@@ -155,26 +155,61 @@ public class MapGenerator {
 
     protected class TerrainGenerator {
 
-        private static final int DISTANCE_TO_LAND_FROM_HIGH_SEAS = 6;
+        private static final int DISTANCE_TO_LAND_FROM_HIGH_SEAS = 4;
         private static final int MAX_DISTANCE_TO_EDGE = 12;
 
         private boolean[][] landMap;
+	
+	private Random tileType;
 
 
         TerrainGenerator(boolean[][] landMap) {
             this.landMap = landMap;
         }
 
+        private int getRandomTileType(int percent) {
+          // Do by percent +- 10.
+          int min = (percent - 10);
+          int max = (percent + 10);
+          if (min < 0) min = 0;
+          if (max > 99) max = 99;
+          int thisValue = tileType.nextInt(max - min) + min;
+          thisValue /= 10; // Gives a number from 0-3.
+	  int minWoD = 0;
+	  int maxWoD = 99;
+	  int dryOrWet = tileType.nextInt(maxWoD - minWoD) + minWoD;
+	  dryOrWet /= 33;
+          switch(thisValue) {
+	    case 0: return Tile.ARCTIC;
+	    case 1: case 2: switch (dryOrWet) {
+	      case 0: return Tile.TUNDRA;
+	      case 1: default: return Tile.TUNDRA;
+	      case 2: return Tile.MARSH;
+	    }
+	    case 3: case 4: case 5: case 6: default: switch (dryOrWet) {
+	      case 0: return Tile.PLAINS;
+	      case 1: default: return Tile.PRAIRIE;
+	      case 2: return Tile.SWAMP;
+	    }
+	    case 7: case 8: case 9: switch (dryOrWet) {
+	      case 0: return Tile.GRASSLANDS;
+	      case 1: default: return Tile.SAVANNAH;
+	      case 2: return Tile.DESERT;
+	    }
+          }
+        }
 
         public Map createMap() {
             Vector columns = new Vector(width);
+	    tileType = new Random();
             for (int i = 0; i < width; i++) {
                 Vector v = new Vector(height);
                 for (int j = 0; j < height; j++) {
                     Tile t;
 
                     if (landMap[i][j]) {
-                        t = new Tile(game, Tile.GRASSLANDS, i, j);
+                        t = new Tile(game, getRandomTileType(((Math.min(j, height - j) * 100) / height)), i, j);
+                        if ((t.getType() != t.ARCTIC) && (tileType.nextInt(3) > 0)) t.setForested(true);
                     } else {
                         t = new Tile(game, Tile.OCEAN, i, j);
                     }

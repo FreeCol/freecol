@@ -31,6 +31,7 @@ import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.FreeColException;
 //import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
@@ -57,9 +58,11 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
     private final JLabel                    cargoLabel;
     private final JLabel                    goldLabel;
+    private final JLabel                    warehouseLabel;
     private final OutsideColonyPanel        outsideColonyPanel;
     private final InPortPanel               inPortPanel;
     private final CargoPanel                cargoPanel;
+    private final WarehousePanel            warehousePanel;
     private final TilePanel                 tilePanel;
     private final BuildingsPanel            buildingsPanel;
     private final DefaultTransferHandler    defaultTransferHandler;
@@ -87,36 +90,43 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         outsideColonyPanel = new OutsideColonyPanel(this);
         inPortPanel = new InPortPanel();
         cargoPanel = new CargoPanel(this);
+        warehousePanel = new WarehousePanel(this);
         tilePanel = new TilePanel(this);
         buildingsPanel = new BuildingsPanel(this);
 
         outsideColonyPanel.setBackground(Color.WHITE);
         inPortPanel.setBackground(Color.WHITE);
         cargoPanel.setBackground(Color.WHITE);
+        warehousePanel.setBackground(Color.WHITE);
         buildingsPanel.setBackground(Color.WHITE);
 
         defaultTransferHandler = new DefaultTransferHandler(this);
         outsideColonyPanel.setTransferHandler(defaultTransferHandler);
         inPortPanel.setTransferHandler(defaultTransferHandler);
         cargoPanel.setTransferHandler(defaultTransferHandler);
+        warehousePanel.setTransferHandler(defaultTransferHandler);
 
         pressListener = new DragListener(this);
         releaseListener = new DropListener();
         outsideColonyPanel.addMouseListener(releaseListener);
         inPortPanel.addMouseListener(releaseListener);
         cargoPanel.addMouseListener(releaseListener);
+        warehousePanel.addMouseListener(releaseListener);
 
         outsideColonyPanel.setLayout(new GridLayout(0 , 2));
         inPortPanel.setLayout(new GridLayout(0 , 2));
         cargoPanel.setLayout(new GridLayout(1 , 0));
+	warehousePanel.setLayout(new GridLayout(1 , 0));
 
         cargoLabel = new JLabel("<html><strike>Cargo</strike></html>");
         goldLabel = new JLabel("Gold: 0");
+	warehouseLabel = new JLabel("Goods");
 
         JButton exitButton = new JButton("Close");
         JScrollPane outsideColonyScroll = new JScrollPane(outsideColonyPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER),
                     inPortScroll = new JScrollPane(inPortPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER),
                     cargoScroll = new JScrollPane(cargoPanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED),
+                    warehouseScroll = new JScrollPane(warehousePanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED),
                     tilesScroll = new JScrollPane(tilePanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED),
                     buildingsScroll = new JScrollPane(buildingsPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         JLabel  outsideColonyLabel = new JLabel("In front of colony"),
@@ -128,12 +138,14 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         outsideColonyScroll.setSize(200, 100);
         inPortScroll.setSize(200, 100);
         cargoScroll.setSize(410, 96);
+	warehouseScroll.setSize(620, 120);
         tilesScroll.setSize(390, 200);
         buildingsScroll.setSize(400,200);
         outsideColonyLabel.setSize(200, 20);
         inPortLabel.setSize(200, 20);
         cargoLabel.setSize(410, 20);
         goldLabel.setSize(100, 20);
+	warehouseLabel.setSize(100, 20);
         tilesLabel.setSize(100, 20);
         buildingsLabel.setSize(300, 20);
 
@@ -141,11 +153,13 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         outsideColonyScroll.setLocation(640, 300);
         inPortScroll.setLocation(640, 450);
         cargoScroll.setLocation(220, 370);
+	warehouseScroll.setLocation(10, 470);
         tilesScroll.setLocation(10, 40);
         buildingsScroll.setLocation(400, 40);
         outsideColonyLabel.setLocation(640, 275);
         inPortLabel.setLocation(640, 425);
         cargoLabel.setLocation(220, 345);
+	warehouseLabel.setLocation(10, 445);
         goldLabel.setLocation(15, 345);
         tilesLabel.setLocation(10, 10);
         buildingsLabel.setLocation(400, 10);
@@ -160,11 +174,13 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         add(outsideColonyScroll);
         add(inPortScroll);
         add(cargoScroll);
+	add(warehouseScroll);
         add(tilesScroll);
         add(buildingsScroll);
         add(outsideColonyLabel);
         add(inPortLabel);
         add(cargoLabel);
+	add(warehouseLabel);
         add(goldLabel);
         add(tilesLabel);
         add(buildingsLabel);
@@ -203,6 +219,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         //
 
         cargoPanel.removeAll();
+	warehousePanel.removeAll();
         outsideColonyPanel.removeAll();
         inPortPanel.removeAll();
         tilePanel.removeAll();
@@ -235,6 +252,24 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         
         setSelectedUnit(lastCarrier);
 
+        //
+        // Warehouse panel:
+        //
+
+        Iterator goodsIterator = colony.getGoodsIterator();
+        while (goodsIterator.hasNext()) {
+            Goods goods = (Goods) goodsIterator.next();
+
+            GoodsLabel goodsLabel = new GoodsLabel(goods, parent);
+            goodsLabel.setTransferHandler(defaultTransferHandler);
+            goodsLabel.addMouseListener(pressListener);
+
+            warehousePanel.add(goodsLabel, false);
+        }
+
+        warehousePanel.revalidate();
+        
+        setSelectedUnit(lastCarrier);
 
         //
         // Units in buildings:
@@ -341,6 +376,18 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
                     cargoPanel.add(label, false);
                 }
+
+                Iterator goodsIterator = selUnit.getGoodsIterator();
+                while (goodsIterator.hasNext()) {
+                    Goods g = (Goods) goodsIterator.next();
+
+                    GoodsLabel label = new GoodsLabel(g, parent);
+                    label.setTransferHandler(defaultTransferHandler);
+                    label.addMouseListener(pressListener);
+
+                    cargoPanel.add(label, false);
+                }
+
             }
 
             updateCargoLabel();
@@ -357,6 +404,19 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         return cargoPanel;
     }
 
+    /**
+    * Returns a pointer to the <code>warehousePanel</code>-object in use.
+    */
+    public final WarehousePanel getWarehousePanel() {
+        return warehousePanel;
+    }
+    
+    /**
+    * Returns a pointer to the <code>tilePanel</code>-object in use.
+    */
+    public final TilePanel getTilePanel() {
+        return tilePanel;
+    }
 
 
     /**
@@ -535,6 +595,63 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
 
     /**
+    * A panel that holds goods that represent cargo that is inside the
+    * Colony.
+    */
+    public final class WarehousePanel extends JPanel {
+        private final ColonyPanel colonyPanel;
+
+        /**
+        * Creates this CargoPanel.
+        * @param colonyPanel The panel that holds this CargoPanel.
+        */
+        public WarehousePanel(ColonyPanel colonyPanel) {
+            this.colonyPanel = colonyPanel;
+        }
+
+        /**
+        * Adds a component to this CargoPanel and makes sure that the unit
+        * or good that the component represents gets modified so that it is
+        * on board the currently selected ship.
+        * @param comp The component to add to this CargoPanel.
+        * @param editState Must be set to 'true' if the state of the component
+        * that is added (which should be a dropped component representing a Unit or
+        * good) should be changed so that the underlying unit or goods are
+        * on board the currently selected ship.
+        * @return The component argument.
+        */
+        public Component add(Component comp, boolean editState) {
+            if (editState) {
+                if (comp instanceof GoodsLabel) {
+                    Goods g = ((GoodsLabel)comp).getGoods();
+                    ((GoodsLabel) comp).setSmall(false);
+                    //inGameController.unloadCargo(g, selectedUnit.getUnit());
+                    colonyPanel.getWarehousePanel().revalidate();
+                    colonyPanel.getCargoPanel().revalidate();
+                } else {
+                    logger.warning("An invalid component got dropped on this WarehousePanel.");
+                }
+            }
+
+            Component c = add(comp);
+
+            refresh();
+            return c;
+        }
+
+        public void remove(Component comp) {
+            if (comp instanceof GoodsLabel) {
+                Goods g = ((GoodsLabel)comp).getGoods();
+                //inGameController.leaveShip(unit);
+
+                super.remove(comp);
+                    colonyPanel.getWarehousePanel().revalidate();
+                    colonyPanel.getCargoPanel().revalidate();
+            }
+        }
+    }
+
+    /**
     * A panel that holds units and goods that represent Units and cargo that are
     * on board the currently selected ship.
     */
@@ -564,8 +681,20 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             if (editState) {
                 if (comp instanceof UnitLabel) {
                     Unit unit = ((UnitLabel)comp).getUnit();
-                    ((UnitLabel) comp).setSmall(false);
-                    inGameController.boardShip(unit, selectedUnit.getUnit());
+                    if (!unit.isCarrier()) // No, you cannot load ships onto other ships.
+                    {
+                      ((UnitLabel) comp).setSmall(false);
+                      inGameController.boardShip(unit, selectedUnit.getUnit());
+                    } else {
+                      return comp;
+                    }
+                } else if (comp instanceof GoodsLabel) {
+                    Goods g = ((GoodsLabel)comp).getGoods();
+                    ((GoodsLabel) comp).setSmall(false);
+		    logger.warning("Attempting to load cargo.");
+                    inGameController.loadCargo(g, selectedUnit.getUnit());
+                    colonyPanel.getWarehousePanel().revalidate();
+                    colonyPanel.getCargoPanel().revalidate();
                 } else {
                     logger.warning("An invalid component got dropped on this CargoPanel.");
                 }
@@ -583,10 +712,15 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 inGameController.leaveShip(unit);
 
                 super.remove(comp);
+            } else if (comp instanceof GoodsLabel) {
+                Goods g = ((GoodsLabel)comp).getGoods();
+                inGameController.unloadCargo(g);
+                super.remove(comp);
+                colonyPanel.getWarehousePanel().revalidate();
+                colonyPanel.getCargoPanel().revalidate();
             }
         }
     }
-
 
 
     /**
@@ -633,6 +767,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             private ColonyTile colonyTile;
             private int x;
             private int y;
+	    private JLabel staticGoodsLabel;
 
             public ASingleTilePanel(ColonyTile colonyTile, int x, int y) {
                 this.colonyTile = colonyTile;
@@ -649,7 +784,21 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                     unitLabel.addMouseListener(pressListener);
 
                     add(unitLabel);
+
+                    staticGoodsLabel = new JLabel(parent.getImageProvider().getGoodsImageIcon(unit.getWorkType()));
+                    staticGoodsLabel.setText(Integer.toString(unit.getFarmedPotential(unit.getWorkType(), colonyTile.getWorkTile())));
+                    add(staticGoodsLabel);
                 }
+		
+		if (colonyTile.isColonyCenterTile())
+		{
+                    staticGoodsLabel = new JLabel(parent.getImageProvider().getGoodsImageIcon(Goods.FOOD));
+                    staticGoodsLabel.setText(Integer.toString(colonyTile.getTile().potential(Goods.FOOD)));
+                    add(staticGoodsLabel);
+                    staticGoodsLabel = new JLabel(parent.getImageProvider().getGoodsImageIcon(colonyTile.getTile().secondaryGoods()));
+                    staticGoodsLabel.setText(Integer.toString(colonyTile.getTile().potential(colonyTile.getTile().secondaryGoods())));
+                    add(staticGoodsLabel);
+		}
 
                 setTransferHandler(defaultTransferHandler);
                 addMouseListener(releaseListener);
@@ -687,6 +836,14 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                         inGameController.work(unit, colonyTile);
 
                         ((UnitLabel) comp).setSmall(false);
+                        
+                        if (staticGoodsLabel != null) {
+                            super.remove(staticGoodsLabel);
+		            staticGoodsLabel = null;
+                        }
+                        staticGoodsLabel = new JLabel(parent.getImageProvider().getGoodsImageIcon(unit.getWorkType()));
+                        staticGoodsLabel.setText(Integer.toString(unit.getFarmedPotential(unit.getWorkType(), colonyTile.getWorkTile())));
+                        add(staticGoodsLabel);
                     } else {
                         logger.warning("An invalid component got dropped on this CargoPanel.");
                     }
@@ -696,6 +853,14 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 Component c = add(comp);
                 refresh();
                 return c;
+            }
+	    
+            public void remove(Component comp) {
+                if (comp instanceof UnitLabel) {
+                    super.remove(staticGoodsLabel);
+		    staticGoodsLabel = null;
+                }
+                super.remove(comp);
             }
         }
 
