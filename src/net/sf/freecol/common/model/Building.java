@@ -565,6 +565,8 @@ public final class Building extends FreeColGameObject implements WorkLocation {
                     student.setTurnsOfTraining(student.getTurnsOfTraining() + ((colony.getSoL() == 100) ? 2 : 1));
 
                     if (student.getTurnsOfTraining() >= student.getNeededTurnsOfTraining()) {
+                        String oldName = student.getName();
+
                         if (student.getType() == Unit.INDENTURED_SERVANT) {
                             student.setType(Unit.FREE_COLONIST);
                         } else if (student.getType() == Unit.PETTY_CRIMINAL) {
@@ -575,6 +577,7 @@ public final class Building extends FreeColGameObject implements WorkLocation {
 
                         student.setTrainingType(-1);
                         student.setTurnsOfTraining(0);
+                        addModelMessage(this, "model.unit.unitImproved", new String[][] {{"%oldName%", oldName}, {"%newName%", student.getName()}});
                     }
                 }
             }
@@ -694,6 +697,10 @@ public final class Building extends FreeColGameObject implements WorkLocation {
     * @see #getMaximumProduction
     */
     public int getProduction() {
+        if (getGoodsOutputType() == -1) {
+            return 0;
+        }
+
         int goodsOutput = getMaximumProduction();
 
         if ((getGoodsInputType() > -1) && (colony.getGoodsCount(getGoodsInputType()) < getMaximumGoodsInput()))  { // Not enough goods to do this?
@@ -714,6 +721,10 @@ public final class Building extends FreeColGameObject implements WorkLocation {
     * @see #getProduction
     */
     public int getProductionNextTurn() {
+        if (getGoodsOutputType() == -1) {
+            return 0;
+        }
+
         int goodsOutput = getMaximumProduction();
 
         if ((getGoodsInputType() > -1) && (colony.getGoodsCount(getGoodsInputType()) + colony.getProductionOf(getGoodsInputType()) < getMaximumGoodsInput()))  { // Not enough goods to do this?
@@ -747,6 +758,10 @@ public final class Building extends FreeColGameObject implements WorkLocation {
     * enough "input goods".
     */
     public int getMaximumProduction() {
+        if (getGoodsOutputType() == -1) {
+            return 0;
+        }
+
         int goodsOutput = 0;
         int goodsOutputType = getGoodsOutputType();
 

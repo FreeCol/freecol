@@ -599,6 +599,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         } else {
             throw new IllegalStateException("It is not allowed to board a ship on another tile.");
         }
+
+        /*if (getTile() != null && getTile().getColony() != null && getTile().getColony().getUnitCount() <= 0) {
+            getTile().getColony().dispose();
+        }*/
     }
 
 
@@ -1103,7 +1107,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     * @param numberOfTools The number to set it to.
     */
     public void setNumberOfTools(int numberOfTools) {
-        if (numberOfTools != 0) {
+        if (numberOfTools >= 20) {
             if (isMounted()) {
                 setMounted(false);
             }
@@ -1118,26 +1122,31 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         }
 
         int changeAmount = 0;
+        /*if (numberOfTools > 100) {
+            logger.warning("Attempting to give a pioneer a number of greater than 100!");
+        }*/
+        if (numberOfTools > 100) {
+            numberOfTools = 100;
+        }
+        
         if ((numberOfTools % 20) != 0) {
-            logger.warning("Attempting to give a pioneer a number of tools that is not a multiple of 20!");
+            //logger.warning("Attempting to give a pioneer a number of tools that is not a multiple of 20!");
             numberOfTools -= (numberOfTools % 20);
         }
-        if (numberOfTools > 100) {
-            logger.warning("Attempting to give a pioneer a number of greater than 100!");
-        }
+
         changeAmount = numberOfTools - this.numberOfTools;
         if (changeAmount > 0) {
             if (getGoodsDumpLocation() != null) {
                int actualAmount = getGoodsDumpLocation().getGoodsCount(Goods.TOOLS);
                if (actualAmount < changeAmount) changeAmount = actualAmount;
-               if ((this.numberOfTools + changeAmount) % 20 > 0) changeAmount -= (this.numberOfTools + changeAmount);
+               if ((this.numberOfTools + changeAmount) % 20 > 0) changeAmount -= (this.numberOfTools + changeAmount)%20;
                if (changeAmount <= 0) return;
                getGoodsDumpLocation().removeGoods(Goods.TOOLS, changeAmount);
                this.numberOfTools = this.numberOfTools + changeAmount;
             } else if (location instanceof Europe) {
                int maximumAmount = ((getOwner().getGold()) / (getGame().getMarket().costToBuy(Goods.TOOLS)));
                if (maximumAmount < changeAmount) changeAmount = maximumAmount;
-               if ((this.numberOfTools + changeAmount) % 20 > 0) changeAmount -= (this.numberOfTools + changeAmount);
+               if ((this.numberOfTools + changeAmount) % 20 > 0) changeAmount -= (this.numberOfTools + changeAmount)%20;
                if (changeAmount <= 0) return;
                getGame().getMarket().buy(Goods.TOOLS, changeAmount, getOwner());
                this.numberOfTools = this.numberOfTools + changeAmount;
@@ -1528,7 +1537,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
 
     public String getMovesAsString() {
         String moves = "";
-        if (movesLeft/3 > 0) {
+        if (movesLeft%3 == 0 || movesLeft/3 > 0) {
             moves += Integer.toString(movesLeft/3);
         }
         
@@ -2371,7 +2380,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             }
         }
 
-        // TODO: all of these require GUI message updates to the user
         if (getOwner().hasFather(FoundingFather.GEORGE_WASHINGTION)) { // || randomChance == true
             String oldName = getName();
 
@@ -2423,6 +2431,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     * @return The Colony it's in, or null if it is not in a Colony
     */
     public Colony getColony() {
+        if (location == null) {
+            return null;
+        }
+        
         if (!(location instanceof Colony)) {
             return null;
         } else {

@@ -49,6 +49,7 @@ public final class Colony extends Settlement implements Location {
     */
     private int currentlyBuilding;
 
+
     /**
     * Creates a new <code>Colony</code>.
     *
@@ -474,36 +475,24 @@ public final class Colony extends Settlement implements Location {
             return;
         }
 
-        // Building a unit:
-        if (currentlyBuilding >= BUILDING_UNIT_ADDITION) {
-            hammers += amount;
-            return;
-        }
+        // Building only:
+        if (currentlyBuilding < BUILDING_UNIT_ADDITION) {
+            if (getBuilding(currentlyBuilding).getNextPop() > getUnitCount()) {
+                addModelMessage(this, "model.colony.buildNeedPop", new String[][] {{"%colony%", getName()}, {"%building%", getBuilding(currentlyBuilding).getNextName()}});
+                return;
+            }
 
-        if (getBuilding(currentlyBuilding).getNextPop() > getUnitCount()) {
-            addModelMessage(this, "model.colony.buildNeedPop", new String[][] {{"%colony%", getName()}, {"%building%", getBuilding(currentlyBuilding).getNextName()}});
-            return;
-        }
-
-        hammers += amount;
-        int hammersRequired = getBuilding(currentlyBuilding).getNextHammers();
-        int toolsRequired = getBuilding(currentlyBuilding).getNextTools();
-        if ((hammers >= hammersRequired) && (hammersRequired != -1)) {
-            hammers = hammersRequired;
-            if (getGoodsCount(Goods.TOOLS) >= toolsRequired) {
-                //TODO: Adam Smith check for factory level buildings
-                if (toolsRequired > 0) {
-                    removeGoods(Goods.TOOLS, toolsRequired);
-                }
-                hammers = 0;
-                getBuilding(currentlyBuilding).setLevel(getBuilding(currentlyBuilding).getLevel() + 1);
-                addModelMessage(this, "model.colony.buildingReady", new String[][] {{"%colony%", getName()}, {"%building%", getBuilding(currentlyBuilding).getName()}});
-            } else {
+            if (getGoodsCount(Goods.TOOLS) < getBuilding(currentlyBuilding).getNextTools()) {
                 addModelMessage(this, "model.colony.buildNeedTools", new String[][] {{"%colony%", getName()}, {"%building%", getBuilding(currentlyBuilding).getNextName()}});
             }
-        } else if (hammersRequired == -1) {
-            addModelMessage(this, "model.colony.alreadyBuilt", new String[][] {{"%colony%", getName()}, {"%building%", getBuilding(currentlyBuilding).getNextName()}});
+
+            if (getBuilding(currentlyBuilding).getNextHammers() == -1) {
+                addModelMessage(this, "model.colony.alreadyBuilt", new String[][] {{"%colony%", getName()}, {"%building%", getBuilding(currentlyBuilding).getNextName()}});
+            }
         }
+        
+        hammers += amount;        
+        checkBuildingComplete();
     }
 
 
@@ -775,6 +764,37 @@ public final class Colony extends Settlement implements Location {
     }
 
 
+    private void checkBuildingComplete() {
+        if (getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) {
+            int unitType = getCurrentlyBuilding() - BUILDING_UNIT_ADDITION;
+
+            if (canBuildUnit(unitType) && Unit.getNextHammers(unitType) <= getHammers() &&
+                Unit.getNextTools(unitType) <= getGoodsCount(Goods.TOOLS)) {
+
+                Unit unit = getGame().getModelController().createUnit(getID() + "buildUnit", getTile(), getOwner(), unitType);
+                hammers = 0;
+                removeGoods(Goods.TOOLS, Unit.getNextTools(unit.getType()));
+                addModelMessage(this, "model.colony.unitReady", new String[][] {{"%colony%", getName()}, {"%unit%", unit.getName()}});
+            }
+        } else {
+            int hammersRequired = getBuilding(currentlyBuilding).getNextHammers();
+            int toolsRequired = getBuilding(currentlyBuilding).getNextTools();
+            if ((hammers >= hammersRequired) && (hammersRequired != -1)) {
+                hammers = hammersRequired;
+                if (getGoodsCount(Goods.TOOLS) >= toolsRequired) {
+                    //TODO: Adam Smith check for factory level buildings
+                    if (toolsRequired > 0) {
+                        removeGoods(Goods.TOOLS, toolsRequired);
+                    }
+                    hammers = 0;
+                    getBuilding(currentlyBuilding).setLevel(getBuilding(currentlyBuilding).getLevel() + 1);
+                    addModelMessage(this, "model.colony.buildingReady", new String[][] {{"%colony%", getName()}, {"%building%", getBuilding(currentlyBuilding).getName()}});
+                }
+            }
+        }
+    }
+
+
     /**
     * Prepares this <code>Colony</code> for a new turn.
     */
@@ -820,19 +840,8 @@ public final class Colony extends Settlement implements Location {
             addModelMessage(this, "model.colony.newColonist", new String[][] {{"%colony%", getName()}});
         }
 
-        // Build units:
-        if (getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) {
-            int unitType = getCurrentlyBuilding() - BUILDING_UNIT_ADDITION;
-
-            if (canBuildUnit(unitType) && Unit.getNextHammers(unitType) <= getHammers() &&
-                Unit.getNextTools(unitType) <= getGoodsCount(Goods.TOOLS)) {
-
-                Unit unit = getGame().getModelController().createUnit(getID() + "buildUnit", getTile(), getOwner(), unitType);
-                hammers = 0;
-                removeGoods(Goods.TOOLS, Unit.getNextTools(unit.getType()));
-                addModelMessage(this, "model.colony.unitReady", new String[][] {{"%colony%", getName()}, {"%unit%", unit.getName()}});
-            }
-        }
+        // Build:
+        checkBuildingComplete();
 
         // Throw away goods there is no room for.
         int capacity = 100 + getBuilding(Building.WAREHOUSE).getLevel() * 100;

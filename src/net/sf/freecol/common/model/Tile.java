@@ -439,7 +439,7 @@ public final class Tile extends FreeColGameObject implements Location {
     */
     public Colony getColony() {
         if (settlement != null && settlement instanceof Colony) {
-            return (Colony) settlement;
+            return ((Colony) settlement);
         } else {
             return null;
         }

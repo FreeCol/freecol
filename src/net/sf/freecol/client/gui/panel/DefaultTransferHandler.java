@@ -20,6 +20,8 @@ import java.awt.Point;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.Dimension;
+import java.io.StringWriter;
+import java.io.PrintWriter;
 
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.client.gui.Canvas;
@@ -319,8 +321,12 @@ public final class DefaultTransferHandler extends TransferHandler {
 
             logger.warning("The dragged component is of an invalid type.");
 
-        } catch (UnsupportedFlavorException ignored) {
-        } catch (IOException ignored) {}
+        } catch (Exception e) {
+            // TODO: Suggest a reconnect.
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            logger.warning(sw.toString());
+        }
 
         return false;
     }

@@ -167,7 +167,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation {
         }
 
         if (!canAdd(locatable)) {
-            throw new IllegalArgumentException("Cannot add locatalbe to this location!");
+            throw new IllegalArgumentException("Cannot add locatable to this location!");
         }
 
         setUnit((Unit) locatable);
@@ -189,6 +189,10 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation {
     * @return <code>true</code> if the code>Locatable</code> was removed and <code>false</code> otherwise.
     */
     public void remove(Locatable locatable) {
+        if (getUnit() == null) {
+            return;
+        }
+
         if (!getUnit().equals(locatable)) {
             return;
         }

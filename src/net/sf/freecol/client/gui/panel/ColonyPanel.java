@@ -344,7 +344,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     public void updateBuildingBox() {
         buildingBox.initialize();
     }
-    
+
     
     public void updateWarehouse() {
         warehousePanel.initialize();
@@ -862,7 +862,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                     //colonyPanel.getWarehousePanel().revalidate();
                     colonyPanel.getCargoPanel().revalidate();
                     updateCargoLabel();
-
+                    buildingsPanel.initialize();
                     initialize();
                     return comp;
                 } else {
@@ -945,9 +945,13 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                     Unit unit = ((UnitLabel)comp).getUnit();
                     if (!unit.isCarrier()) {// No, you cannot load ships onto other ships.
                       ((UnitLabel) comp).setSmall(false);
-                      inGameController.boardShip(unit, selectedUnit.getUnit());
-                      updateBuildingBox();
-                      colonyPanel.updateSoLLabel();
+                      if (inGameController.boardShip(unit, selectedUnit.getUnit())) {
+                        updateBuildingBox();
+                        colonyPanel.updateSoLLabel();
+                      } else {
+                        oldParent.add(comp);
+                        return null;
+                      }
                     } else {
                       return null;
                     }
@@ -974,6 +978,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                     setSelectedUnit(t);
 
                     warehousePanel.initialize();
+                    buildingsPanel.initialize();
                     return comp;
                 } else {
                     logger.warning("An invalid component got dropped on this CargoPanel.");
