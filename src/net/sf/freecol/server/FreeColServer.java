@@ -14,6 +14,7 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 
 // Control:
+import net.sf.freecol.server.control.Controller;
 import net.sf.freecol.server.control.UserConnectionHandler;
 import net.sf.freecol.server.control.PreGameController;
 import net.sf.freecol.server.control.PreGameInputHandler;
@@ -56,7 +57,7 @@ public final class FreeColServer {
 
     // Control:
     private UserConnectionHandler userConnectionHandler;
-    private PreGameController preGameController;
+    private Controller controller;
     private PreGameInputHandler preGameInputHandler;
     private InGameInputHandler inGameInputHandler;
 
@@ -86,7 +87,7 @@ public final class FreeColServer {
         game = new Game();
 
         userConnectionHandler = new UserConnectionHandler(this);
-        preGameController = new PreGameController(this);
+        controller = new PreGameController(this);
         preGameInputHandler = new PreGameInputHandler(this);
         inGameInputHandler = new InGameInputHandler(this);
 
@@ -100,15 +101,6 @@ public final class FreeColServer {
     }
 
 
-
-
-    
-    /**
-    * Shuts down this server.
-    */
-    public void shutdown() {
-        getServer().shutdown();
-    }
 
 
     /**
@@ -182,8 +174,8 @@ public final class FreeColServer {
     * Gets the <code>PreGameController</code>.
     * @return The <code>PreGameController</code>.
     */
-    public PreGameController getPreGameController() {
-        return preGameController;
+    public Controller getController() {
+        return controller;
     }
 
 
@@ -223,8 +215,8 @@ public final class FreeColServer {
         return gameState;
     }
 
-    
-    /** 
+
+    /**
     * Sets the current state of the game.
     * @param state The new state to be set. One of: {@link #STARTING_GAME},
     *              {@link #IN_GAME} and {@link #ENDING_GAME}.

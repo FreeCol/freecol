@@ -26,10 +26,8 @@ import java.util.Iterator;
 /**
 * Handles the network messages that arrives while in the game.
 */
-public final class InGameInputHandler implements MessageHandler {
+public final class InGameInputHandler extends InputHandler {
     private static final Logger logger = Logger.getLogger(InGameInputHandler.class.getName());
-
-    private final FreeColClient freeColClient;
 
 
 
@@ -38,7 +36,7 @@ public final class InGameInputHandler implements MessageHandler {
     * @param freeColClient The main controller.
     */
     public InGameInputHandler(FreeColClient freeColClient) {
-        this.freeColClient = freeColClient;
+        super(freeColClient);
     }
 
 
@@ -80,6 +78,8 @@ public final class InGameInputHandler implements MessageHandler {
                 reply = gameEnded(element);
             } else if (type.equals("chat")) {
                 reply = chat(element);
+            } else if (type.equals("disconnect")) {
+                reply = disconnect(element);
             } else if (type.equals("error")) {
                 reply = error(element);
             } else {
@@ -98,7 +98,7 @@ public final class InGameInputHandler implements MessageHandler {
     *                holds all the information.
     */
     private Element update(Element updateElement) {
-        Game game = freeColClient.getGame();
+        Game game = getFreeColClient().getGame();
 
         NodeList nodeList = updateElement.getChildNodes();
         for (int i=0; i<nodeList.getLength(); i++) {
@@ -113,7 +113,7 @@ public final class InGameInputHandler implements MessageHandler {
         }
 
         // TODO: Refresh only the updated tiles:
-        freeColClient.getCanvas().refresh();
+        getFreeColClient().getCanvas().refresh();
 
         return null;
     }
@@ -126,7 +126,7 @@ public final class InGameInputHandler implements MessageHandler {
     *                holds all the information.
     */
     private Element remove(Element removeElement) {
-        Game game = freeColClient.getGame();
+        Game game = getFreeColClient().getGame();
 
         NodeList nodeList = removeElement.getChildNodes();
         for (int i=0; i<nodeList.getLength(); i++) {
@@ -141,7 +141,7 @@ public final class InGameInputHandler implements MessageHandler {
         }
 
         // TODO: Refresh only the updated tiles:
-        freeColClient.getCanvas().refresh();
+        getFreeColClient().getCanvas().refresh();
         return null;
     }
 
@@ -153,10 +153,10 @@ public final class InGameInputHandler implements MessageHandler {
     *                holds all the information.
     */
     private Element opponentMove(Element opponentMoveElement) {
-        Game game = freeColClient.getGame();
+        Game game = getFreeColClient().getGame();
         Map map = game.getMap();
 
-        Player currentPlayer = freeColClient.getMyPlayer();
+        Player currentPlayer = getFreeColClient().getMyPlayer();
 
         int direction = Integer.parseInt(opponentMoveElement.getAttribute("direction"));
 
@@ -197,7 +197,7 @@ public final class InGameInputHandler implements MessageHandler {
     *                holds all the information.
     */
     private Element opponentAttack(Element opponentAttackElement) {
-        Game game = freeColClient.getGame();
+        Game game = getFreeColClient().getGame();
         Map map = game.getMap();
 
         int direction = Integer.parseInt(opponentAttackElement.getAttribute("direction"));
@@ -213,7 +213,7 @@ public final class InGameInputHandler implements MessageHandler {
             unit.winAttack(defender);
         }
 
-        freeColClient.getCanvas().refresh();
+        getFreeColClient().getCanvas().refresh();
 
         return null;
     }
@@ -226,6 +226,7 @@ public final class InGameInputHandler implements MessageHandler {
     *                holds all the information.
     */
     private Element setCurrentPlayer(Element setCurrentPlayerElement) {
+        FreeColClient freeColClient = getFreeColClient();
         Game game = freeColClient.getGame();
 
         Player currentPlayer = (Player) game.getFreeColGameObject(setCurrentPlayerElement.getAttribute("player"));
@@ -239,7 +240,7 @@ public final class InGameInputHandler implements MessageHandler {
             if (currentPlayer.checkEmigrate()) {
                 freeColClient.getInGameController().emigrateUnitInEurope((int) ((Math.random() * 3) + 1));
             }
-            freeColClient.getInGameController().nextActiveUnit();            
+            freeColClient.getInGameController().nextActiveUnit();
         }
 
         return null;
@@ -247,8 +248,8 @@ public final class InGameInputHandler implements MessageHandler {
 
 
     private void removeUnitsOutsideLOS() {
-        Player player = freeColClient.getMyPlayer();
-        Map map = freeColClient.getGame().getMap();
+        Player player = getFreeColClient().getMyPlayer();
+        Map map = getFreeColClient().getGame().getMap();
 
         Iterator tileIterator = map.getWholeMapIterator();
         while (tileIterator.hasNext()) {
@@ -267,9 +268,9 @@ public final class InGameInputHandler implements MessageHandler {
     *                holds all the information.
     */
     private Element emigrateUnitInEuropeConfirmed(Element emigrateUnitInEuropeConfirmedElement) {
-        Game game = freeColClient.getGame();
+        Game game = getFreeColClient().getGame();
         Unit unit = new Unit(game, (Element) emigrateUnitInEuropeConfirmedElement.getChildNodes().item(0));
-        freeColClient.getMyPlayer().getEurope().emigrate(Integer.parseInt(emigrateUnitInEuropeConfirmedElement.getAttribute("slot")),
+        getFreeColClient().getMyPlayer().getEurope().emigrate(Integer.parseInt(emigrateUnitInEuropeConfirmedElement.getAttribute("slot")),
                                                          unit,
                                                          Integer.parseInt(emigrateUnitInEuropeConfirmedElement.getAttribute("newRecruitable")));
         return null;
@@ -282,7 +283,7 @@ public final class InGameInputHandler implements MessageHandler {
     *                       holds all the information.
     */
     private Element newTurn(Element newTurnElement) {
-        freeColClient.getGame().newTurn();
+        getFreeColClient().getGame().newTurn();
 
         return null;
     }
@@ -295,10 +296,11 @@ public final class InGameInputHandler implements MessageHandler {
     *                holds all the information.
     */
     private Element setDead(Element element) {
+        FreeColClient freeColClient = getFreeColClient();
         Game game = freeColClient.getGame();
         Player player = (Player) game.getFreeColGameObject(element.getAttribute("player"));
         player.setDead(true);
-        
+
         if (player == freeColClient.getMyPlayer()) {
             Canvas canvas = freeColClient.getCanvas();
             if (!canvas.showConfirmDialog("defeated.text", "defeated.yes", "defeated.no")) {
@@ -317,7 +319,7 @@ public final class InGameInputHandler implements MessageHandler {
     *                holds all the information.
     */
     private Element createUnit(Element element) {
-        Game game = freeColClient.getGame();
+        Game game = getFreeColClient().getGame();
 
         Location location = (Location) game.getFreeColGameObject(element.getAttribute("location"));
         Unit unit = new Unit(game, (Element) element.getChildNodes().item(0));
@@ -330,7 +332,7 @@ public final class InGameInputHandler implements MessageHandler {
         return null;
     }
 
-    
+
     /**
     * Handles a "gameEnded"-message.
     *
@@ -338,6 +340,7 @@ public final class InGameInputHandler implements MessageHandler {
     *                holds all the information.
     */
     private Element gameEnded(Element element) {
+        FreeColClient freeColClient = getFreeColClient();
         Game game = freeColClient.getGame();
 
         Player winner = (Player) game.getFreeColGameObject(element.getAttribute("winner"));
@@ -348,7 +351,7 @@ public final class InGameInputHandler implements MessageHandler {
         return null;
     }
 
-    
+
     /**
     * Handles a "chat"-message.
     *
@@ -356,13 +359,13 @@ public final class InGameInputHandler implements MessageHandler {
     *                holds all the information.
     */
     private Element chat(Element element) {
-        Game game = freeColClient.getGame();
+        Game game = getFreeColClient().getGame();
 
         Player sender = (Player) game.getFreeColGameObject(element.getAttribute("sender"));
         String message = element.getAttribute("message");
         boolean privateChat = Boolean.valueOf(element.getAttribute("privateChat")).booleanValue();
 
-        freeColClient.getCanvas().displayChatMessage(sender, message, privateChat);
+        getFreeColClient().getCanvas().displayChatMessage(sender, message, privateChat);
 
         return null;
     }
@@ -375,7 +378,7 @@ public final class InGameInputHandler implements MessageHandler {
     *                holds all the information.
     */
     private Element error(Element element) {
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = getFreeColClient().getCanvas();
 
         if (element.hasAttribute("messageID")) {
             canvas.errorMessage(element.getAttribute("messageID"), element.getAttribute("message"));

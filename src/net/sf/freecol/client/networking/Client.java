@@ -24,7 +24,6 @@ public final class Client {
 
 
 
-
     /**
     * Creates a new <code>Client</code>.
     *
@@ -38,9 +37,9 @@ public final class Client {
         c = new Connection(host, port, handler);
     }
 
-    
-    
-    
+
+
+
     /**
     * Sends the specified message to the server.
     *
@@ -57,7 +56,7 @@ public final class Client {
         }
     }
 
-    
+
     /**
     * Sends the specified message to the server and waits for the reply
     * to be returned before returning from this method.
@@ -110,14 +109,11 @@ public final class Client {
     * Disconnects this client from the server.
     */
     public void disconnect() {
-        // TODO: send(logout)
-
         try {
             c.close();
         } catch (IOException e) {
             logger.warning("Exception while closing connection: " + e);
         }
-
     }
 
 

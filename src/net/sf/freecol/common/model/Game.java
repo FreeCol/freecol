@@ -37,7 +37,7 @@ public class Game extends FreeColGameObject {
 
     /** Contains references to all objects created in this game. */
     private HashMap freeColGameObjects = new HashMap(10000);
-    
+
     /** Contains all the messages for this round. */
     private ArrayList modelMessages = new ArrayList();
 
@@ -133,7 +133,7 @@ public class Game extends FreeColGameObject {
         }
     }
 
-    
+
     /**
     * Removes the specified player from the game.
     * @param player The <code>Player</code> that shall be removed from this <code>Game</code>.
@@ -143,7 +143,7 @@ public class Game extends FreeColGameObject {
 
         players.remove(players.indexOf(player));
         player.dispose();
-        
+
         if (updateCurrentPlayer) {
             currentPlayer = getFirstPlayer();
         }
@@ -154,7 +154,7 @@ public class Game extends FreeColGameObject {
     * Registers a new <code>FreeColGameObject</code> with the specified ID.
     *
     * @param id The unique ID of the <code>FreeColGameObject</code>.
-    * @param freeColGameObject The <code>FreeColGameObject</code> that shall be added 
+    * @param freeColGameObject The <code>FreeColGameObject</code> that shall be added
     *                          to this <code>Game</code>.
     * @exception NullPointerException If either <code>id</code> or <code>freeColGameObject
     *                                   </code> are <i>null</i>.
@@ -178,7 +178,7 @@ public class Game extends FreeColGameObject {
         if (id == null || id.equals("")) {
             throw new NullPointerException();
         }
-        
+
         return (FreeColGameObject) freeColGameObjects.get(id);
     }
 
@@ -186,7 +186,7 @@ public class Game extends FreeColGameObject {
     /**
     * Removes the <code>FreeColGameObject</code> with the specified ID.
     *
-    * @param id The identifier of the <code>FreeColGameObject</code> that shall 
+    * @param id The identifier of the <code>FreeColGameObject</code> that shall
     *           be removed from this <code>Game</code>.
     * @exception NullPointerException If <code>id == null</code>.
     */
@@ -232,7 +232,7 @@ public class Game extends FreeColGameObject {
             if (currentPlayer != null) {
                 currentPlayer.endTurn();
             }
-            
+
             currentPlayer = newCp;
         } else {
             throw new NullPointerException();
@@ -278,8 +278,8 @@ public class Game extends FreeColGameObject {
             }
         }
     }
-    
-    
+
+
     /**
     * Checks if the next player is in a new turn.
     */
@@ -311,23 +311,6 @@ public class Game extends FreeColGameObject {
     */
     public Iterator getFreeColGameObjectIterator() {
         return freeColGameObjects.values().iterator();
-    }
-
-
-    /**
-    * @deprecated Use {@link #getFreeColGameObject} instead.
-    */
-    public Player getPlayerByID(String id) {
-        Iterator playerIterator = getPlayerIterator();
-
-        while (playerIterator.hasNext()) {
-            Player player = (Player) playerIterator.next();
-            if (player.hasID(id)) {
-                return player;
-            }
-        }
-
-        return null;
     }
 
 
@@ -371,7 +354,7 @@ public class Game extends FreeColGameObject {
         return false;
     }
 
-    
+
     /**
     * Gets an <code>Iterator</code> of every <code>Player</code> in this game.
     *
@@ -435,7 +418,7 @@ public class Game extends FreeColGameObject {
         return true;
     }
 
-    
+
     /**
     * Adds a <code>ModelMessage</code> to this game.
     * @param modelMessage The <code>ModelMessage</code>.
@@ -455,7 +438,7 @@ public class Game extends FreeColGameObject {
                 out.add(m);
             }
         }
-        
+
         return out.iterator();
     }
 
@@ -494,7 +477,7 @@ public class Game extends FreeColGameObject {
             FreeColGameObject freeColGameObject = (FreeColGameObject) iterator.next();
             freeColGameObject.newTurn();
         }
-        
+
         iterator = later2.iterator();
         while (iterator.hasNext()) {
             FreeColGameObject freeColGameObject = (FreeColGameObject) iterator.next();
@@ -546,7 +529,7 @@ public class Game extends FreeColGameObject {
         }
 
         setID(gameElement.getAttribute("ID"));
-        
+
         getTurn().setNumber(Integer.parseInt(gameElement.getAttribute("turn")));
 
         // Get the map:
@@ -564,7 +547,7 @@ public class Game extends FreeColGameObject {
         for (int i=0; i<playerList.getLength(); i++) {
             Element playerElement = (Element) playerList.item(i);
 
-            Player player = getPlayerByID(playerElement.getAttribute("ID"));
+            Player player = (Player) getFreeColGameObject(playerElement.getAttribute("ID"));
             if (player != null) {
                 player.readFromXMLElement(playerElement);
             } else {
@@ -581,7 +564,7 @@ public class Game extends FreeColGameObject {
         }
 
         if (gameElement.hasAttribute("currentPlayer")) {
-            currentPlayer = getPlayerByID(gameElement.getAttribute("currentPlayer"));
+            currentPlayer = (Player) getFreeColGameObject(gameElement.getAttribute("currentPlayer"));
         } else {
             currentPlayer = null;
         }

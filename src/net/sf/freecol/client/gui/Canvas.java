@@ -110,12 +110,12 @@ public final class Canvas extends JLayeredPane {
     /**
     * The constructor to use.
     *
-    * @param freeColClient The main control class.
+    * @param client main control class.
     * @param bounds The bounds of this <code>Canvas</code>.
     * @param gui The object responsible of drawing the map onto this component.
     */
-    public Canvas(FreeColClient freeColClient, Rectangle bounds, GUI gui) {
-        this.freeColClient = freeColClient;
+    public Canvas(FreeColClient client, Rectangle bounds, GUI gui) {
+        this.freeColClient = client;
         this.gui = gui;
 
         setBounds(bounds);
@@ -146,6 +146,14 @@ public final class Canvas extends JLayeredPane {
 
         chatDisplayThread = new ChatDisplayThread();
         chatDisplayThread.start();
+
+        Runtime runtime = Runtime.getRuntime();
+        runtime.addShutdownHook(new Thread() {
+            public void run() {
+                freeColClient.getConnectController().quitGame(true);
+            }
+        });
+
         logger.info("Canvas created.");
     }
 
@@ -205,7 +213,7 @@ public final class Canvas extends JLayeredPane {
         }
     }
 
-    
+
     /**
     * Displays the <code>VictoryPanel</code>.
     */
@@ -433,20 +441,22 @@ public final class Canvas extends JLayeredPane {
     * @param comp The component to remove from this Container.
     */
     public void remove(Component comp) {
-        boolean takeFocus = true;
-        if (comp == statusPanel) {
-            takeFocus = false;
+        if (comp != null) {
+            boolean takeFocus = true;
+            if (comp == statusPanel) {
+                takeFocus = false;
+            }
+
+            Rectangle bounds = comp.getBounds();
+            setEnabled(true);
+            super.remove(comp);
+
+            if (takeFocus) {
+                takeFocus();
+            }
+
+            repaint(bounds.x, bounds.y, bounds.width, bounds.height);
         }
-
-        Rectangle bounds = comp.getBounds();
-        setEnabled(true);
-        super.remove(comp);
-
-        if (takeFocus) {
-            takeFocus();
-        }
-
-        repaint(bounds.x, bounds.y, bounds.width, bounds.height);
     }
 
 
@@ -706,7 +716,7 @@ public final class Canvas extends JLayeredPane {
     */
     public void showMainPanel() {
         mainPanel.setLocation(getWidth() / 2 - mainPanel.getWidth() / 2, getHeight() / 2 - mainPanel.getHeight() / 2);
-        add(mainPanel, new Integer(-100));
+        add(mainPanel);
         mainPanel.requestFocus();
     }
 
@@ -762,16 +772,37 @@ public final class Canvas extends JLayeredPane {
     */
     public void quit() {
         if (confirmQuitDialog()) {
-            System.exit(0);
+            reallyQuit();
         }
     }
-    
-    
+
+
     /**
     * Quits the application without any questions.
     */
     public void reallyQuit() {
+        freeColClient.getConnectController().quitGame(true);
+
         System.exit(0);
+    }
+
+    /**
+    * Closes all panels, changes the background and shows the main menu.
+    */
+    public void returnToTitle() {
+        // TODO: check if the GUI object knows that we're not inGame. (Retrieve value
+        //       of GUI::inGame.)
+        //       If GUI thinks we're still in the game then log an error because at this
+        //       point the GUI should have been informed.
+
+        closeMenus();
+
+        if (mapControls != null) {
+            mapControls.removeFromComponent(this);
+        }
+        remove(jMenuBar);
+
+        showMainPanel();
     }
 
 

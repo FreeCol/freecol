@@ -31,14 +31,18 @@ import net.sf.freecol.common.model.*;
 */
 public final class GUI {
     private static final Logger logger = Logger.getLogger(GUI.class.getName());
-    
-    private FreeColClient freeColClient;
+
+    private final FreeColClient freeColClient;
     private final Rectangle bounds;
     private final ImageLibrary lib;
-    private Game gameData;
     private boolean cursor;
+
+    /** Indicates if the game has started, has nothing to do with whether or not the
+        client is logged in. */
+    private boolean inGame;
+
     private final Vector messages;
-    
+
     private Map.Position selectedTile;
     private Map.Position focus = null;
     private Unit activeUnit;
@@ -94,13 +98,11 @@ public final class GUI {
     *
     * @param freeColClient The main control class.
     * @param bounds The bounds of the GUI (= the entire screen if the app is displayed in full-screen).
-    * @param gameData The data of the game that is currently being played.
     * @param lib The library of images needed to display certain things visually.
     */
-    public GUI(FreeColClient freeColClient, Rectangle bounds, Game gameData, ImageLibrary lib) {
+    public GUI(FreeColClient freeColClient, Rectangle bounds, ImageLibrary lib) {
         this.freeColClient = freeColClient;
         this.bounds = bounds;
-        this.gameData = gameData;
         this.lib = lib;
 
         cursor = true;
@@ -121,6 +123,7 @@ public final class GUI {
 
         leftSpace = ((int) bounds.getWidth() - tileWidth) / 2;
         rightSpace = leftSpace;
+        inGame = false;
         logger.info("GUI created.");
 
         messages = new Vector(MESSAGE_COUNT);
@@ -150,6 +153,7 @@ public final class GUI {
     * @see #setFocus
     */
     public void setSelectedTile(Position selectedTile) {
+        Game gameData = freeColClient.getGame();
         Position oldPosition = this.selectedTile;
 
         this.selectedTile = selectedTile;
@@ -235,7 +239,7 @@ public final class GUI {
         if (activeUnit != null && activeUnit.getTile() == null) {
             activeUnit = null;
         }
-        
+
         this.activeUnit = activeUnit;
 
         freeColClient.getCanvas().getMapControls().updateMoves(activeUnit);
@@ -322,7 +326,7 @@ public final class GUI {
             messages.remove(0);
         }
         messages.add(message);
-    
+
         freeColClient.getCanvas().repaint(0, 0, getWidth(), getHeight());
     }
 
@@ -374,9 +378,10 @@ public final class GUI {
      * @param g The Graphics2D on which to display this GUI.
      */
     public void display(Graphics2D g) {
-        if ((gameData != null)
-            && (gameData.getMap() != null)
-            && (focus != null)) {
+        if ((freeColClient.getGame() != null)
+                && (freeColClient.getGame().getMap() != null)
+                && (focus != null)
+                && inGame) {
             displayMap(g);
         } else {
             ImageIcon bgImage = (ImageIcon) UIManager.get("CanvasBackgroundImage");
@@ -470,6 +475,8 @@ public final class GUI {
      * displayed at the center.
      */
     private void positionMap() {
+        Game gameData = freeColClient.getGame();
+
         int x = focus.getX(),
             y = focus.getY();
         int leftColumns = getLeftColumns(),
@@ -563,6 +570,7 @@ public final class GUI {
      */
     private void displayMap(Graphics2D g) {
         Rectangle clipBounds = g.getClipBounds();
+        Game gameData = freeColClient.getGame();
         /*
         PART 1
         ======
@@ -772,7 +780,7 @@ public final class GUI {
     public BufferedImage createProductionImage(ImageIcon goodsIcon, int production, int width, int height) {
         return createProductionImage(goodsIcon, production,  width,  height, 6);
     }
-    
+
 
     /**
     * Creates an illustration for a goods production.
@@ -782,7 +790,7 @@ public final class GUI {
     * @param width The width of the image to deliver.
     * @param height The height of the image to deliver.
     * @param limit The maximum amount of goods icons to display.
-    *              if the production is above this limit, a number 
+    *              if the production is above this limit, a number
     *              is used instead.
     * @return The image.
     */
@@ -815,7 +823,7 @@ public final class GUI {
             BufferedImage stringImage = createStringImage((Graphics2D) g, Integer.toString(Math.abs(production)), Color.RED, goodsIcon.getIconWidth()*2, 12);
             g.drawImage(stringImage, width/2-stringImage.getWidth()/2, goodsIcon.getIconHeight()/2 - stringImage.getHeight()/2, null);
         }
-        
+
         return bi;
     }
 
@@ -892,7 +900,7 @@ public final class GUI {
             } else if (tile.getAddition() == Tile.ADD_MOUNTAINS) {
                 g.drawImage(lib.getTerrainImage(ImageLibrary.MOUNTAINS, tile.getX(), tile.getY()), x, y - 32, null);
             }
-            
+
             if (tile.isPlowed()) {
                 g.drawImage(lib.getMiscImage(ImageLibrary.PLOWED), x, y, null);
             }
@@ -929,9 +937,9 @@ public final class GUI {
 
                     String populationString = Integer.toString(((Colony)settlement).getUnitCount());
                     Color theColor = Color.WHITE;
-                    
+
                     int sol = ((Colony)settlement).getSoL();
-                    
+
                     if (sol >= 100) {
                         theColor = Color.BLUE;
                     } else if (sol >= 50) {
@@ -939,7 +947,7 @@ public final class GUI {
                     } else if (((Colony)settlement).getProductionBonus() < 0) {
                         theColor = Color.RED;
                     }
-                    
+
                     BufferedImage stringImage = createStringImage(g, populationString, theColor, lib.getTerrainImageWidth(tile.getType()), 12);
                     g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType()) - stringImage.getWidth())/2 + 1, y + ((lib.getColonyImageHeight(lib.getSettlementGraphicsType(((Colony)settlement)))) / 2) + 1, null);
 
@@ -1053,11 +1061,11 @@ public final class GUI {
 
 
     /**
-     * Starts a new game. Gives the data of the new game to this GUI.
-     * @param data The data of the new game.
-     */
-    public void setGame(Game data) {
-        gameData = data;
+    * Notifies this GUI that the game has started or ended.
+    * @param inGame Indicates whether or not the game has started.
+    */
+    public void setInGame(boolean inGame) {
+        this.inGame = inGame;
     }
 
 
@@ -1090,8 +1098,8 @@ public final class GUI {
         }
         return false;
     }
-    
-   
+
+
     /**
      * Checks if the Tile/Units at the given coordinates are displayed
      * on the screen (or, if the map is already displayed and the focus
@@ -1116,6 +1124,7 @@ public final class GUI {
      * the given position on the screen.
      */
     public Map.Position convertToMapCoordinates(int x, int y) {
+        Game gameData = freeColClient.getGame();
         if ((gameData == null) || (gameData.getMap() == null)) {
             return null;
         }
@@ -1613,7 +1622,7 @@ public final class GUI {
      * @return 'true' if the Tile is near the bottom.
      */
     public boolean isMapNearBottom(int y) {
-        if (y >= (gameData.getMap().getHeight() - bottomRows)) {
+        if (y >= (freeColClient.getGame().getMap().getHeight() - bottomRows)) {
             return true;
         } else {
             return false;
@@ -1643,7 +1652,7 @@ public final class GUI {
      * @return 'true' if the Tile is near the right.
      */
     public boolean isMapNearRight(int x, int y) {
-        if (x >= (gameData.getMap().getWidth() - getRightColumns(y))) {
+        if (x >= (freeColClient.getGame().getMap().getWidth() - getRightColumns(y))) {
             return true;
         } else {
             return false;

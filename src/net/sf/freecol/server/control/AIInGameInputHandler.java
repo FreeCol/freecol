@@ -25,20 +25,22 @@ import java.io.IOException;
 /**
 * Handles the network messages that arrives while in the game.
 */
-public final class AIInGameInputHandler implements MessageHandler {
-    private static final Logger logger = Logger.getLogger(InGameInputHandler.class.getName());
+public final class AIInGameInputHandler extends InputHandler {
+    private static final Logger logger
+                            = Logger.getLogger(AIInGameInputHandler.class.getName());
 
-    private final FreeColServer freeColServer;
+
     /** The player for whom I work. */
     private final ServerPlayer me;
 
 
     /**
     * The constructor to use.
-    * @param freeColClient The main controller.
+    * @param freeColServer The main server.
+    * @param me The AI player that is being managed by this AIInGameInputHandler.
     */
     public AIInGameInputHandler(FreeColServer freeColServer, ServerPlayer me) {
-        this.freeColServer = freeColServer;
+        super(freeColServer);
         this.me = me;
         if (!me.isAI()) {
             logger.warning("VERY BAD: Applying AIInGameInputHandler to a non-AI player!!!");
@@ -62,9 +64,9 @@ public final class AIInGameInputHandler implements MessageHandler {
             // Therefore most of these messages are useless.
             if (type.equals("update")) {
             } else if (type.equals("remove")) {
-            } else if (type.equals("startGame")) {            
-            } else if (type.equals("updateGame")) {            
-            } else if (type.equals("addPlayer")) {            
+            } else if (type.equals("startGame")) {
+            } else if (type.equals("updateGame")) {
+            } else if (type.equals("addPlayer")) {
             } else if (type.equals("opponentMove")) {
             } else if (type.equals("opponentAttack")) {
             } else if (type.equals("attackResult")) {
@@ -72,8 +74,9 @@ public final class AIInGameInputHandler implements MessageHandler {
                 reply = setCurrentPlayer(connection, element);
             } else if (type.equals("emigrateUnitInEuropeConfirmed")) {
             } else if (type.equals("newTurn")) {
-            } else if (type.equals("setDead")) {            
-            } else if (type.equals("gameEnded")) {            
+            } else if (type.equals("setDead")) {
+            } else if (type.equals("gameEnded")) {
+            } else if (type.equals("disconnect")) {
             } else if (type.equals("error")) {
             } else {
                 logger.warning("Message is of unsupported type \"" + type + "\".");
@@ -84,7 +87,7 @@ public final class AIInGameInputHandler implements MessageHandler {
     }
 
 
-    
+
     /**
     * Handles a "setCurrentPlayer"-message.
     *
@@ -93,7 +96,7 @@ public final class AIInGameInputHandler implements MessageHandler {
     *                holds all the information.
     */
     private Element setCurrentPlayer(Connection connection, Element setCurrentPlayerElement) {
-        Game game = freeColServer.getGame();
+        Game game = getFreeColServer().getGame();
         Player currentPlayer = (Player) game.getFreeColGameObject(setCurrentPlayerElement.getAttribute("player"));
         Element reply = null;
 

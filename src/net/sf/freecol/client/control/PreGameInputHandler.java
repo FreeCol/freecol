@@ -25,11 +25,8 @@ import java.util.logging.Logger;
 /**
 * Handles the network messages that arrives before the game starts.
 */
-public final class PreGameInputHandler implements MessageHandler {
+public final class PreGameInputHandler extends InputHandler {
     private static final Logger logger = Logger.getLogger(PreGameInputHandler.class.getName());
-
-    private final FreeColClient freeColClient;
-
 
 
 
@@ -38,7 +35,7 @@ public final class PreGameInputHandler implements MessageHandler {
     * @param freeColClient The main controller.
     */
     public PreGameInputHandler(FreeColClient freeColClient) {
-        this.freeColClient = freeColClient;
+        super(freeColClient);
     }
 
 
@@ -51,7 +48,7 @@ public final class PreGameInputHandler implements MessageHandler {
     * @param connection The <code>Connection</code> the message was received on.
     * @param element The root element of the message.
     */
-    public Element handle(Connection connection, Element element) {
+    public synchronized Element handle(Connection connection, Element element) {
         Element reply = null;
 
         if (element != null) {
@@ -74,6 +71,10 @@ public final class PreGameInputHandler implements MessageHandler {
                 reply = updateGame(element);
             } else if (type.equals("startGame")) {
                 reply = startGame(element);
+            } else if (type.equals("logout")) {
+                reply = logout(element);
+            } else if (type.equals("disconnect")) {
+                reply = disconnect(element);
             } else if (type.equals("error")) {
                 reply = error(element);
             } else {
@@ -92,13 +93,13 @@ public final class PreGameInputHandler implements MessageHandler {
     *                holds all the information.
     */
     private Element addPlayer(Element element) {
-        Game game = freeColClient.getGame();
+        Game game = getFreeColClient().getGame();
 
         Element playerElement = (Element) element.getElementsByTagName(Player.getXMLElementTagName()).item(0);
         Player newPlayer = new Player(game, playerElement);
 
-        freeColClient.getGame().addPlayer(newPlayer);
-        freeColClient.getCanvas().getStartGamePanel().refreshPlayersTable();
+        getFreeColClient().getGame().addPlayer(newPlayer);
+        getFreeColClient().getCanvas().getStartGamePanel().refreshPlayersTable();
 
         return null;
     }
@@ -111,13 +112,13 @@ public final class PreGameInputHandler implements MessageHandler {
     *                holds all the information.
     */
     private Element removePlayer(Element element) {
-        Game game = freeColClient.getGame();
+        Game game = getFreeColClient().getGame();
 
         Element playerElement = (Element) element.getElementsByTagName(Player.getXMLElementTagName()).item(0);
         Player player = new Player(game, playerElement);
 
-        freeColClient.getGame().removePlayer(player);
-        freeColClient.getCanvas().getStartGamePanel().refreshPlayersTable();
+        getFreeColClient().getGame().removePlayer(player);
+        getFreeColClient().getCanvas().getStartGamePanel().refreshPlayersTable();
 
         return null;
     }
@@ -134,7 +135,7 @@ public final class PreGameInputHandler implements MessageHandler {
         String message = element.getAttribute("message");
         boolean privateChat = Boolean.valueOf(element.getAttribute("privateChat")).booleanValue();
 
-        freeColClient.getCanvas().getStartGamePanel().displayChat(senderName, message, privateChat);
+        getFreeColClient().getCanvas().getStartGamePanel().displayChat(senderName, message, privateChat);
 
         return null;
     }
@@ -147,13 +148,13 @@ public final class PreGameInputHandler implements MessageHandler {
     *                holds all the information.
     */
     private Element playerReady(Element element) {
-        Game game = freeColClient.getGame();
+        Game game = getFreeColClient().getGame();
 
         Player player = (Player) game.getFreeColGameObject(element.getAttribute("player"));
         boolean ready = Boolean.valueOf(element.getAttribute("value")).booleanValue();
 
         player.setReady(ready);
-        freeColClient.getCanvas().getStartGamePanel().refreshPlayersTable();
+        getFreeColClient().getCanvas().getStartGamePanel().refreshPlayersTable();
 
         return null;
     }
@@ -166,7 +167,7 @@ public final class PreGameInputHandler implements MessageHandler {
     *                holds all the information.
     */
     private Element updateNation(Element element) {
-        Game game = freeColClient.getGame();
+        Game game = getFreeColClient().getGame();
 
         Player player = (Player) game.getFreeColGameObject(element.getAttribute("player"));
         String nation = element.getAttribute("value");
@@ -178,7 +179,7 @@ public final class PreGameInputHandler implements MessageHandler {
             logger.warning(e.getMessage());
         }
 
-        freeColClient.getCanvas().getStartGamePanel().refreshPlayersTable();
+        getFreeColClient().getCanvas().getStartGamePanel().refreshPlayersTable();
 
         return null;
     }
@@ -191,14 +192,14 @@ public final class PreGameInputHandler implements MessageHandler {
     *                holds all the information.
     */
     private Element updateColor(Element element) {
-        Game game = freeColClient.getGame();
+        Game game = getFreeColClient().getGame();
 
         Player player = (Player) game.getFreeColGameObject(element.getAttribute("player"));
         String color = element.getAttribute("value");
 
         player.setColor(color);
 
-        freeColClient.getCanvas().getStartGamePanel().refreshPlayersTable();
+        getFreeColClient().getCanvas().getStartGamePanel().refreshPlayersTable();
 
         return null;
     }
@@ -211,19 +212,20 @@ public final class PreGameInputHandler implements MessageHandler {
     *                holds all the information.
     */
     private Element updateGame(Element element) {
-        freeColClient.getGame().readFromXMLElement((Element) element.getElementsByTagName(Game.getXMLElementTagName()).item(0));
+        getFreeColClient().getGame().readFromXMLElement((Element) element.getElementsByTagName(Game.getXMLElementTagName()).item(0));
 
         return null;
     }
 
 
-    /*
+    /**
     * Handles an "startGame"-message.
     *
     * @param element The element (root element in a DOM-parsed XML tree) that
     *                holds all the information.
     */
     private Element startGame(Element element) {
+        FreeColClient freeColClient = getFreeColClient();
         Canvas canvas = freeColClient.getCanvas();
         GUI gui = freeColClient.getGUI();
 
@@ -237,7 +239,7 @@ public final class PreGameInputHandler implements MessageHandler {
         InGameInputHandler inGameInputHandler = freeColClient.getInGameInputHandler();
 
         freeColClient.getClient().setMessageHandler(inGameInputHandler);
-        gui.setGame(freeColClient.getGame());
+        gui.setInGame(true);
 
         MapControls mapControls = new MapControls(freeColClient, gui);
         canvas.setMapControls(mapControls);
@@ -264,13 +266,35 @@ public final class PreGameInputHandler implements MessageHandler {
 
 
     /**
+    * Handles an "logout"-message.
+    *
+    * @param element The element (root element in a DOM-parsed XML tree) that
+    *                holds all the information.
+    */
+    private Element logout(Element element) {
+        Game game = getFreeColClient().getGame();
+
+        String playerID = element.getAttribute("player");
+        // For now we ignore the 'reason' attibute, we could display the reason to the user.
+
+        Player player = (Player) game.getFreeColGameObject(playerID);
+
+        game.removePlayer(player);
+
+        getFreeColClient().getCanvas().getStartGamePanel().refreshPlayersTable();
+
+        return null;
+    }
+
+
+    /**
     * Handles an "error"-message.
     *
     * @param element The element (root element in a DOM-parsed XML tree) that
     *                holds all the information.
     */
     private Element error(Element element)  {
-        Canvas canvas = freeColClient.getCanvas();
+        Canvas canvas = getFreeColClient().getCanvas();
 
         if (element.hasAttribute("messageID")) {
             canvas.errorMessage(element.getAttribute("messageID"), element.getAttribute("message"));

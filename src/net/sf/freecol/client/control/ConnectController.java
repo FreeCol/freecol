@@ -32,12 +32,6 @@ public final class ConnectController {
     private FreeColClient freeColClient;
 
 
-    /** The network <code>Client</code> that can be used to send messages to the server. */
-    private Client client;
-
-
-
-
 
     /**
     * Creates a new <code>ConnectController</code>.
@@ -50,8 +44,6 @@ public final class ConnectController {
 
 
 
-
-
     /**
     * Starts a multiplayer server and connects to it.
     *
@@ -61,7 +53,7 @@ public final class ConnectController {
     public void startMultiplayerGame(String username, int port) {
         if (freeColClient.getFreeColServer() != null && freeColClient.getFreeColServer().getServer().getPort() == port) {
             if (freeColClient.getCanvas().showConfirmDialog("stopServer.text", "stopServer.yes", "stopServer.no")) {
-                freeColClient.getFreeColServer().shutdown();
+                freeColClient.getFreeColServer().getController().shutdown();
             } else {
                 return;
             }
@@ -90,7 +82,7 @@ public final class ConnectController {
 
         if (freeColClient.getFreeColServer() != null && freeColClient.getFreeColServer().getServer().getPort() == port) {
             if (freeColClient.getCanvas().showConfirmDialog("stopServer.text", "stopServer.yes", "stopServer.no")) {
-                freeColClient.getFreeColServer().shutdown();
+                freeColClient.getFreeColServer().getController().shutdown();
             } else {
                 return;
             }
@@ -136,6 +128,7 @@ public final class ConnectController {
     * @return <i>true</i> if the login was completed successfully.
     */
     private boolean login(String username, String host, int port) {
+        Client client = freeColClient.getClient();
         if (client != null) {
             client.disconnect();
         }
@@ -182,6 +175,76 @@ public final class ConnectController {
             return false;
         }
 
+        freeColClient.setLoggedIn(true);
+
         return true;
+    }
+
+
+    /**
+    * Sends a logout message to the server.
+    *
+    * @param notifyServer Whether or not the server should be notified of the logout.
+    * For example: if the server kicked us out then we don't need to confirm with a logout
+    * message.
+    */
+    private void logout(boolean notifyServer) {
+        if (notifyServer) {
+            Element logoutMessage = Message.createNewRootElement("logout");
+            logoutMessage.setAttribute("reason", "User has quit the client.");
+
+            freeColClient.getClient().send(logoutMessage);
+        }
+
+        freeColClient.getGUI().setInGame(false);
+        freeColClient.setGame(null);
+        freeColClient.setMyPlayer(null);
+        freeColClient.setClient(null);
+
+        freeColClient.setLoggedIn(false);
+    }
+
+
+    /**
+    * Quits the current game. If a server is running it will be stopped if bStopServer is
+    * <i>true</i>.
+    * If a server is running through this client and bStopServer is true then the clients
+    * connected to that server will be notified. If a local client is connected to a server
+    * then the server will be notified with a logout in case <i>notifyServer</i> is true.
+    *
+    * @param bStopServer Indicates whether or not a server that was started through this
+    * client should be stopped.
+    *
+    * @param notifyServer Whether or not the server should be notified of the logout.
+    * For example: if the server kicked us out then we don't need to confirm with a logout
+    * message.
+    */
+    public void quitGame(boolean bStopServer, boolean notifyServer) {
+        if (freeColClient.isLoggedIn()) {
+            logout(notifyServer);
+        }
+
+        if (bStopServer) {
+            final FreeColServer server = freeColClient.getFreeColServer();
+            if (server != null) {
+                server.getController().shutdown();
+
+                freeColClient.setFreeColServer(null);
+            }
+        }
+    }
+
+
+    /**
+    * Quits the current game. If a server is running it will be stopped if bStopServer is
+    * <i>true</i>.
+    * The server and perhaps the clients (if a server is running through this client and
+    * bStopServer is true) will be notified.
+    *
+    * @param bStopServer Indicates whether or not a server that was started through this
+    * client should be stopped.
+    */
+    public void quitGame(boolean bStopServer) {
+        quitGame(bStopServer, true);
     }
 }

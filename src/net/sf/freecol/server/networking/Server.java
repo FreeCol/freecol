@@ -54,6 +54,9 @@ public final class Server extends Thread {
     /** The TCP port that is beeing used for the public socket. */
     private int port;
 
+    /** For information about this variable see the run method. */
+    private final Object shutdownLock = new Object();
+
 
 
 
@@ -79,19 +82,32 @@ public final class Server extends Thread {
     /**
     * Starts the thread's processing. Contains the loop that is waiting for new
     * connections to the public socket. When a new client connects to the server
-    * a new {@link Connection} is made, with {@link UserConnectionHandler} as 
+    * a new {@link Connection} is made, with {@link UserConnectionHandler} as
     * the control object.
     */
     public void run() {
-        while (running) {
-            Socket clientSocket = null;
-            try {
-                clientSocket = serverSocket.accept();
-                logger.info("Got client connection from " + clientSocket.getInetAddress().toString());
-                Connection connection = new Connection(clientSocket, freeColServer.getUserConnectionHandler());
-                connections.put(clientSocket, connection);
-            } catch (IOException e) {
-                logger.warning("Accept/connect exception " + e.toString());
+        // This method's entire body is synchronized to shutdownLock.
+        // The reason why this is done is to prevent the shutdown method
+        // from finishing before this thread is finished working.
+        // We have to do this because the ServerSocket::close method keeps
+        // the server alive for several milliseconds EVEN AFTER THE CLOSE METHOD
+        // IS FINISHED. And because of this a new server can't be created on the
+        // same port as this server right after closing this server.
+        //
+        // Now that the shutdown method 'hangs' until the entire server thread is
+        // finished you can be certain that the ServerSocket is REALLY closed
+        // after execution of shutdown.
+        synchronized (shutdownLock) {
+            while (running) {
+                Socket clientSocket = null;
+                try {
+                    clientSocket = serverSocket.accept();
+                    logger.info("Got client connection from " + clientSocket.getInetAddress().toString());
+                    Connection connection = new Connection(clientSocket, freeColServer.getUserConnectionHandler());
+                    connections.put(clientSocket, connection);
+                } catch (IOException e) {
+                    logger.warning("Accept/connect exception " + e.toString());
+                }
             }
         }
     }
@@ -118,8 +134,8 @@ public final class Server extends Thread {
             }
         }
     }
-    
-    
+
+
     /**
     * Sends a network message to all connections.
     * @param element The root element of the message to send.
@@ -128,7 +144,7 @@ public final class Server extends Thread {
         sendToAll(element, null);
     }
 
-    
+
     /**
     * Gets the TCP port that is beeing used for the public socket.
     * @return The TCP port.
@@ -168,15 +184,20 @@ public final class Server extends Thread {
     */
     public void shutdown() {
         running = false;
-        
+
         try {
             serverSocket.close();
         } catch (IOException e) {
             logger.warning("Could not close the server socket!");
         }
+
+        synchronized (shutdownLock) {
+            // Nothing to do here... just waiting for the server thread to finish.
+            // For more info see the run() method
+        }
     }
-    
-    
+
+
     /**
     * Gets a <code>Connection</code> identified by a <code>Socket</code>.
     *
@@ -187,7 +208,7 @@ public final class Server extends Thread {
     public Connection getConnection(Socket socket) {
         return (Connection) connections.get(socket);
     }
-    
+
     /**
     * Adds a (usually Dummy)Connection into the hashmap.
     * @param connection The connection to add.

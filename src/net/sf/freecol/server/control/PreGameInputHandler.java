@@ -22,19 +22,17 @@ import net.sf.freecol.server.model.ServerPlayer;
 * Handles the network messages that arrives before the game starts.
 * @see PreGameController
 */
-public final class PreGameInputHandler implements MessageHandler {
-    private static Logger logger = Logger.getLogger(UserConnectionHandler.class.getName());
-
-    private FreeColServer freeColServer;
+public final class PreGameInputHandler extends InputHandler {
+    private static Logger logger = Logger.getLogger(PreGameInputHandler.class.getName());
 
 
 
     /**
     * The constructor to use.
-    * @param freeColServer The main control object.
+    * @param freeColServer The main server object.
     */
     public PreGameInputHandler(FreeColServer freeColServer) {
-        this.freeColServer = freeColServer;
+        super(freeColServer);
     }
 
 
@@ -61,6 +59,8 @@ public final class PreGameInputHandler implements MessageHandler {
                 reply = color(connection, element);
             } else if (type.equals("requestLaunch")) {
                 reply = requestLaunch(connection, element);
+            } else if (type.equals("logout")) {
+                reply = logout(connection, element);
             } else if (type.equals("chat")) {
                 reply = chat(connection, element);
             }
@@ -78,7 +78,7 @@ public final class PreGameInputHandler implements MessageHandler {
     */
     private Element ready(Connection connection, Element element) {
 
-        ServerPlayer player = freeColServer.getPlayer(connection);
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
 
         if (player != null) {
             boolean ready = (new Boolean(element.getAttribute("value"))).booleanValue();
@@ -88,7 +88,7 @@ public final class PreGameInputHandler implements MessageHandler {
             playerReady.setAttribute("player", player.getID());
             playerReady.setAttribute("value", Boolean.toString(ready));
 
-            freeColServer.getServer().sendToAll(playerReady, player.getConnection());
+            getFreeColServer().getServer().sendToAll(playerReady, player.getConnection());
         } else {
             logger.warning("Ready from unknown connection.");
         }
@@ -104,7 +104,7 @@ public final class PreGameInputHandler implements MessageHandler {
     */
     private Element nation(Connection connection, Element element) {
 
-        ServerPlayer player = freeColServer.getPlayer(connection);
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
 
         if (player != null) {
             String nation = element.getAttribute("value");
@@ -119,7 +119,7 @@ public final class PreGameInputHandler implements MessageHandler {
             updateNation.setAttribute("player", player.getID());
             updateNation.setAttribute("value", nation);
 
-            freeColServer.getServer().sendToAll(updateNation, player.getConnection());
+            getFreeColServer().getServer().sendToAll(updateNation, player.getConnection());
         } else {
             logger.warning("Nation from unknown connection.");
         }
@@ -135,7 +135,7 @@ public final class PreGameInputHandler implements MessageHandler {
     */
     private Element color(Connection connection, Element element) {
 
-        ServerPlayer player = freeColServer.getPlayer(connection);
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
 
         if (player != null) {
             String color = element.getAttribute("value");
@@ -145,7 +145,7 @@ public final class PreGameInputHandler implements MessageHandler {
             updateColor.setAttribute("player", player.getID());
             updateColor.setAttribute("value", color);
 
-            freeColServer.getServer().sendToAll(updateColor, player.getConnection());
+            getFreeColServer().getServer().sendToAll(updateColor, player.getConnection());
         } else {
             logger.warning("Color from unknown connection.");
         }
@@ -160,6 +160,7 @@ public final class PreGameInputHandler implements MessageHandler {
     * @param element The element containing the request.
     */
     private Element requestLaunch(Connection connection, Element element) {
+        FreeColServer freeColServer = getFreeColServer();
 
         ServerPlayer launchingPlayer = freeColServer.getPlayer(connection);
 
@@ -220,7 +221,7 @@ public final class PreGameInputHandler implements MessageHandler {
             return reply;
         }
 
-        freeColServer.getPreGameController().startGame();
+        ((PreGameController) freeColServer.getController()).startGame();
 
         return null;
     }
@@ -235,7 +236,7 @@ public final class PreGameInputHandler implements MessageHandler {
     private Element chat(Connection connection, Element element) {
         // TODO: Add support for private chat.
 
-        freeColServer.getServer().sendToAll(element, connection);
+        getFreeColServer().getServer().sendToAll(element, connection);
 
         return null;
     }

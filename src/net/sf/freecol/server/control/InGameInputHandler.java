@@ -26,23 +26,20 @@ import net.sf.freecol.server.model.ServerPlayer;
 * Handles the network messages that arrives while
 * {@link FreeColServer#IN_GAME in game}.
 */
-public final class InGameInputHandler implements MessageHandler {
+public final class InGameInputHandler extends InputHandler {
     private static Logger logger = Logger.getLogger(InGameInputHandler.class.getName());
-
-    private FreeColServer freeColServer;
 
     public static Random attackCalculator;
 
+
     /**
     * The constructor to use.
-    * @param freeColServer The main control object.
+    * @param freeColServer The main server object.
     */
     public InGameInputHandler(FreeColServer freeColServer) {
-        this.freeColServer = freeColServer;
+        super(freeColServer);
         attackCalculator = new Random();
     }
-
-
 
 
 
@@ -54,6 +51,7 @@ public final class InGameInputHandler implements MessageHandler {
     */
     public synchronized Element handle(Connection connection, Element element) {
         Element reply = null;
+        FreeColServer freeColServer = getFreeColServer();
 
         String type = element.getTagName();
 
@@ -106,14 +104,25 @@ public final class InGameInputHandler implements MessageHandler {
                         reply = putOutsideColony(connection, element);
                     } else if (type.equals("clearSpeciality")) {
                         reply = clearSpeciality(connection, element);
+                    } else if (type.equals("logout")) {
+                        reply = logout(connection, element);
                     } else if (type.equals("endTurn")) {
                         reply = endTurn(connection, element);
                     } else {
                         logger.warning("Unknown request from client " + element.getTagName());
                     }
                 } else {
-                    reply = Message.createNewRootElement("error");
-                    reply.setAttribute("message", "Not your turn.");
+                    // The messages you see here are the ones that are supported even
+                    // though it is NOT the sender's turn.
+                    if (type.equals("logout")) {
+                        reply = logout(connection, element);
+                    }
+                    else {
+                        // The message we've received is probably a good one, but
+                        // it was sent when it was not the sender's turn.
+                        reply = Message.createNewRootElement("error");
+                        reply.setAttribute("message", "Not your turn.");
+                    }
                 }
             }
         } catch (Exception e) {
@@ -139,8 +148,8 @@ public final class InGameInputHandler implements MessageHandler {
     */
     private Element chat(Connection connection, Element element) {
         // TODO: Add support for private chat.
-        element.setAttribute("sender", freeColServer.getPlayer(connection).getID());
-        freeColServer.getServer().sendToAll(element, connection);
+        element.setAttribute("sender", getFreeColServer().getPlayer(connection).getID());
+        getFreeColServer().getServer().sendToAll(element, connection);
         return null;
     }
 
@@ -155,6 +164,7 @@ public final class InGameInputHandler implements MessageHandler {
     *
     */
     private Element move(Connection connection, Element moveElement) {
+        FreeColServer freeColServer = getFreeColServer();
         Game game = freeColServer.getGame();
 
         ServerPlayer player = freeColServer.getPlayer(connection);
@@ -231,6 +241,7 @@ public final class InGameInputHandler implements MessageHandler {
     *
     */
     private Element attack(Connection connection, Element attackElement) {
+        FreeColServer freeColServer = getFreeColServer();
         Game game = freeColServer.getGame();
         ServerPlayer player = freeColServer.getPlayer(connection);
 
@@ -353,6 +364,7 @@ public final class InGameInputHandler implements MessageHandler {
     * @exception IllegalArgumentException If the data format of the message is invalid.
     */
     private Element embark(Connection connection, Element embarkElement) {
+        FreeColServer freeColServer = getFreeColServer();
         Game game = freeColServer.getGame();
         ServerPlayer player = freeColServer.getPlayer(connection);
 
@@ -406,6 +418,7 @@ public final class InGameInputHandler implements MessageHandler {
     * @param boardShipElement The element containing the request.
     */
     private Element boardShip(Connection connection, Element boardShipElement) {
+        FreeColServer freeColServer = getFreeColServer();
         Game game = freeColServer.getGame();
         ServerPlayer player = freeColServer.getPlayer(connection);
 
@@ -466,8 +479,8 @@ public final class InGameInputHandler implements MessageHandler {
     * @param leaveShipElement The element containing the request.
     */
     private Element leaveShip(Connection connection, Element leaveShipElement) {
-        Game game = freeColServer.getGame();
-        ServerPlayer player = freeColServer.getPlayer(connection);
+        Game game = getFreeColServer().getGame();
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
 
         Unit unit = (Unit) game.getFreeColGameObject(leaveShipElement.getAttribute("unit"));
 
@@ -492,8 +505,8 @@ public final class InGameInputHandler implements MessageHandler {
     * @param loadCargoElement The element containing the request.
     */
     private Element loadCargo(Connection connection, Element loadCargoElement) {
-        Game game = freeColServer.getGame();
-        ServerPlayer player = freeColServer.getPlayer(connection);
+        Game game = getFreeColServer().getGame();
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
 
         Unit carrier = (Unit) game.getFreeColGameObject(loadCargoElement.getAttribute("carrier"));
         Goods goods = new Goods(game, (Element) loadCargoElement.getChildNodes().item(0));
@@ -511,8 +524,8 @@ public final class InGameInputHandler implements MessageHandler {
     * @param unloadCargoElement The element containing the request.
     */
     private Element unloadCargo(Connection connection, Element unloadCargoElement) {
-        Game game = freeColServer.getGame();
-        ServerPlayer player = freeColServer.getPlayer(connection);
+        Game game = getFreeColServer().getGame();
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
 
         Goods goods = new Goods(game, (Element) unloadCargoElement.getChildNodes().item(0));
 
@@ -532,8 +545,8 @@ public final class InGameInputHandler implements MessageHandler {
     * @param boardShipElement The element containing the request.
     */
     private Element buyGoods(Connection connection, Element buyGoodsElement) {
-        Game game = freeColServer.getGame();
-        ServerPlayer player = freeColServer.getPlayer(connection);
+        Game game = getFreeColServer().getGame();
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
 
         Unit carrier = (Unit) game.getFreeColGameObject(buyGoodsElement.getAttribute("carrier"));
         int type = Integer.parseInt(buyGoodsElement.getAttribute("type"));
@@ -560,8 +573,8 @@ public final class InGameInputHandler implements MessageHandler {
     * @param leaveShipElement The element containing the request.
     */
     private Element sellGoods(Connection connection, Element sellGoodsElement) {
-        Game game = freeColServer.getGame();
-        ServerPlayer player = freeColServer.getPlayer(connection);
+        Game game = getFreeColServer().getGame();
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
 
         Goods goods = new Goods(game, (Element) sellGoodsElement.getChildNodes().item(0));
 
@@ -581,8 +594,8 @@ public final class InGameInputHandler implements MessageHandler {
     * @param moveToEuropeElement The element containing the request.
     */
     private Element moveToEurope(Connection connection, Element moveToEuropeElement) {
-        Game game = freeColServer.getGame();
-        ServerPlayer player = freeColServer.getPlayer(connection);
+        Game game = getFreeColServer().getGame();
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
 
         Unit unit = (Unit) game.getFreeColGameObject(moveToEuropeElement.getAttribute("unit"));
 
@@ -627,8 +640,8 @@ public final class InGameInputHandler implements MessageHandler {
     * @param element The element containing the request.
     */
     private Element moveToAmerica(Connection connection, Element moveToAmericaElement) {
-        Game game = freeColServer.getGame();
-        ServerPlayer player = freeColServer.getPlayer(connection);
+        Game game = getFreeColServer().getGame();
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
 
         Unit unit = (Unit) game.getFreeColGameObject(moveToAmericaElement.getAttribute("unit"));
 
@@ -649,11 +662,11 @@ public final class InGameInputHandler implements MessageHandler {
     * @param element The element containing the request.
     */
     private Element buildColony(Connection connection, Element buildColonyElement) {
-        Game game = freeColServer.getGame();
-        Player player = freeColServer.getPlayer(connection);
+        Game game = getFreeColServer().getGame();
+        Player player = getFreeColServer().getPlayer(connection);
 
         String name = buildColonyElement.getAttribute("name");
-        Unit unit = (Unit) freeColServer.getGame().getFreeColGameObject(buildColonyElement.getAttribute("unit"));
+        Unit unit = (Unit) game.getFreeColGameObject(buildColonyElement.getAttribute("unit"));
 
         if (unit.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
@@ -684,8 +697,8 @@ public final class InGameInputHandler implements MessageHandler {
     * @param element The element containing the request.
     */
     private Element recruitUnitInEurope(Connection connection, Element recruitUnitInEuropeElement) {
-        Game game = freeColServer.getGame();
-        Player player = freeColServer.getPlayer(connection);
+        Game game = getFreeColServer().getGame();
+        Player player = getFreeColServer().getPlayer(connection);
         Europe europe = player.getEurope();
 
         int slot = Integer.parseInt(recruitUnitInEuropeElement.getAttribute("slot"));
@@ -710,8 +723,8 @@ public final class InGameInputHandler implements MessageHandler {
     * @param element The element containing the request.
     */
     private Element emigrateUnitInEurope(Connection connection, Element emigrateUnitInEuropeElement) {
-        Game game = freeColServer.getGame();
-        Player player = freeColServer.getPlayer(connection);
+        Game game = getFreeColServer().getGame();
+        Player player = getFreeColServer().getPlayer(connection);
         Europe europe = player.getEurope();
 
         int slot = Integer.parseInt(emigrateUnitInEuropeElement.getAttribute("slot"));
@@ -742,8 +755,8 @@ public final class InGameInputHandler implements MessageHandler {
     * @param element The element containing the request.
     */
     private Element trainUnitInEurope(Connection connection, Element trainUnitInEuropeElement) {
-        Game game = freeColServer.getGame();
-        Player player = freeColServer.getPlayer(connection);
+        Game game = getFreeColServer().getGame();
+        Player player = getFreeColServer().getPlayer(connection);
         Europe europe = player.getEurope();
 
         int unitType = Integer.parseInt(trainUnitInEuropeElement.getAttribute("unitType"));
@@ -765,8 +778,8 @@ public final class InGameInputHandler implements MessageHandler {
     * @param workElement The element containing the request.
     */
     private Element equipUnit(Connection connection, Element workElement) {
-        Game game = freeColServer.getGame();
-        ServerPlayer player = freeColServer.getPlayer(connection);
+        Game game = getFreeColServer().getGame();
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
 
         Unit unit = (Unit) game.getFreeColGameObject(workElement.getAttribute("unit"));
         int type = Integer.parseInt(workElement.getAttribute("type"));
@@ -814,8 +827,8 @@ public final class InGameInputHandler implements MessageHandler {
     * @param workElement The element containing the request.
     */
     private Element work(Connection connection, Element workElement) {
-        Game game = freeColServer.getGame();
-        ServerPlayer player = freeColServer.getPlayer(connection);
+        Game game = getFreeColServer().getGame();
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
 
         Unit unit = (Unit) game.getFreeColGameObject(workElement.getAttribute("unit"));
         WorkLocation workLocation = (WorkLocation) game.getFreeColGameObject(workElement.getAttribute("workLocation"));
@@ -843,8 +856,8 @@ public final class InGameInputHandler implements MessageHandler {
     * @param workElement The element containing the request.
     */
     private Element changeWorkType(Connection connection, Element workElement) {
-        Game game = freeColServer.getGame();
-        ServerPlayer player = freeColServer.getPlayer(connection);
+        Game game = getFreeColServer().getGame();
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
 
         Unit unit = (Unit) game.getFreeColGameObject(workElement.getAttribute("unit"));
         int workType = Integer.parseInt(workElement.getAttribute("workType"));
@@ -866,8 +879,8 @@ public final class InGameInputHandler implements MessageHandler {
     * @param setCurrentlyBuildingElement The element containing the request.
     */
     private Element setCurrentlyBuilding(Connection connection, Element setCurrentlyBuildingElement) {
-        Game game = freeColServer.getGame();
-        ServerPlayer player = freeColServer.getPlayer(connection);
+        Game game = getFreeColServer().getGame();
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
 
         Colony colony = (Colony) game.getFreeColGameObject(setCurrentlyBuildingElement.getAttribute("colony"));
         int type = Integer.parseInt(setCurrentlyBuildingElement.getAttribute("type"));
@@ -894,9 +907,9 @@ public final class InGameInputHandler implements MessageHandler {
     *
     */
     private Element changeState(Connection connection, Element changeStateElement) {
-        Game game = freeColServer.getGame();
+        Game game = getFreeColServer().getGame();
 
-        ServerPlayer player = freeColServer.getPlayer(connection);
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
 
         Unit unit = (Unit) game.getFreeColGameObject(changeStateElement.getAttribute("unit"));
         int state = Integer.parseInt(changeStateElement.getAttribute("state"));
@@ -931,8 +944,8 @@ public final class InGameInputHandler implements MessageHandler {
     * @param putOutsideColonyElement The element containing the request.
     */
     private Element putOutsideColony(Connection connection, Element putOutsideColonyElement) {
-        Game game = freeColServer.getGame();
-        ServerPlayer player = freeColServer.getPlayer(connection);
+        Game game = getFreeColServer().getGame();
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
 
         Unit unit = (Unit) game.getFreeColGameObject(putOutsideColonyElement.getAttribute("unit"));
 
@@ -955,8 +968,8 @@ public final class InGameInputHandler implements MessageHandler {
     * @param clearSpecialityElement The element containing the request.
     */
     private Element clearSpeciality(Connection connection, Element clearSpecialityElement) {
-        Game game = freeColServer.getGame();
-        ServerPlayer player = freeColServer.getPlayer(connection);
+        Game game = getFreeColServer().getGame();
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
 
         Unit unit = (Unit) game.getFreeColGameObject(clearSpecialityElement.getAttribute("unit"));
 
@@ -981,6 +994,7 @@ public final class InGameInputHandler implements MessageHandler {
     * @param element The element containing the request.
     */
     private Element endTurn(Connection connection, Element moveElement) {
+        FreeColServer freeColServer = getFreeColServer();
         Game game = freeColServer.getGame();
 
         ServerPlayer nextPlayer = (ServerPlayer) game.getNextPlayer();
@@ -1036,12 +1050,12 @@ public final class InGameInputHandler implements MessageHandler {
     *         if the game is not finished.
     */
     private Player checkForWinner() {
-        Game game = freeColServer.getGame();
+        Game game = getFreeColServer().getGame();
 
         Iterator playerIterator = game.getPlayerIterator();
         Player winner = null;
 
-        if (freeColServer.isSingleplayer()) {
+        if (getFreeColServer().isSingleplayer()) {
             // TODO
         } else {
             while (playerIterator.hasNext()) {
@@ -1066,7 +1080,7 @@ public final class InGameInputHandler implements MessageHandler {
     * and builds a unit if choosen and completed.
     */
     private void createUnitsInColonies() {
-        Game game = freeColServer.getGame();
+        Game game = getFreeColServer().getGame();
         Map map = game.getMap();
 
         Iterator wmi = map.getWholeMapIterator();
@@ -1132,7 +1146,7 @@ public final class InGameInputHandler implements MessageHandler {
     */
     private boolean checkForDeath(Player player) {
         // Die if: (No colonies or units on map) && ((After 20 turns) || (Cannot get a unit from Europe))
-        Game game = freeColServer.getGame();
+        Game game = getFreeColServer().getGame();
         Map map = game.getMap();
 
         Iterator tileIterator = map.getWholeMapIterator();
@@ -1172,7 +1186,7 @@ public final class InGameInputHandler implements MessageHandler {
 
 
     private void sendUpdatedTileToAll(Tile newTile, Player player) {
-        Game game = freeColServer.getGame();
+        Game game = getFreeColServer().getGame();
 
         Iterator enemyPlayerIterator = game.getPlayerIterator();
         while (enemyPlayerIterator.hasNext()) {
@@ -1196,7 +1210,7 @@ public final class InGameInputHandler implements MessageHandler {
     }
 
     private void sendErrorToAll(String message, Player player) {
-        Game game = freeColServer.getGame();
+        Game game = getFreeColServer().getGame();
 
         Iterator enemyPlayerIterator = game.getPlayerIterator();
         while (enemyPlayerIterator.hasNext()) {

@@ -67,7 +67,7 @@ public final class FreeCol {
 
     private static int serverPort;
 
-    
+
 
     private FreeCol() {}
 
@@ -84,12 +84,12 @@ public final class FreeCol {
             return;
         }
 
-        Logger baseLogger = Logger.getLogger("");
-        Handler[] handlers = baseLogger.getHandlers();
+        final Logger baseLogger = Logger.getLogger("");
+        final Handler[] handlers = baseLogger.getHandlers();
         for (int i = 0; i < handlers.length; i++) {
             baseLogger.removeHandler(handlers[i]);
-        } 
-        
+        }
+
         try {
             baseLogger.addHandler(new DefaultHandler());
         } catch (FreeColException e) {
@@ -101,7 +101,14 @@ public final class FreeCol {
 
         if (standAloneServer) {
             try {
-                FreeColServer freeColServer = new FreeColServer(false, serverPort);
+                final FreeColServer freeColServer = new FreeColServer(false, serverPort);
+
+                Runtime runtime = Runtime.getRuntime();
+                runtime.addShutdownHook(new Thread() {
+                    public void run() {
+                        freeColServer.getController().shutdown();
+                    }
+                });
             } catch (IOException e) {
                 System.err.println("Error while loading server: " + e);
                 System.exit(-1);
@@ -246,7 +253,7 @@ public final class FreeCol {
         return FREECOL_VERSION;
     }
 
-    
+
     /**
     * Checks if the program is in "Debug mode".
     */

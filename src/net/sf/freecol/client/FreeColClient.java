@@ -67,6 +67,13 @@ public final class FreeColClient {
     private boolean singleplayer;
     private boolean admin = false;
 
+    /**
+    * Indicated whether or not there is an open connection to the server.
+    * This is not an indication of the existance of a Connection Object, but
+    * instead it is an indication of an approved login to a server.
+    */
+    private boolean loggedIn = false;
+
 
 
 
@@ -135,7 +142,7 @@ public final class FreeColClient {
             }
         }
 
-        gui = new GUI(this, frame.getBounds(), null, lib);
+        gui = new GUI(this, frame.getBounds(), lib);
         canvas = new Canvas(this, frame.getBounds(), gui);
 
         if (frame instanceof WindowedFrame) {
@@ -357,6 +364,24 @@ public final class FreeColClient {
         if (sfxPlayer != null) {
             sfxPlayer.play(sfxLibrary.get(sound));
         }
+    }
+
+
+    /**
+    * Returns <i>true</i> if this client is logged in to a server or <i>false</i> otherwise.
+    * @return <i>true</i> if this client is logged in to a server or <i>false</i> otherwise.
+    */
+    public boolean isLoggedIn() {
+        return loggedIn;
+    }
+
+
+    /**
+    * Sets whether or not this client is logged in to a server.
+    * @param loggedIn An indication of whether or not this client is logged in to a server.
+    */
+    public void setLoggedIn(boolean loggedIn) {
+        this.loggedIn = loggedIn;
     }
 }
 

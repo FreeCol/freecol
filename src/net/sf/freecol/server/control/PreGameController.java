@@ -29,20 +29,17 @@ import org.w3c.dom.Element;
 *
 * @see InGameInputHandler
 */
-public final class PreGameController {
+public final class PreGameController extends Controller {
     private static final Logger logger = Logger.getLogger(PreGameController.class.getName());
-
-
-    private FreeColServer freeColServer;
 
 
 
     /**
     * The constructor to use.
-    * @param freeColServer The main control object.
+    * @param freeColServer The main server object.
     */
     public PreGameController(FreeColServer freeColServer) {
-        this.freeColServer = freeColServer;
+        super(freeColServer);
     }
 
 
@@ -65,9 +62,11 @@ public final class PreGameController {
     * </ol>
     */
     public void startGame() {
+        FreeColServer freeColServer = getFreeColServer();
+
         try {
             Game game = freeColServer.getGame();
-                        
+
             // Add any AI players:
             // TODO: AI player to represent the other European nations
             for (int i = Player.INCA; i <= Player.TUPI; i++) {
@@ -82,17 +81,17 @@ public final class PreGameController {
                 theConnection.setOutgoingMessageHandler(new AIInGameInputHandler(freeColServer, indianPlayer));
                 indianPlayer.setNation(i);
                 indianPlayer.setColor(IndianSettlement.indianColors[i - 4]);
-                
+
                 freeColServer.getServer().addConnection(theConnection, 3 - i);
-                
-                freeColServer.getGame().addPlayer(indianPlayer);               
-                
+
+                freeColServer.getGame().addPlayer(indianPlayer);
+
                 // Send message to all players except to the new player:
                 Element addNewPlayer = Message.createNewRootElement("addPlayer");
                 addNewPlayer.appendChild(indianPlayer.toXMLElement(null, addNewPlayer.getOwnerDocument()));
                 freeColServer.getServer().sendToAll(addNewPlayer, theConnection);
             }
-            
+
             // Make the map:
             MapGenerator mapGenerator = new MapGenerator(game);
             Map map = mapGenerator.createMap(game.getPlayers(), 30, 64);
@@ -119,7 +118,7 @@ public final class PreGameController {
     * @param map The new <code>Map</code> to be set.
     */
     public void setMap(Map map) {
-        Game game = freeColServer.getGame();
+        Game game = getFreeColServer().getGame();
 
         game.setMap(map);
 

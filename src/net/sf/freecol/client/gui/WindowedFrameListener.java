@@ -48,7 +48,6 @@ public final class WindowedFrameListener implements WindowListener {
     * @param event The event that has information on the action.
     */
     public void windowClosed(WindowEvent event) {
-        System.out.println("*2*");
     }
     
     /**
