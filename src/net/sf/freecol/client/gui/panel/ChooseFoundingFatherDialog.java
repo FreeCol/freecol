@@ -41,7 +41,8 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
     public ChooseFoundingFatherDialog(Canvas parent) {
         this.parent = parent;
         chooseFoundingFatherDialog = this;
-
+        
+        setFocusCycleRoot(false);
         setBorder(null);
         setOpaque(false);
 
