@@ -48,7 +48,6 @@ public class Game extends FreeColGameObject {
     /* The market for Europe. */
     private Market market;
 
-    public boolean mustRestartNewTurn;
 
     /**
     * Creates a new game model.
@@ -408,27 +407,12 @@ public class Game extends FreeColGameObject {
     * @see #setFreeColGameObject
     */
     public void newTurn() {
-        Iterator iterator = getFreeColGameObjectIterator();
-
-        mustRestartNewTurn = true;
+        //Iterator iterator = getFreeColGameObjectIterator();
+        Iterator iterator = ((HashMap) freeColGameObjects.clone()).values().iterator();
 
         while (iterator.hasNext()) {
             FreeColGameObject freeColGameObject = (FreeColGameObject) iterator.next();
-            freeColGameObject.hasDoneNewTurn = false;
-        }
-        
-        while (mustRestartNewTurn)
-        {
-          mustRestartNewTurn = false;
-          iterator = getFreeColGameObjectIterator();
-          while ((iterator.hasNext()) && (!mustRestartNewTurn)) {
-              FreeColGameObject freeColGameObject = (FreeColGameObject) iterator.next();
-              if (!freeColGameObject.hasDoneNewTurn)
-              {
-                freeColGameObject.hasDoneNewTurn = true;
-                freeColGameObject.newTurn();
-              }
-          }
+            freeColGameObject.newTurn();
         }
     }
 

@@ -226,22 +226,24 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation {
     * Prepares this <code>ColonyTile</code> for a new turn.
     */
     public void newTurn() {
-        if ((getUnit() == null) && !(isColonyCenterTile())) return; // Produce nothing if there's nobody to work the terrain.
-	if (!(isColonyCenterTile())) {
-            int amount = getUnit().getFarmedPotential(getUnit().getWorkType(), workTile);
-            Goods g = new Goods(getGame(), null, getUnit().getWorkType(), amount);
-	    g.setLocation(colony);
-	} else {
-	    int amount1 = workTile.potential(Goods.FOOD);
-	    Goods g = new Goods(getGame(), null, Goods.FOOD, amount1);
-	    g.setLocation(colony);
-	    int type2 = workTile.secondaryGoods();
-	    int amount2 = workTile.potential(type2);
-	    g = new Goods(getGame(), null, type2, amount2);
-	    g.setLocation(colony);
-	}
+        if ((getUnit() == null) && !(isColonyCenterTile())) {
+            return; // Produce nothing if there's nobody to work the terrain.
+        }
+        
+        if (!(isColonyCenterTile())) {
+                int amount = getUnit().getFarmedPotential(getUnit().getWorkType(), workTile);
+                Goods g = new Goods(getGame(), null, getUnit().getWorkType(), amount);
+            g.setLocation(colony);
+        } else {
+            int amount1 = workTile.potential(Goods.FOOD);
+            Goods g = new Goods(getGame(), null, Goods.FOOD, amount1);
+            g.setLocation(colony);
+            int type2 = workTile.secondaryGoods();
+            int amount2 = workTile.potential(type2);
+            g = new Goods(getGame(), null, type2, amount2);
+            g.setLocation(colony);
+        }
         //colony.add(g);
-        getGame().mustRestartNewTurn = true;
     }
 
 

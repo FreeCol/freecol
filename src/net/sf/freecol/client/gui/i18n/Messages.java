@@ -39,7 +39,7 @@ public final class Messages {
     /**
      * Convenience method that finds the message with a particular id in the
      * default locale.
-     * 
+     *
      * @param  messageId  the id of the message to find
      * @return  the message with the specified id
      */
@@ -83,15 +83,9 @@ public final class Messages {
 
         /* this palaver is only necessary because Class.getPackage() can return
          * null */
-		String  packageName =
-			getClass().getName().substring(
-				0,
-				getClass().getName().lastIndexOf('.'));
+        String packageName = getClass().getName().substring(0, getClass().getName().lastIndexOf('.'));
+        resources = (PropertyResourceBundle) ResourceBundle.getBundle(packageName + ".FreeColMessages", locale);
 
-		resources =
-			(PropertyResourceBundle) ResourceBundle.getBundle(
-				packageName + ".FreeColMessages",
-				locale);
     }
 
 

@@ -343,14 +343,14 @@ public final class Building extends FreeColGameObject implements WorkLocation {
     * Prepares this <code>Building</code> for a new turn.
     */
     public void newTurn() {
-    
+
         int goodsInput = 0;
         int goodsOutput = 0;
         int goodsInputType = -1;
         int goodsOutputType = -1;
-	
+
 	Goods thepackage;
-        
+
         if (level == NOT_BUILT) return; // Don't do anything if the building does not exist.
 
         // Figure out what's produced here and what it requires to do so.
@@ -402,13 +402,12 @@ public final class Building extends FreeColGameObject implements WorkLocation {
             }
         }
         if (goodsOutput <= 0) return;
-        
+
         // Actually produce the goods.
         colony.removeAmountAndTypeOfGoods(goodsInputType, goodsInput);
         thepackage = new Goods(getGame(), null, goodsOutputType, goodsOutput);
 	thepackage.setLocation(colony);
         //colony.add(thepackage);
-        getGame().mustRestartNewTurn = true;
     }
 
 

@@ -752,13 +752,19 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
     public void setArmed(boolean b) {
         if ((b) && (!armed)) {
             if (getGoodsDumpLocation() != null) {
-               if (getGoodsDumpLocation().getGoodsCount(Goods.MUSKETS) < 50) return;
-               getGoodsDumpLocation().removeAmountAndTypeOfGoods(Goods.MUSKETS, 50);
-               armed = true;
+                if (getGoodsDumpLocation().getGoodsCount(Goods.MUSKETS) < 50) {
+                    return;
+                }
+                
+                getGoodsDumpLocation().removeAmountAndTypeOfGoods(Goods.MUSKETS, 50);
+                armed = true;
             } else if (location instanceof Europe) {
-               if (((getOwner().getGold()) / (getGame().getMarket().costToBuy(Goods.MUSKETS))) < 50) return;
-               getGame().getMarket().buy(Goods.MUSKETS, 50, getOwner());
-               armed = true;
+                if (((getOwner().getGold()) / (getGame().getMarket().costToBuy(Goods.MUSKETS))) < 50) {
+                    return;
+                }
+                
+                getGame().getMarket().buy(Goods.MUSKETS, 50, getOwner());
+                armed = true;
             } else {
                 logger.warning("Attempting to arm a soldier outside of a colony or Europe!");
             }

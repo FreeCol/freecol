@@ -25,9 +25,6 @@ abstract public class FreeColGameObject {
     private String id;
     private Game game;
 
-    //UGLY HACK to fix iterator issue involving goods, colonies, and new turns.
-    public boolean hasDoneNewTurn;
-
 
 
 
@@ -39,8 +36,6 @@ abstract public class FreeColGameObject {
     */
     public FreeColGameObject(Game game) {
         this.game = game;
-        
-        hasDoneNewTurn = false;
 
         if (game != null) {
             //game.setFreeColGameObject(id, this);
