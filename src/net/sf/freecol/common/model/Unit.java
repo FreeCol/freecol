@@ -896,12 +896,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                     continue;
                 }
 
-                if (t.getFirstUnit() != null && t.getFirstUnit().getOwner() == null) {
-                    System.out.println("My owner: " + getOwner());
-                    System.out.println("Tile: " + t);
-                    System.out.flush();
-                }
-
                 if (getOwner() == null) {
                     throw new NullPointerException();
                 }
@@ -919,19 +913,17 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         // treasure train moved onto a settlment. do you want to cash it in?
         if (getGame().getMap() != null && location != null) {
             // its a settlement
-            if(location instanceof Tile && getType()==TREASURE_TRAIN && location.getTile().getSettlement()!=null) {
-                if(getOwner().hasFather(FoundingFather.HERNAN_CORTES)) {
+            if (location instanceof Tile && getType()==TREASURE_TRAIN && location.getTile().getSettlement()!=null) {
+                if (getOwner().hasFather(FoundingFather.HERNAN_CORTES)) {
                     // todo -show confirm dialog "Do you wish for the King's
                     // galleon to transport your treasure, deducting
                     // the current tax rate of %TAX_RATE% for a profit of %AMT_AFTER_TAX%?"
-                }
-                else {
+                } else {
                     // todo -show confirm dialog "Do you wish for the King's galleon
                     // transport your treasure, deducting 50% and the current tax rate of %TAX_RATE%
                     // for a profit of %AMT_AFTER_TAX_AND_SHARE%?"
                 }
-            }
-            else if (location instanceof Europe && getType()==GALLEON) {
+            } else if (location instanceof Europe && getType()==GALLEON) {
                 Iterator iter = getUnitIterator();
                 while (iter.hasNext()) {
                     Unit u = (Unit)iter.next();

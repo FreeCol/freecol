@@ -126,10 +126,10 @@ public class IndianSettlement extends Settlement {
     public IndianSettlement(Game game, Element element) {
         super(game, element);
 
-        readFromXMLElement(element);
-
         // The client doesn't know the skill at first.
-        this.learnableSkill = UNKNOWN;
+        this.learnableSkill = UNKNOWN;        
+        
+        readFromXMLElement(element);
     }
 
 
@@ -329,6 +329,10 @@ public class IndianSettlement extends Settlement {
         indianSettlementElement.setAttribute("isCapital", Boolean.toString(isCapital));
         indianSettlementElement.setAttribute("food", Integer.toString(food));
 
+        if (showAll || player == getOwner()) {
+            indianSettlementElement.setAttribute("learnableSkill", Integer.toString(learnableSkill));    
+        }
+        
         indianSettlementElement.appendChild(unitContainer.toXMLElement(player, document, showAll, toSavedGame));
 
         return indianSettlementElement;
@@ -355,6 +359,10 @@ public class IndianSettlement extends Settlement {
         } else {
             food = 0;
         }
+        
+        if (indianSettlementElement.hasAttribute("learnableSkill")) {
+            learnableSkill = Integer.parseInt(indianSettlementElement.getAttribute("learnableSkill"));
+        }       
 
         Element unitContainerElement = getChildElement(indianSettlementElement, UnitContainer.getXMLElementTagName());
         if (unitContainer != null) {

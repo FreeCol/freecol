@@ -400,12 +400,8 @@ public final class InGameInputHandler extends InputHandler {
             Element reply = Message.createNewRootElement("provideSkill");
             reply.setAttribute("skill", Integer.toString(settlement.getLearnableSkill()));
 
-            // TODO: Keep the data that says that we've sent 'skill' to 'player'.
-            //       Used when saving/loading the game.
-
             return reply;
-        }
-        else {
+        } else {
             throw new IllegalStateException("Learnable skill from Indian settlement is unknown at server.");
         }
     }

@@ -883,33 +883,10 @@ public final class InGameController {
 
             if (reply.getTagName().equals("provideSkill")) {
                 skill = Integer.parseInt(reply.getAttribute("skill"));
-                switch (skill) {
-                    case IndianSettlement.NONE:
-                        skillName = null;
-                        break;
-                    case IndianSettlement.EXPERT_FARMER:
-                        skillName = Messages.message("indianSettlement.skillExpertFarmer");
-                        break;
-                    case IndianSettlement.EXPERT_FISHERMAN:
-                        skillName = Messages.message("indianSettlement.skillExpertFisherman");
-                        break;
-                    case IndianSettlement.EXPERT_SILVER_MINER:
-                        skillName = Messages.message("indianSettlement.skillExpertSilverMiner");
-                        break;
-                    case IndianSettlement.MASTER_SUGAR_PLANTER:
-                        skillName = Messages.message("indianSettlement.skillMasterSugarPlanter");
-                        break;
-                    case IndianSettlement.MASTER_COTTON_PLANTER:
-                        skillName = Messages.message("indianSettlement.skillMasterCottonPlanter");
-                        break;
-                    case IndianSettlement.MASTER_TOBACCO_PLANTER:
-                        skillName = Messages.message("indianSettlement.skillMasterTobaccoPlanter");
-                        break;
-                    case IndianSettlement.SEASONED_SCOUT:
-                        skillName = Messages.message("indianSettlement.skillSeasonedScout");
-                        break;
-                    default:
-                        throw new IllegalArgumentException("Invalid skill found in provideSkill message.");
+                if (skill < 0) {
+                    skillName = null;
+                } else {
+                    skillName = Unit.getName(skill);
                 }
             } else {
                 logger.warning("Server gave an invalid reply to an askSkill message");
