@@ -307,13 +307,18 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         tilePanel.initialize();
 
         goldLabel.setText("Gold: " + freeColClient.getMyPlayer().getGold());
-        
+
         buildingBox.initialize();
-        
+
         updateSoLLabel();
         updateProgressLabel();
     }
 
+
+    public void reinitialize() {
+        initialize(colony, game);
+    }
+    
 
     /**
     * Updates the label that is placed above the cargo panel. It shows the name
@@ -511,7 +516,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                     aSingleBuildingPanel = new ASingleBuildingPanel(building);
                     aSingleBuildingPanel.addMouseListener(releaseListener);
                     aSingleBuildingPanel.setTransferHandler(defaultTransferHandler);
-                    aSingleBuildingPanel.setOpaque(false);                    
+                    aSingleBuildingPanel.setOpaque(false);
                     add(aSingleBuildingPanel);
                 }
             }
@@ -572,9 +577,16 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 if (editState) {
                     if (comp instanceof UnitLabel) {
                         Unit unit = ((UnitLabel) comp).getUnit();
-                        inGameController.work(unit, building);
+                        
+                        if (building.canAdd(unit)) {
+                            comp.getParent().remove(comp);
+                            inGameController.work(unit, building);
+                        } else {
+                            return null;
+                        }
                     } else {
                         logger.warning("An invalid component got dropped on this BuildingsPanel.");
+                        return null;
                     }
                 }
 
@@ -617,11 +629,13 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         public Component add(Component comp, boolean editState) {
             if (editState) {
                 if (comp instanceof UnitLabel) {
+                    comp.getParent().remove(comp);
                     UnitLabel unitLabel = ((UnitLabel) comp);
                     Unit unit = unitLabel.getUnit();
                     inGameController.putOutsideColony(unit);
                 } else {
                     logger.warning("An invalid component got dropped on this ColonistsPanel.");
+                    return null;
                 }
             }
 
@@ -682,6 +696,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         public Component add(Component comp, boolean editState) {
             if (editState) {
                 if (comp instanceof GoodsLabel) {
+                    comp.getParent().remove(comp);
                     Goods g = ((GoodsLabel)comp).getGoods();
                     ((GoodsLabel) comp).setSmall(false);
                     //inGameController.unloadCargo(g, selectedUnit.getUnit());
@@ -689,6 +704,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                     colonyPanel.getCargoPanel().revalidate();
                 } else {
                     logger.warning("An invalid component got dropped on this WarehousePanel.");
+                    return null;
                 }
             }
 
@@ -740,6 +756,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         public Component add(Component comp, boolean editState) {
             if (editState) {
                 if (comp instanceof UnitLabel) {
+                    comp.getParent().remove(comp);
                     Unit unit = ((UnitLabel)comp).getUnit();
                     if (!unit.isCarrier()) {// No, you cannot load ships onto other ships.
                       ((UnitLabel) comp).setSmall(false);
@@ -749,6 +766,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                       return comp;
                     }
                 } else if (comp instanceof GoodsLabel) {
+                    comp.getParent().remove(comp);
                     Goods g = ((GoodsLabel)comp).getGoods();
                     ((GoodsLabel) comp).setSmall(false);
                     logger.info("Attempting to load cargo.");
@@ -757,6 +775,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                     colonyPanel.getCargoPanel().revalidate();
                 } else {
                     logger.warning("An invalid component got dropped on this CargoPanel.");
+                    return null;
                 }
             }
 
@@ -899,21 +918,28 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 if (editState) {
                     if (comp instanceof UnitLabel) {
                         Unit unit = ((UnitLabel)comp).getUnit();
-                        inGameController.work(unit, colonyTile);
+                        if (colonyTile.canAdd(unit)) {
+                            comp.getParent().remove(comp);
 
-                        ((UnitLabel) comp).setSmall(false);
+                            inGameController.work(unit, colonyTile);
 
-                        if (staticGoodsLabel != null) {
-                            super.remove(staticGoodsLabel);
-                            staticGoodsLabel = null;
+                            ((UnitLabel) comp).setSmall(false);
+
+                            if (staticGoodsLabel != null) {
+                                super.remove(staticGoodsLabel);
+                                staticGoodsLabel = null;
+                            }
+                            staticGoodsLabel = new JLabel(parent.getImageProvider().getGoodsImageIcon(unit.getWorkType()));
+                            staticGoodsLabel.setText(Integer.toString(unit.getFarmedPotential(unit.getWorkType(), colonyTile.getWorkTile())));
+                            add(staticGoodsLabel);
+
+                            colonyPanel.updateSoLLabel();
+                        } else {
+                            return null;
                         }
-                        staticGoodsLabel = new JLabel(parent.getImageProvider().getGoodsImageIcon(unit.getWorkType()));
-                        staticGoodsLabel.setText(Integer.toString(unit.getFarmedPotential(unit.getWorkType(), colonyTile.getWorkTile())));
-                        add(staticGoodsLabel);
-                        
-                        colonyPanel.updateSoLLabel();
                     } else {
                         logger.warning("An invalid component got dropped on this CargoPanel.");
+                        return null;
                     }
                 }
 

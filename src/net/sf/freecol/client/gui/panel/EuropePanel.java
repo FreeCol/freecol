@@ -373,6 +373,10 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         goldLabel.setText("Gold: " + freeColClient.getMyPlayer().getGold());
     }
 
+    
+    public void reinitialize() {
+        initialize(europe, game);
+    }
 
     /**
     * Selects a unit that is located somewhere on this panel.
@@ -731,11 +735,12 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         public Component add(Component comp, boolean editState) {
             if (editState) {
                 if (comp instanceof UnitLabel) {
+                    comp.getParent().remove(comp);
                     Unit unit = ((UnitLabel)comp).getUnit();
                     inGameController.moveToAmerica(unit);
-                }
-                else {
+                } else {
                     logger.warning("An invalid component got dropped on this ToAmericaPanel.");
+                    return null;
                 }
             }
             setSelectedUnit(null);
@@ -782,11 +787,12 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         public Component add(Component comp, boolean editState) {
             if (editState) {
                 if (comp instanceof UnitLabel) {
+                    comp.getParent().remove(comp);
                     Unit unit = ((UnitLabel)comp).getUnit();
                     inGameController.moveToEurope(unit);
-                }
-                else {
+                } else {
                     logger.warning("An invalid component got dropped on this ToEuropePanel.");
+                    return null;
                 }
             }
             setSelectedUnit(null);
@@ -855,10 +861,12 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         public Component add(Component comp, boolean editState) {
             if (editState) {
                 if (comp instanceof UnitLabel) {
+                    comp.getParent().remove(comp);
                     Unit unit = ((UnitLabel)comp).getUnit();
                     inGameController.leaveShip(unit);
                 } else {
                     logger.warning("An invalid component got dropped on this DocksPanel.");
+                    return null;
                 }
             }
             updateCargoLabel();
@@ -905,6 +913,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         public Component add(Component comp, boolean editState) {
             if (editState) {
                 if (comp instanceof UnitLabel) {
+                    comp.getParent().remove(comp);
                     Unit unit = ((UnitLabel)comp).getUnit();
                     inGameController.boardShip(unit, selectedUnit.getUnit());
                 } else if (comp instanceof MarketLabel) {
@@ -926,6 +935,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     return comp;
                 } else {
                     logger.warning("An invalid component got dropped on this CargoPanel.");
+                    return null;
                 }
             }
 
@@ -970,6 +980,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         public Component add(Component comp, boolean editState) {
             if (editState) {
                 if (comp instanceof GoodsLabel) {
+                    comp.getParent().remove(comp);
                     inGameController.sellGoods(((GoodsLabel)comp).getGoods());
                     updateCargoLabel();
                     goldLabel.setText("Gold: " + freeColClient.getMyPlayer().getGold());
@@ -978,9 +989,9 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     revalidate();
                     europePanel.refresh();
                     return comp;
-                }
-                else {
+                } else {
                     logger.warning("An invalid component got dropped on this MarketPanel.");
+                    return null;
                 }
             }
             europePanel.refresh();

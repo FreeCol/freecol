@@ -4,6 +4,7 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.logging.Logger;
@@ -172,9 +173,23 @@ public final class UnitLabel extends JLabel implements ActionListener {
                         logger.warning("Invalid action");
                 }
                 setIcon(parent.getImageProvider().getUnitImageIcon(parent.getImageProvider().getUnitGraphicsType(unit)));
+                
+                Component uc = getParent();
+                while (uc != null) {
+                    if (uc instanceof ColonyPanel) {
+                        ((ColonyPanel) uc).reinitialize();
+                        break;
+                    } else if (uc instanceof EuropePanel) {
+                        ((EuropePanel) uc).reinitialize();
+                        break;
+                    }
+
+                    uc = uc.getParent();
+                }
+
                 repaint(0, 0, getWidth(), getHeight());
 
-                
+
                 // TODO: Refresh the gold label when goods have prices.
                 //goldLabel.repaint(0, 0, goldLabel.getWidth(), goldLabel.getHeight());
             }

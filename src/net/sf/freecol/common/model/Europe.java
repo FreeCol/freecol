@@ -346,7 +346,7 @@ public final class Europe extends FreeColGameObject implements Location {
         recruitables[1] = Integer.parseInt(europeElement.getAttribute("recruit1"));
         recruitables[2] = Integer.parseInt(europeElement.getAttribute("recruit2"));
 
-        Element unitContainerElement = (Element) europeElement.getElementsByTagName(UnitContainer.getXMLElementTagName()).item(0);
+        Element unitContainerElement = getChildElement(europeElement, UnitContainer.getXMLElementTagName());
         if (unitContainer != null) {
             unitContainer.readFromXMLElement(unitContainerElement);
         } else {

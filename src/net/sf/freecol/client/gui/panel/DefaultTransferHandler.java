@@ -184,7 +184,8 @@ public final class DefaultTransferHandler extends TransferHandler {
                     logger.warning("Oops, I thought we didn't have to write this part.");
                     return true;
                 } else if (comp instanceof JPanel) {
-                    data.getParent().remove(data);
+                    // Do this in the 'add'-methods instead:
+                    //data.getParent().remove(data);
 
                     if (comp instanceof EuropePanel.ToEuropePanel) {
                         ((EuropePanel.ToEuropePanel)comp).add(data, true);
@@ -232,7 +233,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                     logger.warning("Oops, I thought we didn't have to write this part.");
                     return true;
                 } else if (comp instanceof JPanel) {
-                    data.getParent().remove(data);
+                    //data.getParent().remove(data);
 
                     if (comp instanceof ColonyPanel.WarehousePanel) {
                         ((ColonyPanel.WarehousePanel)comp).add(data, true);

@@ -250,6 +250,12 @@ public final class InGameInputHandler implements MessageHandler {
         Element reply = Message.createNewRootElement("attackResult");
         reply.setAttribute("result", Integer.toString(result));
 
+        if (result == Unit.ATTACKER_LOSS) {
+            unit.loseAttack();
+        } else {
+            unit.winAttack(defender);
+        }
+        
         if (unit.getTile().equals(newTile)) { // In other words, we moved...
             Element update = reply.getOwnerDocument().createElement("update");
             Vector surroundingTiles = game.getMap().getSurroundingTiles(unit.getTile(), unit.getLineOfSight());
@@ -262,12 +268,7 @@ public final class InGameInputHandler implements MessageHandler {
 
             reply.appendChild(update);
         }
-
-        if (result == Unit.ATTACKER_LOSS) {
-            unit.loseAttack();
-        } else {
-            unit.winAttack(defender);
-        }
+                
         return reply;
     }
 

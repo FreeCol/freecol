@@ -165,8 +165,6 @@ public final class Tile extends FreeColGameObject implements Location {
         Unit defender = null;
         if (unitIterator.hasNext()) {
             defender = (Unit) unitIterator.next();
-        } else if (settlement == null) {
-            return null;
         }
 
         while (unitIterator.hasNext()) {
@@ -807,7 +805,8 @@ public final class Tile extends FreeColGameObject implements Location {
 
         // Check if there is a settlement on this tile: Do not show enemy units hidden in a settlement:
         // Check if the player can see the tile: Do not show enemy units on a tile out-of-sight.
-        if ((settlement == null || settlement instanceof IndianSettlement || settlement.getOwner().equals(player)) && player.canSee(this)) {
+        //if ((settlement == null || settlement instanceof IndianSettlement || settlement.getOwner().equals(player)) && player.canSee(this)) {
+        if (player.canSee(this)) {
             tileElement.appendChild(unitContainer.toXMLElement(player, document));
         } else {
             UnitContainer emptyUnitContainer = new UnitContainer(getGame(), this);
@@ -817,7 +816,7 @@ public final class Tile extends FreeColGameObject implements Location {
 
         return tileElement;
     }
-    
+
     /**
     * Initialize this object from an XML-representation of this object.
     *
@@ -838,19 +837,17 @@ public final class Tile extends FreeColGameObject implements Location {
         // Notice: Should be calculated by the other host instead of beeing transferred:
         //tileElement.getAttribute("owner");
 
-        NodeList cnl = tileElement.getElementsByTagName(Colony.getXMLElementTagName());
-        if (cnl.getLength() > 0) {
-            Element colonyElement = (Element) cnl.item(0);
+        Element colonyElement = getChildElement(tileElement, Colony.getXMLElementTagName());
+        if (colonyElement != null) {
             if (settlement != null && settlement instanceof Colony) {
                 settlement.readFromXMLElement(colonyElement);
             } else {
                 settlement = new Colony(getGame(), colonyElement);
             }
         }
-        
-        NodeList inl = tileElement.getElementsByTagName(IndianSettlement.getXMLElementTagName());
-        if (inl.getLength() > 0) {
-            Element indianSettlementElement = (Element) inl.item(0);
+
+        Element indianSettlementElement = getChildElement(tileElement, IndianSettlement.getXMLElementTagName());
+        if (indianSettlementElement != null) {
             if (settlement != null && settlement instanceof IndianSettlement) {
                 settlement.readFromXMLElement(indianSettlementElement);
             } else {
@@ -858,7 +855,12 @@ public final class Tile extends FreeColGameObject implements Location {
             }
         }
 
-        Element unitContainerElement = (Element) tileElement.getElementsByTagName(UnitContainer.getXMLElementTagName()).item(0);
+        Element unitContainerElement = getChildElement(tileElement, UnitContainer.getXMLElementTagName());
+        
+        if (unitContainerElement == null) {
+            throw new NullPointerException();
+        }
+
         if (unitContainer != null) {
             unitContainer.readFromXMLElement(unitContainerElement);
         } else {

@@ -294,8 +294,8 @@ public class IndianSettlement extends Settlement {
         tribe = Integer.parseInt(indianSettlementElement.getAttribute("tribe"));
         kind = Integer.parseInt(indianSettlementElement.getAttribute("kind"));
         isCapital = (new Boolean(indianSettlementElement.getAttribute("isCapital"))).booleanValue();
-        
-        Element unitContainerElement = (Element) indianSettlementElement.getElementsByTagName(UnitContainer.getXMLElementTagName()).item(0);
+
+        Element unitContainerElement = getChildElement(indianSettlementElement, UnitContainer.getXMLElementTagName());
         if (unitContainer != null) {
             unitContainer.readFromXMLElement(unitContainerElement);
         } else {

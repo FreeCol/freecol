@@ -593,10 +593,8 @@ public class Player extends FreeColGameObject {
             entryLocation = (Location) getGame().getFreeColGameObject(playerElement.getAttribute("entryLocation"));
         }
 
-        NodeList nl = playerElement.getElementsByTagName(Europe.getXMLElementTagName());
-        
-        if (nl.getLength() > 0) {
-            Element europeElement = (Element) nl.item(0);
+        Element europeElement = getChildElement(playerElement, Europe.getXMLElementTagName());
+        if (europeElement != null) {
             if (europe != null) {
                 europe.readFromXMLElement(europeElement);
             } else {

@@ -291,7 +291,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation {
         colony = (Colony) getGame().getFreeColGameObject(colonyTileElement.getAttribute("colony"));
         workTile = (Tile) getGame().getFreeColGameObject(colonyTileElement.getAttribute("workTile"));
 
-        Element unitElement = (Element) colonyTileElement.getElementsByTagName(Unit.getXMLElementTagName()).item(0);
+        Element unitElement = getChildElement(colonyTileElement, Unit.getXMLElementTagName());
         if (unitElement != null) {
             Unit unit = (Unit) getGame().getFreeColGameObject(unitElement.getAttribute("ID"));
             if (unit != null) {

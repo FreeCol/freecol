@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 
 
 
@@ -189,4 +190,22 @@ abstract public class FreeColGameObject {
         }
     }
 
+
+    /**
+    * Convenience method: returns the first child element with the
+    * specified tagname.
+    *
+    * @param element The <code>Element</code> to search for the child element.
+    * @param tagName The tag name of the child element to be found.
+    */
+    protected Element getChildElement(Element element, String tagName) {
+        NodeList n = element.getChildNodes();
+        for (int i=0; i<n.getLength(); i++) {
+            if (((Element) n.item(i)).getTagName().equals(tagName)) {
+                return (Element) n.item(i);
+            }
+        }
+
+        return null;
+    }
 }

@@ -1321,6 +1321,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         // For now everything takes forever(=-1) turn to complete (build road, ...).
         // This should change according to the terrain etc. !!
         // TODO
+        
+        if (!checkSetState(s)) {
+            throw new IllegalStateException();
+        }
+
         switch (s) {
             case ACTIVE:
                 workLeft = -1;
@@ -2052,21 +2057,12 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         movesLeft = 0;
         if (defender.getType() == BRAVE) {
             defender.dispose();
-            boolean slaughter = true;
+            
             if (newTile.getSettlement() != null) {
-                logger.info("Units remaining: " + newTile.getSettlement().getUnitCount());
                 if (newTile.getSettlement().getUnitCount() <= 0) {
                     //TODO: Burn the camp. Get treasure.
                     newTile.getSettlement().dispose();
-                    //setLocation(newTile);
-                } else {
-                    slaughter = false;
-                }
-            }
-            if (slaughter) {
-                Iterator unitIterator = newTile.getUnitIterator();
-                while (unitIterator.hasNext()) {
-                    ((Unit)unitIterator.next()).dispose();
+                    setLocation(newTile);
                 }
             }
         } else if (isNaval()) {
@@ -2401,13 +2397,14 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         }
 
         if (isCarrier()) {
-            Element unitContainerElement = (Element) unitElement.getElementsByTagName(UnitContainer.getXMLElementTagName()).item(0);
+            Element unitContainerElement = getChildElement(unitElement, UnitContainer.getXMLElementTagName());
             if (unitContainer != null) {
                 unitContainer.readFromXMLElement(unitContainerElement);
             } else {
                 unitContainer = new UnitContainer(getGame(), this, unitContainerElement);
             }
-            Element goodsContainerElement = (Element) unitElement.getElementsByTagName(GoodsContainer.getXMLElementTagName()).item(0);
+
+            Element goodsContainerElement = getChildElement(unitElement, GoodsContainer.getXMLElementTagName());
             if (goodsContainer != null) {
                 goodsContainer.readFromXMLElement(goodsContainerElement);
             } else {

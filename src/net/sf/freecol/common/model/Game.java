@@ -463,9 +463,8 @@ public class Game extends FreeColGameObject {
         setID(gameElement.getAttribute("ID"));
 
         // Get the map:
-        NodeList mapNodeList = gameElement.getElementsByTagName(Map.getXMLElementTagName());
-        if (mapNodeList.getLength() > 0) {
-            Element mapElement = (Element) mapNodeList.item(0);
+        Element mapElement = getChildElement(gameElement, Map.getXMLElementTagName());
+        if (mapElement != null) {
             if (map != null) {
                 map.readFromXMLElement(mapElement);
             } else {
@@ -487,7 +486,7 @@ public class Game extends FreeColGameObject {
             }
         }
 
-        Element marketElement = (Element) gameElement.getElementsByTagName(Market.getXMLElementTagName()).item(0);
+        Element marketElement = getChildElement(gameElement, Market.getXMLElementTagName());
         if (market != null) {
             market.readFromXMLElement(marketElement);
         } else {

@@ -78,7 +78,9 @@ public class UnitContainer extends FreeColGameObject {
     * @param u The Unit to add to this container.
     */
     public void addUnit(Unit unit) {
-        units.add(unit);
+        if (!units.contains(unit)) {
+            units.add(unit);
+        }
     }
 
 
@@ -249,7 +251,9 @@ public class UnitContainer extends FreeColGameObject {
 
             if (u != null) {
                 u.readFromXMLElement(unitElement);
-                units.add(u);
+                if (!units.contains(u)) {
+                    units.add(u);
+                }
                 //u.setLocation(parent);
             } else {
                 u = new Unit(getGame(), unitElement);

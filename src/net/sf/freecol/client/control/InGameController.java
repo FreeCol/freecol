@@ -194,11 +194,6 @@ public final class InGameController {
 
         int result = Integer.parseInt(attackResultElement.getAttribute("result"));
 
-        Element updateElement = (Element) attackResultElement.getElementsByTagName("update").item(0);
-        if (updateElement != null) {
-            freeColClient.getInGameInputHandler().handle(client.getConnection(), updateElement);
-        }
-
         Unit defender = map.getNeighbourOrNull(direction, unit.getTile()).getDefendingUnit(unit);
 
         if (result == Unit.ATTACKER_LOSS) {
@@ -206,6 +201,11 @@ public final class InGameController {
         } else {
             unit.winAttack(defender);
         }
+
+        Element updateElement = (Element) attackResultElement.getElementsByTagName("update").item(0);
+        if (updateElement != null) {
+            freeColClient.getInGameInputHandler().handle(client.getConnection(), updateElement);
+        }        
 
         if (unit.getMovesLeft() <= 0) {
             nextActiveUnit(unit.getTile());
