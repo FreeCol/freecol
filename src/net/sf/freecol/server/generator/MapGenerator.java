@@ -442,8 +442,24 @@ public class MapGenerator {
                                 t.setAddition(Tile.ADD_HILLS);
                             }
                         }
+                        
+                        if (tileType.nextInt(10) == 0 && (t.getType() != Tile.ARCTIC && (t.getType() != Tile.TUNDRA || t.isForested())
+                                && t.getType() != Tile.HIGH_SEAS && t.getType() != Tile.DESERT && t.getType() != Tile.MARSH
+                                && t.getType() != Tile.SWAMP || t.getAddition() == Tile.ADD_MOUNTAINS || t.getAddition() == Tile.ADD_HILLS)) {
+                            t.setBonus(true);
+                        }
                     } else {
                         t = new Tile(game, Tile.OCEAN, i, j);
+                        
+                        if (tileType.nextInt(10) == 0) {
+                            for (int k=0; k<8; k++) {
+                                Position mp = getAdjacent(t.getPosition(), k);
+                                if (isValid(mp) && landMap[mp.getX()][mp.getY()]) {
+                                    t.setBonus(true);
+                                    break;
+                                }
+                            }
+                        }
                     }
 
                     v.add(t);

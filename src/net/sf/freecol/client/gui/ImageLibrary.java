@@ -1,6 +1,6 @@
 package net.sf.freecol.client.gui;
 
-
+import java.util.logging.Logger;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.GraphicsConfiguration;
@@ -24,6 +24,8 @@ import net.sf.freecol.client.gui.panel.ImageProvider;
  * certain things.
  */
 public final class ImageLibrary extends ImageProvider {
+    private static final Logger logger = Logger.getLogger(ImageLibrary.class.getName());
+
     public static final String COPYRIGHT = "Copyright (C) 2003 The FreeCol Team";
     public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String REVISION = "$Revision$";
@@ -60,6 +62,9 @@ public final class ImageLibrary extends ImageProvider {
                             LAND_NORTH = 6,         // corner tile, some 'land' can be found in the far north of this tile
                             LAND_NORTH_EAST = 7,    // border tile, some 'land' can be found in north-east of this tile
                             LAND_CENTER = 8;        // ordinary tile, filled entirely with 'land'
+
+    private static final int BONUS_COUNT = 9;
+    
 
     /**
      * These finals represent the unit graphics that are available.
@@ -211,6 +216,8 @@ public final class ImageLibrary extends ImageProvider {
                                 indianName = new String("Indians"),
                                 goodsDirectory = new String("goods/"),
                                 goodsName = new String("Goods"),
+                                bonusDirectory = new String("bonus/"),
+                                bonusName = new String("Bonus"),
                                 extension = new String(".png");
     private final String dataDirectory;
 
@@ -223,7 +230,8 @@ public final class ImageLibrary extends ImageProvider {
                    misc, // Holds ImageIcon objects
                    colonies, //Holds ImageIcon objects
                    indians, //Holds ImageIcon objects
-                   goods; //Holds ImageIcon objects
+                   goods, //Holds ImageIcon objects
+                   bonus; //Holds ImageIcon objects
     private Vector[] unitButtons; //Holds the unit-order buttons
     private Hashtable colorChips;  // Color is key, BufferedImage is value
 
@@ -276,6 +284,7 @@ public final class ImageLibrary extends ImageProvider {
         loadColonies(gc, resourceLocator, doLookup);
         loadIndians(gc, resourceLocator, doLookup);
         loadGoods(gc, resourceLocator, doLookup);
+        loadBonus(gc, resourceLocator, doLookup);
         loadColorChips(gc);
     }
 
@@ -514,6 +523,28 @@ public final class ImageLibrary extends ImageProvider {
         */
     }
 
+    
+     /**
+     * Loads the bonus-images from file into memory.
+     * @param gc The GraphicsConfiguration is needed to create images that are compatible with the
+     * local environment.
+     * @param resourceLocator The class that is used to locate data files.
+     * @param doLookup Must be set to 'false' if the path to the image files
+     * has been manually provided by the user. If set to 'true' then a
+     * lookup will be done to search for image files from net.sf.freecol,
+     * in this case the images need to be placed in net/sf/freecol/images.
+     * @throws FreeColException If one of the data files could not be found.
+     */
+    private void loadBonus(GraphicsConfiguration gc, Class resourceLocator, boolean doLookup) throws FreeColException {
+        bonus = new Vector(BONUS_COUNT);
+
+        for (int i = 0; i < BONUS_COUNT; i++) {
+            String filePath = dataDirectory + path + bonusDirectory + bonusName + i + extension;
+            bonus.add(findImage(filePath, resourceLocator, doLookup));
+        }
+    }
+    
+
     /**
      * Generates color chip images and stores them in memory. Color chips
      * can be seen next to a unit to indicate its state.
@@ -568,6 +599,29 @@ public final class ImageLibrary extends ImageProvider {
         g.fillRect(1, 1, 9, 15);
         colorChips.put(c, tempImage);
     }
+    
+
+    public Image getBonusImage(Tile tile) {
+        if (tile.getAddition() == Tile.ADD_MOUNTAINS) {
+            return ((ImageIcon) bonus.get(0)).getImage();
+        } else if (tile.getAddition() == Tile.ADD_HILLS) {
+            return ((ImageIcon) bonus.get(6)).getImage();
+        } else if (tile.isForested()) {
+            if (tile.getType() == Tile.GRASSLANDS || tile.getType() == Tile.SAVANNAH) {
+                return ((ImageIcon) bonus.get(8)).getImage();
+            } else {
+                return ((ImageIcon) bonus.get(7)).getImage();
+            }
+        } else if (tile.getType() <= 4) {
+            return ((ImageIcon) bonus.get(tile.getType())).getImage();
+        } else if (tile.getType() == Tile.OCEAN) {
+            return ((ImageIcon) bonus.get(5)).getImage();
+        } else {
+            logger.warning("No bonus graphics for:" + tile.getName());
+            return null;
+        }
+    }
+
 
     /**
      * Returns the unit-image at the given index.
@@ -597,6 +651,7 @@ public final class ImageLibrary extends ImageProvider {
     public Image getTerrainImage(int index, int x, int y) {
         return getTerrainImage(index, LAND_CENTER, x, y);
     }
+
 
     /**
      * Returns the terrain-image at the given index with the specified type.

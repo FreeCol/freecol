@@ -178,6 +178,7 @@ public final class FreeColServer {
 
         savedGameElement.setAttribute("owner", username);
         savedGameElement.setAttribute("singleplayer", Boolean.toString(singleplayer));
+        savedGameElement.setAttribute("version", Message.getFreeColProtocolVersion());
 
         // Add server side model information:
         Element serverObjectsElement = document.createElement("serverObjects");
@@ -204,7 +205,7 @@ public final class FreeColServer {
     * @param file The file where the game data is located.
     * @return The username of the player saving the game.
     */
-    public String loadGame(File file) throws IOException {           
+    public String loadGame(File file) throws IOException {
         InflaterInputStream in = new InflaterInputStream(new FileInputStream(file));
         StringBuffer sb = new StringBuffer();
            

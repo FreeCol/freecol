@@ -1052,6 +1052,13 @@ public final class GUI {
             if (tile.isPlowed()) {
                 g.drawImage(lib.getMiscImage(ImageLibrary.PLOWED), x, y, null);
             }
+            
+            if (tile.hasBonus()) {
+                Image bonusImage = lib.getBonusImage(tile);
+                if (bonusImage != null) {
+                    g.drawImage(bonusImage, x + tileWidth/2 - bonusImage.getWidth(null)/2, y + tileHeight/2 - bonusImage.getHeight(null)/2, null);
+                }
+            }
 
             if (tile.isLand()) {
                 for (int i = 0; i < 8; i++) {

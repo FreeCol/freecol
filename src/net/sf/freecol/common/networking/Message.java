@@ -25,6 +25,9 @@ import org.xml.sax.SAXException;
 public final class Message {
     private static final Logger logger = Logger.getLogger(Message.class.getName());
 
+    private static final String FREECOL_PROTOCOL_VERSION = "0.0.1";
+
+
     /** The actual Message data. */
     private final Document document;
 
@@ -99,7 +102,13 @@ public final class Message {
 
 
     
-    
+    /**
+    * Gets the current version of the FreeCol protocol.   
+    */
+    public static String getFreeColProtocolVersion() {
+        return FREECOL_PROTOCOL_VERSION;
+    }
+
     
     /**
     * Creates and returns a new XML-document.

@@ -547,6 +547,7 @@ public final class Tile extends FreeColGameObject implements Location {
     */
     public void setForested(boolean value) {
         forested = value;
+        bonus = false;        
     }
 
     /**
@@ -581,6 +582,7 @@ public final class Tile extends FreeColGameObject implements Location {
     public void setType(int t) {
         // TODO: check if t is a valid type
         type = t;
+        bonus = false; 
     }
 
 
@@ -794,51 +796,79 @@ public final class Tile extends FreeColGameObject implements Location {
     * @param goods The type of goods to check the potential for.
     * @return The normal potential of this tile to produce that amount of goods.
     */
-    public int potential (int goods)
-    {
-      // Please someone tell me they want to put this data into a separate file... -sjm
-      // Twelve tile types, sixteen goods types, and forested/unforested.
-      int potentialtable[][][] =
-      {
-       // Food    Sugar  Tobac  Cotton Furs   Wood   Ore    Silver Horses Rum    Cigars Cloth  Coats  T.G.   Tools  Musket
-          {{0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Unexp
-          {{5,3}, {0,0}, {0,0}, {2,1}, {0,3}, {0,6}, {1,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Plains
-          {{3,2}, {0,0}, {3,1}, {0,0}, {0,2}, {0,4}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Grasslands
-          {{3,2}, {0,0}, {0,0}, {3,1}, {0,2}, {0,6}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Prairie
-          {{4,3}, {3,1}, {0,0}, {0,0}, {0,2}, {0,4}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Savannah
-          {{3,2}, {0,0}, {0,0}, {0,0}, {0,2}, {0,4}, {2,1}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Marsh
-          {{3,2}, {2,1}, {2,1}, {0,0}, {0,1}, {0,4}, {2,1}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Swamp
-          {{2,2}, {0,0}, {0,0}, {1,1}, {0,2}, {0,2}, {2,1}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Desert
-          {{3,2}, {0,0}, {0,0}, {0,0}, {0,3}, {0,4}, {2,1}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Tundra
-          {{0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Arctic
-          {{4,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Ocean
-          {{4,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // High seas
-          {{2,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {4,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Hills
-          {{0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {3,0}, {1,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}  // Mountains
-      };
+    public int potential(int goods) {
+        // Please someone tell me they want to put this data into a separate file... -sjm
+        // Twelve tile types, sixteen goods types, and forested/unforested.
+        int potentialtable[][][] = {
+        // Food    Sugar  Tobac  Cotton Furs   Wood   Ore    Silver Horses Rum    Cigars Cloth  Coats  T.G.   Tools  Musket
+            {{0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Unexp
+            {{5,3}, {0,0}, {0,0}, {2,1}, {0,3}, {0,6}, {1,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Plains
+            {{3,2}, {0,0}, {3,1}, {0,0}, {0,2}, {0,4}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Grasslands
+            {{3,2}, {0,0}, {0,0}, {3,1}, {0,2}, {0,6}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Prairie
+            {{4,3}, {3,1}, {0,0}, {0,0}, {0,2}, {0,4}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Savannah
+            {{3,2}, {0,0}, {0,0}, {0,0}, {0,2}, {0,4}, {2,1}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Marsh
+            {{3,2}, {2,1}, {2,1}, {0,0}, {0,1}, {0,4}, {2,1}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Swamp
+            {{2,2}, {0,0}, {0,0}, {1,1}, {0,2}, {0,2}, {2,1}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Desert
+            {{3,2}, {0,0}, {0,0}, {0,0}, {0,3}, {0,4}, {2,1}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Tundra
+            {{0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Arctic
+            {{4,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Ocean
+            {{4,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // High seas
+            {{2,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {4,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Hills
+            {{0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {3,0}, {1,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}  // Mountains
+        };
 
-      int basepotential = 0;
-      if (addition_type <= ADD_RIVER_MAJOR) {
-          basepotential = potentialtable[type][goods][(forested ? 1 : 0)];
-      } else if (addition_type == ADD_HILLS) {
-          basepotential = potentialtable[12][goods][0];
-      } else if (addition_type == ADD_MOUNTAINS) {
-          basepotential = potentialtable[13][goods][0];
-      }
-      if (basepotential > 0) {
-        if (plowed) basepotential++;
-        if (road) basepotential++;
-      }
-      
-      return basepotential;
+        int basepotential = 0;
+        if (addition_type <= ADD_RIVER_MAJOR) {
+            basepotential = potentialtable[type][goods][(forested ? 1 : 0)];
+        } else if (addition_type == ADD_HILLS) {
+            basepotential = potentialtable[12][goods][0];
+        } else if (addition_type == ADD_MOUNTAINS) {
+            basepotential = potentialtable[13][goods][0];
+        }
+        if (basepotential > 0) {
+            if (plowed && (goods == Goods.FOOD || goods == Goods.SUGAR || goods == Goods.TOBACCO || goods == Goods.COTTON)) {
+                basepotential++;
+            } else if (road && (goods == Goods.FURS || goods == Goods.LUMBER || goods == Goods.ORE || goods == Goods.SILVER)) {
+                basepotential++;
+            }
+        }
+
+        if (hasBonus()) {
+            if (getAddition() == ADD_MOUNTAINS && goods == Goods.SILVER) {
+                basepotential += 2;
+            } else if (getAddition() == ADD_HILLS && goods == Goods.ORE) {
+                basepotential += 6;
+            } else if (getType() == PLAINS && goods == Goods.FOOD) {
+                basepotential += 4;
+            } else if (getType() == SAVANNAH && goods == Goods.SUGAR) {
+                basepotential += 7;
+            } else if (getType() == GRASSLANDS && goods == Goods.TOBACCO) {
+                basepotential += 6;
+            } else if (getType() == PRAIRIE && goods == Goods.COTTON) {
+                basepotential += 6;
+            } else if (isForested()) {
+                if (getType() == GRASSLANDS || getType() == SAVANNAH) {
+                    if (goods == Goods.LUMBER) {
+                        basepotential += 6;
+                    }
+                } else {
+                    if (goods == Goods.FURS) {
+                        basepotential += 6;
+                    }
+                }
+            } else if (getType() == OCEAN && goods == Goods.FOOD) {
+                basepotential += 5;
+            }
+        }
+
+        return basepotential;
     }
 
     /**
     * The type of secondary good this tile produces best (used for Town Commons squares).
     * @return The type of secondary good best produced by this tile.
     */
-    public int secondaryGoods()
-    {
+    public int secondaryGoods() {
         if (isForested()) return Goods.FURS;
         if (getAddition() >= ADD_HILLS) return Goods.ORE;
         switch(getType()) {
