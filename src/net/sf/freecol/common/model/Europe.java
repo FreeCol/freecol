@@ -129,6 +129,7 @@ public final class Europe extends FreeColGameObject implements Location {
 
         unit.getOwner().modifyGold(-unit.getOwner().getRecruitPrice());
         unit.getOwner().setCrosses(0);
+        unit.getOwner().setCrossesRequired((unit.getOwner().getCrossesRequired()*4)/3);
         unit.setLocation(this);
 
         setRecruitable(slot, newRecruitable);

@@ -115,6 +115,8 @@ public class Player extends FreeColGameObject {
 
     // 0 = pre-rebels; 1 = in rebellion; 2 = independence granted
     private int             rebellionState;
+    
+    private int             crossesRequired = 1000000000; // Not allowed to recruit unit in the first round. ;-)
 
 
     private Location entryLocation;
@@ -680,6 +682,24 @@ public class Player extends FreeColGameObject {
     * @return The number of crosses required to cause a new colonist to emigrate.
     */
     public int getCrossesRequired() {
+        return crossesRequired;
+    }
+
+    
+    /**
+    * Sets the number of crosses required to cause a new colonist to emigrate.
+    * @return The number of crosses required to cause a new colonist to emigrate.
+    */
+    public void setCrossesRequired(int crossesRequired) {
+        this.crossesRequired = crossesRequired;
+    }
+
+    
+    /**
+    * Updates the amount of crosses needed to emigrate a <code>Unit</code> 
+    * from <code>Europe</code>.
+    */
+    private void updateCrossesRequired() {
         // The book I have tells me the crosses needed is:
         // [(colonist count in colonies + total colonist count) * 2] + 8.
         // So every unit counts as 2 unless they're in a colony,
@@ -702,7 +722,6 @@ public class Player extends FreeColGameObject {
                     Iterator childUnitIterator = u.getUnitIterator();
                     while (childUnitIterator.hasNext()) {
                         Unit childUnit = (Unit) childUnitIterator.next();
-                        //units.add(childUnit);
                         count += 2;
                     }
 
@@ -721,7 +740,7 @@ public class Player extends FreeColGameObject {
 
         if (nation == ENGLISH) count = (count * 2) / 3;
 
-        return count;
+        setCrossesRequired(count);
     }
 
 
@@ -777,6 +796,10 @@ public class Player extends FreeColGameObject {
             fathers[currentFather] = true;
             promptNewFather();
         }
+
+        if (crossesRequired != -1) {
+            updateCrossesRequired();
+        }
     }
 
 
@@ -801,6 +824,12 @@ public class Player extends FreeColGameObject {
         playerElement.setAttribute("dead", Boolean.toString(dead));
         playerElement.setAttribute("rebellionState", Integer.toString(rebellionState));
         playerElement.setAttribute("currentFather", Integer.toString(currentFather));
+        
+        if (equals(player)) {
+            playerElement.setAttribute("crossesRequired", Integer.toString(crossesRequired));
+        } else {
+            playerElement.setAttribute("crossesRequired", Integer.toString(-1));
+        }
 
         char[] fatherCharArray = new char[FoundingFather.FATHER_COUNT];
         for(int i = 0; i < fathers.length; i++)
@@ -841,6 +870,7 @@ public class Player extends FreeColGameObject {
         dead = (new Boolean(playerElement.getAttribute("dead"))).booleanValue();
         rebellionState = Integer.parseInt(playerElement.getAttribute("rebellionState"));
         currentFather = Integer.parseInt(playerElement.getAttribute("currentFather"));
+        crossesRequired = Integer.parseInt(playerElement.getAttribute("crossesRequired"));
 
         String fatherStr = playerElement.getAttribute("foundingFathers");
         for(int i = 0; i < fatherStr.length(); i++) {
