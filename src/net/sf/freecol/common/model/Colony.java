@@ -749,10 +749,8 @@ public final class Colony extends Settlement implements Location {
     */
     public int getHorseProduction() {
         int eat = getUnitCount() * 2;
-System.out.println(getName() + ": " +getFoodProduction());
-System.out.println(getName() + ": " +eat);
         int surplus = getFoodProduction() - eat;
-System.out.println(getName() + ": " +surplus + "\n");
+        
         if (getGoodsCount(Goods.HORSES) >= 2 && surplus > 1) {
             if (!getBuilding(Building.STABLES).isBuilt()) {
                 return Math.min(surplus / 2, getPotentialHorseProduction());

@@ -4,6 +4,8 @@ package net.sf.freecol;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 
+import java.awt.Rectangle;
+
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.UIManager;
 import javax.swing.SwingUtilities;
@@ -44,6 +46,7 @@ public final class FreeCol {
 
     private static boolean  windowed = false,
                             sound = true;
+    private static Rectangle windowSize = new Rectangle(-1, -1);
     private static String   dataFolder = "";
     private static FreeColClient freeColClient;
 
@@ -164,7 +167,7 @@ public final class FreeCol {
                 }
             }
 
-            freeColClient = new FreeColClient(windowed, lib, musicLibrary, sfxLibrary);
+            freeColClient = new FreeColClient(windowed, windowSize, lib, musicLibrary, sfxLibrary);
         }
     }
 
@@ -214,7 +217,37 @@ public final class FreeCol {
                     printUsage();
                     System.exit(0);
                 }
-            } else if (args[i].equals("--windowed")) {
+            } else if (args[i].length() >= 10 && args[i].substring(0, 10).equals("--windowed")) {
+                if (args[i].length() > 10 && args[i].charAt(10) != ' ') {
+                    // TODO: Check if the input values are legal.
+                    try {
+                        int x = 0;
+                        int j = 10;
+                        
+                        if (args[i].charAt(10) == '=') {
+                            j++;
+                        }
+
+                        for (; args[i].charAt(j) != 'x'; j++) {
+                            x *= 10;
+                            x += Character.digit(args[i].charAt(j), 10);
+                        }
+
+                        int y = 0;
+                        for (j++; j < args[i].length() && args[i].charAt(j) != ' '; j++) {
+                            y *= 10;
+                            y += Character.digit(args[i].charAt(j), 10);
+                        }
+                        windowSize = new Rectangle(x, y);
+                    } catch (Exception e) {
+                        printUsage();
+                        System.exit(0);
+                    }
+                } else if (args[i].length() != 10) {
+                    printUsage();
+                    System.exit(0);
+                }
+                
                 windowed = true;
             } else if (args[i].equals("--no-sound")) {
                 sound = false;
@@ -282,7 +315,7 @@ public final class FreeCol {
         System.out.println("--freecol-data [DIR]");
         System.out.println("  [DIR] should be the directory with FreeCol's data files, it");
         System.out.println("  has a subdirectory called 'images'");
-        System.out.println("--windowed");
+        System.out.println("--windowed[[=]WIDTHxHEIGHT]");
         System.out.println("  runs FreeCol in windowed mode instead of full screen mode");
         System.out.println("--no-sound");
         System.out.println("  runs FreeCol without sound");
@@ -292,5 +325,6 @@ public final class FreeCol {
         System.out.println("  displays the version number");
         System.out.println("--server PORT");
         System.out.println("  starts a stand-alone server on the specifed port");
+        System.out.println("");
     }
 }

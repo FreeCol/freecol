@@ -4,6 +4,8 @@ import java.util.logging.Logger;
 
 import java.io.File;
 
+import java.awt.Rectangle;
+
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
@@ -90,7 +92,7 @@ public final class FreeColClient {
     * Creates a new <code>FreeColClient</code>. Creates the control
     * objects and starts the GUI.
     */
-    public FreeColClient(boolean windowed, ImageLibrary imageLibrary, MusicLibrary musicLibrary, SfxLibrary sfxLibrary) {
+    public FreeColClient(boolean windowed, Rectangle windowSize, ImageLibrary imageLibrary, MusicLibrary musicLibrary, SfxLibrary sfxLibrary) {
         this.windowed = windowed;
         this.imageLibrary = imageLibrary;
         this.musicLibrary = musicLibrary;
@@ -106,12 +108,13 @@ public final class FreeColClient {
 
         // Gui:
         final boolean theWindowed = windowed;
+        final Rectangle theWindowSize = windowSize;
         final ImageLibrary theImageLibrary = imageLibrary;
         final MusicLibrary theMusicLibrary = musicLibrary;
         final SfxLibrary theSfxLibrary = sfxLibrary;
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                startGUI(theWindowed, theImageLibrary, theMusicLibrary, theSfxLibrary);
+                startGUI(theWindowed, theWindowSize, theImageLibrary, theMusicLibrary, theSfxLibrary);
             }
         });
 
@@ -159,7 +162,7 @@ public final class FreeColClient {
     /**
     * Starts the GUI by creating and displaying the GUI-objects.
     */
-    private void startGUI(boolean windowed, ImageLibrary lib, MusicLibrary musicLibrary, SfxLibrary sfxLibrary) {
+    private void startGUI(boolean windowed, Rectangle windowSize, ImageLibrary lib, MusicLibrary musicLibrary, SfxLibrary sfxLibrary) {
         if (musicLibrary != null) {
             musicPlayer = new SoundPlayer(false, true, true);
         } else {
@@ -182,14 +185,14 @@ public final class FreeColClient {
         gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 
         if (windowed) {
-            frame = new WindowedFrame();
+            frame = new WindowedFrame(windowSize);
         } else {
             if (!gd.isFullScreenSupported()) {
                 logger.warning("It seems that full screen mode is not supported for this GraphicsDevice! Using windowed mode instead.");
 
                 windowed = true;
                 setWindowed(true);
-                frame = new WindowedFrame();
+                frame = new WindowedFrame(windowSize);
             } else {
                 frame = new FullScreenFrame(gd);
             }
