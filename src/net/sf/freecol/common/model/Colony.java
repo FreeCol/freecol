@@ -655,7 +655,7 @@ public final class Colony extends Settlement implements Location {
         return getProductionOf(Goods.FOOD);
     }
 
-    
+
     /**
     * Returns the production of the given type of goods.
     */
@@ -672,6 +672,48 @@ public final class Colony extends Settlement implements Location {
 
 
     /**
+    * Returns a vacant <code>ColonyTile</code> where the
+    * given <code>unit</code> produces the maximum output of
+    * the given <code>goodsType</code>.
+    */
+    public ColonyTile getVacantColonyTileFor(Unit unit, int goodsType) {
+        ColonyTile bestPick = null;
+        int highestProduction = 0;
+
+        Iterator colonyTileIterator = getColonyTileIterator();
+        while (colonyTileIterator.hasNext()) {
+            ColonyTile colonyTile = (ColonyTile) colonyTileIterator.next();
+            if (colonyTile.canAdd(unit) && unit.getFarmedPotential(goodsType, colonyTile.getWorkTile()) > highestProduction) {
+                highestProduction = unit.getFarmedPotential(goodsType, colonyTile.getWorkTile());
+                bestPick = colonyTile;
+            }
+        }
+
+        return bestPick;
+    }
+
+    
+    /**
+    * Returns the production of a vacant <code>ColonyTile</code>
+    * where the given <code>unit</code> produces the maximum output
+    * of the given <code>goodsType</code>.
+    */
+    public int getVacantColonyTileProductionFor(Unit unit, int goodsType) {
+        int highestProduction = 0;
+
+        Iterator colonyTileIterator = getColonyTileIterator();
+        while (colonyTileIterator.hasNext()) {
+            ColonyTile colonyTile = (ColonyTile) colonyTileIterator.next();
+            if (colonyTile.canAdd(unit) && unit.getFarmedPotential(goodsType, colonyTile.getWorkTile()) > highestProduction) {
+                highestProduction = unit.getFarmedPotential(goodsType, colonyTile.getWorkTile());
+            }
+        }
+
+        return highestProduction;
+    }
+
+
+    /**
     * Returns the horse production (given that enough food
     * is beeing produced).
     */
@@ -681,7 +723,7 @@ public final class Colony extends Settlement implements Location {
         }
 
         int amount = getGoodsCount(Goods.HORSES) / 10;
-        
+
         return (amount>=1) ? amount : 1;
     }
 

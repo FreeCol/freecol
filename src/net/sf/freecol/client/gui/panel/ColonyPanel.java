@@ -1017,7 +1017,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 ImageLibrary lib = ((Canvas)parent).getGUI().getImageLibrary();
 
                 if (colonyTile.isColonyCenterTile()) {
-                    //setLayout(new FlowLayout(FlowLayout.CENTER));
+                    setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
                     int width = lib.getTerrainImageWidth(1)*2/3;
 
                     ImageIcon goodsIcon = parent.getImageProvider().getGoodsImageIcon(Goods.FOOD);

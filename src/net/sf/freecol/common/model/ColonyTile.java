@@ -140,7 +140,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation {
     * @return <code>true</code> if the <code>Unit</code> may be added and <code>false</code> otherwise.
     */
     public boolean canAdd(Locatable locatable) {
-        if (!isColonyCenterTile() && getUnit() == null && locatable instanceof Unit) {
+        if (!isColonyCenterTile() && locatable instanceof Unit && (getUnit() == null || locatable == getUnit())) {
             return true;
         } else {
             return false;

@@ -12,6 +12,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.TransferHandler;
 
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.ColonyTile;
 
 /**
@@ -57,35 +58,44 @@ public final class DragListener extends MouseAdapter {
                 JMenuItem menuItem;
 
                 if (tempUnit.getLocation() instanceof ColonyTile) {
-                    menuItem = new JMenuItem("Be a Farmer");
+                    ColonyTile colonyTile = (ColonyTile) tempUnit.getLocation();
+                    menuItem = new JMenuItem("Be a Farmer (" + tempUnit.getFarmedPotential(Goods.FOOD, colonyTile.getWorkTile()) + "/"
+                            + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.FOOD) + ")");
                     menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_FOOD));
                     menuItem.addActionListener(unitLabel);
                     menu.add(menuItem);
-                    menuItem = new JMenuItem("Be a Sugar Planter");
+                    menuItem = new JMenuItem("Be a Sugar Planter (" + tempUnit.getFarmedPotential(Goods.SUGAR, colonyTile.getWorkTile()) + "/"
+                            + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.SUGAR) + ")");
                     menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_SUGAR));
                     menuItem.addActionListener(unitLabel);
                     menu.add(menuItem);
-                    menuItem = new JMenuItem("Be a Tobacco Planter");
+                    menuItem = new JMenuItem("Be a Tobacco Planter (" + tempUnit.getFarmedPotential(Goods.TOBACCO, colonyTile.getWorkTile()) + "/"
+                            + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.TOBACCO) + ")");
                     menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_TOBACCO));
                     menuItem.addActionListener(unitLabel);
                     menu.add(menuItem);
-                    menuItem = new JMenuItem("Be a Cotton Planter");
+                    menuItem = new JMenuItem("Be a Cotton Planter (" + tempUnit.getFarmedPotential(Goods.COTTON, colonyTile.getWorkTile()) + "/"
+                            + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.COTTON) + ")");
                     menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_COTTON));
                     menuItem.addActionListener(unitLabel);
                     menu.add(menuItem);
-                    menuItem = new JMenuItem("Be a Fur Trapper");
+                    menuItem = new JMenuItem("Be a Fur Trapper (" + tempUnit.getFarmedPotential(Goods.FURS, colonyTile.getWorkTile()) + "/"
+                            + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.FURS) + ")");
                     menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_FURS));
                     menuItem.addActionListener(unitLabel);
                     menu.add(menuItem);
-                    menuItem = new JMenuItem("Be a Lumberjack");
+                    menuItem = new JMenuItem("Be a Lumberjack (" + tempUnit.getFarmedPotential(Goods.LUMBER, colonyTile.getWorkTile()) + "/"
+                            + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.LUMBER) + ")");
                     menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_LUMBER));
                     menuItem.addActionListener(unitLabel);
                     menu.add(menuItem);
-                    menuItem = new JMenuItem("Be an Ore Miner");
+                    menuItem = new JMenuItem("Be an Ore Miner (" + tempUnit.getFarmedPotential(Goods.ORE, colonyTile.getWorkTile()) + "/"
+                            + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.ORE) + ")");
                     menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_ORE));
                     menuItem.addActionListener(unitLabel);
                     menu.add(menuItem);
-                    menuItem = new JMenuItem("Be a Silver Miner");
+                    menuItem = new JMenuItem("Be a Silver Miner (" + tempUnit.getFarmedPotential(Goods.SILVER, colonyTile.getWorkTile()) + "/"
+                            + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.SILVER) + ")");
                     menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_SILVER));
                     menuItem.addActionListener(unitLabel);
                     menu.add(menuItem);
@@ -142,14 +152,19 @@ public final class DragListener extends MouseAdapter {
                 if (tempUnit.getType() != Unit.INDIAN_CONVERT && tempUnit.getType() != Unit.PETTY_CRIMINAL &&
                         tempUnit.getType() != Unit.INDENTURED_SERVANT && tempUnit.getType() != Unit.FREE_COLONIST) {
 
-                    menu.addSeparator();
+                    if (menu.getSubElements().length > 0) {
+                        menu.addSeparator();
+                    }
+
                     menuItem = new JMenuItem("Clear speciality");
                     menuItem.setActionCommand(String.valueOf(UnitLabel.CLEAR_SPECIALITY));
                     menuItem.addActionListener(unitLabel);
                     menu.add(menuItem);
                 }
 
-                menu.show(comp, e.getX(), e.getY());
+                if (menu.getSubElements().length > 0) {
+                    menu.show(comp, e.getX(), e.getY());
+                }
             }
         } else {
             TransferHandler handler = comp.getTransferHandler();
