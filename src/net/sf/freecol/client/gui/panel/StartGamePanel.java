@@ -410,6 +410,16 @@ class PlayersTableModel extends AbstractTableModel {
     public int getRowCount() {
         return players.size();
     }
+    
+    private Player getPlayer(int i) {
+        if (i == 0) {
+            return thisPlayer;
+        } else if (players.get(i) == thisPlayer) {
+            return (Player) players.get(0);
+        } else {
+            return (Player) players.get(i);
+        }
+    }
 
     /**
     * Returns the value at the requested location.
@@ -420,7 +430,7 @@ class PlayersTableModel extends AbstractTableModel {
     public Object getValueAt(int row, int column) {
         if ((row < getRowCount()) && (column < getColumnCount())
                 && (row >= 0) && (column >= 0)) {
-            Player player = (Player)players.get(row);
+            Player player = getPlayer(row);
             switch (column) {
                 case 0:
                     return player.getName();
@@ -442,7 +452,7 @@ class PlayersTableModel extends AbstractTableModel {
     public boolean isCellEditable(int row, int column) {
         if ((column > 0) && (column < columnNames.length)
                 && (players.size() > 0) && (row >= 0)
-                && thisPlayer.getName().equals(((Player)players.get(row)).getName())
+                && thisPlayer.getName().equals(getPlayer(row).getName())
                 && !thisPlayer.isReady()) {
             return true;
         } else {
@@ -463,7 +473,7 @@ class PlayersTableModel extends AbstractTableModel {
 
             if (column == 1) {
                 preGameController.setNation(((String)value).toLowerCase());
-                preGameController.setColor(Player.getDefaultNationColor(freeColClient.getMyPlayer().getNation()));
+                preGameController.setColor(Player.getDefaultNationColor(thisPlayer.getNation()));
                 fireTableCellUpdated(row, 2);
             } else if (column == 2) {
                 preGameController.setColor((Color)value);

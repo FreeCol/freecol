@@ -369,12 +369,12 @@ public final class InGameController {
     /**
     * Clear the speciality of a <code>Unit</code>. That is, makes it a
     * <code>Unit.FREE_COLONIST</code>.
-    * 
+    *
     * @param unit The <code>Unit</code> to clear the speciality of.
     */
     public void clearSpeciality(Unit unit) {
         Client client = freeColClient.getClient();
-        
+
         Element clearSpecialityElement = Message.createNewRootElement("clearSpeciality");
         clearSpecialityElement.setAttribute("unit", unit.getID());
 
@@ -415,6 +415,7 @@ public final class InGameController {
         freeColClient.playSound(SfxLibrary.LOAD_CARGO);
 
         Client client = freeColClient.getClient();
+        goods.adjustAmount();
 
         Element loadCargoElement = Message.createNewRootElement("loadCargo");
         loadCargoElement.setAttribute("carrier", carrier.getID());
@@ -434,6 +435,8 @@ public final class InGameController {
     */
     public void unloadCargo(Goods goods) {
         Client client = freeColClient.getClient();
+
+        goods.adjustAmount();
 
         Element unloadCargoElement = Message.createNewRootElement("unloadCargo");
         unloadCargoElement.appendChild(goods.toXMLElement(freeColClient.getMyPlayer(), unloadCargoElement.getOwnerDocument()));
@@ -461,15 +464,26 @@ public final class InGameController {
             throw new NullPointerException();
         }
 
-        if (carrier.getOwner() != myPlayer || carrier.getSpaceLeft() <= 0) {
+        if (carrier.getOwner() != myPlayer || (carrier.getSpaceLeft() <= 0 &&
+                (carrier.getGoodsContainer().getGoodsCount(type) % 100 == 0))) {
             return;
+        }
+
+        if (carrier.getSpaceLeft() <= 0) {
+            int maxAmount = carrier.getGoodsContainer().getGoodsCount(type);
+            while (maxAmount > 100) {
+                maxAmount -= 100;
+            }
+            maxAmount = 100 - maxAmount;
+
+            amount = (amount > maxAmount) ? maxAmount : amount;
         }
 
         if (game.getMarket().getBidPrice(type, amount) > myPlayer.getGold()) {
             canvas.errorMessage("notEnoughGold");
             return;
         }
-        
+
         freeColClient.playSound(SfxLibrary.LOAD_CARGO);
 
         Element buyGoodsElement = Message.createNewRootElement("buyGoods");
@@ -491,6 +505,8 @@ public final class InGameController {
     public void sellGoods(Goods goods) {
         Client client = freeColClient.getClient();
         Player player = freeColClient.getMyPlayer();
+
+        goods.adjustAmount();
 
         Element sellGoodsElement = Message.createNewRootElement("sellGoods");
         sellGoodsElement.appendChild(goods.toXMLElement(freeColClient.getMyPlayer(), sellGoodsElement.getOwnerDocument()));

@@ -347,6 +347,9 @@ public final class Colony extends Settlement implements Location {
         return goodsContainer.getGoodsCount(type);
     }
 
+    public GoodsContainer getGoodsContainer() {
+        return goodsContainer;
+    }
        
     /**
     * Removes a specified amount of a type of Goods from this containter.

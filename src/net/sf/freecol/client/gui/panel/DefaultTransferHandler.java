@@ -6,14 +6,23 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.logging.Logger;
-
+import java.awt.event.*;
+import java.awt.GraphicsEnvironment;
+import java.awt.dnd.*;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.TransferHandler;
+import java.awt.Toolkit;
+import javax.swing.ImageIcon;
+import java.awt.Point;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.awt.Dimension;
 
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.client.gui.Canvas;
 
 /**
 * The transferhandler that is capable of creating ImageSelection objects.
@@ -29,13 +38,15 @@ public final class DefaultTransferHandler extends TransferHandler {
 
     private static final DataFlavor flavor = DataFlavor.imageFlavor;
 
+    private final Canvas canvas;
     private final JLayeredPane parentPanel;
 
     /**
     * The constructor to use.
     * @param parentPanel The layered pane that holds all kinds of information.
     */
-    public DefaultTransferHandler(JLayeredPane parentPanel) {
+    public DefaultTransferHandler(Canvas canvas, JLayeredPane parentPanel) {
+        this.canvas = canvas;
         this.parentPanel = parentPanel;
     }
 
@@ -43,8 +54,8 @@ public final class DefaultTransferHandler extends TransferHandler {
     * Returns the action that can be done to an ImageSelection on the given component.
     * @return The action that can be done to an ImageSelection on the given component.
     */
-    public int getSourceActions(JComponent c) {
-        return TransferHandler.COPY;
+    public int getSourceActions(JComponent comp) {
+        return COPY_OR_MOVE;
     }
 
 
@@ -140,8 +151,6 @@ public final class DefaultTransferHandler extends TransferHandler {
                     } catch (ClassCastException e) {}
                 }
             } else if ((comp instanceof GoodsLabel) || (comp instanceof MarketLabel)) {
-
-
                 try {
                     comp = (JComponent)comp.getParent();
                 } catch (ClassCastException e) {
@@ -167,7 +176,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                 if ((unit.getState() == Unit.TO_EUROPE) && (!(comp instanceof EuropePanel.ToAmericaPanel))) {
                     return false;
                 }
-                
+
                 if ((unit.getState() != Unit.TO_AMERICA) && ((comp instanceof EuropePanel.ToEuropePanel))) {
                     return false;
                 }
@@ -233,6 +242,13 @@ public final class DefaultTransferHandler extends TransferHandler {
 
                 // Import the data.
 
+                if (((GoodsLabel) data).getGoods().getAmount() == -1) {
+                    int amount = getAmount();
+                    if (amount == -1) {
+                        return false;
+                    }
+                    ((GoodsLabel) data).getGoods().setAmount(amount);
+                }
 
                 if (!(comp instanceof ColonyPanel.WarehousePanel || comp instanceof ColonyPanel.CargoPanel
                         || comp instanceof EuropePanel.MarketPanel || comp instanceof EuropePanel.CargoPanel)
@@ -273,6 +289,14 @@ public final class DefaultTransferHandler extends TransferHandler {
 
                 // Import the data.
 
+                if (((MarketLabel) data).getAmount() == -1) {
+                    int amount = getAmount();
+                    if (amount == -1) {
+                        return false;
+                    }
+                    ((MarketLabel) data).setAmount(amount);
+                }
+
 
                 if (comp instanceof JLabel) {
                     logger.warning("Oops, I thought we didn't have to write this part.");
@@ -299,5 +323,204 @@ public final class DefaultTransferHandler extends TransferHandler {
         } catch (IOException ignored) {}
 
         return false;
+    }
+
+    
+    /**
+    * Displays an input dialog box where the user should specify a goods transfer amount.
+    */
+    private int getAmount() {
+        String s = canvas.showInputDialog("goodsTransfer.text", "100", "ok", "cancel");
+        int amount = -1;
+
+        while (s != null && amount == -1) {
+            try {
+                amount = Integer.parseInt(s);
+            } catch (NumberFormatException e) {
+                canvas.errorMessage("notANumber");
+                s = canvas.showInputDialog("goodsTransfer.text", "100", "ok", "cancel");
+            }
+        }
+
+        if (s == null) {
+            return -1;
+        }
+
+        return amount;
+    }
+
+
+
+
+    /*__________________________________________________
+      Methods/inner-classes below have been copied from
+      TransferHandler in order to allow partial loading.
+      --------------------------------------------------
+    */
+
+
+    private static FreeColDragGestureRecognizer recognizer = null;
+
+    public void exportAsDrag(JComponent comp, InputEvent e, int action) {
+        int srcActions = getSourceActions(comp);
+        int dragAction = srcActions & action;
+        if (!(e instanceof MouseEvent)) {
+            dragAction = NONE;
+        }
+
+        if (dragAction != NONE && !GraphicsEnvironment.isHeadless()) {
+            if (recognizer == null) {
+                recognizer = new FreeColDragGestureRecognizer(new FreeColDragHandler());
+            }
+
+            recognizer.gestured(comp, (MouseEvent) e , srcActions, dragAction);
+        } else {
+            exportDone(comp, null, NONE);
+        }
+    }
+
+
+    /**
+     * This is the default drag handler for drag and drop operations that
+     * use the &ltcode&gtTransferHandler</code>.
+     */
+    private static class FreeColDragHandler implements DragGestureListener, DragSourceListener {
+
+        private boolean scrolls;
+
+
+        // --- DragGestureListener methods -----------------------------------
+
+        /**
+         * a Drag gesture has been recognized
+         */
+        public void dragGestureRecognized(DragGestureEvent dge) {
+            JComponent c = (JComponent) dge.getComponent();
+            DefaultTransferHandler th = (DefaultTransferHandler) c.getTransferHandler();
+            Transferable t = th.createTransferable(c);
+            
+            if (t != null) {
+                scrolls = c.getAutoscrolls();
+                c.setAutoscrolls(false);
+                try {
+                    if (c instanceof JLabel && ((JLabel) c).getIcon() instanceof ImageIcon) {
+                        Toolkit tk = Toolkit.getDefaultToolkit();
+                        ImageIcon imageIcon = ((ImageIcon) ((JLabel) c).getIcon());
+                        Dimension bestSize = tk.getBestCursorSize(imageIcon.getIconWidth(), imageIcon.getIconHeight());
+
+                        if (bestSize.width == 0 || bestSize.height == 0) {
+                            dge.startDrag(null, t, this);
+                            return;
+                        }
+
+                        Image image;
+                        if (bestSize.width > bestSize.height) {
+                            image = imageIcon.getImage().getScaledInstance(bestSize.width, -1, Image.SCALE_DEFAULT);
+                        } else {
+                            image = imageIcon.getImage().getScaledInstance(-1, bestSize.height, Image.SCALE_DEFAULT);
+                        }
+
+                        dge.startDrag(tk.createCustomCursor(image, new Point(0,0), "freeColDragIcon"), t, this);
+                    } else {
+                        dge.startDrag(null, t, this);
+                    }
+                    
+                    return;
+                } catch (RuntimeException re) {
+                    c.setAutoscrolls(scrolls);
+                }
+            }
+
+            th.exportDone(c, null, NONE);
+        }
+
+        // --- DragSourceListener methods -----------------------------------
+
+        /**
+         * as the hotspot enters a platform dependent drop site
+         */
+        public void dragEnter(DragSourceDragEvent dsde) {
+        }
+
+
+        /**
+         * as the hotspot moves over a platform dependent drop site
+         */
+        public void dragOver(DragSourceDragEvent dsde) {
+        }
+
+
+        /**
+         * as the hotspot exits a platform dependent drop site
+         */
+        public void dragExit(DragSourceEvent dsde) {
+        }
+
+
+        /**
+         * as the operation completes
+         */
+        public void dragDropEnd(DragSourceDropEvent dsde) {
+            DragSourceContext dsc = dsde.getDragSourceContext();
+            JComponent c = (JComponent)dsc.getComponent();
+            if (dsde.getDropSuccess()) {
+                ((DefaultTransferHandler) c.getTransferHandler()).exportDone(c, dsc.getTransferable(), dsde.getDropAction());
+            } else {
+                ((DefaultTransferHandler) c.getTransferHandler()).exportDone(c, null, NONE);
+            }
+            c.setAutoscrolls(scrolls);
+        }
+
+
+        public void dropActionChanged(DragSourceDragEvent dsde) {
+            DragSourceContext dsc = dsde.getDragSourceContext();
+            JComponent comp = (JComponent)dsc.getComponent();
+
+            if (dsde.getUserAction() == MOVE) {
+                if (comp instanceof GoodsLabel) {
+                    ((GoodsLabel) comp).getGoods().setAmount(-1);
+                } else if (comp instanceof MarketLabel) {
+                    ((MarketLabel) comp).setAmount(-1);
+                }
+            } else {
+                if (comp instanceof GoodsLabel) {
+                    ((GoodsLabel) comp).getGoods().setAmount(100);
+                } else if (comp instanceof MarketLabel) {
+                    ((MarketLabel) comp).setAmount(100);
+                }
+            }
+        }
+    }
+
+
+    private static class FreeColDragGestureRecognizer extends DragGestureRecognizer {
+
+        FreeColDragGestureRecognizer(DragGestureListener dgl) {
+            super(DragSource.getDefaultDragSource(), null, NONE, dgl);
+        }
+
+        void gestured(JComponent c, MouseEvent e, int srcActions, int action) {
+            setComponent(c);
+            setSourceActions(srcActions);
+            appendEvent(e);
+
+            fireDragGestureRecognized(action, e.getPoint());
+        }
+
+
+        /**
+         * register this DragGestureRecognizer's Listeners with the Component
+         */
+        protected void registerListeners() {
+        }
+
+
+        /**
+         * unregister this DragGestureRecognizer's Listeners with the Component
+         *
+         * subclasses must override this method
+         */
+        protected void unregisterListeners() {
+        }
     }
 }

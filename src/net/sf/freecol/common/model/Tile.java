@@ -150,6 +150,11 @@ public final class Tile extends FreeColGameObject implements Location {
         return getGame().getMap().getDistance(getPosition(), tile.getPosition());
     }
 
+    
+    public GoodsContainer getGoodsContainer() {
+        return null;
+    }
+        
 
     /**
     * Gets the <code>Unit</code> that is currently defending this <code>Tile</code>.

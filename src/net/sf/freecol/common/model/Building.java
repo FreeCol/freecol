@@ -507,7 +507,10 @@ public final class Building extends FreeColGameObject implements WorkLocation {
         return bestUnit;
     }
 
-    
+    public GoodsContainer getGoodsContainer() {
+        return null;
+    }
+
     private Unit getTeacher(int unitType) {
         Iterator i = colony.getUnitIterator();
         while (i.hasNext()) {

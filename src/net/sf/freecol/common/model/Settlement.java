@@ -85,4 +85,8 @@ abstract public class Settlement extends FreeColGameObject implements Location {
         this.owner = owner;
     }
 
+    
+    public GoodsContainer getGoodsContainer() {
+        return null;
+    }
 }

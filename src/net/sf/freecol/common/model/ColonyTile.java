@@ -90,6 +90,11 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation {
         return colony.getTile();
     }
 
+    
+    public GoodsContainer getGoodsContainer() {
+        return null;
+    }
+    
 
     /**
     * Gets the <code>Unit</code> currently working on this <code>ColonyTile</code>.

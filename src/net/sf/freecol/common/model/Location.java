@@ -86,4 +86,6 @@ public interface Location {
     * @see FreeColGameObject#getID
     */
     public String getID();
+
+    public GoodsContainer getGoodsContainer();
 }

@@ -26,6 +26,7 @@ public final class MarketLabel extends JLabel implements ActionListener {
     private static Logger logger = Logger.getLogger(MarketLabel.class.getName());
 
     private final int type;
+    private int amount;
     private final Market market;
     private final Canvas parent;
 
@@ -56,6 +57,7 @@ public final class MarketLabel extends JLabel implements ActionListener {
     public MarketLabel(int type, Market market, Canvas parent, boolean isSmall) {
         this(type, market, parent);
         setSmall(true);
+        amount = 100;
     }
 
 
@@ -66,6 +68,22 @@ public final class MarketLabel extends JLabel implements ActionListener {
     public int getType() {
         return type;
     }
+
+    /**
+    * Returns this MarketLabel's goods amount.
+    * @return This MarketLabel's goods amount.
+    */
+    public int getAmount() {
+        return amount;
+    }
+
+    /**
+    * Sets this MarketLabel's goods amount.
+    */
+    public void setAmount(int amount) {
+        this.amount = amount;
+    }
+    
 
     /**
     * Returns this MarketLabel's market.

@@ -21,7 +21,7 @@ public final class ImageSelection implements Transferable {
     private static final DataFlavor[] flavors = {DataFlavor.imageFlavor};
 
     private JLabel label;
-    
+
     /**
     * The constructor to use.
     * @param label The data that this ImageSelection should hold.

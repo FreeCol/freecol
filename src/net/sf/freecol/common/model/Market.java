@@ -117,8 +117,12 @@ public final class Market extends FreeColGameObject {
      *                                <TT>null</TT>
      */
     public void sell(Goods goods, Player player) {
-        sell(goods.getType(), goods.getAmount(), player);
+        int type = goods.getType();
+        int amount = goods.getAmount();
+
         goods.setLocation(null);
+
+        sell(type, amount, player);
     }
 
 

@@ -108,7 +108,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         warehousePanel.setBackground(Color.WHITE);
         buildingsPanel.setBackground(Color.WHITE);
 
-        defaultTransferHandler = new DefaultTransferHandler(this);
+        defaultTransferHandler = new DefaultTransferHandler(parent, this);
         outsideColonyPanel.setTransferHandler(defaultTransferHandler);
         inPortPanel.setTransferHandler(defaultTransferHandler);
         cargoPanel.setTransferHandler(defaultTransferHandler);

@@ -168,6 +168,21 @@ public final class DragListener extends MouseAdapter {
             }
         } else {
             TransferHandler handler = comp.getTransferHandler();
+
+            if (e.isShiftDown()) {
+                if (comp instanceof GoodsLabel) {
+                    ((GoodsLabel) comp).getGoods().setAmount(-1);
+                } else if (comp instanceof MarketLabel) {
+                    ((MarketLabel) comp).setAmount(-1);
+                }
+            } else {
+                if (comp instanceof GoodsLabel) {
+                    ((GoodsLabel) comp).getGoods().setAmount(100);
+                } else if (comp instanceof MarketLabel) {
+                    ((MarketLabel) comp).setAmount(100);
+                }
+            }
+
             handler.exportAsDrag(comp, e, TransferHandler.COPY);
 
             if ((comp instanceof UnitLabel) && (((UnitLabel)comp).getUnit().isCarrier())) {

@@ -591,7 +591,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             throw new IllegalStateException("Illegal move requested!");
         }
 
-        movesLeft--;
+        if (isNaval() && newTile.getSettlement() != null) {
+            movesLeft = 0;
+        } else {
+            movesLeft--;
+        }
     }
 
 
@@ -623,6 +627,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     * @exception IllegalStateException If the carrier is on another tile than this unit.
     */
     public void boardShip(Unit carrier) {
+        if (isCarrier()) {
+            throw new IllegalStateException("A carrier cannot board another carrier!");
+        }
+
         if (getTile() == carrier.getTile() && carrier.getState() != TO_EUROPE && carrier.getState() != TO_AMERICA) {
             setLocation(carrier);
             setState(SENTRY);
@@ -829,6 +837,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         } else { // TODO: Make a better solution:
             return (new ArrayList()).iterator();
         }
+    }
+        
+    public GoodsContainer getGoodsContainer() {
+        return goodsContainer;
     }
         
     /**

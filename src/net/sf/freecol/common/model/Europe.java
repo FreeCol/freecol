@@ -205,7 +205,12 @@ public final class Europe extends FreeColGameObject implements Location {
         }
     }
 
+    
+    public GoodsContainer getGoodsContainer() {
+        return null;
+    }
 
+    
     /**
     * Checks wether or not the specified locatable may be added to this
     * <code>Location</code>.

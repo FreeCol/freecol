@@ -129,7 +129,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         docksPanel.setBackground(Color.WHITE);
         cargoPanel.setBackground(Color.WHITE);
 
-        defaultTransferHandler = new DefaultTransferHandler(this);
+        defaultTransferHandler = new DefaultTransferHandler(parent, this);
         toAmericaPanel.setTransferHandler(defaultTransferHandler);
         toEuropePanel.setTransferHandler(defaultTransferHandler);
         inPortPanel.setTransferHandler(defaultTransferHandler);
@@ -931,7 +931,8 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     inGameController.boardShip(unit, selectedUnit.getUnit());
                     comp.getParent().remove(comp);
                 } else if (comp instanceof MarketLabel) {
-                    inGameController.buyGoods(((MarketLabel)comp).getType(), 100, selectedUnit.getUnit());
+                    inGameController.buyGoods(((MarketLabel)comp).getType(), ((MarketLabel)comp).getAmount(), selectedUnit.getUnit());
+
                     updateCargoLabel();
                     goldLabel.setText("Gold: " + freeColClient.getMyPlayer().getGold());
                     goldLabel.repaint(0, 0, goldLabel.getWidth(), goldLabel.getHeight());
@@ -993,7 +994,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         public Component add(Component comp, boolean editState) {
             if (editState) {
                 if (comp instanceof GoodsLabel) {
-                    comp.getParent().remove(comp);
+                    //comp.getParent().remove(comp);
                     inGameController.sellGoods(((GoodsLabel)comp).getGoods());
                     updateCargoLabel();
                     goldLabel.setText("Gold: " + freeColClient.getMyPlayer().getGold());
@@ -1001,6 +1002,12 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     europePanel.getCargoPanel().revalidate();
                     revalidate();
                     europePanel.refresh();
+                    
+                    // TODO: Make this look prettier :-)
+                    UnitLabel t = selectedUnit;
+                    selectedUnit = null;
+                    setSelectedUnit(t);                    
+
                     return comp;
                 } else {
                     logger.warning("An invalid component got dropped on this MarketPanel.");

@@ -137,6 +137,17 @@ public final class Goods implements Locatable {
         return type;
     }
     
+
+    /**
+    * If the amount of goods is greater than the source can supply,
+    * then this method adjusts the amount to the maximum amount possible.
+    */
+    public void adjustAmount() {
+        int maxAmount = location.getGoodsContainer().getGoodsCount(getType());
+        setAmount((getAmount() > maxAmount) ? maxAmount : getAmount());
+    }
+
+
     /**
     * Prepares the <code>Goods</code> for a new turn.
     */
