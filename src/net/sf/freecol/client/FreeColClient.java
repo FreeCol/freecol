@@ -138,15 +138,14 @@ public final class FreeColClient {
                 windowed = true;
                 setWindowed(true);
                 frame = new WindowedFrame();
-            }
-            else {
+            } else {
                 frame = new FullScreenFrame(gd);
             }
         }
 
         gui = new GUI(this, frame.getBounds(), null, lib);
         canvas = new Canvas(this, frame.getBounds(), gui);
-        
+
         if (frame instanceof WindowedFrame) {
             ((WindowedFrame) frame).setCanvas(canvas);
         } else if (frame instanceof FullScreenFrame) {
@@ -155,11 +154,11 @@ public final class FreeColClient {
 
         frame.getContentPane().add(canvas);
 
-        if (windowed) {
-            frame.setVisible(true);
-        } else {
+        if (!windowed) {
             frame.repaint();
         }
+        
+        frame.setVisible(true);
     }
 
 
@@ -173,7 +172,7 @@ public final class FreeColClient {
         return player;
     }
 
-    
+
     /**
     * Sets the <code>Player</code> that uses this client.
     *
