@@ -154,9 +154,8 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
                 {"BackgroundImage", "bg.png"},
                 {"BackgroundImage2", "bg2.png"},
                 {"CanvasBackgroundImage", "bg_map1.jpg"},
-                {"CargoBackgroundImage", "bg_cargo.png"},
-                {"TitleImage", "freecol.png"},                                                
-                {"EventImage.firstLanding", "landing.png"},                                                
+                {"TitleImage", "freecol.png"},
+                {"EventImage.firstLanding", "landing.png"},
                 {"VictoryImage", "victory.png"},
                 {"FoundingFather.trade", "trade.png"},
                 {"FoundingFather.exploration", "exploration.png"},
@@ -172,21 +171,24 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
             MediaTracker mt = new MediaTracker(new Component() {});
             
             for (int i=0; i<resources.length; i++) {
-                Image image;                
+                Image image = null;                
                 File file = new File(dataDirectory, "images" + System.getProperty("file.separator") + "ui" + System.getProperty("file.separator") + resources[i][1]);
                 
                 if (file.exists() && file.isFile()) {
                     image = Toolkit.getDefaultToolkit().getImage(file.toString());    
                 } else {
-                    image = Toolkit.getDefaultToolkit().getImage(resourceLocator.getResource("data/images/ui/"+  resources[i][1]));    
+                    URL url = resourceLocator.getResource("data/images/ui/"+  resources[i][1]);
+                    if (url != null) {
+                        image = Toolkit.getDefaultToolkit().getImage(url);
+                    }
                 }
 
                 if (image == null) {
                     logger.warning("Could not find image: " + resources[i][1]);
+                } else {
+                    mt.addImage(image, 0);
+                    u.put(resources[i][0], image);
                 }
-
-                mt.addImage(image, 0);
-                u.put(resources[i][0], image);
             }
             
             try {
