@@ -49,6 +49,9 @@ public final class Colony extends Settlement implements Location {
     */
     private int currentlyBuilding;
 
+    // Temporary variable:
+    private int lastVisited = -1;
+
 
     /**
     * Creates a new <code>Colony</code>.
@@ -482,10 +485,6 @@ public final class Colony extends Settlement implements Location {
                 return;
             }
 
-            if (getGoodsCount(Goods.TOOLS) < getBuilding(currentlyBuilding).getNextTools()) {
-                addModelMessage(this, "model.colony.buildNeedTools", new String[][] {{"%colony%", getName()}, {"%building%", getBuilding(currentlyBuilding).getNextName()}});
-            }
-
             if (getBuilding(currentlyBuilding).getNextHammers() == -1) {
                 addModelMessage(this, "model.colony.alreadyBuilt", new String[][] {{"%colony%", getName()}, {"%building%", getBuilding(currentlyBuilding).getNextName()}});
             }
@@ -765,20 +764,30 @@ public final class Colony extends Settlement implements Location {
 
 
     private void checkBuildingComplete() {
+        // In order to avoid duplicate messages:
+        if (lastVisited == getGame().getTurn().getNumber()) {
+            return;
+        } else {
+            lastVisited = getGame().getTurn().getNumber();
+        }
+
         if (getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) {
             int unitType = getCurrentlyBuilding() - BUILDING_UNIT_ADDITION;
 
-            if (canBuildUnit(unitType) && Unit.getNextHammers(unitType) <= getHammers() &&
-                Unit.getNextTools(unitType) <= getGoodsCount(Goods.TOOLS)) {
-
-                Unit unit = getGame().getModelController().createUnit(getID() + "buildUnit", getTile(), getOwner(), unitType);
-                hammers = 0;
-                removeGoods(Goods.TOOLS, Unit.getNextTools(unit.getType()));
-                addModelMessage(this, "model.colony.unitReady", new String[][] {{"%colony%", getName()}, {"%unit%", unit.getName()}});
+            if (canBuildUnit(unitType) && Unit.getNextHammers(unitType) <= getHammers() && Unit.getNextHammers(unitType) != -1) {
+                if (Unit.getNextTools(unitType) <= getGoodsCount(Goods.TOOLS)) {
+                    Unit unit = getGame().getModelController().createUnit(getID() + "buildUnit", getTile(), getOwner(), unitType);
+                    hammers = 0;
+                    removeGoods(Goods.TOOLS, Unit.getNextTools(unit.getType()));
+                    addModelMessage(this, "model.colony.unitReady", new String[][] {{"%colony%", getName()}, {"%unit%", unit.getName()}});
+                } else {
+                    addModelMessage(this, "model.colony.itemNeedTools", new String[][] {{"%colony%", getName()}, {"%item%", Unit.getName(unitType)}});
+                }
             }
         } else {
             int hammersRequired = getBuilding(currentlyBuilding).getNextHammers();
             int toolsRequired = getBuilding(currentlyBuilding).getNextTools();
+
             if ((hammers >= hammersRequired) && (hammersRequired != -1)) {
                 hammers = hammersRequired;
                 if (getGoodsCount(Goods.TOOLS) >= toolsRequired) {
@@ -789,6 +798,8 @@ public final class Colony extends Settlement implements Location {
                     hammers = 0;
                     getBuilding(currentlyBuilding).setLevel(getBuilding(currentlyBuilding).getLevel() + 1);
                     addModelMessage(this, "model.colony.buildingReady", new String[][] {{"%colony%", getName()}, {"%building%", getBuilding(currentlyBuilding).getName()}});
+                } else {
+                    addModelMessage(this, "model.colony.itemNeedTools", new String[][] {{"%colony%", getName()}, {"%item%", getBuilding(currentlyBuilding).getNextName()}});
                 }
             }
         }
@@ -846,7 +857,7 @@ public final class Colony extends Settlement implements Location {
         // Throw away goods there is no room for.
         int capacity = 100 + getBuilding(Building.WAREHOUSE).getLevel() * 100;
         goodsContainer.removeAbove(capacity);
-        
+
         // Remove bells:
         bells -= (getSoL() * getUnitCount()) / 100;
         if (bells < 0) {

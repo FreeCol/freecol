@@ -602,7 +602,10 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                     productionInBuildingPanel.add(productionLabel);
 
                     if (production != building.getMaximumProduction()) {
-                        productionInBuildingPanel.add(new JLabel("(" + (building.getMaximumProduction() - production) + ")"));
+                        //JLabel tl = new JLabel("(" + (building.getMaximumProduction() - production) + ")");
+                        //tl.setForeground(Color.RED);
+                        JLabel tl = new JLabel(Integer.toString(production - building.getMaximumProduction()));
+                        productionInBuildingPanel.add(tl);
                     }
                 }
 
