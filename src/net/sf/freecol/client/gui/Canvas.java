@@ -556,7 +556,7 @@ public final class Canvas extends JLayeredPane {
 
         colopediaPanel.setLocation(getWidth() / 2 - colopediaPanel.getWidth() / 2, getHeight() / 2 - colopediaPanel.getHeight() / 2);
         setEnabled(false);
-        add(colopediaPanel);
+        add(colopediaPanel, JLayeredPane.PALETTE_LAYER);
         colopediaPanel.requestFocus();
     }
 

@@ -1,9 +1,8 @@
 package net.sf.freecol.client.gui;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.client.gui.panel.UnitButton;
+import net.sf.freecol.client.gui.panel.ColopediaPanel;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.FreeCol;
@@ -356,7 +355,7 @@ public class FreeColMenuBar extends JMenuBar {
         colopediaMenu.add(terrainMenuItem);
         terrainMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                canvas.showColopediaPanel(0);
+                canvas.showColopediaPanel(ColopediaPanel.COLOPEDIA_TERRAIN);
             }
         });
         inGameOptions.add(terrainMenuItem);
@@ -368,7 +367,7 @@ public class FreeColMenuBar extends JMenuBar {
         colopediaMenu.add(unitMenuItem);
         unitMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                canvas.showColopediaPanel(1);
+                canvas.showColopediaPanel(ColopediaPanel.COLOPEDIA_UNIT);
             }
         });
         inGameOptions.add(unitMenuItem);
@@ -380,7 +379,7 @@ public class FreeColMenuBar extends JMenuBar {
         colopediaMenu.add(goodsMenuItem);
         goodsMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                canvas.showColopediaPanel(2);
+                canvas.showColopediaPanel(ColopediaPanel.COLOPEDIA_GOODS);
             }
         });
         inGameOptions.add(goodsMenuItem);
@@ -392,7 +391,7 @@ public class FreeColMenuBar extends JMenuBar {
         colopediaMenu.add(skillMenuItem);
         skillMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                canvas.showColopediaPanel(3);
+                canvas.showColopediaPanel(ColopediaPanel.COLOPEDIA_SKILLS);
             }
         });
         inGameOptions.add(skillMenuItem);
@@ -404,7 +403,7 @@ public class FreeColMenuBar extends JMenuBar {
         colopediaMenu.add(buildingMenuItem);
         buildingMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                canvas.showColopediaPanel(4);
+                canvas.showColopediaPanel(ColopediaPanel.COLOPEDIA_BUILDING);
             }
         });
         inGameOptions.add(buildingMenuItem);
@@ -416,7 +415,7 @@ public class FreeColMenuBar extends JMenuBar {
         colopediaMenu.add(fatherMenuItem);
         fatherMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                canvas.showColopediaPanel(5);
+                canvas.showColopediaPanel(ColopediaPanel.COLOPEDIA_FATHER);
             }
         });
         inGameOptions.add(fatherMenuItem);

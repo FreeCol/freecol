@@ -39,7 +39,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     public static final int COLOPEDIA_UNIT    = 1;
     public static final int COLOPEDIA_GOODS   = 2;
     public static final int COLOPEDIA_SKILLS  = 3;
-    public static final int COLOPEDIA_BUIDING = 4;
+    public static final int COLOPEDIA_BUILDING = 4;
     public static final int COLOPEDIA_FATHER  = 5;
     
     // This is copied from net.sf.freecol.common.model.Building where it is private 
@@ -225,7 +225,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             case COLOPEDIA_SKILLS:
                 buildSkillsList();
                 break;
-            case COLOPEDIA_BUIDING:
+            case COLOPEDIA_BUILDING:
                 buildBuildingList();
                 break;
             case COLOPEDIA_FATHER:
@@ -887,7 +887,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
                 case COLOPEDIA_SKILLS:
                     buildUnitDetail(action);
                     break;
-                case COLOPEDIA_BUIDING:
+                case COLOPEDIA_BUILDING:
                     buildBuildingDetail(action);
                     break;
                 case COLOPEDIA_FATHER:
