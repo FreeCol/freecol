@@ -1,3 +1,4 @@
 Manifest-Version: 1.0
 Created-By: FreeCol Team
 Main-Class: net.sf.freecol.FreeCol
+Class-Path: jars/higlayout.jar
