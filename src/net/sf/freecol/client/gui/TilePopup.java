@@ -53,7 +53,9 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
         Iterator unitIterator = tile.getUnitIterator();
         while (unitIterator.hasNext()) {
             Unit u = (Unit) unitIterator.next();
-            addUnit(u);
+            if (!u.isUnderRepair()) {
+                addUnit(u);
+            }
 
             Iterator childUnitIterator = u.getUnitIterator();
             while (childUnitIterator.hasNext()) {

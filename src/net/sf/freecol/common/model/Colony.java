@@ -832,6 +832,15 @@ public final class Colony extends Settlement implements Location {
     * Prepares this <code>Colony</code> for a new turn.
     */
     public void newTurn() {
+        // Repair any damaged ships:
+        Iterator unitIterator = getTile().getUnitIterator();
+        while (unitIterator.hasNext()) {
+            Unit unit = (Unit) unitIterator.next();
+            if (unit.isNaval() && unit.isUnderRepair()) {
+                unit.setHitpoints(unit.getHitpoints()+1);
+            }
+        }
+
         // Skip doing work in enemy colonies.
         if (unitCount != -1) {
             return;

@@ -846,6 +846,7 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
         Font nameFont = null;
         FontMetrics nameFontMetrics = null;
         BufferedImage bi = null;
+        
         Font origFont = g.getFont();
         int fontSize = preferredFontSize;
         do {

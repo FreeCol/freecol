@@ -8,6 +8,8 @@ import java.awt.Image;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -158,7 +160,12 @@ public final class UnitLabel extends JLabel implements ActionListener {
             g.drawImage(productionImage, 0, 0, null);
         }
 
+        if (unit.isUnderRepair()) {
+            BufferedImage repairImage = parent.getGUI().createStringImage((Graphics2D) g, "Under repair", Color.RED, getWidth(), 12);
+            g.drawImage(repairImage, (getWidth() - repairImage.getWidth())/2, (getHeight() - repairImage.getHeight())/2, null);
+        }
     }
+    
 
     /**
     * Analyzes an event and calls the right external methods to take

@@ -108,10 +108,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     private boolean         armed,
                             mounted,
                             missionary;
-    private int             movesLeft;
+    private int             movesLeft;      // Always use getMovesLeft()
     private int             state;
-    private int             workLeft; // expressed in number of turns, '-1' if a Unit can stay in its state forever
+    private int             workLeft;       // expressed in number of turns, '-1' if a Unit can stay in its state forever
     private int             numberOfTools;
+    private int             hitpoints;      // For now; only used by ships when repairing.
     private Player          owner;
     private UnitContainer   unitContainer;
     private GoodsContainer  goodsContainer;
@@ -168,6 +169,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         this.owner = owner;
         this.type = type;
         this.movesLeft = getInitialMovesLeft();
+        setHitpoints(getInitialHitpoints(getType()));
 
         setLocation(location);
 
@@ -437,6 +439,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
      *         when there are no moves left.
      */
     public int getMoveType(Tile target) {
+
+        if (isUnderRepair()) {
+            return ILLEGAL_MOVE;
+        }
 
         if (getMovesLeft() <= 0) {
             return ILLEGAL_MOVE;
@@ -891,9 +897,16 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         }
     }
 
+
     public GoodsContainer getGoodsContainer() {
         return goodsContainer;
     }
+
+
+    public UnitContainer getUnitContainer() {
+        return unitContainer;
+    }
+
 
     /**
     * Sets this <code>Unit</code> to work in the
@@ -1390,10 +1403,16 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
 
     /**
     * Returns the amount of moves this Unit has left.
-    * @return The amount of moves this Unit has left.
+    * @return The amount of moves this Unit has left. If the
+    *         <code>unit.isUnderRepair()</code> then <code>0</code>
+    *         is always returned.
     */
     public int getMovesLeft() {
-        return movesLeft;
+        if (!isUnderRepair()) {
+            return movesLeft;
+        } else {
+            return 0;
+        }
     }
 
 
@@ -1623,6 +1642,66 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
 
 
     /**
+    * Gets the initial hitpoints for a given type of <code>Unit</code>.
+    * For now this method only returns <code>5</code> that is used to
+    * determine the number of rounds needed to repair a unit, but
+    * later it can be used for indicating the health of a unit as well.
+    *
+    * <br><br>
+    *
+    * Larger values would indicate a longer repair-time.
+    *
+    * @param type The type of a <code>Unit</code>.
+    * @return 6
+    */
+    public static int getInitialHitpoints(int type) {
+        return 6;
+    }
+
+
+    /**
+    * Sets the hitpoints for this unit.
+    * @see #getInitialHitpoints
+    */
+    public void setHitpoints(int hitpoints) {
+        this.hitpoints = hitpoints;
+        if (hitpoints >= getInitialHitpoints(getType()) && getState() == FORTIFY) {
+            setState(ACTIVE);
+        }
+    }
+
+
+    /**
+    * Returns the hitpoints.
+    * @see #getInitialHitpoints
+    */
+    public int getHitpoints() {
+        return hitpoints;
+    }
+
+
+    /**
+    * Checks if this unit is under repair.
+    * @return <i>true</i> if under repair and <i>false</i> otherwise.
+    */
+    public boolean isUnderRepair() {
+        return (hitpoints < getInitialHitpoints(getType()));
+    }
+
+
+    /**
+    * Sends this <code>Unit</code> to the closest
+    * <code>Location</code> it can get repaired.
+    */
+    public void sendToRepairLocation() {
+        Location l = getOwner().getRepairLocation(this);
+        setLocation(l);
+        setState(ACTIVE);
+        setMovesLeft(0);
+    }
+
+
+    /**
     * Gets the x-coordinate of this Unit (on the map).
     * @return The x-coordinate of this Unit (on the map).
     */
@@ -1659,16 +1738,16 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
 
     public String getMovesAsString() {
         String moves = "";
-        if (movesLeft%3 == 0 || movesLeft/3 > 0) {
-            moves += Integer.toString(movesLeft/3);
+        if (getMovesLeft()%3 == 0 || getMovesLeft()/3 > 0) {
+            moves += Integer.toString(getMovesLeft()/3);
         }
 
-        if (movesLeft%3 != 0) {
-            if (movesLeft/3 > 0) {
+        if (getMovesLeft()%3 != 0) {
+            if (getMovesLeft()/3 > 0) {
                 moves += " ";
             }
 
-            moves += "(" + Integer.toString(movesLeft - (movesLeft/3) * 3) + "/3) ";
+            moves += "(" + Integer.toString(getMovesLeft() - (getMovesLeft()/3) * 3) + "/3) ";
         }
 
         moves += "/" + Integer.toString(getInitialMovesLeft()/3);
@@ -2476,8 +2555,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                 dispose();
             } else if (isNaval()) {
                 if (result == ATTACK_LOSS) {
-                    // TODO: Add damage. For now just move to Europe:
-                    moveToEurope();
+                    setHitpoints(1);
+                    getUnitContainer().disposeAllUnits();
+                    goodsContainer.removeAbove(0);
+                    sendToRepairLocation();
                 } else { // ATTACK_GREAT_LOSS:
                     dispose();
                 }
@@ -2579,8 +2660,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                 }
 
                 if (result == ATTACK_WIN) {
-                    // TODO: Add damage. For now just move to Europe:
-                    defender.moveToEurope();
+                    defender.setHitpoints(1);
+                    defender.getUnitContainer().disposeAllUnits();
+                    defender.getGoodsContainer().removeAbove(0);
+                    defender.sendToRepairLocation();
+
                 } else { // ATTACK_GREAT_WIN:
                     defender.dispose();
                 }
@@ -2618,6 +2702,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                         }
                     } else {
                         if (getOwner().isEuropean()) {
+                            defender.setHitpoints(getInitialHitpoints(defender.getType()));
                             defender.setLocation(getTile());
                             defender.setOwner(getOwner());
                         } else {
@@ -2998,6 +3083,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         unitElement.setAttribute("trainingType", Integer.toString(trainingType));
         unitElement.setAttribute("workType", Integer.toString(workType));
         unitElement.setAttribute("treasureAmount", Integer.toString(treasureAmount));
+        unitElement.setAttribute("hitpoints", Integer.toString(hitpoints));
 
         if (entryLocation != null) {
             unitElement.setAttribute("entryLocation", entryLocation.getID());
@@ -3049,6 +3135,12 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         owner = (Player) getGame().getFreeColGameObject(unitElement.getAttribute("owner"));
         turnsOfTraining = Integer.parseInt(unitElement.getAttribute("turnsOfTraining"));
         trainingType = Integer.parseInt(unitElement.getAttribute("trainingType"));
+
+        if (unitElement.hasAttribute("hitpoints")) {
+            hitpoints = Integer.parseInt(unitElement.getAttribute("hitpoints"));
+        } else { // Support for PRE-0.0.3 protocols:
+            hitpoints = getInitialHitpoints(getType());
+        }
 
         if (unitElement.hasAttribute("treasureAmount")) {
             treasureAmount = Integer.parseInt(unitElement.getAttribute("treasureAmount"));

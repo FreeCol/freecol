@@ -183,6 +183,10 @@ public final class DefaultTransferHandler extends TransferHandler {
 
                 Unit unit = ((UnitLabel)data).getUnit();
 
+                if (unit.isUnderRepair()) {
+                    return false;
+                }
+                
                 if ((unit.getState() == Unit.TO_AMERICA) && (!(comp instanceof EuropePanel.ToEuropePanel))) {
                     return false;
                 }

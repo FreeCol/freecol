@@ -65,7 +65,7 @@ public class Player extends FreeColGameObject {
     /** An array holding all the Native American tribes in String form. */
     public static final String[] TRIBES = {"Apache", "Arawak", "Aztec", "Cherokee",
                                         "Inca", "Iroquois", "Sioux", "Tupi"};
-                                        
+
     public static final int NUMBER_OF_NATIONS = TRIBES.length + NATIONS.length;
 
     /** The maximum line of sight a unit can have in the game. */
@@ -135,7 +135,7 @@ public class Player extends FreeColGameObject {
 
     private Iterator nextActiveUnitIterator = new NextActiveUnitIterator(this);
 
-    
+
     // Temporary variables:
     protected boolean[][] canSeeTiles = null;
 
@@ -900,7 +900,43 @@ public class Player extends FreeColGameObject {
         return colonies.iterator();
     }
 
-    
+
+    /**
+    * Returns the closest <code>Location</code> in which the given ship can get repaired.
+    * This is the closest {@link Colony} with a drydock, or {@link Europe} if this
+    * player has no colonies with a drydock.
+    *
+    * @param unit The ship that needs a location to be repaired.
+    * @return The closest <code>Location</code> in which the ship can be repaired.
+    * @exception IllegalArgumentException if the <code>unit</code> is not a ship.
+    */
+    public Location getRepairLocation(Unit unit) {
+        if (!unit.isNaval()) {
+            throw new IllegalArgumentException();
+        }
+
+        Location closestLocation = null;
+        int shortestDistance = Integer.MAX_VALUE;
+
+        Iterator colonyIterator = getColonyIterator();
+        while (colonyIterator.hasNext()) {
+            Colony colony = (Colony) colonyIterator.next();
+            int distance;
+            if (colony.getBuilding(Building.DOCK).getLevel() >= Building.SHOP &&
+                    (distance = unit.getTile().getDistanceTo(colony.getTile())) < shortestDistance) {
+                closestLocation = colony;
+                shortestDistance = distance;
+            }
+        }
+
+        if (closestLocation != null) {
+            return closestLocation;
+        } else {
+            return getEurope();
+        }
+    }
+
+
     /**
     * Gets an <code>Iterator</code> containing all the indian settlements this player owns.
     *

@@ -324,7 +324,14 @@ public final class Europe extends FreeColGameObject implements Location {
     * Prepares this object for a new turn.
     */
     public void newTurn() {
-
+        // Repair any damaged ships:
+        Iterator unitIterator = getUnitIterator();
+        while (unitIterator.hasNext()) {
+            Unit unit = (Unit) unitIterator.next();
+            if (unit.isNaval() && unit.isUnderRepair()) {
+                unit.setHitpoints(unit.getHitpoints()+1);
+            }
+        }
     }
 
 
