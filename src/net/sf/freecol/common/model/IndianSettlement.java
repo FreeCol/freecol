@@ -72,11 +72,11 @@ public class IndianSettlement extends Settlement {
     * checked out the settlement yet.
     * The value NONE is used when the skill has already been taught to a European.
     */
-    private int learnableSkill;
+    private int learnableSkill = UNKNOWN;
 
-    private int highlyWantedGoods,
-                wantedGoods1,
-                wantedGoods2;
+    private int highlyWantedGoods = UNKNOWN,
+                wantedGoods1 = UNKNOWN,
+                wantedGoods2 = UNKNOWN;
 
     private boolean isCapital,
                     isVisited; /* true if a European player has asked to speak with the chief. */
@@ -106,8 +106,7 @@ public class IndianSettlement extends Settlement {
      * @exception IllegalArgumentException if an invalid tribe or kind is given
      */
     public IndianSettlement(Game game, Player player, Tile tile, int tribe, int kind,
-            boolean isCapital, int learnableSkill, int highlyWantedGoods, int wantedGoods1,
-            int wantedGoods2, boolean isVisited, Unit missionary) {
+            boolean isCapital, int learnableSkill, boolean isVisited, Unit missionary) {
 
         // TODO: Change 'null' to the indian AI-player:
 
@@ -133,10 +132,6 @@ public class IndianSettlement extends Settlement {
         this.kind = kind;
         this.learnableSkill = learnableSkill;
         this.isCapital = isCapital;
-
-        this.highlyWantedGoods = highlyWantedGoods;
-        this.wantedGoods1 = wantedGoods1;
-        this.wantedGoods2 = wantedGoods2;
         this.isVisited = isVisited;
         this.missionary = missionary;
 
@@ -145,10 +140,11 @@ public class IndianSettlement extends Settlement {
                     || goodsType == Goods.TRADE_GOODS || goodsType == Goods.TOOLS) {
                 continue;
             }
-            goodsContainer.addGoods(goodsType, (int) Math.random() * 300);
+            goodsContainer.addGoods(goodsType, (int) (Math.random() * 300));
         }
 
         goodsContainer.addGoods(Goods.LUMBER, 300);
+        updateWantedGoods();
     }
 
 
@@ -355,9 +351,12 @@ public class IndianSettlement extends Settlement {
         return isCapital;
     }
 
+
     public void setCapital(boolean isCapital) {
         this.isCapital = isCapital;
     }
+    
+
     /**
     * Adds a <code>Locatable</code> to this Location.
     *
@@ -445,17 +444,41 @@ public class IndianSettlement extends Settlement {
     * Gets the amount of gold this <code>IndianSettlment</code>
     * is willing to pay for the given <code>Goods</code>.
     *
-    * @param goods THe <code>Goods</code> to price.
+    * <br><br>
+    *
+    * It is only meaningful to call this method from the
+    * server, since the settlement's {@link GoodsContainer}
+    * is hidden from the clients.
+    *
+    * @param goods The <code>Goods</code> to price.
     * @return The price.
     */
     public int getPrice(Goods goods) {
+        return getPrice(goods.getType(), goods.getAmount());
+    }
+
+    
+    /**
+    * Gets the amount of gold this <code>IndianSettlment</code>
+    * is willing to pay for the given <code>Goods</code>.
+    *
+    * <br><br>
+    *
+    * It is only meaningful to call this method from the
+    * server, since the settlement's {@link GoodsContainer}
+    * is hidden from the clients.
+    *
+    * @param goods The <code>Goods</code> to price.
+    * @return The price.
+    */
+    public int getPrice(int type, int amount) {
         int returnPrice = 0;
 
-        if (goods.getAmount() > 100) {
+        if (amount > 100) {
             throw new IllegalArgumentException();
         }
 
-        if (goods.getType() == Goods.MUSKETS) {
+        if (type == Goods.MUSKETS) {
             int need = 0;
             int supply = 0;
             supply += goodsContainer.getGoodsCount(Goods.MUSKETS) / Unit.MUSKETS_TO_ARM_INDIAN;
@@ -466,7 +489,7 @@ public class IndianSettlement extends Settlement {
                 }
             }
 
-            int sets = ((goodsContainer.getGoodsCount(Goods.MUSKETS) + goods.getAmount()) / Unit.MUSKETS_TO_ARM_INDIAN)
+            int sets = ((goodsContainer.getGoodsCount(Goods.MUSKETS) + amount) / Unit.MUSKETS_TO_ARM_INDIAN)
                         - (goodsContainer.getGoodsCount(Goods.MUSKETS) / Unit.MUSKETS_TO_ARM_INDIAN);
             int startPrice = (19+getPriceAddition()) - (supply / Unit.MUSKETS_TO_ARM_INDIAN);
             for (int i=0; i<sets; i++) {
@@ -475,7 +498,7 @@ public class IndianSettlement extends Settlement {
                 }
                 returnPrice += 25 * (startPrice-i);
             }
-        } else if (goods.getType() == Goods.HORSES) {
+        } else if (type == Goods.HORSES) {
             int need = 0;
             int supply = 0;
             supply += goodsContainer.getGoodsCount(Goods.HORSES) / Unit.HORSES_TO_MOUNT_INDIAN;
@@ -486,7 +509,7 @@ public class IndianSettlement extends Settlement {
                 }
             }
 
-            int sets = (goodsContainer.getGoodsCount(Goods.HORSES) + goods.getAmount()) / Unit.HORSES_TO_MOUNT_INDIAN
+            int sets = (goodsContainer.getGoodsCount(Goods.HORSES) + amount) / Unit.HORSES_TO_MOUNT_INDIAN
                         - (goodsContainer.getGoodsCount(Goods.HORSES) / Unit.HORSES_TO_MOUNT_INDIAN);
             int startPrice = (24+getPriceAddition()) - (supply/Unit.HORSES_TO_MOUNT_INDIAN);
 
@@ -496,13 +519,13 @@ public class IndianSettlement extends Settlement {
                 }
                 returnPrice += 25 * (startPrice-(i*4));
             }
-        } else if (goods.getType() == Goods.FOOD || goods.getType() == Goods.LUMBER || goods.getType() == Goods.SUGAR ||
-                goods.getType() == Goods.TOBACCO || goods.getType() == Goods.COTTON || goods.getType() == Goods.FURS ||
-                goods.getType() == Goods.ORE || goods.getType() == Goods.SILVER) {
+        } else if (type == Goods.FOOD || type == Goods.LUMBER || type == Goods.SUGAR ||
+                type == Goods.TOBACCO || type == Goods.COTTON || type == Goods.FURS ||
+                type == Goods.ORE || type == Goods.SILVER) {
             returnPrice = 0;
         } else {
-            int currentGoods = goodsContainer.getGoodsCount(goods.getType());
-            int valueGoods = Math.min(currentGoods + goods.getAmount(), 200) - currentGoods;
+            int currentGoods = goodsContainer.getGoodsCount(type);
+            int valueGoods = Math.min(currentGoods + amount, 200) - currentGoods;
             if (valueGoods < 0) {
                 valueGoods = 0;
             }
@@ -511,7 +534,64 @@ public class IndianSettlement extends Settlement {
                         - ((20.0+getPriceAddition())-(0.05*(currentGoods)))*(currentGoods));
         }
 
+        // Bonus for top 3 types of goods:
+        if (type == highlyWantedGoods) {
+            returnPrice = (returnPrice*12)/10;
+        } else if (type == wantedGoods1) {
+            returnPrice = (returnPrice*11)/10;
+        } else if (type == wantedGoods2) {
+            returnPrice = (returnPrice*105)/100;
+        }
+
         return returnPrice;
+    }
+
+    
+    /**
+    * Updates the variables {@link #getHighlyWantedGoods highlyWantedGoods},
+    * {@link #getWantedGoods1 wantedGoods1} and
+    * {@link #getWantedGoods2 wantedGoods2}.
+    *
+    * <br><br>
+    *
+    * It is only meaningful to call this method from the
+    * server, since the settlement's {@link GoodsContainer}
+    * is hidden from the clients.
+    *
+    * <br><br>
+    *
+    * This method should only get called when
+    * a scout enters this settlement.
+    */
+    public void updateWantedGoods() {
+        highlyWantedGoods = Goods.RUM;
+        wantedGoods1 = Goods.TRADE_GOODS;
+        wantedGoods2 = Goods.CLOTH;
+        int highlyWantedGoodsAmount = 0;
+        int wantedGoods1Amount = 0;
+        int wantedGoods2Amount = 0;
+        
+        /* TODO: Try the different types goods in random order: */
+        for (int type=0; type<Goods.NUMBER_OF_TYPES; type++) {
+            if (type == Goods.MUSKETS || type == Goods.HORSES) {
+                continue;
+            }
+
+            int price = getPrice(type, 100);
+            if (price > highlyWantedGoodsAmount) {
+                wantedGoods2 = wantedGoods1;
+                wantedGoods1 = highlyWantedGoods;
+                highlyWantedGoods  = type;
+                highlyWantedGoodsAmount = price;
+            } else if (price > wantedGoods1Amount) {
+                wantedGoods2 = wantedGoods1;
+                wantedGoods1 = type;
+                wantedGoods1Amount = price;
+            } else if (price > wantedGoods2Amount) {
+                wantedGoods2 = type;
+                wantedGoods2Amount = price;
+            }
+        }
     }
 
 
@@ -520,7 +600,16 @@ public class IndianSettlement extends Settlement {
     * <code>CITY</code> or a capital.
     */
     private int getPriceAddition() {
-        int addition = getKind();
+        return getBonusMultiplier() - 1;
+    }
+
+    
+    /**
+    * Get general bonus multiplier. This is >1 if this is a <code>VILLAGE</code>,
+    * <code>CITY</code> or a capital.
+    */
+    public int getBonusMultiplier() {
+        int addition = getKind() + 1;
         if (isCapital()) {
             addition++;
         }

@@ -1133,10 +1133,10 @@ public final class Tile extends FreeColGameObject implements Location {
         // Settlement data:
         private int     colonyUnitCount,
                         colonyStockadeLevel,
-                        skill,
-                        highlyWantedGoods,
-                        wantedGoods1,
-                        wantedGoods2;
+                        skill = IndianSettlement.UNKNOWN,
+                        highlyWantedGoods = IndianSettlement.UNKNOWN,
+                        wantedGoods1 = IndianSettlement.UNKNOWN,
+                        wantedGoods2 = IndianSettlement.UNKNOWN;
 
         //private Settlement settlement;
 
@@ -1267,6 +1267,9 @@ public final class Tile extends FreeColGameObject implements Location {
             } else if (getSettlement() != null && getSettlement() instanceof IndianSettlement) {
                 Element settlementElement = getChildElement(tileElement, IndianSettlement.getXMLElementTagName());
                 settlementElement.setAttribute("learnableSkill", Integer.toString(skill));
+                settlementElement.setAttribute("highlyWantedGoods", Integer.toString(highlyWantedGoods));
+                settlementElement.setAttribute("wantedGoods1", Integer.toString(wantedGoods1));
+                settlementElement.setAttribute("wantedGoods2", Integer.toString(wantedGoods2));
                 // wanted goods
             } else if (getSettlement() != null) {
                 logger.warning("Unknown type of settlement: " + getSettlement());

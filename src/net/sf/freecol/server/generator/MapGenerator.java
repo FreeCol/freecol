@@ -209,17 +209,11 @@ public class MapGenerator {
                 //System.out.println("Setting indian settlement at "
                 //                   + position.getX() + "x" + position.getY());
 
-                ArrayList list = generateWantedGoodsForLocation(map, map.getTile(position));
-
                 map.getTile(position).setSettlement(
                     new IndianSettlement(game, player,
                                          map.getTile(position), owner, type, capital,
                                          generateSkillForLocation(map, map.getTile(position)),
-                                         ((Integer)list.get(0)).intValue(),
-                                         ((Integer)list.get(1)).intValue(),
-                                         ((Integer)list.get(2)).intValue(),
-                                         false,
-                                         null)
+                                         false, null)
                 );
 
                 map.getTile(position).setClaim(Tile.CLAIM_CLAIMED);
@@ -247,28 +241,6 @@ public class MapGenerator {
                 return;
             }
         }
-    }
-
-
-    /**
-    * Generates some goods that are wanted by the natives that have a settlement at the given
-    * location.
-    * TODO: This method should be properly implemented. The surrounding terrain
-    *       should be taken into account and it should be partially randomized.
-    * @param tile The tile where the settlement will be located.
-    * @return An ArrayList with three Integer elements: element 0 will be the highly wanted goods,
-    *         element 1 will be the first wanted goods and element 2 will be the second wanted goods.
-    *         The ints inside the Integers will represent valid goods numbers from the Goods class.
-    */
-    private ArrayList generateWantedGoodsForLocation(Map map, Tile tile) {
-        ArrayList returnList = new ArrayList(3);
-
-        // TODO: implement this method!
-        returnList.add(new Integer(Goods.RUM));
-        returnList.add(new Integer(Goods.COATS));
-        returnList.add(new Integer(Goods.CIGARS));
-
-        return returnList;
     }
 
 

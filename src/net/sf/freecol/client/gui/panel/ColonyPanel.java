@@ -694,7 +694,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 c = ((JPanel) getComponent(1)).add(comp);
                 refresh();
                 colonyPanel.updateSoLLabel();
-                
+
                 updateProductionInBuildingPanel();
                 if (oldParent.getParent() instanceof ASingleBuildingPanel) {
                     ((ASingleBuildingPanel) oldParent.getParent()).updateProductionInBuildingPanel();
@@ -1259,10 +1259,11 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                     if (comp instanceof UnitLabel) {
                         Unit unit = ((UnitLabel)comp).getUnit();
                         if (colonyTile.getWorkTile().getOwner() != null && colonyTile.getWorkTile().getOwner() != colony) {
-                            if (colonyTile.getWorkTile().getOwner().getOwner().isEuropean())
+                            if (colonyTile.getWorkTile().getOwner().getOwner().isEuropean()) {
                                 parent.errorMessage("tileTakenEuro");
-                            else // its an indian setttlement
+                            } else {  // its an indian setttlement
                                 parent.errorMessage("tileTakenInd");
+                            }
                             return null;
                         }
 
@@ -1300,8 +1301,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 }
                 super.remove(comp);
             }
-            
-            
+
+
             /**
             * Checks if this <code>JComponent</code> contains the given coordinate.
             */

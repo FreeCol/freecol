@@ -769,6 +769,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         ServerPlayer player = freeColServer.getPlayer(connection);
 
         Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
+
+        if (unit.getOwner() != player) {
+            throw new IllegalStateException("Not your unit!");
+        }
+
         int direction = Integer.parseInt(element.getAttribute("direction"));
         String action = element.getAttribute("action");
         IndianSettlement settlement;
@@ -778,8 +783,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             // Move the unit onto the settlement's Tile.
             unit.setLocation(settlement.getTile());
             unit.setMovesLeft(0);
-        }
-        else {
+        } else {
             settlement = (IndianSettlement) unit.getTile().getSettlement();
             // Move the unit back to its original Tile.
             unit.setLocation(map.getNeighbourOrNull(Map.getReverseDirection(direction), unit.getTile()));
@@ -789,7 +793,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
 
         if (action.equals("basic")) {
             // Just return the skill and wanted goods.
-            reply.setAttribute("skill", Integer.toString(settlement.getLearnableSkill()));
+            reply.setAttribute("skill", Integer.toString(settlement.getLearnableSkill()));            
+            settlement.updateWantedGoods();
             reply.setAttribute("highlyWantedGoods", Integer.toString(settlement.getHighlyWantedGoods()));
             reply.setAttribute("wantedGoods1", Integer.toString(settlement.getWantedGoods1()));
             reply.setAttribute("wantedGoods2", Integer.toString(settlement.getWantedGoods2()));
@@ -800,8 +805,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             playerExploredTile.setHighlyWantedGoods(settlement.getHighlyWantedGoods());
             playerExploredTile.setWantedGoods1(settlement.getWantedGoods1());
             playerExploredTile.setWantedGoods2(settlement.getWantedGoods2());
-        }
-        else if (action.equals("speak")) {
+        } else if (action.equals("speak")) {
             if (!settlement.hasBeenVisited()) {
                 // This can probably be randomized, I don't think the AI needs to do anything here.
                 double random = Math.random();
@@ -810,60 +814,56 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     Element update = reply.getOwnerDocument().createElement("update");
 
                     Position center = new Position(settlement.getTile().getX(), settlement.getTile().getY());
-                    ArrayList surroundingTiles = new ArrayList();
 
-                    Iterator circleIterator = map.getCircleIterator(center, true, 4);
+                    Iterator circleIterator = map.getCircleIterator(center, true, 6);
                     while (circleIterator.hasNext()) {
                         Position position = (Position)circleIterator.next();
                         if ((!position.equals(center)) && map.getTile(position).isLand()) {
-                            surroundingTiles.add(map.getTile(position));
+                            Tile t = map.getTile(position);
+                            player.setExplored(t);
+                            update.appendChild(t.toXMLElement(player, update.getOwnerDocument()));
                         }
                     }
 
-                    for (int i = 0; i < surroundingTiles.size(); i++) {
-                        Tile t = (Tile) surroundingTiles.get(i);
-                        // For now we're not setting the showAll at true. It would show the units on
-                        // the tiles (was this done in the original?).
-                        update.appendChild(t.toXMLElement(player, update.getOwnerDocument()));
-                    }
-
                     reply.appendChild(update);
-                }
-                else if (random < 0.66) {
+                } else {
+                    int beadsGold = (int) (Math.random() * (400 * settlement.getBonusMultiplier())) + 50;
+                    if (unit.getType() == Unit.SEASONED_SCOUT) {
+                        beadsGold = (beadsGold * 11) / 10;
+                    }
                     reply.setAttribute("result", "beads");
-                    reply.setAttribute("amount", "100");
-                    player.modifyGold(100);
-                }
+                    reply.setAttribute("amount", Integer.toString(beadsGold));
+                    player.modifyGold(beadsGold);
+                } 
+                
+                /* This should only happen if you have "Searched for a treasure in the burial mounds":
                 else {
                     reply.setAttribute("result", "die");
                     unit.dispose();
                 }
+                */
                 settlement.setVisited();
-            }
-            else {
+            } else {
                 reply.setAttribute("result", "nothing");
             }
-        }
-        else if (action.equals("tribute")) {
+        } else if (action.equals("tribute")) {
             // TODO: the AI needs to determine whether or not we want to pay and how much.
             double random = Math.random();
-            if (random < 0.5) {
+            if (random < 0.5 && settlement.getOwner().getGold() >= 100) {
                 reply.setAttribute("result", "agree");
                 reply.setAttribute("amount", "100");
+                settlement.getOwner().modifyGold(-100);
                 player.modifyGold(100);
-            }
-            else {
+            } else {
                 reply.setAttribute("result", "disagree");
             }
-            // TODO: make the tribe slightly more angry towards that player.
-        }
-        else if (action.equals("attack")) {
+            settlement.getOwner().modifyTension(player, Player.TENSION_ADD_MINOR);
+        } else if (action.equals("attack")) {
             // The movesLeft has been set to 0 when the scout initiated its action.
             // If it wants to attack then it can and it will need some moves to do it.
             unit.setMovesLeft(1);
             return null;
-        }
-        else if (action.equals("cancel")) {
+        } else if (action.equals("cancel")) {
             return null;
         }
 
