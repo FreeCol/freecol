@@ -35,7 +35,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.ImageIcon;
-import javax.swing.border.EmptyBorder;
+import javax.swing.border.*;
 import javax.swing.UIManager;
 
 /**
@@ -80,7 +80,9 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
         Image tempImage = (Image) UIManager.get("TitleImage");
 
         if (tempImage != null) {
-            add(new JLabel(new ImageIcon(tempImage)), BorderLayout.CENTER);
+            JLabel logoLabel = new JLabel(new ImageIcon(tempImage));
+            logoLabel.setBorder(new CompoundBorder(new EmptyBorder(2,2,2,2), new BevelBorder(BevelBorder.LOWERED)));
+            add(logoLabel, BorderLayout.CENTER);
         }
 
         JPanel buttons = new JPanel(new GridLayout(3, 1, 50, 5));
