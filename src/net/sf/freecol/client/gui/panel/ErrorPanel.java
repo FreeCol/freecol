@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.NumberFormatException;
 import java.util.logging.Logger;
+import java.util.LinkedList;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -25,9 +26,11 @@ public final class ErrorPanel extends FreeColDialog implements ActionListener {
     
     private static final int OK = 0;
     
+    private static final int lineWidth = 320;
+    
     private final Canvas parent;
     
-    private JLabel errorLabel;
+    private LinkedList errorLabels; // A LinkedList of JLabel objects.
     private JButton errorButton;
     
     /**
@@ -44,7 +47,7 @@ public final class ErrorPanel extends FreeColDialog implements ActionListener {
         errorButton.setActionCommand(String.valueOf(OK));
         errorButton.addActionListener(this);
 
-        errorLabel = null;
+        errorLabels = null;
         
         try {
             BevelBorder border = new BevelBorder(BevelBorder.RAISED);
@@ -64,23 +67,73 @@ public final class ErrorPanel extends FreeColDialog implements ActionListener {
 
     /**
     * Adapts the appearance of this ErrorPanel to the given error message.
+    * If the error message is wider than lineWidth then the height of this panel
+    * will be adjusted.
     * @param message The error message to display in this error panel.
     */
     public void initialize(String message) {
-        //TODO: size of labels and panel depend on length of message
+        LinkedList lines = new LinkedList();
+        while (getFontMetrics(getFont()).getStringBounds(message, getGraphics()).getWidth()
+                > lineWidth) {
+            int spaceIndex = message.indexOf(' ');
+            int previousIndex = -1;
+            while (getFontMetrics(getFont()).getStringBounds(message.substring(0, spaceIndex),
+                    getGraphics()).getWidth() <= lineWidth) {
+                previousIndex = spaceIndex;
+                if ((spaceIndex + 1) >= message.length()) {
+                    spaceIndex = 0;
+                    break;
+                }
+                spaceIndex = message.indexOf(' ', spaceIndex + 1);
+                if (spaceIndex == -1) {
+                    spaceIndex = 0;
+                    break;
+                }
+            }
+            
+            if ((previousIndex >= 0) && (spaceIndex >= 0)) {
+                lines.add(message.substring(0, previousIndex));
+                if (previousIndex + 1 < message.length()) {
+                    message = message.substring(previousIndex + 1);
+                }
+                else {
+                    break;
+                }
+            }
+            else {
+                lines.add(message);
+                lines.add("Internal error in ErrorPanel");
+                break;
+            }
+        }
         
-        if (errorLabel != null) {
-            remove(errorLabel);
+        if (message.trim().length() > 0) {
+            lines.add(message);
+        }
+        
+        if (errorLabels != null) {
+            for (int i = 0; i < errorLabels.size(); i++) {
+                remove((JLabel)errorLabels.get(i));
+            }
+            
+            errorLabels.clear();
+        }
+        else {
+            errorLabels = new LinkedList();
         }
 
-        errorLabel = new JLabel(message);
-        errorLabel.setSize(320, 20);
-        errorLabel.setLocation(10, 2);
+        for (int i = 0; i < lines.size(); i++) {
+            JLabel label = new JLabel((String)lines.get(i));
+            label.setSize(lineWidth, 20);
+            label.setLocation(10, 2 + i * 20);
+            add(label);
+            errorLabels.add(label);
+        }
 
-        errorButton.setLocation(130, 25);
-
-        add(errorLabel);
-        setSize(340, 50);
+        errorButton.setLocation(130, 25 + (lines.size() - 1) * 20);
+        add(errorButton);
+        
+        setSize(340, 50 + (lines.size() - 1) * 20);
     }
     
     /**
