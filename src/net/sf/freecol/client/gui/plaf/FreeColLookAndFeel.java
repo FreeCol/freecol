@@ -8,6 +8,10 @@ import javax.swing.plaf.metal.*;
 import net.sf.freecol.common.FreeColException;
 
 import java.io.File;
+import java.io.InputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.logging.Logger;
 
@@ -19,7 +23,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
     private static final Logger logger = Logger.getLogger(FreeColLookAndFeel.class.getName());
     
     private final static Class resourceLocator = net.sf.freecol.FreeCol.class;
-    private File uiDirectory;
+    private File dataDirectory;
     
     private static final Color PRIMARY_1 = new Color(122, 109, 82),
                                BG_COLOR_SELECT = new Color(255, 244, 195),
@@ -49,22 +53,18 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
     */
     public FreeColLookAndFeel(String dataFolder) throws FreeColException {
         super();
-        
+         
         if(dataFolder.equals("")) { // lookup is necessary
-            URL uiDir = resourceLocator.getResource("data/images/ui");
-            
-            if(uiDir == null) {
-                uiDirectory = new File("data" + System.getProperty("file.separator") + "images" + System.getProperty("file.separator") + "ui");            
-                
-                if(!uiDirectory.exists() || !uiDirectory.isDirectory()) {
-                    throw new FreeColException("UI directory not found!");
-                }
+            dataDirectory = new File("data" + System.getProperty("file.separator"));            
+
+            if(!dataDirectory.exists() || !dataDirectory.isDirectory()) {
+                dataDirectory = null;                                
             }
         } else {
-            uiDirectory = new File(dataFolder + "images" + System.getProperty("file.separator") + "ui");
+            dataDirectory = new File(dataFolder);
 
-            if(!uiDirectory.exists() || !uiDirectory.isDirectory()) {
-                throw new FreeColException("UI directory not found in: " + uiDirectory.getName());
+            if(!dataDirectory.exists() || !dataDirectory.isDirectory()) {
+                throw new FreeColException("Data directory not found in: " + dataDirectory.getName());
             }
         }
         
@@ -139,7 +139,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
             u.put("net.sf.freecol.client.gui.plaf.FreeColScrollPaneUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColScrollPaneUI"));
 
             
-            // Add other UI resources:
+            // Add image UI resources:
             String [][] resources = {                
                 {"BackgroundImage", "bg.png"},
                 {"BackgroundImage2", "bg2.png"},
@@ -157,8 +157,10 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
             
             for (int i=0; i<resources.length; i++) {
                 Image image;                
-                if (uiDirectory != null) {
-                    image = Toolkit.getDefaultToolkit().getImage(uiDirectory + resources[i][1]);    
+                File file = new File(dataDirectory, "images" + System.getProperty("file.separator") + "ui" + System.getProperty("file.separator") + resources[i][1]);
+                
+                if (file.exists() && file.isFile()) {
+                    image = Toolkit.getDefaultToolkit().getImage(file.toString());    
                 } else {
                     image = Toolkit.getDefaultToolkit().getImage(resourceLocator.getResource("data/images/ui/"+  resources[i][1]));    
                 }
@@ -172,6 +174,44 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
             } catch (InterruptedException e) {
                 logger.warning("Interrupted while loading resources!");
             }    
+            
+                        
+            // Add font UI resources:
+            resources = new String[][] {                
+                {"HeaderFont", "ShadowedBlack.ttf"},
+            };                  
+            
+            for (int i=0; i<resources.length; i++) {
+                InputStream fontStream = null; 
+                
+                File file = new File(dataDirectory, "fonts" + System.getProperty("file.separator") + resources[i][1]);
+                if (file.exists() && file.isFile()) {
+                    try {
+                        fontStream = new FileInputStream(file.toString());
+                    } catch (FileNotFoundException e) {} // Ignored.
+                } else {
+                    URL url = resourceLocator.getResource("data/fonts/" + resources[i][1]);
+                    if (url != null) {
+                        try {
+                            fontStream = url.openStream();
+                        } catch (IOException e) {} // Ignored.       
+                    }
+                }    
+
+                if (fontStream != null) {  
+                    try {
+                        u.put(resources[i][0], Font.createFont(Font.TRUETYPE_FONT, fontStream));
+                    } catch (FontFormatException e) {
+                        logger.warning("Could not load font: " + resources[i][1]);
+                        u.put(resources[i][0], new Font("SansSerif", Font.PLAIN, 1));                
+                    } catch (IOException ie) {
+                        logger.warning("Could not load font: " + resources[i][1] + " because of an IO problem.");
+                        u.put(resources[i][0], new Font("SansSerif", Font.PLAIN, 1));                
+                    }                                
+                } else {                
+                    u.put(resources[i][0], new Font("SansSerif", Font.PLAIN, 1));                
+                }
+            }                       
         } catch (ClassNotFoundException e) {
             System.err.println(e);
             System.exit(-1);
@@ -179,7 +219,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
 
         return u;
     }
-
+    
     
     /**
     * Gets a one line description of this Look and Feel.

@@ -24,6 +24,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.FlowLayout;
 import java.awt.Image;
+import java.awt.Font;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
@@ -55,17 +56,22 @@ public final class VictoryPanel extends JPanel implements ActionListener {
     * @param parent The parent of this panel.
     */
     public VictoryPanel(Canvas parent) {
-        super(new FlowLayout(FlowLayout.CENTER, 1000, 15));
+        super(new FlowLayout(FlowLayout.CENTER, 1000, 10));
         this.parent = parent;
 
         JLabel victoryLabel = new JLabel(Messages.message("victory.text"));
-        victoryLabel.setFont(victoryLabel.getFont().deriveFont(0, 36));
+        Font font = (Font) UIManager.get("HeaderFont");
+        victoryLabel.setFont(font.deriveFont(0, 48));
         add(victoryLabel);
 
         Image tempImage = (Image) UIManager.get("VictoryImage");
-
+        JLabel imageLabel;
+        
         if (tempImage != null) {
-            add(new JLabel(new ImageIcon(tempImage)));
+            imageLabel = new JLabel(new ImageIcon(tempImage));
+            add(imageLabel);
+        } else {
+            imageLabel = new JLabel("");
         }
 
         add(ok);
@@ -78,7 +84,10 @@ public final class VictoryPanel extends JPanel implements ActionListener {
             setBorder(border);
         } catch(Exception e) {}
 
-        setSize(400, 400);
+        setSize(victoryLabel.getPreferredSize().width + 20, victoryLabel.getPreferredSize().height +
+                                                            imageLabel.getPreferredSize().height +
+                                                            ok.getPreferredSize().height + 50);
+        //setSize(400, 400);
     }
 
     
