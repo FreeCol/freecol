@@ -204,11 +204,12 @@ public final class FreeColServer {
     * @return The username of the player saving the game.
     */
     public String loadGame(File file) throws IOException {
-        InflaterInputStream in = new InflaterInputStream(new FileInputStream(file));
-        StringBuffer sb = new StringBuffer();
-           
-        Message message = new Message(in);
-        
+        BufferedReader in = new BufferedReader(new InputStreamReader(new InflaterInputStream(new FileInputStream(file))));
+        //InputStreamReader in = new InputStreamReader(new InflaterInputStream(new FileInputStream(file)), "ISO-8859-1");
+
+        Message message = new Message(in.readLine());
+        //Message message = new Message(in);
+
         Element savedGameElement = message.getDocument().getDocumentElement();
         Element serverObjectsElement = (Element) savedGameElement.getElementsByTagName("serverObjects").item(0);
         

@@ -4,6 +4,7 @@ package net.sf.freecol.common.networking;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import java.util.logging.Logger;
 
@@ -41,28 +42,7 @@ public final class Message {
     * @param msg The raw message data.
     */
     public Message(String msg) {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        Document tempDocument = null;
-
-        try {
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            tempDocument = builder.parse(new InputSource(new StringReader(msg)));
-        } catch (SAXException sxe) {
-            // Error generated during parsing
-            Exception  x = sxe;
-            if (sxe.getException() != null) {
-                x = sxe.getException();
-            }
-            x.printStackTrace();
-            logger.warning("Invalid message received: \"" + msg + "\"");
-        } catch (ParserConfigurationException pce) {
-            // Parser with specified options can't be built
-            pce.printStackTrace();
-        } catch (IOException ioe) {
-            // I/O error
-            ioe.printStackTrace();
-        }
-        document = tempDocument;
+        this(new InputSource(new StringReader(msg)));
     }
 
     
@@ -70,13 +50,22 @@ public final class Message {
     * Constructs a new Message with data from the given String. The constructor
     * to use if this is an INCOMING message.
     */
-    public Message(InputStream inputStream) {
+    public Message(InputStreamReader inputStreamReader) {
+        this(new InputSource(inputStreamReader));
+    }
+    
+    
+    /**
+    * Constructs a new Message with data from the given String. The constructor
+    * to use if this is an INCOMING message.
+    */
+    public Message(InputSource inputSource) {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         Document tempDocument = null;
 
         try {
             DocumentBuilder builder = factory.newDocumentBuilder();
-            tempDocument = builder.parse(inputStream);
+            tempDocument = builder.parse(inputSource);
         } catch (SAXException sxe) {
             // Error generated during parsing
             Exception  x = sxe;
@@ -94,6 +83,7 @@ public final class Message {
         }
         document = tempDocument;
     }    
+    
 
     /**
     * Constructs a new Message with data from the given XML-document.
