@@ -377,6 +377,47 @@ public final class InGameController {
     }
     
     /**
+    * Equips or unequips a <code>Unit</code> with a certain type of <code>Goods</code>.
+    *
+    * @param unit The <code>Unit</code>.
+    * @param type The type of <code>Goods</code>.
+    * @param amount How many of these goods the unit should have.
+    */
+    public void equipUnit(Unit unit, int type, int amount) {
+        Client client = freeColClient.getClient();
+
+        switch(type) {
+            //TODO: Pass in "Goods.CROSSES" when this is defined to bless as a missionary.
+            //Also check to see if there's a church in the colony, or if you're in Europe.
+            case Goods.MUSKETS:
+                unit.setArmed((amount > 0)); // So give them muskets if the amount we want is greater than zero.
+                break;
+            case Goods.HORSES:
+                unit.setMounted((amount > 0)); // As above.
+                break;
+            case Goods.TOOLS:
+                int actualAmount = amount;
+                if ((actualAmount % 20) > 0) {
+                    logger.warning("Trying to set a number of tools that is not a multiple of 20.");
+                    actualAmount -= (actualAmount % 20);
+                }
+                unit.setNumberOfTools(actualAmount);
+                break;
+            default:
+                logger.warning("Invalid type of goods to equip.");
+                return;
+        }
+
+        Element equipUnitElement = Message.createNewRootElement("equipunit");
+        equipUnitElement.setAttribute("unit", unit.getID());
+        equipUnitElement.setAttribute("type", Integer.toString(type));
+        equipUnitElement.setAttribute("amount", Integer.toString(amount));
+
+        client.send(equipUnitElement);
+    }
+
+    
+    /**
     * Moves a <code>Unit</code> to a <code>WorkLocation</code>.
     *
     * @param unit The <code>Unit</code>.

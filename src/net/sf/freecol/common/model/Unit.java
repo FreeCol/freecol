@@ -286,11 +286,11 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
      */
     public int getWorkType() {
         if (getLocation() instanceof Building) {
-	  // TODO: code me.
-	  return 0;
-	} else {
-	  return workType;
-	}
+          // TODO: code me.
+          return 0;
+        } else {
+          return workType;
+        }
     }
     
      /**
@@ -618,12 +618,12 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
     */
     public int getGoodsSpace() {
         if (isCarrier()) {
-	    int space = 0;
+            int space = 0;
             Iterator goodsIterator = goodsContainer.getGoodsIterator();
-	    while (goodsIterator.hasNext()) {
-	      space += ((Goods) goodsIterator.next()).getTakeSpace();
-	    }
-	    return space;
+            while (goodsIterator.hasNext()) {
+              space += ((Goods) goodsIterator.next()).getTakeSpace();
+            }
+            return space;
         } else {
             return 0;
         }
@@ -697,6 +697,10 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
         if (workLocation.getTile() != getTile()) {
             throw new IllegalStateException("Can only set a 'Unit'  to a 'WorkLocation' that is on the same 'Tile'.");
         }
+        
+        if (armed) setArmed(false);
+        if (mounted) setMounted(false);
+        if (isPioneer()) setNumberOfTools(0);
 
         setLocation(workLocation);
     }
@@ -746,7 +750,27 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
     * @param <i>true</i> if this unit should be armed and <i>false</i> otherwise.
     */
     public void setArmed(boolean b) {
-        armed = b;
+        if ((b) && (!armed)) {
+            if (getGoodsDumpLocation() != null) {
+               if (getGoodsDumpLocation().getGoodsCount(Goods.MUSKETS) < 50) return;
+               getGoodsDumpLocation().removeAmountAndTypeOfGoods(Goods.MUSKETS, 50);
+               armed = true;
+            } else if (location instanceof Europe) {
+               if (((getOwner().getGold()) / (getGame().getMarket().costToBuy(Goods.MUSKETS))) < 50) return;
+               getGame().getMarket().buy(Goods.MUSKETS, 50, getOwner());
+               armed = true;
+            } else {
+                logger.warning("Attempting to arm a soldier outside of a colony or Europe!");
+            }
+        } else if ((!b) && (armed)) {
+            armed = false;
+            Goods g = new Goods(getGame(), null, Goods.MUSKETS, 50);
+            if (getGoodsDumpLocation() != null) {
+                g.setLocation(getGoodsDumpLocation());
+            } else if (location instanceof Europe) {
+                getGame().getMarket().sell(g, getOwner());
+            }
+        }
     }
 
 
@@ -764,7 +788,27 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
     * @param <i>true</i> if this unit should be mounted and <i>false</i> otherwise.
     */
     public void setMounted(boolean b) {
-        mounted = b;
+        if ((b) && (!mounted)) {
+            if (getGoodsDumpLocation() != null) {
+               if (getGoodsDumpLocation().getGoodsCount(Goods.HORSES) < 50) return;
+               getGoodsDumpLocation().removeAmountAndTypeOfGoods(Goods.HORSES, 50);
+               mounted = true;
+            } else if (location instanceof Europe) {
+               if (((getOwner().getGold()) / (getGame().getMarket().costToBuy(Goods.HORSES))) < 50) return;
+               getGame().getMarket().buy(Goods.HORSES, 50, getOwner());
+               mounted = true;
+            } else {
+                logger.warning("Attempting to mount a colonist outside of a colony or Europe!");
+            }
+        } else if ((!b) && (mounted)) {
+            mounted = false;
+            Goods g = new Goods(getGame(), null, Goods.HORSES, 50);
+            if (getGoodsDumpLocation() != null) {
+                g.setLocation(getGoodsDumpLocation());
+            } else if (location instanceof Europe) {
+                getGame().getMarket().sell(g, getOwner());
+            }
+        }
     }
 
 
@@ -801,7 +845,42 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
     * @param numberOfTools The number to set it to.
     */
     public void setNumberOfTools(int numberOfTools) {
-        this.numberOfTools = numberOfTools;
+        int changeAmount = 0;
+        if ((numberOfTools % 20) != 0) {
+            logger.warning("Attempting to give a pioneer a number of tools that is not a multiple of 20!");
+            numberOfTools -= (numberOfTools % 20);
+        }
+        if (numberOfTools > 100) {
+            logger.warning("Attempting to give a pioneer a number of greater than 100!");
+        }
+        changeAmount = numberOfTools - this.numberOfTools;
+        if (changeAmount > 0) {
+            if (getGoodsDumpLocation() != null) {
+               int actualAmount = getGoodsDumpLocation().getGoodsCount(Goods.TOOLS);
+               if (actualAmount < changeAmount) changeAmount = actualAmount;
+               if ((this.numberOfTools + changeAmount) % 20 > 0) changeAmount -= (this.numberOfTools + changeAmount);
+               if (changeAmount <= 0) return;
+               getGoodsDumpLocation().removeAmountAndTypeOfGoods(Goods.TOOLS, changeAmount);
+               this.numberOfTools = this.numberOfTools + changeAmount;
+            } else if (location instanceof Europe) {
+               int maximumAmount = ((getOwner().getGold()) / (getGame().getMarket().costToBuy(Goods.TOOLS)));
+               if (maximumAmount < changeAmount) changeAmount = maximumAmount;
+               if ((this.numberOfTools + changeAmount) % 20 > 0) changeAmount -= (this.numberOfTools + changeAmount);
+               if (changeAmount <= 0) return;
+               getGame().getMarket().buy(Goods.TOOLS, changeAmount, getOwner());
+               this.numberOfTools = this.numberOfTools + changeAmount;
+            } else {
+                logger.warning("Attempting to create a pioneer outside of a colony or Europe!");
+            }
+        } else if (changeAmount < 0) {
+            this.numberOfTools = this.numberOfTools + changeAmount;
+            Goods g = new Goods(getGame(), null, Goods.TOOLS, -changeAmount);
+            if (getGoodsDumpLocation() != null) {
+                g.setLocation(getGoodsDumpLocation());
+            } else if (location instanceof Europe) {
+                getGame().getMarket().sell(g, getOwner());
+            }
+        }
     }
 
 
@@ -1149,7 +1228,7 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
                 break;
             case BUILD_ROAD:
             case PLOW:
-	        switch(getTile().getType()) {
+                switch(getTile().getType()) {
                     case Tile.DESERT:
                     case Tile.PLAINS:
                     case Tile.PRAIRIE:
@@ -1214,7 +1293,7 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
         }
 
         // Do the HARD work of moving this unit to europe:
-	if (!(getLocation() instanceof Europe)) // Perpetual europedom bug fixed.. -sjm
+        if (!(getLocation() instanceof Europe)) // Perpetual europedom bug fixed.. -sjm
           setEntryLocation(getLocation());
         setState(TO_EUROPE);
         setLocation(getOwner().getEurope());
@@ -1249,8 +1328,8 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
             case PLOW:
                 if (!((getTile().isForested()) || !(getTile().isPlowed()))) return false;
             case BUILD_ROAD:
-	        if ((s == BUILD_ROAD) && (getTile().hasRoad())) return false;
-		if (getNumberOfTools() < 20) return false;
+                if ((s == BUILD_ROAD) && (getTile().hasRoad())) return false;
+                if (getNumberOfTools() < 20) return false;
             case IN_COLONY:
                 if (isNaval()) {
                     return false;
@@ -1318,6 +1397,10 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
 
         getTile().setSettlement(colony);
         setLocation(colony);
+        
+        if (isArmed()) setArmed(false);
+        if (isMounted()) setMounted(false);
+        if (isPioneer()) setNumberOfTools(0);
     }
 
 
@@ -1407,14 +1490,14 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
                     case TO_EUROPE:     break;
                     case TO_AMERICA:    setLocation(getEntryLocation()); break;
                     case BUILD_ROAD:    getTile().setRoad(true); numberOfTools -= 20; break;
-		    case PLOW:
-		        if (getTile().isForested()) {
-			    getTile().setForested(false);
-			} else {
-			    getTile().setPlowed(true);
-			}
-			numberOfTools -= 20;
-			break;
+                    case PLOW:
+                        if (getTile().isForested()) {
+                            getTile().setForested(false);
+                        } else {
+                            getTile().setPlowed(true);
+                        }
+                        numberOfTools -= 20;
+                        break;
                     default:            logger.warning("Unkown work completed. State: " + state);
                 }
 
@@ -1621,6 +1704,30 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
     }
     
     /**
+    * Gets the Colony the goods of this unit would go to if it were to de-equip.
+    * @return The Colony the goods would go to, or null if there is no appropriate Colony
+    */
+    public Colony getGoodsDumpLocation() {
+        if ((location instanceof Colony)) {
+            return ((Colony)location);
+        } else if (location instanceof Building) {
+            return (((Building)location).getColony());
+        } else if (location instanceof ColonyTile) {
+            return (((ColonyTile)location).getColony());
+        } else if ((location instanceof Tile) && (((Tile)location).getSettlement() != null) && (((Tile)location).getSettlement() instanceof Colony)) {
+            return (((Colony)(((Tile)location).getSettlement())));
+        } else if (location instanceof Unit) {
+            if ((((Unit)location).getLocation()) instanceof Colony) {
+                return ((Colony)(((Unit)location).getLocation()));
+            } else if (((((Unit)location).getLocation()) instanceof Tile) && (((Tile)(((Unit)location).getLocation())).getSettlement() != null) && (((Tile)(((Unit)location).getLocation())).getSettlement() instanceof Colony)) {
+                return ((Colony)(((Tile)(((Unit)location).getLocation())).getSettlement()));
+            }
+        }
+        return null;
+    }
+
+    
+    /**
     * Given a type of goods to produce in a building, returns the unit's potential to do so.
     * @param goods The type of goods to be produced.
     * @return The potential amount of goods to be manufactured.
@@ -1725,7 +1832,7 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
             default: // Beats me who or what is working here, but he doesn't get a bonus.
                 break;
         }
-	return base;
+        return base;
     }
 
     

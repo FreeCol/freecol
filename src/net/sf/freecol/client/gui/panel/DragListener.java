@@ -64,7 +64,7 @@ public final class DragListener extends MouseAdapter {
                 menu.add(menuItem);
 
                 if (tempUnit.isMounted()) {
-                    menuItem = new JMenuItem("Sell Horses");
+                    menuItem = new JMenuItem("Remove Horses");
                 } else {
                     menuItem = new JMenuItem("Mount");
                 }
@@ -72,14 +72,16 @@ public final class DragListener extends MouseAdapter {
                 menuItem.addActionListener(unitLabel);
                 menu.add(menuItem);
 
-                if (tempUnit.getNumberOfTools() > 0) {
-                    menuItem = new JMenuItem("Sell Tools");
-                } else {
-                    menuItem = new JMenuItem("Equip with Tools");
+                if (!tempUnit.isArmed() && !tempUnit.isMounted()) {
+                    if (tempUnit.getNumberOfTools() > 0) {
+                        menuItem = new JMenuItem("Remove Tools");
+                    } else {
+                        menuItem = new JMenuItem("Equip with Tools");
+                    }
+                    menuItem.setActionCommand(String.valueOf(UnitLabel.TOOLS));
+                    menuItem.addActionListener(unitLabel);
+                    menu.add(menuItem);
                 }
-                menuItem.setActionCommand(String.valueOf(UnitLabel.TOOLS));
-                menuItem.addActionListener(unitLabel);
-                menu.add(menuItem);
 
                 if (tempUnit.isMissionary()) {
                     menuItem = new JMenuItem("Take Off Silly Clothes");

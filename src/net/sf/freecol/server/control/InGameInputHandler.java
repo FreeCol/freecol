@@ -85,6 +85,8 @@ public final class InGameInputHandler implements MessageHandler {
                     reply = recruitUnitInEurope(connection, element);
                 } else if (type.equals("trainUnitInEurope")) {
                     reply = trainUnitInEurope(connection, element);
+                } else if (type.equals("equipunit")) {
+                    reply = equipUnit(connection, element);
                 } else if (type.equals("work")) {
                     reply = work(connection, element);
                 } else if (type.equals("worktype")) {
@@ -525,6 +527,44 @@ public final class InGameInputHandler implements MessageHandler {
         europe.train(unit);
 
         return reply;
+    }
+
+    /**
+    * Handles a "equipunit"-request from a client.
+    *
+    * @param connection The connection the message came from.
+    * @param workElement The element containing the request.
+    */
+    private Element equipUnit(Connection connection, Element workElement) {
+        Game game = freeColServer.getGame();
+
+        Unit unit = (Unit) game.getFreeColGameObject(workElement.getAttribute("unit"));
+        int type = Integer.parseInt(workElement.getAttribute("type"));
+        int amount = Integer.parseInt(workElement.getAttribute("amount"));
+        
+        switch(type) {
+            //TODO: Pass in "Goods.CROSSES" when this is defined to bless as a missionary.
+            //Also check to see if there's a church in the colony, or if you're in Europe.
+            case Goods.MUSKETS:
+                unit.setArmed((amount > 0)); // So give them muskets if the amount we want is greater than zero.
+                break;
+            case Goods.HORSES:
+                unit.setMounted((amount > 0)); // As above.
+                break;
+            case Goods.TOOLS:
+                int actualAmount = amount;
+                if ((actualAmount % 20) > 0) {
+                    logger.warning("Trying to set a number of tools that is not a multiple of 20.");
+                    actualAmount -= (actualAmount % 20);
+                }
+                unit.setNumberOfTools(actualAmount);
+                break;
+            default:
+                logger.warning("Invalid type of goods to equip.");
+                return null;
+        }
+
+        return null;
     }
 
     

@@ -431,7 +431,7 @@ public final class Colony extends Settlement implements Location {
                 if (gc != null) {
                     goodsContainer.readFromXMLElement(childElement);
                 } else {
-                    goodsContainer = new GoodsContainer(getGame(), this);
+                    goodsContainer = new GoodsContainer(getGame(), this, childElement);
                 }
 	    }
         }

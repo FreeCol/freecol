@@ -104,7 +104,14 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation {
     public Unit getUnit() {
         return unit;
     }
-
+    
+    /**
+    * Gets a pointer to the colony containing this tile.
+    * @return The <code>Colony</code>.
+    */
+    public Colony getColony() {
+        return colony;
+    }
 
     /**
     * Sets a <code>Unit</code> to this <code>ColonyTile</code>.

@@ -640,13 +640,13 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         }
 
         public void remove(Component comp) {
-            if (comp instanceof GoodsLabel) {
+                if (comp instanceof GoodsLabel) {
                 Goods g = ((GoodsLabel)comp).getGoods();
                 //inGameController.leaveShip(unit);
 
                 super.remove(comp);
-                    colonyPanel.getWarehousePanel().revalidate();
-                    colonyPanel.getCargoPanel().revalidate();
+                colonyPanel.getWarehousePanel().revalidate();
+                colonyPanel.getCargoPanel().revalidate();
             }
         }
     }

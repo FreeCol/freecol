@@ -131,16 +131,18 @@ public final class UnitLabel extends JLabel implements ActionListener {
             if (!unit.isCarrier()) {
                 switch (Integer.valueOf(command).intValue()) {
                     case ARM:
-                        //parent.trade(!unit.isArmed(), Goods.MUSKETS, unit, 50);
+                        inGameController.equipUnit(unit, Goods.MUSKETS, ((unit.isArmed()) ? 0 : 50));
                         break;
                     case MOUNT:
-                        //parent.trade(!unit.isMounted(), Goods.HORSES, unit, 50);
+                        inGameController.equipUnit(unit, Goods.HORSES, ((unit.isMounted()) ? 0 : 50));
                         break;
                     case TOOLS:
-                        //parent.trade(unit.getNumberOfTools() == 0, Goods.TOOLS, unit, 100);
+                        if (!unit.isArmed() && !unit.isMounted()) {
+                          inGameController.equipUnit(unit, Goods.TOOLS, ((unit.isPioneer()) ? 0 : 100));
+                        }
                         break;
                     case DRESS:
-                        //parent.dressAsMissionary(unit);
+                        //inGameController.equipUnit(unit, Goods.CROSSES, ((unit.isMissionary()) ? 0 : 1));
                         break;
                     case WORKTYPE_FOOD:
                         inGameController.changeWorkType(unit, Goods.FOOD);
