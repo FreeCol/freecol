@@ -5,10 +5,16 @@ import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.awt.Graphics2D;
 import java.awt.Color;
+import java.awt.Image;
 import java.util.*;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.UIManager;
+
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.image.BufferedImage;
+import java.awt.AlphaComposite;
 
 import net.sf.freecol.client.FreeColClient;
 
@@ -619,7 +625,7 @@ public final class GUI {
             // Column per column; start at the left side
             for (int tileX = clipLeftCol; tileX <= clipRightCol; tileX++) {
                 Tile unitTile = gameData.getMap().getTileOrNull(tileX, tileY);
-                
+
                 if (unitTile != null && unitTile.getUnitCount() > 0 && (unitTile.getSettlement() == null || (activeUnit != null && unitTile.contains(activeUnit)))) {
                     if ((activeUnit != null) && (unitTile.contains(activeUnit))) {
                         displayUnit(g, activeUnit, xx, yy);
@@ -635,6 +641,34 @@ public final class GUI {
         /*
         PART 4
         ======
+        Display the colony names.
+        */
+        xx = 0;
+        yy = clipTopY;
+        // Row per row; start with the top modified row
+        for (int tileY = clipTopRow; tileY <= clipBottomRow; tileY++) {
+            xx = clipLeftX;
+            if ((tileY % 2) != 0) {
+                xx += tileWidth / 2;
+            }
+            // Column per column; start at the left side
+            for (int tileX = clipLeftCol; tileX <= clipRightCol; tileX++) {
+                if (map.isValid(tileX, tileY)) {
+                    Tile tile = map.getTile(tileX, tileY);
+                    if (tile.getSettlement() instanceof Colony) {
+                        Colony colony = (Colony) map.getTile(tileX, tileY).getSettlement();
+                        BufferedImage stringImage = createStringImage(g, colony.getName(), colony.getOwner().getColor(), lib.getTerrainImageWidth(tile.getType()) * 4/3);
+                        g.drawImage(stringImage, xx + (lib.getTerrainImageWidth(tile.getType()) - stringImage.getWidth())/2 + 1, yy + (lib.getColonyImageHeight(lib.getSettlementGraphicsType(colony))) + 1, null);
+                    }
+                }
+                xx += tileWidth;
+            }
+            yy += tileHeight / 2;
+        }
+
+        /*
+        PART 5
+        ======
         Display the messages.
         */
 
@@ -649,6 +683,61 @@ public final class GUI {
                 yy += 25;
             }
         }
+    }
+
+
+    /**
+    * Creates an image with a string of a given color and with a black border around the glyphs.
+    *
+    * @param nameString The <code>String</code> to make an image of.
+    * @param color The <code>Color</code> to use when displaying the <code>nameString</code>.
+    * @param maxWidth The maximum width of the image. The size of the <code>Font</code> will be
+    *                 adjusted if the image gets larger than this value.
+    */
+    public BufferedImage createStringImage(Graphics2D g, String nameString, Color color, int maxWidth) {
+
+        Font nameFont = null;
+        FontMetrics nameFontMetrics = null;
+        BufferedImage bi = null;
+
+        int fontSize = 16;
+        Font origFont = g.getFont();
+        do {
+            nameFont = origFont.deriveFont(Font.BOLD, fontSize);
+            g.setFont(nameFont);
+            nameFontMetrics = g.getFontMetrics();
+            bi = new BufferedImage(nameFontMetrics.stringWidth(nameString) + 4, nameFontMetrics.getMaxAscent() + nameFontMetrics.getMaxDescent(), BufferedImage.TYPE_INT_ARGB);
+            fontSize -= 2;
+        } while (bi.getWidth() > maxWidth);
+        g.setFont(origFont);
+
+        Graphics2D big = bi.createGraphics();
+
+        big.setColor(color);
+        big.setFont(nameFont);
+        big.drawString(nameString, 2, nameFontMetrics.getMaxAscent());
+
+        int playerColor = color.getRGB();
+        for (int biX=0; biX<bi.getWidth(); biX++) {
+            for (int biY=0; biY<bi.getHeight(); biY++) {
+                int r = bi.getRGB(biX, biY);
+
+                if (r == playerColor) {
+                    continue;
+                }
+
+                for (int cX=-1; cX <=1; cX++) {
+                    for (int cY=-1; cY <=1; cY++) {
+                        if (biX+cX >= 0 && biY+cY >= 0 && biX+cX < bi.getWidth() && biY+cY < bi.getHeight() && bi.getRGB(biX + cX, biY + cY) == playerColor) {
+                            bi.setRGB(biX, biY, Color.BLACK.getRGB());
+                            continue;
+                        }
+                    }
+                }
+            }
+        }
+
+        return bi;
     }
 
 
@@ -717,7 +806,7 @@ public final class GUI {
                     }
                 }
             } */
-            
+
             // Do this after the basic terrain is done or it looks funny. -sjm
             if (tile.isForested()) {
                 g.drawImage(lib.getTerrainImage(ImageLibrary.FOREST, tile.getX(), tile.getY()), x, y - 32, null);
@@ -726,7 +815,7 @@ public final class GUI {
             } else if (tile.getAddition() == Tile.ADD_MOUNTAINS) {
                 g.drawImage(lib.getTerrainImage(ImageLibrary.MOUNTAINS, tile.getX(), tile.getY()), x, y - 32, null);
             }
-            
+
             if (tile.isLand()) {
                 for (int i = 0; i < 8; i++) {
                     Map.Position p = map.getAdjacent(pos, i);
@@ -756,7 +845,7 @@ public final class GUI {
 
                     // Draw image of colony in center of the tile.
                     g.drawImage(lib.getColonyImage(type), x + (lib.getTerrainImageWidth(tile.getType()) - lib.getColonyImageWidth(type)) / 2, y + (lib.getTerrainImageHeight(tile.getType()) - lib.getColonyImageHeight(type)) / 2, null);
-                    
+
                     // The 5 here is arbitrary -sjm
                     g.drawImage(lib.getColorChip(((Colony)settlement).getOwner().getColor()), x + STATE_OFFSET_X, y + 10, null);
                     String populationString = Integer.toString(((Colony)settlement).getUnitCount());
@@ -765,18 +854,15 @@ public final class GUI {
                     } else {
                         g.setColor(Color.BLACK);
                     }
+
                     g.drawString(populationString, x + TEXT_OFFSET_X + STATE_OFFSET_X, y + 10 + TEXT_OFFSET_Y);
-                    
                     g.setColor(Color.BLACK);
-                    
-                    String nameString = ((Colony)settlement).getName();
-                    g.drawString(nameString, x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(nameString))/2, y + (lib.getTerrainImageHeight(tile.getType()) - lib.getColonyImageHeight(type)) / 2);
                 } else if (settlement instanceof IndianSettlement) {
                     int type = lib.getSettlementGraphicsType(settlement);
 
                     // Draw image of indian settlement in center of the tile.
                     g.drawImage(lib.getIndianSettlementImage(type), x + (lib.getTerrainImageWidth(tile.getType()) - lib.getIndianSettlementImageWidth(type)) / 2, y + (lib.getTerrainImageHeight(tile.getType()) - lib.getIndianSettlementImageHeight(type)) / 2, null);
-                    
+
                     g.drawImage(lib.getColorChip(((IndianSettlement)settlement).getOwner().getColor()), x + STATE_OFFSET_X, y + 10, null);
                     g.drawString("-", x + TEXT_OFFSET_X + STATE_OFFSET_X, y + 10 + TEXT_OFFSET_Y);
                 } else {
