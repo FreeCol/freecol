@@ -846,7 +846,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         setLocation(workLocation);
     }
 
-    
+
     /**
     * Sets the location of this Unit.
     * @param newLocation The new Location of the Unit.
@@ -936,6 +936,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     * @param isCombat Whether this is a result of combat.
     */
     public void setArmed(boolean b, boolean isCombat) {
+        setMovesLeft(0);
+        
         if (isCombat) {
             armed = b; // No questions asked.
             return;
@@ -1001,6 +1003,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     * @param isCombat Whether this is a result of combat.
     */
     public void setMounted(boolean b, boolean isCombat) {
+        setMovesLeft(0);
+        
         if (isCombat) {
             mounted = b; // No questions asked.
             return;
@@ -1065,6 +1069,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     * @param b <i>true</i> if the unit should be a missionary and <i>false</i> otherwise.
     */
     public void setMissionary(boolean b) {
+        setMovesLeft(0);
+
         if (!(getLocation() instanceof Europe) && !getTile().getColony().getBuilding(Building.CHURCH).isBuilt()) {
             throw new IllegalStateException("Can only dress as a missionary when the unit is located in Europe or a Colony with a church.");
         }
@@ -1123,6 +1129,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     * @param numberOfTools The number to set it to.
     */
     public void setNumberOfTools(int numberOfTools) {
+        setMovesLeft(0);
+
         if (numberOfTools >= 20) {
             if (isMounted()) {
                 setMounted(false);
