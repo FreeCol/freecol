@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.networking.Message;
 
 
 /**
@@ -60,6 +62,22 @@ public final class DefaultHandler extends Handler {
         // We should use XMLFormatter here in the future
         // or maybe a self-made HTMLFormatter.
         setFormatter(new TextFormatter());
+        
+        try {
+            String str = "FreeCol game version: " + FreeCol.getVersion() + "\n" 
+                        + "FreeCol protocol version: " + Message.getFreeColProtocolVersion() + "\n\n"
+                        + "Java vendor: " + System.getProperty("java.vendor") + "\n"
+                        + "Java version: " + System.getProperty("java.version") + "\n"
+                        + "Java WM name: " + System.getProperty("java.vm.name") + "\n"
+                        + "Java WM vendor: " + System.getProperty("java.vm.vendor") + "\n"
+                        + "Java WM version: " + System.getProperty("java.vm.version") + "\n\n"
+                        + "OS name: " + System.getProperty("os.name") + "\n"
+                        + "OS architecture: " + System.getProperty("os.arch") + "\n"
+                        + "OS version: " + System.getProperty("os.version") + "\n\n";
+            fileWriter.write(str, 0, str.length());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
