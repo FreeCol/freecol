@@ -308,7 +308,11 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
 
     public void reinitialize() {
-        initialize(colony, game, selectedUnit.getUnit());
+        if (selectedUnit != null) {
+            initialize(colony, game, selectedUnit.getUnit());
+        } else {
+            initialize(colony, game, null);
+        }
     }
 
 
