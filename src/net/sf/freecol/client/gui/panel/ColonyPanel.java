@@ -12,6 +12,7 @@ import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
 import java.util.logging.Logger;
 import java.util.Iterator;
@@ -223,6 +224,9 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         setSize(850, 600);
 
         selectedUnit = null;
+        
+        // See the message of Ulf Onnen for more information about the presence of this fake mouse listener.
+        addMouseListener(new MouseAdapter() {});
     }
 
 
@@ -496,7 +500,6 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         return colony;
     }
 
-    
     /**
     * This panel is a list of the colony's buildings.
     */
@@ -508,7 +511,6 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         * @param colonyPanel The panel that holds this BuildingsPanel.
         */
         public BuildingsPanel(ColonyPanel colonyPanel) {
-            super(new GridLayout(0, 1));                    
             this.colonyPanel = colonyPanel;
         }
 
@@ -518,12 +520,19 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         */
         public void initialize() {
             removeAll();
+            // O row means any number of rows (this makes the look of BuildingsPanel prettier)
+            setLayout(new GridLayout(0, 1));
+
+            //Building[] buildings = colony.getBuildings();
+
+            int displayedBuildings = 0;
+            ASingleBuildingPanel aSingleBuildingPanel;
 
             Iterator buildingIterator = colony.getBuildingIterator();
-            ASingleBuildingPanel aSingleBuildingPanel;            
             while (buildingIterator.hasNext()) {
                 Building building = (Building) buildingIterator.next();
                 if (building.isBuilt()) {
+                    displayedBuildings++;
                     aSingleBuildingPanel = new ASingleBuildingPanel(building);
                     aSingleBuildingPanel.addMouseListener(releaseListener);
                     aSingleBuildingPanel.setTransferHandler(defaultTransferHandler);
@@ -537,7 +546,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         /**
         * This panel is a single line (one building) in the <code>BuildingsPanel</code>.
         */
-        public class ASingleBuildingPanel extends JPanel {
+        public final class ASingleBuildingPanel extends JPanel {
             Building building;
             JPanel productionInBuildingPanel = new JPanel();
 
@@ -675,21 +684,17 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             ImageIcon goodsIcon = parent.getImageProvider().getGoodsImageIcon(Goods.FOOD);
             int add;
 
-            int nextX = 0;
-            BufferedImage productionImage;            
-
-            // Food production:                        
-            if (need != 0) {
-                nextX = (need > 12) ? goodsIcon.getIconWidth() : Math.min(need, 4) * goodsIcon.getIconWidth();                
-                if (horses == 0) {
-                    productionImage = parent.getGUI().createProductionImage(goodsIcon, need, nextX, getHeight(), 12);
-                } else {
-                    nextX = goodsIcon.getIconWidth();
-                    productionImage = parent.getGUI().createProductionImage(goodsIcon, need, nextX, getHeight(), 1);
-                }
-                g.drawImage(productionImage, 0, 0, null);
-                nextX += goodsIcon.getIconWidth()/4;
+            // Food production:
+            int nextX = (need > 12) ? goodsIcon.getIconWidth() : Math.min(need, 4) * goodsIcon.getIconWidth();
+            BufferedImage productionImage;
+            if (horses == 0) {
+                productionImage = parent.getGUI().createProductionImage(goodsIcon, need, nextX, getHeight(), 12);
+            } else {
+                nextX = goodsIcon.getIconWidth();
+                productionImage = parent.getGUI().createProductionImage(goodsIcon, need, nextX, getHeight(), 1);
             }
+            g.drawImage(productionImage, 0, 0, null);
+            nextX += goodsIcon.getIconWidth()/4;
 
             // Food surplus:
             if (surplus != 0) {
@@ -700,11 +705,11 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                     productionImage = parent.getGUI().createProductionImage(goodsIcon, surplus, goodsIcon.getIconWidth() * 2, getHeight(), 6);
                     add = goodsIcon.getIconWidth() * 3;
                 }
-
+                
                 g.drawImage(productionImage, nextX, 0, null);
                 nextX += productionImage.getWidth()/4 + add;
             }
-
+            
             // Horses:
             if (horses != 0) {
                 goodsIcon = parent.getImageProvider().getGoodsImageIcon(Goods.HORSES);
@@ -720,33 +725,28 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             }
 
             // Liberty bells:
-            if (bells != 0) {
-                goodsIcon = parent.getImageProvider().getGoodsImageIcon(Goods.BELLS);
-                if (bells > 6 || bells == 1) {
-                    productionImage = parent.getGUI().createProductionImage(goodsIcon, bells, goodsIcon.getIconWidth(), getHeight(), 6);
-                    add = goodsIcon.getIconWidth();
-                } else {
-                    productionImage = parent.getGUI().createProductionImage(goodsIcon, bells, goodsIcon.getIconWidth() * 2, getHeight(), 6);
-                    add = goodsIcon.getIconWidth()*2;
-                }
-                g.drawImage(productionImage, nextX, 0, null);
-                nextX += productionImage.getWidth()/4 + add;
+            goodsIcon = parent.getImageProvider().getGoodsImageIcon(Goods.BELLS);
+            if (bells > 6 || bells == 1) {
+                productionImage = parent.getGUI().createProductionImage(goodsIcon, bells, goodsIcon.getIconWidth(), getHeight(), 6);
+                add = goodsIcon.getIconWidth();
+            } else {
+                productionImage = parent.getGUI().createProductionImage(goodsIcon, bells, goodsIcon.getIconWidth() * 2, getHeight(), 6);
+                add = goodsIcon.getIconWidth()*2;
             }
-
+            g.drawImage(productionImage, nextX, 0, null);
+            nextX += productionImage.getWidth()/4 + add;
+            
             // Crosses:
-            if (crosses != 0) {
-                goodsIcon = parent.getImageProvider().getGoodsImageIcon(Goods.CROSSES);
-                if (crosses > 6 || crosses == 1) {
-                    productionImage = parent.getGUI().createProductionImage(goodsIcon, crosses, goodsIcon.getIconWidth(), getHeight(), 6);
-                    add = goodsIcon.getIconWidth();
-                } else {
-                    productionImage = parent.getGUI().createProductionImage(goodsIcon, crosses, goodsIcon.getIconWidth() * 2, getHeight(), 6);
-                    add = goodsIcon.getIconWidth()*2;
-                }
-                g.drawImage(productionImage, nextX, 0, null);
+            goodsIcon = parent.getImageProvider().getGoodsImageIcon(Goods.CROSSES);
+            if (crosses > 6 || crosses == 1) {
+                productionImage = parent.getGUI().createProductionImage(goodsIcon, crosses, goodsIcon.getIconWidth(), getHeight(), 6);
+                add = goodsIcon.getIconWidth();
+            } else {
+                productionImage = parent.getGUI().createProductionImage(goodsIcon, crosses, goodsIcon.getIconWidth() * 2, getHeight(), 6);
+                add = goodsIcon.getIconWidth()*2;
             }
+            g.drawImage(productionImage, nextX, 0, null);
         }
-
     }
 
 
@@ -869,9 +869,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                     //colonyPanel.getWarehousePanel().revalidate();
                     colonyPanel.getCargoPanel().revalidate();
                     updateCargoLabel();
-                    //buildingsPanel.initialize();
-                    //initialize();
-                    colonyPanel.reinitialize();                    
+                    buildingsPanel.initialize();
+                    initialize();
                     return comp;
                 } else {
                     logger.warning("An invalid component got dropped on this WarehousePanel.");
@@ -1000,8 +999,9 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                     selectedUnit = null;
                     setSelectedUnit(t);
 
-                    colonyPanel.reinitialize();  
-                                      
+                    warehousePanel.initialize();
+                    buildingsPanel.initialize();
+
                     return comp;
                 } else {
                     logger.warning("An invalid component got dropped on this CargoPanel.");
