@@ -935,9 +935,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     inGameController.boardShip(unit, selectedUnit.getUnit());
                     comp.getParent().remove(comp);                  
                 } else if (comp instanceof MarketLabel) {
-                    if ((freeColClient.getMyPlayer().getGold() >= (game.getMarket().costToBuy(((MarketLabel)comp).getType()) * 100))) {
-                        inGameController.buyGoods(((MarketLabel)comp).getType(), 100, selectedUnit.getUnit());
-                    }
+                    inGameController.buyGoods(((MarketLabel)comp).getType(), 100, selectedUnit.getUnit());
                     updateCargoLabel();
                     goldLabel.setText("Gold: " + freeColClient.getMyPlayer().getGold());
                     goldLabel.repaint(0, 0, goldLabel.getWidth(), goldLabel.getHeight());

@@ -439,6 +439,7 @@ public final class InGameController {
 
         if (game.getMarket().getBidPrice(type, amount) > myPlayer.getGold()) {
             canvas.errorMessage("notEnoughGold");
+            return;
         }
         
         freeColClient.playSound(SfxLibrary.LOAD_CARGO);
