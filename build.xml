@@ -33,7 +33,7 @@
     </copy>
   </target>
   
-  <target name="copy-jar-files" depends="init">
+  <target name="copy-jar-files" depends="init" unless="nojars">
     <mkdir dir="${freecol.build.dir}/jars"/>
     <copy todir="${freecol.build.dir}/jars">
       <fileset dir="${basedir}/jars">
@@ -60,9 +60,12 @@
     <antcall target="copy-sound-files"/>
   </target>
 
-  <target name="build" depends="init,compile,copy-jar-files">
+  <target name="build" depends="init,compile">
     <!-- Copy the data files unless the "nodata" property has been defined -->
     <antcall target="copy-data-files"/>
+  	
+  	<!-- Copy the jar files unless the "nojars" property has been defined -->
+  	<antcall target="copy-jar-files"/>
     
     <copy todir="${freecol.build.dir}">
         <fileset dir="${freecol.src.dir}" includes="**/*.properties"
