@@ -1259,9 +1259,10 @@ public final class GUI {
             }
         }
 
+        /*
         if (tile.getPosition().equals(selectedTile)) {
             g.drawImage(lib.getMiscImage(ImageLibrary.UNIT_SELECT), x, y, null);
-        }
+        }*/
 
         if (displayCoordinates) {
             String posString = tile.getX() + ", " + tile.getY();
@@ -1326,9 +1327,10 @@ public final class GUI {
     private void displayUnit(Graphics2D g, Unit unit, int x, int y) {
         try {
             // Draw the 'selected unit' image if needed.
-            /*if ((unit == getActiveUnit()) && cursor) {
+            //if ((unit == getActiveUnit()) && cursor) {
+            if ((unit == getActiveUnit())) {
                 g.drawImage(lib.getMiscImage(ImageLibrary.UNIT_SELECT), x, y, null);
-            }*/
+            }
 
             // Draw the unit.
             int type = lib.getUnitGraphicsType(unit);
