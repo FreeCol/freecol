@@ -33,7 +33,7 @@ public final class DropListener extends MouseAdapter {
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         Transferable clipData = clipboard.getContents(clipboard);
         if (clipData != null) {
-            if (clipData.isDataFlavorSupported(DataFlavor.imageFlavor)) {
+            if (clipData.isDataFlavorSupported(DefaultTransferHandler.flavor)) {
                 JComponent comp = (JComponent)e.getSource();
                 TransferHandler handler = comp.getTransferHandler();
                 handler.importData(comp, clipData);
