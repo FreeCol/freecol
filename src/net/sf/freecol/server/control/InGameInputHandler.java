@@ -117,8 +117,7 @@ public final class InGameInputHandler extends InputHandler {
                     // though it is NOT the sender's turn.
                     if (type.equals("logout")) {
                         reply = logout(connection, element);
-                    }
-                    else {
+                    } else {
                         // The message we've received is probably a good one, but
                         // it was sent when it was not the sender's turn.
                         reply = Message.createNewRootElement("error");

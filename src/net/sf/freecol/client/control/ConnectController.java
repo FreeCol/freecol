@@ -245,6 +245,12 @@ public final class ConnectController {
         if (bStopServer) {
             final FreeColServer server = freeColClient.getFreeColServer();
             if (server != null) {
+                try {
+                    freeColClient.getClient().getConnection().reallyClose();
+                } catch (IOException e) {
+                    logger.warning("Exception: " + e);
+                }
+
                 server.getController().shutdown();
 
                 freeColClient.setFreeColServer(null);

@@ -97,7 +97,7 @@ public class Connection {
 
 
     /**
-    * Closes this connection.
+    * Sends a "disconnect"-message and closes this connection.
     *
     * @throws IOException
     */
@@ -105,6 +105,16 @@ public class Connection {
         Element disconnectElement = Message.createNewRootElement("disconnect");
         send(disconnectElement);
 
+        reallyClose();
+    }
+
+
+    /**
+    * Closes this connection.
+    *
+    * @throws IOException
+    */
+    public void reallyClose() throws IOException {
         thread.stopWorking();
 
         out.close();

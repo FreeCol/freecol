@@ -55,6 +55,8 @@ public final class UserConnectionHandler implements MessageHandler {
         if (element != null) {
             if (type.equals("login")) {
                 reply = login(connection, element);
+            } else {
+                logger.warning("Unkown request: " + type);
             }
         }
 
@@ -92,6 +94,7 @@ public final class UserConnectionHandler implements MessageHandler {
             }
             
             ServerPlayer player = (ServerPlayer) game.getPlayerByName(username);
+            player.setConnection(connection);
             player.setConnected(true);
 
             // In case this player is the first to reconnect:
@@ -99,6 +102,8 @@ public final class UserConnectionHandler implements MessageHandler {
             if (isCurrentPlayer) {
                 game.setCurrentPlayer(player);
             }
+
+            connection.setMessageHandler(freeColServer.getInGameInputHandler());
 
             // Make the reply:
             Element reply = Message.createNewRootElement("loginConfirmed");

@@ -83,6 +83,7 @@ public class ServerPlayer extends Player {
         resetCanSeeTiles();
     }
 
+
     /**
     * Creates a new <code>ServerPlayer</code>.
     *
@@ -104,11 +105,19 @@ public class ServerPlayer extends Player {
     }
 
 
+    
+    /**
+    * Returns <i>true</i> if this player is currently connected to the server.
+    */
     public boolean isConnected() {
         return connected;
     }
     
     
+    /**
+    * Sets the "connected"-status of this player.
+    * @see #isConnected
+    */
     public void setConnected(boolean connected) {
         this.connected = connected;
     }
@@ -289,5 +298,14 @@ public class ServerPlayer extends Player {
      */
     public Connection getConnection() {
         return connection;
+    }
+    
+    
+    /**
+     * Sets the connection of this player.
+     * @param connection The <code>Connection</code>.
+     */
+    public void setConnection(Connection connection) {
+        this.connection = connection;
     }
 }
