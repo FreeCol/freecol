@@ -80,12 +80,12 @@ public class ServerModelController implements ModelController {
 
     public synchronized Unit createUnit(String taskID, Location location, Player owner, int type) {
         String extendedTaskID = taskID + owner.getID() + Integer.toString(freeColServer.getGame().getTurn().getNumber());
-        ServerUnit unit;
+        Unit unit;
 
         logger.info("Entering createUnit.");
 
         if (taskRegister.containsKey(extendedTaskID)) {
-            unit = (ServerUnit) taskRegister.get(extendedTaskID);
+            unit = (Unit) taskRegister.get(extendedTaskID);
 
             if (unit.getLocation().getTile() != location.getTile() || unit.getOwner() != owner || unit.getType() != type) {
                 logger.warning("Unsynchronization between the client and the server. Maybe a cheating attempt! Differences: " +
@@ -99,7 +99,7 @@ public class ServerModelController implements ModelController {
 
             //taskRegister.remove(extendedTaskID);
         } else {
-            unit = new ServerUnit(freeColServer.getGame(), location, owner, type, Unit.ACTIVE);
+            unit = new Unit(freeColServer.getGame(), location, owner, type, Unit.ACTIVE);
             taskRegister.put(extendedTaskID, unit);
         }
 

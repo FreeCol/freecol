@@ -13,6 +13,7 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.networking.DummyConnection;
 import net.sf.freecol.server.model.ServerPlayer;
+import net.sf.freecol.server.ai.*;
 
 import org.w3c.dom.Element;
 
@@ -69,23 +70,28 @@ public final class PreGameController extends Controller {
 
         try {
             Game game = freeColServer.getGame();
+            AIMain aiMain = new AIMain(freeColServer);
+            freeColServer.setAIMain(aiMain);
+            game.setFreeColGameObjectListener(aiMain);
 
             // Add any AI players:
             // TODO: AI player to represent the other European nations
             for (int i = Player.INCA; i <= Player.TUPI; i++) {
-                DummyConnection theConnection = new DummyConnection(freeColServer.getInGameInputHandler(),
-                                                                    null);
+                DummyConnection theConnection = new DummyConnection(freeColServer.getInGameInputHandler());
                 ServerPlayer indianPlayer = new ServerPlayer(game,
                                                              "Indian_" + Integer.toString(i - 3),
                                                              false,
                                                              true,
                                                              null,
                                                              theConnection);
-                theConnection.setOutgoingMessageHandler(new AIInGameInputHandler(freeColServer, indianPlayer));
                 indianPlayer.setNation(i);
                 indianPlayer.setColor(Player.getDefaultNationColor(i));
 
-                freeColServer.getServer().addConnection(theConnection, 3 - i);
+                DummyConnection aiConnection = new DummyConnection(new AIInGameInputHandler(freeColServer, indianPlayer, aiMain));
+                aiConnection.setOutgoingMessageHandler(theConnection);
+                theConnection.setOutgoingMessageHandler(aiConnection);
+
+                freeColServer.getServer().addConnection(theConnection, 3 - i);                
 
                 freeColServer.getGame().addPlayer(indianPlayer);
 

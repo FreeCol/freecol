@@ -298,6 +298,27 @@ public class Map extends FreeColGameObject {
         return result;
     }
 
+    
+    /**
+    * Creates an array of the eight directions in a random order.
+    * @return The array.
+    */
+    public int[] getRandomDirectionArray() {
+        int[] directions = new int[8];
+        for (int i=0; i<directions.length; i++) {
+            directions[i] = i;
+        }
+        for (int i=0; i<directions.length; i++) {
+            int r1 = (int) (Math.random() * 8);
+            int r2 = (int) (Math.random() * 8);
+            int temp = directions[r1];
+            directions[r1] = directions[r2];
+            directions[r2] = temp;
+        }
+        
+        return directions;
+    }
+
 
     /**
      * Gets an <code>Iterator</code> of every <code>Tile</code> on the map.

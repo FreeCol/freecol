@@ -32,6 +32,7 @@ public class IndianSettlement extends Settlement {
     public static final int CITY = 2;
     public static final int LAST_KIND = 2;
 
+    private int food = 0;
     private int kind;
     private int tribe;
     private boolean isCapital;
@@ -114,10 +115,11 @@ public class IndianSettlement extends Settlement {
      * @return Settlement radius
      */
     public int getRadius() {
-        if (kind == CITY)
+        if (kind == CITY) {
             return 2;
-        else
+        } else {
             return 1;
+        }
     }
 
 
@@ -223,10 +225,20 @@ public class IndianSettlement extends Settlement {
     public boolean canAdd(Locatable locatable) {
         return true;
     }
-    
+
 
     public void newTurn() {
-
+        int workers = unitContainer.getUnitCount();
+        for (int direction=0; direction<8 && workers > 0; direction++) {
+            if (getGame().getMap().getNeighbourOrNull(direction, getTile()) != null &&
+                    (getGame().getMap().getNeighbourOrNull(direction, getTile()).getOwner() == null
+                    || getGame().getMap().getNeighbourOrNull(direction, getTile()).getOwner() == this)) {
+                food += 5;
+                workers--;
+            }
+        }
+    
+        // TODO: Create a unit if food>=300, but not if a maximum number of units is reaced.
     }
     
     
@@ -252,6 +264,7 @@ public class IndianSettlement extends Settlement {
         indianSettlementElement.setAttribute("tribe", Integer.toString(tribe));
         indianSettlementElement.setAttribute("kind", Integer.toString(kind));
         indianSettlementElement.setAttribute("isCapital", Boolean.toString(isCapital));
+        indianSettlementElement.setAttribute("food", Integer.toString(food));
 
         indianSettlementElement.appendChild(unitContainer.toXMLElement(player, document, showAll, toSavedGame));
 
@@ -266,12 +279,18 @@ public class IndianSettlement extends Settlement {
     */
     public void readFromXMLElement(Element indianSettlementElement) {
         setID(indianSettlementElement.getAttribute("ID"));
-        
+
         tile = (Tile) getGame().getFreeColGameObject(indianSettlementElement.getAttribute("tile"));
         owner = (Player)getGame().getFreeColGameObject(indianSettlementElement.getAttribute("owner"));
         tribe = Integer.parseInt(indianSettlementElement.getAttribute("tribe"));
         kind = Integer.parseInt(indianSettlementElement.getAttribute("kind"));
         isCapital = (new Boolean(indianSettlementElement.getAttribute("isCapital"))).booleanValue();
+        
+        if (indianSettlementElement.hasAttribute("food")) {
+            food = Integer.parseInt(indianSettlementElement.getAttribute("food"));
+        } else {
+            food = 0;
+        }
 
         Element unitContainerElement = getChildElement(indianSettlementElement, UnitContainer.getXMLElementTagName());
         if (unitContainer != null) {

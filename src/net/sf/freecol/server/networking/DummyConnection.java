@@ -23,6 +23,8 @@ public final class DummyConnection extends Connection {
     
     /** The message handler to simulate using when receiving messages. */
     private MessageHandler outgoingMessageHandler;
+    private DummyConnection otherConnection;
+    
     
     /**
     * Sets up a dummy connection using the specified {@link MessageHandler}s.
@@ -30,11 +32,25 @@ public final class DummyConnection extends Connection {
     * @param incomingMessageHandler The MessageHandler to call for each message received.
     * @throws IOException
     */
-    public DummyConnection(MessageHandler incomingMessageHandler, MessageHandler outgoingMessageHandler) {
+    public DummyConnection(MessageHandler incomingMessageHandler) {
+        super();
+        setMessageHandler(incomingMessageHandler);
+    }
+
+    
+    /**
+    * Sets up a dummy connection using the specified {@link MessageHandler}s.
+    *
+    * @param incomingMessageHandler The MessageHandler to call for each message received.
+    * @throws IOException
+    */
+    /*public DummyConnection(MessageHandler incomingMessageHandler, MessageHandler outgoingMessageHandler) {
         super();
         setMessageHandler(incomingMessageHandler);
         this.outgoingMessageHandler = outgoingMessageHandler;
-    }
+    }*/
+
+    
 
     /**
     * Closes this connection.
@@ -57,7 +73,7 @@ public final class DummyConnection extends Connection {
     */
     public void send(Element element) throws IOException {
         try {
-            outgoingMessageHandler.handle(this, element);
+            outgoingMessageHandler.handle(getOtherConnection(), element);
         } catch (FreeColException e) {
             //logger.warning("Can't ask AI player");
         }
@@ -76,7 +92,7 @@ public final class DummyConnection extends Connection {
     public Element ask(Element element) throws IOException {
         Element theResult = null;
         try {
-            theResult = outgoingMessageHandler.handle(this, element);
+            theResult = outgoingMessageHandler.handle(getOtherConnection(), element);
         } catch (FreeColException e) {
             //logger.warning("Can't ask AI player");
         }
@@ -102,11 +118,31 @@ public final class DummyConnection extends Connection {
 
     /**
     * Sets the outgoing MessageHandler for this Connection.
-    * @param The new MessageHandler for this Connection.
+    * @param mh The new MessageHandler for this Connection.
     */
-    public void setOutgoingMessageHandler(MessageHandler mh) {
+    private void setOutgoingMessageHandler(MessageHandler mh) {
         outgoingMessageHandler = mh;
     }
+
+    
+    /**
+    * Sets the outgoing MessageHandler for this Connection.
+    * @param c The connectio to get the messagehandler from.
+    */
+    public void setOutgoingMessageHandler(DummyConnection c) {
+        otherConnection = c;
+        setOutgoingMessageHandler(c.getMessageHandler());
+    }
+    
+    
+    /**
+    * Gets the <code>DummyConnection</code> this object is
+    * connected to.
+    */
+    public DummyConnection getOtherConnection() {
+        return otherConnection;
+    }
+
 
     /**
     * Gets the socket.

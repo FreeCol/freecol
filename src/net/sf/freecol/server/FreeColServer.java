@@ -23,12 +23,14 @@ import net.sf.freecol.server.control.PreGameInputHandler;
 import net.sf.freecol.server.control.InGameInputHandler;
 import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.control.ServerModelController;
-import net.sf.freecol.server.control.AIInGameInputHandler;
 
 // Model:
 import net.sf.freecol.server.networking.Server;
 import net.sf.freecol.server.model.*;
 import net.sf.freecol.common.model.*;
+
+// AI:
+import net.sf.freecol.server.ai.*;
 
 // Zip:
 import java.util.zip.InflaterInputStream;
@@ -73,6 +75,7 @@ public final class FreeColServer {
     private InGameController inGameController;
 
     private Game game;
+    private AIMain aiMain;
     private boolean singleplayer;
     
     // The username of the player owning this server.
@@ -189,8 +192,11 @@ public final class FreeColServer {
         }
         savedGameElement.appendChild(serverObjectsElement);
 
-        // Add the rest:
+        // Add the game:
         savedGameElement.appendChild(game.toSavedXMLElement(document));
+        
+        // Add the AIObjects:
+        savedGameElement.appendChild(aiMain.toXMLElement(document));
 
         PrintWriter out = new PrintWriter(new DeflaterOutputStream(new FileOutputStream(file)));
         out.print(savedGameElement.toString());
@@ -212,33 +218,44 @@ public final class FreeColServer {
 
         Element savedGameElement = message.getDocument().getDocumentElement();
         Element serverObjectsElement = (Element) savedGameElement.getElementsByTagName("serverObjects").item(0);
-        
+
         singleplayer = Boolean.valueOf(savedGameElement.getAttribute("singleplayer")).booleanValue();
 
+        // Read the ServerAdditionObjects:
         ArrayList serverObjects = new ArrayList();
-        
         NodeList serverObjectsNodeList = serverObjectsElement.getChildNodes();
         for (int i=0; i<serverObjectsNodeList.getLength(); i++) {
             Element element = (Element) serverObjectsNodeList.item(i);
             if (element.getTagName().equals(ServerPlayer.getServerAdditionXMLElementTagName())) {
                 serverObjects.add(new ServerPlayer(element));
-            } else if (element.getTagName().equals(ServerUnit.getServerAdditionXMLElementTagName())) {
-                serverObjects.add(new ServerUnit(element));
             }
         }
-        
+
+        // Read the game model:
         Element gameElement = (Element) savedGameElement.getElementsByTagName(Game.getXMLElementTagName()).item(0);
-        game = new Game(getModelController(), gameElement, (FreeColGameObject[]) serverObjects.toArray(new FreeColGameObject[0]));
+        game = new Game(aiMain, getModelController(), gameElement, (FreeColGameObject[]) serverObjects.toArray(new FreeColGameObject[0]));
         game.setCurrentPlayer(null);
-        
+
         gameState = IN_GAME;
+
+        // Read the AIObjects:
+        if (savedGameElement.getElementsByTagName(AIMain.getXMLElementTagName()).getLength() > 0) {
+            Element aiMainElement = (Element) savedGameElement.getElementsByTagName(AIMain.getXMLElementTagName()).item(0);
+            aiMain = new AIMain(this, aiMainElement);
+        } else {
+            aiMain = new AIMain(this);
+        }
         
+        // Connect the AI-players:
         Iterator playerIterator = game.getPlayerIterator();
         while (playerIterator.hasNext()) {
             ServerPlayer player = (ServerPlayer) playerIterator.next();
             if (player.isAI()) {
-                DummyConnection theConnection = new DummyConnection(getInGameInputHandler(), null);
-                theConnection.setOutgoingMessageHandler(new AIInGameInputHandler(this, player));
+                DummyConnection theConnection = new DummyConnection(getInGameInputHandler());
+                DummyConnection aiConnection = new DummyConnection(new AIInGameInputHandler(this, player, aiMain));
+                aiConnection.setOutgoingMessageHandler(theConnection);
+                theConnection.setOutgoingMessageHandler(aiConnection);
+
                 getServer().addConnection(theConnection, -1);
                 player.setConnection(theConnection);
                 player.setConnected(true);
@@ -248,7 +265,7 @@ public final class FreeColServer {
         return savedGameElement.getAttribute("owner");
     }
 
-        
+
     /**
     * Sets the mode of the game: singleplayer/multiplayer.
     *
@@ -364,6 +381,16 @@ public final class FreeColServer {
     */
     public Game getGame() {
         return game;
+    }
+
+    
+    public void setAIMain(AIMain aiMain) {
+        this.aiMain = aiMain;
+    }
+
+    
+    public AIMain getAIMain() {
+        return aiMain;
     }
 
 

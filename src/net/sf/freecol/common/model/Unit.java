@@ -2355,37 +2355,54 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
 
         Tile newTile = defender.getTile();
 
+        getOwner().modifyTension(defender.getOwner(), -Player.TENSION_ADD_MINOR);
+
+        // Increases the defender's tension levels:
+        if (defender.getOwner().isAI()) {
+            if (defender.getTile().getSettlement() != null) {
+                if (defender.getTile().getSettlement() instanceof IndianSettlement && ((IndianSettlement) defender.getTile().getSettlement()).isCapital()) {
+                    defender.getOwner().modifyTension(getOwner(), Player.TENSION_ADD_MAJOR);
+                } else {
+                    defender.getOwner().modifyTension(getOwner(), Player.TENSION_ADD_NORMAL);
+                }
+            } else {
+                defender.getOwner().modifyTension(getOwner(), Player.TENSION_ADD_MINOR);
+            }
+        }
+
         movesLeft = 0;
         if (defender.getType() == BRAVE) {
             defender.dispose();
 
             if (newTile.getSettlement() != null) {
                 if (newTile.getSettlement().getUnitCount() <= 0 && newTile.getSettlement() instanceof IndianSettlement) {
-                        Player settlementOwner = newTile.getSettlement().getOwner();
-                        boolean wasCapital = ((IndianSettlement)newTile.getSettlement()).isCapital();
-                        newTile.getSettlement().dispose();
+                    Player settlementOwner = newTile.getSettlement().getOwner();
+                    boolean wasCapital = ((IndianSettlement)newTile.getSettlement()).isCapital();
+                    newTile.getSettlement().dispose();
 
-                        int randomTreasure = getGame().getModelController().getRandom(getID()+"indianTreasureRandom"+getID(), 11);
+                    settlementOwner.modifyTension(getOwner(), Player.TENSION_ADD_MAJOR);
 
-                        Unit tTrain = getGame().getModelController().createUnit(
-                                getID()+"indianTreasure"+getID(), newTile, getOwner(), Unit.TREASURE_TRAIN);
+                    int randomTreasure = getGame().getModelController().getRandom(getID()+"indianTreasureRandom"+getID(), 11);
 
-                        // Incan and Aztecs give more gold
-                        if(settlementOwner.getNation() == Player.INCA || settlementOwner.getNation() == Player.AZTEC) {
-                            tTrain.setTreasureAmount(randomTreasure * 500 + 10000);
-                        } else {
-                            tTrain.setTreasureAmount(randomTreasure * 50 + 300);
-                        }
+                    Unit tTrain = getGame().getModelController().createUnit(
+                            getID()+"indianTreasure"+getID(), newTile, getOwner(), Unit.TREASURE_TRAIN);
 
-                        // capitals give more gold
-                        if(wasCapital) {
-                            tTrain.setTreasureAmount((int) (tTrain.getTreasureAmount()*1.6f));
-                        }
-
-                        addModelMessage(this, "model.unit.indianTreasure", new String[][] {{"%indian%", settlementOwner.getNationAsString()}, {"%amount%", Integer.toString(tTrain.getTreasureAmount())}});
-                        setLocation(newTile);
+                    // Incan and Aztecs give more gold
+                    if(settlementOwner.getNation() == Player.INCA || settlementOwner.getNation() == Player.AZTEC) {
+                        tTrain.setTreasureAmount(randomTreasure * 500 + 10000);
+                    } else {
+                        tTrain.setTreasureAmount(randomTreasure * 50 + 300);
                     }
+
+                    // capitals give more gold
+                    if(wasCapital) {
+                        tTrain.setTreasureAmount((int) (tTrain.getTreasureAmount()*1.6f));
+                    }
+
+                    addModelMessage(this, "model.unit.indianTreasure", new String[][] {{"%indian%", settlementOwner.getNationAsString()}, {"%amount%", Integer.toString(tTrain.getTreasureAmount())}});
+                    setLocation(newTile);
                 }
+            }
         } else if (isNaval()) {
             if(type==PRIVATEER || type==FRIGATE || type==MAN_O_WAR) { // can capture goods; regardless attacking/defending
                 Iterator iter = defender.getGoodsIterator();
@@ -2401,6 +2418,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             Colony targetcolony = null;
             boolean captureColony = ((newTile.getSettlement() != null) && (newTile.getSettlement() instanceof Colony));
             if (captureColony) {
+                defender.getOwner().modifyTension(getOwner(), Player.TENSION_ADD_MAJOR);
+
                 int plunderGold = (int) (newTile.getSettlement().getOwner().getGold() * 0.1); // 10% of their gold
                 getOwner().modifyGold(plunderGold);
                 newTile.getSettlement().getOwner().modifyGold(-plunderGold);
@@ -2410,8 +2429,12 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                 setLocation(newTile);
                 addModelMessage(this, "model.unit.colonyCaptured", new String[][] {{"%colony%", newTile.getColony().getName()}, {"%amount%", Integer.toString(plunderGold)}});
             } else {
-                defender.setLocation(getTile());
-                defender.setOwner(getOwner());
+                if (getOwner().isEuropean()) {
+                    defender.setLocation(getTile());
+                    defender.setOwner(getOwner());
+                } else {
+                    defender.dispose();
+                }
             }
 
             // Colonists get captured if they lose.

@@ -53,6 +53,7 @@ public class Game extends FreeColGameObject {
     private Turn turn = new Turn(1);
 
     private final ModelController modelController;
+    private FreeColGameObjectListener freeColGameObjectListener;
 
 
     /**
@@ -73,9 +74,10 @@ public class Game extends FreeColGameObject {
     * Initiate a new <code>Game</code> with information from
     * a saved game.
     */
-    public Game(ModelController modelController, Element element, FreeColGameObject[] fcgos) {
+    public Game(FreeColGameObjectListener freeColGameObjectListener, ModelController modelController, Element element, FreeColGameObject[] fcgos) {
         super(null, element);
 
+        setFreeColGameObjectListener(freeColGameObjectListener);
         this.modelController = modelController;
         
         canGiveID = true;
@@ -202,6 +204,15 @@ public class Game extends FreeColGameObject {
         }
 
         freeColGameObjects.put(id, freeColGameObject);
+        
+        if (freeColGameObjectListener != null) {
+            freeColGameObjectListener.setFreeColGameObject(id, freeColGameObject);
+        }
+    }
+
+
+    public void setFreeColGameObjectListener(FreeColGameObjectListener freeColGameObjectListener) {
+        this.freeColGameObjectListener = freeColGameObjectListener;
     }
 
 

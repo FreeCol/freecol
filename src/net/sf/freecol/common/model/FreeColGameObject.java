@@ -336,7 +336,7 @@ abstract public class FreeColGameObject {
         Element arrayElement = document.createElement(tagName);
         arrayElement.setAttribute("xLength", Integer.toString(array.length));
         arrayElement.setAttribute("yLength", Integer.toString(array[0].length));
-        
+
         for (int x=0; x < array.length; x++) {
             for (int y=0; y < array[0].length; y++) {
                 arrayElement.setAttribute("x" + Integer.toString(x) + "y" + Integer.toString(y), Integer.toString(array[x][y]));
@@ -360,8 +360,37 @@ abstract public class FreeColGameObject {
         }
         
         return array;
-    }    
+    }
+
     
+    /**
+    * Creates an XML-representation of an array.
+    */
+    protected Element toArrayElement(String tagName, int[] array, Document document) {
+        Element arrayElement = document.createElement(tagName);
+        arrayElement.setAttribute("xLength", Integer.toString(array.length));
+
+        for (int x=0; x < array.length; x++) {
+            arrayElement.setAttribute("x" + Integer.toString(x), Integer.toString(array[x]));
+        }
+        
+        return arrayElement;
+    }
+    
+
+    /**
+    * Reads an XML-representation of an array.
+    */                
+    protected int[] readFromArrayElement(String tagName, Element arrayElement, int[] arrayType) {
+        int[] array = new int[Integer.parseInt(arrayElement.getAttribute("xLength"))];
+        
+        for (int x=0; x<array.length; x++) {
+            array[x] = Integer.parseInt(arrayElement.getAttribute("x" + Integer.toString(x)));
+        }
+        
+        return array;
+    }
+
 
     /**
     * Creates an XML-representation of an array.

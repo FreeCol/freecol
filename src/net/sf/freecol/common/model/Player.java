@@ -28,6 +28,13 @@ public class Player extends FreeColGameObject {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
+    /**
+    * Constants for adding to the tension levels.
+    */
+    public static final int TENSION_ADD_MINOR = 10,
+                            TENSION_ADD_NORMAL = 20,
+                            TENSION_ADD_MAJOR = 30;
+
     /** The nations a player can play. */
     public static final int DUTCH = 0,
                             ENGLISH = 1,
@@ -62,9 +69,16 @@ public class Player extends FreeColGameObject {
     /** The maximum line of sight a unit can have in the game. */
     public static final int MAX_LINE_OF_SIGHT = 2;
 
-    /** Contains booleans to see which tribes this player has met:
-     */
+    /**
+    * Contains booleans to see which tribes this player has met:
+    */
     private boolean[] contacted = new boolean[TRIBES.length + NATIONS.length];
+
+    /**
+    * Only used by AI - stores the tension levels,
+    * 0-100 with 100 maximum hostillity:
+    */
+    private int[] tension = new int[TRIBES.length + NATIONS.length];
 
     private static final Color defaultNationColors[] = {
         Color.ORANGE,
@@ -769,6 +783,28 @@ public class Player extends FreeColGameObject {
         return colonies.iterator();
     }
 
+    
+    /**
+    * Gets an <code>Iterator</code> containing all the indian settlements this player owns.
+    *
+    * @return The <code>Iterator</code>.
+    * @see IndianSettlement
+    */
+    public Iterator getIndianSettlementIterator() {
+        ArrayList indianSettlements = new ArrayList();
+        Map map = getGame().getMap();
+
+        Iterator tileIterator = map.getWholeMapIterator();
+        while (tileIterator.hasNext()) {
+            Tile t = map.getTile((Map.Position) tileIterator.next());
+
+            if (t != null && t.getSettlement() != null && t.getSettlement().getOwner() == this && t.getSettlement() instanceof IndianSettlement) {
+                indianSettlements.add(t.getSettlement());
+            }
+        }
+
+        return indianSettlements.iterator();
+    }
 
     /**
     * Increments the player's cross count, with benefits thereof.
@@ -879,6 +915,30 @@ public class Player extends FreeColGameObject {
         setCrossesRequired(count);
     }
 
+    
+    /**
+    * Modifies the hostiliy against the given player.
+    *
+    * @param player The <code>Player</code>.
+    * @param addToTension The amount to add to the current tension level.
+    * @exception IllegalArgumentException if <code>addToTension < 0</code>.
+    */
+    public void modifyTension(Player player, int addToTension) {
+        tension[player.getNation()] += addToTension;
+        
+        if (tension[player.getNation()]>100) {
+            tension[player.getNation()] = 100;
+        }
+    }
+
+
+    /**
+    * Gets the hostility this player has against the given player.
+    */
+    public int getTension(Player player) {
+        return tension[player.getNation()];
+    }
+
 
     /**
     * Gets the price for a recruit in europe.
@@ -973,6 +1033,7 @@ public class Player extends FreeColGameObject {
         playerElement.setAttribute("dead", Boolean.toString(dead));
         playerElement.setAttribute("rebellionState", Integer.toString(rebellionState));
         playerElement.setAttribute("ai", Boolean.toString(ai));
+        playerElement.appendChild(toArrayElement("tension", tension, document));
 
         if (showAll || equals(player)) {
             playerElement.setAttribute("gold", Integer.toString(gold));
@@ -1040,6 +1101,12 @@ public class Player extends FreeColGameObject {
         rebellionState = Integer.parseInt(playerElement.getAttribute("rebellionState"));
         currentFather = Integer.parseInt(playerElement.getAttribute("currentFather"));
         crossesRequired = Integer.parseInt(playerElement.getAttribute("crossesRequired"));
+
+        if (getChildElement(playerElement, "tension") != null) {
+            tension = readFromArrayElement("tension", getChildElement(playerElement, "tension"), new int[0]);
+        } else {
+            tension = new int[TRIBES.length + NATIONS.length];
+        }
 
         if (playerElement.hasAttribute("contacted")) {
             String contacts = playerElement.getAttribute("contacted");

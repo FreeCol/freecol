@@ -1,5 +1,5 @@
 
-package net.sf.freecol.server.control;
+package net.sf.freecol.server.ai;
 
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.Connection;
@@ -7,9 +7,9 @@ import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Game;
 
+import net.sf.freecol.server.control.*;
 import net.sf.freecol.server.networking.*;
 import net.sf.freecol.server.model.ServerPlayer;
-import net.sf.freecol.server.model.ServerUnit;
 
 import net.sf.freecol.server.FreeColServer;
 
@@ -35,6 +35,7 @@ public final class AIInGameInputHandler implements MessageHandler {
     /** The player for whom I work. */
     private final ServerPlayer me;
     private final FreeColServer freeColServer;
+    private final AIMain aiMain;
 
 
     /**
@@ -42,9 +43,19 @@ public final class AIInGameInputHandler implements MessageHandler {
     * @param freeColServer The main server.
     * @param me The AI player that is being managed by this AIInGameInputHandler.
     */
-    public AIInGameInputHandler(FreeColServer freeColServer, ServerPlayer me) {
+    public AIInGameInputHandler(FreeColServer freeColServer, ServerPlayer me, AIMain aiMain) {
         this.freeColServer = freeColServer;
         this.me = me;
+        this.aiMain = aiMain;
+        
+        if (freeColServer == null) {
+            throw new NullPointerException();
+        } else if (me == null) {
+            throw new NullPointerException();
+        } else if (aiMain == null) {
+            throw new NullPointerException();
+        }
+
         if (!me.isAI()) {
             logger.warning("VERY BAD: Applying AIInGameInputHandler to a non-AI player!!!");
         }
@@ -74,7 +85,7 @@ public final class AIInGameInputHandler implements MessageHandler {
             } else if (type.equals("opponentAttack")) {
             } else if (type.equals("attackResult")) {
             } else if (type.equals("setCurrentPlayer")) {
-                reply = setCurrentPlayer(connection, element);
+                reply = setCurrentPlayer((DummyConnection) connection, element);
             } else if (type.equals("emigrateUnitInEuropeConfirmed")) {
             } else if (type.equals("newTurn")) {
             } else if (type.equals("setDead")) {
@@ -84,8 +95,9 @@ public final class AIInGameInputHandler implements MessageHandler {
             } else if (type.equals("error")) {
             } else if (type.equals("chooseFoundingFather")) {
                 // TODO: Implement
+                logger.warning("TODO: Implement chooseFoundingFather");
             } else if (type.equals("reconnect")) {            
-                logger.warning("The server requests a reconnect. This means an illegal operation has been performed.");
+                logger.warning("The server requests a reconnect. This means an illegal operation has been performed. Please refer to any previous error message.");
             } else {
                 logger.warning("Message is of unsupported type \"" + type + "\".");
             }
@@ -103,30 +115,28 @@ public final class AIInGameInputHandler implements MessageHandler {
     * @param setCurrentPlayerElement The element (root element in a DOM-parsed XML tree) that
     *                holds all the information.
     */
-    private Element setCurrentPlayer(Connection connection, Element setCurrentPlayerElement) {
+    private Element setCurrentPlayer(DummyConnection connection, Element setCurrentPlayerElement) {
         Game game = freeColServer.getGame();
         Player currentPlayer = (Player) game.getFreeColGameObject(setCurrentPlayerElement.getAttribute("player"));
         Element reply = null;
 
         if (me.getID() == currentPlayer.getID()) {
-            //TODO: add more for the AI players to do.
-             Iterator unitsIterator = me.getUnitIterator();
-             while (unitsIterator.hasNext()) {
-                 Object theUnit = unitsIterator.next();
-                 if (theUnit instanceof ServerUnit) {
-                     ((ServerUnit)theUnit).doMission();
-                 }
-             }
-             reply = Message.createNewRootElement("endTurn");
-             if (connection instanceof DummyConnection) {
-                 ((DummyConnection)connection).handleAndSendReply(reply);
-             } else {
-                 try {
-                    connection.send(reply);
-                 } catch (IOException e) {}
-             }
+            getAIPlayer().startWorking();
+
+            Element replyElement = Message.createNewRootElement("endTurn");
+            
+            try {
+                connection.send(replyElement);
+            } catch (IOException e) {
+                logger.warning("Could not send \"endTurn\"-message!");
+            }
         }
 
         return null;
+    }
+    
+    
+    public AIPlayer getAIPlayer() {
+        return (AIPlayer) aiMain.getAIObject(me);
     }
 }
