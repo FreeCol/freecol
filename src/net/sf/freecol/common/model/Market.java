@@ -267,7 +267,11 @@ public final class Market extends FreeColGameObject {
     }
 
     public void newTurn() {
-        // Shift market goods around a bit?
+        for(int i = 0; i < dataForGoodType.length; i++) {
+            int subtract = (int) (dataForGoodType[i].amountInMarket*0.015);
+            dataForGoodType[i].amountInMarket -= subtract;
+        }
+        priceGoods();
     }
 
 
