@@ -179,7 +179,6 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         }
 
         /* Center the mini map correctly based on the map's focus */
-
         xOffset = freeColClient.getGUI().getFocus().getX() - (xSize / 2);
         yOffset = freeColClient.getGUI().getFocus().getY() - (ySize / 2);
 

@@ -20,14 +20,14 @@ public class MapGenerator {
     private static final Logger logger = Logger.getLogger(MapGenerator.class.getName());
 
     // The directions a Unit can move to.
-    public static final int N = 0,
-                            NE = 1,
-                            E = 2,
-                            SE = 3,
-                            S = 4,
-                            SW = 5,
-                            W = 6,
-                            NW = 7;
+    protected static final int N = 0,
+                               NE = 1,
+                               E = 2,
+                               SE = 3,
+                               S = 4,
+                               SW = 5,
+                               W = 6,
+                               NW = 7;
 
     // Deltas for moving to adjacent squares. Different due to the
     // isometric map. Starting north and going clockwise.
@@ -43,6 +43,13 @@ public class MapGenerator {
 
 
 
+    /**
+    * Creates a <code>MapGenerator</code> for generating
+    * random maps for the given game.
+    * @param game The <code>Game</code> this generator
+    *             will be making maps for.
+    * @see #createMap
+    */
     public MapGenerator(Game game) {
         this.game = game;
     }
@@ -50,30 +57,36 @@ public class MapGenerator {
 
 
 
-
+    /**
+    * Creates a new <code>Map</code> where the given players
+    * have random starting locations.
+    * @see LandGenerator
+    * @see TerrainGenerator
+    */
     public Map createMap(Vector players, int width, int height) throws FreeColException {
         this.width = width;
         this.height = height;
 
         LandGenerator landGenerator = new LandGenerator(width, height);
         boolean[][] landMap = landGenerator.createLandMap();
-        
+
         TerrainGenerator terrainGenerator = new TerrainGenerator(landMap);
         Map map = terrainGenerator.createMap();
 
         createIndianSettlements(map, players);
-        
+
         createEuropeanUnits(map, width, height, players);
 
         return map;
     }
-    
+
+
     /**
      * Create the Indian settlements, at least a capital for every nation and
      * random numbers of other settlements.
      * @throws FreeColException if thrown by a called method
      */
-    private void createIndianSettlements(Map map, Vector players) throws FreeColException {
+    protected void createIndianSettlements(Map map, Vector players) throws FreeColException {
         Iterator incaIterator = map.getFloodFillIterator
                                                 (getRandomStartingPos(map));
         Iterator aztecIterator = map.getFloodFillIterator
@@ -155,6 +168,7 @@ public class MapGenerator {
         }
     }
     
+
     /**
     * Gets the Indian player of the appropriate tribe.
     * @return The Indian player of the appropriate tribe.
@@ -169,6 +183,7 @@ public class MapGenerator {
         logger.warning("VERY BAD: Can't find indian player for Indian tribe " + owner);
         return null;
     }
+
 
     /**
      * Finds a suitable location for a settlement and builds it there. If no
@@ -224,6 +239,7 @@ public class MapGenerator {
         }
     }
 
+
     /**
      * Check to see if it is possible to build an Indian settlement at a
      * given map position. A city (Incas and Aztecs) needs a free radius
@@ -260,6 +276,7 @@ public class MapGenerator {
         return false;
     }
 
+
     /**
      * Select a random position on the map to use as a starting position.
      * @return Position selected
@@ -273,6 +290,7 @@ public class MapGenerator {
         }
         return new Map.Position(x, y);
     }    
+
     
     /**
      * Create two ships, one with a colonist, for each player, and
@@ -280,7 +298,7 @@ public class MapGenerator {
      * @param players List of players
      * @throws FreeColException if thrown by a called method
      */
-    private void createEuropeanUnits(Map map, int width, int height, Vector players) throws FreeColException {
+    protected void createEuropeanUnits(Map map, int width, int height, Vector players) throws FreeColException {
         int[] shipYPos = new int[4];
         for (int i = 0; i < 4; i++)
             shipYPos[i] = 0;
@@ -323,7 +341,7 @@ public class MapGenerator {
      * @param usedYPositions List of already assigned positions
      * @return True if the proposed position is too close
      */
-    private boolean isAShipTooClose(int proposedY,
+    protected boolean isAShipTooClose(int proposedY,
                                         int[] usedYPositions) {
         for (int i = 0; i < 4 && usedYPositions[i] != 0; i++) {
             if (Math.abs(usedYPositions[i] - proposedY) < 8) {
@@ -342,7 +360,7 @@ public class MapGenerator {
     * @param direction The direction (N, NE, E, etc.)
     * @return Adjacent position
     */
-    private Position getAdjacent(Position position, int direction) {
+    protected Position getAdjacent(Position position, int direction) {
         int x = position.getX() + ((position.getY() & 1) != 0 ?
             ODD_DX[direction] : EVEN_DX[direction]);
         int y = position.getY() + ((position.getY() & 1) != 0 ?
@@ -352,14 +370,19 @@ public class MapGenerator {
 
     
 
-    private boolean isValid(int x, int y) {
+    protected boolean isValid(int x, int y) {
         return x>=0 && x < width && y >= 0 && y < height;
     }
 
-    private boolean isValid(Position p) {
+    protected boolean isValid(Position p) {
         return isValid(p.getX(), p.getY());
     }
 
+    
+    
+    /**
+    * Class for making a <code>Map</code> based upon a land map.
+    */
     protected class TerrainGenerator {
 
         private static final int DISTANCE_TO_LAND_FROM_HIGH_SEAS = 4;
@@ -370,6 +393,14 @@ public class MapGenerator {
         private Random tileType;
 
 
+        /**
+        * Creates a new <code>TerrainGenerator</code>.
+        * @param landMap Determines wether there should be land
+        *                or ocean on a given tile. This array also
+        *                specifies the size of the map that is going 
+        *                to be created.
+        * @see #createMap
+        */
         TerrainGenerator(boolean[][] landMap) {
             this.landMap = landMap;
         }
@@ -378,20 +409,11 @@ public class MapGenerator {
         /**
         * Gets a random tile type based on the given percentage.
         *
-        * @param percent The location of the tile, where 0% is the center on
-        *        the y-axis and 100% is on the top/bottom of the map.
+        * @param percent The location of the tile, where 100% is the center on
+        *        the y-axis and 0% is on the top/bottom of the map.
         */
         private int getRandomTileType(int percent) {
-          // Do by percent +- 10.
-          /*
-          int min = (percent - 10);
-          int max = (percent + 10);
-          if (min < 0) min = 0;
-          if (max > 99) max = 99;
-          int thisValue = tileType.nextInt(max - min) + min;
-          thisValue /= 10; // Gives a number from 0-3.
-          */
-          int thisValue = (Math.abs(percent - tileType.nextInt(20) - 1)) / 10;
+          int thisValue = Math.max(((percent - tileType.nextInt(20) - 1)) / 10, 0);
 
           int minWoD = 0;
           int maxWoD = 99;
@@ -479,8 +501,10 @@ public class MapGenerator {
         }
 
 
-
-        private void createHighSeas(Map map) {
+        /**
+        * Places "high seas"-tiles on the border of the given map.
+        */
+        protected void createHighSeas(Map map) {
             for (int y = 0; y < height; y++) {
                 for (int x=0; x<MAX_DISTANCE_TO_EDGE && !map.isLandWithinDistance(x, y, DISTANCE_TO_LAND_FROM_HIGH_SEAS); x++) {
                         map.getTile(x, y).setType(Tile.HIGH_SEAS);
@@ -496,6 +520,9 @@ public class MapGenerator {
     }
 
 
+    /**
+    * Class for creating a land map.
+    */
     protected class LandGenerator {
 
 
@@ -508,6 +535,10 @@ public class MapGenerator {
         private int numberOfLandTiles = 0;
 
 
+        /**
+        * Creates a new <code>LandGenerator</code>.
+        * @see #createLandMap
+        */
         LandGenerator(int width, int height) {
             map = new boolean[width][height];
             visited = new boolean[width][height];
@@ -515,8 +546,11 @@ public class MapGenerator {
 
 
 
-
-
+        /**
+        * Creates a new land map. That is; an array
+        * where <i>true</i> means land and <i>false</i> 
+        * means ocean.
+        */
         boolean[][] createLandMap() {
             int x;
             int y;
@@ -534,8 +568,19 @@ public class MapGenerator {
             }
 
             cleanMap();
+            createPolarRegions();
 
             return map;
+        }
+
+
+        private void createPolarRegions() {
+            for (int x=0; x<map.length; x++) {
+                map[x][0] = true;
+                map[x][1] = true;
+                map[x][map[0].length-1] = true;
+                map[x][map[0].length-2] = true;
+            }
         }
 
 
@@ -543,6 +588,10 @@ public class MapGenerator {
             return (numberOfLandTiles * 100) / (map.length * map[0].length) >= minLandMass;
         }
 
+
+        /**
+        * Removes any 1x1 islands on the map.
+        */
         private void cleanMap() {
             for (int y=0; y<map[0].length; y++) {
                 for (int x=0; x<map.length; x++) {
@@ -554,6 +603,10 @@ public class MapGenerator {
         }
 
 
+        /**
+        * Returns <i>true</i> if there are no adjacent land
+        * to the given coordinates.
+        */
         private boolean isSingleTile(int x, int y) {
             Position p = new Position(x, y);
 

@@ -179,12 +179,21 @@ final class ReceivingThread extends Thread {
 
                 } else if (!msg.getType().equals("invalid")) { // == this is not a reply-message:
                     final Message theMsg  = msg;
-                    Thread t = new Thread() {
-                        public void run() {
-                            connection.handleAndSendReply(theMsg);
-                        }
-                    };
-                    t.start();
+                    
+                    /*
+                      TODO: The tag "urgent" should be used to mark messages
+                            that should be processed in a separate thread:
+                    */
+                    if (theMsg.isType("question")) {
+                        Thread t = new Thread() {
+                            public void run() {
+                                connection.handleAndSendReply(theMsg);
+                            }
+                        };
+                        t.start();
+                    } else {
+                        connection.handleAndSendReply(theMsg);
+                    }
                 }
             }
 

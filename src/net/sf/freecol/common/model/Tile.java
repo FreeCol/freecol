@@ -583,6 +583,14 @@ public final class Tile extends FreeColGameObject implements Location {
         // TODO: check if t is a valid type
         type = t;
         bonus = false; 
+        
+        if (!isLand()) {
+            settlement = null;
+            road = false;
+            plowed = false;
+            forested = false;
+            addition_type = ADD_NONE;
+        }
     }
 
 
