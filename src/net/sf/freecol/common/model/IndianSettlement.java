@@ -327,6 +327,7 @@ public class IndianSettlement extends Settlement {
 
         if (showAll || player == getOwner()) {
             indianSettlementElement.setAttribute("food", Integer.toString(food));
+            indianSettlementElement.setAttribute("learnableSkill", Integer.toString(learnableSkill));
         }
 
         // TODO: This method is always used when we need an XML element of an IndianSettlement,
@@ -337,10 +338,6 @@ public class IndianSettlement extends Settlement {
         //       The problem is that after a loadGame the learnableSkill should only be sent to
         //       the client in case that client has knowledge of that skill in that settlement.
         //       See toXMLElement for a solution to this problem.
-        // NOTE: Under normal circumstances the learnableSkill should only be added to the XML
-        //       if showAll is true OR player == getOwner()
-        //       just like the food attribute.
-        indianSettlementElement.setAttribute("learnableSkill", Integer.toString(learnableSkill));
 
         if (showAll || player == getOwner()) {
             indianSettlementElement.appendChild(unitContainer.toXMLElement(player, document, showAll, toSavedGame));
