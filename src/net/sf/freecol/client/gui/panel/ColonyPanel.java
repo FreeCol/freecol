@@ -33,10 +33,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     private final FreeColClient freeColClient;
     private InGameController inGameController;
 
-    private final JLabel                    cargoLabel;
     private final JLabel                    goldLabel;
     private final JLabel                    solLabel;
-    private final JLabel                    warehouseLabel;
     private final JLabel                    hammersLabel;
     private final JLabel                    toolsLabel;
     private final ProductionPanel           productionPanel;
@@ -44,6 +42,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     private final OutsideColonyPanel        outsideColonyPanel;
     private final InPortPanel               inPortPanel;
     private final CargoPanel                cargoPanel;
+    private final TitledBorder              cargoBorder;
     private final WarehousePanel            warehousePanel;
     private final TilePanel                 tilePanel;
     private final BuildingsPanel            buildingsPanel;
@@ -104,11 +103,9 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         cargoPanel.setLayout(new GridLayout(1 , 0));
         warehousePanel.setLayout(new GridLayout(1 , 0));
 
-        cargoLabel = new JLabel("<html><strike>Cargo</strike></html>");
         goldLabel = new JLabel("Gold: 0");
         
         solLabel = new JLabel("SoL: 0%, Tory: 100%");
-        warehouseLabel = new JLabel("Goods");
         hammersLabel = new JLabel("Hammers: 0/0");
         toolsLabel = new JLabel("Tools: 0/0");
 
@@ -128,30 +125,24 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
         exitButton.setSize(80, 20);
         outsideColonyScroll.setSize(204, 275);
-        inPortScroll.setSize(250, 100);
-        cargoScroll.setSize(365, 100);
-        warehouseScroll.setSize(620, 160);
+        inPortScroll.setSize(250, 120);
+        cargoScroll.setSize(365, 120);
+        warehouseScroll.setSize(620, 140);
         productionPanel.setSize(400, 35);
         tilesScroll.setSize(400, 225);
         buildingsScroll.setSize(424,225);
-//        outsideColonyLabel.setSize(200, 620);
-//        inPortLabel.setSize(300, 20);
-//        cargoLabel.setSize(310, 20);
         goldLabel.setSize(100, 20);
 
         solLabel.setSize(180, 20);
-//        warehouseLabel.setSize(100, 20);
 
         EtchedBorder eBorder = new EtchedBorder();
         tilesScroll.setBorder(new CompoundBorder(new TitledBorder("Tiles"), new BevelBorder(BevelBorder.LOWERED)));
         buildingsScroll.setBorder(new CompoundBorder(new TitledBorder("Buildings"), eBorder));
         warehouseScroll.setBorder(new CompoundBorder(new TitledBorder("Goods"), eBorder));
-        cargoScroll.setBorder(new CompoundBorder(new TitledBorder("Cargo"), eBorder));
+        cargoScroll.setBorder(new CompoundBorder(cargoBorder = new TitledBorder("Cargo of ..."), eBorder));
         inPortScroll.setBorder(new CompoundBorder(new TitledBorder("Port"), eBorder));
         outsideColonyScroll.setBorder(new CompoundBorder(new TitledBorder("Outside Colony"), eBorder));
 
-//        tilesLabel.setSize(100, 20);
-//        buildingsLabel.setSize(300, 20);
         buildingBox.setSize(265, 20);
         hammersLabel.setSize(150, 20);
         toolsLabel.setSize(150, 20);
@@ -160,23 +151,17 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         outsideColonyScroll.setLocation(635, 285);
         inPortScroll.setLocation(10, 330);
         cargoScroll.setLocation(265, 330);
-        warehouseScroll.setLocation(10, 430);
+        warehouseScroll.setLocation(10, 450);
         productionPanel.setLocation(10, 235);
         tilesScroll.setLocation(10, 10);
 
-//        buildingsLabel.setLocation(440, 10); // 400,10
+
         buildingsScroll.setLocation(415, 10); // 400,40
-//        outsideColonyLabel.setLocation(640, 275);
-//        inPortLabel.setLocation(640, 425);
-//        cargoLabel.setLocation(220, 345);
-//        warehouseLabel.setLocation(10, 445);
         buildingBox.setLocation(417, 240); // 15,305
         hammersLabel.setLocation(695, 240); // 185,305 (345, 305)
         toolsLabel.setLocation(695, 260);
         solLabel.setLocation(15, 275);
         goldLabel.setLocation(15, 295);
-//        tilesLabel.setLocation(10, 10);
-
 
         setLayout(null);
 
@@ -194,8 +179,6 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         add(buildingsScroll);
         add(outsideColonyLabel);
         add(inPortLabel);
-        add(cargoLabel);
-        add(warehouseLabel);
         add(solLabel);
         add(goldLabel);
         add(tilesLabel);
@@ -317,9 +300,11 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     */
     private void updateCargoLabel() {
         if (selectedUnit != null) {
-            cargoLabel.setText("Cargo (" + selectedUnit.getUnit().getName() + ") space left: " + selectedUnit.getUnit().getSpaceLeft());
+            cargoPanel.getParent().setEnabled(true);
+            cargoBorder.setTitle("Cargo of " + selectedUnit.getUnit().getName() + " (" + selectedUnit.getUnit().getSpaceLeft() + " left)");
         } else {
-            cargoLabel.setText("<html><strike>Cargo</strike></html>");
+            cargoPanel.getParent().setEnabled(false);
+            cargoBorder.setTitle("Cargo of ...");
         }
     }
 
