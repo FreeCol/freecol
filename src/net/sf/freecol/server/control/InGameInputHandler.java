@@ -111,6 +111,8 @@ public final class InGameInputHandler extends InputHandler {
                         reply = disconnect(connection, element);
                     } else if (type.equals("createUnit")) {
                         reply = createUnit(connection, element);
+                    } else if (type.equals("getVacantEntryLocation")) {
+                        reply = getVacantEntryLocation(connection, element);
                     } else {
                         logger.warning("Unknown request from client " + element.getTagName());
                     }
@@ -121,6 +123,8 @@ public final class InGameInputHandler extends InputHandler {
                         reply = logout(connection, element);
                     } else if (type.equals("createUnit")) {
                         reply = createUnit(connection, element);
+                    } else if (type.equals("getVacantEntryLocation")) {
+                        reply = getVacantEntryLocation(connection, element);
                     } else {
                         // The message we've received is probably a good one, but
                         // it was sent when it was not the sender's turn.
@@ -166,6 +170,31 @@ public final class InGameInputHandler extends InputHandler {
 
         Element reply = Message.createNewRootElement("createUnitConfirmed");
         reply.appendChild(unit.toXMLElement(owner, reply.getOwnerDocument()));
+
+        return reply;
+    }
+
+
+    /**
+    * Handles a "getVacantEntryLocation"-message from a client.
+    *
+    * @param connection The connection the message came from.
+    * @param element The element containing the request.
+    *
+    */
+    private Element getVacantEntryLocation(Connection connection, Element element) {
+        Game game = getFreeColServer().getGame();
+        Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
+        Player owner = unit.getOwner();
+
+        if (owner != getFreeColServer().getPlayer(connection)) {
+            throw new IllegalStateException();
+        }
+
+        Location entryLocation = getFreeColServer().getModelController().setToVacantEntryLocation(unit);
+
+        Element reply = Message.createNewRootElement("getVacantEntryLocationConfirmed");
+        reply.setAttribute("location", entryLocation.getID());
 
         return reply;
     }

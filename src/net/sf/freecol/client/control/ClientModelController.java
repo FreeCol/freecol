@@ -30,7 +30,7 @@ public class ClientModelController implements ModelController {
     
     public Unit createUnit(String taskID, Location location, Player owner, int type) {
         Client client = freeColClient.getClient();
-        
+
         Element createUnitElement = Message.createNewRootElement("createUnit");
         createUnitElement.setAttribute("taskID", taskID);
         createUnitElement.setAttribute("location", location.getID());
@@ -48,5 +48,31 @@ public class ClientModelController implements ModelController {
         unit.setLocation(unit.getLocation());
 
         return unit;
+    }
+
+
+    public Location setToVacantEntryLocation(Unit unit) {
+        Game game = freeColClient.getGame();
+        Client client = freeColClient.getClient();
+
+        Element createUnitElement = Message.createNewRootElement("getVacantEntryLocation");
+        createUnitElement.setAttribute("unit", unit.getID());
+
+        Element reply = client.ask(createUnitElement);
+
+        if (!reply.getTagName().equals("getVacantEntryLocationConfirmed")) {
+            logger.warning("Wrong tag name.");
+            throw new IllegalStateException();
+        }
+
+        Location entryLocation = (Location) game.getFreeColGameObject(reply.getAttribute("location"));
+        unit.setLocation(entryLocation);
+
+        return entryLocation;
+    }
+
+
+    public void update(Tile tile) {
+        // Nothing to do on the client side.
     }
 }

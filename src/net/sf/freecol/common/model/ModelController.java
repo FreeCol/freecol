@@ -4,7 +4,7 @@ package net.sf.freecol.common.model;
 
 /**
 * The <code>ModelController</code> is used by the model to perform
-* tasks that are not allowed to perform within the model (like generating 
+* tasks that are not allowed to perform within the model (like generating
 * random numbers or creating new {@link FreeColGameObject FreeColGameObjects}).
 *
 * <br><br>
@@ -31,4 +31,12 @@ public interface ModelController {
     * @param type   The type of unit (Unit.FREE_COLONIST...).
     */
     public Unit createUnit(String taskID, Location location, Player owner, int type);
+
+    public Location setToVacantEntryLocation(Unit unit);
+
+    /**
+    * Tells the <code>ModelController</code> that an internal
+    * change (that is; not caused by the control) has occured in the model.
+    */
+    //public void update(Tile tile);
 }

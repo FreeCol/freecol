@@ -1826,7 +1826,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
 
                 switch (state) {
                     case TO_EUROPE:     addModelMessage(getOwner().getEurope(), "model.unit.arriveInEurope", null); break;
-                    case TO_AMERICA:    setLocation(getVacantEntryLocation()); break;
+                    case TO_AMERICA:    getGame().getModelController().setToVacantEntryLocation(this); break;
                     case BUILD_ROAD:    getTile().setRoad(true); numberOfTools -= 20; break;
                     case PLOW:
                         if (getTile().isForested()) {
@@ -1882,6 +1882,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     * has not not been outside europe before, it will return the default
     * value from the {@link Player} owning this <code>Unit</code>.
     * If the tile is occupied by a enemy unit, then a nearby tile is choosen.
+    *
+    * <br><br>
+    * <i>WARNING:</i> Only the server has the information to determine which
+    *                 <code>Tile</code> is occupied. Use
+    *                 {@link ModelController#getVacantEntryLocation] instead.
     *
     * @return The <code>Location</code>.
     * @see #getEntryLocation

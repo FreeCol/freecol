@@ -5,9 +5,12 @@ package net.sf.freecol.server.control;
 import net.sf.freecol.common.model.*;
 import net.sf.freecol.server.model.*;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.common.networking.Message;
 import org.w3c.dom.*;
 import java.util.HashMap;
 import java.util.logging.Logger;
+import java.io.*;
+import java.util.*;
 
 
 /**
@@ -29,7 +32,7 @@ public class ServerModelController implements ModelController {
         this.freeColServer = freeColServer;
     }
 
-    
+
     public Unit createUnit(String taskID, Location location, Player owner, int type) {
         String extendedTaskID = taskID + Integer.toString(freeColServer.getGame().getTurn().getNumber());
         ServerUnit unit;
@@ -54,5 +57,74 @@ public class ServerModelController implements ModelController {
         }
 
         return unit;
+    }
+
+
+    public Location setToVacantEntryLocation(Unit unit) {
+        Game game = freeColServer.getGame();
+        ServerPlayer player = (ServerPlayer) unit.getOwner();
+        Location entryLocation;
+        String taskID = unit.getID() + Integer.toString(freeColServer.getGame().getTurn().getNumber());
+
+        if (taskRegister.containsKey(taskID)) {
+            entryLocation = (Location) taskRegister.get(taskID);
+            taskRegister.remove(taskID);
+        } else {
+            entryLocation = unit.getVacantEntryLocation();
+            taskRegister.put(taskID, entryLocation);
+        }
+
+        unit.setLocation(entryLocation);
+
+        // Display the tiles surrounding the Unit:
+        Element updateElement = Message.createNewRootElement("update");
+        Vector surroundingTiles = game.getMap().getSurroundingTiles(unit.getTile(), unit.getLineOfSight());
+
+        for (int i=0; i<surroundingTiles.size(); i++) {
+            Tile t = (Tile) surroundingTiles.get(i);
+            player.setExplored(t);
+            updateElement.appendChild(t.toXMLElement(player, updateElement.getOwnerDocument()));
+        }
+
+        try {
+            player.getConnection().send(updateElement);
+        } catch (IOException e) {
+            logger.warning("Could not send message to: " + player.getName() + " with connection " + player.getConnection());
+        }
+
+        // Send update to enemy players:
+        update(unit.getTile(), player);
+
+        return entryLocation;
+    }
+
+    public void update(Tile tile) {
+        update(tile, null);
+    }
+
+
+    public void update(Tile newTile, Player p) {
+        ServerPlayer player = (ServerPlayer) p;
+        Game game = freeColServer.getGame();
+
+        Iterator enemyPlayerIterator = game.getPlayerIterator();
+        while (enemyPlayerIterator.hasNext()) {
+            ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
+
+            if (player != null && player.equals(enemyPlayer)) {
+                continue;
+            }
+
+            try {
+                if (enemyPlayer.canSee(newTile)) {
+                    Element updateElement = Message.createNewRootElement("update");
+                    updateElement.appendChild(newTile.toXMLElement(enemyPlayer, updateElement.getOwnerDocument()));
+
+                    enemyPlayer.getConnection().send(updateElement);
+                }
+            } catch (IOException e) {
+                logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection " + enemyPlayer.getConnection());
+            }
+        }
     }
 }
