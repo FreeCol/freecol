@@ -47,6 +47,8 @@ public final class GUI {
     private Map.Position focus = null;
     private Unit activeUnit;
 
+    private Random roadRandom = new Random();
+
     // Helper variables for displaying the map.
     private final int tileHeight,
     tileWidth,
@@ -829,6 +831,98 @@ public final class GUI {
 
 
     /**
+    * Draws a road, between the given points, on the provided <code>Graphics</code>.
+    * When you provide the same <code>seed</code> you will get the same road.
+    *
+    * @param g The <code>Graphics</code> to draw the road upon.
+    * @param seed The seed of the random generator that is creating the road.
+    * @param x1 The x-component of the first coordinate.
+    * @param y1 The y-component of the first coordinate.
+    * @param x2 The x-component of the second coordinate.
+    * @param y2 The y-component of the second coordinate.
+    */
+    public void drawRoad(Graphics2D g, long seed, int x1, int y1, int x2, int y2) {
+        final int MAX_CORR = 4;
+        Color oldColor = g.getColor();
+        roadRandom.setSeed(seed);
+
+        int i = Math.max(Math.abs(x2-x1), Math.abs(y2-y1));
+        int baseX = x1;
+        int baseY = y1;
+        double addX = (x2-x1)/((double) i);
+        double addY = (y2-y1)/((double) i);
+        int corr = 0;
+        int xCorr = 0;
+        int yCorr = 0;
+        int lastDiff = 1;
+        
+        g.setColor(new Color(128, 64, 0));
+        g.drawLine(baseX, baseY, baseX, baseY);
+
+        for (int j=1; j<=i; j++) {
+            int oldCorr = corr;
+            //if (roadRandom.nextInt(3) == 0) {
+                corr = corr + roadRandom.nextInt(3)-1;
+                if (oldCorr != corr) {
+                    lastDiff = oldCorr - corr;
+                }
+            //}
+
+            if (Math.abs(corr) > MAX_CORR || Math.abs(corr) >= i-j) {
+                if (corr > 0) {
+                    corr--;
+                } else {
+                    corr++;
+                }
+            }
+
+            if (corr != oldCorr) {
+                g.setColor(new Color(128, 128, 0));
+                g.drawLine(baseX+(int) (j*addX)+xCorr, baseY+(int) (j*addY)+yCorr, baseX+(int) (j*addX)+xCorr, baseY+(int) (j*addY)+yCorr);
+            } else {
+                int oldXCorr = 0;
+                int oldYCorr = 0;
+
+                if (x2-x1 == 0) {
+                    oldXCorr = corr+lastDiff;
+                    oldYCorr = 0;
+                } else if (y2-y1 == 0) {
+                    oldXCorr = 0;
+                    oldYCorr = corr+lastDiff;
+                } else {
+                    if (corr > 0) {
+                        oldXCorr = corr+lastDiff;
+                    } else {
+                        oldYCorr = corr+lastDiff;
+                    }
+                }
+                
+                g.setColor(new Color(128, 128, 0));
+                g.drawLine(baseX+(int) (j*addX)+oldXCorr, baseY+(int) (j*addY)+oldYCorr, baseX+(int) (j*addX)+oldXCorr, baseY+(int) (j*addY)+oldYCorr);
+            }
+
+            if (x2-x1 == 0) {
+                xCorr = corr;
+                yCorr = 0;
+            } else if (y2-y1 == 0) {
+                xCorr = 0;
+                yCorr = corr;
+            } else {
+                if (corr > 0) {
+                    xCorr = corr;
+                } else {
+                    yCorr = corr;
+                }
+            }
+
+            g.setColor(new Color(128, 64, 0));
+            g.drawLine(baseX+(int) (j*addX)+xCorr, baseY+(int) (j*addY)+yCorr, baseX+(int) (j*addX)+xCorr, baseY+(int) (j*addY)+yCorr);
+        }
+        g.setColor(oldColor);
+    }
+
+
+    /**
      * Displays the given Tile onto the given Graphics2D object at the
      * location specified by the coordinates. Everything located on the
      * Tile will also be drawn except for units because their image can
@@ -954,6 +1048,7 @@ public final class GUI {
 
             // Paint the roads:
             if (tile.hasRoad()) {
+                long seed = Long.parseLong(Integer.toString(tile.getX()) + Integer.toString(tile.getY()));
                 boolean connectedRoad = false;
                 for (int i = 0; i < 8; i++) {
                     Map.Position p = map.getAdjacent(pos, i);
@@ -966,23 +1061,23 @@ public final class GUI {
                                                         
                             switch (i) {
                                 case 0: nx = x + tileWidth/2; ny = y; break;
-                                case 1: nx = x + tileWidth; ny = y; break;
+                                case 1: nx = x + (tileWidth*3)/4; ny = y + tileHeight/4; break;
                                 case 2: nx = x + tileWidth; ny = y + tileHeight/2; break;
-                                case 3: nx = x + tileWidth; ny = y + tileHeight; break;
+                                case 3: nx = x + (tileWidth*3)/4; ny = y + (tileHeight*3)/4; break;
                                 case 4: nx = x + tileWidth/2; ny = y + tileHeight; break;
-                                case 5: nx = x; ny = y + tileHeight; break;
+                                case 5: nx = x + tileWidth/4; ny = y + (tileHeight*3)/4; break;
                                 case 6: nx = x; ny = y + tileHeight/2; break;
-                                case 7: nx = x; ny = y; break;
+                                case 7: nx = x + tileWidth/4; ny = y + tileHeight/4; break;
                             }
 
-                            g.drawLine(x + tileWidth/2, y + tileHeight/2, nx, ny);
+                            drawRoad(g, seed, x + tileWidth/2, y + tileHeight/2, nx, ny);
                         }
                     }
                 }
                 
                 if (!connectedRoad) {
-                    g.drawLine(x + tileWidth/2 - 10, y + tileHeight/2, x + tileWidth/2 + 10, y + tileHeight/2);
-                    g.drawLine(x + tileWidth/2, y + tileHeight/2 - 10, x + tileWidth/2, y + tileHeight/2 + 10);
+                    drawRoad(g, seed, x + tileWidth/2 - 10, y + tileHeight/2, x + tileWidth/2 + 10, y + tileHeight/2);
+                    drawRoad(g, seed, x + tileWidth/2, y + tileHeight/2 - 10, x + tileWidth/2, y + tileHeight/2 + 10);
                 }
             }
 
