@@ -80,7 +80,7 @@ public final class PreGameController extends Controller {
                                                              theConnection);
                 theConnection.setOutgoingMessageHandler(new AIInGameInputHandler(freeColServer, indianPlayer));
                 indianPlayer.setNation(i);
-                indianPlayer.setColor(IndianSettlement.indianColors[i - 4]);
+                indianPlayer.setColor(Player.getDefaultNationColor(i));
 
                 freeColServer.getServer().addConnection(theConnection, 3 - i);
 

@@ -14,6 +14,7 @@ import javax.swing.JLayeredPane;
 import javax.swing.JPopupMenu;
 
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 
 import net.sf.freecol.client.gui.panel.ChatPanel;
 
@@ -487,7 +488,7 @@ public final class Canvas extends JLayeredPane {
             takeFocusThread.stopWorking();
         }
 
-        if (comp != statusPanel) {
+        if (comp != statusPanel && !(comp instanceof JMenuItem)) {
             remove(statusPanel);
         }
 
@@ -536,6 +537,11 @@ public final class Canvas extends JLayeredPane {
         for (int i = 0; i < getComponentCount(); i++) {
             getComponent(i).setEnabled(b);
         }
+        /*
+        if (jMenuBar != null) {
+            jMenuBar.setEnabled(b);
+        }
+        */
         super.setEnabled(b);
     }
 

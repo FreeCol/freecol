@@ -5,6 +5,9 @@ import net.sf.freecol.FreeCol;
 
 import javax.swing.*;
 import java.awt.event.*;
+import java.util.Iterator;
+import java.util.ArrayList;
+
 
 /**
 * The menu bar that is displayed on the top left corner of the <code>Canvas</code>.
@@ -15,6 +18,7 @@ public class FreeColMenuBar extends JMenuBar {
     private final FreeColClient freeColClient;
     private final Canvas canvas;
     private final GUI gui;
+    private ArrayList inGameOptions = new ArrayList();
     
 
 
@@ -78,6 +82,7 @@ public class FreeColMenuBar extends JMenuBar {
         viewMenu.setOpaque(false);
         viewMenu.setMnemonic(KeyEvent.VK_V);
         add(viewMenu);
+        inGameOptions.add(viewMenu);
 
         JMenuItem europeMenuItem = new JMenuItem("Europe");
         europeMenuItem.setOpaque(false);
@@ -88,6 +93,7 @@ public class FreeColMenuBar extends JMenuBar {
                 canvas.showEuropePanel();
             }
         });
+        inGameOptions.add(europeMenuItem);
 
         // --> Debug
         if (FreeCol.isInDebugMode()) {
@@ -95,11 +101,13 @@ public class FreeColMenuBar extends JMenuBar {
             debugMenu.setOpaque(false);
             debugMenu.setMnemonic(KeyEvent.VK_D);
             add(debugMenu);
+            inGameOptions.add(debugMenu);
 
             JCheckBoxMenuItem sc = new JCheckBoxMenuItem("Show coordinates");
             sc.setOpaque(false);
             sc.setMnemonic(KeyEvent.VK_S);
             debugMenu.add(sc);
+            inGameOptions.add(sc);
 
             sc.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -112,6 +120,7 @@ public class FreeColMenuBar extends JMenuBar {
             reveal.setOpaque(false);
             reveal.setMnemonic(KeyEvent.VK_R);
             debugMenu.add(reveal);
+            inGameOptions.add(reveal);
 
             reveal.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -122,6 +131,14 @@ public class FreeColMenuBar extends JMenuBar {
                     reveal.setEnabled(false);
                 }
             });
+        }
+    }
+    
+    
+    public void setEnabled(boolean enabled) {
+        Iterator componentIterator = inGameOptions.iterator();
+        while (componentIterator.hasNext()) {
+            ((JComponent) componentIterator.next()).setEnabled(enabled);
         }
     }
 }

@@ -75,6 +75,20 @@ public class Player extends FreeColGameObject {
     /** The maximum line of sight a unit can have in the game. */
     public static final int MAX_LINE_OF_SIGHT = 2;
 
+    private static final Color defaultNationColors[] = {
+        Color.ORANGE,
+        Color.RED,
+        Color.BLUE,
+        Color.YELLOW,
+        new Color(244, 240, 196),
+        new Color(196, 160,  32),
+        new Color(104, 136, 192),
+        new Color(108,  60,  24),
+        new Color(116, 164,  76),
+        new Color(192, 172, 132),
+        new Color(144,   0,   0),
+        new Color(  4,  92,   4)
+    };
 
 
     private String          name;
@@ -148,8 +162,8 @@ public class Player extends FreeColGameObject {
         this.name = name;
         this.admin = admin;
 
-        nation = DUTCH;
-        color = Color.ORANGE;
+        nation = game.getVacantNation();
+        color = getDefaultNationColor(nation);
         europe = new Europe(game, this);
 
         // TODO (this is for testing only): Set to 0
@@ -177,6 +191,15 @@ public class Player extends FreeColGameObject {
         readFromXMLElement(element);
     }
 
+
+
+
+    /**
+    * Returns the default color for the given <code>nation</code>.
+    */
+    public static Color getDefaultNationColor(int nation) {
+        return defaultNationColors[nation];
+    }
 
 
     /**

@@ -533,8 +533,7 @@ public final class ImageLibrary extends ImageProvider {
         loadColorChip(gc, Color.YELLOW);
         */
 
-        //FIXME: these same colours are found in the server PreGameController!
-        // They need to be unified into one location!
+        /*
         loadColorChip(gc, IndianSettlement.indianColors[0]);
         loadColorChip(gc, IndianSettlement.indianColors[1]);
         loadColorChip(gc, IndianSettlement.indianColors[2]);
@@ -543,6 +542,7 @@ public final class ImageLibrary extends ImageProvider {
         loadColorChip(gc, IndianSettlement.indianColors[5]);
         loadColorChip(gc, IndianSettlement.indianColors[6]);
         loadColorChip(gc, IndianSettlement.indianColors[7]);
+        */
     }
 
     /**

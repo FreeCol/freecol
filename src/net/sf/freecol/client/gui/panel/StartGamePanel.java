@@ -94,7 +94,7 @@ public final class StartGamePanel extends JPanel implements ActionListener {
         chat = new JTextField();
         chatArea = new JTextArea();
         chatScroll = new JScrollPane(chatArea);
-        tableModel = new PlayersTableModel(freeColClient.getPreGameController());
+        tableModel = new PlayersTableModel(freeColClient, freeColClient.getPreGameController());
         table = new JTable(tableModel);
 
         TableColumn nameColumn = table.getColumnModel().getColumn(0),
@@ -345,6 +345,7 @@ public final class StartGamePanel extends JPanel implements ActionListener {
 * The TableModel for the players table.
 */
 class PlayersTableModel extends AbstractTableModel {
+    private FreeColClient freeColClient;
     private Vector players;
     private Player thisPlayer;
     private final PreGameController preGameController;
@@ -357,7 +358,8 @@ class PlayersTableModel extends AbstractTableModel {
     * @param pgc The PreGameController to use when updates need to be notified across the
     * network.
     */
-    public PlayersTableModel(PreGameController pgc) {
+    public PlayersTableModel(FreeColClient freeColClient, PreGameController pgc) {
+        this.freeColClient = freeColClient;
         players = new Vector();
         thisPlayer = null;
         preGameController = pgc;
@@ -443,8 +445,7 @@ class PlayersTableModel extends AbstractTableModel {
                 && thisPlayer.getName().equals(((Player)players.get(row)).getName())
                 && !thisPlayer.isReady()) {
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
@@ -462,8 +463,9 @@ class PlayersTableModel extends AbstractTableModel {
 
             if (column == 1) {
                 preGameController.setNation(((String)value).toLowerCase());
-            }
-            else if (column == 2) {
+                preGameController.setColor(Player.getDefaultNationColor(freeColClient.getMyPlayer().getNation()));
+                fireTableCellUpdated(row, 2);
+            } else if (column == 2) {
                 preGameController.setColor((Color)value);
             }
 

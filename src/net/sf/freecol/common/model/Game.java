@@ -220,6 +220,30 @@ public class Game extends FreeColGameObject {
         this.map = map;
     }
 
+    
+    /**
+    * Returns a vacant nation.
+    */
+    public int getVacantNation() {
+        boolean[] nationTaken = new boolean[4];
+
+        Iterator playerIterator = getPlayerIterator();
+        while (playerIterator.hasNext()) {
+            Player player = (Player) playerIterator.next();
+            if (player.getNation() < 4) {
+                nationTaken[player.getNation()] = true;
+            }
+        }
+        
+        for (int i=0; i<nationTaken.length; i++) {
+            if (!nationTaken[i]) {
+                return i;
+            }
+        }
+        
+        return -1;
+    }
+
 
     /**
     * Sets the current player.
