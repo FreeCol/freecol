@@ -487,6 +487,30 @@ public final class InGameController {
         client.send(changeWorkTypeElement);
     }
 
+    /**
+    * Changes the state of this <code>Unit</code>.
+    * @param unit The <code>Unit</code>
+    * @param occupation The state of the unit.
+    */
+    public void changeState(Unit unit, int state) {
+        Client client = freeColClient.getClient();
+
+        if (!(unit.checkSetState(state))) {
+            return; // Don't bother.
+        }
+        unit.setState(state);
+        if (unit.getMovesLeft() == 0) {
+            nextActiveUnit();
+        } else {
+            freeColClient.getCanvas().refresh();
+        }
+
+        Element changeStateElement = Message.createNewRootElement("changeState");
+        changeStateElement.setAttribute("unit", unit.getID());
+        changeStateElement.setAttribute("state", Integer.toString(state));
+
+        client.send(changeStateElement);
+    }
     
     /**
      * Moves the specified unit in the "high seas" in a specified direction.

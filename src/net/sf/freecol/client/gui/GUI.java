@@ -214,6 +214,11 @@ public final class GUI {
     * @see #setSelectedTile
     */
     public void setActiveUnit(Unit activeUnit) {
+        // Don't select a unit with zero moves left. -sjm
+        if ((activeUnit != null) && (activeUnit.getMovesLeft() == 0)) {
+            freeColClient.getInGameController().nextActiveUnit();
+            return;
+        }
         this.activeUnit = activeUnit;
 
         freeColClient.getCanvas().getMapControls().updateMoves(activeUnit);
@@ -694,6 +699,51 @@ public final class GUI {
                                                         i,
                                                         tile.getX(), tile.getY()),
                                     x, y, null);
+                    }
+                }
+            }
+
+            // Until the mountain/hill bordering tiles are done... -sjm
+/*            if (tile.isLand()) {
+                for (int i = 0; i < 8; i++) {            
+                    Map.Position p = map.getAdjacent(pos, i);
+                    if (map.isValid(p)) {
+                        Tile borderingTile = map.getTile(p);
+                        if (borderingTile.getAddition() == Tile.ADD_HILLS) {
+                            g.drawImage(lib.getTerrainImage(ImageLibrary.HILLS, i, tile.getX(), tile.getY()), x, y - 32, null);
+                        } else if (borderingTile.getAddition() == Tile.ADD_MOUNTAINS) {
+                            g.drawImage(lib.getTerrainImage(ImageLibrary.MOUNTAINS, i, tile.getX(), tile.getY()), x, y - 32, null);
+                        }
+                    }
+                }
+            } */
+            
+            // Do this after the basic terrain is done or it looks funny. -sjm
+            if (tile.isForested()) {
+                g.drawImage(lib.getTerrainImage(ImageLibrary.FOREST, tile.getX(), tile.getY()), x, y - 32, null);
+            } else if (tile.getAddition() == Tile.ADD_HILLS) {
+                g.drawImage(lib.getTerrainImage(ImageLibrary.HILLS, tile.getX(), tile.getY()), x, y - 32, null);
+            } else if (tile.getAddition() == Tile.ADD_MOUNTAINS) {
+                g.drawImage(lib.getTerrainImage(ImageLibrary.MOUNTAINS, tile.getX(), tile.getY()), x, y - 32, null);
+            }
+            
+            if (tile.isLand()) {
+                for (int i = 0; i < 8; i++) {
+                    Map.Position p = map.getAdjacent(pos, i);
+                    if (map.isValid(p)) {
+                        Tile borderingTile = map.getTile(p);
+                        if (tile.getType() == borderingTile.getType() ||
+                            !borderingTile.isLand() ||
+                            !tile.isLand() ||
+                            !(borderingTile.getType() < tile.getType()) ||
+                            !borderingTile.isExplored()) {
+                            // Equal tiles, sea tiles and unexplored tiles have no effect
+                            continue;
+                        }
+                        // Until the forest bordering tils are done... -sjm
+                        /*if (borderingTile.isForested()) {
+                            g.drawImage(lib.getTerrainImage(ImageLibrary.FOREST, i, tile.getX(), tile.getY()), x, y - 32, null);
+                        } else */
                     }
                 }
             }

@@ -45,6 +45,14 @@ public final class Tile extends FreeColGameObject implements Location {
                             ARCTIC = 9,
                             OCEAN = 10,
                             HIGH_SEAS = 11;
+                      
+    // An addition onto the tile can be one of the following:                             
+    public static final int ADD_NONE = 0,
+                            ADD_RIVER_MINOR = 1,
+                            ADD_RIVER_MAJOR = 2,
+                            ADD_HILLS = 3,
+                            ADD_MOUNTAINS = 4;
+
 
     private boolean road,
                     plowed,
@@ -52,6 +60,8 @@ public final class Tile extends FreeColGameObject implements Location {
                     bonus;
 
     private int     type;
+    
+    private int     addition_type;
 
     private int     x,
                     y;
@@ -97,6 +107,7 @@ public final class Tile extends FreeColGameObject implements Location {
 
         unitContainer = new UnitContainer(game, this);
         this.type = type;
+        this.addition_type = ADD_NONE;
         
         road = false;
         plowed = false;
@@ -300,6 +311,24 @@ public final class Tile extends FreeColGameObject implements Location {
     */
     public int getType() {
         return type;
+    }
+
+    /**
+    * Returns the addition on this Tile. 
+    *
+    * @return The addition on this Tile.
+    */
+    public int getAddition() {
+        return addition_type;
+    }
+    
+    /**
+    * Sets the addition on this Tile. 
+    * @param addition The addition on this Tile.
+    */
+    public void setAddition(int addition) {
+        if (addition != ADD_NONE) setForested(false);
+        addition_type = addition;
     }
 
 
@@ -626,10 +655,19 @@ public final class Tile extends FreeColGameObject implements Location {
           {{3,2}, {0,0}, {0,0}, {0,0}, {0,3}, {0,4}, {2,1}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Tundra
           {{0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Arctic
           {{4,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Ocean
-          {{4,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}  // High seas
+          {{4,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // High seas
+          {{2,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {4,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Hills
+          {{0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {3,0}, {1,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}  // Mountains
       };
       
-      int basepotential = potentialtable[type][goods][(forested ? 1 : 0)];
+      int basepotential = 0;
+      if (addition_type <= ADD_RIVER_MAJOR) {
+          basepotential = potentialtable[type][goods][(forested ? 1 : 0)];
+      } else if (addition_type == ADD_HILLS) {
+          basepotential = potentialtable[12][goods][0];
+      } else if (addition_type == ADD_MOUNTAINS) {
+          basepotential = potentialtable[13][goods][0];
+      }
       if (basepotential > 0) {
         if (plowed) basepotential++;
         if (road) basepotential++;
@@ -648,14 +686,15 @@ public final class Tile extends FreeColGameObject implements Location {
 	switch(getType()) {
             case PLAINS:
             case PRAIRIE:
+            case DESERT:
                 return Goods.COTTON;
+            case SWAMP:
             case GRASSLANDS:
                 return Goods.TOBACCO;
             case SAVANNAH:
                 return Goods.SUGAR;
             case MARSH:
-            case SWAMP:
-            case DESERT:
+                return Goods.FURS;
             case TUNDRA:
             case ARCTIC:
             default:
@@ -682,9 +721,14 @@ public final class Tile extends FreeColGameObject implements Location {
             { 0,50}, // Tundra
             { 0, 0}, // Arctic
             { 0, 0}, // Ocean
-            { 0, 0}  // High seas            
+            { 0, 0} // High seas
         };
         
+        if (addition_type == ADD_HILLS) {
+            return 100;
+        } else if (addition_type == ADD_MOUNTAINS) {
+            return 150;
+        }
         return defenseTable[type][(forested ? 1 : 0)];
     } 
     
@@ -709,6 +753,7 @@ public final class Tile extends FreeColGameObject implements Location {
         tileElement.setAttribute("x", Integer.toString(x));
         tileElement.setAttribute("y", Integer.toString(y));
         tileElement.setAttribute("type", Integer.toString(type));
+        tileElement.setAttribute("addition", Integer.toString(addition_type));
         tileElement.setAttribute("road", Boolean.toString(road));
         tileElement.setAttribute("plowed", Boolean.toString(plowed));
         tileElement.setAttribute("forested", Boolean.toString(forested));
@@ -745,6 +790,7 @@ public final class Tile extends FreeColGameObject implements Location {
         x = Integer.parseInt(tileElement.getAttribute("x"));
         y = Integer.parseInt(tileElement.getAttribute("y"));
         type = Integer.parseInt(tileElement.getAttribute("type"));
+        addition_type = Integer.parseInt(tileElement.getAttribute("addition"));
         road = Boolean.valueOf(tileElement.getAttribute("road")).booleanValue();
         plowed = Boolean.valueOf(tileElement.getAttribute("plowed")).booleanValue();
         forested = Boolean.valueOf(tileElement.getAttribute("forested")).booleanValue();

@@ -1268,9 +1268,14 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
                 break;
             case SENTRY:
                 workLeft = -1;
+                // Make sure we don't lose our movepoints if we're on a ship -sjm
+                if (location instanceof Tile) {
+                    movesLeft = 0;
+                }
                 break;
             case FORTIFY:
                 workLeft = -1;
+                movesLeft = 0;
                 break;
             case BUILD_ROAD:
             case PLOW:
@@ -1287,6 +1292,7 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
                     default: workLeft = -1; break;
                 }
                 if (s == BUILD_ROAD) workLeft /= 2;
+                movesLeft = 0;
             case TO_EUROPE:
                 if ((state == ACTIVE) && (!(location instanceof Europe))) {
                     workLeft = 3;

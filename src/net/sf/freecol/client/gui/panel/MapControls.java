@@ -13,6 +13,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 //import net.sf.freecol.client.control.UserInputHandler;
 
 
@@ -46,12 +47,14 @@ public final class MapControls {
     private final UnitButton[]     unitButton;
     private final int              NUMBER_OF_BUTTONS = 8;
     //private UserInputHandler       userInputHandler;
+    private GUI                    gui;
     
     /**
     * The basic constructor.
     */
-    public MapControls(FreeColClient freeColClient) {
+    public MapControls(FreeColClient freeColClient, GUI gui) {
         this.freeColClient = freeColClient;
+        this.gui = gui;
         //this.game = game;
         //this.imageProvider = imageProvider;
         container = null;
@@ -70,7 +73,7 @@ public final class MapControls {
         miniMap = new MiniMap(freeColClient, freeColClient.getGame().getMap(), freeColClient.getGUI().getImageLibrary(), container);
         unitButton = new UnitButton[NUMBER_OF_BUTTONS];
         for(int i=0; i<NUMBER_OF_BUTTONS; i++) {
-            unitButton[i] = new UnitButton();
+            unitButton[i] = new UnitButton(freeColClient, gui);
         }
         
         
@@ -103,7 +106,7 @@ public final class MapControls {
         miniMapZoomInButton.setActionCommand(String.valueOf(MINIMAP_ZOOMIN));
         for(int i=0; i<NUMBER_OF_BUTTONS; i++) {
             unitButton[i].setActionCommand(String.valueOf(UNITBUTTON + i));
-        }
+        }        
     }
     
     /**

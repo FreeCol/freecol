@@ -38,7 +38,10 @@ public final class ImageLibrary extends ImageProvider {
      * different types of terrain graphics.
      */
     public static final int BEACH = 12,
-                            TERRAIN_COUNT = 13;
+                            FOREST = 13,
+                            HILLS = 14,
+                            MOUNTAINS = 15,
+                            TERRAIN_COUNT = 16;
 
     /**
      * These finals represent the different parts of a tile and its

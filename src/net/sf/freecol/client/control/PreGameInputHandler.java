@@ -231,7 +231,7 @@ public final class PreGameInputHandler implements MessageHandler {
         freeColClient.getClient().setMessageHandler(inGameInputHandler);
         gui.setGame(freeColClient.getGame());
 
-        MapControls mapControls = new MapControls(freeColClient);
+        MapControls mapControls = new MapControls(freeColClient, gui);
         canvas.setMapControls(mapControls);
 
         Unit activeUnit = freeColClient.getMyPlayer().getNextActiveUnit();

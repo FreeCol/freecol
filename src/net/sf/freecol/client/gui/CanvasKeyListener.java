@@ -97,19 +97,27 @@ public final class CanvasKeyListener implements KeyListener {
                 inGameController.endTurn();
                 break;
             case KeyEvent.VK_F:
-             //   userInputHandler.changeOccupation(Unit.FORTIFY);
+                if (parent.getGUI().getActiveUnit() != null) {
+                    parent.getClient().getInGameController().changeState(parent.getGUI().getActiveUnit(), Unit.FORTIFY);
+                }
                 break;
             case KeyEvent.VK_S:
-             //   userInputHandler.changeOccupation(Unit.SENTRY);
+                if (parent.getGUI().getActiveUnit() != null) {
+                    parent.getClient().getInGameController().changeState(parent.getGUI().getActiveUnit(), Unit.SENTRY);
+                }
                 break;
             case KeyEvent.VK_B:
                 inGameController.buildColony();
                 break;
             case KeyEvent.VK_P:
-              //  userInputHandler.changeOccupation(Unit.PLOW);
+                if (parent.getGUI().getActiveUnit() != null) {
+                    parent.getClient().getInGameController().changeState(parent.getGUI().getActiveUnit(), Unit.PLOW);
+                }
                 break;
             case KeyEvent.VK_R:
-              //  userInputHandler.changeOccupation(Unit.BUILD_ROAD);
+                if (parent.getGUI().getActiveUnit() != null) {
+                    parent.getClient().getInGameController().changeState(parent.getGUI().getActiveUnit(), Unit.BUILD_ROAD);
+                }
                 break;
             case KeyEvent.VK_E:
                 parent.showEuropePanel();

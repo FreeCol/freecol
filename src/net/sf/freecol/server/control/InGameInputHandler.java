@@ -95,6 +95,8 @@ public final class InGameInputHandler implements MessageHandler {
                     reply = work(connection, element);
                 } else if (type.equals("worktype")) {
                     reply = workType(connection, element);
+                } else if (type.equals("changeState")) {
+                    reply = changeState(connection, element);
                 } else if (type.equals("putOutsideColony")) {
                     reply = putOutsideColony(connection, element);
                 } else if (type.equals("endTurn")) {
@@ -691,6 +693,40 @@ public final class InGameInputHandler implements MessageHandler {
         return null;
     }
 
+    /**
+    * Handles a "changeState"-message from a client.
+    *
+    * @param connection The connection the message came from.
+    * @param moveElement The element containing the request.
+    * @exception IllegalArgumentException If the data format of the message is invalid.
+    * @exception IllegalStateException If the request is not accepted by the model.
+    *
+    */
+    private Element changeState(Connection connection, Element changeStateElement) {
+        Game game = freeColServer.getGame();
+
+        ServerPlayer player = freeColServer.getPlayer(connection);
+
+        Unit unit = (Unit) game.getFreeColGameObject(changeStateElement.getAttribute("unit"));
+        int state = Integer.parseInt(changeStateElement.getAttribute("state"));
+
+        if (unit == null) {
+            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: " + changeStateElement.getAttribute("unit"));
+        }
+
+        Tile oldTile = unit.getTile();
+        
+        if (!unit.checkSetState(state)) {
+            // Oh, really, Mr. Client? I'll show YOU!
+            // kickPlayer(player);
+            return null;
+        }
+        unit.setState(state);
+
+        sendUpdatedTileToAll(oldTile, player);
+
+        return null;
+    }
 
     /**
     * Handles a "putOutsideColony"-request from a client.

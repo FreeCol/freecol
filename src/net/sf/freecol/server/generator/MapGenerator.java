@@ -209,7 +209,16 @@ public class MapGenerator {
 
                     if (landMap[i][j]) {
                         t = new Tile(game, getRandomTileType(((Math.min(j, height - j) * 100) / height)), i, j);
-                        if ((t.getType() != t.ARCTIC) && (tileType.nextInt(3) > 0)) t.setForested(true);
+                        if ((t.getType() != t.ARCTIC) && (tileType.nextInt(3) > 0)) {
+                            t.setForested(true);
+                        } else if ((t.getType() != t.ARCTIC) && (t.getType() != t.TUNDRA)) {
+                            int k = tileType.nextInt(8);
+                            if (k >= 6) {
+                                t.setAddition(Tile.ADD_MOUNTAINS);
+                            } else if (k >= 4) {
+                                t.setAddition(Tile.ADD_HILLS);
+                            }
+                        }
                     } else {
                         t = new Tile(game, Tile.OCEAN, i, j);
                     }

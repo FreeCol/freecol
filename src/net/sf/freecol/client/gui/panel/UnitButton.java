@@ -8,7 +8,10 @@ import javax.swing.JComponent;
 import net.sf.freecol.common.model.Unit;
 //import net.sf.freecol.client.control.UserInputHandler;
 import net.sf.freecol.client.gui.i18n.Messages;
-
+import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.FreeColClient;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 /**
 * A button with a set of images which is used to give commands
@@ -27,6 +30,8 @@ public final class UnitButton extends JButton {
     private JComponent             container;
     //private UserInputHandler       userInputHandler;
     private int                    buttonType;
+    private GUI                    gui;
+    private FreeColClient freeColClient;
     
     public static final int UNIT_BUTTON_WAIT = 0,
                             UNIT_BUTTON_DONE = 1,
@@ -42,16 +47,20 @@ public final class UnitButton extends JButton {
     /**
     * The basic constructor
     */
-    public UnitButton() {
+    public UnitButton(FreeColClient freeColClient, GUI gui) {
       //userInputHandler = null;
+      this.gui = gui;
+      this.freeColClient = freeColClient;
     }
     
     /**
     * A constructor which initializes the container
     * @param container The JComponent that contains this button
     */
-    public UnitButton(JComponent container) {
+    public UnitButton(JComponent container, FreeColClient freeColClient, GUI gui) {
         this.container = container;
+        this.gui = gui;
+        this.freeColClient = freeColClient;
         //userInputHandler = null;
     }
 
@@ -90,6 +99,12 @@ public final class UnitButton extends JButton {
         setFocusPainted(false);
         setContentAreaFilled(false);
         setBorderPainted(false);
+        
+        addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                push();
+            }
+        });
     }
 
     /**
@@ -121,26 +136,44 @@ public final class UnitButton extends JButton {
                 break;
                 
             case UNIT_BUTTON_FORTIFY:
+                if (gui.getActiveUnit() != null) {
+                    freeColClient.getInGameController().changeState(gui.getActiveUnit(), Unit.FORTIFY);
+                }
                 //userInputHandler.changeOccupation(Unit.FORTIFY);
                 break;
                 
             case UNIT_BUTTON_SENTRY:
+                if (gui.getActiveUnit() != null) {
+                    freeColClient.getInGameController().changeState(gui.getActiveUnit(), Unit.SENTRY);
+                }
                 //userInputHandler.changeOccupation(Unit.SENTRY);
                 break;
             
             case UNIT_BUTTON_CLEAR:
+                if (gui.getActiveUnit() != null) {
+                    freeColClient.getInGameController().changeState(gui.getActiveUnit(), Unit.PLOW);
+                }
                 //userInputHandler.changeOccupation(Unit.PLOW);
                 break;
             
             case UNIT_BUTTON_PLOW:
+                if (gui.getActiveUnit() != null) {
+                    freeColClient.getInGameController().changeState(gui.getActiveUnit(), Unit.PLOW);
+                }
                 //userInputHandler.changeOccupation(Unit.PLOW);
                 break;
             
             case UNIT_BUTTON_ROAD:
+                if (gui.getActiveUnit() != null) {
+                    freeColClient.getInGameController().changeState(gui.getActiveUnit(), Unit.BUILD_ROAD);
+                }
                 //userInputHandler.changeOccupation(Unit.BUILD_ROAD);
                 break;
             
             case UNIT_BUTTON_BUILD:
+                if (gui.getActiveUnit() != null) {
+                    freeColClient.getInGameController().buildColony();
+                }
                 //userInputHandler.changeOccupation(Unit.BUILD_COLONY);
                 break;
             

@@ -199,6 +199,8 @@ public final class InGameInputHandler implements MessageHandler {
         } else {
             unit.winAttack(defender);
         }
+        
+        freeColClient.getCanvas().refresh();
 
         return null;
     }
@@ -228,6 +230,8 @@ public final class InGameInputHandler implements MessageHandler {
         if (attackResultElement.hasAttribute("update")) {
             this.update((Element) attackResultElement.getElementsByTagName("update").item(0));
         }
+        
+        freeColClient.getCanvas().refresh();
 
         return null;
     }
