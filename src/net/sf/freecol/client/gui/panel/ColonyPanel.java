@@ -876,11 +876,12 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         }
 
         public void remove(Component comp) {
-                if (comp instanceof GoodsLabel) {
+        if (comp instanceof GoodsLabel) {
                 Goods g = ((GoodsLabel)comp).getGoods();
                 //inGameController.leaveShip(unit);
 
                 super.remove(comp);
+                
                 colonyPanel.getWarehousePanel().revalidate();
                 colonyPanel.getCargoPanel().revalidate();
             }
@@ -970,6 +971,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                     selectedUnit = null;
                     setSelectedUnit(t);
 
+                    warehousePanel.initialize();
                     return comp;
                 } else {
                     logger.warning("An invalid component got dropped on this CargoPanel.");
@@ -1005,6 +1007,11 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 super.remove(comp);
                 colonyPanel.getWarehousePanel().revalidate();
                 colonyPanel.getCargoPanel().revalidate();
+                
+                // TODO: Make this look prettier :-)
+                UnitLabel t = selectedUnit;
+                selectedUnit = null;
+                setSelectedUnit(t);
             }
         }
     }
@@ -1051,7 +1058,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
             for (int x=0; x<3; x++) {
                 for (int y=0; y<3; y++) {
-                    gui.displayTile((Graphics2D) g, game.getMap(), colony.getTile(x, y), ((2-x)+y)*lib.getTerrainImageWidth(1)/2, (x+y)*lib.getTerrainImageHeight(1)/2, false);
+                    gui.displayColonyTile((Graphics2D) g, game.getMap(), colony.getTile(x, y), ((2-x)+y)*lib.getTerrainImageWidth(1)/2, (x+y)*lib.getTerrainImageHeight(1)/2, colony);
                 }
             }
         }
@@ -1131,6 +1138,11 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 if (editState) {
                     if (comp instanceof UnitLabel) {
                         Unit unit = ((UnitLabel)comp).getUnit();
+                        if (colonyTile.getWorkTile().getOwner() != null && colonyTile.getWorkTile().getOwner() != colony) {
+                            parent.errorMessage("tileTaken");
+                            return null;
+                        }
+
                         if (colonyTile.canAdd(unit)) {
                             oldParent.remove(comp);
 

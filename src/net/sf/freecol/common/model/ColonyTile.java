@@ -145,6 +145,10 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation {
     * @return <code>true</code> if the <code>Unit</code> may be added and <code>false</code> otherwise.
     */
     public boolean canAdd(Locatable locatable) {
+        if (getWorkTile().getOwner() != null && getWorkTile().getOwner() != getColony()) {
+            return false;
+        }
+
         if (!isColonyCenterTile() && locatable instanceof Unit && (getUnit() == null || locatable == getUnit())) {
             return true;
         } else {
@@ -162,13 +166,19 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation {
             throw new IllegalStateException("Other unit present while adding a unit to ColonyTile:" + getID());
         }
 
-        if (!(locatable instanceof Unit)) {
-            throw new IllegalArgumentException("Can only add a 'Unit' to this location!");
+        if (!canAdd(locatable)) {
+            throw new IllegalArgumentException("Cannot add locatalbe to this location!");
         }
 
         setUnit((Unit) locatable);
         
         getColony().updatePopulation();
+        
+        if (unit != null) {
+            getWorkTile().setOwner(getColony());
+        } else {
+            getWorkTile().setOwner(null);
+        }
     }
 
 
@@ -257,6 +267,12 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation {
             int type2 = workTile.secondaryGoods();
             int amount2 = workTile.potential(type2);
             colony.addGoods(type2, amount2);
+            
+            if (unit != null) {
+                getWorkTile().setOwner(getColony());
+            } else {
+                getWorkTile().setOwner(null);
+            }
         }
     }
 

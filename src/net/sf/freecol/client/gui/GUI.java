@@ -930,6 +930,29 @@ public final class GUI {
      * location specified by the coordinates. Everything located on the
      * Tile will also be drawn except for units because their image can
      * be larger than a Tile.
+     * @param g The Graphics2D object on which to draw the Tile.
+     * @param map The map.
+     * @param tile The Tile to draw.
+     * @param x The x-coordinate of the location where to draw the Tile
+     * (in pixels).
+     * @param y The y-coordinate of the location where to draw the Tile
+     * (in pixels).
+     * @param drawUnexploredBorders If true; draws border between explored and
+     *        unexplored terrain.
+     */
+    public void displayColonyTile(Graphics2D g, Map map, Tile tile, int x, int y, Colony colony) {
+        displayTile(g, map, tile, x, y, false);
+        if (tile.getOwner() != null && tile.getOwner() != colony) {
+            g.drawImage(lib.getMiscImage(ImageLibrary.TILE_TAKEN), x, y, null);
+        }
+    }
+    
+
+    /**
+     * Displays the given Tile onto the given Graphics2D object at the
+     * location specified by the coordinates. Everything located on the
+     * Tile will also be drawn except for units because their image can
+     * be larger than a Tile.
      *
      * <br><br>The same as calling <code>displayTile(g, map, tile, x, y, true);</code>.
      * @param g The Graphics2D object on which to draw the Tile.
