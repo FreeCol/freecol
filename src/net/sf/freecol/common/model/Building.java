@@ -703,7 +703,7 @@ public final class Building extends FreeColGameObject implements WorkLocation {
 
         int goodsOutput = getMaximumProduction();
 
-        if ((getGoodsInputType() > -1) && (colony.getGoodsCount(getGoodsInputType()) < getMaximumGoodsInput()))  { // Not enough goods to do this?
+        if ((getGoodsInputType() > -1) && (colony.getGoodsCount(getGoodsInputType()) < goodsOutput))  { // Not enough goods to do this?
             int goodsInput = colony.getGoodsCount(getGoodsInputType());
             if (level < FACTORY) {
                 goodsOutput = goodsInput;
@@ -727,7 +727,7 @@ public final class Building extends FreeColGameObject implements WorkLocation {
 
         int goodsOutput = getMaximumProduction();
 
-        if ((getGoodsInputType() > -1) && (colony.getGoodsCount(getGoodsInputType()) + colony.getProductionOf(getGoodsInputType()) < getMaximumGoodsInput()))  { // Not enough goods to do this?
+        if ((getGoodsInputType() > -1) && (colony.getGoodsCount(getGoodsInputType()) + colony.getProductionOf(getGoodsInputType()) < goodsOutput))  { // Not enough goods to do this?
             int goodsInput = colony.getGoodsCount(getGoodsInputType()) + colony.getProductionOf(getGoodsInputType());
             if (level < FACTORY) {
                 goodsOutput = goodsInput;
@@ -792,7 +792,6 @@ public final class Building extends FreeColGameObject implements WorkLocation {
         if (goodsOutputType == Goods.CROSSES && getColony().getOwner().hasFather(FoundingFather.WILLIAM_PENN)) {
             goodsOutput += goodsOutput/2;
         }
-
 
         return goodsOutput;
     }

@@ -189,6 +189,7 @@ final class ReceivingThread extends Thread {
                             connection.handleAndSendReply(theMsg);
                         }
                     };
+                    t.setName("MessageHandler:"+t.getName());
                     t.start();
                 }
             }
