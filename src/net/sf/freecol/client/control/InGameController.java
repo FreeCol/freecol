@@ -291,20 +291,39 @@ public final class InGameController {
             nextActiveUnit(unit.getTile());
         }
 
+        // checks to see if you have made initial contact with an adjacent nation
+        // if not, then displays the notice box
         for(int i=Map.N; i<Map.NW; i++) {
+            // only happens for land units
+            if(unit.isNaval())
+                break;
             Tile adjTile = unit.getOwner().getGame().getMap().getNeighbourOrNull(i, unit.getTile());
             if(adjTile == null)
                 continue;
+
             Iterator iter = adjTile.getUnitIterator();
             if(iter.hasNext()) {
                 Unit fUnit = (Unit)iter.next();
                 if(fUnit.getOwner() != unit.getOwner()) {
                     if( !unit.getOwner().hasContacted(fUnit.getOwner().getNation()) ) {
-                        // TODO - addModelMessages for the two cases below
+                        //TODO - not sure if this change needs to be done over the network...
+//                        Element askContactedNations = Message.createNewRootElement("contacted");
+//                        String reply = askContactedNations.get
+//                        System.out.println("REPLY IS: " + reply);
+////                        Element setNewLandNameElement = Message.createNewRootElement("setNewLandName");
+////                        setNewLandNameElement.setAttribute("newLandName", newLandName);
+////                        client.send(setNewLandNameElement);
+
+                        //TODO - must display dialog and make changes when another
+                        //TODO - nation moves adjacent to you (now only happens when you move next to another nation)
+
+                        unit.getOwner().setContacted(fUnit.getOwner().getNation(), true);
+                        fUnit.getOwner().setContacted(unit.getOwner().getNation(), true);
+
                         if(fUnit.getOwner().isEuropean())
-                            continue;
+                            canvas.showEventDialog(EventPanel.MEETING_EUROPEANS);
                         else // it is an indian tribe
-                            continue;
+                            canvas.showEventDialog(EventPanel.MEETING_NATIVES);
                     }
                 }
             }
