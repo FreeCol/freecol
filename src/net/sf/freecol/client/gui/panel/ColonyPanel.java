@@ -215,11 +215,19 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         repaint(0, 0, getWidth(), getHeight());
     }
 
-
+    
     /**
      * Initialize the data on the window.
      */
     public void initialize(Colony colony, Game game) {
+        initialize(colony, game, null);
+    }
+
+
+    /**
+     * Initialize the data on the window.
+     */
+    public void initialize(Colony colony, Game game, Unit preSelectedUnit) {
         this.colony = colony;
         this.game = game;
 
@@ -241,6 +249,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         Tile tile = colony.getTile();
 
         UnitLabel lastCarrier = null;
+        selectedUnit = null;
 
         Iterator tileUnitIterator = tile.getUnitIterator();
         while (tileUnitIterator.hasNext()) {
@@ -256,10 +265,16 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             } else {
                 inPortPanel.add(unitLabel);
                 lastCarrier = unitLabel;
+                if (unit == preSelectedUnit) {
+                    setSelectedUnit(unitLabel);
+                }
+
             }
         }
 
-        setSelectedUnit(lastCarrier);
+        if (selectedUnit == null) {
+            setSelectedUnit(lastCarrier);
+        }
 
         //
         // Warehouse panel:
@@ -290,7 +305,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
 
     public void reinitialize() {
-        initialize(colony, game);
+        initialize(colony, game, selectedUnit.getUnit());
     }
 
 
@@ -474,7 +489,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     public final WarehousePanel getWarehousePanel() {
         return warehousePanel;
     }
-    
+
     /**
     * Returns a pointer to the <code>tilePanel</code>-object in use.
     */
@@ -510,8 +525,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             super(new GridLayout(0, 1));
             this.colonyPanel = colonyPanel;
         }
-        
-        
+
+
         public String getUIClassID() {
             return "BuildingsPanelUI";
         }
@@ -950,11 +965,11 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             this.colonyPanel = colonyPanel;
         }
 
-        
+
         public String getUIClassID() {
             return "CargoPanelUI";
         }
-        
+
 
         /**
         * Adds a component to this CargoPanel and makes sure that the unit
@@ -1026,9 +1041,11 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                     //colonyPanel.getCargoPanel().revalidate();
 
                     // TODO: Make this look prettier :-)
+                    /*
                     UnitLabel t = selectedUnit;
                     selectedUnit = null;
                     setSelectedUnit(t);
+                    */
 
                     reinitialize();
 

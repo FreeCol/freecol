@@ -128,12 +128,10 @@ public final class UnitLabel extends JLabel implements ActionListener {
     * @param g The graphics context in which to do the painting.
     */
     public void paintComponent(Graphics g) {
-        if (selected) {
+        if (selected || !unit.isCarrier()) {
             setEnabled(true);
-        } else if (unit.isCarrier()) {
-            setEnabled(false);
         } else {
-            setEnabled(true);
+            setEnabled(false);
         }
 
         super.paintComponent(g);
