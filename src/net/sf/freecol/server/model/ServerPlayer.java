@@ -190,7 +190,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
     }
 
-    
+
     /**
     * Gets called when this player's turn has ended.
     */
@@ -257,6 +257,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
     * @see #setExplored(Unit)
     */
     public void setExplored(Tile tile) {
+        if (canSeeTiles == null) {
+            resetCanSeeTiles();
+        }
+            
         exploredTiles[tile.getX()][tile.getY()] = true;
         canSeeTiles[tile.getX()][tile.getY()] = true;
     }
@@ -275,6 +279,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
             return;
         }
 
+        if (canSeeTiles == null) {
+            resetCanSeeTiles();
+        }
+                
         Iterator positionIterator = getGame().getMap().getCircleIterator(unit.getTile().getPosition(), true, unit.getLineOfSight());
         while (positionIterator.hasNext()) {
             Map.Position p = (Map.Position) positionIterator.next();

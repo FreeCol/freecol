@@ -292,12 +292,11 @@ public class Game extends FreeColGameObject {
             if (currentPlayer != null) {
                 currentPlayer.endTurn();
             }
-
-            currentPlayer = newCp;
         } else {
-            //throw new NullPointerException();
-            logger.warning("Current player set to 'null'.");
+            logger.info("Current player set to 'null'.");
         }
+        
+        currentPlayer = newCp;
     }
 
 

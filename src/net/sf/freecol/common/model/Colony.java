@@ -784,7 +784,7 @@ public final class Colony extends Settlement implements Location {
                     addModelMessage(this, "model.colony.itemNeedTools", new String[][] {{"%colony%", getName()}, {"%item%", Unit.getName(unitType)}});
                 }
             }
-        } else {
+        } else if (currentlyBuilding != -1) {
             int hammersRequired = getBuilding(currentlyBuilding).getNextHammers();
             int toolsRequired = getBuilding(currentlyBuilding).getNextTools();
 

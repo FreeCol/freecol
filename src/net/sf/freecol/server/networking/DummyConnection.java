@@ -59,7 +59,7 @@ public final class DummyConnection extends Connection {
         try {
             outgoingMessageHandler.handle(this, element);
         } catch (FreeColException e) {
-            //logger.warning("Can't send to AI player");
+            //logger.warning("Can't ask AI player");
         }
     }
 

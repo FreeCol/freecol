@@ -82,8 +82,10 @@ public final class AIInGameInputHandler implements MessageHandler {
             } else if (type.equals("disconnect")) {
             } else if (type.equals("logout")) {
             } else if (type.equals("error")) {
-            } else if (type.equals("chooseFoundingFather")) {            
+            } else if (type.equals("chooseFoundingFather")) {
                 // TODO: Implement
+            } else if (type.equals("reconnect")) {            
+                logger.warning("The server requests a reconnect. This means an illegal operation has been performed.");
             } else {
                 logger.warning("Message is of unsupported type \"" + type + "\".");
             }

@@ -228,6 +228,7 @@ public final class FreeColServer {
         
         Element gameElement = (Element) savedGameElement.getElementsByTagName(Game.getXMLElementTagName()).item(0);
         game = new Game(getModelController(), gameElement, (FreeColGameObject[]) serverObjects.toArray(new FreeColGameObject[0]));
+        game.setCurrentPlayer(null);
         
         gameState = IN_GAME;
         

@@ -165,7 +165,7 @@ final class ReceivingThread extends Thread {
 
                 } else if (!msg.getType().equals("invalid")) { // == this is not a reply-message:
                     final Message theMsg  = msg;
-                    
+
                     /*
                       TODO: The tag "urgent" should be used to mark messages
                             that should be processed in a separate thread:
