@@ -68,6 +68,7 @@ public final class InGameController extends Controller {
         }
 
         while (nextPlayer != null && !nextPlayer.isConnected()) {
+            game.setCurrentPlayer(nextPlayer);
             nextPlayer = (ServerPlayer) game.getPlayerAfter(nextPlayer);
         }
 

@@ -37,7 +37,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /** The connection for this player. */
     private Connection connection;
 
-    private boolean connected = true;
+    private boolean connected = false;
 
     /** Stores information about which tiles this player has explored. */
     private boolean[][] exploredTiles;
@@ -65,6 +65,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         resetExploredTiles(getGame().getMap());
         resetCanSeeTiles();
+        
+        connected = (connection != null);
     }
 
 
@@ -86,22 +88,24 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         resetExploredTiles(getGame().getMap());
         resetCanSeeTiles();
+        
+        connected = (connection != null);
     }
 
-    
+
     public ServerPlayer(Element serverAdditionElement) {
         readFromServerAdditionElement(serverAdditionElement);
     }
 
-    
+
     /**
     * Returns <i>true</i> if this player is currently connected to the server.
     */
     public boolean isConnected() {
         return connected;
     }
-    
-    
+
+
     /**
     * Sets the "connected"-status of this player.
     * @see #isConnected
@@ -316,6 +320,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     public void setConnection(Connection connection) {
         this.connection = connection;
+        connected = (connection != null);
     }
     
     public Element toServerAdditionElement(Document document) {

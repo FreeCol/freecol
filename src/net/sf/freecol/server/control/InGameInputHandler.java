@@ -314,7 +314,7 @@ public final class InGameInputHandler extends InputHandler {
         while (enemyPlayerIterator.hasNext()) {
             ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
 
-            if (player.equals(enemyPlayer)) {
+            if (player.equals(enemyPlayer) || enemyPlayer.getConnection() == null) {
                 continue;
             }
 
@@ -462,7 +462,7 @@ public final class InGameInputHandler extends InputHandler {
         while (enemyPlayerIterator.hasNext()) {
             ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
 
-            if (player.equals(enemyPlayer)) {
+            if (player.equals(enemyPlayer) || enemyPlayer.getConnection() == null) {
                 continue;
             }
 
@@ -564,7 +564,7 @@ public final class InGameInputHandler extends InputHandler {
         while (enemyPlayerIterator.hasNext()) {
             ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
 
-            if (player.equals(enemyPlayer)) {
+            if (player.equals(enemyPlayer) || enemyPlayer.getConnection() == null) {
                 continue;
             }
 
@@ -624,7 +624,7 @@ public final class InGameInputHandler extends InputHandler {
             while (enemyPlayerIterator.hasNext()) {
                 ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
 
-                if (player.equals(enemyPlayer)) {
+                if (player.equals(enemyPlayer) || enemyPlayer.getConnection() == null) {
                     continue;
                 }
 
@@ -828,7 +828,7 @@ public final class InGameInputHandler extends InputHandler {
         while (enemyPlayerIterator.hasNext()) {
             ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
 
-            if (player.equals(enemyPlayer)) {
+            if (player.equals(enemyPlayer) || enemyPlayer.getConnection() == null) {
                 continue;
             }
 
@@ -1327,7 +1327,7 @@ public final class InGameInputHandler extends InputHandler {
         while (enemyPlayerIterator.hasNext()) {
             ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
 
-            if (player != null && player.equals(enemyPlayer)) {
+            if (player != null && player.equals(enemyPlayer) || enemyPlayer.getConnection() == null) {
                 continue;
             }
 
@@ -1352,7 +1352,7 @@ public final class InGameInputHandler extends InputHandler {
         while (enemyPlayerIterator.hasNext()) {
             ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
 
-            if ((player != null) && (player.equals(enemyPlayer))) {
+            if ((player != null) && (player.equals(enemyPlayer)) || enemyPlayer.getConnection() == null) {
                 continue;
             }
 

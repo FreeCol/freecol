@@ -368,8 +368,12 @@ public class Game extends FreeColGameObject {
     * Checks if the next player is in a new turn.
     */
     public boolean isNextPlayerInNewTurn() {
+        return (players.indexOf(currentPlayer) > players.indexOf(getNextPlayer())
+                || currentPlayer == getNextPlayer());
+        /*
         int index = players.indexOf(currentPlayer) + 1;
         return index >= players.size();
+        */
     }
 
 

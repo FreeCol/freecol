@@ -87,9 +87,12 @@ public class AIUnit extends AIObject {
         return element;
     }
 
-    
+
     public void readFromXMLElement(Element element) {
         unit = (Unit) getAIMain().getFreeColGameObject(element.getAttribute("ID"));
+        
+        // TODO-INSTEAD: Store mission:
+        mission = new UnitWanderHostileMission(this);
     }    
     
     

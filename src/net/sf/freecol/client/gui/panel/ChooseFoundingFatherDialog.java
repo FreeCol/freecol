@@ -27,13 +27,13 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
     public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
-    
+
     private final Canvas    parent;
     private FoundingFatherPanel[] foundingFatherPanels = new FoundingFatherPanel[FoundingFather.TYPE_COUNT];
     private final JTabbedPane tb;
     private final ChooseFoundingFatherDialog chooseFoundingFatherDialog;
-    
-    
+
+
     /**
     * The constructor that will add the items to this panel.
     * @param parent The parent of this panel.
@@ -54,8 +54,8 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
 
         add(tb);
     }
-    
-    
+
+
     /**
     * Prepares this panel to be displayed.
     */
@@ -69,16 +69,16 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
                 hasSelectedTab = true;
             }
         }
-        
+
         setSize(tb.getPreferredSize());
     }
-    
+
 
     public void requestFocus() {
         tb.requestFocus();
     }
 
-    
+
     /**
     * This function analyses an event and calls the right methods to take
     * care of the user's requests.
@@ -108,8 +108,8 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
         private JTextArea text;
         private JButton ok;
         private JPanel p1;
-        
-        
+
+
         /**
         * Creates a <code>FoundingFatherPanel</code> for a given type
         * of founding fathers.
@@ -120,7 +120,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
             this.type = type;
 
             setLayout(new BorderLayout());
-            
+
             header = new JLabel("", JLabel.CENTER);
             header.setFont(((Font) UIManager.get("HeaderFont")).deriveFont(0, 48));
             header.setBorder(new EmptyBorder(20, 0, 0, 0));
