@@ -207,12 +207,14 @@ public final class Canvas extends JLayeredPane {
     *
     * @param game The <code>Game</code> that is about to start.
     * @param player The <code>Player</code> using this client.
+    * @param singlePlayerMode 'true' if the user wants to start a single player game,
+    *        'false' otherwise.
     */
-    public void showStartGamePanel(Game game, Player player) {
+    public void showStartGamePanel(Game game, Player player, boolean singlePlayerMode) {
         closeMenus();
 
         if (game != null && player != null) {
-            startGamePanel.initialize(game, player);
+            startGamePanel.initialize(singlePlayerMode);
             startGamePanel.setLocation(getWidth() / 2 - startGamePanel.getWidth() / 2, getHeight() / 2 - startGamePanel.getHeight() / 2);
             add(startGamePanel);
             startGamePanel.requestFocus();
@@ -362,7 +364,7 @@ public final class Canvas extends JLayeredPane {
         mapControls.removeFromComponent(this);
         setEnabled(false);
         add(colonyPanel);
-        
+
         colonyPanel.requestFocus();
     }
 
@@ -380,7 +382,7 @@ public final class Canvas extends JLayeredPane {
         Rectangle bounds = comp.getBounds();
         setEnabled(true);
         super.remove(comp);
-        
+
         if (takeFocus) {
             takeFocus();
         }
@@ -444,7 +446,7 @@ public final class Canvas extends JLayeredPane {
         }
 
         c.requestFocus();
-        
+
         // Later:
         /*if ((takeFocusThread == null) || (!takeFocusThread.isAlive()) || (!takeFocusThread.isStillWorking())
                 || takeFocusThread.getComponent() != c) {
@@ -608,8 +610,8 @@ public final class Canvas extends JLayeredPane {
     public void refreshTile(Tile t) {
         refreshTile(t.getX(), t.getY());
     }
-    
-    
+
+
     /**
     * Refreshes the screen at the specified Tile.
     * @param p The position of the tile to refresh.
@@ -673,7 +675,7 @@ public final class Canvas extends JLayeredPane {
     public StartGamePanel getStartGamePanel() {
         return startGamePanel;
     }
- 
+
 
     /**
     * Tells the map controls that a chat message was recieved.
@@ -684,8 +686,8 @@ public final class Canvas extends JLayeredPane {
     public void displayChatMessage(Player sender, String message, boolean privateChat) {
         gui.addMessage(new GUIMessage(sender.getName() + ": " + message, sender.getColor()));
     }
-    
-    
+
+
     /**
     * Displays a chat message originating from this client.
     * @param message The chat message.
@@ -792,8 +794,8 @@ public final class Canvas extends JLayeredPane {
         public boolean isStillWorking() {
             return doYourWork;
         }
-        
-        
+
+
         /**
         * Gets the component this thread is trying to take focus for.
         */

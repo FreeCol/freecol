@@ -103,6 +103,7 @@ public final class PreGameInputHandler implements MessageHandler {
         Player newPlayer = new Player(game, playerElement);
 
         freeColClient.getGame().addPlayer(newPlayer);
+        freeColClient.getCanvas().getStartGamePanel().refreshPlayersTable();
 
         return null;
     }
@@ -121,6 +122,7 @@ public final class PreGameInputHandler implements MessageHandler {
         Player player = new Player(game, playerElement);
 
         freeColClient.getGame().removePlayer(player);
+        freeColClient.getCanvas().getStartGamePanel().refreshPlayersTable();
 
         return null;
     }
@@ -138,7 +140,7 @@ public final class PreGameInputHandler implements MessageHandler {
         boolean privateChat = Boolean.valueOf(element.getAttribute("privateChat")).booleanValue();
 
         freeColClient.getCanvas().getStartGamePanel().displayChat(senderName, message, privateChat);
-        
+
         return null;
     }
 
@@ -154,12 +156,13 @@ public final class PreGameInputHandler implements MessageHandler {
 
         Player player = (Player) game.getFreeColGameObject(element.getAttribute("player"));
         boolean ready = Boolean.valueOf(element.getAttribute("value")).booleanValue();
-        
+
         player.setReady(ready);
+        freeColClient.getCanvas().getStartGamePanel().refreshPlayersTable();
 
         return null;
     }
-    
+
 
     /**
     * Handles an "updateNation"-message.
@@ -167,16 +170,24 @@ public final class PreGameInputHandler implements MessageHandler {
     * @param element The element (root element in a DOM-parsed XML tree) that
     *                holds all the information.
     */
-    private Element updateNation(Element element) {        
+    private Element updateNation(Element element) {
         Game game = freeColClient.getGame();
 
         Player player = (Player) game.getFreeColGameObject(element.getAttribute("player"));
-        String nation = element.getAttribute("nation");
+        String nation = element.getAttribute("value");
 
-        player.setNation(nation);
+        try {
+            player.setNation(nation);
+        }
+        catch (FreeColException e) {
+            logger.warning(e.getMessage());
+        }
+
+        freeColClient.getCanvas().getStartGamePanel().refreshPlayersTable();
+
         return null;
     }
-    
+
 
     /**
     * Handles an "updateColor"-message.
@@ -188,11 +199,12 @@ public final class PreGameInputHandler implements MessageHandler {
         Game game = freeColClient.getGame();
 
         Player player = (Player) game.getFreeColGameObject(element.getAttribute("player"));
-        String color = element.getAttribute("color");
+        String color = element.getAttribute("value");
 
         player.setColor(color);
-        return null;
+        freeColClient.getCanvas().getStartGamePanel().refreshPlayersTable();
 
+        return null;
     }
 
 
@@ -204,10 +216,10 @@ public final class PreGameInputHandler implements MessageHandler {
     */
     private Element updateGame(Element element) {
         freeColClient.getGame().readFromXMLElement((Element) element.getElementsByTagName(Game.getXMLElementTagName()).item(0));
-        
+
         return null;
     }
-    
+
 
     /*
     * Handles an "startGame"-message.
@@ -219,7 +231,7 @@ public final class PreGameInputHandler implements MessageHandler {
         Canvas canvas = freeColClient.getCanvas();
         GUI gui = freeColClient.getGUI();
 
-        canvas.closeMainPanel();        
+        canvas.closeMainPanel();
         canvas.closeMenus();
 
         FreeColMenuBar freeColMenuBar = new FreeColMenuBar(freeColClient, canvas, gui);
@@ -263,7 +275,7 @@ public final class PreGameInputHandler implements MessageHandler {
     */
     private Element error(Element element)  {
         Canvas canvas = freeColClient.getCanvas();
-        
+
         if (element.hasAttribute("messageID")) {
             canvas.errorMessage(element.getAttribute("messageID"), element.getAttribute("message"));
         } else {

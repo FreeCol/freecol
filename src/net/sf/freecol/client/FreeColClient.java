@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 import javax.swing.JFrame;
 
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 
@@ -24,8 +25,6 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.server.FreeColServer;
 
-import         javax.swing.*;
-import         java.awt.Graphics;
 
 
 /**
@@ -35,7 +34,7 @@ import         java.awt.Graphics;
 public final class FreeColClient {
     private static final Logger logger = Logger.getLogger(FreeColClient.class.getName());
 
-    
+
     // Control:
     private ConnectController connectController;
     private PreGameController preGameController;
@@ -59,12 +58,12 @@ public final class FreeColClient {
 
     /** The network <code>Client</code> that can be used to send messages to the server. */
     private Client client;
-    
-    
+
+
     // Model:
 
     private Game game;
-    
+
     /** The player "owning" this client. */
     private Player player;
 
@@ -126,9 +125,9 @@ public final class FreeColClient {
         if (GraphicsEnvironment.isHeadless()) {
             logger.info("It seems that the GraphicsEnvironment is headless!");
         }
-        
+
         GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-        
+
         if (windowed) {
             frame = new WindowedFrame();
         } else {
@@ -155,7 +154,7 @@ public final class FreeColClient {
         frame.getContentPane().add(canvas);
 
         frame.setVisible(true);
-        
+
         if (!windowed) {
             ((FullScreenFrame) frame).display();
         }
@@ -359,8 +358,8 @@ public final class FreeColClient {
     public Client getClient() {
         return client;
     }
-    
-    
+
+
     public void playSound(int sound) {
         if (sfxPlayer != null) {
             sfxPlayer.play(sfxLibrary.get(sound));

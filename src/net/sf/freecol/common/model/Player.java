@@ -49,7 +49,7 @@ public class Player extends FreeColGameObject {
                             ENGLISH = 1,
                             FRENCH = 2,
                             SPANISH = 3;
-                            
+
     /** The Indian tribes. Note that these values differ from IndianSettlement's by a value of 4.*/
     public static final int INCA = 4,
                             AZTEC = 5,
@@ -59,7 +59,7 @@ public class Player extends FreeColGameObject {
                             SIOUX = 9,
                             APACHE = 10,
                             TUPI = 11;
-                            
+
     /** For future reference - the REF forces. */
     public static final int REF_DUTCH = 12,
                             REF_ENGLISH = 13,
@@ -82,10 +82,10 @@ public class Player extends FreeColGameObject {
     private int             gold;
     private Europe          europe;
     private boolean         ready;
-    
+
     /** True if this is an AI player. */
     private boolean         ai;
-    
+
     private int             crosses;
     private int             bells;
     private boolean         dead = false;
@@ -118,10 +118,10 @@ public class Player extends FreeColGameObject {
     */
     public Player(Game game, String name, boolean admin, boolean ai) {
         this(game, name, admin);
-        
+
         this.ai = ai;
     }
-    
+
     /**
     * Creates a new <code>Player</code> with specified name.
     *
@@ -142,7 +142,7 @@ public class Player extends FreeColGameObject {
 
         // TODO (this is for testing only): Set to 0
         gold = 10000;
-        
+
         crosses = 0;
         bells = 0;
     }
@@ -243,8 +243,8 @@ public class Player extends FreeColGameObject {
 
         return false;
     }
-    
-    
+
+
     /**
     * Gets called when this player's turn has ended.
     */
@@ -313,7 +313,7 @@ public class Player extends FreeColGameObject {
         return admin;
     }
 
-    
+
     /**
     * Checks if this player is dead.
     * A <code>Player</code> dies when it looses the game.
@@ -359,11 +359,50 @@ public class Player extends FreeColGameObject {
 
 
     /**
+    * Returns the nation of this player as a String.
+    * @return The nation of this player as a String.
+    */
+    public String getNationAsString() {
+        switch (nation) {
+            case DUTCH:
+                return "Dutch";
+            case ENGLISH:
+                return "English";
+            case FRENCH:
+                return "French";
+            case SPANISH:
+                return "Spanish";
+            default:
+                return "INVALID";
+        }
+    }
+
+
+    /**
     * Returns the color of this player.
     * @return The color of this player.
     */
     public Color getColor() {
         return color;
+    }
+
+
+    /**
+    * Returns the color of this player as a String.
+    * @return The color of this player as a String.
+    */
+    public String getColorAsString() {
+        final String[] colorNames = {"Black", "Blue", "Cyan", "Gray", "Green", "Magenta",
+                "Orange", "Pink", "Red", "White", "Yellow"};
+        final Color[] colors = {Color.BLACK, Color.BLUE, Color.CYAN, Color.GRAY, Color.GREEN,
+                Color.MAGENTA, Color.ORANGE, Color.PINK, Color.RED, Color.WHITE, Color.YELLOW};
+
+        for (int i = 0; i < colors.length; i++) {
+            if (color.equals(colors[i])) {
+                return colorNames[i];
+            }
+        }
+        return "UNSUPPORTED: see Player::getColorAsString";
     }
 
 
@@ -378,8 +417,9 @@ public class Player extends FreeColGameObject {
     /**
     * Sets the nation for this player.
     * @param n The new nation for this player.
+    * @throw FreeColException In case the given nation is invalid.
     */
-    public void setNation(String n) {
+    public void setNation(String n) throws FreeColException {
         if (n.toLowerCase().equals("dutch")) {
             setNation(DUTCH);
         } else if (n.toLowerCase().equals("english")) {
@@ -388,6 +428,8 @@ public class Player extends FreeColGameObject {
             setNation(FRENCH);
         } else if (n.toLowerCase().equals("spanish")) {
             setNation(SPANISH);
+        } else {
+            throw new FreeColException("Invalid nation '" + n + "'.");
         }
     }
 
@@ -429,7 +471,7 @@ public class Player extends FreeColGameObject {
         }
     }
 
-    
+
     /**
     * Checks if this <code>Player</code> is ready to start the game.
     */
@@ -478,7 +520,7 @@ public class Player extends FreeColGameObject {
 
         return units.iterator();
     }
-    
+
 
     /**
     * Increments the player's cross count, with benefits thereof.
@@ -488,12 +530,12 @@ public class Player extends FreeColGameObject {
         crosses += num;
     }
 
-    
+
     public void setCrosses(int crosses) {
         this.crosses = crosses;
     }
 
-    
+
     /**
     * Checks to see whether or not a colonist can emigrate, and does so if possible.
     * @return Whether a new colonist should immigrate.
@@ -544,7 +586,7 @@ public class Player extends FreeColGameObject {
               count += (((Colony)t.getSettlement()).getUnitCount()) * 4; // Units in colonies count doubly. -sjm
             }
         }
-        
+
         Iterator europeUnitIterator = getEurope().getUnitIterator();
         while (europeUnitIterator.hasNext()) {
             europeUnitIterator.next();
@@ -556,7 +598,7 @@ public class Player extends FreeColGameObject {
         return count;
     }
 
-    
+
     /**
     * Gets the price for a recruit in europe.
     */
@@ -602,9 +644,9 @@ public class Player extends FreeColGameObject {
         playerElement.setAttribute("bells", Integer.toString(bells));
         playerElement.setAttribute("ready", Boolean.toString(ready));
         playerElement.setAttribute("dead", Boolean.toString(dead));
-        
+
         playerElement.setAttribute("ai", Boolean.toString(ai));
-        
+
         if (entryLocation != null) {
             playerElement.setAttribute("entryLocation", entryLocation.getID());
         }
@@ -634,7 +676,7 @@ public class Player extends FreeColGameObject {
         ready = (new Boolean(playerElement.getAttribute("ready"))).booleanValue();
         ai = (new Boolean(playerElement.getAttribute("ai"))).booleanValue();
         dead = (new Boolean(playerElement.getAttribute("dead"))).booleanValue();
-        
+
         if (playerElement.hasAttribute("entryLocation")) {
             entryLocation = (Location) getGame().getFreeColGameObject(playerElement.getAttribute("entryLocation"));
         }

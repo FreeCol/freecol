@@ -102,7 +102,7 @@ public final class ConnectController {
 
         try {
             FreeColServer freeColServer = new FreeColServer(true, port);
-            freeColClient.setFreeColServer(freeColServer);            
+            freeColClient.setFreeColServer(freeColServer);
         } catch (IOException e) {
             freeColClient.getCanvas().errorMessage("server.couldNotStart");
             return;
@@ -112,7 +112,7 @@ public final class ConnectController {
         login(username, "127.0.0.1", 3541);
 
         freeColClient.getPreGameController().setReady(true);
-        freeColClient.getCanvas().showStartGamePanel(freeColClient.getGame(), freeColClient.getMyPlayer());
+        freeColClient.getCanvas().showStartGamePanel(freeColClient.getGame(), freeColClient.getMyPlayer(), true);
     }
 
 
@@ -126,7 +126,7 @@ public final class ConnectController {
     public void joinMultiplayerGame(String username, String host, int port) {
         freeColClient.setSingleplayer(false);
         if (login(username, host, port)) {
-            freeColClient.getCanvas().showStartGamePanel(freeColClient.getGame(), freeColClient.getMyPlayer());
+            freeColClient.getCanvas().showStartGamePanel(freeColClient.getGame(), freeColClient.getMyPlayer(), false);
         }
     }
 
@@ -179,13 +179,13 @@ public final class ConnectController {
             } else {
                 canvas.errorMessage(null, reply.getAttribute("message"));
             }
-            
+
             return false;
         } else {
             logger.warning("Unkown message received: " + reply);
             return false;
         }
-        
+
         return true;
     }
 }

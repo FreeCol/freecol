@@ -36,13 +36,13 @@ import net.sf.freecol.client.control.ConnectController;
 */
 public final class NewPanel extends JPanel implements ActionListener {
     private static final Logger logger = Logger.getLogger(NewPanel.class.getName());
-    
+
     private static final int    OK = 0,
                                 CANCEL = 1,
                                 SINGLE = 2,
                                 JOIN = 3,
                                 START = 4;
-    
+
     private final JTextField    server,
                                 port1,
                                 port2,
@@ -53,12 +53,12 @@ public final class NewPanel extends JPanel implements ActionListener {
     private final JLabel        ipLabel,
                                 port1Label,
                                 port2Label;
-    
+
     private final Canvas        parent;
-    
+
     private final ConnectController connectController;
     private JButton ok = new JButton("OK");
-    
+
 
     /**
     * The constructor that will add the items to this panel.
@@ -82,11 +82,11 @@ public final class NewPanel extends JPanel implements ActionListener {
         single = new JRadioButton("Single player game", true);
         join = new JRadioButton("Join multiplayer game", false);
         start = new JRadioButton("Start multiplayer game", false);
-        
+
         group.add(single);
         group.add(join);
         group.add(start);
-        
+
         name.setSize(175, 20);
         nameLabel.setSize(40, 20);
         ok.setSize(80, 20);
@@ -114,15 +114,15 @@ public final class NewPanel extends JPanel implements ActionListener {
         start.setLocation(10, 130);
         port2Label.setLocation(55, 155);
         port2.setLocation(195, 155);
-        
+
         setLayout(null);
-        
+
         ok.setActionCommand(String.valueOf(OK));
         cancel.setActionCommand(String.valueOf(CANCEL));
         single.setActionCommand(String.valueOf(SINGLE));
         join.setActionCommand(String.valueOf(JOIN));
         start.setActionCommand(String.valueOf(START));
-        
+
         ok.addActionListener(this);
         cancel.addActionListener(this);
         single.addActionListener(this);
@@ -149,7 +149,7 @@ public final class NewPanel extends JPanel implements ActionListener {
         add(start);
         add(port2Label);
         add(port2);
-        
+
         try {
             BevelBorder border = new BevelBorder(BevelBorder.RAISED);
             setBorder(border);
@@ -157,8 +157,8 @@ public final class NewPanel extends JPanel implements ActionListener {
 
         setSize(260, 235);
     }
-    
-    
+
+
     public void requestFocus() {
         ok.requestFocus();
     }
@@ -175,6 +175,31 @@ public final class NewPanel extends JPanel implements ActionListener {
         Component components[] = getComponents();
         for (int i = 0; i < components.length; i++) {
             components[i].setEnabled(enabled);
+        }
+
+        if (single.isSelected()) {
+            ipLabel.setEnabled(false);
+            server.setEnabled(false);
+            port1Label.setEnabled(false);
+            port1.setEnabled(false);
+            port2Label.setEnabled(false);
+            port2.setEnabled(false);
+        }
+        else if (join.isSelected()) {
+            ipLabel.setEnabled(true);
+            server.setEnabled(true);
+            port1Label.setEnabled(true);
+            port1.setEnabled(true);
+            port2Label.setEnabled(false);
+            port2.setEnabled(false);
+        }
+        else if (start.isSelected()) {
+            ipLabel.setEnabled(false);
+            server.setEnabled(false);
+            port1Label.setEnabled(false);
+            port1.setEnabled(false);
+            port2Label.setEnabled(true);
+            port2.setEnabled(true);
         }
     }
 
@@ -211,7 +236,7 @@ public final class NewPanel extends JPanel implements ActionListener {
                             port2Label.setForeground(Color.red);
                             break;
                         }
-                        
+
                         connectController.startMultiplayerGame(name.getText(), port);
                     }
                     break;

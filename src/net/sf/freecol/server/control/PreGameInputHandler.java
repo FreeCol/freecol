@@ -26,7 +26,7 @@ import net.sf.freecol.server.model.ServerPlayer;
 
 
 /**
-* Handles the network messages that arrives before the game starts. 
+* Handles the network messages that arrives before the game starts.
 * @see PreGameController
 */
 public final class PreGameInputHandler implements MessageHandler {
@@ -102,7 +102,7 @@ public final class PreGameInputHandler implements MessageHandler {
 
         return null;
     }
-    
+
     /**
     * Handles a "nation"-message from a client.
     *
@@ -115,7 +115,12 @@ public final class PreGameInputHandler implements MessageHandler {
 
         if (player != null) {
             String nation = element.getAttribute("value");
-            player.setNation(nation);
+            try {
+                player.setNation(nation);
+            }
+            catch (FreeColException e) {
+                logger.warning(e.getMessage());
+            }
 
             Element updateNation = Message.createNewRootElement("updateNation");
             updateNation.setAttribute("player", player.getID());
@@ -128,7 +133,7 @@ public final class PreGameInputHandler implements MessageHandler {
 
         return null;
     }
-    
+
     /**
     * Handles a "color"-message from a client.
     *
@@ -164,7 +169,7 @@ public final class PreGameInputHandler implements MessageHandler {
     private Element requestLaunch(Connection connection, Element element) {
 
         ServerPlayer launchingPlayer = freeColServer.getPlayer(connection);
-        
+
         // Check if launching player is an admin.
         if (!launchingPlayer.isAdmin()) {
             Element reply = Message.createNewRootElement("error");
@@ -173,19 +178,19 @@ public final class PreGameInputHandler implements MessageHandler {
 
             return reply;
         }
-        
+
         // Check that no two players have the same color or nation
         Iterator playerIterator = freeColServer.getGame().getPlayerIterator();
-        
+
         LinkedList nations = new LinkedList();
         LinkedList colors = new LinkedList();
-        
+
         while (playerIterator.hasNext()) {
             ServerPlayer player = (ServerPlayer) playerIterator.next();
-            
+
             final int nation = player.getNation();
             final Color color = player.getColor();
-            
+
             // Check the nation.
             for (int i = 0; i < nations.size(); i++) {
                 if (((Integer)nations.get(i)).intValue() == nation) {
@@ -198,7 +203,7 @@ public final class PreGameInputHandler implements MessageHandler {
                 }
             }
             nations.add(new Integer(nation));
-            
+
             // Check the color.
             for (int i = 0; i < colors.size(); i++) {
                 if (((Color)colors.get(i)) == color) {
@@ -212,7 +217,7 @@ public final class PreGameInputHandler implements MessageHandler {
             }
             colors.add(color);
         }
-        
+
         // Check if all players are ready.
         if (!freeColServer.getGame().isAllPlayersReadyToLaunch()) {
             Element reply = Message.createNewRootElement("error");
@@ -226,8 +231,8 @@ public final class PreGameInputHandler implements MessageHandler {
 
         return null;
     }
-    
-    
+
+
     /**
     * Handles a "chat"-message from a client.
     *

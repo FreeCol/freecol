@@ -35,8 +35,8 @@ public final class PreGameController {
 
 
 
-    
-    
+
+
     /**
     * The constructor to use.
     * @param freeColClient The main controller.
@@ -46,7 +46,7 @@ public final class PreGameController {
     }
 
 
-    
+
 
 
     /**
@@ -71,7 +71,12 @@ public final class PreGameController {
     */
     public void setNation(String nation) {
         // Make the change:
-        freeColClient.getMyPlayer().setNation(nation);
+        try {
+            freeColClient.getMyPlayer().setNation(nation);
+        }
+        catch (FreeColException e) {
+            logger.warning(e.getMessage());
+        }
 
         // Inform the server:
         Element nationElement = Message.createNewRootElement("setNation");
@@ -79,7 +84,7 @@ public final class PreGameController {
 
         freeColClient.getClient().send(nationElement);
     }
-    
+
     /**
     * Sets this client's player's color.
     * @param color Which color this player wishes to set.
@@ -124,7 +129,7 @@ public final class PreGameController {
         chatElement.setAttribute("senderName", freeColClient.getMyPlayer().getName());
         chatElement.setAttribute("message", message);
         chatElement.setAttribute("privateChat", "false");
-        
+
         freeColClient.getClient().send(chatElement);
     }
 }
