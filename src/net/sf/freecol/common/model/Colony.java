@@ -659,10 +659,14 @@ public final class Colony extends Settlement implements Location {
     */
     public int getProductionOf(int goodsType) {
         int amount = 0;
+        
+        if (goodsType == Goods.HORSES) {
+            return getHorseProduction();
+        }
 
-        Iterator colonyTileIterator = getColonyTileIterator();
-        while (colonyTileIterator.hasNext()) {
-            amount += ((ColonyTile) colonyTileIterator.next()).getProductionOf(goodsType);
+        Iterator workLocationIterator = getWorkLocationIterator();
+        while (workLocationIterator.hasNext()) {
+            amount += ((WorkLocation) workLocationIterator.next()).getProductionOf(goodsType);
         }
 
         return amount;
@@ -729,6 +733,25 @@ public final class Colony extends Settlement implements Location {
 
 
     /**
+    * Gets the production of horses in this <code>Colony</code>
+    */
+    public int getHorseProduction() {
+        int eat = getUnitCount() * 2;
+
+        int surplus = getFoodProduction() - eat;
+        if (getGoodsCount(Goods.HORSES) >= 2 && surplus > 1) {
+            if (!getBuilding(Building.STABLES).isBuilt()) {
+                return Math.min(surplus / 2, getPotentialHorseProduction());
+            } else {
+                return Math.min(surplus, getPotentialHorseProduction());
+            }
+        }
+        
+        return 0;
+    }
+
+
+    /**
     * Prepares this <code>Colony</code> for a new turn.
     */
     public void newTurn() {
@@ -755,16 +778,12 @@ public final class Colony extends Settlement implements Location {
         }
 
         // Breed horses:
-        int surplus = getFoodProduction() - eat;
-        if (getGoodsCount(Goods.HORSES) >= 2 && surplus > 1) {
+        int horseProduction = getHorseProduction();
+        if (horseProduction != 0) {
             if (!getBuilding(Building.STABLES).isBuilt()) {
-                int horseProduction = Math.min(surplus / 2, getPotentialHorseProduction());
-
                 removeGoods(Goods.FOOD, horseProduction);
                 addGoods(Goods.HORSES, horseProduction);
             } else {
-                int horseProduction = Math.min(surplus, getPotentialHorseProduction());
-
                 removeGoods(Goods.FOOD, horseProduction/2);
                 addGoods(Goods.HORSES, horseProduction);
             }

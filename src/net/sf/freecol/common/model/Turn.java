@@ -74,7 +74,7 @@ public class Turn {
             return Integer.toString(STARTING_YEAR + turn - 1);
         } else {
             int c = turn - (SEASON_YEAR - STARTING_YEAR - 1);
-            return ((c%2==0) ? " Spring" : " Autumn") + Integer.toString(SEASON_YEAR + c/2 - 1);
+            return ((c%2==0) ? "Spring " : "Autumn ") + Integer.toString(SEASON_YEAR + c/2 - 1);
         }
     }
 }

@@ -554,8 +554,6 @@ public final class Building extends FreeColGameObject implements WorkLocation {
                             student.setType(student.getTrainingType());
                         }
 
-                        // TODO: Add message about unit beeing trained.
-
                         student.setTrainingType(-1);
                         student.setTurnsOfTraining(0);
                     }
@@ -566,6 +564,10 @@ public final class Building extends FreeColGameObject implements WorkLocation {
             int goodsOutput = getProduction();
             int goodsInputType = getGoodsInputType();
             int goodsOutputType = getGoodsOutputType();
+
+            if (getGoodsInput() == 0 && getMaximumGoodsInput() > 0) {
+                addModelMessage(this, "model.building.notEnoughInput", new String[][] {{"%building%", getName()}, {"%colony%", colony.getName()}});
+            }
 
             if (goodsOutput <= 0) return;
 

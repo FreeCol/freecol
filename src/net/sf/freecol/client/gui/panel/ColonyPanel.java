@@ -152,7 +152,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         inPortScroll.setSize(200, 100);
         cargoScroll.setSize(410, 96);
         warehouseScroll.setSize(620, 120);
-        productionPanel.setSize(390, 30);
+        productionPanel.setSize(390, 35);
         tilesScroll.setSize(390, 200);
         buildingsScroll.setSize(400,200);
         outsideColonyLabel.setSize(200, 20);
@@ -666,26 +666,77 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         }
 
         public void paintComponent(Graphics g) {
-            int need = colony.getUnitCount() * 2;
-            int surplus = colony.getFoodProduction() - need;
+            final int need = colony.getUnitCount() * 2;
+            final int surplus = colony.getFoodProduction() - need;
+            final int horses = colony.getHorseProduction();
+            final int bells = colony.getProductionOf(Goods.BELLS);
+            final int crosses = colony.getProductionOf(Goods.CROSSES);
 
             ImageIcon goodsIcon = parent.getImageProvider().getGoodsImageIcon(Goods.FOOD);
+            int add;
 
-            int nextX = (need > 14) ? goodsIcon.getIconWidth() : Math.min(need, 6) * goodsIcon.getIconWidth();
-            BufferedImage productionImage = parent.getGUI().createProductionImage(goodsIcon, need, nextX, getHeight(), 14);
+            // Food production:
+            int nextX = (need > 12) ? goodsIcon.getIconWidth() : Math.min(need, 4) * goodsIcon.getIconWidth();
+            BufferedImage productionImage;
+            if (horses == 0) {
+                productionImage = parent.getGUI().createProductionImage(goodsIcon, need, nextX, getHeight(), 12);
+            } else {
+                nextX = goodsIcon.getIconWidth();
+                productionImage = parent.getGUI().createProductionImage(goodsIcon, need, nextX, getHeight(), 1);
+            }
             g.drawImage(productionImage, 0, 0, null);
+            nextX += goodsIcon.getIconWidth()/4;
 
+            // Food surplus:
             if (surplus != 0) {
-                if (surplus > 7) {
-                    productionImage = parent.getGUI().createProductionImage(goodsIcon, surplus, goodsIcon.getIconWidth(), getHeight(), 7);
+                if (surplus > 6 || surplus < 0 || surplus == 1) {
+                    productionImage = parent.getGUI().createProductionImage(goodsIcon, surplus, goodsIcon.getIconWidth(), getHeight(), 6);
+                    add = goodsIcon.getIconWidth();
                 } else {
-                    productionImage = parent.getGUI().createProductionImage(goodsIcon, surplus, goodsIcon.getIconWidth() * 3, getHeight(), 7);
+                    productionImage = parent.getGUI().createProductionImage(goodsIcon, surplus, goodsIcon.getIconWidth() * 2, getHeight(), 6);
+                    add = goodsIcon.getIconWidth() * 3;
                 }
-
-                g.drawImage(productionImage, nextX + goodsIcon.getIconWidth(), 0, null);
+                
+                g.drawImage(productionImage, nextX, 0, null);
+                nextX += productionImage.getWidth()/4 + add;
             }
             
-            //TODO : update for the other types of goods.
+            // Horses:
+            if (horses != 0) {
+                goodsIcon = parent.getImageProvider().getGoodsImageIcon(Goods.HORSES);
+                if (horses > 2 || horses == 1) {
+                    productionImage = parent.getGUI().createProductionImage(goodsIcon, horses, goodsIcon.getIconWidth(), getHeight(), 2);
+                    add = goodsIcon.getIconWidth();
+                } else {
+                    productionImage = parent.getGUI().createProductionImage(goodsIcon, horses, goodsIcon.getIconWidth() * 2, getHeight(), 2);
+                    add = goodsIcon.getIconWidth()*2;
+                }
+                g.drawImage(productionImage, nextX, 0, null);
+                nextX += productionImage.getWidth()/4 + add;
+            }
+
+            // Liberty bells:
+            goodsIcon = parent.getImageProvider().getGoodsImageIcon(Goods.BELLS);
+            if (bells > 6 || bells == 1) {
+                productionImage = parent.getGUI().createProductionImage(goodsIcon, bells, goodsIcon.getIconWidth(), getHeight(), 6);
+                add = goodsIcon.getIconWidth();
+            } else {
+                productionImage = parent.getGUI().createProductionImage(goodsIcon, bells, goodsIcon.getIconWidth() * 2, getHeight(), 6);
+                add = goodsIcon.getIconWidth()*2;
+            }
+            g.drawImage(productionImage, nextX, 0, null);
+            nextX += productionImage.getWidth()/4 + add;
+            
+            // Crosses:
+            goodsIcon = parent.getImageProvider().getGoodsImageIcon(Goods.CROSSES);
+            if (crosses > 6 || crosses == 1) {
+                productionImage = parent.getGUI().createProductionImage(goodsIcon, crosses, goodsIcon.getIconWidth(), getHeight(), 6);
+                add = goodsIcon.getIconWidth();
+            } else {
+                productionImage = parent.getGUI().createProductionImage(goodsIcon, crosses, goodsIcon.getIconWidth() * 2, getHeight(), 6);
+                add = goodsIcon.getIconWidth()*2;
+            }
+            g.drawImage(productionImage, nextX, 0, null);
         }
     }
 
