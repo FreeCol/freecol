@@ -817,10 +817,13 @@ public final class InGameController {
 
 
     /**
-    * Makes a new unit active.
+    * Makes a new unit active. Displays any new <code>ModelMessage</code>s
+    * (uses {@link #nextModelMessage}).
     * @param tile The tile to select if no new unit can be made active.
     */
     public void nextActiveUnit(Tile tile) {
+        nextModelMessage();
+
         GUI gui = freeColClient.getGUI();
         Player myPlayer = freeColClient.getMyPlayer();
 

@@ -248,12 +248,10 @@ public final class InGameInputHandler implements MessageHandler {
             removeUnitsOutsideLOS();
             freeColClient.getCanvas().setEnabled(true);
             freeColClient.getCanvas().closeMenus();
-            freeColClient.getInGameController().nextActiveUnit();
             if (currentPlayer.checkEmigrate()) {
                 freeColClient.getInGameController().emigrateUnitInEurope((int) ((Math.random() * 3) + 1));
             }
-            
-            freeColClient.getInGameController().nextModelMessage();
+            freeColClient.getInGameController().nextActiveUnit();            
         }
 
         return null;

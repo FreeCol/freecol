@@ -14,6 +14,12 @@ import java.util.ResourceBundle;
  * <P>
  * 
  * This class is NOT thread-safe.
+ *
+ * <br><br>
+ *
+ * Messages are put in the file "FreeColMessages.properties".
+ * This file is presently located in the same directory as
+ * the source file of this class.
  */
 public final class Messages {
 
