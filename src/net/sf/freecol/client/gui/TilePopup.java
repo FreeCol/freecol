@@ -26,6 +26,7 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
     private final FreeColClient freeColClient;
     private final Canvas canvas;
     private final GUI gui;
+    private boolean hasAnItem = false;
 
 
     
@@ -74,6 +75,7 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
         menuItem.setActionCommand("unit " + unit.getID());
         menuItem.addActionListener(this);
         add(menuItem);
+        hasAnItem = true;
     }
 
 
@@ -86,6 +88,12 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
         menuItem.setActionCommand("colony");
         menuItem.addActionListener(this);
         add(menuItem);
+        hasAnItem = true;
+    }
+    
+    
+    public boolean hasItem() {
+        return hasAnItem;
     }
 
 

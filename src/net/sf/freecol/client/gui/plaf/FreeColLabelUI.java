@@ -1,7 +1,7 @@
 package net.sf.freecol.client.gui.plaf;
 
-import         javax.swing.plaf.metal.MetalComboBoxUI;
-import         javax.swing.plaf.metal.*;
+import         javax.swing.plaf.metal.MetalLabelUI;
+import         javax.swing.plaf.basic.*;
 import         javax.swing.plaf.*;
 import         javax.swing.*;
 import         java.awt.*;
@@ -17,11 +17,11 @@ import javax.swing.ImageIcon;
 /**
 * Sets the default opaque attribute to <i>false</i>.
 */
-public class FreeColComboBoxUI extends MetalComboBoxUI {
+public class FreeColLabelUI extends MetalLabelUI {
 
 
     public static ComponentUI createUI(JComponent c) {
-        return new FreeColComboBoxUI();
+        return new FreeColLabelUI();
     }
 
 
@@ -32,15 +32,4 @@ public class FreeColComboBoxUI extends MetalComboBoxUI {
     }
 
 
-    /*protected  JButton createArrowButton() {
-        JButton button = super.createArrowButton();
-
-        // TODO: Make button prettier?
-
-        return button;
-    }*/
-    
-    protected ListCellRenderer createRenderer() {
-        return new FreeColComboBoxRenderer.UIResource();
-    }
 }

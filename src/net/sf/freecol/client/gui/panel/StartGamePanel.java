@@ -23,7 +23,10 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
+import javax.swing.table.*;
+import javax.swing.UIManager;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.networking.Client;
@@ -160,10 +163,13 @@ public final class StartGamePanel extends JPanel implements ActionListener {
         chatScroll = new JScrollPane(chatArea);
         tableModel = new PlayersTableModel(freeColClient.getPreGameController());
         table = new JTable(tableModel);
-        tableScroll = new JScrollPane(table);
 
-        TableColumn nationsColumn = table.getColumnModel().getColumn(1),
+        TableColumn nameColumn = table.getColumnModel().getColumn(0),
+                    nationsColumn = table.getColumnModel().getColumn(1),
                     colorsColumn = table.getColumnModel().getColumn(2);
+        DefaultTableCellRenderer dtcr = new DefaultTableCellRenderer();
+        dtcr.setOpaque(false);
+        nameColumn.setCellRenderer(dtcr);
         nationsColumn.setCellEditor(new NationEditor());
         nationsColumn.setCellRenderer(new ComboBoxRenderer());
         colorsColumn.setCellEditor(new ColorEditor());
@@ -172,30 +178,32 @@ public final class StartGamePanel extends JPanel implements ActionListener {
         table.setRowHeight(22);
         table.setCellSelectionEnabled(false);
 
+        tableScroll = new JScrollPane(table);
+        table.addNotify();
+        tableScroll.getViewport().setOpaque(false);
+        tableScroll.getColumnHeader().setOpaque(false);
+
         mapSize.setSize(65, 20);
         mapSizeLabel.setSize(60, 20);
         optionsPanel.setSize(150, 380);
         start.setSize(110, 20);
         cancel.setSize(80, 20);
         readyBox.setSize(90, 20);
-
-        chat.setSize(220, 20);
-        chatScroll.setSize(220, 110);
+        chat.setSize(240, 20);
+        chatScroll.setSize(240, 110);
         tableScroll.setSize(240, 170);
-        chatPanel.setSize(240, 160);
-
+        chatPanel.setSize(260, 160);
 
         mapSize.setLocation(75, 20);
         mapSizeLabel.setLocation(10, 20);
         optionsPanel.setLocation(260, 5);
-        start.setLocation(25, 370);
+        start.setLocation(15, 370);
         cancel.setLocation(155, 370);
         readyBox.setLocation(90, 335);
-
         chat.setLocation(10, 130);
         chatScroll.setLocation(10, 10);
         tableScroll.setLocation(10, 10);
-        chatPanel.setLocation(10, 180);
+        chatPanel.setLocation(0, 180);
 
         setLayout(null);
         optionsPanel.setLayout(null);

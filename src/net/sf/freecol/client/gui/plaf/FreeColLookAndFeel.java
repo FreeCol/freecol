@@ -16,7 +16,12 @@ import net.sf.freecol.client.gui.plaf.FreeColMenuBarUI;
 import net.sf.freecol.client.gui.plaf.FreeColPopupMenuUI;
 import net.sf.freecol.client.gui.plaf.FreeColTextFieldUI;
 import net.sf.freecol.client.gui.plaf.FreeColTextAreaUI;
-
+import net.sf.freecol.client.gui.plaf.FreeColLabelUI;
+import net.sf.freecol.client.gui.plaf.FreeColMenuItemUI;
+import net.sf.freecol.client.gui.plaf.FreeColListUI;
+import net.sf.freecol.client.gui.plaf.FreeColTableUI;
+import net.sf.freecol.client.gui.plaf.FreeColTableHeaderUI;
+import net.sf.freecol.client.gui.plaf.FreeColScrollPaneUI;
 
 
 /**
@@ -110,6 +115,18 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
             u.put("net.sf.freecol.client.gui.plaf.FreeColMenuBarUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColMenuBarUI"));
             u.put("PopupMenuUI", "net.sf.freecol.client.gui.plaf.FreeColPopupMenuUI");
             u.put("net.sf.freecol.client.gui.plaf.FreeColPopupMenuUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColPopupMenuUI"));
+            u.put("LabelUI", "net.sf.freecol.client.gui.plaf.FreeColLabelUI");
+            u.put("net.sf.freecol.client.gui.plaf.FreeColLabelUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColLabelUI"));
+            u.put("MenuItemUI", "net.sf.freecol.client.gui.plaf.FreeColMenuItemUI");
+            u.put("net.sf.freecol.client.gui.plaf.FreeColMenuItemUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColMenuItemUI"));
+            u.put("ListUI", "net.sf.freecol.client.gui.plaf.FreeColListUI");
+            u.put("net.sf.freecol.client.gui.plaf.FreeColListUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColListUI"));
+            u.put("TableUI", "net.sf.freecol.client.gui.plaf.FreeColTableUI");
+            u.put("net.sf.freecol.client.gui.plaf.FreeColTableUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColTableUI"));
+            u.put("TableHeaderUI", "net.sf.freecol.client.gui.plaf.FreeColTableHeaderUI");
+            u.put("net.sf.freecol.client.gui.plaf.FreeColTableHeaderUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColTableHeaderUI"));
+            u.put("ScrollPaneUI", "net.sf.freecol.client.gui.plaf.FreeColScrollPaneUI");
+            u.put("net.sf.freecol.client.gui.plaf.FreeColScrollPaneUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColScrollPaneUI"));
 
             // Add other UI resources:
             File file;
