@@ -826,6 +826,9 @@ public final class InGameController {
     * @param unit The <code>Unit</code>.
     */
     public void clearOrders(Unit unit) {
+        if (unit == null) {
+            return;
+        }
         changeState(unit, Unit.ACTIVE);
     }
 

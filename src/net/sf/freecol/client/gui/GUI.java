@@ -184,9 +184,13 @@ public final class GUI {
                     return;
                 }
 
-                Unit movableUnit = gameData.getMap().getTile(selectedTile).getMovableUnit();
-                if (movableUnit != null) {
-                    setActiveUnit(movableUnit);
+                Unit unitInFront = getUnitInFront(gameData.getMap().getTile(selectedTile));
+                if (unitInFront != null) {
+                    if (unitInFront != activeUnit && unitInFront.getMovesLeft() > 0) {
+                        setActiveUnit(unitInFront);
+                    } else {
+                        freeColClient.getInGameController().clearOrders(unitInFront);
+                    }
                 } else {
                     setFocus(selectedTile);
                 }
@@ -204,6 +208,39 @@ public final class GUI {
                     freeColClient.getCanvas().refreshTile(selectedTile);
                 }
             }
+        }
+    }
+
+
+    /**
+    * Gets the unit that should be displayed on the given tile.
+    *
+    * @param unitTile The <code>Tile</code>.
+    * @return The <code>Unit</code> or <i>null</i> if no unit applies.
+    */
+    public Unit getUnitInFront(Tile unitTile) {
+        if (unitTile != null && unitTile.getUnitCount() > 0 && (unitTile.getSettlement() == null || (activeUnit != null && unitTile.contains(activeUnit)))) {
+            if ((activeUnit != null) && (unitTile.contains(activeUnit))) {
+                return activeUnit;
+            } else {
+                Unit movableUnit = unitTile.getMovableUnit();
+                if (movableUnit != null && movableUnit.getLocation() == movableUnit.getTile()) {
+                    return movableUnit;
+                } else {
+                    Unit bestPick = null;
+                    Iterator unitIterator = unitTile.getUnitIterator();
+                    while (unitIterator.hasNext()) {
+                        Unit u = (Unit) unitIterator.next();
+                        if (bestPick == null || bestPick.getMovesLeft() < u.getMovesLeft()) {
+                            bestPick = u;
+                        }
+                    }
+
+                    return bestPick;
+                }
+            }
+        } else {
+            return null;
         }
     }
 
@@ -255,6 +292,8 @@ public final class GUI {
         }
 
         this.activeUnit = activeUnit;
+
+        freeColClient.getInGameController().clearOrders(activeUnit);
 
         //freeColClient.getCanvas().getMapControls().updateMoves(activeUnit);
         freeColClient.getCanvas().getMapControls().update();
@@ -705,13 +744,10 @@ public final class GUI {
             for (int tileX = clipLeftCol; tileX <= clipRightCol; tileX++) {
                 if (map.isValid(tileX, tileY)) {
                     // Display any units on that Tile:
-                    Tile unitTile = map.getTile(tileX, tileY);
-                    if (unitTile != null && unitTile.getUnitCount() > 0 && (unitTile.getSettlement() == null || (activeUnit != null && unitTile.contains(activeUnit)))) {
-                        if ((activeUnit != null) && (unitTile.contains(activeUnit))) {
-                            displayUnit(g, activeUnit, xx, yy);
-                        } else {
-                            displayUnit(g, unitTile.getFirstUnit(), xx, yy);
-                        }
+                    //Tile unitTile = map.getTile(tileX, tileY);
+                    Unit unitInFront = getUnitInFront(map.getTile(tileX, tileY));
+                    if (unitInFront != null) {
+                        displayUnit(g, unitInFront, xx, yy);
                     }
                 }
                 xx += tileWidth;
