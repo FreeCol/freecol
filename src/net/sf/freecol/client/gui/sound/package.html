@@ -1,0 +1,21 @@
+<html>
+<body>
+This package contains the classes for handling sfx/music in FreeCol.
+
+{@link net.sf.freecol.FreeCol} initializes the libraries and {@link net.sf.freecol.client.gui.Canvas} initializes the players. Pointers to the library-objects and player-objects are stored in most of the GUI-classes.
+
+<p>This is the method for playing sounds (provided you have got access to the pointers):
+
+<PRE>
+        if (sfxPlayer != null) {
+            sfxPlayer.play(sfxLibrary.get(sfxLibrary.ILLEGAL_MOVE));
+        }
+        
+        if (musicPlayer != null) {
+            musicPlayer.play(musicLibrary.get(musicLibrary.INTRO));
+        }
+</PRE>
+
+<p>Notice the if-statement checking wether or not the <i>sfxPlayer</i>-object is <i>null</i>. Beeing <i>null</i> indicates that sound is disabled.
+</body>
+</html>
