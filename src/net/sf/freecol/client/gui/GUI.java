@@ -952,6 +952,40 @@ public final class GUI {
                 }
             }
 
+            // Paint the roads:
+            if (tile.hasRoad()) {
+                boolean connectedRoad = false;
+                for (int i = 0; i < 8; i++) {
+                    Map.Position p = map.getAdjacent(pos, i);
+                    if (map.isValid(p)) {
+                        Tile borderingTile = map.getTile(p);
+                        if (borderingTile.hasRoad()) {
+                            connectedRoad =  true;
+                            int nx = x + tileWidth/2;
+                            int ny = y + tileHeight/2;
+                                                        
+                            switch (i) {
+                                case 0: nx = x + tileWidth/2; ny = y; break;
+                                case 1: nx = x + tileWidth; ny = y; break;
+                                case 2: nx = x + tileWidth; ny = y + tileHeight/2; break;
+                                case 3: nx = x + tileWidth; ny = y + tileHeight; break;
+                                case 4: nx = x + tileWidth/2; ny = y + tileHeight; break;
+                                case 5: nx = x; ny = y + tileHeight; break;
+                                case 6: nx = x; ny = y + tileHeight/2; break;
+                                case 7: nx = x; ny = y; break;
+                            }
+
+                            g.drawLine(x + tileWidth/2, y + tileHeight/2, nx, ny);
+                        }
+                    }
+                }
+                
+                if (!connectedRoad) {
+                    g.drawLine(x + tileWidth/2 - 10, y + tileHeight/2, x + tileWidth/2 + 10, y + tileHeight/2);
+                    g.drawLine(x + tileWidth/2, y + tileHeight/2 - 10, x + tileWidth/2, y + tileHeight/2 + 10);
+                }
+            }
+
             Settlement settlement = tile.getSettlement();
 
             if (settlement != null) {
@@ -1001,7 +1035,6 @@ public final class GUI {
                 g.fill(pol);
                 g.setComposite(oldComposite);
             }
-
         }
 
         if (tile.getPosition().equals(selectedTile)) {

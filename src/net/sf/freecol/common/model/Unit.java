@@ -127,7 +127,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     * @param owner The Player owning the unit.
     * @param type The type of the unit.
     */
-    /*public Unit(Game game, Player owner, int type, int movesLeft, int s) {
+    /*public Unit(Game game, Player owner, int type, int ||||||||||||||||||||||||||, int s) {
         this(game, null, owner, type, movesLeft, s);
     }*/
 
@@ -399,6 +399,30 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             return ILLEGAL_MOVE;
         }
 
+        // Check for disembark.
+        if (isNaval() && target.isLand()) {
+            if (target.getSettlement() != null && target.getSettlement().getOwner() == getOwner()) {
+                return MOVE;
+            } else if (target.getDefendingUnit(this) != null && target.getDefendingUnit(this).getOwner() != getOwner()) {
+                return ILLEGAL_MOVE;
+            }
+
+            Iterator unitIterator = getUnitIterator();
+
+            while (unitIterator.hasNext()) {
+                Unit u = (Unit) unitIterator.next();
+                if (u.getMovesLeft() > 0) {
+                    return DISEMBARK;
+                }
+            }
+
+            return ILLEGAL_MOVE;
+        }
+
+        if (target.getMoveCost(getTile()) > getMovesLeft() + 1 && getMovesLeft() < getInitialMovesLeft()) {
+            return ILLEGAL_MOVE;
+        }
+
         if (target == null) {
             return isNaval() ? MOVE_HIGH_SEAS : ILLEGAL_MOVE;
         }
@@ -418,24 +442,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
 
         if (target.getType() == Tile.HIGH_SEAS) {
             return isNaval() ? MOVE_HIGH_SEAS : ILLEGAL_MOVE;
-        }
-
-        // Check for disembark.
-        if (isNaval() && target.isLand()) {
-            if (target.getSettlement() != null && target.getSettlement().getOwner() == getOwner()) {
-                return MOVE;
-            }
-
-            Iterator unitIterator = getUnitIterator();
-
-            while (unitIterator.hasNext()) {
-                Unit u = (Unit) unitIterator.next();
-                if (u.getMovesLeft() > 0) {
-                    return DISEMBARK;
-                }
-            }
-
-            return ILLEGAL_MOVE;
         }
 
         // Check for an embark:
@@ -460,6 +466,19 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         }
 
         return MOVE;
+    }
+
+
+    /**
+    * Sets the <code>movesLeft</code>. If <code>movesLeft < 0</code>
+    * then <code>movesLeft = 0</code>.
+    */
+    public void setMovesLeft(int movesLeft) {
+        if (movesLeft < 0) {
+            movesLeft = 0;
+        }
+
+        this.movesLeft = movesLeft;
     }
 
 
@@ -526,6 +545,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         setStateToAllChildren(SENTRY);
 
         Tile newTile = getGame().getMap().getNeighbourOrNull(direction, getTile());
+        Tile oldTile = getTile();
 
         if (newTile != null) {
             setLocation(newTile);
@@ -534,9 +554,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         }
 
         if (isNaval() && newTile.getSettlement() != null) {
-            movesLeft = 0;
+            setMovesLeft(0);
         } else {
-            movesLeft--;
+            setMovesLeft(getMovesLeft() - newTile.getMoveCost(oldTile));
         }
     }
 
@@ -558,7 +578,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         }
 
         setLocation(unit);
-        movesLeft--;
+        setMovesLeft(getMovesLeft() - 3);
     }
 
 
@@ -843,7 +863,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         }
 
         setLocation(getTile());
-        movesLeft = 0;
+        setMovesLeft(0);
 
         if (getTile().getColony().getUnitCount() <= 0) {
             getTile().getColony().dispose();
@@ -1436,34 +1456,36 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     public int getInitialMovesLeft() {
         if (isNaval()) {
             int fMagellan = 0;
-            if(owner.hasFather(FoundingFather.FERDINAND_MAGELLAN))
-                fMagellan++;
+            if(owner.hasFather(FoundingFather.FERDINAND_MAGELLAN)) {
+                fMagellan += 3;
+            }
+
             switch (getType()) {
                 case CARAVEL:
-                    return 4+fMagellan;
+                    return 12+fMagellan;
                 case FRIGATE:
-                    return 6+fMagellan;
+                    return 18+fMagellan;
                 case GALLEON:
-                    return 6+fMagellan;
+                    return 18+fMagellan;
                 case MAN_O_WAR:
-                    return 6+fMagellan;
+                    return 18+fMagellan;
                 case MERCHANTMAN:
-                    return 5+fMagellan;
+                    return 15+fMagellan;
                 case PRIVATEER:
-                    return 8+fMagellan;
+                    return 24+fMagellan;
                 default:
                     logger.warning("Unit.getInitialMovesLeft(): Unit has invalid naval type.");
-                    return 3+fMagellan;
+                    return 9+fMagellan;
             }
         } else {
             if (isMounted()) {
-                return 4;
+                return 12;
             } else if (isMissionary()) {
-                return 2;
+                return 6;
             } else if (getType() == WAGON_TRAIN) {
-                return 2;
+                return 6;
             } else {
-                return 1;
+                return 3;
             }
         }
     }
@@ -1500,7 +1522,26 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     * @return A String representation of this Unit.
     */
     public String toString() {
-        return getName() + " " + movesLeft + "/" + getInitialMovesLeft();
+        return getName() + " " + getMovesAsString();
+    }
+
+
+    public String getMovesAsString() {
+        String moves = "";
+        if (movesLeft/3 > 0) {
+            moves += Integer.toString(movesLeft/3);
+        }
+        
+        if (movesLeft%3 != 0) {
+            if (movesLeft/3 > 0) {
+                moves += " ";
+            }
+
+            moves += "(" + Integer.toString(movesLeft - (movesLeft/3) * 3) + "/3) ";
+        }
+
+        moves += "/" + Integer.toString(getInitialMovesLeft()/3);
+        return moves;
     }
 
 

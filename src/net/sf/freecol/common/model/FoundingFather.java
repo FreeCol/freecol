@@ -54,7 +54,7 @@ public class FoundingFather {
 
                             FATHER_COUNT = 25;
 
-    
+
     public static String getDescription(int foundingFather) {
         return getPrefix(foundingFather) + ".description";
     }
@@ -87,6 +87,138 @@ public class FoundingFather {
             case FATHER_JEAN_DE_BREBEUF: return "foundingFather.fatherJeanDeBrebeuf";
             case JUAN_DE_SEPULVEDA: return "foundingFather.juanDeSepulveda";
             case BARTOLOME_DE_LAS_CASAS: return "foundingFather.bartolmeDeLasCasas";
+            default:
+                throw new IllegalArgumentException("FoundingFather has invalid type.");
+        }
+    }
+    
+    
+    public static int getType(int foundingFather) {
+        switch (foundingFather) {
+            case ADAM_SMITH: return 0;
+            case JACOB_FUGGER: return 0;
+            case PETER_MINUIT: return 0;
+            case PETER_STUYVESANT: return 0;
+            case JAN_DE_WITT: return 0;
+            case FERDINAND_MAGELLAN: return 1;
+            case FRANSICO_DE_CORONADO: return 1;
+            case HERNANDO_DE_SOTO: return 1;
+            case HENRY_HUDSON: return 1;
+            case LA_SALLE: return 1;
+            case HERNAN_CORTES: return 2;
+            case GEORGE_WASHINGTION: return 2;
+            case PAUL_REVERE: return 2;
+            case FRANCIS_DRAKE: return 2;
+            case JOHN_PAUL_JONES: return 2;
+            case THOMAS_JEFFERSON: return 3;
+            case POCAHONTAS: return 3;
+            case THOMAS_PAINE: return 3;
+            case SIMON_BOLIVAR: return 3;
+            case BENJAMIN_FRANKLIN: return 3;
+            case WILLIAM_BREWSTER: return 4;
+            case WILLIAM_PENN: return 4;
+            case FATHER_JEAN_DE_BREBEUF: return 4;
+            case JUAN_DE_SEPULVEDA: return 4;
+            case BARTOLOME_DE_LAS_CASAS: return 4;
+            default:
+                throw new IllegalArgumentException("FoundingFather has invalid type.");
+        }
+    }
+    
+    
+    public static int getWeight1(int foundingFather) {
+        switch (foundingFather) {
+            case ADAM_SMITH: return 2;
+            case JACOB_FUGGER: return 0;
+            case PETER_MINUIT: return 9;
+            case PETER_STUYVESANT: return 2;
+            case JAN_DE_WITT: return 2;
+            case FERDINAND_MAGELLAN: return 2;
+            case FRANSICO_DE_CORONADO: return 3;
+            case HERNANDO_DE_SOTO: return 5;
+            case HENRY_HUDSON: return 10;
+            case LA_SALLE: return 7;
+            case HERNAN_CORTES: return 6;
+            case GEORGE_WASHINGTION: return 0;
+            case PAUL_REVERE: return 10;
+            case FRANCIS_DRAKE: return 4;
+            case JOHN_PAUL_JONES: return 0;
+            case THOMAS_JEFFERSON: return 4;
+            case POCAHONTAS: return 7;
+            case THOMAS_PAINE: return 1;
+            case SIMON_BOLIVAR: return 0;
+            case BENJAMIN_FRANKLIN: return 5;
+            case WILLIAM_BREWSTER: return 7;
+            case WILLIAM_PENN: return 8;
+            case FATHER_JEAN_DE_BREBEUF: return 6;
+            case JUAN_DE_SEPULVEDA: return 3;
+            case BARTOLOME_DE_LAS_CASAS: return 0;
+            default:
+                throw new IllegalArgumentException("FoundingFather has invalid type.");
+        }
+    }
+    
+    
+    public static int getWeight2(int foundingFather) {
+        switch (foundingFather) {
+            case ADAM_SMITH: return 8;
+            case JACOB_FUGGER: return 5;
+            case PETER_MINUIT: return 1;
+            case PETER_STUYVESANT: return 4;
+            case JAN_DE_WITT: return 6;
+            case FERDINAND_MAGELLAN: return 10;
+            case FRANSICO_DE_CORONADO: return 5;
+            case HERNANDO_DE_SOTO: return 10;
+            case HENRY_HUDSON: return 1;
+            case LA_SALLE: return 5;
+            case HERNAN_CORTES: return 5;
+            case GEORGE_WASHINGTION: return 4;
+            case PAUL_REVERE: return 2;
+            case FRANCIS_DRAKE: return 8;
+            case JOHN_PAUL_JONES: return 6;
+            case THOMAS_JEFFERSON: return 5;
+            case POCAHONTAS: return 5;
+            case THOMAS_PAINE: return 2;
+            case SIMON_BOLIVAR: return 4;
+            case BENJAMIN_FRANKLIN: return 5;
+            case WILLIAM_BREWSTER: return 4;
+            case WILLIAM_PENN: return 5;
+            case FATHER_JEAN_DE_BREBEUF: return 6;
+            case JUAN_DE_SEPULVEDA: return 8;
+            case BARTOLOME_DE_LAS_CASAS: return 5;
+            default:
+                throw new IllegalArgumentException("FoundingFather has invalid type.");
+        }
+    }
+    
+    
+    public static int getWeight3(int foundingFather) {
+        switch (foundingFather) {
+            case ADAM_SMITH: return 6;
+            case JACOB_FUGGER: return 8;
+            case PETER_MINUIT: return 1; // 0
+            case PETER_STUYVESANT: return 8;
+            case JAN_DE_WITT: return 10;
+            case FERDINAND_MAGELLAN: return 10;
+            case FRANSICO_DE_CORONADO: return 7;
+            case HERNANDO_DE_SOTO: return 5;
+            case HENRY_HUDSON: return 1; // 0
+            case LA_SALLE: return 3;
+            case HERNAN_CORTES: return 1;
+            case GEORGE_WASHINGTION: return 10;
+            case PAUL_REVERE: return 1;
+            case FRANCIS_DRAKE: return 6;
+            case JOHN_PAUL_JONES: return 7;
+            case THOMAS_JEFFERSON: return 6;
+            case POCAHONTAS: return 3;
+            case THOMAS_PAINE: return 8;
+            case SIMON_BOLIVAR: return 6;
+            case BENJAMIN_FRANKLIN: return 5;
+            case WILLIAM_BREWSTER: return 1;
+            case WILLIAM_PENN: return 2;
+            case FATHER_JEAN_DE_BREBEUF: return 1;
+            case JUAN_DE_SEPULVEDA: return 3;
+            case BARTOLOME_DE_LAS_CASAS: return 10;
             default:
                 throw new IllegalArgumentException("FoundingFather has invalid type.");
         }

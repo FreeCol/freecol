@@ -97,17 +97,16 @@ public final class ServerUnit extends Unit {
                 return;
             case MISSION_EXPLORE: //TODO: Make this something other than wandering.
             case MISSION_WANDER:
-                int i = getMovesLeft();
-                int j = 0;
                 Tile thisTile = this.getTile();
-                while(i > 0) {
-                    int direction = (int) Math.random() * 8;
+                while(getMovesLeft() > 0) {
+                    int direction = (int) (Math.random() * 8);
+                    int j;
                     for (j = 8; j > 0 && ((getGame().getMap().getNeighbourOrNull(direction, thisTile) == null) || (getMoveType(direction) != MOVE)); j--) {
-                        direction = (int) Math.random() * 8;
+                        direction = (int) (Math.random() * 8);
                     }
                     if (j == 0) break;
                     thisTile = getGame().getMap().getNeighbourOrNull(direction, thisTile);
-                    i -= 1; //TODO: account for different movement costs
+
                     // The server side does this -sjm
                     //move(direction);
                     Element moveElement = Message.createNewRootElement("move");

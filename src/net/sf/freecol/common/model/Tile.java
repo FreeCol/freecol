@@ -140,7 +140,7 @@ public final class Tile extends FreeColGameObject implements Location {
 
 
     /**
-    * Gets the distance in tiles between this <code>Tile</code> 
+    * Gets the distance in tiles between this <code>Tile</code>
     * and the specified one.
     *
     * @param tile The <code>Tile</code> to check the distance to.
@@ -188,6 +188,42 @@ public final class Tile extends FreeColGameObject implements Location {
                 return defender;
             } else {
                 return null;
+            }
+        }
+    }
+
+    
+    public int getMoveCost(Tile fromTile) {
+        if (!isLand()) {
+            return 3;
+        }
+
+        if (hasRoad() && fromTile.hasRoad()) {
+            return 1;
+        } else if ((getAddition() == ADD_RIVER_MINOR || getAddition() == ADD_RIVER_MAJOR) &&
+                   (fromTile.getAddition() == ADD_RIVER_MINOR || fromTile.getAddition() == ADD_RIVER_MAJOR)) {
+            return 1;
+        } else if (getType() == ARCTIC) {
+            return 6;
+        } else if (getAddition() == ADD_MOUNTAINS) {
+            return 9;
+        } else if (getAddition() == ADD_HILLS) {
+            return 6;
+        }
+
+        if (!isForested()) {
+            if (getType() == MARSH || getType() == SWAMP) {
+                return 6;
+            } else {
+                return 3;
+            }
+        } else {
+            if (getType() == DESERT) {
+                return 3;
+            } else if (getType() == MARSH || getType() == SWAMP) {
+                return 9;
+            } else {
+                return 6;
             }
         }
     }
@@ -289,7 +325,7 @@ public final class Tile extends FreeColGameObject implements Location {
     * @return 'true' if this Tile has a road.
     */
     public boolean hasRoad() {
-        return road;
+        return road || (getSettlement() != null);
     }
 
 

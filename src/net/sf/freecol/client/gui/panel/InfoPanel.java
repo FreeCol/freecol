@@ -105,7 +105,7 @@ public final class InfoPanel extends JPanel {
         if (unit != null) {
             unitLabel.setIcon(imageProvider.getUnitImageIcon(imageProvider.getUnitGraphicsType(unit)));
             unitNameLabel.setText(unit.getName());
-            unitMovesLabel.setText("Moves: " + unit.getMovesLeft() + "/" + unit.getInitialMovesLeft());
+            unitMovesLabel.setText("Moves: " + unit.getMovesAsString());
             if (unit.isPioneer()) {
                 unitToolsLabel.setText("Tools: " + unit.getNumberOfTools());
             } else {
