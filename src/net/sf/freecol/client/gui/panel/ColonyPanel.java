@@ -511,7 +511,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         */
         public void initialize() {
             removeAll();
-            setLayout(new GridLayout(Building.NUMBER_OF_TYPES, 1));
+            // O row means any number of rows (this makes the look of BuildingsPanel prettier)
+            setLayout(new GridLayout(0, 1));
 
             //Building[] buildings = colony.getBuildings();
 

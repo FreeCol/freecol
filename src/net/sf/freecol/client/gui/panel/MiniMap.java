@@ -144,8 +144,7 @@ public final class MiniMap extends JComponent implements MouseInputListener {
 
                 if (settlement != null) {
                     //There's a Settlement on this tile
-                    //For now, just use orange
-                    g.setColor(Color.ORANGE);
+                    g.setColor(settlement.getOwner().getColor());
                 } else if (units > 0) {
                     //There are units on this tile.
                     g.setColor(tile.getFirstUnit().getOwner().getColor());
