@@ -686,7 +686,9 @@ public final class Building extends FreeColGameObject implements WorkLocation {
     */
     public int getMaximumGoodsInput() {
         int goodsInput = getMaximumProduction();
-        goodsInput *= ((level > SHOP) ? SHOP : level); // Factories don't need the extra 3 units.
+        if (level > SHOP) {
+            goodsInput = (goodsInput * 2) / 3; // Factories don't need the extra 3 units.
+        }
 
         return goodsInput;
     }
