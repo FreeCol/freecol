@@ -4,7 +4,14 @@ package net.sf.freecol.common.networking;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.Socket;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import java.util.logging.Logger;
 import net.sf.freecol.common.FreeColException;
@@ -29,10 +36,11 @@ public class Connection {
     public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
-    
+
     private final PrintWriter out;
     private final InputStream in;
     private final Socket socket;
+    private final Transformer xmlTransformer;
     private final ReceivingThread thread;
     private MessageHandler messageHandler;
 
@@ -44,6 +52,7 @@ public class Connection {
         in = null;
         socket = null;
         thread = null;
+        xmlTransformer = null;
     }
 
     /**
@@ -74,11 +83,21 @@ public class Connection {
         out = new PrintWriter(socket.getOutputStream(), true);
         in = socket.getInputStream();
 
+        Transformer myTransformer;
+        try {
+            TransformerFactory factory = TransformerFactory.newInstance();
+            myTransformer = factory.newTransformer();
+            myTransformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+        }
+        catch (TransformerException e) {
+            e.printStackTrace();
+            myTransformer = null;
+        }
+        xmlTransformer = myTransformer;
+
         thread = new ReceivingThread(this, in);
         thread.start();
     }
-
-
 
 
 
@@ -109,11 +128,11 @@ public class Connection {
         if (socket != null) {
             socket.close();
         }
-        
+
         if (thread != null) {
             thread.stopWorking();
         }
-        
+
         logger.info("Connection closed.");
     }
 
@@ -128,8 +147,31 @@ public class Connection {
     * @see #ask
     */
     public void send(Element element) throws IOException {
-        out.print(element.toString() + '\0');
+        out.print(convertElementToString(element) + '\0');
         out.flush();
+    }
+
+
+    /**
+    * On IBM's JDK version 1.4.2 the Element.toString method doesn't give you
+    * a normal XML string, which is fine because the Sun API docs never said that
+    * it should. On Sun's JDK version 1.5 this is also the case. So now instead
+    * of calling Element.toString you should use this method.
+    *
+    * @param element The Element to convert.
+    * @return The string representation of the given Element without the xml version tag.
+    */
+    private String convertElementToString(Element element) {
+        String xml;
+        try {
+            StringWriter stringWriter = new StringWriter();
+            xmlTransformer.transform(new DOMSource(element), new StreamResult(stringWriter));
+            xml = stringWriter.toString();
+        }
+        catch (TransformerException e) {
+            xml = e.getMessage();
+        }
+        return xml;
     }
 
 
@@ -206,7 +248,7 @@ public class Connection {
         try {
             if (element.getTagName().equals("question")) {
                 String networkReplyId = element.getAttribute("networkReplyId");
-                
+
                 Element reply = messageHandler.handle(this, (Element) element.getFirstChild());
 
                 if (reply == null) {
@@ -222,7 +264,7 @@ public class Connection {
                 send(reply);
             } else {
                 Element reply = messageHandler.handle(this, element);
-                
+
                 if (reply != null) {
                     send(reply);
                 }

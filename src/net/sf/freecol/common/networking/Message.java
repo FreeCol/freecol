@@ -45,18 +45,18 @@ public final class Message {
         this(new InputSource(new StringReader(msg)));
     }
 
-    
+
     /**
-    * Constructs a new Message with data from the given String. The constructor
+    * Constructs a new Message with data from the given InputStreamReader. The constructor
     * to use if this is an INCOMING message.
     */
     public Message(InputStreamReader inputStreamReader) {
         this(new InputSource(inputStreamReader));
     }
-    
-    
+
+
     /**
-    * Constructs a new Message with data from the given String. The constructor
+    * Constructs a new Message with data from the given InputSource. The constructor
     * to use if this is an INCOMING message.
     */
     public Message(InputSource inputSource) {
@@ -82,8 +82,8 @@ public final class Message {
             ioe.printStackTrace();
         }
         document = tempDocument;
-    }    
-    
+    }
+
 
     /**
     * Constructs a new Message with data from the given XML-document.
@@ -94,15 +94,15 @@ public final class Message {
     }
 
 
-    
+
     /**
-    * Gets the current version of the FreeCol protocol.   
+    * Gets the current version of the FreeCol protocol.
     */
     public static String getFreeColProtocolVersion() {
         return FREECOL_PROTOCOL_VERSION;
     }
 
-    
+
     /**
     * Creates and returns a new XML-document.
     * @return the new XML-document.
@@ -132,7 +132,7 @@ public final class Message {
         return createNewDocument().createElement(tagName);
     }
 
-    
+
     /**
     * Creates an error message.
     *
@@ -144,7 +144,7 @@ public final class Message {
     */
     public static Element createError(String messageID, String message) {
         Element errorElement = createNewRootElement("error");
-        
+
         if (messageID != null && !messageID.equals("")) {
             errorElement.setAttribute("messageID", messageID);
         }
@@ -152,7 +152,7 @@ public final class Message {
         if (message != null && !message.equals("")) {
             errorElement.setAttribute("message", message);
         }
-        
+
         return errorElement;
     }
 
@@ -179,7 +179,7 @@ public final class Message {
 
         return new String("invalid");
     }
-    
+
 
     /**
     * Checks if this message is of a given type.
@@ -195,7 +195,7 @@ public final class Message {
             return false;
         }
     }
-    
+
 
     /**
     * Sets an attribute on the root element.
@@ -206,7 +206,7 @@ public final class Message {
     public void setAttribute(String key, String value) {
         document.getDocumentElement().setAttribute(key, value);
     }
-    
+
 
     /**
     * Sets an attribute on the root element.
@@ -218,7 +218,7 @@ public final class Message {
         document.getDocumentElement().setAttribute(key, (new Integer(value)).toString());
     }
 
-    
+
     /**
     * Gets an attribute from the root element.
     * @param key The key of the attribute.
@@ -236,14 +236,14 @@ public final class Message {
         return document.getDocumentElement().hasAttribute(attribute);
     }
 
-    
+
     /**
     * Inserts <code>newRoot</code> as the new root element and appends
     * the old root element.
     */
     public void insertAsRoot(Element newRoot) {
         Element oldRoot = document.getDocumentElement();
-        
+
         if (oldRoot != null) {
             document.removeChild(oldRoot);
             newRoot.appendChild(oldRoot);
