@@ -35,6 +35,7 @@ import javax.swing.UIManager;
 import net.sf.freecol.client.gui.i18n.Messages;
 
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.FreeColClient;
 
 /**
 * This panel gets displayed to the player who have won the game.
@@ -44,6 +45,7 @@ public final class VictoryPanel extends FreeColPanel implements ActionListener {
     private static final int    OK = 0;
 
     private final Canvas    parent;
+    private final FreeColClient freeColClient;
     private JButton         ok = new JButton(Messages.message("victory.yes"));
 
 
@@ -53,9 +55,10 @@ public final class VictoryPanel extends FreeColPanel implements ActionListener {
     * The constructor that will add the items to this panel.
     * @param parent The parent of this panel.
     */
-    public VictoryPanel(Canvas parent) {
+    public VictoryPanel(Canvas parent, FreeColClient freeColClient) {
         super(new FlowLayout(FlowLayout.CENTER, 1000, 10));
         this.parent = parent;
+        this.freeColClient = freeColClient;
         
         setCancelComponent(ok);
 
@@ -100,7 +103,7 @@ public final class VictoryPanel extends FreeColPanel implements ActionListener {
         try {
             switch (Integer.valueOf(command).intValue()) {
                 case OK:
-                    parent.reallyQuit();
+                    freeColClient.quit();
                     break;
                 default:
                     logger.warning("Invalid ActionCommand: invalid number.");

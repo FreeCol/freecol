@@ -104,7 +104,7 @@ public final class InGameInputHandler extends InputHandler {
                 }
             });
         } else {
-            getFreeColClient().getCanvas().reallyQuit();
+            getFreeColClient().quit();
         }
 
         return null;
@@ -293,7 +293,7 @@ public final class InGameInputHandler extends InputHandler {
         if (player == freeColClient.getMyPlayer()) {
             Canvas canvas = freeColClient.getCanvas();
             if (!canvas.showConfirmDialog("defeated.text", "defeated.yes", "defeated.no")) {
-                canvas.reallyQuit();
+                freeColClient.quit();
             }
         }
 

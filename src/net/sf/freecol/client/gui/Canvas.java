@@ -145,7 +145,7 @@ public final class Canvas extends JLayeredPane {
         statusPanel = new StatusPanel(this);
 
         chatPanel = new ChatPanel(this, freeColClient);
-        victoryPanel = new VictoryPanel(this);
+        victoryPanel = new VictoryPanel(this, freeColClient);
         chooseFoundingFatherDialog = new ChooseFoundingFatherDialog(this);
         eventPanel = new EventPanel(this, freeColClient);
 
