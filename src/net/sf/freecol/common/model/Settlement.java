@@ -30,7 +30,7 @@ abstract public class Settlement extends FreeColGameObject implements Location {
         
         this.tile = tile;
 
-        setOwner(owner);
+        this.owner = owner;
     }
 
     

@@ -65,6 +65,35 @@ public final class PreGameController {
         freeColClient.getClient().send(readyElement);
     }
 
+    /**
+    * Sets this client's player's nation.
+    * @param nation Which nation this player wishes to set.
+    */
+    public void setNation(String nation) {
+        // Make the change:
+        freeColClient.getMyPlayer().setNation(nation);
+
+        // Inform the server:
+        Element nationElement = Message.createNewRootElement("setNation");
+        nationElement.setAttribute("value", nation);
+
+        freeColClient.getClient().send(nationElement);
+    }
+    
+    /**
+    * Sets this client's player's color.
+    * @param color Which color this player wishes to set.
+    */
+    public void setColor(String color) {
+        // Make the change:
+        freeColClient.getMyPlayer().setColor(color);
+
+        // Inform the server:
+        Element colorElement = Message.createNewRootElement("setColor");
+        colorElement.setAttribute("value", color);
+
+        freeColClient.getClient().send(colorElement);
+    }
 
     /**
     * Requests the game to be started. This will only be successful

@@ -141,6 +141,14 @@ public class UnitContainer extends FreeColGameObject {
         return amount + getUnitCount();
     }
 
+    /**
+    * Gets a clone of the <code>units</code> array.
+    *
+    * @return The clone.
+    */
+    public ArrayList getUnitsClone() {
+        return (ArrayList)units.clone();
+    }
 
     /**
     * Gets an <code>Iterator</code> of every <code>Unit</code> in this

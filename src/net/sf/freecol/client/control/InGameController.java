@@ -126,7 +126,7 @@ public final class InGameController {
 
         switch (move) {
             case Unit.MOVE:             reallyMove(unit, direction); break;
-            //case Unit.ATTACK:         attack(unit, direction); break;
+            case Unit.ATTACK:           attack(unit, direction); break;
             case Unit.DISEMBARK:        disembark(unit, direction); break;
             case Unit.EMBARK:           embark(unit, direction); break;
             case Unit.MOVE_HIGH_SEAS:   moveHighSeas(unit, direction); break;
@@ -171,7 +171,26 @@ public final class InGameController {
         Element reply = client.ask(moveElement);
         freeColClient.getInGameInputHandler().handle(client.getConnection(), reply);
     }
+    
+    /**
+    * Performs an attack in a specified direction. Note that the server
+    * handles the attack calculations here.
+    *
+    * @param unit The unit to perform the attack.
+    * @param direction The direction in which to attack.
+    */
+    private void attack(Unit unit, int direction) {
+        Client client = freeColClient.getClient();
 
+        // Inform the server:
+        Element attackElement = Message.createNewRootElement("attack");
+        attackElement.setAttribute("unit", unit.getID());
+        attackElement.setAttribute("direction", Integer.toString(direction));
+
+        //client.send(moveElement);
+        Element reply = client.ask(attackElement);
+        freeColClient.getInGameInputHandler().handle(client.getConnection(), reply);
+    }
 
     /**
      * Disembarks the specified unit in a specified direction.

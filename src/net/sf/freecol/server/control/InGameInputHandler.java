@@ -6,6 +6,7 @@ import java.net.Socket;
 import java.util.Vector;
 import java.util.logging.Logger;
 import java.util.Iterator;
+import java.util.Random;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -31,8 +32,8 @@ public final class InGameInputHandler implements MessageHandler {
     private static Logger logger = Logger.getLogger(InGameInputHandler.class.getName());
 
     private FreeColServer freeColServer;
-
-
+                     
+    public static Random attackCalculator;
 
     /**
     * The constructor to use.
@@ -40,6 +41,7 @@ public final class InGameInputHandler implements MessageHandler {
     */
     public InGameInputHandler(FreeColServer freeColServer) {
         this.freeColServer = freeColServer;
+        attackCalculator = new Random();
     }
 
 
@@ -61,6 +63,8 @@ public final class InGameInputHandler implements MessageHandler {
             if (freeColServer.getGame().getCurrentPlayer().equals(freeColServer.getPlayer(connection))) {
                 if (type.equals("move")) {
                     reply = move(connection, element);
+                } else if (type.equals("attack")) {
+                    reply = attack(connection, element);
                 } else if (type.equals("embark")) {
                     reply = embark(connection, element);
                 } else if (type.equals("boardShip")) {
@@ -173,6 +177,91 @@ public final class InGameInputHandler implements MessageHandler {
         return reply;
     }
 
+    /**
+    * Handles an "attack"-message from a client.
+    *
+    * @param connection The connection the message came from.
+    * @param moveElement The element containing the request.
+    * @exception IllegalArgumentException If the data format of the message is invalid.
+    * @exception IllegalStateException If the request is not accepted by the model.
+    *
+    */
+    private Element attack(Connection connection, Element attackElement) {
+        Game game = freeColServer.getGame();
+
+        ServerPlayer player = freeColServer.getPlayer(connection);
+
+        Unit unit = (Unit) game.getFreeColGameObject(attackElement.getAttribute("unit"));
+        int direction = Integer.parseInt(attackElement.getAttribute("direction"));
+        
+        Unit defender = null;
+
+        if (unit == null) {
+            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: " + attackElement.getAttribute("unit"));
+        }
+
+        Tile oldTile = unit.getTile();
+        Tile newTile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
+        if (newTile == null) {
+            throw new IllegalArgumentException("Could not find tile in direction " + direction + " from unit with ID " + attackElement.getAttribute("unit"));
+        }
+        defender = newTile.getDefendingUnit(unit);
+        if (defender == null) {
+            throw new IllegalStateException("Nothing to attack in direction " + direction + " from unit with ID " + attackElement.getAttribute("unit"));
+        }
+        
+        int attack_power = unit.getOffensePower(defender);
+        int total_probability = attack_power + defender.getDefensePower(unit);
+        int result = Unit.ATTACKER_LOSS; // Assume this until otherwise calculated.
+        if ((attackCalculator.nextInt(total_probability)) <= attack_power) {
+            // Win.
+            result = Unit.ATTACKER_WIN;
+            unit.winAttack(defender);
+        } // Loss code is later, when unit is no longer needed.
+
+        Iterator enemyPlayerIterator = game.getPlayerIterator();
+        while (enemyPlayerIterator.hasNext()) {
+            ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
+
+            if (player.equals(enemyPlayer)) {
+                continue;
+            }
+
+            Element opponentAttackElement = Message.createNewRootElement("opponentAttack");
+            opponentAttackElement.setAttribute("direction", Integer.toString(direction));
+            opponentAttackElement.setAttribute("result", Integer.toString(result));
+            opponentAttackElement.setAttribute("unit", unit.getID());
+
+            try {
+                enemyPlayer.getConnection().send(opponentAttackElement);
+            } catch (IOException e) {
+                logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection " + enemyPlayer.getConnection());
+            }
+        }
+
+        Element reply = Message.createNewRootElement("attackResult");
+        reply.setAttribute("direction", Integer.toString(direction));
+        reply.setAttribute("result", Integer.toString(result));
+        reply.setAttribute("unit", unit.getID());
+        if (unit.getTile().equals(newTile)) { // In other words, we moved...
+            Element update = reply.getOwnerDocument().createElement("update");
+            Vector surroundingTiles = game.getMap().getSurroundingTiles(unit.getTile(), unit.getLineOfSight());
+
+            for (int i=0; i<surroundingTiles.size(); i++) {
+                Tile t = (Tile) surroundingTiles.get(i);
+                player.setExplored(t);
+                update.appendChild(t.toXMLElement(player, update.getOwnerDocument()));
+            }
+        
+            reply.appendChild(update);
+        }
+
+        // This is down here do it doesn't interfere with other unit code.
+        if (result == Unit.ATTACKER_LOSS) {
+            unit.loseAttack();
+        }
+        return reply;
+    }
 
     /**
     * Handles an "embark"-message from a client.

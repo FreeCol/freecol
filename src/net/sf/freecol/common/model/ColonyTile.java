@@ -1,6 +1,7 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
 import java.util.Vector;
 import java.util.Iterator;
 import java.util.logging.Logger;
@@ -185,7 +186,9 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation {
 
 
     public Iterator getUnitIterator() {
-        throw new UnsupportedOperationException();
+        ArrayList units = new ArrayList();
+        units.add(getUnit());
+        return units.iterator();
     }
 
 

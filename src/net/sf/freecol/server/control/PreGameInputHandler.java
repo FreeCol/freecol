@@ -60,6 +60,10 @@ public final class PreGameInputHandler implements MessageHandler {
         if (element != null) {
             if (type.equals("ready")) {
                 reply = ready(connection, element);
+            } else if (type.equals("setNation")) {
+                reply = nation(connection, element);
+            } else if (type.equals("setColor")) {
+                reply = color(connection, element);
             } else if (type.equals("requestLaunch")) {
                 reply = requestLaunch(connection, element);
             } else if (type.equals("chat")) {
@@ -97,6 +101,57 @@ public final class PreGameInputHandler implements MessageHandler {
         return null;
     }
     
+    /**
+    * Handles a "nation"-message from a client.
+    *
+    * @param connection The connection the message came from.
+    * @param element The element containing the request.
+    */
+    private Element nation(Connection connection, Element element) {
+
+        ServerPlayer player = freeColServer.getPlayer(connection);
+
+        if (player != null) {
+            String nation = element.getAttribute("value");
+            player.setNation(nation);
+
+            Element updateNation = Message.createNewRootElement("updateNation");
+            updateNation.setAttribute("player", player.getID());
+            updateNation.setAttribute("value", nation);
+
+            freeColServer.getServer().sendToAll(updateNation, player.getConnection());
+        } else {
+            logger.warning("Nation from unknown connection.");
+        }
+
+        return null;
+    }
+    
+    /**
+    * Handles a "color"-message from a client.
+    *
+    * @param connection The connection the message came from.
+    * @param element The element containing the request.
+    */
+    private Element color(Connection connection, Element element) {
+
+        ServerPlayer player = freeColServer.getPlayer(connection);
+
+        if (player != null) {
+            String color = element.getAttribute("value");
+            player.setColor(color);
+
+            Element updateColor = Message.createNewRootElement("updateColor");
+            updateColor.setAttribute("player", player.getID());
+            updateColor.setAttribute("value", color);
+
+            freeColServer.getServer().sendToAll(updateColor, player.getConnection());
+        } else {
+            logger.warning("Color from unknown connection.");
+        }
+
+        return null;
+    }
 
     /**
     * Handles a "requestLaunch"-message from a client.

@@ -167,20 +167,13 @@ public final class PreGameInputHandler implements MessageHandler {
     * @param element The element (root element in a DOM-parsed XML tree) that
     *                holds all the information.
     */
-    private Element updateNation(Element element) {
-        /*if (!element.hasAttribute("username") || !element.hasAttribute("nation")) {
-             throw new FreeColException("Invalid message format.");
-        }
+    private Element updateNation(Element element) {        
+        Game game = freeColClient.getGame();
 
-        String username = element.getAttribute("username");
-        String nation = Player.nationToString(Integer.parseInt(element.getAttribute("nation")));
+        Player player = (Player) game.getFreeColGameObject(element.getAttribute("player"));
+        String nation = element.getAttribute("nation");
 
-        try {
-            canvas.getMultiplayerPanel().setNation(username, nation);
-        } catch (FreeColException e) {
-            e.printStackTrace();
-        }
-        */
+        player.setNation(nation);
         return null;
     }
     
@@ -192,19 +185,12 @@ public final class PreGameInputHandler implements MessageHandler {
     *                holds all the information.
     */
     private Element updateColor(Element element) {
-        /*if (!element.hasAttribute("username") || !element.hasAttribute("color")) {
-             throw new FreeColException("Invalid message format.");
-        }
-        
-        String username = element.getAttribute("username");
-        Color color = new Color(Integer.parseInt(element.getAttribute("color")));
+        Game game = freeColClient.getGame();
 
-        try {
-            canvas.getMultiplayerPanel().setColor(username, color);
-        } catch (FreeColException e) {
-            e.printStackTrace();
-        }
-        */
+        Player player = (Player) game.getFreeColGameObject(element.getAttribute("player"));
+        String color = element.getAttribute("color");
+
+        player.setColor(color);
         return null;
 
     }

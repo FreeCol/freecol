@@ -4,6 +4,7 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
 import java.util.Vector;
 import java.util.Iterator;
 import java.util.logging.Logger;
@@ -143,10 +144,10 @@ public final class Tile extends FreeColGameObject implements Location {
     public Unit getDefendingUnit(Unit attacker) {
         Iterator unitIterator = getUnitIterator();
 
-        Unit defender;
+        Unit defender = null;
         if (unitIterator.hasNext()) {
             defender = (Unit) unitIterator.next();
-        } else {
+        } else if (settlement == null) {
             return null;
         }
 
@@ -157,7 +158,17 @@ public final class Tile extends FreeColGameObject implements Location {
                 defender = nextUnit;
             }
         }
-
+        
+        if (settlement != null) {
+            Unit settlementDefender = null;
+            if (settlement instanceof Colony) {
+                settlementDefender = ((Colony)settlement).getDefendingUnit(attacker);
+            }
+            if ((settlementDefender != null) && ((defender == null) || (settlementDefender.getDefensePower(attacker) > defender.getDefensePower(attacker)))) {
+                defender = settlementDefender;
+            }
+        }
+        
         return defender;
     }
 
@@ -553,6 +564,9 @@ public final class Tile extends FreeColGameObject implements Location {
     * @return The amount of units at this <code>Location</code>.
     */
     public int getUnitCount() {
+        if (settlement != null) {
+            return settlement.getUnitCount() + unitContainer.getUnitCount();
+        }
         return unitContainer.getUnitCount();
     }
 
@@ -568,6 +582,14 @@ public final class Tile extends FreeColGameObject implements Location {
         return unitContainer.getUnitIterator();
     }
 
+    /**
+    * Gets a clone of the UnitContainer's <code>units</code> array.
+    *
+    * @return The clone.
+    */
+    public ArrayList getUnitsClone() {
+        return unitContainer.getUnitsClone();
+    }
     
     /**
     * Checks wether or not the specified locatable may be added to this
@@ -604,7 +626,7 @@ public final class Tile extends FreeColGameObject implements Location {
           {{3,2}, {0,0}, {0,0}, {0,0}, {0,3}, {0,4}, {2,1}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Tundra
           {{0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Arctic
           {{4,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Ocean
-          {{4,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}   // High seas
+          {{4,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}  // High seas
       };
       
       int basepotential = potentialtable[type][goods][(forested ? 1 : 0)];

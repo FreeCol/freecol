@@ -241,34 +241,10 @@ public final class StartGamePanel extends JPanel implements ActionListener {
                 case MAPSIZE:
                     break;
                 case NATION:
-                    /*if ((player != null) && (client != null)) {
-                        try {
-                            int n = Player.stringToNation(((String)nation.getSelectedItem()).toLowerCase());
-                            player.setNation(n);
-                            client.setNation(n);
-                        }
-                        catch (FreeColException e) {
-                            e.printStackTrace();
-                        }
-                        catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }*/
+                    freeColClient.getPreGameController().setNation(((String)nation.getSelectedItem()).toLowerCase());
                     break;
                 case COLOR:
-                    /*if ((player != null) && (client != null)) {
-                        try {
-                            Color c = Player.stringToColor(((String)color.getSelectedItem()).toLowerCase());
-                            player.setColor(c);
-                            client.setColor((String)color.getSelectedItem());
-                        }
-                        catch (FreeColException e) {
-                            e.printStackTrace();
-                        }
-                        catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }*/
+                    freeColClient.getPreGameController().setColor(((String)color.getSelectedItem()).toLowerCase());
                     break;
                 case READY:
                     freeColClient.getPreGameController().setReady(readyBox.isSelected());

@@ -305,6 +305,21 @@ public class Player extends FreeColGameObject {
         nation = n;
     }
 
+    /**
+    * Sets the nation for this player.
+    * @param n The new nation for this player.
+    */
+    public void setNation(String n) {
+        if (n.toLowerCase().equals("dutch")) {
+            setNation(DUTCH);
+        } else if (n.toLowerCase().equals("english")) {
+            setNation(ENGLISH);
+        } else if (n.toLowerCase().equals("french")) {
+            setNation(FRENCH);
+        } else if (n.toLowerCase().equals("spanish")) {
+            setNation(SPANISH);
+        }
+    }
 
     /**
     * Sets the color for this player.
@@ -314,6 +329,35 @@ public class Player extends FreeColGameObject {
         color = c;
     }
 
+    /**
+    * Sets the color for this player.
+    * @param c The new color for this player.
+    */
+    public void setColor(String c) {
+        if (c.toLowerCase().equals("black")) {
+            setColor(Color.BLACK);
+        } else if (c.toLowerCase().equals("blue")) {
+            setColor(Color.BLUE);
+        } else if (c.toLowerCase().equals("cyan")) {
+            setColor(Color.CYAN);
+        } else if (c.toLowerCase().equals("gray")) {
+            setColor(Color.GRAY);
+        } else if (c.toLowerCase().equals("green")) {
+            setColor(Color.GREEN);
+        } else if (c.toLowerCase().equals("magenta")) {
+            setColor(Color.MAGENTA);
+        } else if (c.toLowerCase().equals("orange")) {
+            setColor(Color.ORANGE);
+        } else if (c.toLowerCase().equals("pink")) {
+            setColor(Color.PINK);
+        } else if (c.toLowerCase().equals("red")) {
+            setColor(Color.RED);
+        } else if (c.toLowerCase().equals("white")) {
+            setColor(Color.WHITE);
+        } else if (c.toLowerCase().equals("yellow")) {
+            setColor(Color.YELLOW);
+        }
+    }
 
     /**
     * Checks if this <code>Player</code> is ready to start the game.

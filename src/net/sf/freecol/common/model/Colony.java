@@ -95,7 +95,36 @@ public final class Colony extends Settlement implements Location {
     }
 
 
-
+    /**
+    * Sets the owner of this <code>Colony</code>, including all units within.
+    *
+    * @param owner The <code>Player</code> that shall own this <code>Settlement</code>.
+    * @see #getOwner
+    */
+    public void setOwner(Player owner) {
+        this.owner = owner;
+        
+        Iterator i = getWorkLocationIterator();
+        ArrayList units = new ArrayList();
+        while (i.hasNext()) {
+            WorkLocation w = (WorkLocation) i.next();
+            if (w instanceof Building) {
+                Iterator unitIterator = w.getUnitIterator();
+                while (unitIterator.hasNext()) {
+                    Unit unit = (Unit)unitIterator.next();
+                    units.add(unit);
+                }
+            } else if (w instanceof ColonyTile) {
+                Unit unit = ((ColonyTile)w).getUnit();
+                if (unit != null) units.add(unit);
+            }
+        }
+        
+        Iterator unitIterator = units.iterator();
+        while (unitIterator.hasNext()) {
+            ((Unit)unitIterator.next()).setOwner(owner);
+        }
+    }
 
 
     /**
@@ -337,7 +366,48 @@ public final class Colony extends Settlement implements Location {
     public boolean canAdd(Locatable locatable) {
         throw new UnsupportedOperationException();
     }
+    
+    /**
+    * Gets the <code>Unit</code> that is currently defending this <code>Colony</code>.
+    * @param attacker The target that would be attacking this colony.
+    * @return The <code>Unit</code> that has been choosen to defend this colony.
+    */
+    public Unit getDefendingUnit(Unit attacker) {
+        Iterator i = getWorkLocationIterator();
+        ArrayList units = new ArrayList();
+        while (i.hasNext()) {
+            WorkLocation w = (WorkLocation) i.next();
+            if (w instanceof Building) {
+                Iterator unitIterator = w.getUnitIterator();
+                while (unitIterator.hasNext()) {
+                    Unit unit = (Unit)unitIterator.next();
+                    units.add(unit);
+                }
+            } else if (w instanceof ColonyTile) {
+                Unit unit = ((ColonyTile)w).getUnit();
+                if (unit != null) units.add(unit);
+            }
+        }
+        
+        Iterator unitIterator = units.iterator();
+        
+        Unit defender = null;
+        if (unitIterator.hasNext()) {
+            defender = (Unit) unitIterator.next();
+        } else {
+            return null;
+        }
 
+        while (unitIterator.hasNext()) {
+            Unit nextUnit = (Unit) unitIterator.next();
+
+            if (nextUnit.getDefensePower(attacker) > defender.getDefensePower(attacker)) {
+                defender = nextUnit;
+            }
+        }
+        
+        return defender;
+    }
 
     /**
     * Gets a string representation of the Colony. Currently this method

@@ -92,7 +92,8 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
                             DISEMBARK = 4,
                             ILLEGAL_MOVE = 5;
 
-
+    public static final int ATTACKER_LOSS = 0,
+                            ATTACKER_WIN  = 1;
 
     private int             type;
     private boolean         armed,
@@ -747,9 +748,14 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
 
     /**
     * Sets the armed attribute of this unit.
-    * @param <i>true</i> if this unit should be armed and <i>false</i> otherwise.
+    * @param b <i>true</i> if this unit should be armed and <i>false</i> otherwise.
+    * @param isCombat Whether this is a result of combat.
     */
-    public void setArmed(boolean b) {
+    public void setArmed(boolean b, boolean isCombat) {
+        if (isCombat) {
+            armed = b; // No questions asked.
+            return;
+        }
         if ((b) && (!armed)) {
             if (getGoodsDumpLocation() != null) {
                 if (getGoodsDumpLocation().getGoodsCount(Goods.MUSKETS) < 50) {
@@ -779,6 +785,13 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
         }
     }
 
+    /**
+    * Sets the armed attribute of this unit.
+    * @param b <i>true</i> if this unit should be armed and <i>false</i> otherwise.
+    */
+    public void setArmed(boolean b) {
+        setArmed(b, false);
+    }
 
     /**
     * Checks if this <code>Unit</code> is currently armed.
@@ -792,8 +805,13 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
     /**
     * Sets the mounted attribute of this unit.
     * @param <i>true</i> if this unit should be mounted and <i>false</i> otherwise.
+    * @param isCombat Whether this is a result of combat.
     */
-    public void setMounted(boolean b) {
+    public void setMounted(boolean b, boolean isCombat) {
+        if (isCombat) {
+            mounted = b; // No questions asked.
+            return;
+        }
         if ((b) && (!mounted)) {
             if (getGoodsDumpLocation() != null) {
                if (getGoodsDumpLocation().getGoodsCount(Goods.HORSES) < 50) return;
@@ -815,6 +833,14 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
                 getGame().getMarket().sell(g, getOwner());
             }
         }
+    }
+    
+    /**
+    * Sets the mounted attribute of this unit.
+    * @param b <i>true</i> if this unit should be mounted and <i>false</i> otherwise.
+    */
+    public void setMounted(boolean b) {
+        setMounted(b, false);
     }
 
 
@@ -948,6 +974,13 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
         return owner;
     }
 
+    /**
+    * Sets the owner of this Unit.
+    * @parm type The new owner of this Unit.
+    */
+    public void setOwner(Player owner) {
+        this.owner = owner;
+    }
 
     /**
     * Gets the nation the unit is serving. One of {DUTCH , ENGLISH, FRENCH,
@@ -968,6 +1001,13 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
         return type;
     }
 
+    /**
+    * Sets the type of the unit.
+    * @parm type The new type of the unit.
+    */
+    public void setType(int type) {
+        this.type = type;
+    }
 
     /**
     * Checks if this unit is of a given type.
@@ -1861,6 +1901,100 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
           }
         }
         return modified_power;
+    }
+    
+    /**
+    * Carries out the winning of an attack.
+    * @param defender The target of the attack.
+    */
+    public void winAttack(Unit defender) {
+        Tile newTile = defender.getTile();
+        movesLeft = 0;
+        if (defender.getType() == BRAVE) {
+            defender.dispose();
+            if (newTile.getSettlement() != null) {
+                if (newTile.getSettlement().getUnitCount() <= 0) {
+                    //TODO: Burn the camp. Get treasure.
+                    newTile.getSettlement().dispose();
+                    setLocation(newTile);
+                }
+            } else {
+                Iterator unitIterator = newTile.getUnitIterator();
+                while (unitIterator.hasNext()) {
+                    ((Unit)unitIterator.next()).dispose();
+                }
+            }            
+        } else if (isNaval()) {
+            //TODO: seizure of cargo and the like. For now just sink.
+            defender.dispose();
+        } else if (!(defender.isArmed()) && !(defender.getType() == ARTILLERY) && !(defender.getType() == DAMAGED_ARTILLERY)) {
+            if (defender.isMounted()) {
+                defender.dispose(); // Scouts die if they lose.
+            }
+            Colony targetcolony = null;
+            boolean captureColony = ((newTile.getSettlement() != null) && (newTile.getSettlement() instanceof Colony));
+            if (captureColony) {
+                targetcolony = (Colony)(newTile.getSettlement());
+                targetcolony.setOwner(getOwner()); // This also changes over all of the units...
+                setLocation(newTile);
+            }
+            // Colonists get captured if they lose.
+            Iterator unitIterator = newTile.getUnitsClone().iterator();
+            while (unitIterator.hasNext()) {
+                Unit target = (Unit)unitIterator.next();
+                target.setOwner(getOwner());
+                if (!captureColony) target.setLocation(getTile());
+            }
+        } else {
+            if (defender.isMounted()) {
+                defender.setMounted(false, true);
+                if (getType() == BRAVE) {
+                   //TODO: don't always do this. Have some random chance.
+                   setMounted(true, true);
+                }
+            } else if ((defender.getType() == ARTILLERY)) {
+                defender.setType(DAMAGED_ARTILLERY);
+            } else if ((defender.getType() == KINGS_REGULAR) || (defender.getType() == DAMAGED_ARTILLERY)) {
+                defender.dispose();
+            } else {
+                defender.setArmed(false, true);
+                if (getType() == BRAVE) {
+                   //TODO: don't always do this. Have some random chance.
+                   setArmed(true, true);
+                }
+            }
+        }
+    }
+
+    /**
+    * Carries out the loss of an attack.
+    */
+    public void loseAttack() {
+        movesLeft = 0;
+        if (getType() == BRAVE) {
+            dispose();
+            return; // Do NOT try to go any further!
+        } else if (isNaval()) {
+            //TODO: evasion and the like. For now just sink.
+            dispose();
+            return; // Do NOT try to go any further!    
+        } else if (!(isArmed()) && !(getType() == ARTILLERY) && !(getType() == DAMAGED_ARTILLERY)) {
+            dispose(); // Only scouts should ever reach this point. Nobody else should be able to attack.
+            return; // Do NOT try to go any further!
+        } else {
+            if (isMounted()) {
+                setMounted(false, true);
+            } else if (getType() == ARTILLERY) {
+                setType(DAMAGED_ARTILLERY);
+            } else if ((getType() == KINGS_REGULAR) || (getType() == DAMAGED_ARTILLERY)) {
+                dispose();
+                return; // Do NOT try to go any further!
+            } else {
+                setArmed(false, true);
+            }
+        }
+        
+        return;
     }
 
 
