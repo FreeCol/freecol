@@ -444,6 +444,7 @@ public class MapGenerator {
                             }
                         }
                         
+                        // Terrain bonus:
                         if (tileType.nextInt(10) == 0 && (t.getType() != Tile.ARCTIC && (t.getType() != Tile.TUNDRA || t.isForested())
                                 && t.getType() != Tile.HIGH_SEAS && t.getType() != Tile.DESERT && t.getType() != Tile.MARSH
                                 && t.getType() != Tile.SWAMP || t.getAddition() == Tile.ADD_MOUNTAINS || t.getAddition() == Tile.ADD_HILLS)) {
@@ -452,14 +453,17 @@ public class MapGenerator {
                     } else {
                         t = new Tile(game, Tile.OCEAN, i, j);
                         
-                        if (tileType.nextInt(10) == 0) {
-                            for (int k=0; k<8; k++) {
-                                Position mp = getAdjacent(t.getPosition(), k);
-                                if (isValid(mp) && landMap[mp.getX()][mp.getY()]) {
-                                    t.setBonus(true);
-                                    break;
-                                }
+                        // Terrain bonus:
+                        int adjacentLand = 0;
+                        for (int k=0; k<8; k++) {
+                            Position mp = getAdjacent(t.getPosition(), k);
+                            if (isValid(mp) && landMap[mp.getX()][mp.getY()]) {
+                                adjacentLand++;
                             }
+                        }                                                
+                        
+                        if (adjacentLand > 1 && tileType.nextInt(10 - adjacentLand) == 0) {
+                            t.setBonus(true);
                         }
                     }
 

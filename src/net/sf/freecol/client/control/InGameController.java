@@ -142,7 +142,7 @@ public final class InGameController {
         }
     }
 
-
+    
     /**
     * Uses the active unit to build a colony.
     */

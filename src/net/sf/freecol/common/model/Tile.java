@@ -894,10 +894,8 @@ public final class Tile extends FreeColGameObject implements Location {
     * The defense/ambush bonus of this tile.
     * @return The defense modifier (in percent) of this tile.
     */
-    public int defenseBonus ()
-    {
-        int defenseTable[][] =
-        {
+    public int defenseBonus () {
+        int defenseTable[][] = {
             { 0, 0}, // Unexp
             { 0,50}, // Plains
             { 0,50}, // Grasslands

@@ -2580,7 +2580,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         if (base == 0) {
             return 0;
         }
-
+        
         //base += getTile().getColony().getProductionBonus();
         return Math.max(base, 1);
     }
