@@ -53,10 +53,13 @@ public class ServerPlayer extends Player {
     /** The connection for this player. */
     private Connection connection;
 
+    private boolean connected = true;
+
     /** Stores information about which tiles this player has explored. */
     private boolean[][] exploredTiles;
 
     private boolean[][] canSeeTiles = null;
+
 
 
 
@@ -98,6 +101,16 @@ public class ServerPlayer extends Player {
 
         resetExploredTiles(getGame().getMap());
         resetCanSeeTiles();
+    }
+
+
+    public boolean isConnected() {
+        return connected;
+    }
+    
+    
+    public void setConnected(boolean connected) {
+        this.connected = connected;
     }
 
 

@@ -39,7 +39,6 @@ public final class ConnectController {
     */
     public ConnectController(FreeColClient freeColClient) {
         this.freeColClient = freeColClient;
-        //this.canvas = canvas;
     }
 
 
@@ -51,6 +50,10 @@ public final class ConnectController {
     * @param port The port in which the server should listen for new clients.
     */
     public void startMultiplayerGame(String username, int port) {
+        if (freeColClient.isLoggedIn()) {
+            logout(true);
+        }
+
         if (freeColClient.getFreeColServer() != null && freeColClient.getFreeColServer().getServer().getPort() == port) {
             if (freeColClient.getCanvas().showConfirmDialog("stopServer.text", "stopServer.yes", "stopServer.no")) {
                 freeColClient.getFreeColServer().getController().shutdown();
@@ -77,6 +80,10 @@ public final class ConnectController {
     * @param username The name to use when logging in.
     */
     public void startSingleplayerGame(String username) {
+        if (freeColClient.isLoggedIn()) {
+            logout(true);
+        }
+
         // TODO-MUCH-LATER: connect client/server directly (not using network-classes)
         int port = 3541;
 
@@ -112,8 +119,12 @@ public final class ConnectController {
     * @param port The port to use when connecting to the host.
     */
     public void joinMultiplayerGame(String username, String host, int port) {
+        if (freeColClient.isLoggedIn()) {
+            logout(true);
+        }
+
         freeColClient.setSingleplayer(false);
-        if (login(username, host, port)) {
+        if (login(username, host, port) && !freeColClient.getGUI().isInGame()) {
             freeColClient.getCanvas().showStartGamePanel(freeColClient.getGame(), freeColClient.getMyPlayer(), false);
         }
     }
@@ -129,6 +140,8 @@ public final class ConnectController {
     */
     private boolean login(String username, String host, int port) {
         Client client = freeColClient.getClient();
+        Canvas canvas = freeColClient.getCanvas();
+
         if (client != null) {
             client.disconnect();
         }
@@ -136,10 +149,10 @@ public final class ConnectController {
         try {
             client = new Client(host, port, freeColClient.getPreGameInputHandler());
         } catch (ConnectException e) {
-            freeColClient.getCanvas().errorMessage("server.couldNotConnect");
+            canvas.errorMessage("server.couldNotConnect");
             return false;
         } catch (IOException e) {
-            freeColClient.getCanvas().errorMessage("server.couldNotConnect");
+            canvas.errorMessage("server.couldNotConnect");
             return false;
         }
 
@@ -161,8 +174,17 @@ public final class ConnectController {
 
             freeColClient.setGame(game);
             freeColClient.setMyPlayer(thisPlayer);
+
+            // If (true) --> reconnect
+            if (reply.hasAttribute("startGame") && Boolean.valueOf(reply.getAttribute("startGame")).booleanValue()) {
+                freeColClient.setSingleplayer(false);
+                freeColClient.getPreGameController().startGame();
+
+                if (Boolean.valueOf(reply.getAttribute("isCurrentPlayer")).booleanValue()) {
+                    freeColClient.getInGameController().setCurrentPlayer(thisPlayer);
+                }
+            }
         } else if (type.equals("error")) {
-            Canvas canvas = freeColClient.getCanvas();
             if (reply.hasAttribute("messageID")) {
                 canvas.errorMessage(reply.getAttribute("messageID"), reply.getAttribute("message"));
             } else {
@@ -188,7 +210,7 @@ public final class ConnectController {
     * For example: if the server kicked us out then we don't need to confirm with a logout
     * message.
     */
-    private void logout(boolean notifyServer) {
+    public void logout(boolean notifyServer) {
         if (notifyServer) {
             Element logoutMessage = Message.createNewRootElement("logout");
             logoutMessage.setAttribute("reason", "User has quit the client.");

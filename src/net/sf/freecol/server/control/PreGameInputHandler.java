@@ -62,6 +62,8 @@ public final class PreGameInputHandler extends InputHandler {
                 reply = logout(connection, element);
             } else if (type.equals("chat")) {
                 reply = chat(connection, element);
+            } else if (type.equals("disconnect")) {
+                reply = disconnect(connection, element);
             }
         }
 

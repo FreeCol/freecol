@@ -1094,6 +1094,11 @@ public final class GUI {
         this.inGame = inGame;
     }
 
+    
+    public boolean isInGame() {
+        return inGame;
+    }
+
 
     /**
      * Checks if the Tile/Units at the given coordinates are displayed

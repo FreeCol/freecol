@@ -230,36 +230,12 @@ public final class InGameInputHandler extends InputHandler {
 
         Player currentPlayer = (Player) game.getFreeColGameObject(setCurrentPlayerElement.getAttribute("player"));
 
-        game.setCurrentPlayer(currentPlayer);
-
-        if (freeColClient.getMyPlayer().equals(currentPlayer)) {
-            removeUnitsOutsideLOS();
-            freeColClient.getCanvas().setEnabled(true);
-            freeColClient.getCanvas().closeMenus();
-            if (currentPlayer.checkEmigrate()) {
-                freeColClient.getInGameController().emigrateUnitInEurope((int) ((Math.random() * 3) + 1));
-            }
-            freeColClient.getInGameController().nextActiveUnit();
-        }
+        freeColClient.getInGameController().setCurrentPlayer(currentPlayer);
 
         return null;
     }
 
-
-    private void removeUnitsOutsideLOS() {
-        Player player = getFreeColClient().getMyPlayer();
-        Map map = getFreeColClient().getGame().getMap();
-
-        Iterator tileIterator = map.getWholeMapIterator();
-        while (tileIterator.hasNext()) {
-            Tile t = map.getTile((Map.Position) tileIterator.next());
-            if (t != null && !player.canSee(t) && t.getFirstUnit() != null) {
-                t.disposeAllUnits();
-            }
-        }
-    }
-
-
+    
     /**
     * Handles an "emigrateUnitInEuropeConfirmed"-message.
     *
@@ -275,6 +251,7 @@ public final class InGameInputHandler extends InputHandler {
         return null;
     }
 
+    
     /**
     * Handles a "newTurn"-message.
     *

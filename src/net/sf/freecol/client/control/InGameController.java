@@ -53,6 +53,44 @@ public final class InGameController {
 
 
     /**
+    * Sets <code>player</code> as the new <code>currentPlayer</code> of the game.
+    * @param currentPlayer The player.
+    */
+    public void setCurrentPlayer(Player currentPlayer) {
+        Game game = freeColClient.getGame();
+
+        game.setCurrentPlayer(currentPlayer);
+
+        if (freeColClient.getMyPlayer().equals(currentPlayer)) {
+            removeUnitsOutsideLOS();
+            freeColClient.getCanvas().setEnabled(true);
+            freeColClient.getCanvas().closeMenus();
+            if (currentPlayer.checkEmigrate()) {
+                freeColClient.getInGameController().emigrateUnitInEurope((int) ((Math.random() * 3) + 1));
+            }
+            freeColClient.getInGameController().nextActiveUnit();
+        }
+    }
+
+
+    /**
+    * Removes the units we cannot see anymore from the map.
+    */
+    private void removeUnitsOutsideLOS() {
+        Player player = freeColClient.getMyPlayer();
+        Map map = freeColClient.getGame().getMap();
+
+        Iterator tileIterator = map.getWholeMapIterator();
+        while (tileIterator.hasNext()) {
+            Tile t = map.getTile((Map.Position) tileIterator.next());
+            if (t != null && !player.canSee(t) && t.getFirstUnit() != null) {
+                t.disposeAllUnits();
+            }
+        }
+    }
+
+
+    /**
     * Uses the active unit to build a colony.
     */
     public void buildColony() {

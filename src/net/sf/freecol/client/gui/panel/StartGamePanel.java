@@ -287,6 +287,7 @@ public final class StartGamePanel extends JPanel implements ActionListener {
                     freeColClient.getPreGameController().requestLaunch();
                     break;
                 case CANCEL:
+                    freeColClient.getConnectController().logout(true);
                     parent.remove(this);
                     parent.showMainPanel();
                     break;

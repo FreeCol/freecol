@@ -7,6 +7,13 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.FreeColMenuBar;
+import net.sf.freecol.client.gui.CanvasMouseMotionListener;
+import net.sf.freecol.client.gui.CanvasMouseListener;
+import net.sf.freecol.client.gui.CanvasKeyListener;
+import net.sf.freecol.client.gui.panel.MapControls;
+
 
 import net.sf.freecol.common.model.*;
 import net.sf.freecol.common.FreeColException;
@@ -125,5 +132,46 @@ public final class PreGameController {
         chatElement.setAttribute("privateChat", "false");
 
         freeColClient.getClient().send(chatElement);
+    }
+    
+
+    /**
+    * Starts the game.
+    */
+    public void startGame() {
+        Canvas canvas = freeColClient.getCanvas();
+        GUI gui = freeColClient.getGUI();
+
+        canvas.closeMainPanel();
+        canvas.closeMenus();
+
+        FreeColMenuBar freeColMenuBar = new FreeColMenuBar(freeColClient, canvas, gui);
+        canvas.setJMenuBar(freeColMenuBar);
+
+        InGameController inGameController = freeColClient.getInGameController();
+        InGameInputHandler inGameInputHandler = freeColClient.getInGameInputHandler();
+
+        freeColClient.getClient().setMessageHandler(inGameInputHandler);
+        gui.setInGame(true);
+
+        MapControls mapControls = new MapControls(freeColClient, gui);
+        canvas.setMapControls(mapControls);
+
+        Unit activeUnit = freeColClient.getMyPlayer().getNextActiveUnit();
+        gui.setActiveUnit(activeUnit);
+        gui.setFocus(activeUnit.getTile().getPosition());
+
+        canvas.addKeyListener(new CanvasKeyListener(canvas, inGameController, mapControls));
+        canvas.addMouseListener(new CanvasMouseListener(canvas, gui));
+        canvas.addMouseMotionListener(new CanvasMouseMotionListener(gui,  freeColClient.getGame().getMap()));
+
+        canvas.showMapControls();
+
+        if (freeColClient.getMyPlayer().equals(freeColClient.getGame().getCurrentPlayer())) {
+            //canvas.takeFocus();
+        } else {
+            canvas.setEnabled(false);
+            canvas.showStatusPanel("Waiting for the other players to complete their turn...");
+        }
     }
 }

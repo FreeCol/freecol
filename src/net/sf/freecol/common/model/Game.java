@@ -225,7 +225,6 @@ public class Game extends FreeColGameObject {
     * Sets the current player.
     *
     * @param newCp The new current player.
-    * @exception NullPointerException if <code>newCp == null</code>
     */
     public void setCurrentPlayer(Player newCp) {
         if (newCp != null) {
@@ -235,7 +234,8 @@ public class Game extends FreeColGameObject {
 
             currentPlayer = newCp;
         } else {
-            throw new NullPointerException();
+            //throw new NullPointerException();
+            logger.warning("Current player set to 'null'.");
         }
     }
 
@@ -258,7 +258,20 @@ public class Game extends FreeColGameObject {
     * @see #getCurrentPlayer
     */
     public Player getNextPlayer() {
-        int index = players.indexOf(currentPlayer) + 1;
+        return getPlayerAfter(currentPlayer);
+    }
+
+    
+    /**
+    * Gets the player after then given player.
+    * @see #getNextPlayer
+    */
+    public Player getPlayerAfter(Player beforePlayer) {
+        if (players.size() == 0) {
+            return null;
+        }
+        
+        int index = players.indexOf(beforePlayer) + 1;
 
         if (index >= players.size()) {
             index = 0;
@@ -498,14 +511,14 @@ public class Game extends FreeColGameObject {
         gameElement.setAttribute("ID", getID());
         gameElement.setAttribute("turn", Integer.toString(getTurn().getNumber()));
 
-        if (map != null) {
-            gameElement.appendChild(map.toXMLElement(player, document));
-        }
-
         Iterator playerIterator = getPlayerIterator();
         while (playerIterator.hasNext()) {
             Player p = (Player) playerIterator.next();
             gameElement.appendChild(p.toXMLElement(player, document));
+        }
+
+        if (map != null) {
+            gameElement.appendChild(map.toXMLElement(player, document));
         }
 
         gameElement.appendChild(market.toXMLElement(player, document));
@@ -532,16 +545,6 @@ public class Game extends FreeColGameObject {
 
         getTurn().setNumber(Integer.parseInt(gameElement.getAttribute("turn")));
 
-        // Get the map:
-        Element mapElement = getChildElement(gameElement, Map.getXMLElementTagName());
-        if (mapElement != null) {
-            if (map != null) {
-                map.readFromXMLElement(mapElement);
-            } else {
-                map = new Map(this, mapElement);
-            }
-        }
-
         // Get the players:
         NodeList playerList = gameElement.getElementsByTagName(Player.getXMLElementTagName());
         for (int i=0; i<playerList.getLength(); i++) {
@@ -556,6 +559,16 @@ public class Game extends FreeColGameObject {
             }
         }
 
+        // Get the map:
+        Element mapElement = getChildElement(gameElement, Map.getXMLElementTagName());
+        if (mapElement != null) {
+            if (map != null) {
+                map.readFromXMLElement(mapElement);
+            } else {
+                map = new Map(this, mapElement);
+            }
+        }
+                
         Element marketElement = getChildElement(gameElement, Market.getXMLElementTagName());
         if (market != null) {
             market.readFromXMLElement(marketElement);

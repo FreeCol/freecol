@@ -13,6 +13,7 @@ import net.sf.freecol.common.networking.Connection;
 
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
+import net.sf.freecol.common.model.*;
 
 
 
@@ -67,6 +68,8 @@ public final class UserConnectionHandler implements MessageHandler {
     */
     private Element login(Connection connection, Element element) {
         // TODO: Do not allow more than one (human) player to connect to a singleplayer game.
+        
+        Game game = freeColServer.getGame();
 
         if (!element.hasAttribute("username")) {
             throw new IllegalArgumentException("The attribute 'username' is missing.");
@@ -81,16 +84,35 @@ public final class UserConnectionHandler implements MessageHandler {
             return Message.createError("server.wrongFreeColVersion", "The game versions do not match.");
         }
 
+        String username = element.getAttribute("username");
 
         if (freeColServer.getGameState() != FreeColServer.STARTING_GAME) {
-            return Message.createError("server.alreadyStarted", "The game has already been started!");
-        } // TODO: allow a client to take up a lost connection.
+            if (game.getPlayerByName(username) == null) {
+                return Message.createError("server.alreadyStarted", "The game has already been started!");
+            }
+            
+            ServerPlayer player = (ServerPlayer) game.getPlayerByName(username);
+            player.setConnected(true);
+
+            // In case this player is the first to reconnect:
+            boolean isCurrentPlayer = (game.getCurrentPlayer() == null);
+            if (isCurrentPlayer) {
+                game.setCurrentPlayer(player);
+            }
+
+            // Make the reply:
+            Element reply = Message.createNewRootElement("loginConfirmed");
+            reply.setAttribute("admin", Boolean.toString(player.isAdmin()));
+            reply.setAttribute("startGame", "true");
+            reply.setAttribute("isCurrentPlayer", Boolean.toString(isCurrentPlayer));
+            reply.appendChild(freeColServer.getGame().toXMLElement(player, reply.getOwnerDocument()));
+
+            return reply;
+        }
 
         if (!freeColServer.getGame().canAddNewPlayer()) {
             return Message.createError("server.maximumPlayers", "Sorry, the maximum number of players reached.");
         }
-
-        String username = element.getAttribute("username");
 
         if (freeColServer.getGame().playerNameInUse(username)) {
             return Message.createError("server.usernameInUse", "The specified username is already in use.");

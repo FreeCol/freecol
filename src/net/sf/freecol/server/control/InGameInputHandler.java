@@ -107,6 +107,8 @@ public final class InGameInputHandler extends InputHandler {
                         reply = logout(connection, element);
                     } else if (type.equals("endTurn")) {
                         reply = endTurn(connection, element);
+                    } else if (type.equals("disconnect")) {
+                        reply = disconnect(connection, element);
                     } else {
                         logger.warning("Unknown request from client " + element.getTagName());
                     }
@@ -992,19 +994,40 @@ public final class InGameInputHandler extends InputHandler {
     * @param connection The connection the message came from.
     * @param element The element containing the request.
     */
-    private Element endTurn(Connection connection, Element moveElement) {
+    private Element endTurn(Connection connection, Element element) {
+        endTurn(connection);
+        return null;
+    }
+    
+
+    /**
+    * Handles an "endTurn" notification from a client.
+    *
+    * @param connection The connection the message came from.
+    */
+    public void endTurn(Connection connection) {
         FreeColServer freeColServer = getFreeColServer();
         Game game = freeColServer.getGame();
 
+        ServerPlayer oldPlayer = (ServerPlayer) game.getCurrentPlayer();
         ServerPlayer nextPlayer = (ServerPlayer) game.getNextPlayer();
 
-        while (checkForDeath(nextPlayer)) {
+        while (nextPlayer != null && checkForDeath(nextPlayer)) {
             nextPlayer.setDead(true);
             Element setDeadElement = Message.createNewRootElement("setDead");
             setDeadElement.setAttribute("player", nextPlayer.getID());
             freeColServer.getServer().sendToAll(setDeadElement, null);
 
             nextPlayer = (ServerPlayer) game.getNextPlayer();
+        }
+        
+        while (nextPlayer != null && !nextPlayer.isConnected()) {
+            nextPlayer = (ServerPlayer) game.getPlayerAfter(nextPlayer);
+        }
+
+        if (nextPlayer == null) {
+            game.setCurrentPlayer(null);
+            return;
         }
 
         Player winner = checkForWinner();
@@ -1013,7 +1036,7 @@ public final class InGameInputHandler extends InputHandler {
             gameEndedElement.setAttribute("winner", winner.getID());
             freeColServer.getServer().sendToAll(gameEndedElement, null);
 
-            return null;
+            return;
         }
 
         if (game.isNextPlayerInNewTurn()) {
@@ -1038,8 +1061,6 @@ public final class InGameInputHandler extends InputHandler {
         Element setCurrentPlayerElement = Message.createNewRootElement("setCurrentPlayer");
         setCurrentPlayerElement.setAttribute("player", nextPlayer.getID());
         freeColServer.getServer().sendToAll(setCurrentPlayerElement, null);
-
-        return null;
     }
 
 
