@@ -1226,19 +1226,24 @@ public final class Tile extends FreeColGameObject implements Location {
 
             if (getColony() != null) {
                 Element colonyElement = getChildElement(tileElement, Colony.getXMLElementTagName());
-                colonyElement.setAttribute("unitCount", Integer.toString(colonyUnitCount));
 
-                NodeList childNodes = colonyElement.getChildNodes();
-                for (int i=0; i<childNodes.getLength(); i++) {
-                    Element childElement = (Element) childNodes.item(i);
+                if (colonyUnitCount != 0) {
+                    colonyElement.setAttribute("unitCount", Integer.toString(colonyUnitCount));
 
-                    if (childElement.getTagName().equals(Building.getXMLElementTagName())) {
-                        Building b = (Building) getGame().getFreeColGameObject(childElement.getAttribute("ID"));
+                    NodeList childNodes = colonyElement.getChildNodes();
+                    for (int i=0; i<childNodes.getLength(); i++) {
+                        Element childElement = (Element) childNodes.item(i);
 
-                        if (b.getType() == Building.STOCKADE) {
-                            childElement.setAttribute("level", Integer.toString(colonyStockadeLevel));
+                        if (childElement.getTagName().equals(Building.getXMLElementTagName())) {
+                            Building b = (Building) getGame().getFreeColGameObject(childElement.getAttribute("ID"));
+
+                            if (b.getType() == Building.STOCKADE) {
+                                childElement.setAttribute("level", Integer.toString(colonyStockadeLevel));
+                            }
                         }
                     }
+                } else {    // Colony not discovered.
+                    colonyElement.getParentNode().removeChild(colonyElement);
                 }
             }
             /*else if (getSettlement() != null) {
