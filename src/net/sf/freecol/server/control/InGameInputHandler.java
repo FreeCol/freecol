@@ -829,4 +829,26 @@ public final class InGameInputHandler implements MessageHandler {
             }
         }
     }
+    
+    private void sendErrorToAll(String message, Player player) {
+        Game game = freeColServer.getGame();
+
+        Iterator enemyPlayerIterator = game.getPlayerIterator();
+        while (enemyPlayerIterator.hasNext()) {
+            ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
+
+            if ((player != null) && (player.equals(enemyPlayer))) {
+                continue;
+            }
+
+            try {
+                Element errorElement = Message.createNewRootElement("error");
+                errorElement.setAttribute("message", message);
+                    
+                enemyPlayer.getConnection().send(errorElement);
+            } catch (IOException e) {
+                logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection " + enemyPlayer.getConnection());
+            }
+        }
+    }
 }

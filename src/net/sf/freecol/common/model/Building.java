@@ -135,6 +135,13 @@ public final class Building extends FreeColGameObject implements WorkLocation {
     public int getLevel() {
         return level;
     }
+    
+    /* Sets the level of the building.
+    * @param level The new level of the building.
+    */
+    public void setLevel(int level) {
+        this.level = level;
+    }
 
 
     /**
@@ -338,7 +345,6 @@ public final class Building extends FreeColGameObject implements WorkLocation {
         return units.iterator();
     }
 
-
     /**
     * Prepares this <code>Building</code> for a new turn.
     */
@@ -387,6 +393,9 @@ public final class Building extends FreeColGameObject implements WorkLocation {
                 goodsOutputType = Goods.BELLS;
                 goodsOutput = 1;
                 break;
+            case CARPENTER:
+                goodsOutputType = Goods.HAMMERS;
+                goodsInputType = Goods.LUMBER;
             default:
                 break;
         }
@@ -395,7 +404,12 @@ public final class Building extends FreeColGameObject implements WorkLocation {
         Iterator unitIterator = getUnitIterator();
         while (unitIterator.hasNext())
         {
-            goodsOutput += ((Unit) unitIterator.next()).getProducedAmount(goodsOutputType);
+            int productivity = ((Unit) unitIterator.next()).getProducedAmount(goodsOutputType);
+            if (productivity > 0) {
+                productivity += colony.getProductionBonus();
+                if (productivity < 1) productivity = 1;
+            }
+            goodsOutput += productivity;
         }
         goodsInput = goodsOutput;
         goodsOutput *= (type == CHURCH) ? level + 1 : level;
@@ -417,10 +431,14 @@ public final class Building extends FreeColGameObject implements WorkLocation {
             return;
         } else if (goodsOutputType == Goods.BELLS) {
             colony.getOwner().incrementBells(goodsOutput);
-            //TODO: SoL membership
+            colony.addBells(goodsOutput);
             return;
         }
         colony.removeAmountAndTypeOfGoods(goodsInputType, goodsInput);
+        if (goodsOutputType == Goods.HAMMERS) {
+            colony.addHammers(goodsOutput);
+            return;
+        }
         thepackage = new Goods(getGame(), null, goodsOutputType, goodsOutput);
 	thepackage.setLocation(colony);
         //colony.add(thepackage);

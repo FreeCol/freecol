@@ -35,7 +35,9 @@ public final class Colony extends Settlement implements Location {
 
     private GoodsContainer goodsContainer;
 
-
+    private int hammers;
+    private int bells;
+    private int currentlyBuilding;
 
     /**
     * Creates a new <code>Colony</code>.
@@ -51,6 +53,10 @@ public final class Colony extends Settlement implements Location {
         goodsContainer = new GoodsContainer(game, this);
 
         this.name = name;
+        
+        hammers = 0;
+        bells = 0;
+        currentlyBuilding = Building.DOCK;
 
         workLocations.add(new ColonyTile(getGame(), this, tile));
         workLocations.add(new ColonyTile(getGame(), this, getGame().getMap().getNeighbourOrNull(Map.N, tile)));
@@ -408,7 +414,125 @@ public final class Colony extends Settlement implements Location {
         
         return defender;
     }
+    
+    /**
+    * Adds to the hammer count of the colony.
+    * @param amount The number of hammers to add.
+    */
+    public void addHammers(int amount) {
+        int required = 0;
+        int tools = 0;
+        int requiredTable[][][] = {
+          {{  0,  0,  1},{ -1, -1, -1},{ -1, -1, -1},{ -1, -1, -1}}, // TOWNHALL
+          {{  0,  0,  1},{ 52,  0,  3},{ -1, -1, -1},{ -1, -1, -1}}, // CARPENTER
+          {{  0,  0,  1},{ 64, 20,  4},{240,100,  8},{ -1, -1, -1}}, // BLACKSMITH
+          {{  0,  0,  1},{ 64,  0,  4},{160, 20,  8},{ -1, -1, -1}}, // TOBACCONIST
+          {{  0,  0,  1},{ 64,  0,  4},{160, 20,  8},{ -1, -1, -1}}, // WEAVER
+          {{  0,  0,  1},{ 64,  0,  4},{160, 20,  8},{ -1, -1, -1}}, // DISTILLER
+          {{  0,  0,  1},{ 56,  0,  3},{160, 20,  6},{ -1, -1, -1}}, // FUR_TRADER
+          {{ 64,  0,  3},{120,100,  4},{320,100,  8},{ -1, -1, -1}}, // STOCKADE
+          {{ 52,  0,  1},{120, 50,  8},{240,100,  8},{ -1, -1, -1}}, // ARMORY
+          {{ 52,  0,  1},{ 80, 50,  6},{240,100,  8},{ -1, -1, -1}}, // DOCK
+          {{ 64,  0,  4},{160, 50,  8},{200,100, 10},{ -1, -1, -1}}, // SCHOOLHOUSE
+          {{ 80,  0,  1},{ 80, 20,  1},{ -1, -1, -1},{ -1, -1, -1}}, // WAREHOUSE
+          {{ 64,  0,  1},{ -1, -1, -1},{ -1, -1, -1},{ -1, -1, -1}}, // STABLES
+          {{ 52,  0,  3},{176,100,  8},{ -1, -1, -1},{ -1, -1, -1}}, // CHURCH
+          {{ 80,  0,  1},{120, 50,  4},{ -1, -1, -1},{ -1, -1, -1}}, // PRINTING_PRESS
+          {{160, 50,  1},{ -1, -1, -1},{ -1, -1, -1},{ -1, -1, -1}}  // CUSTOM_HOUSE
+        };
+        hammers += amount;
+        int hammersRequired = requiredTable[currentlyBuilding][getBuilding(currentlyBuilding).getLevel() + 1][0];
+        int toolsRequired = requiredTable[currentlyBuilding][getBuilding(currentlyBuilding).getLevel() + 1][1];
+        if ((hammers >= hammersRequired) && (hammersRequired != -1)) {
+            hammers = hammersRequired;
+            if (getGoodsCount(Goods.TOOLS) >= toolsRequired) {
+                //TODO: Adam Smith check for factory level buildings
+                if (toolsRequired > 0) {
+                    removeAmountAndTypeOfGoods(Goods.TOOLS, requiredTable[currentlyBuilding][getBuilding(currentlyBuilding).getLevel() + 1][1]);
+                    hammers = 0;
+                    getBuilding(currentlyBuilding).setLevel(getBuilding(currentlyBuilding).getLevel() + 1);
+                    // TODO: some message about building something
+                } else {
+                    //TODO: some error about not having enough tools
+                }
+            }
+        } else if (hammersRequired == -1) {
+            //TODO: some error about trying to build a nonexistent building
+        }
+    }
+    
+    /**
+    * Returns the hammer count of the colony.
+    * @return The current hammer count of the colony.
+    */
+    public int getHammers() {
+        return hammers;
+    }
+    
+    /**
+    * Adds to the bell count of the colony.
+    * @param amount The number of bells to add.
+    */
+    public void addBells(int amount) {
+        bells += amount;
+        bells -= (getSoL() * getUnitCount()) / 100;
+        if (bells >= ((getUnitCount() + 1) * 50)) {
+            bells = ((getUnitCount() + 1) * 50) * 100;
+        } else if (bells <= 0) {
+            bells = 0;
+        }
+    }
+    
+    /**
+    * Returns the bell count of the colony.
+    * @return The current bell count of the colony.
+    */
+    public int getBells() {
+        return bells;
+    }
+    
+    /**
+    * Returns the SoL memebership of the colony
+    * @return The current SoL membership of the colony.
+    */
+    public int getSoL() {
+        int membership = (bells * 2) / (getUnitCount() + 1);
+        if (membership < 0) membership = 0;
+        if (membership > 100) membership = 100;
+        return membership;
+    }
+    
+    /**
+    * Returns the Tory memebership of the colony
+    * @return The current Tory membership of the colony.
+    */
+    public int getTory() {
+        return 100 - getSoL();
+    }
+    
+    /**
+    * Returns the production bonus, if any, of the colony.
+    * @return The current production bonus of the colony.
+    */
+    public int getProductionBonus() {
+        int bonus = 0;
+        //TODO: account for difficulty levels in the 4 and 8below
+        if ((getTory() * getUnitCount()) / 100 > 8) {
+            bonus -= 2;
+        } else if ((getTory() * getUnitCount()) / 100 > 4) {
+            bonus -= 1;
+        }
+        
+        if (getSoL() == 100) {
+            bonus += 2;
+        } else if (getSoL() >= 50) {
+            bonus += 1;
+        }
+        
+        return bonus;
+    }
 
+    
     /**
     * Gets a string representation of the Colony. Currently this method
     * just returns the name of the <code>Colony</code>, but that may
@@ -452,6 +576,9 @@ public final class Colony extends Settlement implements Location {
         colonyElement.setAttribute("name", name);
         colonyElement.setAttribute("owner", owner.getID());
         colonyElement.setAttribute("tile", tile.getID());
+        colonyElement.setAttribute("hammers", Integer.toString(hammers));
+        colonyElement.setAttribute("bells", Integer.toString(bells));
+        colonyElement.setAttribute("currentlyBuilding", Integer.toString(currentlyBuilding));
 
         Iterator workLocationIterator = workLocations.iterator();
         while (workLocationIterator.hasNext()) {
@@ -474,6 +601,9 @@ public final class Colony extends Settlement implements Location {
         name = colonyElement.getAttribute("name");
         owner = (Player) getGame().getFreeColGameObject(colonyElement.getAttribute("owner"));
         tile = (Tile) getGame().getFreeColGameObject(colonyElement.getAttribute("tile"));
+        hammers = Integer.parseInt(colonyElement.getAttribute("hammers"));
+        bells = Integer.parseInt(colonyElement.getAttribute("bells"));
+        currentlyBuilding = Integer.parseInt(colonyElement.getAttribute("currentlyBuilding"));
 
         NodeList childNodes = colonyElement.getChildNodes();
         for (int i=0; i<childNodes.getLength(); i++) {

@@ -234,9 +234,13 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation {
         }
         
         if (!(isColonyCenterTile())) {
-                int amount = getUnit().getFarmedPotential(getUnit().getWorkType(), workTile);
+            int amount = getUnit().getFarmedPotential(getUnit().getWorkType(), workTile);
+            if (amount > 0) {
+                amount += colony.getProductionBonus();
+                if (amount < 1) amount = 1;
                 Goods g = new Goods(getGame(), null, getUnit().getWorkType(), amount);
-            g.setLocation(colony);
+                g.setLocation(colony);
+            }
         } else {
             int amount1 = workTile.potential(Goods.FOOD);
             Goods g = new Goods(getGame(), null, Goods.FOOD, amount1);

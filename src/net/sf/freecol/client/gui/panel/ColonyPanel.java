@@ -58,6 +58,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
     private final JLabel                    cargoLabel;
     private final JLabel                    goldLabel;
+    private final JLabel                    solLabel;
     private final JLabel                    warehouseLabel;
     private final OutsideColonyPanel        outsideColonyPanel;
     private final InPortPanel               inPortPanel;
@@ -120,6 +121,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
         cargoLabel = new JLabel("<html><strike>Cargo</strike></html>");
         goldLabel = new JLabel("Gold: 0");
+        solLabel = new JLabel("SOL: 0%, Tory: 100%");
 	warehouseLabel = new JLabel("Goods");
 
         JButton exitButton = new JButton("Close");
@@ -145,6 +147,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         inPortLabel.setSize(200, 20);
         cargoLabel.setSize(410, 20);
         goldLabel.setSize(100, 20);
+        solLabel.setSize(160, 20);
 	warehouseLabel.setSize(100, 20);
         tilesLabel.setSize(100, 20);
         buildingsLabel.setSize(300, 20);
@@ -160,6 +163,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         inPortLabel.setLocation(640, 425);
         cargoLabel.setLocation(220, 345);
 	warehouseLabel.setLocation(10, 445);
+        solLabel.setLocation(15, 325);
         goldLabel.setLocation(15, 345);
         tilesLabel.setLocation(10, 10);
         buildingsLabel.setLocation(400, 10);
@@ -181,6 +185,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         add(inPortLabel);
         add(cargoLabel);
 	add(warehouseLabel);
+        add(solLabel);
         add(goldLabel);
         add(tilesLabel);
         add(buildingsLabel);
@@ -284,6 +289,10 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         tilePanel.initialize();
 
         goldLabel.setText("Gold: " + freeColClient.getMyPlayer().getGold());
+        
+        solLabel.setText("SoL: " + colony.getSoL() + "% (" + ((colony.getUnitCount() * colony.getSoL()) / 100) +
+                         "), Tory: " + colony.getTory() + "% (" + 
+                         (colony.getUnitCount() - ((colony.getUnitCount() * colony.getSoL()) / 100)) + ")");
     }
 
 
@@ -306,6 +315,14 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         }
     }
 
+    /**
+    * Updates the SoL membership label.
+    */
+    private void updateSoLLabel() {
+        solLabel.setText("SoL: " + colony.getSoL() + "% (" + ((colony.getUnitCount() * colony.getSoL()) / 100) +
+                         "), Tory: " + colony.getTory() + "% (" + 
+                         (colony.getUnitCount() - ((colony.getUnitCount() * colony.getSoL()) / 100)) + ")");
+    }
 
     /**
     * Returns the currently select unit.
@@ -524,6 +541,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 ((UnitLabel) comp).setSmall(true);
                 c = ((JPanel) getComponent(1)).add(comp);
                 refresh();
+                colonyPanel.updateSoLLabel();
                 return c;
             }
         }
@@ -571,6 +589,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             updateCargoLabel();
             Component c = add(comp);
             refresh();
+            colonyPanel.updateSoLLabel();
             return c;
         }
     }
@@ -685,6 +704,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                     {
                       ((UnitLabel) comp).setSmall(false);
                       inGameController.boardShip(unit, selectedUnit.getUnit());
+                      colonyPanel.updateSoLLabel();
                     } else {
                       return comp;
                     }
@@ -844,6 +864,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                         staticGoodsLabel = new JLabel(parent.getImageProvider().getGoodsImageIcon(unit.getWorkType()));
                         staticGoodsLabel.setText(Integer.toString(unit.getFarmedPotential(unit.getWorkType(), colonyTile.getWorkTile())));
                         add(staticGoodsLabel);
+                        
+                        colonyPanel.updateSoLLabel();
                     } else {
                         logger.warning("An invalid component got dropped on this CargoPanel.");
                     }
