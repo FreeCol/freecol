@@ -395,10 +395,22 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     * @param g The graphics context in which to paint.
     */
     public void paintComponent(Graphics g) {
-        g.setColor(getBackground());
-        g.fillRect(0, 0, getWidth(), getHeight());
-    }
+        int width = getWidth();
+        int height = getHeight();
 
+        Image tempImage = (Image) UIManager.get("BackgroundImage");
+
+        if (tempImage != null) {
+            for (int x=0; x<width; x+=tempImage.getWidth(null)) {
+                for (int y=0; y<height; y+=tempImage.getHeight(null)) {
+                    g.drawImage(tempImage, x, y, null);
+                }
+            }
+        } else {
+            g.setColor(getBackground());
+            g.fillRect(0, 0, width, height);
+        }
+    }
 
 
     /**
@@ -497,6 +509,11 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         public BuildingsPanel(ColonyPanel colonyPanel) {
             super(new GridLayout(0, 1));
             this.colonyPanel = colonyPanel;
+        }
+        
+        
+        public String getUIClassID() {
+            return "BuildingsPanelUI";
         }
 
 
@@ -750,7 +767,14 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         public OutsideColonyPanel(ColonyPanel colonyPanel) {
             this.colonyPanel = colonyPanel;
         }
+        
+        
 
+        public String getUIClassID() {
+            return "OutsideColonyPanelUI";
+        }
+
+        
         /**
         * Adds a component to this OutsideColonyPanel and makes sure that the unit
         * that the component represents gets modified so that it will be located
@@ -814,6 +838,12 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         public Component add(Component comp) {
             return super.add(comp);
         }
+        
+        
+        
+        public String getUIClassID() {
+            return "InPortPanelUI";
+        }
     }
 
 
@@ -831,6 +861,11 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         */
         public WarehousePanel(ColonyPanel colonyPanel) {
             this.colonyPanel = colonyPanel;
+        }
+        
+        
+        public String getUIClassID() {
+            return "WarehousePanelUI";
         }
 
         /**
@@ -914,6 +949,12 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         public CargoPanel(ColonyPanel colonyPanel) {
             this.colonyPanel = colonyPanel;
         }
+
+        
+        public String getUIClassID() {
+            return "CargoPanelUI";
+        }
+        
 
         /**
         * Adds a component to this CargoPanel and makes sure that the unit
@@ -1220,7 +1261,6 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
             buildingBoxListener = new BuildingBoxListener(this, colonyPanel);
             super.addActionListener(buildingBoxListener);
-            super.setRenderer(new BuildingBoxRenderer());
         }
 
         /**
@@ -1312,6 +1352,10 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             public int getType() {
                 return type;
             }
+            
+            public String toString() {
+                return getText();
+            }
         }
 
         /**
@@ -1337,49 +1381,6 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             public void actionPerformed(ActionEvent e) {
                 colonyPanel.getClient().getInGameController().setCurrentlyBuilding(colonyPanel.getColony(), ((BuildingBoxItem)buildingBox.getSelectedItem()).getType());
                 colonyPanel.updateProgressLabel();
-            }
-        }
-
-        /**
-        * The ListCellRenderer for the BuildingBox.
-        */
-        class BuildingBoxRenderer extends JLabel
-                            implements ListCellRenderer {
-
-            public BuildingBoxRenderer() {
-                setOpaque(true);
-                //setHorizontalAlignment(CENTER);
-                setHorizontalAlignment(LEFT);
-                setVerticalAlignment(CENTER);
-            }
-
-            /*
-            * Displays the string associated with the BuildingBoxItem.
-            */
-            public Component getListCellRendererComponent(
-                                            JList list,
-                                            Object value,
-                                            int index,
-                                            boolean isSelected,
-                                            boolean cellHasFocus) {
-
-                if (isSelected) {
-                    setBackground(list.getSelectionBackground());
-                    setForeground(list.getSelectionForeground());
-                } else {
-                    setBackground(list.getBackground());
-                    setForeground(list.getForeground());
-                }
-
-                if (value instanceof BuildingBoxItem) {
-                    setText(((BuildingBoxItem)value).getText());
-                } else {
-                    super.setText("---INVALID ITEM---");
-                }
-
-                setFont(list.getFont());
-
-                return this;
             }
         }
     }

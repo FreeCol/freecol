@@ -151,7 +151,10 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
             u.put("InPortPanelUI", "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI");
             u.put("MarketPanelUI", "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI");
             u.put("CargoPanelUI", "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI");
-
+            u.put("BuildingsPanelUI", "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI");
+            u.put("OutsideColonyPanelUI", "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI");
+            u.put("InPortPanelUI", "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI");
+            u.put("WarehousePanelUI", "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI");
 
             // Add image UI resources:
             String [][] resources = {                
