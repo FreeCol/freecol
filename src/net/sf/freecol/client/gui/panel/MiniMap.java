@@ -216,55 +216,58 @@ public final class MiniMap extends JPanel implements MouseInputListener {
                 Tile tile = map.getTileOrNull(x + xOffset, y + yOffset);
                 Settlement settlement = tile != null ? tile.getSettlement() : null;
                 int units = tile != null ? tile.getUnitCount() : 0;
-
-                if (settlement != null) {
-                    //There's a Settlement on this tile
-                    g.setColor(settlement.getOwner().getColor());
-                } else if (units > 0) {
-                    //There are units on this tile.
-                    g.setColor(tile.getFirstUnit().getOwner().getColor());
-                } else {
-                    int type = tile != null ? tile.getType() : 0;
+                
+                if (tile == null) {
+                    g.setColor(Color.BLACK);
+                } else if (tile.getAddition() == Tile.ADD_HILLS) {
+                    g.setColor(new Color(0.44f, 0.50f, 0.32f)); // Grayish orange
+                } else if (tile.getAddition() == Tile.ADD_MOUNTAINS) {
+                    g.setColor(new Color(0.34f, 0.45f, 0.32f)); // Gray
+                } else if (!tile.isForested()) {
+                    int type = tile.getType();
                     switch (type) {
-                        case 1:
-                        case 2:
-                        case 3:
-                        case 4:
-                            g.setColor(new Color(0.0f, 0.75f, 0.0f));
+                        case Tile.PLAINS:
+                        case Tile.GRASSLANDS:
+                        case Tile.PRAIRIE:
+                        case Tile.SAVANNAH:
+                            g.setColor(new Color(0.14f, 0.50f, 0.12f)); // Green
                             break;
 
-                        case 5:
-                        case 6:
-                            g.setColor(new Color(0.0f, 0.75f, 0.25f));
+                        case Tile.MARSH:
+                        case Tile.SWAMP:
+                            g.setColor(new Color(0.14f, 0.50f, 0.24f)); // Bluish green
                             break;
 
-                        case 7:
-                            g.setColor(new Color(0.25f, 0.75f, 0.0f));
+                        case Tile.DESERT:
+                            g.setColor(new Color(0.39f, 0.45f, 0.17f)); // Orangish
                             break;
 
-                        case 8:
-                            g.setColor(new Color(0.50f, 0.75f, 0.50f));
+                        case Tile.TUNDRA:
+                            g.setColor(new Color(0.39f, 0.62f, 0.37f)); // Light blue
                             break;
 
-                        case 9:
+                        case Tile.ARCTIC:
                             g.setColor(Color.WHITE);
                             break;
 
-                        case 10: //Blue ocean
+                        case Tile.OCEAN: //Blue ocean
                             g.setColor(Color.BLUE);
                             break;
 
-                        case 11: //Darker blue high seas
+                        case Tile.HIGH_SEAS: //Darker blue high seas
                             g.setColor(new Color(0.0f, 0.0f, 0.8f));
                             break;
 
-                        case 0:
+                        case Tile.UNEXPLORED:
                         default:
                             g.setColor(Color.BLACK);
                             break;
                     }
+                } else {
+                  // Tile is forested, so display color of the forest
+                  g.setColor(new Color(0.14f, 0.45f, 0.12f)); // Darker green
                 }
-
+                
                 /* Due to the coordinate system, if the y value of the tile is odd,
                  * it needs to be shifted to the right a half-tile's width
                  */
@@ -280,9 +283,26 @@ public final class MiniMap extends JPanel implements MouseInputListener {
                 yPoints[0] = yPoints[2] = y * tileSize / 4;
                 yPoints[1] = y * tileSize / 4 - tileSize / 4;
                 yPoints[3] = y * tileSize / 4 + tileSize / 4;
-
+                
                 //Draw it
                 g.fillPolygon(xPoints, yPoints, 4);
+                
+                if (settlement != null) {
+                    xPoints[0] += tileSize / 8;
+                    xPoints[2] -= tileSize / 8;
+                    yPoints[1] += tileSize / 16;
+                    yPoints[3] -= tileSize / 16;
+                    g.setColor(settlement.getOwner().getColor());
+                    g.fillPolygon(xPoints, yPoints, 4);
+                } else if (units > 0) {
+                    xPoints[0] += tileSize / 4;
+                    xPoints[2] -= tileSize / 4;
+                    yPoints[1] += tileSize / 8;
+                    yPoints[3] -= tileSize / 8;
+                    g.setColor(tile.getFirstUnit().getOwner().getColor());
+                    g.fillPolygon(xPoints, yPoints, 4);
+                }
+                
             }
         }
 
