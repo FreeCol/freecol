@@ -111,6 +111,7 @@ public final class InGameController {
     public void setInDebugMode(boolean debug) {
         FreeCol.setInDebugMode(debug);
         freeColClient.getCanvas().setJMenuBar(new FreeColMenuBar(freeColClient, freeColClient.getCanvas(), freeColClient.getGUI()));
+        freeColClient.getCanvas().updateJMenuBar();
     }
 
 
@@ -257,6 +258,7 @@ public final class InGameController {
         }
 
         freeColClient.getCanvas().getMapControls().update();
+        freeColClient.getCanvas().updateJMenuBar();
     }
 
 

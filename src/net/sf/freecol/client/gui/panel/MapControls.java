@@ -226,7 +226,7 @@ public final class MapControls {
         *  All units can sentry
         */
         if (true) {
-            unitButton[3].setEnabled(false);
+            unitButton[3].setEnabled(true);
         }
         
         /* Clear Forest / Plow Fields

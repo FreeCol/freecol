@@ -258,6 +258,7 @@ public final class GUI {
 
         //freeColClient.getCanvas().getMapControls().updateMoves(activeUnit);
         freeColClient.getCanvas().getMapControls().update();
+        freeColClient.getCanvas().updateJMenuBar();
 
         //TODO: update only within the bounds of InfoPanel
         freeColClient.getCanvas().repaint(0, 0, getWidth(), getHeight());
