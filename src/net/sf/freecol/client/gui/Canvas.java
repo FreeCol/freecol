@@ -6,6 +6,9 @@ import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.MissingResourceException;
 import java.util.logging.Logger;
 
@@ -853,6 +856,22 @@ public final class Canvas extends JLayeredPane {
             return;
         
         freeColClient.getConnectController().quitGame(true);
+        
+        // remove listeners, they will be added when launching the new game...
+        KeyListener[] keyListeners = getKeyListeners();
+        for(int i = 0; i < keyListeners.length; ++i)
+            removeKeyListener(keyListeners[i]);
+        
+        MouseListener[] mouseListeners = getMouseListeners();
+        for(int i = 0; i < mouseListeners.length; ++i)
+            removeMouseListener(mouseListeners[i]);
+        
+        MouseMotionListener[] mouseMotionListeners = getMouseMotionListeners();
+        for(int i = 0; i < mouseMotionListeners.length; ++i)
+            removeMouseMotionListener(mouseMotionListeners[i]);
+
+        removeInGameComponents();
+        
         showNewGamePanel();
     }
 
