@@ -9,6 +9,7 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.client.gui.panel.MapControls;
 import net.sf.freecol.client.control.InGameController;
+import net.sf.freecol.FreeCol;
 
 
 /**
@@ -42,6 +43,10 @@ public final class CanvasKeyListener implements KeyListener {
     * @param e The event that holds key-information.
     */
     public void keyPressed(KeyEvent e) {
+        if (e.isShiftDown() && e.isControlDown() && e.getKeyCode() == KeyEvent.VK_D) {
+            inGameController.setInDebugMode(!FreeCol.isInDebugMode());
+        }
+
         switch(e.getKeyCode()) {
             case KeyEvent.VK_ESCAPE:
                 //main menu
@@ -135,7 +140,7 @@ public final class CanvasKeyListener implements KeyListener {
                 parent.refresh();
                 break;
             default:
-                logger.warning("The typed key (" + e.getKeyCode() + ") doesn't have a function yet.");
+                logger.info("The typed key (" + e.getKeyCode() + ") doesn't have a function yet.");
         }
     }
 

@@ -170,6 +170,7 @@ public final class Canvas extends JLayeredPane {
     * of the gui and made visible.
     *
     * @param mb The menu bar.
+    * @see FreeColMenuBar
     */
     public void setJMenuBar(JMenuBar mb) {
         if (jMenuBar != null) {
@@ -189,6 +190,7 @@ public final class Canvas extends JLayeredPane {
     * {@link GUI#display} to draw the map/background on this component.
     *
     * @param g The Graphics context in which to draw this component.
+    * @see GUI#display
     */
     public void paintComponent(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
@@ -203,6 +205,7 @@ public final class Canvas extends JLayeredPane {
     * @param player The <code>Player</code> using this client.
     * @param singlePlayerMode 'true' if the user wants to start a single player game,
     *        'false' otherwise.
+    * @see StartGamePanel
     */
     public void showStartGamePanel(Game game, Player player, boolean singlePlayerMode) {
         closeMenus();
@@ -220,6 +223,7 @@ public final class Canvas extends JLayeredPane {
 
     /**
     * Displays the <code>VictoryPanel</code>.
+    * @see VictoryPanel
     */
     public void showVictoryPanel() {
         closeMenus();
@@ -232,6 +236,7 @@ public final class Canvas extends JLayeredPane {
 
     /**
     * Displays the <code>ChatPanel</code>.
+    * @see ChatPanel
     */
     public void showChatPanel() {
         closeMenus();
@@ -244,6 +249,7 @@ public final class Canvas extends JLayeredPane {
 
     /**
     * Displays the <code>NewGamePanel</code>.
+    * @see NewPanel
     */
     public void showNewGamePanel() {
         closeMenus();
@@ -326,6 +332,7 @@ public final class Canvas extends JLayeredPane {
     * @param cancelText The text displayed on the "cancel"-button.
     * @return <i>true</i> if the user clicked the "ok"-button
     *         and <i>false</i> otherwise.
+    * @see FreeColDialog
     */
     public boolean showConfirmDialog(String text, String okText, String cancelText) {
         try {
@@ -358,6 +365,7 @@ public final class Canvas extends JLayeredPane {
     * @param cancelText The text displayed on the "cancel"-button.
     * @return The text the user have entered or <i>null</i> if the
     *         user chose to cancel the action.
+    * @see FreeColDialog
     */
     public String showInputDialog(String text, String defaultValue, String okText, String cancelText) {
         try {
@@ -390,6 +398,7 @@ public final class Canvas extends JLayeredPane {
     *
     * @param message The text message to display on the
     *                status panel.
+    * @see StatusPanel
     */
     public void showStatusPanel(String message) {
         statusPanel.setStatusMessage(message);
@@ -401,6 +410,7 @@ public final class Canvas extends JLayeredPane {
 
     /**
     * Displays the <code>EuropePanel</code>.
+    * @see EuropePanel
     */
     public void showEuropePanel() {
         closeMenus();
@@ -422,6 +432,7 @@ public final class Canvas extends JLayeredPane {
     /**
     * Displays the colony panel of the given <code>Colony</code>.
     * @param colony The colony whose panel needs to be displayed.
+    * @see ColonyPanel
     */
     public void showColonyPanel(Colony colony) {
         closeMenus();
@@ -551,6 +562,7 @@ public final class Canvas extends JLayeredPane {
 
     /**
     * Shows the map controls on this Canvas.
+    * @see MapControls
     */
     public void showMapControls() {
         mapControls.addToComponent(this);
@@ -593,6 +605,7 @@ public final class Canvas extends JLayeredPane {
     * @param pos The coordinates of the Tile where the popup occured.
     * @param x The x-coordinate on the screen where the popup needs to be placed.
     * @param y The y-coordinate on the screen where the popup needs to be placed.
+    * @see TilePopup
     */
     public void showTilePopup(Map.Position pos, int x, int y) {
         if (pos != null) {
@@ -722,6 +735,7 @@ public final class Canvas extends JLayeredPane {
 
     /**
     * Shows the <code>MainPanel</code>.
+    * @see MainPanel
     */
     public void showMainPanel() {
         mainPanel.setLocation(getWidth() / 2 - mainPanel.getWidth() / 2, getHeight() / 2 - mainPanel.getHeight() / 2);
@@ -749,6 +763,7 @@ public final class Canvas extends JLayeredPane {
     /**
     * Gets the <code>StartGamePanel</code> that lies in this container.
     * @return The <code>StartGamePanel</code>.
+    * @see StartGamePanel
     */
     public StartGamePanel getStartGamePanel() {
         return startGamePanel;
@@ -760,6 +775,7 @@ public final class Canvas extends JLayeredPane {
     * @param sender The player who sent the chat message to the server.
     * @param message The chat message.
     * @param privateChat 'true' if the message is a private one, 'false' otherwise.
+    * @see GUIMessage
     */
     public void displayChatMessage(Player sender, String message, boolean privateChat) {
         gui.addMessage(new GUIMessage(sender.getName() + ": " + message, sender.getColor()));
@@ -814,6 +830,22 @@ public final class Canvas extends JLayeredPane {
     * Removes components that is only used when in game.
     */
     public void removeInGameComponents() {
+        // remove listeners, they will be added when launching the new game...
+        KeyListener[] keyListeners = getKeyListeners();
+        for(int i = 0; i < keyListeners.length; ++i) {
+            removeKeyListener(keyListeners[i]);
+        }
+
+        MouseListener[] mouseListeners = getMouseListeners();
+        for(int i = 0; i < mouseListeners.length; ++i) {
+            removeMouseListener(mouseListeners[i]);
+        }
+
+        MouseMotionListener[] mouseMotionListeners = getMouseMotionListeners();
+        for(int i = 0; i < mouseMotionListeners.length; ++i) {
+            removeMouseMotionListener(mouseMotionListeners[i]);
+        }
+
         if (mapControls != null) {
             mapControls.removeFromComponent(this);
         }
@@ -847,31 +879,16 @@ public final class Canvas extends JLayeredPane {
     public FreeColClient getClient() {
       return freeColClient;
     }
-    
+
     /**
      * Displays a quit dialog and, if desired, logouts the current game and shows the new game panel.
      */
     public void newGame() {
         if(!confirmQuitDialog())
             return;
-        
-        freeColClient.getConnectController().quitGame(true);
-        
-        // remove listeners, they will be added when launching the new game...
-        KeyListener[] keyListeners = getKeyListeners();
-        for(int i = 0; i < keyListeners.length; ++i)
-            removeKeyListener(keyListeners[i]);
-        
-        MouseListener[] mouseListeners = getMouseListeners();
-        for(int i = 0; i < mouseListeners.length; ++i)
-            removeMouseListener(mouseListeners[i]);
-        
-        MouseMotionListener[] mouseMotionListeners = getMouseMotionListeners();
-        for(int i = 0; i < mouseMotionListeners.length; ++i)
-            removeMouseMotionListener(mouseMotionListeners[i]);
 
+        freeColClient.getConnectController().quitGame(true);
         removeInGameComponents();
-        
         showNewGamePanel();
     }
 

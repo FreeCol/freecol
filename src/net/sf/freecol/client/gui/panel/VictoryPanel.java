@@ -37,7 +37,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.Canvas;
 
 /**
-* Asks the user if he's sure he wants to quit.
+* This panel gets displayed to the player who have won the game.
 */
 public final class VictoryPanel extends JPanel implements ActionListener {
     private static final Logger logger = Logger.getLogger(VictoryPanel.class.getName());

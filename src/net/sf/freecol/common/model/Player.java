@@ -289,7 +289,7 @@ public class Player extends FreeColGameObject {
     * <pre>0 = Have not declared independence
     * 1 = Declared independence, at war with king
     * 2 = Independence granted</pre>
-    * @return
+    * @return The rebellion state.
     */
     public int getRebellionState() {
         return rebellionState;
@@ -299,11 +299,12 @@ public class Player extends FreeColGameObject {
     /**
     * Sets the rebellion status.
     * @param state The state of this player's rebellion
-    * @see getRebellionState()
+    * @see #getRebellionState
     */
     public void setRebellionState(int state) {
         rebellionState = state;
     }
+
 
     /**
     * Adds a founding father to this players continental congress
@@ -314,6 +315,7 @@ public class Player extends FreeColGameObject {
         fathers[type] = true;
     }
 
+
     /**
     * Determines whether this player has a certain Founding father.
     * @return Whether this player has a Founding father of <code>type</code>
@@ -323,6 +325,7 @@ public class Player extends FreeColGameObject {
         return fathers[type];
     }
 
+
     /**
     * Returns the number of founding fathers in this players congress. Used to calculate number
     * of bells needed to recruit new fathers.
@@ -330,11 +333,15 @@ public class Player extends FreeColGameObject {
     */
     public int getFatherCount() {
         int count = 0;
-        for(int i = 0; i < fathers.length; i++)
-            if(fathers[i] == true)
+        for(int i = 0; i < fathers.length; i++) {
+            if(fathers[i] == true) {
                 count++;
+            }
+        }
+
         return count;
     }
+
 
     /**
     * Sets this players liberty bell production to work towards recruiting <code>father</code>
@@ -427,6 +434,7 @@ public class Player extends FreeColGameObject {
 
     /**
     * Sets this player to be dead or not.
+    * @see #isDead
     */
     public void setDead(boolean dead) {
         this.dead = dead;
@@ -594,6 +602,7 @@ public class Player extends FreeColGameObject {
     * Gets an <code>Iterator</code> containing all the units this player owns.
     *
     * @return The <code>Iterator</code>.
+    * @see Unit
     */
     public Iterator getUnitIterator() {
         ArrayList units = new ArrayList();
@@ -626,12 +635,18 @@ public class Player extends FreeColGameObject {
     /**
     * Increments the player's cross count, with benefits thereof.
     * @param num The number of crosses to add.
+    * @see #setCrosses
     */
     public void incrementCrosses(int num) {
         crosses += num;
     }
 
 
+    /**
+    * Sets the number of crosses this player possess.
+    * @param crosses The number.
+    * @see #incrementCrosses
+    */
     public void setCrosses(int crosses) {
         this.crosses = crosses;
     }
@@ -723,15 +738,13 @@ public class Player extends FreeColGameObject {
     private void promptNewFather() {
         if (currentFather == FoundingFather.JOHN_PAUL_JONES) {
             // inGameController.purchaseUnitFromEurope(Unit.FRIGATE);
-        }
-        else if (currentFather == FoundingFather.BARTOLOME_DE_LAS_CASAS) {
+        } else if (currentFather == FoundingFather.BARTOLOME_DE_LAS_CASAS) {
             for(Iterator iter = getUnitIterator(); iter.hasNext(); ) {
                 Unit u = (Unit)iter.next();
                 if(u.getType() == Unit.INDIAN_CONVERT)
                     u.setType(Unit.FREE_COLONIST);
             }
-        }
-        else if (currentFather == FoundingFather.SIMON_BOLIVAR) {
+        } else if (currentFather == FoundingFather.SIMON_BOLIVAR) {
             //this.get
         }
 
@@ -744,8 +757,10 @@ public class Player extends FreeColGameObject {
     * Prepares this <code>Player</code> for a new turn.
     */
     public void newTurn() {
-        if(currentFather == -1)
+        if(currentFather == -1) {
             promptNewFather();
+        }
+
         //TODO: founding fathers - need real formula to calculate req. number of bells for next father
         if( bells >= (getFatherCount() * 100) + 200 ) {
             // add father

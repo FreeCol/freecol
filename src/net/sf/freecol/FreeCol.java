@@ -252,6 +252,14 @@ public final class FreeCol {
         return inDebugMode;
     }
 
+    
+    /**
+    * Sets the "debug mode" to be active or not.
+    */
+    public static void setInDebugMode(boolean debug) {
+        inDebugMode = debug;
+    }
+
 
     /**
     * Prints the command-line usage (the 'help' for command-line

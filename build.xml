@@ -7,6 +7,7 @@
   <property name="freecol.build.dir" value="${basedir}/src/classes"/>
   <property name="freecol.javadoc.dir" value="${basedir}/javadoc"/>
   <property name="freecol.jar.file" value="${basedir}/FreeCol.jar"/>
+  <property name="freecol.overview.file" value="${freecol.src.dir}/overview.html"/>
 
   <target name="init" unless="TSTAMP">
     <tstamp/>
@@ -80,6 +81,7 @@
   <target name="javadoc" depends="init">
     <mkdir dir="${freecol.javadoc.dir}"/>
     <javadoc sourcepath="${freecol.src.dir}"
+             overview="${freecol.overview.file}"
              destdir="${freecol.javadoc.dir}"
              packagenames="net.sf.freecol.*"
              Author="true"

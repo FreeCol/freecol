@@ -10,10 +10,12 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.FreeColMenuBar;
 import net.sf.freecol.client.gui.sound.*;
 
 import net.sf.freecol.common.model.*;
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.FreeCol;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -39,6 +41,16 @@ public final class InGameController {
     }
 
 
+
+    /**
+    * Sets the "debug mode" to be active or not. Calls
+    * {@link FreeCol#setInDebugMode} and reinitialize the
+    * <code>FreeColMenuBar</code>.
+    */
+    public void setInDebugMode(boolean debug) {
+        FreeCol.setInDebugMode(debug);
+        freeColClient.getCanvas().setJMenuBar(new FreeColMenuBar(freeColClient, freeColClient.getCanvas(), freeColClient.getGUI()));
+    }
 
 
     /**
