@@ -262,10 +262,30 @@ public class Player extends FreeColGameObject {
         }
 
         if (b == true && b != contacted[type]) {
+
+            boolean contactedIndians = false;
+            boolean contactedEuro = false;
+            for(int i=INCA; i<=TUPI; i++)
+                if(contacted[i] == true)
+                    contactedIndians = true;
+            for(int i=DUTCH; i<=SPANISH; i++)
+                    if(contacted[i] == true)
+                        contactedEuro = true;
+
+            // these dialogs should only appear on the first event
             if (player.isEuropean()) {
-                addModelMessage(this, "EventPanel.MEETING_EUROPEANS", null);
+                if(!contactedEuro)
+                    addModelMessage(this, "EventPanel.MEETING_EUROPEANS", null);
             } else {
-                addModelMessage(this, "EventPanel.MEETING_NATIVES", null);
+                if(!contactedIndians)
+                    addModelMessage(this, "EventPanel.MEETING_NATIVES", null);
+
+                // special cases for Aztec/Inca
+                if(player.getNation() == Player.AZTEC) {
+                    addModelMessage(this, "EventPanel.MEETING_AZTEC", null);
+                } else if(player.getNation() == Player.INCA) {
+                    addModelMessage(this, "EventPanel.MEETING_INCA", null);
+                }
             }
         }
 
