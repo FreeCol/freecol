@@ -185,8 +185,10 @@ public final class ImageLibrary extends ImageProvider {
                             GOODS_TOOLS = 14,
                             GOODS_MUSKETS = 15,
                             GOODS_FISH = 16,
-
-                            GOODS_COUNT = 17;
+                            GOODS_BELLS = 17,
+                            GOODS_CROSSES = 18,
+                            GOODS_HAMMERS = 19,
+                            GOODS_COUNT = 20;
 
     /**
      * The filename of the graphical representation of a specific unit is the following:
@@ -678,11 +680,6 @@ public final class ImageLibrary extends ImageProvider {
      * @return The goods-image at the given index.
      */
     public ImageIcon getGoodsImageIcon(int index) {
-        // TODO: Remove this test when graphics have been added.
-        if (index > 16) {
-            index = 0;
-        }
-
         return ((ImageIcon) goods.get(index));
     }
 
