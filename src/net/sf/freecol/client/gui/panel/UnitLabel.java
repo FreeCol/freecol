@@ -63,6 +63,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
     public UnitLabel(Unit unit, Canvas parent) {
         super(parent.getImageProvider().getUnitImageIcon(parent.getImageProvider().getUnitGraphicsType(unit)));
         this.unit = unit;
+        setToolTipText(unit.getName());
         this.parent = parent;
         selected = false;
 
@@ -128,6 +129,10 @@ public final class UnitLabel extends JLabel implements ActionListener {
     * @param g The graphics context in which to do the painting.
     */
     public void paintComponent(Graphics g) {
+        if (!getToolTipText().equals(unit.getName())) {
+            setToolTipText(unit.getName());
+        }
+
         if (selected || !unit.isCarrier()) {
             setEnabled(true);
         } else {

@@ -78,6 +78,16 @@ public final class Goods implements Locatable {
         readFromXMLElement(element);
     }
 
+
+
+    /**
+    * Returns the name of this type of goods.
+    */
+    public String getName() {
+        return getName(type);
+    }
+
+
     /**
      * Returns a textual representation of the Good of type <code>type<code>.
      * @param type  The type of good to return

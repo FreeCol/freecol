@@ -12,6 +12,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
 import net.sf.freecol.common.model.Market;
+import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.client.gui.Canvas;
 
 
@@ -39,7 +40,8 @@ public final class MarketLabel extends JLabel implements ActionListener {
         super(parent.getImageProvider().getGoodsImageIcon(type));
         
         this.type = type;
-        
+        setToolTipText(Goods.getName(type));
+
         if (market == null) {
             throw new NullPointerException();
         }
@@ -113,6 +115,10 @@ public final class MarketLabel extends JLabel implements ActionListener {
     public void paintComponent(Graphics g) {
         setEnabled(true);
 
+        if (!getToolTipText().equals(Goods.getName(type))) {
+            setToolTipText(Goods.getName(type));
+        }
+
         super.setText(Integer.toString(market.paidForSale(type)) + "/" + Integer.toString(market.costToBuy(type)));
         super.paintComponent(g);
     }
@@ -140,3 +146,4 @@ public final class MarketLabel extends JLabel implements ActionListener {
         }
     }
 }
+

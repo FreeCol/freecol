@@ -38,6 +38,7 @@ public final class GoodsLabel extends JLabel implements ActionListener {
     public GoodsLabel(Goods goods, Canvas parent) {
         super(parent.getImageProvider().getGoodsImageIcon(goods.getType()));
         this.goods = goods;
+        setToolTipText(goods.getName());
         this.parent = parent;
         selected = false;
     }
@@ -97,6 +98,9 @@ public final class GoodsLabel extends JLabel implements ActionListener {
             setEnabled(true);
         }
         */
+        if (!getToolTipText().equals(goods.getName())) {
+            setToolTipText(goods.getName());
+        }
 
         super.setText(String.valueOf(goods.getAmount()));
         super.paintComponent(g);
