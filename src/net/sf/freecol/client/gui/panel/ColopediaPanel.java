@@ -180,7 +180,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         
         setLayout(new BorderLayout());
         
-        header = new JLabel("Colopedia", JLabel.CENTER);
+        header = new JLabel("Colonizopedia", JLabel.CENTER);
         header.setFont(((Font) UIManager.get("HeaderFont")).deriveFont(0, 48));
         header.setBorder(new EmptyBorder(20, 0, 0, 0));
         add(header, BorderLayout.NORTH);
