@@ -11,8 +11,6 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
-import net.sf.freecol.common.model.Goods;
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.client.gui.Canvas;
 

@@ -12,14 +12,11 @@ import java.util.Iterator;
 
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.MessageHandler;
-import net.sf.freecol.common.model.FreeColGameObject;
 
 import net.sf.freecol.server.control.UserConnectionHandler;
-import net.sf.freecol.server.networking.DummyConnection;
 import net.sf.freecol.server.FreeColServer;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.Document;
 
 
 

@@ -1,7 +1,6 @@
 
 package net.sf.freecol.client.gui;
 
-import net.sf.freecol.common.*;
 import net.sf.freecol.common.model.*;
 
 import java.awt.event.MouseMotionListener;

@@ -1,24 +1,12 @@
 
 package net.sf.freecol.server.control;
 
-import java.awt.Color;
-import java.net.Socket;
-import java.util.Vector;
-import java.util.Iterator;
 import java.util.logging.Logger;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import net.sf.freecol.FreeCol;
 
-import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.model.Goods;
-import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.Connection;

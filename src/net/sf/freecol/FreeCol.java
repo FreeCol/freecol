@@ -41,10 +41,6 @@ import net.sf.freecol.client.gui.sound.SfxLibrary;
 import net.sf.freecol.server.FreeColServer;
 import java.io.IOException;
 
-import javax.swing.JLabel;
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
-
 
 
 /**

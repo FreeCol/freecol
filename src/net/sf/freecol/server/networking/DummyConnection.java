@@ -20,12 +20,9 @@
 
 package net.sf.freecol.server.networking;
 
-import java.io.InputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.Socket;
 
-import java.util.logging.Logger;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.networking.*;
 

@@ -1,9 +1,6 @@
 
 package net.sf.freecol.client.networking;
 
-import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.model.Unit;
-
 import net.sf.freecol.common.networking.*;
 import java.io.IOException;
 import java.util.logging.Logger;

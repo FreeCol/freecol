@@ -27,8 +27,6 @@ import java.util.logging.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import net.sf.freecol.common.FreeColException;
-
 
 /**
  * Represents an Indian settlement.

@@ -4,14 +4,8 @@ import java.util.logging.Logger;
 
 import javax.swing.JFrame;
 
-import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
-
-import javax.swing.plaf.ColorUIResource;
-import javax.swing.plaf.metal.DefaultMetalTheme;
-import javax.swing.plaf.metal.MetalLookAndFeel;
 
 
 import net.sf.freecol.client.gui.*;
@@ -22,7 +16,6 @@ import net.sf.freecol.client.networking.*;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.server.FreeColServer;
 
 

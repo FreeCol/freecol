@@ -5,8 +5,6 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Goods;
 
-import net.sf.freecol.common.FreeColException;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 

@@ -5,8 +5,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.util.EventObject;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -26,10 +24,8 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.client.control.PreGameController;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Game;
 

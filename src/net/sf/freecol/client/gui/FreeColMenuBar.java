@@ -3,7 +3,6 @@ package net.sf.freecol.client.gui;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.FreeCol;
 
-import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
 

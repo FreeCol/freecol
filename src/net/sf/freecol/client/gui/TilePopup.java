@@ -11,7 +11,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import net.sf.freecol.common.model.*;
-import net.sf.freecol.client.control.*;
 import net.sf.freecol.client.FreeColClient;
 
 

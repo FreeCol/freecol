@@ -2,8 +2,6 @@
 package net.sf.freecol.client.control;
 
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.util.logging.Logger;
@@ -14,11 +12,9 @@ import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.client.gui.Canvas;
 
 import net.sf.freecol.common.model.*;
-import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.networking.Message;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 
 import net.sf.freecol.server.FreeColServer;

@@ -13,9 +13,7 @@ import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.TransferHandler;
 
-import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Goods;
 
 /**
 * The transferhandler that is capable of creating ImageSelection objects.
@@ -63,7 +61,7 @@ public final class DefaultTransferHandler extends TransferHandler {
             return false;
         }
         for (int i = 0; i < flavor.length; i++) {
-            if (flavor[i].equals(this.flavor)) {
+            if (flavor[i].equals(DefaultTransferHandler.flavor)) {
                 return true;
             }
         }
@@ -100,8 +98,8 @@ public final class DefaultTransferHandler extends TransferHandler {
             JLabel data;
 
             // Check flavor.
-            if (t.isDataFlavorSupported(this.flavor)) {
-                data = (JLabel)t.getTransferData(this.flavor);
+            if (t.isDataFlavorSupported(DefaultTransferHandler.flavor)) {
+                data = (JLabel)t.getTransferData(DefaultTransferHandler.flavor);
             } else {
                 logger.warning("Data flavor is not supported!");
                 return false;

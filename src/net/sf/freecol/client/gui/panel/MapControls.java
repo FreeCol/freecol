@@ -9,12 +9,10 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import java.awt.FlowLayout;
 
-import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-//import net.sf.freecol.client.control.UserInputHandler;
 
 
 /**

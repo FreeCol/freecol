@@ -8,7 +8,6 @@ import java.awt.event.MouseEvent;
 import java.util.logging.Logger;
 
 import javax.swing.JComponent;
-import javax.swing.border.BevelBorder;
 import javax.swing.event.MouseInputListener;
 
 import net.sf.freecol.client.FreeColClient;

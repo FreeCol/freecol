@@ -12,8 +12,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.TransferHandler;
 
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Building;
-import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.ColonyTile;
 
 /**

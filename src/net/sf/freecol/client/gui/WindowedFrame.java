@@ -11,9 +11,6 @@ import javax.swing.JFrame;
 
 import net.sf.freecol.FreeCol;
 
-import net.sf.freecol.client.gui.sound.MusicLibrary;
-import net.sf.freecol.client.gui.sound.SfxLibrary;
-
 
 /**
 * The frame that contains everything. If full screen mode is

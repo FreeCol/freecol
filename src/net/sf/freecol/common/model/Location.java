@@ -1,16 +1,7 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.Vector;
-import net.sf.freecol.common.FreeColException;
-
-import java.util.logging.Logger;
-import java.util.HashMap;
 import java.util.Iterator;
-
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Element;
-import org.w3c.dom.Document;
 
 
 /**

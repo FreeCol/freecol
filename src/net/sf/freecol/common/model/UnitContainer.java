@@ -1,12 +1,8 @@
 
 package net.sf.freecol.common.model;
 
-import net.sf.freecol.common.FreeColException;
-
-
 import java.util.logging.Logger;
 import java.util.ArrayList;
-//import java.util.HashMap;
 import java.util.Iterator;
 
 import org.w3c.dom.NodeList;

@@ -20,7 +20,6 @@
 
 package net.sf.freecol.common.networking;
 
-import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.FreeCol;
 
 import java.io.InputStreamReader;
@@ -31,7 +30,6 @@ import java.net.SocketException;
 import java.util.logging.Logger;
 
 import java.util.Vector;
-import java.util.Iterator;
 
 
 

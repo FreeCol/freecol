@@ -1,7 +1,6 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.Vector;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Logger;
@@ -11,7 +10,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
 import net.sf.freecol.common.model.Settlement;
-import net.sf.freecol.common.FreeColException;
 
 
 /**

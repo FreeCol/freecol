@@ -1,17 +1,8 @@
 package net.sf.freecol.client.gui.plaf;
 
 import         javax.swing.plaf.metal.MetalLabelUI;
-import         javax.swing.plaf.basic.*;
 import         javax.swing.plaf.*;
 import         javax.swing.*;
-import         java.awt.*;
-
-import java.io.File;
-import java.net.URL;
-import java.util.Hashtable;
-import java.util.Vector;
-
-import javax.swing.ImageIcon;
 
 
 /**

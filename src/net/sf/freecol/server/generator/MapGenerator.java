@@ -417,9 +417,9 @@ public class MapGenerator {
                     if (landMap[i][j]) {
                         t = new Tile(game, getRandomTileType(((Math.min(j, height - j) * 100) / height)), i, j);
                         //if ((t.getType() != t.ARCTIC) && (tileType.nextInt(3) > 0)) {
-                        if ((t.getType() != t.ARCTIC) && (tileType.nextInt(3) > 1)) {
+                        if ((t.getType() != Tile.ARCTIC) && (tileType.nextInt(3) > 1)) {
                             t.setForested(true);
-                        } else if ((t.getType() != t.ARCTIC) && (t.getType() != t.TUNDRA)) {
+                        } else if ((t.getType() != Tile.ARCTIC) && (t.getType() != Tile.TUNDRA)) {
                             int k = tileType.nextInt(8);
                             if (k >= 6) {
                                 t.setAddition(Tile.ADD_MOUNTAINS);

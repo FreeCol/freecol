@@ -3,9 +3,7 @@ package net.sf.freecol.client.gui.panel;
 
 
 import java.awt.image.BufferedImage;
-import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -15,8 +13,6 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
-import net.sf.freecol.common.model.Building;
-import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.ColonyTile;

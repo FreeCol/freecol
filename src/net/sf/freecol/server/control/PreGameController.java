@@ -1,13 +1,10 @@
 
 package net.sf.freecol.server.control;
 
-import java.awt.Color;
 import java.io.IOException;
-import java.net.ConnectException;
 import java.util.logging.Logger;
 import java.util.Iterator;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.generator.MapGenerator;
 
@@ -18,10 +15,6 @@ import net.sf.freecol.server.networking.DummyConnection;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-
-
-import net.sf.freecol.server.FreeColServer;
 
 
 /**

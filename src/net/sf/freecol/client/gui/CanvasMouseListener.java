@@ -4,8 +4,6 @@ package net.sf.freecol.client.gui;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
 
-import net.sf.freecol.client.control.*;
-
 
 /**
 * Listens to mouse buttons being pressed at the

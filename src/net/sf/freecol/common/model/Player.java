@@ -21,8 +21,6 @@
 package net.sf.freecol.common.model;
 
 import java.awt.Color;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Vector;
 import java.util.Iterator;
 import java.util.ArrayList;
@@ -31,7 +29,6 @@ import net.sf.freecol.common.FreeColException;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
 
 
 

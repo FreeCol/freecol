@@ -254,7 +254,7 @@ public class SoundPlayer {
                     playSound();
 
                 // Take a little break between sounds
-                try { this.sleep(222); } catch (Exception e) {break;}
+                try { Thread.sleep(222); } catch (Exception e) {break;}
             } while (playContinues && playlist.hasNext() && !soundStopped);
         }
 
@@ -353,7 +353,7 @@ public class SoundPlayer {
                 sequencer.start();
 
                 while (!midiEOM && !soundStopped) {
-                    try { this.sleep(99); } catch (Exception e) {break;}
+                    try { Thread.sleep(99); } catch (Exception e) {break;}
                 }
 
                 sequencer.stop();
@@ -362,11 +362,11 @@ public class SoundPlayer {
                 Clip clip = (Clip) currentSound;
                 clip.start();
 
-                try { this.sleep(99); } catch (Exception e) { }
+                try { Thread.sleep(99); } catch (Exception e) { }
 
                 // Just sleep while the clip is playing, but check if the sound have been stopped every second.
                 while ((soundPaused || clip.isActive()) && !soundStopped) {
-                    try { this.sleep(1000); } catch (Exception e) {break;}
+                    try { Thread.sleep(1000); } catch (Exception e) {break;}
                 }
 
                 clip.stop();

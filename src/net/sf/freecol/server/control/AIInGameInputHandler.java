@@ -1,16 +1,11 @@
 
 package net.sf.freecol.server.control;
 
-import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.FreeColGameObject;
 
 import net.sf.freecol.server.networking.*;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -18,13 +13,10 @@ import net.sf.freecol.server.model.ServerUnit;
 
 import net.sf.freecol.server.FreeColServer;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.w3c.dom.Element;
 
 import java.util.logging.Logger;
 import java.util.Iterator;
-import java.awt.Color;
 
 import java.io.IOException;
 

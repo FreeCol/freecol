@@ -6,26 +6,14 @@ import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.Dimension;
-import java.awt.event.KeyEvent;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.util.MissingResourceException;
-import java.util.Vector;
 import java.util.logging.Logger;
 
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLayeredPane;
 import javax.swing.JPopupMenu;
 
 import javax.swing.JMenuBar;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JCheckBoxMenuItem;
-
-import net.sf.freecol.client.networking.Client;
 
 import net.sf.freecol.client.gui.panel.ChatPanel;
 
@@ -44,31 +32,19 @@ import net.sf.freecol.client.gui.panel.MapControls;
 
 import net.sf.freecol.client.gui.panel.ImageProvider;
 
-import net.sf.freecol.client.gui.sound.MusicLibrary;
-import net.sf.freecol.client.gui.sound.SfxLibrary;
-import net.sf.freecol.client.gui.sound.SoundPlayer;
 import net.sf.freecol.client.gui.i18n.Messages;
-
-import net.sf.freecol.common.FreeColException;
 
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
-import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.ModelMessage;
 
-import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.client.FreeColClient;
-
-import net.sf.freecol.client.control.*;
-
-
 
 
 /**

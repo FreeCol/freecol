@@ -2,12 +2,10 @@ package net.sf.freecol.client.gui.panel;
 
 import java.util.logging.Logger;
 
-import java.util.EventListener;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
-//import javax.swing.JPanel;
 
 
 /**

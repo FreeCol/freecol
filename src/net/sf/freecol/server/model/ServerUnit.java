@@ -1,19 +1,11 @@
 
 package net.sf.freecol.server.model;
 
-import java.util.Vector;
-import java.util.HashMap;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.logging.Logger;
-
 import net.sf.freecol.common.model.*;
-//import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.networking.DummyConnection;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.Document;
 
 
 /**

@@ -10,7 +10,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.client.gui.panel.MapControls;
 import net.sf.freecol.client.control.InGameController;
 
-import net.sf.freecol.client.control.*;
 
 /**
 * Listens to keys being pressed at the level of the Canvas.

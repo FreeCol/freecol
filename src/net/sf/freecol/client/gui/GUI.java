@@ -2,11 +2,8 @@
 package net.sf.freecol.client.gui;
 
 import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
 import java.awt.Graphics2D;
-import java.awt.Graphics;
 import java.awt.Color;
-import java.awt.Image;
 import java.util.*;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;

@@ -11,7 +11,6 @@ import javax.swing.SwingConstants;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Unit;
 
 /**

@@ -3,18 +3,15 @@ package net.sf.freecol.server;
 
 import java.io.IOException;
 import java.util.logging.Logger;
-import java.util.Vector;
 import java.util.Iterator;
 
 // XML:
 import org.w3c.dom.Element;
-import org.w3c.dom.Document;
 
 
 // Networking:
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
-import net.sf.freecol.common.networking.MessageHandler;
 
 // Control:
 import net.sf.freecol.server.control.UserConnectionHandler;
@@ -26,9 +23,6 @@ import net.sf.freecol.server.control.InGameInputHandler;
 import net.sf.freecol.server.networking.Server;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.FreeColGameObject;
-
-
 
 
 /**

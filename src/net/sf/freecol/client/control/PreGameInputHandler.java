@@ -2,14 +2,11 @@
 package net.sf.freecol.client.control;
 
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Unit;
-
-import net.sf.freecol.client.networking.*;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FreeColMenuBar;
@@ -20,10 +17,8 @@ import net.sf.freecol.client.gui.CanvasMouseListener;
 import net.sf.freecol.client.gui.CanvasKeyListener;
 import net.sf.freecol.client.gui.panel.MapControls;
 
-import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 import java.util.logging.Logger;
-import java.awt.Color;
 
 
 

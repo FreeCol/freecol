@@ -1,7 +1,5 @@
 package net.sf.freecol.common.model;
 
-import net.sf.freecol.common.FreeColException;
-
 import org.w3c.dom.Element;
 
 

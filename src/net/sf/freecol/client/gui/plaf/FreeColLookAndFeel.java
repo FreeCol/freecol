@@ -4,24 +4,7 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.plaf.*;
 import javax.swing.plaf.metal.*;
-import javax.swing.plaf.basic.*;
 import java.io.File;
-
-import net.sf.freecol.client.gui.plaf.FreeColCheckBoxUI;
-import net.sf.freecol.client.gui.plaf.FreeColComboBoxUI;
-import net.sf.freecol.client.gui.plaf.FreeColRadioButtonUI;
-import net.sf.freecol.client.gui.plaf.FreeColButtonUI;
-import net.sf.freecol.client.gui.plaf.FreeColPanelUI;
-import net.sf.freecol.client.gui.plaf.FreeColMenuBarUI;
-import net.sf.freecol.client.gui.plaf.FreeColPopupMenuUI;
-import net.sf.freecol.client.gui.plaf.FreeColTextFieldUI;
-import net.sf.freecol.client.gui.plaf.FreeColTextAreaUI;
-import net.sf.freecol.client.gui.plaf.FreeColLabelUI;
-import net.sf.freecol.client.gui.plaf.FreeColMenuItemUI;
-import net.sf.freecol.client.gui.plaf.FreeColListUI;
-import net.sf.freecol.client.gui.plaf.FreeColTableUI;
-import net.sf.freecol.client.gui.plaf.FreeColTableHeaderUI;
-import net.sf.freecol.client.gui.plaf.FreeColScrollPaneUI;
 
 
 /**
