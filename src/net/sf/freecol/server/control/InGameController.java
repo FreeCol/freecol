@@ -106,42 +106,53 @@ public final class InGameController extends Controller {
         
         // Ask the player to choose a founding father if none has been choosen:
         if (nextPlayer.isEuropean() && nextPlayer.getCurrentFather() == -1) {
-            int[] randomFoundingFathers = getRandomFoundingFathers(nextPlayer);
-
-            boolean atLeastOneChoice = false;
-            Element chooseFoundingFatherElement = Message.createNewRootElement("chooseFoundingFather");
-            for (int i=0; i<randomFoundingFathers.length; i++) {
-                chooseFoundingFatherElement.setAttribute("foundingFather" + Integer.toString(i), Integer.toString(randomFoundingFathers[i]));
-                atLeastOneChoice = true;
-            }
-            
-            if (!atLeastOneChoice) {
-                nextPlayer.setCurrentFather(-1);
-            } else {
-                try {
-                    Element reply = nextPlayer.getConnection().ask(chooseFoundingFatherElement);
-                    int foundingFather = Integer.parseInt(reply.getAttribute("foundingFather"));
-
-                    boolean foundIt = false;
-                    for (int i=0; i<randomFoundingFathers.length; i++) {
-                        if (randomFoundingFathers[i] == foundingFather) {
-                            foundIt = true;
-                            break;
-                        }
-                    }
-
-                    if (!foundIt) {
-                        throw new IllegalArgumentException();
-                    }
-
-                    nextPlayer.setCurrentFather(foundingFather);
-                } catch (IOException e) {
-                    logger.warning("Could not send message to: " + nextPlayer.getName());
-                }
-            }
+            chooseFoundingFather(nextPlayer);
         }
     }
 
+
+    private void chooseFoundingFather(ServerPlayer player) {
+        final ServerPlayer nextPlayer = player;
+        Thread t = new Thread() {
+            public void run() {
+                int[] randomFoundingFathers = getRandomFoundingFathers(nextPlayer);
+
+                boolean atLeastOneChoice = false;
+                Element chooseFoundingFatherElement = Message.createNewRootElement("chooseFoundingFather");
+                for (int i=0; i<randomFoundingFathers.length; i++) {
+                    chooseFoundingFatherElement.setAttribute("foundingFather" + Integer.toString(i), Integer.toString(randomFoundingFathers[i]));
+                    atLeastOneChoice = true;
+                }
+
+                if (!atLeastOneChoice) {
+                    nextPlayer.setCurrentFather(-1);
+                } else {
+                    try {
+                        Element reply = nextPlayer.getConnection().ask(chooseFoundingFatherElement);
+                        int foundingFather = Integer.parseInt(reply.getAttribute("foundingFather"));
+
+                        boolean foundIt = false;
+                        for (int i=0; i<randomFoundingFathers.length; i++) {
+                            if (randomFoundingFathers[i] == foundingFather) {
+                                foundIt = true;
+                                break;
+                            }
+                        }
+
+                        if (!foundIt) {
+                            throw new IllegalArgumentException();
+                        }
+
+                        nextPlayer.setCurrentFather(foundingFather);
+                    } catch (IOException e) {
+                        logger.warning("Could not send message to: " + nextPlayer.getName());
+                    }
+                }
+            }
+        };
+
+        t.start();
+    }
 
     /**
     * Returns an <code>int[]</code> with the size of {@link FoundingFather#TYPE_COUNT},

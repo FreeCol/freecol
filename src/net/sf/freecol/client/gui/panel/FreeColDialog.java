@@ -236,7 +236,11 @@ public class FreeColDialog extends JPanel {
         JPanel buttons = new JPanel(new GridLayout(1, 2));
 
         JButton okButton = new JButton(okText);
-        JButton cancelButton = new JButton(cancelText);
+        
+        JButton cancelButton = null;
+        if (cancelText != null) {
+            cancelButton = new JButton(cancelText);
+        }
 
         input.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
@@ -250,14 +254,19 @@ public class FreeColDialog extends JPanel {
             }
         });
 
-        cancelButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                inputDialog.setResponse(null);
-            }
-        });
+        if (cancelButton != null) {
+            cancelButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    inputDialog.setResponse(null);
+                }
+            });
+        }
 
         buttons.add(okButton);
-        buttons.add(cancelButton);
+        
+        if (cancelButton != null) {
+            buttons.add(cancelButton);
+        }
 
         inputDialog.add(new JLabel(text));
         inputDialog.add(input);

@@ -56,7 +56,17 @@ public final class InGameInputHandler extends InputHandler {
 
         try {
             if (element != null) {
-                if (freeColServer.getGame().getCurrentPlayer().equals(freeColServer.getPlayer(connection))) {
+                // The first messages you see here are the ones that are supported even
+                // though it is NOT the sender's turn:
+                if (type.equals("logout")) {
+                    reply = logout(connection, element);
+                } else if (type.equals("createUnit")) {
+                    reply = createUnit(connection, element);
+                } else if (type.equals("getVacantEntryLocation")) {
+                    reply = getVacantEntryLocation(connection, element);
+                } else if (type.equals("disconnect")) {
+                    reply = disconnect(connection, element);
+                } else if (freeColServer.getGame().getCurrentPlayer().equals(freeColServer.getPlayer(connection))) {
                     if (type.equals("chat")) {
                         reply = chat(connection, element);
                     } else if (type.equals("move")) {
@@ -103,34 +113,18 @@ public final class InGameInputHandler extends InputHandler {
                         reply = putOutsideColony(connection, element);
                     } else if (type.equals("clearSpeciality")) {
                         reply = clearSpeciality(connection, element);
-                    } else if (type.equals("logout")) {
-                        reply = logout(connection, element);
+                    } else if (type.equals("setNewLandName")) {
+                        reply = setNewLandName(connection, element);
                     } else if (type.equals("endTurn")) {
                         reply = endTurn(connection, element);
-                    } else if (type.equals("disconnect")) {
-                        reply = disconnect(connection, element);
-                    } else if (type.equals("createUnit")) {
-                        reply = createUnit(connection, element);
-                    } else if (type.equals("getVacantEntryLocation")) {
-                        reply = getVacantEntryLocation(connection, element);
                     } else {
                         logger.warning("Unknown request from client " + element.getTagName());
                     }
                 } else {
-                    // The messages you see here are the ones that are supported even
-                    // though it is NOT the sender's turn.
-                    if (type.equals("logout")) {
-                        reply = logout(connection, element);
-                    } else if (type.equals("createUnit")) {
-                        reply = createUnit(connection, element);
-                    } else if (type.equals("getVacantEntryLocation")) {
-                        reply = getVacantEntryLocation(connection, element);
-                    } else {
-                        // The message we've received is probably a good one, but
-                        // it was sent when it was not the sender's turn.
-                        reply = Message.createNewRootElement("error");
-                        reply.setAttribute("message", "Not your turn.");
-                    }
+                    // The message we've received is probably a good one, but
+                    // it was sent when it was not the sender's turn.
+                    reply = Message.createNewRootElement("error");
+                    reply.setAttribute("message", "Not your turn.");
                 }
             }
         } catch (Exception e) {
@@ -148,6 +142,21 @@ public final class InGameInputHandler extends InputHandler {
 
 
     /**
+    * Handles a "setNewLandName"-message from a client.
+    *
+    * @param connection The connection the message came from.
+    * @param element The element containing the request.
+    *
+    */
+    private Element setNewLandName(Connection connection, Element element) {
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
+        player.setNewLandName(element.getAttribute("newLandName"));
+        
+        return null;
+    }
+    
+
+    /**
     * Handles a "createUnit"-message from a client.
     *
     * @param connection The connection the message came from.
@@ -156,6 +165,8 @@ public final class InGameInputHandler extends InputHandler {
     */
     private Element createUnit(Connection connection, Element element) {
         Game game = getFreeColServer().getGame();
+        
+        logger.info("Receiving \"createUnit\"-request.");
 
         String taskID = element.getAttribute("taskID");
         Location location = (Location) game.getFreeColGameObject(element.getAttribute("location"));

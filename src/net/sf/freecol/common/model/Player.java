@@ -20,6 +20,8 @@
 
 package net.sf.freecol.common.model;
 
+import net.sf.freecol.client.gui.i18n.Messages;
+
 import java.awt.Color;
 import java.util.Vector;
 import java.util.Iterator;
@@ -94,6 +96,7 @@ public class Player extends FreeColGameObject {
 
     private String          name;
     private int             nation;
+    private String          newLandName = null;
 
     // Represented on the network as "color.getRGB()":
     private Color           color;
@@ -195,7 +198,29 @@ public class Player extends FreeColGameObject {
     }
 
 
+    /**
+    * Gets the name this player has choosen for the new land.
+    */
+    public String getNewLandName() {
+        return newLandName;
+    }
+    
+    
+    /**
+    * Gets the default name this player has choosen for the new land.
+    */
+    public String getDefaultNewLandName() {
+        return Messages.message("newLandName." + Integer.toString(getNation()));
+    }
 
+    
+    /**
+    * Sets the name this player uses for the new land.
+    */
+    public void setNewLandName(String newLandName) {
+        this.newLandName = newLandName;
+    }
+    
 
     /**
     * Checks if this player is european. This includes the
@@ -294,7 +319,9 @@ public class Player extends FreeColGameObject {
                         return true;
                     }
                 }
-            } else if (t != null && t.getColony() != null && t.getColony().getOwner().equals(this) && t.getColony().getLineOfSight() >= t.getDistanceTo(tile)) {
+            } 
+            
+            if (t != null && t.getColony() != null && t.getColony().getOwner().equals(this) && t.getColony().getLineOfSight() >= t.getDistanceTo(tile)) {
                 return true;
             }
         }
@@ -907,6 +934,10 @@ public class Player extends FreeColGameObject {
             playerElement.setAttribute("currentFather", Integer.toString(-1));
             playerElement.setAttribute("crossesRequired", Integer.toString(-1));
         }
+        
+        if (newLandName != null) {
+            playerElement.setAttribute("newLandName", newLandName);
+        }
 
         if (entryLocation != null) {
             playerElement.setAttribute("entryLocation", entryLocation.getID());
@@ -940,6 +971,10 @@ public class Player extends FreeColGameObject {
         rebellionState = Integer.parseInt(playerElement.getAttribute("rebellionState"));
         currentFather = Integer.parseInt(playerElement.getAttribute("currentFather"));
         crossesRequired = Integer.parseInt(playerElement.getAttribute("crossesRequired"));
+
+        if (playerElement.hasAttribute("newLandName")) {
+            newLandName = playerElement.getAttribute("newLandName");
+        }
 
         if (playerElement.hasAttribute("foundingFathers")) {
             String fatherStr = playerElement.getAttribute("foundingFathers");

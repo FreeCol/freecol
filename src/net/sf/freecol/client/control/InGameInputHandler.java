@@ -168,7 +168,13 @@ public final class InGameInputHandler extends InputHandler {
             }
 
             if ((unit.getTile() != null) && (currentPlayer.canSee(map.getNeighbourOrNull(direction, unit.getTile())))) {
-                unit.move(direction);
+                try {
+                    unit.move(direction);
+                } catch (IllegalStateException e) {
+                    System.err.println(unit.getTile().getPosition().getX() + ", " + unit.getTile().getPosition().getY());
+                    throw e;
+                }
+
                 getFreeColClient().getGUI().setFocus(unit.getTile().getPosition());                
             } else {
                 unit.dispose();

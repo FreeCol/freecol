@@ -12,6 +12,7 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.FreeColMenuBar;
 import net.sf.freecol.client.gui.sound.*;
+import net.sf.freecol.client.gui.panel.EventPanel;
 
 import net.sf.freecol.common.model.*;
 import net.sf.freecol.common.networking.Message;
@@ -195,7 +196,7 @@ public final class InGameController {
                                         }*/
             default:                    throw new RuntimeException("unrecognised move: " + move);
         }
-        
+
         freeColClient.getCanvas().getMapControls().update();
     }
 
@@ -213,6 +214,14 @@ public final class InGameController {
         Client client = freeColClient.getClient();
 
         unit.move(direction);
+
+        if (unit.getTile().isLand() && unit.getOwner().getNewLandName() == null) {
+            String newLandName = canvas.showInputDialog("newLand.text", unit.getOwner().getDefaultNewLandName(), "newLand.yes", null);
+            unit.getOwner().setNewLandName(newLandName);
+            Element setNewLandNameElement = Message.createNewRootElement("setNewLandName");
+            setNewLandNameElement.setAttribute("newLandName", newLandName);
+            canvas.showEventDialog(EventPanel.FIRST_LANDING);
+        }
 
         if (unit.getTile().getSettlement() != null && unit.isCarrier()) {
             canvas.showColonyPanel((Colony) unit.getTile().getSettlement());

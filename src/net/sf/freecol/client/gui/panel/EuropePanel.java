@@ -6,12 +6,14 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseListener;
 import java.util.logging.Logger;
 import java.util.Iterator;
 
+import javax.swing.UIManager;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
@@ -254,6 +256,29 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
     */
     public void refresh() {
         repaint(0, 0, getWidth(), getHeight());
+    }
+
+
+    /**
+    * Paints this component.
+    * @param g The graphics context in which to paint.
+    */
+    public void paintComponent(Graphics g) {
+        int width = getWidth();
+        int height = getHeight();
+
+        Image tempImage = (Image) UIManager.get("BackgroundImage");
+
+        if (tempImage != null) {
+            for (int x=0; x<width; x+=tempImage.getWidth(null)) {
+                for (int y=0; y<height; y+=tempImage.getHeight(null)) {
+                    g.drawImage(tempImage, x, y, null);
+                }
+            }
+        } else {
+            g.setColor(getBackground());
+            g.fillRect(0, 0, width, height);
+        }
     }
 
 
@@ -698,19 +723,6 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
     }
 
 
-    /**
-    * Paints this component.
-    * @param g The graphics context in which to paint.
-    */
-    public void paintComponent(Graphics g) {
-        g.setColor(getBackground());
-        g.fillRect(0, 0, getWidth(), getHeight());
-    }
-
-
-
-
-
 
     /**
     * A panel that holds UnitsLabels that represent Units that are
@@ -759,6 +771,9 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             return c;
         }
 
+        public String getUIClassID() {
+            return "ToAmericaPanelUI";
+        }
     }
 
 
@@ -810,6 +825,11 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             europePanel.refresh();
             return c;
         }
+        
+        
+        public String getUIClassID() {
+            return "ToEuropePanelUI";
+        }
     }
 
 
@@ -830,6 +850,11 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         */
         public Component add(Component comp) {
             return super.add(comp);
+        }
+        
+        
+        public String getUIClassID() {
+            return "InPortPanelUI";
         }
     }
 
@@ -883,6 +908,10 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             Component c = add(comp);
             europePanel.refresh();
             return c;
+        }
+        
+        public String getUIClassID() {
+            return "DocksPanelUI";
         }
     }
 
@@ -961,9 +990,12 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         public boolean isActive() {
             return (getSelectedUnit() != null);
         }
+
+        
+        public String getUIClassID() {
+            return "CargoPanelUI";
+        }
     }
-
-
 
 
     /**
@@ -1017,8 +1049,15 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             europePanel.refresh();
             return comp;
         }
+        
+
         public void remove(Component comp) {
           // Don't remove the marketLabel.
+        }
+        
+        
+        public String getUIClassID() {
+            return "MarketPanelUI";
         }
     }
 
@@ -1662,7 +1701,6 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             }
         }
     }
-
 
 
 }

@@ -38,7 +38,9 @@ public class ClientModelController implements ModelController {
         createUnitElement.setAttribute("owner", owner.getID());
         createUnitElement.setAttribute("type", Integer.toString(type));
 
+        logger.info("Waiting for the server to reply...");
         Element reply = client.ask(createUnitElement);
+        logger.info("Reply received from server.");
 
         if (!reply.getTagName().equals("createUnitConfirmed")) {
             logger.warning("Wrong tag name.");

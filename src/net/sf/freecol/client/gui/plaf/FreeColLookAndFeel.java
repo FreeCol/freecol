@@ -106,7 +106,6 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
         UIDefaults u = super.getDefaults();
 
         try {
-            // Add ComponentUI classes:
             u.put("CheckBoxUI", "net.sf.freecol.client.gui.plaf.FreeColCheckBoxUI");
             u.put("net.sf.freecol.client.gui.plaf.FreeColCheckBoxUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColCheckBoxUI"));
             u.put("ComboBoxUI", "net.sf.freecol.client.gui.plaf.FreeColComboBoxUI");
@@ -137,14 +136,27 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
             u.put("net.sf.freecol.client.gui.plaf.FreeColTableHeaderUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColTableHeaderUI"));
             u.put("ScrollPaneUI", "net.sf.freecol.client.gui.plaf.FreeColScrollPaneUI");
             u.put("net.sf.freecol.client.gui.plaf.FreeColScrollPaneUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColScrollPaneUI"));
+            //u.put("CargoPanelUI", "net.sf.freecol.client.gui.plaf.FreeColCargoPanelUI");
+            //u.put("net.sf.freecol.client.gui.plaf.FreeColCargoPanelUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColCargoPanelUI"));
 
-            
+            // Sharing FreeColBrightPanelUI:
+            u.put("net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI"));
+            u.put("ToAmericaPanelUI", "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI");            
+            u.put("ToEuropePanelUI", "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI");            
+            u.put("DocksPanelUI", "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI");
+            u.put("InPortPanelUI", "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI");
+            u.put("MarketPanelUI", "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI");
+            u.put("CargoPanelUI", "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI");
+
+
             // Add image UI resources:
             String [][] resources = {                
                 {"BackgroundImage", "bg.png"},
                 {"BackgroundImage2", "bg2.png"},
                 {"CanvasBackgroundImage", "bg_map1.jpg"},
+                {"CargoBackgroundImage", "bg_cargo.png"},
                 {"TitleImage", "freecol.png"},                                                
+                {"EventImage.firstLanding", "landing.png"},                                                
                 {"VictoryImage", "victory.png"},
                 {"FoundingFather.trade", "trade.png"},
                 {"FoundingFather.exploration", "exploration.png"},
@@ -152,8 +164,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
                 {"FoundingFather.political", "political.png"},
                 {"FoundingFather.religious", "religious.png"}
             };                       
-            
-            
+
             /*
               Use a media tracker to ensure that the resources are loaded
               before we start the GUI.

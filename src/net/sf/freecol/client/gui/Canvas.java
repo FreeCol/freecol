@@ -32,6 +32,7 @@ import net.sf.freecol.client.gui.panel.EuropePanel;
 import net.sf.freecol.client.gui.panel.StatusPanel;
 import net.sf.freecol.client.gui.panel.VictoryPanel;
 import net.sf.freecol.client.gui.panel.ChooseFoundingFatherDialog;
+import net.sf.freecol.client.gui.panel.EventPanel;
 
 import net.sf.freecol.client.gui.panel.MapControls;
 
@@ -107,6 +108,7 @@ public final class Canvas extends JLayeredPane {
     private final ChatDisplayThread chatDisplayThread;
     private final VictoryPanel      victoryPanel;
     private final ChooseFoundingFatherDialog chooseFoundingFatherDialog;
+    private final EventPanel        eventPanel;
     private TakeFocusThread         takeFocusThread;
     private MapControls             mapControls;
     private JMenuBar                jMenuBar;
@@ -144,6 +146,7 @@ public final class Canvas extends JLayeredPane {
         chatPanel = new ChatPanel(this, freeColClient);
         victoryPanel = new VictoryPanel(this);
         chooseFoundingFatherDialog = new ChooseFoundingFatherDialog(this);
+        eventPanel = new EventPanel(this, freeColClient);
 
         showMainPanel();
 
@@ -366,6 +369,7 @@ public final class Canvas extends JLayeredPane {
     * @param defaultValue The default value appearing in the text field.
     * @param okText The text displayed on the "ok"-button.
     * @param cancelText The text displayed on the "cancel"-button.
+    *                   Use <i>null</i> to disable the cancel-option.
     * @return The text the user have entered or <i>null</i> if the
     *         user chose to cancel the action.
     * @see FreeColDialog
@@ -374,7 +378,10 @@ public final class Canvas extends JLayeredPane {
         try {
             text = Messages.message(text);
             okText = Messages.message(okText);
-            cancelText = Messages.message(cancelText);
+            
+            if (cancelText != null) {
+                cancelText = Messages.message(cancelText);
+            }
         } catch (MissingResourceException e) {
             logger.warning("could not find message with id: " + text + ", " + okText + " or " + cancelText + ".");
         }
@@ -431,6 +438,24 @@ public final class Canvas extends JLayeredPane {
         return response;
     }
     
+    
+    /**
+    * Shows the {@link EventPanel}.
+    */
+    public boolean showEventDialog(int eventID) {
+        eventPanel.initialize(eventID);
+
+        eventPanel.setLocation(getWidth() / 2 - eventPanel.getWidth() / 2, getHeight() / 2 - eventPanel.getHeight() / 2);
+        add(eventPanel, new Integer(POPUP_LAYER.intValue() - 1));
+        eventPanel.requestFocus();
+
+        boolean response = eventPanel.getResponseBoolean();
+        
+        remove(eventPanel);
+
+        return response;
+    }
+
 
     /**
     * Displays the <code>EuropePanel</code>.
@@ -797,6 +822,7 @@ public final class Canvas extends JLayeredPane {
     * @see MainPanel
     */
     public void showMainPanel() {
+        closeMenus();
         mainPanel.setLocation(getWidth() / 2 - mainPanel.getWidth() / 2, getHeight() / 2 - mainPanel.getHeight() / 2);
         add(mainPanel);
         mainPanel.requestFocus();

@@ -1117,6 +1117,7 @@ public final class GUI {
                     g.drawImage(lib.getIndianSettlementImage(type), x + (lib.getTerrainImageWidth(tile.getType()) - lib.getIndianSettlementImageWidth(type)) / 2, y + (lib.getTerrainImageHeight(tile.getType()) - lib.getIndianSettlementImageHeight(type)) / 2, null);
 
                     g.drawImage(lib.getColorChip(((IndianSettlement)settlement).getOwner().getColor()), x + STATE_OFFSET_X, y + 10, null);
+                    g.setColor(Color.BLACK);
                     g.drawString("-", x + TEXT_OFFSET_X + STATE_OFFSET_X, y + 10 + TEXT_OFFSET_Y);
                 } else {
                     logger.warning("Requested to draw unknown settlement type.");

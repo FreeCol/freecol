@@ -37,6 +37,8 @@ public class ServerModelController implements ModelController {
         String extendedTaskID = taskID + Integer.toString(freeColServer.getGame().getTurn().getNumber());
         ServerUnit unit;
 
+        logger.info("Entering createUnit.");
+
         if (taskRegister.containsKey(extendedTaskID)) {
             unit = (ServerUnit) taskRegister.get(extendedTaskID);
 
