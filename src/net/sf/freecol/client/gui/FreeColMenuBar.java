@@ -19,6 +19,7 @@ public class FreeColMenuBar extends JMenuBar {
     private final Canvas canvas;
     private final GUI gui;
     private ArrayList inGameOptions = new ArrayList();
+    private ArrayList mapControlOptions = new ArrayList();
     
 
 
@@ -46,6 +47,7 @@ public class FreeColMenuBar extends JMenuBar {
         JMenuItem newMenuItem = new JMenuItem("New");
         newMenuItem.setOpaque(false);
         newMenuItem.setMnemonic(KeyEvent.VK_N);
+        newMenuItem.setAccelerator(KeyStroke.getKeyStroke('N', InputEvent.CTRL_MASK));
         gameMenu.add(newMenuItem);
         newMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -56,6 +58,7 @@ public class FreeColMenuBar extends JMenuBar {
         JMenuItem openMenuItem = new JMenuItem("Open");
         openMenuItem.setOpaque(false);
         openMenuItem.setMnemonic(KeyEvent.VK_O);
+        openMenuItem.setAccelerator(KeyStroke.getKeyStroke('O', InputEvent.CTRL_MASK));
         gameMenu.add(openMenuItem);
         openMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -69,6 +72,7 @@ public class FreeColMenuBar extends JMenuBar {
         JMenuItem quitMenuItem = new JMenuItem("Quit");
         quitMenuItem.setOpaque(false);
         quitMenuItem.setMnemonic(KeyEvent.VK_Q);
+        quitMenuItem.setAccelerator(KeyStroke.getKeyStroke('Q', InputEvent.CTRL_MASK));
         gameMenu.add(quitMenuItem);
         quitMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -84,9 +88,30 @@ public class FreeColMenuBar extends JMenuBar {
         add(viewMenu);
         inGameOptions.add(viewMenu);
 
-        JMenuItem europeMenuItem = new JMenuItem("Europe");
+        final JCheckBoxMenuItem mcMenuItem = new JCheckBoxMenuItem("Map controls", true);
+        mcMenuItem.setOpaque(false);
+        mcMenuItem.setMnemonic(KeyEvent.VK_M);
+        mcMenuItem.setAccelerator(KeyStroke.getKeyStroke('M', InputEvent.CTRL_MASK));
+        viewMenu.add(mcMenuItem);
+        mcMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                boolean showMC = ((JCheckBoxMenuItem) e.getSource()).isSelected();
+                if (showMC && !canvas.getMapControls().isShowing()) {
+                    canvas.getMapControls().addToComponent(canvas);
+                } else if (!showMC && canvas.getMapControls().isShowing()) {
+                    canvas.getMapControls().removeFromComponent(canvas);
+                } // else: ignore
+            }
+        });
+        inGameOptions.add(mcMenuItem);
+        mapControlOptions.add(mcMenuItem);
+
+        viewMenu.addSeparator();
+
+        final JMenuItem europeMenuItem = new JMenuItem("Europe");
         europeMenuItem.setOpaque(false);
         europeMenuItem.setMnemonic(KeyEvent.VK_E);
+        //europeMenuItem.setAccelerator(KeyStroke.getKeyStroke('E'));
         viewMenu.add(europeMenuItem);
         europeMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -133,12 +158,33 @@ public class FreeColMenuBar extends JMenuBar {
             });
         }
     }
-    
-    
+
+
+    /**
+    * Updates this <code>FreeColMenuBar</code>.
+    */
+    public void update() {
+        boolean enabled = (freeColClient.getGUI().getActiveUnit() != null)
+                          && !canvas.getColonyPanel().isShowing()
+                          && !canvas.getEuropePanel().isShowing();
+
+        Iterator componentIterator = mapControlOptions.iterator();
+        while (componentIterator.hasNext()) {
+            ((JComponent) componentIterator.next()).setEnabled(enabled);
+        }
+    }
+
+
+    /**
+    * When a <code>FreeColMenuBar</code> is disabled, it does
+    * not show the "in game options".
+    */
     public void setEnabled(boolean enabled) {
         Iterator componentIterator = inGameOptions.iterator();
         while (componentIterator.hasNext()) {
             ((JComponent) componentIterator.next()).setEnabled(enabled);
         }
+        
+        update();
     }
 }

@@ -424,6 +424,7 @@ public final class Canvas extends JLayeredPane {
             mapControls.removeFromComponent(this);
             setEnabled(false);
             add(europePanel);
+
             europePanel.requestFocus();
         }
     }
@@ -450,6 +451,16 @@ public final class Canvas extends JLayeredPane {
         colonyPanel.requestFocus();
     }
 
+    
+    /**
+    * Updates the menu bar.
+    */
+    public void updateJMenuBar() {
+        if (jMenuBar instanceof FreeColMenuBar) {
+            ((FreeColMenuBar) jMenuBar).update();
+        }
+    }
+
 
     /**
     * Removes the given component from this Container.
@@ -469,6 +480,8 @@ public final class Canvas extends JLayeredPane {
             if (takeFocus) {
                 takeFocus();
             }
+            
+            updateJMenuBar();
 
             repaint(bounds.x, bounds.y, bounds.width, bounds.height);
         }
@@ -490,6 +503,8 @@ public final class Canvas extends JLayeredPane {
         }
         
         Component c = super.add(comp);
+        updateJMenuBar();
+        
         return c;
     }
 
@@ -510,6 +525,7 @@ public final class Canvas extends JLayeredPane {
         }
 
         super.add(comp, i);
+        updateJMenuBar();
     }
 
 
@@ -544,6 +560,22 @@ public final class Canvas extends JLayeredPane {
         }
     }
 
+
+    /**
+    * Gets the <code>ColonyPanel</code>.
+    */
+    public ColonyPanel getColonyPanel() {
+        return colonyPanel;
+    }
+    
+    
+    /**
+    * Gets the <code>EuropePanel</code>.
+    */
+    public EuropePanel getEuropePanel() {
+        return europePanel;
+    }
+    
 
     /**
     * Enables or disables this component depending on the given argument.
@@ -887,7 +919,7 @@ public final class Canvas extends JLayeredPane {
      * Displays a quit dialog and, if desired, logouts the current game and shows the new game panel.
      */
     public void newGame() {
-        if(!confirmQuitDialog()) {
+        if(!showConfirmDialog("stopCurrentGame.text", "stopCurrentGame.yes", "stopCurrentGame.no")) {
             return;
         }
 

@@ -13,6 +13,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
+import java.awt.event.ActionEvent;
 
 
 /**
@@ -30,42 +31,30 @@ public final class MapControls {
     public static final String  REVISION = "$Revision$";
     public static final int EUROPE = 2;
     public static final int UNITBUTTON = 3;
-    public static final int MINIMAP_ZOOMOUT = 13;
-    public static final int MINIMAP_ZOOMIN = 14;
 
     private JComponent  container;
     private FreeColClient freeColClient;
-    
-    private final JButton          miniMapZoomOutButton;
-    private final JButton          miniMapZoomInButton;
+
     private final InfoPanel        infoPanel;
     private final MiniMap          miniMap;
-    //private final Game             game;
-    //private final ImageProvider    imageProvider;
     private final UnitButton[]     unitButton;
     private final int              NUMBER_OF_BUTTONS = 8;
-    //private UserInputHandler       userInputHandler;
     private GUI                    gui;
+
     
+    
+
     /**
     * The basic constructor.
     */
     public MapControls(FreeColClient freeColClient, GUI gui) {
         this.freeColClient = freeColClient;
         this.gui = gui;
-        //this.game = game;
-        //this.imageProvider = imageProvider;
         container = null;
         
         //
         // Create GUI Objects
         //
-        
-        miniMapZoomOutButton = new JButton("-");
-        miniMapZoomInButton = new JButton("+");
-        
-        miniMapZoomOutButton.setOpaque(true);
-        miniMapZoomInButton.setOpaque(true);
 
         infoPanel = new InfoPanel(freeColClient, freeColClient.getGame(), freeColClient.getGUI().getImageLibrary());
         miniMap = new MiniMap(freeColClient, freeColClient.getGame().getMap(), freeColClient.getGUI().getImageLibrary(), container);
@@ -81,32 +70,26 @@ public final class MapControls {
         
         infoPanel.setFocusable(false);
         miniMap.setFocusable(false);
-        miniMapZoomOutButton.setFocusable(false);
-        miniMapZoomInButton.setFocusable(false);
         for(int i=0; i<NUMBER_OF_BUTTONS; i++) {
             unitButton[i].setFocusable(false);
         }
-        
-        
-        //
-        // Resize GUI Objects
-        //
-        
-        miniMapZoomOutButton.setSize(50, 20);
-        miniMapZoomInButton.setSize(50, 20);
-        
+
         
         //
         // Set ActionCommands
         //
         
-        miniMapZoomOutButton.setActionCommand(String.valueOf(MINIMAP_ZOOMOUT));
-        miniMapZoomInButton.setActionCommand(String.valueOf(MINIMAP_ZOOMIN));
+        /*miniMapZoomOutButton.setActionCommand(String.valueOf(MINIMAP_ZOOMOUT));
+        miniMapZoomInButton.setActionCommand(String.valueOf(MINIMAP_ZOOMIN));*/
         for(int i=0; i<NUMBER_OF_BUTTONS; i++) {
             unitButton[i].setActionCommand(String.valueOf(UNITBUTTON + i));
         }        
     }
+
+
     
+    
+
     /**
     * Adds the map controls to the given component.
     * @param component The component to add the map controls to.
@@ -128,31 +111,21 @@ public final class MapControls {
         unitButton[5].initialize(UnitButton.UNIT_BUTTON_ROAD, imageProvider);
         unitButton[6].initialize(UnitButton.UNIT_BUTTON_BUILD, imageProvider);
         unitButton[7].initialize(UnitButton.UNIT_BUTTON_DISBAND, imageProvider);
-        
+
         //
         // Relocate GUI Objects
         //
-        
+
         infoPanel.setLocation(container.getWidth() - infoPanel.getWidth(), container.getHeight() - infoPanel.getHeight());
         miniMap.setLocation(0, container.getHeight() - miniMap.getHeight());
         for(int i=0; i<NUMBER_OF_BUTTONS; i++) {
             int SPACE = unitButton[0].getWidth() + 5;
             unitButton[i].setLocation(miniMap.getWidth() + (infoPanel.getX() - miniMap.getWidth() - NUMBER_OF_BUTTONS*SPACE)/2 + i*SPACE, container.getHeight() - 40);
         }
-        
-        JPanel mapZoomButtons = new JPanel(new FlowLayout());
-
-        miniMapZoomOutButton.setLocation(0, container.getHeight() - miniMapZoomOutButton.getHeight());
-        miniMapZoomInButton.setLocation(miniMapZoomOutButton.getWidth(), container.getHeight() - miniMapZoomInButton.getHeight());
-
 
         //
         // Add the GUI Objects to the container
         //
-
-        container.add(miniMapZoomOutButton);
-        container.add(miniMapZoomInButton);
-
 
         container.add(infoPanel);
         container.add(miniMap);
@@ -162,6 +135,7 @@ public final class MapControls {
 
         updateButtons();
     }
+
 
     /**
     * Removes the map controls from the given component.
@@ -175,8 +149,7 @@ public final class MapControls {
         if (container != null) {
             container.remove(infoPanel);
             container.remove(miniMap);
-            container.remove(miniMapZoomOutButton);
-            container.remove(miniMapZoomInButton);
+            
             for(int i=0; i<NUMBER_OF_BUTTONS; i++) {
                 container.remove(unitButton[i]);
             }
@@ -184,40 +157,20 @@ public final class MapControls {
             container = null;
         }
     }
+
     
-    /**
-    * Adds an ActionListener to the map controls.
-    * @param l The ActionListener to add to the map controls.
-    */
-    public void addActionListener(ActionListener l) {
-        //
-        // Add ActionListener to GUI Objects
-        //    
-    
-        miniMapZoomOutButton.addActionListener(l);
-        miniMapZoomInButton.addActionListener(l);
-        for(int i=0; i<NUMBER_OF_BUTTONS; i++) {
-            unitButton[i].addActionListener(l);
-        }
+    public boolean isShowing() {
+        return (container != null);
     }
-    
-    /**
-    * Sets the userInputHandler field
-    * @param userInputHandler the UserInputHandler to set
-    */
-    /*public void setUserInputHandler(UserInputHandler userInputHandler) {
-        this.userInputHandler = userInputHandler;
-        for (int i=0; i<NUMBER_OF_BUTTONS; i++) {
-            unitButton[i].setUserInputHandler(userInputHandler);
-        }
-    }*/
-    
+
+
     /**
     * Zooms in the mini map
     */
     public void zoomIn() {
         miniMap.zoomIn();
     }
+
     
     /**
     * Zooms out the mini map
@@ -226,27 +179,24 @@ public final class MapControls {
         miniMap.zoomOut();
     }
 
-    /**
-    * Updates the moves of the displayed unit (or erases it if null provided).
-    * @param unit The displayed unit (or null if none)
-    */
-    public void updateMoves(Unit unit) {
-        infoPanel.updateMoves(unit);
-    }
     
     /**
-    * Pushes one of the unit buttons
-    * @param buttonNumber The index of the button to be pushed
+    * Updates this <code>MapControls</code>.
     */
-    public void pushUnitButton(int buttonNumber) {
-        unitButton[buttonNumber].push();
+    public void update() {
+        if (infoPanel.getUnit() != freeColClient.getGUI().getActiveUnit()) {
+            infoPanel.update(freeColClient.getGUI().getActiveUnit());
+        }
+
+        updateButtons();
     }
-    
+
+
     /**
     * Updates the buttons depending on the currently selected unit. Buttons may
     * disappear or become enabled or disabled.
     */
-    public void updateButtons() {
+    private void updateButtons() {
         ImageProvider imageProvider = freeColClient.getGUI().getImageLibrary();    
         Unit selectedOne = freeColClient.getGUI().getActiveUnit();
         if(selectedOne == null) {
@@ -266,7 +216,7 @@ public final class MapControls {
         }
         
         /* Done
-        *  All units can be done
+        *  All units can be skipped
         */
         if (true) {
             unitButton[1].setEnabled(true);
@@ -283,7 +233,7 @@ public final class MapControls {
         *  All units can sentry
         */
         if (true) {
-            unitButton[3].setEnabled(true);
+            unitButton[3].setEnabled(false);
         }
         
         /* Clear Forest / Plow Fields
@@ -314,7 +264,7 @@ public final class MapControls {
         *  Only colonists can do this, only if they have at least 20 tools, and only if they are
         *  in a land square that does not already have roads
         */
-        if (unitType >= 0 && unitType <= 28 && selectedOne.getNumberOfTools() >= 20 && selectedOne.getTile() != null) {
+        if (selectedOne.getTile() != null && selectedOne.isPioneer()) {
             Tile tile = selectedOne.getTile();
             if(tile.isLand() && !tile.hasRoad()) {
                 unitButton[5].setEnabled(true);
@@ -328,13 +278,8 @@ public final class MapControls {
         /* Build a new colony
         *  Only colonists can do this, and only if they are on a 'colonizeable' tile
         */
-        if (unitType >= 0 && unitType <= 28 && selectedOne.getTile() != null) {
-            Tile tile = selectedOne.getTile();
-            if(tile.isColonizeable()) {
-                unitButton[6].setEnabled(true); 
-            } else {
-                unitButton[6].setEnabled(false);
-            }
+        if (selectedOne.getTile() != null && selectedOne.canBuildColony()) {
+            unitButton[6].setEnabled(true);
         } else {
             unitButton[6].setEnabled(false);
         }

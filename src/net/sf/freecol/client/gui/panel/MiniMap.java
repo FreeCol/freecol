@@ -1,5 +1,9 @@
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.awt.FlowLayout;
+import java.awt.Insets;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -8,7 +12,10 @@ import java.awt.event.MouseEvent;
 import java.util.logging.Logger;
 
 import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JButton;
 import javax.swing.event.MouseInputListener;
+import javax.swing.border.BevelBorder;
 
 import net.sf.freecol.client.FreeColClient;
 
@@ -22,23 +29,30 @@ import net.sf.freecol.common.model.Tile;
  * to see a larger part of the map and to relocate the viewport by
  * clicking on it.
  */
-public final class MiniMap extends JComponent implements MouseInputListener {
+public final class MiniMap extends JPanel implements MouseInputListener {
     public static final String COPYRIGHT = "Copyright (C) 2003 The FreeCol Team";
     public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String REVISION = "$Revision$";
 
     private static final Logger logger = Logger.getLogger(MiniMap.class.getName());
+    public static final int MINIMAP_ZOOMOUT = 13;
+    public static final int MINIMAP_ZOOMIN = 14;
 
     private FreeColClient freeColClient;
     private final Map map;
     private final ImageProvider imageProvider;
     private JComponent container;
+    private final JButton          miniMapZoomOutButton;
+    private final JButton          miniMapZoomInButton;
 
     private int tileSize; //tileSize is the size (in pixels) that each tile will take up on the mini map
 
     /* The top left tile on the mini map represents the tile
     * (xOffset, yOffset) in the world map */
     private int xOffset, yOffset;
+
+    
+
 
     /**
      * The constructor that will initialize this component.
@@ -55,22 +69,78 @@ public final class MiniMap extends JComponent implements MouseInputListener {
 
         tileSize = 12;
 
-        setBackground(Color.BLACK);
-        setSize(256, 128);
+        //setBackground(Color.BLACK);
         addMouseListener(this);
         addMouseMotionListener(this);
+        setLayout(null);
+        setSize(256, 128);
+
+        try {
+            BevelBorder border = new BevelBorder(BevelBorder.RAISED);
+            setBorder(border);
+        } catch(Exception e) {}
+        
+
+
+        // Add buttons:
+        miniMapZoomOutButton = new JButton("-");
+        miniMapZoomOutButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                zoomOut();
+            }
+        });
+
+        miniMapZoomInButton = new JButton("+");
+        miniMapZoomInButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                zoomIn();
+            }
+        });
+
+        miniMapZoomOutButton.setFocusable(false);
+        miniMapZoomInButton.setFocusable(false);
+        miniMapZoomOutButton.setOpaque(true);
+        miniMapZoomInButton.setOpaque(true);
+        miniMapZoomOutButton.setSize(50, 20);
+        miniMapZoomInButton.setSize(50, 20);
+        miniMapZoomOutButton.setActionCommand(String.valueOf(MINIMAP_ZOOMOUT));
+        miniMapZoomInButton.setActionCommand(String.valueOf(MINIMAP_ZOOMIN));
+
+        int bh;
+        int bw;
+        if (getBorder() != null) {
+            Insets insets = getBorder().getBorderInsets(this);
+            bh = getHeight() - Math.max(miniMapZoomOutButton.getHeight(), miniMapZoomInButton.getHeight()) - insets.bottom;
+            bw = insets.left;
+        } else {
+            bh = getHeight() - Math.max(miniMapZoomOutButton.getHeight(), miniMapZoomInButton.getHeight());
+            bw = 0;
+        }
+
+        miniMapZoomOutButton.setLocation(bw, bh);
+        miniMapZoomInButton.setLocation(bw + miniMapZoomOutButton.getWidth(), bh);
+        add(miniMapZoomInButton);
+        add(miniMapZoomOutButton);
     }
+
+    
+    
+
 
     public void setContainer(JComponent container) {
         this.container = container;
     }
+
 
     /**
      * Zooms in the mini map
      */
     public void zoomIn() {
         tileSize += 4;
+        miniMapZoomOutButton.setEnabled(true);
+        repaint();
     }
+
 
     /**
      * Zooms out the mini map
@@ -79,7 +149,14 @@ public final class MiniMap extends JComponent implements MouseInputListener {
         if (tileSize > 4) {
             tileSize -= 4;
         }
+        
+        if (tileSize <= 4) {
+            miniMapZoomOutButton.setEnabled(false);
+        }
+
+        repaint();
     }
+
 
     /**
      * Paints this component.
@@ -230,9 +307,11 @@ public final class MiniMap extends JComponent implements MouseInputListener {
         g.drawRect(miniRectX - miniRectWidth / 2, miniRectY - miniRectHeight / 2, miniRectWidth, miniRectHeight);
     }
 
+
     public void mouseClicked(MouseEvent e) {
 
     }
+
 
     /* Used to keep track of the initial values of xOffset
      * and yOffset for more accurate dragging */
@@ -254,21 +333,28 @@ public final class MiniMap extends JComponent implements MouseInputListener {
         freeColClient.getGUI().setFocus(tileX, tileY);
     }
 
+
     public void mouseReleased(MouseEvent e) {
 
     }
+
 
     public void mouseEntered(MouseEvent e) {
 
     }
 
+
     public void mouseExited(MouseEvent e) {
 
     }
 
-    /* If the user drags the mouse, then continue
-     * to refocus the screen */
+
     public void mouseDragged(MouseEvent e) {
+        /*
+          If the user drags the mouse, then continue
+          to refocus the screen
+        */
+
         if (!e.getComponent().isEnabled()) {
             return;
         }
@@ -279,6 +365,7 @@ public final class MiniMap extends JComponent implements MouseInputListener {
         int tileY = (int) (y / tileSize * 4) + initialY;
         freeColClient.getGUI().setFocus(tileX, tileY);
     }
+
 
     public void mouseMoved(MouseEvent e) {
 

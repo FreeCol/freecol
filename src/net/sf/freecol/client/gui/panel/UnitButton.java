@@ -44,14 +44,16 @@ public final class UnitButton extends JButton {
                             UNIT_BUTTON_DISBAND = 8,
                             UNIT_BUTTON_COUNT = 9;
 
+    
+    
     /**
     * The basic constructor
     */
     public UnitButton(FreeColClient freeColClient, GUI gui) {
-      //userInputHandler = null;
       this.gui = gui;
       this.freeColClient = freeColClient;
     }
+        
     
     /**
     * A constructor which initializes the container
@@ -61,27 +63,12 @@ public final class UnitButton extends JButton {
         this.container = container;
         this.gui = gui;
         this.freeColClient = freeColClient;
-        //userInputHandler = null;
     }
-
-    /**
-    * A constructor which sets the Unit for this class
-    * @param container The JComponent that contains this button
-    * @param unit The Unit that this button sends commands to
-    */
-    /*public UnitButton(JComponent container, UserInputHandler userInputHandler) {
-        this.container = container;
-        this.userInputHandler = userInputHandler;
-    }*/
-
-    /**
-    * Sets the userInputHandler field
-    * @param userInputHandler The UserInputHandler to set it to
-    */
-    /*public void setUserInputHandler(UserInputHandler userInputHandler) {
-        this.userInputHandler = userInputHandler;
-    }*/
     
+
+    
+    
+
     /**
     * Sets various attributes about the button, as well as the picture set
     * @param index The picture set to use (see definitions in ImageLibrary.java)
@@ -107,6 +94,7 @@ public final class UnitButton extends JButton {
         });
     }
 
+
     /**
     * Sets the container
     * @param container The JComponent to set as the container
@@ -115,6 +103,7 @@ public final class UnitButton extends JButton {
         this.container = container;
     }
     
+
     /**
     * A function that removes this button from its container
     */
@@ -122,6 +111,7 @@ public final class UnitButton extends JButton {
         container.remove(this);
     }
     
+
     /**
     * Gets called when this button becomes pressed
     * The button will determine what it is supposed to do
@@ -129,52 +119,51 @@ public final class UnitButton extends JButton {
     public void push() {
         switch(buttonType) {
             case UNIT_BUTTON_WAIT:
+                if (gui.getActiveUnit() != null) {
+                    freeColClient.getInGameController().nextActiveUnit();
+                }
                 break;
             
             case UNIT_BUTTON_DONE:
-                //userInputHandler.endTurn();
+                if (gui.getActiveUnit() != null) {
+                    freeColClient.getInGameController().skipActiveUnit();
+                }
                 break;
                 
             case UNIT_BUTTON_FORTIFY:
                 if (gui.getActiveUnit() != null) {
                     freeColClient.getInGameController().changeState(gui.getActiveUnit(), Unit.FORTIFY);
                 }
-                //userInputHandler.changeOccupation(Unit.FORTIFY);
                 break;
                 
             case UNIT_BUTTON_SENTRY:
                 if (gui.getActiveUnit() != null) {
                     freeColClient.getInGameController().changeState(gui.getActiveUnit(), Unit.SENTRY);
                 }
-                //userInputHandler.changeOccupation(Unit.SENTRY);
                 break;
             
             case UNIT_BUTTON_CLEAR:
                 if (gui.getActiveUnit() != null) {
                     freeColClient.getInGameController().changeState(gui.getActiveUnit(), Unit.PLOW);
                 }
-                //userInputHandler.changeOccupation(Unit.PLOW);
                 break;
             
             case UNIT_BUTTON_PLOW:
                 if (gui.getActiveUnit() != null) {
                     freeColClient.getInGameController().changeState(gui.getActiveUnit(), Unit.PLOW);
                 }
-                //userInputHandler.changeOccupation(Unit.PLOW);
                 break;
             
             case UNIT_BUTTON_ROAD:
                 if (gui.getActiveUnit() != null) {
                     freeColClient.getInGameController().changeState(gui.getActiveUnit(), Unit.BUILD_ROAD);
                 }
-                //userInputHandler.changeOccupation(Unit.BUILD_ROAD);
                 break;
             
             case UNIT_BUTTON_BUILD:
                 if (gui.getActiveUnit() != null) {
                     freeColClient.getInGameController().buildColony();
                 }
-                //userInputHandler.changeOccupation(Unit.BUILD_COLONY);
                 break;
             
             case UNIT_BUTTON_DISBAND:

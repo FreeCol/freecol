@@ -13,6 +13,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Unit;
 
+
 /**
  * This is the panel that shows more details about the currently selected unit
  * and the tile it stands on. It also shows the amount of gold the player has left
@@ -36,6 +37,8 @@ public final class InfoPanel extends JPanel {
     private final Game          game;
     private final ImageProvider imageProvider;
     private Unit unit;
+
+    
 
     /**
     * The constructor that will add the items to this panel.
@@ -96,6 +99,9 @@ public final class InfoPanel extends JPanel {
         setSize(256, 128);
     }
 
+    
+    
+
     /**
     * Paints this component.
     * @param graphics The Graphics context in which to draw this component.
@@ -124,20 +130,23 @@ public final class InfoPanel extends JPanel {
         super.paintComponent(graphics);
     }
 
+
     /**
-    * Updates the moves of the displayed unit (or erases it if null provided).
+    * Updates this <code>InfoPanel</code>.
     * @param unit The displayed unit (or null if none)
     */
-    public void updateMoves(Unit unit) {
+    public void update(Unit unit) {
         this.unit = unit;
-
-        if (unit == null) {
-            unitLabel.setIcon(null);
-            unitNameLabel.setText("");
-            unitMovesLabel.setText("");
-        } else {
-            unitMovesLabel.setText("Moves: " + unit.getMovesLeft() + "/" +
-                                   unit.getInitialMovesLeft());
-        }
+    }
+    
+    
+    /**
+    * Gets the <code>Unit</code> in which this <code>InfoPanel</code> is 
+    * displaying information about.
+    *
+    * @return The <code>Unit</code> or <i>null</i> if no <code>Unit</code> applies.
+    */
+    public Unit getUnit() {
+        return unit;
     }
 }

@@ -399,6 +399,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             return ILLEGAL_MOVE;
         }
 
+        if (target == null) { // TODO: do not allow "MOVE_HIGH_SEAS" north and south.
+            return isNaval() ? MOVE_HIGH_SEAS : ILLEGAL_MOVE;
+        }
+
         // Check for disembark.
         if (isNaval() && target.isLand()) {
             if (target.getSettlement() != null && target.getSettlement().getOwner() == getOwner()) {
@@ -421,10 +425,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
 
         if (target.getMoveCost(getTile()) > getMovesLeft() + 1 && getMovesLeft() < getInitialMovesLeft()) {
             return ILLEGAL_MOVE;
-        }
-
-        if (target == null) {
-            return isNaval() ? MOVE_HIGH_SEAS : ILLEGAL_MOVE;
         }
 
         // Check for an 'attack' instead of 'move'.

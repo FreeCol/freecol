@@ -190,6 +190,8 @@ public final class InGameController {
                                         }*/
             default:                    throw new RuntimeException("unrecognised move: " + move);
         }
+        
+        freeColClient.getCanvas().getMapControls().update();
     }
 
 

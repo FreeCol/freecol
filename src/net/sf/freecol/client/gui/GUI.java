@@ -244,7 +244,8 @@ public final class GUI {
 
         this.activeUnit = activeUnit;
 
-        freeColClient.getCanvas().getMapControls().updateMoves(activeUnit);
+        //freeColClient.getCanvas().getMapControls().updateMoves(activeUnit);
+        freeColClient.getCanvas().getMapControls().update();
 
         //TODO: update only within the bounds of InfoPanel
         freeColClient.getCanvas().repaint(0, 0, getWidth(), getHeight());
@@ -605,7 +606,7 @@ public final class GUI {
         /*
         PART 2
         ======
-        Display the Tiles.
+        Display the Tiles and the Units.
         */
 
         g.setColor(Color.black);
@@ -622,38 +623,17 @@ public final class GUI {
             // Column per column; start at the left side
             for (int tileX = clipLeftCol; tileX <= clipRightCol; tileX++) {
                 if (map.isValid(tileX, tileY)) {
+                    // Display the Tile:
                     displayTile(g, map, map.getTile(tileX, tileY), xx, yy);
-                }
-                xx += tileWidth;
-            }
-            yy += tileHeight / 2;
-        }
 
-        /*
-        PART 3
-        ======
-        Display the Units.
-        */
-
-        yy = clipTopY;
-
-        // Row per row; start with the top row
-        for (int tileY = clipTopRow; tileY <= clipBottomRow; tileY++) {
-            xx = clipLeftX;
-            if ((tileY % 2) != 0) {
-                xx += tileWidth / 2;
-            }
-
-            Unit activeUnit = getActiveUnit();
-            // Column per column; start at the left side
-            for (int tileX = clipLeftCol; tileX <= clipRightCol; tileX++) {
-                Tile unitTile = gameData.getMap().getTileOrNull(tileX, tileY);
-
-                if (unitTile != null && unitTile.getUnitCount() > 0 && (unitTile.getSettlement() == null || (activeUnit != null && unitTile.contains(activeUnit)))) {
-                    if ((activeUnit != null) && (unitTile.contains(activeUnit))) {
-                        displayUnit(g, activeUnit, xx, yy);
-                    } else {
-                        displayUnit(g, unitTile.getFirstUnit(), xx, yy);
+                    // Display any units on that Tile:
+                    Tile unitTile = map.getTile(tileX, tileY);
+                    if (unitTile != null && unitTile.getUnitCount() > 0 && (unitTile.getSettlement() == null || (activeUnit != null && unitTile.contains(activeUnit)))) {
+                        if ((activeUnit != null) && (unitTile.contains(activeUnit))) {
+                            displayUnit(g, activeUnit, xx, yy);
+                        } else {
+                            displayUnit(g, unitTile.getFirstUnit(), xx, yy);
+                        }
                     }
                 }
                 xx += tileWidth;
@@ -662,7 +642,7 @@ public final class GUI {
         }
 
         /*
-        PART 4
+        PART 3
         ======
         Display the colony names.
         */
@@ -690,7 +670,7 @@ public final class GUI {
         }
 
         /*
-        PART 5
+        PART 4
         ======
         Display the messages.
         */
@@ -967,7 +947,7 @@ public final class GUI {
             if (map.isValid(p)) {
                 Tile borderingTile = map.getTile(p);
 
-                if (!drawUnexploredBorders && !borderingTile.isExplored()) {
+                if (!drawUnexploredBorders && !borderingTile.isExplored() && i >= 3 && i <= 5) {
                     continue;
                 }
 
@@ -1130,6 +1110,21 @@ public final class GUI {
                 g.fill(pol);
                 g.setComposite(oldComposite);
             }
+            
+            if (drawUnexploredBorders) {
+                for (int i = 3; i < 6; i++) {
+                    Map.Position p = map.getAdjacent(pos, i);
+                    if (map.isValid(p)) {
+                        Tile borderingTile = map.getTile(p);
+
+                        if (borderingTile.isExplored()){
+                            continue;
+                        }
+
+                        g.drawImage(lib.getTerrainImage(borderingTile.getType(), i, tile.getX(), tile.getY()), x, y, null);
+                    }
+                }
+            }
         }
 
         if (tile.getPosition().equals(selectedTile)) {
@@ -1222,7 +1217,12 @@ public final class GUI {
         this.inGame = inGame;
     }
 
-    
+
+    /**
+    * Checks if the game has started.
+    * @return <i>true</i> if the game has started.
+    * @see #setInGame
+    */
     public boolean isInGame() {
         return inGame;
     }
