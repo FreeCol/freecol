@@ -37,7 +37,7 @@ public final class FreeCol {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    private  static final String FREECOL_VERSION = "0.2.1";
+    private  static final String FREECOL_VERSION = "0.3.0";
 
     private static final String MIN_JDK_VERSION = "1.4";
     private static final String  FILE_SEP = System.getProperty("file.separator");
