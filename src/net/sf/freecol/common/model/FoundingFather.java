@@ -26,6 +26,7 @@ package net.sf.freecol.common.model;
 */
 public class FoundingFather {
 
+    // Remember to update the list in "getWeight" when you add an effect to a founding father:
     public static final int ADAM_SMITH = 0,
                             JACOB_FUGGER = 1, //TODO
                             PETER_MINUIT = 2, //TODO
@@ -61,7 +62,7 @@ public class FoundingFather {
                             RELIGIOUS = 4,
                             TYPE_COUNT = 5;
 
-
+    
     public static String getName(int foundingFather) {
         return getPrefix(foundingFather) + ".name";
     }
@@ -152,6 +153,13 @@ public class FoundingFather {
 
 
     public static int getWeight(int foundingFather, int age) {
+        // This is the list of the founding fathers without effects:
+        if (foundingFather == JACOB_FUGGER || foundingFather == PETER_MINUIT || foundingFather == PETER_STUYVESANT ||
+                foundingFather == JAN_DE_WITT || foundingFather == HERNANDO_DE_SOTO || foundingFather == HERNAN_CORTES ||
+                foundingFather == POCAHONTAS || foundingFather == THOMAS_PAINE || foundingFather == BENJAMIN_FRANKLIN ||
+                foundingFather == FATHER_JEAN_DE_BREBEUF || foundingFather == JUAN_DE_SEPULVEDA) {
+            return 0;
+        }
         if (age == 1) {
             return getWeight1(foundingFather);
         } else if (age == 2) {
