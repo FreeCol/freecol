@@ -2345,33 +2345,37 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             defender.dispose();
 
             if (newTile.getSettlement() != null) {
-                //Random rand = new Random(); // Support for random numbers in the model has not yet been added.
-                if (newTile.getSettlement().getUnitCount() <= 0 && newTile.getSettlement() instanceof IndianSettlement) {
-                    /* Support for adding FreeColGameObjects from the model has not yet been added:
-                    Unit treasure = new Unit(getGame(), owner, Unit.TREASURE_TRAIN);
-                    if(newTile.getSettlement().getOwner().getNation() == Player.INCA ||
-                            newTile.getSettlement().getOwner().getNation() == Player.AZTEC) {
-                        treasure.setTreasureAmount((rand.nextInt(10)+1) * 10000);
-                        if (((IndianSettlement) newTile.getSettlement()).isCapital() ) {
-                            treasure.setTreasureAmount(treasure.getTreasureAmount()+10000);
-                        }
-                    } else {
-                        treasure.setTreasureAmount((rand.nextInt(20)+1) * 100);
-                    }
+                if(newTile.getSettlement().getUnitCount() <= 0 && newTile.getSettlement() instanceof IndianSettlement) {
+                        newTile.getSettlement().dispose();
 
-                    addModelMessage(this, "model.unit.indianTreasure", new String[][] {{"%indian%", newTile.getSettlement().getOwner().getNationAsString()}, {"%amount%", Integer.toString(treasure.getTreasureAmount())}});
-                    */
-                    newTile.getSettlement().dispose();
-                    //newTile.add(treasure);
-                    setLocation(newTile);
-                }
-            }
+                        int rand = getGame().getModelController().getRandom(getID()+"indianTreasureRandom", 11);
+                        Unit tTrain = getGame().getModelController().createUnit(
+                                getID()+"indianTreasure", newTile, owner, Unit.TREASURE_TRAIN);
+
+                        // Incan and Aztecs give more gold
+                        if(newTile.getSettlement().getOwner().getNation() == Player.INCA ||
+                                newTile.getSettlement().getOwner().getNation() == Player.AZTEC) {
+                            tTrain.setTreasureAmount( (rand+1) * 10000);
+                        } else {
+                            if(rand < 2)
+                                rand = 2;
+                            tTrain.setTreasureAmount((rand+1) * 100);
+                        }
+
+                        // capitals give more gold
+                        if( ((IndianSettlement)newTile.getSettlement()).isCapital() )
+                            tTrain.setTreasureAmount( (int) (tTrain.getTreasureAmount()*1.6f));
+
+                        addModelMessage(this, "model.unit.indianTreasure", new String[][] {{"%indian%", newTile.getSettlement().getOwner().getNationAsString()}, {"%amount%", Integer.toString(tTrain.getTreasureAmount())}});
+                        setLocation(newTile);
+                    }
+                }*/
         } else if (isNaval()) {
-            //TODO: seizure of cargo and the like. For now just sink.
-            Iterator iter = defender.getGoodsIterator();
-            while(iter.hasNext())
-            {
-                //addModelMessage();
+            if(type==PRIVATEER || type==FRIGATE || type==MAN_O_WAR) { // can capture goods; regardless attacking/defending
+                Iterator iter = defender.getGoodsIterator();
+                if(iter.hasNext()) {
+                    //TODO: show CaptureGoodsDialog
+                }
             }
             defender.dispose();
         } else if (!(defender.isArmed()) && !(defender.getType() == ARTILLERY) && !(defender.getType() == DAMAGED_ARTILLERY)) {
