@@ -291,6 +291,25 @@ public final class InGameController {
             nextActiveUnit(unit.getTile());
         }
 
+        for(int i=Map.N; i<Map.NW; i++) {
+            Tile adjTile = unit.getOwner().getGame().getMap().getNeighbourOrNull(i, unit.getTile());
+            if(adjTile == null)
+                continue;
+            Iterator iter = adjTile.getUnitIterator();
+            if(iter.hasNext()) {
+                Unit fUnit = (Unit)iter.next();
+                if(fUnit.getOwner() != unit.getOwner()) {
+                    if( !unit.getOwner().hasContacted(fUnit.getOwner().getNation()) ) {
+                        // TODO - addModelMessages for the two cases below
+                        if(fUnit.getOwner().isEuropean())
+                            continue;
+                        else // it is an indian tribe
+                            continue;
+                    }
+                }
+            }
+        }
+
         // Inform the server:
         Element moveElement = Message.createNewRootElement("move");
         moveElement.setAttribute("unit", unit.getID());
