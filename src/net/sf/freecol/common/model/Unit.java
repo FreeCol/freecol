@@ -1998,10 +1998,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                         addModelMessage(getOwner().getEurope(), "model.unit.arriveInEurope", null);
                         if (getType() == GALLEON) {
                             Iterator iter = getUnitIterator();
-                            Unit u = (Unit) iter.next();
-                            while (iter.hasNext() && u.getType() != TREASURE_TRAIN) {
-                                u = (Unit) iter.next();
-                            }
+                            Unit u = null;
+                            while (iter.hasNext() && (u = (Unit) iter.next()) != null && u.getType() != TREASURE_TRAIN);
                             if (u != null && u.getType() == TREASURE_TRAIN) {
                                 u.cashInTreasureTrain();
                             }
@@ -2018,11 +2016,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                         if (getTile().isForested()) {
                             getTile().setForested(false);
                             // Give Lumber to adjacent colony
-                            if (getTile().getColony() != null &&
-                                getTile().getColony().getOwner().equals(getOwner())) {
+                            if (getTile().getColony() != null && getTile().getColony().getOwner().equals(getOwner())) {
                                 getTile().getColony().addGoods(Goods.LUMBER, 100);
-                            }
-                            else {
+                            } else {
                                 Vector surroundingTiles = getTile().getMap().getSurroundingTiles(getTile(), 1);
                                 for (int i=0; i<surroundingTiles.size(); i++) {
                                     Tile t = (Tile) surroundingTiles.get(i);

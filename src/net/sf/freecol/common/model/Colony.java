@@ -867,9 +867,9 @@ public final class Colony extends Settlement implements Location {
         }
 
         // Create a new colonist if there is enough food:
-        if (getGoodsCount(Goods.FOOD) >= 300) {
-            getGame().getModelController().createUnit(getID() + "newTurn300food", getTile(), getOwner(), Unit.FREE_COLONIST);
-            removeGoods(Goods.FOOD, 300);
+        if (getGoodsCount(Goods.FOOD) >= 200) {
+            getGame().getModelController().createUnit(getID() + "newTurn200food", getTile(), getOwner(), Unit.FREE_COLONIST);
+            removeGoods(Goods.FOOD, 200);
             addModelMessage(this, "model.colony.newColonist", new String[][] {{"%colony%", getName()}});
         }
 

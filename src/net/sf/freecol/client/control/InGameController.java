@@ -277,7 +277,7 @@ public final class InGameController {
         }
 
         // Display a "cash in"-dialog if a treasure train have been moved into a colony:
-        if (unit.getLocation() != null && unit.getLocation() instanceof Tile && unit.getLocation().getTile().getColony() != null) {
+        if (unit.getType() == Unit.TREASURE_TRAIN && unit.getLocation() != null && unit.getLocation() instanceof Tile && unit.getLocation().getTile().getColony() != null) {
             String message = (unit.getOwner().hasFather(FoundingFather.HERNAN_CORTES)) ? "cashInTreasureTrain.text.free" : "cashInTreasureTrain.text.pay";
             if (canvas.showConfirmDialog(message, "cashInTreasureTrain.yes", "cashInTreasureTrain.no")) {
                 cashInTreasureTrain(unit);
