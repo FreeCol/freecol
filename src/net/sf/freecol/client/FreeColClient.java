@@ -306,8 +306,13 @@ public final class FreeColClient {
     /**
     * Checks if this client is the game admin.
     * @return <i>true</i> if the client is the game admin and <i>false</i> otherwise.
+    *         <i>false</i> is also returned if a game have not yet been started.
     */
     public boolean isAdmin() {
+        if (getMyPlayer() == null) {
+            return false;
+        }
+
         return getMyPlayer().isAdmin();
     }
 
