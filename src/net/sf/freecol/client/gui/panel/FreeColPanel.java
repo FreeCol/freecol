@@ -1,12 +1,14 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import cz.autel.dmi.*;
+
 import java.util.logging.Logger;
 
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.border.BevelBorder;
+import javax.swing.border.*;
 
 
 /**
@@ -18,6 +20,8 @@ public class FreeColPanel extends JPanel {
     public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
+
+    public static final HIGConstraints higConst = new HIGConstraints();
 
     private static final int cancelKeyCode = KeyEvent.VK_ESCAPE;
     
@@ -37,10 +41,7 @@ public class FreeColPanel extends JPanel {
 
         setFocusCycleRoot(true);
 
-        try {
-            BevelBorder border = new BevelBorder(BevelBorder.RAISED);
-            setBorder(border);
-        } catch(Exception e) {}
+        setBorder( new CompoundBorder(new BevelBorder(BevelBorder.RAISED), new EmptyBorder(10,10,10,10)) );
     }
 
     
@@ -54,4 +55,23 @@ public class FreeColPanel extends JPanel {
         inputMap.put(KeyStroke.getKeyStroke(cancelKeyCode, 0, true), "released");
         SwingUtilities.replaceUIInputMap(c, JComponent.WHEN_IN_FOCUSED_WINDOW, inputMap);
     }
+
+    /**
+     * Registers enter key for a jbutton
+     * @param button
+     */
+    public static void enterPressesWhenFocused(JButton button) {
+        button.registerKeyboardAction(
+            button.getActionForKeyStroke(
+                KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false)),
+                KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false),
+                JComponent.WHEN_FOCUSED);
+
+        button.registerKeyboardAction(
+            button.getActionForKeyStroke(
+                KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true)),
+                KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, true),
+                JComponent.WHEN_FOCUSED);
+    }
+
 }

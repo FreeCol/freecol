@@ -10,6 +10,7 @@ import javax.swing.JLabel;
 import javax.swing.border.BevelBorder;
 
 import net.sf.freecol.client.gui.Canvas;
+import cz.autel.dmi.*;
 
 /**
 * Asks the user if he's sure he wants to quit.
@@ -37,37 +38,52 @@ public final class QuitDialog extends FreeColDialog implements ActionListener {
     public QuitDialog(Canvas parent) {
         this.parent = parent;
 
+        int[] w = {0, 0, 0};
+        int[] h = {0, 10, 0};
+        HIGLayout l = new HIGLayout(w,h);
+        l.setColumnWeight(2, 1);
+        setLayout(l);
+
         cancel = new JButton("No");
-        JLabel          qLabel = new JLabel("Are you sure you want to Quit?");
+        JLabel qLabel = new JLabel("Are you sure you want to Quit?");
+        qLabel.setHorizontalAlignment(JLabel.CENTER);
 
-        qLabel.setSize(200, 20);
-        ok.setSize(60, 20);
-        cancel.setSize(60, 20);
+//        qLabel.setSize(200, 20);
+//        ok.setSize(60, 20);
+//        cancel.setSize(60, 20);
 
-        qLabel.setLocation(10, 10);
-        ok.setLocation(30, 40);
-        cancel.setLocation(130, 40);
+//        qLabel.setLocation(10, 10);
+//        ok.setLocation(30, 40);
+//        cancel.setLocation(130, 40);
 
-        setLayout(null);
+//        setLayout(null);
         
         ok.setActionCommand(String.valueOf(OK));
         cancel.setActionCommand(String.valueOf(CANCEL));
         
         ok.addActionListener(this);
         cancel.addActionListener(this);
-        
-        setCancelComponent(cancel);          
 
-        add(qLabel);
-        add(ok);
-        add(cancel);
-        
-        try {
-            BevelBorder border = new BevelBorder(BevelBorder.RAISED);
-            setBorder(border);
-        }
-        catch(Exception e) {
-        }
+        ok.setMnemonic('y');
+        cancel.setMnemonic('n');
+
+        FreeColPanel.enterPressesWhenFocused(cancel);
+        FreeColPanel.enterPressesWhenFocused(ok);
+
+        setCancelComponent(cancel);
+
+        add(qLabel, higConst.rcwh(1,1, 3,1));
+        higConst.setVCorrection(0,-4);
+        add(ok, higConst.rc(3,1));
+        add(cancel, higConst.rc(3,3));
+        higConst.clearCorrection();
+
+//        try {
+//            BevelBorder border = new BevelBorder(BevelBorder.RAISED);
+//            setBorder(border);
+//        }
+//        catch(Exception e) {
+//        }
 
         setSize(220, 70);
     }

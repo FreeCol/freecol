@@ -16,6 +16,8 @@ import javax.swing.*;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 
+import cz.autel.dmi.*;
+
 /**
  * This panel is displayed when an imporantant event in the game has happened.
  */
@@ -48,27 +50,26 @@ public final class EventPanel extends FreeColDialog implements ActionListener {
     public EventPanel(Canvas parent, FreeColClient freeColClient) {
         this.parent = parent;
         this.freeColClient = freeColClient;
-        
-        setLayout(new BorderLayout());
+
+        int[] w = {0};
+        int[] h = {0, 10, 0, 10, 0};
+        setLayout(new HIGLayout(w, h));
 
         header = new JLabel("", JLabel.CENTER);
         header.setFont(((Font) UIManager.get("HeaderFont")).deriveFont(0, 36));
-        header.setBorder(new EmptyBorder(10, 0, 10, 0));
 
         imageLabel = new JLabel();
-        imageLabel.setBorder(new EmptyBorder(0, 10, 0, 10));
-
-        JPanel p1 = new JPanel(new BorderLayout(0, 0));
-        p1.setBorder(new EmptyBorder(10, 20, 10, 20));
 
         okButton = new JButton("OK");
         okButton.setActionCommand(String.valueOf(OK));
         okButton.addActionListener(this);
-        p1.add(okButton);
 
-        add(header, BorderLayout.NORTH);
-        add(imageLabel, BorderLayout.CENTER);
-        add(p1, BorderLayout.SOUTH);
+
+        add(header, higConst.rc(1,1));
+        add(imageLabel, higConst.rc(3,1));
+        higConst.setVCorrection(0, -4);
+        add(okButton, higConst.rc(5,1));
+        higConst.clearCorrection();
     }
     
     
