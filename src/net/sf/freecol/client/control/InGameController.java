@@ -327,6 +327,24 @@ public final class InGameController {
 
 
     /**
+    * Clear the speciality of a <code>Unit</code>. That is, makes it a
+    * <code>Unit.FREE_COLONIST</code>.
+    * 
+    * @param unit The <code>Unit</code> to clear the speciality of.
+    */
+    public void clearSpeciality(Unit unit) {
+        Client client = freeColClient.getClient();
+        
+        Element clearSpecialityElement = Message.createNewRootElement("clearSpeciality");
+        clearSpecialityElement.setAttribute("unit", unit.getID());
+
+        unit.clearSpeciality();
+
+        client.send(clearSpecialityElement);
+    }
+
+
+    /**
     * Leave a ship. This method should only be invoked if the ship is in a harbour.
     *
     * @param unit The unit who is going to leave the ship where it is located.

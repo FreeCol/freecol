@@ -141,6 +141,16 @@ public final class DragListener extends MouseAdapter {
                     menu.add(menuItem);
                 }
 
+                if (tempUnit.getType() != Unit.INDIAN_CONVERT && tempUnit.getType() != Unit.PETTY_CRIMINAL &&
+                        tempUnit.getType() != Unit.INDENTURED_SERVANT && tempUnit.getType() != Unit.FREE_COLONIST) {
+
+                    menu.addSeparator();
+                    menuItem = new JMenuItem("Clear speciality");
+                    menuItem.setActionCommand(String.valueOf(UnitLabel.CLEAR_SPECIALITY));
+                    menuItem.addActionListener(unitLabel);
+                    menu.add(menuItem);
+                }
+
                 menu.show(comp, e.getX(), e.getY());
             }
         } else {

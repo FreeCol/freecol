@@ -50,7 +50,8 @@ public final class UnitLabel extends JLabel implements ActionListener {
                             WORKTYPE_FURS = 8,
                             WORKTYPE_LUMBER = 9,
                             WORKTYPE_ORE = 10,
-                            WORKTYPE_SILVER = 11;
+                            WORKTYPE_SILVER = 11,
+                            CLEAR_SPECIALITY = 12;
 
     private final Unit unit;
     private final Canvas parent;
@@ -223,6 +224,8 @@ public final class UnitLabel extends JLabel implements ActionListener {
                     case WORKTYPE_SILVER:
                         inGameController.changeWorkType(unit, Goods.SILVER);
                         break;
+                    case CLEAR_SPECIALITY:
+                        inGameController.clearSpeciality(unit);
                     default:
                         logger.warning("Invalid action");
                 }

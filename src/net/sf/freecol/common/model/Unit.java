@@ -2390,6 +2390,18 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         }
     }
 
+    
+    /**
+    * Clear the speciality of a <code>Unit</code>. That is, makes it a
+    * <code>FREE_COLONIST</code>
+    */
+    public void clearSpeciality() {
+        if (isColonist() && getType() != INDIAN_CONVERT && getType() != INDENTURED_SERVANT && getType() != PETTY_CRIMINAL) {
+            setType(FREE_COLONIST);
+        }
+    }
+
+
     /**
     * Gets the Colony the goods of this unit would go to if it were to de-equip.
     * @return The Colony the goods would go to, or null if there is no appropriate Colony

@@ -105,6 +105,8 @@ public final class InGameInputHandler implements MessageHandler {
                         reply = changeState(connection, element);
                     } else if (type.equals("putOutsideColony")) {
                         reply = putOutsideColony(connection, element);
+                    } else if (type.equals("clearSpeciality")) {
+                        reply = clearSpeciality(connection, element);
                     } else if (type.equals("endTurn")) {
                         reply = endTurn(connection, element);
                     } else {
@@ -898,6 +900,28 @@ public final class InGameInputHandler implements MessageHandler {
         return null;
     }
 
+
+    /**
+    * Handles a "clearSpeciality"-request from a client.
+    *
+    * @param connection The connection the message came from.
+    * @param clearSpecialityElement The element containing the request.
+    */
+    private Element clearSpeciality(Connection connection, Element clearSpecialityElement) {
+        Game game = freeColServer.getGame();
+        ServerPlayer player = freeColServer.getPlayer(connection);
+
+        Unit unit = (Unit) game.getFreeColGameObject(clearSpecialityElement.getAttribute("unit"));
+
+        if (unit.getOwner() != player) {
+            throw new IllegalStateException("Not your unit!");
+        }
+
+        unit.clearSpeciality();
+
+        return null;
+    }
+    
 
     /**
     * Handles an "endTurn" notification from a client.
