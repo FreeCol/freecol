@@ -256,6 +256,7 @@ public final class InGameController {
             unit.getOwner().setNewLandName(newLandName);
             Element setNewLandNameElement = Message.createNewRootElement("setNewLandName");
             setNewLandNameElement.setAttribute("newLandName", newLandName);
+            client.send(setNewLandNameElement);
             canvas.showEventDialog(EventPanel.FIRST_LANDING);
         }
 

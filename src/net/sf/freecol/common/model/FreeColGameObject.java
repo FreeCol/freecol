@@ -371,28 +371,42 @@ abstract public class FreeColGameObject {
         arrayElement.setAttribute("xLength", Integer.toString(array.length));
         arrayElement.setAttribute("yLength", Integer.toString(array[0].length));
         
+        StringBuffer sb = new StringBuffer(array.length * array[0].length);
         for (int x=0; x < array.length; x++) {
             for (int y=0; y < array[0].length; y++) {
-                arrayElement.setAttribute("x" + Integer.toString(x) + "y" + Integer.toString(y), Boolean.toString(array[x][y]));
+                //arrayElement.setAttribute("x" + Integer.toString(x) + "y" + Integer.toString(y), Boolean.toString(array[x][y]));
+                if (array[x][y]) {
+                    sb.append("1");
+                } else {
+                    sb.append("0");
+                }
             }
         }
         
+        arrayElement.setAttribute("data", sb.toString());
+
         return arrayElement;
     }
-    
+
 
     /**
     * Reads an XML-representation of an array.
-    */        
+    */
     protected boolean[][] readFromArrayElement(String tagName, Element arrayElement, boolean[][] arrayType) {
         boolean[][] array = new boolean[Integer.parseInt(arrayElement.getAttribute("xLength"))][Integer.parseInt(arrayElement.getAttribute("yLength"))];
-        
+
+        String data = arrayElement.getAttribute("data");
         for (int x=0; x<array.length; x++) {
             for (int y=0; y<array[0].length; y++) {
-                array[x][y] = Boolean.valueOf(arrayElement.getAttribute("x" + Integer.toString(x) + "y" + Integer.toString(y))).booleanValue();
+                if (data.charAt(x*array[0].length+y) == '1') {
+                    array[x][y] = true;
+                } else {
+                    array[x][y] = false;
+                }
+                //array[x][y] = Boolean.valueOf(arrayElement.getAttribute("x" + Integer.toString(x) + "y" + Integer.toString(y))).booleanValue();
             }
         }
-        
+
         return array;
-    }        
+    }
 }
