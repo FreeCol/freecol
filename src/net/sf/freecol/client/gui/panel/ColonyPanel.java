@@ -1,45 +1,19 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GridLayout;
-import java.awt.FlowLayout;
-import java.awt.Dimension;
-import java.awt.image.BufferedImage;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseListener;
-import java.util.logging.Logger;
-import java.util.Iterator;
-
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JLayeredPane;
-import javax.swing.JPanel;
-import javax.swing.JList;
-import javax.swing.JComboBox;
-import javax.swing.JScrollPane;
-import javax.swing.ListCellRenderer;
-import javax.swing.border.BevelBorder;
-import javax.swing.ImageIcon;
-
-import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Building;
-import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.ColonyTile;
-import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.client.*;
+import net.sf.freecol.client.control.*;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.control.InGameController;
+import net.sf.freecol.client.gui.*;
+import net.sf.freecol.common.model.*;
+
+import javax.swing.*;
+import javax.swing.border.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.image.*;
+import java.util.*;
+import java.util.logging.*;
 
 
 /**
@@ -63,7 +37,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     private final JLabel                    goldLabel;
     private final JLabel                    solLabel;
     private final JLabel                    warehouseLabel;
-    private final JLabel                    progressLabel;
+    private final JLabel                    hammersLabel;
+    private final JLabel                    toolsLabel;
     private final ProductionPanel           productionPanel;
     private final BuildingBox               buildingBox;
     private final OutsideColonyPanel        outsideColonyPanel;
@@ -134,7 +109,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         
         solLabel = new JLabel("SoL: 0%, Tory: 100%");
         warehouseLabel = new JLabel("Goods");
-        progressLabel = new JLabel("Hammers: 0/0");
+        hammersLabel = new JLabel("Hammers: 0/0");
+        toolsLabel = new JLabel("Tools: 0/0");
 
 
         buildingBox = new BuildingBox(this);
@@ -151,44 +127,55 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 buildingsLabel = new JLabel("Buildings");
 
         exitButton.setSize(80, 20);
-        outsideColonyScroll.setSize(200, 100);
-        inPortScroll.setSize(200, 100);
-        cargoScroll.setSize(410, 96);
-        warehouseScroll.setSize(620, 120);
-        productionPanel.setSize(390, 35);
-        tilesScroll.setSize(390, 200);
-        buildingsScroll.setSize(400,200);
-        outsideColonyLabel.setSize(200, 20);
-        inPortLabel.setSize(200, 20);
-        cargoLabel.setSize(410, 20);
+        outsideColonyScroll.setSize(204, 275);
+        inPortScroll.setSize(250, 100);
+        cargoScroll.setSize(365, 100);
+        warehouseScroll.setSize(620, 160);
+        productionPanel.setSize(400, 35);
+        tilesScroll.setSize(400, 225);
+        buildingsScroll.setSize(424,225);
+//        outsideColonyLabel.setSize(200, 620);
+//        inPortLabel.setSize(300, 20);
+//        cargoLabel.setSize(310, 20);
         goldLabel.setSize(100, 20);
 
         solLabel.setSize(180, 20);
-        warehouseLabel.setSize(100, 20);
+//        warehouseLabel.setSize(100, 20);
 
-        tilesLabel.setSize(100, 20);
-        buildingsLabel.setSize(300, 20);
+        EtchedBorder eBorder = new EtchedBorder();
+        tilesScroll.setBorder(new CompoundBorder(new TitledBorder("Tiles"), new BevelBorder(BevelBorder.LOWERED)));
+        buildingsScroll.setBorder(new CompoundBorder(new TitledBorder("Buildings"), eBorder));
+        warehouseScroll.setBorder(new CompoundBorder(new TitledBorder("Goods"), eBorder));
+        cargoScroll.setBorder(new CompoundBorder(new TitledBorder("Cargo"), eBorder));
+        inPortScroll.setBorder(new CompoundBorder(new TitledBorder("Port"), eBorder));
+        outsideColonyScroll.setBorder(new CompoundBorder(new TitledBorder("Outside Colony"), eBorder));
+
+//        tilesLabel.setSize(100, 20);
+//        buildingsLabel.setSize(300, 20);
         buildingBox.setSize(265, 20);
-        progressLabel.setSize(150, 20);
+        hammersLabel.setSize(150, 20);
+        toolsLabel.setSize(150, 20);
 
         exitButton.setLocation(760, 570);
-        outsideColonyScroll.setLocation(640, 300);
-        inPortScroll.setLocation(640, 450);
-        cargoScroll.setLocation(220, 370);
-        warehouseScroll.setLocation(10, 470);
-        productionPanel.setLocation(10, 250);
-        tilesScroll.setLocation(10, 40);
-        buildingsLabel.setLocation(440, 10); // 400,10
-        buildingsScroll.setLocation(440, 40); // 400,40
-        outsideColonyLabel.setLocation(640, 275);
-        inPortLabel.setLocation(640, 425);
-        cargoLabel.setLocation(220, 345);
-        warehouseLabel.setLocation(10, 445);
-        buildingBox.setLocation(440, 250); // 15,305
-        progressLabel.setLocation(710, 250); // 185,305 (345, 305)
-        solLabel.setLocation(15, 325);
-        goldLabel.setLocation(15, 345);
-        tilesLabel.setLocation(10, 10);
+        outsideColonyScroll.setLocation(635, 285);
+        inPortScroll.setLocation(10, 330);
+        cargoScroll.setLocation(265, 330);
+        warehouseScroll.setLocation(10, 430);
+        productionPanel.setLocation(10, 235);
+        tilesScroll.setLocation(10, 10);
+
+//        buildingsLabel.setLocation(440, 10); // 400,10
+        buildingsScroll.setLocation(415, 10); // 400,40
+//        outsideColonyLabel.setLocation(640, 275);
+//        inPortLabel.setLocation(640, 425);
+//        cargoLabel.setLocation(220, 345);
+//        warehouseLabel.setLocation(10, 445);
+        buildingBox.setLocation(417, 240); // 15,305
+        hammersLabel.setLocation(695, 240); // 185,305 (345, 305)
+        toolsLabel.setLocation(695, 260);
+        solLabel.setLocation(15, 275);
+        goldLabel.setLocation(15, 295);
+//        tilesLabel.setLocation(10, 10);
 
 
         setLayout(null);
@@ -214,7 +201,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         add(tilesLabel);
         add(buildingsLabel);
         add(buildingBox);
-        add(progressLabel);
+        add(hammersLabel);
+        add(toolsLabel);
 
         try {
             BevelBorder border = new BevelBorder(BevelBorder.RAISED);
@@ -360,12 +348,15 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     */
     private void updateProgressLabel() {
         if (colony.getCurrentlyBuilding() == -1) {
-            progressLabel.setText("");
+            hammersLabel.setText("");
+            toolsLabel.setText("");
         } else {
             if (colony.getCurrentlyBuilding() < Colony.BUILDING_UNIT_ADDITION) {
-                progressLabel.setText("Hammers: " + colony.getHammers() + "/" + colony.getBuilding(colony.getCurrentlyBuilding()).getNextHammers());
+                hammersLabel.setText("Hammers: " + colony.getHammers() + "/" + colony.getBuilding(colony.getCurrentlyBuilding()).getNextHammers());
+                toolsLabel.setText("Tools: " + colony.getGoodsCount(Goods.TOOLS) + "/" + colony.getBuilding(colony.getCurrentlyBuilding()).getNextTools());
             } else {
-                progressLabel.setText("Hammers: " + colony.getHammers() + "/" + Unit.getNextHammers(colony.getCurrentlyBuilding() - Colony.BUILDING_UNIT_ADDITION));
+                hammersLabel.setText("Hammers: " + colony.getHammers() + "/" + Unit.getNextHammers(colony.getCurrentlyBuilding() - Colony.BUILDING_UNIT_ADDITION));
+                toolsLabel.setText("Tools: " + colony.getGoodsCount(Goods.TOOLS) + "/" + Unit.getNextTools(colony.getCurrentlyBuilding() - Colony.BUILDING_UNIT_ADDITION));
             }
         }
     }
