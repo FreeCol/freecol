@@ -29,6 +29,8 @@ public final class EventPanel extends FreeColDialog implements ActionListener {
     public static final int FIRST_LANDING = 0;
     public static final int MEETING_NATIVES = 1;
     public static final int MEETING_EUROPEANS = 2;
+    public static final int MEETING_AZTEC = 3;
+    public static final int MEETING_INCA = 4;
 
     private static final int OK = 0;
     
@@ -93,6 +95,18 @@ public final class EventPanel extends FreeColDialog implements ActionListener {
             imageLabel.setIcon(new ImageIcon(image));
 
             header.setText(Messages.message("event.meetingEuropeans"));
+            setSize(getPreferredSize());
+        } else if(eventID == MEETING_AZTEC) {
+            Image image = (Image) UIManager.get("EventImage.meetingAztec");
+            imageLabel.setIcon(new ImageIcon(image));
+
+            header.setText(Messages.message("event.meetingAztec"));
+            setSize(getPreferredSize());
+        } else if(eventID == MEETING_INCA) {
+            Image image = (Image) UIManager.get("EventImage.meetingInca");
+            imageLabel.setIcon(new ImageIcon(image));
+
+            header.setText(Messages.message("event.meetingInca"));
             setSize(getPreferredSize());
         } else {
             setResponse(new Boolean(false));
