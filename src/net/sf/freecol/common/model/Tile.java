@@ -1098,8 +1098,7 @@ public final class Tile extends FreeColGameObject implements Location {
         if (getColony() != null) {
             playerExploredTiles[nation].setColonyUnitCount(getSettlement().getUnitCount());
             playerExploredTiles[nation].setColonyStockadeLevel(getColony().getBuilding(Building.STOCKADE).getLevel());
-        }
-        else if (getSettlement() != null) {
+        } else if (getSettlement() != null) {
             // Do nothing
         }
     }
@@ -1265,11 +1264,12 @@ public final class Tile extends FreeColGameObject implements Location {
                 } else {    // Colony not discovered.
                     colonyElement.getParentNode().removeChild(colonyElement);
                 }
-            }
-            else if (getSettlement() != null) {
-                Element settlementElement = (Element) tileElement.getElementsByTagName(IndianSettlement.getXMLElementTagName());
+            } else if (getSettlement() != null && getSettlement() instanceof IndianSettlement) {
+                Element settlementElement = getChildElement(tileElement, IndianSettlement.getXMLElementTagName());
                 settlementElement.setAttribute("learnableSkill", Integer.toString(skill));
                 // wanted goods
+            } else if (getSettlement() != null) {
+                logger.warning("Unknown type of settlement: " + getSettlement());
             }
         }
 

@@ -78,8 +78,8 @@ public class Connection {
     */
     public Connection(Socket socket, MessageHandler messageHandler) throws IOException {
         this.messageHandler = messageHandler;
-
         this.socket = socket;
+
         out = new PrintWriter(socket.getOutputStream(), true);
         in = socket.getInputStream();
 
