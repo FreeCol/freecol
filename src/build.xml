@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+
+<project name="FreeCol" default="package">
+  <property environment="env"/>
+  <property name="freecol.image.dir" value="${basedir}/../data/images"/>
+  <property name="freecol.src.dir" value="${basedir}"/>
+  <property name="freecol.build.dir" value="${basedir}/classes"/>
+  <property name="freecol.javadoc.dir" value="${basedir}/javadoc"/>
+  <property name="freecol.jar.file" value="${basedir}/FreeCol.jar"/>
+
+  <target name="init" unless="TSTAMP">
+    <tstamp/>
+  </target>
+
+  <target name="compile" depends="init">
+    <mkdir dir="${freecol.build.dir}"/>
+    <copy todir="${freecol.build.dir}/net/sf/freecol/images">
+      <fileset dir="${freecol.image.dir}">
+        <exclude name="**/CVS/**"/>
+      </fileset>
+    </copy>
+    <javac srcdir="${freecol.src.dir}"
+           destdir="${freecol.build.dir}"
+           debug="on"
+           optimize="on"
+           deprecation="off"
+           source="1.4"
+    />
+    <copy todir="${freecol.build.dir}">
+        <fileset dir="${freecol.src.dir}" includes="**/*.properties"
+        	excludes="classes/**" />
+    </copy>
+  </target>
+
+  <target name="package" depends="init,compile">
+    <jar jarfile="${freecol.jar.file}"
+         basedir="${freecol.build.dir}"
+         manifest="${basedir}/MANIFEST.MF"
+         excludes="**/CVS/**"
+    />
+  </target>
+
+  <target name="clean" depends="init">
+    <delete quiet="true" includeEmptyDirs="true">
+      <fileset dir="${freecol.build.dir}" includes="net/**" />
+      <fileset dir="${freecol.build.dir}" includes="timestamp.inf" />
+    </delete>
+    <delete quiet="true" file="${freecol.jar.file}"/>
+    <delete quiet="true" dir="${freecol.javadoc.dir}"/>
+  </target>
+  
+  <target name="fix" depends="init">
+    <fixcrlf srcdir="${freecol.src.dir}"
+             includes="**/*.java"
+             eol="asis"
+             tab="remove"
+             javafiles="yes"
+             tablength="4"
+             eof="asis"
+    />
+  </target>
+  
+  <target name="javadoc" depends="init">
+    <mkdir dir="${freecol.javadoc.dir}"/>
+    <javadoc sourcepath="${freecol.src.dir}"
+             destdir="${freecol.javadoc.dir}"
+             packagenames="net.sf.freecol.*"
+             Author="true"
+             Windowtitle="FreeCol Code Documentation"
+    />
+  </target>
+</project>
