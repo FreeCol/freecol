@@ -81,6 +81,7 @@ public final class AIInGameInputHandler implements MessageHandler {
             } else if (type.equals("emigrateUnitInEuropeConfirmed")) {
             } else if (type.equals("newTurn")) {
             } else if (type.equals("setDead")) {            
+            } else if (type.equals("gameEnded")) {            
             } else if (type.equals("error")) {
             } else {
                 logger.warning("Message is of unsupported type \"" + type + "\".");

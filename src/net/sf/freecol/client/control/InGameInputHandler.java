@@ -87,6 +87,8 @@ public final class InGameInputHandler implements MessageHandler {
                 reply = setDead(element);
             } else if (type.equals("createUnit")) {
                 reply = createUnit(element);
+            } else if (type.equals("gameEnded")) {
+                reply = gameEnded(element);
             } else if (type.equals("error")) {
                 reply = error(element);
             } else {
@@ -305,6 +307,13 @@ public final class InGameInputHandler implements MessageHandler {
         Game game = freeColClient.getGame();
         Player player = (Player) game.getFreeColGameObject(element.getAttribute("player"));
         player.setDead(true);
+        
+        if (player == freeColClient.getMyPlayer()) {
+            Canvas canvas = freeColClient.getCanvas();
+            if (!canvas.showConfirmDialog("defeated.text", "defeated.yes", "defeated.no")) {
+                canvas.reallyQuit();
+            }
+        }
 
         return null;
     }
@@ -326,6 +335,24 @@ public final class InGameInputHandler implements MessageHandler {
         //                           in order to make it possible to produce units
         //                           other places than the colonies.
         ((Colony) location).createUnit(unit);
+
+        return null;
+    }
+
+    
+    /**
+    * Handles a "gameEnded"-message.
+    *
+    * @param element The element (root element in a DOM-parsed XML tree) that
+    *                holds all the information.
+    */
+    private Element gameEnded(Element element) {
+        Game game = freeColClient.getGame();
+
+        Player winner = (Player) game.getFreeColGameObject(element.getAttribute("winner"));
+        if (winner == freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showVictoryPanel();
+        } // else: The client has already received the message of defeat.
 
         return null;
     }

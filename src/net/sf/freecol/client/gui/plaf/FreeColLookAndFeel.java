@@ -107,6 +107,11 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
             if (file.exists()) {
                 u.put("TitleImage", new ImageIcon(file.toString()));
             }
+            
+            file = new File(uiDirectory, "victory.png");
+            if (file.exists()) {
+                u.put("VictoryImage", new ImageIcon(file.toString()));
+            }
         } catch (ClassNotFoundException e) {
             System.err.println(e);
             System.exit(-1);

@@ -38,6 +38,7 @@ import net.sf.freecol.client.gui.panel.QuitDialog;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.EuropePanel;
 import net.sf.freecol.client.gui.panel.StatusPanel;
+import net.sf.freecol.client.gui.panel.VictoryPanel;
 
 import net.sf.freecol.client.gui.panel.MapControls;
 
@@ -120,6 +121,7 @@ public final class Canvas extends JLayeredPane {
     private final ChatPanel         chatPanel;
     private final GUI               gui;
     private final ChatDisplayThread chatDisplayThread;
+    private final VictoryPanel      victoryPanel;
     private TakeFocusThread         takeFocusThread;
     private MapControls             mapControls;
     private JMenuBar                jMenuBar;
@@ -155,6 +157,7 @@ public final class Canvas extends JLayeredPane {
         statusPanel = new StatusPanel(this);
 
         chatPanel = new ChatPanel(this);
+        victoryPanel = new VictoryPanel(this);
 
         showMainPanel();
 
@@ -221,6 +224,18 @@ public final class Canvas extends JLayeredPane {
         } else {
             logger.warning("Tried to open 'StartGamePanel' without having 'game' and/or 'player' set.");
         }
+    }
+
+    
+    /**
+    * Displays the <code>VictoryPanel</code>.
+    */
+    public void showVictoryPanel() {
+        closeMenus();
+        victoryPanel.setLocation(getWidth() / 2 - victoryPanel.getWidth() / 2, getHeight() / 2 - victoryPanel.getHeight() / 2);
+        setEnabled(false);
+        add(victoryPanel);
+        victoryPanel.requestFocus();
     }
 
 
@@ -702,6 +717,14 @@ public final class Canvas extends JLayeredPane {
         if (confirmQuitDialog()) {
             System.exit(0);
         }
+    }
+    
+    
+    /**
+    * Quits the application without any questions.
+    */
+    public void reallyQuit() {
+        System.exit(0);
     }
 
 

@@ -982,6 +982,15 @@ public final class InGameInputHandler implements MessageHandler {
             nextPlayer = (ServerPlayer) game.getNextPlayer();
         }
 
+        Player winner = checkForWinner();
+        if (winner != null) {
+            Element gameEndedElement = Message.createNewRootElement("gameEnded");
+            gameEndedElement.setAttribute("winner", winner.getID());
+            freeColServer.getServer().sendToAll(gameEndedElement, null);
+            
+            return null;
+        }
+
         if (game.isNextPlayerInNewTurn()) {
             game.newTurn();
 
@@ -1006,6 +1015,37 @@ public final class InGameInputHandler implements MessageHandler {
         freeColServer.getServer().sendToAll(setCurrentPlayerElement, null);
 
         return null;
+    }
+
+
+    /**
+    * Checks if anybody has won the game and returns that player.
+    * @return The <code>Player</code> who have won the game or <i>null</i>
+    *         if the game is not finished.
+    */
+    private Player checkForWinner() {
+        Game game = freeColServer.getGame();
+
+        Iterator playerIterator = game.getPlayerIterator();
+        Player winner = null;
+        
+        if (freeColServer.isSingleplayer()) {
+            // TODO
+        } else {
+            while (playerIterator.hasNext()) {
+                Player p = (Player) playerIterator.next();
+
+                if (!p.isDead() && !p.isAI()) {
+                    if (winner != null) {
+                        return null;
+                    } else {
+                        winner = p;
+                    }
+                }
+            }
+        }
+
+        return winner;
     }
 
 
@@ -1096,8 +1136,19 @@ public final class InGameInputHandler implements MessageHandler {
         // At this point we know the player does not have any units or settlements on the map.
 
         if (player.getNation() >= 0 && player.getNation() <= 3) {
-            if (game.getTurn().getNumber() > 20 || player.getEurope().getFirstUnit() == null
+            /*if (game.getTurn().getNumber() > 20 || player.getEurope().getFirstUnit() == null
                     && player.getGold() < 600 && player.getGold() < player.getRecruitPrice()) {
+            */
+            if (game.getTurn().getNumber() > 20) {
+                return true;
+            } else if (player.getGold() < 1000) {
+                Iterator unitIterator = player.getEurope().getUnitIterator();
+                while (unitIterator.hasNext()) {
+                    if (((Unit) unitIterator.next()).isCarrier()) {
+                        return false;
+                    }
+                }
+
                 return true;
             } else {
                 return false;
