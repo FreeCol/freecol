@@ -395,15 +395,22 @@ abstract public class FreeColGameObject {
     protected boolean[][] readFromArrayElement(String tagName, Element arrayElement, boolean[][] arrayType) {
         boolean[][] array = new boolean[Integer.parseInt(arrayElement.getAttribute("xLength"))][Integer.parseInt(arrayElement.getAttribute("yLength"))];
 
-        String data = arrayElement.getAttribute("data");
+        String data = null;
+        if (arrayElement.hasAttribute("data")) {
+            data = arrayElement.getAttribute("data");
+        } 
+        
         for (int x=0; x<array.length; x++) {
             for (int y=0; y<array[0].length; y++) {
-                if (data.charAt(x*array[0].length+y) == '1') {
-                    array[x][y] = true;
-                } else {
-                    array[x][y] = false;
+                if (data != null) {
+                    if (data.charAt(x*array[0].length+y) == '1') {
+                        array[x][y] = true;
+                    } else {
+                        array[x][y] = false;
+                    }
+                } else { // Old type of storing booleans:
+                    array[x][y] = Boolean.valueOf(arrayElement.getAttribute("x" + Integer.toString(x) + "y" + Integer.toString(y))).booleanValue();
                 }
-                //array[x][y] = Boolean.valueOf(arrayElement.getAttribute("x" + Integer.toString(x) + "y" + Integer.toString(y))).booleanValue();
             }
         }
 
