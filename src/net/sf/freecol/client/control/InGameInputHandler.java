@@ -156,14 +156,16 @@ public final class InGameInputHandler implements MessageHandler {
     private Element opponentMove(Element opponentMoveElement) {
         Game game = freeColClient.getGame();
         Map map = game.getMap();
+        
+        Player currentPlayer = freeColClient.getMyPlayer();
 
         int direction = Integer.parseInt(opponentMoveElement.getAttribute("direction"));
 
         if (!opponentMoveElement.hasAttribute("tile")) {
             Unit unit = (Unit) game.getFreeColGameObject(opponentMoveElement.getAttribute("unit"));
-            Player player = unit.getOwner();
-
-            if (player.canSee(map.getNeighbourOrNull(direction, unit.getTile()))) {
+            //Player player = unit.getOwner();
+            // This originally said player.___, which made no sense. -sjm
+            if ((unit.getTile() != null) && (currentPlayer.canSee(map.getNeighbourOrNull(direction, unit.getTile())))) {
                 unit.move(direction);
             } else {
                 unit.dispose();

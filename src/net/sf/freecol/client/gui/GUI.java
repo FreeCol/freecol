@@ -758,14 +758,14 @@ public final class GUI {
                     g.drawImage(lib.getColonyImage(type), x + (lib.getTerrainImageWidth(tile.getType()) - lib.getColonyImageWidth(type)) / 2, y + (lib.getTerrainImageHeight(tile.getType()) - lib.getColonyImageHeight(type)) / 2, null);
                     
                     // The 5 here is arbitrary -sjm
-                    g.drawImage(lib.getColorChip(((Colony)settlement).getOwner().getColor()), x + STATE_OFFSET_X, y + 5, null);
+                    g.drawImage(lib.getColorChip(((Colony)settlement).getOwner().getColor()), x + STATE_OFFSET_X, y + 10, null);
                     String populationString = Integer.toString(((Colony)settlement).getUnitCount());
                     if (((Colony)settlement).getOwner().getColor() == Color.BLACK) {
                         g.setColor(Color.WHITE);
                     } else {
                         g.setColor(Color.BLACK);
                     }
-                    g.drawString(populationString, x + TEXT_OFFSET_X + STATE_OFFSET_X, y + 5 + TEXT_OFFSET_Y);
+                    g.drawString(populationString, x + TEXT_OFFSET_X + STATE_OFFSET_X, y + 10 + TEXT_OFFSET_Y);
                     
                     g.setColor(Color.BLACK);
                     
@@ -776,6 +776,9 @@ public final class GUI {
 
                     // Draw image of indian settlement in center of the tile.
                     g.drawImage(lib.getIndianSettlementImage(type), x + (lib.getTerrainImageWidth(tile.getType()) - lib.getIndianSettlementImageWidth(type)) / 2, y + (lib.getTerrainImageHeight(tile.getType()) - lib.getIndianSettlementImageHeight(type)) / 2, null);
+                    
+                    g.drawImage(lib.getColorChip(((IndianSettlement)settlement).getOwner().getColor()), x + STATE_OFFSET_X, y + 10, null);
+                    g.drawString("-", x + TEXT_OFFSET_X + STATE_OFFSET_X, y + 10 + TEXT_OFFSET_Y);
                 } else {
                     // TODO: Make this a log message:
                     System.err.println("Requested to draw unknown settlement type.");

@@ -23,7 +23,7 @@ import org.w3c.dom.Document;
 * Every <code>Unit</code> is owned by a {@link Player} and has a
 * {@link Location}.
 */
-public final class Unit extends FreeColGameObject implements Location, Locatable {
+public class Unit extends FreeColGameObject implements Location, Locatable {
     public static final String  COPYRIGHT = "Copyright (C) 2003 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
@@ -321,7 +321,9 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
         }
 
         // Check for an 'attack' instead of 'move'.
-        if ((target.getUnitCount() > 0) && (target.getDefendingUnit(this).getNation() != getNation())
+        if ((target.getUnitCount() > 0) && 
+            (target.getDefendingUnit(this) != null) &&
+            (target.getDefendingUnit(this).getNation() != getNation())
             && ((target.isLand() && !isNaval()) || (isNaval() && !target.isLand()))) {
             return ATTACK;
         }
@@ -2310,6 +2312,10 @@ public final class Unit extends FreeColGameObject implements Location, Locatable
         workLeft = Integer.parseInt(unitElement.getAttribute("workLeft"));
         numberOfTools = Integer.parseInt(unitElement.getAttribute("numberOfTools"));
         owner = getGame().getPlayerByID(unitElement.getAttribute("owner"));
+        
+        if (owner == null) {
+            System.out.println("VERY BAD: Can't find player with ID " + unitElement.getAttribute("owner") + "!");
+        }
         
         if (unitElement.hasAttribute("entryLocation")) {
             entryLocation = (Location) getGame().getFreeColGameObject(unitElement.getAttribute("entryLocation"));

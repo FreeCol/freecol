@@ -15,6 +15,7 @@ import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.model.FreeColGameObject;
 
 import net.sf.freecol.server.control.UserConnectionHandler;
+import net.sf.freecol.server.networking.DummyConnection;
 import net.sf.freecol.server.FreeColServer;
 
 import org.w3c.dom.Element;
@@ -148,7 +149,7 @@ public final class Server extends Thread {
         Iterator connectionIterator = connections.values().iterator();
 
         while (connectionIterator.hasNext()) {
-            Connection connection = (Connection) connectionIterator.next();
+            Connection connection = (Connection)connectionIterator.next();
             connection.setMessageHandler(messageHandler);
         }
     }
@@ -189,5 +190,13 @@ public final class Server extends Thread {
     public Connection getConnection(Socket socket) {
         return (Connection) connections.get(socket);
     }
-
+    
+    /**
+    * Adds a (usually Dummy)Connection into the hashmap.
+    * @param connection The connection to add.
+    * @param fakesocket The false socket number to use.
+    */
+    public void addConnection(Connection connection, int fakesocket) {
+        connections.put(new Socket(), connection);
+    }
 }

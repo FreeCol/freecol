@@ -42,7 +42,7 @@ import org.w3c.dom.*;
 * @see #sendAndWait
 * @see #ask
 */
-public final class Connection {
+public class Connection {
     private static final Logger logger = Logger.getLogger(Connection.class.getName());
     private final PrintWriter out;
     private final InputStream in;
@@ -50,7 +50,15 @@ public final class Connection {
     private final ReceivingThread thread;
     private MessageHandler messageHandler;
 
-
+    /**
+    * Dead constructor, for DummyConnection purposes.
+    */
+    public Connection() {
+        out = null;
+        in = null;
+        socket = null;
+        thread = null;
+    }
 
     /**
     * Sets up a new socket with specified host and port and uses {@link #Connection(Socket, MessageHandler)}.
@@ -169,6 +177,13 @@ public final class Connection {
         messageHandler = mh;
     }
 
+    /**
+    * Gets the MessageHandler for this Connection.
+    * @return The MessageHandler for this Connection.
+    */
+    public MessageHandler getMessageHandler() {
+        return messageHandler;
+    }
 
     public void handleAndSendReply(Message message) {
         handleAndSendReply(message.getDocument().getDocumentElement());

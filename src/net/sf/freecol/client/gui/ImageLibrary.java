@@ -604,7 +604,7 @@ public final class ImageLibrary extends ImageProvider {
      * local environment.
      */
     private void loadColorChips(GraphicsConfiguration gc) {
-        colorChips = new Hashtable(11);
+        colorChips = new Hashtable(19);
 
         loadColorChip(gc, Color.BLACK);
         loadColorChip(gc, Color.BLUE);
@@ -617,6 +617,17 @@ public final class ImageLibrary extends ImageProvider {
         loadColorChip(gc, Color.RED);
         loadColorChip(gc, Color.WHITE);
         loadColorChip(gc, Color.YELLOW);
+        
+        //FIXME: these same colours are found in the server PreGameController!
+        // They need to be unified into one location!
+        loadColorChip(gc, IndianSettlement.indianColors[0]);
+        loadColorChip(gc, IndianSettlement.indianColors[1]);
+        loadColorChip(gc, IndianSettlement.indianColors[2]);
+        loadColorChip(gc, IndianSettlement.indianColors[3]);
+        loadColorChip(gc, IndianSettlement.indianColors[4]);
+        loadColorChip(gc, IndianSettlement.indianColors[5]);
+        loadColorChip(gc, IndianSettlement.indianColors[6]);
+        loadColorChip(gc, IndianSettlement.indianColors[7]);
     }
 
     /**

@@ -49,6 +49,23 @@ public class Player extends FreeColGameObject {
                             ENGLISH = 1,
                             FRENCH = 2,
                             SPANISH = 3;
+                            
+    /** The Indian tribes. Note that these values differ from IndianSettlement's by a value of 4.*/
+    public static final int INCA = 4,
+                            AZTEC = 5,
+                            ARAWAK = 6,
+                            CHEROKEE = 7,
+                            IROQUOIS = 8,
+                            SIOUX = 9,
+                            APACHE = 10,
+                            TUPI = 11;
+                            
+    /** For future reference - the REF forces. */
+    public static final int REF_DUTCH = 12,
+                            REF_ENGLISH = 13,
+                            REF_FRENCH = 14,
+                            REF_SPANISH = 15;
+
 
     /** The maximum line of sight a unit can have in the game. */
     public static final int MAX_LINE_OF_SIGHT = 2;
@@ -65,6 +82,9 @@ public class Player extends FreeColGameObject {
     private int             gold;
     private Europe          europe;
     private boolean         ready;
+    
+    /** True if this is an AI player. */
+    private boolean         ai;
     
     private int             crosses;
     private int             bells;
@@ -87,7 +107,20 @@ public class Player extends FreeColGameObject {
         this(game, name, false);
     }
 
-
+    /**
+    * Creates an new AI <code>Player</code> with the specified name.
+    *
+    * @param game The <code>Game</code> this <code>Player</code> belongs to.
+    * @param name The name that this player will use.
+    * @param admin Whether or not this AI player shall be considered an Admin.
+    * @param ai Whether or not this AI player shall be considered an AI player (usually true here).
+    */
+    public Player(Game game, String name, boolean admin, boolean ai) {
+        this(game, name, admin);
+        
+        this.ai = ai;
+    }
+    
     /**
     * Creates a new <code>Player</code> with specified name.
     *
@@ -230,6 +263,13 @@ public class Player extends FreeColGameObject {
         return gold;
     }
 
+    /**
+    * Determines whether this player is an AI player.
+    * @return Whether this player is an AI player.
+    */
+    public boolean isAI() {
+        return ai;
+    }
 
     /**
     * Modifies the amount of gold that this player has. The argument
@@ -518,6 +558,8 @@ public class Player extends FreeColGameObject {
         playerElement.setAttribute("bells", Integer.toString(bells));
         playerElement.setAttribute("ready", Boolean.toString(ready));
         
+        playerElement.setAttribute("ai", Boolean.toString(ai));
+        
         if (entryLocation != null) {
             playerElement.setAttribute("entryLocation", entryLocation.getID());
         }
@@ -545,6 +587,7 @@ public class Player extends FreeColGameObject {
         crosses = Integer.parseInt(playerElement.getAttribute("crosses"));
         bells = Integer.parseInt(playerElement.getAttribute("bells"));
         ready = (new Boolean(playerElement.getAttribute("ready"))).booleanValue();
+        ai = (new Boolean(playerElement.getAttribute("ai"))).booleanValue();
         
         if (playerElement.hasAttribute("entryLocation")) {
             entryLocation = (Location) getGame().getFreeColGameObject(playerElement.getAttribute("entryLocation"));

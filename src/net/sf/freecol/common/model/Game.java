@@ -110,7 +110,7 @@ public class Game extends FreeColGameObject {
     * @param player The <code>Player</code> that shall be added to this <code>Game</code>.
     */
     public void addPlayer(Player player) {
-        if (canAddNewPlayer()) {
+        if (player.isAI() || canAddNewPlayer()) {
             players.add(player);
 
             if (currentPlayer == null) {

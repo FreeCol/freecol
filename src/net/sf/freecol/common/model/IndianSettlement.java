@@ -20,6 +20,7 @@
 
 package net.sf.freecol.common.model;
 
+import java.awt.Color;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
@@ -48,7 +49,17 @@ public class IndianSettlement extends Settlement {
     public static final int VILLAGE = 1;
     public static final int CITY = 2;
     public static final int LAST_KIND = 2;
-
+    
+    public static final Color indianColors[] = {
+        new Color(244, 240, 196),
+        new Color(196, 160,  32),
+        new Color(104, 136, 192),
+        new Color(108,  60,  24),
+        new Color(116, 164,  76),
+        new Color(192, 172, 132),
+        new Color(144,   0,   0),
+        new Color(  4,  92,   4)
+    };
 
     private int kind;
     private int tribe;
@@ -144,7 +155,7 @@ public class IndianSettlement extends Settlement {
     * @return <i>null</i>.
     */
     public Tile getTile() {
-        return null;
+        return super.getTile();
     }
 
 
@@ -231,6 +242,10 @@ public class IndianSettlement extends Settlement {
         Element indianSettlementElement = document.createElement(getXMLElementTagName());
 
         indianSettlementElement.setAttribute("ID", getID());
+        indianSettlementElement.setAttribute("owner", owner.getID());
+        indianSettlementElement.setAttribute("tribe", Integer.toString(tribe));
+        indianSettlementElement.setAttribute("kind", Integer.toString(kind));
+        indianSettlementElement.setAttribute("isCapital", Boolean.toString(isCapital));
 
         indianSettlementElement.appendChild(unitContainer.toXMLElement(player, document));
 
@@ -245,6 +260,11 @@ public class IndianSettlement extends Settlement {
     */
     public void readFromXMLElement(Element indianSettlementElement) {
         setID(indianSettlementElement.getAttribute("ID"));
+        
+        owner = (Player)getGame().getFreeColGameObject(indianSettlementElement.getAttribute("owner"));
+        tribe = Integer.parseInt(indianSettlementElement.getAttribute("tribe"));
+        kind = Integer.parseInt(indianSettlementElement.getAttribute("kind"));
+        isCapital = (new Boolean(indianSettlementElement.getAttribute("isCapital"))).booleanValue();
         
         Element unitContainerElement = (Element) indianSettlementElement.getElementsByTagName(UnitContainer.getXMLElementTagName()).item(0);
         if (unitContainer != null) {

@@ -77,7 +77,24 @@ public class ServerPlayer extends Player {
         resetExploredTiles(getGame().getMap());
     }
 
+    /**
+    * Creates a new <code>ServerPlayer</code>.
+    *
+    * @param name The player name.
+    * @param admin Whether the player is the game administrator or not.
+    * @param ai Whether this is an AI player.
+    * @param socket The socket to the player's client.
+    * @param connection The <code>Connection</code> for the above mentioned socket.
+    */
+    public ServerPlayer(Game game, String name, boolean admin, boolean ai, Socket socket, Connection connection) {
+        super(game, name, admin, ai);
 
+        this.socket = socket;
+        this.connection = connection;
+        //ready = false;
+
+        resetExploredTiles(getGame().getMap());
+    }
 
 
     /**

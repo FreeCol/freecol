@@ -1,7 +1,7 @@
 
 package net.sf.freecol.server.control;
 
-
+import java.awt.Color;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.util.logging.Logger;
@@ -14,6 +14,7 @@ import net.sf.freecol.server.generator.MapGenerator;
 import net.sf.freecol.common.model.*;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.server.networking.DummyConnection;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -72,8 +73,34 @@ public final class PreGameController {
     */
     public void startGame() {
         try {
-            // Make the map:
             Game game = freeColServer.getGame();
+                        
+            // Add any AI players:
+            // TODO: AI player to represent the other European nations
+            for (int i = Player.INCA; i <= Player.TUPI; i++) {
+                DummyConnection theConnection = new DummyConnection(freeColServer.getInGameInputHandler(),
+                                                                    null);
+                ServerPlayer indianPlayer = new ServerPlayer(game,
+                                                             "Indian_" + Integer.toString(i - 3),
+                                                             false,
+                                                             true,
+                                                             null,
+                                                             theConnection);
+                theConnection.setOutgoingMessageHandler(new AIInGameInputHandler(freeColServer, indianPlayer));
+                indianPlayer.setNation(i);
+                indianPlayer.setColor(IndianSettlement.indianColors[i - 4]);
+                
+                freeColServer.getServer().addConnection(theConnection, 3 - i);
+                
+                freeColServer.getGame().addPlayer(indianPlayer);               
+                
+                // Send message to all players except to the new player:
+                Element addNewPlayer = Message.createNewRootElement("addPlayer");
+                addNewPlayer.appendChild(indianPlayer.toXMLElement(null, addNewPlayer.getOwnerDocument()));
+                freeColServer.getServer().sendToAll(addNewPlayer, theConnection);
+            }
+            
+            // Make the map:
             MapGenerator mapGenerator = new MapGenerator(game);
             Map map = mapGenerator.createMap(game.getPlayers(), 30, 64);
 
