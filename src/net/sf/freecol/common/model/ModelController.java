@@ -32,6 +32,11 @@ public interface ModelController {
     */
     public Unit createUnit(String taskID, Location location, Player owner, int type);
 
+    /**
+    * Puts the specified <code>Unit</code in America.
+    * @param unit The <code>Unit</code>.
+    * @return The <code>Location</code> where the <code>Unit</code> appears.
+    */
     public Location setToVacantEntryLocation(Unit unit);
 
     /**

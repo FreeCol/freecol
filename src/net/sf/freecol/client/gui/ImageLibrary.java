@@ -137,8 +137,9 @@ public final class ImageLibrary extends ImageProvider {
                             WAGON_TRAIN = 57,
 
                             MILKMAID = 58,
+                            JESUIT_MISSIONARY_NO_CROSS = 59,
 
-                            UNIT_GRAPHICS_COUNT = 59;
+                            UNIT_GRAPHICS_COUNT = 60;
 
     private static final int UNIT_BUTTON_WAIT = 0,
                             UNIT_BUTTON_DONE = 1,
@@ -922,8 +923,10 @@ public final class ImageLibrary extends ImageProvider {
                     return UNARMED_DRAGOON;
                 } else if (unit.getNumberOfTools() > 0) {
                     return FREE_COLONIST_WITH_TOOLS;
-                } else {
+                } else if (unit.isMissionary()) {
                     return JESUIT_MISSIONARY;
+                } else {
+                    return JESUIT_MISSIONARY_NO_CROSS;
                 }
             case Unit.INDENTURED_SERVANT:
                 if (unit.isArmed() && unit.isMounted()) {

@@ -485,7 +485,10 @@ public final class Canvas extends JLayeredPane {
             takeFocusThread.stopWorking();
         }
 
-        remove(statusPanel);
+        if (comp != statusPanel && !(comp instanceof JMenuItem) && !(comp instanceof FreeColDialog)) {
+            remove(statusPanel);
+        }
+        
         Component c = super.add(comp);
         return c;
     }
@@ -502,7 +505,7 @@ public final class Canvas extends JLayeredPane {
             takeFocusThread.stopWorking();
         }
 
-        if (comp != statusPanel && !(comp instanceof JMenuItem)) {
+        if (comp != statusPanel && !(comp instanceof JMenuItem) && !(comp instanceof FreeColDialog)) {
             remove(statusPanel);
         }
 

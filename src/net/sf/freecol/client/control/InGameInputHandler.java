@@ -167,6 +167,7 @@ public final class InGameInputHandler extends InputHandler {
 
             if ((unit.getTile() != null) && (currentPlayer.canSee(map.getNeighbourOrNull(direction, unit.getTile())))) {
                 unit.move(direction);
+                getFreeColClient().getGUI().setFocus(unit.getTile().getPosition());                
             } else {
                 unit.dispose();
             }
@@ -180,6 +181,7 @@ public final class InGameInputHandler extends InputHandler {
                 logger.warning("Could not find tile with id: " + tileID);
             }
             unit.setLocation((Tile) game.getFreeColGameObject(tileID));
+            getFreeColClient().getGUI().setFocus(unit.getTile().getPosition());
         }
 
         return null;
