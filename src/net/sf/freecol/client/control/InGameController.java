@@ -1017,7 +1017,7 @@ public final class InGameController {
     public void centerActiveUnit() {
         GUI gui = freeColClient.getGUI();
 
-        gui.setFocus(gui.getSelectedTile());
+        gui.setFocus(gui.getActiveUnit().getTile().getPosition());
     }
 
 
