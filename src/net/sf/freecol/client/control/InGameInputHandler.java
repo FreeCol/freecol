@@ -10,6 +10,8 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.FreeColGameObject;
 
 import net.sf.freecol.client.networking.*;
@@ -82,6 +84,8 @@ public final class InGameInputHandler implements MessageHandler {
                 reply = newTurn(element);
             } else if (type.equals("setDead")) {
                 reply = setDead(element);
+            } else if (type.equals("createUnit")) {
+                reply = createUnit(element);
             } else if (type.equals("error")) {
                 reply = error(element);
             } else {
@@ -302,6 +306,28 @@ public final class InGameInputHandler implements MessageHandler {
         
         return null;
     }
+
+
+    /**
+    * Handles a "createUnit"-message.
+    *
+    * @param element The element (root element in a DOM-parsed XML tree) that
+    *                holds all the information.
+    */
+    private Element createUnit(Element element) {
+        Game game = freeColClient.getGame();
+        
+        Location location = (Location) game.getFreeColGameObject(element.getAttribute("location"));
+        Unit unit = new Unit(game, (Element) element.getChildNodes().item(0));
+
+        // TODO-WHEN-EXTENDING-GAME: Add "createUnit" to interface Location.
+        //                           in order to make it possible to produce units
+        //                           other places than the colonies.
+        ((Colony) location).createUnit(unit);
+        
+        return null;
+    }
+    
 
     /**
     * Handles an "error"-message.

@@ -277,17 +277,21 @@ public final class Colony extends Settlement implements Location {
     */
     public void add(Locatable locatable) {
         if (locatable instanceof Unit) {
-            Iterator i = getWorkLocationIterator();
-            while (i.hasNext()) {
-                WorkLocation w = (WorkLocation) i.next();
-                if (w.canAdd(locatable)) {
-                    //w.add(locatable);
-                    locatable.setLocation(w);
-                    return;
+            if (((Unit) locatable).isColonist()) {
+                Iterator i = getWorkLocationIterator();
+                while (i.hasNext()) {
+                    WorkLocation w = (WorkLocation) i.next();
+                    if (w.canAdd(locatable)) {
+                        //w.add(locatable);
+                        locatable.setLocation(w);
+                        return;
+                    }
                 }
+
+                logger.warning("Could not find a 'WorkLocation' for " + locatable + " in " + this);
+            } else {
+                getTile().add(locatable);
             }
-            
-            logger.warning("Could not find a 'WorkLocation' for " + locatable + " in " + this);
         } else if (locatable instanceof Goods) {
             goodsContainer.addGoods((Goods)locatable);
         } else {
@@ -451,6 +455,22 @@ public final class Colony extends Settlement implements Location {
         }
     }
 
+    
+    /**
+    * Adds the given unit to this colony. If <code>unit.isColonist()</code>
+    * then 300 food is removed, else hammers is set to 0.
+    */
+    public void createUnit(Unit unit) {
+        if (unit.isColonist()) {
+            removeGoods(Goods.FOOD, 300);
+        } else {
+            hammers = 0;
+        }
+
+        unit.setLocation(this);
+    }
+
+
     /**
     * Returns the hammer count of the colony.
     * @return The current hammer count of the colony.
@@ -610,9 +630,8 @@ public final class Colony extends Settlement implements Location {
         }
 
         // Breed horses:
+        int surplus = getFoodProduction() - eat;
         if (getGoodsCount(Goods.HORSES) >= 2 && surplus > 1) {
-            int surplus = getFoodProduction() - eat;
-
             if (!getBuilding(Building.STABLES).isBuilt()) {
                 int horseProduction = Math.min(surplus / 2, getPotentialHorseProduction());
 

@@ -16,6 +16,7 @@ import java.io.IOException;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.*;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.Connection;
@@ -808,6 +809,8 @@ public final class InGameInputHandler implements MessageHandler {
 
             Element newTurnElement = Message.createNewRootElement("newTurn");
             freeColServer.getServer().sendToAll(newTurnElement, null);
+
+            createColonistsInColonies();
         }
 
         game.setCurrentPlayer(nextPlayer);
@@ -826,6 +829,38 @@ public final class InGameInputHandler implements MessageHandler {
         freeColServer.getServer().sendToAll(setCurrentPlayerElement, null);
 
         return null;
+    }
+
+
+    /**
+    * Creates a colonist in every colony having more than 300 food.
+    */
+    private void createColonistsInColonies() {
+        Game game = freeColServer.getGame();
+        Map map = game.getMap();
+
+        Iterator wmi = map.getWholeMapIterator();
+        while (wmi.hasNext()) {
+            Tile tile = map.getTile((Position) wmi.next());
+            if (tile.getColony() != null && tile.getColony().getGoodsCount(Goods.FOOD) >= 300) {
+                Colony colony = tile.getColony();
+                Unit unit = new Unit(game, null, colony.getOwner(), Unit.FREE_COLONIST, Unit.ACTIVE);
+
+                Element createUnitElement = Message.createNewRootElement("createUnit");
+                createUnitElement.setAttribute("location", colony.getID());
+                createUnitElement.appendChild(unit.toXMLElement(colony.getOwner(), createUnitElement.getOwnerDocument()));
+                
+                colony.createUnit(unit);
+
+                ServerPlayer player = ((ServerPlayer) colony.getOwner());
+
+                try {
+                    player.getConnection().send(createUnitElement);
+                } catch (IOException e) {
+                    logger.warning("Could not send message to: " + player.getName() + " with connection " + player.getConnection());
+                }
+            }
+        }
     }
 
 
