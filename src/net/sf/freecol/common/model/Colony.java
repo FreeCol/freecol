@@ -307,7 +307,7 @@ public final class Colony extends Settlement implements Location {
         if (locatable instanceof Unit) {
             if (((Unit) locatable).isColonist()) {
                 WorkLocation w = getVacantColonyTileFor(((Unit) locatable), Goods.FOOD);
-                if (w.canAdd(locatable)) {
+                if (w != null && w.canAdd(locatable)) {
                     locatable.setLocation(w);
                     updatePopulation();
                     return;
