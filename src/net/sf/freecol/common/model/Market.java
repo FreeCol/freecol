@@ -59,7 +59,7 @@ public final class Market extends FreeColGameObject {
         /* price the goods in the newly set-up market */
         priceGoods();
     }
-    
+
     public Market(Game game, Element e) {
         super(game, e);
 
@@ -103,10 +103,9 @@ public final class Market extends FreeColGameObject {
      * @throws  NullPointerException  if either (typeOfGood) or (player) is
      *                                <TT>null</TT>
      */
-    public void sell(Goods typeOfGood, Player player) {
-
+    /*public void sell(Goods typeOfGood, Player player) {
         Data  data = dataForGoodType[typeOfGood.getType()];
-	int originalamount = typeOfGood.getAmount(), amount = originalamount;
+        int originalamount = typeOfGood.getAmount(), amount = originalamount;
         switch(typeOfGood.getType()) {
           case Goods.SILVER:
                amount *= 4; // No bitshifts in Java? Should be << 2 - sjm
@@ -120,9 +119,9 @@ public final class Market extends FreeColGameObject {
           case Goods.CLOTH:
           case Goods.COATS:
               amount *= 2;
-          break; 
+          break;
           default:
-              break; 
+              break;
         }
         if (player.getNation() == Player.DUTCH) amount /= 2;
         data.amountInMarket += amount;
@@ -131,25 +130,39 @@ public final class Market extends FreeColGameObject {
         typeOfGood.getLocation().remove(typeOfGood);
 
         priceGoods();
+    }*/
+
+    
+    public void sell(int type, int amount, Player player) {
+        player.modifyGold(getSalePrice(type, amount));
+        add(type, (player.getNation() == Player.DUTCH) ? (amount/2) : amount);
+    }
+    
+    
+    public void sell(Goods goods, Player player) {
+        sell(goods.getType(), goods.getAmount(), player);
+        goods.setLocation(null);
     }
 
 
     /**
      * Buys a particular amount of a particular type of good with the cost
      * being met by a particular player.
-     * 
+     *
      * @param  typeOfGood  the type of good that is being bought
      * @param  amount      the number of units of goods that are being bought
      * @param  player      the player buying the goods
      * @throws  NullPointerException  if either (typeOfGood) or (player) is
      *                                <TT>null</TT>
      */
+/*
     public Goods buy(int typeOfGood, int amount, Player player) {
 
         Data  data = dataForGoodType[typeOfGood];
         data.amountInMarket -= ((player.getNation() == Player.DUTCH) ? (amount / 2) : amount);
-
+*/
         /* this is a bottomless market: goods cannot be owed by the market */
+/*
         if (data.amountInMarket < 0) {
             data.amountInMarket = 0;
         }
@@ -157,8 +170,86 @@ public final class Market extends FreeColGameObject {
         player.modifyGold( -(amount * data.costToBuy));
 
         priceGoods();
-        
+
         return new Goods(player.getGame(), null, typeOfGood, amount);
+    }
+*/
+
+
+    public void buy(int type, int amount, Player player) {
+        if (getBidPrice(type, amount) > player.getGold()) {
+            throw new IllegalStateException();
+        }
+
+        player.modifyGold(-getBidPrice(type, amount));
+        remove(type, ((player.getNation() == Player.DUTCH) ? (amount / 2) : amount));
+    }
+
+    
+    /**
+    * Add the given <code>Goods</code> to this <code>Market</code>.
+    */
+    public void add(int type, int amount) {
+        Data  data = dataForGoodType[type];
+
+        switch(type) {
+          case Goods.SILVER:
+               amount *= 4; // No bitshifts in Java? Should be << 2 - sjm
+               break;
+          case Goods.SUGAR:
+          case Goods.TOBACCO:
+          case Goods.COTTON:
+          case Goods.FURS:
+          case Goods.RUM:
+          case Goods.CIGARS:
+          case Goods.CLOTH:
+          case Goods.COATS:
+              amount *= 2;
+          break;
+          default:
+              break;
+        }
+        
+        data.amountInMarket += amount;
+        priceGoods();
+    }
+
+
+    /**
+    * Remove the given <code>Goods</code> from this <code>Market</code>.
+    */
+    public void remove(int type, int amount) {
+        Data data = dataForGoodType[type];
+        data.amountInMarket -= amount;
+
+        /* this is a bottomless market: goods cannot be owed by the market */
+        if (data.amountInMarket < 0) {
+            data.amountInMarket = 0;
+        }
+        
+        priceGoods();
+    }
+
+
+    /**
+    * Gets the price of a given goods when the <code>Player</code> buys.
+    *
+    * @return The bid price of the given goods.
+    */
+    public int getBidPrice(int type, int amount) {
+        Data data = dataForGoodType[type];
+        return (amount * data.costToBuy);
+    }
+
+    
+    /**
+    * Gets the price of a given goods when the <code>Player</code> sales.
+    *
+    * @return The sale price of the given goods.
+    */
+    public int getSalePrice(int type, int amount) {
+        Data data = dataForGoodType[type];
+        return (amount * data.paidForSale);
     }
 
 
@@ -262,14 +353,16 @@ public final class Market extends FreeColGameObject {
          * Package constructor: This class is only supposed to be constructed
          * by {@link Market}.
          */
-        Data(Game game) {super(game);}
+        Data(Game game) {
+            super(game);
+        }
 
         Data(Game game, Element e) {
             super(game, e);
 
             readFromXMLElement(e);
-	}
-	
+        }
+
         /**
         * Make a XML-representation of this object.
         *
@@ -297,11 +390,11 @@ public final class Market extends FreeColGameObject {
             setID(dataElement.getAttribute("ID"));
 
             costToBuy = Integer.parseInt(dataElement.getAttribute("buy"));
-	    costToBuy = Integer.parseInt(dataElement.getAttribute("sell"));
-	    costToBuy = Integer.parseInt(dataElement.getAttribute("amount"));
+            costToBuy = Integer.parseInt(dataElement.getAttribute("sell"));
+            costToBuy = Integer.parseInt(dataElement.getAttribute("amount"));
         }
 
-	/**
+        /**
         * Returns the tag name of the root element representing this object.
         *
         * @return the tag name.
@@ -309,7 +402,7 @@ public final class Market extends FreeColGameObject {
         public static String getXMLElementTagName() {
             return "marketdata";
         }
-	
+
         public void newTurn() {
             // Shift market goods around a bit?
         }

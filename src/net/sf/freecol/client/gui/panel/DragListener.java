@@ -12,6 +12,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.TransferHandler;
 
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.ColonyTile;
 
 /**
@@ -50,30 +52,35 @@ public final class DragListener extends MouseAdapter {
             UnitLabel unitLabel = (UnitLabel)comp;
             Unit tempUnit = unitLabel.getUnit();
 
-            if (!tempUnit.isCarrier()) {
+            // if (!tempUnit.isCarrier()) {
+            if (tempUnit.isColonist()) {
                 JPopupMenu menu = new JPopupMenu("Unit");
                 JMenuItem menuItem;
 
-                if (tempUnit.isArmed()) {
-                    menuItem = new JMenuItem("Disarm");
-                } else {
-                    menuItem = new JMenuItem("Arm");
+                if (!tempUnit.isPioneer() && !tempUnit.isMissionary()) {
+                    if (tempUnit.isArmed()) {
+                        menuItem = new JMenuItem("Disarm");
+                    } else {
+                        menuItem = new JMenuItem("Arm");
+                    }
+                    menuItem.setActionCommand(String.valueOf(UnitLabel.ARM));
+                    menuItem.addActionListener(unitLabel);
+                    menu.add(menuItem);
                 }
-                menuItem.setActionCommand(String.valueOf(UnitLabel.ARM));
-                menuItem.addActionListener(unitLabel);
-                menu.add(menuItem);
 
-                if (tempUnit.isMounted()) {
-                    menuItem = new JMenuItem("Remove Horses");
-                } else {
-                    menuItem = new JMenuItem("Mount");
+                if (!tempUnit.isPioneer() && !tempUnit.isMissionary()) {
+                    if (tempUnit.isMounted()) {
+                        menuItem = new JMenuItem("Remove Horses");
+                    } else {
+                        menuItem = new JMenuItem("Mount");
+                    }
+                    menuItem.setActionCommand(String.valueOf(UnitLabel.MOUNT));
+                    menuItem.addActionListener(unitLabel);
+                    menu.add(menuItem);
                 }
-                menuItem.setActionCommand(String.valueOf(UnitLabel.MOUNT));
-                menuItem.addActionListener(unitLabel);
-                menu.add(menuItem);
 
-                if (!tempUnit.isArmed() && !tempUnit.isMounted()) {
-                    if (tempUnit.getNumberOfTools() > 0) {
+                if (!tempUnit.isArmed() && !tempUnit.isMounted() && !tempUnit.isMissionary()) {
+                    if (tempUnit.isPioneer()) {
                         menuItem = new JMenuItem("Remove Tools");
                     } else {
                         menuItem = new JMenuItem("Equip with Tools");
@@ -83,14 +90,18 @@ public final class DragListener extends MouseAdapter {
                     menu.add(menuItem);
                 }
 
-                if (tempUnit.isMissionary()) {
-                    menuItem = new JMenuItem("Take Off Silly Clothes");
-                } else {
-                    menuItem = new JMenuItem("Dress as Missionaries");
+                if (!tempUnit.isArmed() && !tempUnit.isMounted() && !tempUnit.isPioneer() && (tempUnit.getLocation() 
+                        instanceof Europe || tempUnit.getTile().getColony().getBuilding(Building.CHURCH).isBuilt())) {
+
+                    if (tempUnit.isMissionary()) {
+                        menuItem = new JMenuItem("Take Off Silly Clothes");
+                    } else {
+                        menuItem = new JMenuItem("Dress as Missionaries");
+                    }
+                    menuItem.setActionCommand(String.valueOf(UnitLabel.DRESS));
+                    menuItem.addActionListener(unitLabel);
+                    menu.add(menuItem);
                 }
-                menuItem.setActionCommand(String.valueOf(UnitLabel.DRESS));
-                menuItem.addActionListener(unitLabel);
-                menu.add(menuItem);
 
                 if (tempUnit.getLocation() instanceof ColonyTile) {
                     menuItem = new JMenuItem("Be a Farmer");

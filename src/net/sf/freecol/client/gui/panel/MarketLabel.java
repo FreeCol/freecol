@@ -38,8 +38,14 @@ public final class MarketLabel extends JLabel implements ActionListener {
     */
     public MarketLabel(int type, Market market, Canvas parent) {
         super(parent.getImageProvider().getGoodsImageIcon(type));
+        
         this.type = type;
-	this.market = market;
+        
+        if (market == null) {
+            throw new NullPointerException();
+        }
+
+        this.market = market;
         this.parent = parent;
     }
 

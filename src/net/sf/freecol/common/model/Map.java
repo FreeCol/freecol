@@ -187,6 +187,16 @@ public class Map extends FreeColGameObject {
             throw new IllegalArgumentException("Illegal coordinate (" + x + ", " + y + ")");
         }
     }
+    
+    
+    /**
+    * Sets the given tile the the given coordinates.
+    *
+    * @param tile The <code>Tile</code>.
+    */
+    public void setTile(Tile tile, int x, int y) {
+        ((Vector) columns.get(x)).set(y, tile);
+    }
 
 
     /**
@@ -888,7 +898,15 @@ public class Map extends FreeColGameObject {
             int width = Integer.parseInt(mapElement.getAttribute("width"));
             int height = Integer.parseInt(mapElement.getAttribute("height"));
 
-            createColumns(width, height);
+            //createColumns(width, height);
+            columns = new Vector(width);
+            for (int i = 0; i < width; i++) {
+                Vector v = new Vector(height);
+                for (int j = 0; j < height; j++) {
+                    v.add(null);
+                }
+                columns.add(v);
+            }
         }
 
         NodeList tileList = mapElement.getElementsByTagName(Tile.getXMLElementTagName());
@@ -898,7 +916,11 @@ public class Map extends FreeColGameObject {
             int x = Integer.parseInt(tileElement.getAttribute("x"));
             int y = Integer.parseInt(tileElement.getAttribute("y"));
 
-            getTile(x, y).readFromXMLElement(tileElement);
+            if (getTile(x, y) != null) {
+                getTile(x, y).readFromXMLElement(tileElement);
+            } else {
+                setTile(new Tile(getGame(), tileElement), x, y);
+            }
         }
     }
 

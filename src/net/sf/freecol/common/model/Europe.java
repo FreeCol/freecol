@@ -160,6 +160,7 @@ public final class Europe extends FreeColGameObject implements Location {
         //setRecruitPrice(getRecruitPrice() * 2);
     }
 
+
     /**
     * Causes a unit to emigrate from Europe.
     *
@@ -181,6 +182,7 @@ public final class Europe extends FreeColGameObject implements Location {
         //Note that the player object causes this to change -sjm
         //setRecruitPrice(getRecruitPrice() * 2);
     }
+
 
     /**
     * Returns <i>null</i>.
@@ -302,7 +304,7 @@ public final class Europe extends FreeColGameObject implements Location {
         unit.setLocation(this);
     }
 
-
+    
     /**
     * Prepares this object for a new turn.
     */

@@ -142,7 +142,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
                         }
                         break;
                     case DRESS:
-                        //inGameController.equipUnit(unit, Goods.CROSSES, ((unit.isMissionary()) ? 0 : 1));
+                        inGameController.equipUnit(unit, Goods.CROSSES, ((unit.isMissionary()) ? 0 : 1));
                         break;
                     case WORKTYPE_FOOD:
                         inGameController.changeWorkType(unit, Goods.FOOD);

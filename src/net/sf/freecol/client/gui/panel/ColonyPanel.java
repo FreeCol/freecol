@@ -126,13 +126,14 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
         cargoLabel = new JLabel("<html><strike>Cargo</strike></html>");
         goldLabel = new JLabel("Gold: 0");
+        
         solLabel = new JLabel("SOL: 0%, Tory: 100%");
         warehouseLabel = new JLabel("Goods");
         progressLabel = new JLabel("Hammers: 0/0");
-        
-        
+
+
         buildingBox = new BuildingBox(this);
-        
+
         JButton exitButton = new JButton("Close");
         JScrollPane outsideColonyScroll = new JScrollPane(outsideColonyPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER),
                     inPortScroll = new JScrollPane(inPortPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER),
@@ -156,8 +157,10 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         inPortLabel.setSize(200, 20);
         cargoLabel.setSize(410, 20);
         goldLabel.setSize(100, 20);
+
         solLabel.setSize(160, 20);
         warehouseLabel.setSize(100, 20);
+
         tilesLabel.setSize(100, 20);
         buildingsLabel.setSize(300, 20);
         buildingBox.setSize(160, 20);
@@ -216,8 +219,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     }
 
 
-    
-    
+
+
 
     /**
     * Refreshes this panel.
@@ -269,7 +272,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 lastCarrier = unitLabel;
             }
         }
-        
+
         setSelectedUnit(lastCarrier);
 
         //
@@ -288,7 +291,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         }
 
         warehousePanel.revalidate();
-        
+
         setSelectedUnit(lastCarrier);
 
         //
@@ -689,6 +692,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 }
             }
 
+            updateCargoLabel();            
             Component c = add(comp);
 
             refresh();
@@ -737,8 +741,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             if (editState) {
                 if (comp instanceof UnitLabel) {
                     Unit unit = ((UnitLabel)comp).getUnit();
-                    if (!unit.isCarrier()) // No, you cannot load ships onto other ships.
-                    {
+                    if (!unit.isCarrier()) {// No, you cannot load ships onto other ships.
                       ((UnitLabel) comp).setSmall(false);
                       inGameController.boardShip(unit, selectedUnit.getUnit());
                       colonyPanel.updateSoLLabel();
@@ -748,7 +751,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 } else if (comp instanceof GoodsLabel) {
                     Goods g = ((GoodsLabel)comp).getGoods();
                     ((GoodsLabel) comp).setSmall(false);
-                    logger.warning("Attempting to load cargo.");
+                    logger.info("Attempting to load cargo.");
                     inGameController.loadCargo(g, selectedUnit.getUnit());
                     colonyPanel.getWarehousePanel().revalidate();
                     colonyPanel.getCargoPanel().revalidate();
@@ -756,12 +759,19 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                     logger.warning("An invalid component got dropped on this CargoPanel.");
                 }
             }
+
             updateCargoLabel();
             Component c = add(comp);
 
             refresh();
             return c;
         }
+
+
+        public boolean isActive() {
+            return (getSelectedUnit() != null);
+        }
+        
 
         public void remove(Component comp) {
             if (comp instanceof UnitLabel) {
@@ -830,7 +840,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 this.colonyTile = colonyTile;
                 this.x = x;
                 this.y = y;
-                
+
                 setOpaque(false);
 
                 if (colonyTile.getUnit() != null) {
@@ -846,9 +856,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                     staticGoodsLabel.setText(Integer.toString(unit.getFarmedPotential(unit.getWorkType(), colonyTile.getWorkTile())));
                     add(staticGoodsLabel);
                 }
-                
-                if (colonyTile.isColonyCenterTile())
-                {
+
+                if (colonyTile.isColonyCenterTile()) {
                     staticGoodsLabel = new JLabel(parent.getImageProvider().getGoodsImageIcon(Goods.FOOD));
                     staticGoodsLabel.setText(Integer.toString(colonyTile.getTile().potential(Goods.FOOD)));
                     add(staticGoodsLabel);
@@ -893,7 +902,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                         inGameController.work(unit, colonyTile);
 
                         ((UnitLabel) comp).setSmall(false);
-                        
+
                         if (staticGoodsLabel != null) {
                             super.remove(staticGoodsLabel);
                             staticGoodsLabel = null;

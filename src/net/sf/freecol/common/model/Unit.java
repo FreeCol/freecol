@@ -524,7 +524,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     */
     public void add(Locatable locatable) {
         if (isCarrier()) {
-            // TODO: Check if there is space for a new Locatable.
+            if (getSpaceLeft() <= 0) {
+                throw new IllegalStateException();
+            }
 
             if (locatable instanceof Unit) {
                 unitContainer.addUnit((Unit) locatable);
@@ -615,23 +617,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         }
     }
     
-    /**
-    * Gets the storage room of all Goods at this location.
-    * @return The total storage room of all Goods at this location.
-    */
-    public int getGoodsSpace() {
-        if (isCarrier()) {
-            int space = 0;
-            Iterator goodsIterator = goodsContainer.getGoodsIterator();
-            while (goodsIterator.hasNext()) {
-              space += ((Goods) goodsIterator.next()).getTakeSpace();
-            }
-            return space;
-        } else {
-            return 0;
-        }
-    }
-
 
     /**
     * Gets the first <code>Unit</code> beeing carried by this <code>Unit</code>.
@@ -747,7 +732,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         setLocation(getTile());
     }
 
-
+    
     /**
     * Sets the armed attribute of this unit.
     * @param b <i>true</i> if this unit should be armed and <i>false</i> otherwise.
@@ -758,19 +743,26 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             armed = b; // No questions asked.
             return;
         }
+
+        if (b) {
+            if (isPioneer()) {
+                setNumberOfTools(0);
+            }
+            
+            if (isMissionary()) {
+                setMissionary(false);
+            }
+        }
+
         if ((b) && (!armed)) {
             if (getGoodsDumpLocation() != null) {
                 if (getGoodsDumpLocation().getGoodsCount(Goods.MUSKETS) < 50) {
                     return;
                 }
-                
-                getGoodsDumpLocation().removeAmountAndTypeOfGoods(Goods.MUSKETS, 50);
+
+                getGoodsDumpLocation().removeGoods(Goods.MUSKETS, 50);
                 armed = true;
             } else if (location instanceof Europe) {
-                if (((getOwner().getGold()) / (getGame().getMarket().costToBuy(Goods.MUSKETS))) < 50) {
-                    return;
-                }
-                
                 getGame().getMarket().buy(Goods.MUSKETS, 50, getOwner());
                 armed = true;
             } else {
@@ -778,11 +770,13 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             }
         } else if ((!b) && (armed)) {
             armed = false;
-            Goods g = new Goods(getGame(), null, Goods.MUSKETS, 50);
+
             if (getGoodsDumpLocation() != null) {
-                g.setLocation(getGoodsDumpLocation());
+                getGoodsDumpLocation().addGoods(Goods.MUSKETS, 50);
             } else if (location instanceof Europe) {
-                getGame().getMarket().sell(g, getOwner());
+                getGame().getMarket().sell(Goods.MUSKETS, 50, getOwner());
+            } else {
+                throw new IllegalStateException();
             }
         }
     }
@@ -814,29 +808,42 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             mounted = b; // No questions asked.
             return;
         }
+
+        if (b) {
+            if (isPioneer()) {
+                setNumberOfTools(0);
+            }
+            
+            if (isMissionary()) {
+                setMissionary(false);
+            }
+        }
+
         if ((b) && (!mounted)) {
             if (getGoodsDumpLocation() != null) {
-               if (getGoodsDumpLocation().getGoodsCount(Goods.HORSES) < 50) return;
-               getGoodsDumpLocation().removeAmountAndTypeOfGoods(Goods.HORSES, 50);
-               mounted = true;
+                if (getGoodsDumpLocation().getGoodsCount(Goods.HORSES) < 50) {
+                    throw new IllegalStateException();
+                }
+
+                getGoodsDumpLocation().removeGoods(Goods.HORSES, 50);
+                mounted = true;
             } else if (location instanceof Europe) {
-               if (((getOwner().getGold()) / (getGame().getMarket().costToBuy(Goods.HORSES))) < 50) return;
-               getGame().getMarket().buy(Goods.HORSES, 50, getOwner());
-               mounted = true;
+                getGame().getMarket().buy(Goods.HORSES, 50, getOwner());
+                mounted = true;
             } else {
                 logger.warning("Attempting to mount a colonist outside of a colony or Europe!");
             }
         } else if ((!b) && (mounted)) {
             mounted = false;
-            Goods g = new Goods(getGame(), null, Goods.HORSES, 50);
+
             if (getGoodsDumpLocation() != null) {
-                g.setLocation(getGoodsDumpLocation());
+                getGoodsDumpLocation().addGoods(Goods.HORSES, 50);
             } else if (location instanceof Europe) {
-                getGame().getMarket().sell(g, getOwner());
+                getGame().getMarket().sell(Goods.HORSES, 50, getOwner());
             }
         }
     }
-    
+
     /**
     * Sets the mounted attribute of this unit.
     * @param b <i>true</i> if this unit should be mounted and <i>false</i> otherwise.
@@ -861,6 +868,24 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     * @param b <i>true</i> if the unit should be a missionary and <i>false</i> otherwise.
     */
     public void setMissionary(boolean b) {
+        if (!(getLocation() instanceof Europe) && !getTile().getColony().getBuilding(Building.CHURCH).isBuilt()) {
+            throw new IllegalStateException("Can only dress as a missionary when the unit is located in Europe or a Colony with a church.");
+        }
+
+        if (b) {
+            if (isPioneer()) {
+                setNumberOfTools(0);
+            }
+
+            if (isArmed()) {
+                setArmed(false);
+            }
+
+            if (isMounted()) {
+                setMounted(false);
+            }
+        }
+
         missionary = b;
     }
 
@@ -873,12 +898,44 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         return missionary;
     }
 
+    
+    /**
+    * Buys goods of a specified type and amount and adds it to this <code>Unit</code>.
+    * Can only be used when the <code>Unit</code> is a carrier and is located in 
+    * {@link Europe}.
+    *
+    * @param type The type of goods to buy.
+    * @param The amount of goods to buy.
+    */
+    public void buyGoods(int type, int amount) {
+        if (!isCarrier() || !(getLocation() instanceof Europe)) {
+            throw new IllegalStateException("Cannot buy goods when not a carrier or in Europe.");
+        }
 
+        getGame().getMarket().buy(type, amount, getOwner());
+        goodsContainer.addGoods(type, amount);
+    }
+
+    
     /**
     * Sets how many tools this unit is carrying.
     * @param numberOfTools The number to set it to.
     */
     public void setNumberOfTools(int numberOfTools) {
+        if (numberOfTools != 0) {
+            if (isMounted()) {
+                setMounted(false);
+            }
+
+            if (isArmed()) {
+                setArmed(false);
+            }
+            
+            if (isMissionary()) {
+                setMissionary(false);
+            }            
+        }
+
         int changeAmount = 0;
         if ((numberOfTools % 20) != 0) {
             logger.warning("Attempting to give a pioneer a number of tools that is not a multiple of 20!");
@@ -894,7 +951,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                if (actualAmount < changeAmount) changeAmount = actualAmount;
                if ((this.numberOfTools + changeAmount) % 20 > 0) changeAmount -= (this.numberOfTools + changeAmount);
                if (changeAmount <= 0) return;
-               getGoodsDumpLocation().removeAmountAndTypeOfGoods(Goods.TOOLS, changeAmount);
+               getGoodsDumpLocation().removeGoods(Goods.TOOLS, changeAmount);
                this.numberOfTools = this.numberOfTools + changeAmount;
             } else if (location instanceof Europe) {
                int maximumAmount = ((getOwner().getGold()) / (getGame().getMarket().costToBuy(Goods.TOOLS)));
@@ -908,11 +965,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             }
         } else if (changeAmount < 0) {
             this.numberOfTools = this.numberOfTools + changeAmount;
-            Goods g = new Goods(getGame(), null, Goods.TOOLS, -changeAmount);
+
             if (getGoodsDumpLocation() != null) {
-                g.setLocation(getGoodsDumpLocation());
+                getGoodsDumpLocation().addGoods(Goods.TOOLS, -changeAmount);
             } else if (location instanceof Europe) {
-                getGame().getMarket().sell(g, getOwner());
+                getGame().getMarket().sell(Goods.TOOLS, -changeAmount, getOwner());
             }
         }
     }
@@ -1475,7 +1532,12 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     * @return The amount of units/goods than can be moved onto this Unit.
     */
     public int getSpaceLeft() {
-        return getInitialSpaceLeft() - (getUnitCount() + getGoodsSpace());
+        return getInitialSpaceLeft() - (getUnitCount() + getGoodsCount());
+    }
+
+    
+    public int getGoodsCount() {
+        return goodsContainer.getGoodsCount();
     }
 
 
@@ -1839,8 +1901,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         //TODO: <1 move point movement penalty
         
         if (isNaval()) {
-            if (getGoodsSpace() > 0) {
-                modified_power -= ((base_power * getGoodsSpace()) / 8); // -12.5% penalty for every unit of cargo.
+            if (getGoodsCount() > 0) {
+                modified_power -= ((base_power * getGoodsCount()) / 8); // -12.5% penalty for every unit of cargo.
             }
             return modified_power;
         }
@@ -1925,7 +1987,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                 base_power = 0;
                 break;
         }
-        
+
         if (isArmed()) {
             if (base_power == 0) {
                 base_power = 2;
@@ -1940,19 +2002,19 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                 base_power++;
             }
         }
-        
+
         int modified_power = (base_power * 3) / 2; // 50% attack bonus
-        
+
         //TODO: <1 move point movement penalty
-        
+
         if (isNaval()) {
-            if (getGoodsSpace() > 0) {
-                modified_power -= ((base_power * getGoodsSpace()) / 8); // -12.5% penalty for every unit of cargo.
+            if (getGoodsCount() > 0) {
+                modified_power -= ((base_power * getGoodsCount()) / 8); // -12.5% penalty for every unit of cargo.
             }
             //TODO: Drake bonus
             return modified_power;
         }
-        
+
         if ((((getType() != BRAVE) && (target.getType() == KINGS_REGULAR)) ||  // TODO: check for REF artillery pieces
             ((getType() == BRAVE) && (target.getType() != KINGS_REGULAR))) &&
             (target.getTile() != null) &&
@@ -1960,14 +2022,14 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             // Ambush bonus.
             modified_power += ((base_power * target.getTile().defenseBonus()) / 100);
         }
-        
+
         if (((getType() == KINGS_REGULAR)) && // TODO: check for REF artillery pieces
             (target.getTile() != null) &&
             (target.getTile().getSettlement() == null))
         {
             modified_power += (base_power / 2); // REF bombardment bonus
         }
-        
+
         if ((getType() == ARTILLERY) || (getType() == DAMAGED_ARTILLERY)) {
           if ((target.getTile() != null) && (target.getTile().getSettlement()) == null) {
             modified_power -= ((base_power * 3) / 4); // -75% Artillery in the Open penalty
@@ -1975,13 +2037,22 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         }
         return modified_power;
     }
-    
+
     /**
     * Carries out the winning of an attack.
     * @param defender The target of the attack.
     */
     public void winAttack(Unit defender) {
+        if (defender == null) {
+            throw new NullPointerException();
+        }
+
         Tile newTile = defender.getTile();
+
+        if (newTile == null) {
+            throw new NullPointerException();
+        }
+
         movesLeft = 0;
         if (defender.getType() == BRAVE) {
             defender.dispose();
@@ -1996,7 +2067,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                 while (unitIterator.hasNext()) {
                     ((Unit)unitIterator.next()).dispose();
                 }
-            }            
+            }
         } else if (isNaval()) {
             //TODO: seizure of cargo and the like. For now just sink.
             defender.dispose();
@@ -2046,14 +2117,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         movesLeft = 0;
         if (getType() == BRAVE) {
             dispose();
-            return; // Do NOT try to go any further!
         } else if (isNaval()) {
             //TODO: evasion and the like. For now just sink.
             dispose();
-            return; // Do NOT try to go any further!    
         } else if (!(isArmed()) && !(getType() == ARTILLERY) && !(getType() == DAMAGED_ARTILLERY)) {
             dispose(); // Only scouts should ever reach this point. Nobody else should be able to attack.
-            return; // Do NOT try to go any further!
         } else {
             if (isMounted()) {
                 setMounted(false, true);
@@ -2066,7 +2134,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                 setArmed(false, true);
             }
         }
-        
+
         return;
     }
 

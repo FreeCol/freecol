@@ -24,7 +24,7 @@ public class FreeColDialog extends JPanel {
     private boolean responseGiven = false;
 
 
-    
+
 
     /**
     * Default constructor.
@@ -37,7 +37,7 @@ public class FreeColDialog extends JPanel {
     }
 
 
-    
+
 
     /**
     * Sets the <code>response</code> and wakes up any thread waiting for this information.
@@ -47,6 +47,7 @@ public class FreeColDialog extends JPanel {
     public synchronized void setResponse(Object response) {
         this.response = response;
         responseGiven = true;
+        logger.info("Response has been set.");
         notifyAll();
     }
 

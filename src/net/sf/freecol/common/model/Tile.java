@@ -384,6 +384,23 @@ public final class Tile extends FreeColGameObject implements Location {
 
 
     /**
+    * Gets the <code>Colony</code> located on this <code>Tile</code>.
+    * Only a convenience method for {@link #getSettlement}.
+    *
+    * @return The <code>Colony</code> that is located on this <code>Tile</code>
+    *         or <i>null</i> if no <code>Colony</code> apply.
+    * @see #getSettlement
+    */
+    public Colony getColony() {
+        if (settlement != null && settlement instanceof Colony) {
+            return (Colony) settlement;
+        } else {
+            return null;
+        }
+    }
+
+
+    /**
     * Sets the owner of this tile. A <code>Settlement</code> become an
     * owner of a <code>Tile</code> when having workers placed on it.
     *

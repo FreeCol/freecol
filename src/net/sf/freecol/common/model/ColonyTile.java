@@ -238,19 +238,16 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation {
             if (amount > 0) {
                 amount += colony.getProductionBonus();
                 if (amount < 1) amount = 1;
-                Goods g = new Goods(getGame(), null, getUnit().getWorkType(), amount);
-                g.setLocation(colony);
+                colony.addGoods(getUnit().getWorkType(), amount);
             }
         } else {
             int amount1 = workTile.potential(Goods.FOOD);
-            Goods g = new Goods(getGame(), null, Goods.FOOD, amount1);
-            g.setLocation(colony);
+            colony.addGoods(Goods.FOOD, amount1);
+
             int type2 = workTile.secondaryGoods();
             int amount2 = workTile.potential(type2);
-            g = new Goods(getGame(), null, type2, amount2);
-            g.setLocation(colony);
+            colony.addGoods(type2, amount2);
         }
-        //colony.add(g);
     }
 
 

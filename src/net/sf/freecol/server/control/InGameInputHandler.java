@@ -398,50 +398,15 @@ public final class InGameInputHandler implements MessageHandler {
         Game game = freeColServer.getGame();
         ServerPlayer player = freeColServer.getPlayer(connection);
 
-        Goods goods = (Goods) game.getFreeColGameObject(loadCargoElement.getAttribute("goods"));
         Unit carrier = (Unit) game.getFreeColGameObject(loadCargoElement.getAttribute("carrier"));
+        Goods goods = new Goods(game, (Element) loadCargoElement.getChildNodes().item(0));
 
-	
-        Tile oldTile;
-	if (goods.getLocation() != null) {
-	    oldTile = goods.getLocation().getTile();
-	} else {
-	    oldTile = null;
-	}
-
-        goods.Load(carrier);
-
-        Iterator enemyPlayerIterator = game.getPlayerIterator();
-        while (enemyPlayerIterator.hasNext()) {
-            ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
-
-            if (player.equals(enemyPlayer)) {
-                continue;
-            }
-
-            try {
-                if (enemyPlayer.canSee(oldTile)) {
-                    Element removeElement = Message.createNewRootElement("remove");
-
-                    Element removeGoods = removeElement.getOwnerDocument().createElement("removeObject");
-                    removeGoods.setAttribute("ID", goods.getID());
-                    removeElement.appendChild(removeGoods);
-
-                    enemyPlayer.getConnection().send(removeElement);
-                }
-            } catch (IOException e) {
-                logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection " + enemyPlayer.getConnection());
-            }
-        }
-
-	if (oldTile != null) {
-            sendUpdatedTileToAll(oldTile, player);
-	}
+        goods.loadOnto(carrier);
 
         return null;
     }
 
-    
+
     /**
     * Handles an "unloadCargo"-message from a client.
     *
@@ -452,16 +417,12 @@ public final class InGameInputHandler implements MessageHandler {
         Game game = freeColServer.getGame();
         ServerPlayer player = freeColServer.getPlayer(connection);
 
-        Goods goods = (Goods) game.getFreeColGameObject(unloadCargoElement.getAttribute("goods"));
-
-        goods.Unload();
-        Tile newTile = goods.getLocation().getTile();
-
-        sendUpdatedTileToAll(newTile, player);
+        Goods goods = new Goods(game, (Element) unloadCargoElement.getChildNodes().item(0));
+        goods.unload();
 
         return null;
     }
-    
+
     /**
     * Handles a "buyGoods"-message from a client.
     *
@@ -472,15 +433,16 @@ public final class InGameInputHandler implements MessageHandler {
         Game game = freeColServer.getGame();
         ServerPlayer player = freeColServer.getPlayer(connection);
 
-        int type = Integer.parseInt(buyGoodsElement.getAttribute("type"));
         Unit carrier = (Unit) game.getFreeColGameObject(buyGoodsElement.getAttribute("carrier"));
-        Player theplayer = (Player) game.getFreeColGameObject(buyGoodsElement.getAttribute("player"));
+        int type = Integer.parseInt(buyGoodsElement.getAttribute("type"));
+        int amount = Integer.parseInt(buyGoodsElement.getAttribute("amount"));
 
-        if (theplayer.getGold() >= (game.getMarket().costToBuy(type) * 100)) {
-            (game.getMarket().buy(type, 100, theplayer)).setLocation(carrier);
-        } else {
-            logger.warning("A client is buying goods, but does not have enough money to do so???");
+        if (carrier.getOwner() != player) {
+            throw new IllegalStateException();
         }
+
+        carrier.buyGoods(type, amount);
+        
         return null;
     }
 
@@ -495,10 +457,9 @@ public final class InGameInputHandler implements MessageHandler {
         Game game = freeColServer.getGame();
         ServerPlayer player = freeColServer.getPlayer(connection);
 
-        Goods goods = (Goods) game.getFreeColGameObject(sellGoodsElement.getAttribute("goods"));
-        Player theplayer = (Player) game.getFreeColGameObject(sellGoodsElement.getAttribute("player"));
+        Goods goods = new Goods(game, (Element) sellGoodsElement.getChildNodes().item(0));
 
-        game.getMarket().sell(goods, theplayer);
+        game.getMarket().sell(goods, player);
 
         return null;
     }
@@ -667,10 +628,11 @@ public final class InGameInputHandler implements MessageHandler {
         Unit unit = (Unit) game.getFreeColGameObject(workElement.getAttribute("unit"));
         int type = Integer.parseInt(workElement.getAttribute("type"));
         int amount = Integer.parseInt(workElement.getAttribute("amount"));
-        
+
         switch(type) {
-            //TODO: Pass in "Goods.CROSSES" when this is defined to bless as a missionary.
-            //Also check to see if there's a church in the colony, or if you're in Europe.
+            case Goods.CROSSES:
+                unit.setMissionary((amount > 0));
+                break;
             case Goods.MUSKETS:
                 unit.setArmed((amount > 0)); // So give them muskets if the amount we want is greater than zero.
                 break;
@@ -693,7 +655,7 @@ public final class InGameInputHandler implements MessageHandler {
         return null;
     }
 
-    
+
     /**
     * Handles a "work"-request from a client.
     *

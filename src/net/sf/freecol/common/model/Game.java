@@ -55,9 +55,9 @@ public class Game extends FreeColGameObject {
     public Game() {
         super(null);
 
-//        market = new Market(this);
         currentPlayer = null;
         canGiveID = true;
+        market = new Market(this);
     }
 
 
@@ -99,7 +99,9 @@ public class Game extends FreeColGameObject {
 
             return id;
         } else {
-            return null;
+            logger.warning("The client's \"Game\" was requested to give out an id.");
+            throw new Error("The client's \"Game\" was requested to give out an id.");
+            //return null;
         }
     }
 
@@ -438,9 +440,7 @@ public class Game extends FreeColGameObject {
             gameElement.appendChild(p.toXMLElement(player, document));
         }
 
-        if (market != null) {
-            gameElement.appendChild(market.toXMLElement(player, document));
-        }
+        gameElement.appendChild(market.toXMLElement(player, document));
 
         if (currentPlayer != null) {
             gameElement.setAttribute("currentPlayer", currentPlayer.getID());
@@ -487,15 +487,11 @@ public class Game extends FreeColGameObject {
             }
         }
 
-        if (gameElement.hasAttribute("market")) {
-            Element marketElement = (Element) gameElement.getElementsByTagName("market").item(0);
-            if (market != null) {
-                market.readFromXMLElement(marketElement);
-            } else {
-                market = new Market(this, marketElement);
-            }
+        Element marketElement = (Element) gameElement.getElementsByTagName(Market.getXMLElementTagName()).item(0);
+        if (market != null) {
+            market.readFromXMLElement(marketElement);
         } else {
-            market = new Market(this);
+            market = new Market(this, marketElement);
         }
 
         if (gameElement.hasAttribute("currentPlayer")) {

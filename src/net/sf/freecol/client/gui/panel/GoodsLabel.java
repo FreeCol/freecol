@@ -91,11 +91,13 @@ public final class GoodsLabel extends JLabel implements ActionListener {
     * @param g The graphics context in which to do the painting.
     */
     public void paintComponent(Graphics g) {
+        /*
         if (goods.getAmount() < 100) {
             setEnabled(false);
         } else {
             setEnabled(true);
         }
+        */
 
         super.setText(String.valueOf(goods.getAmount()));
         super.paintComponent(g);

@@ -26,8 +26,8 @@ public class GoodsContainer extends FreeColGameObject {
     public static final String  REVISION = "$Revision$";
 
     /** The list of Goods stored in this <code>GoodsContainer</code>. */
-    private ArrayList goods = new ArrayList();
-    
+    private int[] storedGoods = new int[Goods.NUMBER_OF_TYPES];
+
     /** The owner of this <code>GoodsContainer</code>. */
     private Location parent;
 
@@ -77,21 +77,17 @@ public class GoodsContainer extends FreeColGameObject {
     * Adds a <code>Goods</code> to this containter.
     * @param goods The Goods to add to this container.
     */
-    public void addGoods(Goods toadd) {
-        // See if there's already goods of this type. If so, unify into one pile.
-        Iterator goodsIterator = getGoodsIterator();
-        Goods g;
-        while (goodsIterator.hasNext()) {
-            g = ((Goods) goodsIterator.next());
-            if (g.getType() == toadd.getType())
-            {
-              g.setAmount(g.getAmount() + toadd.getAmount());
-              //toadd.dispose(); // This isn't feasible. It causes a NullPointerException. -sjm
-              return;
-            }
+    public void addGoods(Goods g) {
+        addGoods(g.getType(), g.getAmount());
+    }
+
+
+    public void addGoods(int type, int amount) {
+        if (storedGoods[type] + amount < 0) {
+            throw new IllegalStateException();
         }
-        // If we get this far, we haven't found any goods of the type; make a new pile.
-        goods.add(toadd);
+
+        storedGoods[type] += amount;
     }
 
 
@@ -102,45 +98,17 @@ public class GoodsContainer extends FreeColGameObject {
     * @return The goods that has been removed from this container (if any).
     */
     public Goods removeGoods(Goods g) {
-        int index = goods.indexOf(g);
-
-        if (index != -1) {
-            return (Goods) goods.remove(index);
-        } else {
-            return null;
-        }
+        removeGoods(g.getType(), g.getAmount());
+        return g;
     }
-    
-    /**
-    * Removes a specified amount of a type of Goods from this containter.
-    *
-    * @param type The type of Goods to remove from this container.
-    * @param amount The amount of Goods to remove from this container.
-    * @return The goods that have been removed from this container (if any).
-    */
-    public Goods removeAmountAndTypeOfGoods(int type, int amount) {
-        Iterator goodsIterator = getGoodsIterator();
-        Goods g, thepackage;
-        
-        // Find goods of this type.
-        while (goodsIterator.hasNext()) {
-            g = ((Goods) goodsIterator.next());
-            if (g.getType() == type)
-            {
-                // All of one type of goods should be in one pile, so assume that hereforward.
-                if (amount >= g.getAmount())
-                {
-                    // Don't have enough? Give as much as we can.
-                    return removeGoods(g);
-                }
-                // Make a nice little package of the goods we removed, and remove them.
-                thepackage = new Goods(getGame(), null, type, amount);
-                g.setAmount(g.getAmount() - amount);
-                return thepackage;
-            }
+
+
+    public void removeGoods(int type, int amount) {
+        if (storedGoods[type] - amount < 0) {
+            throw new IllegalStateException();
         }
-        // We can't find anything. Give up.
-        return null;
+
+        storedGoods[type] -= amount;
     }
 
 
@@ -151,7 +119,7 @@ public class GoodsContainer extends FreeColGameObject {
     * @return The result.
     */
     public boolean contains(Goods g) {
-        return goods.contains(g);
+        throw new UnsupportedOperationException();
     }
 
 
@@ -161,34 +129,24 @@ public class GoodsContainer extends FreeColGameObject {
     * @return The amount of this type of Goods in this container.
     */
     public int getGoodsCount(int type) {
-        Iterator goodsIterator = getGoodsIterator();
-        int amount = 0;
-        Goods g;
-        while (goodsIterator.hasNext()) {
-            g = ((Goods) goodsIterator.next());
-            if (g.getType() == type)
-            {
-                amount += g.getAmount();
-            }
-        }
-        return amount;
+        return storedGoods[type];
     }
 
 
     /**
-    * Returns the total amount of Goods at this Location, e.g. the total tonnage.
-    * @return The total amount of Goods at this Location, e.g. the total tonnage.
+    * Gets the number of goods-packages. A goods package contain between 1-100.
     */
-    public int getTotalGoodsCount() {
-        int amount = 0;
-
-        Iterator goodsIterator = getGoodsIterator();
-
-        while (goodsIterator.hasNext()) {
-            amount += ((Goods) goodsIterator.next()).getAmount();
+    public int getGoodsCount() {
+        int count = 0;
+        for (int i=0; i<storedGoods.length; i++) {
+            int j = 0;
+            while (storedGoods[i] - j > 0) {
+                count++;
+                j+=100;
+            }
         }
 
-        return amount;
+        return count;
     }
 
 
@@ -199,7 +157,18 @@ public class GoodsContainer extends FreeColGameObject {
     * @return The <code>Iterator</code>.
     */
     public Iterator getGoodsIterator() {
-        return goods.iterator();
+        ArrayList totalGoods = new ArrayList();
+
+        for (int i=0; i<storedGoods.length; i++) {
+            int j = 0;
+            while (storedGoods[i] - j > 0) {
+                int a = (storedGoods[i] - j < 100) ? storedGoods[i] - j : 100;
+                totalGoods.add(new Goods(getGame(), parent, i, a));
+                j += a;
+            }
+        }
+
+        return totalGoods.iterator();
     }
 
 
@@ -208,11 +177,7 @@ public class GoodsContainer extends FreeColGameObject {
     * @return The <code>Goods</code>.
     */
     public Goods getFirstGoods() {
-        if (goods.size() == 0) {
-            return null;
-        } else {
-            return (Goods) goods.get(0);
-        }
+        throw new UnsupportedOperationException();
     }
 
 
@@ -221,11 +186,7 @@ public class GoodsContainer extends FreeColGameObject {
     * @return The <code>Goods</code>.
     */
     public Goods getLastGoods() {
-        if (goods.size() == 0) {
-            return null;
-        } else {
-            return (Goods) goods.get(goods.size() - 1);
-        }
+        throw new UnsupportedOperationException();
     }
 
 
@@ -233,11 +194,6 @@ public class GoodsContainer extends FreeColGameObject {
     * Removes all references to this object.
     */
     public void dispose() {
-        Iterator i = getGoodsIterator();
-        while (i.hasNext()) {
-            ((Goods) i.next()).dispose();
-        }
-
         super.dispose();
     }
 
@@ -261,12 +217,9 @@ public class GoodsContainer extends FreeColGameObject {
 
         element.setAttribute("ID", getID());
 
-        Iterator goodsIterator = getGoodsIterator();
-
-        while (goodsIterator.hasNext()) {
-            element.appendChild(((Goods) goodsIterator.next()).toXMLElement(player, document));
+        for (int i=0; i<storedGoods.length; i++) {
+            element.setAttribute("goods" + Integer.toString(i), Integer.toString(storedGoods[i]));
         }
-
         return element;
     }
 
@@ -278,27 +231,12 @@ public class GoodsContainer extends FreeColGameObject {
     public void readFromXMLElement(Element element) {
         setID(element.getAttribute("ID"));
 
-        //NodeList goodsNodeList = element.getElementsByTagName(Goods.getXMLElementTagName());
-        NodeList goodsNodeList = element.getChildNodes();
+        storedGoods = new int[Goods.NUMBER_OF_TYPES];
 
-        goods.clear();
-
-        for (int i=0; i<goodsNodeList.getLength(); i++) {
-            Element goodsElement = (Element) goodsNodeList.item(i);
-
-            // Check if the goods are already here -> only update:
-            Goods g = (Goods) getGame().getFreeColGameObject(goodsElement.getAttribute("ID"));
-
-            if (g != null) {
-                g.readFromXMLElement(goodsElement);
-                goods.add(g);
-                //u.setLocation(parent);
-            } else {
-                g = new Goods(getGame(), goodsElement);
-                goods.add(g);
-                //u.setLocation(parent);
-            }
+        for (int i=0; i<storedGoods.length; i++) {
+            storedGoods[i] = Integer.parseInt(element.getAttribute("goods" + Integer.toString(i)));
         }
+
     }
 
 

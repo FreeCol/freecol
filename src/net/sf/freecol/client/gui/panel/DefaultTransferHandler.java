@@ -108,13 +108,13 @@ public final class DefaultTransferHandler extends TransferHandler {
                 return false;
             }
 
-	    // Make sure we don't drop onto other Labels.            
+            // Make sure we don't drop onto other Labels.
             if (comp instanceof UnitLabel) {
             
                 /*
-                  If the unit/cargo is dropped on a carrier in port (EuropePanel.InPortPanel), 
+                  If the unit/cargo is dropped on a carrier in port (EuropePanel.InPortPanel),
                   then the ship is selected and the unit is added to its cargo.
-                  
+
                   If not, assume that the user wished to drop the unit/cargo on the panel below.
                 */
                 if (((UnitLabel) comp).getUnit().isCarrier() && ((UnitLabel) comp).getParent() instanceof EuropePanel.InPortPanel) {
@@ -129,8 +129,8 @@ public final class DefaultTransferHandler extends TransferHandler {
                     } catch (ClassCastException e) {
                         return false;
                     }
-            
-                    // This is because we use an extra panel for layout in this particular case; may find a better solution later.        
+
+                    // This is because we use an extra panel for layout in this particular case; may find a better solution later.
                     try {
                         if ((JComponent)comp.getParent() instanceof ColonyPanel.BuildingsPanel.ASingleBuildingPanel) {
                             comp = (JComponent)comp.getParent();
@@ -139,6 +139,8 @@ public final class DefaultTransferHandler extends TransferHandler {
 
                 }
             } else if ((comp instanceof GoodsLabel) || (comp instanceof MarketLabel)) {
+
+
                 try {
                     comp = (JComponent)comp.getParent();
                 } catch (ClassCastException e) {
@@ -148,128 +150,136 @@ public final class DefaultTransferHandler extends TransferHandler {
 
             if (data instanceof UnitLabel) {
 
-            // Check if the unit can be dragged to comp.
-            
-            Unit unit = ((UnitLabel)data).getUnit();
-            
-            if ((unit.getState() == Unit.TO_AMERICA) && (!(comp instanceof EuropePanel.ToEuropePanel))) {
-                return false;
-            }
-            
-            if ((unit.getState() == Unit.TO_EUROPE) && (!(comp instanceof EuropePanel.ToAmericaPanel))) {
-                return false;
-            }
+                // Check if the unit can be dragged to comp.
 
-            /*if (((unit.getState() == Unit.ACTIVE) || ((unit.getState() == Unit.SENTRY) && (!unit.isNaval())))
-                    && (!((comp instanceof EuropePanel.ToAmericaPanel) && (unit.isNaval())))
-                    && (!((comp instanceof EuropePanel.DocksPanel) && (!unit.isNaval())
-                    && (unit.getLocation() instanceof Unit) && (((Unit)unit.getLocation()).getState() == Unit.ACTIVE)))
-                    && (!((comp instanceof EuropePanel.CargoPanel) && (!unit.isNaval())
-                    && (unit.getLocation() instanceof Europe) && (((EuropePanel)parentPanel).getSelectedUnit() != null)
-                    && (((EuropePanel)parentPanel).getSelectedUnit().getState() == Unit.ACTIVE)
-                    && (((EuropePanel)parentPanel).getSelectedUnit().getSpaceLeft() > 0)))
-                    && (!(comp instanceof ColonyPanel.InPortPanel))
-                    && (!(comp instanceof ColonyPanel.BuildingsPanel.ASingleBuildingPanel))
-                    && (!(comp instanceof ColonyPanel.OutsideColonyPanel))
-                    && (!(comp instanceof ColonyPanel.InColonyPanel))
-                    && (!(comp instanceof ColonyPanel.CargoPanel) && (!unit.isNaval()))
-                    && (!(comp instanceof ColonyPanel.TilePanel))) {
+                Unit unit = ((UnitLabel)data).getUnit();
 
-                return false;
-            }*/
-
-            // Import the data.
-
-
-            if (comp instanceof JLabel) {
-                logger.warning("Oops, I thought we didn't have to write this part.");
-                return true;
-            } else if (comp instanceof JPanel) {
-                data.getParent().remove(data);
-                
-                if (comp instanceof EuropePanel.ToEuropePanel) {
-                    ((EuropePanel.ToEuropePanel)comp).add(data, true);
-                } else if (comp instanceof EuropePanel.ToAmericaPanel) {
-                    ((EuropePanel.ToAmericaPanel)comp).add(data, true);
-                } else if (comp instanceof EuropePanel.DocksPanel) {
-                    ((EuropePanel.DocksPanel)comp).add(data, true);
-                } else if (comp instanceof EuropePanel.CargoPanel) {
-                    ((EuropePanel.CargoPanel)comp).add(data, true);
-                } else if (comp instanceof ColonyPanel.BuildingsPanel.ASingleBuildingPanel) {
-                    ((ColonyPanel.BuildingsPanel.ASingleBuildingPanel) comp).add(data, true);
-                } else if (comp instanceof ColonyPanel.OutsideColonyPanel) {
-                    ((ColonyPanel.OutsideColonyPanel) comp).add(data, true);
-                } else if (comp instanceof ColonyPanel.CargoPanel) {
-                    ((ColonyPanel.CargoPanel)comp).add(data, true);
-                } else if (comp instanceof ColonyPanel.TilePanel.ASingleTilePanel) {
-                    ((ColonyPanel.TilePanel.ASingleTilePanel)comp).add(data, true);
-                } else {
-                    logger.warning("The receiving component is of an invalid type.");
+                if ((unit.getState() == Unit.TO_AMERICA) && (!(comp instanceof EuropePanel.ToEuropePanel))) {
                     return false;
                 }
-                
-                comp.revalidate();
-                return true;
-            }
-            }
-            if (data instanceof GoodsLabel) {
 
-            // Check if the unit can be dragged to comp.
-            
-            //Goods g = ((GoodsLabel)data).getGoods();
-            
-            // Import the data.
-
-
-            if (comp instanceof JLabel) {
-                logger.warning("Oops, I thought we didn't have to write this part.");
-                return true;
-            } else if (comp instanceof JPanel) {
-                data.getParent().remove(data);
-                
-                if (comp instanceof ColonyPanel.WarehousePanel) {
-                    ((ColonyPanel.WarehousePanel)comp).add(data, true);
-                } else if (comp instanceof ColonyPanel.CargoPanel) {
-                    ((ColonyPanel.CargoPanel)comp).add(data, true);
-                } else if (comp instanceof EuropePanel.MarketPanel) {
-                    ((EuropePanel.MarketPanel)comp).add(data, true);
-                } else {
-                    logger.warning("The receiving component is of an invalid type.");
+                if ((unit.getState() == Unit.TO_EUROPE) && (!(comp instanceof EuropePanel.ToAmericaPanel))) {
                     return false;
                 }
-                
-                comp.revalidate();
-                return true;
-            }
-	    }
-            if (data instanceof MarketLabel) {
 
-            // Check if the unit can be dragged to comp.
-            
-            //Goods g = ((GoodsLabel)data).getGoods();
-            
-            // Import the data.
+                /*if (((unit.getState() == Unit.ACTIVE) || ((unit.getState() == Unit.SENTRY) && (!unit.isNaval())))
+                        && (!((comp instanceof EuropePanel.ToAmericaPanel) && (unit.isNaval())))
+                        && (!((comp instanceof EuropePanel.DocksPanel) && (!unit.isNaval())
+                        && (unit.getLocation() instanceof Unit) && (((Unit)unit.getLocation()).getState() == Unit.ACTIVE)))
+                        && (!((comp instanceof EuropePanel.CargoPanel) && (!unit.isNaval())
+                        && (unit.getLocation() instanceof Europe) && (((EuropePanel)parentPanel).getSelectedUnit() != null)
+                        && (((EuropePanel)parentPanel).getSelectedUnit().getState() == Unit.ACTIVE)
+                        && (((EuropePanel)parentPanel).getSelectedUnit().getSpaceLeft() > 0)))
+                        && (!(comp instanceof ColonyPanel.InPortPanel))
+                        && (!(comp instanceof ColonyPanel.BuildingsPanel.ASingleBuildingPanel))
+                        && (!(comp instanceof ColonyPanel.OutsideColonyPanel))
+                        && (!(comp instanceof ColonyPanel.InColonyPanel))
+                        && (!(comp instanceof ColonyPanel.CargoPanel) && (!unit.isNaval()))
+                        && (!(comp instanceof ColonyPanel.TilePanel))) {
+
+                    return false;
+                }*/
+
+                if (comp instanceof JLabel) {
+                    logger.warning("Oops, I thought we didn't have to write this part.");
+                    return true;
+                } else if (comp instanceof JPanel) {
+                    data.getParent().remove(data);
+
+                    if (comp instanceof EuropePanel.ToEuropePanel) {
+                        ((EuropePanel.ToEuropePanel)comp).add(data, true);
+                    } else if (comp instanceof EuropePanel.ToAmericaPanel) {
+                        ((EuropePanel.ToAmericaPanel)comp).add(data, true);
+                    } else if (comp instanceof EuropePanel.DocksPanel) {
+                        ((EuropePanel.DocksPanel)comp).add(data, true);
+                    } else if (comp instanceof EuropePanel.CargoPanel) {
+                        ((EuropePanel.CargoPanel)comp).add(data, true);
+                    } else if (comp instanceof ColonyPanel.BuildingsPanel.ASingleBuildingPanel) {
+                        ((ColonyPanel.BuildingsPanel.ASingleBuildingPanel) comp).add(data, true);
+                    } else if (comp instanceof ColonyPanel.OutsideColonyPanel) {
+                        ((ColonyPanel.OutsideColonyPanel) comp).add(data, true);
+                    } else if (comp instanceof ColonyPanel.CargoPanel) {
+                        ((ColonyPanel.CargoPanel)comp).add(data, true);
+                    } else if (comp instanceof ColonyPanel.TilePanel.ASingleTilePanel) {
+                        ((ColonyPanel.TilePanel.ASingleTilePanel)comp).add(data, true);
+                    } else {
+                        logger.warning("The receiving component is of an invalid type.");
+                        return false;
+                    }
+
+                    comp.revalidate();
+                    return true;
+                }
+            } else if (data instanceof GoodsLabel) {
+
+                // Check if the unit can be dragged to comp.
+
+                //Goods g = ((GoodsLabel)data).getGoods();
+
+                // Import the data.
 
 
-            if (comp instanceof JLabel) {
-                logger.warning("Oops, I thought we didn't have to write this part.");
-                return true;
-            } else if (comp instanceof JPanel) {
-                // Be not removing MarketLabels from their home. -sjm
-                //data.getParent().remove(data);
-                
-                if (comp instanceof EuropePanel.CargoPanel) {
-                    ((EuropePanel.CargoPanel)comp).add(data, true);
-                } else {
-                    logger.warning("The receiving component is of an invalid type.");
+                if (!(comp instanceof ColonyPanel.WarehousePanel || comp instanceof ColonyPanel.CargoPanel
+                        || comp instanceof EuropePanel.MarketPanel || comp instanceof EuropePanel.CargoPanel)
+                    || (comp instanceof EuropePanel.CargoPanel && !((EuropePanel.CargoPanel) comp).isActive())
+                    || (comp instanceof ColonyPanel.CargoPanel && !((ColonyPanel.CargoPanel) comp).isActive())) {
+
                     return false;
                 }
-                
-                comp.revalidate();
-                return true;
+
+
+                if (comp instanceof JLabel) {
+                    logger.warning("Oops, I thought we didn't have to write this part.");
+                    return true;
+                } else if (comp instanceof JPanel) {
+                    data.getParent().remove(data);
+
+                    if (comp instanceof ColonyPanel.WarehousePanel) {
+                        ((ColonyPanel.WarehousePanel)comp).add(data, true);
+                    } else if (comp instanceof ColonyPanel.CargoPanel) {
+                        ((ColonyPanel.CargoPanel)comp).add(data, true);
+                    } else if (comp instanceof EuropePanel.MarketPanel) {
+                        ((EuropePanel.MarketPanel)comp).add(data, true);
+                    } else if (comp instanceof EuropePanel.CargoPanel) {
+                        ((EuropePanel.CargoPanel)comp).add(data, true);
+                    } else {
+                        logger.warning("The receiving component is of an invalid type.");
+                        return false;
+                    }
+
+                    comp.revalidate();
+                    return true;
+                }
+            } else if (data instanceof MarketLabel) {
+
+                // Check if the unit can be dragged to comp.
+
+                //Goods g = ((GoodsLabel)data).getGoods();
+
+                // Import the data.
+
+
+                if (comp instanceof JLabel) {
+                    logger.warning("Oops, I thought we didn't have to write this part.");
+                    return true;
+                } else if (comp instanceof JPanel) {
+                    // Be not removing MarketLabels from their home. -sjm
+                    //data.getParent().remove(data);
+
+                    if (comp instanceof EuropePanel.CargoPanel) {
+                        ((EuropePanel.CargoPanel)comp).add(data, true);
+                    } else {
+                        logger.warning("The receiving component is of an invalid type.");
+                        return false;
+                    }
+
+                    comp.revalidate();
+                    return true;
+                }
             }
-	    }
+
             logger.warning("The dragged component is of an invalid type.");
+
         } catch (UnsupportedFlavorException ignored) {
         } catch (IOException ignored) {}
 

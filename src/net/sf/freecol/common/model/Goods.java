@@ -9,11 +9,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-
+//extends FreeColGameObject
 /**
 * Represents a locatable goods of a specified type and amount.
 */
-public final class Goods extends FreeColGameObject implements Locatable {
+public final class Goods implements Locatable {
     public static final String  COPYRIGHT = "Copyright (C) 2003 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
@@ -35,22 +35,22 @@ public final class Goods extends FreeColGameObject implements Locatable {
                             COATS = 12,
                             TRADE_GOODS = 13,
                             TOOLS = 14,
-                            MUSKETS = 15,
-                            //FISH = 16; //Probably not needed except for graphical purposes -sjm
-                            BELLS = 17,
+                            MUSKETS = 15;
+
+    public static final int NUMBER_OF_TYPES = 16;
+
+    // Unstorable goods:
+    public static final int BELLS = 17,
                             CROSSES = 18,
                             HAMMERS = 19;
-    
-    public static final int NUMBER_OF_TYPES = 16; // Anything past this point can't be stored -sjm
 
-
+    private Game game;
+    private Location location;
     private int type;
     private int amount;
 
-    private Location        location;
 
 
-    
     /**
     * Creates a new <code>Goods</code>.
     *
@@ -60,25 +60,25 @@ public final class Goods extends FreeColGameObject implements Locatable {
     * @param amount The amount of the goods.
     */
     public Goods(Game game, Location location, int type, int amount) {
-        super(game);
+        if (game == null) {
+            throw new NullPointerException();
+        }
 
+        if (location == null) {
+            throw new NullPointerException();
+        }
+
+        this.game = game;
+        this.location = location;
         this.type = type;
         this.amount = amount;
     }
 
     
-    /**
-    * Initializes this object from an XML-representation of this object.
-    *
-    * @param The <code>Game</code> in which this <code>Unit</code> belong.
-    * @param element The DOM-element ("Document Object Model") made to represent this "Goods".
-    */
     public Goods(Game game, Element element) {
-        super(game, element);
+        this.game = game;
         readFromXMLElement(element);
     }
-
-
 
 
     /**
@@ -87,9 +87,9 @@ public final class Goods extends FreeColGameObject implements Locatable {
     */
     public void setLocation(Location location) {
         if ((this.location != null)) {
-	    this.location.remove(this);
-	}
-        
+            this.location.remove(this);
+        }
+
         if (location != null) {
             location.add(this);
         }
@@ -112,9 +112,9 @@ public final class Goods extends FreeColGameObject implements Locatable {
     * @return The amount.
     */
     public int getTakeSpace() {
-        return (((amount - 1) / 100) + 1);
-    } 
-    
+        return 1;
+    }
+
     /**
     * Gets the value <code>amount</code>.
     * @return The current value of amount.
@@ -122,7 +122,7 @@ public final class Goods extends FreeColGameObject implements Locatable {
     public int getAmount() {
         return amount;
     }
-    
+
     /**
     * Sets the value <code>amount</code>.
     * @param a The new value for amount.
@@ -130,7 +130,7 @@ public final class Goods extends FreeColGameObject implements Locatable {
     public void setAmount(int a) {
         amount = a;
     }
-    
+
     /**
     * Gets the value <code>type</code>. Note that type of goods should NEVER change.
     * @return The current value of type.
@@ -152,11 +152,13 @@ public final class Goods extends FreeColGameObject implements Locatable {
     * @param carrier The carrier this unit shall embark.
     * @exception IllegalStateException If the carrier is on another tile than this unit.
     */
-    public void Load(Unit carrier) {
-        if ((getLocation() == null) || (getLocation().getTile() == carrier.getTile())) {
+    public void loadOnto(Unit carrier) {
+        if (getLocation() == null) {
+            throw new IllegalStateException("The goods need to be taken from a place, but 'location == null'.");
+        } else if ((getLocation().getTile() == carrier.getTile())) {
             setLocation(carrier);
         } else {
-            throw new IllegalStateException("It is not allowed to board a ship on another tile.");
+            throw new IllegalStateException("It is not allowed to load cargo onto a ship on another tile.");
         }
     }
 
@@ -167,12 +169,11 @@ public final class Goods extends FreeColGameObject implements Locatable {
     * @exception IllegalStateException If not in harbour.
     * @exception ClassCastException If not located on a ship.
     */
-    public void Unload() {
+    public void unload() {
         Location l = ((Unit) getLocation()).getLocation();
 
-        logger.warning("Unloading cargo from a ship.");
+        logger.info("Unloading cargo from a ship.");
         if (l instanceof Europe) {
-            //TODO: sell the goods. But for now...
             setLocation(l);
         } else if (l.getTile().getSettlement() != null && l.getTile().getSettlement() instanceof Colony) {
             setLocation(l.getTile().getSettlement());
@@ -181,16 +182,26 @@ public final class Goods extends FreeColGameObject implements Locatable {
         }
     }    
     
+    
+    /**
+    * Gets the game object this <code>Goods</code> belongs to.
+    * @return The <code>Game</code>.
+    */
+    public Game getGame() {
+        return game;
+    }
+    
+
     /**
     * Removes all references to this object.
     */
-    public void dispose() {
+    /*public void dispose() {
         if (location != null) {
             location.remove(this);
         }
 
         super.dispose();
-    }
+    }*/
 
 
     /**
@@ -202,14 +213,15 @@ public final class Goods extends FreeColGameObject implements Locatable {
     public Element toXMLElement(Player player, Document document) {
         Element goodsElement = document.createElement(getXMLElementTagName());
 
-        goodsElement.setAttribute("ID", getID());
         goodsElement.setAttribute("type", Integer.toString(type));
         goodsElement.setAttribute("amount", Integer.toString(amount));
 
         if (location != null) {
             goodsElement.setAttribute("location", location.getID());
+        } else {
+            logger.warning("Creating an XML-element for a 'Goods' without a 'Location'.");
         }
-        
+
         return goodsElement;
     }
 
@@ -219,15 +231,12 @@ public final class Goods extends FreeColGameObject implements Locatable {
     * @param goodsElement The DOM-element ("Document Object Model") made to represent this "Goods".
     */
     public void readFromXMLElement(Element goodsElement) {
-        setID(goodsElement.getAttribute("ID"));
-
         type = Integer.parseInt(goodsElement.getAttribute("type"));
         amount = Integer.parseInt(goodsElement.getAttribute("amount"));
 
         if (goodsElement.hasAttribute("location")) {
             location = (Location) getGame().getFreeColGameObject(goodsElement.getAttribute("location"));
         }
-
     }
 
 

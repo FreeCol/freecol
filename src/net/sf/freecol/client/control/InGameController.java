@@ -276,12 +276,12 @@ public final class InGameController {
         }
 
         Client client = freeColClient.getClient();
-	
-	if (unit.isCarrier()) {
-	    logger.warning("Trying to load a carrier onto another carrier.");
-	    return;
-	}
-        
+
+        if (unit.isCarrier()) {
+            logger.warning("Trying to load a carrier onto another carrier.");
+            return;
+        }
+
         unit.boardShip(carrier);
 
         Element boardShipElement = Message.createNewRootElement("boardShip");
@@ -321,12 +321,12 @@ public final class InGameController {
         }
 
         Client client = freeColClient.getClient();
-        
-        goods.Load(carrier);
 
         Element loadCargoElement = Message.createNewRootElement("loadCargo");
-        loadCargoElement.setAttribute("goods", goods.getID());
         loadCargoElement.setAttribute("carrier", carrier.getID());
+        loadCargoElement.appendChild(goods.toXMLElement(freeColClient.getMyPlayer(), loadCargoElement.getOwnerDocument()));
+
+        goods.loadOnto(carrier);
 
         client.send(loadCargoElement);
     }
@@ -341,37 +341,45 @@ public final class InGameController {
     public void unloadCargo(Goods goods) {
         Client client = freeColClient.getClient();
 
-        goods.Unload();
+        Element unloadCargoElement = Message.createNewRootElement("unloadCargo");
+        unloadCargoElement.appendChild(goods.toXMLElement(freeColClient.getMyPlayer(), unloadCargoElement.getOwnerDocument()));
 
-        Element leaveShipElement = Message.createNewRootElement("unloadCargo");
-        leaveShipElement.setAttribute("goods", goods.getID());
+        goods.unload();
 
-	logger.warning("Sending unloadCargoElement");
-        client.send(leaveShipElement);
+        client.send(unloadCargoElement);
     }
-    
+
+
     /**
     * Buys goods in Europe.
     *
     * @param unit The unit who is going to board the carrier.
     * @param carrier The carrier.
-    * @param player The player doing the buying.
     */
-    public void buyGoods(int type, Unit carrier, Player player) {
+    public void buyGoods(int type, int amount, Unit carrier) {
+        Client client = freeColClient.getClient();
+        Game game = freeColClient.getGame();
+        Player myPlayer = freeColClient.getMyPlayer();
+        Canvas canvas = freeColClient.getCanvas();
+
         if (carrier == null) {
             throw new NullPointerException();
         }
 
-        Client client = freeColClient.getClient();
-        
-        if (carrier.getSpaceLeft() <= 0) return;
+        if (carrier.getOwner() != myPlayer || carrier.getSpaceLeft() <= 0) {
+            return;
+        }
 
-        (player.getGame().getMarket().buy(type, 100, player)).setLocation(carrier);
+        if (game.getMarket().getBidPrice(type, amount) > myPlayer.getGold()) {
+            canvas.errorMessage("notEnoughGold");
+        }
 
         Element buyGoodsElement = Message.createNewRootElement("buyGoods");
-        buyGoodsElement.setAttribute("type", Integer.toString(type));
         buyGoodsElement.setAttribute("carrier", carrier.getID());
-        buyGoodsElement.setAttribute("player", player.getID());
+        buyGoodsElement.setAttribute("type", Integer.toString(type));
+        buyGoodsElement.setAttribute("amount", Integer.toString(amount));
+
+        carrier.buyGoods(type, amount);
 
         client.send(buyGoodsElement);
     }
@@ -381,16 +389,15 @@ public final class InGameController {
     * Sells goods in Europe.
     *
     * @param goods The goods to be sold.
-    * @param player The player selling the goods.
     */
-    public void sellGoods(Goods goods, Player player) {
+    public void sellGoods(Goods goods) {
         Client client = freeColClient.getClient();
-
-        player.getGame().getMarket().sell(goods, player);
+        Player player = freeColClient.getMyPlayer();
 
         Element sellGoodsElement = Message.createNewRootElement("sellGoods");
-        sellGoodsElement.setAttribute("goods", goods.getID());
-	sellGoodsElement.setAttribute("player", player.getID());
+        sellGoodsElement.appendChild(goods.toXMLElement(freeColClient.getMyPlayer(), sellGoodsElement.getOwnerDocument()));
+
+        player.getGame().getMarket().sell(goods, player);
 
         client.send(sellGoodsElement);
     }
@@ -405,9 +412,16 @@ public final class InGameController {
     public void equipUnit(Unit unit, int type, int amount) {
         Client client = freeColClient.getClient();
 
+        Element equipUnitElement = Message.createNewRootElement("equipunit");
+        equipUnitElement.setAttribute("unit", unit.getID());
+        equipUnitElement.setAttribute("type", Integer.toString(type));
+        equipUnitElement.setAttribute("amount", Integer.toString(amount));
+        
+
         switch(type) {
-            //TODO: Pass in "Goods.CROSSES" when this is defined to bless as a missionary.
-            //Also check to see if there's a church in the colony, or if you're in Europe.
+            case Goods.CROSSES:
+                unit.setMissionary((amount > 0));
+                break;
             case Goods.MUSKETS:
                 unit.setArmed((amount > 0)); // So give them muskets if the amount we want is greater than zero.
                 break;
@@ -427,15 +441,10 @@ public final class InGameController {
                 return;
         }
 
-        Element equipUnitElement = Message.createNewRootElement("equipunit");
-        equipUnitElement.setAttribute("unit", unit.getID());
-        equipUnitElement.setAttribute("type", Integer.toString(type));
-        equipUnitElement.setAttribute("amount", Integer.toString(amount));
-
         client.send(equipUnitElement);
     }
 
-    
+
     /**
     * Moves a <code>Unit</code> to a <code>WorkLocation</code>.
     *

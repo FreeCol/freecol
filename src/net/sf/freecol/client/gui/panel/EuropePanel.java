@@ -335,7 +335,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         toEuropePanel.removeAll();
         inPortPanel.removeAll();
         cargoPanel.removeAll();
-	marketPanel.removeAll();
+        marketPanel.removeAll();
         docksPanel.removeAll();
 
         //
@@ -360,9 +360,8 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                 toAmericaPanel.add(unitLabel, false);
             }
         }
-	
-        for (int i = 0; i < Goods.NUMBER_OF_TYPES; i++)
-        {
+
+        for (int i = 0; i < Goods.NUMBER_OF_TYPES; i++) {
             MarketLabel marketLabel = new MarketLabel(i, game.getMarket(), parent);
             marketLabel.setTransferHandler(defaultTransferHandler);
             marketLabel.addMouseListener(pressListener);
@@ -880,7 +879,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
     public final class CargoPanel extends JPanel {
         private final EuropePanel europePanel;
 
-        
+
 
         /**
         * Creates this CargoPanel.
@@ -890,7 +889,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             this.europePanel = europePanel;
         }
 
-        
+
 
         /**
         * Adds a component to this CargoPanel and makes sure that the unit
@@ -910,31 +909,46 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     inGameController.boardShip(unit, selectedUnit.getUnit());
                 } else if (comp instanceof MarketLabel) {
                     if ((freeColClient.getMyPlayer().getGold() >= (game.getMarket().costToBuy(((MarketLabel)comp).getType()) * 100))) {
-                        inGameController.buyGoods(((MarketLabel)comp).getType(), selectedUnit.getUnit(), freeColClient.getMyPlayer());   
+                        inGameController.buyGoods(((MarketLabel)comp).getType(), 100, selectedUnit.getUnit());
                     }
                     updateCargoLabel();
                     goldLabel.setText("Gold: " + freeColClient.getMyPlayer().getGold());
                     goldLabel.repaint(0, 0, goldLabel.getWidth(), goldLabel.getHeight());
-		    europePanel.getMarketPanel().revalidate();
-		    revalidate();
+
+                    // TODO: Make this look prettier :-)
+                    UnitLabel t = selectedUnit;
+                    selectedUnit = null;
+                    setSelectedUnit(t);
+
+                    europePanel.getMarketPanel().revalidate();
+                    revalidate();
                     europePanel.refresh();
                     return comp;
                 } else {
                     logger.warning("An invalid component got dropped on this CargoPanel.");
                 }
             }
+
             updateCargoLabel();
             Component c = add(comp);
             europePanel.refresh();
             return c;
         }
+        
+        public boolean isActive() {
+            return (getSelectedUnit() != null);
+        }        
     }
 
-/**
+
+
+
+    /**
     * A panel that shows goods available for purchase in Europe.
     */
     public final class MarketPanel extends JPanel {
         private final EuropePanel europePanel;
+
 
         /**
         * Creates this MarketPanel.
@@ -943,6 +957,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         public MarketPanel(EuropePanel europePanel) {
             this.europePanel = europePanel;
         }
+
 
         /**
         * If a GoodsLabel is dropped here, sell the goods.
@@ -955,13 +970,12 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         public Component add(Component comp, boolean editState) {
             if (editState) {
                 if (comp instanceof GoodsLabel) {
-                    //getGame().getMarket().sell(((GoodsLabel)comp).getGoods(), freeColClient.getMyPlayer());
-                    inGameController.sellGoods(((GoodsLabel)comp).getGoods(), freeColClient.getMyPlayer());
+                    inGameController.sellGoods(((GoodsLabel)comp).getGoods());
                     updateCargoLabel();
                     goldLabel.setText("Gold: " + freeColClient.getMyPlayer().getGold());
                     goldLabel.repaint(0, 0, goldLabel.getWidth(), goldLabel.getHeight());
-		    europePanel.getCargoPanel().revalidate();
-		    revalidate();
+                    europePanel.getCargoPanel().revalidate();
+                    revalidate();
                     europePanel.refresh();
                     return comp;
                 }

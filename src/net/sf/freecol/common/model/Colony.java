@@ -337,24 +337,22 @@ public final class Colony extends Settlement implements Location {
         return goodsContainer.getGoodsCount(type);
     }
     
-    /**
-    * Gets the total amount of all types of Goods at this Colony. 
-    * @return The total amount of all types of Goods at this Location.
-    */
-    public int getTotalGoodsCount() {
-        return goodsContainer.getTotalGoodsCount();
-    }
-    
+       
     /**
     * Removes a specified amount of a type of Goods from this containter.
     *
     * @param type The type of Goods to remove from this container.
     * @param amount The amount of Goods to remove from this container.
-    * @return The goods that have been removed from this container (if any).
     */
-    public Goods removeAmountAndTypeOfGoods(int type, int amount) {
-        return goodsContainer.removeAmountAndTypeOfGoods(type, amount);
+    public void removeGoods(int type, int amount) {
+        goodsContainer.removeGoods(type, amount);
     }
+    
+    
+    public void addGoods(int type, int amount) {
+        goodsContainer.addGoods(type, amount);
+    }
+
 
     public Iterator getUnitIterator() {
         throw new UnsupportedOperationException();
@@ -431,7 +429,7 @@ public final class Colony extends Settlement implements Location {
             if (getGoodsCount(Goods.TOOLS) >= toolsRequired) {
                 //TODO: Adam Smith check for factory level buildings
                 if (toolsRequired > 0) {
-                    removeAmountAndTypeOfGoods(Goods.TOOLS, toolsRequired);
+                    removeGoods(Goods.TOOLS, toolsRequired);
                 }
                 hammers = 0;
                 getBuilding(currentlyBuilding).setLevel(getBuilding(currentlyBuilding).getLevel() + 1);
