@@ -19,7 +19,10 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
+import javax.swing.JList;
+import javax.swing.JComboBox;
 import javax.swing.JScrollPane;
+import javax.swing.ListCellRenderer;
 import javax.swing.border.BevelBorder;
 
 //import net.sf.freecol.client.model.ClientGame;
@@ -60,6 +63,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     private final JLabel                    goldLabel;
     private final JLabel                    solLabel;
     private final JLabel                    warehouseLabel;
+    private final JLabel                    progressLabel;
+    private final BuildingBox               buildingBox;
     private final OutsideColonyPanel        outsideColonyPanel;
     private final InPortPanel               inPortPanel;
     private final CargoPanel                cargoPanel;
@@ -117,13 +122,17 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         outsideColonyPanel.setLayout(new GridLayout(0 , 2));
         inPortPanel.setLayout(new GridLayout(0 , 2));
         cargoPanel.setLayout(new GridLayout(1 , 0));
-	warehousePanel.setLayout(new GridLayout(1 , 0));
+        warehousePanel.setLayout(new GridLayout(1 , 0));
 
         cargoLabel = new JLabel("<html><strike>Cargo</strike></html>");
         goldLabel = new JLabel("Gold: 0");
         solLabel = new JLabel("SOL: 0%, Tory: 100%");
-	warehouseLabel = new JLabel("Goods");
-
+        warehouseLabel = new JLabel("Goods");
+        progressLabel = new JLabel("Hammers: 0/0");
+        
+        
+        buildingBox = new BuildingBox(this);
+        
         JButton exitButton = new JButton("Close");
         JScrollPane outsideColonyScroll = new JScrollPane(outsideColonyPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER),
                     inPortScroll = new JScrollPane(inPortPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER),
@@ -140,7 +149,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         outsideColonyScroll.setSize(200, 100);
         inPortScroll.setSize(200, 100);
         cargoScroll.setSize(410, 96);
-	warehouseScroll.setSize(620, 120);
+        warehouseScroll.setSize(620, 120);
         tilesScroll.setSize(390, 200);
         buildingsScroll.setSize(400,200);
         outsideColonyLabel.setSize(200, 20);
@@ -148,21 +157,25 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         cargoLabel.setSize(410, 20);
         goldLabel.setSize(100, 20);
         solLabel.setSize(160, 20);
-	warehouseLabel.setSize(100, 20);
+        warehouseLabel.setSize(100, 20);
         tilesLabel.setSize(100, 20);
         buildingsLabel.setSize(300, 20);
+        buildingBox.setSize(160, 20);
+        progressLabel.setSize(160, 20);
 
         exitButton.setLocation(760, 570);
         outsideColonyScroll.setLocation(640, 300);
         inPortScroll.setLocation(640, 450);
         cargoScroll.setLocation(220, 370);
-	warehouseScroll.setLocation(10, 470);
+        warehouseScroll.setLocation(10, 470);
         tilesScroll.setLocation(10, 40);
         buildingsScroll.setLocation(400, 40);
         outsideColonyLabel.setLocation(640, 275);
         inPortLabel.setLocation(640, 425);
         cargoLabel.setLocation(220, 345);
-	warehouseLabel.setLocation(10, 445);
+        warehouseLabel.setLocation(10, 445);
+        buildingBox.setLocation(15, 305);
+        progressLabel.setLocation(185, 305);
         solLabel.setLocation(15, 325);
         goldLabel.setLocation(15, 345);
         tilesLabel.setLocation(10, 10);
@@ -178,17 +191,19 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         add(outsideColonyScroll);
         add(inPortScroll);
         add(cargoScroll);
-	add(warehouseScroll);
+        add(warehouseScroll);
         add(tilesScroll);
         add(buildingsScroll);
         add(outsideColonyLabel);
         add(inPortLabel);
         add(cargoLabel);
-	add(warehouseLabel);
+        add(warehouseLabel);
         add(solLabel);
         add(goldLabel);
         add(tilesLabel);
         add(buildingsLabel);
+        add(buildingBox);
+        add(progressLabel);
 
         try {
             BevelBorder border = new BevelBorder(BevelBorder.RAISED);
@@ -224,7 +239,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         //
 
         cargoPanel.removeAll();
-	warehousePanel.removeAll();
+        warehousePanel.removeAll();
         outsideColonyPanel.removeAll();
         inPortPanel.removeAll();
         tilePanel.removeAll();
@@ -290,9 +305,10 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
         goldLabel.setText("Gold: " + freeColClient.getMyPlayer().getGold());
         
-        solLabel.setText("SoL: " + colony.getSoL() + "% (" + ((colony.getUnitCount() * colony.getSoL()) / 100) +
-                         "), Tory: " + colony.getTory() + "% (" + 
-                         (colony.getUnitCount() - ((colony.getUnitCount() * colony.getSoL()) / 100)) + ")");
+        buildingBox.initialize();
+        
+        updateSoLLabel();
+        updateProgressLabel();
     }
 
 
@@ -323,6 +339,14 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                          "), Tory: " + colony.getTory() + "% (" + 
                          (colony.getUnitCount() - ((colony.getUnitCount() * colony.getSoL()) / 100)) + ")");
     }
+    
+    /**
+    * Updates the building progress label.
+    */
+    private void updateProgressLabel() {
+        progressLabel.setText("Hammers: " + colony.getHammers() + "/" + colony.getBuilding(colony.getCurrentlyBuilding()).getNextHammers());
+    }
+
 
     /**
     * Returns the currently select unit.
@@ -434,7 +458,20 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     public final TilePanel getTilePanel() {
         return tilePanel;
     }
+    
+    /**
+    * Returns a pointer to the <code>FreeColClient</code> which uses this panel.
+    */
+    public final FreeColClient getClient() {
+        return freeColClient;
+    }
 
+    /**
+    * Returns a pointer to the <code>Colony</code>-pointer in use.
+    */
+    public final Colony getColony() {
+        return colony;
+    }
 
     /**
     * This panel is a list of the colony's buildings.
@@ -711,7 +748,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 } else if (comp instanceof GoodsLabel) {
                     Goods g = ((GoodsLabel)comp).getGoods();
                     ((GoodsLabel) comp).setSmall(false);
-		    logger.warning("Attempting to load cargo.");
+                    logger.warning("Attempting to load cargo.");
                     inGameController.loadCargo(g, selectedUnit.getUnit());
                     colonyPanel.getWarehousePanel().revalidate();
                     colonyPanel.getCargoPanel().revalidate();
@@ -787,7 +824,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             private ColonyTile colonyTile;
             private int x;
             private int y;
-	    private JLabel staticGoodsLabel;
+            private JLabel staticGoodsLabel;
 
             public ASingleTilePanel(ColonyTile colonyTile, int x, int y) {
                 this.colonyTile = colonyTile;
@@ -809,16 +846,16 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                     staticGoodsLabel.setText(Integer.toString(unit.getFarmedPotential(unit.getWorkType(), colonyTile.getWorkTile())));
                     add(staticGoodsLabel);
                 }
-		
-		if (colonyTile.isColonyCenterTile())
-		{
+                
+                if (colonyTile.isColonyCenterTile())
+                {
                     staticGoodsLabel = new JLabel(parent.getImageProvider().getGoodsImageIcon(Goods.FOOD));
                     staticGoodsLabel.setText(Integer.toString(colonyTile.getTile().potential(Goods.FOOD)));
                     add(staticGoodsLabel);
                     staticGoodsLabel = new JLabel(parent.getImageProvider().getGoodsImageIcon(colonyTile.getTile().secondaryGoods()));
                     staticGoodsLabel.setText(Integer.toString(colonyTile.getTile().potential(colonyTile.getTile().secondaryGoods())));
                     add(staticGoodsLabel);
-		}
+                }
 
                 setTransferHandler(defaultTransferHandler);
                 addMouseListener(releaseListener);
@@ -859,7 +896,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                         
                         if (staticGoodsLabel != null) {
                             super.remove(staticGoodsLabel);
-		            staticGoodsLabel = null;
+                            staticGoodsLabel = null;
                         }
                         staticGoodsLabel = new JLabel(parent.getImageProvider().getGoodsImageIcon(unit.getWorkType()));
                         staticGoodsLabel.setText(Integer.toString(unit.getFarmedPotential(unit.getWorkType(), colonyTile.getWorkTile())));
@@ -876,11 +913,11 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 refresh();
                 return c;
             }
-	    
+            
             public void remove(Component comp) {
                 if (comp instanceof UnitLabel) {
                     super.remove(staticGoodsLabel);
-		    staticGoodsLabel = null;
+                    staticGoodsLabel = null;
                 }
                 super.remove(comp);
             }
@@ -888,6 +925,159 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
     }
 
+    /**
+    * A combo box that contains a list of all the buildings that can be built in this colony.
+    */
+    public final class BuildingBox extends JComboBox {
+    
+        private final ColonyPanel colonyPanel;
+        private final BuildingBoxListener buildingBoxListener;
+        
+        /**
+        * Creates a new BuildingBox for this Colony.
+        */
+        public BuildingBox(ColonyPanel colonyPanel) {
+            super();
+            this.colonyPanel = colonyPanel;
+            
+            buildingBoxListener = new BuildingBoxListener(this, colonyPanel);
+            super.addActionListener(buildingBoxListener);
+            super.setRenderer(new BuildingBoxRenderer());
+        }
+        
+        /**
+        * Sets up the BuildingBox such that it contains the appropriate buildings.
+        */
+        public void initialize() {
+            super.removeActionListener(buildingBoxListener);
+            removeAllItems();
+            BuildingBoxItem nothingItem = new BuildingBoxItem("Nothing", -1);
+            this.addItem(nothingItem);
+            BuildingBoxItem toSelect = nothingItem;
+            for (int i = 0; i < Building.NUMBER_OF_TYPES; i++) {
+                if (colonyPanel.getColony().getBuilding(i).getNextName() != null &&
+                    colonyPanel.getColony().getUnitCount() > colonyPanel.getColony().getBuilding(i).getNextPop()) {
+                    String theText = new String(
+                        colony.getBuilding(i).getNextName() +
+                        " (" +
+                        Integer.toString(colonyPanel.getColony().getBuilding(i).getNextHammers()) +
+                        " hammers");
+                        
+                    if (colonyPanel.getColony().getBuilding(i).getNextTools() > 0) {
+                        theText.concat(", " + Integer.toString(colony.getBuilding(i).getNextTools()) + " tools");
+                    }
+                    theText.concat(")");
+                    
+                    BuildingBoxItem nextItem = new BuildingBoxItem(theText, i);
+                    this.addItem(nextItem);
+                    if (i == colonyPanel.getColony().getCurrentlyBuilding()) {
+                        toSelect = nextItem;
+                    }
+                }
+            }
+            this.setSelectedItem(toSelect);
+            super.addActionListener(buildingBoxListener);
+            colonyPanel.updateProgressLabel();
+        }
+        
+        /**
+        * Represents a type of building, and the text of the next building in that type.
+        */
+        public final class BuildingBoxItem {
+            private final String text;
+            private final int type;
+            
+            /**
+            * Sets up the text and the type.
+            */
+            public BuildingBoxItem(String text, int type) {
+                this.text = text;
+                this.type = type;
+            }
+            
+            /**
+            * Gets the text associated with this item.
+            * @returns The text associated with this item.
+            */
+            public String getText() {
+                return text;
+            }
+            
+            /**
+            * Gets the building type associated with that item.
+            * @returns The building type associated with this item.
+            */
+            public int getType() {
+                return type;
+            }
+        }
+        
+        /**
+        * The ActionListener for the BuildingBox.
+        */
+        public final class BuildingBoxListener implements ActionListener {
+        
+            private ColonyPanel colonyPanel;
+            private BuildingBox buildingBox;
+            
+            /**
+            * Sets up this BuildingBoxListener's buildingBox and colonyPanel.
+            */
+            public BuildingBoxListener(BuildingBox buildingBox, ColonyPanel colonyPanel) {
+                super();
+                this.buildingBox = buildingBox;
+                this.colonyPanel = colonyPanel;
+            }
+            
+            /**
+            * Sets the ColonyPanel's Colony's type of building.
+            */
+            public void actionPerformed(ActionEvent e) {
+                colonyPanel.getClient().getInGameController().setCurrentlyBuilding(colonyPanel.getColony(), ((BuildingBoxItem)buildingBox.getSelectedItem()).getType());
+                colonyPanel.updateProgressLabel();
+            }
+        }
+        
+        /**
+        * The ListCellRenderer for the BuildingBox.
+        */
+        class BuildingBoxRenderer extends JLabel
+                            implements ListCellRenderer {
 
-
+            public BuildingBoxRenderer() {
+                setOpaque(true);
+                setHorizontalAlignment(CENTER);
+                setVerticalAlignment(CENTER);
+            }
+        
+            /*
+            * Displays the string associated with the BuildingBoxItem.
+            */
+            public Component getListCellRendererComponent(
+                                            JList list,
+                                            Object value,
+                                            int index,
+                                            boolean isSelected,
+                                            boolean cellHasFocus) {
+                                            
+                if (isSelected) {
+                    setBackground(list.getSelectionBackground());
+                    setForeground(list.getSelectionForeground());
+                } else {
+                    setBackground(list.getBackground());
+                    setForeground(list.getForeground());
+                }
+                                            
+                if (value instanceof BuildingBoxItem) {
+                    setText(((BuildingBoxItem)value).getText());
+                } else {
+                    super.setText("---INVALID ITEM---");
+                }
+                
+                setFont(list.getFont());
+        
+                return this;
+            }
+        }
+    }
 }

@@ -422,39 +422,22 @@ public final class Colony extends Settlement implements Location {
     public void addHammers(int amount) {
         int required = 0;
         int tools = 0;
-        int requiredTable[][][] = {
-          {{  0,  0,  1},{ -1, -1, -1},{ -1, -1, -1},{ -1, -1, -1}}, // TOWNHALL
-          {{  0,  0,  1},{ 52,  0,  3},{ -1, -1, -1},{ -1, -1, -1}}, // CARPENTER
-          {{  0,  0,  1},{ 64, 20,  4},{240,100,  8},{ -1, -1, -1}}, // BLACKSMITH
-          {{  0,  0,  1},{ 64,  0,  4},{160, 20,  8},{ -1, -1, -1}}, // TOBACCONIST
-          {{  0,  0,  1},{ 64,  0,  4},{160, 20,  8},{ -1, -1, -1}}, // WEAVER
-          {{  0,  0,  1},{ 64,  0,  4},{160, 20,  8},{ -1, -1, -1}}, // DISTILLER
-          {{  0,  0,  1},{ 56,  0,  3},{160, 20,  6},{ -1, -1, -1}}, // FUR_TRADER
-          {{ 64,  0,  3},{120,100,  4},{320,100,  8},{ -1, -1, -1}}, // STOCKADE
-          {{ 52,  0,  1},{120, 50,  8},{240,100,  8},{ -1, -1, -1}}, // ARMORY
-          {{ 52,  0,  1},{ 80, 50,  6},{240,100,  8},{ -1, -1, -1}}, // DOCK
-          {{ 64,  0,  4},{160, 50,  8},{200,100, 10},{ -1, -1, -1}}, // SCHOOLHOUSE
-          {{ 80,  0,  1},{ 80, 20,  1},{ -1, -1, -1},{ -1, -1, -1}}, // WAREHOUSE
-          {{ 64,  0,  1},{ -1, -1, -1},{ -1, -1, -1},{ -1, -1, -1}}, // STABLES
-          {{ 52,  0,  3},{176,100,  8},{ -1, -1, -1},{ -1, -1, -1}}, // CHURCH
-          {{ 80,  0,  1},{120, 50,  4},{ -1, -1, -1},{ -1, -1, -1}}, // PRINTING_PRESS
-          {{160, 50,  1},{ -1, -1, -1},{ -1, -1, -1},{ -1, -1, -1}}  // CUSTOM_HOUSE
-        };
+
         hammers += amount;
-        int hammersRequired = requiredTable[currentlyBuilding][getBuilding(currentlyBuilding).getLevel() + 1][0];
-        int toolsRequired = requiredTable[currentlyBuilding][getBuilding(currentlyBuilding).getLevel() + 1][1];
+        int hammersRequired = getBuilding(currentlyBuilding).getNextHammers();;
+        int toolsRequired = getBuilding(currentlyBuilding).getNextTools();;
         if ((hammers >= hammersRequired) && (hammersRequired != -1)) {
             hammers = hammersRequired;
             if (getGoodsCount(Goods.TOOLS) >= toolsRequired) {
                 //TODO: Adam Smith check for factory level buildings
                 if (toolsRequired > 0) {
-                    removeAmountAndTypeOfGoods(Goods.TOOLS, requiredTable[currentlyBuilding][getBuilding(currentlyBuilding).getLevel() + 1][1]);
-                    hammers = 0;
-                    getBuilding(currentlyBuilding).setLevel(getBuilding(currentlyBuilding).getLevel() + 1);
-                    // TODO: some message about building something
-                } else {
-                    //TODO: some error about not having enough tools
+                    removeAmountAndTypeOfGoods(Goods.TOOLS, toolsRequired);
                 }
+                hammers = 0;
+                getBuilding(currentlyBuilding).setLevel(getBuilding(currentlyBuilding).getLevel() + 1);
+                // TODO: some message about building something
+            } else {
+                    //TODO: some error about not having enough tools
             }
         } else if (hammersRequired == -1) {
             //TODO: some error about trying to build a nonexistent building
@@ -468,6 +451,23 @@ public final class Colony extends Settlement implements Location {
     public int getHammers() {
         return hammers;
     }
+    
+    /**
+    * Returns the type of building currently being built.
+    * @return The type of building currently being built.
+    */
+    public int getCurrentlyBuilding() {
+        return currentlyBuilding;
+    }
+    
+    /**
+    * Sets the type of building to be built.
+    * @param type The type of building to be built.
+    */
+    public void setCurrentlyBuilding(int type) {
+        currentlyBuilding = type;
+    }
+
     
     /**
     * Adds to the bell count of the colony.

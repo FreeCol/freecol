@@ -97,6 +97,8 @@ public final class InGameInputHandler implements MessageHandler {
                     reply = work(connection, element);
                 } else if (type.equals("worktype")) {
                     reply = workType(connection, element);
+                } else if (type.equals("setCurrentlyBuilding")) {
+                    reply = setCurrentlyBuilding(connection, element);
                 } else if (type.equals("changeState")) {
                     reply = changeState(connection, element);
                 } else if (type.equals("putOutsideColony")) {
@@ -700,11 +702,14 @@ public final class InGameInputHandler implements MessageHandler {
     */
     private Element work(Connection connection, Element workElement) {
         Game game = freeColServer.getGame();
+        ServerPlayer player = freeColServer.getPlayer(connection);
 
         Unit unit = (Unit) game.getFreeColGameObject(workElement.getAttribute("unit"));
         WorkLocation workLocation = (WorkLocation) game.getFreeColGameObject(workElement.getAttribute("workLocation"));
         
         unit.work(workLocation);
+        
+        sendUpdatedTileToAll(unit.getTile(), player);
 
         return null;
     }
@@ -717,14 +722,38 @@ public final class InGameInputHandler implements MessageHandler {
     */
     private Element workType(Connection connection, Element workElement) {
         Game game = freeColServer.getGame();
+        ServerPlayer player = freeColServer.getPlayer(connection);
 
         Unit unit = (Unit) game.getFreeColGameObject(workElement.getAttribute("unit"));
         int workType = Integer.parseInt(workElement.getAttribute("worktype"));
         
         unit.setWorkType(workType);
+        
+        sendUpdatedTileToAll(unit.getTile(), player);
 
         return null;
     }
+    
+    /**
+    * Handles a "setCurrentlyBuilding"-request from a client.
+    *
+    * @param connection The connection the message came from.
+    * @param setCurrentlyBuildingElement The element containing the request.
+    */
+    private Element setCurrentlyBuilding(Connection connection, Element setCurrentlyBuildingElement) {
+        Game game = freeColServer.getGame();
+        ServerPlayer player = freeColServer.getPlayer(connection);
+
+        Colony colony = (Colony) game.getFreeColGameObject(setCurrentlyBuildingElement.getAttribute("colony"));
+        int type = Integer.parseInt(setCurrentlyBuildingElement.getAttribute("type"));
+        
+        colony.setCurrentlyBuilding(type);
+        
+        sendUpdatedTileToAll(colony.getTile(), player);
+
+        return null;
+    }
+
 
     /**
     * Handles a "changeState"-message from a client.

@@ -69,6 +69,25 @@ public final class Building extends FreeColGameObject implements WorkLocation {
 
     // Sets the maximum number of units in one building (will become a non-constant later):
     private static final int MAX_UNITS = 3;
+    
+    private static final int requiredTable[][][] = {
+        {{  0,  0,  1},{ -1, -1, -1},{ -1, -1, -1},{ -1, -1, -1}}, // TOWNHALL
+        {{  0,  0,  1},{ 52,  0,  3},{ -1, -1, -1},{ -1, -1, -1}}, // CARPENTER
+        {{  0,  0,  1},{ 64, 20,  4},{240,100,  8},{ -1, -1, -1}}, // BLACKSMITH
+        {{  0,  0,  1},{ 64,  0,  4},{160, 20,  8},{ -1, -1, -1}}, // TOBACCONIST
+        {{  0,  0,  1},{ 64,  0,  4},{160, 20,  8},{ -1, -1, -1}}, // WEAVER
+        {{  0,  0,  1},{ 64,  0,  4},{160, 20,  8},{ -1, -1, -1}}, // DISTILLER
+        {{  0,  0,  1},{ 56,  0,  3},{160, 20,  6},{ -1, -1, -1}}, // FUR_TRADER
+        {{ 64,  0,  3},{120,100,  4},{320,100,  8},{ -1, -1, -1}}, // STOCKADE
+        {{ 52,  0,  1},{120, 50,  8},{240,100,  8},{ -1, -1, -1}}, // ARMORY
+        {{ 52,  0,  1},{ 80, 50,  6},{240,100,  8},{ -1, -1, -1}}, // DOCK
+        {{ 64,  0,  4},{160, 50,  8},{200,100, 10},{ -1, -1, -1}}, // SCHOOLHOUSE
+        {{ 80,  0,  1},{ 80, 20,  1},{ -1, -1, -1},{ -1, -1, -1}}, // WAREHOUSE
+        {{ 64,  0,  1},{ -1, -1, -1},{ -1, -1, -1},{ -1, -1, -1}}, // STABLES
+        {{ 52,  0,  3},{176,100,  8},{ -1, -1, -1},{ -1, -1, -1}}, // CHURCH
+        {{ 80,  0,  1},{120, 50,  4},{ -1, -1, -1},{ -1, -1, -1}}, // PRINTING_PRESS
+        {{160, 50,  1},{ -1, -1, -1},{ -1, -1, -1},{ -1, -1, -1}}  // CUSTOM_HOUSE
+    };
 
     // The colony containing this building.
     private Colony colony;
@@ -174,6 +193,47 @@ public final class Building extends FreeColGameObject implements WorkLocation {
         }
     }
 
+    /**
+    * Gets the number of hammers required for the improved building of the same type.
+    *
+    * @return The number of hammers required for the improved building of the same type,
+    *         or -1 if the building does not exist.
+    */
+    public int getNextHammers() {
+        if (level < MAX_LEVEL) {
+            return requiredTable[type][level][0];
+        } else {
+            return -1;
+        }
+    }
+    
+    /**
+    * Gets the number of tools required for the improved building of the same type.
+    *
+    * @return The number of tools required for the improved building of the same type,
+    *         or -1 if the building does not exist.
+    */
+    public int getNextTools() {
+        if (level < MAX_LEVEL) {
+            return requiredTable[type][level][1];
+        } else {
+            return -1;
+        }
+    }
+    
+    /**
+    * Gets the colony population required for the improved building of the same type.
+    *
+    * @return The colony population required for the improved building of the same type,
+    *         or -1 if the building does not exist.
+    */
+    public int getNextPop() {
+        if (level < MAX_LEVEL) {
+            return requiredTable[type][level][1];
+        } else {
+            return -1;
+        }
+    }
 
     /**
     * Checks if the building has been built.

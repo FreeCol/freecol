@@ -486,6 +486,24 @@ public final class InGameController {
 
         client.send(changeWorkTypeElement);
     }
+    
+    /**
+    * Changes the current construction project of a <code>Colony</code>.
+    * @param colony The <code>Colony</code>
+    * @param typ The new type of building to build.
+    */
+    public void setCurrentlyBuilding(Colony colony, int type) {
+        Client client = freeColClient.getClient();
+
+        colony.setCurrentlyBuilding(type);
+
+        Element setCurrentlyBuildingElement = Message.createNewRootElement("setCurrentlyBuilding");
+        setCurrentlyBuildingElement.setAttribute("colony", colony.getID());
+        setCurrentlyBuildingElement.setAttribute("type", Integer.toString(type));
+
+        client.send(setCurrentlyBuildingElement);
+    }
+
 
     /**
     * Changes the state of this <code>Unit</code>.
