@@ -76,7 +76,7 @@ public final class FreeColClient {
 
     private boolean windowed;
     private boolean singleplayer;
-    private boolean admin = false;
+
 
     /**
     * Indicated whether or not there is an open connection to the server.
@@ -304,22 +304,11 @@ public final class FreeColClient {
 
 
     /**
-    * Sets this client to be the game admin or not.
-    *
-    * @param admin The boolean indicating wether or not this client
-    *              is the game admin.
-    */
-    public void setAdmin(boolean admin) {
-        this.admin = admin;
-    }
-
-
-    /**
     * Checks if this client is the game admin.
     * @return <i>true</i> if the client is the game admin and <i>false</i> otherwise.
     */
     public boolean isAdmin() {
-        return admin;
+        return getMyPlayer().isAdmin();
     }
 
 

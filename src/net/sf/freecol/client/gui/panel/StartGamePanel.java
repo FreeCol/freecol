@@ -220,8 +220,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
 
             // Pretend as if the player is ready.
             readyBox.setSelected(true);
-        }
-        else {
+        } else {
             readyBox.setSelected(thisPlayer.isReady());
         }
 
@@ -263,6 +262,8 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         }
 
         table.setEnabled(enabled);
+        
+        start.setEnabled(freeColClient.isAdmin());
     }
 
 

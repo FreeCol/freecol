@@ -171,9 +171,6 @@ public final class ConnectController {
         String type = reply.getTagName();
 
         if (type.equals("loginConfirmed")) {
-            boolean admin = (new Boolean(reply.getAttribute("admin"))).booleanValue();
-            freeColClient.setAdmin(admin);
-
             Game game = new Game(freeColClient.getModelController(), (Element) reply.getElementsByTagName(Game.getXMLElementTagName()).item(0));
             Player thisPlayer = game.getPlayerByName(username);
 
