@@ -427,7 +427,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         int type = getMoveType(direction);
 
         if (type != MOVE && type != DISEMBARK && type != MOVE_HIGH_SEAS) {
-            throw new IllegalStateException("Illegal move requested!");
+            throw new IllegalStateException("Illegal move requested: " + type);
         }
 
         setState(ACTIVE);
@@ -2049,10 +2049,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
 
         Tile newTile = defender.getTile();
 
-        if (newTile == null) {
-            throw new NullPointerException();
-        }
-
         movesLeft = 0;
         if (defender.getType() == BRAVE) {
             defender.dispose();
@@ -2060,7 +2056,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                 if (newTile.getSettlement().getUnitCount() <= 0) {
                     //TODO: Burn the camp. Get treasure.
                     newTile.getSettlement().dispose();
-                    setLocation(newTile);
+                    //setLocation(newTile);
                 }
             } else {
                 Iterator unitIterator = newTile.getUnitIterator();
@@ -2104,6 +2100,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                 defender.setArmed(false, true);
                 if (getType() == BRAVE) {
                    //TODO: don't always do this. Have some random chance.
+                   //      ATTACKER_LOSS_MUSKETS.
                    setArmed(true, true);
                 }
             }
@@ -2129,13 +2126,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                 setType(DAMAGED_ARTILLERY);
             } else if ((getType() == KINGS_REGULAR) || (getType() == DAMAGED_ARTILLERY)) {
                 dispose();
-                return; // Do NOT try to go any further!
             } else {
                 setArmed(false, true);
             }
         }
-
-        return;
     }
 
 
@@ -2391,8 +2385,16 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
 
         if (unitElement.hasAttribute("location")) {
             location = (Location) getGame().getFreeColGameObject(unitElement.getAttribute("location"));
+            
+            /*
+             In this case, 'location == null' can only occur if the location specified in the
+             XML-Element does not exists:
+            */
+            if (location == null) {
+                throw new NullPointerException();
+            }
         }
-        
+
         if (isCarrier()) {
             Element unitContainerElement = (Element) unitElement.getElementsByTagName(UnitContainer.getXMLElementTagName()).item(0);
             if (unitContainer != null) {

@@ -251,6 +251,15 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation {
     }
 
 
+    public void dispose() {
+        if (unit != null) {
+            unit.dispose();
+        }
+        
+        super.dispose();
+    }
+
+
     /**
     * Makes an XML-representation of this object.
     *

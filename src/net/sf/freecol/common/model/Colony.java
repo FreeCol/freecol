@@ -355,6 +355,8 @@ public final class Colony extends Settlement implements Location {
 
 
     public Iterator getUnitIterator() {
+        ArrayList units = new ArrayList();
+
         throw new UnsupportedOperationException();
     }
 
@@ -370,7 +372,7 @@ public final class Colony extends Settlement implements Location {
     public boolean canAdd(Locatable locatable) {
         throw new UnsupportedOperationException();
     }
-    
+
     /**
     * Gets the <code>Unit</code> that is currently defending this <code>Colony</code>.
     * @param attacker The target that would be attacking this colony.
@@ -378,23 +380,27 @@ public final class Colony extends Settlement implements Location {
     */
     public Unit getDefendingUnit(Unit attacker) {
         Iterator i = getWorkLocationIterator();
-        ArrayList units = new ArrayList();
+        //ArrayList units = new ArrayList();
         while (i.hasNext()) {
             WorkLocation w = (WorkLocation) i.next();
             if (w instanceof Building) {
                 Iterator unitIterator = w.getUnitIterator();
                 while (unitIterator.hasNext()) {
                     Unit unit = (Unit)unitIterator.next();
-                    units.add(unit);
+                    //units.add(unit);
+                    return unit;
                 }
             } else if (w instanceof ColonyTile) {
                 Unit unit = ((ColonyTile)w).getUnit();
-                if (unit != null) units.add(unit);
+                //if (unit != null) units.add(unit);
+                return unit;
             }
         }
-        
+
+        return null;
+        /* This is not neccessary: soldiers are outside colony (on the tile):
         Iterator unitIterator = units.iterator();
-        
+
         Unit defender = null;
         if (unitIterator.hasNext()) {
             defender = (Unit) unitIterator.next();
@@ -409,10 +415,11 @@ public final class Colony extends Settlement implements Location {
                 defender = nextUnit;
             }
         }
-        
+
         return defender;
+        */
     }
-    
+
     /**
     * Adds to the hammer count of the colony.
     * @param amount The number of hammers to add.
@@ -558,6 +565,18 @@ public final class Colony extends Settlement implements Location {
     */
     public void newTurn() {
 
+    }
+
+    
+    public void dispose() {
+        Iterator i = getWorkLocationIterator();
+        while (i.hasNext()) {
+            WorkLocation w = (WorkLocation) i.next();
+            ((FreeColGameObject) w).dispose();
+        }
+
+        getTile().setSettlement(null);
+        super.dispose();
     }
 
 

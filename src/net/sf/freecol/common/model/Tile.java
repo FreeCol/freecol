@@ -177,17 +177,15 @@ public final class Tile extends FreeColGameObject implements Location {
             }
         }
         
-        if (settlement != null) {
-            Unit settlementDefender = null;
-            if (settlement instanceof Colony) {
-                settlementDefender = ((Colony)settlement).getDefendingUnit(attacker);
-            }
-            if ((settlementDefender != null) && ((defender == null) || (settlementDefender.getDefensePower(attacker) > defender.getDefensePower(attacker)))) {
-                defender = settlementDefender;
-            }
+        if (defender != null) {
+            return defender;
         }
-        
-        return defender;
+
+        if (settlement != null) {
+            return settlement.getDefendingUnit(attacker);
+        } else {
+            return null;
+        }
     }
 
 

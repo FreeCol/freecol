@@ -171,7 +171,8 @@ public final class InGameController {
         Element reply = client.ask(moveElement);
         freeColClient.getInGameInputHandler().handle(client.getConnection(), reply);
     }
-    
+
+
     /**
     * Performs an attack in a specified direction. Note that the server
     * handles the attack calculations here.
@@ -181,16 +182,38 @@ public final class InGameController {
     */
     private void attack(Unit unit, int direction) {
         Client client = freeColClient.getClient();
+        Game game = freeColClient.getGame();
+        Map map = game.getMap();
 
-        // Inform the server:
         Element attackElement = Message.createNewRootElement("attack");
         attackElement.setAttribute("unit", unit.getID());
         attackElement.setAttribute("direction", Integer.toString(direction));
 
-        //client.send(moveElement);
-        Element reply = client.ask(attackElement);
-        freeColClient.getInGameInputHandler().handle(client.getConnection(), reply);
+        // Get the result of the attack from the server:
+        Element attackResultElement = client.ask(attackElement);
+
+        int result = Integer.parseInt(attackResultElement.getAttribute("result"));
+
+        Element updateElement = (Element) attackResultElement.getElementsByTagName("update").item(0);
+        if (updateElement != null) {
+            freeColClient.getInGameInputHandler().handle(client.getConnection(), updateElement);
+        }
+
+        Unit defender = map.getNeighbourOrNull(direction, unit.getTile()).getDefendingUnit(unit);
+
+        if (result == Unit.ATTACKER_LOSS) {
+            unit.loseAttack();
+        } else {
+            unit.winAttack(defender);
+        }
+
+        if (unit.getMovesLeft() <= 0) {
+            nextActiveUnit(unit.getTile());
+        }
+
+        freeColClient.getCanvas().refresh();
     }
+
 
     /**
      * Disembarks the specified unit in a specified direction.
@@ -686,7 +709,10 @@ public final class InGameController {
 
         Unit unit = gui.getActiveUnit();
 
-        unit.skip();
+        if (unit != null) {
+            unit.skip();
+        }
+        
         nextActiveUnit();
     }
 

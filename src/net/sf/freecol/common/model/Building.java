@@ -504,6 +504,15 @@ public final class Building extends FreeColGameObject implements WorkLocation {
         colony.addGoods(goodsOutputType, goodsOutput);
     }
 
+    
+    public void dispose() {
+        for (int i=0; i<units.size(); i++) {
+            ((Unit) units.get(i)).dispose();
+        }
+        
+        super.dispose();
+    }
+    
 
     /**
     * Makes a XML-representation of this object.

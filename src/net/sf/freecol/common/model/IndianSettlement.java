@@ -151,15 +151,6 @@ public class IndianSettlement extends Settlement {
 
 
     /**
-    * Returns <i>null</i>.
-    * @return <i>null</i>.
-    */
-    public Tile getTile() {
-        return super.getTile();
-    }
-
-
-    /**
     * Adds a <code>Locatable</code> to this Location.
     *
     * @param locatable The code>Locatable</code> to add to this Location.
@@ -213,6 +204,35 @@ public class IndianSettlement extends Settlement {
     }
 
 
+    /**
+    * Gets the <code>Unit</code> that is currently defending this <code>IndianSettlement</code>.
+    * @param attacker The target that would be attacking this <code>IndianSettlement</code>.
+    * @return The <code>Unit</code> that has been choosen to defend this <code>IndianSettlement</code>.
+    */
+    public Unit getDefendingUnit(Unit attacker) {
+        Iterator unitIterator = getUnitIterator();
+
+        Unit defender = null;
+        if (unitIterator.hasNext()) {
+            defender = (Unit) unitIterator.next();
+        } else {
+            return null;
+        }
+
+        while (unitIterator.hasNext()) {
+            Unit nextUnit = (Unit) unitIterator.next();
+
+            if (nextUnit.getDefensePower(attacker) > defender.getDefensePower(attacker)) {
+                defender = nextUnit;
+            }
+        }
+
+        return defender;
+    }
+
+
+
+
     public boolean contains(Locatable locatable) {
         if (locatable instanceof Unit) {
             return unitContainer.contains((Unit) locatable);
@@ -230,8 +250,15 @@ public class IndianSettlement extends Settlement {
     public void newTurn() {
 
     }
-        
     
+    
+    public void dispose() {
+        unitContainer.dispose();
+        getTile().setSettlement(null);
+        super.dispose();
+    }
+    
+
     /**
     * Make a XML-representation of this object.
     *
@@ -242,6 +269,7 @@ public class IndianSettlement extends Settlement {
         Element indianSettlementElement = document.createElement(getXMLElementTagName());
 
         indianSettlementElement.setAttribute("ID", getID());
+        indianSettlementElement.setAttribute("tile", tile.getID());
         indianSettlementElement.setAttribute("owner", owner.getID());
         indianSettlementElement.setAttribute("tribe", Integer.toString(tribe));
         indianSettlementElement.setAttribute("kind", Integer.toString(kind));
@@ -261,6 +289,7 @@ public class IndianSettlement extends Settlement {
     public void readFromXMLElement(Element indianSettlementElement) {
         setID(indianSettlementElement.getAttribute("ID"));
         
+        tile = (Tile) getGame().getFreeColGameObject(indianSettlementElement.getAttribute("tile"));
         owner = (Player)getGame().getFreeColGameObject(indianSettlementElement.getAttribute("owner"));
         tribe = Integer.parseInt(indianSettlementElement.getAttribute("tribe"));
         kind = Integer.parseInt(indianSettlementElement.getAttribute("kind"));
@@ -277,8 +306,7 @@ public class IndianSettlement extends Settlement {
 
     /**
     * Returns the tag name of the root element representing this object.
-    *
-    * @return the tag name.
+    * @return "indianSettlement".
     */
     public static String getXMLElementTagName() {
         return "indianSettlement";

@@ -74,8 +74,6 @@ public final class InGameInputHandler implements MessageHandler {
                 reply = opponentMove(element);
             } else if (type.equals("opponentAttack")) {
                 reply = opponentAttack(element);
-            } else if (type.equals("attackResult")) {
-                reply = attackResult(element);
             } else if (type.equals("setCurrentPlayer")) {
                 reply = setCurrentPlayer(element);
             } else if (type.equals("emigrateUnitInEuropeConfirmed")) {
@@ -163,8 +161,13 @@ public final class InGameInputHandler implements MessageHandler {
 
         if (!opponentMoveElement.hasAttribute("tile")) {
             Unit unit = (Unit) game.getFreeColGameObject(opponentMoveElement.getAttribute("unit"));
-            //Player player = unit.getOwner();
-            // This originally said player.___, which made no sense. -sjm
+            
+            if (unit == null) {
+                //throw new NullPointerException();
+                logger.warning("Could not find the 'unit' in 'opponentMove'.");
+                return null;
+            }
+
             if ((unit.getTile() != null) && (currentPlayer.canSee(map.getNeighbourOrNull(direction, unit.getTile())))) {
                 unit.move(direction);
             } else {
@@ -181,6 +184,7 @@ public final class InGameInputHandler implements MessageHandler {
         return null;
     }
     
+
     /**
     * Handles an "opponentAttack"-message.
     *
@@ -209,36 +213,6 @@ public final class InGameInputHandler implements MessageHandler {
         return null;
     }
     
-    /**
-    * Handles an "attackResult"-message.
-    *
-    * @param attackResultElement The element (root element in a DOM-parsed XML tree) that
-    *                holds all the information.
-    */
-    private Element attackResult(Element attackResultElement) {
-        Game game = freeColClient.getGame();
-        Map map = game.getMap();
-
-        int direction = Integer.parseInt(attackResultElement.getAttribute("direction"));
-        int result = Integer.parseInt(attackResultElement.getAttribute("result"));
-
-        Unit unit = (Unit) game.getFreeColGameObject(attackResultElement.getAttribute("unit"));
-        Unit defender = map.getNeighbourOrNull(direction, unit.getTile()).getDefendingUnit(unit);
-        
-        if (result == Unit.ATTACKER_LOSS) {
-            unit.loseAttack();
-        } else {
-            unit.winAttack(defender);
-        }
-        
-        if (attackResultElement.hasAttribute("update")) {
-            this.update((Element) attackResultElement.getElementsByTagName("update").item(0));
-        }
-        
-        freeColClient.getCanvas().refresh();
-
-        return null;
-    }
     
     /**
     * Handles a "setCurrentPlayer"-message.

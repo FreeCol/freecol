@@ -168,7 +168,7 @@ public class Game extends FreeColGameObject {
         if (id == null || id.equals("")) {
             throw new NullPointerException();
         }
-
+        
         return (FreeColGameObject) freeColGameObjects.get(id);
     }
 

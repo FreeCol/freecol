@@ -153,14 +153,15 @@ public final class InGameInputHandler implements MessageHandler {
                 continue;
             }
 
-            Element opponentMoveElement = Message.createNewRootElement("opponentMove");
-            opponentMoveElement.setAttribute("direction", Integer.toString(direction));
-
             try {
                 if (enemyPlayer.canSee(oldTile)) {
+                    Element opponentMoveElement = Message.createNewRootElement("opponentMove");
+                    opponentMoveElement.setAttribute("direction", Integer.toString(direction));
                     opponentMoveElement.setAttribute("unit", unit.getID());
                     enemyPlayer.getConnection().send(opponentMoveElement);
                 } else if (enemyPlayer.canSee(newTile)) {
+                    Element opponentMoveElement = Message.createNewRootElement("opponentMove");
+                    opponentMoveElement.setAttribute("direction", Integer.toString(direction));
                     opponentMoveElement.setAttribute("tile", unit.getTile().getID());
                     opponentMoveElement.appendChild(unit.toXMLElement(enemyPlayer, opponentMoveElement.getOwnerDocument()));
                     enemyPlayer.getConnection().send(opponentMoveElement);
@@ -194,13 +195,10 @@ public final class InGameInputHandler implements MessageHandler {
     */
     private Element attack(Connection connection, Element attackElement) {
         Game game = freeColServer.getGame();
-
         ServerPlayer player = freeColServer.getPlayer(connection);
 
         Unit unit = (Unit) game.getFreeColGameObject(attackElement.getAttribute("unit"));
         int direction = Integer.parseInt(attackElement.getAttribute("direction"));
-        
-        Unit defender = null;
 
         if (unit == null) {
             throw new IllegalArgumentException("Could not find 'Unit' with specified ID: " + attackElement.getAttribute("unit"));
@@ -208,23 +206,26 @@ public final class InGameInputHandler implements MessageHandler {
 
         Tile oldTile = unit.getTile();
         Tile newTile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
+
         if (newTile == null) {
             throw new IllegalArgumentException("Could not find tile in direction " + direction + " from unit with ID " + attackElement.getAttribute("unit"));
         }
-        defender = newTile.getDefendingUnit(unit);
+
+        Unit defender = newTile.getDefendingUnit(unit);
         if (defender == null) {
             throw new IllegalStateException("Nothing to attack in direction " + direction + " from unit with ID " + attackElement.getAttribute("unit"));
         }
-        
+
+        // Calculate the result:
         int attack_power = unit.getOffensePower(defender);
         int total_probability = attack_power + defender.getDefensePower(unit);
         int result = Unit.ATTACKER_LOSS; // Assume this until otherwise calculated.
-        if ((attackCalculator.nextInt(total_probability)) <= attack_power) {
-            // Win.
-            result = Unit.ATTACKER_WIN;
-            unit.winAttack(defender);
-        } // Loss code is later, when unit is no longer needed.
 
+        if ((attackCalculator.nextInt(total_probability)) <= attack_power) {
+            result = Unit.ATTACKER_WIN;
+        }
+
+        // Inform the other players (other then the player attacking) about the attack:
         Iterator enemyPlayerIterator = game.getPlayerIterator();
         while (enemyPlayerIterator.hasNext()) {
             ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
@@ -245,10 +246,10 @@ public final class InGameInputHandler implements MessageHandler {
             }
         }
 
+        // Create the reply:
         Element reply = Message.createNewRootElement("attackResult");
-        reply.setAttribute("direction", Integer.toString(direction));
         reply.setAttribute("result", Integer.toString(result));
-        reply.setAttribute("unit", unit.getID());
+
         if (unit.getTile().equals(newTile)) { // In other words, we moved...
             Element update = reply.getOwnerDocument().createElement("update");
             Vector surroundingTiles = game.getMap().getSurroundingTiles(unit.getTile(), unit.getLineOfSight());
@@ -258,13 +259,14 @@ public final class InGameInputHandler implements MessageHandler {
                 player.setExplored(t);
                 update.appendChild(t.toXMLElement(player, update.getOwnerDocument()));
             }
-        
+
             reply.appendChild(update);
         }
 
-        // This is down here do it doesn't interfere with other unit code.
         if (result == Unit.ATTACKER_LOSS) {
             unit.loseAttack();
+        } else {
+            unit.winAttack(defender);
         }
         return reply;
     }
