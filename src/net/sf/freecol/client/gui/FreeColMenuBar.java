@@ -27,17 +27,27 @@ public class FreeColMenuBar extends JMenuBar {
     public static final int UNIT_ORDER_WAIT = 0;
     public static final int UNIT_ORDER_FORTIFY = 1;
     public static final int UNIT_ORDER_SENTRY = 2;
-    public static final int UNIT_ORDER_BUILD_COL = 4;
-    public static final int UNIT_ORDER_PLOW = 5;
-    public static final int UNIT_ORDER_BUILD_ROAD = 6;
-    public static final int UNIT_ORDER_SKIP = 8;
-    public static final int UNIT_ORDER_DISBAND = 10;
+    public static final int UNIT_ORDER_CLEAR_ORDERS = 3;
+    public static final int UNIT_ORDER_BUILD_COL = 5;
+    public static final int UNIT_ORDER_PLOW = 6;
+    public static final int UNIT_ORDER_BUILD_ROAD = 7;
+    public static final int UNIT_ORDER_SKIP = 9;
+    public static final int UNIT_ORDER_DISBAND = 11;
     
     private final FreeColClient freeColClient;
     private final Canvas canvas;
     private final GUI gui;
+    
+    /**
+    * Contains the menu items that should only be enabled when in game.
+    */
     private ArrayList inGameOptions = new ArrayList();
+    
+    /**
+    * Contains the menu items that should only be enabled when the map is active. 
+    */
     private ArrayList mapControlOptions = new ArrayList();
+
     private JMenuItem saveMenuItem;
 
 
@@ -194,6 +204,7 @@ public class FreeColMenuBar extends JMenuBar {
         ordersMenu.setMnemonic(KeyEvent.VK_O);
         add(ordersMenu);
         inGameOptions.add(ordersMenu);
+        mapControlOptions.add(ordersMenu);
         
         final JMenuItem waitMenuItem = new JMenuItem(Messages.message("unit.state.0"));
         waitMenuItem.setOpaque(false);
@@ -206,6 +217,7 @@ public class FreeColMenuBar extends JMenuBar {
             }
         });
         inGameOptions.add(waitMenuItem);
+        mapControlOptions.add(waitMenuItem);
 
         final JMenuItem fortifyMenuItem = new JMenuItem(Messages.message("unit.state.2"));
         fortifyMenuItem.setOpaque(false);
@@ -220,7 +232,8 @@ public class FreeColMenuBar extends JMenuBar {
             }
         });
         inGameOptions.add(fortifyMenuItem);
-        
+        mapControlOptions.add(fortifyMenuItem);
+
         final JMenuItem sentryMenuItem = new JMenuItem(Messages.message("unit.state.3"));
         sentryMenuItem.setOpaque(false);
         sentryMenuItem.setMnemonic(KeyEvent.VK_S);
@@ -234,7 +247,23 @@ public class FreeColMenuBar extends JMenuBar {
             }
         });
         inGameOptions.add(sentryMenuItem);
-        
+        mapControlOptions.add(sentryMenuItem);
+
+        final JMenuItem clearOrdersMenuItem = new JMenuItem(Messages.message("menuBar.orders.clearOrders"));
+        clearOrdersMenuItem.setOpaque(false);
+        clearOrdersMenuItem.setMnemonic(KeyEvent.VK_C);
+        ordersMenu.add(clearOrdersMenuItem);
+        clearOrdersMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if(gui.getActiveUnit() != null) {
+                    freeColClient.getInGameController().clearOrders(gui.getActiveUnit());
+                }
+            }
+        });
+        inGameOptions.add(clearOrdersMenuItem);
+        mapControlOptions.add(clearOrdersMenuItem);
+
+
         ordersMenu.addSeparator();
         
         final JMenuItem colonyMenuItem = new JMenuItem(Messages.message("unit.state.7"));
@@ -248,6 +277,7 @@ public class FreeColMenuBar extends JMenuBar {
             }
         });
         inGameOptions.add(colonyMenuItem);
+        mapControlOptions.add(colonyMenuItem);
         
         final JMenuItem plowMenuItem = new JMenuItem(Messages.message("unit.state.5"));
         plowMenuItem.setOpaque(false);
@@ -262,6 +292,7 @@ public class FreeColMenuBar extends JMenuBar {
             }
         });
         inGameOptions.add(plowMenuItem);
+        mapControlOptions.add(plowMenuItem);
         
         final JMenuItem roadMenuItem = new JMenuItem(Messages.message("unit.state.6"));
         roadMenuItem.setOpaque(false);
@@ -276,7 +307,8 @@ public class FreeColMenuBar extends JMenuBar {
             }
         });
         inGameOptions.add(roadMenuItem);
-        
+        mapControlOptions.add(roadMenuItem);
+
         ordersMenu.addSeparator();
         
         final JMenuItem skipMenuItem = new JMenuItem(Messages.message("unit.state.1"));
@@ -290,6 +322,7 @@ public class FreeColMenuBar extends JMenuBar {
             }
         });
         inGameOptions.add(skipMenuItem);
+        mapControlOptions.add(skipMenuItem);
         
         ordersMenu.addSeparator();
         
@@ -305,7 +338,8 @@ public class FreeColMenuBar extends JMenuBar {
                 }
             }
         });
-        inGameOptions.add(disbandMenuItem);        
+        inGameOptions.add(disbandMenuItem);
+        mapControlOptions.add(disbandMenuItem);
         
         // --> Debug
         if (FreeCol.isInDebugMode()) {
@@ -365,72 +399,75 @@ public class FreeColMenuBar extends JMenuBar {
         }
 
         saveMenuItem.setEnabled(freeColClient.getMyPlayer().isAdmin() && freeColClient.getFreeColServer() != null);
-        
-        // Update Orders menu.
-        Unit selectedOne = freeColClient.getGUI().getActiveUnit();
-        JMenu ordersMenu = getMenu(2);
-        if(selectedOne == null) {
-            for (int t=0; t < ordersMenu.getItemCount(); t++) {
-                if(ordersMenu.getItem(t) != null)
-                    ordersMenu.getItem(t).setEnabled(false);
+
+        if (enabled) {
+            // Update Orders menu.
+            Unit selectedOne = freeColClient.getGUI().getActiveUnit();
+            JMenu ordersMenu = getMenu(2);
+            if(selectedOne == null) {
+                for (int t=0; t < ordersMenu.getItemCount(); t++) {
+                    if(ordersMenu.getItem(t) != null)
+                        ordersMenu.getItem(t).setEnabled(false);
+                }
+                return;
             }
-            return;
+
+            int unitType = selectedOne.getType();
+            ordersMenu.getItem(UNIT_ORDER_WAIT).setEnabled(true); // All units can wait
+            ordersMenu.getItem(UNIT_ORDER_FORTIFY).setEnabled(true); // All units can fortify
+            ordersMenu.getItem(UNIT_ORDER_SENTRY).setEnabled(true); // All units can sentry
+            ordersMenu.getItem(UNIT_ORDER_CLEAR_ORDERS).setEnabled(true); // All units can clear orders
+            ordersMenu.getItem(UNIT_ORDER_SKIP).setEnabled(true); // All units can be skipped
+            ordersMenu.getItem(UNIT_ORDER_DISBAND).setEnabled(true); // All units can be disbanded
+
+            /* Clear Forest / Plow Fields
+            *  Only colonists can do this, only if they have at least 20 tools, and only if they are
+            *  in a square that can be improved
+            */
+            if (selectedOne.getTile() != null) {
+                Tile tile = selectedOne.getTile();
+                if(tile.isLand() && tile.isForested()) {
+                    ordersMenu.getItem(UNIT_ORDER_PLOW).setText(Messages.message("unit.state.4"));
+                    ordersMenu.getItem(UNIT_ORDER_PLOW).setEnabled(selectedOne.isPioneer());
+                } else if (tile.isLand() && !tile.isForested() && !tile.isPlowed()) {
+                    ordersMenu.getItem(UNIT_ORDER_PLOW).setText(Messages.message("unit.state.5"));
+                    ordersMenu.getItem(UNIT_ORDER_PLOW).setEnabled(selectedOne.isPioneer());
+                } else if (tile.isLand() && !tile.isForested() && tile.isPlowed()) {
+                    ordersMenu.getItem(UNIT_ORDER_PLOW).setText(Messages.message("unit.state.5"));
+                    ordersMenu.getItem(UNIT_ORDER_PLOW).setEnabled(false);
+                } else {
+                    ordersMenu.getItem(UNIT_ORDER_PLOW).setText(Messages.message("unit.state.5"));
+                    ordersMenu.getItem(UNIT_ORDER_PLOW).setEnabled(false);
+                }
+            } else {
+                ordersMenu.getItem(UNIT_ORDER_PLOW).setText(Messages.message("unit.state.5"));
+                ordersMenu.getItem(UNIT_ORDER_PLOW).setEnabled(false);
+            }
+
+            /* Build roads
+            *  Only colonists can do this, only if they have at least 20 tools, and only if they are
+            *  in a land square that does not already have roads
+            */
+            if (selectedOne.getTile() != null && selectedOne.isPioneer()) {
+                Tile tile = selectedOne.getTile();
+                if(tile.isLand() && !tile.hasRoad()) {
+                    ordersMenu.getItem(UNIT_ORDER_BUILD_ROAD).setEnabled(true);
+                } else {
+                    ordersMenu.getItem(UNIT_ORDER_BUILD_ROAD).setEnabled(false);
+                }
+            } else {
+                ordersMenu.getItem(UNIT_ORDER_BUILD_ROAD).setEnabled(false);
+            }
+
+            /* Build a new colony
+            *  Only colonists can do this, and only if they are on a 'colonizeable' tile
+            */
+            if (selectedOne.getTile() != null && selectedOne.canBuildColony()) {
+                ordersMenu.getItem(UNIT_ORDER_BUILD_COL).setEnabled(true);
+            } else {
+                ordersMenu.getItem(UNIT_ORDER_BUILD_COL).setEnabled(false);
+            }
         }
-        
-        int unitType = selectedOne.getType();
-        ordersMenu.getItem(UNIT_ORDER_WAIT).setEnabled(true); // All units can wait
-        ordersMenu.getItem(UNIT_ORDER_FORTIFY).setEnabled(true); // All units can fortify
-        ordersMenu.getItem(UNIT_ORDER_SENTRY).setEnabled(true); // All units can sentry
-        ordersMenu.getItem(UNIT_ORDER_SKIP).setEnabled(true); // All units can be skipped
-        ordersMenu.getItem(UNIT_ORDER_DISBAND).setEnabled(true); // All units can be disbanded
-        
-        /* Clear Forest / Plow Fields
-         *  Only colonists can do this, only if they have at least 20 tools, and only if they are
-         *  in a square that can be improved
-         */
-         if (selectedOne.getTile() != null) {
-             Tile tile = selectedOne.getTile();
-             if(tile.isLand() && tile.isForested()) {
-                 ordersMenu.getItem(UNIT_ORDER_PLOW).setText(Messages.message("unit.state.4"));
-                 ordersMenu.getItem(UNIT_ORDER_PLOW).setEnabled(selectedOne.isPioneer());
-             } else if (tile.isLand() && !tile.isForested() && !tile.isPlowed()) {
-                 ordersMenu.getItem(UNIT_ORDER_PLOW).setText(Messages.message("unit.state.5"));
-                 ordersMenu.getItem(UNIT_ORDER_PLOW).setEnabled(selectedOne.isPioneer());
-             } else if (tile.isLand() && !tile.isForested() && tile.isPlowed()) {
-                 ordersMenu.getItem(UNIT_ORDER_PLOW).setText(Messages.message("unit.state.5"));
-                 ordersMenu.getItem(UNIT_ORDER_PLOW).setEnabled(false);
-             } else {
-                 ordersMenu.getItem(UNIT_ORDER_PLOW).setText(Messages.message("unit.state.5"));
-                 ordersMenu.getItem(UNIT_ORDER_PLOW).setEnabled(false);
-             }
-         } else {
-             ordersMenu.getItem(UNIT_ORDER_PLOW).setText(Messages.message("unit.state.5"));
-             ordersMenu.getItem(UNIT_ORDER_PLOW).setEnabled(false);
-         }
-         
-         /* Build roads
-         *  Only colonists can do this, only if they have at least 20 tools, and only if they are
-         *  in a land square that does not already have roads
-         */
-         if (selectedOne.getTile() != null && selectedOne.isPioneer()) {
-             Tile tile = selectedOne.getTile();
-             if(tile.isLand() && !tile.hasRoad()) {
-                 ordersMenu.getItem(UNIT_ORDER_BUILD_ROAD).setEnabled(true);
-             } else {
-                 ordersMenu.getItem(UNIT_ORDER_BUILD_ROAD).setEnabled(false);
-             }
-         } else {
-             ordersMenu.getItem(UNIT_ORDER_BUILD_ROAD).setEnabled(false);
-         }
-         
-         /* Build a new colony
-         *  Only colonists can do this, and only if they are on a 'colonizeable' tile
-         */
-         if (selectedOne.getTile() != null && selectedOne.canBuildColony()) {
-             ordersMenu.getItem(UNIT_ORDER_BUILD_COL).setEnabled(true);
-         } else {
-             ordersMenu.getItem(UNIT_ORDER_BUILD_COL).setEnabled(false);
-         }
     }
 
 

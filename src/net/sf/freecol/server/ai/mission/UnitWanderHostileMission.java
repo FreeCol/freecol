@@ -71,7 +71,7 @@ public class UnitWanderHostileMission extends Mission {
             if (!hasAttacked) {
                 int direction = directions[0];
                 int j;
-                for (j = 0; j < 8 && unit.getGame().getMap().getNeighbourOrNull(direction, thisTile) == null || unit.getMoveType(direction) != Unit.MOVE; j++) {
+                for (j = 0; j < 8 && (unit.getGame().getMap().getNeighbourOrNull(direction, thisTile) == null || unit.getMoveType(direction) != Unit.MOVE); j++) {
                     direction = directions[j];
                 }
                 if (j == 8) return; // Not possible to move in any directions.

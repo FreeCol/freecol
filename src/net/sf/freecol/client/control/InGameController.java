@@ -818,6 +818,18 @@ public final class InGameController {
         client.send(changeStateElement);
     }
 
+    
+    /**
+    * Clears the orders of the given <code>Unit</code>.
+    * The orders are cleared by making the unit {@link Unit#ACTIVE}.
+    *
+    * @param unit The <code>Unit</code>.
+    */
+    public void clearOrders(Unit unit) {
+        changeState(unit, Unit.ACTIVE);
+    }
+
+
     /**
      * Moves the specified unit in the "high seas" in a specified direction.
      * This may result in an ordinary move or a move to europe.
