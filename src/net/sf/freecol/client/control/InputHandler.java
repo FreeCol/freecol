@@ -41,6 +41,7 @@ public abstract class InputHandler implements MessageHandler {
     */
     public abstract Element handle(Connection connection, Element element);
 
+
     /**
     * Handles a "disconnect"-message.
     *
@@ -49,9 +50,12 @@ public abstract class InputHandler implements MessageHandler {
     */
     protected Element disconnect(Element disconnectElement) {
         getFreeColClient().getConnectController().quitGame(false, false);
-
-        // TODO: Instead of returnToTitle we should call showScoreBoard or something.
-        getFreeColClient().getCanvas().returnToTitle();
+        
+        if (freeColClient.getFreeColServer() == null) {
+            getFreeColClient().getCanvas().returnToTitle();
+        } else {
+            getFreeColClient().getCanvas().removeInGameComponents();
+        }
 
         return null;
     }

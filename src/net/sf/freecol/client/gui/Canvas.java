@@ -796,13 +796,20 @@ public final class Canvas extends JLayeredPane {
         //       point the GUI should have been informed.
 
         closeMenus();
+        removeInGameComponents();
+        showMainPanel();
+    }
 
+
+    /**
+    * Removes components that is only used when in game.
+    */
+    public void removeInGameComponents() {
         if (mapControls != null) {
             mapControls.removeFromComponent(this);
         }
-        remove(jMenuBar);
 
-        showMainPanel();
+        remove(jMenuBar);
     }
 
 
@@ -851,8 +858,7 @@ public final class Canvas extends JLayeredPane {
                 }
                 try {
                     sleep(500);
-                }
-                catch (InterruptedException e) {
+                } catch (InterruptedException e) {
                 }
             }
         }
