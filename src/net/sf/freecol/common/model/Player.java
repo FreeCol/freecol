@@ -1276,8 +1276,8 @@ public class Player extends FreeColGameObject {
         int random;
 
         if (hasFather(FoundingFather.WILLIAM_BREWSTER)) {
-            // Make sure random is a number from 0 to 17:
-            random = (int)(Math.random() * 18);
+            // Make sure random is a number from 0 to 18:
+            random = (int)(Math.random() * 19);
         }
         else {
             // Chance will be a number from 0 to 99 (never 100!):
@@ -1289,12 +1289,12 @@ public class Player extends FreeColGameObject {
             else if (chance < 42) {
                 return Unit.INDENTURED_SERVANT;
             }
-            else if (chance < 64) {
+            else if (chance < 62) {
                 return Unit.FREE_COLONIST;
             }
             else {
                 // Make sure random is a number from 0 to 17:
-                random = (int) ((chance - 64) / 2);
+                random = (int) ((chance - 62) / 2);
             }
         }
 
@@ -1336,6 +1336,8 @@ public class Player extends FreeColGameObject {
                 return Unit.ELDER_STATESMAN;
             case 17:
                 return Unit.VETERAN_SOLDIER;
+            case 18:
+                return Unit.SEASONED_SCOUT;
         }
     }
 
