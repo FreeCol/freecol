@@ -7,6 +7,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.FlowLayout;
+import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -575,6 +576,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
                 updateProductionInBuildingPanel();
                 add(productionInBuildingPanel);
+
+                setPreferredSize(new Dimension(getWidth(), (parent.getGUI().getImageLibrary().getUnitImageHeight(0) / 3) * 2 + 5));
             }
 
 
