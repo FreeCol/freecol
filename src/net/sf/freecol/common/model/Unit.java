@@ -1981,18 +1981,42 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                 int state = getState();
 
                 switch (state) {
-                    case TO_EUROPE:     addModelMessage(getOwner().getEurope(), "model.unit.arriveInEurope", null); break;
-                    case TO_AMERICA:    getGame().getModelController().setToVacantEntryLocation(this); break;
-                    case BUILD_ROAD:    getTile().setRoad(true); numberOfTools -= 20; break;
+                    case TO_EUROPE:
+                        addModelMessage(getOwner().getEurope(), "model.unit.arriveInEurope", null);
+                        break;
+                    case TO_AMERICA:
+                        getGame().getModelController().setToVacantEntryLocation(this);
+                        break;
+                    case BUILD_ROAD:
+                        getTile().setRoad(true);
+                        numberOfTools -= 20;
+                        break;
                     case PLOW:
                         if (getTile().isForested()) {
                             getTile().setForested(false);
+                            // Give Lumber to adjacent colony
+                            if (getTile().getColony() != null &&
+                                getTile().getColony().getOwner().equals(getOwner())) {
+                                getTile().getColony().addGoods(Goods.LUMBER, 100);
+                            }
+                            else {
+                                Vector surroundingTiles = getTile().getMap().getSurroundingTiles(getTile(), 1);
+                                for (int i=0; i<surroundingTiles.size(); i++) {
+                                    Tile t = (Tile) surroundingTiles.get(i);
+                                    if (t.getColony() != null &&
+                                        t.getColony().getOwner().equals(getOwner())) {
+                                        t.getColony().addGoods(Goods.LUMBER, 100);
+                                        break;
+                                    }
+                                }
+                            }
                         } else {
                             getTile().setPlowed(true);
                         }
                         numberOfTools -= 20;
                         break;
-                    default:            logger.warning("Unkown work completed. State: " + state);
+                    default:
+                        logger.warning("Unknown work completed. State: " + state);
                 }
 
                 setState(ACTIVE);
