@@ -1657,6 +1657,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             getFreeColServer().getInGameController().endTurn(player);
         }
 
+        getFreeColServer().updateMetaServer();
+
         return null;
     }
 

@@ -39,6 +39,7 @@ import net.sf.freecol.client.gui.panel.ChooseFoundingFatherDialog;
 import net.sf.freecol.client.gui.panel.EventPanel;
 import net.sf.freecol.client.gui.panel.EmigrationPanel;
 import net.sf.freecol.client.gui.panel.IndianSettlementPanel;
+import net.sf.freecol.client.gui.panel.ServerListPanel;
 
 import net.sf.freecol.client.gui.panel.MapControls;
 
@@ -124,6 +125,7 @@ public final class Canvas extends JLayeredPane {
     private final EventPanel        eventPanel;
     private final EmigrationPanel   emigrationPanel;
     private final ColopediaPanel    colopediaPanel;
+    private final ServerListPanel   serverListPanel;
     private TakeFocusThread         takeFocusThread;
     private MapControls             mapControls;
     private JMenuBar                jMenuBar;
@@ -152,6 +154,7 @@ public final class Canvas extends JLayeredPane {
         newPanel = new NewPanel(this, freeColClient.getConnectController());
         errorPanel = new ErrorPanel(this);
         startGamePanel = new StartGamePanel(this, freeColClient);
+        serverListPanel = new ServerListPanel(this, freeColClient, freeColClient.getConnectController());
         quitDialog = new QuitDialog(this);
         colonyPanel = new ColonyPanel(this, freeColClient);
         indianSettlementPanel = new IndianSettlementPanel();
@@ -242,6 +245,25 @@ public final class Canvas extends JLayeredPane {
         } else {
             logger.warning("Tried to open 'StartGamePanel' without having 'game' and/or 'player' set.");
         }
+    }
+    
+    
+    /**
+    * Displays the <code>ServerListPanel</code>.
+    *
+    * @param username The username that should be used when connecting 
+    *        to one of the servers on the list.
+    * @param serverList The list containing the servers retrived from the
+    *        metaserver.
+    * @see ServerListPanel
+    */
+    public void showServerListPanel(String username, ArrayList serverList) {
+        closeMenus();
+
+        serverListPanel.initialize(username, serverList);
+        serverListPanel.setLocation(getWidth() / 2 - serverListPanel.getWidth() / 2, getHeight() / 2 - serverListPanel.getHeight() / 2);
+        add(serverListPanel);
+        serverListPanel.requestFocus();
     }
 
 
@@ -1122,6 +1144,7 @@ public final class Canvas extends JLayeredPane {
     public void closeMenus() {
         remove(newPanel);
         remove(startGamePanel);
+        remove(serverListPanel);
         remove(colonyPanel);
         remove(europePanel);
         remove(statusPanel);

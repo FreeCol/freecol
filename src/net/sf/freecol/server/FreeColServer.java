@@ -2,9 +2,14 @@
 package net.sf.freecol.server;
 
 import java.io.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.Iterator;
+import javax.swing.Timer;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+
+import net.sf.freecol.FreeCol;
 
 // XML:
 import org.w3c.dom.*;
@@ -61,6 +66,8 @@ public final class FreeColServer {
 
     private static Logger logger = Logger.getLogger(FreeColServer.class.getName());
 
+    private static final int META_SERVER_UPDATE_INTERVAL = 60000;
+
     /** Constant for storing the state of the game. */
     public static final int STARTING_GAME = 0,
                             IN_GAME = 1,
@@ -87,6 +94,8 @@ public final class FreeColServer {
     // The username of the player owning this server.
     private String owner;
 
+    private boolean publicServer = false;
+    private final int port;
 
 
 
@@ -104,8 +113,10 @@ public final class FreeColServer {
     *                     will be logged by this class).
     *
     */
-    public FreeColServer(boolean singleplayer, int port) throws IOException {
+    public FreeColServer(boolean publicServer, boolean singleplayer, int port) throws IOException {
+        this.publicServer = publicServer;
         this.singleplayer = singleplayer;
+        this.port = port;
 
         modelController = new ServerModelController(this);
 
@@ -124,6 +135,9 @@ public final class FreeColServer {
             logger.warning("Exception while starting server: " + e);
             throw e;
         }
+        
+        updateMetaServer(true);
+        startMetaServerUpdateThread();
     }
 
 
@@ -141,6 +155,8 @@ public final class FreeColServer {
     *
     */
     public FreeColServer(File file, int port) throws IOException {
+        this.port = port;
+
         modelController = new ServerModelController(this);
 
         userConnectionHandler = new UserConnectionHandler(this);
@@ -158,9 +174,167 @@ public final class FreeColServer {
         }
 
         owner = loadGame(file);
+        updateMetaServer(true);
+        startMetaServerUpdateThread();
+    }
+
+    
+    
+    /**
+    * Starts the metaserver update thread if <code>publicServer == true</code>.
+    *
+    * This update is really a "Hi! I am still here!"-message, since an additional
+    * update should be sent when a new player is added to/removed from this server etc.
+    */
+    public void startMetaServerUpdateThread() {
+        if (!publicServer) {
+            return;
+        }
+
+        ActionListener updater = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                updateMetaServer();
+            }
+        };
+        new Timer(META_SERVER_UPDATE_INTERVAL, updater).start();
     }
 
 
+
+    /**
+    * Sends information about this server to the meta-server.
+    * The information is only sent if <code>public == true</code>.
+    */
+    public void updateMetaServer() {
+        updateMetaServer(false);
+    }
+
+
+    /**
+    * Sends information about this server to the meta-server.
+    * The information is only sent if <code>public == true</code>.
+    *
+    * @param firstTime Should be set to <i>true></i> when calling
+    *                  this method for the first time.
+    */
+    public void updateMetaServer(boolean firstTime) {
+        if (!publicServer) {
+            return;
+        }
+
+        Connection mc;
+        try {
+            mc = new Connection(FreeCol.META_SERVER_ADDRESS, FreeCol.META_SERVER_PORT, null);
+        } catch (IOException e) {
+            logger.warning("Could not connect to meta-server.");
+            return;
+        }
+
+        try {
+            Element element;
+            if (firstTime) {
+                element = Message.createNewRootElement("register");
+            } else {
+                element = Message.createNewRootElement("update");
+            }
+
+            // TODO: Add possibillity of choosing a name:
+            element.setAttribute("name", mc.getSocket().getLocalAddress().getHostAddress() + ":" + Integer.toString(port));
+            element.setAttribute("port", Integer.toString(port));
+            element.setAttribute("slotsAvailable", Integer.toString(getSlotsAvailable()));
+            element.setAttribute("currentlyPlaying", Integer.toString(getNumberOfLivingHumanPlayers()));
+            element.setAttribute("isGameStarted", Boolean.toString(gameState != STARTING_GAME));
+
+            mc.send(element);
+        } catch (IOException e) {
+            logger.warning("Network error while communicating with the meta-server.");
+            return;
+        } finally {
+            try {
+                mc.reallyClose();
+            } catch (IOException e) {
+                logger.warning("Could not close connection to meta-server.");
+                return;
+            }
+        }
+    }
+
+
+    /**
+    * Removes this server from the metaserver's list.
+    * The information is only sent if <code>public == true</code>.
+    *
+    * @param firstTime Should be set to <i>true></i> when calling
+    *                  this method for the first time.
+    */
+    public void removeFromMetaServer() {
+        if (!publicServer) {
+            return;
+        }
+        
+        Connection mc;
+        try {
+            mc = new Connection(FreeCol.META_SERVER_ADDRESS, FreeCol.META_SERVER_PORT, null);
+        } catch (IOException e) {
+            logger.warning("Could not connect to meta-server.");
+            return;
+        }
+
+        try {
+            Element element = Message.createNewRootElement("remove");
+            element.setAttribute("port", Integer.toString(port));
+
+            mc.send(element);
+        } catch (IOException e) {
+            logger.warning("Network error while communicating with the meta-server.");
+            return;
+        } finally {
+            try {
+                mc.reallyClose();
+            } catch (IOException e) {
+                logger.warning("Could not close connection to meta-server.");
+                return;
+            }
+        }
+    }
+
+    
+    /**
+    * Gets the number of player that may connect.
+    */
+    public int getSlotsAvailable() {
+        Vector players = game.getPlayers();
+
+        int n = game.getMaximumPlayers();
+        for (int i=0; i<players.size(); i++) {
+            if (!((ServerPlayer) players.get(i)).isEuropean() || ((ServerPlayer) players.get(i)).isREF()) {
+                continue;
+            }
+            if (((ServerPlayer) players.get(i)).isDead() || ((ServerPlayer) players.get(i)).isConnected()) {
+                n--;
+            }
+        }
+
+        return n;
+    }
+
+
+    /**
+    * Gets the number of human players in this game that is still playing.
+    */
+    public int getNumberOfLivingHumanPlayers() {
+        Vector players = game.getPlayers();
+
+        int n = 0;
+        for (int i=0; i<players.size(); i++) {
+            if (!((ServerPlayer) players.get(i)).isAI() && !((ServerPlayer) players.get(i)).isDead() && ((ServerPlayer) players.get(i)).isConnected()) {
+                n++;
+            }
+        }
+
+        return n;
+    }
+    
 
     /**
     * The owner of the game is the player that have loaded the
@@ -184,6 +358,7 @@ public final class FreeColServer {
         Document document = savedGameElement.getOwnerDocument();
 
         savedGameElement.setAttribute("owner", username);
+        savedGameElement.setAttribute("publicServer", Boolean.toString(publicServer));
         savedGameElement.setAttribute("singleplayer", Boolean.toString(singleplayer));
         savedGameElement.setAttribute("version", Message.getFreeColProtocolVersion());
 
@@ -239,6 +414,10 @@ public final class FreeColServer {
         Element serverObjectsElement = (Element) savedGameElement.getElementsByTagName("serverObjects").item(0);
 
         singleplayer = Boolean.valueOf(savedGameElement.getAttribute("singleplayer")).booleanValue();
+
+        if (savedGameElement.hasAttribute("publicServer")) {
+            publicServer = Boolean.valueOf(savedGameElement.getAttribute("publicServer")).booleanValue();
+        }
 
         // Read the ServerAdditionObjects:
         ArrayList serverObjects = new ArrayList();

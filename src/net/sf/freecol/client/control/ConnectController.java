@@ -5,6 +5,7 @@ package net.sf.freecol.client.control;
 import java.io.*;
 import java.net.ConnectException;
 import java.util.logging.Logger;
+import java.util.ArrayList;
 import javax.swing.SwingUtilities;
 
 import net.sf.freecol.FreeCol;
@@ -15,8 +16,10 @@ import net.sf.freecol.client.gui.i18n.Messages;
 
 import net.sf.freecol.common.model.*;
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.ServerInfo;
 
-import org.w3c.dom.Element;
+import org.w3c.dom.*;
 
 
 import net.sf.freecol.server.FreeColServer;
@@ -51,10 +54,11 @@ public final class ConnectController {
     /**
     * Starts a multiplayer server and connects to it.
     *
+    * @param publicServer Should this server be listed at the meta server.
     * @param username The name to use when logging in.
     * @param port The port in which the server should listen for new clients.
     */
-    public void startMultiplayerGame(String username, int port) {
+    public void startMultiplayerGame(boolean publicServer, String username, int port) {
         if (freeColClient.isLoggedIn()) {
             logout(true);
         }
@@ -68,7 +72,7 @@ public final class ConnectController {
         }
 
         try {
-            FreeColServer freeColServer = new FreeColServer(false, port);
+            FreeColServer freeColServer = new FreeColServer(publicServer, false, port);
             freeColClient.setFreeColServer(freeColServer);
         } catch (IOException e) {
             freeColClient.getCanvas().errorMessage("server.couldNotStart");
@@ -101,7 +105,7 @@ public final class ConnectController {
         }
 
         try {
-            FreeColServer freeColServer = new FreeColServer(true, port);
+            FreeColServer freeColServer = new FreeColServer(false, true, port);
             freeColClient.setFreeColServer(freeColServer);
         } catch (IOException e) {
             freeColClient.getCanvas().errorMessage("server.couldNotStart");
@@ -364,5 +368,47 @@ public final class ConnectController {
     */
     public void quitGame(boolean bStopServer) {
         quitGame(bStopServer, true);
+    }
+    
+
+    public ArrayList getServerList() {
+        Canvas canvas = freeColClient.getCanvas();
+
+        Connection mc;
+        try {
+            mc = new Connection(FreeCol.META_SERVER_ADDRESS, FreeCol.META_SERVER_PORT, null);
+        } catch (IOException e) {
+            logger.warning("Could not connect to meta-server.");
+            canvas.errorMessage("metaServer.couldNotConnect");
+            return null;
+        }
+
+        try {
+            Element gslElement = Message.createNewRootElement("getServerList");
+            Element reply = mc.ask(gslElement);
+            if (reply == null) {
+                logger.warning("The meta-server did not return a list.");
+                canvas.errorMessage("metaServer.communicationError");
+                return null;
+            } else {
+                ArrayList items = new ArrayList();
+                NodeList nl = reply.getChildNodes();
+                for (int i=0; i<nl.getLength(); i++) {
+                    items.add(new ServerInfo((Element) nl.item(i)));
+                }
+                return items;
+            }
+        } catch (IOException e) {
+            logger.warning("Network error while communicating with the meta-server.");
+            canvas.errorMessage("metaServer.communicationError");
+            return null;
+        } finally {
+            try {
+                mc.reallyClose();
+            } catch (IOException e) {
+                logger.warning("Could not close connection to meta-server.");
+                return null;
+            }
+        }
     }
 }

@@ -216,6 +216,8 @@ public final class Server extends Thread {
             }
         }
         
+        freeColServer.removeFromMetaServer();
+        
         logger.info("Server shutdown.");
     }
 

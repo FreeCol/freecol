@@ -234,6 +234,14 @@ public class Player extends FreeColGameObject {
         readFromXMLElement(element);
     }
 
+    
+    /**
+    * Checks if this player is a "royal expeditionary force.
+    */
+    public boolean isREF() {
+        return nation == REF_DUTCH || nation == REF_ENGLISH || nation == REF_FRENCH || nation == REF_SPANISH;
+    }
+
 
     /**
     * Gets the name this player has choosen for the new land.

@@ -77,6 +77,14 @@
     <jar jarfile="${freecol.jar.file}"
          basedir="${freecol.build.dir}"
          manifest="${basedir}/src/MANIFEST.MF"
+         excludes="**/CVS/**, **/metaserver/**"
+    />
+  </target>
+  
+  <target name="fullpackage" depends="init,build">
+    <jar jarfile="${freecol.jar.file}"
+         basedir="${freecol.build.dir}"
+         manifest="${basedir}/src/MANIFEST.MF"
          excludes="**/CVS/**"
     />
   </target>

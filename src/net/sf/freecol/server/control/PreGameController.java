@@ -117,6 +117,7 @@ public final class PreGameController extends Controller {
 
             // Start the game:
             freeColServer.setGameState(FreeColServer.IN_GAME);
+            getFreeColServer().updateMetaServer();
 
             Element startGameElement = Message.createNewRootElement("startGame");
             freeColServer.getServer().sendToAll(startGameElement);

@@ -41,6 +41,9 @@ public final class FreeCol {
 
     private  static final String FREECOL_VERSION = "0.3.1";
 
+    public static final String  META_SERVER_ADDRESS = "meta.freecol.org";
+    public static final int     META_SERVER_PORT = 3540;    
+
     private static final String MIN_JDK_VERSION = "1.4";
     private static final String  FILE_SEP = System.getProperty("file.separator");
 
@@ -112,8 +115,9 @@ public final class FreeCol {
         }
 
         if (standAloneServer) {
+            logger.info("Starting stand-alone server.");
             try {
-                final FreeColServer freeColServer = new FreeColServer(false, serverPort);
+                final FreeColServer freeColServer = new FreeColServer(true, false, serverPort);
 
                 Runtime runtime = Runtime.getRuntime();
                 runtime.addShutdownHook(new Thread() {

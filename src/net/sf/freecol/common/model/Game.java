@@ -32,7 +32,7 @@ public class Game extends FreeColGameObject {
     /** The name of the player whose turn it is.*/
     private Player currentPlayer = null;
 
-    /** The maximum number of players allowed in this game */
+    /** The maximum number of (human) players allowed in this game */
     private int maxPlayers = 4;
 
     /** Contains references to all objects created in this game. */

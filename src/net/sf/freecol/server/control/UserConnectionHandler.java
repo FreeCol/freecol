@@ -109,6 +109,8 @@ public final class UserConnectionHandler implements MessageHandler {
 
             connection.setMessageHandler(freeColServer.getInGameInputHandler());
 
+            freeColServer.updateMetaServer();
+
             // Make the reply:
             Element reply = Message.createNewRootElement("loginConfirmed");
             reply.setAttribute("admin", Boolean.toString(player.isAdmin()));
@@ -153,6 +155,8 @@ public final class UserConnectionHandler implements MessageHandler {
         freeColServer.getServer().sendToAll(addNewPlayer, connection);
 
         connection.setMessageHandler(freeColServer.getPreGameInputHandler());
+
+        freeColServer.updateMetaServer();
 
         // Make the reply:
         Element reply = Message.createNewRootElement("loginConfirmed");

@@ -267,6 +267,8 @@ public final class PreGameInputHandler extends InputHandler {
 
         getFreeColServer().getServer().sendToAll(logoutMessage, connection);
 
+        getFreeColServer().updateMetaServer();
+
         return null;
     }
 }

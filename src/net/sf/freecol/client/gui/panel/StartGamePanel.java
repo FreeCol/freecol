@@ -291,7 +291,8 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
                 case CANCEL:
                     freeColClient.getConnectController().quitGame(true);
                     parent.remove(this);
-                    parent.showMainPanel();
+                    //parent.showMainPanel();
+                    parent.showNewGamePanel();
                     break;
                 case MAPSIZE:
                     // TODO
