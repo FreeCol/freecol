@@ -202,6 +202,7 @@ public final class PreGameInputHandler implements MessageHandler {
         String color = element.getAttribute("value");
 
         player.setColor(color);
+
         freeColClient.getCanvas().getStartGamePanel().refreshPlayersTable();
 
         return null;

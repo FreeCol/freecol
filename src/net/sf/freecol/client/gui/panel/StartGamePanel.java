@@ -6,10 +6,10 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.EventObject;
 import java.util.Vector;
 import java.util.logging.Logger;
 
-import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JCheckBox;
@@ -21,12 +21,9 @@ import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.TitledBorder;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
-import javax.swing.table.*;
-import javax.swing.UIManager;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.networking.Client;
@@ -54,9 +51,6 @@ public final class StartGamePanel extends JPanel implements ActionListener {
                                 CHAT = 4;
 
     private final String[]  mapSizes = {"Small", "Medium", "Large", "Huge"};
-    private static final String[]  nations = {"Dutch", "French", "English", "Spanish"};
-    private static final String[]  tribes = {"Apache", "Arawak", "Aztec", "Cherokee",
-                                        "Inca", "Iroquois", "Sioux", "Tupi"};
     private final String[]  colors = {"Black", "Blue", "Cyan", "Gray", "Green", "Magenta",
                                         "Orange", "Pink", "Red", "White", "Yellow"};
 
@@ -73,69 +67,12 @@ public final class StartGamePanel extends JPanel implements ActionListener {
 
     private final JTextField        chat;
     private final JTextArea         chatArea;
-    private final JPanel            optionsPanel;
+    private final JPanel            optionsPanel,
+                                    chatPanel;
     private final JTable            table;
     private final PlayersTableModel tableModel;
 
     private JButton start;
-
-
-    private final class NationEditor extends DefaultCellEditor {
-        public NationEditor() {
-            super(new JComboBox(nations));
-        }
-    }
-
-
-    private final class ColorEditor extends DefaultCellEditor {
-        public ColorEditor() {
-            super(new JComboBox(colors));
-        }
-    }
-
-
-    private static final JComboBox standardNationsComboBox = new JComboBox(nations);
-    private static final JComboBox indianTribesComboBox = new JComboBox(tribes);
-
-    private final class ComboBoxRenderer implements TableCellRenderer {
-        public ComboBoxRenderer() {
-        }
-
-        public Component getTableCellRendererComponent(JTable table, Object value,
-                boolean isSelected, boolean hasFocus, int row, int column) {
-
-            if (column == 2) {
-                JComboBox myBox = new JComboBox(colors);
-                myBox.setSelectedItem(value);
-                return myBox;
-            }
-
-            Player player = (Player)freeColClient.getGame().getPlayers().get(row);
-            if (player.isAI()) {
-                int nation = player.getNation();
-                if ((column == 1) && (nation != Player.DUTCH) && (nation != Player.ENGLISH)
-                        && (nation != Player.FRENCH) && (nation != Player.SPANISH)) {
-                    // This is an indian AI player.
-
-                    indianTribesComboBox.setForeground(Color.LIGHT_GRAY);
-                    return indianTribesComboBox;
-                }
-                else {
-                    standardNationsComboBox.setForeground(Color.LIGHT_GRAY);
-                }
-            }
-            else if (player.isReady()) {
-                standardNationsComboBox.setForeground(Color.GRAY);
-            }
-            else {
-                standardNationsComboBox.setForeground(table.getForeground());
-            }
-            standardNationsComboBox.setBackground(table.getBackground());
-
-            standardNationsComboBox.setSelectedItem(value);
-            return standardNationsComboBox;
-        }
-    }
 
 
     /**
@@ -147,7 +84,6 @@ public final class StartGamePanel extends JPanel implements ActionListener {
         this.freeColClient = freeColClient;
 
         JButton     cancel = new JButton("Cancel");
-        JPanel      chatPanel = new JPanel();
         JLabel      mapSizeLabel = new JLabel("Map Size");
         JScrollPane chatScroll,
                     tableScroll;
@@ -158,6 +94,7 @@ public final class StartGamePanel extends JPanel implements ActionListener {
         readyBox = new JCheckBox("I'm Ready");
         mapSize = new JComboBox(mapSizes);
 
+        chatPanel = new JPanel();
         chat = new JTextField();
         chatArea = new JTextArea();
         chatScroll = new JScrollPane(chatArea);
@@ -168,12 +105,13 @@ public final class StartGamePanel extends JPanel implements ActionListener {
                     nationsColumn = table.getColumnModel().getColumn(1),
                     colorsColumn = table.getColumnModel().getColumn(2);
         DefaultTableCellRenderer dtcr = new DefaultTableCellRenderer();
+
         dtcr.setOpaque(false);
         nameColumn.setCellRenderer(dtcr);
-        nationsColumn.setCellEditor(new NationEditor());
-        nationsColumn.setCellRenderer(new ComboBoxRenderer());
-        colorsColumn.setCellEditor(new ColorEditor());
-        colorsColumn.setCellRenderer(new ComboBoxRenderer());
+        nationsColumn.setCellEditor(new NationCellEditor());
+        nationsColumn.setCellRenderer(new NationCellRenderer());
+        colorsColumn.setCellEditor(new ColorCellEditor(parent, this));
+        colorsColumn.setCellRenderer(new ColorCellRenderer(true));
 
         table.setRowHeight(22);
         table.setCellSelectionEnabled(false);
@@ -270,6 +208,12 @@ public final class StartGamePanel extends JPanel implements ActionListener {
 
         tableModel.setData(game.getPlayers(), thisPlayer);
 
+        ((NationCellRenderer)table.getColumnModel().getColumn(1).getCellRenderer())
+                .setPlayers(game.getPlayers());
+
+        ((ColorCellEditor)table.getColumnModel().getColumn(2).getCellEditor())
+                .setPlayers(game.getPlayers());
+
         if (singlePlayerGame) {
             // If we set the ready flag to false then the player will be able to change the
             // settings as he likes.
@@ -300,15 +244,21 @@ public final class StartGamePanel extends JPanel implements ActionListener {
             components[i].setEnabled(enabled);
         }
 
-        optionsPanel.setEnabled(enabled);
         components = optionsPanel.getComponents();
         for (int i = 0; i < components.length; i++) {
             components[i].setEnabled(enabled);
         }
 
-        if (singlePlayerGame) {
+        components = chatPanel.getComponents();
+        for (int i = 0; i < components.length; i++) {
+            components[i].setEnabled(enabled);
+        }
+
+        if (singlePlayerGame && enabled) {
             readyBox.setEnabled(false);
         }
+
+        table.setEnabled(enabled);
     }
 
 
@@ -469,7 +419,7 @@ class PlayersTableModel extends AbstractTableModel {
                 case 1:
                     return player.getNationAsString();
                 default:
-                    return player.getColorAsString();
+                    return player.getColor();
             }
         }
         return null;
@@ -508,7 +458,7 @@ class PlayersTableModel extends AbstractTableModel {
                 preGameController.setNation(((String)value).toLowerCase());
             }
             else if (column == 2) {
-                preGameController.setColor(((String)value).toLowerCase());
+                preGameController.setColor((Color)value);
             }
 
             fireTableCellUpdated(row, column);

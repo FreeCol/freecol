@@ -2,6 +2,7 @@
 package net.sf.freecol.client.control;
 
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -91,13 +92,13 @@ public final class PreGameController {
     * Sets this client's player's color.
     * @param color Which color this player wishes to set.
     */
-    public void setColor(String color) {
+    public void setColor(Color color) {
         // Make the change:
         freeColClient.getMyPlayer().setColor(color);
 
         // Inform the server:
         Element colorElement = Message.createNewRootElement("setColor");
-        colorElement.setAttribute("value", color);
+        colorElement.setAttribute("value", Player.convertColorToString(color));
 
         freeColClient.getClient().send(colorElement);
     }

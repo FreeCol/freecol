@@ -28,14 +28,14 @@ import net.sf.freecol.server.model.ServerPlayer;
 
 
 /**
-* Handles the network messages that arrives while 
+* Handles the network messages that arrives while
 * {@link FreeColServer#IN_GAME in game}.
 */
 public final class InGameInputHandler implements MessageHandler {
     private static Logger logger = Logger.getLogger(InGameInputHandler.class.getName());
 
     private FreeColServer freeColServer;
-                     
+
     public static Random attackCalculator;
 
     /**
@@ -127,14 +127,14 @@ public final class InGameInputHandler implements MessageHandler {
             e.printStackTrace(new PrintWriter(sw));
 
             logger.warning(sw.toString());
-            
+
             return null;
         }
 
         return reply;
     }
-    
-    
+
+
     /**
     * Handles a "chat"-message from a client.
     *
@@ -170,7 +170,7 @@ public final class InGameInputHandler implements MessageHandler {
         if (unit == null) {
             throw new IllegalArgumentException("Could not find 'Unit' with specified ID: " + moveElement.getAttribute("unit"));
         }
-        
+
         if (unit.getTile() == null) {
             throw new IllegalArgumentException("'Unit' not on map: ID: " + moveElement.getAttribute("unit"));
         }
@@ -178,7 +178,7 @@ public final class InGameInputHandler implements MessageHandler {
         if (unit.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
         }
-        
+
         boolean disembark = !unit.getTile().isLand() && game.getMap().getNeighbourOrNull(direction, unit.getTile()).isLand();
 
         Tile oldTile = unit.getTile();
@@ -388,7 +388,7 @@ public final class InGameInputHandler implements MessageHandler {
             try {
                 if (enemyPlayer.canSee(oldTile)) {
                     Element removeElement = Message.createNewRootElement("remove");
-                    
+
                     Element removeUnit = removeElement.getOwnerDocument().createElement("removeObject");
                     removeUnit.setAttribute("ID", unit.getID());
                     removeElement.appendChild(removeUnit);
@@ -520,7 +520,7 @@ public final class InGameInputHandler implements MessageHandler {
         ServerPlayer player = freeColServer.getPlayer(connection);
 
         Goods goods = new Goods(game, (Element) unloadCargoElement.getChildNodes().item(0));
-        
+
         if (goods.getLocation() instanceof Unit && ((Unit) goods.getLocation()).getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
         }
@@ -909,7 +909,7 @@ public final class InGameInputHandler implements MessageHandler {
         if (unit == null) {
             throw new IllegalArgumentException("Could not find 'Unit' with specified ID: " + changeStateElement.getAttribute("unit"));
         }
-        
+
         if (unit.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
         }
@@ -946,7 +946,7 @@ public final class InGameInputHandler implements MessageHandler {
         }
 
         unit.putOutsideColony();
-        
+
         sendUpdatedTileToAll(unit.getTile(), player);
 
         return null;
@@ -970,14 +970,14 @@ public final class InGameInputHandler implements MessageHandler {
         }
 
         unit.clearSpeciality();
-        
+
         if (unit.getLocation() instanceof Tile) {
             sendUpdatedTileToAll(unit.getTile(), player);
         }
 
         return null;
     }
-    
+
 
     /**
     * Handles an "endTurn" notification from a client.
@@ -1004,7 +1004,7 @@ public final class InGameInputHandler implements MessageHandler {
             Element gameEndedElement = Message.createNewRootElement("gameEnded");
             gameEndedElement.setAttribute("winner", winner.getID());
             freeColServer.getServer().sendToAll(gameEndedElement, null);
-            
+
             return null;
         }
 
@@ -1045,7 +1045,7 @@ public final class InGameInputHandler implements MessageHandler {
 
         Iterator playerIterator = game.getPlayerIterator();
         Player winner = null;
-        
+
         if (freeColServer.isSingleplayer()) {
             // TODO
         } else {

@@ -1,5 +1,4 @@
 
-
 package net.sf.freecol.client.gui.panel;
 
 
@@ -246,12 +245,12 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         selectedUnit = null;
     }
 
-    
+
     public void requestFocus() {
         exitButton.requestFocus();
     }
-    
-    
+
+
 
     /**
     * Refreshes this panel.
@@ -377,8 +376,8 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         setSelectedUnit(carrier);
         updateGoldLabel();
     }
-    
-    
+
+
     /**
     * Updates the gold label.
     */
@@ -510,7 +509,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     remove(recruitPanel);
                     revalidate();
                     repaint(recruitPanel.getX(), recruitPanel.getY(), recruitPanel.getWidth(), recruitPanel.getHeight());
-                    refreshBuyRecruit();                    
+                    refreshBuyRecruit();
                     break;
                 case PURCHASE:
                     purchasePanel.initialize();
@@ -694,13 +693,13 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     refreshBuyRecruit();
                     break;
                 default:
-                    logger.warning("Invalid action");
+                    logger.warning("Invalid action command");
             }
         } catch (NumberFormatException e) {
             logger.warning("Invalid action number");
         }
     }
-    
+
 
     /**
     * Paints this component.
@@ -710,11 +709,11 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         g.setColor(getBackground());
         g.fillRect(0, 0, getWidth(), getHeight());
     }
-    
-    
-    
-    
-    
+
+
+
+
+
 
     /**
     * A panel that holds UnitsLabels that represent Units that are
@@ -723,8 +722,8 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
     public final class ToAmericaPanel extends JPanel {
         private final EuropePanel europePanel;
 
-        
-        
+
+
         /**
         * Creates this ToAmericaPanel.
         * @param europePanel The panel that holds this ToAmericaPanel.
@@ -733,8 +732,8 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             this.europePanel = europePanel;
         }
 
-        
-        
+
+
 
         /**
         * Adds a component to this ToAmericaPanel and makes sure that the unit
@@ -762,12 +761,12 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             europePanel.refresh();
             return c;
         }
-        
+
     }
 
-    
-    
-    
+
+
+
 
     /**
     * A panel that holds UnitsLabels that represent Units that are
@@ -776,7 +775,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
     public final class ToEuropePanel extends JPanel {
         private final EuropePanel europePanel;
 
-        
+
 
         /**
         * Creates this ToEuropePanel.
@@ -786,7 +785,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             this.europePanel = europePanel;
         }
 
-        
+
 
         /**
         * Adds a component to this ToEuropePanel and makes sure that the unit
@@ -816,17 +815,17 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         }
     }
 
-    
-    
-    
+
+
+
 
     /**
     * A panel that holds UnitsLabels that represent naval Units that are
     * waiting in Europe.
     */
     public final class InPortPanel extends JPanel {
-        
-        
+
+
         /**
         * Adds a component to this InPortPanel.
         * @param comp The component to add to this InPortPanel.
@@ -837,9 +836,9 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         }
     }
 
-    
-    
-    
+
+
+
 
     /**
     * A panel that holds UnitsLabels that represent Units that are
@@ -933,7 +932,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                 if (comp instanceof UnitLabel) {
                     Unit unit = ((UnitLabel)comp).getUnit();
                     inGameController.boardShip(unit, selectedUnit.getUnit());
-                    comp.getParent().remove(comp);                  
+                    comp.getParent().remove(comp);
                 } else if (comp instanceof MarketLabel) {
                     inGameController.buyGoods(((MarketLabel)comp).getType(), 100, selectedUnit.getUnit());
                     updateCargoLabel();
@@ -963,7 +962,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
 
         public boolean isActive() {
             return (getSelectedUnit() != null);
-        }        
+        }
     }
 
 
@@ -1032,8 +1031,8 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
     */
     public final MarketPanel getMarketPanel() {
         return marketPanel;
-    }    
-    
+    }
+
 
     /**
     * The panel that allows a user to recruit people in Europe.
@@ -1136,9 +1135,9 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         }
     }
 
-    
-    
-    
+
+
+
 
     /**
     * The panel that allows a user to purchase ships and artillery in Europe.
@@ -1286,7 +1285,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                 } else {
                     privateerButton.setEnabled(true);
                 }
-                
+
                 if (Unit.getPrice(Unit.FRIGATE) > gameOwner.getGold()) {
                     frigateButton.setEnabled(false);
                 } else {
@@ -1296,9 +1295,9 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         }
     }
 
-    
-    
-    
+
+
+
 
     /**
     * The panel that allows a user to train people in Europe.
@@ -1321,8 +1320,8 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                           firebrandPreacherButton,
                           elderStatesmanButton,
                           veteranSoldierButton;
-                          
-                          
+
+
 
         /**
         * The constructor to use.
@@ -1405,7 +1404,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             firebrandPreacherButton.setSize(200, 20);
             elderStatesmanButton.setSize(200, 20);
             veteranSoldierButton.setSize(200, 20);
-            
+
             question.setLocation(10, 10);
             question2.setLocation(10, 30);
             expertOreMinerLabel.setLocation(245, 65);
@@ -1443,7 +1442,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             firebrandPreacherButton.setLocation(35, 415);
             elderStatesmanButton.setLocation(35, 440);
             veteranSoldierButton.setLocation(35, 465);
-            
+
             setLayout(null);
 
             cancel.setActionCommand(String.valueOf(TRAIN_CANCEL));
@@ -1464,7 +1463,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             firebrandPreacherButton.setActionCommand(String.valueOf(TRAIN_FIREBRAND_PREACHER));
             elderStatesmanButton.setActionCommand(String.valueOf(TRAIN_ELDER_STATESMAN));
             veteranSoldierButton.setActionCommand(String.valueOf(TRAIN_VETERAN_SOLDIER));
-            
+
             cancel.addActionListener(actionListener);
             expertOreMinerButton.addActionListener(actionListener);
             expertLumberJackButton.addActionListener(actionListener);
@@ -1483,7 +1482,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             firebrandPreacherButton.addActionListener(actionListener);
             elderStatesmanButton.addActionListener(actionListener);
             veteranSoldierButton.addActionListener(actionListener);
-            
+
             add(question);
             add(question2);
             add(expertOreMinerLabel);
@@ -1521,15 +1520,15 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             add(firebrandPreacherButton);
             add(elderStatesmanButton);
             add(veteranSoldierButton);
-            
+
             try {
                 BevelBorder border = new BevelBorder(BevelBorder.RAISED);
                 setBorder(border);
             } catch(Exception e) {}
-            
+
             setSize(320, 530);
         }
-        
+
 
         /**
         * Updates this panel's labels so that the information it displays is up to date.
@@ -1565,91 +1564,91 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                 else {
                     expertSilverMinerButton.setEnabled(true);
                 }
-                
+
                 if (Unit.getPrice(Unit.MASTER_FUR_TRADER) > gameOwner.getGold()) {
                     masterFurTraderButton.setEnabled(false);
                 }
                 else {
                     masterFurTraderButton.setEnabled(true);
                 }
-                
+
                 if (Unit.getPrice(Unit.MASTER_CARPENTER) > gameOwner.getGold()) {
                     masterCarpenterButton.setEnabled(false);
                 }
                 else {
                     masterCarpenterButton.setEnabled(true);
                 }
-                
+
                 if (Unit.getPrice(Unit.EXPERT_FISHERMAN) > gameOwner.getGold()) {
                     expertFishermanButton.setEnabled(false);
                 }
                 else {
                     expertFishermanButton.setEnabled(true);
                 }
-                
+
                 if (Unit.getPrice(Unit.MASTER_BLACKSMITH) > gameOwner.getGold()) {
                     masterBlacksmithButton.setEnabled(false);
                 }
                 else {
                     masterBlacksmithButton.setEnabled(true);
                 }
-                
+
                 if (Unit.getPrice(Unit.EXPERT_FARMER) > gameOwner.getGold()) {
                     expertFarmerButton.setEnabled(false);
                 }
                 else {
                     expertFarmerButton.setEnabled(true);
                 }
-                
+
                 if (Unit.getPrice(Unit.MASTER_DISTILLER) > gameOwner.getGold()) {
                     masterDistillerButton.setEnabled(false);
                 }
                 else {
                     masterDistillerButton.setEnabled(true);
                 }
-                
+
                 if (Unit.getPrice(Unit.HARDY_PIONEER) > gameOwner.getGold()) {
                     hardyPioneerButton.setEnabled(false);
                 }
                 else {
                     hardyPioneerButton.setEnabled(true);
                 }
-                
+
                 if (Unit.getPrice(Unit.MASTER_TOBACCONIST) > gameOwner.getGold()) {
                     masterTobacconistButton.setEnabled(false);
                 }
                 else {
                     masterTobacconistButton.setEnabled(true);
                 }
-                
+
                 if (Unit.getPrice(Unit.MASTER_WEAVER) > gameOwner.getGold()) {
                     masterWeaverButton.setEnabled(false);
                 }
                 else {
                     masterWeaverButton.setEnabled(true);
                 }
-                
+
                 if (Unit.getPrice(Unit.JESUIT_MISSIONARY) > gameOwner.getGold()) {
                     jesuitMissionaryButton.setEnabled(false);
                 }
                 else {
                     jesuitMissionaryButton.setEnabled(true);
                 }
-                
+
                 if (Unit.getPrice(Unit.FIREBRAND_PREACHER) > gameOwner.getGold()) {
                     firebrandPreacherButton.setEnabled(false);
                 }
                 else {
                     firebrandPreacherButton.setEnabled(true);
                 }
-                
+
                 if (Unit.getPrice(Unit.ELDER_STATESMAN) > gameOwner.getGold()) {
                     elderStatesmanButton.setEnabled(false);
                 }
                 else {
                     elderStatesmanButton.setEnabled(true);
                 }
-                
+
                 if (Unit.getPrice(Unit.VETERAN_SOLDIER) > gameOwner.getGold()) {
                     veteranSoldierButton.setEnabled(false);
                 }
@@ -1659,7 +1658,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             }
         }
     }
-    
+
 
 
 }

@@ -68,6 +68,12 @@ public class Player extends FreeColGameObject {
                             REF_FRENCH = 14,
                             REF_SPANISH = 15;
 
+    /** An array holding all the European nations in String form. */
+    public static final String[] NATIONS = {"Dutch", "French", "English", "Spanish"};
+
+    /** An array holding all the Native American tribes in String form. */
+    public static final String[] TRIBES = {"Apache", "Arawak", "Aztec", "Cherokee",
+                                        "Inca", "Iroquois", "Sioux", "Tupi"};
 
     /** The maximum line of sight a unit can have in the game. */
     public static final int MAX_LINE_OF_SIGHT = 2;
@@ -91,7 +97,7 @@ public class Player extends FreeColGameObject {
     private int             crosses;
     private int             bells;
     private boolean         dead = false;
-    
+
     // any founding fathers in this Player's congress
     private boolean[]       fathers = new boolean[FoundingFather.FATHER_COUNT];
     private int             currentFather;
@@ -154,7 +160,7 @@ public class Player extends FreeColGameObject {
 
         crosses = 0;
         bells = 0;
-        
+
         currentFather = -1;
         rebellionState = 0;
     }
@@ -253,20 +259,20 @@ public class Player extends FreeColGameObject {
 
         return false;
     }
-    
-    
+
+
     /**
     * Returns the state of this players rebellion status.
     * <pre>0 = Have not declared independence
     * 1 = Declared independence, at war with king
-    * 2 = Independence granted</pre>  
+    * 2 = Independence granted</pre>
     * @return
     */
     public int getRebellionState() {
         return rebellionState;
     }
-    
-    
+
+
     /**
     * Sets the rebellion status.
     * @param state The state of this player's rebellion
@@ -275,28 +281,28 @@ public class Player extends FreeColGameObject {
     public void setRebellionState(int state) {
         rebellionState = state;
     }
-    
+
     /**
-    * Adds a founding father to this players continental congress 
+    * Adds a founding father to this players continental congress
     * @param type The type of Founding Father to add
     * @see FoundingFather
     */
     public void addFather(int type) {
         fathers[type] = true;
     }
-    
+
     /**
     * Determines whether this player has a certain Founding father.
     * @return Whether this player has a Founding father of <code>type</code>
-    * @see FoundingFather 
+    * @see FoundingFather
     */
     public boolean hasFather(int type) {
         return fathers[type];
     }
-    
+
     /**
     * Returns the number of founding fathers in this players congress. Used to calculate number
-    * of bells needed to recruit new fathers. 
+    * of bells needed to recruit new fathers.
     * @return The number of founding fathers in this players congress
     */
     public int getFatherCount() {
@@ -306,10 +312,10 @@ public class Player extends FreeColGameObject {
                 count++;
         return count;
     }
-    
+
     /**
     * Sets this players liberty bell production to work towards recruiting <code>father</code>
-    * to its congress 
+    * to its congress
     * @param father The type of FoundingFather to recruit
     * @see FoundingFather
     */
@@ -477,22 +483,12 @@ public class Player extends FreeColGameObject {
 
 
     /**
-    * Returns the color of this player as a String.
-    * @return The color of this player as a String.
+    * Returns the String representation of the given Color.
+    * The result is something that looks like this example: "R:23;G:230;B:89".
+    * @return The String representation of the given Color.
     */
-    public String getColorAsString() {
-        final String[] colorNames = {"Black", "Blue", "Cyan", "Gray", "Green", "Magenta",
-                "Orange", "Pink", "Red", "White", "Yellow"};
-        final Color[] colors = {Color.BLACK, Color.BLUE, Color.CYAN, Color.GRAY,
-                Color.GREEN, Color.MAGENTA, Color.ORANGE, Color.PINK, Color.RED,
-                Color.WHITE, Color.YELLOW};
-
-        for (int i = 0; i < colors.length; i++) {
-            if (color.equals(colors[i])) {
-                return colorNames[i];
-            }
-        }
-        return "UNSUPPORTED: see Player::getColorAsString";
+    public static String convertColorToString(Color c) {
+        return "R:" + c.getRed() + ";G:" + c.getGreen() + ";B:" + c.getBlue();
     }
 
 
@@ -538,29 +534,19 @@ public class Player extends FreeColGameObject {
     * @param c The new color for this player.
     */
     public void setColor(String c) {
-        if (c.toLowerCase().equals("black")) {
-            setColor(Color.BLACK);
-        } else if (c.toLowerCase().equals("blue")) {
-            setColor(Color.BLUE);
-        } else if (c.toLowerCase().equals("cyan")) {
-            setColor(Color.CYAN);
-        } else if (c.toLowerCase().equals("gray")) {
-            setColor(Color.GRAY);
-        } else if (c.toLowerCase().equals("green")) {
-            setColor(Color.GREEN);
-        } else if (c.toLowerCase().equals("magenta")) {
-            setColor(Color.MAGENTA);
-        } else if (c.toLowerCase().equals("orange")) {
-            setColor(Color.ORANGE);
-        } else if (c.toLowerCase().equals("pink")) {
-            setColor(Color.PINK);
-        } else if (c.toLowerCase().equals("red")) {
-            setColor(Color.RED);
-        } else if (c.toLowerCase().equals("white")) {
-            setColor(Color.WHITE);
-        } else if (c.toLowerCase().equals("yellow")) {
-            setColor(Color.YELLOW);
-        }
+        final String red,
+                     green,
+                     blue;
+        red = c.substring(c.indexOf(':') + 1, c.indexOf(';'));
+        c = c.substring(c.indexOf(';') + 1);
+        green = c.substring(c.indexOf(':') + 1, c.indexOf(';'));
+        c = c.substring(c.indexOf(';') + 1);
+        blue = c.substring(c.indexOf(':') + 1);
+
+        Color myColor = new Color(Integer.valueOf(red).intValue(),
+                                  Integer.valueOf(green).intValue(),
+                                  Integer.valueOf(blue).intValue());
+        setColor(myColor);
     }
 
 
@@ -706,7 +692,7 @@ public class Player extends FreeColGameObject {
     public void incrementBells(int num) {
         bells += num;
     }
-    
+
     /**
     * Handles the <code>Player</code>-based changes such as adding units, adding bells, etc
     * Also requests for next founding father to try to recruit via a GUI message
@@ -736,7 +722,7 @@ public class Player extends FreeColGameObject {
     */
     public void newTurn() {
         if(currentFather == -1)
-            promptNewFather();     
+            promptNewFather();
         //TODO: founding fathers - need real formula to calculate req. number of bells for next father
         if( bells >= (getFatherCount() * 100) + 200 ) {
             // add father

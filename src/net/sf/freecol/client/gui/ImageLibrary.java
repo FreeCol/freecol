@@ -340,7 +340,7 @@ public final class ImageLibrary extends ImageProvider {
             if (i < 10) {
                 numberString = "0" + numberString;
             }
-            
+
             char lastChar;
             if (i == BEACH) {
                 lastChar = 'h';
@@ -555,7 +555,7 @@ public final class ImageLibrary extends ImageProvider {
             indians.add(tempImage);
         }
     }
-    
+
      /**
      * Loads the goods-images from file into memory.
      * @param gc The GraphicsConfiguration is needed to create images that are compatible with the
@@ -607,8 +607,9 @@ public final class ImageLibrary extends ImageProvider {
      * local environment.
      */
     private void loadColorChips(GraphicsConfiguration gc) {
-        colorChips = new Hashtable(19);
+        colorChips = new Hashtable(8);
 
+        /*
         loadColorChip(gc, Color.BLACK);
         loadColorChip(gc, Color.BLUE);
         loadColorChip(gc, Color.CYAN);
@@ -620,6 +621,7 @@ public final class ImageLibrary extends ImageProvider {
         loadColorChip(gc, Color.RED);
         loadColorChip(gc, Color.WHITE);
         loadColorChip(gc, Color.YELLOW);
+        */
 
         //FIXME: these same colours are found in the server PreGameController!
         // They need to be unified into one location!
@@ -749,7 +751,7 @@ public final class ImageLibrary extends ImageProvider {
     public Image getIndianSettlementImage(int index) {
         return ((ImageIcon) indians.get(index)).getImage();
     }
-    
+
     /**
      * Returns the goods-image at the given index.
      * @param index The index of the goods-image to return.
@@ -758,7 +760,7 @@ public final class ImageLibrary extends ImageProvider {
     public Image getGoodsImage(int index) {
         return ((ImageIcon) goods.get(index)).getImage();
     }
-    
+
     /**
      * Returns the goods-image at the given index.
      * @param index The index of the goods-image to return.
@@ -783,7 +785,13 @@ public final class ImageLibrary extends ImageProvider {
      * @return The color chip with the given color.
      */
     public Image getColorChip(Color color) {
-        return (Image) colorChips.get(color);
+        Image colorChip = (Image) colorChips.get(color);
+        if (colorChip == null) {
+            GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+            loadColorChip(gc, color);
+            colorChip = (Image) colorChips.get(color);
+        }
+        return colorChip;
     }
 
     /**
@@ -803,7 +811,7 @@ public final class ImageLibrary extends ImageProvider {
     public int getTerrainImageHeight(int index) {
         return ((ImageIcon) ((Vector) terrain1.get(index)).get(LAND_CENTER)).getIconHeight();
     }
-    
+
     /**
      * Returns the width of the Colony-image at the given index.
      * @param index The index of the Colony-image.
@@ -858,7 +866,7 @@ public final class ImageLibrary extends ImageProvider {
         return ((ImageIcon) units.get(index)).getIconHeight();
     }
 
-    
+
      /**
      * Returns the graphics that will represent the given settlement.
      * @param settlement The settlement whose graphics type is needed.
@@ -868,7 +876,7 @@ public final class ImageLibrary extends ImageProvider {
 
         if (settlement instanceof Colony) {
             Colony colony = (Colony) settlement;
-           
+
             int stockadeLevel = colony.getBuilding(Building.STOCKADE).getLevel();
 
             if (stockadeLevel == Building.HOUSE) {
