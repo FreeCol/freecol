@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.ArrayList;
 
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.client.gui.i18n.Messages;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Document;
@@ -197,6 +198,22 @@ public class Player extends FreeColGameObject {
 
 
     /**
+    * Checks if this player is european. This includes the
+    * "Royal Expeditionay Force".
+    *
+    * @return <i>true</i> if this player is european and <i>false</i> otherwise.
+    */
+    public boolean isEuropean() {
+        if (nation == DUTCH || nation == ENGLISH || nation == FRENCH || nation == SPANISH ||
+                nation == REF_DUTCH || nation == REF_ENGLISH || nation == REF_FRENCH || nation == REF_SPANISH) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    /**
     * Returns the default color for the given <code>nation</code>.
     */
     public static Color getDefaultNationColor(int nation) {
@@ -353,6 +370,16 @@ public class Player extends FreeColGameObject {
     */
     public void setCurrentFather(int father) {
         currentFather = father;
+    }
+
+    /**
+    * Gets the {@link FoundingFather founding father} this player is working towards.
+    * @return The ID of the founding father or <code>-1</code> if none.
+    * @see #setCurrentFather
+    * @see FoundingFather
+    */
+    public int getCurrentFather() {
+        return currentFather;
     }
 
 
@@ -760,41 +787,29 @@ public class Player extends FreeColGameObject {
         bells += num;
     }
 
-    /**
-    * Handles the <code>Player</code>-based changes such as adding units, adding bells, etc
-    * Also requests for next founding father to try to recruit via a GUI message
-    */
-    private void promptNewFather() {
-        if (currentFather == FoundingFather.JOHN_PAUL_JONES) {
-            // inGameController.purchaseUnitFromEurope(Unit.FRIGATE);
-        } else if (currentFather == FoundingFather.BARTOLOME_DE_LAS_CASAS) {
-            for(Iterator iter = getUnitIterator(); iter.hasNext(); ) {
-                Unit u = (Unit)iter.next();
-                if(u.getType() == Unit.INDIAN_CONVERT)
-                    u.setType(Unit.FREE_COLONIST);
-            }
-        } else if (currentFather == FoundingFather.SIMON_BOLIVAR) {
-            //this.get
-        }
-
-        // TODO: prompt with GUI message to ask for the next founding father
-        currentFather++;
-    }
-
 
     /**
     * Prepares this <code>Player</code> for a new turn.
     */
     public void newTurn() {
-        if(currentFather == -1) {
-            promptNewFather();
-        }
-
-        //TODO: founding fathers - need real formula to calculate req. number of bells for next father
-        if( bells >= (getFatherCount() * 100) + 200 ) {
-            // add father
+        // TODO: founding fathers - need real formula to calculate req. number of bells for next father
+        if (isEuropean() && bells >= (getFatherCount() * 100) + 200 ) {
             fathers[currentFather] = true;
-            promptNewFather();
+            
+            if (currentFather == FoundingFather.JOHN_PAUL_JONES) {
+                getGame().getModelController().createUnit(getID() + "newTurnJohnPaulJones", getEurope(), this, Unit.FRIGATE);
+            } else if (currentFather == FoundingFather.BARTOLOME_DE_LAS_CASAS) {
+                for(Iterator iter = getUnitIterator(); iter.hasNext(); ) {
+                    Unit u = (Unit)iter.next();
+                    if (u.getType() == Unit.INDIAN_CONVERT) {
+                        u.setType(Unit.FREE_COLONIST);
+                    }
+                }
+            }
+
+            addModelMessage(this, "model.player.foundingFatherJoinedCongress", new String[][] {{"%foundingFather%", Messages.message(FoundingFather.getName(currentFather))}});
+            currentFather = -1;
+            bells = 0;
         }
 
         if (crossesRequired != -1) {
@@ -817,27 +832,30 @@ public class Player extends FreeColGameObject {
         playerElement.setAttribute("nation", Integer.toString(nation));
         playerElement.setAttribute("color", Integer.toString(color.getRGB()));
         playerElement.setAttribute("admin", Boolean.toString(admin));
-        playerElement.setAttribute("gold", Integer.toString(gold));
-        playerElement.setAttribute("crosses", Integer.toString(crosses));
-        playerElement.setAttribute("bells", Integer.toString(bells));
         playerElement.setAttribute("ready", Boolean.toString(ready));
         playerElement.setAttribute("dead", Boolean.toString(dead));
         playerElement.setAttribute("rebellionState", Integer.toString(rebellionState));
-        playerElement.setAttribute("currentFather", Integer.toString(currentFather));
-        
+        playerElement.setAttribute("ai", Boolean.toString(ai));
+
         if (equals(player)) {
+            playerElement.setAttribute("gold", Integer.toString(gold));
+            playerElement.setAttribute("crosses", Integer.toString(crosses));
+            playerElement.setAttribute("bells", Integer.toString(bells));
+            playerElement.setAttribute("currentFather", Integer.toString(currentFather));
             playerElement.setAttribute("crossesRequired", Integer.toString(crossesRequired));
+            
+            char[] fatherCharArray = new char[FoundingFather.FATHER_COUNT];
+            for(int i = 0; i < fathers.length; i++)
+                fatherCharArray[i] = (fathers[i] ? '1' : '0');
+            String fatherStr = new String(fatherCharArray);
+            playerElement.setAttribute("foundingFathers", fatherStr);
         } else {
+            playerElement.setAttribute("gold", Integer.toString(-1));
+            playerElement.setAttribute("crosses", Integer.toString(-1));
+            playerElement.setAttribute("bells", Integer.toString(-1));
+            playerElement.setAttribute("currentFather", Integer.toString(-1));
             playerElement.setAttribute("crossesRequired", Integer.toString(-1));
         }
-
-        char[] fatherCharArray = new char[FoundingFather.FATHER_COUNT];
-        for(int i = 0; i < fathers.length; i++)
-            fatherCharArray[i] = (fathers[i] ? '1' : '0');
-        String fatherStr = new String(fatherCharArray);
-        playerElement.setAttribute("foundingFathers", fatherStr);
-
-        playerElement.setAttribute("ai", Boolean.toString(ai));
 
         if (entryLocation != null) {
             playerElement.setAttribute("entryLocation", entryLocation.getID());
@@ -872,9 +890,11 @@ public class Player extends FreeColGameObject {
         currentFather = Integer.parseInt(playerElement.getAttribute("currentFather"));
         crossesRequired = Integer.parseInt(playerElement.getAttribute("crossesRequired"));
 
-        String fatherStr = playerElement.getAttribute("foundingFathers");
-        for(int i = 0; i < fatherStr.length(); i++) {
-            fathers[i] = ( (fatherStr.charAt(i) == '1') ? true : false );
+        if (playerElement.hasAttribute("foundingFathers")) {
+            String fatherStr = playerElement.getAttribute("foundingFathers");
+            for(int i = 0; i < fatherStr.length(); i++) {
+                fathers[i] = ( (fatherStr.charAt(i) == '1') ? true : false );
+            }
         }
 
         if (playerElement.hasAttribute("entryLocation")) {

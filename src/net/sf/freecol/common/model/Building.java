@@ -206,6 +206,11 @@ public final class Building extends FreeColGameObject implements WorkLocation {
             return null;
         }
 
+        if (level+1 >= FACTORY && !getColony().getOwner().hasFather(FoundingFather.ADAM_SMITH)) {
+            return null;
+        }
+
+
         if (level < MAX_LEVEL) {
             return buildingNames[type][level];
         } else {
@@ -221,6 +226,10 @@ public final class Building extends FreeColGameObject implements WorkLocation {
     */
     public int getNextHammers() {
         if (getType() == CUSTOM_HOUSE) {
+            return -1;
+        }
+
+        if (level+1 >= FACTORY && !getColony().getOwner().hasFather(FoundingFather.ADAM_SMITH)) {
             return -1;
         }
 
@@ -242,6 +251,10 @@ public final class Building extends FreeColGameObject implements WorkLocation {
             return -1;
         }
 
+        if (level+1 >= FACTORY && !getColony().getOwner().hasFather(FoundingFather.ADAM_SMITH)) {
+            return -1;
+        }
+
         if (level < MAX_LEVEL) {
             return requiredTable[type][level][1];
         } else {
@@ -258,6 +271,10 @@ public final class Building extends FreeColGameObject implements WorkLocation {
     */
     public int getNextPop() {
         if (getType() == CUSTOM_HOUSE) {
+            return -1;
+        }
+
+        if (level+1 >= FACTORY && !getColony().getOwner().hasFather(FoundingFather.ADAM_SMITH)) {
             return -1;
         }
 

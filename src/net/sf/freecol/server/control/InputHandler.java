@@ -55,48 +55,7 @@ public abstract class InputHandler implements MessageHandler {
     * @param logoutElement The element (root element in a DOM-parsed XML tree) that
     *                holds all the information.
     */
-    protected Element logout(Connection connection, Element logoutElement) {
-        ServerPlayer player = freeColServer.getPlayer(connection);
-
-        logger.info("Logout by: " + connection + ((player != null) ? " (" + player.getName() + ") " : ""));        
-
-        if (freeColServer.getGameState() == FreeColServer.IN_GAME) {
-            // TODO
-
-            // Remove the player's units/colonies from the map and send map updates to the
-            // players that can see such units or colonies.
-            // SHOULDN'T THIS WAIT UNTIL THE CURRENT PLAYER HAS FINISHED HIS TURN?
-
-            /*
-            player.setDead(true);
-
-            Element setDeadElement = Message.createNewRootElement("setDead");
-            setDeadElement.setAttribute("player", player.getID());
-            freeColServer.getServer().sendToAll(setDeadElement, connection);
-            */
-
-            /*
-             TODO: Setting the player dead directly should be a server option,
-                   but for now - allow the player to reconnect:
-            */
-            player.setConnected(false);
-
-            if (freeColServer.getGame().getCurrentPlayer() == player) {
-                freeColServer.getInGameInputHandler().endTurn(player.getConnection());
-            }
-        } else {
-            Element logoutMessage = Message.createNewRootElement("logout");
-            logoutMessage.setAttribute("reason", "User has logged out.");
-            logoutMessage.setAttribute("player", player.getID());
-
-            player.setConnected(false);
-            freeColServer.getGame().removePlayer(player);
-
-            freeColServer.getServer().sendToAll(logoutMessage, connection);
-        }
-
-        return null;
-    }
+    abstract protected Element logout(Connection connection, Element logoutElement);
 
     
     /**

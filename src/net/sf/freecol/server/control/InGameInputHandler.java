@@ -724,7 +724,7 @@ public final class InGameInputHandler extends InputHandler {
     */
     private Element buildColony(Connection connection, Element buildColonyElement) {
         Game game = getFreeColServer().getGame();
-        Player player = getFreeColServer().getPlayer(connection);
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
 
         String name = buildColonyElement.getAttribute("name");
         Unit unit = (Unit) game.getFreeColGameObject(buildColonyElement.getAttribute("unit"));
@@ -738,6 +738,21 @@ public final class InGameInputHandler extends InputHandler {
 
             Element reply = Message.createNewRootElement("buildColonyConfirmed");
             reply.appendChild(colony.toXMLElement(player, reply.getOwnerDocument()));
+
+            if (colony.getLineOfSight() > unit.getLineOfSight()) {
+                Element updateElement = reply.getOwnerDocument().createElement("update");
+                Vector surroundingTiles = game.getMap().getSurroundingTiles(unit.getTile(), colony.getLineOfSight());
+
+                for (int i=0; i<surroundingTiles.size(); i++) {
+                    Tile t = (Tile) surroundingTiles.get(i);
+                    if (t != unit.getTile()) {
+                        player.setExplored(t);
+                        updateElement.appendChild(t.toXMLElement(player, reply.getOwnerDocument()));
+                    }
+                }
+                
+                reply.appendChild(updateElement);
+            }
 
             unit.buildColony(colony);
 
@@ -1054,146 +1069,50 @@ public final class InGameInputHandler extends InputHandler {
     * @param element The element containing the request.
     */
     private Element endTurn(Connection connection, Element element) {
-        endTurn(connection);
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
+        getFreeColServer().getInGameController().endTurn(player);
+
         return null;
     }
+
     
-
     /**
-    * Handles an "endTurn" notification from a client.
+    * Handles a "logout"-message.
     *
-    * @param connection The connection the message came from.
+    * @param connection The <code>Connection</code> the message was received on.
+    * @param logoutElement The element (root element in a DOM-parsed XML tree) that
+    *                holds all the information.
     */
-    public void endTurn(Connection connection) {
-        FreeColServer freeColServer = getFreeColServer();
-        Game game = freeColServer.getGame();
+    protected Element logout(Connection connection, Element logoutElement) {
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
 
-        ServerPlayer oldPlayer = (ServerPlayer) game.getCurrentPlayer();
-        ServerPlayer nextPlayer = (ServerPlayer) game.getNextPlayer();
+        logger.info("Logout by: " + connection + ((player != null) ? " (" + player.getName() + ") " : ""));        
 
-        while (nextPlayer != null && checkForDeath(nextPlayer)) {
-            nextPlayer.setDead(true);
-            Element setDeadElement = Message.createNewRootElement("setDead");
-            setDeadElement.setAttribute("player", nextPlayer.getID());
-            freeColServer.getServer().sendToAll(setDeadElement, null);
+        // TODO
 
-            nextPlayer = (ServerPlayer) game.getNextPlayer();
-        }
-        
-        while (nextPlayer != null && !nextPlayer.isConnected()) {
-            nextPlayer = (ServerPlayer) game.getPlayerAfter(nextPlayer);
-        }
+        // Remove the player's units/colonies from the map and send map updates to the
+        // players that can see such units or colonies.
+        // SHOULDN'T THIS WAIT UNTIL THE CURRENT PLAYER HAS FINISHED HIS TURN?
 
-        if (nextPlayer == null) {
-            game.setCurrentPlayer(null);
-            return;
-        }
+        /*
+        player.setDead(true);
 
-        Player winner = checkForWinner();
-        if (winner != null) {
-            Element gameEndedElement = Message.createNewRootElement("gameEnded");
-            gameEndedElement.setAttribute("winner", winner.getID());
-            freeColServer.getServer().sendToAll(gameEndedElement, null);
+        Element setDeadElement = Message.createNewRootElement("setDead");
+        setDeadElement.setAttribute("player", player.getID());
+        freeColServer.getServer().sendToAll(setDeadElement, connection);
+        */
 
-            return;
+        /*
+        TODO: Setting the player dead directly should be a server option,
+            but for now - allow the player to reconnect:
+        */
+        player.setConnected(false);
+
+        if (getFreeColServer().getGame().getCurrentPlayer() == player) {
+            getFreeColServer().getInGameController().endTurn(player);
         }
 
-        if (game.isNextPlayerInNewTurn()) {
-            game.newTurn();
-
-            Element newTurnElement = Message.createNewRootElement("newTurn");
-            freeColServer.getServer().sendToAll(newTurnElement, null);
-        }
-
-        try {
-            Element updateElement = Message.createNewRootElement("update");
-            updateElement.appendChild(game.getMarket().toXMLElement(nextPlayer, updateElement.getOwnerDocument()));
-            nextPlayer.getConnection().send(updateElement);
-        } catch (IOException e) {
-            logger.warning("Could not send message to: " + nextPlayer.getName() + " with connection " + nextPlayer.getConnection());
-        }
-
-        game.setCurrentPlayer(nextPlayer);
-
-        Element setCurrentPlayerElement = Message.createNewRootElement("setCurrentPlayer");
-        setCurrentPlayerElement.setAttribute("player", nextPlayer.getID());
-        freeColServer.getServer().sendToAll(setCurrentPlayerElement, null);
-    }
-
-
-    /**
-    * Checks if anybody has won the game and returns that player.
-    * @return The <code>Player</code> who have won the game or <i>null</i>
-    *         if the game is not finished.
-    */
-    private Player checkForWinner() {
-        Game game = getFreeColServer().getGame();
-
-        Iterator playerIterator = game.getPlayerIterator();
-        Player winner = null;
-
-        if (getFreeColServer().isSingleplayer()) {
-            // TODO
-        } else {
-            while (playerIterator.hasNext()) {
-                Player p = (Player) playerIterator.next();
-
-                if (!p.isDead() && !p.isAI()) {
-                    if (winner != null) {
-                        return null;
-                    } else {
-                        winner = p;
-                    }
-                }
-            }
-        }
-
-        return winner;
-    }
-
-
-    /**
-    * Checks if this player has died.
-    * @return <i>true</i> if this player should die.
-    */
-    private boolean checkForDeath(Player player) {
-        // Die if: (No colonies or units on map) && ((After 20 turns) || (Cannot get a unit from Europe))
-        Game game = getFreeColServer().getGame();
-        Map map = game.getMap();
-
-        Iterator tileIterator = map.getWholeMapIterator();
-        while (tileIterator.hasNext()) {
-            Tile t = map.getTile((Map.Position) tileIterator.next());
-
-            if (t != null && ((t.getFirstUnit() != null && t.getFirstUnit().getOwner().equals(player))
-                            || t.getSettlement() != null && t.getSettlement().getOwner().equals(player))) {
-                return false;
-            }
-        }
-
-        // At this point we know the player does not have any units or settlements on the map.
-
-        if (player.getNation() >= 0 && player.getNation() <= 3) {
-            /*if (game.getTurn().getNumber() > 20 || player.getEurope().getFirstUnit() == null
-                    && player.getGold() < 600 && player.getGold() < player.getRecruitPrice()) {
-            */
-            if (game.getTurn().getNumber() > 20) {
-                return true;
-            } else if (player.getGold() < 1000) {
-                Iterator unitIterator = player.getEurope().getUnitIterator();
-                while (unitIterator.hasNext()) {
-                    if (((Unit) unitIterator.next()).isCarrier()) {
-                        return false;
-                    }
-                }
-
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            return true;
-        }
+        return null;
     }
 
 
@@ -1220,6 +1139,7 @@ public final class InGameInputHandler extends InputHandler {
             }
         }
     }
+
 
     private void sendErrorToAll(String message, Player player) {
         Game game = getFreeColServer().getGame();

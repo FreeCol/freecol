@@ -31,6 +31,7 @@ import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.EuropePanel;
 import net.sf.freecol.client.gui.panel.StatusPanel;
 import net.sf.freecol.client.gui.panel.VictoryPanel;
+import net.sf.freecol.client.gui.panel.ChooseFoundingFatherDialog;
 
 import net.sf.freecol.client.gui.panel.MapControls;
 
@@ -105,6 +106,7 @@ public final class Canvas extends JLayeredPane {
     private final GUI               gui;
     private final ChatDisplayThread chatDisplayThread;
     private final VictoryPanel      victoryPanel;
+    private final ChooseFoundingFatherDialog chooseFoundingFatherDialog;
     private TakeFocusThread         takeFocusThread;
     private MapControls             mapControls;
     private JMenuBar                jMenuBar;
@@ -141,6 +143,7 @@ public final class Canvas extends JLayeredPane {
 
         chatPanel = new ChatPanel(this, freeColClient);
         victoryPanel = new VictoryPanel(this);
+        chooseFoundingFatherDialog = new ChooseFoundingFatherDialog(this);
 
         showMainPanel();
 
@@ -407,6 +410,27 @@ public final class Canvas extends JLayeredPane {
         add(statusPanel, new Integer(POPUP_LAYER.intValue() - 10));
     }
 
+
+    /**
+    * Shows a panel where the player may choose the next founding father to recruit.
+    * @param possibleFoundingFathers The different founding fathers the player may choose.
+    * @return The founding father the player has chosen.
+    * @see FoundingFather
+    */
+    public int showChooseFoundingFatherDialog(int[] possibleFoundingFathers) {
+        chooseFoundingFatherDialog.initialize(possibleFoundingFathers);
+
+        chooseFoundingFatherDialog.setLocation(getWidth() / 2 - chooseFoundingFatherDialog.getWidth() / 2, getHeight() / 2 - chooseFoundingFatherDialog.getHeight() / 2);
+        add(chooseFoundingFatherDialog, new Integer(POPUP_LAYER.intValue() - 1));
+        chooseFoundingFatherDialog.requestFocus();
+
+        int response = chooseFoundingFatherDialog.getResponseInt();
+        
+        remove(chooseFoundingFatherDialog);
+
+        return response;
+    }
+    
 
     /**
     * Displays the <code>EuropePanel</code>.

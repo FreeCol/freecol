@@ -51,6 +51,25 @@ public class Turn {
         this.turn = turn;
     }
 
+    
+    /**
+    * Gets the age.
+    *
+    * <br>
+    * <br>1 - if before {@link #SEASON_YEAR}
+    * <br>2 - if between 1600 and 1700.
+    * <br>3 - if after 1700.
+    */
+    public int getAge() {
+        if (getYear() < SEASON_YEAR) {
+            return 1;
+        } else if (getYear() < 1700) {
+            return 2;
+        } else {
+            return 3;
+        }
+    }
+
 
     /**
     * Checks if this turn is equal to another turn.
@@ -60,6 +79,19 @@ public class Turn {
             return false;
         } else {
             return (getNumber() == ((Turn) o).getNumber());
+        }
+    }
+
+    
+    /**
+    * Gets the year this turn is in.
+    */
+    public int getYear() {
+        if (STARTING_YEAR + turn - 1 < SEASON_YEAR) {
+            return STARTING_YEAR + turn - 1;
+        } else {
+            int c = turn - (SEASON_YEAR - STARTING_YEAR - 1);
+            return SEASON_YEAR + c/2 - 1;
         }
     }
 

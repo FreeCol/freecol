@@ -26,7 +26,7 @@ package net.sf.freecol.common.model;
 */
 public class FoundingFather {
 
-    public static final int ADAM_SMITH = 0, //TODO
+    public static final int ADAM_SMITH = 0,
                             JACOB_FUGGER = 1, //TODO
                             PETER_MINUIT = 2, //TODO
                             PETER_STUYVESANT = 3, //TODO
@@ -53,6 +53,18 @@ public class FoundingFather {
                             BARTOLOME_DE_LAS_CASAS = 24,
 
                             FATHER_COUNT = 25;
+
+    public static final int TRADE = 0,
+                            EXPLORATION = 1,
+                            MILITARY = 2,
+                            POLITICAL = 3,
+                            RELIGIOUS = 4,
+                            TYPE_COUNT = 5;
+
+
+    public static String getName(int foundingFather) {
+        return getPrefix(foundingFather) + ".name";
+    }
 
 
     public static String getDescription(int foundingFather) {
@@ -91,42 +103,66 @@ public class FoundingFather {
                 throw new IllegalArgumentException("FoundingFather has invalid type.");
         }
     }
-    
-    
+
+
     public static int getType(int foundingFather) {
         switch (foundingFather) {
-            case ADAM_SMITH: return 0;
-            case JACOB_FUGGER: return 0;
-            case PETER_MINUIT: return 0;
-            case PETER_STUYVESANT: return 0;
-            case JAN_DE_WITT: return 0;
-            case FERDINAND_MAGELLAN: return 1;
-            case FRANSICO_DE_CORONADO: return 1;
-            case HERNANDO_DE_SOTO: return 1;
-            case HENRY_HUDSON: return 1;
-            case LA_SALLE: return 1;
-            case HERNAN_CORTES: return 2;
-            case GEORGE_WASHINGTION: return 2;
-            case PAUL_REVERE: return 2;
-            case FRANCIS_DRAKE: return 2;
-            case JOHN_PAUL_JONES: return 2;
-            case THOMAS_JEFFERSON: return 3;
-            case POCAHONTAS: return 3;
-            case THOMAS_PAINE: return 3;
-            case SIMON_BOLIVAR: return 3;
-            case BENJAMIN_FRANKLIN: return 3;
-            case WILLIAM_BREWSTER: return 4;
-            case WILLIAM_PENN: return 4;
-            case FATHER_JEAN_DE_BREBEUF: return 4;
-            case JUAN_DE_SEPULVEDA: return 4;
-            case BARTOLOME_DE_LAS_CASAS: return 4;
+            case ADAM_SMITH: return TRADE;
+            case JACOB_FUGGER: return TRADE;
+            case PETER_MINUIT: return TRADE;
+            case PETER_STUYVESANT: return TRADE;
+            case JAN_DE_WITT: return TRADE;
+            case FERDINAND_MAGELLAN: return EXPLORATION;
+            case FRANSICO_DE_CORONADO: return EXPLORATION;
+            case HERNANDO_DE_SOTO: return EXPLORATION;
+            case HENRY_HUDSON: return EXPLORATION;
+            case LA_SALLE: return EXPLORATION;
+            case HERNAN_CORTES: return MILITARY;
+            case GEORGE_WASHINGTION: return MILITARY;
+            case PAUL_REVERE: return MILITARY;
+            case FRANCIS_DRAKE: return MILITARY;
+            case JOHN_PAUL_JONES: return MILITARY;
+            case THOMAS_JEFFERSON: return POLITICAL;
+            case POCAHONTAS: return POLITICAL;
+            case THOMAS_PAINE: return POLITICAL;
+            case SIMON_BOLIVAR: return POLITICAL;
+            case BENJAMIN_FRANKLIN: return POLITICAL;
+            case WILLIAM_BREWSTER: return RELIGIOUS;
+            case WILLIAM_PENN: return RELIGIOUS;
+            case FATHER_JEAN_DE_BREBEUF: return RELIGIOUS;
+            case JUAN_DE_SEPULVEDA: return RELIGIOUS;
+            case BARTOLOME_DE_LAS_CASAS: return RELIGIOUS;
             default:
                 throw new IllegalArgumentException("FoundingFather has invalid type.");
         }
     }
+
+
+    public static String getTypeAsString(int type) {
+        switch (type) {
+            case TRADE: return "Trade";
+            case EXPLORATION: return "Exploration";
+            case MILITARY: return "Military";
+            case POLITICAL: return "Political";
+            case RELIGIOUS: return "Religious";
+        }
+        
+        return "";
+    }
+
+
+    public static int getWeight(int foundingFather, int age) {
+        if (age == 1) {
+            return getWeight1(foundingFather);
+        } else if (age == 2) {
+            return getWeight2(foundingFather);
+        } else {
+            return getWeight3(foundingFather);
+        }
+    }
     
-    
-    public static int getWeight1(int foundingFather) {
+
+    private static int getWeight1(int foundingFather) {
         switch (foundingFather) {
             case ADAM_SMITH: return 2;
             case JACOB_FUGGER: return 0;
@@ -159,7 +195,7 @@ public class FoundingFather {
     }
     
     
-    public static int getWeight2(int foundingFather) {
+    private static int getWeight2(int foundingFather) {
         switch (foundingFather) {
             case ADAM_SMITH: return 8;
             case JACOB_FUGGER: return 5;
@@ -192,7 +228,7 @@ public class FoundingFather {
     }
     
     
-    public static int getWeight3(int foundingFather) {
+    private static int getWeight3(int foundingFather) {
         switch (foundingFather) {
             case ADAM_SMITH: return 6;
             case JACOB_FUGGER: return 8;

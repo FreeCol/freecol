@@ -133,6 +133,11 @@ public final class InGameController {
         Element reply = client.ask(buildColonyElement);
 
         if (reply.getTagName().equals("buildColonyConfirmed")) {
+            if (reply.getElementsByTagName("update").getLength() > 0) {
+                Element updateElement = (Element) reply.getElementsByTagName("update").item(0);
+                freeColClient.getInGameInputHandler().update(updateElement);
+            }
+
             Colony colony = new Colony(game, (Element) reply.getChildNodes().item(0));
             unit.buildColony(colony);
             gui.setActiveUnit(null);

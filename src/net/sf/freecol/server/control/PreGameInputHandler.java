@@ -241,4 +241,29 @@ public final class PreGameInputHandler extends InputHandler {
 
         return null;
     }
+    
+    
+    /**
+    * Handles a "logout"-message.
+    *
+    * @param connection The <code>Connection</code> the message was received on.
+    * @param logoutElement The element (root element in a DOM-parsed XML tree) that
+    *                holds all the information.
+    */
+    protected Element logout(Connection connection, Element logoutElement) {
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
+
+        logger.info("Logout by: " + connection + ((player != null) ? " (" + player.getName() + ") " : ""));        
+
+        Element logoutMessage = Message.createNewRootElement("logout");
+        logoutMessage.setAttribute("reason", "User has logged out.");
+        logoutMessage.setAttribute("player", player.getID());
+
+        player.setConnected(false);
+        getFreeColServer().getGame().removePlayer(player);
+
+        getFreeColServer().getServer().sendToAll(logoutMessage, connection);
+
+        return null;
+    }
 }

@@ -145,7 +145,12 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
                 {"BackgroundImage2", "bg2.png"},
                 {"CanvasBackgroundImage", "bg_map1.jpg"},
                 {"TitleImage", "freecol.png"},                                                
-                {"VictoryImage", "victory.png"}                                                                                       
+                {"VictoryImage", "victory.png"},
+                {"FoundingFather.trade", "trade.png"},
+                {"FoundingFather.exploration", "exploration.png"},
+                {"FoundingFather.military", "military.png"},
+                {"FoundingFather.political", "political.png"},
+                {"FoundingFather.religious", "religious.png"}
             };                       
             
             
@@ -163,6 +168,10 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
                     image = Toolkit.getDefaultToolkit().getImage(file.toString());    
                 } else {
                     image = Toolkit.getDefaultToolkit().getImage(resourceLocator.getResource("data/images/ui/"+  resources[i][1]));    
+                }
+
+                if (image == null) {
+                    logger.warning("Could not find image: " + resources[i][1]);
                 }
 
                 mt.addImage(image, 0);
@@ -194,7 +203,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
                     if (url != null) {
                         try {
                             fontStream = url.openStream();
-                        } catch (IOException e) {} // Ignored.       
+                        } catch (IOException e) {} // Ignored.
                     }
                 }    
 
@@ -202,14 +211,15 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
                     try {
                         u.put(resources[i][0], Font.createFont(Font.TRUETYPE_FONT, fontStream));
                     } catch (FontFormatException e) {
-                        logger.warning("Could not load font: " + resources[i][1]);
-                        u.put(resources[i][0], new Font("SansSerif", Font.PLAIN, 1));                
+                        logger.warning("Could not load font: " + resources[i][1] + " because it has the wrong format.");
+                        u.put(resources[i][0], new Font("SansSerif", Font.PLAIN, 1));
                     } catch (IOException ie) {
                         logger.warning("Could not load font: " + resources[i][1] + " because of an IO problem.");
                         u.put(resources[i][0], new Font("SansSerif", Font.PLAIN, 1));                
                     }                                
-                } else {                
-                    u.put(resources[i][0], new Font("SansSerif", Font.PLAIN, 1));                
+                } else {           
+                    logger.warning("Could not find font: " + resources[i][1]);
+                    u.put(resources[i][0], new Font("SansSerif", Font.PLAIN, 1));
                 }
             }                       
         } catch (ClassNotFoundException e) {

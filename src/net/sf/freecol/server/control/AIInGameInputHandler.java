@@ -3,6 +3,7 @@ package net.sf.freecol.server.control;
 
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Game;
 
@@ -24,13 +25,14 @@ import java.io.IOException;
 /**
 * Handles the network messages that arrives while in the game.
 */
-public final class AIInGameInputHandler extends InputHandler {
+public final class AIInGameInputHandler implements MessageHandler {
     private static final Logger logger
                             = Logger.getLogger(AIInGameInputHandler.class.getName());
 
 
     /** The player for whom I work. */
     private final ServerPlayer me;
+    private final FreeColServer freeColServer;
 
 
     /**
@@ -39,7 +41,7 @@ public final class AIInGameInputHandler extends InputHandler {
     * @param me The AI player that is being managed by this AIInGameInputHandler.
     */
     public AIInGameInputHandler(FreeColServer freeColServer, ServerPlayer me) {
-        super(freeColServer);
+        this.freeColServer = freeColServer;
         this.me = me;
         if (!me.isAI()) {
             logger.warning("VERY BAD: Applying AIInGameInputHandler to a non-AI player!!!");
@@ -76,7 +78,10 @@ public final class AIInGameInputHandler extends InputHandler {
             } else if (type.equals("setDead")) {
             } else if (type.equals("gameEnded")) {
             } else if (type.equals("disconnect")) {
+            } else if (type.equals("logout")) {
             } else if (type.equals("error")) {
+            } else if (type.equals("chooseFoundingFather")) {            
+                // TODO: Implement
             } else {
                 logger.warning("Message is of unsupported type \"" + type + "\".");
             }
@@ -95,7 +100,7 @@ public final class AIInGameInputHandler extends InputHandler {
     *                holds all the information.
     */
     private Element setCurrentPlayer(Connection connection, Element setCurrentPlayerElement) {
-        Game game = getFreeColServer().getGame();
+        Game game = freeColServer.getGame();
         Player currentPlayer = (Player) game.getFreeColGameObject(setCurrentPlayerElement.getAttribute("player"));
         Element reply = null;
 

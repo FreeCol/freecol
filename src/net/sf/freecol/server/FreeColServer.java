@@ -19,6 +19,7 @@ import net.sf.freecol.server.control.UserConnectionHandler;
 import net.sf.freecol.server.control.PreGameController;
 import net.sf.freecol.server.control.PreGameInputHandler;
 import net.sf.freecol.server.control.InGameInputHandler;
+import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.control.ServerModelController;
 
 // Model:
@@ -58,10 +59,11 @@ public final class FreeColServer {
 
     // Control:
     private UserConnectionHandler userConnectionHandler;
-    private Controller controller;
+    private PreGameController preGameController;
     private PreGameInputHandler preGameInputHandler;
     private InGameInputHandler inGameInputHandler;
     private ServerModelController modelController;
+    private InGameController inGameController;
 
     private Game game;
     private boolean singleplayer;
@@ -91,9 +93,10 @@ public final class FreeColServer {
         game = new Game(modelController);
 
         userConnectionHandler = new UserConnectionHandler(this);
-        controller = new PreGameController(this);
+        preGameController = new PreGameController(this);
         preGameInputHandler = new PreGameInputHandler(this);
         inGameInputHandler = new InGameInputHandler(this);
+        inGameController = new InGameController(this);
 
         try {
             server = new Server(this, port);
@@ -175,11 +178,15 @@ public final class FreeColServer {
 
 
     /**
-    * Gets the <code>PreGameController</code>.
-    * @return The <code>PreGameController</code>.
+    * Gets the <code>Controller</code>.
+    * @return The <code>Controller</code>.
     */
     public Controller getController() {
-        return controller;
+        if (getGameState() == IN_GAME) {
+            return inGameController;
+        } else {
+            return preGameController;
+        }
     }
 
 
@@ -200,7 +207,12 @@ public final class FreeColServer {
         return inGameInputHandler;
     }
 
+
+    public InGameController getInGameController() {
+        return inGameController;
+    }
     
+
     public ServerModelController getModelController() {
         return modelController;
     }

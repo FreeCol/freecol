@@ -10,6 +10,8 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.*;
+import net.sf.freecol.common.networking.Message;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
@@ -76,6 +78,8 @@ public final class InGameInputHandler extends InputHandler {
                 reply = disconnect(element);
             } else if (type.equals("error")) {
                 reply = error(element);
+            } else if (type.equals("chooseFoundingFather")) {
+                reply = chooseFoundingFather(element);
             } else {
                 logger.warning("Message is of unsupported type \"" + type + "\".");
             }
@@ -91,7 +95,7 @@ public final class InGameInputHandler extends InputHandler {
     * @param updateElement The element (root element in a DOM-parsed XML tree) that
     *                holds all the information.
     */
-    private Element update(Element updateElement) {
+    public Element update(Element updateElement) {
         Game game = getFreeColClient().getGame();
 
         NodeList nodeList = updateElement.getChildNodes();
@@ -323,5 +327,28 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         return null;
+    }
+
+   
+    /**
+    * Handles an "chooseFoundingFather"-request.
+    *
+    * @param element The element (root element in a DOM-parsed XML tree) that
+    *                holds all the information.
+    */
+    private Element chooseFoundingFather(Element element) {
+        int[] possibleFoundingFathers = new int[FoundingFather.TYPE_COUNT];
+        for (int i=0; i<FoundingFather.TYPE_COUNT; i++) {
+            possibleFoundingFathers[i] = Integer.parseInt(element.getAttribute("foundingFather" + Integer.toString(i)));
+        }
+
+        int foundingFather = getFreeColClient().getCanvas().showChooseFoundingFatherDialog(possibleFoundingFathers);
+        
+        Element reply = Message.createNewRootElement("chosenFoundingFather");
+        reply.setAttribute("foundingFather", Integer.toString(foundingFather));
+        
+        getFreeColClient().getMyPlayer().setCurrentFather(foundingFather);
+        
+        return reply;
     }
 }
