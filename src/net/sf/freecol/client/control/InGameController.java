@@ -1003,7 +1003,7 @@ public final class InGameController {
         Element disbandUnit = Message.createNewRootElement("disbandUnit");
         disbandUnit.setAttribute("unit", unit.getID());
         
-        unit.setLocation(null);
+        unit.dispose();
         
         nextActiveUnit();
         

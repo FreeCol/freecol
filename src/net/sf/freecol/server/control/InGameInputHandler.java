@@ -1152,7 +1152,7 @@ public final class InGameInputHandler extends InputHandler {
 
         Tile oldTile = unit.getTile();
         
-        unit.setLocation(null);
+        unit.dispose();
         
         sendUpdatedTileToAll(oldTile, player);
         
