@@ -3,7 +3,6 @@ package net.sf.freecol.server.model;
 
 import net.sf.freecol.common.model.*;
 import net.sf.freecol.common.networking.Message;
-import net.sf.freecol.server.networking.DummyConnection;
 
 import org.w3c.dom.*;
 

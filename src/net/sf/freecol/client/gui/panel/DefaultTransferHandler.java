@@ -3,8 +3,6 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.IOException;
 import java.util.logging.Logger;
 import java.awt.event.*;
 import java.awt.GraphicsEnvironment;
@@ -18,7 +16,6 @@ import java.awt.Toolkit;
 import javax.swing.ImageIcon;
 import java.awt.Point;
 import java.awt.Image;
-import java.awt.image.BufferedImage;
 import java.awt.Dimension;
 import java.io.StringWriter;
 import java.io.PrintWriter;

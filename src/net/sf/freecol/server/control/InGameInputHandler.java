@@ -12,8 +12,6 @@ import java.io.StringWriter;
 import java.io.PrintWriter;
 
 import net.sf.freecol.common.model.*;
-import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.Connection;
 

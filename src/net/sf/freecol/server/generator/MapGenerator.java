@@ -4,7 +4,6 @@ import java.util.*;
 
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
-import net.sf.freecol.server.networking.DummyConnection;
 import net.sf.freecol.common.model.*;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Position;

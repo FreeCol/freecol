@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.panel;
 
 import javax.swing.*;
 import java.awt.FlowLayout;
-import javax.swing.border.BevelBorder;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.gui.Canvas;

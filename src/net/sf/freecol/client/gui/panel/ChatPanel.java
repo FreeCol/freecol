@@ -7,9 +7,7 @@ import java.lang.NumberFormatException;
 import java.util.logging.Logger;
 
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.border.BevelBorder;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.FreeColClient;

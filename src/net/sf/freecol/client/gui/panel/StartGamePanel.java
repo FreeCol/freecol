@@ -17,7 +17,6 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
-import javax.swing.border.BevelBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.TableColumn;
 import javax.swing.table.AbstractTableModel;

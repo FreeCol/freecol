@@ -11,7 +11,6 @@ import java.util.LinkedList;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.border.BevelBorder;
 
 /**
  * This is the panel that pops up when an error needs to be reported.

@@ -11,12 +11,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.NumberFormatException;
 import java.util.logging.Logger;
-import java.util.LinkedList;
 
 import javax.swing.*;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.border.BevelBorder;
 
 /**
  * This panel is displayed when an imporantant event in the game has happened.

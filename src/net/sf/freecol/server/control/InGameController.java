@@ -1,21 +1,16 @@
 
 package net.sf.freecol.server.control;
 
-import java.util.Vector;
 import java.util.logging.Logger;
 import java.util.Iterator;
 import java.util.Random;
 import org.w3c.dom.Element;
 
 import java.io.IOException;
-import java.io.StringWriter;
-import java.io.PrintWriter;
 
 import net.sf.freecol.common.model.*;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.networking.Message;
-import net.sf.freecol.common.networking.Connection;
 
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;

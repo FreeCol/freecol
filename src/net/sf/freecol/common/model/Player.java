@@ -28,9 +28,6 @@ import java.util.Iterator;
 import java.util.ArrayList;
 
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.model.*;
-import net.sf.freecol.server.model.*;
 
 import org.w3c.dom.*;
 

@@ -2,7 +2,6 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.awt.FlowLayout;
 import java.awt.Insets;
 
 import java.awt.Color;

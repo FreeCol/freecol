@@ -132,8 +132,6 @@ public final class FreeColServer {
     *
     */
     public FreeColServer(File file, int port) throws IOException {
-        this.singleplayer = singleplayer;
-
         modelController = new ServerModelController(this);
 
         userConnectionHandler = new UserConnectionHandler(this);

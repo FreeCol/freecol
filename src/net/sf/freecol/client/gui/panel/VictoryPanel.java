@@ -29,10 +29,8 @@ import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.ImageIcon;
 import javax.swing.UIManager;
-import javax.swing.border.BevelBorder;
 
 import net.sf.freecol.client.gui.i18n.Messages;
 

@@ -5,8 +5,6 @@ import java.awt.Graphics;
 import java.util.logging.Logger;
 
 import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.border.BevelBorder;
 import javax.swing.SwingConstants;
 
 import net.sf.freecol.client.FreeColClient;

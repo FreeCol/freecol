@@ -28,7 +28,6 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.net.SocketException;
 import java.util.logging.Logger;
-import javax.swing.SwingUtilities;
 
 import java.util.Vector;
 

@@ -1,8 +1,6 @@
 
 package net.sf.freecol.client.control;
 
-
-import javax.swing.JFileChooser;
 import java.util.logging.Logger;
 import java.util.Iterator;
 import java.util.ArrayList;
@@ -19,7 +17,6 @@ import net.sf.freecol.client.gui.panel.EventPanel;
 
 import net.sf.freecol.common.model.*;
 import net.sf.freecol.common.networking.Message;
-import net.sf.freecol.FreeCol;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;

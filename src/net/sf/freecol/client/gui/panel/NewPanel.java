@@ -24,7 +24,6 @@ import javax.swing.*;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.*;
-import javax.swing.border.BevelBorder;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.gui.Canvas;

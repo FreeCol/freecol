@@ -20,7 +20,6 @@
 
 package net.sf.freecol.common.model;
 
-import java.awt.Color;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
