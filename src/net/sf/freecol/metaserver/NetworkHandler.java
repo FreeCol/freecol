@@ -58,6 +58,8 @@ public final class NetworkHandler implements MessageHandler {
                 reply = getServerList(connection, element);
             } else if (type.equals("remove")) {
                 reply = remove(connection, element);
+            } else if (type.equals("disconnect")) {
+                // Nothing to do.
             } else {
                 logger.warning("Unkown request: " + type);
             }

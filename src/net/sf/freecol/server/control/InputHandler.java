@@ -3,6 +3,7 @@ package net.sf.freecol.server.control;
 
 import java.util.logging.Logger;
 import org.w3c.dom.Element;
+import java.io.IOException;
 
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.MessageHandler;
@@ -78,6 +79,14 @@ public abstract class InputHandler implements MessageHandler {
         if (player == null || player.isConnected()) {
             logout(connection, null);
         }
+
+        try {
+            connection.reallyClose();
+        } catch (IOException e) {
+            logger.warning("Could not close the connection.");
+        }
+
+        freeColServer.getServer().removeConnection(connection);
 
         return null;
     }

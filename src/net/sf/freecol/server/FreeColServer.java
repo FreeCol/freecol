@@ -12,6 +12,7 @@ import java.awt.event.ActionEvent;
 import net.sf.freecol.FreeCol;
 
 // XML:
+import org.xml.sax.SAXException;
 import org.w3c.dom.*;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -251,7 +252,8 @@ public final class FreeColServer {
             return;
         } finally {
             try {
-                mc.reallyClose();
+                //mc.reallyClose();
+                mc.close();
             } catch (IOException e) {
                 logger.warning("Could not close connection to meta-server.");
                 return;
@@ -290,7 +292,8 @@ public final class FreeColServer {
             return;
         } finally {
             try {
-                mc.reallyClose();
+                //mc.reallyClose();
+                mc.close();
             } catch (IOException e) {
                 logger.warning("Could not close connection to meta-server.");
                 return;
@@ -407,7 +410,20 @@ public final class FreeColServer {
         // For debugging (without compression):
         //BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
 
-        Message message = new Message(in.readLine());
+        Message message;
+        try {
+            message = new Message(in.readLine());
+        } catch (SAXException sxe) {
+            // Error generated during parsing
+            Exception  x = sxe;
+            if (sxe.getException() != null) {
+                x = sxe.getException();
+            }
+            StringWriter sw = new StringWriter();
+            x.printStackTrace(new PrintWriter(sw));
+            logger.warning(sw.toString());
+            throw new IOException("SAXException while creating Message.");
+        }
 
         Element savedGameElement = message.getDocument().getDocumentElement();
         String version = savedGameElement.getAttribute("version");

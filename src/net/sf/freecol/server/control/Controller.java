@@ -48,9 +48,11 @@ public abstract class Controller {
     public void shutdown() {
         Server server = freeColServer.getServer();
         if (server != null) {
+            /* This is done in "server":
             Element disconnectMessage = Message.createNewRootElement("disconnect");
             disconnectMessage.setAttribute("reason", "The server is going down.");
             server.sendToAll(disconnectMessage);
+            */
 
             server.shutdown();
             freeColServer = null;

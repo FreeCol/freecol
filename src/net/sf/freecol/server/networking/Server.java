@@ -110,10 +110,11 @@ public final class Server extends Thread {
                     Connection connection = new Connection(clientSocket, freeColServer.getUserConnectionHandler());
                     connections.put(clientSocket, connection);
                 } catch (IOException e) {
-                    StringWriter sw = new StringWriter();
-                    e.printStackTrace(new PrintWriter(sw));
-
-                    logger.warning(sw.toString());
+                    if (running) {
+                        StringWriter sw = new StringWriter();
+                        e.printStackTrace(new PrintWriter(sw));
+                        logger.warning(sw.toString());
+                    }
                 }
             }
         }
@@ -202,14 +203,15 @@ public final class Server extends Thread {
             // Nothing to do here... just waiting for the server thread to finish.
             // For more info see the run() method
         }
-        
+
         Iterator connectionsIterator = connections.values().iterator();
         while (connectionsIterator.hasNext()) {
             Connection c = (Connection) connectionsIterator.next();
-            
+
             try {
                 if (c != null) {
-                    c.reallyClose();
+                    //c.reallyClose();
+                    c.close();
                 }
             } catch (IOException e) {
                 logger.warning("Could not close the connection.");
@@ -233,6 +235,7 @@ public final class Server extends Thread {
         return (Connection) connections.get(socket);
     }
 
+
     /**
     * Adds a (usually Dummy)Connection into the hashmap.
     * @param connection The connection to add.
@@ -240,5 +243,14 @@ public final class Server extends Thread {
     */
     public void addConnection(Connection connection, int fakesocket) {
         connections.put(new Socket(), connection);
+    }
+    
+    
+    /**
+    * Removes the given connection
+    * @param connection The connection that should be removed.
+    */
+    public void removeConnection(Connection connection) {
+        connections.remove(connection.getSocket());
     }
 }

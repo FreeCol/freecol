@@ -5,6 +5,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.MessageHandler;
 
+import java.io.IOException;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Element;
@@ -54,7 +55,7 @@ public abstract class InputHandler implements MessageHandler {
     *                holds all the information.
     */
     protected Element disconnect(Element disconnectElement) {
-        getFreeColClient().getConnectController().quitGame(false, false);
+        // getFreeColClient().getConnectController().quitGame(false, false);
         
         if (freeColClient.getFreeColServer() == null) {
             getFreeColClient().getCanvas().returnToTitle();

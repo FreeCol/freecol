@@ -95,7 +95,16 @@ public final class InGameController implements NetworkConstants {
 
         File file = canvas.showLoadDialog(FreeCol.getSaveDirectory());
 
-        if(file == null || !canvas.showConfirmDialog("stopCurrentGame.text", "stopCurrentGame.yes", "stopCurrentGame.no")) {
+        if (file == null) {
+            return;
+        }
+        
+        if (!file.isFile()) {
+            canvas.errorMessage("fileNotFound");
+            return;
+        }
+
+        if (!canvas.showConfirmDialog("stopCurrentGame.text", "stopCurrentGame.yes", "stopCurrentGame.no")) {
             return;
         }
 

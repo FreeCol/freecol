@@ -120,17 +120,20 @@ public class Connection {
     * @throws IOException
     */
     public void reallyClose() throws IOException {
+        if (thread != null) {
+            thread.stopWorking();
+        }
+            
         if (out != null) {
             out.close();
         }
 
-        //in.close();   <-- Closed by the 'ReceivingThread'
         if (socket != null) {
             socket.close();
         }
 
-        if (thread != null) {
-            thread.stopWorking();
+        if (in != null) {
+            in.close();
         }
 
         logger.info("Connection closed.");
@@ -147,7 +150,7 @@ public class Connection {
     * @see #ask
     */
     public void send(Element element) throws IOException {
-        out.print(convertElementToString(element) + '\0');
+        out.print(convertElementToString(element) + '\n');
         out.flush();
     }
 
@@ -161,7 +164,7 @@ public class Connection {
     * @param element The Element to convert.
     * @return The string representation of the given Element without the xml version tag.
     */
-    private String convertElementToString(Element element) {
+    String convertElementToString(Element element) {
         String xml;
         try {
             StringWriter stringWriter = new StringWriter();

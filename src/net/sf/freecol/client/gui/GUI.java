@@ -121,6 +121,7 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
         this.lib = lib;
 
         cursor = true;
+        
         // Because I'm a thread but my priority must be low -FV
         setPriority(Thread.MIN_PRIORITY);
         start();

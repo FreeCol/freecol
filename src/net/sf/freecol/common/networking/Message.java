@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringWriter;
+import java.io.PrintWriter;
 
 import java.util.logging.Logger;
 
@@ -15,7 +17,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.*;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-
+import org.xml.sax.SAXParseException;
+import org.xml.sax.ErrorHandler;
 
 
 /**
@@ -28,7 +31,8 @@ public final class Message {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    private static final String FREECOL_PROTOCOL_VERSION = "0.0.4";
+    private static final String FREECOL_PROTOCOL_VERSION = "0.1.0";
+    private static final String INVALID_MESSAGE = "invalid";
 
 
     /** The actual Message data. */
@@ -40,7 +44,7 @@ public final class Message {
     *
     * @param msg The raw message data.
     */
-    public Message(String msg) {
+    public Message(String msg) throws SAXException, IOException {
         this(new InputSource(new StringReader(msg)));
     }
 
@@ -49,8 +53,17 @@ public final class Message {
     * Constructs a new Message with data from the given InputStreamReader. The constructor
     * to use if this is an INCOMING message.
     */
-    public Message(InputStreamReader inputStreamReader) {
+    public Message(InputStreamReader inputStreamReader) throws SAXException, IOException {
         this(new InputSource(inputStreamReader));
+    }
+    
+    
+    /**
+    * Constructs a new Message with data from the given InputStream. The constructor
+    * to use if this is an INCOMING message.
+    */
+    public Message(InputStream inputStream) throws SAXException, IOException {
+        this(new InputSource(inputStream));
     }
 
 
@@ -58,28 +71,24 @@ public final class Message {
     * Constructs a new Message with data from the given InputSource. The constructor
     * to use if this is an INCOMING message.
     */
-    public Message(InputSource inputSource) {
+    public Message(InputSource inputSource) throws SAXException, IOException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         Document tempDocument = null;
 
         try {
             DocumentBuilder builder = factory.newDocumentBuilder();
             tempDocument = builder.parse(inputSource);
-        } catch (SAXException sxe) {
-            // Error generated during parsing
-            Exception  x = sxe;
-            if (sxe.getException() != null) {
-                x = sxe.getException();
-            }
-            x.printStackTrace();
-            logger.warning("Invalid message received.");
         } catch (ParserConfigurationException pce) {
             // Parser with specified options can't be built
-            pce.printStackTrace();
-        } catch (IOException ioe) {
-            // I/O error
-            ioe.printStackTrace();
+            StringWriter sw = new StringWriter();
+            pce.printStackTrace(new PrintWriter(sw));
+            logger.warning(sw.toString());
+        } catch (SAXException se) {
+            throw se;
+        } catch (IOException ie) {
+            throw ie;
         }
+
         document = tempDocument;
     }
 
@@ -170,13 +179,11 @@ public final class Message {
     * @return The type of this Message.
     */
     public String getType() {
-        if (document != null) {
-            if (document.getDocumentElement() != null) {
-                return document.getDocumentElement().getTagName();
-            }
+        if (document != null && document.getDocumentElement() != null) {
+            return document.getDocumentElement().getTagName();
+        } else {
+            return INVALID_MESSAGE;
         }
-
-        return new String("invalid");
     }
 
 

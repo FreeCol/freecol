@@ -122,6 +122,7 @@ public final class MapControls {
 
         container.add(infoPanel);
         container.add(miniMap);
+
         for(int i=0; i<NUMBER_OF_BUTTONS; i++) {
             container.add(unitButton[i]);
         }

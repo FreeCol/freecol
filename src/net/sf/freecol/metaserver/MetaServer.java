@@ -190,7 +190,8 @@ public final class MetaServer extends Thread {
 
             try {
                 if (c != null) {
-                    c.reallyClose();
+                    //c.reallyClose();
+                    c.close();
                 }
             } catch (IOException e) {
                 logger.warning("Could not close the connection.");

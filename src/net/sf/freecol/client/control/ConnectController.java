@@ -274,12 +274,16 @@ public final class ConnectController {
                 } catch (FileNotFoundException fe) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
+                            canvas.closeMenus();
+                            canvas.showMainPanel();
                             canvas.errorMessage("fileNotFound");
                         }
                     });
                 } catch (IOException e) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
+                            canvas.closeMenus();
+                            canvas.showMainPanel();
                             freeColClient.getCanvas().errorMessage("server.couldNotStart");
                         }
                     });
@@ -338,19 +342,11 @@ public final class ConnectController {
         if (bStopServer) {
             final FreeColServer server = freeColClient.getFreeColServer();
             if (server != null) {
-                try {
-                    freeColClient.getClient().getConnection().reallyClose();
-                } catch (IOException e) {
-                    logger.warning("Exception: " + e);
-                }
-
                 server.getController().shutdown();
-
                 freeColClient.setFreeColServer(null);
                 freeColClient.setLoggedIn(false);
             }
         }
-
         if (freeColClient.isLoggedIn()) {
             logout(notifyServer);
         }
@@ -371,6 +367,10 @@ public final class ConnectController {
     }
     
 
+    /**
+    * Gets a list of servers from the meta server.
+    * @return A list of {@link ServerInfo} objects.
+    */
     public ArrayList getServerList() {
         Canvas canvas = freeColClient.getCanvas();
 
@@ -404,7 +404,7 @@ public final class ConnectController {
             return null;
         } finally {
             try {
-                mc.reallyClose();
+                mc.close();
             } catch (IOException e) {
                 logger.warning("Could not close connection to meta-server.");
                 return null;
