@@ -47,6 +47,8 @@ public class Game extends FreeColGameObject {
     
     /* The market for Europe. */
     private Market market;
+    
+    private Turn turn = new Turn(1);
 
 
     /**
@@ -80,6 +82,12 @@ public class Game extends FreeColGameObject {
         return market;
     }
     
+    
+    public Turn getTurn() {
+        return turn;
+    }
+
+
     /**
     * Resets this game's Market.
     */
@@ -250,11 +258,32 @@ public class Game extends FreeColGameObject {
     public Player getNextPlayer() {
         int index = players.indexOf(currentPlayer) + 1;
 
-        if (index < players.size()) {
-            return (Player) players.get(index);
-        } else {
-            return (Player) players.get(0);
+        if (index >= players.size()) {
+            index = 0;
         }
+
+        // Find first non-dead player:
+        while (true) {
+            Player player = (Player) players.get(index);
+            if (!player.isDead()) {
+                return player;
+            }
+
+            index++;
+
+            if (index >= players.size()) {
+                index = 0;
+            }
+        }
+    }
+    
+    
+    /**
+    * Checks if the next player is in a new turn.
+    */
+    public boolean isNextPlayerInNewTurn() {
+        int index = players.indexOf(currentPlayer) + 1;
+        return index >= players.size();
     }
 
 
@@ -414,6 +443,8 @@ public class Game extends FreeColGameObject {
     */
     public void newTurn() {
         //Iterator iterator = getFreeColGameObjectIterator();
+        turn.increase();
+
         Iterator iterator = ((HashMap) freeColGameObjects.clone()).values().iterator();
 
         while (iterator.hasNext()) {

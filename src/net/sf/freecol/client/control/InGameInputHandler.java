@@ -80,6 +80,8 @@ public final class InGameInputHandler implements MessageHandler {
                 reply = emigrateUnitInEuropeConfirmed(element);
             } else if (type.equals("newTurn")) {
                 reply = newTurn(element);
+            } else if (type.equals("setDead")) {
+                reply = setDead(element);
             } else if (type.equals("error")) {
                 reply = error(element);
             } else {
@@ -266,6 +268,20 @@ public final class InGameInputHandler implements MessageHandler {
         return null;
     }
 
+
+    /**
+    * Handles a "setDead"-message.
+    *
+    * @param element The element (root element in a DOM-parsed XML tree) that
+    *                holds all the information.
+    */
+    private Element setDead(Element element) {
+        Game game = freeColClient.getGame();
+        Player player = (Player) game.getFreeColGameObject(element.getAttribute("player"));
+        player.setDead(true);
+        
+        return null;
+    }
 
     /**
     * Handles an "error"-message.

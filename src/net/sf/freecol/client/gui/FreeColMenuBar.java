@@ -6,7 +6,6 @@ import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
 
-
 /**
 * The menu bar that is displayed on the top left corner of the <code>Canvas</code>.
 * @see Canvas#setJMenuBar
@@ -122,5 +121,4 @@ public class FreeColMenuBar extends JMenuBar {
             }
         });
     }
-
 }

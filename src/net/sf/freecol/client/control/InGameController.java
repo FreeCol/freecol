@@ -14,6 +14,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.sound.*;
 
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.*;
@@ -130,11 +131,11 @@ public final class InGameController {
             case Unit.DISEMBARK:        disembark(unit, direction); break;
             case Unit.EMBARK:           embark(unit, direction); break;
             case Unit.MOVE_HIGH_SEAS:   moveHighSeas(unit, direction); break;
-            case Unit.ILLEGAL_MOVE:     /*if (sfxPlayer != null) {
+            case Unit.ILLEGAL_MOVE:     freeColClient.playSound(SfxLibrary.ILLEGAL_MOVE); break;
+                                        /*if (sfxPlayer != null) {
                                             sfxPlayer.play(sfxLibrary.get(sfxLibrary.ILLEGAL_MOVE));
                                             break;
                                         }*/
-                                        break;
             default:                    throw new RuntimeException("unrecognised move: " + move);
         }
     }
@@ -305,6 +306,8 @@ public final class InGameController {
             return;
         }
 
+        freeColClient.playSound(SfxLibrary.LOAD_CARGO);        
+
         unit.boardShip(carrier);
 
         Element boardShipElement = Message.createNewRootElement("boardShip");
@@ -343,6 +346,8 @@ public final class InGameController {
             throw new NullPointerException();
         }
 
+        freeColClient.playSound(SfxLibrary.LOAD_CARGO);
+
         Client client = freeColClient.getClient();
 
         Element loadCargoElement = Message.createNewRootElement("loadCargo");
@@ -376,7 +381,8 @@ public final class InGameController {
     /**
     * Buys goods in Europe.
     *
-    * @param unit The unit who is going to board the carrier.
+    * @param type The type of goods to buy.
+    * @param amount The amount of goods to buy.
     * @param carrier The carrier.
     */
     public void buyGoods(int type, int amount, Unit carrier) {
@@ -396,6 +402,8 @@ public final class InGameController {
         if (game.getMarket().getBidPrice(type, amount) > myPlayer.getGold()) {
             canvas.errorMessage("notEnoughGold");
         }
+        
+        freeColClient.playSound(SfxLibrary.LOAD_CARGO);
 
         Element buyGoodsElement = Message.createNewRootElement("buyGoods");
         buyGoodsElement.setAttribute("carrier", carrier.getID());
@@ -424,7 +432,7 @@ public final class InGameController {
 
         client.send(sellGoodsElement);
     }
-    
+
     /**
     * Equips or unequips a <code>Unit</code> with a certain type of <code>Goods</code>.
     *
@@ -439,7 +447,7 @@ public final class InGameController {
         equipUnitElement.setAttribute("unit", unit.getID());
         equipUnitElement.setAttribute("type", Integer.toString(type));
         equipUnitElement.setAttribute("amount", Integer.toString(amount));
-        
+
 
         switch(type) {
             case Goods.CROSSES:
@@ -480,13 +488,13 @@ public final class InGameController {
         Element workElement = Message.createNewRootElement("work");
         workElement.setAttribute("unit", unit.getID());
         workElement.setAttribute("workLocation", workLocation.getID());
-        
+
         unit.work(workLocation);
 
         client.send(workElement);
     }
 
-    
+
     /**
     * Puts the specified unit outside the colony.
     * @param unit The <code>Unit</code>

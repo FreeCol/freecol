@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.BevelBorder;
+import javax.swing.SwingConstants;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.Game;
@@ -28,7 +29,8 @@ public final class InfoPanel extends JPanel {
     private final JLabel        unitLabel,
                                 unitNameLabel,
                                 unitMovesLabel,
-                                goldLabel;
+                                goldLabel,
+                                turnLabel;
                                 
     private FreeColClient freeColClient;
     private final Game          game;
@@ -51,35 +53,40 @@ public final class InfoPanel extends JPanel {
         unitNameLabel = new JLabel();
         unitMovesLabel = new JLabel();
         goldLabel = new JLabel();
+        turnLabel = new JLabel();
         
+        turnLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+
         unitLabel.setSize(118, 96);
         unitNameLabel.setSize(116, 20);
         unitMovesLabel.setSize(116, 20);
         goldLabel.setSize(100, 20);
-        
+        turnLabel.setSize(146, 20);
+
         unitLabel.setLocation(10, 4);
         unitNameLabel.setLocation(130, 15);
         unitMovesLabel.setLocation(130, 40);
         goldLabel.setLocation(10, 102);
-        
+        turnLabel.setLocation(100, 102);
+
         setLayout(null);
-        
+
         add(unitLabel);
         add(unitNameLabel);
         add(unitMovesLabel);
         add(goldLabel);
-        
+        add(turnLabel);
+
         unitLabel.setFocusable(false);
         unitNameLabel.setFocusable(false);
         unitMovesLabel.setFocusable(false);
         goldLabel.setFocusable(false);
-        
+        turnLabel.setFocusable(false);
+
         try {
             BevelBorder border = new BevelBorder(BevelBorder.RAISED);
             setBorder(border);
-        }
-        catch(Exception e) {
-        }
+        } catch(Exception e) {}
 
         setSize(256, 128);
     }
@@ -107,6 +114,7 @@ public final class InfoPanel extends JPanel {
         }
         
         goldLabel.setText("Gold: " + freeColClient.getMyPlayer().getGold());
+        turnLabel.setText("Year: " + freeColClient.getGame().getTurn().toString());
         
         super.paintComponent(graphics);
     }

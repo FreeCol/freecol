@@ -325,6 +325,8 @@ public final class Market extends FreeColGameObject {
 
             dataForGoodType[i] = new Data(getGame(), dataElement);
         }
+        
+        priceGoods();
     }
 
 

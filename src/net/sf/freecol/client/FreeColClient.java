@@ -360,6 +360,13 @@ public final class FreeColClient {
     public Client getClient() {
         return client;
     }
+    
+    
+    public void playSound(int sound) {
+        if (sfxPlayer != null) {
+            sfxPlayer.play(sfxLibrary.get(sound));
+        }
+    }
 }
 
 

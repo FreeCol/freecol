@@ -338,7 +338,7 @@ public final class InGameInputHandler implements MessageHandler {
         Tile oldTile = unit.getTile();
 
         boolean tellEnemyPlayers = true;
-        if (oldTile.getSettlement() != null || oldTile == null) {
+        if (oldTile == null || oldTile.getSettlement() != null) {
             tellEnemyPlayers = false;
         }
 
@@ -795,21 +795,63 @@ public final class InGameInputHandler implements MessageHandler {
 
         Player nextPlayer = game.getNextPlayer();
 
-        if (nextPlayer.equals(game.getFirstPlayer())) {
+        while (checkForDeath(nextPlayer)) {
+            nextPlayer.setDead(true);
+            Element setDeadElement = Message.createNewRootElement("setDead");
+            setDeadElement.setAttribute("player", nextPlayer.getID());
+            freeColServer.getServer().sendToAll(setDeadElement, null);
+
+            nextPlayer = game.getNextPlayer();
+        }
+
+        if (game.isNextPlayerInNewTurn()) {
             game.newTurn();
 
             Element newTurnElement = Message.createNewRootElement("newTurn");
             freeColServer.getServer().sendToAll(newTurnElement, null);
         }
-        
+
         game.setCurrentPlayer(nextPlayer);
 
         Element setCurrentPlayerElement = Message.createNewRootElement("setCurrentPlayer");
         setCurrentPlayerElement.setAttribute("player", nextPlayer.getID());
-
         freeColServer.getServer().sendToAll(setCurrentPlayerElement, null);
 
         return null;
+    }
+
+
+    /**
+    * Checks if this player has died.
+    * @return <i>true</i> if this player should die.
+    */
+    private boolean checkForDeath(Player player) {
+        // Die if: (No colonies or units on map) && ((After 20 turns) || (Cannot get a unit from Europe))
+        Game game = freeColServer.getGame();
+        Map map = game.getMap();
+
+        Iterator tileIterator = map.getWholeMapIterator();
+        while (tileIterator.hasNext()) {
+            Tile t = map.getTile((Map.Position) tileIterator.next());
+
+            if (t != null && ((t.getFirstUnit() != null && t.getFirstUnit().getOwner().equals(player))
+                            || t.getSettlement() != null && t.getSettlement().getOwner().equals(player))) {
+                return false;
+            }
+        }
+
+        // At this point we know the player does not have any units or settlements on the map.
+
+        if (player.getNation() >= 0 && player.getNation() <= 3) {
+            if (game.getTurn().getNumber() > 20 || player.getEurope().getFirstUnit() == null
+                    && player.getGold() < 600 && player.getGold() < player.getEurope().getRecruitPrice()) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return true;
+        }
     }
 
 

@@ -88,6 +88,7 @@ public class Player extends FreeColGameObject {
     
     private int             crosses;
     private int             bells;
+    private boolean         dead = false;
 
 
     private Location entryLocation;
@@ -310,6 +311,23 @@ public class Player extends FreeColGameObject {
         return admin;
     }
 
+    
+    /**
+    * Checks if this player is dead.
+    * A <code>Player</code> dies when it looses the game.
+    */
+    public boolean isDead() {
+        return dead;
+    }
+
+
+    /**
+    * Sets this player to be dead or not.
+    */
+    public void setDead(boolean dead) {
+        this.dead = dead;
+    }
+
 
     /**
     * Returns the name of this player.
@@ -490,7 +508,7 @@ public class Player extends FreeColGameObject {
         // wherein they count as 4.
         // This does that, I think. -sjm
         int count = 8;
-        
+
         ArrayList units = new ArrayList();
         Map map = getGame().getMap();
 
@@ -542,7 +560,6 @@ public class Player extends FreeColGameObject {
         // Nothing to do.
     }
 
-   
     /**
     * Makes an XML-representation of this object.
     *
@@ -561,6 +578,7 @@ public class Player extends FreeColGameObject {
         playerElement.setAttribute("crosses", Integer.toString(crosses));
         playerElement.setAttribute("bells", Integer.toString(bells));
         playerElement.setAttribute("ready", Boolean.toString(ready));
+        playerElement.setAttribute("dead", Boolean.toString(dead));
         
         playerElement.setAttribute("ai", Boolean.toString(ai));
         
@@ -592,6 +610,7 @@ public class Player extends FreeColGameObject {
         bells = Integer.parseInt(playerElement.getAttribute("bells"));
         ready = (new Boolean(playerElement.getAttribute("ready"))).booleanValue();
         ai = (new Boolean(playerElement.getAttribute("ai"))).booleanValue();
+        dead = (new Boolean(playerElement.getAttribute("dead"))).booleanValue();
         
         if (playerElement.hasAttribute("entryLocation")) {
             entryLocation = (Location) getGame().getFreeColGameObject(playerElement.getAttribute("entryLocation"));

@@ -80,6 +80,7 @@ public final class AIInGameInputHandler implements MessageHandler {
                 reply = setCurrentPlayer(connection, element);
             } else if (type.equals("emigrateUnitInEuropeConfirmed")) {
             } else if (type.equals("newTurn")) {
+            } else if (type.equals("setDead")) {            
             } else if (type.equals("error")) {
             } else {
                 logger.warning("Message is of unsupported type \"" + type + "\".");
