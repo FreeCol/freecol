@@ -725,7 +725,7 @@ public final class Tile extends FreeColGameObject implements Location {
 
     /**
     * The type of secondary good this tile produces best (used for Town Commons squares).
-    * @returns The type of secondary good best produced by this tile.
+    * @return The type of secondary good best produced by this tile.
     */
     public int secondaryGoods()
     {

@@ -1210,7 +1210,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
 
     /**
     * Sets the owner of this Unit.
-    * @parm type The new owner of this Unit.
+    * @param type The new owner of this Unit.
     */
     public void setOwner(Player owner) {
         this.owner = owner;
@@ -1237,7 +1237,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
 
     /**
     * Sets the type of the unit.
-    * @parm type The new type of the unit.
+    * @param type The new type of the unit.
     */
     public void setType(int type) {
         this.type = type;

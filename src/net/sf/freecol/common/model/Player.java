@@ -434,7 +434,7 @@ public class Player extends FreeColGameObject {
     /**
     * Sets the nation for this player.
     * @param n The new nation for this player.
-    * @throw FreeColException In case the given nation is invalid.
+    * @throws FreeColException In case the given nation is invalid.
     */
     public void setNation(String n) throws FreeColException {
         final String[] nationNames = {"dutch", "english", "french", "spanish", "apache",

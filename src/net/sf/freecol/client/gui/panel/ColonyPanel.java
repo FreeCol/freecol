@@ -1161,7 +1161,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
             /**
             * Gets the text associated with this item.
-            * @returns The text associated with this item.
+            * @return The text associated with this item.
             */
             public String getText() {
                 return text;
@@ -1169,7 +1169,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
             /**
             * Gets the building type associated with that item.
-            * @returns The building type associated with this item.
+            * @return The building type associated with this item.
             */
             public int getType() {
                 return type;

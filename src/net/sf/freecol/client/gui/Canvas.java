@@ -273,7 +273,7 @@ public final class Canvas extends JLayeredPane {
     *   <li>The <code>messageID</code> is used to get the message from
     *       {@link net.sf.freecol.client.gui.i18n.Messages#message}.
     *   <li>Every occuranse of <code>data[x][0]</code> is replaced with
-    *       <code>data[x][1]</code>.
+    *       <code>data[x][1]</code> for every <code>x</code>.
     *   <li>The message is displayed using a modal dialog.
     * </ol>
     */
@@ -814,7 +814,7 @@ public final class Canvas extends JLayeredPane {
     }
 
     /** Returns the freeColClient.
-    * @returns The <code>freeColClient</code> associated with this <code>Canvas</code>.
+    * @return The <code>freeColClient</code> associated with this <code>Canvas</code>.
     */
     public FreeColClient getClient() {
       return freeColClient;
