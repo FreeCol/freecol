@@ -21,7 +21,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
 import net.sf.freecol.client.gui.panel.ChatPanel;
-
+import net.sf.freecol.client.gui.panel.ColopediaPanel;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.client.gui.panel.MainPanel;
 import net.sf.freecol.client.gui.panel.NewPanel;
@@ -120,6 +120,7 @@ public final class Canvas extends JLayeredPane {
     private final ChooseFoundingFatherDialog chooseFoundingFatherDialog;
     private final EventPanel        eventPanel;
     private final EmigrationPanel   emigrationPanel;
+    private final ColopediaPanel    colopediaPanel;
     private TakeFocusThread         takeFocusThread;
     private MapControls             mapControls;
     private JMenuBar                jMenuBar;
@@ -160,6 +161,7 @@ public final class Canvas extends JLayeredPane {
         chooseFoundingFatherDialog = new ChooseFoundingFatherDialog(this);
         eventPanel = new EventPanel(this, freeColClient);
         emigrationPanel = new EmigrationPanel();
+        colopediaPanel = new ColopediaPanel(this);
 
         showMainPanel();
 
@@ -546,6 +548,19 @@ public final class Canvas extends JLayeredPane {
     }
 
 
+    /**
+     * Shows a panel displaying Colopedia Information.
+     */
+    public void showColopediaPanel(int type) {
+        colopediaPanel.initialize(type);
+
+        colopediaPanel.setLocation(getWidth() / 2 - colopediaPanel.getWidth() / 2, getHeight() / 2 - colopediaPanel.getHeight() / 2);
+        setEnabled(false);
+        add(colopediaPanel);
+        colopediaPanel.requestFocus();
+    }
+
+    
     /**
     * Shows a panel where the player may choose the next founding father to recruit.
     * @param possibleFoundingFathers The different founding fathers the player may choose.

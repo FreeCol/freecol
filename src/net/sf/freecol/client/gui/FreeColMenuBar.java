@@ -341,6 +341,86 @@ public class FreeColMenuBar extends JMenuBar {
         inGameOptions.add(disbandMenuItem);
         mapControlOptions.add(disbandMenuItem);
         
+        // --> Colopedia
+
+        JMenu colopediaMenu = new JMenu(Messages.message("menuBar.colopedia"));
+        colopediaMenu.setOpaque(false);
+        colopediaMenu.setMnemonic(KeyEvent.VK_C);
+        add(colopediaMenu);
+        inGameOptions.add(colopediaMenu);
+
+        JMenuItem terrainMenuItem = new JMenuItem(Messages.message("menuBar.colopedia.terrain"));
+        terrainMenuItem.setOpaque(false);
+        terrainMenuItem.setMnemonic(KeyEvent.VK_T);
+        //terrainMenuItem.setAccelerator(KeyStroke.getKeyStroke('T', InputEvent.CTRL_MASK));
+        colopediaMenu.add(terrainMenuItem);
+        terrainMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                canvas.showColopediaPanel(0);
+            }
+        });
+        inGameOptions.add(terrainMenuItem);
+
+        JMenuItem unitMenuItem = new JMenuItem(Messages.message("menuBar.colopedia.unit"));
+        unitMenuItem.setOpaque(false);
+        unitMenuItem.setMnemonic(KeyEvent.VK_U);
+        //unitMenuItem.setAccelerator(KeyStroke.getKeyStroke('U', InputEvent.CTRL_MASK));
+        colopediaMenu.add(unitMenuItem);
+        unitMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                canvas.showColopediaPanel(1);
+            }
+        });
+        inGameOptions.add(unitMenuItem);
+
+        JMenuItem goodsMenuItem = new JMenuItem(Messages.message("menuBar.colopedia.goods"));
+        goodsMenuItem.setOpaque(false);
+        goodsMenuItem.setMnemonic(KeyEvent.VK_G);
+        //goodsMenuItem.setAccelerator(KeyStroke.getKeyStroke('G', InputEvent.CTRL_MASK));
+        colopediaMenu.add(goodsMenuItem);
+        goodsMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                canvas.showColopediaPanel(2);
+            }
+        });
+        inGameOptions.add(goodsMenuItem);
+
+        JMenuItem skillMenuItem = new JMenuItem(Messages.message("menuBar.colopedia.skill"));
+        skillMenuItem.setOpaque(false);
+        skillMenuItem.setMnemonic(KeyEvent.VK_S);
+        //buildingMenuItem.setAccelerator(KeyStroke.getKeyStroke('S', InputEvent.CTRL_MASK));
+        colopediaMenu.add(skillMenuItem);
+        skillMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                canvas.showColopediaPanel(3);
+            }
+        });
+        inGameOptions.add(skillMenuItem);
+
+        JMenuItem buildingMenuItem = new JMenuItem(Messages.message("menuBar.colopedia.building"));
+        buildingMenuItem.setOpaque(false);
+        buildingMenuItem.setMnemonic(KeyEvent.VK_B);
+        //buildingMenuItem.setAccelerator(KeyStroke.getKeyStroke('B', InputEvent.CTRL_MASK));
+        colopediaMenu.add(buildingMenuItem);
+        buildingMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                canvas.showColopediaPanel(4);
+            }
+        });
+        inGameOptions.add(buildingMenuItem);
+
+        JMenuItem fatherMenuItem = new JMenuItem(Messages.message("menuBar.colopedia.father"));
+        fatherMenuItem.setOpaque(false);
+        fatherMenuItem.setMnemonic(KeyEvent.VK_F);
+        //fatherMenuItem.setAccelerator(KeyStroke.getKeyStroke('F', InputEvent.CTRL_MASK));
+        colopediaMenu.add(fatherMenuItem);
+        fatherMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                canvas.showColopediaPanel(5);
+            }
+        });
+        inGameOptions.add(fatherMenuItem);
+        
         // --> Debug
         if (FreeCol.isInDebugMode()) {
             JMenu debugMenu = new JMenu(Messages.message("menuBar.debug"));
