@@ -300,7 +300,9 @@ public class FreeColMenuBar extends JMenuBar {
         ordersMenu.add(disbandMenuItem);
         disbandMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // TODO
+                if(gui.getActiveUnit() != null) {
+                    freeColClient.getInGameController().disbandActiveUnit();
+                }
             }
         });
         inGameOptions.add(disbandMenuItem);        

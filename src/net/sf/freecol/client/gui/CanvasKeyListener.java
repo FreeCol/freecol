@@ -143,6 +143,11 @@ public final class CanvasKeyListener implements KeyListener {
                 mapControls.zoomOut();
                 parent.refresh();
                 break;
+            case KeyEvent.VK_D:
+                if(parent.getGUI().getActiveUnit() != null) {
+                    parent.getClient().getInGameController().disbandActiveUnit();
+                }
+                break;
             default:
                 logger.info("The typed key (" + e.getKeyCode() + ") doesn't have a function yet.");
         }

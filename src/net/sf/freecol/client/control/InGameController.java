@@ -983,6 +983,32 @@ public final class InGameController {
 
         nextActiveUnit();
     }
+    
+    /**
+     * Disbands the active unit.
+     */
+    public void disbandActiveUnit() {
+        GUI gui = freeColClient.getGUI();
+        Unit unit = gui.getActiveUnit();
+        Client client = freeColClient.getClient();
+        
+        if(unit == null) {
+            return;
+        }
+        
+        if(!freeColClient.getCanvas().showConfirmDialog("disbandUnit.text", "disbandUnit.yes", "disbandUnit.no")) {
+            return;
+        }
+        
+        Element disbandUnit = Message.createNewRootElement("disbandUnit");
+        disbandUnit.setAttribute("unit", unit.getID());
+        
+        unit.setLocation(null);
+        
+        nextActiveUnit();
+        
+        client.send(disbandUnit);
+    }
 
 
     /**

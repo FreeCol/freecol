@@ -166,6 +166,9 @@ public final class UnitButton extends JButton {
                 break;
             
             case UNIT_BUTTON_DISBAND:
+                if(gui.getActiveUnit() != null) {
+                    freeColClient.getInGameController().disbandActiveUnit();
+                }
                 break;
             
             default:
