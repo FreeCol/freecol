@@ -830,10 +830,10 @@ public class Player extends FreeColGameObject {
                 }
             } else if (currentFather == FoundingFather.FRANSICO_DE_CORONADO) {
                 ArrayList tiles = new ArrayList();
-                
+
                 Iterator tileIterator = getGame().getMap().getWholeMapIterator();
                 while (tileIterator.hasNext()) {
-                    Tile tile = (Tile) tileIterator.next();
+                    Tile tile = getGame().getMap().getTile(((Map.Position) tileIterator.next()));
                     if (tile.getColony() != null) {
                         tiles.add(tile);
                         for (int i=0; i<8; i++) {
@@ -847,20 +847,14 @@ public class Player extends FreeColGameObject {
 
                 getGame().getModelController().exploreTiles(this, tiles);
             } else if (currentFather == FoundingFather.LA_SALLE) {
-                Iterator tileIterator = getGame().getMap().getWholeMapIterator();
-                while (tileIterator.hasNext()) {
-                    Tile tile = (Tile) tileIterator.next();
-                    if (tile.getColony() != null) {
-                        tile.getColony().updatePopulation();
-                    }
+                Iterator colonyIterator = getColonyIterator();
+                while (colonyIterator.hasNext()) {
+                    ((Colony) colonyIterator.next()).updatePopulation();
                 }
             } else if (currentFather == FoundingFather.SIMON_BOLIVAR) {
-                Iterator tileIterator = getGame().getMap().getWholeMapIterator();
-                while (tileIterator.hasNext()) {
-                    Tile tile = (Tile) tileIterator.next();
-                    if (tile.getColony() != null) {
-                        tile.getColony().addSoL(20);
-                    }
+                Iterator colonyIterator = getColonyIterator();
+                while (colonyIterator.hasNext()) {
+                    ((Colony) colonyIterator.next()).addSoL(20);
                 }
             }
 
