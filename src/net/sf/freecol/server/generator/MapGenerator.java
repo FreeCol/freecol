@@ -304,11 +304,11 @@ public class MapGenerator {
                 }
             }
             // is hills
-            else if (t.getAddition() == Tile.ADD_HILLS) {
+            else if (t.hasBonus() && t.getAddition() == Tile.ADD_HILLS) {
                 return IndianSettlement.EXPERT_ORE_MINER;
             }
             // has mountains
-            else if (t.getAddition() == Tile.ADD_MOUNTAINS) {
+            else if (t.hasBonus() && t.getAddition() == Tile.ADD_MOUNTAINS) {
                 if(t.hasBonus())
                     return IndianSettlement.EXPERT_SILVER_MINER;
                 else
