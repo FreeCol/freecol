@@ -108,12 +108,12 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     private GoodsContainer  goodsContainer;
     private Location        entryLocation;
     private Location        location;
-    
+
     // to be used only for type == TREASURE_TRAIN
     private int             treasureAmount;
 
     private int             workType; // What type of goods this unit produces in its occupation.
-    
+
     private int             turnsOfTraining = 0;
     private int             trainingType = -1;
 
@@ -138,7 +138,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     /**
     * Initiate a new <code>Unit</code> with the specified parameters.
     *
-    * @param The <code>Game</code> in which this <code>Unit</code> belong.
+    * @param game The <code>Game</code> in which this <code>Unit</code> belong.
     * @param location The <code>Location/code> to place this <code>Unit</code> upon.
     * @param owner The <code>Player</code> owning this unit.
     * @param type The type of the unit.
@@ -186,64 +186,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     }
 
 
-
-
-    /**
-    * The constructor to use.
-    * @param location The Location the unit is created at.
-    * @param owner The Player owning the unit.
-    * @param type The type of the unit.
-    * @param movesLeft The amount of moves this Unit has left.
-    * @param s The initial state for this Unit (one of
-    * {ACTIVE, FORTIFY, ...}).
-    * @param id The unique identifier of this Unit for easy
-    * referencing when communicating with the server.
-    */
-    /*public Unit(Game game, Location location, Player owner, int type, int movesLeft, int s, int id) {
-        super(game);
-
-        unitContainer = new UnitContainer(game, this);
-
-        this.location = location;
-        location.add(this);
-        this.owner = owner;
-//        owner.addElement(this);
-        this.type = type;
-        this.movesLeft = movesLeft;
-        //this.id = id;
-        
-        this.armed = armed;
-        this.mounted = mounted;
-        this.missionary = missionary;
-        this.numberOfTools = numberOfTools;
-        
-        location = null;
-        
-        state = s;
-        workLeft = -1;
-
-        if (type == VETERAN_SOLDIER) {
-            armed = true;
-        } else {
-            armed = false;
-        }
-
-        if (type == SEASONED_SCOUT) {
-            mounted = true;
-        } else {
-            mounted = false;
-        }
-
-        if (type == HARDY_PIONEER) {
-            numberOfTools = 100;
-        } else {
-            numberOfTools = 0;
-        }
-    }*/
-
-
-
-
     /**
     * Initialize this object from an XML-representation of this object.
     *
@@ -271,7 +213,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             throw new IllegalStateException();
         }
     }
-    
+
     /**
      * the current amount of treasure in this unit.
      * Should be type of TREASURE_TRAIN.

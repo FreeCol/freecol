@@ -46,7 +46,7 @@ public class FoundingFather {
                             THOMAS_PAINE = 17,//TODO
                             SIMON_BOLIVAR = 18,//TODO
                             BENJAMIN_FRANKLIN = 19,//TODO
-                            WILLIAM_BREWSTER = 20,//TODO
+                            WILLIAM_BREWSTER = 20,//TODO: show a panel where you can pick the emigrant.
                             WILLIAM_PENN = 21,//TODO
                             FATHER_JEAN_DE_BREBEUF = 22,//TODO
                             JUAN_DE_SEPULVEDA = 23,//TODO

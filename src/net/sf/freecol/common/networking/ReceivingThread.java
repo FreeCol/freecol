@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.net.SocketException;
 import java.util.logging.Logger;
+import javax.swing.SwingUtilities;
 
 import java.util.Vector;
 
@@ -175,7 +176,13 @@ final class ReceivingThread extends Thread {
                     }
 
                 } else if (!msg.getType().equals("invalid")) { // == this is not a reply-message:
-                    connection.handleAndSendReply(msg);
+                    final Message theMsg  = msg;
+                    Thread t = new Thread() {
+                        public void run() {
+                            connection.handleAndSendReply(theMsg);
+                        }
+                    };
+                    t.start();
                 }
             }
 

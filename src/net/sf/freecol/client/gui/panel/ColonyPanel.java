@@ -387,6 +387,9 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                     parent.remove(this);
                     parent.showMapControls();
                     freeColClient.getInGameController().nextModelMessage();
+                    if (parent.getGUI().getActiveUnit() == null) {
+                        freeColClient.getInGameController().nextActiveUnit();
+                    }
                     break;
                 default:
                     logger.warning("Invalid action");
@@ -890,7 +893,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                       ((UnitLabel) comp).setSmall(false);
                       inGameController.boardShip(unit, selectedUnit.getUnit());
                       updateBuildingBox();
-                      colonyPanel.updateSoLLabel();                      
+                      colonyPanel.updateSoLLabel();
                     } else {
                       return null;
                     }

@@ -154,11 +154,14 @@ public class Connection {
         questionElement.setAttribute("networkReplyId", Integer.toString(networkReplyId));
         questionElement.appendChild(element);
 
-        NetworkReplyObject nro = thread.waitForNetworkReply(networkReplyId);
-
-        send(questionElement);
-
-        return (Element) ((Message) nro.getResponse()).getDocument().getDocumentElement().getFirstChild();
+        if (Thread.currentThread() == thread) {
+            logger.warning("Attempt to 'wait()' the ReceivingThread.");
+            throw new IOException("Attempt to 'wait()' the ReceivingThread.");
+        } else {
+            NetworkReplyObject nro = thread.waitForNetworkReply(networkReplyId);
+            send(questionElement);
+            return (Element) ((Message) nro.getResponse()).getDocument().getDocumentElement().getFirstChild();
+        }
     }
 
 
@@ -208,7 +211,7 @@ public class Connection {
         try {
             if (element.getTagName().equals("question")) {
                 String networkReplyId = element.getAttribute("networkReplyId");
-
+                
                 Element reply = messageHandler.handle(this, (Element) element.getFirstChild());
 
                 if (reply == null) {

@@ -824,7 +824,7 @@ public final class Tile extends FreeColGameObject implements Location {
             tileElement.appendChild(unitContainer.toXMLElement(player, document));
         } else {
             UnitContainer emptyUnitContainer = new UnitContainer(getGame(), this);
-            emptyUnitContainer.setID(unitContainer.getID());
+            emptyUnitContainer.setFakeID(unitContainer.getID());
             tileElement.appendChild(emptyUnitContainer.toXMLElement(player, document));
         }
 

@@ -161,6 +161,18 @@ abstract public class FreeColGameObject {
 
     
     /**
+    * Sets the ID of this object for temporary use with
+    * <code>toXMLElement</code>. This method does not
+    * register the object.
+    *
+    * @param newId the unique ID of this object,
+    */
+    public void setFakeID(String newID) {
+        this.id = newID;
+    }
+
+    
+    /**
     * Creates a <code>ModelMessage</code> and uses <code>
     * getGame().addModelMessage(modelMessage)</code>
     * to register it.

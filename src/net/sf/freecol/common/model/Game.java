@@ -52,12 +52,16 @@ public class Game extends FreeColGameObject {
 
     private Turn turn = new Turn(1);
 
+    private final ModelController modelController;
+
 
     /**
     * Creates a new game model.
     */
-    public Game() {
+    public Game(ModelController modelController) {
         super(null);
+        
+        this.modelController = modelController;
 
         currentPlayer = null;
         canGiveID = true;
@@ -69,12 +73,21 @@ public class Game extends FreeColGameObject {
     * Initiate a new <code>Game</code> object from a <code>Element</code>
     * in a DOM-parsed XML-tree.
     */
-    public Game(Element element) {
+    public Game(ModelController modelController, Element element) {
         super(null, element);
 
+        this.modelController = modelController;
+        
         canGiveID = false;
         readFromXMLElement(element);
     }
+
+
+
+    public ModelController getModelController() {
+        return modelController;
+    }
+
 
     /**
     * Returns this Game's Market.
@@ -592,7 +605,21 @@ public class Game extends FreeColGameObject {
                 map = new Map(this, mapElement);
             }
         }
-                
+
+        // Get the players again:
+        playerList = gameElement.getElementsByTagName(Player.getXMLElementTagName());
+        for (int i=0; i<playerList.getLength(); i++) {
+            Element playerElement = (Element) playerList.item(i);
+
+            Player player = (Player) getFreeColGameObject(playerElement.getAttribute("ID"));
+            if (player != null) {
+                player.readFromXMLElement(playerElement);
+            } else {
+                player = new Player(this, playerElement);
+                players.add(player);
+            }
+        }
+
         Element marketElement = getChildElement(gameElement, Market.getXMLElementTagName());
         if (market != null) {
             market.readFromXMLElement(marketElement);

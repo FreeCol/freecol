@@ -70,8 +70,6 @@ public final class InGameInputHandler extends InputHandler {
                 reply = newTurn(element);
             } else if (type.equals("setDead")) {
                 reply = setDead(element);
-            } else if (type.equals("createUnit")) {
-                reply = createUnit(element);
             } else if (type.equals("gameEnded")) {
                 reply = gameEnded(element);
             } else if (type.equals("chat")) {
@@ -282,27 +280,6 @@ public final class InGameInputHandler extends InputHandler {
                 canvas.reallyQuit();
             }
         }
-
-        return null;
-    }
-
-
-    /**
-    * Handles a "createUnit"-message.
-    *
-    * @param element The element (root element in a DOM-parsed XML tree) that
-    *                holds all the information.
-    */
-    private Element createUnit(Element element) {
-        Game game = getFreeColClient().getGame();
-
-        Location location = (Location) game.getFreeColGameObject(element.getAttribute("location"));
-        Unit unit = new Unit(game, (Element) element.getChildNodes().item(0));
-
-        // TODO-WHEN-EXTENDING-GAME: Add "createUnit" to interface Location.
-        //                           in order to make it possible to produce units
-        //                           other places than the colonies.
-        ((Colony) location).createUnit(unit);
 
         return null;
     }

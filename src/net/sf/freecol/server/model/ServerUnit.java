@@ -50,6 +50,20 @@ public final class ServerUnit extends Unit {
     * @param owner The <code>Player</code> owning this unit.
     * @param type The type of the unit.
     * @param s The initial state for this Unit (one of {@link #ACTIVE}, {@link #FORTIFY}...).
+    */
+    public ServerUnit(Game game, Location location, Player owner, int type, int s) {
+        this(game, location, owner, type, s, null);
+    }
+
+
+    /**
+    * Initiate a new <code>Unit</code> with the specified parameters.
+    *
+    * @param The <code>Game</code> in which this <code>Unit</code> belong.
+    * @param location The <code>Location/code> to place this <code>Unit</code> upon.
+    * @param owner The <code>Player</code> owning this unit.
+    * @param type The type of the unit.
+    * @param s The initial state for this Unit (one of {@link #ACTIVE}, {@link #FORTIFY}...).
     * @param connection The connection to send data through.
     */
     public ServerUnit(Game game, Location location, Player owner, int type, int s, DummyConnection connection) {
@@ -57,7 +71,7 @@ public final class ServerUnit extends Unit {
         
         this.connection = connection;
     }
-    
+
     /**
     * Gets a mission for this ServerUnit.
     * @return One of MISSION_STAND, MISSION_WANDER, etc.

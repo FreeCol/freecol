@@ -109,6 +109,8 @@ public final class InGameInputHandler extends InputHandler {
                         reply = endTurn(connection, element);
                     } else if (type.equals("disconnect")) {
                         reply = disconnect(connection, element);
+                    } else if (type.equals("createUnit")) {
+                        reply = createUnit(connection, element);
                     } else {
                         logger.warning("Unknown request from client " + element.getTagName());
                     }
@@ -117,6 +119,8 @@ public final class InGameInputHandler extends InputHandler {
                     // though it is NOT the sender's turn.
                     if (type.equals("logout")) {
                         reply = logout(connection, element);
+                    } else if (type.equals("createUnit")) {
+                        reply = createUnit(connection, element);
                     } else {
                         // The message we've received is probably a good one, but
                         // it was sent when it was not the sender's turn.
@@ -134,6 +138,34 @@ public final class InGameInputHandler extends InputHandler {
 
             return null;
         }
+
+        return reply;
+    }
+
+
+    /**
+    * Handles a "createUnit"-message from a client.
+    *
+    * @param connection The connection the message came from.
+    * @param element The element containing the request.
+    *
+    */
+    private Element createUnit(Connection connection, Element element) {
+        Game game = getFreeColServer().getGame();
+
+        String taskID = element.getAttribute("taskID");
+        Location location = (Location) game.getFreeColGameObject(element.getAttribute("location"));
+        Player owner = (Player) game.getFreeColGameObject(element.getAttribute("owner"));
+        int type = Integer.parseInt(element.getAttribute("type"));
+
+        if (owner != getFreeColServer().getPlayer(connection)) {
+            throw new IllegalStateException();
+        }
+
+        Unit unit = getFreeColServer().getModelController().createUnit(taskID, location, owner, type);
+
+        Element reply = Message.createNewRootElement("createUnitConfirmed");
+        reply.appendChild(unit.toXMLElement(owner, reply.getOwnerDocument()));
 
         return reply;
     }
@@ -738,7 +770,11 @@ public final class InGameInputHandler extends InputHandler {
         reply.setAttribute("slot", Integer.toString(slot));
         reply.appendChild(unit.toXMLElement(player, reply.getOwnerDocument()));
 
-        europe.emigrate(slot, unit, newRecruitable);
+        if (player.hasFather(FoundingFather.WILLIAM_BREWSTER)) {
+            europe.emigrate(slot, unit, newRecruitable);
+        } else {
+            europe.emigrate((int) ((Math.random() * 3) + 1), unit, newRecruitable);
+        }
 
         try {
             connection.send(reply);
@@ -1043,8 +1079,6 @@ public final class InGameInputHandler extends InputHandler {
 
             Element newTurnElement = Message.createNewRootElement("newTurn");
             freeColServer.getServer().sendToAll(newTurnElement, null);
-
-            createUnitsInColonies();
         }
 
         try {
@@ -1091,71 +1125,6 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         return winner;
-    }
-
-
-    /**
-    * Creates a colonist in every colony having more than 300 food
-    * and builds a unit if choosen and completed.
-    */
-    private void createUnitsInColonies() {
-        Game game = getFreeColServer().getGame();
-        Map map = game.getMap();
-
-        Iterator wmi = map.getWholeMapIterator();
-        while (wmi.hasNext()) {
-            Tile tile = map.getTile((Position) wmi.next());
-            if (tile.getColony() != null && tile.getColony().getGoodsCount(Goods.FOOD) >= 300) {
-                Colony colony = tile.getColony();
-                Unit unit = new Unit(game, null, colony.getOwner(), Unit.FREE_COLONIST, Unit.ACTIVE);
-
-                Element createUnitElement = Message.createNewRootElement("createUnit");
-                createUnitElement.setAttribute("location", colony.getID());
-                createUnitElement.appendChild(unit.toXMLElement(colony.getOwner(), createUnitElement.getOwnerDocument()));
-
-                colony.createUnit(unit);
-
-                ServerPlayer player = ((ServerPlayer) colony.getOwner());
-
-                try {
-                    player.getConnection().send(createUnitElement);
-                } catch (IOException e) {
-                    logger.warning("Could not send message to: " + player.getName() + " with connection " + player.getConnection());
-                }
-            }
-
-            if (tile.getColony() != null && tile.getColony().getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) {
-                int unitType = tile.getColony().getCurrentlyBuilding() - Colony.BUILDING_UNIT_ADDITION;
-
-                if (Unit.getNextHammers(unitType) <= tile.getColony().getHammers() &&
-                    Unit.getNextTools(unitType) <= tile.getColony().getGoodsCount(Goods.TOOLS)) {
-
-                    Colony colony = tile.getColony();
-
-                    // Check for cheating:
-                    if (!colony.canBuildUnit(unitType)) {
-                        logger.warning("Trying to build: " + unitType + " in colony: " + colony);
-                        return;
-                    }
-
-                    Unit unit = new Unit(game, null, colony.getOwner(), unitType, Unit.ACTIVE);
-
-                    Element createUnitElement = Message.createNewRootElement("createUnit");
-                    createUnitElement.setAttribute("location", colony.getID());
-                    createUnitElement.appendChild(unit.toXMLElement(colony.getOwner(), createUnitElement.getOwnerDocument()));
-
-                    colony.createUnit(unit);
-
-                    ServerPlayer player = ((ServerPlayer) colony.getOwner());
-
-                    try {
-                        player.getConnection().send(createUnitElement);
-                    } catch (IOException e) {
-                        logger.warning("Could not send message to: " + player.getName() + " with connection " + player.getConnection());
-                    }
-                }
-            }
-        }
     }
 
 

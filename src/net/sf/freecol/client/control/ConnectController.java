@@ -169,7 +169,7 @@ public final class ConnectController {
             boolean admin = (new Boolean(reply.getAttribute("admin"))).booleanValue();
             freeColClient.setAdmin(admin);
 
-            Game game = new Game((Element) reply.getElementsByTagName(Game.getXMLElementTagName()).item(0));
+            Game game = new Game(freeColClient.getModelController(), (Element) reply.getElementsByTagName(Game.getXMLElementTagName()).item(0));
             Player thisPlayer = game.getPlayerByName(username);
 
             freeColClient.setGame(game);

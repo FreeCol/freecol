@@ -112,6 +112,14 @@ public final class Colony extends Settlement implements Location {
 
 
     /**
+    * Gets this colony's line of sight.
+    */
+    public int getLineOfSight() {
+        return 2;
+    }
+
+
+    /**
     * Sets the owner of this <code>Colony</code>, including all units within.
     *
     * @param owner The <code>Player</code> that shall own this <code>Settlement</code>.
@@ -271,11 +279,16 @@ public final class Colony extends Settlement implements Location {
     public void add(Locatable locatable) {
         if (locatable instanceof Unit) {
             if (((Unit) locatable).isColonist()) {
+                WorkLocation w = getVacantColonyTileFor(((Unit) locatable), Goods.FOOD);
+                if (w.canAdd(locatable)) {
+                    locatable.setLocation(w);
+                    return;
+                }
+
                 Iterator i = getWorkLocationIterator();
                 while (i.hasNext()) {
-                    WorkLocation w = (WorkLocation) i.next();
+                    w = (WorkLocation) i.next();
                     if (w.canAdd(locatable)) {
-                        //w.add(locatable);
                         locatable.setLocation(w);
                         return;
                     }
@@ -479,25 +492,7 @@ public final class Colony extends Settlement implements Location {
         }
     }
 
-    
-    /**
-    * Adds the given unit to this colony. If <code>unit.isColonist()</code>
-    * then 300 food is removed, else hammers and tools are removed.
-    */
-    public void createUnit(Unit unit) {
-        if (unit.isColonist()) {
-            removeGoods(Goods.FOOD, 300);
-            addModelMessage(this, "model.colony.newColonist", new String[][] {{"%colony%", getName()}});
-        } else {
-            hammers = 0;
-            removeGoods(Goods.TOOLS, Unit.getNextTools(unit.getType()));
-            addModelMessage(this, "model.colony.unitReady", new String[][] {{"%colony%", getName()}, {"%unit%", unit.getName()}});
-        }
 
-        unit.setLocation(this);
-    }
-
-    
     /**
     * Returns an <code>Iterator</code> of every unit type this colony may build.
     */
@@ -686,7 +681,8 @@ public final class Colony extends Settlement implements Location {
         Iterator colonyTileIterator = getColonyTileIterator();
         while (colonyTileIterator.hasNext()) {
             ColonyTile colonyTile = (ColonyTile) colonyTileIterator.next();
-            if (colonyTile.canAdd(unit) && unit.getFarmedPotential(goodsType, colonyTile.getWorkTile()) > highestProduction) {
+            if (colonyTile.canAdd(unit) && unit.getFarmedPotential(goodsType, colonyTile.getWorkTile()) > highestProduction
+                    && (colonyTile.getWorkTile().isLand() || getBuilding(Building.DOCK).isBuilt())) {
                 highestProduction = unit.getFarmedPotential(goodsType, colonyTile.getWorkTile());
                 bestPick = colonyTile;
             }
@@ -707,7 +703,8 @@ public final class Colony extends Settlement implements Location {
         Iterator colonyTileIterator = getColonyTileIterator();
         while (colonyTileIterator.hasNext()) {
             ColonyTile colonyTile = (ColonyTile) colonyTileIterator.next();
-            if (colonyTile.canAdd(unit) && unit.getFarmedPotential(goodsType, colonyTile.getWorkTile()) > highestProduction) {
+            if (colonyTile.canAdd(unit) && unit.getFarmedPotential(goodsType, colonyTile.getWorkTile()) > highestProduction
+                    && (colonyTile.getWorkTile().isLand() || getBuilding(Building.DOCK).isBuilt())) {
                 highestProduction = unit.getFarmedPotential(goodsType, colonyTile.getWorkTile());
             }
         }
@@ -751,7 +748,7 @@ public final class Colony extends Settlement implements Location {
             addModelMessage(this, "model.colony.colonistStarved", new String[][] {{"%colony%", getName()}});
         } else {
             removeGoods(Goods.FOOD, eat);
-            
+
             if (eat > getFoodProduction() && (food-eat) / (eat - getFoodProduction()) <= 3) {
                 addModelMessage(this, "model.colony.famineFeared", new String[][] {{"%colony%", getName()}, {"%number%", Integer.toString((food-eat) / (eat - getFoodProduction()))}});
             }
@@ -770,6 +767,27 @@ public final class Colony extends Settlement implements Location {
 
                 removeGoods(Goods.FOOD, horseProduction/2);
                 addGoods(Goods.HORSES, horseProduction);
+            }
+        }
+
+        // Create a new colonist if there is enough food:
+        if (getGoodsCount(Goods.FOOD) >= 300) {
+            getGame().getModelController().createUnit(getID() + "newTurn300food", getTile(), getOwner(), Unit.FREE_COLONIST);
+            removeGoods(Goods.FOOD, 300);
+            addModelMessage(this, "model.colony.newColonist", new String[][] {{"%colony%", getName()}});
+        }
+
+        // Build units:
+        if (getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) {
+            int unitType = getCurrentlyBuilding() - BUILDING_UNIT_ADDITION;
+
+            if (canBuildUnit(unitType) && Unit.getNextHammers(unitType) <= getHammers() &&
+                Unit.getNextTools(unitType) <= getGoodsCount(Goods.TOOLS)) {
+
+                Unit unit = getGame().getModelController().createUnit(getID() + "buildUnit", getTile(), getOwner(), unitType);
+                hammers = 0;
+                removeGoods(Goods.TOOLS, Unit.getNextTools(unit.getType()));
+                addModelMessage(this, "model.colony.unitReady", new String[][] {{"%colony%", getName()}, {"%unit%", unit.getName()}});
             }
         }
 

@@ -307,11 +307,11 @@ public class MapGenerator {
                 unitType = Unit.CARAVEL;
             }
 
-            Unit unit1 = new Unit(game, startTile, player, unitType, Unit.ACTIVE);
-            Unit unit2 = new Unit(game, unit1, player, Unit.HARDY_PIONEER, Unit.SENTRY);
-            Unit unit3 = new Unit(game, unit1, player, Unit.VETERAN_SOLDIER, Unit.SENTRY);
-            Unit unit4 = new Unit(game, startTile, player, Unit.GALLEON, Unit.ACTIVE);
-            Unit unit5 = new Unit(game, unit4, player, Unit.FREE_COLONIST, Unit.SENTRY);
+            ServerUnit unit1 = new ServerUnit(game, startTile, player, unitType, Unit.ACTIVE);
+            ServerUnit unit2 = new ServerUnit(game, unit1, player, Unit.HARDY_PIONEER, Unit.SENTRY);
+            ServerUnit unit3 = new ServerUnit(game, unit1, player, Unit.VETERAN_SOLDIER, Unit.SENTRY);
+            ServerUnit unit4 = new ServerUnit(game, startTile, player, Unit.GALLEON, Unit.ACTIVE);
+            ServerUnit unit5 = new ServerUnit(game, unit4, player, Unit.FREE_COLONIST, Unit.SENTRY);
         }
     }
 

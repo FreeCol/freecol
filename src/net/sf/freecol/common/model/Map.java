@@ -865,7 +865,7 @@ public class Map extends FreeColGameObject {
                 mapElement.appendChild(tile.toXMLElement(player, document));
             } else {
                 Tile hiddenTile = new Tile(getGame(), tile.getX(), tile.getY());
-                hiddenTile.setID(tile.getID());
+                hiddenTile.setFakeID(tile.getID());
                 mapElement.appendChild(hiddenTile.toXMLElement(player, document));
             }
         }

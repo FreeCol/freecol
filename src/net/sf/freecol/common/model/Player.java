@@ -256,7 +256,10 @@ public class Player extends FreeColGameObject {
         if (tile.getFirstUnit() != null && tile.getFirstUnit().getOwner().equals(this)) {
             return true;
         }
-
+        
+        if (tile != null && tile.getColony() != null && tile.getColony().getOwner().equals(this)) {
+            return true;
+        }
 
         // Check the tiles in a MAX_LINE_OF_SIGHT radius around the given tile:
         Vector surroundingTiles = getGame().getMap().getSurroundingTiles(tile, MAX_LINE_OF_SIGHT);
@@ -272,7 +275,7 @@ public class Player extends FreeColGameObject {
                         return true;
                     }
                 }
-            } else if (t != null && t.getColony() != null && t.getColony().getOwner().equals(this)) {
+            } else if (t != null && t.getColony() != null && t.getColony().getOwner().equals(this) && t.getColony().getLineOfSight() >= t.getDistanceTo(tile)) {
                 return true;
             }
         }

@@ -34,6 +34,7 @@ public final class FreeColClient {
     private PreGameInputHandler preGameInputHandler;
     private InGameController inGameController;
     private InGameInputHandler inGameInputHandler;
+    private ClientModelController modelController;
 
 
     // Gui:
@@ -93,6 +94,7 @@ public final class FreeColClient {
         preGameInputHandler = new PreGameInputHandler(this);
         inGameController = new InGameController(this);
         inGameInputHandler = new InGameInputHandler(this);
+        modelController = new ClientModelController(this);
 
         // Gui:
         startGUI(windowed, imageLibrary, musicLibrary, sfxLibrary);
@@ -335,6 +337,13 @@ public final class FreeColClient {
         return inGameInputHandler;
     }
 
+    
+    /**
+    * Gets the <code>ClientModelController</code>.
+    */
+    public ClientModelController getModelController() {
+        return modelController;
+    }
 
     /**
     * Sets the <code>Client</code> that shall be used to send

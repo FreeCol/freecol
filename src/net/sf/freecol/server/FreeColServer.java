@@ -19,6 +19,7 @@ import net.sf.freecol.server.control.UserConnectionHandler;
 import net.sf.freecol.server.control.PreGameController;
 import net.sf.freecol.server.control.PreGameInputHandler;
 import net.sf.freecol.server.control.InGameInputHandler;
+import net.sf.freecol.server.control.ServerModelController;
 
 // Model:
 import net.sf.freecol.server.networking.Server;
@@ -60,6 +61,7 @@ public final class FreeColServer {
     private Controller controller;
     private PreGameInputHandler preGameInputHandler;
     private InGameInputHandler inGameInputHandler;
+    private ServerModelController modelController;
 
     private Game game;
     private boolean singleplayer;
@@ -84,7 +86,9 @@ public final class FreeColServer {
     public FreeColServer(boolean singleplayer, int port) throws IOException {
         this.singleplayer = singleplayer;
 
-        game = new Game();
+        modelController = new ServerModelController(this);
+
+        game = new Game(modelController);
 
         userConnectionHandler = new UserConnectionHandler(this);
         controller = new PreGameController(this);
@@ -196,6 +200,11 @@ public final class FreeColServer {
         return inGameInputHandler;
     }
 
+    
+    public ServerModelController getModelController() {
+        return modelController;
+    }
+    
 
     /**
     * Gets the <code>Game</code> that is beeing played.
