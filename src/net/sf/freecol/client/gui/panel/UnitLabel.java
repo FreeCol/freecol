@@ -17,6 +17,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.ImageLibrary;
 
 import net.sf.freecol.client.control.InGameController;
 
@@ -108,16 +109,18 @@ public final class UnitLabel extends JLabel implements ActionListener {
         if (isSmall) {
             setPreferredSize(null);
             ImageIcon imageIcon = (parent.getImageProvider().getUnitImageIcon(parent.getImageProvider().getUnitGraphicsType(unit)));
-            setIcon(new ImageIcon(imageIcon.getImage().getScaledInstance(imageIcon.getIconWidth() / 2, imageIcon.getIconHeight() / 2, Image.SCALE_DEFAULT)));
+            //setIcon(new ImageIcon(imageIcon.getImage().getScaledInstance(imageIcon.getIconWidth() / 2, imageIcon.getIconHeight() / 2, Image.SCALE_DEFAULT)));
+            setIcon(new ImageIcon(imageIcon.getImage().getScaledInstance((imageIcon.getIconWidth() / 3) * 2, (imageIcon.getIconHeight() / 3) * 2, Image.SCALE_DEFAULT)));
         } else {
             if (unit.getLocation() instanceof ColonyTile) {
-                setPreferredSize(new java.awt.Dimension(parent.getImageProvider().getTerrainImageWidth(0)*3/4, parent.getImageProvider().getUnitImageHeight(parent.getImageProvider().getUnitGraphicsType(unit))));
+                setPreferredSize(new java.awt.Dimension(parent.getImageProvider().getTerrainImageWidth(0) * 3/4, parent.getImageProvider().getUnitImageHeight(parent.getImageProvider().getUnitGraphicsType(unit))));
             } else {
                 setPreferredSize(null);
             }
 
             setIcon(parent.getImageProvider().getUnitImageIcon(parent.getImageProvider().getUnitGraphicsType(unit)));
         }
+
     }
 
 

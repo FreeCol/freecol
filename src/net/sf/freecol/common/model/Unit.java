@@ -414,8 +414,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
      */
     public int getWorkType() {
         if (getLocation() instanceof Building) {
-          // TODO: code me.
-          return 0;
+          return ((Building) getLocation()).getGoodsOutputType();
         } else {
           return workType;
         }

@@ -37,7 +37,7 @@ public final class Goods implements Locatable {
     public static final int NUMBER_OF_TYPES = 16;
 
     // Unstorable goods:
-    public static final int FISH = 16,
+    public static final int FISH = 16, // Stored as food.
                             BELLS = 17,
                             CROSSES = 18,
                             HAMMERS = 19;

@@ -536,6 +536,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         */
         public final class ASingleBuildingPanel extends JPanel {
             Building building;
+            JPanel productionInBuildingPanel = new JPanel();
 
 
             /**
@@ -547,7 +548,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
                 removeAll();
                 setBackground(Color.WHITE);
-                setLayout(new GridLayout(1, 2));
+
+                setLayout(new GridLayout(1, 3));
 
                 JPanel colonistsInBuildingPanel = new JPanel();
                 colonistsInBuildingPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -570,6 +572,30 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
                 colonistsInBuildingPanel.setOpaque(false);
                 add(colonistsInBuildingPanel);
+
+                updateProductionInBuildingPanel();
+                add(productionInBuildingPanel);
+            }
+
+
+            public void updateProductionInBuildingPanel() {
+                productionInBuildingPanel.removeAll();
+                productionInBuildingPanel.setOpaque(false);
+                productionInBuildingPanel.setLayout(new FlowLayout());
+
+                int production = building.getProductionNextTurn();
+                if (production > 0) {
+                    ImageIcon goodsIcon = parent.getImageProvider().getGoodsImageIcon(building.getGoodsOutputType());
+                    int width = goodsIcon.getIconWidth() * 3;
+                    BufferedImage productionImage = parent.getGUI().createProductionImage(goodsIcon, production, width, goodsIcon.getIconHeight());
+                    JLabel productionLabel = new JLabel(new ImageIcon(productionImage));
+                    productionInBuildingPanel.add(productionLabel);
+
+                    if (production != building.getMaximumProduction()) {
+                        productionInBuildingPanel.add(new JLabel("(" + (building.getMaximumProduction() - production) + ")"));
+                    }
+                }
+
             }
 
 
@@ -585,6 +611,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             */
             public Component add(Component comp, boolean editState) {
                 Component c;
+                Component oldParent = comp.getParent();
 
                 if (editState) {
                     if (comp instanceof UnitLabel) {
@@ -608,6 +635,12 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 c = ((JPanel) getComponent(1)).add(comp);
                 refresh();
                 colonyPanel.updateSoLLabel();
+                
+                updateProductionInBuildingPanel();
+                if (oldParent.getParent() instanceof ASingleBuildingPanel) {
+                    ((ASingleBuildingPanel) oldParent.getParent()).updateProductionInBuildingPanel();
+                }
+
                 return c;
             }
         }

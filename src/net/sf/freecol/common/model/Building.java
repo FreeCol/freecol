@@ -351,6 +351,10 @@ public final class Building extends FreeColGameObject implements WorkLocation {
             return false;
         }
 
+        if (!((Unit) locatable).isColonist() && ((Unit) locatable).getType() != Unit.INDIAN_CONVERT) {
+            return false;
+        }
+
         if (getType() == SCHOOLHOUSE && (getLevel() < Unit.getSkillLevel(((Unit) locatable).getType())
                 || ((Unit) locatable).getType() == Unit.INDIAN_CONVERT
                 || ((Unit) locatable).getType() == Unit.FREE_COLONIST
@@ -513,7 +517,7 @@ public final class Building extends FreeColGameObject implements WorkLocation {
                 return unit;
             }
         }
-        
+
         return null;
     }
 
@@ -522,12 +526,6 @@ public final class Building extends FreeColGameObject implements WorkLocation {
     * Prepares this <code>Building</code> for a new turn.
     */
     public void newTurn() {
-
-        int goodsInput = 0;
-        int goodsOutput = 0;
-        int goodsInputType = -1;
-        int goodsOutputType = -1;
-
         if ((level == NOT_BUILT) && (type != CHURCH)) return; // Don't do anything if the building does not exist.
 
         if (type == SCHOOLHOUSE) {
@@ -560,52 +558,177 @@ public final class Building extends FreeColGameObject implements WorkLocation {
                     }
                 }
             }
+        } else if (getGoodsOutputType() != -1) {
+            int goodsInput = getGoodsInput();
+            int goodsOutput = getProduction();
+            int goodsInputType = getGoodsInputType();
+            int goodsOutputType = getGoodsOutputType();
 
-            return;
+            if (goodsOutput <= 0) return;
+
+            // Actually produce the goods:
+            if (goodsOutputType == Goods.CROSSES) {
+                colony.getOwner().incrementCrosses(goodsOutput);
+            } else if (goodsOutputType == Goods.BELLS) {
+                colony.getOwner().incrementBells(goodsOutput);
+                colony.addBells(goodsOutput);
+            } else {
+                colony.removeGoods(goodsInputType, goodsInput);
+
+                if (goodsOutputType == Goods.HAMMERS) {
+                    colony.addHammers(goodsOutput);
+                    return;
+                }
+
+                colony.addGoods(goodsOutputType, goodsOutput);
+            }
         }
+    }
 
-        // Figure out what's produced here and what it requires to do so.
+
+    /**
+    * Returns the type of goods this building produces or '-1'
+    * if no type applies.
+    */
+    public int getGoodsOutputType() {
+        switch(type) {
+            case BLACKSMITH:    return Goods.TOOLS;
+            case TOBACCONIST:   return Goods.CIGARS;
+            case WEAVER:        return Goods.CLOTH;
+            case DISTILLER:     return Goods.RUM;
+            case FUR_TRADER:    return Goods.COATS;
+            case ARMORY:        return Goods.MUSKETS;
+            case CHURCH:        return Goods.CROSSES;
+            case TOWN_HALL:     return Goods.BELLS;
+            case CARPENTER:     return Goods.HAMMERS;
+            default:            return -1;
+        }
+    }
+
+
+    /**
+    * Returns the type of goods this building needs or '-1'
+    * if no type applies.
+    */
+    public int getGoodsInputType() {
         switch(type) {
             case BLACKSMITH:
-                goodsInputType = Goods.ORE;
-                goodsOutputType = Goods.TOOLS;
-                break;
+                return Goods.ORE;
             case TOBACCONIST:
-                goodsInputType = Goods.TOBACCO;
-                goodsOutputType = Goods.CIGARS;
-                break;
+                return Goods.TOBACCO;
             case WEAVER:
-                goodsInputType = Goods.COTTON;
-                goodsOutputType = Goods.CLOTH;
-                break;
+                return Goods.COTTON;
             case DISTILLER:
-                goodsInputType = Goods.SUGAR;
-                goodsOutputType = Goods.RUM;
-                break;
+                return Goods.SUGAR;
             case FUR_TRADER:
-                goodsInputType = Goods.FURS;
-                goodsOutputType = Goods.COATS;
-                break;
+                return Goods.FURS;
             case ARMORY:
-                goodsInputType = Goods.TOOLS;
-                goodsOutputType = Goods.MUSKETS;
-                break;
-            case CHURCH:
-                goodsOutputType = Goods.CROSSES;
-                goodsOutput = 1;
-                break;
-            case TOWN_HALL:
-                goodsOutputType = Goods.BELLS;
-                goodsOutput = 1;
-                break;
+                return Goods.TOOLS;
             case CARPENTER:
-                goodsOutputType = Goods.HAMMERS;
-                goodsInputType = Goods.LUMBER;
+                return Goods.LUMBER;
             default:
-                break;
+                return -1;
+        }
+    }
+
+
+    /**
+    * Returns the amount of goods needed to have
+    * a full production.
+    *
+    * @see #getGoodsInput
+    * @see #getProduction
+    */
+    public int getMaximumGoodsInput() {
+        int goodsInput = getMaximumProduction();
+        goodsInput *= ((level > SHOP) ? SHOP : level); // Factories don't need the extra 3 units.
+
+        return goodsInput;
+    }
+
+
+    /**
+    * Returns the amount of goods beeing used to
+    * get the current {@link #getProduction production}.
+    *
+    * @see #getMaximumGoodsInput
+    * @see #getProduction
+    */
+    public int getGoodsInput() {
+        if ((getGoodsInputType() > -1) && (colony.getGoodsCount(getGoodsInputType()) < getMaximumGoodsInput()))  { // Not enough goods to do this?
+            return colony.getGoodsCount(getGoodsInputType());
+        } else {
+            return getMaximumGoodsInput();
+        }
+    }
+
+
+    /**
+    * Returns the actual production of this building.
+    *
+    * @see #getProductionNextTurn
+    * @see #getMaximumProduction
+    */
+    public int getProduction() {
+        int goodsOutput = getMaximumProduction();
+
+        if ((getGoodsInputType() > -1) && (colony.getGoodsCount(getGoodsInputType()) < getMaximumGoodsInput()))  { // Not enough goods to do this?
+            int goodsInput = colony.getGoodsCount(getGoodsInputType());
+            if (level < FACTORY) {
+                goodsOutput = goodsInput;
+            } else {
+                goodsOutput = (goodsInput * 3) / 2;
+            }
         }
 
-        if (goodsOutputType < 0) return;
+        return goodsOutput;
+    }
+
+    
+    /**
+    * Returns the actual production of this building for next turn.
+    * @see #getProduction
+    */
+    public int getProductionNextTurn() {
+        int goodsOutput = getMaximumProduction();
+
+        if ((getGoodsInputType() > -1) && (colony.getGoodsCount(getGoodsInputType()) + colony.getProductionOf(getGoodsInputType()) < getMaximumGoodsInput()))  { // Not enough goods to do this?
+            int goodsInput = colony.getGoodsCount(getGoodsInputType()) + colony.getProductionOf(getGoodsInputType());
+            if (level < FACTORY) {
+                goodsOutput = goodsInput;
+            } else {
+                goodsOutput = (goodsInput * 3) / 2;
+            }
+        }
+
+        return goodsOutput;
+    }
+
+
+    /**
+    * Returns the production of the given type of goods.
+    */
+    public int getProductionOf(int goodsType) {
+        if (goodsType == getGoodsOutputType()) {
+            return getProduction();
+        } else {
+            return 0;
+        }
+    }
+
+
+    /**
+    * Returns the maximum production of this building.
+    * That is; the production of this building when there is
+    * enough "input goods".
+    */
+    public int getMaximumProduction() {
+        int goodsOutput = 0;
+        int goodsOutputType = getGoodsOutputType();
+
+        if (getType() == CHURCH || getType() == TOWN_HALL) {
+            goodsOutput = 1;
+        }
 
         Iterator unitIterator = getUnitIterator();
         while (unitIterator.hasNext()) {
@@ -617,43 +740,13 @@ public final class Building extends FreeColGameObject implements WorkLocation {
             goodsOutput += productivity;
         }
 
-        goodsInput = goodsOutput;
         goodsOutput *= (type == CHURCH) ? level + 1 : level;
-        goodsInput *= ((level > SHOP) ? SHOP : level); // Factories don't need the extra 3 units.
-        
-        if ((goodsInputType > -1) && (colony.getGoodsCount(goodsInputType) < goodsInput))  { // Not enough goods to do this?
-            goodsInput = colony.getGoodsCount(goodsInputType);
-            if (level < FACTORY) {
-                goodsOutput = goodsInput;
-            } else {
-                goodsOutput = (goodsInput * 3) / 2;
-            }
-        }
-        
+
         if (goodsOutputType == Goods.BELLS) {
             goodsOutput += goodsOutput * colony.getBuilding(Building.PRINTING_PRESS).getLevel();
         }
 
-        if (goodsOutput <= 0) return;
-
-        // Actually produce the goods.
-        if (goodsOutputType == Goods.CROSSES) {
-            colony.getOwner().incrementCrosses(goodsOutput);
-            return;
-        } else if (goodsOutputType == Goods.BELLS) {
-            colony.getOwner().incrementBells(goodsOutput);
-            colony.addBells(goodsOutput);
-            return;
-        }
-
-        colony.removeGoods(goodsInputType, goodsInput);
-
-        if (goodsOutputType == Goods.HAMMERS) {
-            colony.addHammers(goodsOutput);
-            return;
-        }
-
-        colony.addGoods(goodsOutputType, goodsOutput);
+        return goodsOutput;
     }
 
 

@@ -8,5 +8,8 @@ package net.sf.freecol.common.model;
 */
 public interface WorkLocation extends Location {
 
-
+    /**
+    * Returns the production of the given type of goods.
+    */
+    public int getProductionOf(int goodsType);
 }

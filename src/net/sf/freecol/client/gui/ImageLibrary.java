@@ -677,6 +677,11 @@ public final class ImageLibrary extends ImageProvider {
      * @return The goods-image at the given index.
      */
     public ImageIcon getGoodsImageIcon(int index) {
+        // TODO: Remove this test when graphics have been added.
+        if (index > 16) {
+            index = 0;
+        }
+
         return ((ImageIcon) goods.get(index));
     }
 

@@ -223,24 +223,6 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation {
 
     
     /**
-    * Returns the production of food on this tile.
-    */
-    public int getFoodProduction() {
-        if (isColonyCenterTile()) {
-            return workTile.potential(Goods.FOOD);
-        } else if (getUnit() != null) {
-            if (getUnit().getWorkType() == Goods.FOOD) {
-                return getUnit().getFarmedPotential(getUnit().getWorkType(), workTile);
-            } else {
-                return 0;
-            }
-        } else {
-            return 0;
-        }
-    }
-
-
-    /**
     * Prepares this <code>ColonyTile</code> for a new turn.
     */
     public void newTurn() {
@@ -271,11 +253,56 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation {
     }
 
 
+    /**
+    * Returns the production of food on this tile.
+    */
+    public int getFoodProduction() {
+        return getProductionOf(Goods.FOOD);
+    }
+
+
+    /**
+    * Returns the production of the given type of goods.
+    */
+    public int getProductionOf(int goodsType) {
+        if ((getUnit() == null) && !(isColonyCenterTile())) {
+            return 0; // Produce nothing if there's nobody to work the terrain.
+        }
+
+        if (!(isColonyCenterTile())) {
+            if (getUnit().getWorkType() != goodsType) {
+                return 0;
+            }
+
+            int amount = getUnit().getFarmedPotential(getUnit().getWorkType(), workTile);
+
+            if (!workTile.isLand() && !colony.getBuilding(Building.DOCK).isBuilt()) {
+                amount = 0;
+            }
+
+            if (amount > 0) {
+                amount += colony.getProductionBonus();
+                return amount;
+            }
+
+            return 0;
+        } else {
+            if (goodsType == Goods.FOOD) {
+                return workTile.potential(Goods.FOOD);
+            } else if (goodsType == workTile.secondaryGoods()) {
+                return workTile.potential(workTile.secondaryGoods());
+            } else {
+                return 0;
+            }
+        }
+    }
+
+
     public void dispose() {
         if (unit != null) {
             unit.dispose();
         }
-        
+
         super.dispose();
     }
 

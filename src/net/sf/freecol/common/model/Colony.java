@@ -652,11 +652,19 @@ public final class Colony extends Settlement implements Location {
     * Gets the production of food.
     */
     public int getFoodProduction() {
+        return getProductionOf(Goods.FOOD);
+    }
+
+    
+    /**
+    * Returns the production of the given type of goods.
+    */
+    public int getProductionOf(int goodsType) {
         int amount = 0;
 
         Iterator colonyTileIterator = getColonyTileIterator();
         while (colonyTileIterator.hasNext()) {
-            amount += ((ColonyTile) colonyTileIterator.next()).getFoodProduction();
+            amount += ((ColonyTile) colonyTileIterator.next()).getProductionOf(goodsType);
         }
 
         return amount;
