@@ -448,10 +448,6 @@ public final class InGameController {
             carrier = (Unit) unit.getLocation();
             leaveShip(unit);
         }
-        
-        if (unit.getLocation() instanceof ColonyTile || unit.getLocation() instanceof Building) {
-            putOutsideColony(unit);
-        }
 
         Element equipUnitElement = Message.createNewRootElement("equipunit");
         equipUnitElement.setAttribute("unit", unit.getID());
@@ -483,6 +479,12 @@ public final class InGameController {
         }
 
         client.send(equipUnitElement);
+
+        if (unit.getLocation() instanceof ColonyTile || unit.getLocation() instanceof Building) {
+            if (!putOutsideColony(unit)) {
+                return;
+            }
+        }
         
         if (carrier != null) {
             boardShip(unit, carrier);
@@ -512,16 +514,24 @@ public final class InGameController {
     /**
     * Puts the specified unit outside the colony.
     * @param unit The <code>Unit</code>
+    * @return <i>true</i> if the unit was successfully put outside the colony.
     */
-    public void putOutsideColony(Unit unit) {
+    public boolean putOutsideColony(Unit unit) {
         Client client = freeColClient.getClient();
+        Canvas canvas = freeColClient.getCanvas();
 
-        unit.putOutsideColony();
+        if (unit.getTile().getColony().getUnitCount() > 1 || canvas.showConfirmDialog("abandonColony.text", "abandonColony.yes", "abandonColony.no")) {
+            unit.putOutsideColony();
+        } else {
+            return false;
+        }
 
         Element putOutsideColonyElement = Message.createNewRootElement("putOutsideColony");
         putOutsideColonyElement.setAttribute("unit", unit.getID());
 
         client.send(putOutsideColonyElement);
+        
+        return true;
     }
 
     /**

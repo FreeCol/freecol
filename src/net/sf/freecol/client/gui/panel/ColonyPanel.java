@@ -163,8 +163,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
         tilesLabel.setSize(100, 20);
         buildingsLabel.setSize(300, 20);
-        buildingBox.setSize(160, 20);
-        progressLabel.setSize(160, 20);
+        buildingBox.setSize(265, 20);
+        progressLabel.setSize(150, 20);
 
         exitButton.setLocation(760, 570);
         outsideColonyScroll.setLocation(640, 300);
@@ -172,17 +172,18 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         cargoScroll.setLocation(220, 370);
         warehouseScroll.setLocation(10, 470);
         tilesScroll.setLocation(10, 40);
-        buildingsScroll.setLocation(400, 40);
+        buildingsLabel.setLocation(440, 10); // 400,10
+        buildingsScroll.setLocation(440, 40); // 400,40
         outsideColonyLabel.setLocation(640, 275);
         inPortLabel.setLocation(640, 425);
         cargoLabel.setLocation(220, 345);
         warehouseLabel.setLocation(10, 445);
-        buildingBox.setLocation(15, 305);
-        progressLabel.setLocation(185, 305);
+        buildingBox.setLocation(440, 250); // 15,305
+        progressLabel.setLocation(710, 250); // 185,305 (345, 305)
         solLabel.setLocation(15, 325);
         goldLabel.setLocation(15, 345);
         tilesLabel.setLocation(10, 10);
-        buildingsLabel.setLocation(400, 10);
+
 
         setLayout(null);
 
@@ -531,7 +532,11 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 colonistsInBuildingPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
                 colonistsInBuildingPanel.setBackground(Color.WHITE);
 
-                add(new JLabel(building.getName()));
+                if (building.getMaxUnits() == 0) {
+                    add(new JLabel("(" + building.getName() + ")"));
+                } else {
+                    add(new JLabel(building.getName()));
+                }
 
                 Iterator unitIterator = building.getUnitIterator();
                 while (unitIterator.hasNext()) {
@@ -615,10 +620,19 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         public Component add(Component comp, boolean editState) {
             if (editState) {
                 if (comp instanceof UnitLabel) {
-                    comp.getParent().remove(comp);
                     UnitLabel unitLabel = ((UnitLabel) comp);
                     Unit unit = unitLabel.getUnit();
                     inGameController.putOutsideColony(unit);
+
+                    if (unit.getTile().getColony() == null) {
+                        parent.remove(colonyPanel);
+                        parent.showMapControls();
+                        return null;
+                    } else if (!(unit.getLocation() instanceof Tile)) {
+                        return null;
+                    }
+                    
+                    comp.getParent().remove(comp);
                 } else {
                     logger.warning("An invalid component got dropped on this ColonistsPanel.");
                     return null;
@@ -999,7 +1013,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             BuildingBoxItem toSelect = nothingItem;
             for (int i = 0; i < Building.NUMBER_OF_TYPES; i++) {
                 if (colonyPanel.getColony().getBuilding(i).getNextName() != null &&
-                    colonyPanel.getColony().getUnitCount() > colonyPanel.getColony().getBuilding(i).getNextPop()) {
+                    colonyPanel.getColony().getUnitCount() >= colonyPanel.getColony().getBuilding(i).getNextPop()) {
                     String theText = new String(
                         colony.getBuilding(i).getNextName() +
                         " (" +
@@ -1007,9 +1021,10 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                         " hammers");
                         
                     if (colonyPanel.getColony().getBuilding(i).getNextTools() > 0) {
-                        theText.concat(", " + Integer.toString(colony.getBuilding(i).getNextTools()) + " tools");
+                        theText += ", " + Integer.toString(colony.getBuilding(i).getNextTools()) + " tools";
                     }
-                    theText.concat(")");
+
+                    theText += ")";
                     
                     BuildingBoxItem nextItem = new BuildingBoxItem(theText, i);
                     this.addItem(nextItem);
@@ -1089,7 +1104,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
             public BuildingBoxRenderer() {
                 setOpaque(true);
-                setHorizontalAlignment(CENTER);
+                //setHorizontalAlignment(CENTER);
+                setHorizontalAlignment(LEFT);
                 setVerticalAlignment(CENTER);
             }
         

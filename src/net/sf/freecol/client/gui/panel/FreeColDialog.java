@@ -75,7 +75,7 @@ public class FreeColDialog extends JPanel {
                     if (event instanceof MouseEvent) {
                         MouseEvent me = (MouseEvent) event;
                         Component dc = SwingUtilities.getDeepestComponentAt(((ComponentEvent) event).getComponent(), me.getX(), me.getY());
-                        if (!SwingUtilities.isDescendingFrom(dc, this)) {
+                        if (!SwingUtilities.isDescendingFrom(dc, this) || dc.getListeners(MouseListener.class).length == 0) {
                             continue;
                         }
                     }

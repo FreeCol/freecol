@@ -233,7 +233,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
                         logger.warning("Invalid action");
                 }
                 setIcon(parent.getImageProvider().getUnitImageIcon(parent.getImageProvider().getUnitGraphicsType(unit)));
-                
+
                 Component uc = getParent();
                 while (uc != null) {
                     if (uc instanceof ColonyPanel) {
@@ -245,6 +245,11 @@ public final class UnitLabel extends JLabel implements ActionListener {
                     }
 
                     uc = uc.getParent();
+                }
+
+                if (unit.getTile() != null && unit.getTile().getColony() == null) {
+                    parent.remove(uc);
+                    parent.showMapControls();
                 }
 
                 repaint(0, 0, getWidth(), getHeight());

@@ -110,6 +110,7 @@ public final class Colony extends Settlement implements Location {
     public void setOwner(Player owner) {
         this.owner = owner;
         
+        /*
         Iterator i = getWorkLocationIterator();
         ArrayList units = new ArrayList();
         while (i.hasNext()) {
@@ -124,9 +125,9 @@ public final class Colony extends Settlement implements Location {
                 Unit unit = ((ColonyTile)w).getUnit();
                 if (unit != null) units.add(unit);
             }
-        }
+        }*/
         
-        Iterator unitIterator = units.iterator();
+        Iterator unitIterator = getUnitIterator();
         while (unitIterator.hasNext()) {
             ((Unit)unitIterator.next()).setOwner(owner);
         }
@@ -365,7 +366,20 @@ public final class Colony extends Settlement implements Location {
     public Iterator getUnitIterator() {
         ArrayList units = new ArrayList();
 
-        throw new UnsupportedOperationException();
+        Iterator wli = getWorkLocationIterator();
+        while (wli.hasNext()) {
+            WorkLocation wl = (WorkLocation) wli.next();
+
+            Iterator unitIterator = wl.getUnitIterator();
+            while (unitIterator.hasNext()) {
+                Object o = unitIterator.next();
+                if (o != null) {
+                    units.add(o);
+                }
+            }
+        }
+
+        return units.iterator();
     }
 
     public Iterator getGoodsIterator() {
@@ -387,45 +401,7 @@ public final class Colony extends Settlement implements Location {
     * @return The <code>Unit</code> that has been choosen to defend this colony.
     */
     public Unit getDefendingUnit(Unit attacker) {
-        Iterator i = getWorkLocationIterator();
-        //ArrayList units = new ArrayList();
-        while (i.hasNext()) {
-            WorkLocation w = (WorkLocation) i.next();
-            if (w instanceof Building) {
-                Iterator unitIterator = w.getUnitIterator();
-                while (unitIterator.hasNext()) {
-                    Unit unit = (Unit)unitIterator.next();
-                    //units.add(unit);
-                    return unit;
-                }
-            } else if (w instanceof ColonyTile) {
-                Unit unit = ((ColonyTile)w).getUnit();
-                //if (unit != null) units.add(unit);
-                return unit;
-            }
-        }
-
-        return null;
-        /* This is not neccessary: soldiers are outside colony (on the tile):
-        Iterator unitIterator = units.iterator();
-
-        Unit defender = null;
-        if (unitIterator.hasNext()) {
-            defender = (Unit) unitIterator.next();
-        } else {
-            return null;
-        }
-
-        while (unitIterator.hasNext()) {
-            Unit nextUnit = (Unit) unitIterator.next();
-
-            if (nextUnit.getDefensePower(attacker) > defender.getDefensePower(attacker)) {
-                defender = nextUnit;
-            }
-        }
-
-        return defender;
-        */
+        return (Unit) getUnitIterator().next();
     }
 
     /**
@@ -436,9 +412,14 @@ public final class Colony extends Settlement implements Location {
         int required = 0;
         int tools = 0;
 
+        if (getBuilding(currentlyBuilding).getNextPop() > getUnitCount()) {
+            // TODO: Show error: not enough colonists to build the given building.
+            return;
+        }
+
         hammers += amount;
-        int hammersRequired = getBuilding(currentlyBuilding).getNextHammers();;
-        int toolsRequired = getBuilding(currentlyBuilding).getNextTools();;
+        int hammersRequired = getBuilding(currentlyBuilding).getNextHammers();
+        int toolsRequired = getBuilding(currentlyBuilding).getNextTools();
         if ((hammers >= hammersRequired) && (hammersRequired != -1)) {
             hammers = hammersRequired;
             if (getGoodsCount(Goods.TOOLS) >= toolsRequired) {
@@ -456,7 +437,7 @@ public final class Colony extends Settlement implements Location {
             //TODO: some error about trying to build a nonexistent building
         }
     }
-    
+
     /**
     * Returns the hammer count of the colony.
     * @return The current hammer count of the colony.
@@ -472,7 +453,7 @@ public final class Colony extends Settlement implements Location {
     public int getCurrentlyBuilding() {
         return currentlyBuilding;
     }
-    
+
     /**
     * Sets the type of building to be built.
     * @param type The type of building to be built.
@@ -572,10 +553,20 @@ public final class Colony extends Settlement implements Location {
     * Prepares this <code>Colony</code> for a new turn.
     */
     public void newTurn() {
-
+        int eat = getUnitCount() * 2;
+        int food = getGoodsCount(Goods.FOOD);
+        
+        if (eat > food) {
+            // Kill a colonist:
+            ((Unit) getUnitIterator().next()).dispose();
+            removeGoods(Goods.FOOD, food);
+            // TODO: Display some kind of message
+        } else {
+            removeGoods(Goods.FOOD, eat);
+        }
     }
 
-    
+
     public void dispose() {
         Iterator i = getWorkLocationIterator();
         while (i.hasNext()) {

@@ -133,7 +133,7 @@ public final class PreGameInputHandler implements MessageHandler {
     *                holds all the information.
     */
     private Element chat(Element element)  {
-        String senderName = element.getAttribute("sender");
+        String senderName = element.getAttribute("senderName");
         String message = element.getAttribute("message");
         boolean privateChat = Boolean.valueOf(element.getAttribute("privateChat")).booleanValue();
 

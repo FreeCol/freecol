@@ -735,9 +735,14 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         }
 
         setLocation(getTile());
+        movesLeft = 0;
+
+        if (getTile().getColony().getUnitCount() <= 0) {
+            getTile().getColony().dispose();
+        }
     }
 
-    
+
     /**
     * Sets the armed attribute of this unit.
     * @param b <i>true</i> if this unit should be armed and <i>false</i> otherwise.

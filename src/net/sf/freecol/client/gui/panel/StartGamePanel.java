@@ -65,7 +65,7 @@ public final class StartGamePanel extends JPanel implements ActionListener {
     private final JTextArea     chatArea;
     private final JPanel        optionsPanel;
 
-
+    private JButton start;
 
     /**
     * The constructor that will add the items to this panel.
@@ -75,14 +75,15 @@ public final class StartGamePanel extends JPanel implements ActionListener {
         this.parent = parent;
         this.freeColClient = freeColClient;
 
-        JButton     start = new JButton("Start Game"),
-                    cancel = new JButton("Cancel");
+        JButton     cancel = new JButton("Cancel");
         JPanel      chatPanel = new JPanel();
         JLabel      mapSizeLabel = new JLabel("Map Size"),
                     nameLabel = new JLabel("Name"),
                     nationLabel = new JLabel("Nation"),
                     colorLabel = new JLabel("Color");
         JScrollPane chatScroll;
+
+        start = new JButton("Start Game");
 
         optionsPanel = new JPanel();        
         readyBox = new JCheckBox("I'm Ready");
@@ -187,7 +188,7 @@ public final class StartGamePanel extends JPanel implements ActionListener {
 
     
     
-    
+
     public void initialize(Game game, Player thisPlayer) {
         this.game = game;
         this.thisPlayer = thisPlayer;
@@ -197,6 +198,7 @@ public final class StartGamePanel extends JPanel implements ActionListener {
         name.setText(thisPlayer.getName());
         // TODO: Initialize 'mapSize', 'nation' and 'color' from values in 'game'.
         readyBox.setSelected(thisPlayer.isReady());
+        setEnabled(true);
     }
 
 
@@ -237,6 +239,7 @@ public final class StartGamePanel extends JPanel implements ActionListener {
                     break;
                 case CANCEL:
                     parent.remove(this);
+                    parent.showMainPanel();
                     break;
                 case MAPSIZE:
                     break;

@@ -5,6 +5,7 @@ import  net.sf.freecol.common.FreeColException;
 
 import java.util.logging.Logger;
 import java.util.Vector;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -447,6 +448,19 @@ public class Game extends FreeColGameObject {
 
         Iterator iterator = ((HashMap) freeColGameObjects.clone()).values().iterator();
 
+        ArrayList later = new ArrayList();
+        while (iterator.hasNext()) {
+            FreeColGameObject freeColGameObject = (FreeColGameObject) iterator.next();
+
+            // Take the settlements after the buildings and colonytiles:
+            if (freeColGameObject instanceof Settlement) {
+                later.add(freeColGameObject);
+            } else {
+                freeColGameObject.newTurn();
+            }
+        }
+
+        iterator = later.iterator();
         while (iterator.hasNext()) {
             FreeColGameObject freeColGameObject = (FreeColGameObject) iterator.next();
             freeColGameObject.newTurn();

@@ -46,13 +46,13 @@ public final class Building extends FreeColGameObject implements WorkLocation {
                             WEAVER = 4,
                             DISTILLER = 5,
                             FUR_TRADER = 6,
-                            STOCKADE = 7,
+                            SCHOOLHOUSE = 7, //10
                             ARMORY = 8,
-                            DOCK = 9,
-                            SCHOOLHOUSE = 10,
+                            CHURCH = 9, //13
+                            STOCKADE = 10, //7
                             WAREHOUSE = 11,
                             STABLES = 12,
-                            CHURCH = 13,
+                            DOCK = 13, //9
                             PRINTING_PRESS = 14,
                             CUSTOM_HOUSE = 15;
 
@@ -70,6 +70,7 @@ public final class Building extends FreeColGameObject implements WorkLocation {
     // Sets the maximum number of units in one building (will become a non-constant later):
     private static final int MAX_UNITS = 3;
     
+    /*
     private static final int requiredTable[][][] = {
         {{  0,  0,  1},{ -1, -1, -1},{ -1, -1, -1},{ -1, -1, -1}}, // TOWNHALL
         {{  0,  0,  1},{ 52,  0,  3},{ -1, -1, -1},{ -1, -1, -1}}, // CARPENTER
@@ -86,6 +87,26 @@ public final class Building extends FreeColGameObject implements WorkLocation {
         {{ 64,  0,  1},{ -1, -1, -1},{ -1, -1, -1},{ -1, -1, -1}}, // STABLES
         {{ 52,  0,  3},{176,100,  8},{ -1, -1, -1},{ -1, -1, -1}}, // CHURCH
         {{ 80,  0,  1},{120, 50,  4},{ -1, -1, -1},{ -1, -1, -1}}, // PRINTING_PRESS
+        {{160, 50,  1},{ -1, -1, -1},{ -1, -1, -1},{ -1, -1, -1}}  // CUSTOM_HOUSE
+    };
+    */
+
+    private static final int requiredTable[][][] = {
+        {{  0,  0,  1},{ -1, -1, -1},{ -1, -1, -1},{ -1, -1, -1}}, // TOWNHALL
+        {{  0,  0,  1},{ 52,  0,  3},{ -1, -1, -1},{ -1, -1, -1}}, // CARPENTER
+        {{  0,  0,  1},{ 64, 20,  1},{240,100,  8},{ -1, -1, -1}}, // BLACKSMITH
+        {{  0,  0,  1},{ 62, 20,  1},{160,100,  8},{ -1, -1, -1}}, // TOBACCONIST
+        {{  0,  0,  1},{ 64, 20,  1},{160,100,  8},{ -1, -1, -1}}, // WEAVER
+        {{  0,  0,  1},{ 64, 20,  1},{160,100,  8},{ -1, -1, -1}}, // DISTILLER
+        {{  0,  0,  1},{ 56, 20,  1},{160,100,  6},{ -1, -1, -1}}, // FUR_TRADER
+        {{ 64,  0,  4},{160, 50,  8},{200,100, 10},{ -1, -1, -1}}, // SCHOOLHOUSE
+        {{ 52,  0,  1},{120, 50,  8},{240,100,  8},{ -1, -1, -1}}, // ARMORY
+        {{ 64,  0,  3},{176,100,  8},{ -1, -1, -1},{ -1, -1, -1}}, // CHURCH
+        {{ 64,  0,  3},{120,100,  3},{320,200,  8},{ -1, -1, -1}}, // STOCKADE
+        {{ 80,  0,  1},{ 80, 20,  1},{ -1, -1, -1},{ -1, -1, -1}}, // WAREHOUSE
+        {{ 64,  0,  1},{ -1, -1, -1},{ -1, -1, -1},{ -1, -1, -1}}, // STABLES
+        {{ 52,  0,  1},{ 80, 50,  4},{240,100,  8},{ -1, -1, -1}}, // DOCK
+        {{ 52, 20,  1},{120, 50,  4},{ -1, -1, -1},{ -1, -1, -1}}, // PRINTING_PRESS
         {{160, 50,  1},{ -1, -1, -1},{ -1, -1, -1},{ -1, -1, -1}}  // CUSTOM_HOUSE
     };
 
@@ -229,7 +250,7 @@ public final class Building extends FreeColGameObject implements WorkLocation {
     */
     public int getNextPop() {
         if (level < MAX_LEVEL) {
-            return requiredTable[type][level][1];
+            return requiredTable[type][level][2];
         } else {
             return -1;
         }
@@ -283,7 +304,12 @@ public final class Building extends FreeColGameObject implements WorkLocation {
     * @return The number.
     */
     public int getMaxUnits() {
-        return MAX_UNITS;
+        if (type == STOCKADE || type == DOCK || type == WAREHOUSE || 
+                type == STABLES || type == PRINTING_PRESS || type == CUSTOM_HOUSE) {
+            return 0;
+        } else {
+            return MAX_UNITS;
+        }
     }
 
 
@@ -414,7 +440,7 @@ public final class Building extends FreeColGameObject implements WorkLocation {
         int goodsOutput = 0;
         int goodsInputType = -1;
         int goodsOutputType = -1;
-        
+
         if ((level == NOT_BUILT) && (type != CHURCH)) return; // Don't do anything if the building does not exist.
 
         // Figure out what's produced here and what it requires to do so.
@@ -504,7 +530,7 @@ public final class Building extends FreeColGameObject implements WorkLocation {
         colony.addGoods(goodsOutputType, goodsOutput);
     }
 
-    
+
     public void dispose() {
         for (int i=0; i<units.size(); i++) {
             ((Unit) units.get(i)).dispose();
