@@ -3283,17 +3283,30 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
 
         if (isCarrier()) {
             Element unitContainerElement = getChildElement(unitElement, UnitContainer.getXMLElementTagName());
-            if (unitContainer != null) {
-                unitContainer.readFromXMLElement(unitContainerElement);
+            if (unitContainerElement != null) {
+                if (unitContainer != null) {
+                    unitContainer.readFromXMLElement(unitContainerElement);
+                } else {
+                    unitContainer = new UnitContainer(getGame(), this, unitContainerElement);
+                }
             } else {
-                unitContainer = new UnitContainer(getGame(), this, unitContainerElement);
+                // Probably an old (incompatible) save game (will cause an error if this is a client):
+                logger.warning("Carrier did not have a \"unitContainer\"-tag.");
+                unitContainer = new UnitContainer(getGame(), this);
             }
 
+
             Element goodsContainerElement = getChildElement(unitElement, GoodsContainer.getXMLElementTagName());
-            if (goodsContainer != null) {
-                goodsContainer.readFromXMLElement(goodsContainerElement);
+            if (goodsContainerElement != null) {
+                if (goodsContainer != null) {
+                    goodsContainer.readFromXMLElement(goodsContainerElement);
+                } else {
+                    goodsContainer = new GoodsContainer(getGame(), this, goodsContainerElement);
+                }
             } else {
-                goodsContainer = new GoodsContainer(getGame(), this, goodsContainerElement);
+                // Probably an old (incompatible) save game (will cause an error if this is a client):
+                logger.warning("Carrier did not have a \"goodsContainer\"-tag.");
+                goodsContainer = new GoodsContainer(getGame(), this);
             }
         }
     }

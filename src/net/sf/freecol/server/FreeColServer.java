@@ -40,6 +40,7 @@ import net.sf.freecol.server.control.ServerModelController;
 import net.sf.freecol.server.networking.Server;
 import net.sf.freecol.server.model.*;
 import net.sf.freecol.common.model.*;
+import net.sf.freecol.common.model.Map;
 
 // AI:
 import net.sf.freecol.server.ai.*;
@@ -495,6 +496,15 @@ public final class FreeColServer {
                 getServer().addConnection(theConnection, -1);
                 player.setConnection(theConnection);
                 player.setConnected(true);
+            }
+        }
+
+        // Support for pre-0.0.3 protocols:
+        Iterator pi = game.getMap().getWholeMapIterator();
+        while (pi.hasNext()) {
+            Tile t = game.getMap().getTile((Map.Position) pi.next());
+            if (t.getSettlement() != null && t.getSettlement() instanceof IndianSettlement) {
+                ((IndianSettlement) t.getSettlement()).createGoodsContainer();
             }
         }
 

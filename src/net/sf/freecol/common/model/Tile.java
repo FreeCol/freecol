@@ -992,7 +992,9 @@ public final class Tile extends FreeColGameObject implements Location {
 
         if (toSavedGame) {
             for (int i=0; i<playerExploredTiles.length; i++) {
-                tileElement.appendChild(playerExploredTiles[i].toXMLElement(player, document, showAll, toSavedGame));
+                if (playerExploredTiles[i] != null) {
+                    tileElement.appendChild(playerExploredTiles[i].toXMLElement(player, document, showAll, toSavedGame));
+                }
             }
         }
 
