@@ -181,10 +181,14 @@ public final class DefaultTransferHandler extends TransferHandler {
                     return false;
                 }
 
-                if (unit.isCarrier() && (comp instanceof EuropePanel.CargoPanel || comp instanceof ColonyPanel.CargoPanel)) {
+                if (unit.isCarrier() && (comp instanceof EuropePanel.CargoPanel || comp instanceof EuropePanel.DocksPanel 
+                        || comp instanceof EuropePanel.MarketPanel || comp instanceof ColonyPanel.OutsideColonyPanel 
+                        || comp instanceof ColonyPanel.WarehousePanel || comp instanceof ColonyPanel.BuildingsPanel.ASingleBuildingPanel
+                        || comp instanceof ColonyPanel.TilePanel.ASingleTilePanel || comp instanceof ColonyPanel.CargoPanel)) {
                     return false;
                 }
-
+       
+                                
                 /*if (((unit.getState() == Unit.ACTIVE) || ((unit.getState() == Unit.SENTRY) && (!unit.isNaval())))
                         && (!((comp instanceof EuropePanel.ToAmericaPanel) && (unit.isNaval())))
                         && (!((comp instanceof EuropePanel.DocksPanel) && (!unit.isNaval())
