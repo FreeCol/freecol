@@ -965,7 +965,7 @@ public final class Colony extends Settlement implements Location {
         } else {
             bells = 0;
         }
-        
+
         if (colonyElement.hasAttribute("currentlyBuilding")) {
             currentlyBuilding = Integer.parseInt(colonyElement.getAttribute("currentlyBuilding"));
         } else {

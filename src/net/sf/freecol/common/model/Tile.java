@@ -1228,7 +1228,9 @@ public final class Tile extends FreeColGameObject implements Location {
                 Element colonyElement = getChildElement(tileElement, Colony.getXMLElementTagName());
 
                 if (colonyUnitCount != 0) {
-                    colonyElement.setAttribute("unitCount", Integer.toString(colonyUnitCount));
+                    if (colonyElement.hasAttribute("unitCount")) {
+                        colonyElement.setAttribute("unitCount", Integer.toString(colonyUnitCount));
+                    }
 
                     NodeList childNodes = colonyElement.getChildNodes();
                     for (int i=0; i<childNodes.getLength(); i++) {
