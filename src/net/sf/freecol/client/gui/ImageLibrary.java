@@ -192,7 +192,7 @@ public final class ImageLibrary extends ImageProvider {
      * homeDirectory + path + unitsDirectory + unitsName + UNITTYPE + extension
      * where '+' is the concatenation of Strings. and UNITTYPE is the type of the unit (as in the Unit class).
      */
-    private static final String path = new String("data/images/"),
+    private static final String path = new String("images/"),
                                 unitsDirectory = new String("units/"),
                                 unitsName = new String("Unit"),
                                 terrainDirectory = new String("terrain/"),
@@ -230,8 +230,9 @@ public final class ImageLibrary extends ImageProvider {
     public ImageLibrary() throws FreeColException {
         // This is the location of the data directory when running FreeCol
         // from its default location in the CVS repository.
-        dataDirectory = "";
-        init(true);
+        //dataDirectory = "";
+        //init(true);
+        this("");
     }
 
     /**
@@ -240,12 +241,12 @@ public final class ImageLibrary extends ImageProvider {
      * @throws FreeColException If one of the data files could not be found.
      */
     public ImageLibrary(String freeColHome) throws FreeColException {
-        dataDirectory = freeColHome;
-
         // TODO: normally this check shouldn't be here. init(false) is the way to go.
         if (freeColHome.equals("")) {
+            dataDirectory = "data/";
             init(true);
         } else {
+            dataDirectory = freeColHome;        
             init(false);
         }
 
