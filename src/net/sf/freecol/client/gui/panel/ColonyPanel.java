@@ -249,6 +249,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         Tile tile = colony.getTile();
 
         UnitLabel lastCarrier = null;
+        UnitLabel preSelectedUnitLabel = null;
         selectedUnit = null;
 
         Iterator tileUnitIterator = tile.getUnitIterator();
@@ -266,14 +267,16 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 inPortPanel.add(unitLabel);
                 lastCarrier = unitLabel;
                 if (unit == preSelectedUnit) {
-                    setSelectedUnit(unitLabel);
+                    preSelectedUnitLabel = unitLabel;
                 }
 
             }
         }
 
-        if (selectedUnit == null) {
-            setSelectedUnit(lastCarrier);
+        if (preSelectedUnitLabel == null) {
+            setSelectedUnitLabel(lastCarrier);
+        } else {
+            setSelectedUnitLabel(preSelectedUnitLabel);
         }
 
         //
@@ -369,6 +372,15 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     public Unit getSelectedUnit() {
         return selectedUnit.getUnit();
     }
+    
+
+    /**
+    * Returns the currently select unit.
+    * @return The currently select unit.
+    */
+    public UnitLabel getSelectedUnitLabel() {
+        return selectedUnit;
+    }
 
 
     /**
@@ -430,10 +442,25 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
     /**
     * Selects a unit that is located somewhere on this panel.
+    * @param unit The unit that is being selected.
+    */
+    public void setSelectedUnit(Unit unit) {
+        Component[] components = inPortPanel.getComponents();
+        for (int i=0; i<components.length; i++) {
+            if (components[i] instanceof UnitLabel && ((UnitLabel) components[i]).getUnit() == unit) {
+                setSelectedUnitLabel((UnitLabel) components[i]);
+                break;
+            }
+        }
+    }
+
+
+    /**
+    * Selects a unit that is located somewhere on this panel.
     *
     * @param unit The unit that is being selected.
     */
-    public void setSelectedUnit(UnitLabel unitLabel) {
+    public void setSelectedUnitLabel(UnitLabel unitLabel) {
         if (selectedUnit != unitLabel) {
             if (selectedUnit != null) {
                 selectedUnit.setSelected(false);
@@ -990,11 +1017,15 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
             if (editState) {
                 if (comp instanceof UnitLabel) {
-                    oldParent.remove(comp);
+                    if (oldParent != null) {
+                        oldParent.remove(comp);
+                    }
                     Unit unit = ((UnitLabel)comp).getUnit();
                     if (!unit.isCarrier()) {// No, you cannot load ships onto other ships.
                         if(!selectedUnit.getUnit().canAdd(unit)) {
-                            oldParent.add(comp);
+                            if (oldParent != null) {
+                                oldParent.add(comp);
+                            }
                             return null;
                         }
 
@@ -1007,12 +1038,17 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                             updateBuildingBox();
                             colonyPanel.updateSoLLabel();
                         } else {
-                            oldParent.add(comp);
+                            if (oldParent != null) {
+                                oldParent.add(comp);
+                            }
                             return null;
                         }
                     } else {
-                      oldParent.add(comp);
-                      return null;
+                        if (oldParent != null) {
+                            oldParent.add(comp);
+                        }
+
+                        return null;
                     }
                 } else if (comp instanceof GoodsLabel) {
                     Goods g = ((GoodsLabel)comp).getGoods();
@@ -1032,7 +1068,10 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                         if(!selectedUnit.getUnit().canAdd(g)) {
                             return null;
                         }
-                        oldParent.remove(comp);
+                        
+                        if (oldParent != null) {
+                            oldParent.remove(comp);
+                        }
                     }
 
                     ((GoodsLabel) comp).setSmall(false);
@@ -1088,7 +1127,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 // TODO: Make this look prettier :-)
                 UnitLabel t = selectedUnit;
                 selectedUnit = null;
-                setSelectedUnit(t);
+                setSelectedUnitLabel(t);
             }
         }
     }

@@ -186,15 +186,18 @@ public final class DragListener extends MouseAdapter {
                 }
             }
 
-            handler.exportAsDrag(comp, e, TransferHandler.COPY);
-
             if ((comp instanceof UnitLabel) && (((UnitLabel)comp).getUnit().isCarrier())) {
                 if (parentPanel instanceof EuropePanel) {
-                    ((EuropePanel) parentPanel).setSelectedUnit((UnitLabel)comp);
+                    Unit u = ((UnitLabel) comp).getUnit();
+                    if (u.getState() != Unit.TO_AMERICA && u.getState() != Unit.TO_EUROPE) {
+                        ((EuropePanel) parentPanel).setSelectedUnitLabel((UnitLabel)comp);
+                    }
                 } else if (parentPanel instanceof ColonyPanel) {
-                    ((ColonyPanel) parentPanel).setSelectedUnit((UnitLabel)comp);
+                    ((ColonyPanel) parentPanel).setSelectedUnitLabel((UnitLabel)comp);
                 }
             }
+            
+            handler.exportAsDrag(comp, e, TransferHandler.COPY);
         }
     }
 }

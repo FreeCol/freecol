@@ -4,6 +4,7 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -368,7 +369,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             ((JPanel)marketPanel).add(marketLabel);
         }
 
-        setSelectedUnit(carrier);
+        setSelectedUnitLabel(carrier);
         updateGoldLabel();
     }
 
@@ -387,15 +388,31 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
     public void reinitialize() {
         final UnitLabel selectedUnit = this.selectedUnit;
         initialize(europe, game);
-        setSelectedUnit(selectedUnit);
+        setSelectedUnit(selectedUnit.getUnit());
     }
+
+    
+    /**
+    * Selects a unit that is located somewhere on this panel.
+    * @param unit The unit that is being selected.
+    */
+    public void setSelectedUnit(Unit unit) {
+        Component[] components = inPortPanel.getComponents();
+        for (int i=0; i<components.length; i++) {
+            if (components[i] instanceof UnitLabel && ((UnitLabel) components[i]).getUnit() == unit) {
+                setSelectedUnitLabel((UnitLabel) components[i]);
+                break;
+            }
+        }
+    }
+    
 
     /**
     * Selects a unit that is located somewhere on this panel.
     *
     * @param unit The unit that is being selected.
     */
-    public void setSelectedUnit(UnitLabel unitLabel) {
+    public void setSelectedUnitLabel(UnitLabel unitLabel) {
         if (selectedUnit != unitLabel) {
             if (selectedUnit != null) {
                 selectedUnit.setSelected(false);
@@ -457,6 +474,15 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
     */
     public Unit getSelectedUnit() {
         return selectedUnit.getUnit();
+    }
+
+    
+    /**
+    * Returns the currently select unit.
+    * @return The currently select unit.
+    */
+    public UnitLabel getSelectedUnitLabel() {
+        return selectedUnit;
     }
 
 
@@ -725,10 +751,52 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             }
 
             if (editState) {
+                Container oldParent = comp.getParent();
+
                 if (comp instanceof UnitLabel) {
                     Unit unit = ((UnitLabel)comp).getUnit();
-                    inGameController.boardShip(unit, selectedUnit.getUnit());
-                    comp.getParent().remove(comp);
+                    if (selectedUnit.getUnit().getSpaceLeft() > 0) {
+                        inGameController.boardShip(unit, selectedUnit.getUnit());
+
+                        if (comp.getParent() != null) {
+                            comp.getParent().remove(comp);
+                        }
+                    } else {
+                        return null;
+                    }
+                } else if (comp instanceof GoodsLabel) {
+                    Goods g = ((GoodsLabel)comp).getGoods();
+
+                    // Transfer a maximum of 100 goods at a time:
+                    if (g.getAmount() > 100) {
+                        g.setAmount(g.getAmount() - 100);
+                        g = new Goods(game, g.getLocation(), g.getType(), 100);
+                        g.setAmount(100);
+
+                        //enough space ?
+                        if(!selectedUnit.getUnit().canAdd(g)) {
+                            return null;
+                        }
+                    } else {
+                        // enough space ?
+                        if(!selectedUnit.getUnit().canAdd(g)) {
+                            return null;
+                        }
+                        
+                        if (oldParent != null) {
+                            oldParent.remove(comp);
+                        }
+                    }
+
+                    inGameController.loadCargo(g, selectedUnit.getUnit());
+
+                    // TODO: Make this look prettier :-)
+                    UnitLabel t = selectedUnit;
+                    selectedUnit = null;
+                    setSelectedUnitLabel(t);
+                    //reinitialize();
+
+                    return comp;
                 } else if (comp instanceof MarketLabel) {
                     inGameController.buyGoods(((MarketLabel)comp).getType(), ((MarketLabel)comp).getAmount(), selectedUnit.getUnit());
 
@@ -739,7 +807,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     // TODO: Make this look prettier :-)
                     UnitLabel t = selectedUnit;
                     selectedUnit = null;
-                    setSelectedUnit(t);
+                    setSelectedUnitLabel(t);
 
                     europePanel.getMarketPanel().revalidate();
                     revalidate();
@@ -808,7 +876,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     // TODO: Make this look prettier :-)
                     UnitLabel t = selectedUnit;
                     selectedUnit = null;
-                    setSelectedUnit(t);
+                    setSelectedUnitLabel(t);
 
                     return comp;
                 } else {

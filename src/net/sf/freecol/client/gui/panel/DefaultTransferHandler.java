@@ -107,6 +107,12 @@ public final class DefaultTransferHandler extends TransferHandler {
     public boolean importData(JComponent comp, Transferable t) {
         try {
             JLabel data;
+            
+            /* 
+                This variable is used to temporarily keep the old selected unit,
+                while moving cargo from one carrier to another:
+            */
+            UnitLabel oldSelectedUnit = null;
 
             // Check flavor.
             if (t.isDataFlavorSupported(DefaultTransferHandler.flavor)) {
@@ -131,10 +137,18 @@ public final class DefaultTransferHandler extends TransferHandler {
                   If not, assume that the user wished to drop the unit/cargo on the panel below.
                 */
                 if (((UnitLabel) comp).getUnit().isCarrier() && ((UnitLabel) comp).getParent() instanceof EuropePanel.InPortPanel) {
-                    ((EuropePanel) parentPanel).setSelectedUnit((UnitLabel) comp);
+                    if (data instanceof UnitLabel && ((UnitLabel) data).getUnit().getLocation() instanceof Unit
+                            || data instanceof GoodsLabel && ((GoodsLabel) data).getGoods().getLocation() instanceof Unit) {
+                        oldSelectedUnit = ((EuropePanel) parentPanel).getSelectedUnitLabel();
+                    }
+                    ((EuropePanel) parentPanel).setSelectedUnitLabel((UnitLabel) comp);
                     comp = ((EuropePanel) parentPanel).getCargoPanel();
                 } else if (((UnitLabel) comp).getUnit().isCarrier() && ((UnitLabel) comp).getParent() instanceof ColonyPanel.InPortPanel) {
-                    ((ColonyPanel) parentPanel).setSelectedUnit((UnitLabel) comp);
+                    if (data instanceof UnitLabel && ((UnitLabel) data).getUnit().getLocation() instanceof Unit
+                            || data instanceof GoodsLabel && ((GoodsLabel) data).getGoods().getLocation() instanceof Unit) {
+                        oldSelectedUnit = ((ColonyPanel) parentPanel).getSelectedUnitLabel();
+                    }
+                    ((ColonyPanel) parentPanel).setSelectedUnitLabel((UnitLabel) comp);
                     comp = ((ColonyPanel) parentPanel).getCargoPanel();
                 } else {
                     try {
@@ -236,6 +250,15 @@ public final class DefaultTransferHandler extends TransferHandler {
                     }
 
                     comp.revalidate();
+
+                    if (oldSelectedUnit != null) {
+                        if (((UnitLabel) oldSelectedUnit).getParent() instanceof EuropePanel.InPortPanel) {
+                            ((EuropePanel) parentPanel).setSelectedUnit(oldSelectedUnit.getUnit());
+                        } else {
+                            ((ColonyPanel) parentPanel).setSelectedUnit(oldSelectedUnit.getUnit());
+                        }
+                    }
+
                     return true;
                 }
             } else if (data instanceof GoodsLabel) {
@@ -283,6 +306,15 @@ public final class DefaultTransferHandler extends TransferHandler {
                     }
 
                     comp.revalidate();
+
+                    if (oldSelectedUnit != null) {
+                        if (((UnitLabel) oldSelectedUnit).getParent() instanceof EuropePanel.InPortPanel) {
+                            ((EuropePanel) parentPanel).setSelectedUnit(oldSelectedUnit.getUnit());
+                        } else {
+                            ((ColonyPanel) parentPanel).setSelectedUnit(oldSelectedUnit.getUnit());
+                        }
+                    }
+
                     return true;
                 }
             } else if (data instanceof MarketLabel) {
