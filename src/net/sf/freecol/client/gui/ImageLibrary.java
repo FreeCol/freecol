@@ -3,10 +3,12 @@ package net.sf.freecol.client.gui;
 import java.util.logging.Logger;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.awt.geom.GeneralPath;
 import java.io.File;
 import java.net.URL;
 import java.util.Hashtable;
@@ -64,7 +66,7 @@ public final class ImageLibrary extends ImageProvider {
                             LAND_CENTER = 8;        // ordinary tile, filled entirely with 'land'
 
     private static final int BONUS_COUNT = 9;
-    
+
 
     /**
      * These finals represent the unit graphics that are available.
@@ -234,6 +236,8 @@ public final class ImageLibrary extends ImageProvider {
                    bonus; //Holds ImageIcon objects
     private Vector[] unitButtons; //Holds the unit-order buttons
     private Hashtable colorChips;  // Color is key, BufferedImage is value
+    private Hashtable missionChips;  // Color is key, BufferedImage is value
+    private Hashtable expertMissionChips;  // Color is key, BufferedImage is value
 
     /**
      * The constructor to use.
@@ -258,7 +262,7 @@ public final class ImageLibrary extends ImageProvider {
             dataDirectory = "data/";
             init(true);
         } else {
-            dataDirectory = freeColHome;        
+            dataDirectory = freeColHome;
             init(false);
         }
 
@@ -285,7 +289,10 @@ public final class ImageLibrary extends ImageProvider {
         loadIndians(gc, resourceLocator, doLookup);
         loadGoods(gc, resourceLocator, doLookup);
         loadBonus(gc, resourceLocator, doLookup);
-        loadColorChips(gc);
+
+        colorChips = new Hashtable();
+        missionChips = new Hashtable();
+        expertMissionChips = new Hashtable();
     }
 
     /**
@@ -307,7 +314,7 @@ public final class ImageLibrary extends ImageProvider {
         if ((tmpFile == null) || !tmpFile.exists() || !tmpFile.isFile() || !tmpFile.canRead()) {
             throw new FreeColException("The data file \"" + filePath + "\" could not be found.");
         }
-        
+
         return new ImageIcon(filePath);
     }
 
@@ -523,7 +530,7 @@ public final class ImageLibrary extends ImageProvider {
         */
     }
 
-    
+
      /**
      * Loads the bonus-images from file into memory.
      * @param gc The GraphicsConfiguration is needed to create images that are compatible with the
@@ -543,42 +550,7 @@ public final class ImageLibrary extends ImageProvider {
             bonus.add(findImage(filePath, resourceLocator, doLookup));
         }
     }
-    
 
-    /**
-     * Generates color chip images and stores them in memory. Color chips
-     * can be seen next to a unit to indicate its state.
-     * @param gc The GraphicsConfiguration is needed to create images that are compatible with the
-     * local environment.
-     */
-    private void loadColorChips(GraphicsConfiguration gc) {
-        colorChips = new Hashtable(8);
-
-        /*
-        loadColorChip(gc, Color.BLACK);
-        loadColorChip(gc, Color.BLUE);
-        loadColorChip(gc, Color.CYAN);
-        loadColorChip(gc, Color.GRAY);
-        loadColorChip(gc, Color.GREEN);
-        loadColorChip(gc, Color.MAGENTA);
-        loadColorChip(gc, Color.ORANGE);
-        loadColorChip(gc, Color.PINK);
-        loadColorChip(gc, Color.RED);
-        loadColorChip(gc, Color.WHITE);
-        loadColorChip(gc, Color.YELLOW);
-        */
-
-        /*
-        loadColorChip(gc, IndianSettlement.indianColors[0]);
-        loadColorChip(gc, IndianSettlement.indianColors[1]);
-        loadColorChip(gc, IndianSettlement.indianColors[2]);
-        loadColorChip(gc, IndianSettlement.indianColors[3]);
-        loadColorChip(gc, IndianSettlement.indianColors[4]);
-        loadColorChip(gc, IndianSettlement.indianColors[5]);
-        loadColorChip(gc, IndianSettlement.indianColors[6]);
-        loadColorChip(gc, IndianSettlement.indianColors[7]);
-        */
-    }
 
     /**
      * Generates a color chip image and stores it in memory.
@@ -589,7 +561,7 @@ public final class ImageLibrary extends ImageProvider {
     private void loadColorChip(GraphicsConfiguration gc, Color c) {
         BufferedImage tempImage = gc.createCompatibleImage(11, 17);
         Graphics g = tempImage.getGraphics();
-        if (c == Color.BLACK) {
+        if (c.equals(Color.BLACK)) {
             g.setColor(Color.WHITE);
         } else {
             g.setColor(Color.BLACK);
@@ -599,7 +571,60 @@ public final class ImageLibrary extends ImageProvider {
         g.fillRect(1, 1, 9, 15);
         colorChips.put(c, tempImage);
     }
-    
+
+
+    /**
+     * Generates a mission chip image and stores it in memory.
+     * @param gc The GraphicsConfiguration is needed to create images that are compatible with the
+     * local environment.
+     * @param c The color of the color chip to create.
+     */
+    private void loadMissionChip(GraphicsConfiguration gc, Color c, boolean expertMission) {
+        BufferedImage tempImage = gc.createCompatibleImage(11, 17);
+        Graphics2D g = (Graphics2D)tempImage.getGraphics();
+
+        if (expertMission) {
+            g.setColor(Color.BLACK);
+        }
+        else {
+            g.setColor(Color.DARK_GRAY);
+        }
+        g.drawRect(0, 0, 10, 16);
+
+        GeneralPath cross = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
+        cross.moveTo(4, 1);
+        cross.lineTo(6, 1);
+        cross.lineTo(6, 4);
+        cross.lineTo(9, 4);
+        cross.lineTo(9, 6);
+        cross.lineTo(6, 6);
+        cross.lineTo(6, 15);
+        cross.lineTo(4, 15);
+        cross.lineTo(4, 6);
+        cross.lineTo(1, 6);
+        cross.lineTo(1, 4);
+        cross.lineTo(4, 4);
+        cross.closePath();
+
+        if (expertMission && c.equals(Color.BLACK)) {
+            g.setColor(Color.DARK_GRAY);
+        }
+        else if ((!expertMission) && c.equals(Color.DARK_GRAY)) {
+            g.setColor(Color.BLACK);
+        }
+        else {
+            g.setColor(c);
+        }
+        g.fill(cross);
+
+        if (expertMission) {
+            expertMissionChips.put(c, tempImage);
+        }
+        else {
+            missionChips.put(c, tempImage);
+        }
+    }
+
 
     public Image getBonusImage(Tile tile) {
         if (tile.getAddition() == Tile.ADD_MOUNTAINS) {
@@ -761,6 +786,33 @@ public final class ImageLibrary extends ImageProvider {
             colorChip = (Image) colorChips.get(color);
         }
         return colorChip;
+    }
+
+    /**
+     * Returns the mission chip with the given color.
+     * @param color The color of the color chip to return.
+     * @param expertMission Indicates whether or not the missionary is an expert.
+     * @return The color chip with the given color.
+     */
+    public Image getMissionChip(Color color, boolean expertMission) {
+        Image missionChip;
+        if (expertMission) {
+            missionChip = (Image)expertMissionChips.get(color);
+        }
+        else {
+            missionChip = (Image)missionChips.get(color);
+        }
+        if (missionChip == null) {
+            GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+            loadMissionChip(gc, color, expertMission);
+            if (expertMission) {
+                missionChip = (Image)expertMissionChips.get(color);
+            }
+            else {
+                missionChip = (Image)missionChips.get(color);
+            }
+        }
+        return missionChip;
     }
 
     /**

@@ -92,6 +92,9 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
     TEXT_OFFSET_X = 2, // Relative to the state indicator.
     TEXT_OFFSET_Y = 13, // Relative to the state indicator.
     STATE_OFFSET_X = 25,
+    STATE_OFFSET_Y = 10,
+    MISSION_OFFSET_X = 37,
+    MISSION_OFFSET_Y = 10,
     OTHER_UNITS_OFFSET_X = -5, // Relative to the state indicator.
     OTHER_UNITS_OFFSET_Y = 1,
     OTHER_UNITS_WIDTH = 3,
@@ -121,7 +124,7 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
         this.lib = lib;
 
         cursor = true;
-        
+
         // Because I'm a thread but my priority must be low -FV
         setPriority(Thread.MIN_PRIORITY);
         start();
@@ -848,7 +851,7 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
         Font nameFont = null;
         FontMetrics nameFontMetrics = null;
         BufferedImage bi = null;
-        
+
         Font origFont = g.getFont();
         int fontSize = preferredFontSize;
         do {
@@ -1267,9 +1270,18 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
                     // Draw image of indian settlement in center of the tile.
                     g.drawImage(lib.getIndianSettlementImage(type), x + (lib.getTerrainImageWidth(tile.getType()) - lib.getIndianSettlementImageWidth(type)) / 2, y + (lib.getTerrainImageHeight(tile.getType()) - lib.getIndianSettlementImageHeight(type)) / 2, null);
 
-                    g.drawImage(lib.getColorChip(((IndianSettlement)settlement).getOwner().getColor()), x + STATE_OFFSET_X, y + 10, null);
+                    // Draw the color chip for the settlement.
+                    g.drawImage(lib.getColorChip(((IndianSettlement)settlement).getOwner().getColor()), x + STATE_OFFSET_X, y + STATE_OFFSET_Y, null);
+
+                    // Draw the mission chip if needed.
+                    if (((IndianSettlement)settlement).getMissionary() != null) {
+                        Unit missionary = ((IndianSettlement)settlement).getMissionary();
+                        boolean expert = (missionary.getType() == Unit.JESUIT_MISSIONARY);
+                        g.drawImage(lib.getMissionChip(((IndianSettlement)settlement).getOwner().getColor(), expert), x + MISSION_OFFSET_X, y + MISSION_OFFSET_Y, null);
+                    }
+
                     g.setColor(Color.BLACK);
-                    g.drawString("-", x + TEXT_OFFSET_X + STATE_OFFSET_X, y + 10 + TEXT_OFFSET_Y);
+                    g.drawString("-", x + TEXT_OFFSET_X + STATE_OFFSET_X, y + STATE_OFFSET_Y + TEXT_OFFSET_Y);
                 } else {
                     logger.warning("Requested to draw unknown settlement type.");
                 }

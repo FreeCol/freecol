@@ -61,7 +61,7 @@ public class Game extends FreeColGameObject {
     */
     public Game(ModelController modelController) {
         super(null);
-        
+
         this.modelController = modelController;
 
         currentPlayer = null;
@@ -69,7 +69,7 @@ public class Game extends FreeColGameObject {
         market = new Market(this);
     }
 
-    
+
     /**
     * Initiate a new <code>Game</code> with information from
     * a saved game.
@@ -79,21 +79,21 @@ public class Game extends FreeColGameObject {
 
         setFreeColGameObjectListener(freeColGameObjectListener);
         this.modelController = modelController;
-        
+
         canGiveID = true;
-        
+
         for (int i=0; i<fcgos.length; i++) {
             fcgos[i].setGame(this);
             fcgos[i].updateID();
-            
+
             if (fcgos[i] instanceof Player) {
                 players.add(fcgos[i]);
             }
-        }            
-            
+        }
+
         readFromXMLElement(element);
     }
-    
+
 
     /**
     * Initiate a new <code>Game</code> object from a <code>Element</code>
@@ -103,7 +103,7 @@ public class Game extends FreeColGameObject {
         super(null, element);
 
         this.modelController = modelController;
-        
+
         canGiveID = false;
         readFromXMLElement(element);
     }
@@ -204,7 +204,7 @@ public class Game extends FreeColGameObject {
         }
 
         freeColGameObjects.put(id, freeColGameObject);
-        
+
         if (freeColGameObjectListener != null) {
             freeColGameObjectListener.setFreeColGameObject(id, freeColGameObject);
         }
@@ -271,7 +271,7 @@ public class Game extends FreeColGameObject {
         this.map = map;
     }
 
-    
+
     /**
     * Returns a vacant nation.
     */
@@ -285,13 +285,13 @@ public class Game extends FreeColGameObject {
                 nationTaken[player.getNation()] = true;
             }
         }
-        
+
         for (int i=0; i<nationTaken.length; i++) {
             if (!nationTaken[i]) {
                 return i;
             }
         }
-        
+
         return -1;
     }
 
@@ -309,7 +309,7 @@ public class Game extends FreeColGameObject {
         } else {
             logger.info("Current player set to 'null'.");
         }
-        
+
         currentPlayer = newCp;
     }
 
@@ -335,7 +335,7 @@ public class Game extends FreeColGameObject {
         return getPlayerAfter(currentPlayer);
     }
 
-    
+
     /**
     * Gets the player after the given player.
     * @see #getNextPlayer
@@ -344,7 +344,7 @@ public class Game extends FreeColGameObject {
         if (players.size() == 0) {
             return null;
         }
-        
+
         int index = players.indexOf(beforePlayer) + 1;
 
         if (index >= players.size()) {
@@ -467,6 +467,25 @@ public class Game extends FreeColGameObject {
 
 
     /**
+    * Returns all the European players known by the player of this game.
+    * @return All the European players known by the player of this game.
+    */
+    public Vector getEuropeanPlayers() {
+        Vector europeans = new Vector();
+        Iterator playerIterator = getPlayerIterator();
+
+        while (playerIterator.hasNext()) {
+            Player player = (Player) playerIterator.next();
+
+            if (player.isEuropean()) {
+                europeans.addElement(player);
+            }
+        }
+        return europeans;
+    }
+
+
+    /**
     * Gets the maximum number of players that can be added to this game.
     *
     * @return the maximum number of players that can be added to this game
@@ -489,7 +508,7 @@ public class Game extends FreeColGameObject {
         }
     }
 
-    
+
     /**
     * Checks if all players are ready to launch.
     *
@@ -599,6 +618,22 @@ public class Game extends FreeColGameObject {
 
 
     /**
+    * Returns an amount of gold that should be payed by payingPlayer to attackingPlayer in order for
+    * attackingPlayer to attack targetPlayer. This method should NEVER be randomized: it should always
+    * return the same amount if given the same three parameters.
+    * @return An amount of gold that should be payed by payingPlayer to attackingPlayer in order for
+    * attackingPlayer to attack targetPlayer.
+    */
+    public static int getInciteAmount(Player payingPlayer, Player targetPlayer, Player attackingPlayer) {
+        // TODO: take into account the strength of the three players that are involved.
+
+        // NOTE: this method should NEVER have any randomisation in it.
+
+        return 1000;
+    }
+
+
+    /**
     * Make a XML-representation of this object.
     *
     * @param document The document to use when creating new componenets.
@@ -608,16 +643,16 @@ public class Game extends FreeColGameObject {
         if (toSavedGame && !showAll) {
             throw new IllegalArgumentException("showAll must be set to true when toSavedGame is true.");
         }
-                
+
         Element gameElement = document.createElement(getXMLElementTagName());
 
         gameElement.setAttribute("ID", getID());
         gameElement.setAttribute("turn", Integer.toString(getTurn().getNumber()));
-        
+
         if (toSavedGame) {
             gameElement.setAttribute("nextID", Integer.toString(nextId));
         }
-        
+
         Iterator playerIterator = getPlayerIterator();
         while (playerIterator.hasNext()) {
             Player p = (Player) playerIterator.next();
@@ -654,7 +689,7 @@ public class Game extends FreeColGameObject {
         if (gameElement.hasAttribute("nextID")) {
             nextId = Integer.parseInt(gameElement.getAttribute("nextID"));
         }
-        
+
         // Get the market
         Element marketElement = getChildElement(gameElement, Market.getXMLElementTagName());
         if (market != null) {

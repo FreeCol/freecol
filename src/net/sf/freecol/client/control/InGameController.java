@@ -98,7 +98,7 @@ public final class InGameController implements NetworkConstants {
         if (file == null) {
             return;
         }
-        
+
         if (!file.isFile()) {
             canvas.errorMessage("fileNotFound");
             return;
@@ -276,8 +276,7 @@ public final class InGameController implements NetworkConstants {
             case Unit.ENTER_INDIAN_VILLAGE_WITH_SCOUT:
                                         scoutIndianSettlement(unit, direction); break;
             case Unit.ENTER_INDIAN_VILLAGE_WITH_MISSIONARY:
-                                        // TODO
-                                        freeColClient.playSound(SfxLibrary.ILLEGAL_MOVE); break;
+                                        useMissionary(unit, direction); break;
             case Unit.ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST:
                                         learnSkillAtIndianSettlement(unit, direction); break;
             case Unit.ENTER_FOREIGN_COLONY_WITH_SCOUT:
@@ -408,13 +407,13 @@ public final class InGameController implements NetworkConstants {
         tradeElement.setAttribute("settlement", settlement.getID());
         tradeElement.setAttribute("gold", Integer.toString(gold));
         tradeElement.appendChild(goods.toXMLElement(null, tradeElement.getOwnerDocument()));
-        
+
         client.send(tradeElement);
-        
+
         unit.trade(settlement, goods, gold);
     }
 
-    
+
     /**
     * Trades the given goods. The goods gets transferred
     * from the given <code>Unit</code> to the given <code>Settlement</code>.
@@ -1235,6 +1234,98 @@ public final class InGameController implements NetworkConstants {
 
         nextActiveUnit(unit.getTile());
     }
+
+
+    /**
+    * Moves a missionary into an indian settlement.
+    * @param unit The unit that will enter the settlement.
+    * @param direction The direction in which the Indian settlement lies.
+    */
+    private void useMissionary(Unit unit, int direction) {
+        Client client = freeColClient.getClient();
+        Canvas canvas = freeColClient.getCanvas();
+        Map map = freeColClient.getGame().getMap();
+        IndianSettlement settlement = (IndianSettlement) map.getNeighbourOrNull(direction, unit.getTile()).getSettlement();
+
+        ArrayList response = canvas.showUseMissionaryDialog(settlement);
+        int action = ((Integer)response.get(0)).intValue();
+
+        Element missionaryMessage = Message.createNewRootElement("missionaryAtSettlement");
+        missionaryMessage.setAttribute("unit", unit.getID());
+        missionaryMessage.setAttribute("direction", Integer.toString(direction));
+
+        Element reply = null;
+
+        unit.setMovesLeft(0);
+
+        switch (action) {
+            case FreeColDialog.MISSIONARY_CANCEL:
+                missionaryMessage.setAttribute("action", "cancel");
+                client.send(missionaryMessage);
+                break;
+            case FreeColDialog.MISSIONARY_ESTABLISH:
+                missionaryMessage.setAttribute("action", "establish");
+                client.send(missionaryMessage);
+                unit.setLocation(settlement);
+                settlement.setMissionary(unit);
+                break;
+            case FreeColDialog.MISSIONARY_DENOUNCE_AS_HERESY:
+                missionaryMessage.setAttribute("action", "heresy");
+                reply = client.ask(missionaryMessage);
+
+                if (!reply.getTagName().equals("missionaryReply")) {
+                    logger.warning("Server gave an invalid reply to a missionaryAtSettlement message");
+                    return;
+                }
+
+                String success = reply.getAttribute("success");
+                if (success.equals("true")) {
+                    settlement.getMissionary().dispose();
+                    unit.setLocation(settlement);
+                    settlement.setMissionary(unit);
+                }
+                else {
+                    unit.dispose();
+                }
+                break;
+            case FreeColDialog.MISSIONARY_INCITE_INDIANS:
+                missionaryMessage.setAttribute("action", "incite");
+                missionaryMessage.setAttribute("incite", ((Player)response.get(1)).getID());
+
+                reply = client.ask(missionaryMessage);
+
+                if (reply.getTagName().equals("missionaryReply")) {
+                    int amount = Integer.parseInt(reply.getAttribute("amount"));
+
+                    boolean confirmed = canvas.showInciteDialog((Player)response.get(1), amount);
+
+                    Element inciteMessage = Message.createNewRootElement("inciteAtSettlement");
+                    inciteMessage.setAttribute("unit", unit.getID());
+                    inciteMessage.setAttribute("direction", Integer.toString(direction));
+                    inciteMessage.setAttribute("confirmed", confirmed ? "true" : "false");
+                    inciteMessage.setAttribute("enemy", ((Player)response.get(1)).getID());
+
+                    if (confirmed) {
+                        unit.getOwner().modifyGold(-amount);
+
+                        // Maybe at this point we can keep track of the fact that the indian is now at
+                        // war with the chosen european player, but is this really necessary at the client
+                        // side?
+                        settlement.getOwner().setStance((Player)response.get(1), Player.WAR);
+                        ((Player)response.get(1)).setStance(settlement.getOwner(), Player.WAR);
+                    }
+
+                    client.send(inciteMessage);
+                }
+                else {
+                    logger.warning("Server gave an invalid reply to a missionaryAtSettlement message");
+                    return;
+                }
+        }
+
+        nextActiveUnit(unit.getTile());
+    }
+
 
     /**
      * Moves the specified unit to Europe.

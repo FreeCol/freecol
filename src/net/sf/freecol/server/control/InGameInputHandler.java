@@ -91,6 +91,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                         reply = learnSkillAtSettlement(connection, element);
                     } else if (type.equals("scoutIndianSettlement")) {
                         reply = scoutIndianSettlement(connection, element);
+                    } else if (type.equals("missionaryAtSettlement")) {
+                        reply = missionaryAtSettlement(connection, element);
+                    } else if (type.equals("inciteAtSettlement")) {
+                        reply = inciteAtSettlement(connection, element);
                     } else if (type.equals("leaveShip")) {
                         reply = leaveShip(connection, element);
                     } else if (type.equals("loadCargo")) {
@@ -868,6 +872,106 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
 
 
     /**
+    * Handles a "missionaryAtSettlement"-message from a client.
+    *
+    * @param connection The connection the message came from.
+    * @param element The element containing the request.
+    */
+    private Element missionaryAtSettlement(Connection connection, Element element) {
+        FreeColServer freeColServer = getFreeColServer();
+        Game game = freeColServer.getGame();
+        Map map = game.getMap();
+        ServerPlayer player = freeColServer.getPlayer(connection);
+
+        Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
+        int direction = Integer.parseInt(element.getAttribute("direction"));
+        String action = element.getAttribute("action");
+        IndianSettlement settlement = (IndianSettlement) map.getNeighbourOrNull(direction, unit.getTile()).getSettlement();
+
+        unit.setMovesLeft(0);
+
+        if (action.equals("cancel")) {
+            return null;
+        }
+        else if (action.equals("establish")) {
+            unit.setLocation(settlement);
+            settlement.setMissionary(unit);
+            return null;
+        }
+        else if (action.equals("heresy")) {
+            Element reply = Message.createNewRootElement("missionaryReply");
+
+            // TODO: chance needs to depend on amount of crosses that the players who are involved have.
+            double random = Math.random();
+            if (random < 0.5) {
+                reply.setAttribute("success", "true");
+                settlement.getMissionary().dispose();
+                unit.setLocation(settlement);
+                settlement.setMissionary(unit);
+            }
+            else {
+                reply.setAttribute("success", "false");
+                unit.dispose();
+            }
+
+            return reply;
+        }
+        else if (action.equals("incite")) {
+            Element reply = Message.createNewRootElement("missionaryReply");
+
+            Player enemy = (Player)game.getFreeColGameObject(element.getAttribute("incite"));
+
+            reply.setAttribute("amount", String.valueOf(Game.getInciteAmount(player, enemy, settlement.getOwner())));
+
+            // Move the unit into the settlement while we wait for the client's response.
+            unit.setLocation(settlement);
+
+            return reply;
+        }
+        else {
+            return null;
+        }
+    }
+
+
+    /**
+    * Handles a "inciteAtSettlement"-message from a client.
+    *
+    * @param connection The connection the message came from.
+    * @param element The element containing the request.
+    */
+    private Element inciteAtSettlement(Connection connection, Element element) {
+        FreeColServer freeColServer = getFreeColServer();
+        Game game = freeColServer.getGame();
+        Map map = game.getMap();
+        ServerPlayer player = freeColServer.getPlayer(connection);
+
+        Unit unit = (Unit)game.getFreeColGameObject(element.getAttribute("unit"));
+        int direction = Integer.parseInt(element.getAttribute("direction"));
+        String confirmed = element.getAttribute("confirmed");
+
+        IndianSettlement settlement = (IndianSettlement) unit.getTile().getSettlement();
+        // Move the unit back to its original Tile.
+        unit.setLocation(map.getNeighbourOrNull(Map.getReverseDirection(direction), unit.getTile()));
+
+        if (confirmed.equals("true")) {
+            Player enemy = (Player)game.getFreeColGameObject(element.getAttribute("enemy"));
+
+            int amount = Game.getInciteAmount(player, enemy, settlement.getOwner());
+
+            player.modifyGold(-amount);
+
+            // Set the indian player at war with the european player (and vice versa).
+            settlement.getOwner().setStance(enemy, Player.WAR);
+            enemy.setStance(settlement.getOwner(), Player.WAR);
+        }
+        // else: no need to do anything: unit's moves are already zero.
+
+        return null;
+    }
+
+
+    /**
     * Handles a "leaveShip"-message from a client.
     *
     * @param connection The connection the message came from.
@@ -1480,7 +1584,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     private Element tradeProposition(Connection connection, Element element) {
         Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        
+
         Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
         Settlement settlement = (Settlement) game.getFreeColGameObject(element.getAttribute("settlement"));
         Goods goods = new Goods(game, Message.getChildElement(element, Goods.getXMLElementTagName()));
@@ -1531,12 +1635,12 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     private Element trade(Connection connection, Element element) {
         Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        
+
         Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
         Settlement settlement = (Settlement) game.getFreeColGameObject(element.getAttribute("settlement"));
         Goods goods = new Goods(game, Message.getChildElement(element, Goods.getXMLElementTagName()));
         int gold = Integer.parseInt(element.getAttribute("gold"));
-        
+
         if (gold <= 0) {
             throw new IllegalArgumentException();
         }
@@ -1575,7 +1679,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         return null;
     }
 
-    
+
     /**
      * Handles a "deliverGift"-message.
      *
@@ -1585,7 +1689,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     private Element deliverGift(Connection connection, Element element) {
         Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        
+
         Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
         Settlement settlement = (Settlement) game.getFreeColGameObject(element.getAttribute("settlement"));
         Goods goods = new Goods(game, Message.getChildElement(element, Goods.getXMLElementTagName()));

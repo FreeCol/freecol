@@ -86,7 +86,7 @@ public class IndianSettlement extends Settlement {
 
     private ArrayList ownedUnits = new ArrayList();
 
-
+    private Unit missionary;
 
 
     /**
@@ -98,11 +98,16 @@ public class IndianSettlement extends Settlement {
      * @param kind Kind of settlement
      * @param isCapital True if settlement is tribe's capital
      * @param learnableSkill The skill that can be learned by Europeans at this settlement.
+     * @param highlyWantedGoods The goods that are very much wanted by the people from this settlement.
+     * @param wantedGoods1 Goods that wanted by the people from this settlement.
+     * @param wantedGoods2 Goods that wanted by the people from this settlement.
+     * @param isVisited Indicates if any European scout has asked to speak with the chief.
+     * @param missionary The missionary in this settlement (or null).
      * @exception IllegalArgumentException if an invalid tribe or kind is given
      */
     public IndianSettlement(Game game, Player player, Tile tile, int tribe, int kind,
             boolean isCapital, int learnableSkill, int highlyWantedGoods, int wantedGoods1,
-            int wantedGoods2, boolean isVisited) {
+            int wantedGoods2, boolean isVisited, Unit missionary) {
 
         // TODO: Change 'null' to the indian AI-player:
 
@@ -133,6 +138,7 @@ public class IndianSettlement extends Settlement {
         this.wantedGoods1 = wantedGoods1;
         this.wantedGoods2 = wantedGoods2;
         this.isVisited = isVisited;
+        this.missionary = missionary;
 
         for (int goodsType=0; goodsType<Goods.NUMBER_OF_TYPES; goodsType++) {
             if (goodsType == Goods.LUMBER || goodsType == Goods.HORSES || goodsType == Goods.MUSKETS
@@ -162,6 +168,7 @@ public class IndianSettlement extends Settlement {
         this.wantedGoods1 = UNKNOWN;
         this.wantedGoods2 = UNKNOWN;
         isVisited = false;
+        missionary = null;
 
         readFromXMLElement(element);
     }
@@ -247,6 +254,24 @@ public class IndianSettlement extends Settlement {
     */
     public int getWantedGoods2() {
         return wantedGoods2;
+    }
+
+
+    /**
+    * Returns the missionary from this settlement if there is one or null if there is none.
+    * @return The missionary from this settlement if there is one or null if there is none.
+    */
+    public Unit getMissionary() {
+        return missionary;
+    }
+
+
+    /**
+    * Sets the missionary for this settlement.
+    * @param missionary The missionary for this settlement.
+    */
+    public void setMissionary(Unit missionary) {
+        this.missionary = missionary;
     }
 
 
@@ -624,6 +649,10 @@ public class IndianSettlement extends Settlement {
             indianSettlementElement.setAttribute("hasBeenVisted", Boolean.toString(isVisited));
         }
 
+        if (missionary != null) {
+            indianSettlementElement.setAttribute("missionary", missionary.getID());
+        }
+
         if (showAll || player == getOwner()) {
             indianSettlementElement.appendChild(unitContainer.toXMLElement(player, document, showAll, toSavedGame));
             indianSettlementElement.appendChild(goodsContainer.toXMLElement(player, document, showAll, toSavedGame));
@@ -680,6 +709,9 @@ public class IndianSettlement extends Settlement {
         }
         if (indianSettlementElement.hasAttribute("hasBeenVisited")) {
             isVisited = Boolean.getBoolean(indianSettlementElement.getAttribute("hasBeenVisited"));
+        }
+        if (indianSettlementElement.hasAttribute("missionary")) {
+            missionary = (Unit) getGame().getFreeColGameObject(indianSettlementElement.getAttribute("missionary"));
         }
 
         Element unitContainerElement = getChildElement(indianSettlementElement, UnitContainer.getXMLElementTagName());

@@ -246,12 +246,12 @@ public final class Canvas extends JLayeredPane {
             logger.warning("Tried to open 'StartGamePanel' without having 'game' and/or 'player' set.");
         }
     }
-    
-    
+
+
     /**
     * Displays the <code>ServerListPanel</code>.
     *
-    * @param username The username that should be used when connecting 
+    * @param username The username that should be used when connecting
     *        to one of the servers on the list.
     * @param serverList The list containing the servers retrived from the
     *        metaserver.
@@ -505,6 +505,79 @@ public final class Canvas extends JLayeredPane {
         remove(scoutDialog);
 
         return response;
+    }
+
+
+    /**
+    * Displays a dialog that asks the user what he wants to do with his missionary in the indian
+    * settlement.
+    *
+    * @param settlement The indian settlement that is being visited.
+    *
+    * @return ArrayList with an Integer and optionally a Player refencing the player to attack in case
+    *         of "incite indians". Integer can be any of:
+    *         FreeColDialog.MISSIONARY_ESTABLISH if he wants to establish a mission,
+    *         FreeColDialog.MISSIONARY_DENOUNCE_AS_HERESY if he wants to denounce the existing
+    *            (foreign) mission as heresy,
+    *         FreeColDialog.MISSIONARY_INCITE_INDIANS if he wants to incite the indians
+    *            (requests their support for war against another European power),
+    *         FreeColDialog.MISSIONARY_CANCEL if the action was cancelled.
+    */
+    public ArrayList showUseMissionaryDialog(IndianSettlement settlement) {
+        FreeColDialog missionaryDialog = FreeColDialog.createUseMissionaryDialog(settlement);
+        missionaryDialog.setLocation(getWidth() / 2 - missionaryDialog.getWidth() / 2, getHeight() / 2 - missionaryDialog.getHeight() / 2);
+        add(missionaryDialog, new Integer(POPUP_LAYER.intValue() - 1));
+        missionaryDialog.requestFocus();
+
+        Integer response = (Integer)missionaryDialog.getResponse();
+        ArrayList returnValue = new ArrayList();
+        returnValue.add(response);
+
+        remove(missionaryDialog);
+
+        if (response.intValue() == FreeColDialog.MISSIONARY_INCITE_INDIANS) {
+            FreeColDialog inciteDialog = FreeColDialog.createInciteDialog(freeColClient.getGame().getEuropeanPlayers(), freeColClient.getMyPlayer());
+            inciteDialog.setLocation(getWidth() / 2 - inciteDialog.getWidth() / 2, getHeight() / 2 - inciteDialog.getHeight() / 2);
+            add(inciteDialog, new Integer(POPUP_LAYER.intValue() - 1));
+            inciteDialog.requestFocus();
+
+            Player response2 = (Player)inciteDialog.getResponse();
+            if (response2 != null) {
+                returnValue.add(response2);
+            }
+            else {
+                returnValue.clear();
+                returnValue.add(new Integer(FreeColDialog.MISSIONARY_CANCEL));
+            }
+
+            remove(inciteDialog);
+        }
+
+        return returnValue;
+    }
+
+
+    /**
+    * Displays a yes/no question to the user asking if he wants to pay the given amount to an
+    * indian tribe in order to have them declare war on the given player.
+    *
+    * @param enemy The european player to attack.
+    * @param amount The amount of gold to pay.
+    *
+    * @return true if the players wants to pay, false otherwise.
+    */
+    public boolean showInciteDialog(Player enemy, int amount) {
+        String message = Messages.message("missionarySettlement.inciteConfirm");
+        message = message.replaceAll("%player%", enemy.getName());
+        message = message.replaceAll("%amount%", String.valueOf(amount));
+
+        FreeColDialog confirmDialog = FreeColDialog.createConfirmDialog(message, Messages.message("yes"), Messages.message("no"));
+        confirmDialog.setLocation(getWidth() / 2 - confirmDialog.getWidth() / 2, getHeight() / 2 - confirmDialog.getHeight() / 2);
+        add(confirmDialog, new Integer(POPUP_LAYER.intValue() - 1));
+        confirmDialog.requestFocus();
+        boolean result = confirmDialog.getResponseBoolean();
+        remove(confirmDialog);
+        return result;
     }
 
 

@@ -218,7 +218,8 @@ public class MapGenerator {
                                          ((Integer)list.get(0)).intValue(),
                                          ((Integer)list.get(1)).intValue(),
                                          ((Integer)list.get(2)).intValue(),
-                                         false)
+                                         false,
+                                         null)
                 );
 
                 map.getTile(position).setClaim(Tile.CLAIM_CLAIMED);

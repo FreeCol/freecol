@@ -3,6 +3,7 @@ package net.sf.freecol.client.gui.panel;
 import java.util.logging.Logger;
 import java.util.Iterator;
 import java.util.ArrayList;
+import java.util.Vector;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -14,6 +15,7 @@ import java.io.*;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 
 import cz.autel.dmi.HIGLayout;
@@ -30,10 +32,15 @@ public class FreeColDialog extends FreeColPanel {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    public static final int     SCOUT_INDIAN_SETTLEMENT_CANCEL = 0,
-                                SCOUT_INDIAN_SETTLEMENT_SPEAK = 1,
-                                SCOUT_INDIAN_SETTLEMENT_TRIBUTE = 2,
-                                SCOUT_INDIAN_SETTLEMENT_ATTACK = 3;
+    public static final int SCOUT_INDIAN_SETTLEMENT_CANCEL = 0,
+                            SCOUT_INDIAN_SETTLEMENT_SPEAK = 1,
+                            SCOUT_INDIAN_SETTLEMENT_TRIBUTE = 2,
+                            SCOUT_INDIAN_SETTLEMENT_ATTACK = 3;
+
+    public static final int MISSIONARY_CANCEL = 0,
+                            MISSIONARY_ESTABLISH = 1,
+                            MISSIONARY_DENOUNCE_AS_HERESY = 2,
+                            MISSIONARY_INCITE_INDIANS = 3;
 
     // Stores the response from the user:
     private Object response = null;
@@ -399,6 +406,163 @@ public class FreeColDialog extends FreeColPanel {
         scoutDialog.setSize(scoutDialog.getPreferredSize());
 
         return scoutDialog;
+    }
+
+
+    /**
+    * Creates a dialog that asks the user what he wants to do with his missionary in the indian
+    * settlement. Options are: establish mission, denounce existing (foreign) mission as heresy,
+    * incite indians (request them to attack other European player) or cancel.
+    * The possible responses are integers that are defined in this class as finals.
+    *
+    * @param settlement The indian settlement that is being visited.
+    *
+    * @return The FreeColDialog that asks the question to the user.
+    */
+    public static FreeColDialog createUseMissionaryDialog(IndianSettlement settlement) {
+        String mainText = Messages.message("missionarySettlement.question");
+
+        final JLabel question = new JLabel("<html><body>" + mainText + "</body></html>");
+        final JButton establishOrHeresy = new JButton(),
+                incite = new JButton(Messages.message("missionarySettlement.incite")),
+                cancel = new JButton(Messages.message("missionarySettlement.cancel"));
+
+        if (settlement.getMissionary() == null) {
+            establishOrHeresy.setText(Messages.message("missionarySettlement.establish"));
+        }
+        else {
+            establishOrHeresy.setText(Messages.message("missionarySettlement.heresy"));
+        }
+
+        final FreeColDialog missionaryDialog = new FreeColDialog() {
+            public void requestFocus() {
+                cancel.requestFocus();
+            }
+        };
+
+        int w1[] = {10, 30, 200, 30, 10};
+        int h1[] = {10, 100, 10, 20, 10, 20, 10, 20, 10};
+        HIGLayout layout = new HIGLayout(w1, h1);
+        higConst.clearCorrection();
+        layout.setRowWeight(2,1);
+        missionaryDialog.setLayout(layout);
+
+        if (settlement.getMissionary() == null) {
+            establishOrHeresy.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    missionaryDialog.setResponse(new Integer(MISSIONARY_ESTABLISH));
+                }
+            });
+        }
+        else {
+            establishOrHeresy.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    missionaryDialog.setResponse(new Integer(MISSIONARY_DENOUNCE_AS_HERESY));
+                }
+            });
+        }
+
+        incite.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                missionaryDialog.setResponse(new Integer(MISSIONARY_INCITE_INDIANS));
+            }
+        });
+        cancel.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                missionaryDialog.setResponse(new Integer(MISSIONARY_CANCEL));
+            }
+        });
+
+        missionaryDialog.add(question, higConst.rcwh(2, 2, 3, 1));
+        missionaryDialog.add(establishOrHeresy, higConst.rc(4, 3));
+        missionaryDialog.add(incite, higConst.rc(6, 3));
+        missionaryDialog.add(cancel, higConst.rc(8, 3));
+
+        missionaryDialog.setSize(missionaryDialog.getPreferredSize());
+
+        return missionaryDialog;
+    }
+
+
+    /**
+    * Creates a dialog that asks the user which player he wants the indians to attack.
+    * All the players will be shown as options (not including the current player of course).
+    * The possible responses are Player objects that that represent a player that should be
+    * attacked.
+    *
+    * @param allPlayers All players in the game.
+    * @param thisUser The current player.
+    *
+    * @return The FreeColDialog that asks the question to the user.
+    */
+    public static FreeColDialog createInciteDialog(Vector allPlayers, Player thisUser) {
+        String mainText = Messages.message("missionarySettlement.inciteQuestion");
+
+        final JLabel question = new JLabel("<html><body>" + mainText + "</body></html>");
+        final JButton players[] = new JButton[allPlayers.size() - 1],
+                cancel = new JButton(Messages.message("missionarySettlement.cancel"));
+
+        int arrayIndex = 0;
+        for (int i = 0; i < allPlayers.size(); i++) {
+            Player p = (Player)allPlayers.get(i);
+            if (p.equals(thisUser)) {
+                continue;
+            }
+            players[arrayIndex] = new JButton(p.getName() + " (" + p.getNationAsString() + ")");
+            arrayIndex++;
+        }
+
+        final FreeColDialog inciteDialog = new FreeColDialog() {
+            public void requestFocus() {
+                cancel.requestFocus();
+            }
+        };
+
+        int w1[] = {10, 30, 200, 30, 10};
+        int h1[] = new int[3 + allPlayers.size() * 2];
+
+        // h1 = {10, 100, 10, 20, 10, 20, 10, 20, 10, ...};
+        h1[0] = 10;
+        h1[1] = 100;
+        h1[2] = 10;
+        for (int i = 3; i < h1.length; i += 2) {
+            h1[i] = 20;
+            h1[i + 1] = 10;
+        }
+
+        HIGLayout layout = new HIGLayout(w1, h1);
+        higConst.clearCorrection();
+        layout.setRowWeight(2,1);
+        inciteDialog.setLayout(layout);
+
+        arrayIndex = 0;
+        for (int i = 0; i < allPlayers.size(); i++) {
+            final Player p = (Player)allPlayers.get(i);
+            if (p.equals(thisUser)) {
+                continue;
+            }
+            players[arrayIndex].addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    inciteDialog.setResponse(p);
+                }
+            });
+            arrayIndex++;
+        }
+        cancel.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                inciteDialog.setResponse(null);
+            }
+        });
+
+        inciteDialog.add(question, higConst.rcwh(2, 2, 3, 1));
+        for (int i = 0; i < players.length; i++) {
+            inciteDialog.add(players[i], higConst.rc(4 + i * 2, 3));
+        }
+        inciteDialog.add(cancel, higConst.rc(4 + players.length * 2, 3));
+
+        inciteDialog.setSize(inciteDialog.getPreferredSize());
+
+        return inciteDialog;
     }
 
 
