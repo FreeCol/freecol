@@ -836,7 +836,7 @@ public class Player extends FreeColGameObject {
                 while (tileIterator.hasNext()) {
                     Tile tile = (Tile) tileIterator.next();
                     if (tile.getColony() != null) {
-                        tile.getColony().addSol(20);
+                        tile.getColony().addSoL(20);
                     }
                 }
             }
