@@ -17,6 +17,7 @@
     <mkdir dir="${freecol.build.dir}"/>
     <javac srcdir="${freecol.src.dir}"
            destdir="${freecol.build.dir}"
+           classpath="${basedir}/jars/higlayout.jar"
            debug="on"
            optimize="on"
            deprecation="off"
@@ -27,6 +28,15 @@
   <target name="copy-sound-files" depends="init" unless="nosound">
     <copy todir="${freecol.build.dir}/net/sf/freecol/data/audio">
       <fileset dir="${freecol.data.dir}/audio">
+        <exclude name="**/CVS/**"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="copy-jar-files" depends="init">
+    <mkdir dir="${freecol.build.dir}/jars"/>
+    <copy todir="${freecol.build.dir}/jars">
+      <fileset dir="${basedir}/jars">
         <exclude name="**/CVS/**"/>
       </fileset>
     </copy>
@@ -50,7 +60,7 @@
     <antcall target="copy-sound-files"/>
   </target>
 
-  <target name="build" depends="init,compile">
+  <target name="build" depends="init,compile,copy-jar-files">
     <!-- Copy the data files unless the "nodata" property has been defined -->
     <antcall target="copy-data-files"/>
     
