@@ -62,10 +62,9 @@ public class Player extends FreeColGameObject {
     /** The maximum line of sight a unit can have in the game. */
     public static final int MAX_LINE_OF_SIGHT = 2;
 
-    /** Contains booleans to see which tribes this player has met with
-     * has - 1 because you won't meet yourself :)
+    /** Contains booleans to see which tribes this player has met:
      */
-    private boolean[] contacted = new boolean[TRIBES.length + NATIONS.length -1];
+    private boolean[] contacted = new boolean[TRIBES.length + NATIONS.length];
 
     private static final Color defaultNationColors[] = {
         Color.ORANGE,
@@ -255,7 +254,33 @@ public class Player extends FreeColGameObject {
     /**
      * Sets whether this player has contacted <code>type</code>
      */
+    public void setContacted(Player player, boolean b) {
+        int type = player.getNation();
+
+        if (type == getNation()) {
+            return;
+        }
+
+        if (b == true && b != contacted[type]) {
+            if (player.isEuropean()) {
+                addModelMessage(this, "EventPanel.MEETING_EUROPEANS", null);
+            } else {
+                addModelMessage(this, "EventPanel.MEETING_NATIVES", null);
+            }
+        }
+
+        setContacted(type, b);
+    }
+
+
+    /**
+     * Sets whether this player has contacted <code>type</code>
+     */
     public void setContacted(int type, boolean b) {
+        if (type == getNation()) {
+            return;
+        }
+            
         contacted[type] = b;
     }
 
@@ -428,7 +453,7 @@ public class Player extends FreeColGameObject {
     * Gets called when this player's turn has ended.
     */
     public void endTurn() {
-        // Will be implemented later.
+        getGame().removeModelMessagesFor(this);
     }
 
 
@@ -929,16 +954,6 @@ public class Player extends FreeColGameObject {
         playerElement.setAttribute("rebellionState", Integer.toString(rebellionState));
         playerElement.setAttribute("ai", Boolean.toString(ai));
 
-        StringBuffer sb = new StringBuffer(contacted.length);
-        for(int i = 0; i < contacted.length; i++) {
-            if(contacted[i])
-                sb.append('1');
-            else
-                sb.append('0');
-        }
-
-        playerElement.setAttribute("contacted", sb.toString());
-
         if (showAll || equals(player)) {
             playerElement.setAttribute("gold", Integer.toString(gold));
             playerElement.setAttribute("crosses", Integer.toString(crosses));
@@ -947,10 +962,20 @@ public class Player extends FreeColGameObject {
             playerElement.setAttribute("crossesRequired", Integer.toString(crossesRequired));
 
             char[] fatherCharArray = new char[FoundingFather.FATHER_COUNT];
-            for(int i = 0; i < fathers.length; i++)
+            for(int i = 0; i < fathers.length; i++) {
                 fatherCharArray[i] = (fathers[i] ? '1' : '0');
-            String fatherStr = new String(fatherCharArray);
-            playerElement.setAttribute("foundingFathers", fatherStr);
+            }
+            playerElement.setAttribute("foundingFathers", new String(fatherCharArray));
+
+            StringBuffer sb = new StringBuffer(contacted.length);
+            for(int i = 0; i < contacted.length; i++) {
+                if(contacted[i]) {
+                    sb.append('1');
+                } else {
+                    sb.append('0');
+                }
+            }
+            playerElement.setAttribute("contacted", sb.toString());            
         } else {
             playerElement.setAttribute("gold", Integer.toString(-1));
             playerElement.setAttribute("crosses", Integer.toString(-1));
@@ -996,12 +1021,15 @@ public class Player extends FreeColGameObject {
         currentFather = Integer.parseInt(playerElement.getAttribute("currentFather"));
         crossesRequired = Integer.parseInt(playerElement.getAttribute("crossesRequired"));
 
-        String contacts = playerElement.getAttribute("contacted");
-        for(int i = 0; i < contacts.length(); i++) {
-            if(contacts.charAt(i) == '1')
-                contacted[i] = true;
-            else
-                contacted[i] = false;
+        if (playerElement.hasAttribute("contacted")) {
+            String contacts = playerElement.getAttribute("contacted");
+            for(int i = 0; i < contacts.length(); i++) {
+                if(contacts.charAt(i) == '1') {
+                    contacted[i] = true;
+                } else {
+                    contacted[i] = false;
+                }
+            }
         }
 
         if (playerElement.hasAttribute("newLandName")) {

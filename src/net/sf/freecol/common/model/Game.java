@@ -517,6 +517,28 @@ public class Game extends FreeColGameObject {
 
 
     /**
+    * Removes all the model messages for the given player.
+    */
+    public void removeModelMessagesFor(Player player) {
+        Iterator i = modelMessages.iterator();
+        while(i.hasNext()) {
+            ModelMessage m = (ModelMessage) i.next();
+            if (m.hasBeenDisplayed()) {
+                i.remove();
+            }
+        }
+    }
+
+
+    /**
+    * Removes all the model messages.
+    */
+    public void clearModelMessages() {
+        modelMessages.clear();
+    }
+
+
+    /**
     * Prepares this <code>Game</code> for a new turn.
     *
     * Invokes <code>newTurn()</code> for every registered <code>FreeColGamObject</code>.
@@ -526,7 +548,6 @@ public class Game extends FreeColGameObject {
     public void newTurn() {
         //Iterator iterator = getFreeColGameObjectIterator();
         turn.increase();
-        modelMessages.clear();
 
         Iterator iterator = ((HashMap) freeColGameObjects.clone()).values().iterator();
 

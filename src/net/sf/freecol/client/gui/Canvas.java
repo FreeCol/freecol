@@ -285,56 +285,69 @@ public final class Canvas extends JLayeredPane {
     *       <code>data[x][1]</code> for every <code>x</code>.
     *   <li>The message is displayed using a modal dialog.
     * </ol>
+    *
+    * A specialized panel may be used. In this case the <code>messageID</code>
+    * of the <code>ModelMessage</code> if used as a key for this panel.
+    *
     */
     public void showModelMessage(ModelMessage m) {
         String okText = "ok";
         String cancelText = "display";
         String message = m.getMessageID();
-        try {
-            okText = Messages.message(okText);
-            cancelText = Messages.message(cancelText);
-            message = Messages.message(message);
-        } catch (MissingResourceException e) {
-            logger.warning("could not find message with id: " + okText + ".");
-        }
 
-        String[][] data = m.getData();
-        if (data != null) {
-            for (int i=0; i<data.length; i++) {
-                message = message.replaceAll(data[i][0], data[i][1]);
+        if (message.equals("EventPanel.MEETING_EUROPEANS")) {
+            showEventDialog(EventPanel.MEETING_EUROPEANS);
+            freeColClient.getInGameController().nextModelMessage();
+        } else if (message.equals("EventPanel.MEETING_NATIVES")) {
+            showEventDialog(EventPanel.MEETING_NATIVES);
+            freeColClient.getInGameController().nextModelMessage();
+        } else {
+            try {
+                okText = Messages.message(okText);
+                cancelText = Messages.message(cancelText);
+                message = Messages.message(message);
+            } catch (MissingResourceException e) {
+                logger.warning("could not find message with id: " + okText + ".");
             }
-        }
 
-        FreeColGameObject source = m.getSource();
-        if (source instanceof Europe && !europePanel.isShowing() ||
-                source instanceof Colony && !colonyPanel.isShowing()) {
+            String[][] data = m.getData();
+            if (data != null) {
+                for (int i=0; i<data.length; i++) {
+                    message = message.replaceAll(data[i][0], data[i][1]);
+                }
+            }
 
-            FreeColDialog confirmDialog = FreeColDialog.createConfirmDialog(message, okText, cancelText);
-            confirmDialog.setLocation(getWidth() / 2 - confirmDialog.getWidth() / 2, getHeight() / 2 - confirmDialog.getHeight() / 2);
-            add(confirmDialog, new Integer(POPUP_LAYER.intValue() - 1));
-            confirmDialog.requestFocus();
+            FreeColGameObject source = m.getSource();
+            if (source instanceof Europe && !europePanel.isShowing() ||
+                    source instanceof Colony && !colonyPanel.isShowing()) {
 
-            if (!confirmDialog.getResponseBoolean()) {
-                remove(confirmDialog);
-                if (source instanceof Europe) {
-                    showEuropePanel();
-                } else if (source instanceof Colony) {
-                    showColonyPanel((Colony) source);
+                FreeColDialog confirmDialog = FreeColDialog.createConfirmDialog(message, okText, cancelText);
+                confirmDialog.setLocation(getWidth() / 2 - confirmDialog.getWidth() / 2, getHeight() / 2 - confirmDialog.getHeight() / 2);
+                add(confirmDialog, new Integer(POPUP_LAYER.intValue() - 1));
+                confirmDialog.requestFocus();
+
+                if (!confirmDialog.getResponseBoolean()) {
+                    remove(confirmDialog);
+                    if (source instanceof Europe) {
+                        showEuropePanel();
+                    } else if (source instanceof Colony) {
+                        showColonyPanel((Colony) source);
+                    }
+                } else {
+                    remove(confirmDialog);
+                    freeColClient.getInGameController().nextModelMessage();
                 }
             } else {
-                remove(confirmDialog);
+                FreeColDialog informationDialog = FreeColDialog.createInformationDialog(message, okText);
+                informationDialog.setLocation(getWidth() / 2 - informationDialog.getWidth() / 2, getHeight() / 2 - informationDialog.getHeight() / 2);
+                add(informationDialog, new Integer(POPUP_LAYER.intValue() - 1));
+                informationDialog.requestFocus();
+
+                informationDialog.getResponse();
+                remove(informationDialog);
+
                 freeColClient.getInGameController().nextModelMessage();
             }
-        } else {
-            FreeColDialog informationDialog = FreeColDialog.createInformationDialog(message, okText);
-            informationDialog.setLocation(getWidth() / 2 - informationDialog.getWidth() / 2, getHeight() / 2 - informationDialog.getHeight() / 2);
-            add(informationDialog, new Integer(POPUP_LAYER.intValue() - 1));
-            informationDialog.requestFocus();
-
-            informationDialog.getResponse();
-            remove(informationDialog);
-
-            freeColClient.getInGameController().nextModelMessage();
         }
     }
 

@@ -861,6 +861,21 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         if (location != null) {
             location.add(this);
         }
+
+        // Check for adjacent units owned by a player that our owner has not met before:
+        if (getGame().getMap() != null && location != null && location instanceof Tile && !isNaval()) {
+            Iterator tileIterator = getGame().getMap().getAdjacentIterator(getTile().getPosition());
+            while (tileIterator.hasNext()) {
+                Tile t = getGame().getMap().getTile((Position) tileIterator.next());
+                if (t.getSettlement() != null && !t.getSettlement().getOwner().hasContacted(getOwner().getNation())) {
+                    t.getSettlement().getOwner().setContacted(getOwner(), true);
+                    getOwner().setContacted(t.getSettlement().getOwner(), true);
+                } else if (t.isLand() && t.getFirstUnit() != null && !t.getFirstUnit().getOwner().hasContacted(getOwner().getNation())) {
+                    t.getFirstUnit().getOwner().setContacted(getOwner(), true);
+                    getOwner().setContacted(t.getFirstUnit().getOwner(), true);
+                }
+            }
+        }
     }
 
 

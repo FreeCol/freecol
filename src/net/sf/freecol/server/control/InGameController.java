@@ -53,6 +53,9 @@ public final class InGameController extends Controller {
             throw new IllegalArgumentException("It is not " + player.getName() + "'s turn!");
         }
 
+        // Clean up server side model messages:
+        game.clearModelMessages();
+
         ServerPlayer nextPlayer = (ServerPlayer) game.getNextPlayer();
 
         while (nextPlayer != null && checkForDeath(nextPlayer)) {

@@ -163,6 +163,8 @@ public final class InGameInputHandler extends InputHandler {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         player.setNewLandName(element.getAttribute("newLandName"));
 
+        // TODO: Send name to all other players.
+        
         return null;
     }
 
