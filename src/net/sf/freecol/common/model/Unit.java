@@ -1,6 +1,7 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.Random;
 import java.util.Vector;
 import java.util.HashMap;
 import java.util.ArrayList;
@@ -109,6 +110,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     private GoodsContainer  goodsContainer;
     private Location        entryLocation;
     private Location        location;
+    
+    // to be used only for type == TREASURE_TRAIN
+    private int             treasureAmount;
 
     private int             workType; // What type of goods this unit produces in its occupation.
     
@@ -257,7 +261,25 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
 
 
 
-
+    /**
+    * Returns the current amount of treasure in this unit.
+    * Should be type of TREASURE_TRAIN. 
+    * @return The amount of treasure.
+    */
+    public int getTreasureAmount() {
+        return treasureAmount;
+    }
+    
+    /**
+     * the current amount of treasure in this unit.
+     * Should be type of TREASURE_TRAIN.
+     * @param amt    The amount of treasure
+     */
+    public void setTreasureAmount(int amt) {
+        this.treasureAmount = amt;
+    }
+    
+    
     /**
     * Checks if this <code>Unit</code> is a colonist. A <code>Unit</code>
     * is a colonist if it can build a new <code>Colony</code>.
@@ -2291,7 +2313,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             if (getGoodsCount() > 0) {
                 modified_power -= ((base_power * getGoodsCount()) / 8); // -12.5% penalty for every unit of cargo.
             }
-            //TODO: Drake bonus
+            if (getOwner().hasFather(FoundingFather.FRANCIS_DRAKE)) {
+                modified_power += (base_power * 3) / 2;
+            }
             return modified_power;
         }
 
@@ -2334,10 +2358,30 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             defender.dispose();
             
             if (newTile.getSettlement() != null) {
-                if (newTile.getSettlement().getUnitCount() <= 0) {
-                    //TODO: Burn the camp. Get treasure.
+                Random rand = new Random();
+                if (newTile.getSettlement().getUnitCount() <= 0 && newTile.getSettlement() instanceof IndianSettlement) {
+                    Unit treasure = new Unit(getGame(), owner, Unit.TREASURE_TRAIN);
+                    int amt = 1;
+                    if(newTile.getSettlement().getOwner().getNation() == Player.INCA ||
+                       newTile.getSettlement().getOwner().getNation() == Player.AZTEC) {
+                        treasure.setTreasureAmount( (rand.nextInt(10)+1) * 10000);
+                        if ( ((IndianSettlement)newTile.getSettlement()).isCapital() )
+                            treasure.setTreasureAmount(treasure.getTreasureAmount()+10000);
+                    }
+                    else {
+                        treasure.setTreasureAmount((rand.nextInt(20)+1) * 100);
+                    }
+                    
                     newTile.getSettlement().dispose();
+                    // TODO: notify of treasure gain
+                    newTile.add(treasure);
                     setLocation(newTile);
+                }
+                else if (newTile.getSettlement().getUnitCount() <= 0 && newTile.getSettlement() instanceof Colony) {
+                    // TODO: notify of plundering
+                    int gold = (int) (newTile.getSettlement().getOwner().getGold() * 0.1);
+                    getOwner().modifyGold(gold); // 10% of their gold
+                    newTile.getSettlement().getOwner().modifyGold(gold);
                 }
             }
         } else if (isNaval()) {
@@ -2386,6 +2430,18 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                    setArmed(true, true);
                 }
             }
+        }
+        
+        // TODO: all of these require GUI message updates to the user
+        if (getOwner().hasFather(FoundingFather.GEORGE_WASHINGTION)) {
+            if (getType() == PETTY_CRIMINAL)
+                setType(INDENTURED_SERVANT);
+            else if (getType() == INDENTURED_SERVANT)
+                setType(FREE_COLONIST);
+            else if (getType() == FREE_COLONIST)
+                setType(VETERAN_SOLDIER);
+            else if (getType() == VETERAN_SOLDIER && getOwner().getRebellionState() > 1)
+                setType(COLONIAL_REGULAR);
         }
     }
 
