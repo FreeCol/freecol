@@ -204,7 +204,8 @@ public class MapGenerator {
                 while (circleIterator.hasNext()) {
                     Position adjPos = (Position)circleIterator.next();
                     map.getTile(adjPos).setClaim(Tile.CLAIM_CLAIMED);
-                    map.getTile(adjPos).setOwner(map.getTile(position).getSettlement());
+                    // TODO: Implement this later:
+                    //map.getTile(adjPos).setOwner(map.getTile(position).getSettlement());
                 }
                 
                 for (int i = 0; i < (type * 2) + 4; i++) {

@@ -167,7 +167,11 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation {
         }
 
         if (!canAdd(locatable)) {
-            throw new IllegalArgumentException("Cannot add locatable to this location!");
+            if (getWorkTile().getOwner() != null && getWorkTile().getOwner() != getColony()) {
+                throw new IllegalArgumentException("Cannot add locatable to this location: somebody else owns this land!");
+            } else {                
+                throw new IllegalArgumentException("Cannot add locatable to this location: there is a unit here already!");
+            }
         }
 
         setUnit((Unit) locatable);

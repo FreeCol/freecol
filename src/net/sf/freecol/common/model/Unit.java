@@ -2594,8 +2594,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     * @param tile The tile which is being worked.
     * @return The potential amount of goods to be farmed.
     */
-    public int getFarmedPotential(int goods, Tile tile)
-    {
+    public int getFarmedPotential(int goods, Tile tile) {
+        if (tile == null) {
+            throw new NullPointerException();
+        }
+        
         int base = tile.potential(goods);
         switch (type) {
             case EXPERT_FARMER:
