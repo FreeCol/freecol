@@ -1,12 +1,10 @@
 # Copyright 1999-2004 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# <put CVS info header here>
 
 inherit games
 
 DESCRIPTION="An open source clone of the game Colonization"
 HOMEPAGE="http://freecol.sf.net"
-# TODO: update SRC_URI as soon as ebuild is added to Gentoo
 SRC_URI="http://freecol.sf.net/download/${PN}-${PV}.tar.gz"
 
 LICENSE="GPL-2"
@@ -22,7 +20,6 @@ DEPEND="${RDEPEND}
 
 src_unpack() {
     unpack ${A}
-    cd ${S}
 }
 
 src_compile() {
@@ -34,12 +31,22 @@ src_compile() {
         die "\$JAVA_HOME not set."
     fi
 
-    ant || die "compile problem"
+    cd ${WORKDIR}/${PN}
+    ant -Dnodata=true || die "compile problem"
 }
 
 src_install () {
+    cd ${T}
+    
+    echo "#!/bin/sh" > ${PN}
+	echo "cd '${GAMES_DATADIR}/${PN}'" >> ${PN}
+	echo "'${JAVA_HOME}'/bin/java -jar FreeCol.jar --freecol-data '${GAMES_DATADIR}/${PN}/data'" >> ${PN}
+    
     dogamesbin "${T}/${PN}" || die "dogamesbin failed"
     dodir "${GAMES_DATADIR}/${PN}"
-    cp FreeCol.jar "${D}${GAMES_DATADIR}/${PN}" || die "cp failed"
+    
+    cp "${WORKDIR}/${PN}/FreeCol.jar" "${D}${GAMES_DATADIR}/${PN}"  || die "cp jar file failed"
+    cp -r "${WORKDIR}/${PN}/data" "${D}${GAMES_DATADIR}/${PN}"      || die "cp data dir failed"
+    
     prepgamesdirs
 }
