@@ -187,7 +187,7 @@ public class AIMain implements FreeColGameObjectListener {
 
     /**
     * Returns the tag name of the root element representing this object.
-    * @return the tag name.
+    * @return "aiMain"
     */
     public static String getXMLElementTagName() {
         return "aiMain";

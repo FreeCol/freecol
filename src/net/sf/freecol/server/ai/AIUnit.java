@@ -73,7 +73,9 @@ public class AIUnit extends AIObject {
     *        when communicating with the server.
     */
     public void doMission(Connection connection) {
-        getMission().doMission(connection);
+        if (getMission() != null) {
+            getMission().doMission(connection);
+        }
     }
     
 
@@ -93,9 +95,9 @@ public class AIUnit extends AIObject {
     
     /**
     * Returns the tag name of the root element representing this object.
-    * @return the tag name.
+    * @return "aiUnit"
     */
     public static String getXMLElementTagName() {
-        return "aiPlayer";
+        return "aiUnit";
     }
 }
