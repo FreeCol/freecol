@@ -152,28 +152,9 @@ public final class UnitLabel extends JLabel implements ActionListener {
             }
 
             int production = unit.getFarmedPotential(unit.getWorkType(), ((ColonyTile) unit.getLocation()).getWorkTile());
-            
-            if (production > 0) {
-                int p = getWidth() / production;
-                if (p-goodsIcon.getIconWidth() < 0) {
-                    p = (getWidth() - goodsIcon.getIconWidth()) / production;
-                }
 
-                if (production > 6) { // TODO: Or the user chooses it:
-                    goodsIcon.paintIcon(this, g, getWidth()/2 - goodsIcon.getIconWidth()/2, STP);
-                    BufferedImage stringImage = parent.getGUI().createStringImage((Graphics2D) g, Integer.toString(production), Color.WHITE, goodsIcon.getIconWidth()*2, 12);
-                    g.drawImage(stringImage, getWidth()/2-stringImage.getWidth()/2, goodsIcon.getIconHeight()/2 - stringImage.getHeight()/2+STP, null);
-                } else {
-                    for (int i=0; i<production; i++) {
-                        goodsIcon.paintIcon(this, g, i*p, STP);
-                    }
-                }
-
-            } else {
-                goodsIcon.paintIcon(this, g, getWidth()/2 - goodsIcon.getIconWidth()/2, STP);
-                BufferedImage stringImage = parent.getGUI().createStringImage((Graphics2D) g, "0", Color.WHITE, goodsIcon.getIconWidth()*2, 12);
-                g.drawImage(stringImage, getWidth()/2-stringImage.getWidth()/2, goodsIcon.getIconHeight()/2 - stringImage.getHeight()/2+STP, null);
-            }
+            BufferedImage productionImage = parent.getGUI().createProductionImage(goodsIcon, production, getWidth(), getHeight());
+            g.drawImage(productionImage, 0, 0, null);
         }
 
     }

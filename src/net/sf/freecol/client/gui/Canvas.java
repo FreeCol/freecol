@@ -445,19 +445,16 @@ public final class Canvas extends JLayeredPane {
             c = colonyPanel;
         }
 
-        c.requestFocus();
+        if (takeFocusThread != null) {
+            takeFocusThread.stopWorking();
+        }
 
-        // Later:
-        /*if ((takeFocusThread == null) || (!takeFocusThread.isAlive()) || (!takeFocusThread.isStillWorking())
-                || takeFocusThread.getComponent() != c) {
-
-            if (takeFocusThread != null) {
-                takeFocusThread.stopWorking();
-            }
-
+        if (c != this) {
+            c.requestFocus();
+        } else {
             takeFocusThread = new TakeFocusThread(c);
             takeFocusThread.start();
-        }*/
+        }
     }
 
 

@@ -7,6 +7,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.FlowLayout;
+import java.awt.image.BufferedImage;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 //import java.awt.event.MouseAdapter;
@@ -24,6 +25,7 @@ import javax.swing.JComboBox;
 import javax.swing.JScrollPane;
 import javax.swing.ListCellRenderer;
 import javax.swing.border.BevelBorder;
+import javax.swing.ImageIcon;
 
 //import net.sf.freecol.client.model.ClientGame;
 import net.sf.freecol.common.model.Tile;
@@ -64,6 +66,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     private final JLabel                    solLabel;
     private final JLabel                    warehouseLabel;
     private final JLabel                    progressLabel;
+    private final ProductionPanel           productionPanel;
     private final BuildingBox               buildingBox;
     private final OutsideColonyPanel        outsideColonyPanel;
     private final InPortPanel               inPortPanel;
@@ -93,6 +96,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         this.freeColClient = freeColClient;
         this.inGameController = freeColClient.getInGameController();
 
+        productionPanel = new ProductionPanel(this);
         outsideColonyPanel = new OutsideColonyPanel(this);
         inPortPanel = new InPortPanel();
         cargoPanel = new CargoPanel(this);
@@ -100,6 +104,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         tilePanel = new TilePanel(this);
         buildingsPanel = new BuildingsPanel(this);
 
+        productionPanel.setBackground(Color.WHITE);
         outsideColonyPanel.setBackground(Color.WHITE);
         inPortPanel.setBackground(Color.WHITE);
         cargoPanel.setBackground(Color.WHITE);
@@ -150,6 +155,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         inPortScroll.setSize(200, 100);
         cargoScroll.setSize(410, 96);
         warehouseScroll.setSize(620, 120);
+        productionPanel.setSize(390, 30);
         tilesScroll.setSize(390, 200);
         buildingsScroll.setSize(400,200);
         outsideColonyLabel.setSize(200, 20);
@@ -170,6 +176,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         inPortScroll.setLocation(640, 450);
         cargoScroll.setLocation(220, 370);
         warehouseScroll.setLocation(10, 470);
+        productionPanel.setLocation(10, 250);
         tilesScroll.setLocation(10, 40);
         buildingsLabel.setLocation(440, 10); // 400,10
         buildingsScroll.setLocation(440, 40); // 400,40
@@ -195,6 +202,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         add(inPortScroll);
         add(cargoScroll);
         add(warehouseScroll);
+        add(productionPanel);
         add(tilesScroll);
         add(buildingsScroll);
         add(outsideColonyLabel);
@@ -606,6 +614,35 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     }
 
 
+    /**
+    * This panel holds the information of the current food, liberty bell and cross production.
+    */
+    public final class ProductionPanel extends JPanel {
+        private final ColonyPanel colonyPanel;
+
+        public ProductionPanel(ColonyPanel colonyPanel) {
+            this.colonyPanel = colonyPanel;
+        }
+        
+        public void paintComponent(Graphics g) {
+            //int production = colony.getFoodProduction();
+            //int surplus = production - colony.getUnitCount() * 2;
+            int need = colony.getUnitCount() * 2;
+            int surplus = colony.getFoodProduction() - need;
+
+            ImageIcon goodsIcon = parent.getImageProvider().getGoodsImageIcon(Goods.FOOD);
+
+            int nextX = Math.min(need, 8) * goodsIcon.getIconWidth();
+            BufferedImage productionImage = parent.getGUI().createProductionImage(goodsIcon, need, nextX, getHeight());
+            g.drawImage(productionImage, 0, 0, null);
+
+            if (surplus != 0) {
+                productionImage = parent.getGUI().createProductionImage(goodsIcon, surplus, goodsIcon.getIconWidth() * 3, getHeight());
+                g.drawImage(productionImage, nextX + goodsIcon.getIconWidth(), 0, null);
+            }
+        }
+    }
+
 
     /**
     * A panel that holds UnitsLabels that represent Units that are
@@ -920,7 +957,6 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             private ColonyTile colonyTile;
             private int x;
             private int y;
-            private JLabel staticGoodsLabel;
 
             public ASingleTilePanel(ColonyTile colonyTile, int x, int y) {
                 this.colonyTile = colonyTile;
@@ -939,21 +975,31 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                     add(unitLabel);
                 }
 
+                ImageLibrary lib = ((Canvas)parent).getGUI().getImageLibrary();
+
                 if (colonyTile.isColonyCenterTile()) {
-                    staticGoodsLabel = new JLabel(parent.getImageProvider().getGoodsImageIcon(Goods.FOOD));
-                    staticGoodsLabel.setText(Integer.toString(colonyTile.getTile().potential(Goods.FOOD)));
-                    add(staticGoodsLabel);
-                    staticGoodsLabel = new JLabel(parent.getImageProvider().getGoodsImageIcon(colonyTile.getTile().secondaryGoods()));
-                    staticGoodsLabel.setText(Integer.toString(colonyTile.getTile().potential(colonyTile.getTile().secondaryGoods())));
-                    add(staticGoodsLabel);
+                    //setLayout(new FlowLayout(FlowLayout.CENTER));
+                    int width = lib.getTerrainImageWidth(1)*2/3;
+
+                    ImageIcon goodsIcon = parent.getImageProvider().getGoodsImageIcon(Goods.FOOD);
+                    BufferedImage productionImage = parent.getGUI().createProductionImage(goodsIcon, colonyTile.getTile().potential(Goods.FOOD), width, goodsIcon.getIconHeight());
+                    JLabel sl = new JLabel(new ImageIcon(productionImage), JLabel.CENTER);
+                    sl.setSize(lib.getTerrainImageWidth(1), goodsIcon.getIconHeight());
+                    add(sl);
+
+                    if (colonyTile.getTile().potential(colonyTile.getTile().secondaryGoods()) != 0) {
+                        goodsIcon = parent.getImageProvider().getGoodsImageIcon(colonyTile.getTile().secondaryGoods());
+                        productionImage = parent.getGUI().createProductionImage(goodsIcon, colonyTile.getTile().potential(colonyTile.getTile().secondaryGoods()), width, goodsIcon.getIconHeight());
+                        sl = new JLabel(new ImageIcon(productionImage), JLabel.CENTER);
+                        sl.setSize(lib.getTerrainImageWidth(1), goodsIcon.getIconHeight());
+                        add(sl);
+                    }
                 }
 
                 setTransferHandler(defaultTransferHandler);
                 addMouseListener(releaseListener);
 
                 // Size and position:
-                ImageLibrary lib = ((Canvas)parent).getGUI().getImageLibrary();
-
                 setSize(lib.getTerrainImageWidth(1), lib.getTerrainImageHeight(1));
                 setLocation(((2-x)+y)*lib.getTerrainImageWidth(1)/2, (x+y)*lib.getTerrainImageHeight(1)/2);
             }

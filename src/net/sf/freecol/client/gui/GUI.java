@@ -699,6 +699,7 @@ public final class GUI {
         }
     }
 
+
     /**
     * Creates an image with a string of a given color and with a black border around the glyphs.
     *
@@ -754,6 +755,45 @@ public final class GUI {
             }
         }
 
+        return bi;
+    }
+
+
+    /**
+    * Creates an illustration for a goods production.
+    *
+    * @param goodsIcon The icon representing the goods.
+    * @param production The amount of goods that is beeing produced.
+    * @param width The width of the image to deliver.
+    * @param height The height of the image to deliver.
+    * @return The image.
+    */
+    public BufferedImage createProductionImage(ImageIcon goodsIcon, int production, int width, int height) {
+        BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = bi.createGraphics();
+
+        if (production > 0) {
+            int p = width / production;
+            if (p-goodsIcon.getIconWidth() < 0) {
+                p = (width - goodsIcon.getIconWidth()) / production;
+            }
+
+            if (production > 6) { // TODO: Or the user chooses it:
+                goodsIcon.paintIcon(null, g, width/2 - goodsIcon.getIconWidth()/2, 0);
+                BufferedImage stringImage = createStringImage((Graphics2D) g, Integer.toString(production), Color.WHITE, goodsIcon.getIconWidth()*2, 12);
+                g.drawImage(stringImage, width/2-stringImage.getWidth()/2, goodsIcon.getIconHeight()/2 - stringImage.getHeight()/2, null);
+            } else {
+                for (int i=0; i<production; i++) {
+                    goodsIcon.paintIcon(null, g, i*p, 0);
+                }
+            }
+
+        } else {
+            goodsIcon.paintIcon(null, g, width/2 - goodsIcon.getIconWidth()/2, 0);
+            BufferedImage stringImage = createStringImage((Graphics2D) g, "0", Color.WHITE, goodsIcon.getIconWidth()*2, 12);
+            g.drawImage(stringImage, width/2-stringImage.getWidth()/2, goodsIcon.getIconHeight()/2 - stringImage.getHeight()/2, null);
+        }
+        
         return bi;
     }
 
