@@ -32,9 +32,9 @@ import net.sf.freecol.common.model.*;
 * In addition, the graphical state of the map (focus, active unit..) is also a responsibillity
 * of this class.
 */
-public final class GUI {
+public final class GUI extends Thread { // Thread to have a blinking loop and animation in general
     private static final Logger logger = Logger.getLogger(GUI.class.getName());
-    
+
     public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
@@ -120,6 +120,9 @@ public final class GUI {
         this.lib = lib;
 
         cursor = true;
+        // Because I'm a thread but my priority must be low -FV
+        setPriority(Thread.MIN_PRIORITY);
+        start();
 
         tileHeight = lib.getTerrainImageHeight(0);
         tileWidth = lib.getTerrainImageWidth(0);
@@ -141,6 +144,25 @@ public final class GUI {
         logger.info("GUI created.");
 
         messages = new Vector(MESSAGE_COUNT);
+    }
+
+
+    /**
+    * As a Thread this <code>GUI</code> object has a life loop. Now it only change cursor every 0.5 sec
+    * for blinking feedback.
+    **/
+    public void run(){
+        while (true){
+            cursor = !cursor;
+
+            if (freeColClient!=null && freeColClient.getCanvas()!=null)
+              freeColClient.getCanvas().repaint(0, 0, getWidth(), getHeight());
+
+            try {
+                sleep(500);
+            } catch (InterruptedException e) {
+            }
+        }
     }
 
 
@@ -186,7 +208,9 @@ public final class GUI {
 
                 Unit unitInFront = getUnitInFront(gameData.getMap().getTile(selectedTile));
                 if (unitInFront != null) {
-                    if (unitInFront != activeUnit && unitInFront.getMovesLeft() > 0) {
+                    // Because of the following comment from somewhere else I've put the end in comment -FV
+                    // The user might what to check the status of a unit - SG
+                    if (unitInFront != activeUnit /*&& unitInFront.getMovesLeft() > 0*/) {
                         setActiveUnit(unitInFront);
                     } else {
                         freeColClient.getInGameController().clearOrders(unitInFront);
@@ -1366,7 +1390,7 @@ public final class GUI {
         try {
             // Draw the 'selected unit' image if needed.
             //if ((unit == getActiveUnit()) && cursor) {
-            if ((unit == getActiveUnit())) {
+            if ((unit == getActiveUnit()) && (cursor || (activeUnit.getMovesLeft() == 0))) {
                 g.drawImage(lib.getMiscImage(ImageLibrary.UNIT_SELECT), x, y, null);
             }
 
