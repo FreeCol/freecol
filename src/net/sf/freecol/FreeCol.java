@@ -72,13 +72,18 @@ public final class FreeCol {
 
         handleArgs(args);
 
-        if (javaCheck)
-            if (!checkJavaVersion()) {
-                System.err.println("Java version " + MIN_JDK_VERSION +
-                                   " or better is recommended in order to run FreeCol." +
-                                   " Use --no-java-check to skip this check.");
-                return;
-            }
+        if (javaCheck && !checkJavaVersion()) {
+            System.err.println("Java version " + MIN_JDK_VERSION +
+                            " or better is recommended in order to run FreeCol." +
+                            " Use --no-java-check to skip this check.");
+            return;
+        }
+        
+        if (Runtime.getRuntime().maxMemory() < 128000000) {
+            System.out.println("You need to assign more memory to the JVM. Restart FreeCol with:");
+            System.out.println("java -Xmx128M -jar FreeCol.jar");
+            return;
+        }
 
         final Logger baseLogger = Logger.getLogger("");
         final Handler[] handlers = baseLogger.getHandlers();
@@ -316,7 +321,7 @@ public final class FreeCol {
     * arguments).
     */
     private static void printUsage() {
-        System.out.println("Usage: java -jar FreeCol.jar [OPTIONS]");
+        System.out.println("Usage: java -Xmx128M -jar FreeCol.jar [OPTIONS]");
         System.out.println("");
         System.out.println("Options:");
         System.out.println("--freecol-data [DIR]");
@@ -334,6 +339,6 @@ public final class FreeCol {
         System.out.println("  displays the version number");
         System.out.println("--server PORT");
         System.out.println("  starts a stand-alone server on the specifed port");
-        System.out.println("");
+        System.out.println();
     }
 }
