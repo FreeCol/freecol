@@ -41,7 +41,7 @@ public class FreeColPanel extends JPanel {
 
         setFocusCycleRoot(true);
 
-        setBorder( new CompoundBorder(new BevelBorder(BevelBorder.RAISED), new EmptyBorder(10,10,10,10)) );
+        setBorder( new CompoundBorder(new BevelBorder(BevelBorder.RAISED), new EmptyBorder(5,5,5,5)) );
     }
 
     

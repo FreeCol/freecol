@@ -155,7 +155,7 @@ public class FreeColDialog extends FreeColPanel {
         informationDialog.add(l);
         informationDialog.add(okButton);
 
-        informationDialog.setSize(width + 10, l.getMinimumSize().height + okButton.getMinimumSize().height + 30);
+        informationDialog.setSize(width + 20, l.getMinimumSize().height + okButton.getMinimumSize().height + 40);
 
         informationDialog.setCancelComponent(okButton);
 
