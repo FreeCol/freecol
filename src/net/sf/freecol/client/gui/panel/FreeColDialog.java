@@ -345,6 +345,7 @@ public class FreeColDialog extends FreeColPanel {
                 }
             }
         });
+        fileChooser.setFileHidingEnabled(false);
         loadDialog.setLayout(new BorderLayout());
         loadDialog.add(fileChooser);
         loadDialog.setSize(480, 320);
