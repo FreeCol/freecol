@@ -2,6 +2,8 @@ package net.sf.freecol.client;
 
 import java.util.logging.Logger;
 
+import java.io.File;
+
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
@@ -108,10 +110,46 @@ public final class FreeColClient {
                 startGUI(theWindowed, theImageLibrary, theMusicLibrary, theSfxLibrary);
             }
         });
+
+        createFreeColDirs();
     }
 
 
 
+    /**
+    * Creates a freecol dir for the current operating system user. The directory is created
+    * within the current user's home directory. This directory will be called ".freecol" and
+    * underneath that directory there will be a "save" directory created.
+    * All of this will only be done in case they don't already exist.
+    */
+    private void createFreeColDirs() {
+        String dir = System.getProperty("user.home");
+        String fileSeparator = System.getProperty("file.separator");
+
+        if (!dir.endsWith(fileSeparator)) {
+            dir += fileSeparator;
+        }
+        dir += ".freecol";
+
+        File file = new File(dir);
+        if (file.exists() && file.isFile()) {
+            logger.warning("Could not create .freecol under ~ because there already exists a regular file with the same name.");
+            return;
+        }
+        else if (!file.exists()) {
+            file.mkdir();
+        }
+
+        dir += fileSeparator + "save";
+        file = new File(dir);
+        if (file.exists() && file.isFile()) {
+            logger.warning("Could not create .freecol/save under ~ because there already exists a regular file with the same name.");
+            return;
+        }
+        else if (!file.exists()) {
+            file.mkdir();
+        }
+    }
 
 
     /**
@@ -249,7 +287,7 @@ public final class FreeColClient {
     */
     public void quit() {
         getConnectController().quitGame(true);
-        
+
         if (!windowed) {
             gd.setFullScreenWindow(null);
         }
@@ -355,7 +393,7 @@ public final class FreeColClient {
         return inGameInputHandler;
     }
 
-    
+
     /**
     * Gets the <code>ClientModelController</code>.
     */

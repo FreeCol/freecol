@@ -117,7 +117,7 @@ public class Player extends FreeColGameObject {
 
     // 0 = pre-rebels; 1 = in rebellion; 2 = independence granted
     private int             rebellionState;
-    
+
     private int             crossesRequired = 1000000000; // Not allowed to recruit unit in the first round. ;-)
 
 
@@ -131,10 +131,10 @@ public class Player extends FreeColGameObject {
     * This constructor should only be used by subclasses.
     */
     protected Player() {
-    
-    }    
 
-    
+    }
+
+
     /**
     * Creates a new non-admin <code>Player</code> with the specified name.
     *
@@ -209,8 +209,8 @@ public class Player extends FreeColGameObject {
     public String getNewLandName() {
         return newLandName;
     }
-    
-    
+
+
     /**
     * Gets the default name this player has choosen for the new land.
     */
@@ -218,14 +218,14 @@ public class Player extends FreeColGameObject {
         return Messages.message("newLandName." + Integer.toString(getNation()));
     }
 
-    
+
     /**
     * Sets the name this player uses for the new land.
     */
     public void setNewLandName(String newLandName) {
         this.newLandName = newLandName;
     }
-    
+
 
     /**
     * Checks if this player is european. This includes the
@@ -305,7 +305,7 @@ public class Player extends FreeColGameObject {
         if (tile.getFirstUnit() != null && tile.getFirstUnit().getOwner().equals(this)) {
             return true;
         }
-        
+
         if (tile != null && tile.getColony() != null && tile.getColony().getOwner().equals(this)) {
             return true;
         }
@@ -324,8 +324,8 @@ public class Player extends FreeColGameObject {
                         return true;
                     }
                 }
-            } 
-            
+            }
+
             if (t != null && t.getColony() != null && t.getColony().getOwner().equals(this) && t.getColony().getLineOfSight() >= t.getDistanceTo(tile)) {
                 return true;
             }
@@ -714,7 +714,7 @@ public class Player extends FreeColGameObject {
 
         return colonies.iterator();
     }
-    
+
 
     /**
     * Increments the player's cross count, with benefits thereof.
@@ -734,8 +734,8 @@ public class Player extends FreeColGameObject {
     public void setCrosses(int crosses) {
         this.crosses = crosses;
     }
-    
-    
+
+
     /**
     * Gets the number of crosses this player possess.
     * @return The number.
@@ -767,7 +767,7 @@ public class Player extends FreeColGameObject {
         return crossesRequired;
     }
 
-    
+
     /**
     * Sets the number of crosses required to cause a new colonist to emigrate.
     * @return The number of crosses required to cause a new colonist to emigrate.
@@ -776,9 +776,9 @@ public class Player extends FreeColGameObject {
         this.crossesRequired = crossesRequired;
     }
 
-    
+
     /**
-    * Updates the amount of crosses needed to emigrate a <code>Unit</code> 
+    * Updates the amount of crosses needed to emigrate a <code>Unit</code>
     * from <code>Europe</code>.
     */
     private void updateCrossesRequired() {
@@ -850,7 +850,7 @@ public class Player extends FreeColGameObject {
         // TODO: founding fathers - need real formula to calculate req. number of bells for next father
         if (isEuropean() && bells >= (getFatherCount() * 100) + 200 ) {
             fathers[currentFather] = true;
-            
+
             if (currentFather == FoundingFather.JOHN_PAUL_JONES) {
                 getGame().getModelController().createUnit(getID() + "newTurnJohnPaulJones", getEurope(), this, Unit.FRIGATE);
             } else if (currentFather == FoundingFather.BARTOLOME_DE_LAS_CASAS) {
@@ -926,7 +926,7 @@ public class Player extends FreeColGameObject {
             playerElement.setAttribute("bells", Integer.toString(bells));
             playerElement.setAttribute("currentFather", Integer.toString(currentFather));
             playerElement.setAttribute("crossesRequired", Integer.toString(crossesRequired));
-            
+
             char[] fatherCharArray = new char[FoundingFather.FATHER_COUNT];
             for(int i = 0; i < fathers.length; i++)
                 fatherCharArray[i] = (fathers[i] ? '1' : '0');
@@ -939,7 +939,7 @@ public class Player extends FreeColGameObject {
             playerElement.setAttribute("currentFather", Integer.toString(-1));
             playerElement.setAttribute("crossesRequired", Integer.toString(-1));
         }
-        
+
         if (newLandName != null) {
             playerElement.setAttribute("newLandName", newLandName);
         }
@@ -1016,83 +1016,76 @@ public class Player extends FreeColGameObject {
 
 
     /**
-        * Generates a random unit type. The unit type that is returned represents
-        * the type of a unit that is recruitable in Europe.
-        * @return A random unit type of a unit that is recruitable in Europe.
-        */
-        public int generateRecruitable() {
-            // Here's the old way of doing this:
-            /*int random = (int)(Math.random() * UNIT_COUNT);
-            while (!Unit.isRecruitable(random)) {
-                random = (int)(Math.random() * UNIT_COUNT);
-            }*/
-            //...and here's my way of doing this: -sjm
-            int chance = (int)(Math.random() * 100);
-            int random = Unit.PETTY_CRIMINAL;
-            if (chance < 20 && !hasFather(FoundingFather.WILLIAM_BREWSTER)) {
-                 random = Unit.PETTY_CRIMINAL;
-            } else if (chance < 45 && !hasFather(FoundingFather.WILLIAM_BREWSTER)) {
-                 random = Unit.INDENTURED_SERVANT;
-            } else if (chance < 67 && !hasFather(FoundingFather.WILLIAM_BREWSTER)) {
-                 random = Unit.FREE_COLONIST;
-            } else {
-                switch ((int) ((chance - 67) / 2)) {
-                default:
-                case 0:
-                    random = Unit.EXPERT_ORE_MINER;
-                    break;
-                case 1:
-                    random = Unit.EXPERT_LUMBER_JACK;
-                    break;
-                case 2:
-                    random = Unit.MASTER_GUNSMITH;
-                    break;
-                case 3:
-                    random = Unit.EXPERT_SILVER_MINER;
-                    break;
-                case 4:
-                    random = Unit.MASTER_FUR_TRADER;
-                    break;
-                case 5:
-                    random = Unit.MASTER_CARPENTER;
-                    break;
-                case 6:
-                    random = Unit.EXPERT_FISHERMAN;
-                    break;
-                case 7:
-                    random = Unit.MASTER_BLACKSMITH;
-                    break;
-                case 8:
-                    random = Unit.EXPERT_FARMER;
-                    break;
-                case 9:
-                    random = Unit.MASTER_DISTILLER;
-                    break;
-                case 10:
-                    random = Unit.HARDY_PIONEER;
-                    break;
-                case 11:
-                    random = Unit.MASTER_TOBACCONIST;
-                    break;
-                case 12:
-                    random = Unit.MASTER_WEAVER;
-                    break;
-                case 13:
-                    random = Unit.JESUIT_MISSIONARY;
-                    break;
-                case 14:
-                    random = Unit.FIREBRAND_PREACHER;
-                    break;
-                case 15:
-                    random = Unit.ELDER_STATESMAN;
-                    break;
-                case 16:
-                    random = Unit.VETERAN_SOLDIER;
-                    break;
-                }
-            }
-            return random;
+    * Generates a random unit type. The unit type that is returned represents
+    * the type of a unit that is recruitable in Europe.
+    * @return A random unit type of a unit that is recruitable in Europe.
+    */
+    public int generateRecruitable() {
+        int random;
+
+        if (hasFather(FoundingFather.WILLIAM_BREWSTER)) {
+            // Make sure random is a number from 0 to 17:
+            random = (int)(Math.random() * 18);
         }
+        else {
+            // Chance will be a number from 0 to 99 (never 100!):
+            int chance = (int)(Math.random() * 100);
+
+            if (chance < 21) {
+                return Unit.PETTY_CRIMINAL;
+            }
+            else if (chance < 42) {
+                return Unit.INDENTURED_SERVANT;
+            }
+            else if (chance < 64) {
+                return Unit.FREE_COLONIST;
+            }
+            else {
+                // Make sure random is a number from 0 to 17:
+                random = (int) ((chance - 64) / 2);
+            }
+        }
+
+        switch (random) {
+            default:
+            case 0:
+                return Unit.FREE_COLONIST;
+            case 1:
+                return Unit.EXPERT_ORE_MINER;
+            case 2:
+                return Unit.EXPERT_LUMBER_JACK;
+            case 3:
+                return Unit.MASTER_GUNSMITH;
+            case 4:
+                return Unit.EXPERT_SILVER_MINER;
+            case 5:
+                return Unit.MASTER_FUR_TRADER;
+            case 6:
+                return Unit.MASTER_CARPENTER;
+            case 7:
+                return Unit.EXPERT_FISHERMAN;
+            case 8:
+                return Unit.MASTER_BLACKSMITH;
+            case 9:
+                return Unit.EXPERT_FARMER;
+            case 10:
+                return Unit.MASTER_DISTILLER;
+            case 11:
+                return Unit.HARDY_PIONEER;
+            case 12:
+                return Unit.MASTER_TOBACCONIST;
+            case 13:
+                return Unit.MASTER_WEAVER;
+            case 14:
+                return Unit.JESUIT_MISSIONARY;
+            case 15:
+                return Unit.FIREBRAND_PREACHER;
+            case 16:
+                return Unit.ELDER_STATESMAN;
+            case 17:
+                return Unit.VETERAN_SOLDIER;
+        }
+    }
 
 
 
