@@ -30,6 +30,10 @@ import net.sf.freecol.server.networking.Server;
 import net.sf.freecol.server.model.*;
 import net.sf.freecol.common.model.*;
 
+// Zip:
+import java.util.zip.InflaterInputStream;
+import java.util.zip.DeflaterOutputStream;
+
 
 /**
 * The main control class for the FreeCol server. This class both
@@ -167,15 +171,14 @@ public final class FreeColServer {
     * @param username The username of the player saving the game.
     */
     public void saveGame(File file, String username) throws IOException {
-        PrintWriter out = new PrintWriter(new FileWriter(file));
         Game game = getGame();
-        
+
         Element savedGameElement = Message.createNewRootElement("savedGame");
         Document document = savedGameElement.getOwnerDocument();
-        
+
         savedGameElement.setAttribute("owner", username);
         savedGameElement.setAttribute("singleplayer", Boolean.toString(singleplayer));
-                
+
         // Add server side model information:
         Element serverObjectsElement = document.createElement("serverObjects");
         Iterator fcgoIterator = game.getFreeColGameObjectIterator();
@@ -186,10 +189,11 @@ public final class FreeColServer {
             }
         }
         savedGameElement.appendChild(serverObjectsElement);
-        
+
         // Add the rest:
         savedGameElement.appendChild(game.toSavedXMLElement(document));
-        
+
+        PrintWriter out = new PrintWriter(new DeflaterOutputStream(new FileOutputStream(file)));
         out.print(savedGameElement.toString());
         out.close();
     }
@@ -200,8 +204,8 @@ public final class FreeColServer {
     * @param file The file where the game data is located.
     * @return The username of the player saving the game.
     */
-    public String loadGame(File file) throws IOException {
-        FileInputStream in = new FileInputStream(file);                  
+    public String loadGame(File file) throws IOException {           
+        InflaterInputStream in = new InflaterInputStream(new FileInputStream(file));
         StringBuffer sb = new StringBuffer();
            
         Message message = new Message(in);
