@@ -38,8 +38,12 @@ public final class QuitDialog extends FreeColDialog implements ActionListener {
     private static final Logger logger = Logger.getLogger(QuitDialog.class.getName());
     private static final int    OK = 0,
                                 CANCEL = 1;
-    
+
     private final Canvas    parent;
+    private JButton         ok = new JButton("Yes");
+
+    
+    
     
     /**
     * The constructor that will add the items to this panel.
@@ -47,19 +51,18 @@ public final class QuitDialog extends FreeColDialog implements ActionListener {
     */
     public QuitDialog(Canvas parent) {
         this.parent = parent;
-        
-        JButton         ok = new JButton("Yes"),
-                        cancel = new JButton("No");
+
+        JButton         cancel = new JButton("No");
         JLabel          qLabel = new JLabel("Are you sure you want to Quit?");
-        
+
         qLabel.setSize(200, 20);
         ok.setSize(60, 20);
         cancel.setSize(60, 20);
-        
+
         qLabel.setLocation(10, 10);
         ok.setLocation(30, 40);
         cancel.setLocation(130, 40);
-        
+
         setLayout(null);
         
         ok.setActionCommand(String.valueOf(OK));
@@ -81,6 +84,11 @@ public final class QuitDialog extends FreeColDialog implements ActionListener {
 
         setSize(220, 70);
     }
+    
+    public void requestFocus() {
+        ok.requestFocus();
+    }
+
     
     /**
     * This function analyses an event and calls the right methods to take

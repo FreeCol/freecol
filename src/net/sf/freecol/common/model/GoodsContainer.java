@@ -103,12 +103,31 @@ public class GoodsContainer extends FreeColGameObject {
     }
 
 
+    /**
+    * Removes the given amount of the given type of goods.
+    *
+    * @param type The type of goods to remove.
+    * @param amount The type of amount to remove.
+    */
     public void removeGoods(int type, int amount) {
         if (storedGoods[type] - amount < 0) {
             throw new IllegalStateException("Operation would leave " + (storedGoods[type] - amount) + " goods of type " + type + " here.");
         }
 
         storedGoods[type] -= amount;
+    }
+    
+    
+    /**
+    * Removes all goods above given amount, except for
+    * <code>Goods.FOOD</code> which is left unchanged.
+    */
+    public void removeAbove(int amount) {
+        for (int i=1; i<storedGoods.length; i++) {
+            if (storedGoods[i] > amount) {
+                storedGoods[i] = amount;
+            }
+        }
     }
 
 
@@ -152,9 +171,11 @@ public class GoodsContainer extends FreeColGameObject {
 
     /**
     * Gets an <code>Iterator</code> of every <code>Goods</code> in this
-    * <code>GoodsContainer</code>.
+    * <code>GoodsContainer</code>. Each <code>Goods</code> have a maximum
+    * amount of 100.
     *
     * @return The <code>Iterator</code>.
+    * @see #getCompactGoodsIterator
     */
     public Iterator getGoodsIterator() {
         ArrayList totalGoods = new ArrayList();
@@ -165,6 +186,27 @@ public class GoodsContainer extends FreeColGameObject {
                 int a = (storedGoods[i] - j < 100) ? storedGoods[i] - j : 100;
                 totalGoods.add(new Goods(getGame(), parent, i, a));
                 j += a;
+            }
+        }
+
+        return totalGoods.iterator();
+    }
+
+    
+    /**
+    * Gets an <code>Iterator</code> of every <code>Goods</code> in this
+    * <code>GoodsContainer</code>. There is only one <code>Goods</code>
+    * for each type of goods.
+    *
+    * @return The <code>Iterator</code>.
+    * @see #getGoodsIterator
+    */
+    public Iterator getCompactGoodsIterator() {
+        ArrayList totalGoods = new ArrayList();
+
+        for (int i=0; i<storedGoods.length; i++) {
+            if (storedGoods[i] > 0) {
+                totalGoods.add(new Goods(getGame(), parent, i, storedGoods[i]));
             }
         }
 

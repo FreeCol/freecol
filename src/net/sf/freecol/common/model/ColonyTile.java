@@ -224,6 +224,24 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation {
         return getUnit();
     }
 
+    
+    /**
+    * Returns the production of food on this tile.
+    */
+    public int getFoodProduction() {
+        if (isColonyCenterTile()) {
+            return workTile.potential(Goods.FOOD);
+        } else if (getUnit() != null) {
+            if (getUnit().getWorkType() == Goods.FOOD) {
+                return getUnit().getFarmedPotential(getUnit().getWorkType(), workTile);
+            } else {
+                return 0;
+            }
+        } else {
+            return 0;
+        }
+    }
+
 
     /**
     * Prepares this <code>ColonyTile</code> for a new turn.
@@ -232,7 +250,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation {
         if ((getUnit() == null) && !(isColonyCenterTile())) {
             return; // Produce nothing if there's nobody to work the terrain.
         }
-        
+
         if (!(isColonyCenterTile())) {
             int amount = getUnit().getFarmedPotential(getUnit().getWorkType(), workTile);
 

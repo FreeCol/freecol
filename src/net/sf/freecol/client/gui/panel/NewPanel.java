@@ -57,7 +57,9 @@ public final class NewPanel extends JPanel implements ActionListener {
     private final Canvas        parent;
     
     private final ConnectController connectController;
+    private JButton ok = new JButton("OK");
     
+
     /**
     * The constructor that will add the items to this panel.
     * @param parent The parent of this panel.
@@ -66,8 +68,7 @@ public final class NewPanel extends JPanel implements ActionListener {
         this.parent = parent;
         this.connectController = connectController;
 
-        JButton         ok = new JButton("OK"),
-                        cancel = new JButton("Cancel");
+        JButton         cancel = new JButton("Cancel");
         ButtonGroup     group = new ButtonGroup();
         JLabel          nameLabel = new JLabel("Name");
 
@@ -157,6 +158,12 @@ public final class NewPanel extends JPanel implements ActionListener {
         setSize(260, 235);
     }
     
+    
+    public void requestFocus() {
+        ok.requestFocus();
+    }
+
+
     /**
     * Sets whether or not this component is enabled. It also does this for
     * its children.

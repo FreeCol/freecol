@@ -385,6 +385,19 @@ public final class Colony extends Settlement implements Location {
     public Iterator getGoodsIterator() {
         return goodsContainer.getGoodsIterator();
     }
+    
+
+    /**
+    * Gets an <code>Iterator</code> of every <code>Goods</code> in this
+    * <code>Colony</code>. There is only one <code>Goods</code>
+    * for each type of goods.
+    *
+    * @return The <code>Iterator</code>.
+    */
+    public Iterator getCompactGoodsIterator() {
+        return goodsContainer.getCompactGoodsIterator();
+    }
+
 
     public boolean contains(Locatable locatable) {
         throw new UnsupportedOperationException();
@@ -550,12 +563,43 @@ public final class Colony extends Settlement implements Location {
 
 
     /**
+    * Gets the production of food.
+    */
+    public int getFoodProduction() {
+        int amount = 0;
+
+        Iterator colonyTileIterator = getColonyTileIterator();
+        while (colonyTileIterator.hasNext()) {
+            amount += ((ColonyTile) colonyTileIterator.next()).getFoodProduction();
+        }
+
+        return amount;
+    }
+
+
+    /**
+    * Returns the horse production (given that enough food
+    * is beeing produced).
+    */
+    public int getPotentialHorseProduction() {
+        if (getGoodsCount(Goods.HORSES) < 2) {
+            return 0;
+        }
+
+        int amount = getGoodsCount(Goods.HORSES) / 10;
+        
+        return (amount>=1) ? amount : 1;
+    }
+
+
+    /**
     * Prepares this <code>Colony</code> for a new turn.
     */
     public void newTurn() {
+        // Eat food:
         int eat = getUnitCount() * 2;
         int food = getGoodsCount(Goods.FOOD);
-        
+
         if (eat > food) {
             // Kill a colonist:
             ((Unit) getUnitIterator().next()).dispose();
@@ -564,6 +608,27 @@ public final class Colony extends Settlement implements Location {
         } else {
             removeGoods(Goods.FOOD, eat);
         }
+
+        // Breed horses:
+        if (getGoodsCount(Goods.HORSES) >= 2 && surplus > 1) {
+            int surplus = getFoodProduction() - eat;
+
+            if (!getBuilding(Building.STABLES).isBuilt()) {
+                int horseProduction = Math.min(surplus / 2, getPotentialHorseProduction());
+
+                removeGoods(Goods.FOOD, horseProduction);
+                addGoods(Goods.HORSES, horseProduction);
+            } else {
+                int horseProduction = Math.min(surplus, getPotentialHorseProduction());
+
+                removeGoods(Goods.FOOD, horseProduction/2);
+                addGoods(Goods.HORSES, horseProduction);
+            }
+        }
+        
+        // Throw away goods there is no room for.
+        int capacity = 100 + getBuilding(Building.WAREHOUSE).getLevel() * 100;
+        goodsContainer.removeAbove(capacity);
     }
 
 

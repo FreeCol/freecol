@@ -217,6 +217,7 @@ public final class Canvas extends JLayeredPane {
             startGamePanel.initialize(game, player);
             startGamePanel.setLocation(getWidth() / 2 - startGamePanel.getWidth() / 2, getHeight() / 2 - startGamePanel.getHeight() / 2);
             add(startGamePanel);
+            startGamePanel.requestFocus();
         } else {
             logger.warning("Tried to open 'StartGamePanel' without having 'game' and/or 'player' set.");
         }
@@ -242,6 +243,7 @@ public final class Canvas extends JLayeredPane {
         closeMenus();
         newPanel.setLocation(getWidth() / 2 - newPanel.getWidth() / 2, getHeight() / 2 - newPanel.getHeight() / 2);
         add(newPanel);
+        newPanel.requestFocus();
     }
 
 
@@ -341,6 +343,7 @@ public final class Canvas extends JLayeredPane {
             mapControls.removeFromComponent(this);
             setEnabled(false);
             add(europePanel);
+            europePanel.requestFocus();
         }
     }
 
@@ -361,6 +364,8 @@ public final class Canvas extends JLayeredPane {
         mapControls.removeFromComponent(this);
         setEnabled(false);
         add(colonyPanel);
+        
+        colonyPanel.requestFocus();
     }
 
 
@@ -531,6 +536,7 @@ public final class Canvas extends JLayeredPane {
         errorPanel.setLocation(getWidth() / 2 - errorPanel.getWidth() / 2, getHeight() / 2 - errorPanel.getHeight() / 2);
         setEnabled(false);
         add(errorPanel, JLayeredPane.MODAL_LAYER);
+        errorPanel.requestFocus();
     }
 
     
@@ -617,6 +623,7 @@ public final class Canvas extends JLayeredPane {
     public void showMainPanel() {
         mainPanel.setLocation(getWidth() / 2 - mainPanel.getWidth() / 2, getHeight() / 2 - mainPanel.getHeight() / 2);
         add(mainPanel, new Integer(-100));
+        mainPanel.requestFocus();
     }
 
 
@@ -679,6 +686,7 @@ public final class Canvas extends JLayeredPane {
     public boolean confirmQuitDialog() {
         quitDialog.setLocation(getWidth() / 2 - quitDialog.getWidth() / 2, getHeight() / 2 - quitDialog.getHeight() / 2);
         add(quitDialog, JLayeredPane.POPUP_LAYER);
+        quitDialog.requestFocus();
 
         return quitDialog.getResponseBoolean();
     }

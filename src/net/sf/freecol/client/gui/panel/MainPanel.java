@@ -48,7 +48,9 @@ public final class MainPanel extends JPanel implements ActionListener {
                                 QUIT = 2;
     
     private final Canvas parent;
+    private JButton newButton;
     
+
     /**
     * The constructor that will add the items to this panel.
     * @param parent The parent of this panel.
@@ -58,18 +60,11 @@ public final class MainPanel extends JPanel implements ActionListener {
 
         this.parent = parent;
 
-        JButton         newButton = new JButton("New"),
-                        openButton = new JButton("Open"),
+        JButton         openButton = new JButton("Open"),
                         quitButton = new JButton("Quit");
-/*
-        newButton.setSize(80, 20);
-        openButton.setSize(80, 20);
-        quitButton.setSize(80, 20);
-
-        newButton.setLocation(10, 10);
-        openButton.setLocation(10, 35);
-        quitButton.setLocation(10, 60);
-*/
+        
+        newButton = new JButton("New");
+        
         newButton.setActionCommand(String.valueOf(NEW));
         openButton.setActionCommand(String.valueOf(OPEN));
         quitButton.setActionCommand(String.valueOf(QUIT));
@@ -105,6 +100,11 @@ public final class MainPanel extends JPanel implements ActionListener {
         //setSize(100, 115);
         setSize(getPreferredSize());
     }
+
+    public void requestFocus() {
+        newButton.requestFocus();
+    }
+
 
     /**
     * Sets whether or not this component is enabled. It also does this for

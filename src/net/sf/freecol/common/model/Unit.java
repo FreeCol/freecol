@@ -1328,10 +1328,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     * {ACTIVE, FORTIFIED, ...}.
     */
     public void setState(int s) {
-        // For now everything takes forever(=-1) turn to complete (build road, ...).
-        // This should change according to the terrain etc. !!
-        // TODO
-
         if (!checkSetState(s)) {
             throw new IllegalStateException();
         }
@@ -2169,7 +2165,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             return (Colony) location;
         }
     }
-    
+
     /**
     * Gets the Colony the goods of this unit would go to if it were to de-equip.
     * @return The Colony the goods would go to, or null if there is no appropriate Colony
@@ -2193,7 +2189,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         return null;
     }
 
-    
+
     /**
     * Given a type of goods to produce in a building, returns the unit's potential to do so.
     * @param goods The type of goods to be produced.
@@ -2233,7 +2229,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                 return 1;
             default: // Beats me who or what is working here, but he doesn't get a bonus.
                 if (isColonist())
-                    return 3; 
+                    return 3;
                 else
                     return 0; // Can't work if you're not a colonist.
         }
@@ -2250,7 +2246,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         int base = tile.potential(goods);
         switch (type) {
             case EXPERT_FARMER:
-                if ((goods == Goods.FOOD) && !tile.isLand()) {
+                if ((goods == Goods.FOOD) && tile.isLand()) {
                     //TODO: Special tile stuff. He gets +6/+4 for wheat/deer tiles respectively...
                     base += 2;
                 }
@@ -2298,14 +2294,14 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                 }
                 break;
             case INDIAN_CONVERT:
-                if ((goods == Goods.FOOD) || (goods == Goods.SUGAR) || (goods == Goods.COTTON) || (goods == Goods.TOBACCO) || (goods == Goods.FURS)) {
+                if ((goods == Goods.FOOD) || (goods == Goods.SUGAR) || (goods == Goods.COTTON) || (goods == Goods.TOBACCO) || (goods == Goods.FURS) || (goods == Goods.ORE || (goods == Goods.SILVER))) {
                     base += 1;
                 }
                 break;
             default: // Beats me who or what is working here, but he doesn't get a bonus.
                 break;
         }
-        
+
         return base;
     }
 

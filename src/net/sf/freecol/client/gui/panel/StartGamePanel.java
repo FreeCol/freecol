@@ -186,8 +186,11 @@ public final class StartGamePanel extends JPanel implements ActionListener {
     }
 
 
-    
-    
+
+    public void requestFocus() {
+        start.requestFocus();
+    }
+
 
     public void initialize(Game game, Player thisPlayer) {
         this.game = game;

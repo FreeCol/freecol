@@ -79,7 +79,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     private Game        game;
     private UnitLabel   selectedUnit;
 
-
+    private JButton exitButton = new JButton("Close");
 
 
 
@@ -134,7 +134,6 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
         buildingBox = new BuildingBox(this);
 
-        JButton exitButton = new JButton("Close");
         JScrollPane outsideColonyScroll = new JScrollPane(outsideColonyPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER),
                     inPortScroll = new JScrollPane(inPortPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER),
                     cargoScroll = new JScrollPane(cargoPanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED),
@@ -222,6 +221,10 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
 
 
+    public void requestFocus() {
+        exitButton.requestFocus();
+    }
+    
 
     /**
     * Refreshes this panel.
@@ -732,7 +735,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
         public void initialize() {
             warehousePanel.removeAll();
-            Iterator goodsIterator = colony.getGoodsIterator();
+            Iterator goodsIterator = colony.getCompactGoodsIterator();
             while (goodsIterator.hasNext()) {
                 Goods goods = (Goods) goodsIterator.next();
 
@@ -742,8 +745,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
                 warehousePanel.add(goodsLabel, false);
             }
-            
-            warehousePanel.revalidate();            
+
+            warehousePanel.revalidate();
         }
     }
 
@@ -786,10 +789,18 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                       return comp;
                     }
                 } else if (comp instanceof GoodsLabel) {
-                    comp.getParent().remove(comp);
                     Goods g = ((GoodsLabel)comp).getGoods();
+
+                    // Transfer a maximum of 100 goods at a time:
+                    if (g.getAmount() > 100) {
+                        g.setAmount(g.getAmount() - 100);
+                        g = new Goods(game, g.getLocation(), g.getType(), 100);
+                        g.setAmount(100);
+                    } else {
+                        comp.getParent().remove(comp);
+                    }
+
                     ((GoodsLabel) comp).setSmall(false);
-                    logger.info("Attempting to load cargo.");
                     inGameController.loadCargo(g, selectedUnit.getUnit());
                     colonyPanel.getWarehousePanel().revalidate();
                     //colonyPanel.getCargoPanel().revalidate();
@@ -799,7 +810,6 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                     selectedUnit = null;
                     setSelectedUnit(t);
 
-                    //refresh();
                     return comp;
                 } else {
                     logger.warning("An invalid component got dropped on this CargoPanel.");

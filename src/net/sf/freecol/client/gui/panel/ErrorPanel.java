@@ -56,6 +56,12 @@ public final class ErrorPanel extends JPanel implements ActionListener {
         add(errorButton);
     }
     
+    
+    public void requestFocus() {
+        errorButton.requestFocus();
+    }
+
+
     /**
     * Adapts the appearance of this ErrorPanel to the given error message.
     * @param message The error message to display in this error panel.

@@ -102,6 +102,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
     private Game        game;
     private UnitLabel   selectedUnit;
 
+    private JButton exitButton = new JButton("Close");
 
 
 
@@ -157,8 +158,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         cargoLabel = new JLabel("<html><strike>Cargo</strike></html>");
         goldLabel = new JLabel("Gold: 0");
 
-        JButton exitButton = new JButton("Close"),
-                recruitButton = new JButton("Recruit"),
+        JButton recruitButton = new JButton("Recruit"),
                 purchaseButton = new JButton("Purchase"),
                 trainButton = new JButton("Train");
         JScrollPane toAmericaScroll = new JScrollPane(toAmericaPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER),
@@ -246,7 +246,9 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
     }
 
     
-    
+    public void requestFocus() {
+        exitButton.requestFocus();
+    }
     
     
 
@@ -969,6 +971,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         */
         public MarketPanel(EuropePanel europePanel) {
             this.europePanel = europePanel;
+            setLayout(new GridLayout(2,8));
         }
 
 

@@ -173,16 +173,18 @@ public final class MapControls {
         //
         // Remove the GUI Objects from the container
         //
-        
-        container.remove(infoPanel);
-        container.remove(miniMap);
-        container.remove(miniMapZoomOutButton);
-        container.remove(miniMapZoomInButton);
-        for(int i=0; i<NUMBER_OF_BUTTONS; i++) {
-            container.remove(unitButton[i]);
+
+        if (container != null) {
+            container.remove(infoPanel);
+            container.remove(miniMap);
+            container.remove(miniMapZoomOutButton);
+            container.remove(miniMapZoomInButton);
+            for(int i=0; i<NUMBER_OF_BUTTONS; i++) {
+                container.remove(unitButton[i]);
+            }
+
+            container = null;
         }
-        
-        container = null;
     }
     
     /**
