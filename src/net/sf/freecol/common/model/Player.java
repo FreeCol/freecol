@@ -134,6 +134,7 @@ public class Player extends FreeColGameObject {
     
     }    
 
+    
     /**
     * Creates a new non-admin <code>Player</code> with the specified name.
     *

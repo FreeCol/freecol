@@ -241,6 +241,15 @@ public final class FreeColClient {
 
 
     /**
+    * Quits the application without any questions.
+    */
+    public void quit() {
+        getConnectController().quitGame(true);
+        System.exit(0);
+    }
+
+
+    /**
     * Sets this client to be the game admin or not.
     *
     * @param admin The boolean indicating wether or not this client

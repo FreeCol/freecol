@@ -136,13 +136,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     * @param owner The Player owning the unit.
     * @param type The type of the unit.
     */
-    /*public Unit(Game game, Player owner, int type, int ||||||||||||||||||||||||||, int s) {
-        this(game, null, owner, type, movesLeft, s);
-    }*/
-
     public Unit(Game game, Player owner, int type) {
         this(game, null, owner, type, isCarrier(type)?ACTIVE:SENTRY);
     }
+
 
     /**
     * Initiate a new <code>Unit</code> with the specified parameters.
@@ -203,8 +200,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     */
     public Unit(Game game, Element element) {
         super(game, element);
-
-        //unitContainer = new UnitContainer(game, this);
         readFromXMLElement(element);
     }
 
@@ -223,6 +218,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         }
     }
 
+    
     /**
      * the current amount of treasure in this unit.
      * Should be type of TREASURE_TRAIN.

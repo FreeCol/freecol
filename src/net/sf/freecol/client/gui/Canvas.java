@@ -961,24 +961,15 @@ public final class Canvas extends JLayeredPane {
 
 
     /**
-    * Quits the application. Uses {@link #confirmQuitDialog} to get
-    * a "Are you sure"-confirmation from the user.
+    * Quits the application. This method uses {@link #confirmQuitDialog}
+    * in order to get a "Are you sure"-confirmation from the user.
     */
     public void quit() {
         if (confirmQuitDialog()) {
-            reallyQuit();
+            freeColClient.quit();
         }
     }
 
-
-    /**
-    * Quits the application without any questions.
-    */
-    public void reallyQuit() {
-        freeColClient.getConnectController().quitGame(true);
-
-        System.exit(0);
-    }
 
     /**
     * Closes all panels, changes the background and shows the main menu.
@@ -1025,6 +1016,13 @@ public final class Canvas extends JLayeredPane {
     }
 
 
+    /**
+    * Displays a "Are you sure you want to quit"-dialog
+    * in which the user may choose to quit or cancel.
+    *
+    * @return <i>true</i> if the user desides to quit and 
+    *         <i>false</i> otherwise.
+    */
     public boolean confirmQuitDialog() {
         quitDialog.setLocation(getWidth() / 2 - quitDialog.getWidth() / 2, getHeight() / 2 - quitDialog.getHeight() / 2);
         add(quitDialog, JLayeredPane.POPUP_LAYER);
