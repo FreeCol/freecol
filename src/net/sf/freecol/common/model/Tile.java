@@ -1187,7 +1187,7 @@ public final class Tile extends FreeColGameObject implements Location {
         }
 
 
-        public void setBonus(boolean robonus) {
+        public void setBonus(boolean bonus) {
             this.bonus = bonus;
         }
 
