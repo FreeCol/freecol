@@ -436,6 +436,36 @@ public final class Canvas extends JLayeredPane {
         inputDialog.requestFocus();
 
         String response = (String) inputDialog.getResponse();
+        
+        // checks if the user entered some text.
+        if((response != null) && (response.length() == 0)) {
+            String okTxt = "ok";
+            String txt = "enterSomeText";
+            try {
+                okTxt = Messages.message(okTxt);
+                txt = Messages.message(txt);
+            }
+            catch(MissingResourceException e) {
+                logger.warning("could not find message with id: " + txt + " or " + okTxt + ".");
+            }
+            
+            FreeColDialog informationDialog = FreeColDialog.createInformationDialog(txt, okTxt);
+            informationDialog.setLocation(getWidth() / 2 - informationDialog.getWidth() / 2, getHeight() / 2 - informationDialog.getHeight() / 2);
+            
+            do {
+                remove(inputDialog);
+                add(informationDialog, new Integer(POPUP_LAYER.intValue() - 1));
+                informationDialog.requestFocus();
+
+                informationDialog.getResponse();
+                remove(informationDialog);
+                
+                add(inputDialog, new Integer(POPUP_LAYER.intValue() - 1));
+                inputDialog.requestFocus();
+
+                response = (String) inputDialog.getResponse();
+            } while((response != null) && (response.length() == 0));
+        }
 
         remove(inputDialog);
 
