@@ -259,7 +259,7 @@ public class IndianSettlement extends Settlement {
     * @param document The document to use when creating new componenets.
     * @return The DOM-element ("Document Object Model") made to represent this "IndianSettlement".
     */
-    public Element toXMLElement(Player player, Document document) {
+    public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
         Element indianSettlementElement = document.createElement(getXMLElementTagName());
 
         indianSettlementElement.setAttribute("ID", getID());
@@ -269,7 +269,7 @@ public class IndianSettlement extends Settlement {
         indianSettlementElement.setAttribute("kind", Integer.toString(kind));
         indianSettlementElement.setAttribute("isCapital", Boolean.toString(isCapital));
 
-        indianSettlementElement.appendChild(unitContainer.toXMLElement(player, document));
+        indianSettlementElement.appendChild(unitContainer.toXMLElement(player, document, showAll, toSavedGame));
 
         return indianSettlementElement;
     }

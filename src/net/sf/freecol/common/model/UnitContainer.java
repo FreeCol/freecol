@@ -218,7 +218,7 @@ public class UnitContainer extends FreeColGameObject {
     * @param document The document to use when creating new componenets.
     * @return The DOM-element ("Document Object Model") made to represent this "UnitContainer".
     */
-    public Element toXMLElement(Player player, Document document) {
+    public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
         Element element = document.createElement(getXMLElementTagName());
 
         element.setAttribute("ID", getID());
@@ -226,7 +226,7 @@ public class UnitContainer extends FreeColGameObject {
         Iterator unitIterator = getUnitIterator();
 
         while (unitIterator.hasNext()) {
-            element.appendChild(((Unit) unitIterator.next()).toXMLElement(player, document));
+            element.appendChild(((Unit) unitIterator.next()).toXMLElement(player, document, showAll, toSavedGame));
         }
 
         return element;

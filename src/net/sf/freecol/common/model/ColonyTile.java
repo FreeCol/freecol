@@ -341,7 +341,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation {
     * @param document The document to use when creating new componenets.
     * @return The DOM-element ("Document Object Model") made to represent this "ColonyTile".
     */
-    public Element toXMLElement(Player player, Document document) {
+    public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
         Element colonyTileElement = document.createElement(getXMLElementTagName());
 
         colonyTileElement.setAttribute("ID", getID());
@@ -349,7 +349,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation {
         colonyTileElement.setAttribute("workTile", workTile.getID());
 
         if (unit != null) {
-            colonyTileElement.appendChild(unit.toXMLElement(player, document));
+            colonyTileElement.appendChild(unit.toXMLElement(player, document, showAll, toSavedGame));
         }
 
         return colonyTileElement;

@@ -11,6 +11,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.MissingResourceException;
 import java.util.logging.Logger;
+import java.io.File;
 
 import javax.swing.JComponent;
 import javax.swing.JLayeredPane;
@@ -133,7 +134,7 @@ public final class Canvas extends JLayeredPane {
 
         takeFocusThread = null;
 
-        mainPanel = new MainPanel(this);
+        mainPanel = new MainPanel(this, freeColClient);
         newPanel = new NewPanel(this, freeColClient.getConnectController());
         errorPanel = new ErrorPanel(this);
         startGamePanel = new StartGamePanel(this, freeColClient);
@@ -361,6 +362,49 @@ public final class Canvas extends JLayeredPane {
         return response;
     }
 
+    
+    /**
+    * Displays a dialog where the user may choose a file.
+    *
+    * @param directory The directory containing the files.
+    * @return The <code>File</code>.
+    * @see FreeColDialog
+    */
+    public File showLoadDialog(File directory) {
+        FreeColDialog loadDialog = FreeColDialog.createLoadDialog(directory);
+        loadDialog.setLocation(getWidth() / 2 - loadDialog.getWidth() / 2, getHeight() / 2 - loadDialog.getHeight() / 2);
+        add(loadDialog, new Integer(POPUP_LAYER.intValue() - 1));
+        loadDialog.requestFocus();
+
+        File response = (File) loadDialog.getResponse();
+
+        remove(loadDialog);
+
+        return response;
+    }
+    
+    
+    /**
+    * Displays a dialog where the user may choose a filename.
+    *
+    * @param directory The directory containing the files in which the
+    *                  user may overwrite.
+    * @return The <code>File</code>.    
+    * @see FreeColDialog    
+    */
+    public File showSaveDialog(File directory) {
+        FreeColDialog saveDialog = FreeColDialog.createSaveDialog(directory);
+        saveDialog.setLocation(getWidth() / 2 - saveDialog.getWidth() / 2, getHeight() / 2 - saveDialog.getHeight() / 2);
+        add(saveDialog, new Integer(POPUP_LAYER.intValue() - 1));
+        saveDialog.requestFocus();
+
+        File response = (File) saveDialog.getResponse();
+
+        remove(saveDialog);
+
+        return response;
+    }    
+        
 
     /**
     * Displays a dialog with a text field and a ok/cancel option.

@@ -28,6 +28,10 @@ abstract public class FreeColGameObject {
 
 
 
+    public FreeColGameObject() {    
+    
+    }
+    
 
     /**
     * Creates a new <code>FreeColGameObject</code> with an automatically assigned 
@@ -80,7 +84,16 @@ abstract public class FreeColGameObject {
         return game;
     }
 
+    
+    /**
+    * Sets the game object this <code>FreeColGameObject</code> belongs to.
+    * @param game The <code>game</code>.
+    */
+    public void setGame(Game game) {
+        this.game = game;
+    }    
 
+    
     /**
     * Prepares the object for a new turn.
     */
@@ -96,6 +109,15 @@ abstract public class FreeColGameObject {
 
 
     /**
+    * Updates the id. This method should be overwritten
+    * by server model objects.
+    */
+    public void updateID() {
+        
+    }
+    
+        
+    /**
     * This method should return an XML-representation of this object.
     * Only attributes visible to <code>player</code> will be added to
     * that representation.
@@ -104,13 +126,62 @@ abstract public class FreeColGameObject {
     *               made for.
     * @param document The document to use when creating new componenets.
     * @return The DOM-element ("Document Object Model").
+    * @see #toXMLElement(Player, Document, boolean, boolean)
     */
-    abstract public Element toXMLElement(Player player, Document document);
+    public Element toXMLElement(Player player, Document document) {
+        return toXMLElement(player, document, false, false);
+    }
+    
+    
+    /**
+    * This method should return an XML-representation of this object.
+    * All attributes will be made visable.
+    *
+    * @param player The <code>Player</code> this XML-representation is
+    *               made for.
+    * @param document The document to use when creating new componenets.
+    * @return The DOM-element ("Document Object Model").
+    * @see #toXMLElement(Player, Document, boolean, boolean)
+    */
+    public Element toXMLElement(Document document) {
+        return toXMLElement(null, document, true, false);
+    }
+        
+    
+    /**
+    * This method should return an XML-representation of this object
+    * for the purpose of storing this object when saving the game.
+    *
+    * @param player The <code>Player</code> this XML-representation is
+    *               made for.
+    * @param document The document to use when creating new componenets.
+    * @return The DOM-element ("Document Object Model").
+    * @see #toXMLElement(Player, Document, boolean, boolean)    
+    */
+    public Element toSavedXMLElement(Document document) {
+        return toXMLElement(null, document, true, true);
+    }
+        
+    
+    /**
+    * This method should return an XML-representation of this object.
+    * Only attributes visible to <code>player</code> will be added to
+    * that representation if <code>showAll</code> is set to <i>false</i>.
+    *
+    * @param player The <code>Player</code> this XML-representation is
+    *               made for.
+    * @param document The document to use when creating new componenets.
+    * @param showAll Only attributes visible to <code>player</code> will be added to
+    *                the representation if <code>showAll</code> is set to <i>false</i>.
+    * @param toSavedGame If <i>true</i> then information that is only needed when saving a
+    *                    game is added.
+    * @return The DOM-element ("Document Object Model").
+    */    
+    abstract public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame);
 
 
     /**
     * Initialize this object from an XML-representation of this object.
-    *
     * @param element The DOM-element ("Document Object Model") made to represent this object.
     */
     abstract public void readFromXMLElement(Element element);
@@ -257,4 +328,71 @@ abstract public class FreeColGameObject {
         return null;
     }
 
+    
+    /**
+    * Creates an XML-representation of an array.
+    */
+    protected Element toArrayElement(String tagName, int[][] array, Document document) {
+        Element arrayElement = document.createElement(tagName);
+        arrayElement.setAttribute("xLength", Integer.toString(array.length));
+        arrayElement.setAttribute("yLength", Integer.toString(array[0].length));
+        
+        for (int x=0; x < array.length; x++) {
+            for (int y=0; y < array[0].length; y++) {
+                arrayElement.setAttribute("x" + Integer.toString(x) + "y" + Integer.toString(y), Integer.toString(array[x][y]));
+            }
+        }
+        
+        return arrayElement;
+    }
+    
+
+    /**
+    * Reads an XML-representation of an array.
+    */                
+    protected int[][] readFromArrayElement(String tagName, Element arrayElement, int[][] arrayType) {
+        int[][] array = new int[Integer.parseInt(arrayElement.getAttribute("xLength"))][Integer.parseInt(arrayElement.getAttribute("yLength"))];
+        
+        for (int x=0; x<array.length; x++) {
+            for (int y=0; y<array[0].length; y++) {
+                array[x][y] = Integer.parseInt(arrayElement.getAttribute("x" + Integer.toString(x) + "y" + Integer.toString(y)));
+            }
+        }
+        
+        return array;
+    }    
+    
+
+    /**
+    * Creates an XML-representation of an array.
+    */        
+    protected Element toArrayElement(String tagName, boolean[][] array, Document document) {
+        Element arrayElement = document.createElement(tagName);
+        arrayElement.setAttribute("xLength", Integer.toString(array.length));
+        arrayElement.setAttribute("yLength", Integer.toString(array[0].length));
+        
+        for (int x=0; x < array.length; x++) {
+            for (int y=0; y < array[0].length; y++) {
+                arrayElement.setAttribute("x" + Integer.toString(x) + "y" + Integer.toString(y), Boolean.toString(array[x][y]));
+            }
+        }
+        
+        return arrayElement;
+    }
+    
+
+    /**
+    * Reads an XML-representation of an array.
+    */        
+    protected boolean[][] readFromArrayElement(String tagName, Element arrayElement, boolean[][] arrayType) {
+        boolean[][] array = new boolean[Integer.parseInt(arrayElement.getAttribute("xLength"))][Integer.parseInt(arrayElement.getAttribute("yLength"))];
+        
+        for (int x=0; x<array.length; x++) {
+            for (int y=0; y<array[0].length; y++) {
+                array[x][y] = Boolean.valueOf(arrayElement.getAttribute("x" + Integer.toString(x) + "y" + Integer.toString(y))).booleanValue();
+            }
+        }
+        
+        return array;
+    }        
 }

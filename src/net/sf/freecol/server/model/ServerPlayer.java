@@ -21,7 +21,7 @@
 package net.sf.freecol.server.model;
 
 import java.net.Socket;
-
+import org.w3c.dom.*;
 import java.util.Iterator;
 
 import net.sf.freecol.common.model.*;
@@ -45,7 +45,7 @@ import net.sf.freecol.common.networking.Connection;
 * In addition, there are pointers to this player's
 * {@link Connection} and {@link Socket}
 */
-public class ServerPlayer extends Player {
+public class ServerPlayer extends Player implements ServerModelObject {
 
     /** The network socket to the player's client. */
     private Socket socket;
@@ -60,7 +60,7 @@ public class ServerPlayer extends Player {
 
     private boolean[][] canSeeTiles = null;
 
-
+    private String serverID;
 
 
 
@@ -104,6 +104,10 @@ public class ServerPlayer extends Player {
         resetCanSeeTiles();
     }
 
+    
+    public ServerPlayer(Element serverAdditionElement) {
+        readFromServerAdditionElement(serverAdditionElement);
+    }
 
     
     /**
@@ -320,5 +324,34 @@ public class ServerPlayer extends Player {
      */
     public void setConnection(Connection connection) {
         this.connection = connection;
+    }
+    
+    public Element toServerAdditionElement(Document document) {
+        Element element = document.createElement(getServerAdditionXMLElementTagName());
+
+        element.setAttribute("ID", getID());
+        element.appendChild(toArrayElement("exploredTiles", exploredTiles, document));
+
+        return element;
+    }
+    
+    
+    public void updateID() {
+        setID(serverID);
+    }
+    
+    
+    public void readFromServerAdditionElement(Element element) {
+        serverID = element.getAttribute("ID");
+        exploredTiles = readFromArrayElement("exploredTiles", getChildElement(element, "exploredTiles"), new boolean[0][0]);
+    }    
+    
+    
+    /**
+    * Returns the tag name of the root element representing this object.
+    * @return the tag name.
+    */
+    public static String getServerAdditionXMLElementTagName() {
+        return "serverPlayer";
     }
 }

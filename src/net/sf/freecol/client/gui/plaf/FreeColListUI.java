@@ -16,6 +16,7 @@ public class FreeColListUI extends BasicListUI {
 
     public void installUI(JComponent c) {
         super.installUI(c);
+        ((JList) c).setCellRenderer(createRenderer());
     }
 
     public void paint(Graphics g, JComponent c) {
@@ -38,4 +39,7 @@ public class FreeColListUI extends BasicListUI {
         super.paint(g, c);
     }
 
+    protected ListCellRenderer createRenderer() {
+        return new FreeColComboBoxRenderer.UIResource();
+    }    
 }

@@ -850,7 +850,7 @@ public class Map extends FreeColGameObject {
     * @param document The document to use when creating new componenets.
     * @return The DOM-element ("Document Object Model") made to represent this "Map".
     */
-    public Element toXMLElement(Player player, Document document) {
+    public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
         Element mapElement = document.createElement(getXMLElementTagName());
 
         mapElement.setAttribute("ID", getID());
@@ -861,12 +861,12 @@ public class Map extends FreeColGameObject {
         while (tileIterator.hasNext()) {
             Tile tile = getTile((Position) tileIterator.next());
             
-            if (player.hasExplored(tile)) {
-                mapElement.appendChild(tile.toXMLElement(player, document));
+            if (showAll || player.hasExplored(tile)) {
+                mapElement.appendChild(tile.toXMLElement(player, document, showAll, toSavedGame));
             } else {
                 Tile hiddenTile = new Tile(getGame(), tile.getX(), tile.getY());
                 hiddenTile.setFakeID(tile.getID());
-                mapElement.appendChild(hiddenTile.toXMLElement(player, document));
+                mapElement.appendChild(hiddenTile.toXMLElement(player, document, showAll, toSavedGame));
             }
         }
 

@@ -1,12 +1,13 @@
 
 package net.sf.freecol.server;
 
-import java.io.IOException;
+import java.io.*;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 import java.util.Iterator;
 
 // XML:
-import org.w3c.dom.Element;
+import org.w3c.dom.*;
 
 
 // Networking:
@@ -24,8 +25,8 @@ import net.sf.freecol.server.control.ServerModelController;
 
 // Model:
 import net.sf.freecol.server.networking.Server;
-import net.sf.freecol.server.model.ServerPlayer;
-import net.sf.freecol.common.model.Game;
+import net.sf.freecol.server.model.*;
+import net.sf.freecol.common.model.*;
 
 
 /**
@@ -67,6 +68,9 @@ public final class FreeColServer {
 
     private Game game;
     private boolean singleplayer;
+    
+    // The username of the player owning this server.
+    private String owner;
 
 
 
@@ -107,9 +111,122 @@ public final class FreeColServer {
         }
     }
 
+    
+    /**
+    * Starts a new server in a specified mode and with a specified port
+    * and loads the game from the given file.
+    *
+    * @param file         The file where the game data is located.
+    *
+    * @param port         The TCP port to use for the public socket.
+    *                     That is the port the clients will connect to.
+    *
+    * @throws IOException if the public socket cannot be created (the exception
+    *                     will be logged by this class).
+    *
+    */
+    public FreeColServer(File file, int port) throws IOException {
+        this.singleplayer = singleplayer;
+
+        modelController = new ServerModelController(this);
+
+        owner = loadGame(file);
+
+        userConnectionHandler = new UserConnectionHandler(this);
+        preGameController = new PreGameController(this);
+        preGameInputHandler = new PreGameInputHandler(this);
+        inGameInputHandler = new InGameInputHandler(this);
+        inGameController = new InGameController(this);
+
+        try {
+            server = new Server(this, port);
+            server.start();
+        } catch (IOException e) {
+            logger.warning("Exception while starting server: " + e);
+            throw e;
+        }
+    }    
 
 
-
+    
+    /**
+    * The owner of the game is the player that have loaded the
+    * game.
+    * @see #loadGame
+    */
+    public String getOwner() {
+        return owner;
+    }
+    
+    
+    /**
+    * Saves a game.
+    * @param file The file where the data will be written.
+    * @param username The username of the player saving the game.
+    */
+    public void saveGame(File file, String username) throws IOException {
+        PrintWriter out = new PrintWriter(new FileWriter(file));
+        Game game = getGame();
+        
+        Element savedGameElement = Message.createNewRootElement("savedGame");
+        Document document = savedGameElement.getOwnerDocument();
+        
+        savedGameElement.setAttribute("owner", username);
+                
+        // Add server side model information:
+        Element serverObjectsElement = document.createElement("serverObjects");
+        Iterator fcgoIterator = game.getFreeColGameObjectIterator();
+        while (fcgoIterator.hasNext()) {
+            FreeColGameObject fcgo = (FreeColGameObject) fcgoIterator.next();
+            if (fcgo instanceof ServerModelObject) {
+                serverObjectsElement.appendChild(((ServerModelObject) fcgo).toServerAdditionElement(document));
+            }
+        }
+        savedGameElement.appendChild(serverObjectsElement);
+        
+        // Add the rest:
+        savedGameElement.appendChild(game.toSavedXMLElement(document));
+        
+        out.print(savedGameElement.toString());
+        out.close();
+    }
+    
+    
+    /**
+    * Loads a game.
+    * @param file The file where the game data is located.
+    * @return The username of the player saving the game.
+    */
+    public String loadGame(File file) throws IOException {
+        FileInputStream in = new FileInputStream(file);                  
+        StringBuffer sb = new StringBuffer();
+           
+        Message message = new Message(in);
+        
+        Element savedGameElement = message.getDocument().getDocumentElement();
+        Element serverObjectsElement = (Element) savedGameElement.getElementsByTagName("serverObjects").item(0);
+        
+        ArrayList serverObjects = new ArrayList();
+        
+        NodeList serverObjectsNodeList = serverObjectsElement.getChildNodes();
+        for (int i=0; i<serverObjectsNodeList.getLength(); i++) {
+            Element element = (Element) serverObjectsNodeList.item(i);
+            if (element.getTagName().equals(ServerPlayer.getServerAdditionXMLElementTagName())) {
+                serverObjects.add(new ServerPlayer(element));
+            } else if (element.getTagName().equals(ServerUnit.getServerAdditionXMLElementTagName())) {
+                serverObjects.add(new ServerUnit(element));
+            }
+        }
+        
+        Element gameElement = (Element) savedGameElement.getElementsByTagName(Game.getXMLElementTagName()).item(0);
+        game = new Game(getModelController(), gameElement, (FreeColGameObject[]) serverObjects.toArray(new FreeColGameObject[0]));
+        
+        gameState = IN_GAME;
+        
+        return savedGameElement.getAttribute("owner");
+    }    
+    
+        
     /**
     * Sets the mode of the game: singleplayer/multiplayer.
     *

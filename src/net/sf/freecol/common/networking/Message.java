@@ -4,6 +4,7 @@ package net.sf.freecol.common.networking;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.InputStream;
 
 import java.util.logging.Logger;
 
@@ -58,6 +59,35 @@ public final class Message {
         document = tempDocument;
     }
 
+    
+    /**
+    * Constructs a new Message with data from the given String. The constructor
+    * to use if this is an INCOMING message.
+    */
+    public Message(InputStream inputStream) {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        Document tempDocument = null;
+
+        try {
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            tempDocument = builder.parse(inputStream);
+        } catch (SAXException sxe) {
+            // Error generated during parsing
+            Exception  x = sxe;
+            if (sxe.getException() != null) {
+                x = sxe.getException();
+            }
+            x.printStackTrace();
+            logger.warning("Invalid message received.");
+        } catch (ParserConfigurationException pce) {
+            // Parser with specified options can't be built
+            pce.printStackTrace();
+        } catch (IOException ioe) {
+            // I/O error
+            ioe.printStackTrace();
+        }
+        document = tempDocument;
+    }    
 
     /**
     * Constructs a new Message with data from the given XML-document.

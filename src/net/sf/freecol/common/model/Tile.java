@@ -832,7 +832,7 @@ public final class Tile extends FreeColGameObject implements Location {
     * @param document The document to use when creating new componenets.
     * @return The DOM-element ("Document Object Model") made to represent this "Tile".
     */
-    public Element toXMLElement(Player player, Document document) {
+    public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
         Element tileElement = document.createElement(getXMLElementTagName());
 
         tileElement.setAttribute("ID", getID());
@@ -849,19 +849,19 @@ public final class Tile extends FreeColGameObject implements Location {
         //tileElement.setAttribute("owner", owner.getID());
 
         if (settlement != null) {
-            tileElement.appendChild(settlement.toXMLElement(player, document));
+            tileElement.appendChild(settlement.toXMLElement(player, document, showAll, toSavedGame));
         }
 
         // TODO: Check if there is a settlement on this tile: Do not show enemy units hidden in a settlement.
         //       Needs to store a "defendingUnit" if the unitContainer is hidden.
 
         // Check if the player can see the tile: Do not show enemy units on a tile out-of-sight.
-        if (player.canSee(this)) {
-            tileElement.appendChild(unitContainer.toXMLElement(player, document));
+        if (showAll || player.canSee(this)) {
+            tileElement.appendChild(unitContainer.toXMLElement(player, document, showAll, toSavedGame));
         } else {
             UnitContainer emptyUnitContainer = new UnitContainer(getGame(), this);
             emptyUnitContainer.setFakeID(unitContainer.getID());
-            tileElement.appendChild(emptyUnitContainer.toXMLElement(player, document));
+            tileElement.appendChild(emptyUnitContainer.toXMLElement(player, document, showAll, toSavedGame));
         }
 
         return tileElement;

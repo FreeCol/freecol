@@ -2,7 +2,7 @@
 package net.sf.freecol.client.control;
 
 
-import java.io.IOException;
+import java.io.*;
 import java.net.ConnectException;
 import java.util.logging.Logger;
 
@@ -203,6 +203,52 @@ public final class ConnectController {
     }
 
 
+    /**
+    * Opens a dialog where the user should specify the filename
+    * and loads the game.
+    */  
+    public void loadGame() {  
+        File file = freeColClient.getCanvas().showLoadDialog(FreeCol.getSaveDirectory());  
+        if (file != null) {               
+            loadGame(file);
+        }
+    }
+    
+        
+    /**
+    * Loads a game from the given file.
+    * @param file The <code>File</code>.
+    */
+    public void loadGame(File file) {
+        Canvas canvas = freeColClient.getCanvas();
+        int port = 3541;
+        
+        if (freeColClient.getFreeColServer() != null && freeColClient.getFreeColServer().getServer().getPort() == port) {
+            if (freeColClient.getCanvas().showConfirmDialog("stopServer.text", "stopServer.yes", "stopServer.no")) {
+                freeColClient.getFreeColServer().getController().shutdown();
+            } else {
+                return;
+            }
+        }
+        
+        try {
+            FreeColServer freeColServer = new FreeColServer(file, port);
+            freeColClient.setFreeColServer(freeColServer);
+            
+            String username = freeColServer.getOwner();
+            
+            freeColClient.setSingleplayer(freeColServer.isSingleplayer());
+            login(username, "127.0.0.1", 3541);            
+        } catch (FileNotFoundException fe) {
+            canvas.errorMessage("fileNotFound");
+            return;
+        } catch (IOException e) {
+            freeColClient.getCanvas().errorMessage("server.couldNotStart");
+            return;
+        }                                       
+    }
+    
+        
     /**
     * Sends a logout message to the server.
     *

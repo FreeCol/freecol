@@ -325,7 +325,7 @@ public final class Europe extends FreeColGameObject implements Location {
     * @param document The document to use when creating new componenets.
     * @return The DOM-element ("Document Object Model") made to represent this "Europe".
     */
-    public Element toXMLElement(Player player, Document document) {
+    public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
         Element europeElement = document.createElement(getXMLElementTagName());
 
         europeElement.setAttribute("ID", getID());
@@ -335,7 +335,7 @@ public final class Europe extends FreeColGameObject implements Location {
         europeElement.setAttribute("artilleryPrice", Integer.toString(artilleryPrice));
         europeElement.setAttribute("owner", owner.getID());
 
-        europeElement.appendChild(unitContainer.toXMLElement(player, document));
+        europeElement.appendChild(unitContainer.toXMLElement(player, document, showAll, toSavedGame));
 
         return europeElement;
     }

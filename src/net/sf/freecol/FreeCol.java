@@ -39,6 +39,7 @@ import net.sf.freecol.client.gui.sound.SfxLibrary;
 
 import net.sf.freecol.server.FreeColServer;
 import java.io.IOException;
+import java.io.File;
 
 
 
@@ -66,6 +67,8 @@ public final class FreeCol {
     private static boolean inDebugMode = false;
 
     private static int serverPort;
+    
+    private static File saveDirectory;
 
 
 
@@ -98,6 +101,18 @@ public final class FreeCol {
 
 
         handleArgs(args);
+        
+        // TODO: The location of the save directory should be determined by the installer.
+        saveDirectory = new File(System.getProperty("user.home"));
+        if (!saveDirectory.exists()) {
+            saveDirectory = new File("save");
+        } else {        
+            saveDirectory = new File(saveDirectory, "freecol" + FILE_SEP + "save");
+        }
+        
+        if (!saveDirectory.exists()) {
+            saveDirectory.mkdirs();
+        }
 
         if (standAloneServer) {
             try {
@@ -166,6 +181,13 @@ public final class FreeCol {
     }
 
 
+    /**
+    * Returns the directory where the savegames should be put.
+    */
+    public static File getSaveDirectory() {
+        return saveDirectory;
+    }
+    
 
     /**
     * Ensure that the Java version is good enough. JDK 1.4 or better is

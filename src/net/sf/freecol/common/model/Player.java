@@ -29,9 +29,10 @@ import java.util.ArrayList;
 
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.*;
+import net.sf.freecol.server.model.*;
 
-import org.w3c.dom.Element;
-import org.w3c.dom.Document;
+import org.w3c.dom.*;
 
 
 
@@ -129,6 +130,12 @@ public class Player extends FreeColGameObject {
 
 
 
+    /**
+    * This constructor should only be used by subclasses.
+    */
+    public Player() {
+    
+    }    
 
     /**
     * Creates a new non-admin <code>Player</code> with the specified name.
@@ -902,7 +909,7 @@ public class Player extends FreeColGameObject {
     * @param document The document to use when creating new componenets.
     * @return The DOM-element ("Document Object Model") made to represent this "Player".
     */
-    public Element toXMLElement(Player player, Document document) {
+    public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
         Element playerElement = document.createElement(getXMLElementTagName());
 
         playerElement.setAttribute("ID", getID());
@@ -915,7 +922,7 @@ public class Player extends FreeColGameObject {
         playerElement.setAttribute("rebellionState", Integer.toString(rebellionState));
         playerElement.setAttribute("ai", Boolean.toString(ai));
 
-        if (equals(player)) {
+        if (showAll || equals(player)) {
             playerElement.setAttribute("gold", Integer.toString(gold));
             playerElement.setAttribute("crosses", Integer.toString(crosses));
             playerElement.setAttribute("bells", Integer.toString(bells));
@@ -943,8 +950,8 @@ public class Player extends FreeColGameObject {
             playerElement.setAttribute("entryLocation", entryLocation.getID());
         }
 
-        if (equals(player)) {
-            playerElement.appendChild(europe.toXMLElement(player, document));
+        if (showAll || equals(player)) {
+            playerElement.appendChild(europe.toXMLElement(player, document, showAll, toSavedGame));
         }
 
         return playerElement;

@@ -873,7 +873,7 @@ public final class Colony extends Settlement implements Location {
     * @param document The document to use when creating new componenets.
     * @return The DOM-element ("Document Object Model") made to represent this "Colony".
     */
-    public Element toXMLElement(Player player, Document document) {
+    public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
         Element colonyElement = document.createElement(getXMLElementTagName());
 
         colonyElement.setAttribute("ID", getID());
@@ -881,22 +881,22 @@ public final class Colony extends Settlement implements Location {
         colonyElement.setAttribute("owner", owner.getID());
         colonyElement.setAttribute("tile", tile.getID());
 
-        if (player == getOwner()) {
+        if (showAll || player == getOwner()) {
             colonyElement.setAttribute("hammers", Integer.toString(hammers));
             colonyElement.setAttribute("bells", Integer.toString(bells));
             colonyElement.setAttribute("currentlyBuilding", Integer.toString(currentlyBuilding));
 
             Iterator workLocationIterator = workLocations.iterator();
             while (workLocationIterator.hasNext()) {
-                colonyElement.appendChild(((FreeColGameObject) workLocationIterator.next()).toXMLElement(player, document));
+                colonyElement.appendChild(((FreeColGameObject) workLocationIterator.next()).toXMLElement(player, document, showAll, toSavedGame));
             }
         } else {
             colonyElement.setAttribute("unitCount", Integer.toString(getUnitCount()));
-            colonyElement.appendChild(getDefendingUnit().toXMLElement(player, document));
-            colonyElement.appendChild(getBuilding(Building.STOCKADE).toXMLElement(player, document));
+            colonyElement.appendChild(getDefendingUnit().toXMLElement(player, document, showAll, toSavedGame));
+            colonyElement.appendChild(getBuilding(Building.STOCKADE).toXMLElement(player, document, showAll, toSavedGame));
         }
 
-        colonyElement.appendChild(goodsContainer.toXMLElement(player, document));
+        colonyElement.appendChild(goodsContainer.toXMLElement(player, document, showAll, toSavedGame));
 
         return colonyElement;
     }

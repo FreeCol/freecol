@@ -68,6 +68,30 @@ public class Game extends FreeColGameObject {
         market = new Market(this);
     }
 
+    
+    /**
+    * Initiate a new <code>Game</code> with information from
+    * a saved game.
+    */
+    public Game(ModelController modelController, Element element, FreeColGameObject[] fcgos) {
+        super(null, element);
+
+        this.modelController = modelController;
+        
+        canGiveID = true;
+        
+        for (int i=0; i<fcgos.length; i++) {
+            fcgos[i].setGame(this);
+            fcgos[i].updateID();
+            
+            if (fcgos[i] instanceof Player) {
+                players.add(fcgos[i]);
+            }
+        }            
+            
+        readFromXMLElement(element);
+    }
+    
 
     /**
     * Initiate a new <code>Game</code> object from a <code>Element</code>
@@ -542,23 +566,31 @@ public class Game extends FreeColGameObject {
     * @param document The document to use when creating new componenets.
     * @return The DOM-element ("Document Object Model") made to represent this "Game".
     */
-    public Element toXMLElement(Player player, Document document) {
+    public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
+        if (toSavedGame && !showAll) {
+            throw new IllegalArgumentException("showAll must be set to true when toSavedGame is true.");
+        }
+                
         Element gameElement = document.createElement(getXMLElementTagName());
 
         gameElement.setAttribute("ID", getID());
         gameElement.setAttribute("turn", Integer.toString(getTurn().getNumber()));
-
+        
+        if (toSavedGame) {
+            gameElement.setAttribute("nextID", Integer.toString(nextId));
+        }
+        
         Iterator playerIterator = getPlayerIterator();
         while (playerIterator.hasNext()) {
             Player p = (Player) playerIterator.next();
-            gameElement.appendChild(p.toXMLElement(player, document));
+            gameElement.appendChild(p.toXMLElement(player, document, showAll, toSavedGame));
         }
 
         if (map != null) {
-            gameElement.appendChild(map.toXMLElement(player, document));
+            gameElement.appendChild(map.toXMLElement(player, document, showAll, toSavedGame));
         }
 
-        gameElement.appendChild(market.toXMLElement(player, document));
+        gameElement.appendChild(market.toXMLElement(player, document, showAll, toSavedGame));
 
         if (currentPlayer != null) {
             gameElement.setAttribute("currentPlayer", currentPlayer.getID());
@@ -579,9 +611,12 @@ public class Game extends FreeColGameObject {
         }
 
         setID(gameElement.getAttribute("ID"));
-
         getTurn().setNumber(Integer.parseInt(gameElement.getAttribute("turn")));
 
+        if (gameElement.hasAttribute("nextID")) {
+            nextId = Integer.parseInt(gameElement.getAttribute("nextID"));
+        }
+        
         // Get the players:
         NodeList playerList = gameElement.getElementsByTagName(Player.getXMLElementTagName());
         for (int i=0; i<playerList.getLength(); i++) {

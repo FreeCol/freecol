@@ -5,13 +5,12 @@ import net.sf.freecol.common.model.*;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.networking.DummyConnection;
 
-import org.w3c.dom.Element;
-
+import org.w3c.dom.*;
 
 /**
 * A Player with extra server data, e.g. AI data.
 */
-public final class ServerUnit extends Unit {
+public final class ServerUnit extends Unit implements ServerModelObject {
     public static final String  COPYRIGHT = "Copyright (C) 2003 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
@@ -21,10 +20,12 @@ public final class ServerUnit extends Unit {
                             MISSION_EXPLORE = 2;
     
     /** What we want this unit to do. */
-    private int mission;
+    private int mission = MISSION_STAND;
     
     /** Where to send our actions. */
     private DummyConnection connection;
+    
+    private String serverID;
 
 
     /**
@@ -72,6 +73,12 @@ public final class ServerUnit extends Unit {
         this.connection = connection;
     }
 
+    
+    public ServerUnit(Element serverAdditionElement) {
+        readFromServerAdditionElement(serverAdditionElement);
+    }
+    
+        
     /**
     * Gets a mission for this ServerUnit.
     * @return One of MISSION_STAND, MISSION_WANDER, etc.
@@ -117,4 +124,34 @@ public final class ServerUnit extends Unit {
                 return;
         }
     }
+    
+
+    public void updateID() {
+        setID(serverID);
+    }
+    
+            
+    public Element toServerAdditionElement(Document document) {
+        Element element = document.createElement(getServerAdditionXMLElementTagName());
+       
+        element.setAttribute("ID", getID());       
+        element.setAttribute("mission", Integer.toString(mission));       
+       
+        return element;
+    }
+    
+    
+    public void readFromServerAdditionElement(Element element) {
+        serverID = element.getAttribute("ID");    
+        mission = Integer.parseInt(element.getAttribute("mission"));
+    }    
+    
+    
+    /**
+    * Returns the tag name of the root element representing this object.
+    * @return the tag name.
+    */
+    public static String getServerAdditionXMLElementTagName() {
+        return "serverUnit";
+    }        
 }

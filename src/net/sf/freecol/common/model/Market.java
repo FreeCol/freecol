@@ -254,13 +254,13 @@ public final class Market extends FreeColGameObject {
     * @param document The document to use when creating new componenets.
     * @return The DOM-element ("Document Object Model") made to represent this "Map".
     */
-    public Element toXMLElement(Player player, Document document) {
+    public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
         Element marketElement = document.createElement(getXMLElementTagName());
 
         marketElement.setAttribute("ID", getID());
 
         for (int i=0; i<dataForGoodType.length;i++) {
-            marketElement.appendChild(dataForGoodType[i].toXMLElement(player, document));
+            marketElement.appendChild(dataForGoodType[i].toXMLElement(player, document, showAll, toSavedGame));
         }
 
         return marketElement;
@@ -332,7 +332,7 @@ public final class Market extends FreeColGameObject {
         * @param document The document to use when creating new componenets.
         * @return The DOM-element ("Document Object Model") made to represent this "Data".
         */
-        public Element toXMLElement(Player player, Document document) {
+        public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
             Element dataElement = document.createElement(getXMLElementTagName());
 
             dataElement.setAttribute("ID", getID());

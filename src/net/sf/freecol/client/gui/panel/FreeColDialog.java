@@ -5,7 +5,10 @@ import java.util.logging.Logger;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.event.*;
 import javax.swing.border.BevelBorder;
+import java.io.*;
+import net.sf.freecol.client.gui.i18n.Messages;
 
 
 /**
@@ -288,4 +291,129 @@ public class FreeColDialog extends FreeColPanel {
         return inputDialog;
     }
     
+    
+    /**
+    * Creates a new <code>FreeColDialog</code> in which the user
+    * may choose a savegame to load.
+    * 
+    * @param directory The directory to display when choosing the file.
+    * @return The <code>FreeColDialog</code>.
+    */
+    public static FreeColDialog createLoadDialog(File directory) {
+        final FileList fileList = new FileList(directory);       
+        
+        final FreeColDialog loadDialog = new FreeColDialog()  {
+            public void requestFocus() {
+                fileList.requestFocus();
+            }
+        };
+                
+        loadDialog.setLayout(new BorderLayout());
+
+        JPanel buttons = new JPanel(new GridLayout(1, 2));
+        JButton okButton = new JButton(Messages.message("load"));        
+        JButton cancelButton = new JButton(Messages.message("cancel"));
+
+        okButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                loadDialog.setResponse(((FileList.FileListEntry) fileList.getSelectedValue()).getFile());
+            }
+        });
+
+        if (cancelButton != null) {
+            cancelButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    loadDialog.setResponse(null);
+                }
+            });
+        }
+
+        buttons.add(okButton);       
+        buttons.add(cancelButton);
+        buttons.setOpaque(false);
+        
+        loadDialog.add(fileList, BorderLayout.CENTER);
+        loadDialog.add(buttons, BorderLayout.SOUTH);
+       
+        loadDialog.setSize(400, 200);        
+        loadDialog.setCancelComponent(cancelButton);
+
+        if (fileList.getModel().getSize() > 0) {
+            fileList.setSelectedIndex(0);
+        }
+        
+        return loadDialog;
+    }    
+    
+    
+    /**
+    * Creates a new <code>FreeColDialog</code> in which the user
+    * may choose the destination of the savegame.
+    * 
+    * @param directory The directory to display when choosing the name.
+    * @return The <code>FreeColDialog</code>.
+    */
+    public static FreeColDialog createSaveDialog(File directory) {
+        final FileList fileList = new FileList(directory);
+        final JTextField input = new JTextField();
+        final File theDirectory = directory;        
+
+        final FreeColDialog saveDialog = new FreeColDialog()  {
+            public void requestFocus() {
+                input.requestFocus();
+            }
+        };
+                
+        saveDialog.setLayout(new BorderLayout());
+
+        JPanel buttons = new JPanel(new GridLayout(1, 2));
+        JButton okButton = new JButton(Messages.message("save"));        
+        JButton cancelButton = new JButton(Messages.message("cancel"));
+
+        fileList.addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+                input.setText(fileList.getSelectedValue().toString());
+            }
+        });
+        
+        input.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                saveDialog.setResponse(new File(theDirectory, input.getText() + ".fsg"));
+            }
+        });
+                
+        okButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                saveDialog.setResponse(new File(theDirectory, input.getText() + ".fsg"));
+            }
+        });
+
+        if (cancelButton != null) {
+            cancelButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    saveDialog.setResponse(null);
+                }
+            });
+        }
+
+        buttons.add(okButton);       
+        buttons.add(cancelButton);
+        buttons.setOpaque(false);
+        
+        JPanel p1 = new JPanel(new GridLayout(2, 1));
+        p1.add(new JScrollPane(input));
+        p1.add(buttons);
+        
+        saveDialog.add(fileList, BorderLayout.CENTER);
+        saveDialog.add(p1, BorderLayout.SOUTH);        
+       
+        saveDialog.setSize(400, 200);        
+        saveDialog.setCancelComponent(cancelButton);
+
+        if (fileList.getModel().getSize() > 0) {
+            fileList.setSelectedIndex(0);
+        }     
+        
+        return saveDialog;
+    }        
 }

@@ -20,7 +20,7 @@ public class FreeColMenuBar extends JMenuBar {
     private final GUI gui;
     private ArrayList inGameOptions = new ArrayList();
     private ArrayList mapControlOptions = new ArrayList();
-    
+    private JMenuItem saveMenuItem;
 
 
     /**
@@ -55,7 +55,7 @@ public class FreeColMenuBar extends JMenuBar {
             }
         });
 
-        JMenuItem openMenuItem = new JMenuItem("Open");
+        JMenuItem openMenuItem = new JMenuItem("Load");
         openMenuItem.setOpaque(false);
         openMenuItem.setMnemonic(KeyEvent.VK_O);
         openMenuItem.setAccelerator(KeyStroke.getKeyStroke('O', InputEvent.CTRL_MASK));
@@ -63,10 +63,22 @@ public class FreeColMenuBar extends JMenuBar {
         openMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // TODO: show a confirmation dialog and quit the game
-                canvas.showOpenGamePanel();
+                freeColClient.getInGameController().loadGame();
             }
         });
-
+        
+        saveMenuItem = new JMenuItem("Save");
+        saveMenuItem.setOpaque(false);
+        saveMenuItem.setMnemonic(KeyEvent.VK_S);
+        saveMenuItem.setAccelerator(KeyStroke.getKeyStroke('S', InputEvent.CTRL_MASK));
+        gameMenu.add(saveMenuItem);
+        saveMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                freeColClient.getInGameController().saveGame();
+            }
+        });
+        inGameOptions.add(saveMenuItem);
+        
         gameMenu.addSeparator();
 
         JMenuItem quitMenuItem = new JMenuItem("Quit");
@@ -172,6 +184,8 @@ public class FreeColMenuBar extends JMenuBar {
         while (componentIterator.hasNext()) {
             ((JComponent) componentIterator.next()).setEnabled(enabled);
         }
+        
+        saveMenuItem.setEnabled(freeColClient.getMyPlayer().isAdmin() && freeColClient.getFreeColServer() != null);
     }
 
 

@@ -20,6 +20,7 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 
 import java.awt.Component;
@@ -49,6 +50,7 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
                                 QUIT = 2;
     
     private final Canvas parent;
+    private final FreeColClient freeColClient;
     private JButton newButton;
     
 
@@ -56,10 +58,11 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
     * The constructor that will add the items to this panel.
     * @param parent The parent of this panel.
     */
-    public MainPanel(Canvas parent) {
+    public MainPanel(Canvas parent, FreeColClient freeColClient) {
         setLayout(new BorderLayout());
 
         this.parent = parent;
+        this.freeColClient = freeColClient;
 
         JButton         openButton = new JButton("Open"),
                         quitButton = new JButton("Quit");
@@ -128,7 +131,7 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
                     parent.remove(this);
                     break;
                 case OPEN:
-                    parent.showOpenGamePanel();
+                    freeColClient.getInGameController().loadGame();
                     break;
                 case QUIT:
                     parent.quit();

@@ -813,7 +813,7 @@ public final class Building extends FreeColGameObject implements WorkLocation {
     * @param document The document to use when creating new componenets.
     * @return The DOM-element ("Document Object Model") made to represent this "Building".
     */
-    public Element toXMLElement(Player player, Document document) {
+    public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
         Element buildingElement = document.createElement(getXMLElementTagName());
 
         buildingElement.setAttribute("ID", getID());
@@ -823,7 +823,7 @@ public final class Building extends FreeColGameObject implements WorkLocation {
 
         Iterator unitIterator = getUnitIterator();
         while (unitIterator.hasNext()) {
-            buildingElement.appendChild(((FreeColGameObject) unitIterator.next()).toXMLElement(player, document));
+            buildingElement.appendChild(((FreeColGameObject) unitIterator.next()).toXMLElement(player, document, showAll, toSavedGame));
         }
 
         return buildingElement;

@@ -2,10 +2,13 @@
 package net.sf.freecol.client.control;
 
 
+import javax.swing.JFileChooser;
 import java.util.logging.Logger;
 import java.util.Iterator;
 import java.util.ArrayList;
+import java.io.*;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.client.gui.Canvas;
@@ -42,7 +45,44 @@ public final class InGameController {
     }
 
 
+    /**
+    * Opens a dialog where the user should specify the filename
+    * and saves the game.
+    */
+    public void saveGame() {    
+        Canvas canvas = freeColClient.getCanvas();
+        
+        if (freeColClient.getMyPlayer().isAdmin() && freeColClient.getFreeColServer() != null) {               
+            File file = canvas.showSaveDialog(FreeCol.getSaveDirectory());
+            try {
+                freeColClient.getFreeColServer().saveGame(file, freeColClient.getMyPlayer().getUsername());                              
+            } catch (IOException e) {
+                canvas.errorMessage("couldNotSaveGame");
+            }
+        }    
+    }
 
+    
+    /**
+    * Opens a dialog where the user should specify the filename
+    * and loads the game.
+    */  
+    public void loadGame() {  
+        Canvas canvas = freeColClient.getCanvas();
+        
+        File file = canvas.showLoadDialog(FreeCol.getSaveDirectory());
+        
+        if(file == null || !canvas.showConfirmDialog("stopCurrentGame.text", "stopCurrentGame.yes", "stopCurrentGame.no")) {
+            return;
+        }                    
+      
+        freeColClient.getConnectController().quitGame(true);
+        canvas.removeInGameComponents();    
+
+        freeColClient.getConnectController().loadGame(file);
+    }    
+    
+    
     /**
     * Sets the "debug mode" to be active or not. Calls
     * {@link FreeCol#setInDebugMode} and reinitialize the

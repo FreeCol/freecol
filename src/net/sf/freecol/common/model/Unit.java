@@ -118,6 +118,15 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     private int             trainingType = -1;
 
 
+    
+    /**
+    * This constructor should only be used by subclasses.
+    */
+    public Unit() {
+    
+    }
+    
+    
     /**
     * Initiate a new <code>Unit</code> of a specified type with the state set
     * to {@link #ACTIVE} if a carrier and {@link #SENTRY} otherwise. The
@@ -2737,7 +2746,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     * @param document The document to use when creating new componenets.
     * @return The DOM-element ("Document Object Model") made to represent this "Unit".
     */
-    public Element toXMLElement(Player player, Document document) {
+    public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
         Element unitElement = document.createElement(getXMLElementTagName());
 
         unitElement.setAttribute("ID", getID());
@@ -2758,7 +2767,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         }
 
         if (location != null) {
-            if (player == getOwner() || !(location instanceof Building || location instanceof ColonyTile)) {
+            if (showAll || player == getOwner() || !(location instanceof Building || location instanceof ColonyTile)) {
                 unitElement.setAttribute("location", location.getID());
             } else {
                 unitElement.setAttribute("location", getTile().getColony().getID());
@@ -2767,16 +2776,16 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
 
         // Do not show enemy units hidden in a carrier:
         if (isCarrier()) {
-            if (getOwner().equals(player)) {
-                unitElement.appendChild(unitContainer.toXMLElement(player, document));
-                unitElement.appendChild(goodsContainer.toXMLElement(player, document));
+            if (showAll || getOwner().equals(player)) {
+                unitElement.appendChild(unitContainer.toXMLElement(player, document, showAll, toSavedGame));
+                unitElement.appendChild(goodsContainer.toXMLElement(player, document, showAll, toSavedGame));
             } else {
                 UnitContainer emptyUnitContainer = new UnitContainer(getGame(), this);
                 emptyUnitContainer.setID(unitContainer.getID());
-                unitElement.appendChild(emptyUnitContainer.toXMLElement(player, document));
+                unitElement.appendChild(emptyUnitContainer.toXMLElement(player, document, showAll, toSavedGame));
                 GoodsContainer emptyGoodsContainer = new GoodsContainer(getGame(), this);
                 emptyGoodsContainer.setID(unitContainer.getID());
-                unitElement.appendChild(emptyGoodsContainer.toXMLElement(player, document));
+                unitElement.appendChild(emptyGoodsContainer.toXMLElement(player, document, showAll, toSavedGame));
             }
         }
 
