@@ -577,7 +577,8 @@ public final class Tile extends FreeColGameObject implements Location {
     * @param t The new type for this Tile.
     */
     public void setType(int t) {
-        // TODO: check if t is a valid type
+        if(t < UNEXPLORED || t > HIGH_SEAS)
+            throw new IllegalStateException("Tile type must be valid");
         type = t;
         bonus = false; 
         
