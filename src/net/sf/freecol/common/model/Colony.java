@@ -441,6 +441,11 @@ public final class Colony extends Settlement implements Location {
         int required = 0;
         int tools = 0;
 
+        if (currentlyBuilding == -1) {
+            addModelMessage(this, "model.colony.cannotBuild", new String[][] {{"%colony%", getName()}});
+            return;
+        }
+
         // Building a unit:
         if (currentlyBuilding >= BUILDING_UNIT_ADDITION) {
             hammers += amount;
@@ -448,7 +453,7 @@ public final class Colony extends Settlement implements Location {
         }
 
         if (getBuilding(currentlyBuilding).getNextPop() > getUnitCount()) {
-            // TODO: Show error: not enough colonists to build the given building.
+            addModelMessage(this, "model.colony.buildNeedPop", new String[][] {{"%colony%", getName()}, {"%building%", getBuilding(currentlyBuilding).getNextName()}});
             return;
         }
 
@@ -464,12 +469,12 @@ public final class Colony extends Settlement implements Location {
                 }
                 hammers = 0;
                 getBuilding(currentlyBuilding).setLevel(getBuilding(currentlyBuilding).getLevel() + 1);
-                // TODO: some message about building something
+                addModelMessage(this, "model.colony.buildingReady", new String[][] {{"%colony%", getName()}, {"%building%", getBuilding(currentlyBuilding).getName()}});
             } else {
-                    //TODO: some error about not having enough tools
+                addModelMessage(this, "model.colony.buildNeedTools", new String[][] {{"%colony%", getName()}, {"%building%", getBuilding(currentlyBuilding).getNextName()}});
             }
         } else if (hammersRequired == -1) {
-            //TODO: some error about trying to build a nonexistent building
+            addModelMessage(this, "model.colony.alreadyBuilt", new String[][] {{"%colony%", getName()}, {"%building%", getBuilding(currentlyBuilding).getNextName()}});
         }
     }
 
@@ -481,9 +486,11 @@ public final class Colony extends Settlement implements Location {
     public void createUnit(Unit unit) {
         if (unit.isColonist()) {
             removeGoods(Goods.FOOD, 300);
+            addModelMessage(this, "model.colony.newColonist", new String[][] {{"%colony%", getName()}});
         } else {
             hammers = 0;
             removeGoods(Goods.TOOLS, Unit.getNextTools(unit.getType()));
+            addModelMessage(this, "model.colony.unitReady", new String[][] {{"%colony%", getName()}, {"%unit%", unit.getName()}});
         }
 
         unit.setLocation(this);
@@ -690,9 +697,13 @@ public final class Colony extends Settlement implements Location {
             // Kill a colonist:
             ((Unit) getUnitIterator().next()).dispose();
             removeGoods(Goods.FOOD, food);
-            // TODO: Display some kind of message
+            addModelMessage(this, "model.colony.colonistStarved", new String[][] {{"%colony%", getName()}});
         } else {
             removeGoods(Goods.FOOD, eat);
+            
+            if (eat > getFoodProduction() && (food-eat) / (eat - getFoodProduction()) <= 3) {
+                addModelMessage(this, "model.colony.famineFeared", new String[][] {{"%colony%", getName()}, {"%number%", Integer.toString((food-eat) / (eat - getFoodProduction()))}});
+            }
         }
 
         // Breed horses:

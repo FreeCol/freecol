@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.util.logging.Logger;
 import java.util.Iterator;
+import java.util.ArrayList;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
@@ -836,6 +837,48 @@ public final class InGameController {
     }
 
     
+    /**
+    * Displays the next <code>ModelMessage</code>.
+    * @see net.sf.freecol.common.model.ModelMessage ModelMessage
+    */
+    public void nextModelMessage() {
+        Canvas canvas = freeColClient.getCanvas();
+
+        ArrayList messages = new ArrayList();
+
+        Iterator i = freeColClient.getGame().getModelMessageIterator(freeColClient.getMyPlayer());
+        if (i.hasNext()) {
+            ModelMessage first = (ModelMessage) i.next();
+            first.setBeenDisplayed(true);
+            messages.add(first);
+            while (i.hasNext()) {
+                ModelMessage m = (ModelMessage) i.next();
+                if (m.getSource() == first.getSource()) {
+                    m.setBeenDisplayed(true);
+                    boolean unique = true;
+                    for (int j=0; j<messages.size(); j++) {
+                        if (messages.get(j).equals(m)) {
+                            unique = false;
+                            break;
+                        }
+                    }
+
+                    if (unique) {
+                        messages.add(m);
+                    }
+                }
+            }
+
+        }
+
+        if (messages.size() > 0) {
+            for (int j=0; j<messages.size(); j++) {
+                canvas.showModelMessage((ModelMessage) messages.get(j));
+            }
+        }
+    }
+
+
     /**
     * End the turn.
     */

@@ -792,9 +792,13 @@ public final class GUI {
                 }
             }
 
-        } else {
+        } else if (production == 0) {
             goodsIcon.paintIcon(null, g, width/2 - goodsIcon.getIconWidth()/2, 0);
             BufferedImage stringImage = createStringImage((Graphics2D) g, "0", Color.WHITE, goodsIcon.getIconWidth()*2, 12);
+            g.drawImage(stringImage, width/2-stringImage.getWidth()/2, goodsIcon.getIconHeight()/2 - stringImage.getHeight()/2, null);
+        } else {
+            goodsIcon.paintIcon(null, g, width/2 - goodsIcon.getIconWidth()/2, 0);
+            BufferedImage stringImage = createStringImage((Graphics2D) g, Integer.toString(Math.abs(production)), Color.RED, goodsIcon.getIconWidth()*2, 12);
             g.drawImage(stringImage, width/2-stringImage.getWidth()/2, goodsIcon.getIconHeight()/2 - stringImage.getHeight()/2, null);
         }
         

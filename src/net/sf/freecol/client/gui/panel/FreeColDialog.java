@@ -121,6 +121,42 @@ public class FreeColDialog extends JPanel {
         return ((Integer) getResponse()).intValue();
     }
 
+    
+    /**
+    * Creates a new <code>FreeColDialog</code> with a text and an ok-button.
+    * The "ok"-option calls {@link #setResponse setResponse(new Boolean(true))}.
+    *
+    * @param text The text that explains the choice for the user.
+    * @param okText The text displayed on the "ok"-button.
+    * @return The <code>FreeColDialog</code>.
+    */
+    public static FreeColDialog createInformationDialog(String text, String okText) {
+        final JButton okButton = new JButton(okText);
+
+        final FreeColDialog informationDialog = new FreeColDialog() {
+            public void requestFocus() {
+                okButton.requestFocus();
+            }
+        };
+
+        okButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                informationDialog.setResponse(new Boolean(true));
+            }
+        });
+
+        informationDialog.setLayout(new FlowLayout(FlowLayout.CENTER, 10,10));
+        JLabel l = new JLabel(text);
+        int width = l.getMinimumSize().width;
+
+        informationDialog.add(l);
+        informationDialog.add(okButton);
+
+        informationDialog.setSize(width + 10, l.getMinimumSize().height + okButton.getMinimumSize().height + 30);
+
+        return informationDialog;
+    }
+
 
     /**
     * Creates a new <code>FreeColDialog</code> with a text and a ok/cancel option.

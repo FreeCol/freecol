@@ -5,6 +5,7 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Unit;
@@ -251,6 +252,8 @@ public final class InGameInputHandler implements MessageHandler {
             if (currentPlayer.checkEmigrate()) {
                 freeColClient.getInGameController().emigrateUnitInEurope((int) ((Math.random() * 3) + 1));
             }
+            
+            freeColClient.getInGameController().nextModelMessage();
         }
 
         return null;

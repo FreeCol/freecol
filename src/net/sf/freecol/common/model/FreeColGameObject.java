@@ -159,6 +159,22 @@ abstract public class FreeColGameObject {
         this.id = newID;
     }
 
+    
+    /**
+    * Creates a <code>ModelMessage</code> and uses <code>getGame().addModelMessage(...)</code>.
+    *
+    * @param source The source of the message. This is what the message should be 
+    *               associated with. In addition, the owner of the source is the
+    *               player getting the message.
+    * @param messageID The ID of the message to display.
+    * @param data Contains data to be displayed in the message or <i>null</i>.
+    * @see Game#addModelMessage
+    * @see ModelMessage
+    */
+    protected void addModelMessage(FreeColGameObject source, String messageID, String[][] data) {
+        getGame().addModelMessage(new ModelMessage(source, messageID, data));
+    }
+
 
     /**
     * Checks if this object has the specified ID.

@@ -43,22 +43,23 @@ public final class Europe extends FreeColGameObject implements Location {
     */
     private UnitContainer unitContainer;
 
-
+    private Player owner;
 
 
     /**
     * Creates a new <code>Europe</code>.
     * @param game The <code>Game</code> in which this object belong.
     */
-    public Europe(Game game) {
+    public Europe(Game game, Player owner) {
         super(game);
+        this.owner = owner;
 
         unitContainer = new UnitContainer(game, this);
 
         setRecruitable(1, Unit.generateRecruitable());
         setRecruitable(2, Unit.generateRecruitable());
         setRecruitable(3, Unit.generateRecruitable());
-        
+
         artilleryPrice = 500;
     }
 
@@ -292,6 +293,14 @@ public final class Europe extends FreeColGameObject implements Location {
 
     
     /**
+    * Gets the <code>Player</code> using this <code>Europe</code>.
+    */
+    public Player getOwner() {
+        return owner;
+    }
+
+    
+    /**
     * Prepares this object for a new turn.
     */
     public void newTurn() {
@@ -313,6 +322,7 @@ public final class Europe extends FreeColGameObject implements Location {
         europeElement.setAttribute("recruit1", Integer.toString(recruitables[1]));
         europeElement.setAttribute("recruit2", Integer.toString(recruitables[2]));
         europeElement.setAttribute("artilleryPrice", Integer.toString(artilleryPrice));
+        europeElement.setAttribute("owner", owner.getID());
 
         europeElement.appendChild(unitContainer.toXMLElement(player, document));
 
@@ -331,6 +341,7 @@ public final class Europe extends FreeColGameObject implements Location {
         recruitables[1] = Integer.parseInt(europeElement.getAttribute("recruit1"));
         recruitables[2] = Integer.parseInt(europeElement.getAttribute("recruit2"));
         artilleryPrice = Integer.parseInt(europeElement.getAttribute("artilleryPrice"));
+        owner = (Player) getGame().getFreeColGameObject(europeElement.getAttribute("owner"));
 
         Element unitContainerElement = getChildElement(europeElement, UnitContainer.getXMLElementTagName());
         if (unitContainer != null) {

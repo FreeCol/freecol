@@ -356,10 +356,14 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     * Updates the building progress label.
     */
     private void updateProgressLabel() {
-        if (colony.getCurrentlyBuilding() < Colony.BUILDING_UNIT_ADDITION) {
-            progressLabel.setText("Hammers: " + colony.getHammers() + "/" + colony.getBuilding(colony.getCurrentlyBuilding()).getNextHammers());
+        if (colony.getCurrentlyBuilding() == -1) {
+            progressLabel.setText("");
         } else {
-            progressLabel.setText("Hammers: " + colony.getHammers() + "/" + Unit.getNextHammers(colony.getCurrentlyBuilding() - Colony.BUILDING_UNIT_ADDITION));
+            if (colony.getCurrentlyBuilding() < Colony.BUILDING_UNIT_ADDITION) {
+                progressLabel.setText("Hammers: " + colony.getHammers() + "/" + colony.getBuilding(colony.getCurrentlyBuilding()).getNextHammers());
+            } else {
+                progressLabel.setText("Hammers: " + colony.getHammers() + "/" + Unit.getNextHammers(colony.getCurrentlyBuilding() - Colony.BUILDING_UNIT_ADDITION));
+            }
         }
     }
 
@@ -385,6 +389,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 case EXIT:
                     parent.remove(this);
                     parent.showMapControls();
+                    freeColClient.getInGameController().nextModelMessage();
                     break;
                 default:
                     logger.warning("Invalid action");

@@ -138,7 +138,7 @@ public class Player extends FreeColGameObject {
 
         nation = DUTCH;
         color = Color.ORANGE;
-        europe = new Europe(game);
+        europe = new Europe(game, this);
 
         // TODO (this is for testing only): Set to 0
         gold = 10000;

@@ -51,14 +51,17 @@ import net.sf.freecol.client.gui.i18n.Messages;
 
 import net.sf.freecol.common.FreeColException;
 
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.ModelMessage;
 
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.client.FreeColClient;
@@ -163,7 +166,7 @@ public final class Canvas extends JLayeredPane {
 
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
-        takeFocus();
+        //takeFocus();
 
         chatDisplayThread = new ChatDisplayThread();
         chatDisplayThread.start();
@@ -259,6 +262,71 @@ public final class Canvas extends JLayeredPane {
         newPanel.setLocation(getWidth() / 2 - newPanel.getWidth() / 2, getHeight() / 2 - newPanel.getHeight() / 2);
         add(newPanel);
         newPanel.requestFocus();
+    }
+
+
+    /**
+    * Displays a <code>ModelMessage</code> in a modal dialog.
+    * The message is displayed in this way:
+    *
+    * <ol>
+    *   <li>The <code>messageID</code> is used to get the message from
+    *       {@link net.sf.freecol.client.gui.i18n.Messages#message}.
+    *   <li>Every occuranse of <code>data[x][0]</code> is replaced with
+    *       <code>data[x][1]</code>.
+    *   <li>The message is displayed using a modal dialog.
+    * </ol>
+    */
+    public void showModelMessage(ModelMessage m) {
+        String okText = "ok";
+        String cancelText = "display";
+        String message = m.getMessageID();
+        try {
+            okText = Messages.message(okText);
+            cancelText = Messages.message(cancelText);
+            message = Messages.message(message);
+        } catch (MissingResourceException e) {
+            logger.warning("could not find message with id: " + okText + ".");
+        }
+
+        String[][] data = m.getData();
+        if (data != null) {
+            for (int i=0; i<data.length; i++) {
+                message = message.replaceAll(data[i][0], data[i][1]);
+            }
+        }
+
+        FreeColGameObject source = m.getSource();
+        if (source instanceof Europe && !europePanel.isShowing() ||
+                source instanceof Colony && !colonyPanel.isShowing()) {
+
+            FreeColDialog confirmDialog = FreeColDialog.createConfirmDialog(message, okText, cancelText);
+            confirmDialog.setLocation(getWidth() / 2 - confirmDialog.getWidth() / 2, getHeight() / 2 - confirmDialog.getHeight() / 2);
+            add(confirmDialog, new Integer(POPUP_LAYER.intValue() - 1));
+            confirmDialog.requestFocus();
+
+            if (!confirmDialog.getResponseBoolean()) {
+                remove(confirmDialog);
+                if (source instanceof Europe) {
+                    showEuropePanel();
+                } else if (source instanceof Colony) {
+                    showColonyPanel((Colony) source);
+                }
+            } else {
+                remove(confirmDialog);
+                freeColClient.getInGameController().nextModelMessage();
+            }
+        } else {
+            FreeColDialog informationDialog = FreeColDialog.createInformationDialog(message, okText);
+            informationDialog.setLocation(getWidth() / 2 - informationDialog.getWidth() / 2, getHeight() / 2 - informationDialog.getHeight() / 2);
+            add(informationDialog, new Integer(POPUP_LAYER.intValue() - 1));
+            informationDialog.requestFocus();
+
+            informationDialog.getResponse();
+            remove(informationDialog);
+
+            freeColClient.getInGameController().nextModelMessage();
+        }
     }
 
 

@@ -1837,7 +1837,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                 int state = getState();
 
                 switch (state) {
-                    case TO_EUROPE:     break;
+                    case TO_EUROPE:     addModelMessage(getOwner().getEurope(), "model.unit.arriveInEurope", null); break;
                     case TO_AMERICA:    setLocation(getVacantEntryLocation()); break;
                     case BUILD_ROAD:    getTile().setRoad(true); numberOfTools -= 20; break;
                     case PLOW:

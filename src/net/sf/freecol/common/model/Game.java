@@ -40,15 +40,18 @@ public class Game extends FreeColGameObject {
     /** Contains references to all objects created in this game. */
     private HashMap freeColGameObjects = new HashMap(10000);
     
+    /** Contains all the messages for this round. */
+    private ArrayList modelMessages = new ArrayList();
+
     /** The next availeble ID, that can be given to a new <code>FreeColGameObject</code>. */
     private int nextId = 1;
-    
+
     /** Indicates wether or not this object may give ID's */
     private boolean canGiveID;
-    
+
     /* The market for Europe. */
     private Market market;
-    
+
     private Turn turn = new Turn(1);
 
 
@@ -82,8 +85,8 @@ public class Game extends FreeColGameObject {
     public Market getMarket() {
         return market;
     }
-    
-    
+
+
     public Turn getTurn() {
         return turn;
     }
@@ -433,7 +436,31 @@ public class Game extends FreeColGameObject {
 
         return true;
     }
+
     
+    /**
+    * Adds a <code>ModelMessage</code> to this game.
+    * @param modelMessage The <code>ModelMessage</code>.
+    */
+    public void addModelMessage(ModelMessage modelMessage) {
+        modelMessages.add(modelMessage);
+    }
+
+
+    public Iterator getModelMessageIterator(Player player) {
+        ArrayList out = new ArrayList();
+
+        Iterator i = modelMessages.iterator();
+        while (i.hasNext()) {
+            ModelMessage m = (ModelMessage) i.next();
+            if (m.getOwner() == player && !m.hasBeenDisplayed()) {
+                out.add(m);
+            }
+        }
+        
+        return out.iterator();
+    }
+
 
     /**
     * Prepares this <code>Game</code> for a new turn.
@@ -445,6 +472,7 @@ public class Game extends FreeColGameObject {
     public void newTurn() {
         //Iterator iterator = getFreeColGameObjectIterator();
         turn.increase();
+        modelMessages.clear();
 
         Iterator iterator = ((HashMap) freeColGameObjects.clone()).values().iterator();
 
