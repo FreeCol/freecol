@@ -947,6 +947,11 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                     oldParent.remove(comp);
                     Unit unit = ((UnitLabel)comp).getUnit();
                     if (!unit.isCarrier()) {// No, you cannot load ships onto other ships.
+                      if(!selectedUnit.getUnit().canAdd(unit)) {
+                          oldParent.add(comp);
+                          return null;
+                      }
+                      
                       ((UnitLabel) comp).setSmall(false);
                       if (inGameController.boardShip(unit, selectedUnit.getUnit())) {
                         updateBuildingBox();
@@ -956,6 +961,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                         return null;
                       }
                     } else {
+                      oldParent.add(comp);
                       return null;
                     }
                 } else if (comp instanceof GoodsLabel) {
@@ -966,7 +972,16 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                         g.setAmount(g.getAmount() - 100);
                         g = new Goods(game, g.getLocation(), g.getType(), 100);
                         g.setAmount(100);
+                        
+                        //enough space ?
+                        if(!selectedUnit.getUnit().canAdd(g)) {
+                            return null;
+                        }
                     } else {
+                        // enough space ?
+                        if(!selectedUnit.getUnit().canAdd(g)) {
+                            return null;
+                        }
                         oldParent.remove(comp);
                     }
 
@@ -982,6 +997,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
                     warehousePanel.initialize();
                     buildingsPanel.initialize();
+
                     return comp;
                 } else {
                     logger.warning("An invalid component got dropped on this CargoPanel.");

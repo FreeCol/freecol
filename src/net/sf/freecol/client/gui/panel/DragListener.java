@@ -176,9 +176,12 @@ public final class DragListener extends MouseAdapter {
                     ((MarketLabel) comp).setAmount(-1);
                 }
             } else {
-                if (comp instanceof GoodsLabel) {
-                    ((GoodsLabel) comp).getGoods().setAmount(100);
-                } else if (comp instanceof MarketLabel) {
+                // We can have less than 100 of the goods so we must not do setAmount(100).
+                //if (comp instanceof GoodsLabel) {
+                    //((GoodsLabel) comp).getGoods().setAmount(100);
+                //} else
+                
+                if (comp instanceof MarketLabel) {
                     ((MarketLabel) comp).setAmount(100);
                 }
             }
