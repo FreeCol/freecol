@@ -896,8 +896,7 @@ public final class InGameController {
                     default:
                         throw new IllegalArgumentException("Invalid skill found in provideSkill message.");
                 }
-            }
-            else {
+            } else {
                 logger.warning("Server gave an invalid reply to an askSkill message");
                 return;
             }
@@ -906,8 +905,7 @@ public final class InGameController {
 
             if (skillName == null) {
                 canvas.errorMessage("indianSettlement.noMoreSkill");
-            }
-            else {
+            } else {
                 Element learnSkill = Message.createNewRootElement("learnSkillAtSettlement");
                 learnSkill.setAttribute("unit", unit.getID());
                 learnSkill.setAttribute("direction", Integer.toString(direction));
@@ -915,17 +913,17 @@ public final class InGameController {
                 if (canvas.showConfirmDialog("learnSkill.text", "learnSkill.yes", "learnSkill.no", skillName)) {
                     unit.setType(skill);
                     settlement.setLearnableSkill(IndianSettlement.NONE);
-                }
-                else {
+                } else {
                     learnSkill.setAttribute("action", "cancel");
                 }
 
                 client.send(learnSkill);
             }
-        }
-        else {
+        } else {
             canvas.errorMessage("indianSettlement.noMoreSkill");
         }
+
+        nextActiveUnit(unit.getTile());
     }
 
 
