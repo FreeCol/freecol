@@ -2,9 +2,9 @@
 
 <project name="FreeCol" default="package">
   <property environment="env"/>
-  <property name="freecol.image.dir" value="${basedir}/../data/images"/>
-  <property name="freecol.src.dir" value="${basedir}"/>
-  <property name="freecol.build.dir" value="${basedir}/classes"/>
+  <property name="freecol.image.dir" value="${basedir}/data/images"/>
+  <property name="freecol.src.dir" value="${basedir}/src"/>
+  <property name="freecol.build.dir" value="${basedir}/src/classes"/>
   <property name="freecol.javadoc.dir" value="${basedir}/javadoc"/>
   <property name="freecol.jar.file" value="${basedir}/FreeCol.jar"/>
 
@@ -35,7 +35,7 @@
   <target name="package" depends="init,compile">
     <jar jarfile="${freecol.jar.file}"
          basedir="${freecol.build.dir}"
-         manifest="${basedir}/MANIFEST.MF"
+         manifest="${basedir}/src/MANIFEST.MF"
          excludes="**/CVS/**"
     />
   </target>
