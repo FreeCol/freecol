@@ -150,6 +150,13 @@ public class IndianSettlement extends Settlement {
     }
 
 
+    public boolean isCapital() {
+        return isCapital;
+    }
+    
+    public void setCapital(boolean isCapital) {
+        this.isCapital = isCapital;
+    }
     /**
     * Adds a <code>Locatable</code> to this Location.
     *
