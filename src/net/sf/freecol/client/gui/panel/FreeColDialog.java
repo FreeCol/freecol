@@ -26,25 +26,6 @@ public class FreeColDialog extends FreeColPanel {
 
 
 
-    /**
-    * Is being used to make the Save- and LoadDialogs more user-friendly.
-    */
-    final class SavegameFilter extends FileFilter {
-        public boolean accept(File f) {
-            if (f.getName().endsWith(".fsg") || f.isDirectory()) {
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-
-        public String getDescription() {
-            return "*.fsg";
-        }
-    }
-
-
 
     /**
     * Default constructor.
@@ -396,5 +377,24 @@ public class FreeColDialog extends FreeColPanel {
         saveDialog.setSize(480, 320);
 
         return saveDialog;
+    }
+
+
+    /**
+    * Is being used to make the Save- and LoadDialogs more user-friendly.
+    */
+    final class SavegameFilter extends FileFilter {
+        public boolean accept(File f) {
+            if (f.getName().endsWith(".fsg") || f.isDirectory()) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        public String getDescription() {
+            return "*.fsg";
+        }
     }
 }

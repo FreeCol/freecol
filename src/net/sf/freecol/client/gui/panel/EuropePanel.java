@@ -46,37 +46,8 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
 
     private static final int    EXIT = 0,
                                 RECRUIT = 1,
-                                RECRUIT_CANCEL = 2,
-                                RECRUIT_1 = 3,
-                                RECRUIT_2 = 4,
-                                RECRUIT_3 = 5,
-                                PURCHASE = 6,
-                                PURCHASE_CANCEL = 7,
-                                PURCHASE_ARTILLERY = 8,
-                                PURCHASE_CARAVEL = 9,
-                                PURCHASE_MERCHANTMAN = 10,
-                                PURCHASE_GALLEON = 11,
-                                PURCHASE_PRIVATEER = 12,
-                                PURCHASE_FRIGATE = 13,
-                                TRAIN = 14,
-                                TRAIN_CANCEL = 15,
-                                TRAIN_EXPERT_ORE_MINER = 16,
-                                TRAIN_EXPERT_LUMBER_JACK = 17,
-                                TRAIN_MASTER_GUNSMITH = 18,
-                                TRAIN_EXPERT_SILVER_MINER = 19,
-                                TRAIN_MASTER_FUR_TRADER = 20,
-                                TRAIN_MASTER_CARPENTER = 21,
-                                TRAIN_EXPERT_FISHERMAN = 22,
-                                TRAIN_MASTER_BLACKSMITH = 23,
-                                TRAIN_EXPERT_FARMER = 24,
-                                TRAIN_MASTER_DISTILLER = 25,
-                                TRAIN_HARDY_PIONEER = 26,
-                                TRAIN_MASTER_TOBACCONIST = 27,
-                                TRAIN_MASTER_WEAVER = 28,
-                                TRAIN_JESUIT_MISSIONARY = 29,
-                                TRAIN_FIREBRAND_PREACHER = 30,
-                                TRAIN_ELDER_STATESMAN = 31,
-                                TRAIN_VETERAN_SOLDIER = 32;
+                                PURCHASE = 2,
+                                TRAIN = 3;
 
 
     private final Canvas  parent;
@@ -91,9 +62,9 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
     private final DocksPanel                docksPanel;
     private final CargoPanel                cargoPanel;
     private final MarketPanel               marketPanel;
-    private final RecruitPanel              recruitPanel;
-    private final PurchasePanel             purchasePanel;
-    private final TrainPanel                trainPanel;
+    private final RecruitDialog              recruitDialog;
+    private final PurchaseDialog             purchaseDialog;
+    private final TrainDialog                trainDialog;
     private final DefaultTransferHandler    defaultTransferHandler;
     private final MouseListener             pressListener;
 
@@ -123,9 +94,9 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         docksPanel = new DocksPanel(this);
         cargoPanel = new CargoPanel(this);
         marketPanel = new MarketPanel(this);
-        recruitPanel = new RecruitPanel(this);
-        purchasePanel = new PurchasePanel(this);
-        trainPanel = new TrainPanel(this);
+        recruitDialog = new RecruitDialog();
+        purchaseDialog = new PurchaseDialog();
+        trainDialog = new TrainDialog();
 
         toAmericaPanel.setBackground(Color.WHITE);
         toEuropePanel.setBackground(Color.WHITE);
@@ -505,248 +476,13 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     freeColClient.getInGameController().nextModelMessage();
                     break;
                 case RECRUIT:
-                    recruitPanel.initialize();
-                    recruitPanel.setLocation(getWidth() / 2 - recruitPanel.getWidth() / 2, getHeight() / 2 - recruitPanel.getHeight() / 2);
-                    add(recruitPanel, JLayeredPane.PALETTE_LAYER);
-                    recruitPanel.requestFocus();
-                    break;
-                case RECRUIT_CANCEL:
-                    remove(recruitPanel);
-                    revalidate();
-                    repaint(recruitPanel.getX(), recruitPanel.getY(), recruitPanel.getWidth(), recruitPanel.getHeight());
-                    requestFocus();
-                    break;
-                case RECRUIT_1:
-                    inGameController.recruitUnitInEurope(1);
-                    remove(recruitPanel);
-                    revalidate();
-                    repaint(recruitPanel.getX(), recruitPanel.getY(), recruitPanel.getWidth(), recruitPanel.getHeight());
-                    refreshBuyRecruit();
-                    requestFocus();
-                    break;
-                case RECRUIT_2:
-                    inGameController.recruitUnitInEurope(2);
-                    remove(recruitPanel);
-                    revalidate();
-                    repaint(recruitPanel.getX(), recruitPanel.getY(), recruitPanel.getWidth(), recruitPanel.getHeight());
-                    refreshBuyRecruit();
-                    requestFocus();
-                    break;
-                case RECRUIT_3:
-                    inGameController.recruitUnitInEurope(3);
-                    remove(recruitPanel);
-                    revalidate();
-                    repaint(recruitPanel.getX(), recruitPanel.getY(), recruitPanel.getWidth(), recruitPanel.getHeight());
-                    refreshBuyRecruit();
-                    requestFocus();
+                    showRecruitDialog();
                     break;
                 case PURCHASE:
-                    purchasePanel.initialize();
-                    purchasePanel.setLocation(getWidth() / 2 - purchasePanel.getWidth() / 2, getHeight() / 2 - purchasePanel.getHeight() / 2);
-                    add(purchasePanel, JLayeredPane.PALETTE_LAYER);
-                    purchasePanel.requestFocus();
-                    break;
-                case PURCHASE_CANCEL:
-                    remove(purchasePanel);
-                    revalidate();
-                    repaint(purchasePanel.getX(), purchasePanel.getY(), purchasePanel.getWidth(), purchasePanel.getHeight());
-                    requestFocus();
-                    break;
-                case PURCHASE_ARTILLERY:
-                    inGameController.purchaseUnitFromEurope(Unit.ARTILLERY);
-                    remove(purchasePanel);
-                    revalidate();
-                    repaint(purchasePanel.getX(), purchasePanel.getY(), purchasePanel.getWidth(), purchasePanel.getHeight());
-                    refreshBuyPurchase(Unit.ARTILLERY);
-                    requestFocus();
-                    break;
-                case PURCHASE_CARAVEL:
-                    inGameController.purchaseUnitFromEurope(Unit.CARAVEL);
-                    remove(purchasePanel);
-                    revalidate();
-                    repaint(purchasePanel.getX(), purchasePanel.getY(), purchasePanel.getWidth(), purchasePanel.getHeight());
-                    refreshBuyPurchase(Unit.CARAVEL);
-                    requestFocus();
-                    break;
-                case PURCHASE_MERCHANTMAN:
-                    inGameController.purchaseUnitFromEurope(Unit.MERCHANTMAN);
-                    remove(purchasePanel);
-                    revalidate();
-                    repaint(purchasePanel.getX(), purchasePanel.getY(), purchasePanel.getWidth(), purchasePanel.getHeight());
-                    refreshBuyPurchase(Unit.MERCHANTMAN);
-                    requestFocus();
-                    break;
-                case PURCHASE_GALLEON:
-                    inGameController.purchaseUnitFromEurope(Unit.GALLEON);
-                    remove(purchasePanel);
-                    revalidate();
-                    repaint(purchasePanel.getX(), purchasePanel.getY(), purchasePanel.getWidth(), purchasePanel.getHeight());
-                    refreshBuyPurchase(Unit.GALLEON);
-                    requestFocus();
-                    break;
-                case PURCHASE_PRIVATEER:
-                    inGameController.purchaseUnitFromEurope(Unit.PRIVATEER);
-                    remove(purchasePanel);
-                    revalidate();
-                    repaint(purchasePanel.getX(), purchasePanel.getY(), purchasePanel.getWidth(), purchasePanel.getHeight());
-                    refreshBuyPurchase(Unit.PRIVATEER);
-                    requestFocus();
-                    break;
-                case PURCHASE_FRIGATE:
-                    inGameController.purchaseUnitFromEurope(Unit.FRIGATE);
-                    remove(purchasePanel);
-                    revalidate();
-                    repaint(purchasePanel.getX(), purchasePanel.getY(), purchasePanel.getWidth(), purchasePanel.getHeight());
-                    refreshBuyPurchase(Unit.FRIGATE);
-                    requestFocus();
+                    showPurchaseDialog();
                     break;
                 case TRAIN:
-                    trainPanel.initialize();
-                    trainPanel.setLocation(getWidth() / 2 - trainPanel.getWidth() / 2, getHeight() / 2 - trainPanel.getHeight() / 2);
-                    add(trainPanel, JLayeredPane.PALETTE_LAYER);
-                    trainPanel.requestFocus();
-                    break;
-                case TRAIN_CANCEL:
-                    remove(trainPanel);
-                    revalidate();
-                    repaint(trainPanel.getX(), trainPanel.getY(), trainPanel.getWidth(), trainPanel.getHeight());
-                    requestFocus();
-                    break;
-                case TRAIN_EXPERT_ORE_MINER:
-                    inGameController.trainUnitInEurope(Unit.EXPERT_ORE_MINER);
-                    remove(trainPanel);
-                    revalidate();
-                    repaint(trainPanel.getX(), trainPanel.getY(), trainPanel.getWidth(), trainPanel.getHeight());
-                    refreshBuyRecruit();
-                    requestFocus();
-                    break;
-                case TRAIN_EXPERT_LUMBER_JACK:
-                    inGameController.trainUnitInEurope(Unit.EXPERT_LUMBER_JACK);
-                    remove(trainPanel);
-                    revalidate();
-                    repaint(trainPanel.getX(), trainPanel.getY(), trainPanel.getWidth(), trainPanel.getHeight());
-                    refreshBuyRecruit();
-                    requestFocus();
-                    break;
-                case TRAIN_MASTER_GUNSMITH:
-                    inGameController.trainUnitInEurope(Unit.MASTER_GUNSMITH);
-                    remove(trainPanel);
-                    revalidate();
-                    repaint(trainPanel.getX(), trainPanel.getY(), trainPanel.getWidth(), trainPanel.getHeight());
-                    refreshBuyRecruit();
-                    requestFocus();
-                    break;
-                case TRAIN_EXPERT_SILVER_MINER:
-                    inGameController.trainUnitInEurope(Unit.EXPERT_SILVER_MINER);
-                    remove(trainPanel);
-                    revalidate();
-                    repaint(trainPanel.getX(), trainPanel.getY(), trainPanel.getWidth(), trainPanel.getHeight());
-                    refreshBuyRecruit();
-                    requestFocus();
-                    break;
-                case TRAIN_MASTER_FUR_TRADER:
-                    inGameController.trainUnitInEurope(Unit.MASTER_FUR_TRADER);
-                    remove(trainPanel);
-                    revalidate();
-                    repaint(trainPanel.getX(), trainPanel.getY(), trainPanel.getWidth(), trainPanel.getHeight());
-                    refreshBuyRecruit();
-                    requestFocus();
-                    break;
-                case TRAIN_MASTER_CARPENTER:
-                    inGameController.trainUnitInEurope(Unit.MASTER_CARPENTER);
-                    remove(trainPanel);
-                    revalidate();
-                    repaint(trainPanel.getX(), trainPanel.getY(), trainPanel.getWidth(), trainPanel.getHeight());
-                    refreshBuyRecruit();
-                    requestFocus();
-                    break;
-                case TRAIN_EXPERT_FISHERMAN:
-                    inGameController.trainUnitInEurope(Unit.EXPERT_FISHERMAN);
-                    remove(trainPanel);
-                    revalidate();
-                    repaint(trainPanel.getX(), trainPanel.getY(), trainPanel.getWidth(), trainPanel.getHeight());
-                    refreshBuyRecruit();
-                    requestFocus();
-                    break;
-                case TRAIN_MASTER_BLACKSMITH:
-                    inGameController.trainUnitInEurope(Unit.MASTER_BLACKSMITH);
-                    remove(trainPanel);
-                    revalidate();
-                    repaint(trainPanel.getX(), trainPanel.getY(), trainPanel.getWidth(), trainPanel.getHeight());
-                    refreshBuyRecruit();
-                    requestFocus();
-                    break;
-                case TRAIN_EXPERT_FARMER:
-                    inGameController.trainUnitInEurope(Unit.EXPERT_FARMER);
-                    remove(trainPanel);
-                    revalidate();
-                    repaint(trainPanel.getX(), trainPanel.getY(), trainPanel.getWidth(), trainPanel.getHeight());
-                    refreshBuyRecruit();
-                    requestFocus();
-                    break;
-                case TRAIN_MASTER_DISTILLER:
-                    inGameController.trainUnitInEurope(Unit.MASTER_DISTILLER);
-                    remove(trainPanel);
-                    revalidate();
-                    repaint(trainPanel.getX(), trainPanel.getY(), trainPanel.getWidth(), trainPanel.getHeight());
-                    refreshBuyRecruit();
-                    requestFocus();
-                    break;
-                case TRAIN_HARDY_PIONEER:
-                    inGameController.trainUnitInEurope(Unit.HARDY_PIONEER);
-                    remove(trainPanel);
-                    revalidate();
-                    repaint(trainPanel.getX(), trainPanel.getY(), trainPanel.getWidth(), trainPanel.getHeight());
-                    refreshBuyRecruit();
-                    requestFocus();
-                    break;
-                case TRAIN_MASTER_TOBACCONIST:
-                    inGameController.trainUnitInEurope(Unit.MASTER_TOBACCONIST);
-                    remove(trainPanel);
-                    revalidate();
-                    repaint(trainPanel.getX(), trainPanel.getY(), trainPanel.getWidth(), trainPanel.getHeight());
-                    refreshBuyRecruit();
-                    requestFocus();
-                    break;
-                case TRAIN_MASTER_WEAVER:
-                    inGameController.trainUnitInEurope(Unit.MASTER_WEAVER);
-                    remove(trainPanel);
-                    revalidate();
-                    repaint(trainPanel.getX(), trainPanel.getY(), trainPanel.getWidth(), trainPanel.getHeight());
-                    refreshBuyRecruit();
-                    requestFocus();
-                    break;
-                case TRAIN_JESUIT_MISSIONARY:
-                    inGameController.trainUnitInEurope(Unit.JESUIT_MISSIONARY);
-                    remove(trainPanel);
-                    revalidate();
-                    repaint(trainPanel.getX(), trainPanel.getY(), trainPanel.getWidth(), trainPanel.getHeight());
-                    refreshBuyRecruit();
-                    requestFocus();
-                    break;
-                case TRAIN_FIREBRAND_PREACHER:
-                    inGameController.trainUnitInEurope(Unit.FIREBRAND_PREACHER);
-                    remove(trainPanel);
-                    revalidate();
-                    repaint(trainPanel.getX(), trainPanel.getY(), trainPanel.getWidth(), trainPanel.getHeight());
-                    refreshBuyRecruit();
-                    requestFocus();
-                    break;
-                case TRAIN_ELDER_STATESMAN:
-                    inGameController.trainUnitInEurope(Unit.ELDER_STATESMAN);
-                    remove(trainPanel);
-                    revalidate();
-                    repaint(trainPanel.getX(), trainPanel.getY(), trainPanel.getWidth(), trainPanel.getHeight());
-                    refreshBuyRecruit();
-                    requestFocus();
-                    break;
-                case TRAIN_VETERAN_SOLDIER:
-                    inGameController.trainUnitInEurope(Unit.VETERAN_SOLDIER);
-                    remove(trainPanel);
-                    revalidate();
-                    repaint(trainPanel.getX(), trainPanel.getY(), trainPanel.getWidth(), trainPanel.getHeight());
-                    refreshBuyRecruit();
-                    requestFocus();
+                    showTrainDialog();
                     break;
                 default:
                     logger.warning("Invalid action command");
@@ -1083,13 +819,13 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             europePanel.refresh();
             return comp;
         }
-        
+
 
         public void remove(Component comp) {
           // Don't remove the marketLabel.
         }
-        
-        
+
+
         public String getUIClassID() {
             return "MarketPanelUI";
         }
@@ -1111,10 +847,42 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
     }
 
 
+
+    /**
+    * Displays the <code>RecruitDialog</code>. Does not return from this
+    * method before the panel is closed.
+    */
+    public void showRecruitDialog() {
+        recruitDialog.initialize();
+        recruitDialog.setLocation(getWidth() / 2 - recruitDialog.getWidth() / 2, getHeight() / 2 - recruitDialog.getHeight() / 2);
+        add(recruitDialog, JLayeredPane.PALETTE_LAYER);
+
+        recruitDialog.requestFocus();
+
+
+        boolean response = recruitDialog.getResponseBoolean();
+
+        remove(recruitDialog);
+        revalidate();
+        repaint(recruitDialog.getX(), recruitDialog.getY(), recruitDialog.getWidth(), recruitDialog.getHeight());
+
+        if (response) {
+            refreshBuyRecruit();
+        }
+
+        requestFocus();
+    }
+
+
     /**
     * The panel that allows a user to recruit people in Europe.
     */
-    public final class RecruitPanel extends JPanel {
+    public final class RecruitDialog extends FreeColDialog implements ActionListener {
+        private static final int RECRUIT_CANCEL = 0,
+                                 RECRUIT_1 = 1,
+                                 RECRUIT_2 = 2,
+                                 RECRUIT_3 = 3;
+
         private final JLabel    price;
         private final JButton   person1,
                                 person2,
@@ -1125,13 +893,15 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         * The constructor to use.
         * @param actionListener The ActionListener for this panel's buttons.
         */
-        public RecruitPanel(ActionListener actionListener) {
+        public RecruitDialog() {
             setFocusCycleRoot(true);
+            ActionListener actionListener = this;
 
             JLabel  question = new JLabel("Click one of the following individuals to"),
                     question2 = new JLabel("recruit them."),
                     priceLabel = new JLabel("Their price:");
             cancel = new JButton("Cancel");
+            setCancelComponent(cancel);
 
             price = new JLabel();
             person1 = new JButton();
@@ -1193,7 +963,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         public void requestFocus() {
             cancel.requestFocus();
         }
-        
+
 
         /**
         * Updates this panel's labels so that the information it displays is up to date.
@@ -1218,16 +988,85 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                 }
             }
         }
+
+
+        /**
+        * Analyzes an event and calls the right external methods to take
+        * care of the user's request.
+        *
+        * @param event The incoming action event
+        */
+        public void actionPerformed(ActionEvent event) {
+            String command = event.getActionCommand();
+            try {
+                switch (Integer.valueOf(command).intValue()) {
+
+                case RECRUIT_CANCEL:
+                    setResponse(new Boolean(false));
+                    break;
+                case RECRUIT_1:
+                    inGameController.recruitUnitInEurope(1);
+                    setResponse(new Boolean(true));
+                    break;
+                case RECRUIT_2:
+                    inGameController.recruitUnitInEurope(2);
+                    setResponse(new Boolean(true));
+                    break;
+                case RECRUIT_3:
+                    inGameController.recruitUnitInEurope(3);
+                    setResponse(new Boolean(true));
+                    break;
+                default:
+                    logger.warning("Invalid action command");
+                    setResponse(new Boolean(false));
+                }
+            } catch (NumberFormatException e) {
+                logger.warning("Invalid action number");
+                setResponse(new Boolean(false));
+            }
+        }
     }
 
 
 
+    /**
+    * Displays the <code>PurchaseDialog</code>. Does not return from this
+    * method before the panel is closed.
+    */
+    public void showPurchaseDialog() {
+        purchaseDialog.initialize();
+        purchaseDialog.setLocation(getWidth() / 2 - purchaseDialog.getWidth() / 2, getHeight() / 2 - purchaseDialog.getHeight() / 2);
+        add(purchaseDialog, JLayeredPane.PALETTE_LAYER);
+
+        purchaseDialog.requestFocus();
+
+
+        int response = purchaseDialog.getResponseInt();
+
+        remove(purchaseDialog);
+        revalidate();
+        repaint(purchaseDialog.getX(), purchaseDialog.getY(), purchaseDialog.getWidth(), purchaseDialog.getHeight());
+
+        if (response > -1) {
+            refreshBuyPurchase(response);
+        }
+
+        requestFocus();
+    }
 
 
     /**
     * The panel that allows a user to purchase ships and artillery in Europe.
     */
-    public final class PurchasePanel extends JPanel {
+    public final class PurchaseDialog extends FreeColDialog implements ActionListener {
+        private static final int PURCHASE_CANCEL = 0,
+                                 PURCHASE_ARTILLERY = 1,
+                                 PURCHASE_CARAVEL = 2,
+                                 PURCHASE_MERCHANTMAN = 3,
+                                 PURCHASE_GALLEON = 4,
+                                 PURCHASE_PRIVATEER = 5,
+                                 PURCHASE_FRIGATE = 6;
+
         private JButton   artilleryButton,
                                 caravelButton,
                                 merchantmanButton,
@@ -1241,8 +1080,9 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         * The constructor to use.
         * @param actionListener The ActionListener for this panel's buttons.
         */
-        public PurchasePanel(ActionListener actionListener) {
+        public PurchaseDialog() {
             setFocusCycleRoot(true);
+            ActionListener actionListener = this;
 
             JLabel  question = new JLabel("Click one of the following items to"),
                     question2 = new JLabel("purchase them."),
@@ -1252,6 +1092,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     privateerLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.PRIVATEER))),
                     frigateLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.FRIGATE)));
             cancel = new JButton("Cancel");
+            setCancelComponent(cancel);
 
             artilleryButton = new JButton(Unit.getName(Unit.ARTILLERY));
             caravelButton = new JButton(Unit.getName(Unit.CARAVEL));
@@ -1386,16 +1227,109 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                 }
             }
         }
+
+
+        /**
+        * Analyzes an event and calls the right external methods to take
+        * care of the user's request.
+        *
+        * @param event The incoming action event
+        */
+        public void actionPerformed(ActionEvent event) {
+            String command = event.getActionCommand();
+            try {
+                switch (Integer.valueOf(command).intValue()) {
+
+                case PURCHASE_CANCEL:
+                    setResponse(new Integer(-1));
+                    break;
+                case PURCHASE_ARTILLERY:
+                    inGameController.purchaseUnitFromEurope(Unit.ARTILLERY);
+                    setResponse(new Integer(Unit.ARTILLERY));
+                    break;
+                case PURCHASE_CARAVEL:
+                    inGameController.purchaseUnitFromEurope(Unit.CARAVEL);
+                    setResponse(new Integer(Unit.CARAVEL));
+                    break;
+                case PURCHASE_MERCHANTMAN:
+                    inGameController.purchaseUnitFromEurope(Unit.MERCHANTMAN);
+                    setResponse(new Integer(Unit.MERCHANTMAN));
+                    break;
+                case PURCHASE_GALLEON:
+                    inGameController.purchaseUnitFromEurope(Unit.GALLEON);
+                    setResponse(new Integer(Unit.GALLEON));
+                    break;
+                case PURCHASE_PRIVATEER:
+                    inGameController.purchaseUnitFromEurope(Unit.PRIVATEER);
+                    setResponse(new Integer(Unit.PRIVATEER));
+                    break;
+                case PURCHASE_FRIGATE:
+                    inGameController.purchaseUnitFromEurope(Unit.FRIGATE);
+                    setResponse(new Integer(Unit.FRIGATE));
+                    break;
+                default:
+                    logger.warning("Invalid action command");
+                    setResponse(new Integer(-1));
+                }
+            } catch (NumberFormatException e) {
+                logger.warning("Invalid action number");
+                setResponse(new Integer(-1));
+            }
+        }
     }
 
 
 
+    /**
+    * Displays the <code>TrainDialog</code>. Does not return from this
+    * method before the panel is closed.
+    */
+    public void showTrainDialog() {
+        trainDialog.initialize();
+        trainDialog.setLocation(getWidth() / 2 - trainDialog.getWidth() / 2, getHeight() / 2 - trainDialog.getHeight() / 2);
+        add(trainDialog, JLayeredPane.PALETTE_LAYER);
+
+        trainDialog.requestFocus();
+
+
+        boolean response = trainDialog.getResponseBoolean();
+
+        remove(trainDialog);
+        revalidate();
+        repaint(trainDialog.getX(), trainDialog.getY(), trainDialog.getWidth(), trainDialog.getHeight());
+
+        if (response) {
+            refreshBuyRecruit();
+        }
+
+        requestFocus();
+    }
 
 
     /**
     * The panel that allows a user to train people in Europe.
     */
-    public final class TrainPanel extends JPanel {
+    public final class TrainDialog extends FreeColDialog implements ActionListener{
+
+        private static final int TRAIN_CANCEL = 0,
+                                 TRAIN_EXPERT_ORE_MINER = 1,
+                                 TRAIN_EXPERT_LUMBER_JACK = 2,
+                                 TRAIN_MASTER_GUNSMITH = 3,
+                                 TRAIN_EXPERT_SILVER_MINER = 4,
+                                 TRAIN_MASTER_FUR_TRADER = 5,
+                                 TRAIN_MASTER_CARPENTER = 6,
+                                 TRAIN_EXPERT_FISHERMAN = 7,
+                                 TRAIN_MASTER_BLACKSMITH = 8,
+                                 TRAIN_EXPERT_FARMER = 9,
+                                 TRAIN_MASTER_DISTILLER = 10,
+                                 TRAIN_HARDY_PIONEER = 11,
+                                 TRAIN_MASTER_TOBACCONIST = 12,
+                                 TRAIN_MASTER_WEAVER = 13,
+                                 TRAIN_JESUIT_MISSIONARY = 14,
+                                 TRAIN_FIREBRAND_PREACHER = 15,
+                                 TRAIN_ELDER_STATESMAN = 16,
+                                 TRAIN_VETERAN_SOLDIER = 17;
+
         private JButton   expertOreMinerButton,
                           expertLumberJackButton,
                           masterGunsmithButton,
@@ -1421,8 +1355,10 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         * The constructor to use.
         * @param actionListener The ActionListener for this panel's buttons.
         */
-        public TrainPanel(ActionListener actionListener) {
+        public TrainDialog() {
             setFocusCycleRoot(true);
+
+            ActionListener actionListener = this;
 
             JLabel  question = new JLabel("Click one of the following individuals to"),
                     question2 = new JLabel("train them."),
@@ -1444,6 +1380,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     elderStatesmanLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.ELDER_STATESMAN))),
                     veteranSoldierLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.VETERAN_SOLDIER)));
             cancel = new JButton("Cancel");
+            setCancelComponent(cancel);
 
             expertOreMinerButton = new JButton(Unit.getName(Unit.EXPERT_ORE_MINER));
             expertLumberJackButton = new JButton(Unit.getName(Unit.EXPERT_LUMBER_JACK));
@@ -1640,125 +1577,199 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
 
                 if (Unit.getPrice(Unit.EXPERT_ORE_MINER) > gameOwner.getGold()) {
                     expertOreMinerButton.setEnabled(false);
-                }
-                else {
+                } else {
                     expertOreMinerButton.setEnabled(true);
                 }
 
                 if (Unit.getPrice(Unit.EXPERT_LUMBER_JACK) > gameOwner.getGold()) {
                     expertLumberJackButton.setEnabled(false);
-                }
-                else {
+                } else {
                     expertLumberJackButton.setEnabled(true);
                 }
 
                 if (Unit.getPrice(Unit.MASTER_GUNSMITH) > gameOwner.getGold()) {
                     masterGunsmithButton.setEnabled(false);
-                }
-                else {
+                } else {
                     masterGunsmithButton.setEnabled(true);
                 }
 
                 if (Unit.getPrice(Unit.EXPERT_SILVER_MINER) > gameOwner.getGold()) {
                     expertSilverMinerButton.setEnabled(false);
-                }
-                else {
+                } else {
                     expertSilverMinerButton.setEnabled(true);
                 }
 
                 if (Unit.getPrice(Unit.MASTER_FUR_TRADER) > gameOwner.getGold()) {
                     masterFurTraderButton.setEnabled(false);
-                }
-                else {
+                } else {
                     masterFurTraderButton.setEnabled(true);
                 }
 
                 if (Unit.getPrice(Unit.MASTER_CARPENTER) > gameOwner.getGold()) {
                     masterCarpenterButton.setEnabled(false);
-                }
-                else {
+                } else {
                     masterCarpenterButton.setEnabled(true);
                 }
 
                 if (Unit.getPrice(Unit.EXPERT_FISHERMAN) > gameOwner.getGold()) {
                     expertFishermanButton.setEnabled(false);
-                }
-                else {
+                } else {
                     expertFishermanButton.setEnabled(true);
                 }
 
                 if (Unit.getPrice(Unit.MASTER_BLACKSMITH) > gameOwner.getGold()) {
                     masterBlacksmithButton.setEnabled(false);
-                }
-                else {
+                } else {
                     masterBlacksmithButton.setEnabled(true);
                 }
 
                 if (Unit.getPrice(Unit.EXPERT_FARMER) > gameOwner.getGold()) {
                     expertFarmerButton.setEnabled(false);
-                }
-                else {
+                } else {
                     expertFarmerButton.setEnabled(true);
                 }
 
                 if (Unit.getPrice(Unit.MASTER_DISTILLER) > gameOwner.getGold()) {
                     masterDistillerButton.setEnabled(false);
-                }
-                else {
+                } else {
                     masterDistillerButton.setEnabled(true);
                 }
 
                 if (Unit.getPrice(Unit.HARDY_PIONEER) > gameOwner.getGold()) {
                     hardyPioneerButton.setEnabled(false);
-                }
-                else {
+                } else {
                     hardyPioneerButton.setEnabled(true);
                 }
 
                 if (Unit.getPrice(Unit.MASTER_TOBACCONIST) > gameOwner.getGold()) {
                     masterTobacconistButton.setEnabled(false);
-                }
-                else {
+                } else {
                     masterTobacconistButton.setEnabled(true);
                 }
 
                 if (Unit.getPrice(Unit.MASTER_WEAVER) > gameOwner.getGold()) {
                     masterWeaverButton.setEnabled(false);
-                }
-                else {
+                } else {
                     masterWeaverButton.setEnabled(true);
                 }
 
                 if (Unit.getPrice(Unit.JESUIT_MISSIONARY) > gameOwner.getGold()) {
                     jesuitMissionaryButton.setEnabled(false);
-                }
-                else {
+                } else {
                     jesuitMissionaryButton.setEnabled(true);
                 }
 
                 if (Unit.getPrice(Unit.FIREBRAND_PREACHER) > gameOwner.getGold()) {
                     firebrandPreacherButton.setEnabled(false);
-                }
-                else {
+                } else {
                     firebrandPreacherButton.setEnabled(true);
                 }
 
                 if (Unit.getPrice(Unit.ELDER_STATESMAN) > gameOwner.getGold()) {
                     elderStatesmanButton.setEnabled(false);
-                }
-                else {
+                } else {
                     elderStatesmanButton.setEnabled(true);
                 }
 
                 if (Unit.getPrice(Unit.VETERAN_SOLDIER) > gameOwner.getGold()) {
                     veteranSoldierButton.setEnabled(false);
-                }
-                else {
+                } else {
                     veteranSoldierButton.setEnabled(true);
                 }
             }
         }
-    }
 
+
+
+        /**
+        * Analyzes an event and calls the right external methods to take
+        * care of the user's request.
+        *
+        * @param event The incoming action event
+        */
+        public void actionPerformed(ActionEvent event) {
+            String command = event.getActionCommand();
+            try {
+                switch (Integer.valueOf(command).intValue()) {
+                    case TRAIN_CANCEL:
+                        setResponse(new Boolean(false));
+                        break;
+                    case TRAIN_EXPERT_ORE_MINER:
+                        inGameController.trainUnitInEurope(Unit.EXPERT_ORE_MINER);
+                        setResponse(new Boolean(true));
+                        break;
+                    case TRAIN_EXPERT_LUMBER_JACK:
+                        inGameController.trainUnitInEurope(Unit.EXPERT_LUMBER_JACK);
+                        setResponse(new Boolean(true));                        break;
+                    case TRAIN_MASTER_GUNSMITH:
+                        inGameController.trainUnitInEurope(Unit.MASTER_GUNSMITH);
+                        setResponse(new Boolean(true));
+                        break;
+                    case TRAIN_EXPERT_SILVER_MINER:
+                        inGameController.trainUnitInEurope(Unit.EXPERT_SILVER_MINER);
+                        setResponse(new Boolean(true));
+                        break;
+                    case TRAIN_MASTER_FUR_TRADER:
+                        inGameController.trainUnitInEurope(Unit.MASTER_FUR_TRADER);
+                        setResponse(new Boolean(true));
+                        break;
+                    case TRAIN_MASTER_CARPENTER:
+                        inGameController.trainUnitInEurope(Unit.MASTER_CARPENTER);
+                        setResponse(new Boolean(true));
+                        break;
+                    case TRAIN_EXPERT_FISHERMAN:
+                        inGameController.trainUnitInEurope(Unit.EXPERT_FISHERMAN);
+                        setResponse(new Boolean(true));
+                        break;
+                    case TRAIN_MASTER_BLACKSMITH:
+                        inGameController.trainUnitInEurope(Unit.MASTER_BLACKSMITH);
+                        setResponse(new Boolean(true));
+                        break;
+                    case TRAIN_EXPERT_FARMER:
+                        inGameController.trainUnitInEurope(Unit.EXPERT_FARMER);
+                        setResponse(new Boolean(true));
+                        break;
+                    case TRAIN_MASTER_DISTILLER:
+                        inGameController.trainUnitInEurope(Unit.MASTER_DISTILLER);
+                        setResponse(new Boolean(true));
+                        break;
+                    case TRAIN_HARDY_PIONEER:
+                        inGameController.trainUnitInEurope(Unit.HARDY_PIONEER);
+                        setResponse(new Boolean(true));
+                        break;
+                    case TRAIN_MASTER_TOBACCONIST:
+                        inGameController.trainUnitInEurope(Unit.MASTER_TOBACCONIST);
+                        setResponse(new Boolean(true));
+                        break;
+                    case TRAIN_MASTER_WEAVER:
+                        inGameController.trainUnitInEurope(Unit.MASTER_WEAVER);
+                        setResponse(new Boolean(true));
+                        break;
+                    case TRAIN_JESUIT_MISSIONARY:
+                        inGameController.trainUnitInEurope(Unit.JESUIT_MISSIONARY);
+                        setResponse(new Boolean(true));
+                        break;
+                    case TRAIN_FIREBRAND_PREACHER:
+                        inGameController.trainUnitInEurope(Unit.FIREBRAND_PREACHER);
+                        setResponse(new Boolean(true));
+                        break;
+                    case TRAIN_ELDER_STATESMAN:
+                        inGameController.trainUnitInEurope(Unit.ELDER_STATESMAN);
+                        setResponse(new Boolean(true));
+                        break;
+                    case TRAIN_VETERAN_SOLDIER:
+                        inGameController.trainUnitInEurope(Unit.VETERAN_SOLDIER);
+                        setResponse(new Boolean(true));
+                        break;
+                    default:
+                        logger.warning("Invalid action command");
+                        setResponse(new Boolean(false));
+                }
+            } catch (NumberFormatException e) {
+                logger.warning("Invalid action number");
+                setResponse(new Boolean(false));
+            }
+        }
+    }
 
 }
