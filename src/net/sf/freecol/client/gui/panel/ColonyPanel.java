@@ -511,6 +511,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         * @param colonyPanel The panel that holds this BuildingsPanel.
         */
         public BuildingsPanel(ColonyPanel colonyPanel) {
+            super(new GridLayout(0, 1));
             this.colonyPanel = colonyPanel;
         }
 
@@ -520,19 +521,13 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         */
         public void initialize() {
             removeAll();
-            // O row means any number of rows (this makes the look of BuildingsPanel prettier)
-            setLayout(new GridLayout(0, 1));
 
-            //Building[] buildings = colony.getBuildings();
-
-            int displayedBuildings = 0;
             ASingleBuildingPanel aSingleBuildingPanel;
 
             Iterator buildingIterator = colony.getBuildingIterator();
             while (buildingIterator.hasNext()) {
                 Building building = (Building) buildingIterator.next();
                 if (building.isBuilt()) {
-                    displayedBuildings++;
                     aSingleBuildingPanel = new ASingleBuildingPanel(building);
                     aSingleBuildingPanel.addMouseListener(releaseListener);
                     aSingleBuildingPanel.setTransferHandler(defaultTransferHandler);
@@ -682,19 +677,22 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             final int crosses = colony.getProductionOf(Goods.CROSSES);
 
             ImageIcon goodsIcon = parent.getImageProvider().getGoodsImageIcon(Goods.FOOD);
+            BufferedImage productionImage;
+            int nextX = 0;
             int add;
 
             // Food production:
-            int nextX = (need > 12) ? goodsIcon.getIconWidth() : Math.min(need, 4) * goodsIcon.getIconWidth();
-            BufferedImage productionImage;
-            if (horses == 0) {
-                productionImage = parent.getGUI().createProductionImage(goodsIcon, need, nextX, getHeight(), 12);
-            } else {
-                nextX = goodsIcon.getIconWidth();
-                productionImage = parent.getGUI().createProductionImage(goodsIcon, need, nextX, getHeight(), 1);
+            if (need != 0) {
+                nextX = (need > 12) ? goodsIcon.getIconWidth() : Math.min(need, 4) * goodsIcon.getIconWidth();
+                if (horses == 0) {
+                    productionImage = parent.getGUI().createProductionImage(goodsIcon, need, nextX, getHeight(), 12);
+                } else {
+                    nextX = goodsIcon.getIconWidth();
+                    productionImage = parent.getGUI().createProductionImage(goodsIcon, need, nextX, getHeight(), 1);
+                }
+                g.drawImage(productionImage, 0, 0, null);
+                nextX += goodsIcon.getIconWidth()/4;
             }
-            g.drawImage(productionImage, 0, 0, null);
-            nextX += goodsIcon.getIconWidth()/4;
 
             // Food surplus:
             if (surplus != 0) {
@@ -725,27 +723,31 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             }
 
             // Liberty bells:
-            goodsIcon = parent.getImageProvider().getGoodsImageIcon(Goods.BELLS);
-            if (bells > 6 || bells == 1) {
-                productionImage = parent.getGUI().createProductionImage(goodsIcon, bells, goodsIcon.getIconWidth(), getHeight(), 6);
-                add = goodsIcon.getIconWidth();
-            } else {
-                productionImage = parent.getGUI().createProductionImage(goodsIcon, bells, goodsIcon.getIconWidth() * 2, getHeight(), 6);
-                add = goodsIcon.getIconWidth()*2;
+            if (bells != 0) {
+                goodsIcon = parent.getImageProvider().getGoodsImageIcon(Goods.BELLS);
+                if (bells > 6 || bells == 1) {
+                    productionImage = parent.getGUI().createProductionImage(goodsIcon, bells, goodsIcon.getIconWidth(), getHeight(), 6);
+                    add = goodsIcon.getIconWidth();
+                } else {
+                    productionImage = parent.getGUI().createProductionImage(goodsIcon, bells, goodsIcon.getIconWidth() * 2, getHeight(), 6);
+                    add = goodsIcon.getIconWidth()*2;
+                }
+                g.drawImage(productionImage, nextX, 0, null);
+                nextX += productionImage.getWidth()/4 + add;
             }
-            g.drawImage(productionImage, nextX, 0, null);
-            nextX += productionImage.getWidth()/4 + add;
             
             // Crosses:
-            goodsIcon = parent.getImageProvider().getGoodsImageIcon(Goods.CROSSES);
-            if (crosses > 6 || crosses == 1) {
-                productionImage = parent.getGUI().createProductionImage(goodsIcon, crosses, goodsIcon.getIconWidth(), getHeight(), 6);
-                add = goodsIcon.getIconWidth();
-            } else {
-                productionImage = parent.getGUI().createProductionImage(goodsIcon, crosses, goodsIcon.getIconWidth() * 2, getHeight(), 6);
-                add = goodsIcon.getIconWidth()*2;
+            if (crosses != 0) {
+                goodsIcon = parent.getImageProvider().getGoodsImageIcon(Goods.CROSSES);
+                if (crosses > 6 || crosses == 1) {
+                    productionImage = parent.getGUI().createProductionImage(goodsIcon, crosses, goodsIcon.getIconWidth(), getHeight(), 6);
+                    add = goodsIcon.getIconWidth();
+                } else {
+                    productionImage = parent.getGUI().createProductionImage(goodsIcon, crosses, goodsIcon.getIconWidth() * 2, getHeight(), 6);
+                    add = goodsIcon.getIconWidth()*2;
+                }
+                g.drawImage(productionImage, nextX, 0, null);
             }
-            g.drawImage(productionImage, nextX, 0, null);
         }
     }
 
@@ -867,10 +869,11 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                     ((GoodsLabel) comp).setSmall(false);
                     //inGameController.unloadCargo(g, selectedUnit.getUnit());
                     //colonyPanel.getWarehousePanel().revalidate();
-                    colonyPanel.getCargoPanel().revalidate();
-                    updateCargoLabel();
-                    buildingsPanel.initialize();
-                    initialize();
+                    //colonyPanel.getCargoPanel().revalidate();
+                    //updateCargoLabel();
+                    //buildingsPanel.initialize();
+                    //initialize();
+                    reinitialize();
                     return comp;
                 } else {
                     logger.warning("An invalid component got dropped on this WarehousePanel.");
@@ -955,7 +958,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                           oldParent.add(comp);
                           return null;
                       }
-                      
+
                       ((UnitLabel) comp).setSmall(false);
                       if (inGameController.boardShip(unit, selectedUnit.getUnit())) {
                         updateBuildingBox();
@@ -976,7 +979,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                         g.setAmount(g.getAmount() - 100);
                         g = new Goods(game, g.getLocation(), g.getType(), 100);
                         g.setAmount(100);
-                        
+
                         //enough space ?
                         if(!selectedUnit.getUnit().canAdd(g)) {
                             return null;
@@ -999,8 +1002,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                     selectedUnit = null;
                     setSelectedUnit(t);
 
-                    warehousePanel.initialize();
-                    buildingsPanel.initialize();
+                    reinitialize();
 
                     return comp;
                 } else {
