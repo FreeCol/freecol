@@ -25,6 +25,9 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
                                SECONDARY_1 = new Color(10, 10, 10),
                                DISABLED_COLOR = new Color(166, 144, 95),
                                BG_COLOR = new Color(216, 194, 145);
+                               
+                               
+
 
     /**
      * Initiates a new "FreeCol Look and Feel".
@@ -35,6 +38,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
         this("");
     }
     
+
    /**
     * Initiates a new "FreeCol Look and Feel".
     *
@@ -46,13 +50,20 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
         
         if(dataFolder.equals("")) { // lookup is necessary
             URL uiDir = resourceLocator.getResource("data/images/ui");
-            if(uiDir == null)
-                throw new FreeColException("ui directory not found !");
-        }
-        else {
+            
+            if(uiDir == null) {
+                uiDirectory = new File("data" + System.getProperty("file.separator") + "images" + System.getProperty("file.separator") + "ui");            
+                
+                if(!uiDirectory.exists() || !uiDirectory.isDirectory()) {
+                    throw new FreeColException("UI directory not found!");
+                }
+            }
+        } else {
             uiDirectory = new File(dataFolder + "images" + System.getProperty("file.separator") + "ui");
-            if(!uiDirectory.exists() || !uiDirectory.isDirectory())
-                throw new FreeColException("ui directory not found !");
+
+            if(!uiDirectory.exists() || !uiDirectory.isDirectory()) {
+                throw new FreeColException("UI directory not found in: " + uiDirectory.getName());
+            }
         }
         
         setCurrentTheme(new DefaultMetalTheme() {
@@ -82,6 +93,9 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
         });
     }
 
+
+    
+    
    /**
     * Creates the look and feel specific defaults table.
     * @return The defaults table.
@@ -152,9 +166,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
                 if (file.exists()) {
                     u.put("VictoryImage", new ImageIcon(file.toString()));
                 }
-            }
-            
-            else {
+            } else {
                 URL url;
                 String uiFolder = "data/images/ui/";
                 

@@ -116,11 +116,9 @@ public final class FreeCol {
         } else {
             try {
                 UIManager.setLookAndFeel(new FreeColLookAndFeel(dataFolder));
-            }
-            catch (UnsupportedLookAndFeelException e) {
+            } catch (UnsupportedLookAndFeelException e) {
                 logger.warning("Could not load the \"FreeCol Look and Feel\"");
-            }
-            catch (FreeColException e) {
+            } catch (FreeColException e) {
                 e.printStackTrace();
                 System.out.println("\nThe data files could not be found by FreeCol. Please make sure");
                 System.out.println("they are present. If FreeCol is looking in the wrong directory");
@@ -129,13 +127,6 @@ public final class FreeCol {
                 printUsage();
                 return;
             }
-
-            /*
-            JFrame statusFrame = new JFrame("Loading FreeCol...");
-            statusFrame.getContentPane().add(new JLabel("Please wait: Loading FreeCol."));
-            statusFrame.pack();
-            statusFrame.setVisible(true);
-            */
 
             // TODO: don't use same datafolder for both images and music because the images are best kept inside the .JAR file.
 

@@ -276,6 +276,29 @@ public final class ImageLibrary extends ImageProvider {
     }
 
     /**
+    * Finds the image file in the given <code>filePath</code>.
+    *
+    * @doLookup If <i>true</i> then the <code>resourceLocator</code>
+    *           is used when searching for the image file.
+    * @return An ImageIcon with data loaded from the image file.
+    */
+    private ImageIcon findImage(String filePath, Class resourceLocator, boolean doLookup) throws FreeColException {
+        if (doLookup) {
+            URL url = resourceLocator.getResource(filePath);
+            if (url != null) {
+                return new ImageIcon(url);
+            }
+        }
+
+        File tmpFile = new File(filePath);
+        if ((tmpFile == null) || !tmpFile.exists() || !tmpFile.isFile() || !tmpFile.canRead()) {
+            throw new FreeColException("The data file \"" + filePath + "\" could not be found.");
+        }
+        
+        return new ImageIcon(filePath);
+    }
+
+    /**
      * Loads the unit-images from file into memory.
      * @param gc The GraphicsConfiguration is needed to create images that are compatible with the
      * local environment.
@@ -291,21 +314,7 @@ public final class ImageLibrary extends ImageProvider {
 
         for (int i = 0; i < UNIT_GRAPHICS_COUNT; i++) {
             String filePath = dataDirectory + path + unitsDirectory + unitsName + i + extension;
-            ImageIcon tempImage;
-            if (doLookup) {
-                URL url = resourceLocator.getResource(filePath);
-                if (url == null) {
-                    throw new FreeColException("The data file \"" + filePath + "\" could not be found.");
-                }
-                tempImage = new ImageIcon(url);
-            } else {
-                File tmpFile = new File(filePath);
-                if ((tmpFile == null) || !tmpFile.exists() || !tmpFile.isFile() || !tmpFile.canRead()) {
-                    throw new FreeColException("The data file \"" + filePath + "\" could not be found.");
-                }
-                tempImage = new ImageIcon(filePath);
-            }
-            units.add(tempImage);
+            units.add(findImage(filePath, resourceLocator, doLookup));
         }
 
         /*
@@ -356,38 +365,11 @@ public final class ImageLibrary extends ImageProvider {
             for (char c = 'a'; c <= lastChar; c++) {
                 String filePath = dataDirectory + path + terrainDirectory + terrainName + numberString + "/"
                     + terrainName + numberString + c + "0" + extension;
-                ImageIcon tempImage;
-                if (doLookup) {
-                    URL url = resourceLocator.getResource(filePath);
-                    if (url == null) {
-                        throw new FreeColException("The data file \"" + filePath + "\" could not be found.");
-                    }
-                    tempImage = new ImageIcon(url);
-                } else {
-                    File tmpFile = new File(filePath);
-                    if ((tmpFile == null) || !tmpFile.exists() || !tmpFile.isFile() || !tmpFile.canRead()) {
-                        throw new FreeColException("The data file \"" + filePath + "\" could not be found.");
-                    }
-                    tempImage = new ImageIcon(filePath);
-                }
-                tempVector1.add(tempImage);
+                tempVector1.add(findImage(filePath, resourceLocator, doLookup));
 
                 filePath = dataDirectory + path + terrainDirectory + terrainName + numberString + "/"
                     + terrainName + numberString + c + "1" + extension;
-                if (doLookup) {
-                    URL url = resourceLocator.getResource(filePath);
-                    if (url == null) {
-                        throw new FreeColException("The data file \"" + filePath + "\" could not be found.");
-                    }
-                    tempImage = new ImageIcon(url);
-                } else {
-                    File tmpFile = new File(filePath);
-                    if ((tmpFile == null) || !tmpFile.exists() || !tmpFile.isFile() || !tmpFile.canRead()) {
-                        throw new FreeColException("The data file \"" + filePath + "\" could not be found.");
-                    }
-                    tempImage = new ImageIcon(filePath);
-                }
-                tempVector2.add(tempImage);
+                tempVector2.add(findImage(filePath, resourceLocator, doLookup));
             }
 
             terrain1.add(tempVector1);
@@ -411,21 +393,7 @@ public final class ImageLibrary extends ImageProvider {
 
         for (int i = 0; i < MISC_COUNT; i++) {
             String filePath = dataDirectory + path + miscDirectory + miscName + i + extension;
-            ImageIcon tempImage;
-            if (doLookup) {
-                URL url = resourceLocator.getResource(filePath);
-                if (url == null) {
-                    throw new FreeColException("The data file \"" + filePath + "\" could not be found.");
-                }
-                tempImage = new ImageIcon(url);
-            } else {
-                File tmpFile = new File(filePath);
-                if ((tmpFile == null) || !tmpFile.exists() || !tmpFile.isFile() || !tmpFile.canRead()) {
-                    throw new FreeColException("The data file \"" + filePath + "\" could not be found.");
-                }
-                tempImage = new ImageIcon(filePath);
-            }
-            misc.add(tempImage);
+            misc.add(findImage(filePath, resourceLocator, doLookup));
         }
     }
 
@@ -467,22 +435,7 @@ public final class ImageLibrary extends ImageProvider {
             }
             for(int j = 0; j < UNIT_BUTTON_COUNT; j++) {
                 String filePath = dataDirectory + path + unitButtonDirectory + subDirectory + unitButtonName + j + extension;
-                ImageIcon tempImage;
-                if (doLookup) {
-                    URL url = resourceLocator.getResource(filePath);
-                    if (url == null) {
-                        throw new FreeColException("The data file \"" + filePath + "\" could not be fonud.");
-                    }
-                    tempImage = new ImageIcon(url);
-                }
-                else {
-                    File tmpFile = new File(filePath);
-                    if ((tmpFile == null) || !tmpFile.exists() || !tmpFile.isFile() || !tmpFile.canRead()) {
-                        throw new FreeColException("The data file \"" + filePath + "\" could not be found.");
-                    }
-                    tempImage = new ImageIcon(filePath);
-                }
-                unitButtons[i].add(tempImage);
+                unitButtons[i].add(findImage(filePath, resourceLocator, doLookup));
             }
         }
     }
@@ -503,22 +456,7 @@ public final class ImageLibrary extends ImageProvider {
 
         for(int i = 0; i < COLONY_COUNT; i++) {
             String filePath = dataDirectory + path + colonyDirectory + colonyName + i + extension;
-            ImageIcon tempImage;
-            if (doLookup) {
-                URL url = resourceLocator.getResource(filePath);
-                if (url == null) {
-                    throw new FreeColException("The data file \"" + filePath + "\" could not be fonud.");
-                }
-                tempImage = new ImageIcon(url);
-            }
-            else {
-                File tmpFile = new File(filePath);
-                if ((tmpFile == null) || !tmpFile.exists() || !tmpFile.isFile() || !tmpFile.canRead()) {
-                    throw new FreeColException("The data file \"" + filePath + "\" could not be found.");
-                }
-                tempImage = new ImageIcon(filePath);
-            }
-            colonies.add(tempImage);
+            colonies.add(findImage(filePath, resourceLocator, doLookup));
         }
     }
 
@@ -538,22 +476,7 @@ public final class ImageLibrary extends ImageProvider {
 
         for(int i = 0; i < INDIAN_COUNT; i++) {
             String filePath = dataDirectory + path + indianDirectory + indianName + i + extension;
-            ImageIcon tempImage;
-            if (doLookup) {
-                URL url = resourceLocator.getResource(filePath);
-                if (url == null) {
-                    throw new FreeColException("The data file \"" + filePath + "\" could not be fonud.");
-                }
-                tempImage = new ImageIcon(url);
-            }
-            else {
-                File tmpFile = new File(filePath);
-                if ((tmpFile == null) || !tmpFile.exists() || !tmpFile.isFile() || !tmpFile.canRead()) {
-                    throw new FreeColException("The data file \"" + filePath + "\" could not be found.");
-                }
-                tempImage = new ImageIcon(filePath);
-            }
-            indians.add(tempImage);
+            indians.add(findImage(filePath, resourceLocator, doLookup));
         }
     }
 
@@ -573,21 +496,7 @@ public final class ImageLibrary extends ImageProvider {
 
         for (int i = 0; i < GOODS_COUNT; i++) {
             String filePath = dataDirectory + path + goodsDirectory + goodsName + i + extension;
-            ImageIcon tempImage;
-            if (doLookup) {
-                URL url = resourceLocator.getResource(filePath);
-                if (url == null) {
-                    throw new FreeColException("The data file \"" + filePath + "\" could not be found.");
-                }
-                tempImage = new ImageIcon(url);
-            } else {
-                File tmpFile = new File(filePath);
-                if ((tmpFile == null) || !tmpFile.exists() || !tmpFile.isFile() || !tmpFile.canRead()) {
-                    throw new FreeColException("The data file \"" + filePath + "\" could not be found.");
-                }
-                tempImage = new ImageIcon(filePath);
-            }
-            goods.add(tempImage);
+            goods.add(findImage(filePath, resourceLocator, doLookup));
         }
 
         /*
