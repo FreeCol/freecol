@@ -190,6 +190,15 @@ abstract public class FreeColGameObject {
         }
     }
 
+    
+    /**
+    * Returns a string representation of the object.
+    * @return The <code>String</code>
+    */
+    public String toString() {
+        return getClass().getName() + ": " + getID() + " (hash code: " + Integer.toHexString(hashCode()) + ")";
+    }
+
 
     /**
     * Convenience method: returns the first child element with the
@@ -208,4 +217,5 @@ abstract public class FreeColGameObject {
 
         return null;
     }
+
 }

@@ -524,14 +524,18 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     */
     public void add(Locatable locatable) {
         if (isCarrier()) {
-            if (getSpaceLeft() <= 0) {
-                throw new IllegalStateException();
-            }
 
             if (locatable instanceof Unit) {
+                if (getSpaceLeft() <= 0) {
+                    throw new IllegalStateException();
+                }
+
                 unitContainer.addUnit((Unit) locatable);
             } else if (locatable instanceof Goods) {
                 goodsContainer.addGoods((Goods) locatable);
+                if (getSpaceLeft() < 0) {
+                    throw new IllegalStateException();
+                }
             } else {
                 logger.warning("Tried to add an unrecognized 'Locatable' to a unit.");
             }
@@ -685,7 +689,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         if (workLocation.getTile() != getTile()) {
             throw new IllegalStateException("Can only set a 'Unit'  to a 'WorkLocation' that is on the same 'Tile'.");
         }
-        
+
         if (armed) setArmed(false);
         if (mounted) setMounted(false);
         if (isPioneer()) setNumberOfTools(0);
@@ -1321,7 +1325,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         // For now everything takes forever(=-1) turn to complete (build road, ...).
         // This should change according to the terrain etc. !!
         // TODO
-        
+
         if (!checkSetState(s)) {
             throw new IllegalStateException();
         }
@@ -1409,8 +1413,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         }
 
         // Do the HARD work of moving this unit to europe:
-        if (!(getLocation() instanceof Europe)) // Perpetual europedom bug fixed.. -sjm
-          setEntryLocation(getLocation());
+        if (!(getLocation() instanceof Europe)) { // Perpetual europedom bug fixed.. -sjm
+            setEntryLocation(getLocation());
+        }
+
         setState(TO_EUROPE);
         setLocation(getOwner().getEurope());
     }
@@ -1474,7 +1480,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                     return false;
                 }
                 if (((location instanceof Europe) && (getState() == TO_AMERICA))
-                        || (getTile().getType() == Tile.HIGH_SEAS)) {
+                        || (getEntryLocation() == getLocation())) {
+                        //|| (getTile().getType() == Tile.HIGH_SEAS)) {
                     return true;
                 }
                 return false;
@@ -1540,7 +1547,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         return getInitialSpaceLeft() - (getUnitCount() + getGoodsCount());
     }
 
-    
+
     public int getGoodsCount() {
         return goodsContainer.getGoodsCount();
     }

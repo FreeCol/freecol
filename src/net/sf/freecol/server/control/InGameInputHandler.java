@@ -95,8 +95,8 @@ public final class InGameInputHandler implements MessageHandler {
                     reply = equipUnit(connection, element);
                 } else if (type.equals("work")) {
                     reply = work(connection, element);
-                } else if (type.equals("worktype")) {
-                    reply = workType(connection, element);
+                } else if (type.equals("changeWorkType")) {
+                    reply = changeWorkType(connection, element);
                 } else if (type.equals("setCurrentlyBuilding")) {
                     reply = setCurrentlyBuilding(connection, element);
                 } else if (type.equals("changeState")) {
@@ -336,7 +336,12 @@ public final class InGameInputHandler implements MessageHandler {
         Unit carrier = (Unit) game.getFreeColGameObject(boardShipElement.getAttribute("carrier"));
 
         Tile oldTile = unit.getTile();
-        
+
+        boolean tellEnemyPlayers = true;
+        if (oldTile.getSettlement() != null || oldTile == null) {
+            tellEnemyPlayers = false;
+        }
+
         if (unit.isCarrier()) {
           logger.warning("Tried to load a carrier onto another carrier.");
           return null;
@@ -344,33 +349,35 @@ public final class InGameInputHandler implements MessageHandler {
 
         unit.boardShip(carrier);
 
-        Iterator enemyPlayerIterator = game.getPlayerIterator();
-        while (enemyPlayerIterator.hasNext()) {
-            ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
+        if (tellEnemyPlayers) {
+            Iterator enemyPlayerIterator = game.getPlayerIterator();
+            while (enemyPlayerIterator.hasNext()) {
+                ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
 
-            if (player.equals(enemyPlayer)) {
-                continue;
-            }
-
-            try {
-                if (enemyPlayer.canSee(oldTile)) {
-                    Element removeElement = Message.createNewRootElement("remove");
-
-                    Element removeUnit = removeElement.getOwnerDocument().createElement("removeObject");
-                    removeUnit.setAttribute("ID", unit.getID());
-                    removeElement.appendChild(removeUnit);
-
-                    enemyPlayer.getConnection().send(removeElement);
+                if (player.equals(enemyPlayer)) {
+                    continue;
                 }
-            } catch (IOException e) {
-                logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection " + enemyPlayer.getConnection());
+
+                try {
+                    if (enemyPlayer.canSee(oldTile)) {
+                        Element removeElement = Message.createNewRootElement("remove");
+
+                        Element removeUnit = removeElement.getOwnerDocument().createElement("removeObject");
+                        removeUnit.setAttribute("ID", unit.getID());
+                        removeElement.appendChild(removeUnit);
+
+                        enemyPlayer.getConnection().send(removeElement);
+                    }
+                } catch (IOException e) {
+                    logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection " + enemyPlayer.getConnection());
+                }
             }
         }
 
         return null;
     }
 
-    
+
     /**
     * Handles a "leaveShip"-message from a client.
     *
@@ -671,30 +678,35 @@ public final class InGameInputHandler implements MessageHandler {
 
         Unit unit = (Unit) game.getFreeColGameObject(workElement.getAttribute("unit"));
         WorkLocation workLocation = (WorkLocation) game.getFreeColGameObject(workElement.getAttribute("workLocation"));
-        
+
+        if (workLocation == null) {
+            throw new NullPointerException();
+        }
+
+        // No reason to send an update to other players: this is always hidden.
+
         unit.work(workLocation);
-        
-        sendUpdatedTileToAll(unit.getTile(), player);
 
         return null;
     }
 
+
     /**
-    * Handles a "worktype"-request from a client.
+    * Handles a "changeWorkType"-request from a client.
     *
     * @param connection The connection the message came from.
     * @param workElement The element containing the request.
     */
-    private Element workType(Connection connection, Element workElement) {
+    private Element changeWorkType(Connection connection, Element workElement) {
         Game game = freeColServer.getGame();
         ServerPlayer player = freeColServer.getPlayer(connection);
 
         Unit unit = (Unit) game.getFreeColGameObject(workElement.getAttribute("unit"));
-        int workType = Integer.parseInt(workElement.getAttribute("worktype"));
-        
+        int workType = Integer.parseInt(workElement.getAttribute("workType"));
+
+        // No reason to send an update to other players: this is always hidden.
+
         unit.setWorkType(workType);
-        
-        sendUpdatedTileToAll(unit.getTile(), player);
 
         return null;
     }
@@ -742,7 +754,7 @@ public final class InGameInputHandler implements MessageHandler {
         }
 
         Tile oldTile = unit.getTile();
-        
+
         if (!unit.checkSetState(state)) {
             // Oh, really, Mr. Client? I'll show YOU!
             // kickPlayer(player);

@@ -56,6 +56,8 @@ public class ServerPlayer extends Player {
     /** Stores information about which tiles this player has explored. */
     private boolean[][] exploredTiles;
 
+    private boolean[][] canSeeTiles = null;
+
 
 
 
@@ -75,6 +77,7 @@ public class ServerPlayer extends Player {
         //ready = false;
 
         resetExploredTiles(getGame().getMap());
+        resetCanSeeTiles();
     }
 
     /**
@@ -94,6 +97,7 @@ public class ServerPlayer extends Player {
         //ready = false;
 
         resetExploredTiles(getGame().getMap());
+        resetCanSeeTiles();
     }
 
 
@@ -125,6 +129,63 @@ public class ServerPlayer extends Player {
 
         }
 
+    }
+
+
+    /**
+    * Resets this player's "can see"-tiles. This is done by setting
+    * all the tiles within a {@link Unit}s line of sight visible.
+    * The other tiles are made unvisible.
+    */
+    public void resetCanSeeTiles() {
+        Map map = getGame().getMap();
+
+        if (map != null) {
+            canSeeTiles = new boolean[map.getWidth()][map.getHeight()];
+
+            Iterator unitIterator = getUnitIterator();
+            while (unitIterator.hasNext()) {
+                Unit unit = (Unit) unitIterator.next();
+
+                Map.Position position = unit.getTile().getPosition();
+                canSeeTiles[position.getX()][position.getY()] = true;
+
+                Iterator positionIterator = map.getCircleIterator(position, true, unit.getLineOfSight());
+                while (positionIterator.hasNext()) {
+                    Map.Position p = (Map.Position) positionIterator.next();
+                    canSeeTiles[p.getX()][p.getY()] = true;
+                }
+            }
+
+        }
+    }
+
+    
+    /**
+    * Gets called when this player's turn has ended.
+    */
+    public void endTurn() {
+        super.endTurn();
+        resetCanSeeTiles();
+    }
+
+
+    /**
+    * Checks if this <code>Player</code> can see the given
+    * <code>Tile</code>. The <code>Tile</code> can be seen if
+    * it is in a {@link Unit}'s line of sight.
+    *
+    * @param The given <code>Tile</code>.
+    * @return <i>true</i> if the <code>Player</code> can see
+    *         the given <code>Tile</code> and <i>false</i>
+    *         otherwise.
+    */
+    public boolean canSee(Tile tile) {
+        if (canSeeTiles == null) {
+            resetCanSeeTiles();
+        }
+
+        return canSeeTiles[tile.getX()][tile.getY()];
     }
 
 
@@ -163,6 +224,7 @@ public class ServerPlayer extends Player {
     */
     public void setExplored(Tile tile) {
         exploredTiles[tile.getX()][tile.getY()] = true;
+        canSeeTiles[tile.getX()][tile.getY()] = true;
     }
 
 
@@ -183,6 +245,7 @@ public class ServerPlayer extends Player {
         while (positionIterator.hasNext()) {
             Map.Position p = (Map.Position) positionIterator.next();
             exploredTiles[p.getX()][p.getY()] = true;
+            canSeeTiles[p.getX()][p.getY()] = true;
         }
     }
 

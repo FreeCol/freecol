@@ -477,11 +477,11 @@ public final class InGameController {
     public void work(Unit unit, WorkLocation workLocation) {
         Client client = freeColClient.getClient();
 
-        unit.work(workLocation);
-
         Element workElement = Message.createNewRootElement("work");
         workElement.setAttribute("unit", unit.getID());
         workElement.setAttribute("workLocation", workLocation.getID());
+        
+        unit.work(workLocation);
 
         client.send(workElement);
     }
@@ -503,18 +503,18 @@ public final class InGameController {
     }
 
     /**
-    * Changes the worktype of this <code>Unit</code>.
+    * Changes the work type of this <code>Unit</code>.
     * @param unit The <code>Unit</code>
     * @param workType The new work type.
     */
     public void changeWorkType(Unit unit, int workType) {
         Client client = freeColClient.getClient();
 
-        unit.setWorkType(workType);
-
         Element changeWorkTypeElement = Message.createNewRootElement("changeWorkType");
         changeWorkTypeElement.setAttribute("unit", unit.getID());
-        changeWorkTypeElement.setAttribute("worktype", Integer.toString(workType));
+        changeWorkTypeElement.setAttribute("workType", Integer.toString(workType));
+
+        unit.setWorkType(workType);
 
         client.send(changeWorkTypeElement);
     }
@@ -549,18 +549,20 @@ public final class InGameController {
             logger.warning("Can't set state " + state);
             return; // Don't bother.
         }
+
+        Element changeStateElement = Message.createNewRootElement("changeState");
+        changeStateElement.setAttribute("unit", unit.getID());
+        changeStateElement.setAttribute("state", Integer.toString(state));
+
         unit.setState(state);
+
         if (unit.getMovesLeft() == 0) {
             nextActiveUnit();
         } else {
             freeColClient.getCanvas().refresh();
         }
 
-        Element changeStateElement = Message.createNewRootElement("changeState");
-        changeStateElement.setAttribute("unit", unit.getID());
-        changeStateElement.setAttribute("state", Integer.toString(state));
-
-        client.send(changeStateElement);
+        client.send(changeStateElement);                
     }
     
     /**

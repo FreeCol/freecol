@@ -211,10 +211,6 @@ public class Player extends FreeColGameObject {
     *         otherwise.
     */
     public boolean canSee(Tile tile) {
-        /*
-         TODO-MUCH-LATER: We could use an array like 'serverPlayer.exploreTile' to speed things up.
-        */
-
         if (tile == null) {
             return false;
         }
@@ -243,6 +239,14 @@ public class Player extends FreeColGameObject {
         }
 
         return false;
+    }
+    
+    
+    /**
+    * Gets called when this player's turn has ended.
+    */
+    public void endTurn() {
+        // Will be implemented later.
     }
 
 

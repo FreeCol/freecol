@@ -279,20 +279,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         // Warehouse panel:
         //
 
-        Iterator goodsIterator = colony.getGoodsIterator();
-        while (goodsIterator.hasNext()) {
-            Goods goods = (Goods) goodsIterator.next();
+        warehousePanel.initialize();
 
-            GoodsLabel goodsLabel = new GoodsLabel(goods, parent);
-            goodsLabel.setTransferHandler(defaultTransferHandler);
-            goodsLabel.addMouseListener(pressListener);
-
-            warehousePanel.add(goodsLabel, false);
-        }
-
-        warehousePanel.revalidate();
-
-        setSelectedUnit(lastCarrier);
 
         //
         // Units in buildings:
@@ -328,13 +316,11 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         if (selectedUnit != null) {
             try {
                 cargoLabel.setText("Cargo (" + selectedUnit.getUnit().getName() + ") space left: " + selectedUnit.getUnit().getSpaceLeft());
-            }
-            catch (FreeColException e) {
+            } catch (FreeColException e) {
                 e.printStackTrace();
                 cargoLabel.setText("Cargo");
             }
-        }
-        else {
+        } else {
             cargoLabel.setText("<html><strike>Cargo</strike></html>");
         }
     }
@@ -700,15 +686,18 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                     Goods g = ((GoodsLabel)comp).getGoods();
                     ((GoodsLabel) comp).setSmall(false);
                     //inGameController.unloadCargo(g, selectedUnit.getUnit());
-                    colonyPanel.getWarehousePanel().revalidate();
+                    //colonyPanel.getWarehousePanel().revalidate();
                     colonyPanel.getCargoPanel().revalidate();
+                    updateCargoLabel();
+
+                    initialize();
+                    return comp;
                 } else {
                     logger.warning("An invalid component got dropped on this WarehousePanel.");
                     return null;
                 }
             }
 
-            updateCargoLabel();            
             Component c = add(comp);
 
             refresh();
@@ -724,6 +713,23 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 colonyPanel.getWarehousePanel().revalidate();
                 colonyPanel.getCargoPanel().revalidate();
             }
+        }
+
+
+        public void initialize() {
+            warehousePanel.removeAll();
+            Iterator goodsIterator = colony.getGoodsIterator();
+            while (goodsIterator.hasNext()) {
+                Goods goods = (Goods) goodsIterator.next();
+
+                GoodsLabel goodsLabel = new GoodsLabel(goods, parent);
+                goodsLabel.setTransferHandler(defaultTransferHandler);
+                goodsLabel.addMouseListener(pressListener);
+
+                warehousePanel.add(goodsLabel, false);
+            }
+            
+            warehousePanel.revalidate();            
         }
     }
 
@@ -772,7 +778,15 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                     logger.info("Attempting to load cargo.");
                     inGameController.loadCargo(g, selectedUnit.getUnit());
                     colonyPanel.getWarehousePanel().revalidate();
-                    colonyPanel.getCargoPanel().revalidate();
+                    //colonyPanel.getCargoPanel().revalidate();
+
+                    // TODO: Make this look prettier :-)
+                    UnitLabel t = selectedUnit;
+                    selectedUnit = null;
+                    setSelectedUnit(t);
+
+                    //refresh();
+                    return comp;
                 } else {
                     logger.warning("An invalid component got dropped on this CargoPanel.");
                     return null;
@@ -790,7 +804,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         public boolean isActive() {
             return (getSelectedUnit() != null);
         }
-        
+
 
         public void remove(Component comp) {
             if (comp instanceof UnitLabel) {
