@@ -7,6 +7,8 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.FreeCol;
 
+import java.awt.geom.*;
+import java.awt.*;
 import javax.swing.*;
 
 import java.awt.event.*;
@@ -563,5 +565,19 @@ public class FreeColMenuBar extends JMenuBar {
         }
 
         update();
+    }
+    
+
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+     
+        //Font originalFont = g.getFont();
+        //g.setFont(originalFont.deriveFont(Font.ITALIC));
+
+        String displayString =  "Gold: " + freeColClient.getMyPlayer().getGold() + "    |    Year: " + freeColClient.getGame().getTurn().toString();
+        Rectangle2D displayStringBounds = g.getFontMetrics().getStringBounds(displayString, g);
+        g.drawString(displayString, getWidth()-10-(int)displayStringBounds.getWidth(), 15);
+
+        //g.setFont(originalFont);
     }
 }
