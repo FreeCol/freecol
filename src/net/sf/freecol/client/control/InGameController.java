@@ -51,6 +51,17 @@ public final class InGameController {
 
 
     /**
+    * Sends a public chat message.
+    */
+    public void sendChat(String message) {
+        Element chatElement = Message.createNewRootElement("chat");
+        chatElement.setAttribute("message", message);
+        chatElement.setAttribute("privateChat", "false");
+        freeColClient.getClient().send(chatElement);
+    }
+
+
+    /**
     * Uses the active unit to build a colony.
     */
     public void buildColony() {

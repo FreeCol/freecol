@@ -12,6 +12,7 @@ import javax.swing.JTextField;
 import javax.swing.border.BevelBorder;
 
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.FreeColClient;
 
 
 /**
@@ -23,24 +24,26 @@ public final class ChatPanel extends JPanel implements ActionListener {
     public static final String  COPYRIGHT = "Copyright (C) 2003 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
-    
+
     private static final Logger logger = Logger.getLogger(ChatPanel.class.getName());
-    
+
     public static final int    CHAT = 1;
-    
+
     private final Canvas            parent;
+    private final FreeColClient     freeColClient;
     private final JTextField        field;
 
-    
-    
-    
+
+
+
 
     /**
     * The constructor that will add the items to this panel.
     * @param parent The parent of this panel.
     */
-    public ChatPanel(Canvas parent) {
+    public ChatPanel(Canvas parent, FreeColClient freeColClient) {
         this.parent = parent;
+        this.freeColClient = freeColClient;
 
         JLabel label = new JLabel("Message: ");
 
@@ -87,7 +90,9 @@ public final class ChatPanel extends JPanel implements ActionListener {
         try {
             switch (Integer.valueOf(command).intValue()) {
                 case CHAT:
-                    parent.displayChatMessage(getChatText());
+                    String message = getChatText();
+                    freeColClient.getInGameController().sendChat(message);
+                    parent.displayChatMessage(message);
                     parent.remove(this);
                     break;
                 default:

@@ -65,7 +65,9 @@ public final class InGameInputHandler implements MessageHandler {
         try {
             if (element != null) {
                 if (freeColServer.getGame().getCurrentPlayer().equals(freeColServer.getPlayer(connection))) {
-                    if (type.equals("move")) {
+                    if (type.equals("chat")) {
+                        reply = chat(connection, element);
+                    } else if (type.equals("move")) {
                         reply = move(connection, element);
                     } else if (type.equals("attack")) {
                         reply = attack(connection, element);
@@ -130,6 +132,21 @@ public final class InGameInputHandler implements MessageHandler {
         }
 
         return reply;
+    }
+    
+    
+    /**
+    * Handles a "chat"-message from a client.
+    *
+    * @param connection The connection the message came from.
+    * @param element The element containing the request.
+    *
+    */
+    private Element chat(Connection connection, Element element) {
+        // TODO: Add support for private chat.
+        element.setAttribute("sender", freeColServer.getPlayer(connection).getID());
+        freeColServer.getServer().sendToAll(element, connection);
+        return null;
     }
 
 

@@ -156,7 +156,7 @@ public final class Canvas extends JLayeredPane {
         europePanel = new EuropePanel(this, freeColClient, freeColClient.getInGameController());
         statusPanel = new StatusPanel(this);
 
-        chatPanel = new ChatPanel(this);
+        chatPanel = new ChatPanel(this, freeColClient);
         victoryPanel = new VictoryPanel(this);
 
         showMainPanel();

@@ -85,7 +85,7 @@ public final class GUI {
     OTHER_UNITS_WIDTH = 3,
     MAX_OTHER_UNITS = 10,
     MESSAGE_COUNT = 3,
-    MESSAGE_AGE = 3000; // The amount of time before a message gets deleted (in milliseconds).
+    MESSAGE_AGE = 10000; // The amount of time before a message gets deleted (in milliseconds).
 
     // Debug variables:
     boolean displayCoordinates = false;
@@ -325,6 +325,8 @@ public final class GUI {
             messages.remove(0);
         }
         messages.add(message);
+    
+        freeColClient.getCanvas().repaint(0, 0, getWidth(), getHeight());
     }
 
 
@@ -688,13 +690,15 @@ public final class GUI {
 
         // Don't edit the list of messages while I'm drawing them.
         synchronized (this) {
-            yy = (int) bounds.getHeight() - 115 - MESSAGE_COUNT * 25;
+            BufferedImage si = createStringImage(g, "getSizes", Color.WHITE, bounds.width, 12);
+
+            yy = (int) bounds.getHeight() - 200 - getMessageCount() * si.getHeight();//* 25-115 ;
             xx = 40;
-            for (int i = getMessageCount() - 1; i >= 0; i--) {
+
+            for (int i = 0; i < getMessageCount(); i++) {
                 GUIMessage message = getMessage(i);
-                g.setColor(message.getColor());
-                g.drawString(message.getMessage(), xx, yy);
-                yy += 25;
+                g.drawImage(createStringImage(g, message.getMessage(), message.getColor(), bounds.width, 12), xx, yy, null);
+                yy += si.getHeight();
             }
         }
     }
