@@ -915,6 +915,33 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                 }
             }
         }
+
+        // treasure train moved onto a settlment. do you want to cash it in?
+        if (getGame().getMap() != null && location != null) {
+            // its a settlement
+            if(location instanceof Tile && getType()==TREASURE_TRAIN && location.getTile().getSettlement()!=null) {
+                if(getOwner().hasFather(FoundingFather.HERNAN_CORTES)) {
+                    // todo -show confirm dialog "Do you wish for the King's
+                    // galleon to transport your treasure, deducting
+                    // the current tax rate of %TAX_RATE% for a profit of %AMT_AFTER_TAX%?"
+                }
+                else {
+                    // todo -show confirm dialog "Do you wish for the King's galleon
+                    // transport your treasure, deducting 50% and the current tax rate of %TAX_RATE%
+                    // for a profit of %AMT_AFTER_TAX_AND_SHARE%?"
+                }
+            }
+            else if (location instanceof Europe && getType()==GALLEON) {
+                Iterator iter = getUnitIterator();
+                while (iter.hasNext()) {
+                    Unit u = (Unit)iter.next();
+                    if(u.getType()==TREASURE_TRAIN) {
+                        // todo -show confirm dialog "Do you wish to deposit your treasure, deducting
+                        // the current tax rate of %TAX_RATE% for a profit of %AMT_AFTER_TAX%?"
+                    }
+                }
+            }
+        }
     }
 
 
