@@ -4,6 +4,7 @@ package net.sf.freecol.client.gui;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.awt.Graphics2D;
+import java.awt.Graphics;
 import java.awt.Color;
 import java.awt.Image;
 import java.util.*;
@@ -15,8 +16,11 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.image.BufferedImage;
 import java.awt.AlphaComposite;
+import java.awt.Polygon;
+import java.awt.Composite;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.FreeCol;
 
 import net.sf.freecol.common.*;
 import net.sf.freecol.common.model.Map;
@@ -770,44 +774,42 @@ public final class GUI {
     public void displayTile(Graphics2D g, Map map, Tile tile, int x, int y) {
         g.drawImage(lib.getTerrainImage(tile.getType(), tile.getX(), tile.getY()), x, y, null);
 
-        if (tile.isExplored()) {
-            Map.Position pos = new Map.Position(tile.getX(), tile.getY());
+        Map.Position pos = new Map.Position(tile.getX(), tile.getY());
 
-            for (int i = 0; i < 8; i++) {
-                Map.Position p = map.getAdjacent(pos, i);
-                if (map.isValid(p)) {
-                    Tile borderingTile = map.getTile(p);
+        for (int i = 0; i < 8; i++) {
+            Map.Position p = map.getAdjacent(pos, i);
+            if (map.isValid(p)) {
+                Tile borderingTile = map.getTile(p);
 
-                   if (tile.getType() == borderingTile.getType() ||
-                        !borderingTile.isLand() ||
-                        !borderingTile.isExplored()) {
-                        // Equal tiles, sea tiles and unexplored tiles have no effect
-                        continue;
-                    }
+                if (tile.getType() == borderingTile.getType() || !borderingTile.isLand() && borderingTile.getType() != Tile.OCEAN){
+                    // Equal tiles, sea tiles and unexplored tiles have no effect
+                    continue;
+                }
 
-                    if (!tile.isLand()) {
-                        // Draw a beach overlayed with bordering land type
-                        g.drawImage(lib.getTerrainImage(ImageLibrary.BEACH,
-                                                        i,
-                                                        tile.getX(), tile.getY()),
-                                    x, y, null);
-                        g.drawImage(lib.getTerrainImage(borderingTile.getType(),
-                                                        i,
-                                                        tile.getX(), tile.getY()),
-                                    x, y, null);
-                    } else if (borderingTile.getType() < tile.getType()) {
-                        // Draw land terrain with bordering land type
-                        g.drawImage(lib.getTerrainImage(borderingTile.getType(),
-                                                        i,
-                                                        tile.getX(), tile.getY()),
-                                    x, y, null);
-                    }
+                if (!tile.isLand() && borderingTile.isExplored() && borderingTile.getType() != Tile.OCEAN) {
+                    // Draw a beach overlayed with bordering land type
+                    g.drawImage(lib.getTerrainImage(ImageLibrary.BEACH,
+                                                    i,
+                                                    tile.getX(), tile.getY()),
+                                x, y, null);
+                    g.drawImage(lib.getTerrainImage(borderingTile.getType(),
+                                                    i,
+                                                    tile.getX(), tile.getY()),
+                                x, y, null);
+                } else if (borderingTile.getType() < tile.getType()) {
+                    // Draw land terrain with bordering land type
+                    g.drawImage(lib.getTerrainImage(borderingTile.getType(),
+                                                    i,
+                                                    tile.getX(), tile.getY()),
+                                x, y, null);
                 }
             }
+        }
 
+        if (tile.isExplored()) {
             // Until the mountain/hill bordering tiles are done... -sjm
 /*            if (tile.isLand()) {
-                for (int i = 0; i < 8; i++) {            
+                for (int i = 0; i < 8; i++) {
                     Map.Position p = map.getAdjacent(pos, i);
                     if (map.isValid(p)) {
                         Tile borderingTile = map.getTile(p);
@@ -868,6 +870,8 @@ public final class GUI {
                         theColor = Color.BLUE;
                     } else if (sol >= 50) {
                         theColor = Color.GREEN;
+                    } else if (((Colony)settlement).getProductionBonus() < 0) {
+                        theColor = Color.RED;
                     }
                     
                     BufferedImage stringImage = createStringImage(g, populationString, theColor, lib.getTerrainImageWidth(tile.getType()), 12);
@@ -886,6 +890,18 @@ public final class GUI {
                     logger.warning("Requested to draw unknown settlement type.");
                 }
             }
+
+            if (FreeCol.isInDebugMode() && !freeColClient.getMyPlayer().canSee(tile)) {
+                g.setColor(Color.BLACK);
+                Composite oldComposite = g.getComposite();
+                g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.2f));
+                Polygon pol = new Polygon(new int[] {x + tileWidth/2, x + tileWidth, x + tileWidth/2, x},
+                                          new int[] {y, y + tileHeight/2, y + tileHeight, y + tileHeight/2},
+                                          4);
+                g.fill(pol);
+                g.setComposite(oldComposite);
+            }
+
         }
 
         if (tile.getPosition().equals(selectedTile)) {

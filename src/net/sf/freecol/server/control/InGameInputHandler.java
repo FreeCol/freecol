@@ -12,6 +12,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.IOException;
+import java.io.StringWriter;
+import java.io.PrintWriter;
 
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.*;
@@ -119,7 +121,11 @@ public final class InGameInputHandler implements MessageHandler {
             }
         } catch (Exception e) {
             // TODO: Force the client to reconnect.
-            logger.warning(e.toString());
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+
+            logger.warning(sw.toString());
+            
             return null;
         }
 
@@ -575,6 +581,29 @@ public final class InGameInputHandler implements MessageHandler {
         Tile oldTile = unit.getTile();
         unit.moveToEurope();
 
+        Iterator enemyPlayerIterator = game.getPlayerIterator();
+        while (enemyPlayerIterator.hasNext()) {
+            ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
+
+            if (player.equals(enemyPlayer)) {
+                continue;
+            }
+
+            try {
+                if (enemyPlayer.canSee(oldTile)) {
+                    Element removeElement = Message.createNewRootElement("remove");
+
+                    Element removeUnit = removeElement.getOwnerDocument().createElement("removeObject");
+                    removeUnit.setAttribute("ID", unit.getID());
+                    removeElement.appendChild(removeUnit);
+
+                    enemyPlayer.getConnection().send(removeElement);
+                }
+            } catch (IOException e) {
+                logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection " + enemyPlayer.getConnection());
+            }
+        }
+
         return null;
     }
 
@@ -758,6 +787,10 @@ public final class InGameInputHandler implements MessageHandler {
                 return null;
         }
 
+        if (unit.getLocation() instanceof Tile) {
+            sendUpdatedTileToAll(unit.getTile(), player);
+        }
+
         return null;
     }
 
@@ -896,6 +929,8 @@ public final class InGameInputHandler implements MessageHandler {
         }
 
         unit.putOutsideColony();
+        
+        sendUpdatedTileToAll(unit.getTile(), player);
 
         return null;
     }
@@ -918,6 +953,10 @@ public final class InGameInputHandler implements MessageHandler {
         }
 
         unit.clearSpeciality();
+        
+        if (unit.getLocation() instanceof Tile) {
+            sendUpdatedTileToAll(unit.getTile(), player);
+        }
 
         return null;
     }
@@ -952,9 +991,6 @@ public final class InGameInputHandler implements MessageHandler {
             createUnitsInColonies();
         }
 
-        game.setCurrentPlayer(nextPlayer);
-
-        // TODO: Remove when each player has it's own market:
         try {
             Element updateElement = Message.createNewRootElement("update");
             updateElement.appendChild(game.getMarket().toXMLElement(nextPlayer, updateElement.getOwnerDocument()));
@@ -962,6 +998,8 @@ public final class InGameInputHandler implements MessageHandler {
         } catch (IOException e) {
             logger.warning("Could not send message to: " + nextPlayer.getName() + " with connection " + nextPlayer.getConnection());
         }
+
+        game.setCurrentPlayer(nextPlayer);
 
         Element setCurrentPlayerElement = Message.createNewRootElement("setCurrentPlayer");
         setCurrentPlayerElement.setAttribute("player", nextPlayer.getID());
@@ -1077,7 +1115,7 @@ public final class InGameInputHandler implements MessageHandler {
         while (enemyPlayerIterator.hasNext()) {
             ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
 
-            if (player.equals(enemyPlayer)) {
+            if (player != null && player.equals(enemyPlayer)) {
                 continue;
             }
 

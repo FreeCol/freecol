@@ -120,7 +120,14 @@ public class ServerPlayer extends Player {
                 Map.Position position = unit.getTile().getPosition();
                 exploredTiles[position.getX()][position.getY()] = true;
 
-                Iterator positionIterator = map.getCircleIterator(position, true, unit.getLineOfSight());
+                Iterator positionIterator;
+
+                if (unit.getTile().getColony() != null) {
+                    positionIterator = map.getCircleIterator(position, true, 2);
+                } else {
+                    positionIterator = map.getCircleIterator(position, true, unit.getLineOfSight());
+                }
+
                 while (positionIterator.hasNext()) {
                     Map.Position p = (Map.Position) positionIterator.next();
                     exploredTiles[p.getX()][p.getY()] = true;

@@ -236,6 +236,8 @@ public class Player extends FreeColGameObject {
                         return true;
                     }
                 }
+            } else if (t != null && t.getColony() != null && t.getColony().getOwner().equals(this)) {
+                return true;
             }
         }
 

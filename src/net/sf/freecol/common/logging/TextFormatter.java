@@ -39,10 +39,10 @@ final class TextFormatter extends Formatter {
     */
     public TextFormatter() {
     }
-    
 
-    
-    
+
+
+
 
     /**
     * Formats the given log record's data into human-readable text.
@@ -54,25 +54,21 @@ final class TextFormatter extends Formatter {
         String level;
         if (record.getLevel() == Level.INFO) {
             level = "INFO";
-        }
-        else if (record.getLevel() == Level.ALL) {
+        } else if (record.getLevel() == Level.ALL) {
             level = "ALL";
-        }
-        else if (record.getLevel() == Level.SEVERE) {
+        } else if (record.getLevel() == Level.SEVERE) {
             level = "SEVERE";
-        }
-        else if (record.getLevel() == Level.WARNING) {
+        } else if (record.getLevel() == Level.WARNING) {
             level = "WARNING";
-        }
-        else {
+        } else {
             level = "UNKNOWN";
         }
-        
+
         String result = record.getSourceClassName() + ' ' + record.getSourceMethodName();
-        result += "\n\t" + level + ": " + record.getMessage();
+        result += "\n\t" + level + ": " + record.getMessage().replaceAll("\n", "\n\t");
         result += "\n\t" + new Date(record.getMillis()).toString();
         result += "\n\tThread ID: " + record.getThreadID() + '\n';
-        
+
         return result;
     }
 }

@@ -429,25 +429,33 @@ public final class Canvas extends JLayeredPane {
     * a while even its request doesn't get granted immediately.
     */
     private void takeFocus() {
-        if ((takeFocusThread == null) || (!takeFocusThread.isAlive()) || (!takeFocusThread.isStillWorking())) {
-            JComponent c = this;
-            
+        JComponent c = this;
 
-            if (startGamePanel.isShowing()) {
-                c = startGamePanel;
-            } else if (newPanel.isShowing()) {
-                c = newPanel;
-            } else if (mainPanel.isShowing()) {
-                c = mainPanel;
-            } else if (europePanel.isShowing()) {
-                c = europePanel;
-            } else if (colonyPanel.isShowing()) {
-                c = colonyPanel;
+        if (startGamePanel.isShowing()) {
+            c = startGamePanel;
+        } else if (newPanel.isShowing()) {
+            c = newPanel;
+        } else if (mainPanel.isShowing()) {
+            c = mainPanel;
+        } else if (europePanel.isShowing()) {
+            c = europePanel;
+        } else if (colonyPanel.isShowing()) {
+            c = colonyPanel;
+        }
+
+        c.requestFocus();
+        
+        // Later:
+        /*if ((takeFocusThread == null) || (!takeFocusThread.isAlive()) || (!takeFocusThread.isStillWorking())
+                || takeFocusThread.getComponent() != c) {
+
+            if (takeFocusThread != null) {
+                takeFocusThread.stopWorking();
             }
 
             takeFocusThread = new TakeFocusThread(c);
             takeFocusThread.start();
-        }
+        }*/
     }
 
 
@@ -784,6 +792,15 @@ public final class Canvas extends JLayeredPane {
         public boolean isStillWorking() {
             return doYourWork;
         }
+        
+        
+        /**
+        * Gets the component this thread is trying to take focus for.
+        */
+        public JComponent getComponent() {
+            return component;
+        }
+
 
         /**
         * Makes sure that the given component takes the focus.

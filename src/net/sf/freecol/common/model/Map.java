@@ -284,7 +284,7 @@ public class Map extends FreeColGameObject {
     public Vector getSurroundingTiles(Tile t, int range) {
         Vector result = new Vector();
         Position tilePosition = new Position(t.getX(), t.getY());
-        Iterator i = range == 1 ?
+        Iterator i = (range == 1) ?
             getAdjacentIterator(tilePosition) :
             getCircleIterator(tilePosition, true, range);
 
@@ -411,9 +411,6 @@ public class Map extends FreeColGameObject {
 
     /**
      * Gets the distance in tiles between two map positions.
-     * With an isometric map this is a non-trivial task.  The formula
-     * below has been developed largely through trial and error.  It
-     * should cover all cases, but I wouldn't bet my life on it.
      *
      * @param ax Position A x-coordinate
      * @param ay Position A y-coordinate
@@ -422,30 +419,21 @@ public class Map extends FreeColGameObject {
      * @return Distance
      */
     public int getDistance(int ax, int ay, int bx, int by) {
-        int ypos = ay;
-        if ((ypos % 2) != (by % 2)) {
-            if ((ypos % 2 == 0 && ax > bx) ||
-                (ypos % 2 == 1 && ax < bx)) {
-                if (ypos > by)
-                    ypos--;
-                else
-                    ypos++;
-            } else {
-                ypos++;
-            }
-        } else {
-            if (ypos < by)
-                ypos--;
-            else
-                ypos++;
+        int r = bx - ax - (ay - by)/2;
+
+        if (by > ay && ay%2 == 0 && by%2 != 0) {
+            r++;
+        } else if (by < ay && ay%2 != 0 && by%2 == 0) {
+            r--;
         }
-        return Math.abs(ax - bx) + (Math.abs(ypos - by)) / 2;
+
+        return Math.max(Math.abs(ay-by+r), Math.abs(r));
     }
 
 
-    
 
-    
+
+
     /**
      * Represents a position on the Map.
      */

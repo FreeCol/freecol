@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.FreeColException;
 
@@ -413,7 +414,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
 
         return getMoveType(target);
     }
-    
+
 
     /**
      * Gets the type of a move that is made when moving to the
@@ -429,7 +430,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             return ILLEGAL_MOVE;
         }
 
-        if (target == null || target.getType() == Tile.HIGH_SEAS) {
+        if (target == null) {
             return isNaval() ? MOVE_HIGH_SEAS : ILLEGAL_MOVE;
         }
 
@@ -444,6 +445,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             } else {
                 return ATTACK;
             }
+        }
+
+        if (target.getType() == Tile.HIGH_SEAS) {
+            return isNaval() ? MOVE_HIGH_SEAS : ILLEGAL_MOVE;
         }
 
         // Check for disembark.
@@ -1833,7 +1838,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
 
                 switch (state) {
                     case TO_EUROPE:     break;
-                    case TO_AMERICA:    setLocation(getEntryLocation()); break;
+                    case TO_AMERICA:    setLocation(getVacantEntryLocation()); break;
                     case BUILD_ROAD:    getTile().setRoad(true); numberOfTools -= 20; break;
                     case PLOW:
                         if (getTile().isForested()) {
@@ -1872,12 +1877,45 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     *
     * @return The <code>Location</code>.
     * @see Player#getEntryLocation
+    * @see #getVacantEntryLocation
     */
     public Location getEntryLocation() {
         if (entryLocation != null) {
             return entryLocation;
         } else {
             return getOwner().getEntryLocation();
+        }
+    }
+
+    
+    /**
+    * Gets the <code>Location</code> in which this unit will be put
+    * when returning from {@link Europe}. If this <code>Unit</code>
+    * has not not been outside europe before, it will return the default
+    * value from the {@link Player} owning this <code>Unit</code>.
+    * If the tile is occupied by a enemy unit, then a nearby tile is choosen.
+    *
+    * @return The <code>Location</code>.
+    * @see #getEntryLocation
+    */
+    public Location getVacantEntryLocation() {
+        Tile l = (Tile) getEntryLocation();
+
+        if (l.getFirstUnit() != null && l.getFirstUnit().getOwner() != getOwner()) {
+            int radius = 1;
+            while (true) {
+                Iterator i = getGame().getMap().getCircleIterator(l.getPosition(), false, radius);
+                while (i.hasNext()) {
+                    Tile l2 = getGame().getMap().getTile((Position) i.next());
+                    if (l2.getFirstUnit() == null || l2.getFirstUnit().getOwner() == getOwner()) {
+                        return l2;
+                    }
+                }
+
+                radius++;
+            }
+        } else {
+            return l;
         }
     }
 
