@@ -17,7 +17,6 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.ImageLibrary;
 
 import net.sf.freecol.client.control.InGameController;
 

@@ -5,16 +5,9 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Unit;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.FreeColMenuBar;
-import net.sf.freecol.client.gui.CanvasMouseMotionListener;
-import net.sf.freecol.client.gui.CanvasMouseListener;
-import net.sf.freecol.client.gui.CanvasKeyListener;
-import net.sf.freecol.client.gui.panel.MapControls;
 
 import org.w3c.dom.Element;
 import java.util.logging.Logger;
