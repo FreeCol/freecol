@@ -18,7 +18,7 @@ public final class ImageSelection implements Transferable {
     
     private static Logger logger = Logger.getLogger(ImageSelection.class.getName());
 
-    private static final DataFlavor[] flavors = {DataFlavor.imageFlavor};
+    //private static final DataFlavor[] flavors = {DataFlavor.imageFlavor};
 
     private JLabel label;
 
@@ -49,6 +49,7 @@ public final class ImageSelection implements Transferable {
     * @return The flavors that are supported by this Transferable.
     */
     public DataFlavor[] getTransferDataFlavors() {
+        DataFlavor[] flavors = {DefaultTransferHandler.flavor};
         return flavors;
     }
 
@@ -59,6 +60,6 @@ public final class ImageSelection implements Transferable {
     * 'false' otherwise.
     */
     public boolean isDataFlavorSupported(DataFlavor flavor) {
-        return flavor.equals(flavors[0]);
+        return flavor.equals(DefaultTransferHandler.flavor);
     }
 }

@@ -35,7 +35,8 @@ public final class DefaultTransferHandler extends TransferHandler {
 
     private static Logger logger = Logger.getLogger(DefaultTransferHandler.class.getName());
 
-    private static final DataFlavor flavor = DataFlavor.imageFlavor;
+    //private static final DataFlavor flavor = DataFlavor.imageFlavor;
+    public static final DataFlavor flavor = new DataFlavor(ImageSelection.class, "ImageSelection");
 
     private final Canvas canvas;
     private final JLayeredPane parentPanel;
