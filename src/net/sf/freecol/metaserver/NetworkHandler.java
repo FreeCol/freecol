@@ -2,6 +2,7 @@
 package net.sf.freecol.metaserver;
 
 
+import java.io.IOException;
 import java.util.logging.Logger;
 import org.w3c.dom.Element;
 
@@ -23,6 +24,7 @@ public final class NetworkHandler implements MessageHandler {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
+    private MetaServer metaServer;
     private MetaRegister metaRegister;
 
 
@@ -30,7 +32,8 @@ public final class NetworkHandler implements MessageHandler {
     /**
     * The constructor to use.
     */
-    public NetworkHandler(MetaRegister metaRegister) {
+    public NetworkHandler(MetaServer metaServer, MetaRegister metaRegister) {
+        this.metaServer = metaServer;
         this.metaRegister = metaRegister;
     }
 
@@ -59,7 +62,7 @@ public final class NetworkHandler implements MessageHandler {
             } else if (type.equals("remove")) {
                 reply = remove(connection, element);
             } else if (type.equals("disconnect")) {
-                // Nothing to do.
+                reply = disconnect(connection, element);
             } else {
                 logger.warning("Unkown request: " + type);
             }
@@ -123,6 +126,23 @@ public final class NetworkHandler implements MessageHandler {
         int port = Integer.parseInt(element.getAttribute("port"));
 
         metaRegister.removeServer(address, port);
+        
+        return null;
+    }
+    
+    
+    /**
+    * Handles a "disconnect"-request.
+    * @param element The element containing the request.
+    */
+    private Element disconnect(Connection connection, Element element) {
+        try {
+            connection.reallyClose();
+        } catch (IOException e) {
+            logger.warning("Could not close the connection.");
+        }
+
+        metaServer.removeConnection(connection);
         
         return null;
     }

@@ -105,7 +105,7 @@ public final class MetaServer extends Thread {
         this.port = port;
 
         final MetaRegister mr = new MetaRegister();
-        networkHandler = new NetworkHandler(mr);
+        networkHandler = new NetworkHandler(this, mr);
         serverSocket = new ServerSocket(port);
         
         ActionListener deadServerRemover = new ActionListener() {
@@ -212,4 +212,13 @@ public final class MetaServer extends Thread {
     public Connection getConnection(Socket socket) {
         return (Connection) connections.get(socket);
     }
+    
+    
+    /**
+    * Removes the given connection
+    * @param connection The connection that should be removed.
+    */
+    public void removeConnection(Connection connection) {
+        connections.remove(connection.getSocket());
+    }    
 }
