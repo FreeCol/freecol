@@ -165,6 +165,8 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
                 {"EventImage.firstLanding", "landing.png"},
                 {"EventImage.meetingNatives", "meet_natives.png"},
                 {"EventImage.meetingEuropeans", "meet_europeans.png"},
+                {"EventImage.meetingAztec", "meet_aztec.png"},
+                {"EventImage.meetingInca", "meet_inca.png"},
                 {"VictoryImage", "victory.png"},
                 {"FoundingFather.trade", "trade.png"},
                 {"FoundingFather.exploration", "exploration.png"},
