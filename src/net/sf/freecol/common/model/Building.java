@@ -69,27 +69,6 @@ public final class Building extends FreeColGameObject implements WorkLocation {
 
     // Sets the maximum number of units in one building (will become a non-constant later):
     private static final int MAX_UNITS = 3;
-    
-    /*
-    private static final int requiredTable[][][] = {
-        {{  0,  0,  1},{ -1, -1, -1},{ -1, -1, -1},{ -1, -1, -1}}, // TOWNHALL
-        {{  0,  0,  1},{ 52,  0,  3},{ -1, -1, -1},{ -1, -1, -1}}, // CARPENTER
-        {{  0,  0,  1},{ 64, 20,  4},{240,100,  8},{ -1, -1, -1}}, // BLACKSMITH
-        {{  0,  0,  1},{ 64,  0,  4},{160, 20,  8},{ -1, -1, -1}}, // TOBACCONIST
-        {{  0,  0,  1},{ 64,  0,  4},{160, 20,  8},{ -1, -1, -1}}, // WEAVER
-        {{  0,  0,  1},{ 64,  0,  4},{160, 20,  8},{ -1, -1, -1}}, // DISTILLER
-        {{  0,  0,  1},{ 56,  0,  3},{160, 20,  6},{ -1, -1, -1}}, // FUR_TRADER
-        {{ 64,  0,  3},{120,100,  4},{320,100,  8},{ -1, -1, -1}}, // STOCKADE
-        {{ 52,  0,  1},{120, 50,  8},{240,100,  8},{ -1, -1, -1}}, // ARMORY
-        {{ 52,  0,  1},{ 80, 50,  6},{240,100,  8},{ -1, -1, -1}}, // DOCK
-        {{ 64,  0,  4},{160, 50,  8},{200,100, 10},{ -1, -1, -1}}, // SCHOOLHOUSE
-        {{ 80,  0,  1},{ 80, 20,  1},{ -1, -1, -1},{ -1, -1, -1}}, // WAREHOUSE
-        {{ 64,  0,  1},{ -1, -1, -1},{ -1, -1, -1},{ -1, -1, -1}}, // STABLES
-        {{ 52,  0,  3},{176,100,  8},{ -1, -1, -1},{ -1, -1, -1}}, // CHURCH
-        {{ 80,  0,  1},{120, 50,  4},{ -1, -1, -1},{ -1, -1, -1}}, // PRINTING_PRESS
-        {{160, 50,  1},{ -1, -1, -1},{ -1, -1, -1},{ -1, -1, -1}}  // CUSTOM_HOUSE
-    };
-    */
 
     private static final int requiredTable[][][] = {
         {{  0,  0,  1},{ -1, -1, -1},{ -1, -1, -1},{ -1, -1, -1}}, // TOWNHALL
@@ -155,7 +134,7 @@ public final class Building extends FreeColGameObject implements WorkLocation {
 
 
 
-    
+
 
     /**
     * Gets the <code>Tile</code> where this <code>Building</code> is located.
@@ -167,7 +146,7 @@ public final class Building extends FreeColGameObject implements WorkLocation {
 
 
     /**
-    * Gets the level of the building. One of {@link #NOT_BUILT}, 
+    * Gets the level of the building. One of {@link #NOT_BUILT},
     * {@link #HOUSE}, {@link #SHOP} and {@link #FACTORY}.
     *
     * @return The current level.
@@ -175,7 +154,7 @@ public final class Building extends FreeColGameObject implements WorkLocation {
     public int getLevel() {
         return level;
     }
-    
+
     /* Sets the level of the building.
     * @param level The new level of the building.
     */
@@ -187,7 +166,7 @@ public final class Building extends FreeColGameObject implements WorkLocation {
     /**
     * Gets the name of a building.
     *
-    * @return The name of the <code>Building</code> or 
+    * @return The name of the <code>Building</code> or
     *         <i>null</i> if the building has not been built.
     */
     public String getName() {
@@ -207,6 +186,10 @@ public final class Building extends FreeColGameObject implements WorkLocation {
     *         if the improvement does not exist.
     */
     public String getNextName() {
+        if (getType() == CUSTOM_HOUSE) {
+            return null;
+        }
+
         if (level < MAX_LEVEL) {
             return buildingNames[type][level];
         } else {
@@ -221,13 +204,17 @@ public final class Building extends FreeColGameObject implements WorkLocation {
     *         or -1 if the building does not exist.
     */
     public int getNextHammers() {
+        if (getType() == CUSTOM_HOUSE) {
+            return -1;
+        }
+
         if (level < MAX_LEVEL) {
             return requiredTable[type][level][0];
         } else {
             return -1;
         }
     }
-    
+
     /**
     * Gets the number of tools required for the improved building of the same type.
     *
@@ -235,13 +222,18 @@ public final class Building extends FreeColGameObject implements WorkLocation {
     *         or -1 if the building does not exist.
     */
     public int getNextTools() {
+        if (getType() == CUSTOM_HOUSE) {
+            return -1;
+        }
+
         if (level < MAX_LEVEL) {
             return requiredTable[type][level][1];
         } else {
             return -1;
         }
     }
-    
+
+
     /**
     * Gets the colony population required for the improved building of the same type.
     *
@@ -249,6 +241,10 @@ public final class Building extends FreeColGameObject implements WorkLocation {
     *         or -1 if the building does not exist.
     */
     public int getNextPop() {
+        if (getType() == CUSTOM_HOUSE) {
+            return -1;
+        }
+
         if (level < MAX_LEVEL) {
             return requiredTable[type][level][2];
         } else {
@@ -304,7 +300,7 @@ public final class Building extends FreeColGameObject implements WorkLocation {
     * @return The number.
     */
     public int getMaxUnits() {
-        if (type == STOCKADE || type == DOCK || type == WAREHOUSE || 
+        if (type == STOCKADE || type == DOCK || type == WAREHOUSE ||
                 type == STABLES || type == PRINTING_PRESS || type == CUSTOM_HOUSE) {
             return 0;
         } else {
@@ -574,6 +570,8 @@ public final class Building extends FreeColGameObject implements WorkLocation {
         type = Integer.parseInt(buildingElement.getAttribute("type"));
         level = Integer.parseInt(buildingElement.getAttribute("level"));
 
+        units.clear();
+
         NodeList unitNodeList = buildingElement.getChildNodes();
         for (int i=0; i<unitNodeList.getLength(); i++) {
             Element unitElement = (Element) unitNodeList.item(i);
@@ -581,6 +579,9 @@ public final class Building extends FreeColGameObject implements WorkLocation {
             Unit unit = (Unit) getGame().getFreeColGameObject(unitElement.getAttribute("ID"));
             if (unit != null) {
                 unit.readFromXMLElement(unitElement);
+                if (!units.contains(unit)) {
+                    units.add(unit);
+                }
             } else {
                 unit = new Unit(getGame(), unitElement);
                 units.add(unit);

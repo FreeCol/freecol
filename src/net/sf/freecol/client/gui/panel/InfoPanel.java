@@ -29,14 +29,15 @@ public final class InfoPanel extends JPanel {
     private final JLabel        unitLabel,
                                 unitNameLabel,
                                 unitMovesLabel,
+                                unitToolsLabel,
                                 goldLabel,
                                 turnLabel;
-                                
+
     private FreeColClient freeColClient;
     private final Game          game;
     private final ImageProvider imageProvider;
     private Unit unit;
-    
+
     /**
     * The constructor that will add the items to this panel.
     * @param game The Game object that has all kinds of useful information
@@ -48,24 +49,27 @@ public final class InfoPanel extends JPanel {
         this.freeColClient = freeColClient;
         this.game = game;
         this.imageProvider = imageProvider;
-        
+
         unitLabel = new JLabel();
         unitNameLabel = new JLabel();
         unitMovesLabel = new JLabel();
+        unitToolsLabel = new JLabel();
         goldLabel = new JLabel();
         turnLabel = new JLabel();
-        
+
         turnLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 
         unitLabel.setSize(118, 96);
         unitNameLabel.setSize(116, 20);
         unitMovesLabel.setSize(116, 20);
+        unitToolsLabel.setSize(116, 20);
         goldLabel.setSize(100, 20);
         turnLabel.setSize(146, 20);
 
         unitLabel.setLocation(10, 4);
         unitNameLabel.setLocation(130, 15);
         unitMovesLabel.setLocation(130, 40);
+        unitToolsLabel.setLocation(130, 65);
         goldLabel.setLocation(10, 102);
         turnLabel.setLocation(100, 102);
 
@@ -74,12 +78,14 @@ public final class InfoPanel extends JPanel {
         add(unitLabel);
         add(unitNameLabel);
         add(unitMovesLabel);
+        add(unitToolsLabel);
         add(goldLabel);
         add(turnLabel);
 
         unitLabel.setFocusable(false);
         unitNameLabel.setFocusable(false);
         unitMovesLabel.setFocusable(false);
+        unitToolsLabel.setFocusable(false);
         goldLabel.setFocusable(false);
         turnLabel.setFocusable(false);
 
@@ -90,7 +96,7 @@ public final class InfoPanel extends JPanel {
 
         setSize(256, 128);
     }
-    
+
     /**
     * Paints this component.
     * @param graphics The Graphics context in which to draw this component.
@@ -99,23 +105,22 @@ public final class InfoPanel extends JPanel {
         //Unit unit = freeColClient.getGUI().getActiveUnit();
         if (unit != null) {
             unitLabel.setIcon(imageProvider.getUnitImageIcon(imageProvider.getUnitGraphicsType(unit)));
-            try {
-                unitNameLabel.setText(unit.getName());
-            }
-            catch (FreeColException e) {
-                unitNameLabel.setText("UNKNOWN");
-            }
+            unitNameLabel.setText(unit.getName());
             unitMovesLabel.setText("Moves: " + unit.getMovesLeft() + "/" + unit.getInitialMovesLeft());
-        }
-        else {
+            if (unit.isPioneer()) {
+                unitToolsLabel.setText("Tools: " + unit.getNumberOfTools());
+            } else {
+                unitToolsLabel.setText("");
+            }
+        } else {
             unitLabel.setIcon(null);
             unitNameLabel.setText("");
             unitMovesLabel.setText("");
         }
-        
+
         goldLabel.setText("Gold: " + freeColClient.getMyPlayer().getGold());
         turnLabel.setText("Year: " + freeColClient.getGame().getTurn().toString());
-        
+
         super.paintComponent(graphics);
     }
 

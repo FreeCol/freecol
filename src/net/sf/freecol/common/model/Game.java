@@ -448,19 +448,28 @@ public class Game extends FreeColGameObject {
 
         Iterator iterator = ((HashMap) freeColGameObjects.clone()).values().iterator();
 
-        ArrayList later = new ArrayList();
+        ArrayList later1 = new ArrayList();
+        ArrayList later2 = new ArrayList();
         while (iterator.hasNext()) {
             FreeColGameObject freeColGameObject = (FreeColGameObject) iterator.next();
 
             // Take the settlements after the buildings and colonytiles:
             if (freeColGameObject instanceof Settlement) {
-                later.add(freeColGameObject);
+                later2.add(freeColGameObject);
+            } else if (freeColGameObject instanceof Building) {
+                later1.add(freeColGameObject);
             } else {
                 freeColGameObject.newTurn();
             }
         }
 
-        iterator = later.iterator();
+        iterator = later1.iterator();
+        while (iterator.hasNext()) {
+            FreeColGameObject freeColGameObject = (FreeColGameObject) iterator.next();
+            freeColGameObject.newTurn();
+        }
+        
+        iterator = later2.iterator();
         while (iterator.hasNext()) {
             FreeColGameObject freeColGameObject = (FreeColGameObject) iterator.next();
             freeColGameObject.newTurn();

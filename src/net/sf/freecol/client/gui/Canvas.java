@@ -126,8 +126,6 @@ public final class Canvas extends JLayeredPane {
 
 
 
-
-
     /**
     * The constructor to use.
     *
@@ -432,7 +430,22 @@ public final class Canvas extends JLayeredPane {
     */
     private void takeFocus() {
         if ((takeFocusThread == null) || (!takeFocusThread.isAlive()) || (!takeFocusThread.isStillWorking())) {
-            takeFocusThread = new TakeFocusThread(this);
+            JComponent c = this;
+            
+
+            if (startGamePanel.isShowing()) {
+                c = startGamePanel;
+            } else if (newPanel.isShowing()) {
+                c = newPanel;
+            } else if (mainPanel.isShowing()) {
+                c = mainPanel;
+            } else if (europePanel.isShowing()) {
+                c = europePanel;
+            } else if (colonyPanel.isShowing()) {
+                c = colonyPanel;
+            }
+
+            takeFocusThread = new TakeFocusThread(c);
             takeFocusThread.start();
         }
     }
@@ -534,12 +547,14 @@ public final class Canvas extends JLayeredPane {
 
         errorPanel.initialize(message);
         errorPanel.setLocation(getWidth() / 2 - errorPanel.getWidth() / 2, getHeight() / 2 - errorPanel.getHeight() / 2);
-        setEnabled(false);
+        //setEnabled(false);
         add(errorPanel, JLayeredPane.MODAL_LAYER);
         errorPanel.requestFocus();
+        errorPanel.getResponse();
+        remove(errorPanel);
     }
 
-    
+
     /**
     * Shows a message with some information and
     * a "Ok"-button.

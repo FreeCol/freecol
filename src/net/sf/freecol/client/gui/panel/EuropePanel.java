@@ -449,12 +449,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
     */
     private void updateCargoLabel() {
         if (selectedUnit != null) {
-            try {
-                cargoLabel.setText("Cargo (" + selectedUnit.getUnit().getName() + ") space left: " + selectedUnit.getUnit().getSpaceLeft());
-            } catch (FreeColException e) {
-                e.printStackTrace();
-                cargoLabel.setText("Cargo");
-            }
+            cargoLabel.setText("Cargo (" + selectedUnit.getUnit().getName() + ") space left: " + selectedUnit.getUnit().getSpaceLeft());
         } else {
             cargoLabel.setText("<html><strike>Cargo</strike></html>");
         }
@@ -935,9 +930,9 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
 
             if (editState) {
                 if (comp instanceof UnitLabel) {
-                    comp.getParent().remove(comp);
                     Unit unit = ((UnitLabel)comp).getUnit();
                     inGameController.boardShip(unit, selectedUnit.getUnit());
+                    comp.getParent().remove(comp);                  
                 } else if (comp instanceof MarketLabel) {
                     if ((freeColClient.getMyPlayer().getGold() >= (game.getMarket().costToBuy(((MarketLabel)comp).getType()) * 100))) {
                         inGameController.buyGoods(((MarketLabel)comp).getType(), 100, selectedUnit.getUnit());
@@ -966,7 +961,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             europePanel.refresh();
             return c;
         }
-        
+
         public boolean isActive() {
             return (getSelectedUnit() != null);
         }        

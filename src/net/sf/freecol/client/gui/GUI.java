@@ -221,14 +221,24 @@ public final class GUI {
     */
     public void setActiveUnit(Unit activeUnit) {
         // Don't select a unit with zero moves left. -sjm
-        if ((activeUnit != null) && (activeUnit.getMovesLeft() == 0)) {
+        // The user might what to check the status of a unit - SG
+        /*if ((activeUnit != null) && (activeUnit.getMovesLeft() == 0)) {
             freeColClient.getInGameController().nextActiveUnit();
             return;
+        }*/
+
+        if (activeUnit != null && activeUnit.getOwner() != freeColClient.getMyPlayer()) {
+            return;
         }
+
+        if (activeUnit != null && activeUnit.getTile() == null) {
+            activeUnit = null;
+        }
+        
         this.activeUnit = activeUnit;
 
         freeColClient.getCanvas().getMapControls().updateMoves(activeUnit);
-        
+
         //TODO: update only within the bounds of InfoPanel
         freeColClient.getCanvas().repaint(0, 0, getWidth(), getHeight());
 
@@ -237,7 +247,7 @@ public final class GUI {
         }
     }
 
-    
+
     /**
     * Gets the focus of the map. That is the center tile of the displayed
     * map.

@@ -60,59 +60,65 @@ public final class InGameInputHandler implements MessageHandler {
 
         String type = element.getTagName();
 
-        if (element != null) {
-            if (freeColServer.getGame().getCurrentPlayer().equals(freeColServer.getPlayer(connection))) {
-                if (type.equals("move")) {
-                    reply = move(connection, element);
-                } else if (type.equals("attack")) {
-                    reply = attack(connection, element);
-                } else if (type.equals("embark")) {
-                    reply = embark(connection, element);
-                } else if (type.equals("boardShip")) {
-                    reply = boardShip(connection, element);
-                } else if (type.equals("leaveShip")) {
-                    reply = leaveShip(connection, element);
-                } else if (type.equals("loadCargo")) {
-                    reply = loadCargo(connection, element);
-                } else if (type.equals("unloadCargo")) {
-                    reply = unloadCargo(connection, element);
-                } else if (type.equals("buyGoods")) {
-                    reply = buyGoods(connection, element);
-                } else if (type.equals("sellGoods")) {
-                    reply = sellGoods(connection, element);
-                } else if (type.equals("moveToEurope")) {
-                    reply = moveToEurope(connection, element);
-                } else if (type.equals("moveToAmerica")) {
-                    reply = moveToAmerica(connection, element);
-                } else if (type.equals("buildColony")) {
-                    reply = buildColony(connection, element);
-                } else if (type.equals("recruitUnitInEurope")) {
-                    reply = recruitUnitInEurope(connection, element);
-                } else if (type.equals("emigrateUnitInEurope")) {
-                    reply = emigrateUnitInEurope(connection, element);
-                } else if (type.equals("trainUnitInEurope")) {
-                    reply = trainUnitInEurope(connection, element);
-                } else if (type.equals("equipunit")) {
-                    reply = equipUnit(connection, element);
-                } else if (type.equals("work")) {
-                    reply = work(connection, element);
-                } else if (type.equals("changeWorkType")) {
-                    reply = changeWorkType(connection, element);
-                } else if (type.equals("setCurrentlyBuilding")) {
-                    reply = setCurrentlyBuilding(connection, element);
-                } else if (type.equals("changeState")) {
-                    reply = changeState(connection, element);
-                } else if (type.equals("putOutsideColony")) {
-                    reply = putOutsideColony(connection, element);
-                } else if (type.equals("endTurn")) {
-                    reply = endTurn(connection, element);
+        try {
+            if (element != null) {
+                if (freeColServer.getGame().getCurrentPlayer().equals(freeColServer.getPlayer(connection))) {
+                    if (type.equals("move")) {
+                        reply = move(connection, element);
+                    } else if (type.equals("attack")) {
+                        reply = attack(connection, element);
+                    } else if (type.equals("embark")) {
+                        reply = embark(connection, element);
+                    } else if (type.equals("boardShip")) {
+                        reply = boardShip(connection, element);
+                    } else if (type.equals("leaveShip")) {
+                        reply = leaveShip(connection, element);
+                    } else if (type.equals("loadCargo")) {
+                        reply = loadCargo(connection, element);
+                    } else if (type.equals("unloadCargo")) {
+                        reply = unloadCargo(connection, element);
+                    } else if (type.equals("buyGoods")) {
+                        reply = buyGoods(connection, element);
+                    } else if (type.equals("sellGoods")) {
+                        reply = sellGoods(connection, element);
+                    } else if (type.equals("moveToEurope")) {
+                        reply = moveToEurope(connection, element);
+                    } else if (type.equals("moveToAmerica")) {
+                        reply = moveToAmerica(connection, element);
+                    } else if (type.equals("buildColony")) {
+                        reply = buildColony(connection, element);
+                    } else if (type.equals("recruitUnitInEurope")) {
+                        reply = recruitUnitInEurope(connection, element);
+                    } else if (type.equals("emigrateUnitInEurope")) {
+                        reply = emigrateUnitInEurope(connection, element);
+                    } else if (type.equals("trainUnitInEurope")) {
+                        reply = trainUnitInEurope(connection, element);
+                    } else if (type.equals("equipunit")) {
+                        reply = equipUnit(connection, element);
+                    } else if (type.equals("work")) {
+                        reply = work(connection, element);
+                    } else if (type.equals("changeWorkType")) {
+                        reply = changeWorkType(connection, element);
+                    } else if (type.equals("setCurrentlyBuilding")) {
+                        reply = setCurrentlyBuilding(connection, element);
+                    } else if (type.equals("changeState")) {
+                        reply = changeState(connection, element);
+                    } else if (type.equals("putOutsideColony")) {
+                        reply = putOutsideColony(connection, element);
+                    } else if (type.equals("endTurn")) {
+                        reply = endTurn(connection, element);
+                    } else {
+                        logger.warning("Unknown request from client " + element.getTagName());
+                    }
                 } else {
-                    logger.warning("Unknown request from client " + element.getTagName());
+                    reply = Message.createNewRootElement("error");
+                    reply.setAttribute("message", "Not your turn.");
                 }
-            } else {
-                reply = Message.createNewRootElement("error");
-                reply.setAttribute("message", "Not your turn.");
-           }
+            }
+        } catch (Exception e) {
+            // TODO: Force the client to reconnect.
+            logger.warning(e.toString());
+            return null;
         }
 
         return reply;
@@ -139,8 +145,16 @@ public final class InGameInputHandler implements MessageHandler {
         if (unit == null) {
             throw new IllegalArgumentException("Could not find 'Unit' with specified ID: " + moveElement.getAttribute("unit"));
         }
+        
+        if (unit.getTile() == null) {
+            throw new IllegalArgumentException("'Unit' not on map: ID: " + moveElement.getAttribute("unit"));
+        }
 
-        boolean disembark = (unit.getMoveType(direction) == Unit.DISEMBARK);
+        if (unit.getOwner() != player) {
+            throw new IllegalStateException("Not your unit!");
+        }
+        
+        boolean disembark = !unit.getTile().isLand() && game.getMap().getNeighbourOrNull(direction, unit.getTile()).isLand();
 
         Tile oldTile = unit.getTile();
 
@@ -207,6 +221,14 @@ public final class InGameInputHandler implements MessageHandler {
             throw new IllegalArgumentException("Could not find 'Unit' with specified ID: " + attackElement.getAttribute("unit"));
         }
 
+        if (unit.getTile() == null) {
+            throw new IllegalArgumentException("'Unit' is not on the map: " + unit.toString());
+        }
+
+        if (unit.getOwner() != player) {
+            throw new IllegalStateException("Not your unit!");
+        }
+
         Tile oldTile = unit.getTile();
         Tile newTile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
 
@@ -226,7 +248,6 @@ public final class InGameInputHandler implements MessageHandler {
 
         if ((attackCalculator.nextInt(total_probability+1)) <= attack_power) {
             result = Unit.ATTACKER_WIN;
-        } else {
         }
 
         // Inform the other players (other then the player attacking) about the attack:
@@ -238,15 +259,38 @@ public final class InGameInputHandler implements MessageHandler {
                 continue;
             }
 
-            Element opponentAttackElement = Message.createNewRootElement("opponentAttack");
-            opponentAttackElement.setAttribute("direction", Integer.toString(direction));
-            opponentAttackElement.setAttribute("result", Integer.toString(result));
-            opponentAttackElement.setAttribute("unit", unit.getID());
+            // Send
+            if (enemyPlayer.canSee(oldTile) || enemyPlayer.canSee(newTile)) {
+                Element opponentAttackElement = Message.createNewRootElement("opponentAttack");
+                opponentAttackElement.setAttribute("direction", Integer.toString(direction));
+                opponentAttackElement.setAttribute("result", Integer.toString(result));
+                opponentAttackElement.setAttribute("unit", unit.getID());
 
-            try {
-                enemyPlayer.getConnection().send(opponentAttackElement);
-            } catch (IOException e) {
-                logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection " + enemyPlayer.getConnection());
+                if (enemyPlayer != unit.getOwner() && enemyPlayer != defender.getOwner()) {
+                    if (!enemyPlayer.canSee(oldTile)) {
+                        Element updateElement = Message.createNewRootElement("update");
+                        updateElement.appendChild(oldTile.toXMLElement(enemyPlayer, updateElement.getOwnerDocument()));
+                        try {
+                            enemyPlayer.getConnection().send(updateElement);
+                        } catch (IOException e) {
+                            logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection " + enemyPlayer.getConnection());
+                        }
+                    } else if (!enemyPlayer.canSee(newTile)) {
+                        Element updateElement = Message.createNewRootElement("update");
+                        updateElement.appendChild(newTile.toXMLElement(enemyPlayer, updateElement.getOwnerDocument()));
+                        try {
+                            enemyPlayer.getConnection().send(updateElement);
+                        } catch (IOException e) {
+                            logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection " + enemyPlayer.getConnection());
+                        }
+                    }
+                }
+
+                try {
+                    enemyPlayer.getConnection().send(opponentAttackElement);
+                } catch (IOException e) {
+                    logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection " + enemyPlayer.getConnection());
+                }
             }
         }
 
@@ -254,12 +298,17 @@ public final class InGameInputHandler implements MessageHandler {
         Element reply = Message.createNewRootElement("attackResult");
         reply.setAttribute("result", Integer.toString(result));
 
+        // If a colony has been won, send an updated tile:
+        if (result == Unit.ATTACKER_WIN && newTile.getColony() != null && defender.getLocation() != defender.getTile()) {
+            reply.appendChild(newTile.toXMLElement(newTile.getColony().getOwner(), reply.getOwnerDocument()));
+        }
+
         if (result == Unit.ATTACKER_LOSS) {
             unit.loseAttack();
         } else {
             unit.winAttack(defender);
         }
-        
+
         if (unit.getTile().equals(newTile)) { // In other words, we moved...
             Element update = reply.getOwnerDocument().createElement("update");
             Vector surroundingTiles = game.getMap().getSurroundingTiles(unit.getTile(), unit.getLineOfSight());
@@ -272,7 +321,7 @@ public final class InGameInputHandler implements MessageHandler {
 
             reply.appendChild(update);
         }
-                
+
         return reply;
     }
 
@@ -293,6 +342,10 @@ public final class InGameInputHandler implements MessageHandler {
 
         if (unit == null || destinationUnit == null || game.getMap().getNeighbourOrNull(direction, unit.getTile()) != destinationUnit.getTile()) {
             throw new IllegalArgumentException("Invalid data format in client message.");
+        }
+
+        if (unit.getOwner() != player) {
+            throw new IllegalStateException("Not your unit!");
         }
 
         Tile oldTile = unit.getTile();
@@ -338,6 +391,10 @@ public final class InGameInputHandler implements MessageHandler {
 
         Unit unit = (Unit) game.getFreeColGameObject(boardShipElement.getAttribute("unit"));
         Unit carrier = (Unit) game.getFreeColGameObject(boardShipElement.getAttribute("carrier"));
+
+        if (unit.getOwner() != player) {
+            throw new IllegalStateException("Not your unit!");
+        }
 
         Tile oldTile = unit.getTile();
 
@@ -394,6 +451,10 @@ public final class InGameInputHandler implements MessageHandler {
 
         Unit unit = (Unit) game.getFreeColGameObject(leaveShipElement.getAttribute("unit"));
 
+        if (unit.getOwner() != player) {
+            throw new IllegalStateException("Not your unit!");
+        }
+
         unit.leaveShip();
         Tile newTile = unit.getTile();
 
@@ -434,6 +495,11 @@ public final class InGameInputHandler implements MessageHandler {
         ServerPlayer player = freeColServer.getPlayer(connection);
 
         Goods goods = new Goods(game, (Element) unloadCargoElement.getChildNodes().item(0));
+        
+        if (goods.getLocation() instanceof Unit && ((Unit) goods.getLocation()).getOwner() != player) {
+            throw new IllegalStateException("Not your unit!");
+        }
+
         goods.unload();
 
         return null;
@@ -454,15 +520,19 @@ public final class InGameInputHandler implements MessageHandler {
         int amount = Integer.parseInt(buyGoodsElement.getAttribute("amount"));
 
         if (carrier.getOwner() != player) {
+            throw new IllegalStateException("Not your unit!");
+        }
+
+        if (carrier.getOwner() != player) {
             throw new IllegalStateException();
         }
 
         carrier.buyGoods(type, amount);
-        
+
         return null;
     }
 
-    
+
     /**
     * Handles a "sellGoods"-message from a client.
     *
@@ -475,11 +545,15 @@ public final class InGameInputHandler implements MessageHandler {
 
         Goods goods = new Goods(game, (Element) sellGoodsElement.getChildNodes().item(0));
 
+        if (goods.getLocation() instanceof Unit && ((Unit) goods.getLocation()).getOwner() != player) {
+            throw new IllegalStateException("Not your unit!");
+        }
+
         game.getMarket().sell(goods, player);
 
         return null;
     }
-    
+
     /**
     * Handles a "moveToEurope"-message from a client.
     *
@@ -491,7 +565,11 @@ public final class InGameInputHandler implements MessageHandler {
         ServerPlayer player = freeColServer.getPlayer(connection);
 
         Unit unit = (Unit) game.getFreeColGameObject(moveToEuropeElement.getAttribute("unit"));
-        
+
+        if (unit.getOwner() != player) {
+            throw new IllegalStateException("Not your unit!");
+        }
+
         Tile oldTile = unit.getTile();
         unit.moveToEurope();
 
@@ -507,8 +585,14 @@ public final class InGameInputHandler implements MessageHandler {
     */
     private Element moveToAmerica(Connection connection, Element moveToAmericaElement) {
         Game game = freeColServer.getGame();
+        ServerPlayer player = freeColServer.getPlayer(connection);
 
         Unit unit = (Unit) game.getFreeColGameObject(moveToAmericaElement.getAttribute("unit"));
+
+        if (unit.getOwner() != player) {
+            throw new IllegalStateException("Not your unit!");
+        }
+
         unit.moveToAmerica();
 
         return null;
@@ -527,6 +611,10 @@ public final class InGameInputHandler implements MessageHandler {
 
         String name = buildColonyElement.getAttribute("name");
         Unit unit = (Unit) freeColServer.getGame().getFreeColGameObject(buildColonyElement.getAttribute("unit"));
+
+        if (unit.getOwner() != player) {
+            throw new IllegalStateException("Not your unit!");
+        }
 
         if (unit.canBuildColony()) {
             Colony colony = new Colony(game, player, name, unit.getTile());
@@ -635,10 +723,15 @@ public final class InGameInputHandler implements MessageHandler {
     */
     private Element equipUnit(Connection connection, Element workElement) {
         Game game = freeColServer.getGame();
+        ServerPlayer player = freeColServer.getPlayer(connection);
 
         Unit unit = (Unit) game.getFreeColGameObject(workElement.getAttribute("unit"));
         int type = Integer.parseInt(workElement.getAttribute("type"));
         int amount = Integer.parseInt(workElement.getAttribute("amount"));
+
+        if (unit.getOwner() != player) {
+            throw new IllegalStateException("Not your unit!");
+        }
 
         switch(type) {
             case Goods.CROSSES:
@@ -680,6 +773,10 @@ public final class InGameInputHandler implements MessageHandler {
         Unit unit = (Unit) game.getFreeColGameObject(workElement.getAttribute("unit"));
         WorkLocation workLocation = (WorkLocation) game.getFreeColGameObject(workElement.getAttribute("workLocation"));
 
+        if (unit.getOwner() != player) {
+            throw new IllegalStateException("Not your unit!");
+        }
+
         if (workLocation == null) {
             throw new NullPointerException();
         }
@@ -705,13 +802,16 @@ public final class InGameInputHandler implements MessageHandler {
         Unit unit = (Unit) game.getFreeColGameObject(workElement.getAttribute("unit"));
         int workType = Integer.parseInt(workElement.getAttribute("workType"));
 
+        if (unit.getOwner() != player) {
+            throw new IllegalStateException("Not your unit!");
+        }
         // No reason to send an update to other players: this is always hidden.
 
         unit.setWorkType(workType);
 
         return null;
     }
-    
+
     /**
     * Handles a "setCurrentlyBuilding"-request from a client.
     *
@@ -724,9 +824,13 @@ public final class InGameInputHandler implements MessageHandler {
 
         Colony colony = (Colony) game.getFreeColGameObject(setCurrentlyBuildingElement.getAttribute("colony"));
         int type = Integer.parseInt(setCurrentlyBuildingElement.getAttribute("type"));
-        
+
+        if (colony.getOwner() != player) {
+            throw new IllegalStateException("Not your colony!");
+        }
+
         colony.setCurrentlyBuilding(type);
-        
+
         sendUpdatedTileToAll(colony.getTile(), player);
 
         return null;
@@ -753,6 +857,10 @@ public final class InGameInputHandler implements MessageHandler {
         if (unit == null) {
             throw new IllegalArgumentException("Could not find 'Unit' with specified ID: " + changeStateElement.getAttribute("unit"));
         }
+        
+        if (unit.getOwner() != player) {
+            throw new IllegalStateException("Not your unit!");
+        }
 
         Tile oldTile = unit.getTile();
 
@@ -777,13 +885,19 @@ public final class InGameInputHandler implements MessageHandler {
     */
     private Element putOutsideColony(Connection connection, Element putOutsideColonyElement) {
         Game game = freeColServer.getGame();
+        ServerPlayer player = freeColServer.getPlayer(connection);
 
         Unit unit = (Unit) game.getFreeColGameObject(putOutsideColonyElement.getAttribute("unit"));
+
+        if (unit.getOwner() != player) {
+            throw new IllegalStateException("Not your unit!");
+        }
+
         unit.putOutsideColony();
 
         return null;
     }
-    
+
 
     /**
     * Handles an "endTurn" notification from a client.
@@ -865,11 +979,18 @@ public final class InGameInputHandler implements MessageHandler {
 
             if (tile.getColony() != null && tile.getColony().getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) {
                 int unitType = tile.getColony().getCurrentlyBuilding() - Colony.BUILDING_UNIT_ADDITION;
-                
+
                 if (Unit.getNextHammers(unitType) <= tile.getColony().getHammers() &&
                     Unit.getNextTools(unitType) <= tile.getColony().getGoodsCount(Goods.TOOLS)) {
 
                     Colony colony = tile.getColony();
+
+                    // Check for cheating:
+                    if (!colony.canBuildUnit(unitType)) {
+                        logger.warning("Trying to build: " + unitType + " in colony: " + colony);
+                        return;
+                    }
+
                     Unit unit = new Unit(game, null, colony.getOwner(), unitType, Unit.ACTIVE);
 
                     Element createUnitElement = Message.createNewRootElement("createUnit");
@@ -948,7 +1069,7 @@ public final class InGameInputHandler implements MessageHandler {
             }
         }
     }
-    
+
     private void sendErrorToAll(String message, Player player) {
         Game game = freeColServer.getGame();
 
@@ -963,11 +1084,12 @@ public final class InGameInputHandler implements MessageHandler {
             try {
                 Element errorElement = Message.createNewRootElement("error");
                 errorElement.setAttribute("message", message);
-                    
+
                 enemyPlayer.getConnection().send(errorElement);
             } catch (IOException e) {
                 logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection " + enemyPlayer.getConnection());
             }
         }
     }
+
 }

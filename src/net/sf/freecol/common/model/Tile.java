@@ -175,14 +175,18 @@ public final class Tile extends FreeColGameObject implements Location {
             }
         }
         
-        if (defender != null) {
-            return defender;
-        }
-
         if (settlement != null) {
-            return settlement.getDefendingUnit(attacker);
+            if (defender == null || defender.isColonist() && !defender.isArmed() && !defender.isMounted()) {
+                return settlement.getDefendingUnit(attacker);
+            } else {
+                return defender;
+            }
         } else {
-            return null;
+            if (defender != null) {
+                return defender;
+            } else {
+                return null;
+            }
         }
     }
 
@@ -598,8 +602,7 @@ public final class Tile extends FreeColGameObject implements Location {
     * Gets the <code>Tile</code> where this <code>Location</code> is located
     * or null if no <code>Tile</code> applies.
     *
-    * @return The code>Tile</code> where this <code>Location</code> is
-    *         located. Or null if no code>Tile</code> applies.
+    * @return This <code>Tile</code>.
     */
     public Tile getTile() {
         return this;
@@ -811,9 +814,10 @@ public final class Tile extends FreeColGameObject implements Location {
             tileElement.appendChild(settlement.toXMLElement(player, document));
         }
 
-        // Check if there is a settlement on this tile: Do not show enemy units hidden in a settlement:
+        // TODO: Check if there is a settlement on this tile: Do not show enemy units hidden in a settlement.
+        //       Needs to store a "defendingUnit" if the unitContainer is hidden.
+
         // Check if the player can see the tile: Do not show enemy units on a tile out-of-sight.
-        //if ((settlement == null || settlement instanceof IndianSettlement || settlement.getOwner().equals(player)) && player.canSee(this)) {
         if (player.canSee(this)) {
             tileElement.appendChild(unitContainer.toXMLElement(player, document));
         } else {

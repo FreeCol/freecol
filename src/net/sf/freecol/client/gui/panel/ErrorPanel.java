@@ -16,7 +16,7 @@ import javax.swing.border.BevelBorder;
 /**
  * This is the panel that pops up when an error needs to be reported.
  */
-public final class ErrorPanel extends JPanel implements ActionListener {
+public final class ErrorPanel extends FreeColDialog implements ActionListener {
     public static final String  COPYRIGHT = "Copyright (C) 2003 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
@@ -93,7 +93,8 @@ public final class ErrorPanel extends JPanel implements ActionListener {
         try {
             switch (Integer.valueOf(command).intValue()) {
                 case OK:
-                    parent.closeErrorPanel();
+                    //parent.closeErrorPanel();
+                    setResponse(new Boolean(true));
                     break;
                 default:
                     logger.warning("Invalid Actioncommand: invalid number.");

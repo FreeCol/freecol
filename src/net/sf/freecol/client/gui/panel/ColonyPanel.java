@@ -318,12 +318,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     */
     private void updateCargoLabel() {
         if (selectedUnit != null) {
-            try {
-                cargoLabel.setText("Cargo (" + selectedUnit.getUnit().getName() + ") space left: " + selectedUnit.getUnit().getSpaceLeft());
-            } catch (FreeColException e) {
-                e.printStackTrace();
-                cargoLabel.setText("Cargo");
-            }
+            cargoLabel.setText("Cargo (" + selectedUnit.getUnit().getName() + ") space left: " + selectedUnit.getUnit().getSpaceLeft());
         } else {
             cargoLabel.setText("<html><strike>Cargo</strike></html>");
         }
@@ -337,6 +332,17 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                          "), Tory: " + colony.getTory() + "% (" +
                          (colony.getUnitCount() - ((colony.getUnitCount() * colony.getSoL()) / 100)) + ")");
     }
+
+
+    public void updateBuildingBox() {
+        buildingBox.initialize();
+    }
+    
+    
+    public void updateWarehouse() {
+        warehousePanel.initialize();
+    }
+
 
     /**
     * Updates the building progress label.
@@ -460,7 +466,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     public final TilePanel getTilePanel() {
         return tilePanel;
     }
-    
+
     /**
     * Returns a pointer to the <code>FreeColClient</code> which uses this panel.
     */
@@ -575,10 +581,12 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 if (editState) {
                     if (comp instanceof UnitLabel) {
                         Unit unit = ((UnitLabel) comp).getUnit();
-                        
+
                         if (building.canAdd(unit)) {
                             comp.getParent().remove(comp);
                             inGameController.work(unit, building);
+                            updateBuildingBox();
+                            updateWarehouse();
                         } else {
                             return null;
                         }
@@ -629,17 +637,21 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 if (comp instanceof UnitLabel) {
                     UnitLabel unitLabel = ((UnitLabel) comp);
                     Unit unit = unitLabel.getUnit();
-                    inGameController.putOutsideColony(unit);
+
+                    if (!(unit.getLocation() instanceof Unit)) {
+                        inGameController.putOutsideColony(unit);
+                    }
 
                     if (unit.getTile().getColony() == null) {
                         parent.remove(colonyPanel);
                         parent.showMapControls();
                         return null;
-                    } else if (!(unit.getLocation() instanceof Tile)) {
+                    } else if (!(unit.getLocation() instanceof Tile) && !(unit.getLocation() instanceof Unit)) {
                         return null;
                     }
                     
                     comp.getParent().remove(comp);
+                    updateBuildingBox();
                 } else {
                     logger.warning("An invalid component got dropped on this ColonistsPanel.");
                     return null;
@@ -784,7 +796,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             if (selectedUnit == null) {
                 return null;
             }
-                    
+
             if (editState) {
                 if (comp instanceof UnitLabel) {
                     comp.getParent().remove(comp);
@@ -792,9 +804,10 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                     if (!unit.isCarrier()) {// No, you cannot load ships onto other ships.
                       ((UnitLabel) comp).setSmall(false);
                       inGameController.boardShip(unit, selectedUnit.getUnit());
-                      colonyPanel.updateSoLLabel();
+                      updateBuildingBox();
+                      colonyPanel.updateSoLLabel();                      
                     } else {
-                      return comp;
+                      return null;
                     }
                 } else if (comp instanceof GoodsLabel) {
                     Goods g = ((GoodsLabel)comp).getGoods();
@@ -927,14 +940,12 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 }
 
                 if (colonyTile.isColonyCenterTile()) {
-
                     staticGoodsLabel = new JLabel(parent.getImageProvider().getGoodsImageIcon(Goods.FOOD));
                     staticGoodsLabel.setText(Integer.toString(colonyTile.getTile().potential(Goods.FOOD)));
                     add(staticGoodsLabel);
                     staticGoodsLabel = new JLabel(parent.getImageProvider().getGoodsImageIcon(colonyTile.getTile().secondaryGoods()));
                     staticGoodsLabel.setText(Integer.toString(colonyTile.getTile().potential(colonyTile.getTile().secondaryGoods())));
                     add(staticGoodsLabel);
-
                 }
 
                 setTransferHandler(defaultTransferHandler);
@@ -949,7 +960,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
 
             public void paintComponent(Graphics g) {
-            
+
             }
 
 
@@ -972,6 +983,9 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                             comp.getParent().remove(comp);
 
                             inGameController.work(unit, colonyTile);
+
+                            updateBuildingBox();
+                            updateWarehouse();
 
                             ((UnitLabel) comp).setSmall(false);
                             colonyPanel.updateSoLLabel();
@@ -1007,7 +1021,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
         private final ColonyPanel colonyPanel;
         private final BuildingBoxListener buildingBoxListener;
-        
+
         /**
         * Creates a new BuildingBox for this Colony.
         */
@@ -1052,20 +1066,25 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 }
             }
 
-            String theText = new String(Unit.getName(Unit.WAGON_TRAIN) +
-                " (" + Unit.getNextHammers(Unit.WAGON_TRAIN) + " hammers");
+            Iterator buildableUnitIterator = colonyPanel.getColony().getBuildableUnitIterator();
+            while (buildableUnitIterator.hasNext()) {
+                int unitID = (int) ((Integer) buildableUnitIterator.next()).intValue();
 
-            if (Unit.getNextTools(Unit.WAGON_TRAIN) > 0) {
-                theText += ", " + Integer.toString(Unit.getNextTools(Unit.WAGON_TRAIN)) + " tools";
-            }
+                String theText = new String(Unit.getName(unitID) +
+                    " (" + Unit.getNextHammers(unitID) + " hammers");
 
-            theText += ")";
+                if (Unit.getNextTools(unitID) > 0) {
+                    theText += ", " + Integer.toString(Unit.getNextTools(unitID)) + " tools";
+                }
 
-            int i = Unit.WAGON_TRAIN + Colony.BUILDING_UNIT_ADDITION;
-            BuildingBoxItem wagonTrainItem = new BuildingBoxItem(theText, i);
-            addItem(wagonTrainItem);
-            if (i == colonyPanel.getColony().getCurrentlyBuilding()) {
-                toSelect = wagonTrainItem;
+                theText += ")";
+
+                int i = unitID + Colony.BUILDING_UNIT_ADDITION;
+                BuildingBoxItem uItem = new BuildingBoxItem(theText, i);
+                addItem(uItem);
+                if (i == colonyPanel.getColony().getCurrentlyBuilding()) {
+                    toSelect = uItem;
+                }
             }
 
             this.setSelectedItem(toSelect);

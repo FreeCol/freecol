@@ -1,6 +1,7 @@
 package net.sf.freecol.client.gui;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.FreeCol;
 
 import java.awt.*;
 import javax.swing.*;
@@ -89,36 +90,38 @@ public class FreeColMenuBar extends JMenuBar {
         });
 
         // --> Debug
-        JMenu debugMenu = new JMenu("Debug");
-        debugMenu.setOpaque(false);
-        debugMenu.setMnemonic(KeyEvent.VK_D);
-        add(debugMenu);
+        if (FreeCol.isInDebugMode()) {
+            JMenu debugMenu = new JMenu("Debug");
+            debugMenu.setOpaque(false);
+            debugMenu.setMnemonic(KeyEvent.VK_D);
+            add(debugMenu);
 
-        JCheckBoxMenuItem sc = new JCheckBoxMenuItem("Show coordinates");
-        sc.setOpaque(false);
-        sc.setMnemonic(KeyEvent.VK_S);
-        debugMenu.add(sc);
+            JCheckBoxMenuItem sc = new JCheckBoxMenuItem("Show coordinates");
+            sc.setOpaque(false);
+            sc.setMnemonic(KeyEvent.VK_S);
+            debugMenu.add(sc);
 
-        sc.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                gui.displayCoordinates = ((JCheckBoxMenuItem) e.getSource()).isSelected();
-                canvas.refresh();
-            }
-        });
-        
-        final JMenuItem reveal = new JCheckBoxMenuItem("Reveal entire map");
-        reveal.setOpaque(false);
-        reveal.setMnemonic(KeyEvent.VK_R);
-        debugMenu.add(reveal);
-
-        reveal.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (freeColClient.getFreeColServer() != null) {
-                    freeColClient.getFreeColServer().revealMapForAllPlayers();
+            sc.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    gui.displayCoordinates = ((JCheckBoxMenuItem) e.getSource()).isSelected();
+                    canvas.refresh();
                 }
+            });
 
-                reveal.setEnabled(false);
-            }
-        });
+            final JMenuItem reveal = new JCheckBoxMenuItem("Reveal entire map");
+            reveal.setOpaque(false);
+            reveal.setMnemonic(KeyEvent.VK_R);
+            debugMenu.add(reveal);
+
+            reveal.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    if (freeColClient.getFreeColServer() != null) {
+                        freeColClient.getFreeColServer().revealMapForAllPlayers();
+                    }
+
+                    reveal.setEnabled(false);
+                }
+            });
+        }
     }
 }

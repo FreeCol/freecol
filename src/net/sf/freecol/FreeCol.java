@@ -68,6 +68,8 @@ public final class FreeCol {
     private static FreeColClient freeColClient;
 
     private static boolean standAloneServer = false;
+    private static boolean inDebugMode = false;
+
     private static int serverPort;
 
     
@@ -209,6 +211,8 @@ public final class FreeCol {
             } else if (args[i].equals("--version")) {
                 System.out.println("FreeCol " + getVersion());
                 System.exit(0);
+            } else if (args[i].equals("--debug")) {
+                inDebugMode = true;
             } else if (args[i].equals("--server")) {
                 standAloneServer = true;
                 i++;
@@ -226,7 +230,7 @@ public final class FreeCol {
         }
     }
 
-    
+
     /**
     * Gets the current version of game.
     *
@@ -235,6 +239,14 @@ public final class FreeCol {
     */
     public static String getVersion() {
         return FREECOL_VERSION;
+    }
+
+    
+    /**
+    * Checks if the program is in "Debug mode".
+    */
+    public static boolean isInDebugMode() {
+        return inDebugMode;
     }
 
 

@@ -195,6 +195,13 @@ public final class InGameController {
 
         int result = Integer.parseInt(attackResultElement.getAttribute("result"));
 
+        // If a successful attack against a colony, we need to update the tile:
+        Element utElement = getChildElement(attackResultElement, Tile.getXMLElementTagName());
+        if (utElement != null) {
+            Tile updateTile = (Tile) game.getFreeColGameObject(utElement.getAttribute("ID"));
+            updateTile.readFromXMLElement(utElement);
+        }
+
         Unit defender = map.getNeighbourOrNull(direction, unit.getTile()).getDefendingUnit(unit);
 
         if (result == Unit.ATTACKER_LOSS) {
@@ -296,7 +303,8 @@ public final class InGameController {
     */
     public void boardShip(Unit unit, Unit carrier) {
         if (carrier == null) {
-            throw new NullPointerException();
+            logger.warning("Trying to load onto a non-existent carrier.");
+            return;
         }
 
         Client client = freeColClient.getClient();
@@ -308,11 +316,11 @@ public final class InGameController {
 
         freeColClient.playSound(SfxLibrary.LOAD_CARGO);
 
-        unit.boardShip(carrier);
-
         Element boardShipElement = Message.createNewRootElement("boardShip");
         boardShipElement.setAttribute("unit", unit.getID());
         boardShipElement.setAttribute("carrier", carrier.getID());
+
+        unit.boardShip(carrier);
 
         client.send(boardShipElement);
     }
@@ -525,7 +533,9 @@ public final class InGameController {
         Client client = freeColClient.getClient();
         Canvas canvas = freeColClient.getCanvas();
 
-        if (unit.getTile().getColony().getUnitCount() > 1 || canvas.showConfirmDialog("abandonColony.text", "abandonColony.yes", "abandonColony.no")) {
+        if (unit.getTile().getColony().getUnitCount() > 1 || !(unit.getLocation() instanceof Colony ||
+                unit.getLocation() instanceof Building || unit.getLocation() instanceof ColonyTile)
+                || canvas.showConfirmDialog("abandonColony.text", "abandonColony.yes", "abandonColony.no")) {
             unit.putOutsideColony();
         } else {
             return false;
@@ -809,5 +819,26 @@ public final class InGameController {
 
         Element endTurnElement = Message.createNewRootElement("endTurn");
         client.send(endTurnElement);
+    }
+    
+    
+    
+
+    /**
+    * Convenience method: returns the first child element with the
+    * specified tagname.
+    *
+    * @param element The <code>Element</code> to search for the child element.
+    * @param tagName The tag name of the child element to be found.
+    */
+    protected Element getChildElement(Element element, String tagName) {
+        NodeList n = element.getChildNodes();
+        for (int i=0; i<n.getLength(); i++) {
+            if (((Element) n.item(i)).getTagName().equals(tagName)) {
+                return (Element) n.item(i);
+            }
+        }
+
+        return null;
     }
 }

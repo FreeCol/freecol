@@ -702,7 +702,7 @@ public class Player extends FreeColGameObject {
             if (unitIterator != null && unitIterator.hasNext()) {
                 Unit u = (Unit) unitIterator.next();
 
-                if ((u.getMovesLeft() > 0) && (u.getState() == Unit.ACTIVE) && !(u.getLocation() instanceof WorkLocation)) {
+                if ((u.getMovesLeft() > 0) && (u.getState() == Unit.ACTIVE) && !(u.getLocation() instanceof WorkLocation) && u.getTile() != null) {
                     return u;
                 } else {
                     return next();
@@ -756,12 +756,12 @@ public class Player extends FreeColGameObject {
                         while (childUnitIterator.hasNext()) {
                             Unit childUnit = (Unit) childUnitIterator.next();
 
-                            if ((childUnit.getMovesLeft() > 0) && (childUnit.getState() == Unit.ACTIVE)) {
+                            if ((childUnit.getMovesLeft() > 0) && (childUnit.getState() == Unit.ACTIVE) && u.getTile() != null) {
                                 units.add(childUnit);
                             }
                         }
 
-                        if ((u.getMovesLeft() > 0) && (u.getState() == Unit.ACTIVE)) {
+                        if ((u.getMovesLeft() > 0) && (u.getState() == Unit.ACTIVE) && u.getTile() != null) {
                             units.add(u);
                         }
                     }

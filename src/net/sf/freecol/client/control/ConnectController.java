@@ -125,9 +125,9 @@ public final class ConnectController {
     */
     public void joinMultiplayerGame(String username, String host, int port) {
         freeColClient.setSingleplayer(false);
-        login(username, host, port);
-        
-        freeColClient.getCanvas().showStartGamePanel(freeColClient.getGame(), freeColClient.getMyPlayer());
+        if (login(username, host, port)) {
+            freeColClient.getCanvas().showStartGamePanel(freeColClient.getGame(), freeColClient.getMyPlayer());
+        }
     }
 
 
@@ -137,8 +137,9 @@ public final class ConnectController {
     * @param username The name to use when logging in. This should be a unique identifier.
     * @param host The name of the machine running the <code>FreeColServer</code>.
     * @param port The port to use when connecting to the host.
+    * @return <i>true</i> if the login was completed successfully.
     */
-    private void login(String username, String host, int port) {
+    private boolean login(String username, String host, int port) {
         if (client != null) {
             client.disconnect();
         }
@@ -147,10 +148,10 @@ public final class ConnectController {
             client = new Client(host, port, freeColClient.getPreGameInputHandler());
         } catch (ConnectException e) {
             freeColClient.getCanvas().errorMessage("server.couldNotConnect");
-            return;
+            return false;
         } catch (IOException e) {
             freeColClient.getCanvas().errorMessage("server.couldNotConnect");
-            return;
+            return false;
         }
 
         freeColClient.setClient(client);
@@ -172,16 +173,19 @@ public final class ConnectController {
             freeColClient.setGame(game);
             freeColClient.setMyPlayer(thisPlayer);
         } else if (type.equals("error")) {
+            Canvas canvas = freeColClient.getCanvas();
             if (reply.hasAttribute("messageID")) {
-                freeColClient.getCanvas().errorMessage(reply.getAttribute("messageID"), reply.getAttribute("message"));
+                canvas.errorMessage(reply.getAttribute("messageID"), reply.getAttribute("message"));
             } else {
-                freeColClient.getCanvas().errorMessage(null, reply.getAttribute("message"));
+                canvas.errorMessage(null, reply.getAttribute("message"));
             }
-
-            return;
+            
+            return false;
         } else {
             logger.warning("Unkown message received: " + reply);
-            return;
+            return false;
         }
+        
+        return true;
     }
 }

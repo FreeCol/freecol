@@ -269,19 +269,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     }
 
 
-    /**
-     * Gets the type of a move made in a specified direction.
-     *
-     * @param direction The direction of the move.
-     * @return The move type. Notice: <code>Unit.ILLEGAL_MOVE</code>
-     *         when there are no moves left.
-     */
-    public int getMoveType(int direction) {
-        Tile target = getGame().getMap().getNeighbourOrNull(direction, getTile());
-
-        return getMoveType(target);
-    }
-
      /**
      * Gets the type of goods this unit is producing in its current occupation.
      * @return The type of goods this unit would produce.
@@ -294,7 +281,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
           return workType;
         }
     }
-    
+
      /**
      * Sets the type of goods this unit is producing in its current occupation.
      * @param type The type of goods to attempt to produce.
@@ -302,6 +289,21 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     public void setWorkType(int type) {
         workType = type;
     }
+
+    
+    /**
+     * Gets the type of a move made in a specified direction.
+     *
+     * @param direction The direction of the move.
+     * @return The move type. Notice: <code>Unit.ILLEGAL_MOVE</code>
+     *         when there are no moves left.
+     */
+    public int getMoveType(int direction) {
+        Tile target = getGame().getMap().getNeighbourOrNull(direction, getTile());
+
+        return getMoveType(target);
+    }
+    
 
     /**
      * Gets the type of a move that is made when moving to the
@@ -481,6 +483,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     public void boardShip(Unit carrier) {
         if (getTile() == carrier.getTile()) {
             setLocation(carrier);
+            setState(SENTRY);
         } else {
             throw new IllegalStateException("It is not allowed to board a ship on another tile.");
         }
@@ -500,8 +503,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
 
         if (l instanceof Europe) {
             setLocation(l);
+            setState(ACTIVE);
         } else if (getTile().getSettlement() != null) {
             setLocation(getTile());
+            setState(ACTIVE);
         } else {
             throw new IllegalStateException("A unit may only leave a ship while in a harbour.");
         }
@@ -1153,6 +1158,72 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
 
 
     /**
+    * Returns the name of a unit in a human readable format. The return
+    * value can be used when communicating with the user.
+    *
+    * @return The given unit type as a String
+    * @throws IllegalArgumentException
+    */
+    public String getName() {
+        // TODO: Use i18n:
+
+        String name = "";
+        boolean addP = false;
+
+        if (isPioneer() && getType() != HARDY_PIONEER) {
+            name = "Pioneer (";
+            addP = true;
+        } else if (isArmed() && getType() != KINGS_REGULAR && getType() != COLONIAL_REGULAR && getType() != BRAVE && getType() != VETERAN_SOLDIER) {
+            if (!isMounted()) {
+                name = "Soldier (";
+            } else {
+                name = "Dragoon (";
+            }
+            addP = true;
+        } else if (isMounted() && getType() != SEASONED_SCOUT && getType() != BRAVE) {
+            name = "Scout (";
+            addP = true;
+        }
+
+        if (!isArmed() && (getType() == KINGS_REGULAR || getType() == COLONIAL_REGULAR || getType() == VETERAN_SOLDIER)) {
+            name = "Unarmed ";
+        }
+
+        if (getType() == BRAVE) {
+            if (isArmed() && !isMounted()) {
+                name = "Armed ";
+            } else if (isMounted()) {
+                name = "Mounted ";
+            }
+        }
+
+        name += getName(getType());
+
+        if (isArmed() && isMounted()) {
+            if (getType() == KINGS_REGULAR) {
+                name = "King's cavalry";
+                addP = false;
+            } else if (getType() == COLONIAL_REGULAR) {
+                name = "Colonial cavalry";
+                addP = false;
+            } else if (getType() == VETERAN_SOLDIER) {
+                name = "Veteran Dragoon";
+                addP = false;
+            } else if (getType() == BRAVE) {
+                name = "Indian Dragoon";
+                addP = false;
+            }
+        }
+
+        if (addP) {
+            name += ")";
+        }
+
+        return name;
+    }
+
+
+    /**
     * Returns the name of a unit type in a human readable format. The return
     * value can be used when communicating with the user.
     *
@@ -1160,8 +1231,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     * @throws IllegalArgumentException
     */
     public static String getName(int someType) {
-        // TODO: Use i18n:
-
         switch (someType) {
             case FREE_COLONIST:
                 return "Free Colonist";
@@ -1220,7 +1289,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             case COLONIAL_REGULAR:
                 return "Colonial Regular";
             case KINGS_REGULAR:
-                return "Kings Regular";
+                return "King's Regular";
             case CARAVEL:
                 return "Caravel";
             case FRIGATE:
@@ -1256,9 +1325,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     * @return The type of this Unit as a String
     * @throws FreeColException
     */
-    public String getName() throws FreeColException {
+    /*public String getName() throws FreeColException {
         return Unit.getName(getType());
-    }
+    }*/
 
 
     /**
@@ -1329,19 +1398,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     * @return A String representation of this Unit.
     */
     public String toString() {
-        String result;
-        try {
-            result = getName();
-        } catch (FreeColException e) {
-            result = "<ERROR>";
-            e.printStackTrace();
-        }
-
-        result += " " + movesLeft + "/" + getInitialMovesLeft();
-
-        // TODO: add armed & mounted info.
-
-        return result;
+        return getName() + " " + movesLeft + "/" + getInitialMovesLeft();
     }
 
 
@@ -1512,10 +1569,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                     return false;
                 }
             case SENTRY:
-                if (!getTile().isLand()) {
+                if (getTile() == null) {
                     return true;
-                }
-                else {
+                } else if (!getTile().isLand()) {
+                    return true;
+                } else {
                     if (getMovesLeft() > 0) {
                         return true;
                     }
@@ -2252,45 +2310,101 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     * @param goods The type of goods to be produced.
     * @return The potential amount of goods to be manufactured.
     */
-    public int getProducedAmount(int goods)
-    {
+    public int getProducedAmount(int goods) {
+        int base = 0;
+
         switch (type) {
             case MASTER_DISTILLER:
-                if (goods == Goods.RUM) return 6;
-                return 3;
+                if (goods == Goods.RUM) {
+                    base = 6;
+                } else {
+                    return 3;
+                }
+                break;
             case MASTER_WEAVER:
-                if (goods == Goods.CLOTH) return 6;
-                return 3;
+                if (goods == Goods.CLOTH) {
+                    base = 6;
+                } else {
+                    base = 3;
+                }
+                break;
             case MASTER_TOBACCONIST:
-                if (goods == Goods.CIGARS) return 6;
-                return 3;
+                if (goods == Goods.CIGARS) {
+                    base = 6;
+                } else {
+                    base = 3;
+                }
+                break;
             case MASTER_FUR_TRADER:
-                if (goods == Goods.COATS) return 6;
-                return 3;
+                if (goods == Goods.COATS) {
+                    base = 6;
+                } else {
+                    base = 3;
+                }
+                break;
             case MASTER_BLACKSMITH:
-                if (goods == Goods.TOOLS) return 6;
-                return 3;
+                if (goods == Goods.TOOLS) {
+                    base = 6;
+                } else {
+                    base = 3;
+                }
+                break;
             case MASTER_GUNSMITH:
-                if (goods == Goods.MUSKETS) return 6;
-                return 3;
+                if (goods == Goods.MUSKETS) {
+                    base = 6;
+                } else {
+                    base = 3;
+                }
+                break;
             case ELDER_STATESMAN:
-                if (goods == Goods.BELLS) return 6;
-                return 3;
+                if (goods == Goods.BELLS) {
+                    base = 6;
+                } else {
+                    base = 3;
+                }
+                break;
             case FIREBRAND_PREACHER:
-                if (goods == Goods.CROSSES) return 6;
-                return 3;
+                if (goods == Goods.CROSSES) {
+                    base = 6;
+                } else {
+                    base = 3;
+                }
+                break;
+            case MASTER_CARPENTER:
+                if (goods == Goods.HAMMERS) {
+                    base = 6;
+                } else {
+                    base = 3;
+                }
+                break;
+            case FREE_COLONIST:
+                base = 3;
+                break;
             case INDENTURED_SERVANT:
-                return 2;
+                base = 2;
+                break;
             case PETTY_CRIMINAL:
             case INDIAN_CONVERT:
-                return 1;
+                base = 1;
+                break;
             default: // Beats me who or what is working here, but he doesn't get a bonus.
-                if (isColonist())
-                    return 3;
-                else
-                    return 0; // Can't work if you're not a colonist.
+                if (isColonist()) {
+                    base = 3;
+                } else {
+                    base = 0; // Can't work if you're not a colonist.
+                }                
         }
+
+        if (base == 0) {
+            return 0;
+        }
+
+        base += getTile().getColony().getProductionBonus();
+        return Math.max(base, 1);
     }
+
+
+
 
     /**
     * Given a type of goods to produce in the field and a tile, returns the unit's potential to produce goods.
@@ -2359,22 +2473,55 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                 break;
         }
 
-        return base;
+        if (getLocation() instanceof ColonyTile && !((ColonyTile) getLocation()).getWorkTile().isLand()
+                && !((ColonyTile) getLocation()).getColony().getBuilding(Building.DOCK).isBuilt()) {
+            base = 0;
+        }
+
+        if (base == 0) {
+            return 0;
+        }
+
+        base += getTile().getColony().getProductionBonus();
+        return Math.max(base, 1);
     }
 
-    
+
     public static int getNextHammers(int type) {
         if (type == WAGON_TRAIN) {
             return 40;
+        } else if (type == ARTILLERY) {
+            return 192;
+        } else if (type == CARAVEL) {
+            return 128;
+        } else if (type == MERCHANTMAN) {
+            return 192;
+        } else if (type == GALLEON) {
+            return 320;
+        } else if (type == PRIVATEER) {
+            return 256;
+        } else if (type == FRIGATE) {
+            return 512;
         } else {
             return -1;
         }
     }
-    
-    
+
     public static int getNextTools(int type) {
         if (type == WAGON_TRAIN) {
             return 0;
+        } else if (type == ARTILLERY) {
+            return 40;
+        } else if (type == CARAVEL) {
+            return 40;
+        } else if (type == MERCHANTMAN) {
+            return 80;
+        } else if (type == GALLEON) {
+            return 100;
+        } else if (type == PRIVATEER) {
+            return 120;
+        } else if (type == FRIGATE) {
+            return 200;
         } else {
             return -1;
         }
@@ -2426,13 +2573,17 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         unitElement.setAttribute("workLeft", Integer.toString(workLeft));
         unitElement.setAttribute("numberOfTools", Integer.toString(numberOfTools));
         unitElement.setAttribute("owner", owner.getID());
-        
+
         if (entryLocation != null) {
             unitElement.setAttribute("entryLocation", entryLocation.getID());
         }
 
         if (location != null) {
-            unitElement.setAttribute("location", location.getID());
+            if (player == getOwner() || !(location instanceof Building || location instanceof ColonyTile)) {
+                unitElement.setAttribute("location", location.getID());
+            } else {
+                unitElement.setAttribute("location", getTile().getColony().getID());
+            }
         }
 
         // Do not show enemy units hidden in a carrier:

@@ -187,7 +187,9 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation {
 
     public Iterator getUnitIterator() {
         ArrayList units = new ArrayList();
-        units.add(getUnit());
+        if (getUnit() != null) {
+            units.add(getUnit());
+        }
         return units.iterator();
     }
 
@@ -319,6 +321,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation {
             Unit unit = (Unit) getGame().getFreeColGameObject(unitElement.getAttribute("ID"));
             if (unit != null) {
                 unit.readFromXMLElement(unitElement);
+                this.unit = unit;
             } else {
                 this.unit = new Unit(getGame(), unitElement);
             }

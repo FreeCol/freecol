@@ -21,6 +21,8 @@
 package net.sf.freecol.common.networking;
 
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.FreeCol;
+
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -39,6 +41,7 @@ import java.util.Iterator;
 final class ReceivingThread extends Thread {
     private static final Logger logger = Logger.getLogger(ReceivingThread.class.getName());
     private static final int BUFFER_SIZE = 4096;
+
     private final BufferedReader reader;
     private boolean halt;
 
@@ -47,9 +50,9 @@ final class ReceivingThread extends Thread {
     private Vector threadsWaitingForNetworkReply = new Vector();
     private final Connection connection;
 
-    
-    
-    
+
+
+
 
     /**
     * The constructor to use.
@@ -67,8 +70,8 @@ final class ReceivingThread extends Thread {
     }
 
 
-    
-    
+
+
 
     /**
     * Gets the next <code>networkReplyId</code> that will be used when identifing a network message.
@@ -148,9 +151,11 @@ final class ReceivingThread extends Thread {
                 }
                 
                 // START DEBUG-LINES:
-                //System.out.println(msg);
-                //System.out.println();
-                //System.out.flush();
+                if (FreeCol.isInDebugMode()) {
+                    System.out.println(msg);
+                    System.out.println();
+                    System.out.flush();
+                }
                 // END DEBUB
 
                 if (msg.isType("reply")) { // == this is a reply-message:
@@ -175,7 +180,7 @@ final class ReceivingThread extends Thread {
                     connection.handleAndSendReply(msg);
                 }
             }
-            
+
             msg = null;
         }
     }

@@ -151,11 +151,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
             }
 
             int production = unit.getFarmedPotential(unit.getWorkType(), ((ColonyTile) unit.getLocation()).getWorkTile());
-            if (unit.getLocation() instanceof ColonyTile && !((ColonyTile) unit.getLocation()).getWorkTile().isLand()
-                    && !((ColonyTile) unit.getLocation()).getColony().getBuilding(Building.DOCK).isBuilt()) {
-                production = 0;
-            }
-
+            
             if (production > 0) {
                 int p = getWidth() / production;
                 if (p-goodsIcon.getIconWidth() < 0) {

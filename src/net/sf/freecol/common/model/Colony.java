@@ -39,6 +39,10 @@ public final class Colony extends Settlement implements Location {
     private int hammers;
     private int bells;
     
+    // Will only be used on enemy colonies:
+    private int unitCount = -1;
+    private Unit defendingUnit = null;
+    
     /**
     * The type of the "Building" that is beeing built,
     * or if <code>currentlyBuilding >= BUILDING_UNIT_ADDITION</code>
@@ -117,24 +121,7 @@ public final class Colony extends Settlement implements Location {
     */
     public void setOwner(Player owner) {
         this.owner = owner;
-        
-        /*
-        Iterator i = getWorkLocationIterator();
-        ArrayList units = new ArrayList();
-        while (i.hasNext()) {
-            WorkLocation w = (WorkLocation) i.next();
-            if (w instanceof Building) {
-                Iterator unitIterator = w.getUnitIterator();
-                while (unitIterator.hasNext()) {
-                    Unit unit = (Unit)unitIterator.next();
-                    units.add(unit);
-                }
-            } else if (w instanceof ColonyTile) {
-                Unit unit = ((ColonyTile)w).getUnit();
-                if (unit != null) units.add(unit);
-            }
-        }*/
-        
+
         Iterator unitIterator = getUnitIterator();
         while (unitIterator.hasNext()) {
             ((Unit)unitIterator.next()).setOwner(owner);
@@ -339,6 +326,10 @@ public final class Colony extends Settlement implements Location {
     public int getUnitCount() {
         int count = 0;
 
+        if (unitCount != -1) {
+            return unitCount;
+        }
+
         Iterator i = getWorkLocationIterator();
         while (i.hasNext()) {
             WorkLocation w = (WorkLocation) i.next();
@@ -357,7 +348,7 @@ public final class Colony extends Settlement implements Location {
     public int getGoodsCount(int type) {
         return goodsContainer.getGoodsCount(type);
     }
-    
+
        
     /**
     * Removes a specified amount of a type of Goods from this containter.
@@ -426,7 +417,20 @@ public final class Colony extends Settlement implements Location {
     * @return The <code>Unit</code> that has been choosen to defend this colony.
     */
     public Unit getDefendingUnit(Unit attacker) {
-        return (Unit) getUnitIterator().next();
+        return getDefendingUnit();
+    }
+
+
+    /**
+    * Gets the <code>Unit</code> that is currently defending this <code>Colony</code>.
+    * @return The <code>Unit</code> that has been choosen to defend this colony.
+    */
+    public Unit getDefendingUnit() {
+        if (defendingUnit == null) {
+            return (Unit) getUnitIterator().next();
+        } else {
+            return defendingUnit;
+        }
     }
 
     /**
@@ -483,6 +487,48 @@ public final class Colony extends Settlement implements Location {
         }
 
         unit.setLocation(this);
+    }
+
+    
+    /**
+    * Returns an <code>Iterator</code> of every unit type this colony may build.
+    */
+    public Iterator getBuildableUnitIterator() {
+        ArrayList buildableUnits = new ArrayList();
+        buildableUnits.add(new Integer(Unit.WAGON_TRAIN));
+        
+        if (getBuilding(Building.ARMORY).isBuilt()) {
+            buildableUnits.add(new Integer(Unit.ARTILLERY));
+        }
+
+        if (getBuilding(Building.DOCK).getLevel() >= Building.FACTORY) {
+            buildableUnits.add(new Integer(Unit.CARAVEL));
+            buildableUnits.add(new Integer(Unit.MERCHANTMAN));
+            buildableUnits.add(new Integer(Unit.GALLEON));
+            buildableUnits.add(new Integer(Unit.PRIVATEER));
+            buildableUnits.add(new Integer(Unit.FRIGATE));
+            // TODO-LATER: Add "MAN_OF_WAR" if independent.
+        }
+        
+        return buildableUnits.iterator();
+    }
+
+   
+    /**
+    * Checks if this colony may build the given unit type.
+    *
+    * @param unitType The unit type to test against.
+    * @return The result.
+    */
+    public boolean canBuildUnit(int unitType) {
+        Iterator buildableUnitIterator = getBuildableUnitIterator();
+        while (buildableUnitIterator.hasNext()) {
+            if (unitType == (int) ((Integer) buildableUnitIterator.next()).intValue()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 
@@ -631,6 +677,11 @@ public final class Colony extends Settlement implements Location {
     * Prepares this <code>Colony</code> for a new turn.
     */
     public void newTurn() {
+        // Skip doing work in enemy colonies.
+        if (unitCount != -1) {
+            return;
+        }
+
         // Eat food:
         int eat = getUnitCount() * 2;
         int food = getGoodsCount(Goods.FOOD);
@@ -659,7 +710,7 @@ public final class Colony extends Settlement implements Location {
                 addGoods(Goods.HORSES, horseProduction);
             }
         }
-        
+
         // Throw away goods there is no room for.
         int capacity = 100 + getBuilding(Building.WAREHOUSE).getLevel() * 100;
         goodsContainer.removeAbove(capacity);
@@ -691,15 +742,22 @@ public final class Colony extends Settlement implements Location {
         colonyElement.setAttribute("name", name);
         colonyElement.setAttribute("owner", owner.getID());
         colonyElement.setAttribute("tile", tile.getID());
-        colonyElement.setAttribute("hammers", Integer.toString(hammers));
-        colonyElement.setAttribute("bells", Integer.toString(bells));
-        colonyElement.setAttribute("currentlyBuilding", Integer.toString(currentlyBuilding));
 
-        Iterator workLocationIterator = workLocations.iterator();
-        while (workLocationIterator.hasNext()) {
-            colonyElement.appendChild(((FreeColGameObject) workLocationIterator.next()).toXMLElement(player, document));
+        if (player == getOwner()) {
+            colonyElement.setAttribute("hammers", Integer.toString(hammers));
+            colonyElement.setAttribute("bells", Integer.toString(bells));
+            colonyElement.setAttribute("currentlyBuilding", Integer.toString(currentlyBuilding));
+
+            Iterator workLocationIterator = workLocations.iterator();
+            while (workLocationIterator.hasNext()) {
+                colonyElement.appendChild(((FreeColGameObject) workLocationIterator.next()).toXMLElement(player, document));
+            }
+        } else {
+            colonyElement.setAttribute("unitCount", Integer.toString(getUnitCount()));
+            colonyElement.appendChild(getDefendingUnit().toXMLElement(player, document));
+            colonyElement.appendChild(getBuilding(Building.STOCKADE).toXMLElement(player, document));
         }
-        
+
         colonyElement.appendChild(goodsContainer.toXMLElement(player, document));
 
         return colonyElement;
@@ -716,9 +774,31 @@ public final class Colony extends Settlement implements Location {
         name = colonyElement.getAttribute("name");
         owner = (Player) getGame().getFreeColGameObject(colonyElement.getAttribute("owner"));
         tile = (Tile) getGame().getFreeColGameObject(colonyElement.getAttribute("tile"));
-        hammers = Integer.parseInt(colonyElement.getAttribute("hammers"));
-        bells = Integer.parseInt(colonyElement.getAttribute("bells"));
-        currentlyBuilding = Integer.parseInt(colonyElement.getAttribute("currentlyBuilding"));
+        defendingUnit = null;
+
+        if (colonyElement.hasAttribute("hammers")) {
+            hammers = Integer.parseInt(colonyElement.getAttribute("hammers"));
+        } else {
+            hammers = 0;
+        }
+
+        if (colonyElement.hasAttribute("bells")) {
+            bells = Integer.parseInt(colonyElement.getAttribute("bells"));
+        } else {
+            bells = 0;
+        }
+        
+        if (colonyElement.hasAttribute("currentlyBuilding")) {
+            currentlyBuilding = Integer.parseInt(colonyElement.getAttribute("currentlyBuilding"));
+        } else {
+            currentlyBuilding = -1;
+        }
+
+        if (colonyElement.hasAttribute("unitCount")) {
+            unitCount = Integer.parseInt(colonyElement.getAttribute("unitCount"));
+        } else {
+            unitCount = -1;
+        }
 
         NodeList childNodes = colonyElement.getChildNodes();
         for (int i=0; i<childNodes.getLength(); i++) {
@@ -748,6 +828,8 @@ public final class Colony extends Settlement implements Location {
                 } else {
                     goodsContainer = new GoodsContainer(getGame(), this, childElement);
                 }
+            } else if (childElement.getTagName().equals(Unit.getXMLElementTagName())) {
+                defendingUnit = new Unit(getGame(), childElement);
             }
         }
     }
