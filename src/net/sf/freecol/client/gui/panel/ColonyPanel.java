@@ -132,7 +132,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         cargoLabel = new JLabel("<html><strike>Cargo</strike></html>");
         goldLabel = new JLabel("Gold: 0");
         
-        solLabel = new JLabel("SOL: 0%, Tory: 100%");
+        solLabel = new JLabel("SoL: 0%, Tory: 100%");
         warehouseLabel = new JLabel("Goods");
         progressLabel = new JLabel("Hammers: 0/0");
 
@@ -1182,7 +1182,10 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                     if (comp instanceof UnitLabel) {
                         Unit unit = ((UnitLabel)comp).getUnit();
                         if (colonyTile.getWorkTile().getOwner() != null && colonyTile.getWorkTile().getOwner() != colony) {
-                            parent.errorMessage("tileTaken");
+                            if (colonyTile.getWorkTile().getOwner().getOwner().isEuropean())
+                                parent.errorMessage("tileTakenEuro");
+                            else // its an indian setttlement
+                                parent.errorMessage("tileTakenInd");
                             return null;
                         }
 
