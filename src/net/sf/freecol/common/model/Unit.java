@@ -2853,7 +2853,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         state = Integer.parseInt(unitElement.getAttribute("state"));
         workLeft = Integer.parseInt(unitElement.getAttribute("workLeft"));
         numberOfTools = Integer.parseInt(unitElement.getAttribute("numberOfTools"));
-        owner = getGame().getPlayerByID(unitElement.getAttribute("owner"));
+        owner = (Player) getGame().getFreeColGameObject(unitElement.getAttribute("owner"));
         turnsOfTraining = Integer.parseInt(unitElement.getAttribute("turnsOfTraining"));
         trainingType = Integer.parseInt(unitElement.getAttribute("trainingType"));
 
