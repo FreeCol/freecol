@@ -8,6 +8,12 @@ import java.util.Iterator;
 
 // XML:
 import org.w3c.dom.*;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 
 // Networking:
@@ -197,9 +203,26 @@ public final class FreeColServer {
         
         // Add the AIObjects:
         savedGameElement.appendChild(aiMain.toXMLElement(document));
+        
+        // Convert the XML Element to a human-readable XML string.
+        String xml;
+        try {
+            TransformerFactory factory = TransformerFactory.newInstance();
+            Transformer xmlTransformer = factory.newTransformer();
+            xmlTransformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 
+            StringWriter stringWriter = new StringWriter();
+            xmlTransformer.transform(new DOMSource(savedGameElement), new StreamResult(stringWriter));
+            xml = stringWriter.toString();
+        }
+        catch (TransformerException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        // Write the string to file.
         PrintWriter out = new PrintWriter(new DeflaterOutputStream(new FileOutputStream(file)));
-        out.print(savedGameElement.toString());
+        out.print(xml);
         out.close();
     }
     
