@@ -2,7 +2,6 @@
 package net.sf.freecol.client.control;
 
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Game;

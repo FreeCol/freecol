@@ -10,7 +10,6 @@ import org.w3c.dom.Element;
 
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.networking.Message;
-import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.Connection;
 
 import net.sf.freecol.server.FreeColServer;

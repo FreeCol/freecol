@@ -15,7 +15,6 @@ import net.sf.freecol.common.model.*;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.networking.Message;
-import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.Connection;
 
 import net.sf.freecol.server.FreeColServer;

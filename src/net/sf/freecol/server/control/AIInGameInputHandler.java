@@ -2,7 +2,6 @@
 package net.sf.freecol.server.control;
 
 import net.sf.freecol.common.networking.Message;
-import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Game;
