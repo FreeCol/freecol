@@ -91,6 +91,8 @@ public class ModelMessage {
             return ((Settlement) source).getOwner();
         } else if (source instanceof Europe) {
             return ((Europe) source).getOwner();
+        } else if (source instanceof Player) {
+            return (Player) source;
         }
 
         return null;

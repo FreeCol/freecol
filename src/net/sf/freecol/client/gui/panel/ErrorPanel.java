@@ -51,9 +51,7 @@ public final class ErrorPanel extends FreeColDialog implements ActionListener {
         try {
             BevelBorder border = new BevelBorder(BevelBorder.RAISED);
             setBorder(border);
-        }
-        catch(Exception e) {
-        }
+        } catch(Exception e) {}
 
         add(errorButton);
     }

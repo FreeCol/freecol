@@ -185,7 +185,20 @@ public class ServerPlayer extends Player {
                     canSeeTiles[p.getX()][p.getY()] = true;
                 }
             }
+            
+            Iterator colonyIterator = getColonyIterator();
+            while (colonyIterator.hasNext()) {
+                Colony colony = (Colony) colonyIterator.next();
+                
+                Map.Position position = colony.getTile().getPosition();
+                canSeeTiles[position.getX()][position.getY()] = true;
 
+                Iterator positionIterator = map.getCircleIterator(position, true, colony.getLineOfSight());
+                while (positionIterator.hasNext()) {
+                    Map.Position p = (Map.Position) positionIterator.next();
+                    canSeeTiles[p.getX()][p.getY()] = true;
+                }
+            }
         }
     }
 
@@ -259,7 +272,7 @@ public class ServerPlayer extends Player {
         exploredTiles[tile.getX()][tile.getY()] = true;
         canSeeTiles[tile.getX()][tile.getY()] = true;
     }
-    
+
 
     /**
     * Sets the tiles within the given <code>Unit</code>'s line of

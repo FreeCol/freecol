@@ -662,6 +662,29 @@ public class Player extends FreeColGameObject {
 
 
     /**
+    * Gets an <code>Iterator</code> containing all the colonies this player owns.
+    *
+    * @return The <code>Iterator</code>.
+    * @see Colony
+    */
+    public Iterator getColonyIterator() {
+        ArrayList colonies = new ArrayList();
+        Map map = getGame().getMap();
+
+        Iterator tileIterator = map.getWholeMapIterator();
+        while (tileIterator.hasNext()) {
+            Tile t = map.getTile((Map.Position) tileIterator.next());
+
+            if (t != null && t.getColony() != null && t.getColony().getOwner() == this) {
+                colonies.add(t.getColony());
+            }
+        }
+
+        return colonies.iterator();
+    }
+    
+
+    /**
     * Increments the player's cross count, with benefits thereof.
     * @param num The number of crosses to add.
     * @see #setCrosses
