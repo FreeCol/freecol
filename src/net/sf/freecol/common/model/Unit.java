@@ -846,7 +846,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         setLocation(workLocation);
     }
 
-
+    
     /**
     * Sets the location of this Unit.
     * @param newLocation The new Location of the Unit.

@@ -201,6 +201,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation {
             return;
         }
 
+        getWorkTile().setOwner(null);
         setUnit(null);
         getColony().updatePopulation();
     }
@@ -331,6 +332,10 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation {
 
 
     public void dispose() {
+        if (unit != null) {
+            getWorkTile().setOwner(null);
+        }
+
         if (unit != null) {
             unit.dispose();
         }

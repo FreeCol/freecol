@@ -953,9 +953,10 @@ public final class Tile extends FreeColGameObject implements Location {
         tileElement.setAttribute("plowed", Boolean.toString(plowed));
         tileElement.setAttribute("forested", Boolean.toString(forested));
         tileElement.setAttribute("bonus", Boolean.toString(bonus));
-
-        // Notice: Should be calculated by the other host instead of beeing transferred:
-        //tileElement.setAttribute("owner", owner.getID());
+        
+        if (owner != null) {
+            tileElement.setAttribute("owner", owner.getID());
+        }
 
         if (settlement != null) {
             tileElement.appendChild(settlement.toXMLElement(player, document, showAll, toSavedGame));
@@ -992,9 +993,10 @@ public final class Tile extends FreeColGameObject implements Location {
         plowed = Boolean.valueOf(tileElement.getAttribute("plowed")).booleanValue();
         forested = Boolean.valueOf(tileElement.getAttribute("forested")).booleanValue();
         bonus = Boolean.valueOf(tileElement.getAttribute("bonus")).booleanValue();
-
-        // Notice: Should be calculated by the other host instead of beeing transferred:
-        //tileElement.getAttribute("owner");
+        
+        if (tileElement.hasAttribute("owner")) {
+            owner = (Settlement) getGame().getFreeColGameObject(tileElement.getAttribute("owner"));
+        }
 
         Element colonyElement = getChildElement(tileElement, Colony.getXMLElementTagName());
         if (colonyElement != null) {
