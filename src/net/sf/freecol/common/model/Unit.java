@@ -448,7 +448,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             else if (isMissionary()) {
                 return ENTER_INDIAN_VILLAGE_WITH_MISSIONARY;
             }
-            else if (getType() == FREE_COLONIST) {
+            else if ((getType() == FREE_COLONIST) || (getType() == INDENTURED_SERVANT)) {
                 return ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST;
             }
             else {
