@@ -3,6 +3,7 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
@@ -159,7 +160,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         cargoLabel.setSize(410, 20);
         goldLabel.setSize(100, 20);
 
-        solLabel.setSize(160, 20);
+        solLabel.setSize(180, 20);
         warehouseLabel.setSize(100, 20);
 
         tilesLabel.setSize(100, 20);
@@ -614,14 +615,14 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             */
             public Component add(Component comp, boolean editState) {
                 Component c;
-                Component oldParent = comp.getParent();
+                Container oldParent = comp.getParent();
 
                 if (editState) {
                     if (comp instanceof UnitLabel) {
                         Unit unit = ((UnitLabel) comp).getUnit();
 
                         if (building.canAdd(unit)) {
-                            comp.getParent().remove(comp);
+                            oldParent.remove(comp);
                             inGameController.work(unit, building);
                             updateBuildingBox();
                             updateWarehouse();
@@ -679,6 +680,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
                 g.drawImage(productionImage, nextX + goodsIcon.getIconWidth(), 0, null);
             }
+            
+            //TODO : update for the other types of goods.
         }
     }
 
@@ -709,6 +712,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         * @return The component argument.
         */
         public Component add(Component comp, boolean editState) {
+            Container oldParent = comp.getParent();
             if (editState) {
                 if (comp instanceof UnitLabel) {
                     UnitLabel unitLabel = ((UnitLabel) comp);
@@ -726,7 +730,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                         return null;
                     }
                     
-                    comp.getParent().remove(comp);
+                    oldParent.remove(comp);
                     updateBuildingBox();
                 } else {
                     logger.warning("An invalid component got dropped on this ColonistsPanel.");
@@ -739,6 +743,9 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             Component c = add(comp);
             refresh();
             colonyPanel.updateSoLLabel();
+            if (oldParent != null && oldParent.getParent() instanceof BuildingsPanel.ASingleBuildingPanel) {
+                ((BuildingsPanel.ASingleBuildingPanel) oldParent.getParent()).updateProductionInBuildingPanel();
+            }
             return c;
         }
     }
@@ -869,13 +876,14 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         * @return The component argument.
         */
         public Component add(Component comp, boolean editState) {
+            Container oldParent = comp.getParent();
             if (selectedUnit == null) {
                 return null;
             }
 
             if (editState) {
                 if (comp instanceof UnitLabel) {
-                    comp.getParent().remove(comp);
+                    oldParent.remove(comp);
                     Unit unit = ((UnitLabel)comp).getUnit();
                     if (!unit.isCarrier()) {// No, you cannot load ships onto other ships.
                       ((UnitLabel) comp).setSmall(false);
@@ -894,7 +902,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                         g = new Goods(game, g.getLocation(), g.getType(), 100);
                         g.setAmount(100);
                     } else {
-                        comp.getParent().remove(comp);
+                        oldParent.remove(comp);
                     }
 
                     ((GoodsLabel) comp).setSmall(false);
@@ -918,6 +926,9 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             Component c = add(comp);
 
             refresh();
+            if (oldParent != null && oldParent.getParent() instanceof BuildingsPanel.ASingleBuildingPanel) {
+                ((BuildingsPanel.ASingleBuildingPanel) oldParent.getParent()).updateProductionInBuildingPanel();
+            }
             return c;
         }
 
@@ -1061,11 +1072,12 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             * @return The component argument.
             */
             public Component add(Component comp, boolean editState) {
+                Container oldParent = comp.getParent();
                 if (editState) {
                     if (comp instanceof UnitLabel) {
                         Unit unit = ((UnitLabel)comp).getUnit();
                         if (colonyTile.canAdd(unit)) {
-                            comp.getParent().remove(comp);
+                            oldParent.remove(comp);
 
                             inGameController.work(unit, colonyTile);
 
@@ -1086,6 +1098,9 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 updateCargoLabel();
                 Component c = add(comp);
                 refresh();
+                if (oldParent != null && oldParent.getParent() instanceof BuildingsPanel.ASingleBuildingPanel) {
+                    ((BuildingsPanel.ASingleBuildingPanel) oldParent.getParent()).updateProductionInBuildingPanel();
+                }
                 return c;
             }
 
