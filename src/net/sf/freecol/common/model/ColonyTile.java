@@ -174,7 +174,27 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation {
             }
         }
 
-        setUnit((Unit) locatable);
+        Unit u = (Unit) locatable;
+
+        if (u != null) {
+            if (u.isArmed()) {
+                u.setArmed(false);
+            }
+
+            if (u.isMounted()) {
+                u.setMounted(false);
+            }
+
+            if (u.isMissionary()) {
+                u.setMissionary(false);
+            }
+
+            if (u.getNumberOfTools() > 0) {
+                u.setNumberOfTools(0);
+            }
+        }
+
+        setUnit(u);
         
         getColony().updatePopulation();
         

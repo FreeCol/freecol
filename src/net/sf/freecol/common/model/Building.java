@@ -393,7 +393,25 @@ public final class Building extends FreeColGameObject implements WorkLocation {
             throw new IllegalStateException();
         }
 
-        units.add((Unit) locatable);
+        Unit unit = (Unit) locatable;
+
+        if (unit.isArmed()) {
+            unit.setArmed(false);
+        }
+
+        if (unit.isMounted()) {
+            unit.setMounted(false);
+        }
+
+        if (unit.isMissionary()) {
+            unit.setMissionary(false);
+        }
+
+        if (unit.getNumberOfTools() > 0) {
+            unit.setNumberOfTools(0);
+        }
+
+        units.add(unit);
         getColony().updatePopulation();
     }
 
