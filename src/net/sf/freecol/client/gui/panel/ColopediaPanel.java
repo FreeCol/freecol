@@ -4,10 +4,12 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -251,23 +253,23 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      */
     private void buildUnitList() {
         listPanel.setLayout(new GridLayout(8, 2));
-        buildUnitButton(Unit.FREE_COLONIST,      FREE_COLONIST); //ImageLibrary.FREE_COLONIST);
-        buildUnitButton(Unit.INDENTURED_SERVANT, INDENTURED_SERVANT); //ImageLibrary.INDENTURED_SERVANT);
-        buildUnitButton(Unit.PETTY_CRIMINAL,     PETTY_CRIMINAL); //ImageLibrary.PETTY_CRIMINAL);
-        buildUnitButton(Unit.INDIAN_CONVERT,     INDIAN_CONVERT); //ImageLibrary.INDIAN_CONVERT);
-        buildUnitButton(Unit.BRAVE,              BRAVE); //ImageLibrary.BRAVE);
-        buildUnitButton(Unit.COLONIAL_REGULAR,   COLONIAL_REGULAR); //ImageLibrary.COLONIAL_REGULAR);
-        buildUnitButton(Unit.KINGS_REGULAR,      KINGS_REGULAR); //ImageLibrary.KINGS_REGULAR);
-        buildUnitButton(Unit.CARAVEL,            CARAVEL); //ImageLibrary.CARAVEL);
-        buildUnitButton(Unit.FRIGATE,            FRIGATE); //ImageLibrary.FRIGATE);
-        buildUnitButton(Unit.GALLEON,            GALLEON); //ImageLibrary.GALLEON);
-        buildUnitButton(Unit.MAN_O_WAR,          MAN_O_WAR); //ImageLibrary.MAN_O_WAR);
-        buildUnitButton(Unit.MERCHANTMAN,        MERCHANTMAN); //ImageLibrary.MERCHANTMAN);
-        buildUnitButton(Unit.PRIVATEER,          PRIVATEER); //ImageLibrary.PRIVATEER);
-        buildUnitButton(Unit.ARTILLERY,          ARTILLERY); //ImageLibrary.ARTILLERY);
-        buildUnitButton(Unit.TREASURE_TRAIN,     TREASURE_TRAIN); //ImageLibrary.TREASURE_TRAIN);
-        buildUnitButton(Unit.WAGON_TRAIN,        WAGON_TRAIN); //ImageLibrary.WAGON_TRAIN);
-//        buildUnitButton(Unit.MILKMAID,           MILKMAID); //ImageLibrary.MILKMAID);
+        buildUnitButton(Unit.FREE_COLONIST,      FREE_COLONIST,      .5f); //ImageLibrary.FREE_COLONIST);
+        buildUnitButton(Unit.INDENTURED_SERVANT, INDENTURED_SERVANT, .5f); //ImageLibrary.INDENTURED_SERVANT);
+        buildUnitButton(Unit.PETTY_CRIMINAL,     PETTY_CRIMINAL,     .5f); //ImageLibrary.PETTY_CRIMINAL);
+        buildUnitButton(Unit.INDIAN_CONVERT,     INDIAN_CONVERT,     .5f); //ImageLibrary.INDIAN_CONVERT);
+        buildUnitButton(Unit.BRAVE,              BRAVE,              .5f); //ImageLibrary.BRAVE);
+        buildUnitButton(Unit.COLONIAL_REGULAR,   COLONIAL_REGULAR,   .5f); //ImageLibrary.COLONIAL_REGULAR);
+        buildUnitButton(Unit.KINGS_REGULAR,      KINGS_REGULAR,      .5f); //ImageLibrary.KINGS_REGULAR);
+        buildUnitButton(Unit.CARAVEL,            CARAVEL,            .5f); //ImageLibrary.CARAVEL);
+        buildUnitButton(Unit.FRIGATE,            FRIGATE,            .5f); //ImageLibrary.FRIGATE);
+        buildUnitButton(Unit.GALLEON,            GALLEON,            .5f); //ImageLibrary.GALLEON);
+        buildUnitButton(Unit.MAN_O_WAR,          MAN_O_WAR,          .5f); //ImageLibrary.MAN_O_WAR);
+        buildUnitButton(Unit.MERCHANTMAN,        MERCHANTMAN,        .5f); //ImageLibrary.MERCHANTMAN);
+        buildUnitButton(Unit.PRIVATEER,          PRIVATEER,          .5f); //ImageLibrary.PRIVATEER);
+        buildUnitButton(Unit.ARTILLERY,          ARTILLERY,          .5f); //ImageLibrary.ARTILLERY);
+        buildUnitButton(Unit.TREASURE_TRAIN,     TREASURE_TRAIN,     .5f); //ImageLibrary.TREASURE_TRAIN);
+        buildUnitButton(Unit.WAGON_TRAIN,        WAGON_TRAIN,        .5f); //ImageLibrary.WAGON_TRAIN);
+//        buildUnitButton(Unit.MILKMAID,           MILKMAID,           .5f); //ImageLibrary.MILKMAID);
     }
 
     /**
@@ -298,28 +300,28 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      */
     private void buildSkillsList() {
         listPanel.setLayout(new GridLayout(11, 2));
-        buildUnitButton(Unit.EXPERT_FARMER,          EXPERT_FARMER); //ImageLibrary.EXPERT_FARMER);
-        buildUnitButton(Unit.EXPERT_FISHERMAN,       EXPERT_FISHERMAN); //ImageLibrary.EXPERT_FISHERMAN);
-        buildUnitButton(Unit.EXPERT_FUR_TRAPPER,     EXPERT_FUR_TRAPPER); //ImageLibrary.EXPERT_FUR_TRAPPER);
-        buildUnitButton(Unit.EXPERT_SILVER_MINER,    EXPERT_SILVER_MINER); //ImageLibrary.EXPERT_SILVER_MINER);
-        buildUnitButton(Unit.EXPERT_LUMBER_JACK,     EXPERT_LUMBER_JACK); //ImageLibrary.EXPERT_LUMBER_JACK);
-        buildUnitButton(Unit.EXPERT_ORE_MINER,       EXPERT_ORE_MINER); //ImageLibrary.EXPERT_ORE_MINER);
-        buildUnitButton(Unit.MASTER_SUGAR_PLANTER,   MASTER_SUGAR_PLANTER); //ImageLibrary.MASTER_SUGAR_PLANTER);
-        buildUnitButton(Unit.MASTER_COTTON_PLANTER,  MASTER_COTTON_PLANTER); //ImageLibrary.MASTER_COTTON_PLANTER);
-        buildUnitButton(Unit.MASTER_TOBACCO_PLANTER, MASTER_TOBACCO_PLANTER); //ImageLibrary.MASTER_TOBACCO_PLANTER);
-        buildUnitButton(Unit.FIREBRAND_PREACHER,     FIREBRAND_PREACHER); //ImageLibrary.FIREBRAND_PREACHER);
-        buildUnitButton(Unit.ELDER_STATESMAN,        ELDER_STATESMAN); //ImageLibrary.ELDER_STATESMAN);
-        buildUnitButton(Unit.MASTER_CARPENTER,       MASTER_CARPENTER); //ImageLibrary.MASTER_CARPENTER);
-        buildUnitButton(Unit.MASTER_DISTILLER,       MASTER_DISTILLER); //ImageLibrary.MASTER_DISTILLER);
-        buildUnitButton(Unit.MASTER_WEAVER,          MASTER_WEAVER); //ImageLibrary.MASTER_WEAVER);
-        buildUnitButton(Unit.MASTER_TOBACCONIST,     MASTER_TOBACCONIST); //ImageLibrary.MASTER_TOBACCONIST);
-        buildUnitButton(Unit.MASTER_FUR_TRADER,      MASTER_FUR_TRADER); //ImageLibrary.MASTER_FUR_TRADER);
-        buildUnitButton(Unit.MASTER_BLACKSMITH,      MASTER_BLACKSMITH); //ImageLibrary.MASTER_BLACKSMITH);
-        buildUnitButton(Unit.MASTER_GUNSMITH,        MASTER_GUNSMITH); //ImageLibrary.MASTER_GUNSMITH);
-        buildUnitButton(Unit.SEASONED_SCOUT,         SEASONED_SCOUT_MOUNTED); //ImageLibrary.SEASONED_SCOUT_MOUNTED);
-        buildUnitButton(Unit.HARDY_PIONEER,          HARDY_PIONEER_WITH_TOOLS); //ImageLibrary.HARDY_PIONEER_WITH_TOOLS);
-        buildUnitButton(Unit.VETERAN_SOLDIER,        VETERAN_SOLDIER); //ImageLibrary.VETERAN_SOLDIER);
-        buildUnitButton(Unit.JESUIT_MISSIONARY,      JESUIT_MISSIONARY); //ImageLibrary.JESUIT_MISSIONARY);
+        buildUnitButton(Unit.EXPERT_FARMER,          EXPERT_FARMER,            .5f); //ImageLibrary.EXPERT_FARMER);
+        buildUnitButton(Unit.EXPERT_FISHERMAN,       EXPERT_FISHERMAN,         .5f); //ImageLibrary.EXPERT_FISHERMAN);
+        buildUnitButton(Unit.EXPERT_FUR_TRAPPER,     EXPERT_FUR_TRAPPER,       .5f); //ImageLibrary.EXPERT_FUR_TRAPPER);
+        buildUnitButton(Unit.EXPERT_SILVER_MINER,    EXPERT_SILVER_MINER,      .5f); //ImageLibrary.EXPERT_SILVER_MINER);
+        buildUnitButton(Unit.EXPERT_LUMBER_JACK,     EXPERT_LUMBER_JACK,       .5f); //ImageLibrary.EXPERT_LUMBER_JACK);
+        buildUnitButton(Unit.EXPERT_ORE_MINER,       EXPERT_ORE_MINER,         .5f); //ImageLibrary.EXPERT_ORE_MINER);
+        buildUnitButton(Unit.MASTER_SUGAR_PLANTER,   MASTER_SUGAR_PLANTER,     .5f); //ImageLibrary.MASTER_SUGAR_PLANTER);
+        buildUnitButton(Unit.MASTER_COTTON_PLANTER,  MASTER_COTTON_PLANTER,    .5f); //ImageLibrary.MASTER_COTTON_PLANTER);
+        buildUnitButton(Unit.MASTER_TOBACCO_PLANTER, MASTER_TOBACCO_PLANTER,   .5f); //ImageLibrary.MASTER_TOBACCO_PLANTER);
+        buildUnitButton(Unit.FIREBRAND_PREACHER,     FIREBRAND_PREACHER,       .5f); //ImageLibrary.FIREBRAND_PREACHER);
+        buildUnitButton(Unit.ELDER_STATESMAN,        ELDER_STATESMAN,          .5f); //ImageLibrary.ELDER_STATESMAN);
+        buildUnitButton(Unit.MASTER_CARPENTER,       MASTER_CARPENTER,         .5f); //ImageLibrary.MASTER_CARPENTER);
+        buildUnitButton(Unit.MASTER_DISTILLER,       MASTER_DISTILLER,         .5f); //ImageLibrary.MASTER_DISTILLER);
+        buildUnitButton(Unit.MASTER_WEAVER,          MASTER_WEAVER,            .5f); //ImageLibrary.MASTER_WEAVER);
+        buildUnitButton(Unit.MASTER_TOBACCONIST,     MASTER_TOBACCONIST,       .5f); //ImageLibrary.MASTER_TOBACCONIST);
+        buildUnitButton(Unit.MASTER_FUR_TRADER,      MASTER_FUR_TRADER,        .5f); //ImageLibrary.MASTER_FUR_TRADER);
+        buildUnitButton(Unit.MASTER_BLACKSMITH,      MASTER_BLACKSMITH,        .5f); //ImageLibrary.MASTER_BLACKSMITH);
+        buildUnitButton(Unit.MASTER_GUNSMITH,        MASTER_GUNSMITH,          .5f); //ImageLibrary.MASTER_GUNSMITH);
+        buildUnitButton(Unit.SEASONED_SCOUT,         SEASONED_SCOUT_MOUNTED,   .5f); //ImageLibrary.SEASONED_SCOUT_MOUNTED);
+        buildUnitButton(Unit.HARDY_PIONEER,          HARDY_PIONEER_WITH_TOOLS, .5f); //ImageLibrary.HARDY_PIONEER_WITH_TOOLS);
+        buildUnitButton(Unit.VETERAN_SOLDIER,        VETERAN_SOLDIER,          .5f); //ImageLibrary.VETERAN_SOLDIER);
+        buildUnitButton(Unit.JESUIT_MISSIONARY,      JESUIT_MISSIONARY,        .5f); //ImageLibrary.JESUIT_MISSIONARY);
     }
 
     /**
@@ -395,11 +397,19 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * @param unit
      * @param unitIcon
      */
-    private void buildUnitButton(int unit, int unitIcon) {
+    private void buildUnitButton(int unit, int unitIcon, float scale) {
         String name = Unit.getName(unit);
         JButton button;
         if (unitIcon >= 0) {
             ImageIcon icon = library.getUnitImageIcon(unitIcon);
+            if (scale != 1) {
+              Image image;
+              image = icon.getImage();
+              int width = (int) (scale * image.getWidth(this));
+              int height = (int) (scale * image.getHeight(this));
+              image = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+              icon = new ImageIcon(image);
+            }
             button = new JButton(name, icon);
             button.setVerticalAlignment(JButton.TOP);
             button.setVerticalTextPosition(JButton.TOP);
@@ -466,9 +476,20 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         name.setPreferredSize(new Dimension(detailPanel.getWidth(), 50));
         detailPanel.add(name);
 
-        ImageIcon icon = new ImageIcon(library.getTerrainImage(terrain, 0, 0));
+        Image terrainImage = library.getTerrainImage(terrain, 0, 0);
+        ImageIcon icon = new ImageIcon(terrainImage);
         JLabel imageLabel = new JLabel(icon);
         detailPanel.add(imageLabel);
+        
+        int tileWidth = library.getTerrainImageWidth(0);
+        int tileHeight = library.getTerrainImageHeight(0);
+        BufferedImage terrainImage2 = new BufferedImage(tileWidth,
+                                                        tileHeight,
+                                                        BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = terrainImage2.createGraphics();
+        g.drawImage(terrainImage, 0, 0, null);
+        Image bonusImage = library.getBonusImageIcon(0).getImage();
+        g.drawImage(bonusImage, tileWidth/2 - bonusImage.getWidth(null)/2, tileHeight/2 - bonusImage.getHeight(null)/2, null);
 
         JTextArea description = new JTextArea();
         description.setBorder(null);

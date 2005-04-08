@@ -65,9 +65,17 @@ public final class ImageLibrary extends ImageProvider {
                             LAND_NORTH_EAST = 7,    // border tile, some 'land' can be found in north-east of this tile
                             LAND_CENTER = 8;        // ordinary tile, filled entirely with 'land'
 
-    private static final int BONUS_COUNT = 9;
-
-
+    public static final int BONUS_SILVER = 0,
+                            BONUS_FOOD = 1,
+                            BONUS_TOBACCO = 2,
+                            BONUS_COTTON = 3,
+                            BONUS_SUGAR = 4,
+                            BONUS_FISH = 5,
+                            BONUS_ORE = 6,
+                            BONUS_FURS = 7,
+                            BONUS_LUMBER = 8,
+                            BONUS_COUNT = 9;
+    
     /**
      * These finals represent the unit graphics that are available.
      * It's important to note the difference between these finals and
@@ -626,27 +634,40 @@ public final class ImageLibrary extends ImageProvider {
     }
 
 
+    /**
+     * Returns the bonus-image for the given tile.
+     * @param tile
+     * @return the bonus-image for the given tile.
+     */
     public Image getBonusImage(Tile tile) {
         if (tile.getAddition() == Tile.ADD_MOUNTAINS) {
-            return ((ImageIcon) bonus.get(0)).getImage();
+            return ((ImageIcon) bonus.get(BONUS_SILVER)).getImage();
         } else if (tile.getAddition() == Tile.ADD_HILLS) {
-            return ((ImageIcon) bonus.get(6)).getImage();
+            return ((ImageIcon) bonus.get(BONUS_ORE)).getImage();
         } else if (tile.isForested()) {
             if (tile.getType() == Tile.GRASSLANDS || tile.getType() == Tile.SAVANNAH) {
-                return ((ImageIcon) bonus.get(8)).getImage();
+                return ((ImageIcon) bonus.get(BONUS_LUMBER)).getImage();
             } else {
-                return ((ImageIcon) bonus.get(7)).getImage();
+                return ((ImageIcon) bonus.get(BONUS_FURS)).getImage();
             }
         } else if (tile.getType() <= 4) {
             return ((ImageIcon) bonus.get(tile.getType())).getImage();
         } else if (tile.getType() == Tile.OCEAN) {
-            return ((ImageIcon) bonus.get(5)).getImage();
+            return ((ImageIcon) bonus.get(BONUS_FISH)).getImage();
         } else {
             logger.warning("No bonus graphics for:" + tile.getName());
             return null;
         }
     }
 
+    /**
+     * Returns the bonus-ImageIcon at the given index.
+     * @param index The index of the bonus-ImageIcon to return.
+     * @return The bonus-ImageIcon at the given index.
+     */
+    public ImageIcon getBonusImageIcon(int index) {
+      return (ImageIcon) bonus.get(index);
+    }
 
     /**
      * Returns the unit-image at the given index.
