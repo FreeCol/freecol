@@ -1134,14 +1134,34 @@ public final class Canvas extends JLayeredPane {
     /**
     * Shows a message with some information and an "OK"-button.
     * @param messageId The messageId of the message to display.
-    * @replaceString The string that we need to use to replace all occurences of %replace% in the
-    *     message.
+    * @param replaceString The string that we need to use to replace all occurences of %replace% in the
+    *        message.
     */
-    public void showInformationMessage(String messageId, String replaceString) {
+    /*public void showInformationMessage(String messageId, String replaceString) {
+        showInformationDialog(messageId, {{"%replace%", replaceString}});
+    }*/
+
+    /**
+    * Shows a message with some information and an "OK"-button.
+    *
+    * <br><br><b>Example:</b>
+    * <br><code>canvas.showInformationMessage("noNeedForTheGoods", new String[][] {{"%goods%", goods.getName()}});</code>
+    * @param messageId The messageId of the message to display.
+    * @param replace All occurances of <code>replace[i][0]</code> in
+    *                the message gets replaced by <code>replace[i][1].
+    */
+    public void showInformationMessage(String messageId, String[][] replace) {
         String text = Messages.message(messageId);
-        if (replaceString != null) {
+
+        /*if (replaceString != null) {
             text = text.replaceAll("%replace%", replaceString);
+        }*/
+        if (replace != null) {
+            for (int i=0; i<replace.length; i++) {
+                text = text.replaceAll(replace[i][0], replace[i][1]);
+            }
         }
+
         FreeColDialog infoDialog = FreeColDialog.createInformationDialog(text);
 
         infoDialog.setLocation(getWidth() / 2 - infoDialog.getWidth() / 2, getHeight() / 2 - infoDialog.getHeight() / 2);

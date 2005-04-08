@@ -96,7 +96,10 @@ public final class Messages {
 
 
     public String findMessage(String messageId) {
-
+        if (messageId == null) {
+            throw new NullPointerException();
+        }
+        
         return resources.getString(messageId);
     }
 
