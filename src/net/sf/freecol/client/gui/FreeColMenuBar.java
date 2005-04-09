@@ -3,6 +3,10 @@ package net.sf.freecol.client.gui;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ColopediaPanel;
+import net.sf.freecol.client.gui.panel.ReportForeignAffairPanel;
+import net.sf.freecol.client.gui.panel.ReportIndianPanel;
+import net.sf.freecol.client.gui.panel.ReportLabourPanel;
+import net.sf.freecol.client.gui.panel.ReportReligiousPanel;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.FreeCol;
@@ -342,6 +346,62 @@ public class FreeColMenuBar extends JMenuBar {
         inGameOptions.add(disbandMenuItem);
         mapControlOptions.add(disbandMenuItem);
         
+        // --> Report
+        
+        JMenu reportMenu = new JMenu(Messages.message("menuBar.report"));
+        reportMenu.setOpaque(false);
+        reportMenu.setMnemonic(KeyEvent.VK_R);
+        add(reportMenu);
+        inGameOptions.add(reportMenu);
+
+        JMenuItem religionMenuItem = new JMenuItem(Messages.message("menuBar.report.religion"));
+        religionMenuItem.setOpaque(false);
+        religionMenuItem.setMnemonic(KeyEvent.VK_R);
+        //religionMenuItem.setAccelerator(KeyStroke.getKeyStroke('I', InputEvent.CTRL_MASK));
+        reportMenu.add(religionMenuItem);
+        religionMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                canvas.showReportPanel(ReportReligiousPanel.class.getName());
+            }
+        });
+        inGameOptions.add(religionMenuItem);
+
+        JMenuItem labourMenuItem = new JMenuItem(Messages.message("menuBar.report.labour"));
+        labourMenuItem.setOpaque(false);
+        labourMenuItem.setMnemonic(KeyEvent.VK_L);
+        //labourMenuItem.setAccelerator(KeyStroke.getKeyStroke('L', InputEvent.CTRL_MASK));
+        reportMenu.add(labourMenuItem);
+        labourMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                canvas.showReportPanel(ReportLabourPanel.class.getName());
+            }
+        });
+        inGameOptions.add(labourMenuItem);
+
+        JMenuItem foreignMenuItem = new JMenuItem(Messages.message("menuBar.report.foreign"));
+        foreignMenuItem.setOpaque(false);
+        foreignMenuItem.setMnemonic(KeyEvent.VK_F);
+        //foreignMenuItem.setAccelerator(KeyStroke.getKeyStroke('L', InputEvent.CTRL_MASK));
+        reportMenu.add(foreignMenuItem);
+        foreignMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                canvas.showReportPanel(ReportForeignAffairPanel.class.getName());
+            }
+        });
+        inGameOptions.add(foreignMenuItem);
+
+        JMenuItem indianMenuItem = new JMenuItem(Messages.message("menuBar.report.indian"));
+        indianMenuItem.setOpaque(false);
+        indianMenuItem.setMnemonic(KeyEvent.VK_I);
+        //indianMenuItem.setAccelerator(KeyStroke.getKeyStroke('I', InputEvent.CTRL_MASK));
+        reportMenu.add(indianMenuItem);
+        indianMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                canvas.showReportPanel(ReportIndianPanel.class.getName());
+            }
+        });
+        inGameOptions.add(indianMenuItem);
+
         // --> Colopedia
 
         JMenu colopediaMenu = new JMenu(Messages.message("menuBar.colopedia"));

@@ -13,7 +13,6 @@ import java.util.MissingResourceException;
 import java.util.logging.Logger;
 import java.util.Iterator;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.io.File;
 
 import javax.swing.JComponent;
@@ -25,10 +24,15 @@ import javax.swing.JMenuItem;
 
 import net.sf.freecol.client.gui.panel.ChatPanel;
 import net.sf.freecol.client.gui.panel.ColopediaPanel;
+import net.sf.freecol.client.gui.panel.ReportForeignAffairPanel;
+import net.sf.freecol.client.gui.panel.ReportIndianPanel;
+import net.sf.freecol.client.gui.panel.ReportLabourPanel;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.client.gui.panel.MainPanel;
 import net.sf.freecol.client.gui.panel.NewPanel;
 import net.sf.freecol.client.gui.panel.ErrorPanel;
+import net.sf.freecol.client.gui.panel.ReportPanel;
+import net.sf.freecol.client.gui.panel.ReportReligiousPanel;
 import net.sf.freecol.client.gui.panel.StartGamePanel;
 import net.sf.freecol.client.gui.panel.QuitDialog;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
@@ -125,6 +129,10 @@ public final class Canvas extends JLayeredPane {
     private final EventPanel        eventPanel;
     private final EmigrationPanel   emigrationPanel;
     private final ColopediaPanel    colopediaPanel;
+    private final ReportReligiousPanel     reportReligiousPanel;
+    private final ReportLabourPanel        reportLabourPanel;
+    private final ReportForeignAffairPanel reportForeignAffairPanel;
+    private final ReportIndianPanel        reportIndianPanel;
     private final ServerListPanel   serverListPanel;
     private TakeFocusThread         takeFocusThread;
     private MapControls             mapControls;
@@ -168,6 +176,10 @@ public final class Canvas extends JLayeredPane {
         eventPanel = new EventPanel(this, freeColClient);
         emigrationPanel = new EmigrationPanel();
         colopediaPanel = new ColopediaPanel(this);
+        reportReligiousPanel = new ReportReligiousPanel(this);
+        reportLabourPanel = new ReportLabourPanel(this);
+        reportForeignAffairPanel = new ReportForeignAffairPanel(this);
+        reportIndianPanel = new ReportIndianPanel(this);
 
         showMainPanel();
 
@@ -742,6 +754,31 @@ public final class Canvas extends JLayeredPane {
     }
 
 
+    /**
+     * Shows a panel displaying Colopedia Information.
+     */
+    public void showReportPanel(String classname) {
+        ReportPanel reportPanel = null;
+        if ("net.sf.freecol.client.gui.panel.ReportReligiousPanel".equals(classname)) {
+            reportPanel = reportReligiousPanel;
+        } else if ("net.sf.freecol.client.gui.panel.ReportLabourPanel".equals(classname)) {
+            reportPanel = reportLabourPanel;
+        } else if ("net.sf.freecol.client.gui.panel.ReportForeignAffairPanel".equals(classname)) {
+            reportPanel = reportForeignAffairPanel;
+        } else if ("net.sf.freecol.client.gui.panel.ReportIndianPanel".equals(classname)) {
+            reportPanel = reportIndianPanel;
+        }
+
+        if (reportPanel != null) {
+            reportPanel.initialize();
+            reportPanel.setLocation(getWidth() / 2 - reportPanel.getWidth() / 2, getHeight() / 2 - reportPanel.getHeight() / 2);
+            setEnabled(false);
+            add(reportPanel, JLayeredPane.PALETTE_LAYER);
+            reportPanel.requestFocus();
+        }
+    }
+
+    
     /**
     * Shows a panel where the player may choose the next founding father to recruit.
     * @param possibleFoundingFathers The different founding fathers the player may choose.
