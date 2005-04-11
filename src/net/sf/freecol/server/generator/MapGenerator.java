@@ -612,6 +612,7 @@ public class MapGenerator {
                 if (colonyTile != null) {
                     colonyTile.setType(Tile.PRAIRIE);
                     colonyTile.setPlowed(true);
+                    colonyTile.setAddition(Tile.ADD_NONE);
 
                     Unit buildColonyUnit = new Unit(game, colonyTile, player, Unit.EXPERT_FARMER, Unit.ACTIVE);
                     Colony colony = new Colony(game, player, "Colony for Testing", colonyTile);
@@ -620,6 +621,7 @@ public class MapGenerator {
                     ct.setType(Tile.PLAINS);
                     ct.setForested(false);
                     ct.setPlowed(true);
+                    ct.setAddition(Tile.ADD_NONE);
 
                     Unit carpenter = new Unit(game, colonyTile, player, Unit.MASTER_CARPENTER, Unit.ACTIVE);
                     carpenter.setLocation(colony.getBuilding(Building.CARPENTER));
@@ -632,6 +634,7 @@ public class MapGenerator {
                     lt.setType(Tile.PLAINS);
                     lt.setForested(true);
                     lt.setRoad(true);
+                    lt.setAddition(Tile.ADD_NONE);
                     lumberjack.setWorkType(Goods.LUMBER);
                     
                     Unit scout = new Unit(game, colonyTile, player, Unit.SEASONED_SCOUT, Unit.ACTIVE);

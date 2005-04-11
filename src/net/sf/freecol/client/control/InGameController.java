@@ -1206,7 +1206,7 @@ public final class InGameController implements NetworkConstants {
             else if (action.equals("speak") && result.equals("beads")) {
                 String amount = reply.getAttribute("amount");
                 unit.getOwner().modifyGold(Integer.parseInt(amount));
-                canvas.showInformationMessage("scoutSettlement.speakBeads", new String[][] {{"%replace", amount}});
+                canvas.showInformationMessage("scoutSettlement.speakBeads", new String[][] {{"%replace%", amount}});
             }
             else if (action.equals("speak") && result.equals("nothing")) {
                 canvas.showInformationMessage("scoutSettlement.speakNothing");
@@ -1218,7 +1218,7 @@ public final class InGameController implements NetworkConstants {
             else if (action.equals("tribute") && result.equals("agree")) {
                 String amount = reply.getAttribute("amount");
                 unit.getOwner().modifyGold(Integer.parseInt(amount));
-                canvas.showInformationMessage("scoutSettlement.tributeAgree", new String[][] {{"%replace", amount}});
+                canvas.showInformationMessage("scoutSettlement.tributeAgree", new String[][] {{"%replace%", amount}});
             }
             else if (action.equals("tribute") && result.equals("disagree")) {
                 canvas.showInformationMessage("scoutSettlement.tributeDisagree");
