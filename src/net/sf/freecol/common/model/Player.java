@@ -209,8 +209,18 @@ public class Player extends FreeColGameObject {
         color = getDefaultNationColor(nation);
         europe = new Europe(game, this);
 
-        // TODO (this is for testing only): Set to 0
-        gold = 10000;
+        if (isEuropean(nation)) {
+            gold = 0;
+
+            // START DEBUG:
+            if (net.sf.freecol.FreeCol.isInDebugMode()) {
+                gold = 10000;
+            }
+            // END DEBUG
+        } else {
+            gold = 1500;
+        }
+
 
         crosses = 0;
         bells = 0;
@@ -274,6 +284,17 @@ public class Player extends FreeColGameObject {
     * @return <i>true</i> if this player is european and <i>false</i> otherwise.
     */
     public boolean isEuropean() {
+        return isEuropean(nation);
+    }
+    
+    
+    /**
+    * Checks if this player is european. This includes the
+    * "Royal Expeditionay Force".
+    *
+    * @return <i>true</i> if this player is european and <i>false</i> otherwise.
+    */
+    public static boolean isEuropean(int nation) {
         if (nation == DUTCH || nation == ENGLISH || nation == FRENCH || nation == SPANISH ||
                 nation == REF_DUTCH || nation == REF_ENGLISH || nation == REF_FRENCH || nation == REF_SPANISH) {
             return true;

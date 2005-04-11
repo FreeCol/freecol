@@ -103,9 +103,10 @@ public final class PreGameController extends Controller {
 
             // Make the map:
             MapGenerator mapGenerator = new MapGenerator(game);
-            Map map = mapGenerator.createMap(game.getPlayers(), 30, 64);
+            mapGenerator.createMap(game.getPlayers(), 30, 64);
+            Map map = game.getMap();
 
-            // Set the map and inform the clients:
+            // Inform the clients:
             setMap(map);
 
             // Initialise the crosses required values.
@@ -138,7 +139,8 @@ public final class PreGameController extends Controller {
     public void setMap(Map map) {
         Game game = getFreeColServer().getGame();
 
-        game.setMap(map);
+        // Already done my the map generator:
+        //game.setMap(map);
 
         game.reinitialiseMarket(); // Do this here because game is restarting. -sjm
 

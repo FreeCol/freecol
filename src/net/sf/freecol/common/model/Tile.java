@@ -655,9 +655,12 @@ public final class Tile extends FreeColGameObject implements Location {
         }
 
         for (int direction = Map.N; direction <= Map.NW; direction++) {
-            Settlement set = getMap().getNeighbourOrNull(direction, this).getSettlement();
-            if((set != null) && (set.getOwner().isEuropean())) {
-                return false;
+            Tile otherTile = getMap().getNeighbourOrNull(direction, this);
+            if (otherTile != null) {
+                Settlement set = otherTile.getSettlement();
+                if((set != null) && (set.getOwner().isEuropean())) {
+                    return false;
+                }
             }
         }
 

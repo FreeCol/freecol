@@ -173,8 +173,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
 
         this.owner = owner;
         this.type = type;
-        this.movesLeft = getInitialMovesLeft();
-        setHitpoints(getInitialHitpoints(getType()));
 
         setLocation(location);
 
@@ -205,6 +203,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         } else {
             missionary = false;
         }
+        
+        this.movesLeft = getInitialMovesLeft();
+        setHitpoints(getInitialHitpoints(getType()));        
     }
 
 
@@ -1132,7 +1133,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     /**
     * Sets the armed attribute of this unit.
     * @param b <i>true</i> if this unit should be armed and <i>false</i> otherwise.
-    * @param isCombat Whether this is a result of combat.
+    * @param isCombat Whether this is a result of combat. That is; do not pay
+    *                 for the muskets.
+    *
     */
     public void setArmed(boolean b, boolean isCombat) {
         setMovesLeft(0);

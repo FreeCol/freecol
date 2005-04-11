@@ -285,4 +285,19 @@ public class GoodsContainer extends FreeColGameObject {
     public static String getXMLElementTagName() {
         return "goodsContainer";
     }
+    
+    
+    /**
+    * Creates a <code>String</code> representation of this
+    * <code>GoodsContainer</code>.    
+    */
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("GoodsContainer with: ");
+        for (int i=0; i<storedGoods.length; i++) {
+            sb.append(Goods.getName(i) + "=" + storedGoods[i] + ", ");
+        }
+        return sb.toString();
+    }
+
 }

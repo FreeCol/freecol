@@ -38,6 +38,9 @@ public class IndianSettlement extends Settlement {
 
     /** The amount of goods a brave can produce a single turn. */
     private static final int WORK_AMOUNT = 5;
+    
+    /** The amount of raw material that should be available before producing manufactured goods: */
+    private static final int KEEP_RAW_MATERIAL = 50;
 
     // These are the learnable skills for an Indian settlement.
     // They are fully compatible with the types from the Unit class!
@@ -87,6 +90,10 @@ public class IndianSettlement extends Settlement {
     private ArrayList ownedUnits = new ArrayList();
 
     private Unit missionary;
+
+    /* A higher number indicates a higher level of unrest. This variable is only used by the server-side. */
+    //private int unrestLevel = 0;
+
 
 
     /**
@@ -138,6 +145,7 @@ public class IndianSettlement extends Settlement {
         this.isVisited = isVisited;
         this.missionary = missionary;
 
+        /*
         for (int goodsType=0; goodsType<Goods.NUMBER_OF_TYPES; goodsType++) {
             if (goodsType == Goods.LUMBER || goodsType == Goods.HORSES || goodsType == Goods.MUSKETS
                     || goodsType == Goods.TRADE_GOODS || goodsType == Goods.TOOLS) {
@@ -145,9 +153,10 @@ public class IndianSettlement extends Settlement {
             }
             goodsContainer.addGoods(goodsType, (int) (Math.random() * 300));
         }
+        */
 
         goodsContainer.addGoods(Goods.LUMBER, 300);
-        updateWantedGoods();
+        //updateWantedGoods();
     }
 
 
@@ -460,7 +469,7 @@ public class IndianSettlement extends Settlement {
         return getPrice(goods.getType(), goods.getAmount());
     }
 
-    
+
     /**
     * Gets the amount of gold this <code>IndianSettlment</code>
     * is willing to pay for the given <code>Goods</code>.
@@ -528,6 +537,27 @@ public class IndianSettlement extends Settlement {
             returnPrice = 0;
         } else {
             int currentGoods = goodsContainer.getGoodsCount(type);
+
+            // Increase amount if raw materials are produced:
+            int rawType = Goods.getRawMaterial(type);
+            if (rawType != -1) {
+                int rawProduction = getMaximumProduction(rawType);
+                if (currentGoods < 100) {
+                    if (rawProduction < 5) {
+                        currentGoods += rawProduction * 10;
+                    } else if (rawProduction < 10) {
+                        currentGoods += 50 + Math.max((rawProduction-5) * 5, 0);
+                    } else if (rawProduction < 20) {
+                        currentGoods += 75 + Math.max((rawProduction-10) * 2, 0);
+                    } else {
+                        currentGoods += 100;
+                    }
+                }
+            }
+            if (type == Goods.TRADE_GOODS) {
+                currentGoods += 20;
+            }
+
             int valueGoods = Math.min(currentGoods + amount, 200) - currentGoods;
             if (valueGoods < 0) {
                 valueGoods = 0;
@@ -549,7 +579,27 @@ public class IndianSettlement extends Settlement {
         return returnPrice;
     }
 
+
+    /**
+    * Gets the maximum possible production of the given type of goods.
+    * @param goodsType The type of goods to check.
+    * @return The maximum amount, of the given type of goods, that can
+    *         be produced in one turn.
+    */
+    public int getMaximumProduction(int goodsType) {
+        int amount = 0;
+        Iterator it = getGame().getMap().getCircleIterator(getTile().getPosition(), true, getRadius());
+        while (it.hasNext()) {
+            Tile workTile = getGame().getMap().getTile((Map.Position) it.next());
+            if (workTile.getOwner() == null || workTile.getOwner() == this) {
+                amount += workTile.potential(goodsType);
+            }
+        }
+        
+        return amount;
+    }
     
+
     /**
     * Updates the variables {@link #getHighlyWantedGoods highlyWantedGoods},
     * {@link #getWantedGoods1 wantedGoods1} and
@@ -567,9 +617,9 @@ public class IndianSettlement extends Settlement {
     * a scout enters this settlement.
     */
     public void updateWantedGoods() {
-        highlyWantedGoods = Goods.RUM;
-        wantedGoods1 = Goods.TRADE_GOODS;
-        wantedGoods2 = Goods.CLOTH;
+        highlyWantedGoods = Goods.TRADE_GOODS;
+        wantedGoods1 = Goods.TOOLS;
+        wantedGoods2 = Goods.RUM;
         int highlyWantedGoodsAmount = 0;
         int wantedGoods1Amount = 0;
         int wantedGoods2Amount = 0;
@@ -635,7 +685,8 @@ public class IndianSettlement extends Settlement {
 
 
     public void newTurn() {
-        /* Determine the maximum possible production of each type of goods: */
+        /* Determine the maximum possible production for each type of goods: */
+        int totalGoods = 0;
         int[] potential = new int[Goods.NUMBER_OF_TYPES];
         Iterator it = getGame().getMap().getCircleIterator(getTile().getPosition(), true, getRadius());
         while (it.hasNext()) {
@@ -643,28 +694,39 @@ public class IndianSettlement extends Settlement {
             if (workTile.getOwner() == null || workTile.getOwner() == this) {
                 for (int i=0; i<Goods.NUMBER_OF_TYPES;i++) {
                     potential[i] += workTile.potential(i);
+                    totalGoods += potential[i];
                 }
             }
         }
 
-        /* Produce goods: */
+        /* Produce the goods: */
         int workers = ownedUnits.size();
+        for (int i=1; i<Goods.NUMBER_OF_TYPES;i++) {
+            goodsContainer.addGoods(i, potential[i]);
+        }
         goodsContainer.addGoods(Goods.FOOD, Math.min(potential[Goods.FOOD], workers*3));
-        for (int i=0; i<workers*WORK_AMOUNT; i++) {
+
+        /* Use tools (if available) to produce manufactured goods: */
+        if (goodsContainer.getGoodsCount(Goods.TOOLS) > 0) {
             int typeWithSmallestAmount = -1;
-            for (int j=1; j<Goods.NUMBER_OF_TYPES; j++) {
-                if (potential[j] > 0 && (typeWithSmallestAmount == -1 ||
-                        goodsContainer.getGoodsCount(j) < goodsContainer.getGoodsCount(typeWithSmallestAmount))) {
-                    typeWithSmallestAmount = j;
-                }
+            if (potential[Goods.SUGAR]-KEEP_RAW_MATERIAL > 0) {
+                typeWithSmallestAmount = Goods.RUM;
             }
+            if (potential[Goods.TOBACCO]-KEEP_RAW_MATERIAL > 0 && goodsContainer.getGoodsCount(Goods.CIGARS) < goodsContainer.getGoodsCount(typeWithSmallestAmount)) {
+                typeWithSmallestAmount = Goods.CIGARS;
+            }
+            if (potential[Goods.COTTON]-KEEP_RAW_MATERIAL > 0 && goodsContainer.getGoodsCount(Goods.CLOTH) < goodsContainer.getGoodsCount(typeWithSmallestAmount)) {
+                typeWithSmallestAmount = Goods.CLOTH;
+            }
+            if (potential[Goods.FURS]-KEEP_RAW_MATERIAL > 0 && goodsContainer.getGoodsCount(Goods.COATS) < goodsContainer.getGoodsCount(typeWithSmallestAmount)) {
+                typeWithSmallestAmount = Goods.COATS;
+            }
+
             if (typeWithSmallestAmount != -1) {
-                if (goodsContainer.getGoodsCount(Goods.TOOLS) > 0) {
-                    goodsContainer.addGoods(typeWithSmallestAmount, 3);
-                    goodsContainer.removeGoods(Goods.TOOLS, 1);
-                } else {
-                    goodsContainer.addGoods(typeWithSmallestAmount, 1);
-                }
+                int production = Math.min(goodsContainer.getGoodsCount(Goods.getRawMaterial(typeWithSmallestAmount)), Math.min(10, goodsContainer.getGoodsCount(Goods.TOOLS)));
+                goodsContainer.removeGoods(Goods.TOOLS, production);
+                goodsContainer.removeGoods(Goods.getRawMaterial(typeWithSmallestAmount), production);
+                goodsContainer.addGoods(typeWithSmallestAmount, production * 5);
             }
         }
 
@@ -676,15 +738,14 @@ public class IndianSettlement extends Settlement {
             consumeGoods(Goods.FURS, 1);
             consumeGoods(Goods.ORE, 1);
             consumeGoods(Goods.SILVER, 1);
-            consumeGoods(Goods.SILVER, 1);
             consumeGoods(Goods.RUM, 2);
             consumeGoods(Goods.CIGARS, 1);
             consumeGoods(Goods.COATS, 1);
             consumeGoods(Goods.CLOTH, 1);
-            consumeGoods(Goods.TRADE_GOODS, 5);
+            consumeGoods(Goods.TRADE_GOODS, 2);
         }
+        goodsContainer.removeAbove(500);
 
-        goodsContainer.removeAbove(300);
 
         // TODO: Create a unit if food>=200, but not if a maximum number of units is reaced.
     }
@@ -692,8 +753,9 @@ public class IndianSettlement extends Settlement {
 
     private void consumeGoods(int type, int amount) {
         if (goodsContainer.getGoodsCount(type) > 0) {
-            goodsContainer.removeGoods(type, Math.min(amount, goodsContainer.getGoodsCount(type)));
-            getOwner().modifyGold(Math.min(amount, goodsContainer.getGoodsCount(type)));
+            amount = Math.min(amount, goodsContainer.getGoodsCount(type));
+            getOwner().modifyGold(amount);
+            goodsContainer.removeGoods(type, amount);
         }
     }
 

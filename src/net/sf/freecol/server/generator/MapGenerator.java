@@ -61,11 +61,13 @@ public class MapGenerator {
 
     /**
     * Creates a new <code>Map</code> where the given players
-    * have random starting locations.
+    * have random starting locations. During this process,
+    * <code>game.setMap(...)</code> is invoked.
+    *
     * @see LandGenerator
     * @see TerrainGenerator
     */
-    public Map createMap(Vector players, int width, int height) throws FreeColException {
+    public void createMap(Vector players, int width, int height) throws FreeColException {
         this.width = width;
         this.height = height;
 
@@ -74,12 +76,12 @@ public class MapGenerator {
 
         TerrainGenerator terrainGenerator = new TerrainGenerator(landMap);
         Map map = terrainGenerator.createMap();
+        
+        game.setMap(map);
 
         createIndianSettlements(map, players);
 
         createEuropeanUnits(map, width, height, players);
-
-        return map;
     }
 
 
@@ -588,9 +590,56 @@ public class MapGenerator {
 
             Unit unit1 = new Unit(game, startTile, player, unitType, Unit.ACTIVE);
             Unit unit2 = new Unit(game, unit1, player, Unit.HARDY_PIONEER, Unit.SENTRY);
-            Unit unit3 = new Unit(game, unit1, player, Unit.VETERAN_SOLDIER, Unit.SENTRY);
-            Unit unit4 = new Unit(game, startTile, player, Unit.GALLEON, Unit.ACTIVE);
-            Unit unit5 = new Unit(game, unit4, player, Unit.FREE_COLONIST, Unit.SENTRY);
+            Unit unit3 = new Unit(game, unit1, player, Unit.FREE_COLONIST, Unit.SENTRY);
+            unit3.setArmed(true, true);
+
+            // START DEBUG:
+            if (net.sf.freecol.FreeCol.isInDebugMode()) {
+                Unit unit4 = new Unit(game, startTile, player, Unit.GALLEON, Unit.ACTIVE);
+                Unit unit5 = new Unit(game, unit4, player, Unit.FREE_COLONIST, Unit.SENTRY);
+                Unit unit6 = new Unit(game, unit4, player, Unit.VETERAN_SOLDIER, Unit.SENTRY);
+
+                Tile colonyTile = null;
+                Iterator cti = map.getCircleIterator(new Position(x, y), true, width);
+                while(cti.hasNext()) {
+                    Tile tempTile = map.getTile((Position) cti.next());
+                    if (tempTile.isColonizeable()) {
+                        colonyTile = tempTile;
+                        break;
+                    }
+                }
+
+                if (colonyTile != null) {
+                    colonyTile.setType(Tile.PRAIRIE);
+                    colonyTile.setPlowed(true);
+
+                    Unit buildColonyUnit = new Unit(game, colonyTile, player, Unit.EXPERT_FARMER, Unit.ACTIVE);
+                    Colony colony = new Colony(game, player, "Colony for Testing", colonyTile);
+                    buildColonyUnit.buildColony(colony);
+                    Tile ct = ((ColonyTile) buildColonyUnit.getLocation()).getWorkTile();
+                    ct.setType(Tile.PLAINS);
+                    ct.setForested(false);
+                    ct.setPlowed(true);
+
+                    Unit carpenter = new Unit(game, colonyTile, player, Unit.MASTER_CARPENTER, Unit.ACTIVE);
+                    carpenter.setLocation(colony.getBuilding(Building.CARPENTER));
+                    
+                    Unit statesman = new Unit(game, colonyTile, player, Unit.ELDER_STATESMAN, Unit.ACTIVE);
+                    statesman.setLocation(colony.getBuilding(Building.TOWN_HALL));
+                    
+                    Unit lumberjack = new Unit(game, colony, player, Unit.EXPERT_LUMBER_JACK, Unit.ACTIVE);
+                    Tile lt = ((ColonyTile) lumberjack.getLocation()).getWorkTile();
+                    lt.setType(Tile.PLAINS);
+                    lt.setForested(true);
+                    lt.setRoad(true);
+                    lumberjack.setWorkType(Goods.LUMBER);
+                    
+                    Unit scout = new Unit(game, colonyTile, player, Unit.SEASONED_SCOUT, Unit.ACTIVE);
+
+                    break;
+                }
+            }
+            // END DEBUG
         }
     }
 

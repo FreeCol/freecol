@@ -98,6 +98,28 @@ public final class Goods implements Locatable {
         return getName(type);
     }
 
+    
+    /**
+    * Gets the type of goods that is needed to produce the given type
+    * of goods.
+    *
+    * @param goodsType The type of manufactured goods.
+    * @return The type of raw material.
+    */
+    public static int getRawMaterial(int goodsType) {
+        switch (goodsType) {
+            case HORSES: return FOOD;
+            case RUM: return SUGAR;
+            case CIGARS: return TOBACCO;
+            case CLOTH: return COTTON;
+            case COATS: return FURS;
+            case TOOLS: return ORE;
+            case MUSKETS: return TOOLS;
+            case HAMMERS: return LUMBER;
+            default: logger.warning("No raw material for: " + goodsType); return -1;
+        }
+    }
+
 
     /**
      * Returns a textual representation of the Good of type <code>type<code>.
