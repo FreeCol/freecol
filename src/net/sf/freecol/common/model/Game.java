@@ -29,6 +29,8 @@ public class Game extends FreeColGameObject {
 
     private Map map;
 
+    private GameOptions gameOptions;
+
     /** The name of the player whose turn it is.*/
     private Player currentPlayer = null;
 
@@ -63,6 +65,7 @@ public class Game extends FreeColGameObject {
         super(null);
 
         this.modelController = modelController;
+        gameOptions = new GameOptions();
 
         currentPlayer = null;
         canGiveID = true;
@@ -618,6 +621,14 @@ public class Game extends FreeColGameObject {
 
 
     /**
+    * Gets the <code>GameOptions</code> that is associated with this {@link Game}.
+    */
+    public GameOptions getGameOptions() {
+        return gameOptions;
+    }
+
+
+    /**
     * Returns an amount of gold that should be payed by payingPlayer to attackingPlayer in order for
     * attackingPlayer to attack targetPlayer. This method should NEVER be randomized: it should always
     * return the same amount if given the same three parameters.
@@ -652,6 +663,8 @@ public class Game extends FreeColGameObject {
         if (toSavedGame) {
             gameElement.setAttribute("nextID", Integer.toString(nextId));
         }
+
+        gameElement.appendChild(gameOptions.toXMLElement(document));
 
         Iterator playerIterator = getPlayerIterator();
         while (playerIterator.hasNext()) {
@@ -688,6 +701,17 @@ public class Game extends FreeColGameObject {
 
         if (gameElement.hasAttribute("nextID")) {
             nextId = Integer.parseInt(gameElement.getAttribute("nextID"));
+        }
+
+        Element gameOptionsElement = getChildElement(gameElement, GameOptions.getXMLElementTagName());
+        if (gameOptionsElement != null) {
+            if (gameOptions != null) {
+                gameOptions.readFromXMLElement(gameOptionsElement);
+            } else {
+                gameOptions = new GameOptions(gameOptionsElement);
+            }
+        } else {
+            gameOptions = new GameOptions();
         }
 
         // Get the market

@@ -84,6 +84,15 @@ abstract public class FreeColGameObject {
         return game;
     }
 
+
+    /**
+    * Gets the <code>GameOptions</code> that is associated with the {@link Game}
+    * owning this <code>FreeColGameObject</code>.
+    */
+    public GameOptions getGameOptions() {
+        return game.getGameOptions();
+    }
+
     
     /**
     * Sets the game object this <code>FreeColGameObject</code> belongs to.

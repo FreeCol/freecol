@@ -44,6 +44,7 @@ import net.sf.freecol.client.gui.panel.EventPanel;
 import net.sf.freecol.client.gui.panel.EmigrationPanel;
 import net.sf.freecol.client.gui.panel.IndianSettlementPanel;
 import net.sf.freecol.client.gui.panel.ServerListPanel;
+import net.sf.freecol.client.gui.panel.GameOptionsDialog;
 
 import net.sf.freecol.client.gui.panel.MapControls;
 
@@ -134,6 +135,7 @@ public final class Canvas extends JLayeredPane {
     private final ReportForeignAffairPanel reportForeignAffairPanel;
     private final ReportIndianPanel        reportIndianPanel;
     private final ServerListPanel   serverListPanel;
+    private final GameOptionsDialog gameOptionsDialog;
     private TakeFocusThread         takeFocusThread;
     private MapControls             mapControls;
     private JMenuBar                jMenuBar;
@@ -180,6 +182,7 @@ public final class Canvas extends JLayeredPane {
         reportLabourPanel = new ReportLabourPanel(this);
         reportForeignAffairPanel = new ReportForeignAffairPanel(this);
         reportIndianPanel = new ReportIndianPanel(this);
+        gameOptionsDialog = new GameOptionsDialog(this, freeColClient);
 
         showMainPanel();
 
@@ -449,6 +452,21 @@ public final class Canvas extends JLayeredPane {
         remove(confirmDialog);
 
         return response;
+    }
+
+
+    /**
+    * Displays a dialog for setting game options.
+    */
+    public void showGameOptionsDialog() {
+        gameOptionsDialog.initialize();
+        
+        gameOptionsDialog.setLocation(getWidth() / 2 - gameOptionsDialog.getWidth() / 2, getHeight() / 2 - gameOptionsDialog.getHeight() / 2);
+        add(gameOptionsDialog, new Integer(POPUP_LAYER.intValue() - 1));
+        gameOptionsDialog.requestFocus();
+
+        gameOptionsDialog.getResponseBoolean();
+        remove(gameOptionsDialog);
     }
 
 

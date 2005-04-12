@@ -210,7 +210,7 @@ public class Player extends FreeColGameObject {
         europe = new Europe(game, this);
 
         if (isEuropean(nation)) {
-            gold = 0;
+            gold = getGameOptions().getInteger(GameOptions.STARTING_MONEY);
 
             // START DEBUG:
             if (net.sf.freecol.FreeCol.isInDebugMode()) {
