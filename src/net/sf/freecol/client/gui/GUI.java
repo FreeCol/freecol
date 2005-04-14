@@ -110,7 +110,7 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
     boolean displayCoordinates = false;
 
 
-
+    
     /**
     * The constructor to use.
     *

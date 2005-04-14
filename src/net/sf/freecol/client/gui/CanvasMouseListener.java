@@ -45,10 +45,8 @@ public final class CanvasMouseListener implements MouseListener {
         }*/
 
         if (e.getButton() == MouseEvent.BUTTON1) {
-            //userInputHandler.tileSelected(gui.convertToMapCoordinates(e.getX(), e.getY()));
             gui.setSelectedTile(gui.convertToMapCoordinates(e.getX(), e.getY()));
         } else if (e.getButton() == MouseEvent.BUTTON3) {
-            //userInputHandler.popupRequested(gui.convertToMapCoordinates(e.getX(), e.getY()), e.getX(), e.getY());
             canvas.showTilePopup(gui.convertToMapCoordinates(e.getX(), e.getY()), e.getX(), e.getY());
         }
     }

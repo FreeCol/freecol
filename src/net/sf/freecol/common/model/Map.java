@@ -27,14 +27,14 @@ public class Map extends FreeColGameObject {
     private static final Logger logger = Logger.getLogger(Map.class.getName());
 
 
-    // The possible sizes for a Map.
+    /** The possible sizes for a Map. */
     public static final int SMALL = 0,
                             MEDIUM = 1,
                             LARGE = 2,
                             HUGE = 3,
                             CUSTOM = 4;
 
-    // The directions a Unit can move to.
+    /** The directions a Unit can move to. */
     public static final int N = 0,
                             NE = 1,
                             E = 2,
@@ -43,6 +43,14 @@ public class Map extends FreeColGameObject {
                             SW = 5,
                             W = 6,
                             NW = 7;
+
+    /** The infinity cost as used by {@link #findPath}. */
+    public static final int COST_INFINITY = Integer.MAX_VALUE - 100000000;
+    
+    /** Constant used for given options in {@link #findPath} */
+    public static final int BOTH_LAND_AND_SEA = 0,
+                            ONLY_LAND = 1,
+                            ONLY_SEA = 2;
 
     // Deltas for moving to adjacent squares. Different due to the
     // isometric map. Starting north and going clockwise.
@@ -104,6 +112,261 @@ public class Map extends FreeColGameObject {
     }
 
 
+    /**
+    * Returns the opposite direction of the given direction.
+    */
+    public int getOppositeDirection(int direction) {
+        return (direction+4<8) ? direction+4 : direction-4;
+    }
+
+
+    /**
+    * Finds a shortest path between the given tiles. The <code>Tile</code>
+    * at the <code>end</code> will not be checked against the <code>options</code>.
+    *
+    * <br><br>
+    *
+    * <i>Important: This method will not include colonies in a possible
+    * path, and {@link PathNode#getTurns}, {@link PathNode#getTotalTurns and
+    * {@link PathNode#getMovesLeft will all return <code>-1</code> for
+    * the generated {@link PathNode}s.
+    *
+    * <br><br>
+    *
+    * Use {@link #findPath(unit, tile, tile)} whenever possible.</i>
+    *
+    * @param start The <code>Tile</code> in which the path starts from.
+    * @param end The end of the path.
+    * @param options One of: {@link #BOTH_LAND_AND_SEA}, {@link #BOTH_LAND_AND_SEA},
+    *                {@link #ONLY_LAND} and {@link #ONLY_SEA}.
+    * @return A <code>PathNode</code> for the first tile in the path. Calling
+    *             {@link PathNode#getTile} on this object, will return the
+    *             <code>Tile</code> right after the specified starting tile, and
+    *             {@link PathNode#getDirection} will return the direction you
+    *             need to take in order to reach that tile.
+    *             This method returns <code>null</code> if no path is found.    
+    * @see findPath(unit, tile , tile)
+    * @see Unit#findPath(tile)
+    * @exception NullPointerException if either <code>start</code> or <code>end</code>
+    *             are <code>null</code>.
+    */
+    public PathNode findPath(Tile start, Tile end, int options) {
+        return findPath(null, start, end, options);
+    }
+
+
+    /**
+    * Finds a shortest path between the given tiles. The <code>Tile</code>
+    * at the <code>end</code> will not be checked against the
+    * <code>unit</code>'s legal moves.
+    *
+    * @param unit The <code>Unit</code> that should be used to determine
+    *             wether or not a path is legal.
+    * @param start The <code>Tile</code> in which the path starts from.
+    * @param end The end of the path.
+    * @return A <code>PathNode</code> for the first tile in the path. Calling
+    *             {@link PathNode#getTile} on this object, will return the
+    *             <code>Tile</code> right after the specified starting tile, and
+    *             {@link PathNode#getDirection} will return the direction you
+    *             need to take in order to reach that tile.
+    *             This method returns <code>null</code> if no path is found.
+    * @see findPath(tile, tile, options)
+    * @see Unit#findPath(tile)
+    * @exception NullPointerException if either <code>unit</code>, <code>start</code> or <code>end</code>
+    *             are <code>null</code>.
+    */
+    public PathNode findPath(Unit unit, Tile start, Tile end) {
+        if (unit == null) {
+            throw new NullPointerException();
+        }
+        return findPath(unit, start, end, -1);
+    }
+
+
+    /**
+    * Finds a shortest path between the given tiles. The <code>Tile</code>
+    * at the <code>end</code> will not be checked against validity
+    * (neither the <code>options</code> nor allowed movement by the <code>unit</code>.
+    *
+    * @param unit The <code>Unit</code> that should be used to determine
+    *             wether or not a path is legal. The <code>options</code>
+    *             are used instead if <code>unit == null</code>.
+    * @param start The <code>Tile</code> in which the path starts from.
+    * @param end The end of the path.
+    * @param options One of: {@link #BOTH_LAND_AND_SEA}, {@link #BOTH_LAND_AND_SEA},
+    *             {@link #ONLY_LAND} and {@link #ONLY_SEA}. These options are
+    *             ignored if <code>unit != null</code>.
+    * @return A <code>PathNode</code> for the first tile in the path. Calling
+    *             {@link PathNode#getTile} on this object, will return the
+    *             <code>Tile</code> right after the specified starting tile, and
+    *             {@link PathNode#getDirection} will return the direction you
+    *             need to take in order to reach that tile.
+    *             This method returns <code>null</code> if no path is found.
+    * @exception NullPointerException if either <code>start</code> or <code>end</code>
+    *             are <code>null</code>.
+    * @exception IllegalArgumentException if <code>start == end</code>.
+    */
+    private PathNode findPath(Unit unit, Tile start, Tile end, int options) {
+        if (start == end) {
+            throw new IllegalArgumentException("start == end");
+        }
+
+        PathNode firstNode;
+        if (unit != null) {
+            firstNode = new PathNode(start, 0, getDistance(start.getPosition(), end.getPosition()), -1, unit.getMovesLeft(), 0);
+        } else {
+            firstNode = new PathNode(start, 0, getDistance(start.getPosition(), end.getPosition()), -1, -1, -1);
+        }
+
+        // TODO: Choose a better datastructur:
+        ArrayList openList = new ArrayList();
+        ArrayList closedList = new ArrayList();
+
+        openList.add(firstNode);
+
+        while (openList.size() > 0) {
+            // TODO: Better method for choosing the node with the lowest f:
+            PathNode currentNode = (PathNode) openList.get(0);
+            for (int i=1; i<openList.size(); i++) {
+                if (currentNode.compareTo(openList.get(i)) < 0) {
+                    currentNode = (PathNode) openList.get(i);
+                }
+            }
+
+            // Found our goal:
+            if (currentNode.getTile() == end) {
+                while (currentNode.previous != null) {
+                    currentNode.previous.next = currentNode;
+                    currentNode = currentNode.previous;
+                }
+                return currentNode.next;
+            }
+
+            // Try every direction:
+            for (int direction=0; direction<8; direction++) {
+                Tile newTile = getNeighbourOrNull(direction, currentNode.getTile());
+
+                if (newTile == null) {
+                    continue;
+                }
+
+                int cost = currentNode.getCost();
+                int movesLeft = currentNode.getMovesLeft();
+                int turns = currentNode.getTurns();
+                if (unit != null) {
+                    if (newTile.isLand() && unit.isNaval()) {
+                        if ((newTile.getSettlement() == null || newTile.getSettlement().getOwner() != unit.getOwner()) && newTile != end) {
+                            // Not allowed to move a naval unit on land:
+                            continue;
+                        } else {
+                            // Entering a settlement costs all of the remaining moves for a naval unit:
+                            cost += movesLeft;
+                            movesLeft = 0;
+                        }
+                    } else if ((!newTile.isLand() && !unit.isNaval()) && newTile != end) {
+                        // Not allowed to move a land unit on water:
+                        continue;
+                    } else {
+                        int mc = currentNode.getTile().getMoveCost(newTile);
+                        // Normal move: Using -2 in order to make 1/3 and 2/3 move count as 3/3.
+                        if (mc - 2 <= movesLeft) {
+                            movesLeft -= mc;
+                            if (movesLeft < 0) {
+                                mc += movesLeft;
+                                movesLeft = 0;
+                            }
+                            cost += mc;
+                        } else if (movesLeft == unit.getInitialMovesLeft()) {
+                            // Entering a terrain with a higher move cost, but no moves have been spent yet.
+                            cost += movesLeft;
+                            movesLeft = 0;
+                        } else {
+                            // This move takes an extra turn to complete:
+                            turns++;
+                            if (mc > unit.getInitialMovesLeft()) {
+                                // Entering a terrain with a higher move cost than the initial moves:
+                                cost += movesLeft + unit.getInitialMovesLeft();
+                                movesLeft = 0;
+                            } else {
+                                // Normal move:
+                                cost += movesLeft + mc;
+                                movesLeft = unit.getInitialMovesLeft() - mc;
+                            }
+                        }
+                    }
+                } else {
+                    if ((options == ONLY_SEA && newTile.isLand() || options == ONLY_LAND && !newTile.isLand()) && newTile != end) {
+                        continue;
+                    } else {
+                        cost += currentNode.getTile().getMoveCost(newTile);
+                    }
+                }
+
+                int f = cost + getDistance(newTile.getPosition(), end.getPosition());
+
+                PathNode successor = null;
+                // TODO: Better method for finding the node on the open list:
+                int i;
+                for (i=0; i<openList.size(); i++) {
+                    if (((PathNode) openList.get(i)).getTile() == newTile) {
+                        successor = (PathNode) openList.get(i);
+                        break;
+                    }
+                }
+
+                if (successor != null) {
+                    if (successor.getF() <= f) {
+                        continue;
+                    } else {
+                        openList.remove(i);
+                    }
+                } else {
+                    // TODO: Better method for finding the node on the closed list:
+                    for (i=0; i<closedList.size(); i++) {
+                        if (((PathNode) closedList.get(i)).getTile() == newTile) {
+                            successor = (PathNode) closedList.get(i);
+                            break;
+                        }
+                    }
+                    if (successor != null) {
+                        if (successor.getF() <= f) {
+                            continue;
+                        } else {
+                            closedList.remove(i);
+                        }
+                    }
+                }
+
+                successor = new PathNode(newTile, cost, f, direction, movesLeft, turns);
+                successor.previous = currentNode;
+                openList.add(successor);
+            }
+
+            closedList.add(currentNode);
+
+            // TODO: Better method for removing the node on the open list:
+            for (int i=0; i<openList.size(); i++) {
+                if (((PathNode) openList.get(i)) == currentNode) {
+                    openList.remove(i);
+                    break;
+                }
+            }
+        }
+
+        return null;
+    }
+
+
+    /**
+    * Searches for land within the given radius.
+    *
+    * @param x X-component of the position to search from.
+    * @param y Y-component of the position to search from.
+    * @param distance The radius that should be searched for land,
+    *                 given in number of {@link Tile tiles}.
+    * @return <code>true</code> if there is {@link Tile#isLand land} 
+    *         within the given radius and <code>false</code> otherwise.
+    */
     public boolean isLandWithinDistance(int x, int y, int distance) {
         Iterator i = getCircleIterator(new Position(x, y), true, distance);
         while(i.hasNext()) {

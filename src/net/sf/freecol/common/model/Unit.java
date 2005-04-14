@@ -503,6 +503,59 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
 
 
     /**
+    * Finds a shortest path from the current <code>Tile</code>
+    * to the one specified. Only paths on water are allowed if
+    * <code>isNaval()</code> and only paths on land if not.
+    *
+    * <br><br>
+    *
+    * The <code>Tile</code> at the <code>end</code> will not be
+    * checked against the legal moves of this <code>Unit</code>.
+    *
+    * @param end The <code>Tile</code> in which the path ends.
+    * @return A <code>PathNode</code> for the first tile in the path. Calling
+    *             {@link PathNode#getTile} on this object, will return the
+    *             <code>Tile</code> right after the specified starting tile, and
+    *             {@link PathNode#getDirection} will return the direction you
+    *             need to take in order to reach that tile.
+    *             This method returns <code>null</code> if no path is found.    
+    * @see Map#findPath(tile, tile, options)
+    * @see Map#findPath(unit, tile , tile)
+    * @exception NullPointerException if <code>end == null</code>
+    */
+    public PathNode findPath(Tile end) {
+        return getGame().getMap().findPath(this, getTile(), end);
+    }
+
+
+    /**
+    * Gets the cost of moving this <code>Unit</code> onto the given <code>Tile</code>.
+    * A call to {@link #getMoveType} will return <code>false</code>, if {@link #getMoveCost}
+    * returns a move cost larger than the {@link #getMovesLeft moves left}.
+    *
+    * @param target The <code>Tile</code> this <code>Unit</code> will move onto.
+    * @return The cost of moving this unit onto the given <code>Tile</code>.
+    * @see Tile#getMoveCost
+    */
+    public int getMoveCost(Tile target) {
+        // Remember to also change map.findPath(...) if you change anything here.
+
+        int cost = target.getMoveCost(getTile());
+
+        // Using +2 in order to make 1/3 and 2/3 move count as 3/3.
+        if (cost > getMovesLeft()) {
+            if (getMovesLeft() + 2 >= getInitialMovesLeft() || cost <= getMovesLeft() + 2) {
+                return getMovesLeft();
+            } else {
+                return cost;
+            }
+        } else {
+            return cost;
+        }
+    }
+
+
+    /**
      * Gets the type of a move that is made when moving to the
      * specified <code>Tile</code> from the current one.
      *
@@ -550,7 +603,12 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             return ILLEGAL_MOVE;
         }
 
+        /*
         if (target.getMoveCost(getTile()) > getMovesLeft() + 1 && getMovesLeft() < getInitialMovesLeft()) {
+            return ILLEGAL_MOVE;
+        }
+        */
+        if (getMoveCost(target) > getMovesLeft()) {
             return ILLEGAL_MOVE;
         }
 
@@ -695,6 +753,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         Tile newTile = getGame().getMap().getNeighbourOrNull(direction, getTile());
         Tile oldTile = getTile();
 
+        int moveCost = getMoveCost(newTile);
+
         if (newTile != null) {
             setLocation(newTile);
         } else {
@@ -702,9 +762,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         }
 
         if (isNaval() && newTile.getSettlement() != null) {
+            // If this behaviour should change, remember to correct map.findPath(...):
             setMovesLeft(0);
         } else {
-            setMovesLeft(getMovesLeft() - newTile.getMoveCost(oldTile));
+            setMovesLeft(getMovesLeft() - moveCost);
         }
     }
 
@@ -1063,6 +1124,15 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             indianSettlement.addOwnedUnit(this);
         }
     }
+    
+    
+    /**
+    * Gets the <code>IndianSettlement</code> that owns this unit.
+    */
+    public IndianSettlement getIndianSettlement() {
+        return indianSettlement;
+    }
+
 
     /**
     * Gets the location of this Unit.

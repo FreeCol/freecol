@@ -20,7 +20,7 @@ import org.w3c.dom.*;
 * The mission has three different tasks to perform:
 * <ol>
 *     <li>Get the gift (goods) from the {@link IndianSettlement} that owns the unit.
-*     <li>Transport this gift to the closest {@link Settlement} of the target player.
+*     <li>Transport this gift to the given {@link Colony}.
 *     <li>Complete the mission by delivering the gift.
 * </ol>
 */
@@ -31,8 +31,8 @@ public class IndianBringGiftMission extends Mission {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    /** The <code>Player</code> receiving the gift. */
-    private Player targetPlayer;
+    /** The <code>Colony</code> receiving the gift. */
+    private Colony target;
     
     /** Desides wether this mission has been completed or not. */
     private boolean giftDelivered;
@@ -43,10 +43,10 @@ public class IndianBringGiftMission extends Mission {
     * @param aiUnit The <code>AIUnit</code> this mission
     *        is created for.
     */
-    public IndianBringGiftMission(AIMain aiMain, AIUnit aiUnit, Player targetPlayer) {
+    public IndianBringGiftMission(AIMain aiMain, AIUnit aiUnit, Colony target) {
         super(aiMain, aiUnit);
         
-        this.targetPlayer = targetPlayer;
+        this.target = target;
 
         if (getUnit().getType() != Unit.BRAVE) {
             logger.warning("Only an indian brave can be given the mission: IndianBringGiftMission");
@@ -70,13 +70,35 @@ public class IndianBringGiftMission extends Mission {
     */
     public void doMission(Connection connection) {
         if (!hasGift()) {
-            // Move to the owning settlement
+            if (getUnit().getTile() != getUnit().getIndianSettlement().getTile()) {
+                // Move to the owning settlement:
+                Map map = getAIMain().getGame().getMap();
+                PathNode pathNode = getUnit().findPath(getUnit().getIndianSettlement().getTile());
+                if (pathNode != null) {
+                    int direction = pathNode.getDirection();
+                    int turns = pathNode.getTurns();
+                    while (pathNode != null && pathNode.getTurns() == turns && getUnit().getMoveType(direction) == Unit.MOVE) {
+                        Element moveElement = Message.createNewRootElement("move");
+                        moveElement.setAttribute("unit", getUnit().getID());
+                        moveElement.setAttribute("direction", Integer.toString(direction));
+
+                        try {
+                            connection.send(moveElement);
+                        } catch (IOException e) {
+                            logger.warning("Could not send \"move\"-message!");
+                        }
+                        pathNode = pathNode.next;
+                    }
+                }
+            } else {
+                // Load the goods:
+            }
         } else {
             // Move to the target's colony and deliver
         }
     }
-    
-    
+
+
     /**
     * Checks if the unit is carrying a gift (goods).
     * @return <i>true</i> if <code>getUnit().getSpaceLeft() == 0</code> and false otherwise.
@@ -96,7 +118,8 @@ public class IndianBringGiftMission extends Mission {
     * the mission would be invalidated as well.
     */
     public boolean isValid() {
-        return (!giftDelivered && isValidMission(getUnit().getOwner(), targetPlayer));
+        // The last check is to ensure that the colony have not been burned to the ground.
+        return (!giftDelivered && isValidMission(getUnit().getOwner(), target.getOwner()) && target != null && target.getTile().getColony() == target);
     }
     
     
@@ -114,7 +137,7 @@ public class IndianBringGiftMission extends Mission {
         Element element = document.createElement(getXMLElementTagName());
 
         element.setAttribute("unit", getUnit().getID());
-        element.setAttribute("targetPlayer", targetPlayer.getID());
+        element.setAttribute("target", target.getID());
         element.setAttribute("giftDelivered", Boolean.toString(giftDelivered));
 
         return element;
@@ -123,7 +146,14 @@ public class IndianBringGiftMission extends Mission {
 
     public void readFromXMLElement(Element element) {
         setAIUnit((AIUnit) getAIMain().getAIObject(element.getAttribute("unit")));
-        targetPlayer = (Player) getGame().getFreeColGameObject(element.getAttribute("targetPlayer"));
+        
+        if (element.hasAttribute("target")) {
+            target = (Colony) getGame().getFreeColGameObject(element.getAttribute("target"));
+        } else {
+            // For PRE-0.1.1-protocols
+            target = null;
+        }
+
         giftDelivered = Boolean.valueOf(element.getAttribute("giftDelivered")).booleanValue();
     }
 

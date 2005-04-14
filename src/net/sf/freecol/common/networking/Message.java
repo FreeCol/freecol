@@ -31,7 +31,7 @@ public final class Message {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    private static final String FREECOL_PROTOCOL_VERSION = "0.1.0";
+    private static final String FREECOL_PROTOCOL_VERSION = "0.1.1";
     private static final String INVALID_MESSAGE = "invalid";
 
 

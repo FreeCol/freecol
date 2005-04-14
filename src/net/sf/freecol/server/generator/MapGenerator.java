@@ -262,7 +262,7 @@ public class MapGenerator {
 
         Iterator iter = map.getAdjacentIterator(mainTile.getPosition());
   
-        logger.info("creating want list for settlement");
+        //logger.info("creating want list for settlement");
 
         /* this probably needs finetuning. 
            The indians should prefer manufactured goods.
@@ -388,8 +388,8 @@ public class MapGenerator {
                 
         }
 
-        logger.info("the indians choose: "+good+" and "+good1+" and "+good2);
-        logger.info("===============");
+        //logger.info("the indians choose: "+good+" and "+good1+" and "+good2);
+        //logger.info("===============");
         
         // constructs the return array
         int rv[] = new int[3];
@@ -611,6 +611,7 @@ public class MapGenerator {
 
                 if (colonyTile != null) {
                     colonyTile.setType(Tile.PRAIRIE);
+                    colonyTile.setForested(false);
                     colonyTile.setPlowed(true);
                     colonyTile.setAddition(Tile.ADD_NONE);
 

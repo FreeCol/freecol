@@ -22,6 +22,11 @@ public class AIPlayer extends AIObject {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
+    
+    private static final int MAX_DISTANCE_TO_BRING_GIFT = 10;
+    private static final int MAX_NUMBER_OF_GIFTS_BEING_DELIVERED = 1;
+    
+
     /* Stores temporary information for sessions (trading with another player etc). */
     private HashMap sessionRegister = new HashMap();
     
@@ -95,27 +100,7 @@ public class AIPlayer extends AIObject {
 
         // Bring gifts to nice players:
         if (!player.isEuropean()) {
-            playerIterator = getGame().getPlayerIterator();
-            while (playerIterator.hasNext()) {
-                Player targetPlayer = (Player) playerIterator.next();
-                if (targetPlayer.isEuropean() && IndianBringGiftMission.isValidMission(getPlayer(), targetPlayer) && getPlayer().getTension(targetPlayer) <= Player.TENSION_HAPPY) {
-                    Settlement targetSettlement = targetPlayer.getRandomSettlement();
-                    if (targetSettlement != null) {
-                        Iterator unitIterator = player.getUnitIterator();
-                        AIUnit bestUnit = null;
-                        int shortestDistance = Integer.MAX_VALUE;
-                        while (unitIterator.hasNext()) {
-                            AIUnit u = (AIUnit) getAIMain().getAIObject((Unit) unitIterator.next());
-                            if (!u.hasMission() && u.getUnit().getTile().getDistanceTo(targetSettlement.getTile()) < shortestDistance) {
-                                bestUnit = u;
-                            }
-                        }
-                        if (bestUnit != null) {
-                            bestUnit.setMission(new IndianBringGiftMission(getAIMain(), bestUnit, targetPlayer));
-                        }
-                    }
-                }
-            }
+            //bringGifts();
         }
 
         // Assign a mission to every unit:
@@ -137,11 +122,64 @@ public class AIPlayer extends AIObject {
 
 
     /**
+    * Brings gifts to nice players with nearby colonies.
+    * Should only be called for an indian player.
+    */
+    private void bringGifts() {
+        Iterator indianSettlementIterator = player.getIndianSettlementIterator();
+        while (indianSettlementIterator.hasNext()) {
+            IndianSettlement indianSettlement = (IndianSettlement) indianSettlementIterator.next();
+
+            int alreadyAssignedUnits = 0;
+            Iterator ownedUnits = indianSettlement.getOwnedUnitsIterator();
+            while (ownedUnits.hasNext()) {
+                if (((AIUnit) getAIMain().getAIObject((Unit) ownedUnits.next())).getMission() instanceof IndianBringGiftMission) {
+                    alreadyAssignedUnits++;
+                }
+            }
+            if (alreadyAssignedUnits > MAX_NUMBER_OF_GIFTS_BEING_DELIVERED) {
+                continue;
+            }
+
+            // Creates a list of nearby colonies:
+            List nearbyColonies = new ArrayList();
+            Iterator it = getGame().getMap().getCircleIterator(indianSettlement.getTile().getPosition(), true, MAX_DISTANCE_TO_BRING_GIFT);
+            while (it.hasNext()) {
+                Tile t = getGame().getMap().getTile((Map.Position) it.next());
+                if (t.getColony() != null && IndianBringGiftMission.isValidMission(getPlayer(), t.getColony().getOwner())
+                        && getPlayer().getTension(t.getColony().getOwner()) <= Player.TENSION_HAPPY) {
+                    nearbyColonies.add(t.getColony());
+                }
+            }
+            if (nearbyColonies.size() > 0) {
+                Colony target = (Colony) nearbyColonies.get(random.nextInt(nearbyColonies.size()));
+                Iterator it2 = indianSettlement.getOwnedUnitsIterator();
+                AIUnit chosenOne = null;
+                while (it2.hasNext()) {
+                    chosenOne = (AIUnit) getAIMain().getAIObject((Unit) it2.next());
+                    if (chosenOne.getMission() == null) {
+                        break;
+                    }
+                }
+                if (chosenOne != null) {
+                    // Check that the colony can be reached:
+                    PathNode pn = getGame().getMap().findPath(chosenOne.getUnit(), indianSettlement.getTile(), target.getTile());
+                    if (pn != null && pn.getTotalTurns() <= MAX_DISTANCE_TO_BRING_GIFT) {
+                        chosenOne.setMission(new IndianBringGiftMission(getAIMain(), chosenOne, target));
+                    }
+                }
+
+            }
+        }
+    }
+    
+
+    /**
     * Takes the necessary actions to secure the settlements.
     * This is done by making new military units or to give
     * existing units new missions.
     */
-    public void secureSettlements() {
+    private void secureSettlements() {
         Map map = player.getGame().getMap();
 
         if (!player.isEuropean()) {
