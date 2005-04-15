@@ -23,14 +23,13 @@ public class AIPlayer extends AIObject {
     public static final String  REVISION = "$Revision$";
 
     
-    private static final int MAX_DISTANCE_TO_BRING_GIFT = 10;
+    private static final int MAX_DISTANCE_TO_BRING_GIFT = 5;
     private static final int MAX_NUMBER_OF_GIFTS_BEING_DELIVERED = 1;
     
 
     /* Stores temporary information for sessions (trading with another player etc). */
     private HashMap sessionRegister = new HashMap();
-    
-    private Random random = new Random();
+        
 
     /**
     * The FreeColGameObject this AIObject contains AI-information for:
@@ -100,7 +99,7 @@ public class AIPlayer extends AIObject {
 
         // Bring gifts to nice players:
         if (!player.isEuropean()) {
-            //bringGifts();
+            bringGifts();
         }
 
         // Assign a mission to every unit:
@@ -130,6 +129,11 @@ public class AIPlayer extends AIObject {
         while (indianSettlementIterator.hasNext()) {
             IndianSettlement indianSettlement = (IndianSettlement) indianSettlementIterator.next();
 
+            // Do not bring gifts all the time:
+            if (getRandom().nextInt(10) != 1) {
+                continue;
+            }
+
             int alreadyAssignedUnits = 0;
             Iterator ownedUnits = indianSettlement.getOwnedUnitsIterator();
             while (ownedUnits.hasNext()) {
@@ -152,7 +156,7 @@ public class AIPlayer extends AIObject {
                 }
             }
             if (nearbyColonies.size() > 0) {
-                Colony target = (Colony) nearbyColonies.get(random.nextInt(nearbyColonies.size()));
+                Colony target = (Colony) nearbyColonies.get(getRandom().nextInt(nearbyColonies.size()));
                 Iterator it2 = indianSettlement.getOwnedUnitsIterator();
                 AIUnit chosenOne = null;
                 while (it2.hasNext()) {
@@ -261,7 +265,7 @@ public class AIPlayer extends AIObject {
                     haggling = ((Integer) sessionRegister.get("tradeHaggling#"+unit.getID())).intValue();
                 }
 
-                if (random.nextInt(3+haggling) <= 3) {
+                if (getRandom().nextInt(3+haggling) <= 3) {
                     sessionRegister.put("tradeGold#"+unit.getID(), new Integer(gold));
                     sessionRegister.put("tradeHaggling#"+unit.getID(), new Integer(haggling+1));
                     return gold;

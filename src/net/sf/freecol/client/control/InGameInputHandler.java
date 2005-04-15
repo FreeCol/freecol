@@ -81,6 +81,8 @@ public final class InGameInputHandler extends InputHandler {
                 reply = error(element);
             } else if (type.equals("chooseFoundingFather")) {
                 reply = chooseFoundingFather(element);
+            } else if (type.equals("deliverGift")) {
+                reply = deliverGift(element);
             } else if (type.equals("reconnect")) {
                 reply = reconnect(element);
             } else {
@@ -408,5 +410,27 @@ public final class InGameInputHandler extends InputHandler {
         getFreeColClient().getMyPlayer().setCurrentFather(foundingFather);
         
         return reply;
+    }
+    
+    
+    /**
+    * Handles an "deliverGift"-request.
+    *
+    * @param element The element (root element in a DOM-parsed XML tree) that
+    *                holds all the information.
+    */
+    private Element deliverGift(Element element) {
+        Game game = getFreeColClient().getGame();
+        Element unitElement = Message.getChildElement(element, Unit.getXMLElementTagName());
+
+        Unit unit = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
+        unit.readFromXMLElement(unitElement);
+
+        Settlement settlement = (Settlement) game.getFreeColGameObject(element.getAttribute("settlement"));
+        Goods goods = new Goods(game, Message.getChildElement(element, Goods.getXMLElementTagName()));
+
+        unit.deliverGift(settlement, goods);
+
+        return null;
     }
 }

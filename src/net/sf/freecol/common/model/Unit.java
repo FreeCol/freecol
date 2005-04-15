@@ -306,12 +306,17 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             throw new IllegalStateException("No more moves left!");
         }
 
+        int type = goods.getType();
+        int amount = goods.getAmount();
+
         goods.setLocation(settlement);
         setMovesLeft(0);
 
         if (settlement instanceof IndianSettlement) {
             int value = ((IndianSettlement) settlement).getPrice(goods) / 100;
             settlement.getOwner().modifyTension(getOwner(), -value);
+        } else {
+            addModelMessage(settlement.getOwner(), "model.unit.gift", new String[][] {{"%player%", getOwner().getNationAsString()}, {"%type%", Goods.getName(type)}, {"%amount%", Integer.toString(amount)}});
         }
     }
 

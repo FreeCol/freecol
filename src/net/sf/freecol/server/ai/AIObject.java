@@ -4,6 +4,8 @@ package net.sf.freecol.server.ai;
 import net.sf.freecol.common.model.*;
 import net.sf.freecol.common.networking.Message;
 
+import java.util.*;
+
 import org.w3c.dom.*;
 
 
@@ -18,7 +20,7 @@ public abstract class AIObject {
     public static final String  REVISION = "$Revision$";
     
     private final AIMain aiMain;
-    
+
     
     /**
     * Creates a new <code>AIObject</code>.
@@ -39,6 +41,14 @@ public abstract class AIObject {
     public abstract void readFromXMLElement(Element element);
     
     
+    /**
+    * Returns an instance of the class <code>Random</code>. It that can be
+    * used to generate random numbers.
+    */
+    protected Random getRandom() {
+        return aiMain.getRandom();
+    }
+
     
     /**
     * Returns the game.

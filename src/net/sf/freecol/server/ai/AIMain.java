@@ -22,7 +22,8 @@ public class AIMain implements FreeColGameObjectListener {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    private FreeColServer freeColServer;    
+    private FreeColServer freeColServer;
+    private Random random = new Random();
 
     /**
     * Contains mappings between <code>FreeColGameObject</code>s
@@ -63,6 +64,15 @@ public class AIMain implements FreeColGameObjectListener {
         return freeColServer.getGame();
     }
 
+
+    /**
+    * Returns an instance of the class <code>Random</code>. It that can be
+    * used to generate random numbers.
+    */    
+    public Random getRandom() {
+        return random;
+    } 
+    
 
     /**
     * Searches for new {@link FreeColGameObject FreeColGameObjects}. An AI-object is

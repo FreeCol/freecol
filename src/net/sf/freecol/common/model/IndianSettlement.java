@@ -40,7 +40,7 @@ public class IndianSettlement extends Settlement {
     private static final int WORK_AMOUNT = 5;
     
     /** The amount of raw material that should be available before producing manufactured goods: */
-    private static final int KEEP_RAW_MATERIAL = 50;
+    public static final int KEEP_RAW_MATERIAL = 50;
 
     // These are the learnable skills for an Indian settlement.
     // They are fully compatible with the types from the Unit class!
@@ -393,6 +393,8 @@ public class IndianSettlement extends Settlement {
     public void remove(Locatable locatable) {
         if (locatable instanceof Unit) {
             unitContainer.removeUnit((Unit) locatable);
+        } else if (locatable instanceof Goods) {
+            goodsContainer.removeGoods((Goods)locatable);
         } else {
             logger.warning("Tried to remove an unrecognized 'Locatable' from a IndianSettlement.");
         }
@@ -413,6 +415,10 @@ public class IndianSettlement extends Settlement {
         return unitContainer.getUnitIterator();
     }
 
+
+    public GoodsContainer getGoodsContainer() {
+        return goodsContainer;
+    }
 
 
     public Unit getFirstUnit() {

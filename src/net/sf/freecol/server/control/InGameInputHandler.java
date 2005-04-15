@@ -1718,6 +1718,25 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalStateException("Not adjacent to settlemen!");
         }
 
+        ServerPlayer receiver = (ServerPlayer) settlement.getOwner();
+        if (!receiver.isAI() && receiver.isConnected()) {
+            Element deliverGiftElement = Message.createNewRootElement("deliverGift");
+
+            Element unitElement = unit.toXMLElement(receiver, deliverGiftElement.getOwnerDocument());
+            Element goodsContainerElement = unit.getGoodsContainer().toXMLElement(receiver, deliverGiftElement.getOwnerDocument());
+            unitElement.replaceChild(goodsContainerElement, unitElement.getElementsByTagName(GoodsContainer.getXMLElementTagName()).item(0));
+            deliverGiftElement.appendChild(unitElement);
+
+            deliverGiftElement.setAttribute("settlement", settlement.getID());
+            deliverGiftElement.appendChild(goods.toXMLElement(receiver, deliverGiftElement.getOwnerDocument()));
+
+            try {
+                receiver.getConnection().send(deliverGiftElement);
+            } catch (IOException e) {
+                logger.warning("Could not send \"deliverGift\"-message!");
+            }
+        }
+
         unit.deliverGift(settlement, goods);
 
         return null;

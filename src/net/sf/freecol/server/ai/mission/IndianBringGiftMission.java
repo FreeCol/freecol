@@ -3,6 +3,7 @@ package net.sf.freecol.server.ai.mission;
 
 import java.io.IOException;
 import java.util.logging.Logger;
+import java.util.*;
 
 import net.sf.freecol.server.ai.*;
 import net.sf.freecol.common.model.*;
@@ -72,29 +73,43 @@ public class IndianBringGiftMission extends Mission {
         if (!hasGift()) {
             if (getUnit().getTile() != getUnit().getIndianSettlement().getTile()) {
                 // Move to the owning settlement:
-                Map map = getAIMain().getGame().getMap();
-                PathNode pathNode = getUnit().findPath(getUnit().getIndianSettlement().getTile());
-                if (pathNode != null) {
-                    int direction = pathNode.getDirection();
-                    int turns = pathNode.getTurns();
-                    while (pathNode != null && pathNode.getTurns() == turns && getUnit().getMoveType(direction) == Unit.MOVE) {
-                        Element moveElement = Message.createNewRootElement("move");
-                        moveElement.setAttribute("unit", getUnit().getID());
-                        moveElement.setAttribute("direction", Integer.toString(direction));
-
-                        try {
-                            connection.send(moveElement);
-                        } catch (IOException e) {
-                            logger.warning("Could not send \"move\"-message!");
-                        }
-                        pathNode = pathNode.next;
-                    }
+                int r = moveTowards(connection, getUnit().getIndianSettlement().getTile());
+                if (r >= 0) {
+                    move(connection, r);
                 }
             } else {
                 // Load the goods:
+                List goodsList = new ArrayList();
+                GoodsContainer gc = getUnit().getIndianSettlement().getGoodsContainer();
+                for (int i=1; i<=4; i++) {
+                    if (gc.getGoodsCount(i) >= IndianSettlement.KEEP_RAW_MATERIAL + 25) {
+                        goodsList.add(new Goods(getGame(), getUnit().getIndianSettlement(), i, getRandom().nextInt(15)+10));
+                    }
+                }
+                
+                if (goodsList.size() > 0) {
+                    Goods goods = (Goods) goodsList.get(getRandom().nextInt(goodsList.size()));
+                    goods.setLocation(getUnit());
+                }
             }
         } else {
             // Move to the target's colony and deliver
+            int r = moveTowards(connection, target.getTile());
+            if (r >= 0) { // We have arrived.
+                Element deliverGiftElement = Message.createNewRootElement("deliverGift");
+                deliverGiftElement.setAttribute("unit", getUnit().getID());
+                deliverGiftElement.setAttribute("settlement", target.getID());
+                deliverGiftElement.appendChild(((Goods) getUnit().getGoodsIterator().next()).toXMLElement(null, deliverGiftElement.getOwnerDocument()));
+
+                try {
+                    connection.send(deliverGiftElement);
+                } catch (IOException e) {
+                    logger.warning("Could not send \"deliverGift\"-message!");
+                }
+                
+                giftDelivered = true;
+                getUnit().getOwner().modifyTension(target.getOwner(), 1);
+            }
         }
     }
 
