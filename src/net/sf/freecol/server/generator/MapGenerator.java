@@ -230,8 +230,7 @@ public class MapGenerator {
                 while (circleIterator.hasNext()) {
                     Position adjPos = (Position)circleIterator.next();
                     map.getTile(adjPos).setClaim(Tile.CLAIM_CLAIMED);
-                    // TODO: Implement this later:
-                    //map.getTile(adjPos).setOwner(map.getTile(position).getSettlement());
+                    map.getTile(adjPos).setNationOwner(player.getNation());
                 }
 
                 for (int i = 0; i < (type * 2) + 4; i++) {
@@ -618,11 +617,13 @@ public class MapGenerator {
                     Unit buildColonyUnit = new Unit(game, colonyTile, player, Unit.EXPERT_FARMER, Unit.ACTIVE);
                     Colony colony = new Colony(game, player, "Colony for Testing", colonyTile);
                     buildColonyUnit.buildColony(colony);
-                    Tile ct = ((ColonyTile) buildColonyUnit.getLocation()).getWorkTile();
-                    ct.setType(Tile.PLAINS);
-                    ct.setForested(false);
-                    ct.setPlowed(true);
-                    ct.setAddition(Tile.ADD_NONE);
+                    if (buildColonyUnit.getLocation() instanceof ColonyTile) {
+                        Tile ct = ((ColonyTile) buildColonyUnit.getLocation()).getWorkTile();
+                        ct.setType(Tile.PLAINS);
+                        ct.setForested(false);
+                        ct.setPlowed(true);
+                        ct.setAddition(Tile.ADD_NONE);
+                    }
 
                     Unit carpenter = new Unit(game, colonyTile, player, Unit.MASTER_CARPENTER, Unit.ACTIVE);
                     carpenter.setLocation(colony.getBuilding(Building.CARPENTER));
@@ -631,12 +632,14 @@ public class MapGenerator {
                     statesman.setLocation(colony.getBuilding(Building.TOWN_HALL));
                     
                     Unit lumberjack = new Unit(game, colony, player, Unit.EXPERT_LUMBER_JACK, Unit.ACTIVE);
-                    Tile lt = ((ColonyTile) lumberjack.getLocation()).getWorkTile();
-                    lt.setType(Tile.PLAINS);
-                    lt.setForested(true);
-                    lt.setRoad(true);
-                    lt.setAddition(Tile.ADD_NONE);
-                    lumberjack.setWorkType(Goods.LUMBER);
+                    if (lumberjack.getLocation() instanceof ColonyTile) {
+                        Tile lt = ((ColonyTile) lumberjack.getLocation()).getWorkTile();
+                        lt.setType(Tile.PLAINS);
+                        lt.setForested(true);
+                        lt.setRoad(true);
+                        lt.setAddition(Tile.ADD_NONE);
+                        lumberjack.setWorkType(Goods.LUMBER);
+                    }
                     
                     Unit scout = new Unit(game, colonyTile, player, Unit.SEASONED_SCOUT, Unit.ACTIVE);
 

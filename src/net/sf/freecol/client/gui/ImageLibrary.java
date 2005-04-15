@@ -35,7 +35,8 @@ public final class ImageLibrary extends ImageProvider {
     public static final int UNIT_SELECT = 0,
                             PLOWED = 4,
                             TILE_TAKEN = 5,
-                            MISC_COUNT = 6;
+                            TILE_OWNED_BY_INDIANS = 6,
+                            MISC_COUNT = 7;
 
     /**
      * These finals represent the EXTRA terrain graphics; the ones that

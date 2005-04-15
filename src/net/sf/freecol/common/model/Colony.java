@@ -84,6 +84,8 @@ public final class Colony extends Settlement implements Location {
         bells = 0;
         currentlyBuilding = Building.DOCK;
 
+        tile.setNationOwner(owner.getNation());
+
         if (initializeWorkLocations) {
             workLocations.add(new ColonyTile(getGame(), this, tile));
             workLocations.add(new ColonyTile(getGame(), this, getGame().getMap().getNeighbourOrNull(Map.N, tile)));
@@ -112,7 +114,7 @@ public final class Colony extends Settlement implements Location {
             workLocations.add(new Building(getGame(),this, Building.PRINTING_PRESS, Building.NOT_BUILT));
             workLocations.add(new Building(getGame(),this, Building.CUSTOM_HOUSE, Building.NOT_BUILT));
         }
-    }
+            }
 
 
     public void updatePopulation() {
@@ -313,9 +315,19 @@ public final class Colony extends Settlement implements Location {
                     return;
                 }
 
-                Iterator i = getWorkLocationIterator();
+                Iterator i = getBuildingIterator();
                 while (i.hasNext()) {
                     w = (WorkLocation) i.next();
+                    if (w.canAdd(locatable)) {
+                        locatable.setLocation(w);
+                        updatePopulation();
+                        return;
+                    }
+                }
+                
+                Iterator it = getWorkLocationIterator();
+                while (it.hasNext()) {
+                    w = (WorkLocation) it.next();
                     if (w.canAdd(locatable)) {
                         locatable.setLocation(w);
                         updatePopulation();
@@ -709,7 +721,8 @@ public final class Colony extends Settlement implements Location {
         while (colonyTileIterator.hasNext()) {
             ColonyTile colonyTile = (ColonyTile) colonyTileIterator.next();
             if (colonyTile.canAdd(unit) && unit.getFarmedPotential(goodsType, colonyTile.getWorkTile()) > highestProduction
-                    && (colonyTile.getWorkTile().isLand() || getBuilding(Building.DOCK).isBuilt())) {
+                    && (colonyTile.getWorkTile().isLand() || getBuilding(Building.DOCK).isBuilt())
+                    && (colonyTile.getWorkTile().getNationOwner() == Player.NO_NATION || colonyTile.getWorkTile().getNationOwner() == unit.getNation())) {
                 highestProduction = unit.getFarmedPotential(goodsType, colonyTile.getWorkTile());
                 bestPick = colonyTile;
             }
@@ -718,7 +731,7 @@ public final class Colony extends Settlement implements Location {
         return bestPick;
     }
 
-    
+
     /**
     * Returns the production of a vacant <code>ColonyTile</code>
     * where the given <code>unit</code> produces the maximum output
@@ -731,7 +744,8 @@ public final class Colony extends Settlement implements Location {
         while (colonyTileIterator.hasNext()) {
             ColonyTile colonyTile = (ColonyTile) colonyTileIterator.next();
             if (colonyTile.canAdd(unit) && unit.getFarmedPotential(goodsType, colonyTile.getWorkTile()) > highestProduction
-                    && (colonyTile.getWorkTile().isLand() || getBuilding(Building.DOCK).isBuilt())) {
+                    && (colonyTile.getWorkTile().isLand() || getBuilding(Building.DOCK).isBuilt())
+                    && (colonyTile.getWorkTile().getNationOwner() == Player.NO_NATION || colonyTile.getWorkTile().getNationOwner() == unit.getNation())) {
                 highestProduction = unit.getFarmedPotential(goodsType, colonyTile.getWorkTile());
             }
         }
@@ -761,7 +775,7 @@ public final class Colony extends Settlement implements Location {
     public int getHorseProduction() {
         int eat = getUnitCount() * 2;
         int surplus = getFoodProduction() - eat;
-        
+
         if (getGoodsCount(Goods.HORSES) >= 2 && surplus > 1) {
             if (!getBuilding(Building.STABLES).isBuilt()) {
                 return Math.min(surplus / 2, getPotentialHorseProduction());
@@ -769,7 +783,7 @@ public final class Colony extends Settlement implements Location {
                 return Math.min(surplus, getPotentialHorseProduction());
             }
         }
-        
+
         return 0;
     }
 
@@ -816,7 +830,7 @@ public final class Colony extends Settlement implements Location {
         }
     }
 
-    
+
     /**
     * Returns a random unit from this colony.
     *

@@ -145,7 +145,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                         reply = trade(connection, element);
                     } else if (type.equals("deliverGift")) {
                         reply = deliverGift(connection, element);
-
+                    } else if (type.equals("buyLand")) {
+                        reply = buyLand(connection, element);
                     } else {
                         logger.warning("Unknown request from client " + element.getTagName());
                     }
@@ -176,6 +177,29 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
 
         return reply;
+    }
+
+
+    /**
+    * Handles a "buyLand"-message from a client.
+    *
+    * @param connection The connection the message came from.
+    * @param element The element containing the request.
+    *
+    */
+    private Element buyLand(Connection connection, Element element) {
+        Game game = getFreeColServer().getGame();
+
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
+        Tile tile = (Tile) game.getFreeColGameObject(element.getAttribute("tile"));
+        
+        if (tile == null) {
+            throw new NullPointerException();
+        }
+
+        player.buyLand(tile);
+
+        return null;
     }
 
 

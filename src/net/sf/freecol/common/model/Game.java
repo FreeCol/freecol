@@ -300,6 +300,22 @@ public class Game extends FreeColGameObject {
 
 
     /**
+    * Return a <code>Player</code> identified by it's nation.
+    */
+    public Player getPlayer(int nation) {
+        Iterator playerIterator = getPlayerIterator();
+        while (playerIterator.hasNext()) {
+            Player player = (Player) playerIterator.next();
+            if (player.getNation() == nation) {
+                return player;
+            }
+        }
+        
+        return null;
+    }
+
+
+    /**
     * Sets the current player.
     *
     * @param newCp The new current player.

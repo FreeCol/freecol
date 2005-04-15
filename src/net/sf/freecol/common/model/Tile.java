@@ -64,6 +64,9 @@ public final class Tile extends FreeColGameObject implements Location {
                     y;
 
     private int     indianClaim;
+    
+    /** The nation that consider this tile to be their land. */
+    private int     nationOwner = Player.NO_NATION;
 
     /** A pointer to the settlement located on this tile or 'null' if there is no settlement on this tile. */
     private Settlement settlement;
@@ -448,6 +451,26 @@ public final class Tile extends FreeColGameObject implements Location {
         return type;
     }
 
+    
+    /**
+    * The nation that consider this tile to be their property.
+    * @return The nation or {@link Player#NO_NATION} is there is
+    *         no nation owning this tile.
+    */
+    public int getNationOwner() {
+        return nationOwner;
+    }
+
+    
+    /**
+    * Sets the nation that should consider this tile to be their property.
+    * @see #getNationOwner
+    */
+    public void setNationOwner(int nationOwner) {
+        this.nationOwner = nationOwner;
+    }
+
+
     /**
     * Returns the addition on this Tile.
     *
@@ -456,6 +479,7 @@ public final class Tile extends FreeColGameObject implements Location {
     public int getAddition() {
         return addition_type;
     }
+
 
     /**
     * Sets the addition on this Tile.
@@ -466,6 +490,7 @@ public final class Tile extends FreeColGameObject implements Location {
         addition_type = addition;
     }
 
+
     /**
     * Returns the claim on this Tile.
     *
@@ -475,6 +500,7 @@ public final class Tile extends FreeColGameObject implements Location {
         return indianClaim;
     }
 
+
     /**
     * Sets the claim on this Tile.
     * @param claim The claim on this Tile.
@@ -482,6 +508,7 @@ public final class Tile extends FreeColGameObject implements Location {
     public void setClaim(int claim) {
         indianClaim = claim;
     }
+
 
     /**
     * Puts a <code>Settlement</code> on this <code>Tile</code>.
@@ -979,6 +1006,10 @@ public final class Tile extends FreeColGameObject implements Location {
         tileElement.setAttribute("plowed", Boolean.toString(plowed));
         tileElement.setAttribute("forested", Boolean.toString(forested));
         tileElement.setAttribute("bonus", Boolean.toString(bonus));
+        
+        //if (showAll || player.canSee(this)) {
+            tileElement.setAttribute("nationOwner", Integer.toString(nationOwner));
+        //}
 
         if (owner != null) {
             tileElement.setAttribute("owner", owner.getID());
@@ -1032,6 +1063,12 @@ public final class Tile extends FreeColGameObject implements Location {
         plowed = Boolean.valueOf(tileElement.getAttribute("plowed")).booleanValue();
         forested = Boolean.valueOf(tileElement.getAttribute("forested")).booleanValue();
         bonus = Boolean.valueOf(tileElement.getAttribute("bonus")).booleanValue();
+        
+        if (tileElement.hasAttribute("nationOwner")) {
+            nationOwner = Integer.parseInt(tileElement.getAttribute("nationOwner"));
+        } else {
+            nationOwner = Player.NO_NATION;
+        }
 
         if (tileElement.hasAttribute("owner")) {
             owner = (Settlement) getGame().getFreeColGameObject(tileElement.getAttribute("owner"));

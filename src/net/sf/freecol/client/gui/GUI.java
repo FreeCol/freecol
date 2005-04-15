@@ -1069,6 +1069,15 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
         if (tile.getOwner() != null && tile.getOwner() != colony) {
             g.drawImage(lib.getMiscImage(ImageLibrary.TILE_TAKEN), x, y, null);
         }
+        int nation = tile.getNationOwner();
+        if (nation != Player.NO_NATION 
+                && !Player.isEuropean(nation)
+                && nation != colony.getOwner().getNation()
+                && tile.getSettlement() == null
+                && !colony.getOwner().hasFather(FoundingFather.PETER_MINUIT)) {
+            Image image = lib.getMiscImage(ImageLibrary.TILE_OWNED_BY_INDIANS);
+            g.drawImage(image, x+tileWidth/2-image.getWidth(null)/2, y+tileHeight/2-image.getHeight(null)/2, null);
+        }
     }
 
 

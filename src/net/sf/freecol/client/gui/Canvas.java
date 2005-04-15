@@ -710,13 +710,14 @@ public final class Canvas extends JLayeredPane {
     * @return The choosen object, or <i>null</i> for the cancel-button.
     */
     public Object showChoiceDialog(String text, String cancelText, Object[] objects) {
-        //return showChoiceDialog(text, cancelText, Arrays.asList(objects).iterator());
+        /*
         try {
             text = Messages.message(text);
             cancelText = Messages.message(cancelText);
         } catch (MissingResourceException e) {
             logger.warning("could not find message with id: " + text + " or " + cancelText + ".");
         }
+        */
 
         FreeColDialog choiceDialog = FreeColDialog.createChoiceDialog(text, cancelText, objects);
         choiceDialog.setLocation(getWidth() / 2 - choiceDialog.getWidth() / 2, getHeight() / 2 - choiceDialog.getHeight() / 2);

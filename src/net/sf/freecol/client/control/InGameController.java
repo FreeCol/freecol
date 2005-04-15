@@ -300,6 +300,19 @@ public final class InGameController implements NetworkConstants {
         freeColClient.getCanvas().updateJMenuBar();
     }
 
+    
+    /**
+    * Buys the given land from the indians.
+    */
+    public void buyLand(Tile tile) {
+        Element buyLandElement = Message.createNewRootElement("buyLand");
+        buyLandElement.setAttribute("tile", tile.getID());
+
+        freeColClient.getMyPlayer().buyLand(tile);
+        
+        freeColClient.getClient().send(buyLandElement);
+    }
+
 
     /**
     * Uses the given unit to trade with a <code>Settlement</code> in
@@ -331,7 +344,7 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        Goods goods = (Goods) canvas.showChoiceDialog("tradeProposition.text", "tradeProposition.cancel", unit.getGoodsIterator());
+        Goods goods = (Goods) canvas.showChoiceDialog(Messages.message("tradeProposition.text"), Messages.message("tradeProposition.cancel"), unit.getGoodsIterator());
         if (goods == null) { // == Trade aborted by the player.
             return;
         }
@@ -622,7 +635,7 @@ public final class InGameController implements NetworkConstants {
             } else if (choices.size() == 0) {
                 throw new IllegalStateException();
             } else {
-                destinationUnit = (Unit) canvas.showChoiceDialog("embark.text", "embark.cancel", choices.iterator());
+                destinationUnit = (Unit) canvas.showChoiceDialog(Messages.message("embark.text"), Messages.message("embark.cancel"), choices.iterator());
                 if (destinationUnit == null) { // == user cancelled
                     return;
                 }

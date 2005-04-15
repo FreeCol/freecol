@@ -31,10 +31,11 @@ public class Player extends FreeColGameObject {
     /**
     * Constants for adding to the tension levels.
     */
-    public static final int TENSION_ADD_MINOR = 100,    // Unit destroyed, etc
+    public static final int TENSION_ADD_TAKE_LAND = 50, // Grab land without paying     
+                            TENSION_ADD_MINOR = 100,    // Unit destroyed, etc
                             TENSION_ADD_NORMAL = 200,   // Unit destroyed in a Settlement, etc
                             TENSION_ADD_MAJOR = 300;    // Unit destroyed in a capital, etc
-                            
+
     /** The AI player is happy if <code>tension <= TENSION_HAPPY</code>. */
     public static final int TENSION_HAPPY = 100;
 
@@ -46,6 +47,8 @@ public class Player extends FreeColGameObject {
                             CEASE_FIRE = -1,
                             PEACE = 0,
                             ALLIANCE = 1;
+
+    public static final int NO_NATION = -1;
 
     /** The nations a player can play. */
     public static final int DUTCH = 0,
@@ -286,8 +289,8 @@ public class Player extends FreeColGameObject {
     public boolean isEuropean() {
         return isEuropean(nation);
     }
-    
-    
+
+
     /**
     * Checks if this player is european. This includes the
     * "Royal Expeditionay Force".
@@ -301,6 +304,38 @@ public class Player extends FreeColGameObject {
         } else {
             return false;
         }
+    }
+    
+    
+    /**
+    * Returns the price of the given land.
+    */
+    public int getLandPrice(Tile tile)  {
+        int price = 0;
+        for (int i=0; i<Goods.NUMBER_OF_TYPES; i++) {
+            price += tile.potential(i);
+        }
+        return price*40+100;
+    }
+
+
+    /**
+    * Buys the given land.
+    */
+    public void buyLand(Tile tile) {
+        int nation = tile.getNationOwner();
+        if (nation == NO_NATION || nation == getNation()) {
+            throw new IllegalStateException();
+        }
+        Player owner = getGame().getPlayer(nation);
+        if (owner.isEuropean()) {
+            throw new IllegalStateException();
+        }
+
+        int price = owner.getLandPrice(tile);
+        modifyGold(-price);
+        owner.modifyGold(price);
+        tile.setNationOwner(getNation());
     }
 
 
@@ -768,6 +803,15 @@ public class Player extends FreeColGameObject {
     * @return The nation of this player as a String.
     */
     public String getNationAsString() {
+        return getNationAsString(getNation());
+    }
+
+
+    /**
+    * Returns the given nation as a String.
+    * @return The given nation as a String.
+    */
+    public static String getNationAsString(int nation) {
         switch (nation) {
             case DUTCH:
                 return "Dutch";

@@ -5,6 +5,7 @@ import net.sf.freecol.client.*;
 import net.sf.freecol.client.control.*;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.*;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.*;
 
 import javax.swing.*;
@@ -1265,6 +1266,31 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                                 parent.errorMessage("tileTakenInd");
                             }
                             return null;
+                        }
+                        if (colonyTile.getWorkTile().getNationOwner() != Player.NO_NATION
+                                && colonyTile.getWorkTile().getNationOwner() != unit.getOwner().getNation()
+                                && !Player.isEuropean(colonyTile.getWorkTile().getNationOwner())
+                                && !unit.getOwner().hasFather(FoundingFather.PETER_MINUIT)) {
+                            int nation = colonyTile.getWorkTile().getNationOwner();
+                            int price = game.getPlayer(colonyTile.getWorkTile().getNationOwner()).getLandPrice(colonyTile.getWorkTile());
+                            ChoiceItem[] choices = {
+                                new ChoiceItem(Messages.message("indianLand.pay").replaceAll("%amount%", Integer.toString(price)), 1),
+                                new ChoiceItem(Messages.message("indianLand.take"), 2)
+                            };
+                            ChoiceItem ci = (ChoiceItem) parent.showChoiceDialog(
+                                Messages.message("indianLand.text").replaceAll("%player%", Player.getNationAsString(nation)),
+                                Messages.message("indianLand.cancel"), choices
+                            );
+                            if (ci == null) {
+                                return null;
+                            } else if (ci.getChoice() == 1) {
+                                if (price > freeColClient.getMyPlayer().getGold()) {
+                                    parent.errorMessage("notEnoughGold");
+                                    return null;
+                                } else {
+                                    inGameController.buyLand(colonyTile.getWorkTile());
+                                }
+                            }
                         }
 
                         if (colonyTile.canAdd(unit)) {
