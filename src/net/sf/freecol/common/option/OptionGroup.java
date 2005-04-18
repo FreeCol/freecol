@@ -23,15 +23,13 @@ public class OptionGroup extends Option {
     /**
     * Creates a new <code>OptionGroup</code>.
     *
-    * @param id The identifier for this option. This is used when the object should be
-    *           found in an {@link OptionGroup}.
     * @param name The name of the <code>Option</code>. This text is used for identifying
     *           the option for a user. Example: The text related to a checkbox.
     * @param shortDescription Should give a short description of the <code>OptionGroup</code>.
     *           This might be used as a tooltip text.
     */
-    public OptionGroup(String id, String name, String shortDescription) {
-        super(id, name, shortDescription);
+    public OptionGroup(String name, String shortDescription) {
+        super(NO_ID, name, shortDescription);
         options = new ArrayList();
     }
 
@@ -59,6 +57,42 @@ public class OptionGroup extends Option {
     */
     public void add(Option option) {
         options.add(option);
+    }
+
+    
+    /**
+    * Removes all of the <code>Option</code>s from this <code>OptionGroup</code>.
+    */
+    public void removeAll() {
+        options.clear();
+    }
+
+
+    /**
+    * Removes the given <code>Option</code> from this <code>OptionGroup</code>.
+    * @param option The <code>Option</code> to be removed.
+    * @return The <code>Option</code> if it has been found and removed from either
+    *         this <code>OptionGroup</code> or any of this <code>OptionGroup</code>'s
+    *         sub-<code>OptionGroup</code>s. <code>null</code> is returned if the 
+    *         object is not found.
+    */
+    public Option remove(Option option) {
+        int index = options.indexOf(option);
+        if (index >= 0) {
+            return (Option) options.remove(index);
+        } else {
+            Iterator optionIterator = options.iterator();
+            while (optionIterator.hasNext()) {
+                Option o = (Option) optionIterator.next();
+                if (o instanceof OptionGroup) {
+                    if (((OptionGroup) o).remove(option) != null) {
+                        return option;
+                    }
+                }
+            }
+        }
+        
+        return null;
     }
 
 
@@ -102,8 +136,6 @@ public class OptionGroup extends Option {
     protected void readAttributes(Element optionGroupElement) {
         super.readAttributes(optionGroupElement);
 
-        options.clear();
-
         NodeList nl = optionGroupElement.getChildNodes();
         for (int i=0; i<nl.getLength(); i++) {
             Element optionElement = (Element) nl.item(i);
@@ -140,6 +172,7 @@ public class OptionGroup extends Option {
     * @param optionGroupElement The DOM-element ("Document Object Model") made to represent this "OptionGroup".
     */
     public void readFromXMLElement(Element optionGroupElement) {
+        options.clear();
         readAttributes(optionGroupElement);
     }
 

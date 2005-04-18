@@ -1386,10 +1386,18 @@ public final class Tile extends FreeColGameObject implements Location {
 
             colonyUnitCount = Integer.parseInt(tileElement.getAttribute("colonyUnitCount"));
             colonyStockadeLevel = Integer.parseInt(tileElement.getAttribute("colonyStockadeLevel"));
-            skill = Integer.parseInt(tileElement.getAttribute("learnableSkill"));
-            highlyWantedGoods = Integer.parseInt(tileElement.getAttribute("highlyWantedGoods"));
-            wantedGoods1 = Integer.parseInt(tileElement.getAttribute("wantedGoods1"));
-            wantedGoods2 = Integer.parseInt(tileElement.getAttribute("wantedGoods2"));
+            
+            if (tileElement.hasAttribute("learnableSkill")) {
+                skill = Integer.parseInt(tileElement.getAttribute("learnableSkill"));
+                highlyWantedGoods = Integer.parseInt(tileElement.getAttribute("highlyWantedGoods"));
+                wantedGoods1 = Integer.parseInt(tileElement.getAttribute("wantedGoods1"));
+                wantedGoods2 = Integer.parseInt(tileElement.getAttribute("wantedGoods2"));
+            } else { // Support for pre-0.1.0:
+                skill = IndianSettlement.UNKNOWN;
+                highlyWantedGoods = IndianSettlement.UNKNOWN;
+                wantedGoods1 = IndianSettlement.UNKNOWN;
+                wantedGoods2 = IndianSettlement.UNKNOWN;
+            }
         }
 
 

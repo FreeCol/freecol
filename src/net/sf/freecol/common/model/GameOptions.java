@@ -10,9 +10,10 @@ import org.w3c.dom.*;
 
 
 /**
-* Keeps track of the available game options.
+* Keeps track of the available game options. New options should be added to
+* {@link #addDefaultOptions}.
 */
-public final class GameOptions extends OptionGroup {
+public class GameOptions extends OptionGroup {
     private static Logger logger = Logger.getLogger(GameOptions.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
@@ -30,11 +31,29 @@ public final class GameOptions extends OptionGroup {
     * Creates a new <code>GameOptions</code>.
     */
     public GameOptions() {
-        super("gameOptions", "gameOptions.name", "gameOptions.shortDescription");
+        super("gameOptions.name", "gameOptions.shortDescription");
 
+        values = new HashMap();
+        
+        addDefaultOptions();
+    }
+
+
+
+
+
+
+    /**
+    * Adds the options to this <code>GameOptions</code>.
+    */
+    protected void addDefaultOptions() {
         /* Add options here: */
-        add(new IntegerOption(STARTING_MONEY, "gameOptions.startingMoney.name", "gameOptions.startingMoney.shortDescription", 0));
 
+        OptionGroup starting = new OptionGroup("gameOptions.starting.name", "gameOptions.starting.shortDescription");
+        starting.add(new IntegerOption(STARTING_MONEY, "gameOptions.startingMoney.name", "gameOptions.startingMoney.shortDescription", 0));
+        add(starting);
+
+        /* Create the mapping: */
         createMap();
     }
 
@@ -73,24 +92,48 @@ public final class GameOptions extends OptionGroup {
 
 
     private void createMap() {
-        if (values == null) {
-            values = new HashMap();
-        } else {
-            values.clear();
-        }
         addToMap(this);
     }
 
 
     private void addToMap(OptionGroup og) {
-        Iterator it = iterator();
+        List oldOptions = new ArrayList();
+
+        Iterator it = og.iterator();
         while (it.hasNext()) {
             Option option = (Option) it.next();
             if (option instanceof OptionGroup) {
                 addToMap((OptionGroup) option);
+            } else {
+                Option oldOption = (Option) values.put(option.getId(), option);
+                if (oldOption != null) {
+                    oldOptions.add(oldOption);
+                }
             }
-            values.put(option.getId(), option);
         }
+        
+        Iterator it2 = oldOptions.iterator();
+        while (it2.hasNext()) {
+            remove((Option) it2.next());
+        }
+/*
+        Iterator it = og.iterator();
+        while (it.hasNext()) {
+            Option option = (Option) it.next();
+            if (option instanceof OptionGroup) {
+                groups.add(option);
+            } else {
+                Option oldOption = (Option) values.put(option.getId(), option);
+                if (oldOption != null) {
+                    remove(oldOption);
+                }
+            }
+        }
+
+        Iterator it2 = og.iterator();
+        while (it2.hasNext()) {
+            addToMap((OptionGroup) it2.next());
+        }*/
     }
 
 
@@ -114,8 +157,18 @@ public final class GameOptions extends OptionGroup {
     * @param gameOptionsElement The DOM-element ("Document Object Model") made to represent this "GameOptions".
     */
     public void readFromXMLElement(Element gameOptionsElement) {
+        // Remove all options:
+        if (values == null) {
+            values = new HashMap();
+        } else {
+            values.clear();
+        }
+        removeAll();
+
+        addDefaultOptions();
+
         readAttributes(gameOptionsElement);
-        createMap();
+        addToMap(this);
     }
 
 
