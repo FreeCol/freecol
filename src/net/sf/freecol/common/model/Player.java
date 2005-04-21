@@ -31,7 +31,7 @@ public class Player extends FreeColGameObject {
     /**
     * Constants for adding to the tension levels.
     */
-    public static final int TENSION_ADD_TAKE_LAND = 50, // Grab land without paying     
+    public static final int TENSION_ADD_TAKE_LAND = 50, // Grab land without paying
                             TENSION_ADD_MINOR = 100,    // Unit destroyed, etc
                             TENSION_ADD_NORMAL = 200,   // Unit destroyed in a Settlement, etc
                             TENSION_ADD_MAJOR = 300;    // Unit destroyed in a capital, etc
@@ -213,7 +213,11 @@ public class Player extends FreeColGameObject {
         europe = new Europe(game, this);
 
         if (isEuropean(nation)) {
-            gold = getGameOptions().getInteger(GameOptions.STARTING_MONEY);
+            /*
+              Setting the amount of gold to "getGameOptions().getInteger(GameOptions.STARTING_MONEY)"            
+              just before starting the game. See "net.sf.freecol.server.control.PreGameController".
+            */
+            gold = 0;
 
             // START DEBUG:
             if (net.sf.freecol.FreeCol.isInDebugMode()) {
@@ -247,7 +251,7 @@ public class Player extends FreeColGameObject {
         readFromXMLElement(element);
     }
 
-    
+
     /**
     * Checks if this player is a "royal expeditionary force.
     */
@@ -698,6 +702,18 @@ public class Player extends FreeColGameObject {
     public int getGold() {
         return gold;
     }
+
+    
+    /**
+    * Sets the amount of gold that this player has.
+    * @param gold The new amount of gold.
+    * @exception IllegalArgumentException if the new amount is negative.
+    * @see #modifyGold
+    */
+    public void setGold(int gold) {
+        this.gold = gold;
+    }
+
 
     /**
     * Determines whether this player is an AI player.

@@ -149,6 +149,7 @@ public final class PreGameController extends Controller {
             ServerPlayer player = (ServerPlayer) playerIterator.next();
 
             player.resetExploredTiles(map);
+            player.setGold(game.getGameOptions().getInteger(GameOptions.STARTING_MONEY));
 
             Element updateGameElement = Message.createNewRootElement("updateGame");
             updateGameElement.appendChild(game.toXMLElement(player, updateGameElement.getOwnerDocument()));

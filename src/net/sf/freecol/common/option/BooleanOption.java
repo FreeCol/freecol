@@ -51,7 +51,6 @@ public class BooleanOption extends Option {
     *                should be constructed.
     */
     public BooleanOption(Element element) {
-        super(element);
         readFromXMLElement(element);
     }
 
@@ -61,6 +60,14 @@ public class BooleanOption extends Option {
     */
     public boolean getValue() {
         return value;
+    }
+    
+    
+    /**
+    * Sets the current value of this <code>BooleanOption</code>.
+    */
+    public void setValue(boolean value) {
+        this.value = value;
     }
 
 

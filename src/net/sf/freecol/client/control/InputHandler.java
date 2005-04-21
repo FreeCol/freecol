@@ -18,7 +18,7 @@ public abstract class InputHandler implements MessageHandler {
     public static final String  REVISION = "$Revision$";
 
 
-    private FreeColClient freeColClient;
+    private final FreeColClient freeColClient;
 
 
     /**
@@ -55,13 +55,16 @@ public abstract class InputHandler implements MessageHandler {
     *                holds all the information.
     */
     protected Element disconnect(Element disconnectElement) {
-        // getFreeColClient().getConnectController().quitGame(false, false);
-        
-        if (freeColClient.getFreeColServer() == null) {
-            getFreeColClient().getCanvas().returnToTitle();
-        } else {
-            getFreeColClient().getCanvas().removeInGameComponents();
-        }
+        // Updating the GUI should always be done in the EDT:
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                if (freeColClient.getFreeColServer() == null) {
+                    freeColClient.getCanvas().returnToTitle();
+                } else {
+                    freeColClient.getCanvas().removeInGameComponents();
+                }
+            }
+        });
 
         return null;
     }

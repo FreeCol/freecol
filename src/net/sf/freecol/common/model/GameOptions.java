@@ -11,9 +11,10 @@ import org.w3c.dom.*;
 
 /**
 * Keeps track of the available game options. New options should be added to
-* {@link #addDefaultOptions}.
+* {@link #addDefaultOptions} and each option should be given an unique
+* identifier (defined as a constant in this class).
 */
-public class GameOptions extends OptionGroup {
+public class GameOptions extends OptionMap {
     private static Logger logger = Logger.getLogger(GameOptions.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
@@ -21,40 +22,16 @@ public class GameOptions extends OptionGroup {
     public static final String  REVISION = "$Revision$";
 
 
+    /** The amount of money each player will receive before the game starts. */
     public static final String STARTING_MONEY = "startingMoney";
 
-
-    private HashMap values;
 
 
     /**
     * Creates a new <code>GameOptions</code>.
     */
     public GameOptions() {
-        super("gameOptions.name", "gameOptions.shortDescription");
-
-        values = new HashMap();
-        
-        addDefaultOptions();
-    }
-
-
-
-
-
-
-    /**
-    * Adds the options to this <code>GameOptions</code>.
-    */
-    protected void addDefaultOptions() {
-        /* Add options here: */
-
-        OptionGroup starting = new OptionGroup("gameOptions.starting.name", "gameOptions.starting.shortDescription");
-        starting.add(new IntegerOption(STARTING_MONEY, "gameOptions.startingMoney.name", "gameOptions.startingMoney.shortDescription", 0));
-        add(starting);
-
-        /* Create the mapping: */
-        createMap();
+        super(getXMLElementTagName(), "gameOptions.name", "gameOptions.shortDescription");
     }
 
 
@@ -67,108 +44,22 @@ public class GameOptions extends OptionGroup {
     *                should be constructed.
     */
     public GameOptions(Element element) {
-        super(element);
-        readFromXMLElement(element);
+        super(element, getXMLElementTagName(), "gameOptions.name", "gameOptions.shortDescription");
     }
 
 
 
 
     /**
-    * Gets the integer value of an option.
-    *
-    * @param id The id of the option.
-    * @return The value.
-    * @exception IllegalArgumentException If there is no integer
-    *            value associated with the specified option.
+    * Adds the options to this <code>GameOptions</code>.
     */
-    public int getInteger(String id) {
-        try {
-            return ((IntegerOption) values.get(id)).getValue();
-        } catch (ClassCastException e) {
-            throw new IllegalArgumentException("No integer value associated with the specified option.");
-        }
-    }
+    protected void addDefaultOptions() {
+        /* Add options here: */
 
-
-    private void createMap() {
-        addToMap(this);
-    }
-
-
-    private void addToMap(OptionGroup og) {
-        List oldOptions = new ArrayList();
-
-        Iterator it = og.iterator();
-        while (it.hasNext()) {
-            Option option = (Option) it.next();
-            if (option instanceof OptionGroup) {
-                addToMap((OptionGroup) option);
-            } else {
-                Option oldOption = (Option) values.put(option.getId(), option);
-                if (oldOption != null) {
-                    oldOptions.add(oldOption);
-                }
-            }
-        }
-        
-        Iterator it2 = oldOptions.iterator();
-        while (it2.hasNext()) {
-            remove((Option) it2.next());
-        }
-/*
-        Iterator it = og.iterator();
-        while (it.hasNext()) {
-            Option option = (Option) it.next();
-            if (option instanceof OptionGroup) {
-                groups.add(option);
-            } else {
-                Option oldOption = (Option) values.put(option.getId(), option);
-                if (oldOption != null) {
-                    remove(oldOption);
-                }
-            }
-        }
-
-        Iterator it2 = og.iterator();
-        while (it2.hasNext()) {
-            addToMap((OptionGroup) it2.next());
-        }*/
-    }
-
-
-    /**
-    * Makes an XML-representation of this object.
-    *
-    * @param document The document to use when creating new componenets.
-    * @return The DOM-element ("Document Object Model") made to represent this "GameOptions".
-    */
-    public Element toXMLElement(Document document) {
-        Element gameOptionsElement = document.createElement(getXMLElementTagName());
-
-        writeAttributes(gameOptionsElement);
-
-        return gameOptionsElement;
-    }
-
-
-    /**
-    * Initializes this object from an XML-representation of this object.
-    * @param gameOptionsElement The DOM-element ("Document Object Model") made to represent this "GameOptions".
-    */
-    public void readFromXMLElement(Element gameOptionsElement) {
-        // Remove all options:
-        if (values == null) {
-            values = new HashMap();
-        } else {
-            values.clear();
-        }
-        removeAll();
-
-        addDefaultOptions();
-
-        readAttributes(gameOptionsElement);
-        addToMap(this);
+        /* Initial values: */
+        OptionGroup starting = new OptionGroup("gameOptions.starting.name", "gameOptions.starting.shortDescription");
+        starting.add(new IntegerOption(STARTING_MONEY, "gameOptions.startingMoney.name", "gameOptions.startingMoney.shortDescription", 0, 50000, 0));
+        add(starting);
     }
 
 

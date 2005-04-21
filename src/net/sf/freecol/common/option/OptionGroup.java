@@ -43,11 +43,17 @@ public class OptionGroup extends Option {
     *                should be constructed.
     */
     public OptionGroup(Element element) {
-        super(element);
         options = new ArrayList();
         readFromXMLElement(element);
     }
 
+
+    /**
+    * Empty constructor to be used by subclasses.
+    */    
+    protected OptionGroup() {
+        options = new ArrayList();
+    }
 
 
     /**
@@ -65,34 +71,6 @@ public class OptionGroup extends Option {
     */
     public void removeAll() {
         options.clear();
-    }
-
-
-    /**
-    * Removes the given <code>Option</code> from this <code>OptionGroup</code>.
-    * @param option The <code>Option</code> to be removed.
-    * @return The <code>Option</code> if it has been found and removed from either
-    *         this <code>OptionGroup</code> or any of this <code>OptionGroup</code>'s
-    *         sub-<code>OptionGroup</code>s. <code>null</code> is returned if the 
-    *         object is not found.
-    */
-    public Option remove(Option option) {
-        int index = options.indexOf(option);
-        if (index >= 0) {
-            return (Option) options.remove(index);
-        } else {
-            Iterator optionIterator = options.iterator();
-            while (optionIterator.hasNext()) {
-                Option o = (Option) optionIterator.next();
-                if (o instanceof OptionGroup) {
-                    if (((OptionGroup) o).remove(option) != null) {
-                        return option;
-                    }
-                }
-            }
-        }
-        
-        return null;
     }
 
 
@@ -134,21 +112,7 @@ public class OptionGroup extends Option {
     *                child nodes should be read from.
     */    
     protected void readAttributes(Element optionGroupElement) {
-        super.readAttributes(optionGroupElement);
-
-        NodeList nl = optionGroupElement.getChildNodes();
-        for (int i=0; i<nl.getLength(); i++) {
-            Element optionElement = (Element) nl.item(i);
-            if (optionElement.getTagName().equals(OptionGroup.getXMLElementTagName())) {
-                options.add(new OptionGroup(optionElement));
-            } else if (optionElement.getTagName().equals(BooleanOption.getXMLElementTagName())) {
-                options.add(new BooleanOption(optionElement));
-            } else if (optionElement.getTagName().equals(IntegerOption.getXMLElementTagName())) {
-                options.add(new IntegerOption(optionElement));
-            } else {
-                logger.warning("Unrecognized option.");
-            }
-        }
+        throw new UnsupportedOperationException();
     }
 
 
@@ -172,8 +136,7 @@ public class OptionGroup extends Option {
     * @param optionGroupElement The DOM-element ("Document Object Model") made to represent this "OptionGroup".
     */
     public void readFromXMLElement(Element optionGroupElement) {
-        options.clear();
-        readAttributes(optionGroupElement);
+        throw new UnsupportedOperationException();
     }
 
 

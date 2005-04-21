@@ -4,6 +4,7 @@ package net.sf.freecol.client.gui.panel;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.option.OptionMapUI;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,7 +16,7 @@ import javax.swing.*;
 
 
 /**
-* Dialog for changing the {@link GameOption}s.
+* Dialog for changing the {@link GameOptions}.
 */
 public final class GameOptionsDialog extends FreeColDialog implements ActionListener {
     private static final Logger logger = Logger.getLogger(GameOptionsDialog.class.getName());
@@ -26,11 +27,12 @@ public final class GameOptionsDialog extends FreeColDialog implements ActionList
 
     private static final int    OK = 0;
 
-    private final Canvas    parent;
+    private final Canvas        parent;
     private final FreeColClient freeColClient;
 
-    private JButton         ok = new JButton(Messages.message("ok"));
+    private JButton             ok = new JButton(Messages.message("ok"));
     private JLabel header;
+    private OptionMapUI ui;
 
 
     /**
@@ -38,6 +40,8 @@ public final class GameOptionsDialog extends FreeColDialog implements ActionList
     * @param parent The parent of this panel.
     */
     public GameOptionsDialog(Canvas parent, FreeColClient freeColClient) {
+        setLayout(new BorderLayout());
+
         this.parent = parent;
         this.freeColClient = freeColClient;
 
@@ -48,17 +52,29 @@ public final class GameOptionsDialog extends FreeColDialog implements ActionList
         FreeColPanel.enterPressesWhenFocused(ok);
         setCancelComponent(ok);
 
-        add(ok, BorderLayout.SOUTH);
-
         setSize(640, 480);
     }
 
 
     public void initialize() {
-        header = new JLabel(Messages.message(freeColClient.getGame().getGameOptions().getName()), JLabel.CENTER);
+        removeAll();
+
+        // Header:
+        header = new JLabel(freeColClient.getGame().getGameOptions().getName(), JLabel.CENTER);
         header.setFont(((Font) UIManager.get("HeaderFont")).deriveFont(0, 48));
         header.setBorder(new EmptyBorder(20, 0, 0, 0));
         add(header, BorderLayout.NORTH);
+
+        // Options:
+        JPanel uiPanel = new JPanel(new BorderLayout());
+        uiPanel.setOpaque(false);
+        ui = new OptionMapUI(freeColClient.getGame().getGameOptions());
+        uiPanel.add(ui, BorderLayout.CENTER);
+        uiPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        add(uiPanel, BorderLayout.CENTER);
+        
+        // Buttons:
+        add(ok, BorderLayout.SOUTH);
     }
 
 
@@ -77,14 +93,15 @@ public final class GameOptionsDialog extends FreeColDialog implements ActionList
         try {
             switch (Integer.valueOf(command).intValue()) {
                 case OK:
+                    ui.updateOption();
+                    freeColClient.getPreGameController().sendGameOptions();
                     parent.remove(this);
                     setResponse(new Boolean(true));
                     break;
                 default:
                     logger.warning("Invalid ActionCommand: invalid number.");
             }
-        }
-        catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             logger.warning("Invalid Actioncommand: not a number.");
         }
     }

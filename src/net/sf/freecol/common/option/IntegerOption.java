@@ -20,7 +20,10 @@ public class IntegerOption extends Option {
 
     private int value;
     private int defaultValue;
+    private int minimumValue;
+    private int maximumValue;
 
+    
 
     /**
     * Creates a new <code>IntegerOption</code>.
@@ -31,13 +34,17 @@ public class IntegerOption extends Option {
     *           the option for a user. Example: The text related to a checkbox.
     * @param shortDescription Should give a short description of the <code>IntegerOption</code>.
     *           This might be used as a tooltip text.
+    * @param minimumValue The minimum allowed value.
+    * @param maximumValue The maximum allowed value.
     * @param defaultValue The default value of this option.
     */
-    public IntegerOption(String id, String name, String shortDescription, int defaultValue) {
+    public IntegerOption(String id, String name, String shortDescription, int minimumValue, int maximumValue, int defaultValue) {
         super(id, name, shortDescription);
 
         this.defaultValue = defaultValue;
         this.value = defaultValue;
+        this.minimumValue = minimumValue;
+        this.maximumValue = maximumValue;
     }
 
 
@@ -50,8 +57,25 @@ public class IntegerOption extends Option {
     *                should be constructed.
     */
     public IntegerOption(Element element) {
-        super(element);
         readFromXMLElement(element);
+    }
+
+    
+
+    
+    /**
+    * Returns the minimum allowed value.
+    */
+    public int getMinimumValue() {
+        return minimumValue;
+    }
+    
+    
+    /**
+    * Returns the maximum allowed value.
+    */
+    public int getMaximumValue() {
+        return maximumValue;
     }
 
 
@@ -60,6 +84,14 @@ public class IntegerOption extends Option {
     */
     public int getValue() {
         return value;
+    }
+
+    
+    /**
+    * Sets the value of this <code>IntegerOption</code>.
+    */
+    public void setValue(int value) {
+        this.value = value;
     }
 
 
@@ -76,6 +108,8 @@ public class IntegerOption extends Option {
 
         optionElement.setAttribute("value", Integer.toString(value));
         optionElement.setAttribute("defaultValue", Integer.toString(defaultValue));
+        optionElement.setAttribute("minimumValue", Integer.toString(minimumValue));
+        optionElement.setAttribute("maximumValue", Integer.toString(maximumValue));
 
         return optionElement;
     }
@@ -90,6 +124,14 @@ public class IntegerOption extends Option {
 
         value = Integer.parseInt(optionElement.getAttribute("value"));
         defaultValue = Integer.parseInt(optionElement.getAttribute("defaultValue"));
+
+        if (optionElement.hasAttribute("minimumValue")) {
+            minimumValue = Integer.parseInt(optionElement.getAttribute("minimumValue"));
+            maximumValue = Integer.parseInt(optionElement.getAttribute("maximumValue"));
+        } else { // Support for old protocols:
+            minimumValue = 0;
+            maximumValue = 10000;
+        }
     }
 
 

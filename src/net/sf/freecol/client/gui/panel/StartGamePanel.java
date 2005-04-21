@@ -43,7 +43,8 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
                                 CANCEL = 1,
                                 MAPSIZE = 2,
                                 READY = 3,
-                                CHAT = 4;
+                                CHAT = 4,
+                                GAME_OPTIONS = 5;
 
     private final String[]  mapSizes = {"Small", "Medium", "Large", "Huge"};
     private final String[]  colors = {"Black", "Blue", "Cyan", "Gray", "Green", "Magenta",
@@ -68,6 +69,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
     private final PlayersTableModel tableModel;
 
     private JButton start;
+    private JButton gameOptions;
 
 
     /**
@@ -86,6 +88,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         setCancelComponent(cancel);
 
         start = new JButton("Start Game");
+        gameOptions = new JButton("Game options");
 
         optionsPanel = new JPanel();
         readyBox = new JCheckBox("I'm Ready");
@@ -128,6 +131,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         chatScroll.setSize(240, 110);
         tableScroll.setSize(240, 170);
         chatPanel.setSize(260, 160);
+        gameOptions.setSize(120, 20);
 
         mapSize.setLocation(75, 20);
         mapSizeLabel.setLocation(10, 20);
@@ -139,6 +143,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         chatScroll.setLocation(10, 10);
         tableScroll.setLocation(10, 10);
         chatPanel.setLocation(0, 180);
+        gameOptions.setLocation(15, 345);
 
         setLayout(null);
         optionsPanel.setLayout(null);
@@ -148,6 +153,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         start.setActionCommand(String.valueOf(START));
         cancel.setActionCommand(String.valueOf(CANCEL));
         readyBox.setActionCommand(String.valueOf(READY));
+        gameOptions.setActionCommand(String.valueOf(GAME_OPTIONS));
 
         chat.setActionCommand(String.valueOf(CHAT));
 
@@ -155,8 +161,8 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         start.addActionListener(this);
         cancel.addActionListener(this);
         readyBox.addActionListener(this);
-
         chat.addActionListener(this);
+        gameOptions.addActionListener(this);
 
         // if I'm not an admin
         // start.setEnabled(false);
@@ -166,9 +172,12 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         // Disable while not implemented.
         mapSizeLabel.setEnabled(false);
         mapSize.setEnabled(false);
+        
+
 
         optionsPanel.add(mapSize);
         optionsPanel.add(mapSizeLabel);
+        optionsPanel.add(gameOptions);
         add(optionsPanel);
         add(start);
         add(cancel);
@@ -265,6 +274,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
 
         if (enabled) {
             start.setEnabled(freeColClient.isAdmin());
+            gameOptions.setEnabled(freeColClient.isAdmin());
         }
     }
 
@@ -308,6 +318,9 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
                                 chat.getText(), false);
                         chat.setText("");
                     }
+                    break;
+                case GAME_OPTIONS:
+                    parent.showGameOptionsDialog();
                     break;
                 default:
                     logger.warning("Invalid Actioncommand: invalid number.");

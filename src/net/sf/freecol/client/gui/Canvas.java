@@ -457,16 +457,20 @@ public final class Canvas extends JLayeredPane {
 
     /**
     * Displays a dialog for setting game options.
+    * @return <code>true</code> if the game options have been modified,
+    *         and <code>false</code> otherwise.
     */
-    public void showGameOptionsDialog() {
+    public boolean showGameOptionsDialog() {
         gameOptionsDialog.initialize();
-        
+
         gameOptionsDialog.setLocation(getWidth() / 2 - gameOptionsDialog.getWidth() / 2, getHeight() / 2 - gameOptionsDialog.getHeight() / 2);
         add(gameOptionsDialog, new Integer(POPUP_LAYER.intValue() - 1));
         gameOptionsDialog.requestFocus();
 
-        gameOptionsDialog.getResponseBoolean();
+        boolean r = gameOptionsDialog.getResponseBoolean();
         remove(gameOptionsDialog);
+        
+        return r;
     }
 
 

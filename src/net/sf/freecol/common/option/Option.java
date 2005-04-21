@@ -1,6 +1,8 @@
 
 package net.sf.freecol.common.option;
 
+import net.sf.freecol.client.gui.i18n.Messages;
+
 import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
@@ -23,10 +25,11 @@ abstract public class Option {
     private String id;
     private String name;
     private String shortDescription;
-    
+
 
     /**
     * Creates a new <code>Option</code>.
+    *
     * @param id The identifier for this option. This is used when the object should be
     *           found in an {@link OptionGroup}.
     * @param name The name of the <code>Option</code>. This text is used for identifying
@@ -42,18 +45,22 @@ abstract public class Option {
 
 
     /**
-    * Creates an <code>Option</code> from an XML representation.
-    *
-    * <br><br>
-    *
-    * This constructor should be used by subclasses that which to provide
-    * this functionality.
-    *
-    * @param element The XML <code>Element</code> from which this object
-    *                should be constructed.
+    * Empty constructor to be used by subclasses.
     */
-    public Option(Element element) {
+    protected Option() {
 
+    }
+
+    
+    
+    
+
+    /**
+    * Gives a short description of this <code>Option</code>.
+    * Can for instance be used as a tooltip text.
+    */
+    public String getShortDescription() {
+        return Messages.message(shortDescription);
     }
 
 
@@ -63,7 +70,7 @@ abstract public class Option {
     * @see #getName
     */
     public String toString() {
-        return name;
+        return getName();
     }
 
 
@@ -81,7 +88,7 @@ abstract public class Option {
     * @return The name as provided in the constructor.
     */
     public String getName() {
-        return name;
+        return Messages.message(name);
     }
 
 

@@ -53,7 +53,9 @@ public final class PreGameInputHandler extends InputHandler {
         String type = element.getTagName();
 
         if (element != null) {
-            if (type.equals("ready")) {
+            if (type.equals("updateGameOptions")) {
+                reply = updateGameOptions(connection, element);
+            } else if (type.equals("ready")) {
                 reply = ready(connection, element);
             } else if (type.equals("setNation")) {
                 reply = nation(connection, element);
@@ -71,6 +73,26 @@ public final class PreGameInputHandler extends InputHandler {
         }
 
         return reply;
+    }
+
+
+
+    /**
+    * Handles a "updateGameOptions"-message from a client.
+    *
+    * @param connection The connection the message came from.
+    * @param element The element containing the request.
+    */
+    public Element updateGameOptions(Connection connection, Element element) {
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
+
+        if (!player.isAdmin()) {
+            throw new IllegalStateException();
+        }
+
+        getFreeColServer().getGame().getGameOptions().readFromXMLElement((Element) element.getChildNodes().item(0));
+
+        return null;
     }
 
 

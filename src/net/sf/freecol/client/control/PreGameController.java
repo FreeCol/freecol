@@ -136,6 +136,18 @@ public final class PreGameController {
 
         freeColClient.getClient().send(chatElement);
     }
+    
+
+    /**
+    * Sends the {@link GameOptions} to the server.
+    * This method should be called after updating that object.
+    */
+    public void sendGameOptions() {
+        Element updateGameOptionsElement = Message.createNewRootElement("updateGameOptions");
+        updateGameOptionsElement.appendChild(freeColClient.getGame().getGameOptions().toXMLElement(updateGameOptionsElement.getOwnerDocument()));
+
+        freeColClient.getClient().send(updateGameOptionsElement);        
+    }
 
 
     /**

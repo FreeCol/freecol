@@ -719,6 +719,7 @@ public class Game extends FreeColGameObject {
             nextId = Integer.parseInt(gameElement.getAttribute("nextID"));
         }
 
+        // Gets the game options:
         Element gameOptionsElement = getChildElement(gameElement, GameOptions.getXMLElementTagName());
         if (gameOptionsElement != null) {
             if (gameOptions != null) {
