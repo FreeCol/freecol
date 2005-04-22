@@ -91,8 +91,12 @@ public class IndianSettlement extends Settlement {
 
     private Unit missionary;
 
-    /* A higher number indicates a higher level of unrest. This variable is only used by the server-side. */
-    //private int unrestLevel = 0;
+
+    /**
+    * Only used by AI - stores the alarm levels,
+    * 0-1000 with 1000 maximum alarm:
+    */
+    private int[] alarm = new int[Player.NUMBER_OF_NATIONS];
 
 
 
@@ -180,6 +184,31 @@ public class IndianSettlement extends Settlement {
 
         readFromXMLElement(element);
     }
+
+
+
+    /**
+    * Modifies the alarm level towards the given player.
+    *
+    * @param player The <code>Player</code>.
+    * @param addToAlarm The amount to add to the current alarm level.
+    */
+    public void modifyAlarm(Player player, int addToAlarm) {
+        alarm[player.getNation()] += addToAlarm;
+
+        if (alarm[player.getNation()]>1000) {
+            alarm[player.getNation()] = 1000;
+        }
+    }
+
+
+    /**
+    * Gets the alarm level towards the given player.
+    */
+    public int getAlarm(Player player) {
+        return alarm[player.getNation()];
+    }
+
 
     /**
     * Returns true if a European player has visited this settlement to speak with the chief.
@@ -818,6 +847,7 @@ public class IndianSettlement extends Settlement {
             indianSettlementElement.setAttribute("wantedGoods1", Integer.toString(wantedGoods1));
             indianSettlementElement.setAttribute("wantedGoods2", Integer.toString(wantedGoods2));
             indianSettlementElement.setAttribute("hasBeenVisted", Boolean.toString(isVisited));
+            indianSettlementElement.appendChild(toArrayElement("alarm", alarm, document));
         }
 
         if (missionary != null) {
@@ -864,6 +894,12 @@ public class IndianSettlement extends Settlement {
                     ownedUnits.add(u);
                 }
             }
+        }
+
+        if (getChildElement(indianSettlementElement, "alarm") != null) {
+            alarm = readFromArrayElement("alarm", getChildElement(indianSettlementElement, "alarm"), new int[0]);
+        } else {
+            alarm = new int[Player.NUMBER_OF_NATIONS];
         }
 
         if (indianSettlementElement.hasAttribute("learnableSkill")) {

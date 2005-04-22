@@ -535,7 +535,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
 
     /**
     * Gets the cost of moving this <code>Unit</code> onto the given <code>Tile</code>.
-    * A call to {@link #getMoveType} will return <code>false</code>, if {@link #getMoveCost}
+    * A call to {@link #getMoveType} will return <code>ILLEGAL_MOVE</code>, if {@link #getMoveCost}
     * returns a move cost larger than the {@link #getMovesLeft moves left}.
     *
     * @param target The <code>Tile</code> this <code>Unit</code> will move onto.
@@ -631,22 +631,17 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                 if (isScout()) {
                     if (settlement instanceof IndianSettlement) {
                         return ENTER_INDIAN_VILLAGE_WITH_SCOUT;
-                    }
-                    else {
+                    } else {
                         return ENTER_FOREIGN_COLONY_WITH_SCOUT;
                     }
-                }
-                else if (isMissionary() && (settlement instanceof IndianSettlement)) {
+                } else if (isMissionary() && (settlement instanceof IndianSettlement)) {
                     return ENTER_INDIAN_VILLAGE_WITH_MISSIONARY;
-                }
-                else if (((getType() == FREE_COLONIST) || (getType() == INDENTURED_SERVANT)) && (settlement instanceof IndianSettlement)) {
+                } else if (((getType() == FREE_COLONIST) || (getType() == INDENTURED_SERVANT)) && (settlement instanceof IndianSettlement)) {
                     return ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST;
-                }
-                else {
+                } else {
                     return ILLEGAL_MOVE;
                 }
-            }
-            else {
+            } else {
                 return ATTACK;
             }
         }

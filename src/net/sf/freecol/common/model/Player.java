@@ -31,7 +31,7 @@ public class Player extends FreeColGameObject {
     /**
     * Constants for adding to the tension levels.
     */
-    public static final int TENSION_ADD_TAKE_LAND = 50, // Grab land without paying
+    public static final int TENSION_ADD_TAKE_LAND = 75, // Grab land without paying
                             TENSION_ADD_MINOR = 100,    // Unit destroyed, etc
                             TENSION_ADD_NORMAL = 200,   // Unit destroyed in a Settlement, etc
                             TENSION_ADD_MAJOR = 300;    // Unit destroyed in a capital, etc
@@ -39,6 +39,19 @@ public class Player extends FreeColGameObject {
     /** The AI player is happy if <code>tension <= TENSION_HAPPY</code>. */
     public static final int TENSION_HAPPY = 100;
 
+    /** The AI player is content if <code>tension <= TENSION_CONTENT && tension > TENSION_HAPPY</code>. */
+    public static final int TENSION_CONTENT = 600;
+
+    /** The AI player is displeased if <code>tension <= TENSION_DISPLEASED && tension > TENSION_CONTENT</code>. */
+    public static final int TENSION_DISPLEASED = 700;
+
+    /** The AI player is angry if <code>tension <= TENSION_ANGRY && tension > TENSION_DISPLEASED</code>. */
+    public static final int TENSION_ANGRY = 800;
+
+    /** The AI player is hateful if <code>tension > TENSION_ANGRY</code>. */
+    public static final int TENSION_HATEFUL = 1000;
+
+    
 
     /**
     * Contants for describing the stance towards a player.
