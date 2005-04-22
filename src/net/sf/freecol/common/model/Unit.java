@@ -2270,16 +2270,28 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                         if (getTile().isForested()) {
                             getTile().setForested(false);
                             // Give Lumber to adjacent colony
+                            int lumberAmount = 100;
                             if (getTile().getColony() != null && getTile().getColony().getOwner().equals(getOwner())) {
-                                getTile().getColony().addGoods(Goods.LUMBER, 100);
+                                getTile().getColony().addGoods(Goods.LUMBER, lumberAmount);
                             } else {
                                 Vector surroundingTiles = getTile().getMap().getSurroundingTiles(getTile(), 1);
+                                Vector adjacentColonies = new Vector();
                                 for (int i=0; i<surroundingTiles.size(); i++) {
                                     Tile t = (Tile) surroundingTiles.get(i);
-                                    if (t.getColony() != null &&
-                                        t.getColony().getOwner().equals(getOwner())) {
-                                        t.getColony().addGoods(Goods.LUMBER, 100);
-                                        break;
+                                    if (t.getColony() != null && t.getColony().getOwner().equals(getOwner())) {
+                                        adjacentColonies.add(t.getColony());
+                                    }
+                                }
+                                if (adjacentColonies.size() > 0) {
+                                    int lumberPerCity = (int) (lumberAmount / adjacentColonies.size());
+                                    for (int i=0; i<adjacentColonies.size(); i++) {
+                                        Colony c = (Colony) adjacentColonies.get(i);
+                                        // Make sure the lumber lost is being added again to the first adjacent colony:
+                                        if(i==0) {
+                                            c.addGoods(Goods.LUMBER, lumberPerCity + ((int) lumberAmount % adjacentColonies.size()));
+                                        } else {
+                                            c.addGoods(Goods.LUMBER, lumberPerCity);
+                                        }
                                     }
                                 }
                             }
