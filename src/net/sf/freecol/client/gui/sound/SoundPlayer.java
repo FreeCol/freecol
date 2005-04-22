@@ -5,6 +5,7 @@ package net.sf.freecol.client.gui.sound;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.logging.Logger;
 
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MetaEventListener;
@@ -28,7 +29,7 @@ import javax.sound.sampled.LineListener;
 */
 public class SoundPlayer {
 
-
+	private static final Logger logger = Logger.getLogger(SoundPlayer.class.getName());
     public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
@@ -272,7 +273,7 @@ public class SoundPlayer {
                     FileInputStream fileInputStream = new FileInputStream(file);
                     currentSound = new BufferedInputStream(fileInputStream, 1024);
                 } catch (Exception e3) {
-                    // TODO: Log the exception: "Error while loading audio file."
+                	logger.warning("Error while loading audio file: " + e3.getMessage());
                     currentSound = null;
                     return false;
                 }
@@ -308,7 +309,7 @@ public class SoundPlayer {
                     clip.open(stream);
                     currentSound = clip;
                 } catch (Exception ex) {
-                    // TODO: Log the exception: "Error while reading audio-stream."
+                	logger.warning("Error while reading audio-stream: " + ex.getMessage());
                     currentSound = null;
                     return false;
                 }
@@ -323,16 +324,16 @@ public class SoundPlayer {
                         }
 
                     } catch (InvalidMidiDataException imde) {
-                        // TODO: Log the exception: "Unsupported audio file."
+                    	logger.warning("Unsupported audio file: " + imde.getMessage());
                         currentSound = null;
                         return false;
                     } catch (Exception ex) {
-                        // TODO: Log the exception: "Error while loading MIDI-file."
+                    	logger.warning("Error while loading MIDI-file: " + ex.getMessage());
                         currentSound = null;
                         return false;
                     }
                 } else {
-                    // TODO: Log: "Could not load MIDI-file, because it has been disabled."
+                	logger.info("Could not load MIDI-file, because it has been disabled.");
                     currentSound = null;
                     return false;
                 }
