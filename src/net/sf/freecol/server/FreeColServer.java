@@ -68,6 +68,8 @@ public final class FreeColServer {
 
     private static Logger logger = Logger.getLogger(FreeColServer.class.getName());
 
+    private static final boolean DEBUG = false;
+
     private static final int META_SERVER_UPDATE_INTERVAL = 60000;
 
     /** Constant for storing the state of the game. */
@@ -137,7 +139,7 @@ public final class FreeColServer {
             logger.warning("Exception while starting server: " + e);
             throw e;
         }
-        
+
         updateMetaServer(true);
         startMetaServerUpdateThread();
     }
@@ -180,8 +182,8 @@ public final class FreeColServer {
         startMetaServerUpdateThread();
     }
 
-    
-    
+
+
     /**
     * Starts the metaserver update thread if <code>publicServer == true</code>.
     *
@@ -274,7 +276,7 @@ public final class FreeColServer {
         if (!publicServer) {
             return;
         }
-        
+
         Connection mc;
         try {
             mc = new Connection(FreeCol.META_SERVER_ADDRESS, FreeCol.META_SERVER_PORT, null);
@@ -302,7 +304,7 @@ public final class FreeColServer {
         }
     }
 
-    
+
     /**
     * Gets the number of player that may connect.
     */
@@ -338,7 +340,7 @@ public final class FreeColServer {
 
         return n;
     }
-    
+
 
     /**
     * The owner of the game is the player that have loaded the
@@ -389,11 +391,19 @@ public final class FreeColServer {
             Transformer xmlTransformer = factory.newTransformer();
             xmlTransformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 
-            // For debugging (without compression):
-            //PrintWriter out = new PrintWriter(new FileOutputStream(file));
-            DeflaterOutputStream out = new DeflaterOutputStream(new FileOutputStream(file));
-            xmlTransformer.transform(new DOMSource(savedGameElement), new StreamResult(out));
-            out.close();
+            if (DEBUG) {
+                // No compression
+                PrintWriter out = new PrintWriter(new FileOutputStream(file));
+                xmlTransformer.transform(new DOMSource(savedGameElement), new StreamResult(out));
+                out.close();
+            }
+            else {
+                // Compression
+                DeflaterOutputStream out = new DeflaterOutputStream(new FileOutputStream(file));
+                xmlTransformer.transform(new DOMSource(savedGameElement), new StreamResult(out));
+                out.close();
+            }
+
         } catch (TransformerException e) {
             e.printStackTrace();
             return;
@@ -407,9 +417,15 @@ public final class FreeColServer {
     * @return The username of the player saving the game.
     */
     public String loadGame(File file) throws IOException {
-        BufferedReader in = new BufferedReader(new InputStreamReader(new InflaterInputStream(new FileInputStream(file))));
-        // For debugging (without compression):
-        //BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+        BufferedReader in;
+        if (DEBUG) {
+            // No compression
+            in = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+        }
+        else {
+            // Compression
+            in = new BufferedReader(new InputStreamReader(new InflaterInputStream(new FileInputStream(file))));
+        }
 
         Message message;
         try {

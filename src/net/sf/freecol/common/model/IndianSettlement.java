@@ -38,7 +38,7 @@ public class IndianSettlement extends Settlement {
 
     /** The amount of goods a brave can produce a single turn. */
     private static final int WORK_AMOUNT = 5;
-    
+
     /** The amount of raw material that should be available before producing manufactured goods: */
     public static final int KEEP_RAW_MATERIAL = 50;
 
@@ -396,7 +396,7 @@ public class IndianSettlement extends Settlement {
     public void setCapital(boolean isCapital) {
         this.isCapital = isCapital;
     }
-    
+
 
     /**
     * Adds a <code>Locatable</code> to this Location.
@@ -630,10 +630,10 @@ public class IndianSettlement extends Settlement {
                 amount += workTile.potential(goodsType);
             }
         }
-        
+
         return amount;
     }
-    
+
 
     /**
     * Updates the variables {@link #getHighlyWantedGoods highlyWantedGoods},
@@ -658,7 +658,7 @@ public class IndianSettlement extends Settlement {
         int highlyWantedGoodsAmount = 0;
         int wantedGoods1Amount = 0;
         int wantedGoods2Amount = 0;
-        
+
         /* TODO: Try the different types goods in random order: */
         for (int type=0; type<Goods.NUMBER_OF_TYPES; type++) {
             if (type == Goods.MUSKETS || type == Goods.HORSES) {
@@ -691,7 +691,7 @@ public class IndianSettlement extends Settlement {
         return getBonusMultiplier() - 1;
     }
 
-    
+
     /**
     * Get general bonus multiplier. This is >1 if this is a <code>VILLAGE</code>,
     * <code>CITY</code> or a capital.
@@ -802,7 +802,7 @@ public class IndianSettlement extends Settlement {
         super.dispose();
     }
 
-    
+
     /**
     * Creates the {@link GoodsContainer}.
     * <br><br>
@@ -821,6 +821,10 @@ public class IndianSettlement extends Settlement {
     * @return The DOM-element ("Document Object Model") made to represent this "IndianSettlement".
     */
     public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
+        if (toSavedGame && !showAll) {
+            logger.warning("toSavedGame is true, but showAll is false");
+        }
+
         Element indianSettlementElement = document.createElement(getXMLElementTagName());
 
         indianSettlementElement.setAttribute("ID", getID());
@@ -841,15 +845,15 @@ public class IndianSettlement extends Settlement {
             indianSettlementElement.setAttribute("ownedUnits", ownedUnitsString);
         }
 
-        if (showAll || player == getOwner() || toSavedGame) {
-            indianSettlementElement.setAttribute("learnableSkill", Integer.toString(learnableSkill));
-            indianSettlementElement.setAttribute("highlyWantedGoods", Integer.toString(highlyWantedGoods));
-            indianSettlementElement.setAttribute("wantedGoods1", Integer.toString(wantedGoods1));
-            indianSettlementElement.setAttribute("wantedGoods2", Integer.toString(wantedGoods2));
+        if (showAll || player == getOwner()) {
             indianSettlementElement.setAttribute("hasBeenVisted", Boolean.toString(isVisited));
-            indianSettlementElement.appendChild(toArrayElement("alarm", alarm, document));
         }
 
+        indianSettlementElement.setAttribute("learnableSkill", Integer.toString(learnableSkill));
+        indianSettlementElement.setAttribute("highlyWantedGoods", Integer.toString(highlyWantedGoods));
+        indianSettlementElement.setAttribute("wantedGoods1", Integer.toString(wantedGoods1));
+        indianSettlementElement.setAttribute("wantedGoods2", Integer.toString(wantedGoods2));
+        indianSettlementElement.appendChild(toArrayElement("alarm", alarm, document));
         if (missionary != null) {
             indianSettlementElement.setAttribute("missionary", missionary.getID());
         }

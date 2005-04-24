@@ -64,7 +64,7 @@ public final class Tile extends FreeColGameObject implements Location {
                     y;
 
     private int     indianClaim;
-    
+
     /** The nation that consider this tile to be their land. */
     private int     nationOwner = Player.NO_NATION;
 
@@ -451,7 +451,7 @@ public final class Tile extends FreeColGameObject implements Location {
         return type;
     }
 
-    
+
     /**
     * The nation that consider this tile to be their property.
     * @return The nation or {@link Player#NO_NATION} is there is
@@ -461,7 +461,7 @@ public final class Tile extends FreeColGameObject implements Location {
         return nationOwner;
     }
 
-    
+
     /**
     * Sets the nation that should consider this tile to be their property.
     * @see #getNationOwner
@@ -995,6 +995,10 @@ public final class Tile extends FreeColGameObject implements Location {
         //       ExploredTile data of 'player'. The toXMLElement method of IndianSettlement
         //       should also be expanded in the same way and the parameter should be passed on
         //       to that method. (Create new class PlayerExploredIndianSettlement?)
+        if (toSavedGame && !showAll) {
+            logger.warning("toSavedGame is true, but showAll is false");
+        }
+
         Element tileElement = document.createElement(getXMLElementTagName());
 
         tileElement.setAttribute("ID", getID());
@@ -1006,16 +1010,16 @@ public final class Tile extends FreeColGameObject implements Location {
         tileElement.setAttribute("plowed", Boolean.toString(plowed));
         tileElement.setAttribute("forested", Boolean.toString(forested));
         tileElement.setAttribute("bonus", Boolean.toString(bonus));
-        
-        //if (showAll || player.canSee(this)) {
-            tileElement.setAttribute("nationOwner", Integer.toString(nationOwner));
-        //}
 
-        if (owner != null) {
+        if (showAll || player.canSee(this)) {
+            tileElement.setAttribute("nationOwner", Integer.toString(nationOwner));
+        }
+
+        if ((showAll || player.canSee(this)) && (owner != null)) {
             tileElement.setAttribute("owner", owner.getID());
         }
 
-        if (settlement != null) {
+        if ((settlement != null) && (showAll || player.canSee(this))) {
             tileElement.appendChild(settlement.toXMLElement(player, document, showAll, toSavedGame));
         }
 
@@ -1028,9 +1032,10 @@ public final class Tile extends FreeColGameObject implements Location {
             tileElement.appendChild(emptyUnitContainer.toXMLElement(player, document, showAll, toSavedGame));
         }
 
-        if (!showAll && !player.canSee(this)) {
+        if (!showAll) {
+            // We're sending the Tile from the server to the client and showAll is false.
             if (player != null) {
-                playerExploredTiles[player.getNation()].setAttributes(tileElement);
+                playerExploredTiles[player.getNation()].setAttributes(tileElement, player, document);
             } else {
                 logger.warning("player == null");
             }
@@ -1063,7 +1068,7 @@ public final class Tile extends FreeColGameObject implements Location {
         plowed = Boolean.valueOf(tileElement.getAttribute("plowed")).booleanValue();
         forested = Boolean.valueOf(tileElement.getAttribute("forested")).booleanValue();
         bonus = Boolean.valueOf(tileElement.getAttribute("bonus")).booleanValue();
-        
+
         if (tileElement.hasAttribute("nationOwner")) {
             nationOwner = Integer.parseInt(tileElement.getAttribute("nationOwner"));
         } else {
@@ -1289,7 +1294,7 @@ public final class Tile extends FreeColGameObject implements Location {
         /**
         * Hides the invisible features of the given <code>tileElement</code>.
         */
-        public void setAttributes(Element tileElement) {
+        public void setAttributes(Element tileElement, Player player, Document document) {
             tileElement.setAttribute("road", Boolean.toString(road));
             tileElement.setAttribute("plowed", Boolean.toString(plowed));
             tileElement.setAttribute("forested", Boolean.toString(forested));
@@ -1318,13 +1323,20 @@ public final class Tile extends FreeColGameObject implements Location {
                 } else {    // Colony not discovered.
                     colonyElement.getParentNode().removeChild(colonyElement);
                 }
-            } else if (getSettlement() != null && getSettlement() instanceof IndianSettlement) {
+            } else if ((getSettlement() != null) && (getSettlement() instanceof IndianSettlement)) {
                 Element settlementElement = getChildElement(tileElement, IndianSettlement.getXMLElementTagName());
+
+                if (settlementElement == null) {
+                    // The settlement doesn't fall within the player's LOS, but a one point the player has
+                    // seen a settlement on this Tile.
+                    tileElement.appendChild(settlement.toXMLElement(player, document, false, false));
+                }
+                settlementElement = getChildElement(tileElement, IndianSettlement.getXMLElementTagName());
+
                 settlementElement.setAttribute("learnableSkill", Integer.toString(skill));
                 settlementElement.setAttribute("highlyWantedGoods", Integer.toString(highlyWantedGoods));
                 settlementElement.setAttribute("wantedGoods1", Integer.toString(wantedGoods1));
                 settlementElement.setAttribute("wantedGoods2", Integer.toString(wantedGoods2));
-                // wanted goods
             } else if (getSettlement() != null) {
                 logger.warning("Unknown type of settlement: " + getSettlement());
             }
@@ -1386,7 +1398,7 @@ public final class Tile extends FreeColGameObject implements Location {
 
             colonyUnitCount = Integer.parseInt(tileElement.getAttribute("colonyUnitCount"));
             colonyStockadeLevel = Integer.parseInt(tileElement.getAttribute("colonyStockadeLevel"));
-            
+
             if (tileElement.hasAttribute("learnableSkill")) {
                 skill = Integer.parseInt(tileElement.getAttribute("learnableSkill"));
             } else { // Support for pre-0.1.0:

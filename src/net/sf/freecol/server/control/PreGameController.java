@@ -91,7 +91,7 @@ public final class PreGameController extends Controller {
                 aiConnection.setOutgoingMessageHandler(theConnection);
                 theConnection.setOutgoingMessageHandler(aiConnection);
 
-                freeColServer.getServer().addConnection(theConnection, 3 - i);                
+                freeColServer.getServer().addConnection(theConnection, 3 - i);
 
                 freeColServer.getGame().addPlayer(indianPlayer);
 

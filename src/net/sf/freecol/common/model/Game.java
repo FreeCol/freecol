@@ -310,7 +310,7 @@ public class Game extends FreeColGameObject {
                 return player;
             }
         }
-        
+
         return null;
     }
 
