@@ -6,6 +6,7 @@ import net.sf.freecol.common.model.*;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseEvent;
 
+
 /**
  * Listens to the mouse being moved at the level of the Canvas.
  */
@@ -14,6 +15,7 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
+    private final Canvas canvas;
     private final GUI gui;
     private final Map map;
     private ScrollThread scrollThread;
@@ -132,7 +134,8 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
      * @param m The Map that is currently being drawn on the
      * Canvas (by the GUI).
      */
-    public CanvasMouseMotionListener(GUI g, Map m) {
+    public CanvasMouseMotionListener(Canvas canvas, GUI g, Map m) {
+        this.canvas = canvas;
         gui = g;
         map = m;
         scrollThread = null;
@@ -195,6 +198,22 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
      * @param e The MouseEvent that holds all the information.
      */
     public void mouseDragged(MouseEvent e) {
-        // Ignore for now.
+        Tile tile = map.getTile(gui.convertToMapCoordinates(e.getX(), e.getY()));
+        if (tile != null) {
+            if (gui.getActiveUnit() == null) {
+                gui.stopDrag();
+            } else if (gui.getActiveUnit().getTile() != tile) {
+                if (gui.isDragStarted()) {
+                    PathNode dragPath = gui.getActiveUnit().findPath(tile);
+                    gui.setDragPath(dragPath);
+                }
+            } else {
+                if (!gui.isDragStarted()) {
+                    gui.startDrag();
+                } else {
+                    gui.setDragPath(null);
+                }
+            }
+        }
     }
 }

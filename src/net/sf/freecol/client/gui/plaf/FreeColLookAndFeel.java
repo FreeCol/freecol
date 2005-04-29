@@ -174,8 +174,9 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
                 {"FoundingFather.exploration", "exploration.png"},
                 {"FoundingFather.military", "military.png"},
                 {"FoundingFather.political", "political.png"},
-                {"FoundingFather.religious", "religious.png"}
-            };                       
+                {"FoundingFather.religious", "religious.png"},
+                {"cursor.go.image", "go.png"}
+            };
 
             /*
               Use a media tracker to ensure that the resources are loaded
@@ -247,7 +248,17 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
                     logger.warning("Could not find font: " + resources[i][1]);
                     u.put(resources[i][0], new Font("SansSerif", Font.PLAIN, 1));
                 }
-            }                       
+            }          
+            
+            
+            // Add cursors:
+            Image im = (Image) u.get("cursor.go.image");
+            if (im != null) {
+                u.put("cursor.go", Toolkit.getDefaultToolkit().createCustomCursor(im, new Point(im.getWidth(null)/2, im.getHeight(null)/2), "go"));
+            } else {
+                u.put("cursor.go", Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            }
+
         } catch (ClassNotFoundException e) {
             System.err.println(e);
             System.exit(-1);

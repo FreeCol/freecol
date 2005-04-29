@@ -183,7 +183,7 @@ public final class PreGameController {
 
         canvas.addKeyListener(new CanvasKeyListener(canvas, inGameController, mapControls));
         canvas.addMouseListener(new CanvasMouseListener(canvas, gui));
-        canvas.addMouseMotionListener(new CanvasMouseMotionListener(gui,  freeColClient.getGame().getMap()));
+        canvas.addMouseMotionListener(new CanvasMouseMotionListener(canvas, gui,  freeColClient.getGame().getMap()));
 
         canvas.showMapControls();
 

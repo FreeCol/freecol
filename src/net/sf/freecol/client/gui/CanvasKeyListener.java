@@ -47,8 +47,17 @@ public final class CanvasKeyListener implements KeyListener {
     * @param e The event that holds key-information.
     */
     public void keyPressed(KeyEvent e) {
+        if (parent.getGUI().isDragStarted()) {
+            parent.getGUI().stopDrag();
+        }
+
         if (e.isShiftDown() && e.isControlDown() && e.getKeyCode() == KeyEvent.VK_D) {
             inGameController.setInDebugMode(!FreeCol.isInDebugMode());
+            return;
+        }
+
+        if (e.isControlDown() || e.isAltDown()) {
+            return;
         }
 
         switch(e.getKeyCode()) {
@@ -159,7 +168,9 @@ public final class CanvasKeyListener implements KeyListener {
     * @param e The event that holds key-information.
     */
     public void keyReleased(KeyEvent e) {
-        // Ignore for now
+        if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
+            parent.getGUI().setDragPath(null);
+        }
     }
     
     /**

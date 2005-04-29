@@ -18,6 +18,7 @@ import java.awt.AlphaComposite;
 import java.awt.Polygon;
 import java.awt.Composite;
 import java.awt.geom.GeneralPath;
+import java.awt.Cursor;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.FreeCol;
@@ -54,6 +55,10 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
     private Map.Position selectedTile;
     private Map.Position focus = null;
     private Unit activeUnit;
+
+    /** A path to be displayed on the map. */
+    private PathNode dragPath = null;
+    private boolean dragStarted = false;
 
     /** This <code>Random</code>-object should only be used by {@link #drawRoad}. */
     private Random roadRandom = new Random();
@@ -155,18 +160,20 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
     /**
     * As a Thread this <code>GUI</code> object has a life loop. Now it only change cursor every 0.5 sec
     * for blinking feedback.
-    **/
+    */
     public void run(){
         while (true){
             cursor = !cursor;
 
-            if (freeColClient!=null && freeColClient.getCanvas()!=null)
-              freeColClient.getCanvas().repaint(0, 0, getWidth(), getHeight());
+            if (freeColClient != null && freeColClient.getCanvas() != null
+                    && getActiveUnit() != null && getActiveUnit().getTile() != null) {
+              //freeColClient.getCanvas().repaint(0, 0, getWidth(), getHeight());
+                freeColClient.getCanvas().refreshTile(getActiveUnit().getTile());
+            }
 
             try {
                 sleep(500);
-            } catch (InterruptedException e) {
-            }
+            } catch (InterruptedException e) {}
         }
     }
 
@@ -1065,7 +1072,7 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
      *        unexplored terrain.
      */
     public void displayColonyTile(Graphics2D g, Map map, Tile tile, int x, int y, Colony colony) {
-        displayTile(g, map, tile, x, y, false);
+        displayTile(g, map, tile, x, y, false, false);
         if (tile.getOwner() != null && tile.getOwner() != colony) {
             g.drawImage(lib.getMiscImage(ImageLibrary.TILE_TAKEN), x, y, null);
         }
@@ -1097,7 +1104,7 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
      * (in pixels).
      */
     public void displayTile(Graphics2D g, Map map, Tile tile, int x, int y) {
-        displayTile(g, map, tile, x, y, true);
+        displayTile(g, map, tile, x, y, true, true);
     }
 
 
@@ -1115,8 +1122,9 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
      * (in pixels).
      * @param drawUnexploredBorders If true; draws border between explored and
      *        unexplored terrain.
+     * @param displayPath If true; draws the path as given by <code>displayPath</code>.
      */
-    public void displayTile(Graphics2D g, Map map, Tile tile, int x, int y, boolean drawUnexploredBorders) {
+    public void displayTile(Graphics2D g, Map map, Tile tile, int x, int y, boolean drawUnexploredBorders, boolean displayPath) {
         g.drawImage(lib.getTerrainImage(tile.getType(), tile.getX(), tile.getY()), x, y, null);
 
         Map.Position pos = new Map.Position(tile.getX(), tile.getY());
@@ -1354,6 +1362,76 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
             String posString = tile.getX() + ", " + tile.getY();
             g.drawString(posString, x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(posString))/2, y + (lib.getTerrainImageHeight(tile.getType()) - g.getFontMetrics().getAscent())/2);
         }
+        
+        if (displayPath && dragPath != null) {
+            PathNode temp = dragPath;
+            while (temp != null) {
+                if (temp.getTile() == tile) {
+                    if (temp.getTurns() == 0) {
+                        g.setColor(Color.GREEN);
+                    } else {
+                        g.setColor(Color.RED);
+                    }
+
+                    g.fillOval(x + tileWidth/2, y + tileHeight/2, 10, 10);
+                    g.setColor(Color.BLACK);
+                    g.drawOval(x + tileWidth/2, y + tileHeight/2, 10, 10);
+                }
+
+                temp = temp.next;
+            }
+        }
+    }
+
+    
+    /**
+    * Stops any ongoing drag operation on the mapboard.
+    */
+    public void stopDrag() {
+        freeColClient.getCanvas().setCursor(null);
+        setDragPath(null);
+        dragStarted = false;
+    }
+    
+    
+    /**
+    * Starts a drag operation on the mapboard.
+    */
+    public void startDrag() {
+        freeColClient.getCanvas().setCursor((Cursor) UIManager.get("cursor.go"));
+        setDragPath(null);
+        dragStarted = true;
+    }
+    
+    
+    /**
+    * Checks if there is currently a drag operation on the mapboard.
+    */
+    public boolean isDragStarted() {
+        return dragStarted;
+    }
+
+
+    /**
+    * Sets the path to be drawn on the map.
+    * @param dragPath The path that should be drawn on the map
+    *        or <code>null</code> if no path should be drawn.
+    */
+    public void setDragPath(PathNode dragPath) {
+        PathNode tempPath = this.dragPath;
+        this.dragPath = dragPath;
+        
+        freeColClient.getCanvas().refresh();
+    }
+
+    
+    /**
+    * Gets the path to be drawn on the map.
+    * @return The path that should be drawn on the map
+    *        or <code>null</code> if no path should be drawn.
+    */
+    public PathNode getDragPath() {
+        return dragPath;
     }
 
 

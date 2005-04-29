@@ -4,6 +4,10 @@ package net.sf.freecol.client.gui;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
 
+import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.PathNode;
+
+
 
 /**
 * Listens to mouse buttons being pressed at the
@@ -80,6 +84,30 @@ public final class CanvasMouseListener implements MouseListener {
     * @param e The MouseEvent that holds all the information.
     */
     public void mouseReleased(MouseEvent e) {
-        // Ignore for now.
+        if (gui.getDragPath() != null) {
+            // A mouse drag has ended (see CanvasMouseMotionListener).
+
+            PathNode temp = gui.getDragPath();
+
+            gui.stopDrag();
+            
+            // Move the unit:
+            if (temp != null && temp.getTurns() == 0) {
+                canvas.getClient().getInGameController().moveActiveUnit(temp.getDirection());
+                temp = temp.next;
+            }
+            while (temp != null && temp.getTurns() == 0) {
+                if (gui.getActiveUnit() == null) {
+                    break;
+                }
+                if (gui.getActiveUnit().getMoveType(temp.getDirection()) != Unit.MOVE) {
+                    break;
+                }
+                canvas.getClient().getInGameController().moveActiveUnit(temp.getDirection());
+                temp = temp.next;
+            }
+        } else if (gui.isDragStarted()) {
+            gui.stopDrag();
+        }
     }
 }

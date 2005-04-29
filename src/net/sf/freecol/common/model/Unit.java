@@ -641,8 +641,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                 } else {
                     return ILLEGAL_MOVE;
                 }
-            } else {
+            } else if (isOffensiveUnit()) {
                 return ATTACK;
+            } else {
+                return ILLEGAL_MOVE;
             }
         }
 

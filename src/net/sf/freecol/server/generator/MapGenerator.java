@@ -591,6 +591,7 @@ public class MapGenerator {
             Unit unit2 = new Unit(game, unit1, player, Unit.HARDY_PIONEER, Unit.SENTRY);
             Unit unit3 = new Unit(game, unit1, player, Unit.FREE_COLONIST, Unit.SENTRY);
             unit3.setArmed(true, true);
+            unit3.setMovesLeft(unit3.getInitialMovesLeft());
 
             // START DEBUG:
             if (net.sf.freecol.FreeCol.isInDebugMode()) {
