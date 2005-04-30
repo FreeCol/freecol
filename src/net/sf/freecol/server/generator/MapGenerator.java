@@ -600,7 +600,7 @@ public class MapGenerator {
                 Unit unit6 = new Unit(game, unit4, player, Unit.VETERAN_SOLDIER, Unit.SENTRY);
 
                 Tile colonyTile = null;
-                Iterator cti = map.getCircleIterator(new Position(x, y), true, width);
+                Iterator cti = map.getFloodFillIterator(new Position(x, y));
                 while(cti.hasNext()) {
                     Tile tempTile = map.getTile((Position) cti.next());
                     if (tempTile.isColonizeable()) {
@@ -628,10 +628,10 @@ public class MapGenerator {
 
                     Unit carpenter = new Unit(game, colonyTile, player, Unit.MASTER_CARPENTER, Unit.ACTIVE);
                     carpenter.setLocation(colony.getBuilding(Building.CARPENTER));
-                    
+
                     Unit statesman = new Unit(game, colonyTile, player, Unit.ELDER_STATESMAN, Unit.ACTIVE);
                     statesman.setLocation(colony.getBuilding(Building.TOWN_HALL));
-                    
+
                     Unit lumberjack = new Unit(game, colony, player, Unit.EXPERT_LUMBER_JACK, Unit.ACTIVE);
                     if (lumberjack.getLocation() instanceof ColonyTile) {
                         Tile lt = ((ColonyTile) lumberjack.getLocation()).getWorkTile();
@@ -641,7 +641,7 @@ public class MapGenerator {
                         lt.setAddition(Tile.ADD_NONE);
                         lumberjack.setWorkType(Goods.LUMBER);
                     }
-                    
+
                     Unit scout = new Unit(game, colonyTile, player, Unit.SEASONED_SCOUT, Unit.ACTIVE);
 
                     break;

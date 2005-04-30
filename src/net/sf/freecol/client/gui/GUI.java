@@ -255,8 +255,10 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
     * @return The <code>Unit</code> or <i>null</i> if no unit applies.
     */
     public Unit getUnitInFront(Tile unitTile) {
-        if (unitTile != null && unitTile.getUnitCount() > 0 && (unitTile.getSettlement() == null || (activeUnit != null && unitTile.contains(activeUnit)))) {
-            if ((activeUnit != null) && (unitTile.contains(activeUnit))) {
+        if (unitTile != null && unitTile.getUnitCount() > 0 && (unitTile.getSettlement() == null 
+                || (activeUnit != null && unitTile.contains(activeUnit)))) {
+                
+            if (activeUnit != null && activeUnit.getLocation().getTile() == unitTile) {
                 return activeUnit;
             } else {
                 Unit movableUnit = unitTile.getMovableUnit();
@@ -1516,7 +1518,8 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
                     occupationString = "F";
                     break;
                 case Unit.SENTRY:
-                    occupationString = "S";
+                    //occupationString = "S";
+                    occupationString = "-";
                     break;
                 case Unit.IN_COLONY:
                     occupationString = "B";
