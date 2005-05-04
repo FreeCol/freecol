@@ -385,6 +385,7 @@ public final class InGameController implements NetworkConstants {
                 int ret = ci.getChoice();
                 if (ret == 1) {
                     tradeWithSettlement(unit, settlement, goods, gold);
+                    canvas.getJMenuBar().repaint(); // Update gold label.
                     return;
                 } else if (ret == 0) {
                     deliverGiftToSettlement(unit, settlement, goods);

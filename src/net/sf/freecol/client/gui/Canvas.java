@@ -226,6 +226,16 @@ public final class Canvas extends JLayeredPane {
         jMenuBar = mb;
     }
 
+    
+    /**
+    * Gets the menu bar.
+    * @return The menu bar.
+    * @see FreeColMenuBar
+    */
+    public JMenuBar getJMenuBar() {
+        return jMenuBar;
+    }
+
 
     /**
     * Paints this component. This method will use
