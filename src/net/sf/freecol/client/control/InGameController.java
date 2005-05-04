@@ -309,8 +309,10 @@ public final class InGameController implements NetworkConstants {
         buyLandElement.setAttribute("tile", tile.getID());
 
         freeColClient.getMyPlayer().buyLand(tile);
-        
+
         freeColClient.getClient().send(buyLandElement);
+        
+        freeColClient.getCanvas().updateGoldLabel();
     }
 
 
@@ -385,7 +387,6 @@ public final class InGameController implements NetworkConstants {
                 int ret = ci.getChoice();
                 if (ret == 1) {
                     tradeWithSettlement(unit, settlement, goods, gold);
-                    canvas.getJMenuBar().repaint(); // Update gold label.
                     return;
                 } else if (ret == 0) {
                     deliverGiftToSettlement(unit, settlement, goods);
@@ -425,6 +426,8 @@ public final class InGameController implements NetworkConstants {
         client.send(tradeElement);
 
         unit.trade(settlement, goods, gold);
+        
+        freeColClient.getCanvas().updateGoldLabel();
     }
 
 
@@ -467,6 +470,9 @@ public final class InGameController implements NetworkConstants {
         client.send(cashInTreasureTrainElement);
 
         unit.cashInTreasureTrain();
+        
+        freeColClient.getCanvas().updateGoldLabel();
+
         nextModelMessage();
     }
 
@@ -836,6 +842,7 @@ public final class InGameController implements NetworkConstants {
         buyGoodsElement.setAttribute("amount", Integer.toString(amount));
 
         carrier.buyGoods(type, amount);
+        freeColClient.getCanvas().updateGoldLabel();
 
         client.send(buyGoodsElement);
     }
@@ -858,6 +865,7 @@ public final class InGameController implements NetworkConstants {
         sellGoodsElement.appendChild(goods.toXMLElement(freeColClient.getMyPlayer(), sellGoodsElement.getOwnerDocument()));
 
         player.getGame().getMarket().sell(goods, player);
+        freeColClient.getCanvas().updateGoldLabel();
 
         client.send(sellGoodsElement);
     }
@@ -914,6 +922,8 @@ public final class InGameController implements NetworkConstants {
                 logger.warning("Invalid type of goods to equip.");
                 return;
         }
+
+        freeColClient.getCanvas().updateGoldLabel();
 
         client.send(equipUnitElement);
 
@@ -1218,6 +1228,7 @@ public final class InGameController implements NetworkConstants {
             else if (action.equals("speak") && result.equals("beads")) {
                 String amount = reply.getAttribute("amount");
                 unit.getOwner().modifyGold(Integer.parseInt(amount));
+                freeColClient.getCanvas().updateGoldLabel();
                 canvas.showInformationMessage("scoutSettlement.speakBeads", new String[][] {{"%replace%", amount}});
             }
             else if (action.equals("speak") && result.equals("nothing")) {
@@ -1230,6 +1241,7 @@ public final class InGameController implements NetworkConstants {
             else if (action.equals("tribute") && result.equals("agree")) {
                 String amount = reply.getAttribute("amount");
                 unit.getOwner().modifyGold(Integer.parseInt(amount));
+                freeColClient.getCanvas().updateGoldLabel();
                 canvas.showInformationMessage("scoutSettlement.tributeAgree", new String[][] {{"%replace%", amount}});
             }
             else if (action.equals("tribute") && result.equals("disagree")) {
@@ -1395,6 +1407,8 @@ public final class InGameController implements NetworkConstants {
             logger.warning("Could not train unit in europe.");
             return;
         }
+        
+        freeColClient.getCanvas().updateGoldLabel();
     }
 
 
@@ -1425,6 +1439,8 @@ public final class InGameController implements NetworkConstants {
             logger.warning("Could not recruit the specified unit in europe.");
             return;
         }
+        
+        freeColClient.getCanvas().updateGoldLabel();
     }
 
 
@@ -1460,6 +1476,8 @@ public final class InGameController implements NetworkConstants {
         Unit unit = new Unit(game, (Element) reply.getChildNodes().item(0));
         int newRecruitable = Integer.parseInt(reply.getAttribute("newRecruitable"));
         europe.emigrate(slot, unit, newRecruitable);
+        
+        freeColClient.getCanvas().updateGoldLabel();
     }
 
 

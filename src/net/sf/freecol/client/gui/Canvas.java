@@ -235,6 +235,14 @@ public final class Canvas extends JLayeredPane {
     public JMenuBar getJMenuBar() {
         return jMenuBar;
     }
+    
+    
+    /**
+    * Updates the label displaying the current amount of gold.
+    */
+    public void updateGoldLabel() {
+        getJMenuBar().repaint();
+    }
 
 
     /**
