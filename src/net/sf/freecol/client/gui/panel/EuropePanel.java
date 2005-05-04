@@ -767,25 +767,29 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                 } else if (comp instanceof GoodsLabel) {
                     Goods g = ((GoodsLabel)comp).getGoods();
 
-                    // Transfer a maximum of 100 goods at a time:
-                    if (g.getAmount() > 100) {
-                        g.setAmount(g.getAmount() - 100);
-                        g = new Goods(game, g.getLocation(), g.getType(), 100);
-                        g.setAmount(100);
+                    Unit carrier = getSelectedUnit();
+                    int newAmount = g.getAmount();
+                    if (carrier.getSpaceLeft() == 0 && carrier.getGoodsContainer().getGoodsCount(g.getType()) % 100 + g.getAmount() > 100) {
+                        newAmount = 100 - carrier.getGoodsContainer().getGoodsCount(g.getType()) % 100;
+                    } else if (g.getAmount() > 100) {
+                        newAmount = 100;
+                    }
 
-                        //enough space ?
-                        if(!selectedUnit.getUnit().canAdd(g)) {
-                            return null;
-                        }
+                    if (newAmount == 0) {
+                        return null;
+                    }
+
+                    if (g.getAmount() != newAmount) {
+                        g.setAmount(g.getAmount() - newAmount);
+                        g = new Goods(game, g.getLocation(), g.getType(), newAmount);
                     } else {
-                        // enough space ?
-                        if(!selectedUnit.getUnit().canAdd(g)) {
-                            return null;
-                        }
-                        
                         if (oldParent != null) {
                             oldParent.remove(comp);
                         }
+                    }
+                    
+                    if (!selectedUnit.getUnit().canAdd(g)) {
+                        return null;
                     }
 
                     inGameController.loadCargo(g, selectedUnit.getUnit());
