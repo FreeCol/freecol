@@ -582,16 +582,18 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             return isNaval() ? MOVE_HIGH_SEAS : ILLEGAL_MOVE;
         }
 
+        // Trade with settlement
+        if (target.getSettlement() != null && target.getSettlement().getOwner() != getOwner()
+                && isCarrier() && goodsContainer.getGoodsCount() > 0) {
+            return ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS;
+        }
+
         // Check for disembark.
         if (isNaval() && target.isLand()) {
             if (target.getSettlement() != null && target.getSettlement().getOwner() == getOwner()) {
                 return MOVE;
             } else if (target.getSettlement() != null && target.getSettlement().getOwner() != getOwner()) {
-                if (isCarrier() && goodsContainer.getGoodsCount() > 0) {
-                    return ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS;
-                } else {
-                    return ILLEGAL_MOVE;
-                }
+                return ILLEGAL_MOVE;
             } else if (target.getDefendingUnit(this) != null && target.getDefendingUnit(this).getOwner() != getOwner()) {
                 return ILLEGAL_MOVE;
             }
