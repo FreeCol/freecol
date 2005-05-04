@@ -198,7 +198,12 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
      * @param e The MouseEvent that holds all the information.
      */
     public void mouseDragged(MouseEvent e) {
-        Tile tile = map.getTile(gui.convertToMapCoordinates(e.getX(), e.getY()));
+        Map.Position p = gui.convertToMapCoordinates(e.getX(), e.getY());
+        if (p == null || !map.isValid(p)) {
+            return;
+        }
+
+        Tile tile = map.getTile(p);
         if (tile != null) {
             if (gui.getActiveUnit() == null) {
                 gui.stopDrag();

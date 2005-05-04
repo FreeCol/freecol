@@ -202,6 +202,11 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
     */
     public void setSelectedTile(Position selectedTile) {
         Game gameData = freeColClient.getGame();
+        
+        if (selectedTile != null && !gameData.getMap().isValid(selectedTile)) {
+            return;
+        }
+
         Position oldPosition = this.selectedTile;
 
         this.selectedTile = selectedTile;

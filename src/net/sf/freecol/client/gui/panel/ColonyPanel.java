@@ -11,6 +11,7 @@ import net.sf.freecol.common.model.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
+import java.awt.dnd.Autoscroll;
 import java.awt.event.*;
 import java.awt.image.*;
 import java.util.*;
@@ -27,6 +28,17 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     public static final String  REVISION = "$Revision$";
 
     private static Logger logger = Logger.getLogger(ColonyPanel.class.getName());
+
+    /**
+    * The height of the area in which autoscrolling should happen.
+    */
+    public static final int SCROLL_AREA_HEIGHT = 40;
+    
+    /**
+    * The speed of the scrolling.
+    */
+    public static final int SCROLL_SPEED = 10;
+
 
     private static final int    EXIT = 0;
 
@@ -124,6 +136,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 tilesLabel = new JLabel("Tiles"),
                 buildingsLabel = new JLabel("Buildings");
 
+        buildingsScroll.setAutoscrolls(true);
+        
         exitButton.setSize(80, 20);
         outsideColonyScroll.setSize(204, 275);
         inPortScroll.setSize(250, 120);
@@ -549,6 +563,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     public final class BuildingsPanel extends JPanel {
         private final ColonyPanel colonyPanel;
 
+
         /**
         * Creates this BuildingsPanel.
         * @param colonyPanel The panel that holds this BuildingsPanel.
@@ -586,10 +601,11 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         }
 
 
+
         /**
         * This panel is a single line (one building) in the <code>BuildingsPanel</code>.
         */
-        public final class ASingleBuildingPanel extends JPanel {
+        public final class ASingleBuildingPanel extends JPanel implements Autoscroll {
             Building building;
             JPanel productionInBuildingPanel = new JPanel();
 
@@ -632,6 +648,22 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 add(productionInBuildingPanel);
 
                 setPreferredSize(new Dimension(getWidth(), (parent.getGUI().getImageLibrary().getUnitImageHeight(0) / 3) * 2 + 5));
+            }
+
+
+            public void autoscroll(Point p) {
+                JViewport vp = (JViewport) colonyPanel.buildingsPanel.getParent();
+                if (getLocation().y + p.y - vp.getViewPosition().y < SCROLL_AREA_HEIGHT) {
+                    vp.setViewPosition(new Point(vp.getViewPosition().x, Math.max(vp.getViewPosition().y - SCROLL_SPEED, 0)));
+                } else if (getLocation().y + p.y - vp.getViewPosition().y >= vp.getHeight() - SCROLL_AREA_HEIGHT) {
+                    vp.setViewPosition(new Point(vp.getViewPosition().x, Math.min(vp.getViewPosition().y + SCROLL_SPEED, colonyPanel.buildingsPanel.getHeight() - vp.getHeight())));
+                }
+            }
+
+
+            public Insets getAutoscrollInsets() {
+                Rectangle r = getBounds();
+                return new Insets(r.x, r.y, r.width, r.height);
             }
 
 
