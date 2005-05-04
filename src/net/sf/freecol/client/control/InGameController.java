@@ -283,7 +283,7 @@ public final class InGameController implements NetworkConstants {
                                         // TODO
                                         freeColClient.playSound(SfxLibrary.ILLEGAL_MOVE); break;
             case Unit.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS:
-                                        tradeWithSettlement(unit, direction);
+                                        tradeWithSettlement(unit, direction); break;
             case Unit.ILLEGAL_MOVE:     freeColClient.playSound(SfxLibrary.ILLEGAL_MOVE); break;
             default:                    throw new RuntimeException("unrecognised move: " + move);
         }
