@@ -900,14 +900,22 @@ public final class Colony extends Settlement implements Location {
         checkBuildingComplete();
 
         // Throw away goods there is no room for.
-        int capacity = 100 + getBuilding(Building.WAREHOUSE).getLevel() * 100;
-        goodsContainer.removeAbove(capacity);
+        goodsContainer.removeAbove(getWarehouseCapacity());
 
         // Remove bells:
         bells -= (getSoL() * getUnitCount()) / 100;
         if (bells < 0) {
             bells = 0;
         }
+    }
+
+    
+    /**
+    * Returns the capacity of this colony's warehouse. All goods above this limit,
+    * except {@link Goods#FOOD}, will be removed when calling {@link #newTurn}.
+    */
+    public int getWarehouseCapacity() {
+        return 100 + getBuilding(Building.WAREHOUSE).getLevel() * 100;
     }
 
 

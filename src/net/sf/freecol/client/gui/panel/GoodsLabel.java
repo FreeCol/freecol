@@ -2,6 +2,7 @@
 package net.sf.freecol.client.gui.panel;
 
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -11,6 +12,7 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.client.gui.Canvas;
 
@@ -91,15 +93,15 @@ public final class GoodsLabel extends JLabel implements ActionListener {
     * @param g The graphics context in which to do the painting.
     */
     public void paintComponent(Graphics g) {
-        /*
-        if (goods.getAmount() < 100) {
-            setEnabled(false);
-        } else {
-            setEnabled(true);
-        }
-        */
         if (!getToolTipText().equals(goods.getName())) {
             setToolTipText(goods.getName());
+        }
+
+        if (goods.getType() != Goods.FOOD && goods.getLocation() instanceof Colony 
+                && ((Colony) goods.getLocation()).getWarehouseCapacity() < goods.getAmount()) {
+            setForeground(Color.RED);
+        } else {
+            setForeground(Color.BLACK);
         }
 
         super.setText(String.valueOf(goods.getAmount()));
