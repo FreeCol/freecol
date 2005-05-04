@@ -11,6 +11,7 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseAdapter;
 import java.util.logging.Logger;
 import java.util.Iterator;
 
@@ -216,6 +217,9 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         setSize(850, 600);
 
         selectedUnit = null;
+        
+        // See the message of Ulf Onnen for more information about the presence of this fake mouse listener.
+        addMouseListener(new MouseAdapter() {});
     }
 
 

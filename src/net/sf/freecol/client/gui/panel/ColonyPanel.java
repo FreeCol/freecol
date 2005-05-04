@@ -212,7 +212,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         selectedUnit = null;
         
         // See the message of Ulf Onnen for more information about the presence of this fake mouse listener.
-        addMouseListener(new MouseAdapter() {});
+        addMouseListener(new MouseAdapter() {});        
     }
 
 

@@ -42,6 +42,9 @@ public class FreeColPanel extends JPanel {
         setFocusCycleRoot(true);
 
         setBorder( new CompoundBorder(new BevelBorder(BevelBorder.RAISED), new EmptyBorder(5,5,5,5)) );
+
+        // See the message of Ulf Onnen for more information about the presence of this fake mouse listener.
+        addMouseListener(new MouseAdapter() {});
     }
 
 
