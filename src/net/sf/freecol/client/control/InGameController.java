@@ -1029,10 +1029,40 @@ public final class InGameController implements NetworkConstants {
     */
     public void changeState(Unit unit, int state) {
         Client client = freeColClient.getClient();
+        Game game = freeColClient.getGame();
+        Canvas canvas = freeColClient.getCanvas();
 
         if (!(unit.checkSetState(state))) {
             logger.warning("Can't set state " + state);
             return; // Don't bother.
+        }
+
+        if (state == Unit.PLOW || state == Unit.BUILD_ROAD) {
+            if (unit.getTile().getNationOwner() != Player.NO_NATION
+                    && unit.getTile().getNationOwner() != unit.getOwner().getNation()
+                    && !Player.isEuropean(unit.getTile().getNationOwner())
+                    && !unit.getOwner().hasFather(FoundingFather.PETER_MINUIT)) {
+                int nation = unit.getTile().getNationOwner();
+                int price = game.getPlayer(unit.getTile().getNationOwner()).getLandPrice(unit.getTile());
+                ChoiceItem[] choices = {
+                    new ChoiceItem(Messages.message("indianLand.pay").replaceAll("%amount%", Integer.toString(price)), 1),
+                    new ChoiceItem(Messages.message("indianLand.take"), 2)
+                };
+                ChoiceItem ci = (ChoiceItem) canvas.showChoiceDialog(
+                    Messages.message("indianLand.text").replaceAll("%player%", Player.getNationAsString(nation)),
+                    Messages.message("indianLand.cancel"), choices
+                );
+                if (ci == null) {
+                    return;
+                } else if (ci.getChoice() == 1) {
+                    if (price > freeColClient.getMyPlayer().getGold()) {
+                        canvas.errorMessage("notEnoughGold");
+                        return;
+                    } else {
+                        buyLand(unit.getTile());
+                    }
+                }
+            }
         }
 
         Element changeStateElement = Message.createNewRootElement("changeState");

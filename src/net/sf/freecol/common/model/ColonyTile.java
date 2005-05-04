@@ -176,18 +176,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation {
 
         Unit u = (Unit) locatable;
 
-        if (getWorkTile().getNationOwner() != Player.NO_NATION 
-                && getWorkTile().getNationOwner() != u.getOwner().getNation()
-                && !u.getOwner().hasFather(FoundingFather.PETER_MINUIT)) {
-            Player otherPlayer = getGame().getPlayer(getWorkTile().getNationOwner());
-            if (otherPlayer != null) {
-                otherPlayer.modifyTension(u.getOwner(), Player.TENSION_ADD_TAKE_LAND);
-            } else {
-                logger.warning("Could not find player with nation: " + getWorkTile().getNationOwner());
-            }
-        }
-
-        getWorkTile().setNationOwner(u.getOwner().getNation());
+        getWorkTile().takeOwnership(u.getOwner());
 
         if (u != null) {
             if (u.isArmed()) {

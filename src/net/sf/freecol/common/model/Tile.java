@@ -469,6 +469,27 @@ public final class Tile extends FreeColGameObject implements Location {
     public void setNationOwner(int nationOwner) {
         this.nationOwner = nationOwner;
     }
+    
+
+    /**
+    * Makes the given player take the ownership of this <code>Tile</code>.
+    * The tension level is modified accordingly.
+    */
+    public void takeOwnership(Player player) {
+        if (getNationOwner() != Player.NO_NATION
+                && getNationOwner() != player.getNation()
+                && !player.hasFather(FoundingFather.PETER_MINUIT)) {
+            Player otherPlayer = getGame().getPlayer(getNationOwner());
+            if (otherPlayer != null) {
+                if (!otherPlayer.isEuropean()) {
+                    otherPlayer.modifyTension(player, Player.TENSION_ADD_TAKE_LAND);
+                }
+            } else {
+                logger.warning("Could not find player with nation: " + getNationOwner());
+            }
+        }
+        setNationOwner(player.getNation());
+    }
 
 
     /**

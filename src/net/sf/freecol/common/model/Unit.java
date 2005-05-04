@@ -2261,10 +2261,12 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                         getGame().getModelController().setToVacantEntryLocation(this);
                         break;
                     case BUILD_ROAD:
+                        getTile().takeOwnership(getOwner());
                         getTile().setRoad(true);
                         numberOfTools -= 20;
                         break;
                     case PLOW:
+                        getTile().takeOwnership(getOwner());
                         if (getTile().isForested()) {
                             getTile().setForested(false);
                             // Give Lumber to adjacent colony
@@ -2285,7 +2287,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                                     for (int i=0; i<adjacentColonies.size(); i++) {
                                         Colony c = (Colony) adjacentColonies.get(i);
                                         // Make sure the lumber lost is being added again to the first adjacent colony:
-                                        if(i==0) {
+                                        if (i==0) {
                                             c.addGoods(Goods.LUMBER, lumberPerCity + ((int) lumberAmount % adjacentColonies.size()));
                                         } else {
                                             c.addGoods(Goods.LUMBER, lumberPerCity);
