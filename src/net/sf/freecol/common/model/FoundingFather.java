@@ -27,7 +27,7 @@ public class FoundingFather {
                             FRANCIS_DRAKE = 13,
                             JOHN_PAUL_JONES = 14,
                             THOMAS_JEFFERSON = 15,
-                            POCAHONTAS = 16,//TODO
+                            POCAHONTAS = 16,
                             THOMAS_PAINE = 17,//TODO
                             SIMON_BOLIVAR = 18,
                             BENJAMIN_FRANKLIN = 19,//TODO
@@ -150,7 +150,7 @@ public class FoundingFather {
         // This is the list of the founding fathers without effects:
         if (foundingFather == JACOB_FUGGER || foundingFather == PETER_STUYVESANT ||
                 foundingFather == JAN_DE_WITT || foundingFather == HERNANDO_DE_SOTO ||
-                foundingFather == POCAHONTAS || foundingFather == THOMAS_PAINE || foundingFather == BENJAMIN_FRANKLIN ||
+                foundingFather == THOMAS_PAINE || foundingFather == BENJAMIN_FRANKLIN ||
                 foundingFather == FATHER_JEAN_DE_BREBEUF || foundingFather == JUAN_DE_SEPULVEDA) {
             return 0;
         }

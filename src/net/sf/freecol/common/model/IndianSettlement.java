@@ -94,7 +94,7 @@ public class IndianSettlement extends Settlement {
 
     /**
     * Only used by AI - stores the alarm levels,
-    * 0-1000 with 1000 maximum alarm:
+    * 0-1000 with 1000 as the maximum alarm level:
     */
     private int[] alarm = new int[Player.NUMBER_OF_NATIONS];
 
@@ -200,6 +200,22 @@ public class IndianSettlement extends Settlement {
             alarm[player.getNation()] = 1000;
         }
     }
+
+    
+    /**
+    * Sets alarm towards the given player.
+    *
+    * @param player The <code>Player</code>.
+    * @param alarmLevel The alarm level.
+    */
+    public void setAlarm(Player player, int alarmLevel) {
+        alarm[player.getNation()] = alarmLevel;
+
+        if (alarm[player.getNation()]>1000) {
+            alarm[player.getNation()] = 1000;
+        }
+    }
+    
 
 
     /**
@@ -783,6 +799,44 @@ public class IndianSettlement extends Settlement {
 
 
         // TODO: Create a unit if food>=200, but not if a maximum number of units is reaced.
+        
+        
+        /* Increase alarm: */
+        if (getUnitCount() > 0) {
+            Iterator ci = getGame().getMap().getCircleIterator(getTile().getPosition(), true, getRadius());
+            while (ci.hasNext()) {
+                Tile t = getGame().getMap().getTile((Map.Position) ci.next());
+                if (t.getFirstUnit() != null && t.getFirstUnit().getOwner().isEuropean()) {
+                    // Nearby military units.
+                    Iterator ui = t.getUnitIterator();
+                    while (ui.hasNext()) {
+                        Unit u = (Unit) ui.next();
+                        if (u.isOffensiveUnit() && !u.isNaval()) {
+                            int d = (u.getOwner().hasFather(FoundingFather.POCAHONTAS)) ? 2 : 1;
+                            modifyAlarm(u.getOwner(), u.getOffensePower(getTile().getDefendingUnit(u)) / d);
+                        }
+                    }
+                } else if (t.getOwner() != null && t.getOwner().getOwner().isEuropean()) {
+                    // Land being used by another settlement:
+                    int d = (t.getOwner().getOwner().hasFather(FoundingFather.POCAHONTAS)) ? 2 : 1;
+                    modifyAlarm(t.getOwner().getOwner(), 2 / d);
+                }
+
+                // Settlement:
+                if (t.getSettlement() != null && t.getSettlement().getOwner().isEuropean()) {
+                    int d = (t.getSettlement().getOwner().hasFather(FoundingFather.POCAHONTAS)) ? 2 : 1;
+                    modifyAlarm(t.getSettlement().getOwner(), (t.getSettlement().getUnitCount() / 2) / d);
+                }
+            }
+
+            /* Decrease alarm slightly: */
+            for (int i=0; i<alarm.length; i++) {
+                alarm[i] -= 4 + alarm[i]/100;
+                if (alarm[i] < 0) {
+                    alarm[i] = 0;
+                }
+            }
+        }
     }
 
 

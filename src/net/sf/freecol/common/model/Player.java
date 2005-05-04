@@ -1231,6 +1231,21 @@ public class Player extends FreeColGameObject {
         }
     }
 
+    
+    /**
+    * Sets the hostiliy against the given player.
+    *
+    * @param player The <code>Player</code>.
+    * @param tensionLevel The tension level.
+    */
+    public void setTension(Player player, int tensionLevel) {
+        tension[player.getNation()] = tensionLevel;
+        
+        if (tension[player.getNation()]>1000) {
+            tension[player.getNation()] = 1000;
+        }
+    }
+
 
     /**
     * Gets the hostility this player has against the given player.
@@ -1326,9 +1341,25 @@ public class Player extends FreeColGameObject {
                 while (colonyIterator.hasNext()) {
                     ((Colony) colonyIterator.next()).addSoL(20);
                 }
+            } else if (currentFather == FoundingFather.POCAHONTAS) {
+                Iterator pi = getGame().getPlayerIterator();
+                while (pi.hasNext()) {
+                    Player p = (Player) pi.next();
+                    if (!p.isEuropean()) {
+                        p.setTension(this, 0);
+                        Iterator isi = p.getIndianSettlementIterator();
+                        while (isi.hasNext()) {
+                            IndianSettlement is = (IndianSettlement) isi.next();
+                            is.setAlarm(this, 0);
+                        }
+                    }
+                }
             }
 
-            addModelMessage(this, "model.player.foundingFatherJoinedCongress", new String[][] {{"%foundingFather%", Messages.message(FoundingFather.getName(currentFather))}});
+            addModelMessage(this, "model.player.foundingFatherJoinedCongress",
+                            new String[][] {{"%foundingFather%",
+                            Messages.message(FoundingFather.getName(currentFather))}});
+
             currentFather = -1;
             bells = 0;
         }

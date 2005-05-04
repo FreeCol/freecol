@@ -98,13 +98,14 @@ public final class Goods implements Locatable {
         return getName(type);
     }
 
-    
+
     /**
     * Gets the type of goods that is needed to produce the given type
     * of goods.
     *
     * @param goodsType The type of manufactured goods.
-    * @return The type of raw material.
+    * @return The type of raw material or <code>-1</code> if the given type
+    *         of goods does not have a raw material.
     */
     public static int getRawMaterial(int goodsType) {
         switch (goodsType) {
@@ -116,7 +117,7 @@ public final class Goods implements Locatable {
             case TOOLS: return ORE;
             case MUSKETS: return TOOLS;
             case HAMMERS: return LUMBER;
-            default: logger.warning("No raw material for: " + goodsType); return -1;
+            default: return -1;
         }
     }
 
