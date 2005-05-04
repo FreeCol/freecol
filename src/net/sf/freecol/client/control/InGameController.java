@@ -300,7 +300,7 @@ public final class InGameController implements NetworkConstants {
         freeColClient.getCanvas().updateJMenuBar();
     }
 
-    
+
     /**
     * Buys the given land from the indians.
     */
@@ -1057,7 +1057,7 @@ public final class InGameController implements NetworkConstants {
 
     /**
      * Moves the specified unit in the "high seas" in a specified direction.
-     * This may result in an ordinary move or a move to europe.
+     * This may result in an ordinary move, no move or a move to europe.
      *
      * @param unit The unit to be moved.
      * @param direction The direction in which to move the Unit.
@@ -1066,12 +1066,10 @@ public final class InGameController implements NetworkConstants {
         Canvas canvas = freeColClient.getCanvas();
         Map map = freeColClient.getGame().getMap();
 
-        if (unit.getTile() == null || map.getNeighbourOrNull(direction, unit.getTile()) == null
-            || canvas.showConfirmDialog("highseas.text", "highseas.yes", "highseas.no")) {
-
+        if (unit.getTile() == null || canvas.showConfirmDialog("highseas.text", "highseas.yes", "highseas.no")) {
             moveToEurope(unit);
             nextActiveUnit();
-        } else {
+        } else if (map.getNeighbourOrNull(direction, unit.getTile()) != null) {
             reallyMove(unit, direction);
         }
     }
