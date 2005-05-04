@@ -767,7 +767,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             throw new IllegalStateException("Illegal move requested!");
         }
 
-        if (isNaval() && newTile.getSettlement() != null) {
+        if ((isNaval() || getType() == WAGON_TRAIN) && newTile.getSettlement() != null) {
             // If this behaviour should change, remember to correct map.findPath(...):
             setMovesLeft(0);
         } else {

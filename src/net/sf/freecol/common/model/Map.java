@@ -266,6 +266,11 @@ public class Map extends FreeColGameObject {
                     } else if ((!newTile.isLand() && !unit.isNaval()) && newTile != end) {
                         // Not allowed to move a land unit on water:
                         continue;
+                    } else if (unit.getType() == Unit.WAGON_TRAIN && newTile.getSettlement() != null 
+                               && newTile.getSettlement().getOwner() == unit.getOwner()) {
+                        // Entering a settlement costs all of the remaining moves for a wagon train:
+                        cost += movesLeft;
+                        movesLeft = 0;
                     } else {
                         int mc = currentNode.getTile().getMoveCost(newTile);
                         // Normal move: Using -2 in order to make 1/3 and 2/3 move count as 3/3.
