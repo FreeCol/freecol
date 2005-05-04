@@ -698,6 +698,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     public int getTakeSpace() {
         if (getType() == TREASURE_TRAIN) {
             return 6;
+        } else if (isCarrier()) {
+            return 100000; // Not possible to put on a carrier.
         } else {
             return 1;
         }
