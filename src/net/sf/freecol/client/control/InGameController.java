@@ -798,7 +798,8 @@ public final class InGameController implements NetworkConstants {
 
 
     /**
-    * Buys goods in Europe.
+    * Buys goods in Europe. The amount of goods is adjusted if there
+    * is lack of space in the <code>carrier</code>.
     *
     * @param type The type of goods to buy.
     * @param amount The amount of goods to buy.
@@ -820,13 +821,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         if (carrier.getSpaceLeft() <= 0) {
-            int maxAmount = carrier.getGoodsContainer().getGoodsCount(type);
-            while (maxAmount > 100) {
-                maxAmount -= 100;
-            }
-            maxAmount = 100 - maxAmount;
-
-            amount = (amount > maxAmount) ? maxAmount : amount;
+            amount = Math.min(amount, 100 - carrier.getGoodsContainer().getGoodsCount(type) % 100);
         }
 
         if (game.getMarket().getBidPrice(type, amount) > myPlayer.getGold()) {
