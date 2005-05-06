@@ -22,6 +22,9 @@ public class ServerModelController implements ModelController {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
+    /** The number of turns before a <code>TaskEntry</code> is removed. */
+    private static final int TASK_ENTRY_TIME_OUT = 5;
+
     private final FreeColServer freeColServer;
 
     private HashMap taskRegister = new HashMap();
@@ -43,49 +46,99 @@ public class ServerModelController implements ModelController {
     */
     public synchronized int getRandom(String taskID, int n) {
         String extendedTaskID = taskID + Integer.toString(freeColServer.getGame().getTurn().getNumber());
-        
+
         logger.info("Entering getRandom");
-        
+
         if (taskRegister.containsKey(extendedTaskID)) {
             //return ((Integer) taskRegister.remove(extendedTaskID)).intValue();
-            return ((Integer) taskRegister.get(extendedTaskID)).intValue();
+            return ((Integer) ((TaskEntry) taskRegister.get(extendedTaskID)).entry).intValue();
         } else {
             int value = random.nextInt(n);
-            taskRegister.put(extendedTaskID, new Integer(value));
+            taskRegister.put(extendedTaskID, new TaskEntry(extendedTaskID, freeColServer.getGame().getTurn().getNumber(), true, new Integer(value)));
             return value;
         }
 
     }
 
-    
+
+    /**
+    * Removes any entries older than {@link #TASK_ENTRY_TIME_OUT}.
+    */
     public void clearTaskRegister() {
+        int currentTurn = freeColServer.getGame().getTurn().getNumber();
+
         String log = null;
-        Iterator it = taskRegister.keySet().iterator();
-        
-        if (it.hasNext()) {
-            log = "Clearing the task register. Removing the following items: ";
+        Iterator it = taskRegister.values().iterator();
+        while (it.hasNext()) {
+            TaskEntry te = (TaskEntry) it.next();
+            if (te.createdTurn + TASK_ENTRY_TIME_OUT < currentTurn) {
+                if (!te.secure) {
+                    logger.warning("Possibly a cheating attempt.");
+                }
+                taskRegister.remove(te.taskID);
+                if (log == null) {
+                    log = "Clearing the task register. Removing the following items: ";
+                }
+                log += te.taskID + " ";
+            }
         }
 
-        while (it.hasNext()) {
-            log += it.next().toString() + " ";
-        }
-        
         if (log != null) {
             logger.info(log);
         }
+    }
 
-        taskRegister.clear();
+    
+    /**
+    * Creates a new unit. This method is the same as running
+    * {@link #createUnit(String, Location, Player, int, boolean} with <code>secure = true</code>.
+    *
+    * @param taskID The <code>taskID</code> should be a unique identifier.
+    *               One method to make a unique <code>taskID</code>:
+    *               <br><br>
+    *               getID() + "methodName:taskDescription"
+    *               <br>br>
+    *               As long as the "taskDescription" is unique
+    *               within the method ("methodName"), you get a unique
+    *               identifier.
+    * @param location The <code>Location</code> where the <code>Unit</code>
+    *               will be created.
+    * @param owner  The <code>Player</code> owning the <code>Unit</code>.
+    * @param type   The type of unit (Unit.FREE_COLONIST...).
+    */
+    public synchronized Unit createUnit(String taskID, Location location, Player owner, int type) {
+        return createUnit(taskID, location, owner, type, true);
     }
 
 
-    public synchronized Unit createUnit(String taskID, Location location, Player owner, int type) {
+    /**
+    * Creates a new unit.
+    *
+    * @param taskID The <code>taskID</code> should be a unique identifier.
+    *               One method to make a unique <code>taskID</code>:
+    *               <br><br>
+    *               getID() + "methodName:taskDescription"
+    *               <br>br>
+    *               As long as the "taskDescription" is unique
+    *               within the method ("methodName"), you get a unique
+    *               identifier.
+    * @param location The <code>Location</code> where the <code>Unit</code>
+    *               will be created.
+    * @param owner  The <code>Player</code> owning the <code>Unit</code>.
+    * @param type   The type of unit (Unit.FREE_COLONIST...).
+    * @param secure This variable should be set to <code>false</code> in case this method
+    *               is called when serving a client. Setting this variable to <code>false</code>
+    *               signals that the request might be illegal.
+    */
+    public synchronized Unit createUnit(String taskID, Location location, Player owner, int type, boolean secure) {
         String extendedTaskID = taskID + owner.getID() + Integer.toString(freeColServer.getGame().getTurn().getNumber());
         Unit unit;
 
         logger.info("Entering createUnit.");
 
         if (taskRegister.containsKey(extendedTaskID)) {
-            unit = (Unit) taskRegister.get(extendedTaskID);
+            TaskEntry taskEntry = (TaskEntry) taskRegister.get(extendedTaskID);
+            unit = (Unit) taskEntry.entry;
 
             if (unit.getLocation().getTile() != location.getTile() || unit.getOwner() != owner || unit.getType() != type) {
                 logger.warning("Unsynchronization between the client and the server. Maybe a cheating attempt! Differences: " +
@@ -93,20 +146,29 @@ public class ServerModelController implements ModelController {
                         ((unit.getOwner() != owner) ? "owner: " + unit.getOwner() + "!=" + owner : "") +
                         ((unit.getType() != type) ? "type: " + unit.getType() + "!=" + type : ""));
 
+                taskRegister.remove(extendedTaskID);
                 unit.dispose();
                 return null;
             }
 
-            //taskRegister.remove(extendedTaskID);
+            if (secure) {
+                taskEntry.secure = true;
+            }
         } else {
             unit = new Unit(freeColServer.getGame(), location, owner, type, Unit.ACTIVE);
-            taskRegister.put(extendedTaskID, unit);
+            TaskEntry taskEntry = new TaskEntry(extendedTaskID, freeColServer.getGame().getTurn().getNumber(), secure, unit);
+            taskRegister.put(extendedTaskID, taskEntry);
         }
 
         return unit;
     }
 
 
+    /**
+    * Puts the specified <code>Unit</code in America.
+    * @param unit The <code>Unit</code>.
+    * @return The <code>Location</code> where the <code>Unit</code> appears.
+    */
     public synchronized Location setToVacantEntryLocation(Unit unit) {
         Game game = freeColServer.getGame();
         ServerPlayer player = (ServerPlayer) unit.getOwner();
@@ -114,11 +176,12 @@ public class ServerModelController implements ModelController {
         String taskID = unit.getID() + Integer.toString(freeColServer.getGame().getTurn().getNumber());
 
         if (taskRegister.containsKey(taskID)) {
-            entryLocation = (Location) taskRegister.get(taskID);
+            entryLocation = (Location) ((TaskEntry) taskRegister.get(taskID)).entry;
+
             //taskRegister.remove(taskID);
         } else {
             entryLocation = unit.getVacantEntryLocation();
-            taskRegister.put(taskID, entryLocation);
+            taskRegister.put(taskID, new TaskEntry(taskID, freeColServer.getGame().getTurn().getNumber(), true, entryLocation));
         }
 
         unit.setLocation(entryLocation);
@@ -196,6 +259,25 @@ public class ServerModelController implements ModelController {
         }
     }
 
+    
+    
+    
 
+    /**
+    * A single entry in the task register.
+    */
+    private class TaskEntry {
+        String taskID;
+        int createdTurn;
+        boolean secure;
+        Object entry;
+
+        TaskEntry(String taskID, int createdTurn, boolean secure, Object entry) {
+            this.taskID = taskID;
+            this.createdTurn = createdTurn;
+            this.secure = secure;
+            this.entry = entry;
+        }
+    }
 }
 

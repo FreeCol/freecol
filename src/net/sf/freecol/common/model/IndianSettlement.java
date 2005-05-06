@@ -36,6 +36,11 @@ public class IndianSettlement extends Settlement {
     public static final int CITY = 2;
     public static final int LAST_KIND = 2;
 
+
+    public static final int ADD_ALARM_UNIT_DESTROYED = 400;
+    public static final int ADD_ALARM_SETTLEMENT_ATTACKED = 500;
+
+
     /** The amount of goods a brave can produce a single turn. */
     private static final int WORK_AMOUNT = 5;
 

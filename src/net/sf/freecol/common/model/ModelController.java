@@ -5,8 +5,13 @@ import java.util.ArrayList;
 
 /**
 * The <code>ModelController</code> is used by the model to perform
-* tasks that are not allowed to perform within the model (like generating
-* random numbers or creating new {@link FreeColGameObject FreeColGameObjects}).
+* tasks which cannot be done by the model.
+*
+* <br><br>
+*
+* The tasks might not be allowed to perform within the model (like generating
+* random numbers or creating new {@link FreeColGameObject FreeColGameObjects}),
+* or the model might have insufficient data.
 *
 * <br><br>
 *
@@ -17,7 +22,7 @@ public interface ModelController {
     public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
-    
+
     /**
     * Creates a new unit.
     *

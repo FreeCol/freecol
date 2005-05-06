@@ -150,8 +150,7 @@ public class AIPlayer extends AIObject {
             Iterator it = getGame().getMap().getCircleIterator(indianSettlement.getTile().getPosition(), true, MAX_DISTANCE_TO_BRING_GIFT);
             while (it.hasNext()) {
                 Tile t = getGame().getMap().getTile((Map.Position) it.next());
-                if (t.getColony() != null && IndianBringGiftMission.isValidMission(getPlayer(), t.getColony().getOwner())
-                        && getPlayer().getTension(t.getColony().getOwner()) <= Player.TENSION_HAPPY) {
+                if (t.getColony() != null && IndianBringGiftMission.isValidMission(getPlayer(), t.getColony().getOwner())) {
                     nearbyColonies.add(t.getColony());
                 }
             }

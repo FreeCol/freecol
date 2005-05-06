@@ -9,6 +9,8 @@ import net.sf.freecol.client.gui.panel.ReportLabourPanel;
 import net.sf.freecol.client.gui.panel.ReportReligiousPanel;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.FreeCol;
 
 import java.awt.geom.*;
@@ -495,7 +497,6 @@ public class FreeColMenuBar extends JMenuBar {
             sc.setMnemonic(KeyEvent.VK_S);
             debugMenu.add(sc);
             inGameOptions.add(sc);
-
             sc.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     gui.displayCoordinates = ((JCheckBoxMenuItem) e.getSource()).isSelected();
@@ -508,7 +509,6 @@ public class FreeColMenuBar extends JMenuBar {
             reveal.setMnemonic(KeyEvent.VK_R);
             debugMenu.add(reveal);
             inGameOptions.add(reveal);
-
             reveal.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     if (freeColClient.getFreeColServer() != null) {
@@ -516,6 +516,59 @@ public class FreeColMenuBar extends JMenuBar {
                     }
 
                     reveal.setEnabled(false);
+                }
+            });
+            
+            debugMenu.addSeparator();
+
+            final JMenuItem compareMaps = new JMenuItem(Messages.message("menuBar.debug.compareMaps"));
+            compareMaps.setOpaque(false);
+            compareMaps.setMnemonic(KeyEvent.VK_C);
+            compareMaps.setAccelerator(KeyStroke.getKeyStroke('C', InputEvent.CTRL_MASK | InputEvent.ALT_MASK));
+            debugMenu.add(compareMaps);
+            inGameOptions.add(compareMaps);
+            compareMaps.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    boolean problemDetected = false;
+                    Map serverMap = freeColClient.getFreeColServer().getGame().getMap();
+                    Player myServerPlayer = (Player) freeColClient.getFreeColServer().getGame().getFreeColGameObject(freeColClient.getMyPlayer().getID());
+                    
+                    Iterator it = serverMap.getWholeMapIterator();
+                    while (it.hasNext()) {
+                        Tile t = serverMap.getTile((Map.Position) it.next());
+                        if (myServerPlayer.canSee(t)) {
+                            Iterator unitIterator = t.getUnitIterator();
+                            while (unitIterator.hasNext()) {
+                                Unit u = (Unit) unitIterator.next();
+                                if (u.isVisibleTo(myServerPlayer)) {
+                                    if (freeColClient.getGame().getFreeColGameObject(u.getID()) == null) {
+                                        System.out.println("Unsynchronization detected: Unit missing on client-side");
+                                        System.out.println(u.getName() + "(" + u.getID() + "). Position: " + u.getTile().getPosition());
+                                        try {
+                                            System.out.println("Possible unit on client-side: " + freeColClient.getGame().getMap().getTile(u.getTile().getPosition()).getFirstUnit().getID());
+                                        } catch (NullPointerException npe) {}
+                                        System.out.println();
+                                        problemDetected = true;
+                                    } else {
+                                        Unit clientSideUnit = (Unit) freeColClient.getGame().getFreeColGameObject(u.getID());
+                                        if (!clientSideUnit.getTile().getID().equals(u.getTile().getID())) {
+                                            System.out.println("Unsynchronization detected: Unit located on different tiles");
+                                            System.out.println("Server: " + u.getName() + "(" + u.getID() + "). Position: " + u.getTile().getPosition());
+                                            System.out.println("Client: " + clientSideUnit.getName() + "(" + clientSideUnit.getID() + "). Position: " + clientSideUnit.getTile().getPosition());
+                                            System.out.println();
+                                            problemDetected = true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    if (problemDetected) {
+                        canvas.showInformationMessage("menuBar.debug.compareMaps.problem");
+                    } else {
+                        canvas.showInformationMessage("menuBar.debug.compareMaps.checkComplete");
+                    }
                 }
             });
         }

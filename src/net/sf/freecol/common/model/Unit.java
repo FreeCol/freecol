@@ -205,7 +205,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         }
         
         this.movesLeft = getInitialMovesLeft();
-        setHitpoints(getInitialHitpoints(getType()));        
+        setHitpoints(getInitialHitpoints(getType()));       
+        
+        getOwner().invalidateCanSeeTiles();
     }
 
 
@@ -1529,7 +1531,12 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     * @param type The new owner of this Unit.
     */
     public void setOwner(Player owner) {
+        Player oldOwner = this.owner;
+
         this.owner = owner;
+
+        getOwner().invalidateCanSeeTiles();
+        oldOwner.invalidateCanSeeTiles();
     }
 
     /**
@@ -1986,6 +1993,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                     case Tile.TUNDRA: workLeft = 4; break;
                     default: workLeft = -1; break;
                 }
+                getTile().takeOwnership(getOwner());
                 if (s == BUILD_ROAD) workLeft /= 2;
                 movesLeft = 0;
             case TO_EUROPE:
@@ -2261,12 +2269,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                         getGame().getModelController().setToVacantEntryLocation(this);
                         break;
                     case BUILD_ROAD:
-                        getTile().takeOwnership(getOwner());
                         getTile().setRoad(true);
                         numberOfTools -= 20;
                         break;
                     case PLOW:
-                        getTile().takeOwnership(getOwner());
                         if (getTile().isForested()) {
                             getTile().setForested(false);
                             // Give Lumber to adjacent colony
@@ -2788,6 +2794,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             }
         } else if (result == ATTACK_WIN || result == ATTACK_GREAT_WIN || result == ATTACK_DONE_SETTLEMENT) {
             getOwner().modifyTension(defender.getOwner(), -Player.TENSION_ADD_MINOR);
+            if (getIndianSettlement() != null) {
+                getIndianSettlement().modifyAlarm(defender.getOwner(), -IndianSettlement.ADD_ALARM_UNIT_DESTROYED/2);
+            }
 
             // Increases the defender's tension levels:
             if (defender.getOwner().isAI()) {
@@ -2797,8 +2806,14 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                     } else {
                         defender.getOwner().modifyTension(getOwner(), Player.TENSION_ADD_NORMAL);
                     }
+                    if (defender.getIndianSettlement() != null) {
+                        defender.getIndianSettlement().modifyAlarm(getOwner(), IndianSettlement.ADD_ALARM_SETTLEMENT_ATTACKED);
+                    }
                 } else {
                     defender.getOwner().modifyTension(getOwner(), Player.TENSION_ADD_MINOR);
+                    if (defender.getIndianSettlement() != null) {
+                        defender.getIndianSettlement().modifyAlarm(getOwner(), IndianSettlement.ADD_ALARM_UNIT_DESTROYED);
+                    }
                 }
             }
 
@@ -3236,6 +3251,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
 
         setIndianSettlement(null);
 
+        getOwner().invalidateCanSeeTiles();
+
         super.dispose();
     }
 
@@ -3399,6 +3416,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                 goodsContainer = new GoodsContainer(getGame(), this);
             }
         }
+        
+        getOwner().invalidateCanSeeTiles();        
     }
 
 

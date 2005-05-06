@@ -134,17 +134,18 @@ public class IndianBringGiftMission extends Mission {
     */
     public boolean isValid() {
         // The last check is to ensure that the colony have not been burned to the ground.
-        return (!giftDelivered && isValidMission(getUnit().getOwner(), target.getOwner()) && target != null && target.getTile().getColony() == target);
+        return (!giftDelivered && isValidMission(getUnit().getOwner(), target.getOwner()) 
+                && target != null && target.getTile().getColony() == target);
     }
-    
-    
+
+
     /**
     * Checks if the player <code>owner</code> can bring a gift to the
     * <code>targetPlayer</code>.
     */
     public static boolean isValidMission(Player owner, Player targetPlayer) {
         int stance = owner.getStance(targetPlayer);
-        return (stance != Player.WAR && stance != Player.CEASE_FIRE);
+        return (stance != Player.WAR && stance != Player.CEASE_FIRE) && owner.getTension(targetPlayer) <= Player.TENSION_HAPPY;
     }
 
 

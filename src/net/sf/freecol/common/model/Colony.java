@@ -846,6 +846,11 @@ public final class Colony extends Settlement implements Location {
     * Prepares this <code>Colony</code> for a new turn.
     */
     public void newTurn() {
+        // Skip doing work in enemy colonies.
+        if (unitCount != -1) {
+            return;
+        }
+
         // Repair any damaged ships:
         Iterator unitIterator = getTile().getUnitIterator();
         while (unitIterator.hasNext()) {
@@ -853,11 +858,6 @@ public final class Colony extends Settlement implements Location {
             if (unit.isNaval() && unit.isUnderRepair()) {
                 unit.setHitpoints(unit.getHitpoints()+1);
             }
-        }
-
-        // Skip doing work in enemy colonies.
-        if (unitCount != -1) {
-            return;
         }
 
         // Eat food:
@@ -891,9 +891,10 @@ public final class Colony extends Settlement implements Location {
 
         // Create a new colonist if there is enough food:
         if (getGoodsCount(Goods.FOOD) >= 200) {
-            getGame().getModelController().createUnit(getID() + "newTurn200food", getTile(), getOwner(), Unit.FREE_COLONIST);
+            Unit u = getGame().getModelController().createUnit(getID() + "newTurn200food", getTile(), getOwner(), Unit.FREE_COLONIST);
             removeGoods(Goods.FOOD, 200);
             addModelMessage(this, "model.colony.newColonist", new String[][] {{"%colony%", getName()}});
+            logger.info("New colonist created in " + getName() + " with ID=" + u.getID());
         }
 
         // Build:

@@ -186,37 +186,66 @@ public final class InGameInputHandler extends InputHandler {
         int direction = Integer.parseInt(opponentMoveElement.getAttribute("direction"));
 
         if (!opponentMoveElement.hasAttribute("tile")) {
-            Unit unit = (Unit) game.getFreeColGameObject(opponentMoveElement.getAttribute("unit"));
+            final Unit unit = (Unit) game.getFreeColGameObject(opponentMoveElement.getAttribute("unit"));
 
             if (unit == null) {
-                //throw new NullPointerException();
-                logger.warning("Could not find the 'unit' in 'opponentMove'.");
+                logger.warning("Could not find the 'unit' in 'opponentMove'. Unit ID: "+ opponentMoveElement.getAttribute("unit"));
                 return null;
             }
 
-            if ((unit.getTile() != null) && (currentPlayer.canSee(map.getNeighbourOrNull(direction, unit.getTile())))) {
+            if (unit.getTile() == null) {
+                logger.warning("unit.getTile() == null");
+                return null;
+            }
+
+            if (currentPlayer.canSee(map.getNeighbourOrNull(direction, unit.getTile())))  {
+                final Tile oldTile = unit.getTile();
                 try {
                     unit.move(direction);
                 } catch (IllegalStateException e) {
                     System.err.println(unit.getTile().getPosition().getX() + ", " + unit.getTile().getPosition().getY());
                     throw e;
                 }
+                final Tile newTile = unit.getTile();
 
-                getFreeColClient().getGUI().setFocus(unit.getTile().getPosition());                
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        getFreeColClient().getCanvas().refreshTile(oldTile);
+                        getFreeColClient().getCanvas().refreshTile(newTile);
+                        getFreeColClient().getGUI().setFocus(newTile.getPosition());
+                    }
+                });
             } else {
+                final Tile oldTile = unit.getTile();
                 unit.dispose();
+
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        getFreeColClient().getCanvas().refreshTile(oldTile);
+                    }
+                });
             }
         } else {
             String tileID = opponentMoveElement.getAttribute("tile");
 
-            NodeList nl = opponentMoveElement.getElementsByTagName(Unit.getXMLElementTagName());
-            Unit unit = new Unit(game, (Element) nl.item(0));
+            Element unitElement = Message.getChildElement(opponentMoveElement, Unit.getXMLElementTagName());
+            if (unitElement == null) {
+                logger.warning("unitElement == null");
+                throw new NullPointerException("unitElement == null");
+            }
+            final Unit unit = new Unit(game, unitElement);
 
             if (game.getFreeColGameObject(tileID) == null) {
                 logger.warning("Could not find tile with id: " + tileID);
             }
             unit.setLocation((Tile) game.getFreeColGameObject(tileID));
-            getFreeColClient().getGUI().setFocus(unit.getTile().getPosition());
+            
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    getFreeColClient().getCanvas().refreshTile(unit.getTile());
+                    getFreeColClient().getGUI().setFocus(unit.getTile().getPosition());
+                }
+            });
         }
 
         return null;
@@ -239,28 +268,52 @@ public final class InGameInputHandler extends InputHandler {
 
         Unit unit = (Unit) game.getFreeColGameObject(opponentAttackElement.getAttribute("unit"));
         Unit defender = (Unit) game.getFreeColGameObject(opponentAttackElement.getAttribute("defender"));
-        
+
         if (unit == null && defender == null) {
             logger.warning("Both \"unit\" and \"defender\" is \"null\"!");
             throw new NullPointerException();
         }
 
+        if (opponentAttackElement.hasAttribute("update")) {
+            if (opponentAttackElement.getAttribute("update").equals("unit")) {
+                Element unitElement = Message.getChildElement(opponentAttackElement, Unit.getXMLElementTagName());
+                if (unitElement == null) {
+                    logger.warning("unitElement == null");
+                    throw new NullPointerException("unitElement == null");
+                }
+                unit = new Unit(game, unitElement);
+                unit.setLocation(unit.getTile());
+                if (unit.getTile() == null) {
+                    logger.warning("unit.getTile() == null");
+                    throw new NullPointerException("unit.getTile() == null");
+                }
+            } else if (opponentAttackElement.getAttribute("update").equals("defender")) {
+                Element defenderElement = Message.getChildElement(opponentAttackElement, Unit.getXMLElementTagName());
+                if (defenderElement == null) {
+                    logger.warning("defenderElement == null");
+                    throw new NullPointerException("defenderElement == null");
+                }
+                defender = new Unit(game, defenderElement);
+                defender.setLocation(defender.getTile());
+
+                if (defender.getTile() == null) {
+                    logger.warning("defender.getTile() == null");
+                    throw new NullPointerException();
+                }
+            } else {
+                logger.warning("Unknown update.");
+                throw new IllegalStateException("Unknown update.");
+            }
+        }
+
         if (unit == null) {
-            unit = new Unit(game, Message.getChildElement(opponentAttackElement, Unit.getXMLElementTagName()));
-            unit.setLocation(unit.getTile());
-
-            if (unit.getTile() == null) {
-                logger.warning("unit.getTile() == null");
-                throw new NullPointerException();
-            }
-        } else if (defender == null) {
-            defender = new Unit(game, Message.getChildElement(opponentAttackElement, Unit.getXMLElementTagName()));
-            defender.setLocation(defender.getTile());
-
-            if (defender.getTile() == null) {
-                logger.warning("defender.getTile() == null");
-                throw new NullPointerException();
-            }
+            logger.warning("unit == null");
+            throw new NullPointerException("unit == null");
+        }
+        
+        if (defender == null) {
+            logger.warning("defender == null");
+            throw new NullPointerException("defender == null");
         }
 
         unit.attack(defender, result, plunderGold);

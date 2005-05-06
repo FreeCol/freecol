@@ -241,7 +241,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalStateException();
         }
 
-        Unit unit = getFreeColServer().getModelController().createUnit(taskID, location, owner, type);
+        Unit unit = getFreeColServer().getModelController().createUnit(taskID, location, owner, type, false);
 
         Element reply = Message.createNewRootElement("createUnitConfirmed");
         reply.appendChild(unit.toXMLElement(owner, reply.getOwnerDocument()));
@@ -471,6 +471,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
 
         // Test the parameters:
         if (unit == null) {
+
             throw new IllegalArgumentException("Could not find 'Unit' with specified ID: " + attackElement.getAttribute("unit"));
         }
 
@@ -510,7 +511,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             if (player.equals(enemyPlayer) || enemyPlayer.getConnection() == null) {
                 continue;
             }
-
+            
             if (unit.isVisibleTo(enemyPlayer) || defender.isVisibleTo(enemyPlayer)) {
                 Element opponentAttackElement = Message.createNewRootElement("opponentAttack");
                 opponentAttackElement.setAttribute("direction", Integer.toString(direction));
@@ -520,8 +521,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 opponentAttackElement.setAttribute("defender", defender.getID());
 
                 if (!defender.isVisibleTo(enemyPlayer)) {
+                    opponentAttackElement.setAttribute("update", "defender");
                     opponentAttackElement.appendChild(defender.toXMLElement(enemyPlayer, opponentAttackElement.getOwnerDocument()));
                 } else if (!unit.isVisibleTo(enemyPlayer)) {
+                    opponentAttackElement.setAttribute("update", "unit");                
                     opponentAttackElement.appendChild(unit.toXMLElement(enemyPlayer, opponentAttackElement.getOwnerDocument()));
                 }
 

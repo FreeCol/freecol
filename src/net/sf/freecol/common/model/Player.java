@@ -31,7 +31,7 @@ public class Player extends FreeColGameObject {
     /**
     * Constants for adding to the tension levels.
     */
-    public static final int TENSION_ADD_TAKE_LAND = 75, // Grab land without paying
+    public static final int TENSION_ADD_TAKE_LAND = 350, // Grab land without paying
                             TENSION_ADD_MINOR = 100,    // Unit destroyed, etc
                             TENSION_ADD_NORMAL = 200,   // Unit destroyed in a Settlement, etc
                             TENSION_ADD_MAJOR = 300;    // Unit destroyed in a capital, etc
@@ -231,12 +231,6 @@ public class Player extends FreeColGameObject {
               just before starting the game. See "net.sf.freecol.server.control.PreGameController".
             */
             gold = 0;
-
-            // START DEBUG:
-            if (net.sf.freecol.FreeCol.isInDebugMode()) {
-                gold = 10000;
-            }
-            // END DEBUG
         } else {
             gold = 1500;
         }
@@ -495,11 +489,23 @@ public class Player extends FreeColGameObject {
         }
     }
 
+    
+    /**
+    * Forces an update of the <code>canSeeTiles</code>. This method should be used
+    * to invalidate the current <code>canSeeTiles</code>. The method
+    * {@link #resetCanSeeTiles} will be called whenever it is needed.
+    */
+    public void invalidateCanSeeTiles() {
+        canSeeTiles = null;
+    }
+
 
     /**
     * Resets this player's "can see"-tiles. This is done by setting
     * all the tiles within a {@link Unit}s line of sight visible.
     * The other tiles are made unvisible.
+    * <br><br>
+    * Use {@link updateCanSeeTiles} whenever possible.
     */
     public void resetCanSeeTiles() {
         Map map = getGame().getMap();
@@ -710,7 +716,8 @@ public class Player extends FreeColGameObject {
 
     /**
     * Returns the amount of gold that this player has.
-    * @return The amount of gold that this player has.
+    * @return The amount of gold that this player has or 
+    *        <code>-1</code> if the amount of gold is unknown.
     */
     public int getGold() {
         return gold;
@@ -724,6 +731,10 @@ public class Player extends FreeColGameObject {
     * @see #modifyGold
     */
     public void setGold(int gold) {
+        if (this.gold == -1) {
+            return;
+        }
+        
         this.gold = gold;
     }
 
@@ -746,6 +757,10 @@ public class Player extends FreeColGameObject {
     *            amount of gold after adding <code>amount</code>.
     */
     public void modifyGold(int amount) {
+        if (this.gold == -1) {
+            return;
+        }
+            
         if ((gold + amount) >= 0) {
             gold += amount;
         } else {
@@ -1225,7 +1240,7 @@ public class Player extends FreeColGameObject {
     */
     public void modifyTension(Player player, int addToTension) {
         tension[player.getNation()] += addToTension;
-        
+
         if (tension[player.getNation()]>1000) {
             tension[player.getNation()] = 1000;
         }
@@ -1414,7 +1429,7 @@ public class Player extends FreeColGameObject {
             }
             playerElement.setAttribute("contacted", sb.toString());
         } else {
-            playerElement.setAttribute("gold", Integer.toString(-1));        
+            playerElement.setAttribute("gold", Integer.toString(-1));
             playerElement.setAttribute("crosses", Integer.toString(-1));
             playerElement.setAttribute("bells", Integer.toString(-1));
             playerElement.setAttribute("currentFather", Integer.toString(-1));

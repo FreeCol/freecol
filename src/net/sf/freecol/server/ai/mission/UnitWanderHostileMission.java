@@ -57,50 +57,50 @@ public class UnitWanderHostileMission extends Mission {
         Unit unit = getUnit();
         Map map = getGame().getMap();
 
-        while(unit.getMovesLeft() > 0) {
-            // Create an array of the 8 directions in random order:
-            int[] directions = map.getRandomDirectionArray();
-
-            // Search for a target:
-            boolean hasAttacked = false;
-            for (int j = 0; j < 8; j++) {
-                if (unit.getMoveType(directions[j]) == Unit.ATTACK && unit.getOwner().getStance(unit.getGame().getMap().getNeighbourOrNull(directions[j], unit.getTile()).getDefendingUnit(unit).getOwner()) == Player.WAR) {
-                    Element element = Message.createNewRootElement("attack");
-                    element.setAttribute("unit", unit.getID());
-                    element.setAttribute("direction", Integer.toString(directions[j]));
-
-                    try {
-                        connection.send(element);
-                        hasAttacked = true;
-                    } catch (IOException e) {
-                        logger.warning("Could not send message!");
-                    }
-                }
-            }
-            
-            if (!hasAttacked) {
-                int direction = directions[0];
-                int j;
-                for (j = 0; j < 8 && (unit.getGame().getMap().getNeighbourOrNull(direction, thisTile) == null || unit.getMoveType(direction) != Unit.MOVE); j++) {
-                    direction = directions[j];
-                }
-                if (j == 8) return; // Not possible to move in any directions.
-                thisTile = unit.getGame().getMap().getNeighbourOrNull(direction, thisTile);
-
-                Element element = Message.createNewRootElement("move");
+        PathNode pathToTarget = null;
+        if (unit.isOffensiveUnit()) {
+            pathToTarget = findTarget(5);
+        }
+        
+        if (pathToTarget != null) {
+            int direction = moveTowards(connection, pathToTarget);
+            if (direction >= 0 && unit.getMoveType(direction) == Unit.ATTACK) {
+                Element element = Message.createNewRootElement("attack");
                 element.setAttribute("unit", unit.getID());
                 element.setAttribute("direction", Integer.toString(direction));
 
                 try {
-                    connection.ask(element);
+                    connection.send(element);
                 } catch (IOException e) {
                     logger.warning("Could not send message!");
                 }
+
+            }
+        } else {
+            // Just make a random move if no target can be found.
+            int[] directions = map.getRandomDirectionArray();
+
+            int direction = directions[0];
+            int j;
+            for (j = 0; j < 8 && (map.getNeighbourOrNull(direction, thisTile) == null || unit.getMoveType(direction) != Unit.MOVE); j++) {
+                direction = directions[j];
+            }
+            if (j == 8) return; // Not possible to move in any directions.
+            thisTile = map.getNeighbourOrNull(direction, thisTile);
+
+            Element element = Message.createNewRootElement("move");
+            element.setAttribute("unit", unit.getID());
+            element.setAttribute("direction", Integer.toString(direction));
+
+            try {
+                connection.ask(element);
+            } catch (IOException e) {
+                logger.warning("Could not send message!");
             }
         }
     }
 
-    
+
     public Element toXMLElement(Document document) {
         Element element = document.createElement(getXMLElementTagName());
         
