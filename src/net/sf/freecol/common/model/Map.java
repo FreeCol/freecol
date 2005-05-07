@@ -47,6 +47,9 @@ public class Map extends FreeColGameObject {
     /** The infinity cost as used by {@link #findPath}. */
     public static final int COST_INFINITY = Integer.MAX_VALUE - 100000000;
     
+    private static final int COST_UNIT_BLOCKING = 20,
+                             COST_MAY_BLOCK = 10;
+    
     /** Constant used for given options in {@link #findPath} */
     public static final int BOTH_LAND_AND_SEA = 0,
                             ONLY_LAND = 1,
@@ -137,7 +140,7 @@ public class Map extends FreeColGameObject {
     *
     * @param start The <code>Tile</code> in which the path starts from.
     * @param end The end of the path.
-    * @param options One of: {@link #BOTH_LAND_AND_SEA}, {@link #BOTH_LAND_AND_SEA},
+    * @param type One of: {@link #BOTH_LAND_AND_SEA}, {@link #BOTH_LAND_AND_SEA},
     *                {@link #ONLY_LAND} and {@link #ONLY_SEA}.
     * @return A <code>PathNode</code> for the first tile in the path. Calling
     *             {@link PathNode#getTile} on this object, will return the
@@ -150,8 +153,8 @@ public class Map extends FreeColGameObject {
     * @exception NullPointerException if either <code>start</code> or <code>end</code>
     *             are <code>null</code>.
     */
-    public PathNode findPath(Tile start, Tile end, int options) {
-        return findPath(null, start, end, options);
+    public PathNode findPath(Tile start, Tile end, int type) {
+        return findPath(null, start, end, type);
     }
 
 
@@ -193,8 +196,8 @@ public class Map extends FreeColGameObject {
     *             are used instead if <code>unit == null</code>.
     * @param start The <code>Tile</code> in which the path starts from.
     * @param end The end of the path.
-    * @param options One of: {@link #BOTH_LAND_AND_SEA}, {@link #BOTH_LAND_AND_SEA},
-    *             {@link #ONLY_LAND} and {@link #ONLY_SEA}. These options are
+    * @param type One of: {@link #BOTH_LAND_AND_SEA}, {@link #BOTH_LAND_AND_SEA},
+    *             {@link #ONLY_LAND} and {@link #ONLY_SEA}. This argument if
     *             ignored if <code>unit != null</code>.
     * @return A <code>PathNode</code> for the first tile in the path. Calling
     *             {@link PathNode#getTile} on this object, will return the
@@ -206,7 +209,7 @@ public class Map extends FreeColGameObject {
     *             are <code>null</code>.
     * @exception IllegalArgumentException if <code>start == end</code>.
     */
-    private PathNode findPath(Unit unit, Tile start, Tile end, int options) {
+    private PathNode findPath(Unit unit, Tile start, Tile end, int type) {
         if (start == end) {
             throw new IllegalArgumentException("start == end");
         }
@@ -254,7 +257,10 @@ public class Map extends FreeColGameObject {
                 int movesLeft = currentNode.getMovesLeft();
                 int turns = currentNode.getTurns();
                 if (unit != null) {
-                    if (newTile.isLand() && unit.isNaval()) {
+                    if (newTile.getType() == Tile.UNEXPLORED && newTile != end) {
+                        // Not allowed to use an unexplored tile for a path:
+                        continue;
+                    } else if (newTile.isLand() && unit.isNaval()) {
                         if ((newTile.getSettlement() == null || newTile.getSettlement().getOwner() != unit.getOwner()) && newTile != end) {
                             // Not allowed to move a naval unit on land:
                             continue;
@@ -266,15 +272,30 @@ public class Map extends FreeColGameObject {
                     } else if ((!newTile.isLand() && !unit.isNaval()) && newTile != end) {
                         // Not allowed to move a land unit on water:
                         continue;
-                    } else if (unit.getType() == Unit.WAGON_TRAIN && newTile.getSettlement() != null 
+                    } else if (unit.getType() == Unit.WAGON_TRAIN && newTile.getSettlement() != null
                                && newTile.getSettlement().getOwner() == unit.getOwner()) {
                         // Entering a settlement costs all of the remaining moves for a wagon train:
                         cost += movesLeft;
                         movesLeft = 0;
                     } else {
-                        int mc = currentNode.getTile().getMoveCost(newTile);
-                        // Normal move: Using -2 in order to make 1/3 and 2/3 move count as 3/3.
-                        if (mc - 2 <= movesLeft) {
+                        int mc = newTile.getMoveCost(currentNode.getTile());
+                        if (newTile != end && newTile.getSettlement() != null
+                            && newTile.getSettlement().getOwner() != unit.getOwner()) {
+                            // A settlement is blocking the path:
+                            cost += COST_INFINITY;
+                        } else if (newTile != end && turns == 0 && newTile.getDefendingUnit(unit) != null
+                                && newTile.getDefendingUnit(unit).getOwner() != unit.getOwner()) {
+                            // A unit is blocking the path:
+                            turns++;
+                            cost += COST_UNIT_BLOCKING;
+                            movesLeft = unit.getInitialMovesLeft();
+                        } else if (newTile != end && turns == 1 && newTile.getDefendingUnit(unit) != null
+                                && newTile.getDefendingUnit(unit).getOwner() != unit.getOwner()) {
+                            // A unit is blocking the path (but can move away before we get there):
+                            cost += COST_MAY_BLOCK;
+                            movesLeft = unit.getInitialMovesLeft();
+                        } else if (mc - 2 <= movesLeft) {
+                            // Normal move: Using -2 in order to make 1/3 and 2/3 move count as 3/3.
                             movesLeft -= mc;
                             if (movesLeft < 0) {
                                 mc += movesLeft;
@@ -300,10 +321,10 @@ public class Map extends FreeColGameObject {
                         }
                     }
                 } else {
-                    if ((options == ONLY_SEA && newTile.isLand() || options == ONLY_LAND && !newTile.isLand()) && newTile != end) {
+                    if ((type == ONLY_SEA && newTile.isLand() || type == ONLY_LAND && !newTile.isLand()) && newTile != end) {
                         continue;
                     } else {
-                        cost += currentNode.getTile().getMoveCost(newTile);
+                        cost += newTile.getMoveCost(currentNode.getTile());
                     }
                 }
 

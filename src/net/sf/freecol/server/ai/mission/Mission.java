@@ -194,9 +194,9 @@ public abstract class Mission extends AIObject {
                     // Not allowed to move a land unit on water:
                     continue;
                 } else {
-                    int mc = currentNode.getTile().getMoveCost(newTile);
-                    // Normal move: Using -2 in order to make 1/3 and 2/3 move count as 3/3.
+                    int mc = newTile.getMoveCost(currentNode.getTile());
                     if (mc - 2 <= movesLeft) {
+                        // Normal move: Using -2 in order to make 1/3 and 2/3 move count as 3/3.
                         movesLeft -= mc;
                         if (movesLeft < 0) {
                             mc += movesLeft;
