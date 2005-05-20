@@ -832,6 +832,72 @@ public final class Colony extends Settlement implements Location {
 
 
     /**
+    * Returns the price for the remaining hammers and tools for the
+    * {@link Building} that is currently being built.
+    *
+    * @return The price.
+    * @see #payForBuilding
+    */
+    public int getPriceForBuilding() {
+        // Any changes in this method should also be reflected in "payForBulding()"
+
+        int hammersRemaining = 0;
+        int toolsRemaining = 0;
+        if (getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) {
+            int unitType = getCurrentlyBuilding() - BUILDING_UNIT_ADDITION;
+            hammersRemaining = Math.max(Unit.getNextHammers(unitType) - hammers, 0);
+            toolsRemaining = Math.max(Unit.getNextTools(unitType) - hammers, 0);
+        } else if (getCurrentlyBuilding() != -1) {
+            hammersRemaining = Math.max(getBuilding(currentlyBuilding).getNextHammers() - hammers, 0);
+            toolsRemaining = Math.max(getBuilding(currentlyBuilding).getNextTools() - getGoodsCount(Goods.TOOLS), 0);
+        }
+
+        int price = hammersRemaining * getGameOptions().getInteger(GameOptions.HAMMER_PRICE)
+                    + (getGame().getMarket().getBidPrice(Goods.TOOLS, toolsRemaining) * 110) / 100;
+
+        return price;
+    }
+
+
+    /**
+    * Buys the remaining hammers and tools for the {@link Building} that is
+    * currently being built.
+    *
+    * @exception IllegalStateException If the owner of this <code>Colony</code>
+    *            has an insufficient amount of gold.
+    * @see getPriceForBuilding
+    */
+    public void payForBuilding() {
+        // Any changes in this method should also be reflected in "getPriceForBuilding()"
+
+        if (getPriceForBuilding() > getOwner().getGold()) {
+            throw new IllegalStateException("Not enough gold.");
+        }
+
+        int hammersRemaining = 0;
+        int toolsRemaining = 0;
+        if (getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) {
+            int unitType = getCurrentlyBuilding() - BUILDING_UNIT_ADDITION;
+            hammersRemaining = Math.max(Unit.getNextHammers(unitType) - hammers, 0);
+            toolsRemaining = Math.max(Unit.getNextTools(unitType) - hammers, 0);
+        } else if (getCurrentlyBuilding() != -1) {
+            hammersRemaining = Math.max(getBuilding(currentlyBuilding).getNextHammers() - hammers, 0);
+            toolsRemaining = Math.max(getBuilding(currentlyBuilding).getNextTools() - getGoodsCount(Goods.TOOLS), 0);
+        }
+
+        if (hammersRemaining > 0) {
+            getOwner().modifyGold(-hammersRemaining * getGameOptions().getInteger(GameOptions.HAMMER_PRICE));
+            hammers = getBuilding(currentlyBuilding).getNextHammers();
+        }
+
+        if (toolsRemaining > 0) {
+            getGame().getMarket().buy(Goods.TOOLS, toolsRemaining, getOwner());
+            getGoodsContainer().addGoods(Goods.TOOLS, toolsRemaining);
+        }
+    }
+
+
+    /**
     * Returns a random unit from this colony.
     *
     * At this moment, this method always returns the first unit

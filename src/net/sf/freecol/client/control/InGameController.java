@@ -1432,10 +1432,36 @@ public final class InGameController implements NetworkConstants {
             logger.warning("Could not train unit in europe.");
             return;
         }
-        
+
         freeColClient.getCanvas().updateGoldLabel();
     }
 
+
+    /**
+    * Buys the remaining hammers and tools for the {@link Building}
+    * currently being built in the given <code>Colony</code>.
+    *
+    * @param colony The {@link Colony} where the building should be bought.
+    */
+    public void payForBuilding(Colony colony) {
+        /*
+        if (!freeColClient.getCanvas().showConfirmDialog("payForBuilding.text", "payForBuilding.yes", "payForBuilding.no")) {
+            return;
+        }
+        */
+
+        if (colony.getPriceForBuilding() > freeColClient.getMyPlayer().getGold()) {
+            freeColClient.getCanvas().errorMessage("notEnoughGold");
+            return;
+        }
+
+        Element payForBuildingElement = Message.createNewRootElement("payForBuilding");
+        payForBuildingElement.setAttribute("colony", colony.getID());
+
+        colony.payForBuilding();
+
+        freeColClient.getClient().send(payForBuildingElement);
+    }
 
     /**
     * Recruit a unit from a specified "slot" in Europe.

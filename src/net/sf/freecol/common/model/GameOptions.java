@@ -1,6 +1,7 @@
 
 package net.sf.freecol.common.model;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.option.*;
 
 import java.util.logging.Logger;
@@ -24,6 +25,9 @@ public class GameOptions extends OptionMap {
 
     /** The amount of money each player will receive before the game starts. */
     public static final String STARTING_MONEY = "startingMoney";
+
+    /** The cost of a single hammer when buying a building in a colony. */
+    public static final String HAMMER_PRICE = "hammerPrice";
 
 
 
@@ -58,8 +62,17 @@ public class GameOptions extends OptionMap {
 
         /* Initial values: */
         OptionGroup starting = new OptionGroup("gameOptions.starting.name", "gameOptions.starting.shortDescription");
-        starting.add(new IntegerOption(STARTING_MONEY, "gameOptions.startingMoney.name", "gameOptions.startingMoney.shortDescription", 0, 50000, 0));
+        if (FreeCol.isInDebugMode()) {
+            starting.add(new IntegerOption(STARTING_MONEY, "gameOptions.startingMoney.name", "gameOptions.startingMoney.shortDescription", 0, 50000, 10000));
+        } else {
+            starting.add(new IntegerOption(STARTING_MONEY, "gameOptions.startingMoney.name", "gameOptions.startingMoney.shortDescription", 0, 50000, 0));
+        }
         add(starting);
+
+        /* Colony options: */
+        OptionGroup colony = new OptionGroup("gameOptions.colony.name", "gameOptions.colony.shortDescription");
+        colony.add(new IntegerOption(HAMMER_PRICE, "gameOptions.hammerPrice.name", "gameOptions.hammerPrice.shortDescription", 0, 50, 20));
+        add(colony);
     }
 
 

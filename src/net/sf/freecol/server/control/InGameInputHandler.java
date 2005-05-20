@@ -147,6 +147,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                         reply = deliverGift(connection, element);
                     } else if (type.equals("buyLand")) {
                         reply = buyLand(connection, element);
+                    } else if (type.equals("payForBuilding")) {
+                        reply = payForBuilding(connection, element);
                     } else {
                         logger.warning("Unknown request from client " + element.getTagName());
                     }
@@ -1500,6 +1502,27 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         unit.putOutsideColony();
 
         sendUpdatedTileToAll(unit.getTile(), player);
+
+        return null;
+    }
+
+
+    /**
+    * Handles a "payForBuilding"-request from a client.
+    *
+    * @param connection The connection the message came from.
+    * @param payForBuildingElement The element containing the request.
+    */
+    private Element payForBuilding(Connection connection, Element payForBuildingElement) {
+        Game game = getFreeColServer().getGame();
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
+
+        Colony colony = (Colony) game.getFreeColGameObject(payForBuildingElement.getAttribute("colony"));
+        if (colony.getOwner() != player) {
+            throw new IllegalStateException("Not your unit!");
+        }
+
+        colony.payForBuilding();
 
         return null;
     }

@@ -40,7 +40,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     public static final int SCROLL_SPEED = 10;
 
 
-    private static final int    EXIT = 0;
+    private static final int    EXIT = 0,
+                                BUY_BUILDING = 1;
 
     private final Canvas  parent;
     private final FreeColClient freeColClient;
@@ -68,7 +69,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     private UnitLabel   selectedUnit;
 
     private JButton exitButton = new JButton("Close");
-
+    private JButton buyBuilding = new JButton("Buy building");
 
 
 
@@ -82,7 +83,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         this.inGameController = freeColClient.getInGameController();
 
         setFocusCycleRoot(true);
-        
+
         productionPanel = new ProductionPanel(this);
         outsideColonyPanel = new OutsideColonyPanel(this);
         inPortPanel = new InPortPanel();
@@ -117,7 +118,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         warehousePanel.setLayout(new GridLayout(1 , 0));
 
         goldLabel = new JLabel("Gold: 0");
-        
+
         solLabel = new JLabel("SoL: 0%, Tory: 100%");
         hammersLabel = new JLabel("Hammers: 0/0");
         toolsLabel = new JLabel("Tools: 0/0");
@@ -137,7 +138,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 buildingsLabel = new JLabel("Buildings");
 
         buildingsScroll.setAutoscrolls(true);
-        
+
+        buyBuilding.setSize(132, 20);
         exitButton.setSize(80, 20);
         outsideColonyScroll.setSize(204, 275);
         inPortScroll.setSize(250, 120);
@@ -177,11 +179,14 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         toolsLabel.setLocation(695, 260);
         solLabel.setLocation(15, 275);
         goldLabel.setLocation(15, 295);
+        buyBuilding.setLocation(550, 260); //682
 
         setLayout(null);
 
+        buyBuilding.setActionCommand(String.valueOf(BUY_BUILDING));
         exitButton.setActionCommand(String.valueOf(EXIT));
 
+        buyBuilding.addActionListener(this);
         exitButton.addActionListener(this);
 
         add(exitButton);
@@ -201,6 +206,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         add(buildingBox);
         add(hammersLabel);
         add(toolsLabel);
+        add(buyBuilding);
 
         try {
             BevelBorder border = new BevelBorder(BevelBorder.RAISED);
@@ -210,9 +216,9 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         setSize(850, 600);
 
         selectedUnit = null;
-        
+
         // See the message of Ulf Onnen for more information about the presence of this fake mouse listener.
-        addMouseListener(new MouseAdapter() {});        
+        addMouseListener(new MouseAdapter() {});
     }
 
 
@@ -242,7 +248,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     /**
      * Initialize the data on the window.
      */
-    public void initialize(Colony colony, Game game, Unit preSelectedUnit) {
+    public void initialize(final Colony colony, Game game, Unit preSelectedUnit) {
         this.colony = colony;
         this.game = game;
 
@@ -380,6 +386,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 hammersLabel.setText("Hammers: " + colony.getHammers() + "/" + Unit.getNextHammers(colony.getCurrentlyBuilding() - Colony.BUILDING_UNIT_ADDITION));
                 toolsLabel.setText("Tools: " + colony.getGoodsCount(Goods.TOOLS) + "/" + Unit.getNextTools(colony.getCurrentlyBuilding() - Colony.BUILDING_UNIT_ADDITION));
             }
+            buyBuilding.setEnabled(colony.getCurrentlyBuilding() >= 0 && colony.getPriceForBuilding() <= freeColClient.getMyPlayer().getGold());
         }
     }
 
@@ -391,7 +398,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     public Unit getSelectedUnit() {
         return selectedUnit.getUnit();
     }
-    
+
 
     /**
     * Returns the currently select unit.
@@ -411,6 +418,11 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         String command = event.getActionCommand();
         try {
             switch (Integer.valueOf(command).intValue()) {
+                case BUY_BUILDING:
+                    freeColClient.getInGameController().payForBuilding(colony);
+                    updateProgressLabel();
+                    freeColClient.getCanvas().updateGoldLabel();
+                    break;
                 case EXIT:
                     closeColonyPanel();
                     break;
@@ -1512,7 +1524,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             public int getType() {
                 return type;
             }
-            
+
             public String toString() {
                 return getText();
             }
