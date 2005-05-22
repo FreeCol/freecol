@@ -9,6 +9,8 @@ import java.util.StringTokenizer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import java.util.Vector;
+
 
 /**
  * Represents an Indian settlement.
@@ -95,6 +97,9 @@ public class IndianSettlement extends Settlement {
     private ArrayList ownedUnits = new ArrayList();
 
     private Unit missionary;
+    /** A number from 0 to 100. When it reaches 100 a convert is generated for the
+        nation of the missionary and the counter is reset. */
+    private int  convertProgress;
 
 
     /**
@@ -166,6 +171,7 @@ public class IndianSettlement extends Settlement {
 
         goodsContainer.addGoods(Goods.LUMBER, 300);
         //updateWantedGoods();
+        convertProgress = 0;
     }
 
 
@@ -186,6 +192,7 @@ public class IndianSettlement extends Settlement {
         this.wantedGoods2 = UNKNOWN;
         isVisited = false;
         missionary = null;
+        convertProgress = 0;
 
         readFromXMLElement(element);
     }
@@ -206,7 +213,7 @@ public class IndianSettlement extends Settlement {
         }
     }
 
-    
+
     /**
     * Sets alarm towards the given player.
     *
@@ -220,7 +227,7 @@ public class IndianSettlement extends Settlement {
             alarm[player.getNation()] = 1000;
         }
     }
-    
+
 
 
     /**
@@ -329,6 +336,9 @@ public class IndianSettlement extends Settlement {
     * @param missionary The missionary for this settlement.
     */
     public void setMissionary(Unit missionary) {
+        if (missionary != this.missionary) {
+            convertProgress = 0;
+        }
         this.missionary = missionary;
     }
 
@@ -804,8 +814,8 @@ public class IndianSettlement extends Settlement {
 
 
         // TODO: Create a unit if food>=200, but not if a maximum number of units is reaced.
-        
-        
+
+
         /* Increase alarm: */
         if (getUnitCount() > 0) {
             Iterator ci = getGame().getMap().getCircleIterator(getTile().getPosition(), true, getRadius());
@@ -839,6 +849,58 @@ public class IndianSettlement extends Settlement {
                 alarm[i] -= 4 + alarm[i]/100;
                 if (alarm[i] < 0) {
                     alarm[i] = 0;
+                }
+            }
+        }
+
+        /* Increase convert progress. And generate convert if needed. */
+        if (missionary != null) {
+            int increment = 8;
+
+            // Update increment if missionary is an expert.
+            if (missionary.getType() == Unit.JESUIT_MISSIONARY) {
+                increment = 13;
+            }
+
+            // Increase increment if alarm level is high.
+            increment += 2 * alarm[missionary.getOwner().getNation()] / 100;
+
+            convertProgress += increment;
+
+            // Create a new colonist if there is enough food:
+            if (convertProgress >= 100) {
+
+                Vector tiles = getGame().getMap().getSurroundingTiles(getTile(), 1);
+                Tile targetTile = null;
+                // Currently, the convert is put at the first available tile.
+                for (int i = 0; i < tiles.size(); i++) {
+                    Tile t = (Tile)tiles.get(i);
+                    if (!t.isLand()) {
+                        continue;
+                    }
+                    if (t.getUnitCount() > 0) {
+                        Iterator unitIterator = t.getUnitIterator();
+
+                        if (((Unit)unitIterator.next()).getOwner() == missionary.getOwner()) {
+                            targetTile = t;
+                            break;
+                        }
+                    }
+                    else {
+                        targetTile = t;
+                        break;
+                    }
+                }
+
+                if (targetTile != null) {
+                    convertProgress -= 100;
+
+                    Unit u = getGame().getModelController().createUnit(getID() + "newTurn100missionary", targetTile, missionary.getOwner(), Unit.INDIAN_CONVERT);
+                    addModelMessage(this, "model.colony.newConvert", new String[][] {{"%nation%", getOwner().getNationAsString()}});
+                    logger.info("New convert created for " + missionary.getOwner().getName() + " with ID=" + u.getID());
+                }
+                else if (convertProgress > 100) {
+                     convertProgress = 100;
                 }
             }
         }
@@ -915,6 +977,7 @@ public class IndianSettlement extends Settlement {
         indianSettlementElement.appendChild(toArrayElement("alarm", alarm, document));
         if (missionary != null) {
             indianSettlementElement.setAttribute("missionary", missionary.getID());
+            indianSettlementElement.setAttribute("convertProgress", Integer.toString(convertProgress));
         }
 
         if (showAll || player == getOwner()) {
@@ -982,6 +1045,7 @@ public class IndianSettlement extends Settlement {
         }
         if (indianSettlementElement.hasAttribute("missionary")) {
             missionary = (Unit) getGame().getFreeColGameObject(indianSettlementElement.getAttribute("missionary"));
+            convertProgress = Integer.parseInt(indianSettlementElement.getAttribute("convertProgress"));
         }
 
         Element unitContainerElement = getChildElement(indianSettlementElement, UnitContainer.getXMLElementTagName());

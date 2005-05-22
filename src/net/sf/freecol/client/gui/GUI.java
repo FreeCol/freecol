@@ -115,7 +115,7 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
     boolean displayCoordinates = false;
 
 
-    
+
     /**
     * The constructor to use.
     *
@@ -202,7 +202,7 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
     */
     public void setSelectedTile(Position selectedTile) {
         Game gameData = freeColClient.getGame();
-        
+
         if (selectedTile != null && !gameData.getMap().isValid(selectedTile)) {
             return;
         }
@@ -260,9 +260,9 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
     * @return The <code>Unit</code> or <i>null</i> if no unit applies.
     */
     public Unit getUnitInFront(Tile unitTile) {
-        if (unitTile != null && unitTile.getUnitCount() > 0 && (unitTile.getSettlement() == null 
+        if (unitTile != null && unitTile.getUnitCount() > 0 && (unitTile.getSettlement() == null
                 || (activeUnit != null && unitTile.contains(activeUnit)))) {
-                
+
             if (activeUnit != null && activeUnit.getLocation().getTile() == unitTile) {
                 return activeUnit;
             } else {
@@ -1083,7 +1083,7 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
             g.drawImage(lib.getMiscImage(ImageLibrary.TILE_TAKEN), x, y, null);
         }
         int nation = tile.getNationOwner();
-        if (nation != Player.NO_NATION 
+        if (nation != Player.NO_NATION
                 && !Player.isEuropean(nation)
                 && nation != colony.getOwner().getNation()
                 && tile.getSettlement() == null
@@ -1300,7 +1300,7 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
                     if (((IndianSettlement)settlement).getMissionary() != null) {
                         Unit missionary = ((IndianSettlement)settlement).getMissionary();
                         boolean expert = (missionary.getType() == Unit.JESUIT_MISSIONARY);
-                        g.drawImage(lib.getMissionChip(((IndianSettlement)settlement).getOwner().getColor(), expert), x + MISSION_OFFSET_X, y + MISSION_OFFSET_Y, null);
+                        g.drawImage(lib.getMissionChip(missionary.getOwner().getColor(), expert), x + MISSION_OFFSET_X, y + MISSION_OFFSET_Y, null);
                     }
 
                     g.setColor(Color.BLACK);
@@ -1368,7 +1368,7 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
             String posString = tile.getX() + ", " + tile.getY();
             g.drawString(posString, x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(posString))/2, y + (lib.getTerrainImageHeight(tile.getType()) - g.getFontMetrics().getAscent())/2);
         }
-        
+
         if (displayPath && dragPath != null) {
             PathNode temp = dragPath;
             while (temp != null) {
@@ -1389,7 +1389,7 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
         }
     }
 
-    
+
     /**
     * Stops any ongoing drag operation on the mapboard.
     */
@@ -1398,8 +1398,8 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
         setDragPath(null);
         dragStarted = false;
     }
-    
-    
+
+
     /**
     * Starts a drag operation on the mapboard.
     */
@@ -1408,8 +1408,8 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
         setDragPath(null);
         dragStarted = true;
     }
-    
-    
+
+
     /**
     * Checks if there is currently a drag operation on the mapboard.
     */
@@ -1426,11 +1426,11 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
     public void setDragPath(PathNode dragPath) {
         PathNode tempPath = this.dragPath;
         this.dragPath = dragPath;
-        
+
         freeColClient.getCanvas().refresh();
     }
 
-    
+
     /**
     * Gets the path to be drawn on the map.
     * @return The path that should be drawn on the map

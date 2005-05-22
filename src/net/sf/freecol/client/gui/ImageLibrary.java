@@ -76,7 +76,7 @@ public final class ImageLibrary extends ImageProvider {
                             BONUS_FURS = 7,
                             BONUS_LUMBER = 8,
                             BONUS_COUNT = 9;
-    
+
     /**
      * These finals represent the unit graphics that are available.
      * It's important to note the difference between these finals and
@@ -589,7 +589,7 @@ public final class ImageLibrary extends ImageProvider {
      * @param c The color of the color chip to create.
      */
     private void loadMissionChip(GraphicsConfiguration gc, Color c, boolean expertMission) {
-        BufferedImage tempImage = gc.createCompatibleImage(11, 17);
+        BufferedImage tempImage = gc.createCompatibleImage(10, 17);
         Graphics2D g = (Graphics2D)tempImage.getGraphics();
 
         if (expertMission) {
@@ -598,7 +598,7 @@ public final class ImageLibrary extends ImageProvider {
         else {
             g.setColor(Color.DARK_GRAY);
         }
-        g.drawRect(0, 0, 10, 16);
+        g.fillRect(0, 0, 10, 17);
 
         GeneralPath cross = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
         cross.moveTo(4, 1);
@@ -607,8 +607,8 @@ public final class ImageLibrary extends ImageProvider {
         cross.lineTo(9, 4);
         cross.lineTo(9, 6);
         cross.lineTo(6, 6);
-        cross.lineTo(6, 15);
-        cross.lineTo(4, 15);
+        cross.lineTo(6, 16);
+        cross.lineTo(4, 16);
         cross.lineTo(4, 6);
         cross.lineTo(1, 6);
         cross.lineTo(1, 4);
@@ -824,9 +824,11 @@ public final class ImageLibrary extends ImageProvider {
         else {
             missionChip = (Image)missionChips.get(color);
         }
+
         if (missionChip == null) {
             GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
             loadMissionChip(gc, color, expertMission);
+
             if (expertMission) {
                 missionChip = (Image)expertMissionChips.get(color);
             }

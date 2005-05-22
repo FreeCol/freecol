@@ -48,7 +48,7 @@ public final class InGameController extends Controller {
         Game game = freeColServer.getGame();
 
         ServerPlayer oldPlayer = (ServerPlayer) game.getCurrentPlayer();
-        
+
         if (oldPlayer != player) {
             throw new IllegalArgumentException("It is not " + player.getName() + "'s turn!");
         }
@@ -87,7 +87,7 @@ public final class InGameController extends Controller {
         }
 
         freeColServer.getModelController().clearTaskRegister();
-        
+
         if (game.isNextPlayerInNewTurn()) {
             game.newTurn();
 
@@ -111,7 +111,7 @@ public final class InGameController extends Controller {
         setCurrentPlayerElement.setAttribute("player", nextPlayer.getID());
         freeColServer.getServer().sendToAll(setCurrentPlayerElement, null);
 
-        // Ask the player to choose a founding father if none has been choosen:
+        // Ask the player to choose a founding father if none has been chosen:
         if (nextPlayer.isEuropean() && nextPlayer.getCurrentFather() == -1) {
             chooseFoundingFather(nextPlayer);
         }
@@ -197,7 +197,7 @@ public final class InGameController extends Controller {
                 }
             }
         }
-        
+
         return randomFoundingFathers;
     }
 
