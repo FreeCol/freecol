@@ -1348,9 +1348,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     public void setMissionary(boolean b) {
         setMovesLeft(0);
 
-        if (!b && (getLocation() instanceof Europe || (getTile() != null && getTile().getColony() != null))) {
-            missionary = b;
-        } else if (!(getLocation() instanceof Europe) && !getTile().getColony().getBuilding(Building.CHURCH).isBuilt()) {
+        if (!(getLocation() instanceof Europe)
+                && (!(getLocation() instanceof Unit) || !(((Unit) getLocation()).getLocation() instanceof Europe))
+                && !getTile().getColony().getBuilding(Building.CHURCH).isBuilt()) {
             throw new IllegalStateException("Can only dress as a missionary when the unit is located in Europe or a Colony with a church.");
         } else {
             if (isPioneer()) {

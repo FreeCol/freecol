@@ -340,7 +340,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
 
         if (unit.getTile() == null) {
-            throw new IllegalArgumentException("'Unit' not on map: ID: " + moveElement.getAttribute("unit"));
+            throw new IllegalArgumentException("'Unit' not on map: ID: " + moveElement.getAttribute("unit") + " (" + unit.getName() + ")");
         }
 
         if (unit.getOwner() != player) {
