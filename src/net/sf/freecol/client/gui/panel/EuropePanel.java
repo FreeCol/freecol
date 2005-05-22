@@ -502,7 +502,6 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             switch (Integer.valueOf(command).intValue()) {
                 case EXIT:
                     parent.remove(this);
-                    parent.showMapControls();
                     freeColClient.getInGameController().nextModelMessage();
                     break;
                 case RECRUIT:

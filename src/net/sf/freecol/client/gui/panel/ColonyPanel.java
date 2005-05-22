@@ -440,7 +440,6 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     */
     public void closeColonyPanel() {
         parent.remove(this);
-        parent.showMapControls();
         freeColClient.getInGameController().nextModelMessage();
         if (parent.getGUI().getActiveUnit() == null) {
             freeColClient.getInGameController().nextActiveUnit();

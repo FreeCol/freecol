@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.StringWriter;
 import java.io.PrintWriter;
 
@@ -31,7 +32,7 @@ public final class Message {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    private static final String FREECOL_PROTOCOL_VERSION = "0.1.1";
+    private static final String FREECOL_PROTOCOL_VERSION = "0.1.2";
     private static final String INVALID_MESSAGE = "invalid";
 
 
@@ -50,11 +51,11 @@ public final class Message {
 
 
     /**
-    * Constructs a new Message with data from the given InputStreamReader. The constructor
+    * Constructs a new Message with data from the given <code>Reader</code>. The constructor
     * to use if this is an INCOMING message.
     */
-    public Message(InputStreamReader inputStreamReader) throws SAXException, IOException {
-        this(new InputSource(inputStreamReader));
+    public Message(Reader reader) throws SAXException, IOException {
+        this(new InputSource(reader));
     }
     
     

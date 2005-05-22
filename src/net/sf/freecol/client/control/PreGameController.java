@@ -4,6 +4,7 @@ package net.sf.freecol.client.control;
 
 import java.awt.Color;
 import java.util.logging.Logger;
+import java.io.*;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
@@ -19,7 +20,20 @@ import net.sf.freecol.common.model.*;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.networking.Message;
 
-import org.w3c.dom.Element;
+
+// XML:
+import org.xml.sax.SAXException;
+import org.w3c.dom.*;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+// Zip:
+import java.util.zip.InflaterInputStream;
+
 
 
 /**
@@ -149,6 +163,67 @@ public final class PreGameController {
         freeColClient.getClient().send(updateGameOptionsElement);        
     }
 
+    
+    /**
+    * Reads the {@link GameOptions} from the given file.
+    */
+    public void loadGameOptions(File loadFile) throws IOException {
+        Canvas canvas = freeColClient.getCanvas();
+
+        //BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(loadFile)));
+        Element element;
+        try {
+            if (loadFile.getName().endsWith(".fsg")) {
+                Message message = new Message(new InflaterInputStream(new FileInputStream(loadFile)));
+                element = (Element) message.getDocument().getDocumentElement().getElementsByTagName(GameOptions.getXMLElementTagName()).item(0);
+            } else {
+                Message message = new Message(new FileInputStream(loadFile));
+                element = message.getDocument().getDocumentElement();
+            }
+        } catch (SAXException sxe) {
+            // Error generated during parsing
+            Exception  x = sxe;
+            if (sxe.getException() != null) {
+                x = sxe.getException();
+            }
+            StringWriter sw = new StringWriter();
+            x.printStackTrace(new PrintWriter(sw));
+            logger.warning(sw.toString());
+            throw new IOException("SAXException while creating Message.");
+        } catch (NullPointerException e) {
+            throw new IOException("the given file does not contain game options.");
+        }
+
+        if (element != null) {
+            freeColClient.getGame().getGameOptions().readFromXMLElement(element);
+        } else {
+            throw new IOException("the given file does not contain game options.");
+        }
+    }
+
+
+    /**
+    * Writes the {@link GameOptions} to the given file.
+    */
+    public void saveGameOptions(File saveFile) throws IOException {
+        Element element = freeColClient.getGame().getGameOptions().toXMLElement(Message.createNewDocument());
+
+        // Write the XML Element to the file:
+        try {
+            TransformerFactory factory = TransformerFactory.newInstance();
+            Transformer xmlTransformer = factory.newTransformer();
+            //xmlTransformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            xmlTransformer.setOutputProperty(OutputKeys.INDENT, "yes");
+
+            PrintWriter out = new PrintWriter(new FileOutputStream(saveFile));
+            xmlTransformer.transform(new DOMSource(element), new StreamResult(out));
+            out.close();
+        } catch (TransformerException e) {
+            e.printStackTrace();
+            return;
+        }
+    }
+
 
     /**
     * Starts the game.
@@ -160,18 +235,14 @@ public final class PreGameController {
         canvas.closeMainPanel();
         canvas.closeMenus();
 
-        FreeColMenuBar freeColMenuBar = new FreeColMenuBar(freeColClient, canvas, gui);
-        canvas.setJMenuBar(freeColMenuBar);
-
         InGameController inGameController = freeColClient.getInGameController();
         InGameInputHandler inGameInputHandler = freeColClient.getInGameInputHandler();
 
         freeColClient.getClient().setMessageHandler(inGameInputHandler);
         gui.setInGame(true);
 
-        MapControls mapControls = new MapControls(freeColClient, gui);
-        canvas.setMapControls(mapControls);
-
+        freeColClient.getCanvas().resetFreeColMenuBar();
+        
         Unit activeUnit = freeColClient.getMyPlayer().getNextActiveUnit();
         freeColClient.getMyPlayer().updateCrossesRequired();
         gui.setActiveUnit(activeUnit);
@@ -181,11 +252,9 @@ public final class PreGameController {
             gui.setFocus(((Tile) freeColClient.getMyPlayer().getEntryLocation()).getPosition());
         }
 
-        canvas.addKeyListener(new CanvasKeyListener(canvas, inGameController, mapControls));
+        canvas.addKeyListener(new CanvasKeyListener(canvas, inGameController));
         canvas.addMouseListener(new CanvasMouseListener(canvas, gui));
         canvas.addMouseMotionListener(new CanvasMouseMotionListener(canvas, gui,  freeColClient.getGame().getMap()));
-
-        canvas.showMapControls();
 
         if (freeColClient.getMyPlayer().equals(freeColClient.getGame().getCurrentPlayer())) {
             //canvas.takeFocus();

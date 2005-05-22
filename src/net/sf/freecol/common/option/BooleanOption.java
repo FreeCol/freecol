@@ -11,7 +11,7 @@ import org.w3c.dom.*;
 * Represents an option that can be either <i>true</i>
 * or <i>false</i>.
 */
-public class BooleanOption extends Option {
+public class BooleanOption extends AbstractOption {
     public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
@@ -42,18 +42,6 @@ public class BooleanOption extends Option {
     }
 
 
-    /**
-    * Creates an <code>BooleanOption</code> from an XML representation.
-    *
-    * <br><br>
-    *
-    * @param element The XML <code>Element</code> from which this object
-    *                should be constructed.
-    */
-    public BooleanOption(Element element) {
-        readFromXMLElement(element);
-    }
-
 
     /**
     * Gets the current value of this <code>BooleanOption</code>.
@@ -78,12 +66,9 @@ public class BooleanOption extends Option {
     * @return The DOM-element ("Document Object Model") made to represent this "BooleanOption".
     */
     public Element toXMLElement(Document document) {
-        Element optionElement = document.createElement(getXMLElementTagName());
-
-        super.writeAttributes(optionElement);
+        Element optionElement = document.createElement(getId());
 
         optionElement.setAttribute("value", Boolean.toString(value));
-        optionElement.setAttribute("defaultValue", Boolean.toString(defaultValue));
 
         return optionElement;
     }
@@ -94,10 +79,7 @@ public class BooleanOption extends Option {
     * @param optionElement The DOM-element ("Document Object Model") made to represent this "BooleanOption".
     */
     public void readFromXMLElement(Element optionElement) {
-        super.readAttributes(optionElement);
-
         value = Boolean.valueOf(optionElement.getAttribute("value")).booleanValue();
-        defaultValue = Boolean.valueOf(optionElement.getAttribute("defaultValue")).booleanValue();
     }
 
 

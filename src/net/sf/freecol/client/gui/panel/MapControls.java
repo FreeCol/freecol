@@ -7,6 +7,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.Canvas;
 
 
 /**
@@ -141,20 +142,21 @@ public final class MapControls {
         //
 
         if (container != null) {
-            container.remove(infoPanel);
-            container.remove(miniMap);
-            
-            for(int i=0; i<NUMBER_OF_BUTTONS; i++) {
-                container.remove(unitButton[i]);
-            }
-
+            JComponent temp = container;
             container = null;
+
+            temp.remove(infoPanel);
+            temp.remove(miniMap);
+
+            for(int i=0; i<NUMBER_OF_BUTTONS; i++) {
+                temp.remove(unitButton[i]);
+            }
         }
     }
 
-    
+
     public boolean isShowing() {
-        return (container != null);
+        return container != null;
     }
 
 

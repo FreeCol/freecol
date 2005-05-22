@@ -650,7 +650,7 @@ public class FreeColDialog extends FreeColPanel {
     * @param directory The directory to display when choosing the file.
     * @return The <code>FreeColDialog</code>.
     */
-    public static FreeColDialog createLoadDialog(File directory) {
+    public static FreeColDialog createLoadDialog(File directory, FileFilter[] fileFilters) {
         String dir = System.getProperty("user.home");
         String fileSeparator = System.getProperty("file.separator");
         if (!dir.endsWith(fileSeparator)) {
@@ -662,15 +662,19 @@ public class FreeColDialog extends FreeColPanel {
         final JFileChooser fileChooser = new JFileChooser(dir);
 
         fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
-        fileChooser.addChoosableFileFilter(loadDialog.new SavegameFilter());
-        fileChooser.setAcceptAllFileFilterUsed(false);
+        if (fileFilters.length > 0) {
+            for (int i=0; i<fileFilters.length; i++) {
+                fileChooser.addChoosableFileFilter(fileFilters[i]);
+            }
+            fileChooser.setFileFilter(fileFilters[0]);
+            fileChooser.setAcceptAllFileFilterUsed(false);
+        }
         fileChooser.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 String actionCommand = event.getActionCommand();
                 if (actionCommand.equals(JFileChooser.APPROVE_SELECTION)) {
                     loadDialog.setResponse(fileChooser.getSelectedFile());
-                }
-                else if (actionCommand.equals(JFileChooser.CANCEL_SELECTION)) {
+                } else if (actionCommand.equals(JFileChooser.CANCEL_SELECTION)) {
                     loadDialog.setResponse(null);
                 }
             }
@@ -691,7 +695,7 @@ public class FreeColDialog extends FreeColPanel {
     * @param directory The directory to display when choosing the name.
     * @return The <code>FreeColDialog</code>.
     */
-    public static FreeColDialog createSaveDialog(File directory) {
+    public static FreeColDialog createSaveDialog(File directory, final String standardName, FileFilter[] fileFilters) {
         String dir = System.getProperty("user.home");
         String fileSeparator = System.getProperty("file.separator");
         if (!dir.endsWith(fileSeparator)) {
@@ -703,15 +707,20 @@ public class FreeColDialog extends FreeColPanel {
         final JFileChooser fileChooser = new JFileChooser(dir);
 
         fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
-        fileChooser.addChoosableFileFilter(saveDialog.new SavegameFilter());
-        fileChooser.setAcceptAllFileFilterUsed(false);
+        if (fileFilters.length > 0) {
+            for (int i=0; i<fileFilters.length; i++) {
+                fileChooser.addChoosableFileFilter(fileFilters[i]);
+            }
+            fileChooser.setFileFilter(fileFilters[0]);
+            fileChooser.setAcceptAllFileFilterUsed(false);
+        }
         fileChooser.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 String actionCommand = event.getActionCommand();
                 if (actionCommand.equals(JFileChooser.APPROVE_SELECTION)) {
                     File file = fileChooser.getSelectedFile();
-                    if (!file.getName().endsWith(".fsg")) {
-                        file = new File(file.getAbsolutePath() + ".fsg");
+                    if (standardName != null && !file.getName().endsWith(standardName)) {
+                        file = new File(file.getAbsolutePath() + standardName);
                     }
                     saveDialog.setResponse(file);
                 }
@@ -730,20 +739,68 @@ public class FreeColDialog extends FreeColPanel {
 
 
     /**
-    * Is being used to make the Save- and LoadDialogs more user-friendly.
+    * Returns a filter accepting "*.fsg".
     */
-    final class SavegameFilter extends FileFilter {
-        public boolean accept(File f) {
-            if (f.getName().endsWith(".fsg") || f.isDirectory()) {
-                return true;
+    public static FileFilter getFSGFileFilter() {
+        FileFilter fsgFilter = new FileFilter() {
+            public boolean accept(File f) {
+                if (f.getName().endsWith(".fsg") || f.isDirectory()) {
+                    return true;
+                } else {
+                    return false;
+                }
             }
-            else {
-                return false;
-            }
-        }
 
-        public String getDescription() {
-            return "*.fsg";
-        }
+            public String getDescription() {
+                return "FreeCol Save Game (*.fsg)";
+            }
+        };
+        
+        return fsgFilter;
+    }
+    
+
+    /**
+    * Returns a filter accepting "*.fgo".
+    */
+    public static FileFilter getFGOFileFilter() {
+        FileFilter fgoFilter = new FileFilter() {
+            public boolean accept(File f) {
+                if (f.getName().endsWith(".fgo") || f.isDirectory()) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+            public String getDescription() {
+                return "FreeCol Game Options (*.fgo)";
+            }
+        };
+        
+        return fgoFilter;
+    }
+    
+    
+    /**
+    * Returns a filter accepting all files containing a {@link GameOptions}.
+    * That is; both "*.fgo" and "*.fsg".
+    */
+    public static FileFilter getGameOptionsFileFilter() {
+        FileFilter goFilter = new FileFilter() {
+            public boolean accept(File f) {
+                if (f.getName().endsWith(".fgo") || f.getName().endsWith(".fsg") || f.isDirectory()) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+            public String getDescription() {
+                return "FreeCol Game Options and Save Games (*.fgo and *.fsg)";
+            }
+        };
+        
+        return goFilter;
     }
 }

@@ -164,6 +164,14 @@ public final class MiniMap extends JPanel implements MouseInputListener {
     public void paintComponent(Graphics graphics) {
         Graphics2D g = (Graphics2D) graphics;
 
+        /* Fill the rectangle with solid black */
+        g.setColor(Color.BLACK);
+        g.fillRect(0, 0, getWidth(), getHeight());
+
+        if (freeColClient.getGUI() == null || freeColClient.getGUI().getFocus() == null) {
+            return;
+        }
+
         /* xSize and ySize represent how many tiles can be represented on the
            mini map at the current zoom level */
         int xSize = getWidth() / tileSize;
@@ -194,10 +202,6 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         } else if (yOffset + ySize > map.getHeight()) {
             yOffset = map.getHeight() - ySize;
         }
-
-        /* Fill the rectangle with solid black */
-        g.setColor(Color.BLACK);
-        g.fillRect(0, 0, getWidth(), getHeight());
 
         /* Iterate through all the squares on the mini map and paint the
          * tiles based on terrain */

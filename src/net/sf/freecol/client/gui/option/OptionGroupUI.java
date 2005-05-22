@@ -2,12 +2,15 @@
 package net.sf.freecol.client.gui.option;
 
 import net.sf.freecol.common.option.*;
+import net.sf.freecol.client.gui.action.FreeColAction;
 
+import java.awt.Dimension;
 import java.awt.Component;
+import java.awt.FlowLayout;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
-import javax.swing.BoxLayout;
 import javax.swing.JComponent;
+import javax.swing.KeyStroke;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -26,6 +29,9 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
+    /** The horisontal gap between components in this <code>OptionGroupUI</code>. */
+    public static final int H_GAP = 20;
+
     private final OptionGroup option;
     private final OptionUpdater[] optionUpdaters;
     
@@ -35,7 +41,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
     * @param option The <code>OptionGroup</code> to make a user interface for.
     */
     public OptionGroupUI(OptionGroup option) {
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setLayout(new FlowLayout(FlowLayout.LEFT, H_GAP, 5));
 
         this.option = option;
 
@@ -44,20 +50,21 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
         while (it.hasNext()) {
             Option o = (Option) it.next();
 
+            JComponent c = null;
             if (o instanceof OptionGroup) {
-                JComponent c = new OptionGroupUI((OptionGroup) o);
-                add(c);
-                ou.add((OptionUpdater) c);
+                c = new OptionGroupUI((OptionGroup) o);
             } else if (o instanceof BooleanOption) {
-                JComponent c = new BooleanOptionUI((BooleanOption) o);
-                add(c);
-                ou.add((OptionUpdater) c);
+                c = new BooleanOptionUI((BooleanOption) o);
             } else if (o instanceof IntegerOption) {
-                JComponent c = new IntegerOptionUI((IntegerOption) o);
-                add(c);
-                ou.add((OptionUpdater) c);
+                c = new IntegerOptionUI((IntegerOption) o);
+            } else if (o instanceof FreeColAction) {
+                c = new FreeColActionUI((FreeColAction) o, this);
             } else {
                 logger.warning("Unknown option.");
+            }
+            if (c != null) {
+                add(c);
+                ou.add((OptionUpdater) c);
             }
         }
         optionUpdaters = (OptionUpdater[]) ou.toArray(new OptionUpdater[0]);
@@ -74,7 +81,19 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
         for (int i=0; i<optionUpdaters.length; i++) {
             optionUpdaters[i].updateOption();
         }
-
+    }
+    
+    
+    /**
+    * Removes the given <code>KeyStroke</code> from all of this
+    * <code>OptionGroupUI</code>'s children.
+    */
+    public void removeKeyStroke(KeyStroke keyStroke) {
+        for (int i=0; i<optionUpdaters.length; i++) {
+            if (optionUpdaters[i] instanceof FreeColActionUI) {
+                ((FreeColActionUI) optionUpdaters[i]).removeKeyStroke(keyStroke);
+            }
+        }
     }
 
 }

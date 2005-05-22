@@ -396,8 +396,7 @@ public final class FreeColServer {
                 PrintWriter out = new PrintWriter(new FileOutputStream(file));
                 xmlTransformer.transform(new DOMSource(savedGameElement), new StreamResult(out));
                 out.close();
-            }
-            else {
+            } else {
                 // Compression
                 DeflaterOutputStream out = new DeflaterOutputStream(new FileOutputStream(file));
                 xmlTransformer.transform(new DOMSource(savedGameElement), new StreamResult(out));
@@ -421,8 +420,7 @@ public final class FreeColServer {
         if (DEBUG) {
             // No compression
             in = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-        }
-        else {
+        } else {
             // Compression
             in = new BufferedReader(new InputStreamReader(new InflaterInputStream(new FileInputStream(file))));
         }

@@ -340,8 +340,7 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
             freeColClient.getInGameController().clearOrders(activeUnit);
         }
 
-        //freeColClient.getCanvas().getMapControls().updateMoves(activeUnit);
-        freeColClient.getCanvas().getMapControls().update();
+        freeColClient.getActionManager().update();
         freeColClient.getCanvas().updateJMenuBar();
 
         //TODO: update only within the bounds of InfoPanel

@@ -55,7 +55,7 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
 
             if (o instanceof OptionGroup) {
                 JComponent c = new OptionGroupUI((OptionGroup) o);
-                c.setBorder(BorderFactory.createEmptyBorder(20,5,0,5));
+                c.setBorder(BorderFactory.createEmptyBorder(OptionGroupUI.H_GAP-5,0,0,0));
                 c.setOpaque(true);
                 tb.addTab(o.getName(), null, c, o.getShortDescription());
                 ou.add((OptionUpdater) c);
@@ -79,7 +79,7 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
         setOpaque(false);
     }
 
-
+    
     /**
     * Updates the value of the {@link Option} this object keeps.
     */

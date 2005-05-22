@@ -103,7 +103,7 @@ public abstract class OptionMap extends OptionGroup {
     * to the <code>Map</code>. This is done recursively if the specified
     * group has any sub-groups.
     */
-    private void addToMap(OptionGroup og) {
+    public void addToMap(OptionGroup og) {
         Iterator it = og.iterator();
         while (it.hasNext()) {
             Option option = (Option) it.next();
@@ -125,7 +125,10 @@ public abstract class OptionMap extends OptionGroup {
     public Element toXMLElement(Document document) {
         Element gameOptionsElement = document.createElement(xmlTagName);
 
-        writeAttributes(gameOptionsElement);
+        Iterator it = values.values().iterator();
+        while (it.hasNext()) {
+            gameOptionsElement.appendChild(((Option) it.next()).toXMLElement(document));
+        }
 
         return gameOptionsElement;
     }
@@ -149,18 +152,33 @@ public abstract class OptionMap extends OptionGroup {
     private void updateFromElement(Element element) {
         NodeList nl = element.getChildNodes();
         for (int i=0; i<nl.getLength(); i++) {
-            Element optionElement = (Element) nl.item(i);
+            Node n = nl.item(i);
+            if (!(n instanceof Element)) {
+                continue;
+            }
+            Element optionElement = (Element) n;
 
             if (optionElement.getTagName().equals(OptionGroup.getXMLElementTagName())) {
                 updateFromElement(optionElement);
             } else {
-                Option o = getObject(optionElement.getAttribute("id"));
+                if (optionElement.hasAttribute("id")) {
+                    // old protocols:
+                    Option o = getObject(optionElement.getAttribute("id"));
 
-                if (o != null) {
-                    o.readFromXMLElement(optionElement);
+                    if (o != null) {
+                        o.readFromXMLElement(optionElement);
+                    } else {
+                        // Normal only if this option is from an old save game:
+                        logger.info("Option \"" + optionElement.getAttribute("id") + "\" (" + optionElement.getTagName() + ") could not be found.");
+                    }
                 } else {
-                    // Normal only if this option is from an old save game:
-                    logger.info("Option \"" + optionElement.getAttribute("id") + "\" (" + optionElement.getTagName() + ") could not be found.");
+                    Option o = getObject(optionElement.getTagName());
+                    if (o != null) {
+                        o.readFromXMLElement(optionElement);
+                    } else {
+                        // Normal only if this option is from an old save game:
+                        logger.info("Option \"" + optionElement.getTagName() + " not found.");
+                    }
                 }
             }
         }

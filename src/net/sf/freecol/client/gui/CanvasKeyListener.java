@@ -21,24 +21,20 @@ public final class CanvasKeyListener implements KeyListener {
     public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
-    
+
     private final Canvas            parent;
     private final InGameController inGameController;
-    private final MapControls       mapControls;
 
     private KeyEvent keyEvent;
 
+    
     /**
     * The constructor to use.
     * @param parent The container of all child panels.
-    * @param userInputHandler The handler for the user's input.
-    * @param mapControls The gui components that are used to interact with the map
-    * and the objects that are located on the map.
     */
-    public CanvasKeyListener(Canvas parent, InGameController inGameController, MapControls mapControls) {
+    public CanvasKeyListener(Canvas parent, InGameController inGameController) {
         this.parent = parent;
         this.inGameController = inGameController;
-        this.mapControls = mapControls;
     }
 
 
@@ -56,7 +52,7 @@ public final class CanvasKeyListener implements KeyListener {
             return;
         }
 
-        if (e.isControlDown() || e.isAltDown()) {
+        if (e.getModifiers() != 0) {
             return;
         }
 
@@ -104,58 +100,28 @@ public final class CanvasKeyListener implements KeyListener {
             case KeyEvent.VK_PAGE_UP:
                 inGameController.moveActiveUnit(Map.NE);
                 break;
-            case KeyEvent.VK_W: //Unit wait:
-                inGameController.nextActiveUnit();
-                break;
-            case KeyEvent.VK_SPACE:
-                inGameController.skipActiveUnit();
-                break;
             case KeyEvent.VK_ENTER:
                 inGameController.endTurn();
                 break;
-            case KeyEvent.VK_F:
-                if (parent.getGUI().getActiveUnit() != null) {
-                    parent.getClient().getInGameController().changeState(parent.getGUI().getActiveUnit(), Unit.FORTIFY);
-                }
-                break;
             case KeyEvent.VK_S:
+                /*
                 if (parent.getGUI().getActiveUnit() != null) {
                     parent.getClient().getInGameController().changeState(parent.getGUI().getActiveUnit(), Unit.SENTRY);
                 }
-                break;
-            case KeyEvent.VK_B:
-                inGameController.buildColony();
-                break;
-            case KeyEvent.VK_P:
-                if (parent.getGUI().getActiveUnit() != null) {
-                    parent.getClient().getInGameController().changeState(parent.getGUI().getActiveUnit(), Unit.PLOW);
-                }
-                break;
-            case KeyEvent.VK_R:
-                if (parent.getGUI().getActiveUnit() != null) {
-                    parent.getClient().getInGameController().changeState(parent.getGUI().getActiveUnit(), Unit.BUILD_ROAD);
-                }
-                break;
-            case KeyEvent.VK_E:
-                parent.showEuropePanel();
+                */
                 break;
             case KeyEvent.VK_T:
                 parent.showChatPanel();
                 break;
             case KeyEvent.VK_PLUS:
             case KeyEvent.VK_EQUALS:
-                mapControls.zoomIn();
-                parent.refresh();
+                //mapControls.zoomIn();
+                //parent.refresh();
                 break;
             case KeyEvent.VK_MINUS:
             case KeyEvent.VK_UNDERSCORE:
-                mapControls.zoomOut();
-                parent.refresh();
-                break;
-            case KeyEvent.VK_D:
-                if(parent.getGUI().getActiveUnit() != null) {
-                    parent.getClient().getInGameController().disbandActiveUnit();
-                }
+                //mapControls.zoomOut();
+                //parent.refresh();
                 break;
             default:
                 logger.info("The typed key (" + e.getKeyCode() + ") doesn't have a function yet.");

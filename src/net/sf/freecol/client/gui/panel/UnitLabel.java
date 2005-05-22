@@ -225,7 +225,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
                     if (uc instanceof ColonyPanel) {
                         if (unit.getTile() != null && unit.getTile().getColony() == null) {
                             parent.remove(uc);
-                            parent.showMapControls();
+                            parent.getClient().getActionManager().update();
                         } else {
                             ((ColonyPanel) uc).reinitialize();
                         }

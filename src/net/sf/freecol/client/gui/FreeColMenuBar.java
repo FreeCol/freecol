@@ -1,3 +1,4 @@
+
 package net.sf.freecol.client.gui;
 
 import net.sf.freecol.client.FreeColClient;
@@ -7,6 +8,7 @@ import net.sf.freecol.client.gui.panel.ReportForeignAffairPanel;
 import net.sf.freecol.client.gui.panel.ReportIndianPanel;
 import net.sf.freecol.client.gui.panel.ReportLabourPanel;
 import net.sf.freecol.client.gui.panel.ReportReligiousPanel;
+import net.sf.freecol.client.gui.action.*;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Map;
@@ -20,6 +22,7 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.util.Iterator;
 import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -44,16 +47,6 @@ public class FreeColMenuBar extends JMenuBar {
     private final FreeColClient freeColClient;
     private final Canvas canvas;
     private final GUI gui;
-    
-    /**
-    * Contains the menu items that should only be enabled when in game.
-    */
-    private ArrayList inGameOptions = new ArrayList();
-    
-    /**
-    * Contains the menu items that should only be enabled when the map is active. 
-    */
-    private ArrayList mapControlOptions = new ArrayList();
 
     private JMenuItem saveMenuItem;
 
@@ -72,6 +65,8 @@ public class FreeColMenuBar extends JMenuBar {
         this.freeColClient = f;
         this.canvas = c;
         this.gui = g;
+
+        ActionManager am = f.getActionManager();
 
         // --> Game
         JMenu gameMenu = new JMenu(Messages.message("menuBar.game"));
@@ -111,9 +106,19 @@ public class FreeColMenuBar extends JMenuBar {
                 freeColClient.getInGameController().saveGame();
             }
         });
-        inGameOptions.add(saveMenuItem);
 
         gameMenu.addSeparator();
+
+        JMenuItem preferencesMenuItem = new JMenuItem(Messages.message("menuBar.game.preferences"));
+        preferencesMenuItem.setOpaque(false);
+        preferencesMenuItem.setMnemonic(KeyEvent.VK_P);
+        preferencesMenuItem.setAccelerator(KeyStroke.getKeyStroke('P', InputEvent.CTRL_MASK));
+        gameMenu.add(preferencesMenuItem);
+        preferencesMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                freeColClient.getCanvas().showClientOptionsDialog();
+            }
+        });
 
         JMenuItem reconnectMenuItem = new JMenuItem(Messages.message("menuBar.game.reconnect"));
         reconnectMenuItem.setOpaque(false);
@@ -145,25 +150,11 @@ public class FreeColMenuBar extends JMenuBar {
         viewMenu.setOpaque(false);
         viewMenu.setMnemonic(KeyEvent.VK_V);
         add(viewMenu);
-        inGameOptions.add(viewMenu);
 
-        final JCheckBoxMenuItem mcMenuItem = new JCheckBoxMenuItem(Messages.message("menuBar.view.mapControls"), true);
+        final JCheckBoxMenuItem mcMenuItem = new JCheckBoxMenuItem(am.getFreeColAction(MapControlsAction.ID));
         mcMenuItem.setOpaque(false);
-        mcMenuItem.setMnemonic(KeyEvent.VK_M);
-        mcMenuItem.setAccelerator(KeyStroke.getKeyStroke('M', InputEvent.CTRL_MASK));
+        mcMenuItem.setSelected(((MapControlsAction) am.getFreeColAction(MapControlsAction.ID)).isSelected());
         viewMenu.add(mcMenuItem);
-        mcMenuItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                boolean showMC = ((JCheckBoxMenuItem) e.getSource()).isSelected();
-                if (showMC && !canvas.getMapControls().isShowing()) {
-                    canvas.getMapControls().addToComponent(canvas);
-                } else if (!showMC && canvas.getMapControls().isShowing()) {
-                    canvas.getMapControls().removeFromComponent(canvas);
-                } // else: ignore
-            }
-        });
-        inGameOptions.add(mcMenuItem);
-        mapControlOptions.add(mcMenuItem);
 
         final JCheckBoxMenuItem dtnMenuItem = new JCheckBoxMenuItem(Messages.message("menuBar.view.displayTileNames"));
         dtnMenuItem.setOpaque(false);
@@ -176,7 +167,6 @@ public class FreeColMenuBar extends JMenuBar {
                 freeColClient.getCanvas().refresh();
             }
         });
-        inGameOptions.add(dtnMenuItem);
 
         final JCheckBoxMenuItem dgMenuItem = new JCheckBoxMenuItem(Messages.message("menuBar.view.displayGrid"));
         dgMenuItem.setOpaque(false);
@@ -189,58 +179,28 @@ public class FreeColMenuBar extends JMenuBar {
                 freeColClient.getCanvas().refresh();
             }
         });
-        inGameOptions.add(dgMenuItem);
 
         viewMenu.addSeparator();
 
-        final JMenuItem europeMenuItem = new JMenuItem(Messages.message("menuBar.view.europe"));
+        final JMenuItem europeMenuItem = new JMenuItem(am.getFreeColAction(EuropeAction.ID));
         europeMenuItem.setOpaque(false);
-        europeMenuItem.setMnemonic(KeyEvent.VK_E);
-        //europeMenuItem.setAccelerator(KeyStroke.getKeyStroke('E'));
         viewMenu.add(europeMenuItem);
-        europeMenuItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                canvas.showEuropePanel();
-            }
-        });
-        inGameOptions.add(europeMenuItem);
 
         // --> Orders
         JMenu ordersMenu = new JMenu(Messages.message("menuBar.orders"));
         ordersMenu.setOpaque(false);
         ordersMenu.setMnemonic(KeyEvent.VK_O);
         add(ordersMenu);
-        inGameOptions.add(ordersMenu);
-        mapControlOptions.add(ordersMenu);
-        
-        final JMenuItem waitMenuItem = new JMenuItem(Messages.message("unit.state.0"));
+
+        final JMenuItem waitMenuItem = new JMenuItem(am.getFreeColAction(WaitAction.ID));
         waitMenuItem.setOpaque(false);
-        waitMenuItem.setMnemonic(KeyEvent.VK_W);
-        //waitMenuItem.setAccelerator(KeyStroke.getKeyStroke('W'));
         ordersMenu.add(waitMenuItem);
-        waitMenuItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                freeColClient.getInGameController().nextActiveUnit();
-            }
-        });
-        inGameOptions.add(waitMenuItem);
-        mapControlOptions.add(waitMenuItem);
 
-        final JMenuItem fortifyMenuItem = new JMenuItem(Messages.message("unit.state.2"));
+        final JMenuItem fortifyMenuItem = new JMenuItem(am.getFreeColAction(FortifyAction.ID));
         fortifyMenuItem.setOpaque(false);
-        fortifyMenuItem.setMnemonic(KeyEvent.VK_F);
-        //fortifyMenuItem.setAccelerator(KeyStroke.getKeyStroke('F'));
         ordersMenu.add(fortifyMenuItem);
-        fortifyMenuItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if(gui.getActiveUnit() != null) {
-                    freeColClient.getInGameController().changeState(gui.getActiveUnit(), Unit.FORTIFY);
-                }
-            }
-        });
-        inGameOptions.add(fortifyMenuItem);
-        mapControlOptions.add(fortifyMenuItem);
 
+        /*
         final JMenuItem sentryMenuItem = new JMenuItem(Messages.message("unit.state.3"));
         sentryMenuItem.setOpaque(false);
         sentryMenuItem.setMnemonic(KeyEvent.VK_S);
@@ -253,108 +213,46 @@ public class FreeColMenuBar extends JMenuBar {
                 }
             }
         });
-        inGameOptions.add(sentryMenuItem);
-        mapControlOptions.add(sentryMenuItem);
-
-        final JMenuItem clearOrdersMenuItem = new JMenuItem(Messages.message("menuBar.orders.clearOrders"));
-        clearOrdersMenuItem.setOpaque(false);
-        clearOrdersMenuItem.setMnemonic(KeyEvent.VK_C);
-        ordersMenu.add(clearOrdersMenuItem);
-        clearOrdersMenuItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if(gui.getActiveUnit() != null) {
-                    freeColClient.getInGameController().clearOrders(gui.getActiveUnit());
-                }
-            }
-        });
-        inGameOptions.add(clearOrdersMenuItem);
-        mapControlOptions.add(clearOrdersMenuItem);
-
+        */
 
         ordersMenu.addSeparator();
-        
-        final JMenuItem colonyMenuItem = new JMenuItem(Messages.message("unit.state.7"));
+
+        final JMenuItem colonyMenuItem = new JMenuItem(am.getFreeColAction(BuildColonyAction.ID));
         colonyMenuItem.setOpaque(false);
-        colonyMenuItem.setMnemonic(KeyEvent.VK_B);
-        //colonyMenuItem.setAccelerator(KeyStroke.getKeyStroke('B'));
         ordersMenu.add(colonyMenuItem);
-        colonyMenuItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                freeColClient.getInGameController().buildColony();
-            }
-        });
-        inGameOptions.add(colonyMenuItem);
-        mapControlOptions.add(colonyMenuItem);
-        
-        final JMenuItem plowMenuItem = new JMenuItem(Messages.message("unit.state.5"));
+
+        final JMenuItem plowMenuItem = new JMenuItem(am.getFreeColAction(PlowAction.ID));
         plowMenuItem.setOpaque(false);
-        plowMenuItem.setMnemonic(KeyEvent.VK_P);
-        //plowMenuItem.setAccelerator(KeyStroke.getKeyStroke('P'));
         ordersMenu.add(plowMenuItem);
-        plowMenuItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if(gui.getActiveUnit() != null) {
-                    freeColClient.getInGameController().changeState(gui.getActiveUnit(), Unit.PLOW);
-                }
-            }
-        });
-        inGameOptions.add(plowMenuItem);
-        mapControlOptions.add(plowMenuItem);
-        
-        final JMenuItem roadMenuItem = new JMenuItem(Messages.message("unit.state.6"));
+
+        final JMenuItem roadMenuItem = new JMenuItem(am.getFreeColAction(BuildRoadAction.ID));
         roadMenuItem.setOpaque(false);
-        roadMenuItem.setMnemonic(KeyEvent.VK_R);
-        //roadMenuItem.setAccelerator(KeyStroke.getKeyStroke('R'));
         ordersMenu.add(roadMenuItem);
-        roadMenuItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if(gui.getActiveUnit() != null) {
-                    freeColClient.getInGameController().changeState(gui.getActiveUnit(), Unit.BUILD_ROAD);
-                }
-            }
-        });
-        inGameOptions.add(roadMenuItem);
-        mapControlOptions.add(roadMenuItem);
 
         ordersMenu.addSeparator();
-        
-        final JMenuItem skipMenuItem = new JMenuItem(Messages.message("unit.state.1"));
+
+
+        final JMenuItem skipMenuItem = new JMenuItem(am.getFreeColAction(SkipUnitAction.ID));
         skipMenuItem.setOpaque(false);
-        skipMenuItem.setMnemonic(KeyEvent.VK_SPACE);
-        //skipMenuItem.setAccelerator(KeyStroke.getKeyStroke(' '));
         ordersMenu.add(skipMenuItem);
-        skipMenuItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                freeColClient.getInGameController().skipActiveUnit();
-            }
-        });
-        inGameOptions.add(skipMenuItem);
-        mapControlOptions.add(skipMenuItem);
-        
+
+        final JMenuItem clearOrdersMenuItem = new JMenuItem(am.getFreeColAction(ClearOrdersAction.ID));
+        clearOrdersMenuItem.setOpaque(false);
+        ordersMenu.add(clearOrdersMenuItem);
+
         ordersMenu.addSeparator();
-        
-        final JMenuItem disbandMenuItem = new JMenuItem(Messages.message("unit.state.8"));
+
+        final JMenuItem disbandMenuItem = new JMenuItem(am.getFreeColAction(DisbandUnitAction.ID));
         disbandMenuItem.setOpaque(false);
-        disbandMenuItem.setMnemonic(KeyEvent.VK_D);
-        //disbandMenuItem.setAccelerator(KeyStroke.getKeyStroke('D'));
         ordersMenu.add(disbandMenuItem);
-        disbandMenuItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if(gui.getActiveUnit() != null) {
-                    freeColClient.getInGameController().disbandActiveUnit();
-                }
-            }
-        });
-        inGameOptions.add(disbandMenuItem);
-        mapControlOptions.add(disbandMenuItem);
-        
+
+
         // --> Report
-        
+
         JMenu reportMenu = new JMenu(Messages.message("menuBar.report"));
         reportMenu.setOpaque(false);
         reportMenu.setMnemonic(KeyEvent.VK_R);
         add(reportMenu);
-        inGameOptions.add(reportMenu);
 
         JMenuItem religionMenuItem = new JMenuItem(Messages.message("menuBar.report.religion"));
         religionMenuItem.setOpaque(false);
@@ -366,7 +264,6 @@ public class FreeColMenuBar extends JMenuBar {
                 canvas.showReportPanel(ReportReligiousPanel.class.getName());
             }
         });
-        inGameOptions.add(religionMenuItem);
 
         JMenuItem labourMenuItem = new JMenuItem(Messages.message("menuBar.report.labour"));
         labourMenuItem.setOpaque(false);
@@ -378,7 +275,6 @@ public class FreeColMenuBar extends JMenuBar {
                 canvas.showReportPanel(ReportLabourPanel.class.getName());
             }
         });
-        inGameOptions.add(labourMenuItem);
 
         JMenuItem foreignMenuItem = new JMenuItem(Messages.message("menuBar.report.foreign"));
         foreignMenuItem.setOpaque(false);
@@ -390,7 +286,6 @@ public class FreeColMenuBar extends JMenuBar {
                 canvas.showReportPanel(ReportForeignAffairPanel.class.getName());
             }
         });
-        inGameOptions.add(foreignMenuItem);
 
         JMenuItem indianMenuItem = new JMenuItem(Messages.message("menuBar.report.indian"));
         indianMenuItem.setOpaque(false);
@@ -402,7 +297,6 @@ public class FreeColMenuBar extends JMenuBar {
                 canvas.showReportPanel(ReportIndianPanel.class.getName());
             }
         });
-        inGameOptions.add(indianMenuItem);
 
         // --> Colopedia
 
@@ -410,7 +304,6 @@ public class FreeColMenuBar extends JMenuBar {
         colopediaMenu.setOpaque(false);
         colopediaMenu.setMnemonic(KeyEvent.VK_C);
         add(colopediaMenu);
-        inGameOptions.add(colopediaMenu);
 
         JMenuItem terrainMenuItem = new JMenuItem(Messages.message("menuBar.colopedia.terrain"));
         terrainMenuItem.setOpaque(false);
@@ -422,7 +315,6 @@ public class FreeColMenuBar extends JMenuBar {
                 canvas.showColopediaPanel(ColopediaPanel.COLOPEDIA_TERRAIN);
             }
         });
-        inGameOptions.add(terrainMenuItem);
 
         JMenuItem unitMenuItem = new JMenuItem(Messages.message("menuBar.colopedia.unit"));
         unitMenuItem.setOpaque(false);
@@ -434,7 +326,6 @@ public class FreeColMenuBar extends JMenuBar {
                 canvas.showColopediaPanel(ColopediaPanel.COLOPEDIA_UNIT);
             }
         });
-        inGameOptions.add(unitMenuItem);
 
         JMenuItem goodsMenuItem = new JMenuItem(Messages.message("menuBar.colopedia.goods"));
         goodsMenuItem.setOpaque(false);
@@ -446,7 +337,6 @@ public class FreeColMenuBar extends JMenuBar {
                 canvas.showColopediaPanel(ColopediaPanel.COLOPEDIA_GOODS);
             }
         });
-        inGameOptions.add(goodsMenuItem);
 
         JMenuItem skillMenuItem = new JMenuItem(Messages.message("menuBar.colopedia.skill"));
         skillMenuItem.setOpaque(false);
@@ -458,7 +348,6 @@ public class FreeColMenuBar extends JMenuBar {
                 canvas.showColopediaPanel(ColopediaPanel.COLOPEDIA_SKILLS);
             }
         });
-        inGameOptions.add(skillMenuItem);
 
         JMenuItem buildingMenuItem = new JMenuItem(Messages.message("menuBar.colopedia.building"));
         buildingMenuItem.setOpaque(false);
@@ -470,7 +359,6 @@ public class FreeColMenuBar extends JMenuBar {
                 canvas.showColopediaPanel(ColopediaPanel.COLOPEDIA_BUILDING);
             }
         });
-        inGameOptions.add(buildingMenuItem);
 
         JMenuItem fatherMenuItem = new JMenuItem(Messages.message("menuBar.colopedia.father"));
         fatherMenuItem.setOpaque(false);
@@ -482,21 +370,18 @@ public class FreeColMenuBar extends JMenuBar {
                 canvas.showColopediaPanel(ColopediaPanel.COLOPEDIA_FATHER);
             }
         });
-        inGameOptions.add(fatherMenuItem);
-        
+
         // --> Debug
         if (FreeCol.isInDebugMode()) {
             JMenu debugMenu = new JMenu(Messages.message("menuBar.debug"));
             debugMenu.setOpaque(false);
             debugMenu.setMnemonic(KeyEvent.VK_D);
             add(debugMenu);
-            inGameOptions.add(debugMenu);
 
             JCheckBoxMenuItem sc = new JCheckBoxMenuItem(Messages.message("menuBar.debug.showCoordinates"));
             sc.setOpaque(false);
             sc.setMnemonic(KeyEvent.VK_S);
             debugMenu.add(sc);
-            inGameOptions.add(sc);
             sc.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     gui.displayCoordinates = ((JCheckBoxMenuItem) e.getSource()).isSelected();
@@ -508,7 +393,6 @@ public class FreeColMenuBar extends JMenuBar {
             reveal.setOpaque(false);
             reveal.setMnemonic(KeyEvent.VK_R);
             debugMenu.add(reveal);
-            inGameOptions.add(reveal);
             reveal.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     if (freeColClient.getFreeColServer() != null) {
@@ -526,7 +410,6 @@ public class FreeColMenuBar extends JMenuBar {
             compareMaps.setMnemonic(KeyEvent.VK_C);
             compareMaps.setAccelerator(KeyStroke.getKeyStroke('C', InputEvent.CTRL_MASK | InputEvent.ALT_MASK));
             debugMenu.add(compareMaps);
-            inGameOptions.add(compareMaps);
             compareMaps.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     boolean problemDetected = false;
@@ -572,6 +455,8 @@ public class FreeColMenuBar extends JMenuBar {
                 }
             });
         }
+        
+        update();
     }
 
 
@@ -583,87 +468,7 @@ public class FreeColMenuBar extends JMenuBar {
             return;
         }
 
-        boolean enabled = (freeColClient.getGUI().getActiveUnit() != null)
-                          && !canvas.getColonyPanel().isShowing()
-                          && !canvas.getEuropePanel().isShowing()
-                          && !canvas.getChooseFoundingFatherDialog().isShowing()
-                          && !canvas.getEventPanel().isShowing();
-
-        Iterator componentIterator = mapControlOptions.iterator();
-        while (componentIterator.hasNext()) {
-            ((JComponent) componentIterator.next()).setEnabled(enabled);
-        }
-
         saveMenuItem.setEnabled(freeColClient.getMyPlayer().isAdmin() && freeColClient.getFreeColServer() != null);
-
-        if (enabled) {
-            // Update Orders menu.
-            Unit selectedOne = freeColClient.getGUI().getActiveUnit();
-            JMenu ordersMenu = getMenu(2);
-            if(selectedOne == null) {
-                for (int t=0; t < ordersMenu.getItemCount(); t++) {
-                    if(ordersMenu.getItem(t) != null)
-                        ordersMenu.getItem(t).setEnabled(false);
-                }
-                return;
-            }
-
-            int unitType = selectedOne.getType();
-            ordersMenu.getItem(UNIT_ORDER_WAIT).setEnabled(true); // All units can wait
-            ordersMenu.getItem(UNIT_ORDER_FORTIFY).setEnabled(true); // All units can fortify
-            ordersMenu.getItem(UNIT_ORDER_SENTRY).setEnabled(true); // All units can sentry
-            ordersMenu.getItem(UNIT_ORDER_CLEAR_ORDERS).setEnabled(true); // All units can clear orders
-            ordersMenu.getItem(UNIT_ORDER_SKIP).setEnabled(true); // All units can be skipped
-            ordersMenu.getItem(UNIT_ORDER_DISBAND).setEnabled(true); // All units can be disbanded
-
-            /* Clear Forest / Plow Fields
-            *  Only colonists can do this, only if they have at least 20 tools, and only if they are
-            *  in a square that can be improved
-            */
-            if (selectedOne.getTile() != null) {
-                Tile tile = selectedOne.getTile();
-                if(tile.isLand() && tile.isForested()) {
-                    ordersMenu.getItem(UNIT_ORDER_PLOW).setText(Messages.message("unit.state.4"));
-                    ordersMenu.getItem(UNIT_ORDER_PLOW).setEnabled(selectedOne.isPioneer());
-                } else if (tile.isLand() && !tile.isForested() && !tile.isPlowed()) {
-                    ordersMenu.getItem(UNIT_ORDER_PLOW).setText(Messages.message("unit.state.5"));
-                    ordersMenu.getItem(UNIT_ORDER_PLOW).setEnabled(selectedOne.isPioneer());
-                } else if (tile.isLand() && !tile.isForested() && tile.isPlowed()) {
-                    ordersMenu.getItem(UNIT_ORDER_PLOW).setText(Messages.message("unit.state.5"));
-                    ordersMenu.getItem(UNIT_ORDER_PLOW).setEnabled(false);
-                } else {
-                    ordersMenu.getItem(UNIT_ORDER_PLOW).setText(Messages.message("unit.state.5"));
-                    ordersMenu.getItem(UNIT_ORDER_PLOW).setEnabled(false);
-                }
-            } else {
-                ordersMenu.getItem(UNIT_ORDER_PLOW).setText(Messages.message("unit.state.5"));
-                ordersMenu.getItem(UNIT_ORDER_PLOW).setEnabled(false);
-            }
-
-            /* Build roads
-            *  Only colonists can do this, only if they have at least 20 tools, and only if they are
-            *  in a land square that does not already have roads
-            */
-            if (selectedOne.getTile() != null && selectedOne.isPioneer()) {
-                Tile tile = selectedOne.getTile();
-                if(tile.isLand() && !tile.hasRoad()) {
-                    ordersMenu.getItem(UNIT_ORDER_BUILD_ROAD).setEnabled(true);
-                } else {
-                    ordersMenu.getItem(UNIT_ORDER_BUILD_ROAD).setEnabled(false);
-                }
-            } else {
-                ordersMenu.getItem(UNIT_ORDER_BUILD_ROAD).setEnabled(false);
-            }
-
-            /* Build a new colony
-            *  Only colonists can do this, and only if they are on a 'colonizeable' tile
-            */
-            if (selectedOne.getTile() != null && selectedOne.canBuildColony()) {
-                ordersMenu.getItem(UNIT_ORDER_BUILD_COL).setEnabled(true);
-            } else {
-                ordersMenu.getItem(UNIT_ORDER_BUILD_COL).setEnabled(false);
-            }
-        }
     }
 
 
@@ -672,25 +477,17 @@ public class FreeColMenuBar extends JMenuBar {
     * not show the "in game options".
     */
     public void setEnabled(boolean enabled) {
-        Iterator componentIterator = inGameOptions.iterator();
-        while (componentIterator.hasNext()) {
-            ((JComponent) componentIterator.next()).setEnabled(enabled);
-        }
+        // Not implemented (and possibly not needed).
 
         update();
     }
-    
+
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-     
-        //Font originalFont = g.getFont();
-        //g.setFont(originalFont.deriveFont(Font.ITALIC));
 
         String displayString =  "Gold: " + freeColClient.getMyPlayer().getGold() + "    |    Year: " + freeColClient.getGame().getTurn().toString();
         Rectangle2D displayStringBounds = g.getFontMetrics().getStringBounds(displayString, g);
         g.drawString(displayString, getWidth()-10-(int)displayStringBounds.getWidth(), 15);
-
-        //g.setFont(originalFont);
     }
 }

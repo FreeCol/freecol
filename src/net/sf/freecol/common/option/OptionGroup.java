@@ -10,7 +10,7 @@ import org.w3c.dom.*;
 /**
 * Used for grouping objects of {@link Option}s.
 */
-public class OptionGroup extends Option {
+public class OptionGroup extends AbstractOption {
     public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
@@ -33,27 +33,6 @@ public class OptionGroup extends Option {
         options = new ArrayList();
     }
 
-
-    /**
-    * Creates an <code>OptionGroup</code> from an XML representation.
-    *
-    * <br><br>
-    *
-    * @param element The XML <code>Element</code> from which this object
-    *                should be constructed.
-    */
-    public OptionGroup(Element element) {
-        options = new ArrayList();
-        readFromXMLElement(element);
-    }
-
-
-    /**
-    * Empty constructor to be used by subclasses.
-    */    
-    protected OptionGroup() {
-        options = new ArrayList();
-    }
 
 
     /**
@@ -83,40 +62,6 @@ public class OptionGroup extends Option {
 
 
     /**
-    * Writes the attributes and add the child nodes for this <code>OptionGroup</code>.
-    * Should be called by subclasses from their own <code>writeAttributes</code>
-    * in order to keep the superclass' values.
-    *
-    * @param element The XML <code>Element</code> in which the attributes and
-    *                child nodes should be added.
-    */
-    protected void writeAttributes(Element optionGroupElement) {
-        super.writeAttributes(optionGroupElement);
-
-        Document document = optionGroupElement.getOwnerDocument();
-
-        Iterator oi = options.iterator();
-        while (oi.hasNext()) {
-            optionGroupElement.appendChild(((Option) oi.next()).toXMLElement(document));
-        }
-    }
-
-
-    /**
-    * Reads the attributes and child nodes from the given <code>Element</code>
-    * and uses this information to update this object.
-    * Should be called by subclasses for their own <code>readAttributes</code>
-    * in order to read the superclass' values.
-    *
-    * @param element The XML <code>Element</code> in which the attributes and
-    *                child nodes should be read from.
-    */    
-    protected void readAttributes(Element optionGroupElement) {
-        throw new UnsupportedOperationException();
-    }
-
-
-    /**
     * Makes an XML-representation of this object.
     *
     * @param document The document to use when creating new componenets.
@@ -125,7 +70,10 @@ public class OptionGroup extends Option {
     public Element toXMLElement(Document document) {
         Element optionGroupElement = document.createElement(getXMLElementTagName());
 
-        writeAttributes(optionGroupElement);
+        Iterator oi = options.iterator();
+        while (oi.hasNext()) {
+            optionGroupElement.appendChild(((Option) oi.next()).toXMLElement(document));
+        }
 
         return optionGroupElement;
     }

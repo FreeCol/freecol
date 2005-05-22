@@ -10,7 +10,7 @@ import org.w3c.dom.*;
 /**
 * Represents an option where the valid choice is an integer.
 */
-public class IntegerOption extends Option {
+public class IntegerOption extends AbstractOption {
     private static Logger logger = Logger.getLogger(IntegerOption.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
@@ -47,20 +47,6 @@ public class IntegerOption extends Option {
         this.maximumValue = maximumValue;
     }
 
-
-    /**
-    * Creates an <code>IntegerOption</code> from an XML representation.
-    *
-    * <br><br>
-    *
-    * @param element The XML <code>Element</code> from which this object
-    *                should be constructed.
-    */
-    public IntegerOption(Element element) {
-        readFromXMLElement(element);
-    }
-
-    
 
     
     /**
@@ -102,14 +88,9 @@ public class IntegerOption extends Option {
     * @return The DOM-element ("Document Object Model") made to represent this "IntegerOption".
     */
     public Element toXMLElement(Document document) {
-        Element optionElement = document.createElement(getXMLElementTagName());
-
-        super.writeAttributes(optionElement);
+        Element optionElement = document.createElement(getId());
 
         optionElement.setAttribute("value", Integer.toString(value));
-        optionElement.setAttribute("defaultValue", Integer.toString(defaultValue));
-        optionElement.setAttribute("minimumValue", Integer.toString(minimumValue));
-        optionElement.setAttribute("maximumValue", Integer.toString(maximumValue));
 
         return optionElement;
     }
@@ -120,18 +101,7 @@ public class IntegerOption extends Option {
     * @param optionElement The DOM-element ("Document Object Model") made to represent this "IntegerOption".
     */
     public void readFromXMLElement(Element optionElement) {
-        super.readAttributes(optionElement);
-
         value = Integer.parseInt(optionElement.getAttribute("value"));
-        defaultValue = Integer.parseInt(optionElement.getAttribute("defaultValue"));
-
-        if (optionElement.hasAttribute("minimumValue")) {
-            minimumValue = Integer.parseInt(optionElement.getAttribute("minimumValue"));
-            maximumValue = Integer.parseInt(optionElement.getAttribute("maximumValue"));
-        } else { // Support for old protocols:
-            minimumValue = 0;
-            maximumValue = 10000;
-        }
     }
 
 

@@ -13,6 +13,8 @@ import java.util.MissingResourceException;
 import java.util.logging.Logger;
 import java.util.Iterator;
 import java.util.ArrayList;
+import java.util.List;
+import javax.swing.filechooser.FileFilter;
 import java.io.File;
 
 import javax.swing.JComponent;
@@ -22,6 +24,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
+import net.sf.freecol.client.gui.action.FreeColAction;
 import net.sf.freecol.client.gui.panel.ChatPanel;
 import net.sf.freecol.client.gui.panel.ColopediaPanel;
 import net.sf.freecol.client.gui.panel.ReportForeignAffairPanel;
@@ -45,8 +48,7 @@ import net.sf.freecol.client.gui.panel.EmigrationPanel;
 import net.sf.freecol.client.gui.panel.IndianSettlementPanel;
 import net.sf.freecol.client.gui.panel.ServerListPanel;
 import net.sf.freecol.client.gui.panel.GameOptionsDialog;
-
-import net.sf.freecol.client.gui.panel.MapControls;
+import net.sf.freecol.client.gui.panel.ClientOptionsDialog;
 
 import net.sf.freecol.client.gui.panel.ImageProvider;
 
@@ -136,9 +138,10 @@ public final class Canvas extends JLayeredPane {
     private final ReportIndianPanel        reportIndianPanel;
     private final ServerListPanel   serverListPanel;
     private final GameOptionsDialog gameOptionsDialog;
+    private final ClientOptionsDialog clientOptionsDialog;
     private TakeFocusThread         takeFocusThread;
-    private MapControls             mapControls;
     private JMenuBar                jMenuBar;
+    private final List actionList = new ArrayList();
 
 
 
@@ -183,6 +186,7 @@ public final class Canvas extends JLayeredPane {
         reportForeignAffairPanel = new ReportForeignAffairPanel(this);
         reportIndianPanel = new ReportIndianPanel(this);
         gameOptionsDialog = new GameOptionsDialog(this, freeColClient);
+        clientOptionsDialog = new ClientOptionsDialog(this, freeColClient);
 
         showMainPanel();
 
@@ -205,6 +209,13 @@ public final class Canvas extends JLayeredPane {
 
 
 
+    /**
+    * Returns the <code>ClientOptionsDialog</code>.
+    * @see ClientOptions
+    */
+    public ClientOptionsDialog getClientOptionsDialog() {
+        return clientOptionsDialog;
+    }
 
 
     /**
@@ -482,13 +493,49 @@ public final class Canvas extends JLayeredPane {
         gameOptionsDialog.initialize();
 
         gameOptionsDialog.setLocation(getWidth() / 2 - gameOptionsDialog.getWidth() / 2, getHeight() / 2 - gameOptionsDialog.getHeight() / 2);
-        add(gameOptionsDialog, new Integer(POPUP_LAYER.intValue() - 1));
+        add(gameOptionsDialog, new Integer(POPUP_LAYER.intValue() - 2));
         gameOptionsDialog.requestFocus();
 
         boolean r = gameOptionsDialog.getResponseBoolean();
         remove(gameOptionsDialog);
-        
+
         return r;
+    }
+    
+    
+    /**
+    * Displays a dialog for setting client options.
+    * @return <code>true</code> if the client options have been modified,
+    *         and <code>false</code> otherwise.
+    */
+    public boolean showClientOptionsDialog() {
+        clientOptionsDialog.initialize();
+
+        clientOptionsDialog.setLocation(getWidth() / 2 - clientOptionsDialog.getWidth() / 2, getHeight() / 2 - clientOptionsDialog.getHeight() / 2);
+        add(clientOptionsDialog, new Integer(POPUP_LAYER.intValue() - 2));
+        clientOptionsDialog.requestFocus();
+
+        boolean r = clientOptionsDialog.getResponseBoolean();
+        remove(clientOptionsDialog);
+
+        return r;
+    }
+
+
+    /**
+    * Displays a dialog where the user may choose a file.
+    * This is the same as calling:
+    *
+    * <br><br><code>
+    * showLoadDialog(directory, new FileFilter[] {FreeColDialog.getFSGFileFilter()});
+    * </code>
+    *
+    * @param directory The directory containing the files.
+    * @return The <code>File</code>.
+    * @see FreeColDialog
+    */
+    public File showLoadDialog(File directory) {
+        return showLoadDialog(directory, new FileFilter[] {FreeColDialog.getFSGFileFilter()});
     }
 
 
@@ -499,10 +546,10 @@ public final class Canvas extends JLayeredPane {
     * @return The <code>File</code>.
     * @see FreeColDialog
     */
-    public File showLoadDialog(File directory) {
-        FreeColDialog loadDialog = FreeColDialog.createLoadDialog(directory);
+    public File showLoadDialog(File directory, FileFilter[] fileFilters) {
+        FreeColDialog loadDialog = FreeColDialog.createLoadDialog(directory, fileFilters);
         loadDialog.setLocation(getWidth() / 2 - loadDialog.getWidth() / 2, getHeight() / 2 - loadDialog.getHeight() / 2);
-        add(loadDialog, new Integer(POPUP_LAYER.intValue() - 1));
+        add(loadDialog, new Integer(POPUP_LAYER.intValue()-1));
         loadDialog.requestFocus();
 
         File response = (File) loadDialog.getResponse();
@@ -515,6 +562,11 @@ public final class Canvas extends JLayeredPane {
 
     /**
     * Displays a dialog where the user may choose a filename.
+    * This is the same as calling:
+    *
+    * <br><br><code>
+    * showSaveDialog(directory, new FileFilter[] {FreeColDialog.getFSGFileFilter()});
+    * </code>
     *
     * @param directory The directory containing the files in which the
     *                  user may overwrite.
@@ -522,9 +574,22 @@ public final class Canvas extends JLayeredPane {
     * @see FreeColDialog
     */
     public File showSaveDialog(File directory) {
-        FreeColDialog saveDialog = FreeColDialog.createSaveDialog(directory);
+        return showSaveDialog(directory, ".fsg", new FileFilter[] {FreeColDialog.getFSGFileFilter()});
+    }
+
+
+    /**
+    * Displays a dialog where the user may choose a filename.
+    *
+    * @param directory The directory containing the files in which the
+    *                  user may overwrite.
+    * @return The <code>File</code>.
+    * @see FreeColDialog
+    */
+    public File showSaveDialog(File directory, String standardName, FileFilter[] fileFilters) {
+        FreeColDialog saveDialog = FreeColDialog.createSaveDialog(directory, standardName, fileFilters);
         saveDialog.setLocation(getWidth() / 2 - saveDialog.getWidth() / 2, getHeight() / 2 - saveDialog.getHeight() / 2);
-        add(saveDialog, new Integer(POPUP_LAYER.intValue() - 1));
+        add(saveDialog, new Integer(POPUP_LAYER.intValue()-1));
         saveDialog.requestFocus();
 
         File response = (File) saveDialog.getResponse();
@@ -886,7 +951,6 @@ public final class Canvas extends JLayeredPane {
             europePanel.initialize(freeColClient.getMyPlayer().getEurope(), freeColClient.getGame());
             europePanel.setLocation(getWidth() / 2 - europePanel.getWidth() / 2,
                                     getHeight() / 2 - europePanel.getHeight() / 2);
-            mapControls.removeFromComponent(this);
             setEnabled(false);
             add(europePanel);
 
@@ -909,7 +973,6 @@ public final class Canvas extends JLayeredPane {
         colonyPanel.initialize(colony, freeColClient.getGame());
         colonyPanel.setLocation(getWidth() / 2 - colonyPanel.getWidth() / 2,
                                 getHeight() / 2 - colonyPanel.getHeight() / 2);
-        mapControls.removeFromComponent(this);
         setEnabled(false);
         add(colonyPanel);
 
@@ -969,6 +1032,16 @@ public final class Canvas extends JLayeredPane {
             ((FreeColMenuBar) jMenuBar).update();
         }
     }
+ 
+    
+    /**
+    * Creates and sets a <code>FreeColMenuBar</code> on this <code>Canvas</code>.
+    * @see FreeColMenuBar
+    */
+    public void resetFreeColMenuBar() {
+        FreeColMenuBar freeColMenuBar = new FreeColMenuBar(freeColClient, this, freeColClient.getGUI());
+        setJMenuBar(freeColMenuBar);
+    }
 
 
     /**
@@ -983,14 +1056,14 @@ public final class Canvas extends JLayeredPane {
             }
 
             Rectangle bounds = comp.getBounds();
-            setEnabled(true);
             super.remove(comp);
+            setEnabled(true);
+            updateJMenuBar();
+            freeColClient.getActionManager().update();
 
             if (takeFocus) {
                 takeFocus();
             }
-
-            updateJMenuBar();
 
             repaint(bounds.x, bounds.y, bounds.width, bounds.height);
         }
@@ -1013,6 +1086,7 @@ public final class Canvas extends JLayeredPane {
 
         Component c = super.add(comp);
         updateJMenuBar();
+        freeColClient.getActionManager().update();
 
         return c;
     }
@@ -1035,6 +1109,7 @@ public final class Canvas extends JLayeredPane {
 
         super.add(comp, i);
         updateJMenuBar();
+        freeColClient.getActionManager().update();
     }
 
 
@@ -1095,38 +1170,15 @@ public final class Canvas extends JLayeredPane {
         for (int i = 0; i < getComponentCount(); i++) {
             getComponent(i).setEnabled(b);
         }
+
         /*
         if (jMenuBar != null) {
             jMenuBar.setEnabled(b);
         }
         */
+        freeColClient.getActionManager().update();
+
         super.setEnabled(b);
-    }
-
-
-    /**
-    * Shows the map controls on this Canvas.
-    * @see MapControls
-    */
-    public void showMapControls() {
-        mapControls.addToComponent(this);
-        takeFocus();
-    }
-
-
-    /**
-    * Sets the map controls.
-    */
-    public void setMapControls(MapControls mapControls) {
-        this.mapControls = mapControls;
-    }
-
-
-    /**
-    * Gets the map controls.
-    */
-    public MapControls getMapControls() {
-        return mapControls;
     }
 
 
@@ -1427,10 +1479,6 @@ public final class Canvas extends JLayeredPane {
             removeMouseMotionListener(mouseMotionListeners[i]);
         }
 
-        if (mapControls != null) {
-            mapControls.removeFromComponent(this);
-        }
-
         if (jMenuBar != null) {
             remove(jMenuBar);
         }
@@ -1461,12 +1509,14 @@ public final class Canvas extends JLayeredPane {
         return gui;
     }
 
+
     /** Returns the freeColClient.
     * @return The <code>freeColClient</code> associated with this <code>Canvas</code>.
     */
     public FreeColClient getClient() {
       return freeColClient;
     }
+
 
     /**
      * Displays a quit dialog and, if desired, logouts the current game and shows the new game panel.
