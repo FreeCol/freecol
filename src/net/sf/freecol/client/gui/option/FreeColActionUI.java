@@ -10,10 +10,13 @@ import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyListener;
+import java.awt.image.BufferedImage;
 import java.awt.FlowLayout;
+import java.awt.Graphics2D;
 import java.awt.BorderLayout;
 import java.util.Iterator;
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
 import javax.swing.JTextField;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
@@ -38,6 +41,7 @@ public final class FreeColActionUI extends JPanel implements OptionUpdater, Acti
     private final OptionGroupUI optionGroupUI;
     private KeyStroke keyStroke;
     private JButton recordButton;
+    private JButton removeButton;
     private BlinkingLabel bl;
 
 
@@ -60,13 +64,52 @@ public final class FreeColActionUI extends JPanel implements OptionUpdater, Acti
         bl = new BlinkingLabel();
         p1.add(bl);
 
-        recordButton = new JButton("O");
+        recordButton = new JButton(getRecordImage());
         recordButton.addActionListener(this);
         p1.add(recordButton);
+        
+        removeButton = new JButton(getRemoveImage());
+        removeButton.addActionListener(this);
+        p1.add(removeButton);
         
         add(p1, BorderLayout.EAST);
 
         setOpaque(false);
+    }
+
+    
+    /**
+    * Creates an icon for symbolizing the recording of a <code>KeyStroke</code>.
+    */
+    public static ImageIcon getRecordImage() {
+        BufferedImage bi = new BufferedImage(9, 9, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = bi.createGraphics();
+        g.setColor(Color.RED);
+        g.fillOval(0, 0, 9, 9);
+        g.setColor(Color.BLACK);
+        g.drawOval(0, 0, 9, 9);
+
+        return new ImageIcon(bi);
+    }
+    
+    
+    /**
+    * Creates an icon to be used on the button that removes a keyboard accelerator.
+    */
+    public static ImageIcon getRemoveImage() {
+        BufferedImage bi = new BufferedImage(9, 9, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = bi.createGraphics();
+        /*g.fillRect(0, 0, 9, 9);*/
+        g.setColor(Color.BLACK);
+        g.drawLine(1, 0, 8, 7);
+        g.drawLine(0, 1, 7, 8);
+        g.drawLine(7, 0, 0, 7);
+        g.drawLine(9, 0, 0, 9);
+        g.setColor(Color.RED);
+        g.drawLine(0, 0, 8, 8);
+        g.drawLine(8, 0, 0, 8);
+
+        return new ImageIcon(bi);
     }
 
 
@@ -116,8 +159,14 @@ public final class FreeColActionUI extends JPanel implements OptionUpdater, Acti
 
     
     public void actionPerformed(ActionEvent evt) {
-        bl.startBlinking();
-        bl.requestFocus();
+        if (evt.getSource() == recordButton) {
+            bl.startBlinking();
+            bl.requestFocus();
+        } else if (evt.getSource() == removeButton) {
+            bl.stopBlinking();
+            bl.setText(" ");
+            keyStroke = null;
+        }
     }
 
 
@@ -127,7 +176,7 @@ public final class FreeColActionUI extends JPanel implements OptionUpdater, Acti
     */
     class BlinkingLabel extends JLabel implements ActionListener, KeyListener {
 
-        private Timer blinkingTimer = new Timer(1000, this);
+        private Timer blinkingTimer = new Timer(500, this);
         private boolean blinkOn = false;
 
         BlinkingLabel() {
@@ -159,6 +208,10 @@ public final class FreeColActionUI extends JPanel implements OptionUpdater, Acti
         }
 
         public void actionPerformed(ActionEvent evt) {
+            if (!hasFocus()) {
+                stopBlinking();
+            }
+
             if (blinkOn) {
                 setOpaque(false);
                 blinkOn = false;
