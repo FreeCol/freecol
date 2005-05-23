@@ -31,6 +31,7 @@ import net.sf.freecol.client.gui.panel.ReportForeignAffairPanel;
 import net.sf.freecol.client.gui.panel.ReportIndianPanel;
 import net.sf.freecol.client.gui.panel.ReportLabourPanel;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
+import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.MainPanel;
 import net.sf.freecol.client.gui.panel.NewPanel;
 import net.sf.freecol.client.gui.panel.ErrorPanel;
@@ -39,6 +40,7 @@ import net.sf.freecol.client.gui.panel.ReportReligiousPanel;
 import net.sf.freecol.client.gui.panel.StartGamePanel;
 import net.sf.freecol.client.gui.panel.QuitDialog;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
+import net.sf.freecol.client.gui.panel.InfoPanel;
 import net.sf.freecol.client.gui.panel.EuropePanel;
 import net.sf.freecol.client.gui.panel.StatusPanel;
 import net.sf.freecol.client.gui.panel.VictoryPanel;
@@ -481,6 +483,27 @@ public final class Canvas extends JLayeredPane {
         remove(confirmDialog);
 
         return response;
+    }
+
+    
+    /**
+    * Is this <code>Canvas</code> displaying another panel.
+    * {@link InfoPanel} and {@link Minimap} is ignored..
+    */
+    public boolean isShowingSubPanel() {
+        if (getColonyPanel().isShowing() || getEuropePanel().isShowing()) {
+            return true;
+        }
+        
+        Component[] comps = getComponents();
+        for (int i=0; i < comps.length; i++) {
+            if (comps[i] instanceof FreeColPanel && !(comps[i] instanceof InfoPanel)) {
+
+                return true;
+            }
+        }
+        
+        return false;
     }
 
 

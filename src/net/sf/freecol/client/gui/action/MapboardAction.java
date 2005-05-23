@@ -42,5 +42,10 @@ public abstract class MapboardAction extends FreeColAction {
                     && !getFreeColClient().getCanvas().getChooseFoundingFatherDialog().isShowing()
                     && !getFreeColClient().getCanvas().getEventPanel().isShowing());
         }
+
+/*
+        if (enabled) {
+            setEnabled(getFreeColClient().getCanvas() != null && !getFreeColClient().getCanvas().isShowingSubPanel());
+        }*/
     }
 }
