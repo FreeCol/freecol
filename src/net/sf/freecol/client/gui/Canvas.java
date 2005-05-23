@@ -190,8 +190,6 @@ public final class Canvas extends JLayeredPane {
         gameOptionsDialog = new GameOptionsDialog(this, freeColClient);
         clientOptionsDialog = new ClientOptionsDialog(this, freeColClient);
 
-        showMainPanel();
-
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
         //takeFocus();
