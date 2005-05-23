@@ -34,18 +34,9 @@ public abstract class MapboardAction extends FreeColAction {
     */
     public void update() {
         super.update();
-        
-        if (enabled) {
-            setEnabled(getFreeColClient().getCanvas() != null
-                    && !getFreeColClient().getCanvas().getColonyPanel().isShowing()
-                    && !getFreeColClient().getCanvas().getEuropePanel().isShowing()
-                    && !getFreeColClient().getCanvas().getChooseFoundingFatherDialog().isShowing()
-                    && !getFreeColClient().getCanvas().getEventPanel().isShowing());
-        }
 
-/*
         if (enabled) {
             setEnabled(getFreeColClient().getCanvas() != null && !getFreeColClient().getCanvas().isShowingSubPanel());
-        }*/
+        }
     }
 }
