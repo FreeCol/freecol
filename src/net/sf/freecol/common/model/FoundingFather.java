@@ -33,7 +33,7 @@ public class FoundingFather {
                             BENJAMIN_FRANKLIN = 19,//TODO
                             WILLIAM_BREWSTER = 20,//TODO: show a panel where you can pick the emigrant.
                             WILLIAM_PENN = 21,
-                            FATHER_JEAN_DE_BREBEUF = 22,//TODO
+                            FATHER_JEAN_DE_BREBEUF = 22,
                             JUAN_DE_SEPULVEDA = 23,//TODO
                             BARTOLOME_DE_LAS_CASAS = 24,
 
@@ -151,7 +151,7 @@ public class FoundingFather {
         if (foundingFather == JACOB_FUGGER || foundingFather == PETER_STUYVESANT ||
                 foundingFather == JAN_DE_WITT || foundingFather == HERNANDO_DE_SOTO ||
                 foundingFather == THOMAS_PAINE || foundingFather == BENJAMIN_FRANKLIN ||
-                foundingFather == FATHER_JEAN_DE_BREBEUF || foundingFather == JUAN_DE_SEPULVEDA) {
+                foundingFather == JUAN_DE_SEPULVEDA) {
             return 0;
         }
         if (age == 1) {

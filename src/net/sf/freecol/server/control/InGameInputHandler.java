@@ -243,7 +243,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalStateException();
         }
 
-        Unit unit = getFreeColServer().getModelController().createUnit(taskID, location, owner, type, false);
+        Unit unit = getFreeColServer().getModelController().createUnit(taskID, location, owner, type, false, connection);
 
         Element reply = Message.createNewRootElement("createUnitConfirmed");
         reply.appendChild(unit.toXMLElement(owner, reply.getOwnerDocument()));

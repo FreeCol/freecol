@@ -598,6 +598,7 @@ public class MapGenerator {
                 Unit unit4 = new Unit(game, startTile, player, Unit.GALLEON, Unit.ACTIVE);
                 Unit unit5 = new Unit(game, unit4, player, Unit.FREE_COLONIST, Unit.SENTRY);
                 Unit unit6 = new Unit(game, unit4, player, Unit.VETERAN_SOLDIER, Unit.SENTRY);
+                Unit unit7 = new Unit(game, unit4, player, Unit.JESUIT_MISSIONARY, Unit.SENTRY);
 
                 Tile colonyTile = null;
                 Iterator cti = map.getFloodFillIterator(new Position(x, y));

@@ -498,11 +498,10 @@ public final class Canvas extends JLayeredPane {
         Component[] comps = getComponents();
         for (int i=0; i < comps.length; i++) {
             if (comps[i] instanceof FreeColPanel && !(comps[i] instanceof InfoPanel)) {
-
                 return true;
             }
         }
-        
+
         return false;
     }
 
@@ -1084,7 +1083,7 @@ public final class Canvas extends JLayeredPane {
             updateJMenuBar();
             freeColClient.getActionManager().update();
 
-            if (takeFocus) {
+            if (takeFocus && !isShowingSubPanel()) {
                 takeFocus();
             }
 

@@ -4,7 +4,7 @@ package net.sf.freecol.server.control;
 import net.sf.freecol.common.model.*;
 import net.sf.freecol.server.model.*;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.*;
 import org.w3c.dom.*;
 import java.util.HashMap;
 import java.util.logging.Logger;
@@ -107,7 +107,7 @@ public class ServerModelController implements ModelController {
     * @param type   The type of unit (Unit.FREE_COLONIST...).
     */
     public synchronized Unit createUnit(String taskID, Location location, Player owner, int type) {
-        return createUnit(taskID, location, owner, type, true);
+        return createUnit(taskID, location, owner, type, true, null);
     }
 
 
@@ -129,8 +129,10 @@ public class ServerModelController implements ModelController {
     * @param secure This variable should be set to <code>false</code> in case this method
     *               is called when serving a client. Setting this variable to <code>false</code>
     *               signals that the request might be illegal.
+    * @param connection The connection that has requested to create the unit, or null if this
+    *               request is internal to the server.
     */
-    public synchronized Unit createUnit(String taskID, Location location, Player owner, int type, boolean secure) {
+    public synchronized Unit createUnit(String taskID, Location location, Player owner, int type, boolean secure, Connection connection) {
         String extendedTaskID = taskID + owner.getID() + Integer.toString(freeColServer.getGame().getTurn().getNumber());
         Unit unit;
 
@@ -156,6 +158,11 @@ public class ServerModelController implements ModelController {
             }
         } else {
             unit = new Unit(freeColServer.getGame(), location, owner, type, Unit.ACTIVE);
+            if (connection == null) {
+                update(unit, null);
+            } else {
+                update(unit, freeColServer.getPlayer(connection));
+            }
             TaskEntry taskEntry = new TaskEntry(extendedTaskID, freeColServer.getGame().getTurn().getNumber(), secure, unit);
             taskRegister.put(extendedTaskID, taskEntry);
         }
@@ -163,7 +170,7 @@ public class ServerModelController implements ModelController {
         return unit;
     }
 
-
+    
     /**
     * Puts the specified <code>Unit</code in America.
     * @param unit The <code>Unit</code>.
@@ -250,6 +257,32 @@ public class ServerModelController implements ModelController {
                 if (enemyPlayer.canSee(newTile)) {
                     Element updateElement = Message.createNewRootElement("update");
                     updateElement.appendChild(newTile.toXMLElement(enemyPlayer, updateElement.getOwnerDocument()));
+
+                    enemyPlayer.getConnection().send(updateElement);
+                }
+            } catch (IOException e) {
+                logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection " + enemyPlayer.getConnection());
+            }
+        }
+    }
+    
+    
+    public void update(Unit unit, Player p) {
+        ServerPlayer player = (ServerPlayer) p;
+        Game game = freeColServer.getGame();
+
+        Iterator enemyPlayerIterator = game.getPlayerIterator();
+        while (enemyPlayerIterator.hasNext()) {
+            ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
+
+            if (player != null && player.equals(enemyPlayer)) {
+                continue;
+            }
+
+            try {
+                if (unit.isVisibleTo(enemyPlayer)) {
+                    Element updateElement = Message.createNewRootElement("update");
+                    updateElement.appendChild(unit.getTile().toXMLElement(enemyPlayer, updateElement.getOwnerDocument()));
 
                     enemyPlayer.getConnection().send(updateElement);
                 }

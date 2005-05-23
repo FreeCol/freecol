@@ -14,6 +14,12 @@ import org.w3c.dom.Document;
 
 /**
 * The main component of the game model.
+*
+* <br><br>
+*
+* If an object of this class returns a non-null result to {@link #getViewOwner},
+* then this object just represents a view of the game from a single player's
+* perspective. In that case, some information might be missing from the model.
 */
 public class Game extends FreeColGameObject {
     public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
@@ -33,6 +39,12 @@ public class Game extends FreeColGameObject {
 
     /** The name of the player whose turn it is.*/
     private Player currentPlayer = null;
+
+    /**
+     * The owner of this view of the game, or <code>null</code> if this
+     * game has all the information.
+     */
+    private Player viewOwner;
 
     /** The maximum number of (human) players allowed in this game */
     private int maxPlayers = 4;
@@ -65,6 +77,8 @@ public class Game extends FreeColGameObject {
         super(null);
 
         this.modelController = modelController;
+        this.viewOwner = null;
+
         gameOptions = new GameOptions();
 
         currentPlayer = null;
@@ -82,6 +96,7 @@ public class Game extends FreeColGameObject {
 
         setFreeColGameObjectListener(freeColGameObjectListener);
         this.modelController = modelController;
+        this.viewOwner = null;
 
         canGiveID = true;
 
@@ -101,20 +116,38 @@ public class Game extends FreeColGameObject {
     /**
     * Initiate a new <code>Game</code> object from a <code>Element</code>
     * in a DOM-parsed XML-tree.
+    * @param viewOwner The username of the owner of this view of the game.
     */
-    public Game(ModelController modelController, Element element) {
+    public Game(ModelController modelController, Element element, String viewOwnerUsername) {
         super(null, element);
 
         this.modelController = modelController;
 
         canGiveID = false;
         readFromXMLElement(element);
+        this.viewOwner = getPlayerByName(viewOwnerUsername);
     }
 
 
 
     public ModelController getModelController() {
         return modelController;
+    }
+
+
+    /**
+     * Returns the owner of this view of the game, or <code>null</code>
+     * if this game has all the information.
+     * <br><br>
+     * If this value is <code>null</code>, then it means that this 
+     * <code>Game</code> object has access to all information 
+     * (ie is the server model).
+     *
+     * @return The <code>Player</code> using this <code>Game</code>-object
+     *         as a view.
+     */
+    public Player getViewOwner() {
+        return viewOwner;
     }
 
 

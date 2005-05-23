@@ -54,7 +54,7 @@ public final class DragListener extends MouseAdapter {
             UnitLabel unitLabel = (UnitLabel)comp;
             Unit tempUnit = unitLabel.getUnit();
 
-            if (tempUnit.isColonist()) {
+            if (tempUnit.isColonist() || tempUnit.getType() == Unit.INDIAN_CONVERT) {
                 JPopupMenu menu = new JPopupMenu("Unit");
                 JMenuItem menuItem;
 
@@ -105,85 +105,87 @@ public final class DragListener extends MouseAdapter {
                 }
 
 
-                if (!tempUnit.isPioneer() && !tempUnit.isMissionary() && tempUnit.canArm()) {
-                    if (tempUnit.isArmed()) {
-                        menuItem = new JMenuItem("Disarm");
-                    } else {
-                        if (tempUnit.getLocation() instanceof Europe) {
-                            menuItem = new JMenuItem("Arm (" + tempUnit.getGame().getMarket().getBidPrice(Goods.MUSKETS, 50) + " gold)");
+                if (tempUnit.isColonist()) {
+                    if (!tempUnit.isPioneer() && !tempUnit.isMissionary() && tempUnit.canArm()) {
+                        if (tempUnit.isArmed()) {
+                            menuItem = new JMenuItem("Disarm");
                         } else {
-                            menuItem = new JMenuItem("Arm");
-                        }
-                    }
-                    menuItem.setActionCommand(String.valueOf(UnitLabel.ARM));
-                    menuItem.addActionListener(unitLabel);
-                    menu.add(menuItem);
-                }
-
-                if (!tempUnit.isPioneer() && !tempUnit.isMissionary() && tempUnit.canMount()) {
-                    if (tempUnit.isMounted()) {
-                        menuItem = new JMenuItem("Remove Horses");
-                    } else {
-                        if (tempUnit.getLocation() instanceof Europe) {
-                            menuItem = new JMenuItem("Mount (" + tempUnit.getGame().getMarket().getBidPrice(Goods.HORSES, 50) + " gold)");
-                        } else {
-                            menuItem = new JMenuItem("Mount");
-                        }
-                    }
-                    menuItem.setActionCommand(String.valueOf(UnitLabel.MOUNT));
-                    menuItem.addActionListener(unitLabel);
-                    menu.add(menuItem);
-                }
-
-                if (!tempUnit.isArmed() && !tempUnit.isMounted() && !tempUnit.isMissionary() && tempUnit.canEquipWithTools()) {
-                    if (tempUnit.isPioneer()) {
-                        menuItem = new JMenuItem("Remove Tools");
-                    } else {
-                        if (tempUnit.getLocation() instanceof Europe) {
-                            int amount = 100;
-                            int price = tempUnit.getGame().getMarket().getBidPrice(Goods.TOOLS, amount);
-                            if (price <= tempUnit.getOwner().getGold()) {
-                                menuItem = new JMenuItem("Equip with Tools (" + price + " gold)");
+                            if (tempUnit.getLocation() instanceof Europe) {
+                                menuItem = new JMenuItem("Arm (" + tempUnit.getGame().getMarket().getBidPrice(Goods.MUSKETS, 50) + " gold)");
                             } else {
-                                while (price > tempUnit.getOwner().getGold()) {
-                                    amount -= 20;
-                                    price = tempUnit.getGame().getMarket().getBidPrice(Goods.TOOLS, amount);
-                                }
-                                menuItem = new JMenuItem("Equip with " + amount + " Tools (" + price + " gold)");
-
+                                menuItem = new JMenuItem("Arm");
                             }
-                        } else {
-                            menuItem = new JMenuItem("Equip with Tools");
                         }
-                    }
-                    menuItem.setActionCommand(String.valueOf(UnitLabel.TOOLS));
-                    menuItem.addActionListener(unitLabel);
-                    menu.add(menuItem);
-                }
-
-                if (!tempUnit.isArmed() && !tempUnit.isMounted() && !tempUnit.isPioneer() && tempUnit.canDressAsMissionary()) {
-
-                    if (tempUnit.isMissionary()) {
-                        menuItem = new JMenuItem("Take Off Silly Clothes");
-                    } else {
-                        menuItem = new JMenuItem("Dress as Missionaries");
-                    }
-                    menuItem.setActionCommand(String.valueOf(UnitLabel.DRESS));
-                    menuItem.addActionListener(unitLabel);
-                    menu.add(menuItem);
-                }
-
-                if (tempUnit.getType() != Unit.INDIAN_CONVERT && tempUnit.getType() != Unit.PETTY_CRIMINAL &&
-                        tempUnit.getType() != Unit.INDENTURED_SERVANT && tempUnit.getType() != Unit.FREE_COLONIST) {
-
-                    if (menu.getSubElements().length > 0) {
-                        menu.addSeparator();
+                        menuItem.setActionCommand(String.valueOf(UnitLabel.ARM));
+                        menuItem.addActionListener(unitLabel);
+                        menu.add(menuItem);
                     }
 
-                    menuItem = new JMenuItem("Clear speciality");
-                    menuItem.setActionCommand(String.valueOf(UnitLabel.CLEAR_SPECIALITY));
-                    menuItem.addActionListener(unitLabel);
-                    menu.add(menuItem);
+                    if (!tempUnit.isPioneer() && !tempUnit.isMissionary() && tempUnit.canMount()) {
+                        if (tempUnit.isMounted()) {
+                            menuItem = new JMenuItem("Remove Horses");
+                        } else {
+                            if (tempUnit.getLocation() instanceof Europe) {
+                                menuItem = new JMenuItem("Mount (" + tempUnit.getGame().getMarket().getBidPrice(Goods.HORSES, 50) + " gold)");
+                            } else {
+                                menuItem = new JMenuItem("Mount");
+                            }
+                        }
+                        menuItem.setActionCommand(String.valueOf(UnitLabel.MOUNT));
+                        menuItem.addActionListener(unitLabel);
+                        menu.add(menuItem);
+                    }
+
+                    if (!tempUnit.isArmed() && !tempUnit.isMounted() && !tempUnit.isMissionary() && tempUnit.canEquipWithTools()) {
+                        if (tempUnit.isPioneer()) {
+                            menuItem = new JMenuItem("Remove Tools");
+                        } else {
+                            if (tempUnit.getLocation() instanceof Europe) {
+                                int amount = 100;
+                                int price = tempUnit.getGame().getMarket().getBidPrice(Goods.TOOLS, amount);
+                                if (price <= tempUnit.getOwner().getGold()) {
+                                    menuItem = new JMenuItem("Equip with Tools (" + price + " gold)");
+                                } else {
+                                    while (price > tempUnit.getOwner().getGold()) {
+                                        amount -= 20;
+                                        price = tempUnit.getGame().getMarket().getBidPrice(Goods.TOOLS, amount);
+                                    }
+                                    menuItem = new JMenuItem("Equip with " + amount + " Tools (" + price + " gold)");
+
+                                }
+                            } else {
+                                menuItem = new JMenuItem("Equip with Tools");
+                            }
+                        }
+                        menuItem.setActionCommand(String.valueOf(UnitLabel.TOOLS));
+                        menuItem.addActionListener(unitLabel);
+                        menu.add(menuItem);
+                    }
+
+                    if (!tempUnit.isArmed() && !tempUnit.isMounted() && !tempUnit.isPioneer() && tempUnit.canDressAsMissionary()) {
+
+                        if (tempUnit.isMissionary()) {
+                            menuItem = new JMenuItem("Take Off Silly Clothes");
+                        } else {
+                            menuItem = new JMenuItem("Dress as Missionaries");
+                        }
+                        menuItem.setActionCommand(String.valueOf(UnitLabel.DRESS));
+                        menuItem.addActionListener(unitLabel);
+                        menu.add(menuItem);
+                    }
+
+                    if (tempUnit.getType() != Unit.INDIAN_CONVERT && tempUnit.getType() != Unit.PETTY_CRIMINAL &&
+                            tempUnit.getType() != Unit.INDENTURED_SERVANT && tempUnit.getType() != Unit.FREE_COLONIST) {
+
+                        if (menu.getSubElements().length > 0) {
+                            menu.addSeparator();
+                        }
+
+                        menuItem = new JMenuItem("Clear speciality");
+                        menuItem.setActionCommand(String.valueOf(UnitLabel.CLEAR_SPECIALITY));
+                        menuItem.addActionListener(unitLabel);
+                        menu.add(menuItem);
+                    }
                 }
 
                 if (menu.getSubElements().length > 0) {

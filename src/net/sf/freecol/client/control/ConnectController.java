@@ -175,7 +175,7 @@ public final class ConnectController {
         String type = reply.getTagName();
 
         if (type.equals("loginConfirmed")) {
-            Game game = new Game(freeColClient.getModelController(), (Element) reply.getElementsByTagName(Game.getXMLElementTagName()).item(0));
+            Game game = new Game(freeColClient.getModelController(), (Element) reply.getElementsByTagName(Game.getXMLElementTagName()).item(0), username);
             Player thisPlayer = game.getPlayerByName(username);
 
             freeColClient.setGame(game);
