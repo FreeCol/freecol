@@ -309,8 +309,12 @@ public class Player extends FreeColGameObject {
 
     /**
     * Creates a unique colony name.
-    * @return A name that is not used by any of this 
-    *         player's colonies.
+    * This is done by fetching a new default colony name from the 
+    * list of default names.
+    *
+    * @return A <code>String</code> containing a new unused colony name
+    *         from the list, if any is available, and otherwise 
+    *         an automatically generated name.
     */
     public String getDefaultColonyName() {
         try {
