@@ -64,7 +64,7 @@ public class ServerModelController implements ModelController {
     /**
     * Removes any entries older than {@link #TASK_ENTRY_TIME_OUT}.
     */
-    public void clearTaskRegister() {
+    public synchronized void clearTaskRegister() {
         int currentTurn = freeColServer.getGame().getTurn().getNumber();
 
         String log = null;

@@ -565,9 +565,14 @@ public final class InGameController implements NetworkConstants {
             defender = map.getNeighbourOrNull(direction, unit.getTile()).getDefendingUnit(unit);
         }
 
-        unit.attack(defender, result, plunderGold);
+        if (defender == null) {
+            logger.warning("defender == null");
+            throw new NullPointerException("defender == null");
+        }
 
-        if (!defender.isVisibleTo(freeColClient.getMyPlayer())) {
+        unit.attack(defender, result, plunderGold);
+        
+        if (!defender.isDisposed() && (defender.getLocation() == null || !defender.isVisibleTo(freeColClient.getMyPlayer()))) {
             defender.dispose();
         }
 

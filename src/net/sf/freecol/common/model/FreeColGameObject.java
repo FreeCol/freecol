@@ -25,6 +25,7 @@ abstract public class FreeColGameObject {
 
     private String id;
     private Game game;
+    private boolean disposed = false;
 
 
 
@@ -113,7 +114,17 @@ abstract public class FreeColGameObject {
     * Removes all references to this object.
     */
     public void dispose() {
+        disposed = true;
         getGame().removeFreeColGameObject(getID());
+    }
+    
+
+    /**
+    * Checks if this object has been disposed.
+    * @see #dispose
+    */
+    public boolean isDisposed() {
+        return disposed;
     }
 
 

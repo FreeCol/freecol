@@ -473,7 +473,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
 
         // Test the parameters:
         if (unit == null) {
-
             throw new IllegalArgumentException("Could not find 'Unit' with specified ID: " + attackElement.getAttribute("unit"));
         }
 
@@ -513,7 +512,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             if (player.equals(enemyPlayer) || enemyPlayer.getConnection() == null) {
                 continue;
             }
-            
+
             if (unit.isVisibleTo(enemyPlayer) || defender.isVisibleTo(enemyPlayer)) {
                 Element opponentAttackElement = Message.createNewRootElement("opponentAttack");
                 opponentAttackElement.setAttribute("direction", Integer.toString(direction));
@@ -526,7 +525,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     opponentAttackElement.setAttribute("update", "defender");
                     opponentAttackElement.appendChild(defender.toXMLElement(enemyPlayer, opponentAttackElement.getOwnerDocument()));
                 } else if (!unit.isVisibleTo(enemyPlayer)) {
-                    opponentAttackElement.setAttribute("update", "unit");                
+                    opponentAttackElement.setAttribute("update", "unit");
                     opponentAttackElement.appendChild(unit.toXMLElement(enemyPlayer, opponentAttackElement.getOwnerDocument()));
                 }
 
@@ -552,7 +551,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
 
         unit.attack(defender, result, plunderGold);
 
-        if (unit.getTile().equals(newTile)) { // In other words, we moved...
+        if (result >= Unit.ATTACK_EVADES && unit.getTile().equals(newTile)) { // In other words, we moved...
             Element update = reply.getOwnerDocument().createElement("update");
             Vector surroundingTiles = game.getMap().getSurroundingTiles(unit.getTile(), unit.getLineOfSight());
 

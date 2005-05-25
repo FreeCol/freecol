@@ -310,19 +310,19 @@ public final class InGameInputHandler extends InputHandler {
             logger.warning("unit == null");
             throw new NullPointerException("unit == null");
         }
-        
+
         if (defender == null) {
             logger.warning("defender == null");
             throw new NullPointerException("defender == null");
         }
-
+        
         unit.attack(defender, result, plunderGold);
 
-        if (!unit.isVisibleTo(getFreeColClient().getMyPlayer())) {
-            unit.dispose();
+        if (!unit.isDisposed() && (unit.getLocation() == null || !unit.isVisibleTo(getFreeColClient().getMyPlayer()))) {
+            unit.dispose(); 
         }
 
-        if (!defender.isVisibleTo(getFreeColClient().getMyPlayer())) {
+        if (!defender.isDisposed() && (defender.getLocation() == null || !defender.isVisibleTo(getFreeColClient().getMyPlayer()))) {
             defender.dispose();
         }
 
