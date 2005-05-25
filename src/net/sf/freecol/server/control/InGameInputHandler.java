@@ -921,13 +921,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
 
         if (action.equals("cancel")) {
             return null;
-        }
-        else if (action.equals("establish")) {
+        } else if (action.equals("establish")) {
             unit.setLocation(settlement);
             settlement.setMissionary(unit);
             return null;
-        }
-        else if (action.equals("heresy")) {
+        } else if (action.equals("heresy")) {
             Element reply = Message.createNewRootElement("missionaryReply");
 
             // TODO: chance needs to depend on amount of crosses that the players who are involved have.
@@ -937,18 +935,16 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 settlement.getMissionary().dispose();
                 unit.setLocation(settlement);
                 settlement.setMissionary(unit);
-            }
-            else {
+            } else {
                 reply.setAttribute("success", "false");
                 unit.dispose();
             }
 
             return reply;
-        }
-        else if (action.equals("incite")) {
+        }  else if (action.equals("incite")) {
             Element reply = Message.createNewRootElement("missionaryReply");
 
-            Player enemy = (Player)game.getFreeColGameObject(element.getAttribute("incite"));
+            Player enemy = (Player) game.getFreeColGameObject(element.getAttribute("incite"));
 
             reply.setAttribute("amount", String.valueOf(Game.getInciteAmount(player, enemy, settlement.getOwner())));
 
@@ -956,8 +952,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             unit.setLocation(settlement);
 
             return reply;
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -993,6 +988,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             // Set the indian player at war with the european player (and vice versa).
             settlement.getOwner().setStance(enemy, Player.WAR);
             enemy.setStance(settlement.getOwner(), Player.WAR);
+            
+            // Increase tension levels:
+            settlement.getOwner().modifyTension(enemy, 500);
+            enemy.modifyTension(settlement.getOwner(), 500);
+            enemy.modifyTension(player, 250);
         }
         // else: no need to do anything: unit's moves are already zero.
 

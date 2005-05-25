@@ -242,7 +242,7 @@ public final class PreGameController {
         gui.setInGame(true);
 
         freeColClient.getCanvas().resetFreeColMenuBar();
-        
+
         Unit activeUnit = freeColClient.getMyPlayer().getNextActiveUnit();
         freeColClient.getMyPlayer().updateCrossesRequired();
         gui.setActiveUnit(activeUnit);
@@ -257,7 +257,7 @@ public final class PreGameController {
         canvas.addMouseMotionListener(new CanvasMouseMotionListener(canvas, gui,  freeColClient.getGame().getMap()));
 
         if (freeColClient.getMyPlayer().equals(freeColClient.getGame().getCurrentPlayer())) {
-            //canvas.takeFocus();
+            canvas.requestFocus();
         } else {
             canvas.setEnabled(false);
             canvas.showStatusPanel("Waiting for the other players to complete their turn...");

@@ -40,7 +40,6 @@ public final class InGameController implements NetworkConstants {
     private final FreeColClient freeColClient;
 
 
-
     /**
     * The constructor to use.
     * @param freeColClient The main controller.
@@ -204,7 +203,8 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        String name = freeColClient.getCanvas().showInputDialog("nameColony.text", "", "nameColony.yes", "nameColony.no");
+        String name = freeColClient.getCanvas().showInputDialog("nameColony.text", 
+                freeColClient.getMyPlayer().getDefaultColonyName(), "nameColony.yes", "nameColony.no");
 
         if (name == null) { // The user cancelled the action.
             return;

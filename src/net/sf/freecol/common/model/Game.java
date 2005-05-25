@@ -685,11 +685,15 @@ public class Game extends FreeColGameObject {
     * attackingPlayer to attack targetPlayer.
     */
     public static int getInciteAmount(Player payingPlayer, Player targetPlayer, Player attackingPlayer) {
-        // TODO: take into account the strength of the three players that are involved.
+        int amount = 0;
+        if (attackingPlayer.getTension(payingPlayer) > attackingPlayer.getTension(targetPlayer)) {
+            amount = 10000;
+        } else {
+            amount = 5000;
+        }
+        amount += 20 * (attackingPlayer.getTension(payingPlayer) - attackingPlayer.getTension(targetPlayer));
 
-        // NOTE: this method should NEVER have any randomisation in it.
-
-        return 1000;
+        return Math.max(amount, 650);
     }
 
 

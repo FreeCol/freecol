@@ -855,7 +855,7 @@ public class IndianSettlement extends Settlement {
             }
         }
 
-        /* Increase convert progress. And generate convert if needed. */
+        /* Increase convert progress and generate convert if needed. */
         if (missionary != null && getGame().getViewOwner() == null) {
             int increment = 8;
 
@@ -968,7 +968,7 @@ public class IndianSettlement extends Settlement {
         indianSettlementElement.setAttribute("wantedGoods2", Integer.toString(wantedGoods2));
         indianSettlementElement.appendChild(toArrayElement("alarm", alarm, document));
         
-        if (missionary != null && (showAll || player == getOwner() || (missionary != null && player == missionary.getOwner()))) {
+        if (missionary != null) {
             indianSettlementElement.setAttribute("missionary", missionary.getID());
         }
 

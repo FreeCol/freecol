@@ -7,6 +7,7 @@ import java.awt.Color;
 import java.util.Vector;
 import java.util.Iterator;
 import java.util.ArrayList;
+import java.util.MissingResourceException;
 
 import net.sf.freecol.common.FreeColException;
 
@@ -164,6 +165,9 @@ public class Player extends FreeColGameObject {
     public static final int REBELLION_POST_WAR = 2;
 
     private int             crossesRequired = -1;
+    
+    // No need for a persistent storage of this variable:
+    private int colonyNameIndex = 0;
 
 
     private Location entryLocation;
@@ -280,6 +284,53 @@ public class Player extends FreeColGameObject {
     */
     public String getDefaultNewLandName() {
         return Messages.message("newLandName." + Integer.toString(getNation()));
+    }
+
+    
+    /**
+    * Returns the <code>Colony</code> with the given name.
+    *
+    * @param name The name of the <code>Colony</code>.
+    * @return The <code>Colony</code> or <code>null</code>
+    *         if this player does not have a <code>Colony</code>
+    *         with the specified name.
+    */
+    public Colony getColony(String name) {
+        Iterator it = getColonyIterator();
+        while (it.hasNext()) {
+            Colony colony = (Colony) it.next();
+            if (colony.getName().equals(name)) {
+                return colony;
+            }
+        }
+        return null;
+    }
+
+
+    /**
+    * Creates a unique colony name.
+    * @return A name that is not used by any of this 
+    *         player's colonies.
+    */
+    public String getDefaultColonyName() {
+        try {
+            String name = "";
+            do {
+                name = Messages.message("newColonyName."
+                        + Integer.toString(getNation()) + "."
+                        + Integer.toString(colonyNameIndex));
+                colonyNameIndex++;
+            } while (getColony(name) != null);
+
+            return name;
+        } catch (MissingResourceException e) {
+            String name = null;
+            do {
+                name = Messages.message("Colony") + colonyNameIndex;
+                colonyNameIndex++;
+            } while (getColony(name) != null);
+            return name;
+        }
     }
 
 
