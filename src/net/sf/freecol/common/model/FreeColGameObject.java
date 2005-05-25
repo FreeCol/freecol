@@ -309,15 +309,16 @@ abstract public class FreeColGameObject {
     * @return <i>true</i> if the two <code>FreeColGameObject</code> are equal and <i>false</i> otherwise.
     */
     public boolean equals(FreeColGameObject o) {
-        if (o == null) {
-            return false;
-        }
-
-        if (getID().equals(o.getID())) {
-            return true;
+        if (o != null) {
+            return getID().equals(o.getID());
         } else {
             return false;
         }
+    }
+    
+    
+    public int hashCode() {
+        return getID().hashCode();
     }
 
     
@@ -326,7 +327,7 @@ abstract public class FreeColGameObject {
     * @return The <code>String</code>
     */
     public String toString() {
-        return getClass().getName() + ": " + getID() + " (hash code: " + Integer.toHexString(hashCode()) + ")";
+        return getClass().getName() + ": " + getID() + " (super's hash code: " + Integer.toHexString(super.hashCode()) + ")";
     }
 
 

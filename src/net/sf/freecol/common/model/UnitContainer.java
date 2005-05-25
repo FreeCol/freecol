@@ -73,7 +73,7 @@ public class UnitContainer extends FreeColGameObject {
     * Adds a <code>Unit</code> to this containter.
     * @param u The Unit to add to this container.
     */
-    public void addUnit(Unit unit) {
+    public void addUnit(Unit unit) {    
         if (!units.contains(unit)) {
             units.add(unit);
         }

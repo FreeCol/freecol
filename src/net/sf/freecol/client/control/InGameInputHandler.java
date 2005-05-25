@@ -288,6 +288,12 @@ public final class InGameInputHandler extends InputHandler {
                     throw new NullPointerException("unit.getTile() == null");
                 }
             } else if (opponentAttackElement.getAttribute("update").equals("defender")) {
+                Element defenderTileElement = Message.getChildElement(opponentAttackElement, Tile.getXMLElementTagName());
+                if (defenderTileElement != null) {
+                    Tile defenderTile = (Tile) game.getFreeColGameObject(defenderTileElement.getAttribute("ID"));
+                    defenderTile.readFromXMLElement(defenderTileElement);
+                }
+
                 Element defenderElement = Message.getChildElement(opponentAttackElement, Unit.getXMLElementTagName());
                 if (defenderElement == null) {
                     logger.warning("defenderElement == null");

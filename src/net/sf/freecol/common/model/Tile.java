@@ -1040,7 +1040,8 @@ public final class Tile extends FreeColGameObject implements Location {
             tileElement.setAttribute("owner", owner.getID());
         }
 
-        if ((settlement != null) && (showAll || player.canSee(this))) {
+        //if ((settlement != null) && (showAll || player.canSee(this))) {
+        if (settlement != null) {
             tileElement.appendChild(settlement.toXMLElement(player, document, showAll, toSavedGame));
         }
 
@@ -1211,7 +1212,7 @@ public final class Tile extends FreeColGameObject implements Location {
                         bonus;
 
         // Settlement data:
-        private int     colonyUnitCount,
+        private int     colonyUnitCount = 0,
                         colonyStockadeLevel,
                         skill = IndianSettlement.UNKNOWN,
                         highlyWantedGoods = IndianSettlement.UNKNOWN,
@@ -1350,7 +1351,8 @@ public final class Tile extends FreeColGameObject implements Location {
                 if (settlementElement == null) {
                     // The settlement doesn't fall within the player's LOS, but a one point the player has
                     // seen a settlement on this Tile.
-                    tileElement.appendChild(settlement.toXMLElement(player, document, false, false));
+//                    tileElement.appendChild(settlement.toXMLElement(player, document, false, false));
+throw new NullPointerException();
                 }
                 settlementElement = getChildElement(tileElement, IndianSettlement.getXMLElementTagName());
 

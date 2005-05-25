@@ -75,7 +75,7 @@ public class ServerModelController implements ModelController {
                 if (!te.secure) {
                     logger.warning("Possibly a cheating attempt.");
                 }
-                taskRegister.remove(te.taskID);
+                it.remove();
                 if (log == null) {
                     log = "Clearing the task register. Removing the following items: ";
                 }
@@ -135,11 +135,12 @@ public class ServerModelController implements ModelController {
     public synchronized Unit createUnit(String taskID, Location location, Player owner, int type, boolean secure, Connection connection) {
         String extendedTaskID = taskID + owner.getID() + Integer.toString(freeColServer.getGame().getTurn().getNumber());
         Unit unit;
+        TaskEntry taskEntry;
 
         logger.info("Entering createUnit.");
 
         if (taskRegister.containsKey(extendedTaskID)) {
-            TaskEntry taskEntry = (TaskEntry) taskRegister.get(extendedTaskID);
+            taskEntry = (TaskEntry) taskRegister.get(extendedTaskID);
             unit = (Unit) taskEntry.entry;
 
             if (unit.getLocation().getTile() != location.getTile() || unit.getOwner() != owner || unit.getType() != type) {
@@ -158,14 +159,15 @@ public class ServerModelController implements ModelController {
             }
         } else {
             unit = new Unit(freeColServer.getGame(), location, owner, type, Unit.ACTIVE);
-            if (connection == null) {
-                update(unit, null);
-            } else {
-                update(unit, freeColServer.getPlayer(connection));
-            }
-            TaskEntry taskEntry = new TaskEntry(extendedTaskID, freeColServer.getGame().getTurn().getNumber(), secure, unit);
+            taskEntry = new TaskEntry(extendedTaskID, freeColServer.getGame().getTurn().getNumber(), secure, unit);
             taskRegister.put(extendedTaskID, taskEntry);
         }
+
+        /*
+        if (connection != null) {
+            update(unit, freeColServer.getPlayer(connection));
+        }
+        */ 
 
         return unit;
     }
@@ -265,8 +267,8 @@ public class ServerModelController implements ModelController {
             }
         }
     }
-    
-    
+
+
     public void update(Unit unit, Player p) {
         ServerPlayer player = (ServerPlayer) p;
         Game game = freeColServer.getGame();
@@ -292,9 +294,9 @@ public class ServerModelController implements ModelController {
         }
     }
 
-    
-    
-    
+
+
+
 
     /**
     * A single entry in the task register.

@@ -2877,7 +2877,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                     Colony targetcolony = null;
                     boolean captureColony = ((result == ATTACK_DONE_SETTLEMENT) && (newTile.getSettlement() instanceof Colony));
                     if (captureColony) {
-
                         defender.getOwner().modifyTension(getOwner(), Player.TENSION_ADD_MAJOR);
 
                         if (getOwner().isEuropean()) {
@@ -3384,7 +3383,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
              XML-Element does not exists:
             */
             if (location == null) {
-                throw new NullPointerException();
+                logger.warning("The unit's location could not be found.");
+                throw new NullPointerException("The unit's location could not be found.");
             }
         }
 

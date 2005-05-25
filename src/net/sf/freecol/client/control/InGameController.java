@@ -571,7 +571,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         unit.attack(defender, result, plunderGold);
-        
+
         if (!defender.isDisposed() && (defender.getLocation() == null || !defender.isVisibleTo(freeColClient.getMyPlayer()))) {
             defender.dispose();
         }

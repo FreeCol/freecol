@@ -239,10 +239,14 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Player owner = (Player) game.getFreeColGameObject(element.getAttribute("owner"));
         int type = Integer.parseInt(element.getAttribute("type"));
 
-        if (owner != getFreeColServer().getPlayer(connection)) {
-            throw new IllegalStateException();
+        if (location == null) {
+            throw new NullPointerException();
         }
-
+        
+        if (owner == null) {
+            throw new NullPointerException();
+        }
+        
         Unit unit = getFreeColServer().getModelController().createUnit(taskID, location, owner, type, false, connection);
 
         Element reply = Message.createNewRootElement("createUnitConfirmed");
@@ -523,6 +527,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
 
                 if (!defender.isVisibleTo(enemyPlayer)) {
                     opponentAttackElement.setAttribute("update", "defender");
+                    if (!enemyPlayer.canSee(defender.getTile())) {
+                        enemyPlayer.setExplored(defender.getTile());
+                        opponentAttackElement.appendChild(defender.getTile().toXMLElement(enemyPlayer, opponentAttackElement.getOwnerDocument()));
+                    }
                     opponentAttackElement.appendChild(defender.toXMLElement(enemyPlayer, opponentAttackElement.getOwnerDocument()));
                 } else if (!unit.isVisibleTo(enemyPlayer)) {
                     opponentAttackElement.setAttribute("update", "unit");
