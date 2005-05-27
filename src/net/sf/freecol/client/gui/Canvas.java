@@ -237,7 +237,7 @@ public final class Canvas extends JLayeredPane {
         jMenuBar = mb;
     }
 
-    
+
     /**
     * Gets the menu bar.
     * @return The menu bar.
@@ -246,8 +246,8 @@ public final class Canvas extends JLayeredPane {
     public JMenuBar getJMenuBar() {
         return jMenuBar;
     }
-    
-    
+
+
     /**
     * Updates the label displaying the current amount of gold.
     */
@@ -521,8 +521,8 @@ public final class Canvas extends JLayeredPane {
 
         return r;
     }
-    
-    
+
+
     /**
     * Displays a dialog for setting client options.
     * @return <code>true</code> if the client options have been modified,
@@ -904,7 +904,7 @@ public final class Canvas extends JLayeredPane {
         }
     }
 
-    
+
     /**
     * Shows a panel where the player may choose the next founding father to recruit.
     * @param possibleFoundingFathers The different founding fathers the player may choose.
@@ -1052,8 +1052,8 @@ public final class Canvas extends JLayeredPane {
             ((FreeColMenuBar) jMenuBar).update();
         }
     }
- 
-    
+
+
     /**
     * Creates and sets a <code>FreeColMenuBar</code> on this <code>Canvas</code>.
     * @see FreeColMenuBar
@@ -1644,5 +1644,4 @@ public final class Canvas extends JLayeredPane {
             }
         }
     }
-
 }

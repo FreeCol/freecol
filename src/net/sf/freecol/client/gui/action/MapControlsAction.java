@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 
 
 /**
-* An action for displaying the map controls. 
+* An action for displaying the map controls.
 * @see MapControls
 */
 public class MapControlsAction extends MapboardAction {
@@ -50,7 +50,7 @@ public class MapControlsAction extends MapboardAction {
         showMapControls(enabled && selected);
     }
 
-    
+
     /**
     * Returns the id of this <code>Option</code>.
     * @return "mapControlsAction"
@@ -60,17 +60,26 @@ public class MapControlsAction extends MapboardAction {
     }
 
 
+    /**
+    * Returns The MapControls object.
+    * @return The MapControls object.
+    */
+    public MapControls getMapControls() {
+        return mapControls;
+    }
+
+
     public void actionPerformed(ActionEvent e) {
         selected = ((AbstractButton) e.getSource()).isSelected();
         showMapControls(selected);
     }
-    
-    
+
+
     public boolean isSelected() {
         return selected;
     }
 
-    
+
     private void showMapControls(boolean selected) {
         if (selected && getFreeColClient().getGUI().isInGame()) {
             if (mapControls == null ) {

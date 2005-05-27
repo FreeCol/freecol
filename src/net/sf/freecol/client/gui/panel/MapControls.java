@@ -8,6 +8,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.ImageLibrary;
 
 
 /**
@@ -35,8 +36,8 @@ public final class MapControls {
     private final int              NUMBER_OF_BUTTONS = 8;
     private GUI                    gui;
 
-    
-    
+
+
 
     /**
     * The basic constructor.
@@ -45,7 +46,7 @@ public final class MapControls {
         this.freeColClient = freeColClient;
         this.gui = gui;
         container = null;
-        
+
         //
         // Create GUI Objects
         //
@@ -56,33 +57,39 @@ public final class MapControls {
         for(int i=0; i<NUMBER_OF_BUTTONS; i++) {
             unitButton[i] = new UnitButton(freeColClient, gui);
         }
-        
-        
+
+
         //
         // Don't allow them to gain focus
         //
-        
+
         infoPanel.setFocusable(false);
         miniMap.setFocusable(false);
         for(int i=0; i<NUMBER_OF_BUTTONS; i++) {
             unitButton[i].setFocusable(false);
         }
 
-        
+
         //
         // Set ActionCommands
         //
-        
+
         /*miniMapZoomOutButton.setActionCommand(String.valueOf(MINIMAP_ZOOMOUT));
         miniMapZoomInButton.setActionCommand(String.valueOf(MINIMAP_ZOOMIN));*/
         for(int i=0; i<NUMBER_OF_BUTTONS; i++) {
             unitButton[i].setActionCommand(String.valueOf(UNITBUTTON + i));
-        }        
+        }
     }
 
 
-    
-    
+    /**
+    * Returns the MiniMap.
+    * @return The MiniMap.
+    */
+    public MiniMap getMiniMap() {
+        return miniMap;
+    }
+
 
     /**
     * Adds the map controls to the given component.
@@ -111,7 +118,7 @@ public final class MapControls {
         //
 
         infoPanel.setLocation(container.getWidth() - infoPanel.getWidth(), container.getHeight() - infoPanel.getHeight());
-        miniMap.setLocation(0, container.getHeight() - miniMap.getHeight());
+        miniMap.setLocation(freeColClient.getGUI().getImageLibrary().getUIImageWidth(ImageLibrary.MINIMAP_BORDER_LEFT), container.getHeight() - miniMap.getHeight() - freeColClient.getGUI().getImageLibrary().getUIImageHeight(ImageLibrary.MINIMAP_BORDER_BOTTOM));
         for(int i=0; i<NUMBER_OF_BUTTONS; i++) {
             int SPACE = unitButton[0].getWidth() + 5;
             unitButton[i].setLocation(miniMap.getWidth() + (infoPanel.getX() - miniMap.getWidth() - NUMBER_OF_BUTTONS*SPACE)/2 + i*SPACE, container.getHeight() - 40);
@@ -167,7 +174,7 @@ public final class MapControls {
         miniMap.zoomIn();
     }
 
-    
+
     /**
     * Zooms out the mini map
     */
@@ -175,7 +182,7 @@ public final class MapControls {
         miniMap.zoomOut();
     }
 
-    
+
     /**
     * Updates this <code>MapControls</code>.
     */
@@ -193,7 +200,7 @@ public final class MapControls {
     * disappear or become enabled or disabled.
     */
     private void updateButtons() {
-        ImageProvider imageProvider = freeColClient.getGUI().getImageLibrary();    
+        ImageProvider imageProvider = freeColClient.getGUI().getImageLibrary();
         Unit selectedOne = freeColClient.getGUI().getActiveUnit();
         if(selectedOne == null) {
             for (int t=0; t<NUMBER_OF_BUTTONS; t++) {
@@ -203,35 +210,35 @@ public final class MapControls {
         }
 
         int unitType = selectedOne.getType();
-        
+
         /* Wait
         *  All units can wait
         */
         if (true) {
             unitButton[0].setEnabled(true);
         }
-        
+
         /* Done
         *  All units can be skipped
         */
         if (true) {
             unitButton[1].setEnabled(true);
         }
-        
+
         /* Fortify
         *  All units can fortify
         */
         if (true) {
             unitButton[2].setEnabled(true);
         }
-        
+
         /* Sentry
         *  All units can sentry
         */
         if (true) {
             unitButton[3].setEnabled(true);
         }
-        
+
         /* Clear Forest / Plow Fields
         *  Only colonists can do this, only if they have at least 20 tools, and only if they are
         *  in a square that can be improved
@@ -255,7 +262,7 @@ public final class MapControls {
             unitButton[4].initialize(UnitButton.UNIT_BUTTON_CLEAR, imageProvider);
             unitButton[4].setEnabled(false);
         }
-        
+
         /* Build roads
         *  Only colonists can do this, only if they have at least 20 tools, and only if they are
         *  in a land square that does not already have roads
@@ -270,7 +277,7 @@ public final class MapControls {
         } else {
             unitButton[5].setEnabled(false);
         }
-        
+
         /* Build a new colony
         *  Only colonists can do this, and only if they are on a 'colonizeable' tile
         */
@@ -279,7 +286,7 @@ public final class MapControls {
         } else {
             unitButton[6].setEnabled(false);
         }
-        
+
         /* Disband
         *  Any unit can do this
         */

@@ -50,7 +50,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
     * (xOffset, yOffset) in the world map */
     private int xOffset, yOffset;
 
-    
+
 
 
     /**
@@ -72,14 +72,8 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         addMouseListener(this);
         addMouseMotionListener(this);
         setLayout(null);
+        setBorder(null);
         setSize(256, 128);
-
-        try {
-            BevelBorder border = new BevelBorder(BevelBorder.RAISED);
-            setBorder(border);
-        } catch(Exception e) {}
-        
-
 
         // Add buttons:
         miniMapZoomOutButton = new JButton("-");
@@ -122,8 +116,8 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         add(miniMapZoomOutButton);
     }
 
-    
-    
+
+
 
 
     public void setContainer(JComponent container) {
@@ -148,7 +142,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         if (tileSize > 4) {
             tileSize -= 4;
         }
-        
+
         if (tileSize <= 4) {
             miniMapZoomOutButton.setEnabled(false);
         }
@@ -220,7 +214,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
                 Tile tile = map.getTileOrNull(x + xOffset, y + yOffset);
                 Settlement settlement = tile != null ? tile.getSettlement() : null;
                 int units = tile != null ? tile.getUnitCount() : 0;
-                
+
                 if (tile == null) {
                     g.setColor(Color.BLACK);
                 } else if (tile.getAddition() == Tile.ADD_HILLS) {
@@ -271,7 +265,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
                   // Tile is forested, so display color of the forest
                   g.setColor(new Color(0.14f, 0.45f, 0.12f)); // Darker green
                 }
-                
+
                 /* Due to the coordinate system, if the y value of the tile is odd,
                  * it needs to be shifted to the right a half-tile's width
                  */
@@ -287,10 +281,10 @@ public final class MiniMap extends JPanel implements MouseInputListener {
                 yPoints[0] = yPoints[2] = y * tileSize / 4;
                 yPoints[1] = y * tileSize / 4 - tileSize / 4;
                 yPoints[3] = y * tileSize / 4 + tileSize / 4;
-                
+
                 //Draw it
                 g.fillPolygon(xPoints, yPoints, 4);
-                
+
                 if (settlement != null) {
                     xPoints[0] += tileSize / 8;
                     xPoints[2] -= tileSize / 8;
@@ -306,7 +300,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
                     g.setColor(tile.getFirstUnit().getOwner().getColor());
                     g.fillPolygon(xPoints, yPoints, 4);
                 }
-                
+
             }
         }
 
