@@ -27,7 +27,7 @@ import net.sf.freecol.common.networking.Connection;
 * {@link Connection} and {@link Socket}
 */
 public class ServerPlayer extends Player implements ServerModelObject {
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
     

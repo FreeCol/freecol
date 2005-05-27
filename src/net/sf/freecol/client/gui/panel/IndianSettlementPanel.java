@@ -20,7 +20,7 @@ import cz.autel.dmi.HIGLayout;
  * This panel is used to show information about an Indian settlement.
  */
 public final class IndianSettlementPanel extends FreeColDialog implements ActionListener {
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 

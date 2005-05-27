@@ -15,7 +15,7 @@ import net.sf.freecol.common.model.FoundingFather;
  * This panel displays the Foreign Affairs Report.
  */
 public final class ReportForeignAffairPanel extends ReportPanel implements ActionListener {
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
     

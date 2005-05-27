@@ -18,7 +18,7 @@ import org.w3c.dom.*;
 * Objects of this class contains AI-information for a single {@link Player}.
 */
 public class AIPlayer extends AIObject {
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
