@@ -7,9 +7,11 @@ import java.awt.Insets;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.event.MouseEvent;
 import java.util.logging.Logger;
 
+import javax.swing.UIManager;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JButton;
@@ -36,6 +38,12 @@ public final class MiniMap extends JPanel implements MouseInputListener {
     private static final Logger logger = Logger.getLogger(MiniMap.class.getName());
     public static final int MINIMAP_ZOOMOUT = 13;
     public static final int MINIMAP_ZOOMIN = 14;
+    
+    private static final int MAP_WIDTH = 256;
+    private static final int MAP_HEIGHT = 128;
+
+    private int mapX;
+    private int mapY;
 
     private FreeColClient freeColClient;
     private final Map map;
@@ -72,8 +80,28 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         addMouseListener(this);
         addMouseMotionListener(this);
         setLayout(null);
-        setBorder(null);
-        setSize(256, 128);
+
+        boolean usingSkin;
+        Image skin = (Image) UIManager.get("MiniMap.skin");
+        if (skin == null) {
+            try {
+                BevelBorder border = new BevelBorder(BevelBorder.RAISED);
+                setBorder(border);
+            } catch (Exception e) {}
+            setSize(MAP_WIDTH, MAP_HEIGHT);
+            setOpaque(true);
+            usingSkin = false;
+            mapX = 0;
+            mapY = 0;
+        } else {
+            setBorder(null);
+            setSize(skin.getWidth(null), skin.getHeight(null));
+            setOpaque(false);
+            usingSkin = true;
+            // The values below should be specified by a skin-configuration-file:
+            mapX = 38;
+            mapY = 75;
+        }
 
         // Add buttons:
         miniMapZoomOutButton = new JButton("-");
@@ -99,15 +127,12 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         miniMapZoomOutButton.setActionCommand(String.valueOf(MINIMAP_ZOOMOUT));
         miniMapZoomInButton.setActionCommand(String.valueOf(MINIMAP_ZOOMIN));
 
-        int bh;
-        int bw;
+        int bh = mapY + MAP_HEIGHT - Math.max(miniMapZoomOutButton.getHeight(), miniMapZoomInButton.getHeight());;
+        int bw = mapX;
         if (getBorder() != null) {
             Insets insets = getBorder().getBorderInsets(this);
-            bh = getHeight() - Math.max(miniMapZoomOutButton.getHeight(), miniMapZoomInButton.getHeight()) - insets.bottom;
-            bw = insets.left;
-        } else {
-            bh = getHeight() - Math.max(miniMapZoomOutButton.getHeight(), miniMapZoomInButton.getHeight());
-            bw = 0;
+            bh -= insets.bottom;
+            bw += insets.left;
         }
 
         miniMapZoomOutButton.setLocation(bw, bh);
@@ -156,11 +181,27 @@ public final class MiniMap extends JPanel implements MouseInputListener {
      * @param graphics The Graphics context in which to draw this component.
      */
     public void paintComponent(Graphics graphics) {
+        Image skin = (Image) UIManager.get("MiniMap.skin");
+        if (skin == null) {
+            paintMap(graphics, 0, 0, getWidth(), getHeight());
+        } else {
+            paintMap(graphics, mapX, mapY, MAP_WIDTH, MAP_HEIGHT);
+            paintSkin(graphics, skin);
+        }
+    }
+
+
+    private void paintSkin(Graphics graphics, Image skin) {
+        graphics.drawImage(skin, 0, 0, null);
+    }
+
+
+    private void paintMap(Graphics graphics, int x, int y, int width, int height) {
         Graphics2D g = (Graphics2D) graphics;
 
         /* Fill the rectangle with solid black */
         g.setColor(Color.BLACK);
-        g.fillRect(0, 0, getWidth(), getHeight());
+        g.fillRect(x, y, width, height);
 
         if (freeColClient.getGUI() == null || freeColClient.getGUI().getFocus() == null) {
             return;
@@ -168,16 +209,16 @@ public final class MiniMap extends JPanel implements MouseInputListener {
 
         /* xSize and ySize represent how many tiles can be represented on the
            mini map at the current zoom level */
-        int xSize = getWidth() / tileSize;
-        int ySize = (getHeight() / tileSize) * 4;
+        int xSize = width / tileSize;
+        int ySize = (height / tileSize) * 4;
 
         /* If the mini map is too zoomed out, then zoom it in */
         while (xSize > map.getWidth() || ySize > map.getHeight()) {
             tileSize += 4;
 
             /* Update with the new values */
-            xSize = getWidth() / tileSize;
-            ySize = (getHeight() / tileSize) * 4;
+            xSize = width / tileSize;
+            ySize = (height / tileSize) * 4;
         }
 
         /* Center the mini map correctly based on the map's focus */
@@ -201,17 +242,17 @@ public final class MiniMap extends JPanel implements MouseInputListener {
          * tiles based on terrain */
 
         /* Points that will be used to draw the diamond for each tile */
-        int[] xPoints = new int[4];
-        int[] yPoints = new int[4];
+        int[] xPoints = new int[4] ;
+        int[] yPoints = new int[4] ;
 
         int xPixels = 0;
-        for (int x = 0; xPixels <= 256 + tileSize; x++, xPixels += tileSize) {
+        for (int tileX = 0; xPixels <= 256 + tileSize; tileX++, xPixels += tileSize) {
             int yPixels = 0;
-            for (int y = 0; yPixels <= 128 + tileSize; y++, yPixels += tileSize / 4) {
+            for (int tileY = 0; yPixels <= 128 + tileSize; tileY++, yPixels += tileSize / 4) {
                 /* Check the terrain to find out which color to use */
                 g.setColor(Color.BLACK); //Default
 
-                Tile tile = map.getTileOrNull(x + xOffset, y + yOffset);
+                Tile tile = map.getTileOrNull(tileX + xOffset, tileY + yOffset);
                 Settlement settlement = tile != null ? tile.getSettlement() : null;
                 int units = tile != null ? tile.getUnitCount() : 0;
 
@@ -269,18 +310,21 @@ public final class MiniMap extends JPanel implements MouseInputListener {
                 /* Due to the coordinate system, if the y value of the tile is odd,
                  * it needs to be shifted to the right a half-tile's width
                  */
-                if (((y + yOffset) % 2) == 0) {
-                    xPoints[0] = x * tileSize - tileSize / 2;
-                    xPoints[1] = xPoints[3] = x * tileSize;
-                    xPoints[2] = x * tileSize + tileSize / 2;
+                if (((tileY + yOffset) % 2) == 0) {
+                    xPoints[0] = x + tileX * tileSize - tileSize / 2;
+                    xPoints[1] = x + tileX * tileSize;
+                    xPoints[2] = x + tileX * tileSize + tileSize / 2;
+                    xPoints[3] = xPoints[1];
                 } else {
-                    xPoints[0] = x * tileSize;
-                    xPoints[1] = xPoints[3] = x * tileSize + tileSize / 2;
-                    xPoints[2] = x * tileSize + tileSize;
+                    xPoints[0] = x + tileX * tileSize;
+                    xPoints[1] = x + tileX * tileSize + tileSize / 2;
+                    xPoints[2] = x + tileX * tileSize + tileSize;
+                    xPoints[3] = xPoints[1];
                 }
-                yPoints[0] = yPoints[2] = y * tileSize / 4;
-                yPoints[1] = y * tileSize / 4 - tileSize / 4;
-                yPoints[3] = y * tileSize / 4 + tileSize / 4;
+                yPoints[0] = y + tileY * tileSize / 4;
+                yPoints[1] = y + tileY * tileSize / 4 - tileSize / 4;
+                yPoints[3] = y + tileY * tileSize / 4 + tileSize / 4;
+                yPoints[2] = yPoints[0];
 
                 //Draw it
                 g.fillPolygon(xPoints, yPoints, 4);
@@ -312,12 +356,19 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         int miniRectY = (freeColClient.getGUI().getFocus().getY() - yOffset) * tileSize / 4;
         int miniRectWidth = (container.getWidth() / imageProvider.getTerrainImageWidth(0) + 1) * tileSize;
         int miniRectHeight = (container.getHeight() / imageProvider.getTerrainImageHeight(0) + 1) * tileSize / 2;
-        if (miniRectX + miniRectWidth / 2 > getWidth())
-            miniRectX = getWidth() - miniRectWidth / 2 - 1;
-        else if (miniRectX - miniRectWidth / 2 < 0) miniRectX = miniRectWidth / 2;
-        if (miniRectY + miniRectHeight / 2 > getHeight())
-            miniRectY = getHeight() - miniRectHeight / 2 - 1;
-        else if (miniRectY - miniRectHeight / 2 < 0) miniRectY = miniRectHeight / 2;
+        if (miniRectX + miniRectWidth / 2 > width) {
+            miniRectX = width - miniRectWidth / 2 - 1;
+        } else if (miniRectX - miniRectWidth / 2 < 0) {
+            miniRectX = miniRectWidth / 2;
+        }
+        if (miniRectY + miniRectHeight / 2 > height) {
+            miniRectY = height - miniRectHeight / 2 - 1;
+        } else if (miniRectY - miniRectHeight / 2 < 0) {
+            miniRectY = miniRectHeight / 2;
+        }
+
+        miniRectX += x;
+        miniRectY += y;
 
         g.setColor(Color.WHITE);
         g.drawRect(miniRectX - miniRectWidth / 2, miniRectY - miniRectHeight / 2, miniRectWidth, miniRectHeight);
@@ -336,17 +387,22 @@ public final class MiniMap extends JPanel implements MouseInputListener {
     /* If the user clicks on the mini map, refocus the map
      * to center on the tile that he clicked on */
     public void mousePressed(MouseEvent e) {
-        if (!e.getComponent().isEnabled()) {
+        if (!e.getComponent().isEnabled() || !isInMap(e.getX(), e.getY())) {
             return;
         }
 
-        int x = e.getX();
-        int y = e.getY();
+        int x = e.getX() - mapX;
+        int y = e.getY() - mapY;
         initialX = xOffset;
         initialY = yOffset;
         int tileX = (int) (x / tileSize) + xOffset;
         int tileY = (int) (y / tileSize * 4) + yOffset;
         freeColClient.getGUI().setFocus(tileX, tileY);
+    }
+
+    
+    private boolean isInMap(int x, int y) {
+        return x >= mapX && x < mapX+MAP_WIDTH && y >= mapY && y < mapY+MAP_HEIGHT;
     }
 
 
@@ -371,12 +427,12 @@ public final class MiniMap extends JPanel implements MouseInputListener {
           to refocus the screen
         */
 
-        if (!e.getComponent().isEnabled()) {
+        if (!e.getComponent().isEnabled() || !isInMap(e.getX(), e.getY())) {
             return;
         }
 
-        int x = e.getX();
-        int y = e.getY();
+        int x = e.getX() - mapX;
+        int y = e.getY() - mapY;
         int tileX = (int) (x / tileSize) + initialX;
         int tileY = (int) (y / tileSize * 4) + initialY;
         freeColClient.getGUI().setFocus(tileX, tileY);

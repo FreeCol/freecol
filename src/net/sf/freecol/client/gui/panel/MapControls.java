@@ -83,15 +83,6 @@ public final class MapControls {
 
 
     /**
-    * Returns the MiniMap.
-    * @return The MiniMap.
-    */
-    public MiniMap getMiniMap() {
-        return miniMap;
-    }
-
-
-    /**
     * Adds the map controls to the given component.
     * @param component The component to add the map controls to.
     */
@@ -118,7 +109,7 @@ public final class MapControls {
         //
 
         infoPanel.setLocation(container.getWidth() - infoPanel.getWidth(), container.getHeight() - infoPanel.getHeight());
-        miniMap.setLocation(freeColClient.getGUI().getImageLibrary().getUIImageWidth(ImageLibrary.MINIMAP_BORDER_LEFT), container.getHeight() - miniMap.getHeight() - freeColClient.getGUI().getImageLibrary().getUIImageHeight(ImageLibrary.MINIMAP_BORDER_BOTTOM));
+        miniMap.setLocation(0, container.getHeight() - miniMap.getHeight());
         for(int i=0; i<NUMBER_OF_BUTTONS; i++) {
             int SPACE = unitButton[0].getWidth() + 5;
             unitButton[i].setLocation(miniMap.getWidth() + (infoPanel.getX() - miniMap.getWidth() - NUMBER_OF_BUTTONS*SPACE)/2 + i*SPACE, container.getHeight() - 40);

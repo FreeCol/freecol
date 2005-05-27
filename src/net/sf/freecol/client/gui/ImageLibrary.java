@@ -207,11 +207,6 @@ public final class ImageLibrary extends ImageProvider {
                             GOODS_HAMMERS = 19,
                             GOODS_COUNT = 20;
 
-    public static final int MINIMAP_BORDER_TOP = 0,
-                            MINIMAP_BORDER_BOTTOM = 1,
-                            MINIMAP_BORDER_LEFT = 2,
-                            MINIMAP_BORDER_RIGHT = 3,
-                            UI_COUNT = 4;
 
     /**
      * The filename of the graphical representation of a specific unit is the following:
@@ -235,7 +230,6 @@ public final class ImageLibrary extends ImageProvider {
                                 goodsName = new String("Goods"),
                                 bonusDirectory = new String("bonus/"),
                                 bonusName = new String("Bonus"),
-                                uiDirectory = new String("ui/"),
                                 extension = new String(".png");
     private final String dataDirectory;
 
@@ -306,7 +300,6 @@ public final class ImageLibrary extends ImageProvider {
         loadIndians(gc, resourceLocator, doLookup);
         loadGoods(gc, resourceLocator, doLookup);
         loadBonus(gc, resourceLocator, doLookup);
-        loadUi(gc, resourceLocator, doLookup);
 
         colorChips = new Hashtable();
         missionChips = new Hashtable();
@@ -569,30 +562,6 @@ public final class ImageLibrary extends ImageProvider {
         }
     }
 
-    /**
-     * Loads a small subset of the ui-images from file into memory.
-     * @param gc The GraphicsConfiguration is needed to create images that are compatible with the
-     * local environment.
-     * @param resourceLocator The class that is used to locate data files.
-     * @param doLookup Must be set to 'false' if the path to the image files
-     * has been manually provided by the user. If set to 'true' then a
-     * lookup will be done to search for image files from net.sf.freecol,
-     * in this case the images need to be placed in net/sf/freecol/images.
-     * @throws FreeColException If one of the data files could not be found.
-     */
-    private void loadUi(GraphicsConfiguration gc, Class resourceLocator, boolean doLookup) throws FreeColException {
-        ui = new Vector(UI_COUNT);
-
-        String filePath = dataDirectory + path + uiDirectory + "minimap_top" + extension;
-        ui.add(findImage(filePath, resourceLocator, doLookup));
-        filePath = dataDirectory + path + uiDirectory + "minimap_bottom" + extension;
-        ui.add(findImage(filePath, resourceLocator, doLookup));
-        filePath = dataDirectory + path + uiDirectory + "minimap_left" + extension;
-        ui.add(findImage(filePath, resourceLocator, doLookup));
-        filePath = dataDirectory + path + uiDirectory + "minimap_right" + extension;
-        ui.add(findImage(filePath, resourceLocator, doLookup));
-    }
-
 
     /**
      * Generates a color chip image and stores it in memory.
@@ -828,14 +797,6 @@ public final class ImageLibrary extends ImageProvider {
         return ((ImageIcon) colonies.get(index)).getImage();
     }
 
-    /**
-     * Returns the ui-image at the given index.
-     * @param index The index of the ui-image to return.
-     * @return The ui-image at the given index.
-     */
-    public Image getUIImage(int index) {
-        return ((ImageIcon) ui.get(index)).getImage();
-    }
 
     /**
      * Returns the color chip with the given color.
@@ -951,24 +912,6 @@ public final class ImageLibrary extends ImageProvider {
      */
     public int getUnitImageHeight(int index) {
         return ((ImageIcon) units.get(index)).getIconHeight();
-    }
-
-    /**
-     * Returns the width of the ui-image at the given index.
-     * @param index The index of the ui-image.
-     * @return The width of the ui-image at the given index.
-     */
-    public int getUIImageWidth(int index) {
-        return ((ImageIcon) ui.get(index)).getIconWidth();
-    }
-
-    /**
-     * Returns the height of the ui-image at the given index.
-     * @param index The index of the ui-image.
-     * @return The height of the ui-image at the given index.
-     */
-    public int getUIImageHeight(int index) {
-        return ((ImageIcon) ui.get(index)).getIconHeight();
     }
 
 

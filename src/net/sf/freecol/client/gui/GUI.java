@@ -28,9 +28,7 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.*;
 
-import net.sf.freecol.client.gui.action.ActionManager;
-import net.sf.freecol.client.gui.action.MapControlsAction;
-import net.sf.freecol.client.gui.panel.MapControls;
+
 
 /**
 * This class is responsible for drawing the map/background on the <code>Canvas</code>.
@@ -1390,17 +1388,6 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
 
                 temp = temp.next;
             }
-        }
-
-        // Show the minimap border if the MapControls are currently being shown.
-        ActionManager am = freeColClient.getActionManager();
-        MapControls mc = ((MapControlsAction)am.getFreeColAction(MapControlsAction.ID)).getMapControls();
-        if (mc != null && mc.isShowing()) {
-            int menubarHeight = 20;
-            g.drawImage(lib.getUIImage(ImageLibrary.MINIMAP_BORDER_TOP), lib.getUIImageWidth(ImageLibrary.MINIMAP_BORDER_LEFT), (int)bounds.getHeight() - lib.getUIImageHeight(ImageLibrary.MINIMAP_BORDER_BOTTOM) - mc.getMiniMap().getHeight() - lib.getUIImageHeight(ImageLibrary.MINIMAP_BORDER_TOP) - menubarHeight, null);
-            g.drawImage(lib.getUIImage(ImageLibrary.MINIMAP_BORDER_BOTTOM), lib.getUIImageWidth(ImageLibrary.MINIMAP_BORDER_LEFT), (int)bounds.getHeight() - lib.getUIImageHeight(ImageLibrary.MINIMAP_BORDER_BOTTOM) - menubarHeight, null);
-            g.drawImage(lib.getUIImage(ImageLibrary.MINIMAP_BORDER_LEFT), 0, (int)bounds.getHeight() - lib.getUIImageHeight(ImageLibrary.MINIMAP_BORDER_LEFT) - menubarHeight, null);
-            g.drawImage(lib.getUIImage(ImageLibrary.MINIMAP_BORDER_RIGHT), lib.getUIImageWidth(ImageLibrary.MINIMAP_BORDER_LEFT) + mc.getMiniMap().getWidth(), (int)bounds.getHeight() - lib.getUIImageHeight(ImageLibrary.MINIMAP_BORDER_RIGHT) - menubarHeight, null);
         }
     }
 
