@@ -31,7 +31,8 @@ public final class UnitButton extends JButton {
     private int                    buttonType;
     private GUI                    gui;
     private FreeColClient freeColClient;
-    
+
+
     public static final int UNIT_BUTTON_WAIT = 0,
                             UNIT_BUTTON_DONE = 1,
                             UNIT_BUTTON_FORTIFY = 2,
@@ -42,8 +43,6 @@ public final class UnitButton extends JButton {
                             UNIT_BUTTON_BUILD = 7,
                             UNIT_BUTTON_DISBAND = 8,
                             UNIT_BUTTON_COUNT = 9;
-
-    
     
     /**
     * The basic constructor
@@ -53,7 +52,7 @@ public final class UnitButton extends JButton {
       this.freeColClient = freeColClient;
     }
         
-    
+
     /**
     * A constructor which initializes the container
     * @param container The JComponent that contains this button
@@ -63,10 +62,10 @@ public final class UnitButton extends JButton {
         this.gui = gui;
         this.freeColClient = freeColClient;
     }
-    
 
-    
-    
+
+
+
 
     /**
     * Sets various attributes about the button, as well as the picture set
@@ -85,7 +84,11 @@ public final class UnitButton extends JButton {
         setFocusPainted(false);
         setContentAreaFilled(false);
         setBorderPainted(false);
-        
+
+        ActionListener[] actionListeners = getActionListeners();
+        for (int i=0; i<actionListeners.length; i++) {
+            removeActionListener(actionListeners[i]);
+        }
         addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 push();
@@ -101,7 +104,7 @@ public final class UnitButton extends JButton {
     public void setContainer(JComponent container) {
         this.container = container;
     }
-    
+
 
     /**
     * A function that removes this button from its container
@@ -170,7 +173,7 @@ public final class UnitButton extends JButton {
                     freeColClient.getInGameController().disbandActiveUnit();
                 }
                 break;
-            
+
             default:
                 break;
         }

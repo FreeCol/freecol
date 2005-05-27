@@ -1676,6 +1676,7 @@ public class Player extends FreeColGameObject {
 
         private Iterator unitIterator = null;
         private Player owner;
+        private Unit nextUnit = null;
 
 
 
@@ -1689,50 +1690,47 @@ public class Player extends FreeColGameObject {
 
 
 
-
-
-
         public boolean hasNext() {
-            if (unitIterator != null && unitIterator.hasNext()) {
+            if (nextUnit != null && isActive(nextUnit)) {
                 return true;
-            } else {
-                unitIterator = createUnitIterator();
+            }
 
-                if (unitIterator.hasNext()) {
+            if (unitIterator == null) {
+                unitIterator = createUnitIterator();
+            }
+            while (unitIterator.hasNext()) {
+                nextUnit = (Unit) unitIterator.next();
+                if (isActive(nextUnit)) {
                     return true;
-                } else {
-                    return false;
                 }
             }
+            unitIterator = createUnitIterator();
+            while (unitIterator.hasNext()) {
+                nextUnit = (Unit) unitIterator.next();
+                if (isActive(nextUnit)) {
+                    return true;
+                }
+            }
+
+            nextUnit = null;
+            return false;
         }
 
 
         public Object next() {
-            if (unitIterator != null && unitIterator.hasNext()) {
-                Unit u = (Unit) unitIterator.next();
-
-                if (!u.isDisposed() && (u.getMovesLeft() > 0) && (u.getState() == Unit.ACTIVE)
-                        && !(u.getLocation() instanceof WorkLocation) && u.getTile() != null) {
-                    return u;
-                } else {
-                    return next();
-                }
-            } else {
-                unitIterator = createUnitIterator();
-
-                if (unitIterator.hasNext()) {
-                    Unit u = (Unit) unitIterator.next();
-
-                    if (!u.isDisposed() && (u.getMovesLeft() > 0) && (u.getState() == Unit.ACTIVE)
-                            && !(u.getLocation() instanceof WorkLocation) && u.getTile() != null) {
-                        return u;
-                    } else {
-                        return next();
-                    }
-                } else {
-                    return null;
-                }
+            if (nextUnit == null || !isActive(nextUnit)) {
+                hasNext();
             }
+
+            Unit temp = nextUnit;
+            nextUnit = null;
+            return temp;
+        }
+
+
+        public boolean isActive(Unit u) {
+            return !u.isDisposed() && (u.getMovesLeft() > 0) && (u.getState() == Unit.ACTIVE)
+                    && !(u.getLocation() instanceof WorkLocation) && u.getTile() != null;
         }
 
 
@@ -1767,17 +1765,16 @@ public class Player extends FreeColGameObject {
                         while (childUnitIterator.hasNext()) {
                             Unit childUnit = (Unit) childUnitIterator.next();
 
-                            if ((childUnit.getMovesLeft() > 0) && (childUnit.getState() == Unit.ACTIVE) && u.getTile() != null) {
+                            if (isActive(childUnit)) {
                                 units.add(childUnit);
                             }
                         }
-
-                        if ((u.getMovesLeft() > 0) && (u.getState() == Unit.ACTIVE) && u.getTile() != null) {
+                        if (isActive(u)) {
                             units.add(u);
                         }
                     }
                 }
-            }
+            } 
 
             return units.iterator();
         }

@@ -35,14 +35,14 @@ import java.io.File;
 public final class FreeCol {
     private static final Logger logger = Logger.getLogger(FreeCol.class.getName());
     
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2004 The FreeCol Team";
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    private  static final String FREECOL_VERSION = "0.3.1";
+    private  static final String FREECOL_VERSION = "0.4.0-pre";
 
     public static final String  META_SERVER_ADDRESS = "meta.freecol.org";
-    public static final int     META_SERVER_PORT = 3540;    
+    public static final int     META_SERVER_PORT = 3540;
 
     private static final String MIN_JDK_VERSION = "1.4";
     private static final String  FILE_SEP = System.getProperty("file.separator");
