@@ -139,6 +139,8 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         miniMapZoomInButton.setLocation(bw + miniMapZoomOutButton.getWidth(), bh);
         add(miniMapZoomInButton);
         add(miniMapZoomOutButton);
+        
+        miniMapZoomOutButton.setEnabled(false);        
     }
 
 
@@ -155,6 +157,11 @@ public final class MiniMap extends JPanel implements MouseInputListener {
      */
     public void zoomIn() {
         tileSize += 4;
+        if (tileSize >= 24) {
+            tileSize = 24;
+            miniMapZoomInButton.setEnabled(false);
+        }
+
         miniMapZoomOutButton.setEnabled(true);
         repaint();
     }
@@ -168,10 +175,12 @@ public final class MiniMap extends JPanel implements MouseInputListener {
             tileSize -= 4;
         }
 
-        if (tileSize <= 4) {
+        if (tileSize <= 12) {
+            tileSize = 12;
             miniMapZoomOutButton.setEnabled(false);
         }
 
+        miniMapZoomInButton.setEnabled(true);
         repaint();
     }
 
@@ -253,8 +262,8 @@ public final class MiniMap extends JPanel implements MouseInputListener {
                 g.setColor(Color.BLACK); //Default
 
                 Tile tile = map.getTileOrNull(tileX + xOffset, tileY + yOffset);
-                Settlement settlement = tile != null ? tile.getSettlement() : null;
-                int units = tile != null ? tile.getUnitCount() : 0;
+                Settlement settlement = (tile != null ? tile.getSettlement() : null);
+                int units = (tile != null ? tile.getUnitCount() : 0);
 
                 if (tile == null) {
                     g.setColor(Color.BLACK);
