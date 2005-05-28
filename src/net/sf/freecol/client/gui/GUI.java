@@ -1595,21 +1595,9 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
     public boolean onScreen(int x, int y) {
         if (bottomRow < 0) {
             return true; // complete repaint about to happen
+        } else {
+            return y - 2 > topRow && y + 4 < bottomRow && x - 1 > leftColumn && x + 1 < rightColumn;
         }
-        if (y > topRow && y < bottomRow &&
-            x > leftColumn + 2 && x < rightColumn) {
-            // It is within the boundaries, check if it is obscured by
-            // the minimap or the info area
-            if (y > bottomRow - 2) {
-                if (x > leftColumn + 3 && x < rightColumn - 2) {
-                    return true;
-                }
-                // Else case falls through to false return
-            } else {
-                return true;
-            }
-        }
-        return false;
     }
 
 
