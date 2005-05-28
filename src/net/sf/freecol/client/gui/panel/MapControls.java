@@ -52,7 +52,7 @@ public final class MapControls {
         //
 
         infoPanel = new InfoPanel(freeColClient, freeColClient.getGame(), freeColClient.getGUI().getImageLibrary());
-        miniMap = new MiniMap(freeColClient, freeColClient.getGame().getMap(), freeColClient.getGUI().getImageLibrary(), container);
+        miniMap = new MiniMap(freeColClient, freeColClient.getGUI().getImageLibrary(), container);
         unitButton = new UnitButton[NUMBER_OF_BUTTONS];
         for(int i=0; i<NUMBER_OF_BUTTONS; i++) {
             unitButton[i] = new UnitButton(freeColClient, gui);

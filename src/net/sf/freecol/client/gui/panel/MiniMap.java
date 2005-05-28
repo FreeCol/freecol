@@ -25,6 +25,7 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 
 
+
 /**
  * This component draws a small version of the map. It allows us
  * to see a larger part of the map and to relocate the viewport by
@@ -46,7 +47,6 @@ public final class MiniMap extends JPanel implements MouseInputListener {
     private int mapY;
 
     private FreeColClient freeColClient;
-    private final Map map;
     private final ImageProvider imageProvider;
     private JComponent container;
     private final JButton          miniMapZoomOutButton;
@@ -54,9 +54,17 @@ public final class MiniMap extends JPanel implements MouseInputListener {
 
     private int tileSize; //tileSize is the size (in pixels) that each tile will take up on the mini map
 
-    /* The top left tile on the mini map represents the tile
-    * (xOffset, yOffset) in the world map */
+    /**
+    * The top left tile on the mini map represents the tile
+    * (xOffset, yOffset) in the world map
+    */
     private int xOffset, yOffset;
+
+    /**
+    * Used for adjusting the position of the mapboard image.
+    * @see #paintMap
+    */
+    private int adjustX = 0, adjustY = 0;
 
 
 
@@ -68,15 +76,13 @@ public final class MiniMap extends JPanel implements MouseInputListener {
      * and information about those images (such as the width of a tile image).
      * @param container The component that contains the minimap.
      */
-    public MiniMap(FreeColClient freeColClient, Map map, ImageProvider imageProvider, JComponent container) {
+    public MiniMap(FreeColClient freeColClient, ImageProvider imageProvider, JComponent container) {
         this.freeColClient = freeColClient;
-        this.map = map;
         this.imageProvider = imageProvider;
         this.container = container;
 
         tileSize = 12;
 
-        //setBackground(Color.BLACK);
         addMouseListener(this);
         addMouseMotionListener(this);
         setLayout(null);
@@ -139,8 +145,6 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         miniMapZoomInButton.setLocation(bw + miniMapZoomOutButton.getWidth(), bh);
         add(miniMapZoomInButton);
         add(miniMapZoomOutButton);
-        
-        miniMapZoomOutButton.setEnabled(false);        
     }
 
 
@@ -171,12 +175,10 @@ public final class MiniMap extends JPanel implements MouseInputListener {
      * Zooms out the mini map
      */
     public void zoomOut() {
-        if (tileSize > 4) {
+        if (tileSize > 8) {
             tileSize -= 4;
-        }
-
-        if (tileSize <= 12) {
-            tileSize = 12;
+        } else {
+            tileSize = 4;
             miniMapZoomOutButton.setEnabled(false);
         }
 
@@ -187,7 +189,8 @@ public final class MiniMap extends JPanel implements MouseInputListener {
 
     /**
      * Paints this component.
-     * @param graphics The Graphics context in which to draw this component.
+     * @param graphics The <code>Graphics</code> context in which 
+     *                 to draw this component.
      */
     public void paintComponent(Graphics graphics) {
         Image skin = (Image) UIManager.get("MiniMap.skin");
@@ -200,13 +203,26 @@ public final class MiniMap extends JPanel implements MouseInputListener {
     }
 
 
+    /**
+    * Paints the skin onto this component.
+    */
     private void paintSkin(Graphics graphics, Image skin) {
         graphics.drawImage(skin, 0, 0, null);
     }
 
 
+    /**
+    * Paints a representation of the mapboard onto this component.
+    * @param graphics The <code>Graphics</code> context in which 
+    *                 to draw this component.
+    * @param x The x-position of the upperleft corner of the map.
+    * @param y The y-position of the upperleft corner of the map.
+    * @param width The width of the map.
+    * @param height The height of the map.
+    */
     private void paintMap(Graphics graphics, int x, int y, int width, int height) {
         Graphics2D g = (Graphics2D) graphics;
+        Map map = freeColClient.getGame().getMap();
 
         /* Fill the rectangle with solid black */
         g.setColor(Color.BLACK);
@@ -215,20 +231,10 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         if (freeColClient.getGUI() == null || freeColClient.getGUI().getFocus() == null) {
             return;
         }
-
         /* xSize and ySize represent how many tiles can be represented on the
            mini map at the current zoom level */
         int xSize = width / tileSize;
         int ySize = (height / tileSize) * 4;
-
-        /* If the mini map is too zoomed out, then zoom it in */
-        while (xSize > map.getWidth() || ySize > map.getHeight()) {
-            tileSize += 4;
-
-            /* Update with the new values */
-            xSize = width / tileSize;
-            ySize = (height / tileSize) * 4;
-        }
 
         /* Center the mini map correctly based on the map's focus */
         xOffset = freeColClient.getGUI().getFocus().getX() - (xSize / 2);
@@ -236,6 +242,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
 
         /* Make sure the mini map won't try to display tiles off the
          * bounds of the world map */
+
         if (xOffset < 0) {
             xOffset = 0;
         } else if (xOffset + xSize > map.getWidth()) {
@@ -247,6 +254,25 @@ public final class MiniMap extends JPanel implements MouseInputListener {
             yOffset = map.getHeight() - ySize;
         }
 
+
+        if (map.getWidth() <= xSize) {
+            xOffset = 0;
+            adjustX = ((xSize - map.getWidth()) * tileSize)/2;
+            width = map.getWidth() * tileSize;
+            x += adjustX;
+        } else {
+            adjustX = 0;
+        }
+
+        if (map.getHeight() <= ySize) {
+            yOffset = 0;
+            adjustY = ((ySize - map.getHeight()) * tileSize)/8;
+            height = map.getHeight() * (tileSize/4);
+            y += adjustY;
+        } else {
+            adjustY = 0;
+        }
+
         /* Iterate through all the squares on the mini map and paint the
          * tiles based on terrain */
 
@@ -255,15 +281,17 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         int[] yPoints = new int[4] ;
 
         int xPixels = 0;
-        for (int tileX = 0; xPixels <= 256 + tileSize; tileX++, xPixels += tileSize) {
+        for (int tileX = 0; xPixels <= width + tileSize; tileX++, xPixels += tileSize) {
             int yPixels = 0;
-            for (int tileY = 0; yPixels <= 128 + tileSize; tileY++, yPixels += tileSize / 4) {
+            for (int tileY = 0; yPixels <= height + tileSize; tileY++, yPixels += tileSize/4) {
                 /* Check the terrain to find out which color to use */
-                g.setColor(Color.BLACK); //Default
-
                 Tile tile = map.getTileOrNull(tileX + xOffset, tileY + yOffset);
+                if (tile == null) {
+                    continue;
+                }
                 Settlement settlement = (tile != null ? tile.getSettlement() : null);
                 int units = (tile != null ? tile.getUnitCount() : 0);
+                g.setColor(Color.BLACK); //Default
 
                 if (tile == null) {
                     g.setColor(Color.BLACK);
@@ -316,44 +344,61 @@ public final class MiniMap extends JPanel implements MouseInputListener {
                   g.setColor(new Color(0.14f, 0.45f, 0.12f)); // Darker green
                 }
 
-                /* Due to the coordinate system, if the y value of the tile is odd,
-                 * it needs to be shifted to the right a half-tile's width
-                 */
-                if (((tileY + yOffset) % 2) == 0) {
-                    xPoints[0] = x + tileX * tileSize - tileSize / 2;
-                    xPoints[1] = x + tileX * tileSize;
-                    xPoints[2] = x + tileX * tileSize + tileSize / 2;
-                    xPoints[3] = xPoints[1];
+                if (tileSize == 4) {
+                    int extra = (((tileY + yOffset) % 2) == 0) ? 0 : 2;
+                    g.drawLine(x+extra+ 4*tileX, y+tileY, x+2+extra+4*tileX, y+tileY);
+                    g.drawLine(x+extra+1+4*tileX, y+1+tileY, x+extra+1+4*tileX, y+1+tileY);
+
+                    if (settlement != null) {
+                        g.setColor(settlement.getOwner().getColor());
+                        g.drawLine(x+extra+4*tileX+1, y+tileY, x+extra+4*tileX+1, y+tileY);
+                    } else if (units > 0) {
+                        g.setColor(tile.getFirstUnit().getOwner().getColor());
+                        g.drawLine(x+extra+4*tileX+1, y+tileY, x+extra+4*tileX+1, y+tileY);
+                    }
                 } else {
-                    xPoints[0] = x + tileX * tileSize;
-                    xPoints[1] = x + tileX * tileSize + tileSize / 2;
-                    xPoints[2] = x + tileX * tileSize + tileSize;
-                    xPoints[3] = xPoints[1];
-                }
-                yPoints[0] = y + tileY * tileSize / 4;
-                yPoints[1] = y + tileY * tileSize / 4 - tileSize / 4;
-                yPoints[3] = y + tileY * tileSize / 4 + tileSize / 4;
-                yPoints[2] = yPoints[0];
+                    /* Due to the coordinate system, if the y value of the tile is odd,
+                    * it needs to be shifted to the right a half-tile's width
+                    */
+                    if (((tileY + yOffset) % 2) == 0) {
+                        xPoints[0] = x + tileX * tileSize - tileSize / 2;
+                        xPoints[1] = x + tileX * tileSize;
+                        xPoints[2] = x + tileX * tileSize + tileSize / 2;
+                        xPoints[3] = xPoints[1];
+                    } else {
+                        xPoints[0] = x + tileX * tileSize;
+                        xPoints[1] = x + tileX * tileSize + tileSize / 2;
+                        xPoints[2] = x + tileX * tileSize + tileSize;
+                        xPoints[3] = xPoints[1];
+                    }
+                    yPoints[0] = y + tileY * tileSize / 4;
+                    yPoints[1] = y + tileY * tileSize / 4 - tileSize / 4;
+                    yPoints[3] = y + tileY * tileSize / 4 + tileSize / 4;
+                    yPoints[2] = yPoints[0];
 
-                //Draw it
-                g.fillPolygon(xPoints, yPoints, 4);
-
-                if (settlement != null) {
-                    xPoints[0] += tileSize / 8;
-                    xPoints[2] -= tileSize / 8;
-                    yPoints[1] += tileSize / 16;
-                    yPoints[3] -= tileSize / 16;
-                    g.setColor(settlement.getOwner().getColor());
+                    //Draw it
                     g.fillPolygon(xPoints, yPoints, 4);
-                } else if (units > 0) {
-                    xPoints[0] += tileSize / 4;
-                    xPoints[2] -= tileSize / 4;
-                    yPoints[1] += tileSize / 8;
-                    yPoints[3] -= tileSize / 8;
-                    g.setColor(tile.getFirstUnit().getOwner().getColor());
-                    g.fillPolygon(xPoints, yPoints, 4);
-                }
 
+                    if (settlement != null) {
+                        xPoints[0] += tileSize / 8;
+                        xPoints[2] -= tileSize / 8;
+                        yPoints[1] += tileSize / 16;
+                        yPoints[3] -= tileSize / 16;
+                        g.setColor(settlement.getOwner().getColor());
+                        g.fillPolygon(xPoints, yPoints, 4);
+                        g.setColor(Color.BLACK);
+                        g.drawPolygon(xPoints, yPoints, 4);
+                    } else if (units > 0) {
+                        xPoints[0] += tileSize / 4;
+                        xPoints[2] -= tileSize / 4;
+                        yPoints[1] += tileSize / 8;
+                        yPoints[3] -= tileSize / 8;
+                        g.setColor(tile.getFirstUnit().getOwner().getColor());
+                        g.fillPolygon(xPoints, yPoints, 4);
+                        g.setColor(Color.BLACK);
+                        g.drawPolygon(xPoints, yPoints, 4);
+                    }
+                }
             }
         }
 
@@ -381,6 +426,11 @@ public final class MiniMap extends JPanel implements MouseInputListener {
 
         g.setColor(Color.WHITE);
         g.drawRect(miniRectX - miniRectWidth / 2, miniRectY - miniRectHeight / 2, miniRectWidth, miniRectHeight);
+
+        if (adjustX > 0 && adjustY > 0) {
+            g.setColor(Color.WHITE);
+            g.drawRect(x, y, width, height);
+        }
     }
 
 
@@ -404,8 +454,8 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         int y = e.getY() - mapY;
         initialX = xOffset;
         initialY = yOffset;
-        int tileX = (int) (x / tileSize) + xOffset;
-        int tileY = (int) (y / tileSize * 4) + yOffset;
+        int tileX = (int) ((x - adjustX) / tileSize) + xOffset;
+        int tileY = (int) ((y - adjustY) / tileSize * 4) + yOffset;
         freeColClient.getGUI().setFocus(tileX, tileY);
     }
 
@@ -442,8 +492,8 @@ public final class MiniMap extends JPanel implements MouseInputListener {
 
         int x = e.getX() - mapX;
         int y = e.getY() - mapY;
-        int tileX = (int) (x / tileSize) + initialX;
-        int tileY = (int) (y / tileSize * 4) + initialY;
+        int tileX = (int) ((x - adjustX) / tileSize) + initialX;
+        int tileY = (int) ((y - adjustY) / tileSize * 4) + initialY;
         freeColClient.getGUI().setFocus(tileX, tileY);
     }
 
