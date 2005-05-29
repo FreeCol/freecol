@@ -19,7 +19,7 @@
 # Location of the freecol CVS directory.
 FREECOL_CVS_DIR=/home/`whoami`/freecol
 # The current FreeCol version
-VERSION="0.3.0"
+VERSION="0.4.0-pre"
 
 
 
@@ -55,7 +55,7 @@ cp $copyFiles freecol
 # Step 3: Find the files that should be added to the archive. These will be passed on to 'tar'.
 #
 filesToArchive=`\
-    find freecol/src ! -name '*.class' ! -path '*CVS*' ! -path '*classes*' -type f -printf '%p ';\
+    find freecol/src ! -name '.#*' ! -name '*.class' ! -path '*CVS*' ! -path '*classes*' -type f -printf '%p ';\
     find freecol/data ! -path '*CVS*' -type f -printf '%p ';\
     find freecol/build.xml -type f -printf '%p '`
 for i in $commonFiles; do
