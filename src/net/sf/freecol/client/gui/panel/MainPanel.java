@@ -113,8 +113,8 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
         try {
             switch (Integer.valueOf(command).intValue()) {
                 case NEW:
+                    parent.remove(this);                
                     parent.showNewGamePanel();
-                    parent.remove(this);
                     break;
                 case OPEN:
                     freeColClient.getConnectController().loadGame();
