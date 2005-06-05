@@ -93,7 +93,8 @@ public final class CanvasMouseListener implements MouseListener {
             gui.stopDrag();
             
             // Move the unit:
-            if (temp != null && temp.getTurns() == 0) {
+            if (temp != null && temp.getTurns() == 0 
+                    && gui.getActiveUnit().getMoveType(temp.getDirection()) != Unit.ILLEGAL_MOVE) {
                 canvas.getClient().getInGameController().moveActiveUnit(temp.getDirection());
                 temp = temp.next;
             }

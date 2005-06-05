@@ -199,31 +199,26 @@ public final class DefaultTransferHandler extends TransferHandler {
                     return false;
                 }
 
-                if (unit.isCarrier() && (comp instanceof EuropePanel.CargoPanel || comp instanceof EuropePanel.DocksPanel 
-                        || comp instanceof EuropePanel.MarketPanel || comp instanceof ColonyPanel.OutsideColonyPanel 
-                        || comp instanceof ColonyPanel.WarehousePanel || comp instanceof ColonyPanel.BuildingsPanel.ASingleBuildingPanel
-                        || comp instanceof ColonyPanel.TilePanel.ASingleTilePanel || comp instanceof ColonyPanel.CargoPanel)) {
+                if (!unit.isNaval() && (comp instanceof EuropePanel.InPortPanel 
+                        || comp instanceof ColonyPanel.InPortPanel
+                        || comp instanceof EuropePanel.ToEuropePanel
+                        || comp instanceof EuropePanel.ToAmericaPanel)) {
                     return false;
                 }
-       
-                                
-                /*if (((unit.getState() == Unit.ACTIVE) || ((unit.getState() == Unit.SENTRY) && (!unit.isNaval())))
-                        && (!((comp instanceof EuropePanel.ToAmericaPanel) && (unit.isNaval())))
-                        && (!((comp instanceof EuropePanel.DocksPanel) && (!unit.isNaval())
-                        && (unit.getLocation() instanceof Unit) && (((Unit)unit.getLocation()).getState() == Unit.ACTIVE)))
-                        && (!((comp instanceof EuropePanel.CargoPanel) && (!unit.isNaval())
-                        && (unit.getLocation() instanceof Europe) && (((EuropePanel)parentPanel).getSelectedUnit() != null)
-                        && (((EuropePanel)parentPanel).getSelectedUnit().getState() == Unit.ACTIVE)
-                        && (((EuropePanel)parentPanel).getSelectedUnit().getSpaceLeft() > 0)))
-                        && (!(comp instanceof ColonyPanel.InPortPanel))
-                        && (!(comp instanceof ColonyPanel.BuildingsPanel.ASingleBuildingPanel))
-                        && (!(comp instanceof ColonyPanel.OutsideColonyPanel))
-                        && (!(comp instanceof ColonyPanel.InColonyPanel))
-                        && (!(comp instanceof ColonyPanel.CargoPanel) && (!unit.isNaval()))
-                        && (!(comp instanceof ColonyPanel.TilePanel))) {
 
+                if (comp instanceof EuropePanel.MarketPanel || comp instanceof ColonyPanel.WarehousePanel) {
                     return false;
-                }*/
+                }
+                
+                if (unit.isNaval() && (comp instanceof EuropePanel.CargoPanel
+                        || comp instanceof EuropePanel.DocksPanel
+                        || comp instanceof ColonyPanel.OutsideColonyPanel
+                        || comp instanceof ColonyPanel.BuildingsPanel.ASingleBuildingPanel
+                        || comp instanceof ColonyPanel.TilePanel.ASingleTilePanel
+                        || comp instanceof ColonyPanel.CargoPanel)) {
+                    return false;
+                }
+
 
                 if (comp instanceof JLabel) {
                     logger.warning("Oops, I thought we didn't have to write this part.");

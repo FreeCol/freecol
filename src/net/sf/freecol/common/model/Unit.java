@@ -2080,48 +2080,29 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             case ACTIVE:
                 return true;
             case PLOW:
-                if (!((getTile().isForested()) || !(getTile().isPlowed()))) return false;
+                if (getTile().isPlowed()) {
+                    return false;
+                }
+                return (getNumberOfTools() >= 20);
             case BUILD_ROAD:
-                if ((s == BUILD_ROAD) && (getTile().hasRoad())) return false;
-                if (getNumberOfTools() < 20) return false;
+                if (getTile().hasRoad()) {
+                    return false;
+                }
+                return (getNumberOfTools() >= 20);
             case IN_COLONY:
-                if (isNaval()) {
-                    return false;
-                }
+                return !isNaval();
             case FORTIFY:
-                if (getMovesLeft() > 0) {
-                    return true;
-                }
-                else {
-                    return false;
-                }
+                return (getMovesLeft() > 0);
             case SENTRY:
-                /*
-                if (getTile() == null) {
-                    return true;
-                } else if (!getTile().isLand()) {
-                    return true;
-                } else {
-                    if (getMovesLeft() > 0) {
-                        return true;
-                    }
-                    else {
-                        return false;
-                    }
-                }*/
                 return true;
             case TO_EUROPE:
                 if (!isNaval()) {
                     return false;
                 }
-                if (((location instanceof Europe) && (getState() == TO_AMERICA))
-                        || (getEntryLocation() == getLocation())) {
-                        //|| (getTile().getType() == Tile.HIGH_SEAS)) {
-                    return true;
-                }
-                return false;
+                return ((location instanceof Europe) && (getState() == TO_AMERICA))
+                        || (getEntryLocation() == getLocation());
             case TO_AMERICA:
-                return location instanceof Europe && isNaval();
+                return (location instanceof Europe && isNaval());
             default:
                 logger.warning("Invalid unit state: " + s);
                 return false;
