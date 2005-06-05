@@ -14,16 +14,7 @@ import net.sf.freecol.common.networking.Connection;
 /**
 * A <code>Player</code> with additional (server specific) information.
 *
-* <br><br>
-*
-* Contains an array of the player's explored tiles. This is
-* neccessary because there is only one <code>Map</code> for
-* each <code>Game</code>. At the client-side 
-* <code>tile.isExplored()</code> may be used instead.
-*
-* <br><br>
-*
-* In addition, there are pointers to this player's
+* That is: pointers to this player's
 * {@link Connection} and {@link Socket}
 */
 public class ServerPlayer extends Player implements ServerModelObject {
@@ -39,10 +30,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
     private boolean connected = false;
 
-    /** Stores information about which tiles this player has explored. */
-    //private boolean[][] exploredTiles;
-
-//    private boolean[][] canSeeTiles = null;
 
     private String serverID;
 
@@ -61,11 +48,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         this.socket = socket;
         this.connection = connection;
-        //ready = false;
 
         resetExploredTiles(getGame().getMap());
         resetCanSeeTiles();
-        
+
         connected = (connection != null);
     }
 
@@ -84,11 +70,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         this.socket = socket;
         this.connection = connection;
-        //ready = false;
 
         resetExploredTiles(getGame().getMap());
         resetCanSeeTiles();
-        
+
         connected = (connection != null);
     }
 
@@ -125,8 +110,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
     */
     public void resetExploredTiles(Map map) {
         if (map != null) {
-            //exploredTiles = new boolean[map.getWidth()][map.getHeight()];
-
             Iterator unitIterator = getUnitIterator();
             while (unitIterator.hasNext()) {
                 Unit unit = (Unit) unitIterator.next();
@@ -150,7 +133,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
     }
 
-    
+
     /**
     * Checks if this <code>Player</code> has explored the given <code>Tile</code>.
     * @param tile The <code>Tile</code>.
@@ -248,8 +231,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         element.setAttribute("ID", getID());
         
-        //element.appendChild(toArrayElement("exploredTiles", exploredTiles, document));
-
         return element;
     }
     

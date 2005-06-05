@@ -88,9 +88,11 @@ public class Connection {
             TransformerFactory factory = TransformerFactory.newInstance();
             myTransformer = factory.newTransformer();
             myTransformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-        }
-        catch (TransformerException e) {
-            e.printStackTrace();
+        } catch (TransformerException e) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            logger.warning(sw.toString());
+
             myTransformer = null;
         }
         xmlTransformer = myTransformer;
@@ -170,9 +172,11 @@ public class Connection {
             StringWriter stringWriter = new StringWriter();
             xmlTransformer.transform(new DOMSource(element), new StreamResult(stringWriter));
             xml = stringWriter.toString();
-        }
-        catch (TransformerException e) {
+        } catch (TransformerException e) {
             xml = e.getMessage();
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            logger.warning(sw.toString());
         }
         return xml;
     }
@@ -257,6 +261,7 @@ public class Connection {
                 if (reply == null) {
                     reply = Message.createNewRootElement("reply");
                     reply.setAttribute("networkReplyId", networkReplyId);
+                    logger.info("reply == null");
                 } else {
                     Element replyHeader = reply.getOwnerDocument().createElement("reply");
                     replyHeader.setAttribute("networkReplyId", networkReplyId);
@@ -273,11 +278,13 @@ public class Connection {
                 }
             }
         } catch (FreeColException e) {
-            logger.warning("EXCEPTION: " + e.getMessage());
-            e.printStackTrace();
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            logger.warning(sw.toString());
         } catch (IOException e) {
-            logger.warning("EXCEPTION: " + e.getMessage());
-            e.printStackTrace();
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            logger.warning(sw.toString());
         }
     }
 

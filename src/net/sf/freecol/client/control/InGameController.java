@@ -1315,10 +1315,10 @@ public final class InGameController implements NetworkConstants {
                 break;
             case FreeColDialog.MISSIONARY_ESTABLISH:
                 missionaryMessage.setAttribute("action", "establish");
-                client.send(missionaryMessage);
-                unit.setLocation(settlement);
                 settlement.setMissionary(unit);
-                break;
+                client.send(missionaryMessage);
+                nextActiveUnit(); // At this point: unit.getTile() == null
+                return;
             case FreeColDialog.MISSIONARY_DENOUNCE_AS_HERESY:
                 missionaryMessage.setAttribute("action", "heresy");
                 reply = client.ask(missionaryMessage);
@@ -1330,14 +1330,13 @@ public final class InGameController implements NetworkConstants {
 
                 String success = reply.getAttribute("success");
                 if (success.equals("true")) {
-                    settlement.getMissionary().dispose();
-                    unit.setLocation(settlement);
                     settlement.setMissionary(unit);
-                }
-                else {
+                    nextActiveUnit(); // At this point: unit.getTile() == null
+                } else {
                     unit.dispose();
+                    nextActiveUnit(); // At this point: unit == null
                 }
-                break;
+                return;
             case FreeColDialog.MISSIONARY_INCITE_INDIANS:
                 missionaryMessage.setAttribute("action", "incite");
                 missionaryMessage.setAttribute("incite", ((Player)response.get(1)).getID());

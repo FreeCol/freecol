@@ -81,7 +81,10 @@ public final class Tile extends FreeColGameObject implements Location {
     */
     private Settlement owner;
 
-    private PlayerExploredTile[] playerExploredTiles = new PlayerExploredTile[Player.NUMBER_OF_NATIONS];
+    /**
+    * Stores each player's image of this tile. Only initialized when needed.
+    */
+    private PlayerExploredTile[] playerExploredTiles = null;
 
 
 
@@ -94,6 +97,14 @@ public final class Tile extends FreeColGameObject implements Location {
     */
     public Tile(Game game, int locX, int locY) {
         this(game, UNEXPLORED, locX, locY);
+
+        if (getGame().getViewOwner() == null) {
+            playerExploredTiles = new PlayerExploredTile[Player.NUMBER_OF_NATIONS];
+
+            for (int i=0; i<playerExploredTiles.length; i++) {
+                playerExploredTiles[i] = new PlayerExploredTile(getGame(), i);
+            }
+        }
     }
 
 
@@ -124,9 +135,13 @@ public final class Tile extends FreeColGameObject implements Location {
         owner = null;
         settlement = null;
 
-        for (int i=0; i<playerExploredTiles.length; i++) {
-            playerExploredTiles[i] = new PlayerExploredTile(game, i);
-            updatePlayerExploredTile(i);
+        if (getGame().getViewOwner() == null) {
+            playerExploredTiles = new PlayerExploredTile[Player.NUMBER_OF_NATIONS];
+
+            for (int i=0; i<playerExploredTiles.length; i++) {
+                playerExploredTiles[i] = new PlayerExploredTile(getGame(), i);
+                updatePlayerExploredTile(i);
+            }
         }
     }
 
@@ -138,6 +153,11 @@ public final class Tile extends FreeColGameObject implements Location {
     */
     public Tile(Game game, Element element) {
         super(game, element);
+
+        if (getGame().getViewOwner() == null) {
+            playerExploredTiles = new PlayerExploredTile[Player.NUMBER_OF_NATIONS];
+        }
+
         readFromXMLElement(element);
     }
 
@@ -1157,6 +1177,9 @@ public final class Tile extends FreeColGameObject implements Location {
 
 
     public PlayerExploredTile getPlayerExploredTile(Player player) {
+        if (playerExploredTiles == null) {
+            return null;
+        }
         return playerExploredTiles[player.getNation()];
     }
 
@@ -1171,6 +1194,10 @@ public final class Tile extends FreeColGameObject implements Location {
     }
 
     public void updatePlayerExploredTile(int nation) {
+        if (playerExploredTiles == null || getGame().getViewOwner() != null) {
+            return;
+        }
+
         playerExploredTiles[nation].setRoad(road);
         playerExploredTiles[nation].setPlowed(plowed);
         playerExploredTiles[nation].setForested(forested);
@@ -1180,7 +1207,12 @@ public final class Tile extends FreeColGameObject implements Location {
             playerExploredTiles[nation].setColonyUnitCount(getSettlement().getUnitCount());
             playerExploredTiles[nation].setColonyStockadeLevel(getColony().getBuilding(Building.STOCKADE).getLevel());
         } else if (getSettlement() != null) {
-            // Do nothing
+            playerExploredTiles[nation].setMissionary(((IndianSettlement) getSettlement()).getMissionary());
+
+            /*
+             * These attributes should not be updated by this method:
+             * skill, highlyWantedGoods, wantedGoods1 and wantedGoods2
+             */
         }
     }
 
@@ -1201,9 +1233,9 @@ public final class Tile extends FreeColGameObject implements Location {
     * in this class to hide information that is not available.
     */
     public class PlayerExploredTile extends FreeColGameObject {
-
+        
         private int nation;
-        private boolean explored;
+        private boolean explored = false;
 
         // Tile data:
         private boolean road,
@@ -1211,13 +1243,16 @@ public final class Tile extends FreeColGameObject implements Location {
                         forested,
                         bonus;
 
-        // Settlement data:
+        // Colony data:
         private int     colonyUnitCount = 0,
-                        colonyStockadeLevel,
-                        skill = IndianSettlement.UNKNOWN,
+                        colonyStockadeLevel;
+                        
+        // IndianSettlement data:
+        private int     skill = IndianSettlement.UNKNOWN,
                         highlyWantedGoods = IndianSettlement.UNKNOWN,
                         wantedGoods1 = IndianSettlement.UNKNOWN,
                         wantedGoods2 = IndianSettlement.UNKNOWN;
+        private Unit    missionary = null;
 
         //private Settlement settlement;
 
@@ -1297,6 +1332,11 @@ public final class Tile extends FreeColGameObject implements Location {
         }
 
 
+        public void setMissionary(Unit missionary) {
+            this.missionary = missionary;
+        }
+
+
         /**
         * Returns <i>true</i> if the tile has been explored.
         */
@@ -1348,18 +1388,20 @@ public final class Tile extends FreeColGameObject implements Location {
             } else if ((getSettlement() != null) && (getSettlement() instanceof IndianSettlement)) {
                 Element settlementElement = getChildElement(tileElement, IndianSettlement.getXMLElementTagName());
 
-                if (settlementElement == null) {
-                    // The settlement doesn't fall within the player's LOS, but a one point the player has
-                    // seen a settlement on this Tile.
-//                    tileElement.appendChild(settlement.toXMLElement(player, document, false, false));
-throw new NullPointerException();
-                }
-                settlementElement = getChildElement(tileElement, IndianSettlement.getXMLElementTagName());
-
                 settlementElement.setAttribute("learnableSkill", Integer.toString(skill));
                 settlementElement.setAttribute("highlyWantedGoods", Integer.toString(highlyWantedGoods));
                 settlementElement.setAttribute("wantedGoods1", Integer.toString(wantedGoods1));
                 settlementElement.setAttribute("wantedGoods2", Integer.toString(wantedGoods2));
+
+                Element missionaryElement = getChildElement(settlementElement, "missionary");
+                if (missionaryElement != null) {
+                    settlementElement.removeChild(missionaryElement);
+                }
+                if (missionary != null) {
+                    missionaryElement = document.createElement("missionary");
+                    missionaryElement.appendChild(missionary.toXMLElement(player, document, false, false));
+                    settlementElement.appendChild(missionaryElement);
+                }
             } else if (getSettlement() != null) {
                 logger.warning("Unknown type of settlement: " + getSettlement());
             }
@@ -1400,6 +1442,12 @@ throw new NullPointerException();
             tileElement.setAttribute("wantedGoods1", Integer.toString(wantedGoods1));
             tileElement.setAttribute("wantedGoods2", Integer.toString(wantedGoods2));
 
+            if (missionary != null) {
+                Element missionaryElement = document.createElement("missionary");
+                missionaryElement.appendChild(missionary.toXMLElement(player, document, false, false));
+                tileElement.appendChild(missionaryElement);
+            }
+
             return tileElement;
         }
 
@@ -1424,7 +1472,7 @@ throw new NullPointerException();
 
             if (tileElement.hasAttribute("learnableSkill")) {
                 skill = Integer.parseInt(tileElement.getAttribute("learnableSkill"));
-            } else { // Support for pre-0.1.0:
+            } else { // Support for pre-0.1.0 protocols:
                 skill = IndianSettlement.UNKNOWN;
             }
 
@@ -1432,10 +1480,21 @@ throw new NullPointerException();
                 highlyWantedGoods = Integer.parseInt(tileElement.getAttribute("highlyWantedGoods"));
                 wantedGoods1 = Integer.parseInt(tileElement.getAttribute("wantedGoods1"));
                 wantedGoods2 = Integer.parseInt(tileElement.getAttribute("wantedGoods2"));
-            } else { // Support for pre-0.1.0:
+            } else { // Support for pre-0.1.0 protocols:
                 highlyWantedGoods = IndianSettlement.UNKNOWN;
                 wantedGoods1 = IndianSettlement.UNKNOWN;
                 wantedGoods2 = IndianSettlement.UNKNOWN;
+            }
+
+            Element missionaryElement = getChildElement(tileElement, "missionary");
+            if (missionaryElement != null) {
+                if (missionary == null) {
+                    missionary = new Unit(getGame(), getChildElement(missionaryElement, Unit.getXMLElementTagName()));
+                } else {
+                    missionary.readFromXMLElement(getChildElement(missionaryElement, Unit.getXMLElementTagName()));
+                }
+            } else {
+                missionary = null;
             }
         }
 

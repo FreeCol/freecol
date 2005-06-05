@@ -338,10 +338,22 @@ public class IndianSettlement extends Settlement {
     * @param missionary The missionary for this settlement.
     */
     public void setMissionary(Unit missionary) {
+        if (!missionary.isMissionary()) {
+            throw new IllegalArgumentException("Specified unit is not a missionary.");
+        }
+        if (missionary == null) {
+            throw new NullPointerException();
+        }
+
         if (missionary != this.missionary) {
             convertProgress = 0;
         }
+        if (this.missionary != null) {
+            this.missionary.dispose();
+        }
         this.missionary = missionary;
+        missionary.setLocation(null);
+        getTile().updatePlayerExploredTile(missionary.getOwner());
     }
 
 
@@ -967,9 +979,11 @@ public class IndianSettlement extends Settlement {
         indianSettlementElement.setAttribute("wantedGoods1", Integer.toString(wantedGoods1));
         indianSettlementElement.setAttribute("wantedGoods2", Integer.toString(wantedGoods2));
         indianSettlementElement.appendChild(toArrayElement("alarm", alarm, document));
-        
+
         if (missionary != null) {
-            indianSettlementElement.setAttribute("missionary", missionary.getID());
+            Element missionaryElement = document.createElement("missionary");
+            missionaryElement.appendChild(missionary.toXMLElement(player, document, showAll, toSavedGame));
+            indianSettlementElement.appendChild(missionaryElement);
         }
 
         if (showAll || player == getOwner()) {
@@ -1036,11 +1050,17 @@ public class IndianSettlement extends Settlement {
         if (indianSettlementElement.hasAttribute("hasBeenVisited")) {
             isVisited = Boolean.getBoolean(indianSettlementElement.getAttribute("hasBeenVisited"));
         }
-        if (indianSettlementElement.hasAttribute("missionary")) {
-            missionary = (Unit) getGame().getFreeColGameObject(indianSettlementElement.getAttribute("missionary"));
-        }
         if (indianSettlementElement.hasAttribute("convertProgress")) {
             convertProgress = Integer.parseInt(indianSettlementElement.getAttribute("convertProgress"));
+        }
+
+        Element missionaryElement = getChildElement(indianSettlementElement, "missionary");
+        if (missionaryElement != null) {
+            if (missionary == null) {
+                missionary = new Unit(getGame(), getChildElement(missionaryElement, Unit.getXMLElementTagName()));
+            } else {
+                missionary.readFromXMLElement(getChildElement(missionaryElement, Unit.getXMLElementTagName()));
+            }
         }
 
         Element unitContainerElement = getChildElement(indianSettlementElement, UnitContainer.getXMLElementTagName());

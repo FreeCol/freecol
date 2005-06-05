@@ -929,23 +929,32 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (action.equals("cancel")) {
             return null;
         } else if (action.equals("establish")) {
-            unit.setLocation(settlement);
+            sendRemoveUnitToAll(unit, player);
             settlement.setMissionary(unit);
             return null;
         } else if (action.equals("heresy")) {
             Element reply = Message.createNewRootElement("missionaryReply");
 
+            sendRemoveUnitToAll(unit, player);
+
             // TODO: chance needs to depend on amount of crosses that the players who are involved have.
             double random = Math.random();
+            if (settlement.getMissionary().getType() == Unit.JESUIT_MISSIONARY
+                    || settlement.getMissionary().getOwner().hasFather(FoundingFather.FATHER_JEAN_DE_BREBEUF)) {
+                random += 0.2;
+            }
+            if (unit.getType() == Unit.JESUIT_MISSIONARY
+                    || unit.getOwner().hasFather(FoundingFather.FATHER_JEAN_DE_BREBEUF)) {
+                random -= 0.2;
+            }
             if (random < 0.5) {
                 reply.setAttribute("success", "true");
-                settlement.getMissionary().dispose();
-                unit.setLocation(settlement);
                 settlement.setMissionary(unit);
             } else {
                 reply.setAttribute("success", "false");
                 unit.dispose();
             }
+
 
             return reply;
         }  else if (action.equals("incite")) {
@@ -961,6 +970,35 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             return reply;
         } else {
             return null;
+        }
+    }
+
+
+    private void sendRemoveUnitToAll(Unit unit, Player player) {
+        FreeColServer freeColServer = getFreeColServer();
+        Game game = freeColServer.getGame();
+
+        Iterator enemyPlayerIterator = game.getPlayerIterator();
+        while (enemyPlayerIterator.hasNext()) {
+            ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
+
+            if (player.equals(enemyPlayer) || enemyPlayer.getConnection() == null) {
+                continue;
+            }
+
+            try {
+                if (unit.isVisibleTo(enemyPlayer)) {
+                    Element removeElement = Message.createNewRootElement("remove");
+
+                    Element removeUnit = removeElement.getOwnerDocument().createElement("removeObject");
+                    removeUnit.setAttribute("ID", unit.getID());
+                    removeElement.appendChild(removeUnit);
+
+                    enemyPlayer.getConnection().send(removeElement);
+                }
+            } catch (IOException e) {
+                logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection " + enemyPlayer.getConnection());
+            }
         }
     }
 
@@ -1812,6 +1850,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
 
         logger.info("Logout by: " + connection + ((player != null) ? " (" + player.getName() + ") " : ""));
 
+        if (player == null) {
+            return null;
+        }
         // TODO
 
         // Remove the player's units/colonies from the map and send map updates to the
