@@ -74,7 +74,7 @@ public final class UnitButton extends JButton {
     */
     public void initialize(int index, ImageProvider imageProvider) {
         buttonType = index;
-        setSize(30, 30);
+        //setSize(30, 30);
         setRolloverEnabled(true);
         setIcon(imageProvider.getUnitButtonImageIcon(index, 0));
         setRolloverIcon(imageProvider.getUnitButtonImageIcon(index, 1));
@@ -84,6 +84,9 @@ public final class UnitButton extends JButton {
         setFocusPainted(false);
         setContentAreaFilled(false);
         setBorderPainted(false);
+
+        setSize(imageProvider.getUnitButtonImageIcon(index, 0).getIconWidth(), 
+                imageProvider.getUnitButtonImageIcon(index, 0).getIconHeight());
 
         ActionListener[] actionListeners = getActionListeners();
         for (int i=0; i<actionListeners.length; i++) {
