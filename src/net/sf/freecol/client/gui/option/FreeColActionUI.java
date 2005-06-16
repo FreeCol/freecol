@@ -10,6 +10,8 @@ import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.awt.FlowLayout;
 import java.awt.Graphics2D;
@@ -174,7 +176,7 @@ public final class FreeColActionUI extends JPanel implements OptionUpdater, Acti
     /**
     * Label for displaying a <code>KeyStroke</code>.
     */
-    class BlinkingLabel extends JLabel implements ActionListener, KeyListener {
+    class BlinkingLabel extends JLabel implements ActionListener, KeyListener, MouseListener {
 
         private Timer blinkingTimer = new Timer(500, this);
         private boolean blinkOn = false;
@@ -185,7 +187,22 @@ public final class FreeColActionUI extends JPanel implements OptionUpdater, Acti
             setOpaque(false);
             setBorder(BorderFactory.createLineBorder(Color.BLACK));
             addKeyListener(this);
+            addMouseListener(this);
         }
+
+        public void mouseClicked(MouseEvent e) {
+            if (e.getClickCount() > 1) {
+                startBlinking();
+                requestFocus();
+            }
+        }
+
+
+        public void mouseEntered(MouseEvent e) {}
+        public void mouseExited(MouseEvent e) {}
+        public void mousePressed(MouseEvent e) {}
+        public void mouseReleased(MouseEvent e) {}
+
 
         public Dimension getMinimumSize() {
             return new Dimension(80, super.getMinimumSize().height);
