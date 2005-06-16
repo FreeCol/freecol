@@ -27,6 +27,9 @@ public final class InfoPanel extends FreeColPanel {
 
     private static final Logger logger = Logger.getLogger(InfoPanel.class.getName());
 
+    private static final int PANEL_WIDTH = 256;
+    private static final int PANEL_HEIGHT = 128;
+
     private final FreeColClient freeColClient;
     private final Game          game;
     private final ImageProvider imageProvider;
@@ -48,14 +51,26 @@ public final class InfoPanel extends FreeColPanel {
         this.game = game;
         this.imageProvider = imageProvider;
 
-        setSize(256, 128);
         setLayout(null);
+
+        int panelTop = 0;
+        Image skin = (Image) UIManager.get("InfoPanel.skin");
+        if (skin == null) {
+            setSize(PANEL_WIDTH, PANEL_HEIGHT);
+        } else {
+            setBorder(null);
+            setSize(skin.getWidth(null), skin.getHeight(null));
+            setOpaque(false);
+            panelTop = 65;
+        }
 
         unitInfoPanel.setVisible(false);
         endTurnPanel.setVisible(false);
 
-        unitInfoPanel.setLocation((getWidth()-unitInfoPanel.getWidth())/2, (getHeight()-unitInfoPanel.getHeight())/2);
-        endTurnPanel.setLocation((getWidth()-endTurnPanel.getWidth())/2, (getHeight()-endTurnPanel.getHeight())/2);
+        unitInfoPanel.setLocation((getWidth()-unitInfoPanel.getWidth())/2,
+                                  (PANEL_HEIGHT-unitInfoPanel.getHeight())/2 + panelTop);
+        endTurnPanel.setLocation((getWidth()-endTurnPanel.getWidth())/2,
+                                 (PANEL_HEIGHT-endTurnPanel.getHeight())/2 + panelTop);
 
         add(unitInfoPanel);
         add(endTurnPanel);
@@ -100,7 +115,12 @@ public final class InfoPanel extends FreeColPanel {
             }
         }
 
-        super.paintComponent(graphics);
+        Image skin = (Image) UIManager.get("InfoPanel.skin");
+        if (skin != null) {
+            graphics.drawImage(skin, 0, 0, null);
+        } else {
+            super.paintComponent(graphics);
+        }
     }
 
 

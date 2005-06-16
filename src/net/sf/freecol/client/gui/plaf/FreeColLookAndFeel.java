@@ -176,7 +176,8 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
                 {"FoundingFather.political", "political.png"},
                 {"FoundingFather.religious", "religious.png"},
                 {"cursor.go.image", "go.png"},
-                {"MiniMap.skin", "minimap-skin.png"}
+                {"MiniMap.skin", "minimap-skin.png"},
+                {"InfoPanel.skin", "infopanel-skin.png"}
             };
 
             /*
