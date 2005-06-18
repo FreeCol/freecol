@@ -424,6 +424,16 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         miniRectX += x;
         miniRectY += y;
 
+        /* Make the white rectangle smaller if necessary: */
+        if (miniRectX - miniRectWidth / 2 < mapX) {
+            miniRectWidth -= mapX - miniRectX + miniRectWidth / 2;
+            miniRectX = mapX + miniRectWidth / 2;
+        }
+        if (miniRectY - miniRectHeight / 2 < mapY) {
+            miniRectHeight -= mapY - miniRectY + miniRectHeight / 2;
+            miniRectY = mapY + miniRectHeight / 2;
+        }
+
         g.setColor(Color.WHITE);
         g.drawRect(miniRectX - miniRectWidth / 2, miniRectY - miniRectHeight / 2, miniRectWidth, miniRectHeight);
 
