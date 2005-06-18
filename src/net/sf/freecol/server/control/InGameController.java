@@ -128,7 +128,9 @@ public final class InGameController extends Controller {
                 Element chooseFoundingFatherElement = Message.createNewRootElement("chooseFoundingFather");
                 for (int i=0; i<randomFoundingFathers.length; i++) {
                     chooseFoundingFatherElement.setAttribute("foundingFather" + Integer.toString(i), Integer.toString(randomFoundingFathers[i]));
-                    atLeastOneChoice = true;
+                    if (randomFoundingFathers[i] != -1) {
+                        atLeastOneChoice = true;
+                    }
                 }
 
                 if (!atLeastOneChoice) {
