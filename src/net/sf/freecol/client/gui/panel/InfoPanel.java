@@ -53,7 +53,8 @@ public final class InfoPanel extends FreeColPanel {
 
         setLayout(null);
 
-        int panelTop = 0;
+        int internalPanelTop = 0;
+        int internalPanelHeight = 128;
         Image skin = (Image) UIManager.get("InfoPanel.skin");
         if (skin == null) {
             setSize(PANEL_WIDTH, PANEL_HEIGHT);
@@ -61,16 +62,17 @@ public final class InfoPanel extends FreeColPanel {
             setBorder(null);
             setSize(skin.getWidth(null), skin.getHeight(null));
             setOpaque(false);
-            panelTop = 65;
+            internalPanelTop = 75;
+            internalPanelHeight = 100;
         }
 
         unitInfoPanel.setVisible(false);
         endTurnPanel.setVisible(false);
 
         unitInfoPanel.setLocation((getWidth()-unitInfoPanel.getWidth())/2,
-                                  (PANEL_HEIGHT-unitInfoPanel.getHeight())/2 + panelTop);
+                                  internalPanelTop + (internalPanelHeight-unitInfoPanel.getHeight())/2);
         endTurnPanel.setLocation((getWidth()-endTurnPanel.getWidth())/2,
-                                 (PANEL_HEIGHT-endTurnPanel.getHeight())/2 + panelTop);
+                                  internalPanelTop + (internalPanelHeight-endTurnPanel.getHeight())/2);
 
         add(unitInfoPanel);
         add(endTurnPanel);
@@ -118,9 +120,9 @@ public final class InfoPanel extends FreeColPanel {
         Image skin = (Image) UIManager.get("InfoPanel.skin");
         if (skin != null) {
             graphics.drawImage(skin, 0, 0, null);
-        } else {
-            super.paintComponent(graphics);
         }
+        
+        super.paintComponent(graphics);
     }
 
 
@@ -136,6 +138,8 @@ public final class InfoPanel extends FreeColPanel {
         private Unit unit;
 
         public UnitInfoPanel() {
+            super(null);
+/*
             unitLabel = new JLabel();
             unitNameLabel = new JLabel();
             unitMovesLabel = new JLabel();
@@ -163,11 +167,41 @@ public final class InfoPanel extends FreeColPanel {
             unitMovesLabel.setFocusable(false);
             unitToolsLabel.setFocusable(false);
 
-            setSize(256, 128);
+            setSize(226, 100);
+            setOpaque(false);
+            */
+
+            JPanel picturePanel = new JPanel(new BorderLayout());
+            picturePanel.setOpaque(false);
+            picturePanel.setSize(110, 100);
+            picturePanel.setLocation(0, 0);
+            unitLabel = new JLabel();
+            unitLabel.setHorizontalAlignment(JLabel.CENTER);
+            unitLabel.setVerticalAlignment(JLabel.CENTER);
+            picturePanel.add(unitLabel, BorderLayout.CENTER);
+            add(picturePanel);
+
+            JPanel labelPanel = new JPanel(new GridLayout(3, 1, 10, 10));
+            labelPanel.setOpaque(false);
+            unitNameLabel = new JLabel();
+            unitMovesLabel = new JLabel();
+            unitToolsLabel = new JLabel();
+            labelPanel.add(unitNameLabel);
+            labelPanel.add(unitMovesLabel);
+            labelPanel.add(unitToolsLabel);
+            unitLabel.setFocusable(false);
+            unitNameLabel.setFocusable(false);
+            unitMovesLabel.setFocusable(false);
+            unitToolsLabel.setFocusable(false);
+            labelPanel.setSize(130, 60);
+            labelPanel.setLocation(100, (100-labelPanel.getHeight())/2);
+            add(labelPanel);
+
+            setSize(226, 100);
             setOpaque(false);
         }
-        
-        
+
+
         /**
         * Paints this component.
         * @param graphics The Graphics context in which to draw this component.
@@ -194,7 +228,7 @@ public final class InfoPanel extends FreeColPanel {
 
             super.paintComponent(graphics);
         }
-        
+
 
         /**
         * Updates this <code>InfoPanel</code>.
@@ -231,7 +265,7 @@ public final class InfoPanel extends FreeColPanel {
             add(endTurnLabel);
             add(endTurnButton);
             setOpaque(false);
-            setSize(250, endTurnLabel.getPreferredSize().height + endTurnButton.getPreferredSize().height + 30);
+            setSize(230, endTurnLabel.getPreferredSize().height + endTurnButton.getPreferredSize().height + 30);
 
             /* TODO:
               The action listener does not work, because this button looses it's focus.
