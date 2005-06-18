@@ -1348,25 +1348,27 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     public void setMissionary(boolean b) {
         setMovesLeft(0);
 
-        if (!(getLocation() instanceof Europe)
-                && (!(getLocation() instanceof Unit) || !(((Unit) getLocation()).getLocation() instanceof Europe))
-                && !getTile().getColony().getBuilding(Building.CHURCH).isBuilt()) {
-            throw new IllegalStateException("Can only dress as a missionary when the unit is located in Europe or a Colony with a church.");
-        } else {
-            if (isPioneer()) {
-                setNumberOfTools(0);
-            }
+        if (b) {
+            if (!(getLocation() instanceof Europe)
+                    && (!(getLocation() instanceof Unit) || !(((Unit) getLocation()).getLocation() instanceof Europe))
+                    && !getTile().getColony().getBuilding(Building.CHURCH).isBuilt()) {
+                throw new IllegalStateException("Can only dress as a missionary when the unit is located in Europe or a Colony with a church.");
+            } else {
+                if (isPioneer()) {
+                    setNumberOfTools(0);
+                }
 
-            if (isArmed()) {
-                setArmed(false);
-            }
+                if (isArmed()) {
+                    setArmed(false);
+                }
 
-            if (isMounted()) {
-                setMounted(false);
+                if (isMounted()) {
+                    setMounted(false);
+                }
             }
-
-            missionary = b;
         }
+        
+        missionary = b;
     }
 
 
@@ -1625,6 +1627,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             addP = true;
         } else if (isMounted() && getType() != SEASONED_SCOUT && getType() != BRAVE) {
             name = "Scout (";
+            addP = true;
+        } else if (isMissionary() && getType() != JESUIT_MISSIONARY) {
+            name = "Missionary (";
             addP = true;
         }
 
