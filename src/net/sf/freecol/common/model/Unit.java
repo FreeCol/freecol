@@ -206,7 +206,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         
         this.movesLeft = getInitialMovesLeft();
         setHitpoints(getInitialHitpoints(getType()));       
-        
+
         getOwner().invalidateCanSeeTiles();
     }
 
@@ -525,7 +525,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     *             <code>Tile</code> right after the specified starting tile, and
     *             {@link PathNode#getDirection} will return the direction you
     *             need to take in order to reach that tile.
-    *             This method returns <code>null</code> if no path is found.    
+    *             This method returns <code>null</code> if no path is found.
     * @see Map#findPath(tile, tile, options)
     * @see Map#findPath(unit, tile , tile)
     * @exception NullPointerException if <code>end == null</code>
@@ -630,7 +630,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
 
             Settlement settlement = target.getSettlement();
 
-            if ((settlement != null) && (!isOffensiveUnit() || isScout())) {
+            if ((settlement != null) && (!isOffensiveUnit() || isScout()) && getTile().isLand()) {
                 // Entering indian village or colony.
                 if (isScout()) {
                     if (settlement instanceof IndianSettlement) {
