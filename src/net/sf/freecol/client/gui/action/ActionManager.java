@@ -39,6 +39,8 @@ public class ActionManager extends OptionGroup {
         add(new MapControlsAction(freeColClient));
         add(new WaitAction(freeColClient));
         add(new SkipUnitAction(freeColClient));
+        add(new EndTurnAction(freeColClient));
+        add(new ChatAction(freeColClient));
         
         freeColClient.getClientOptions().add(this);
         freeColClient.getClientOptions().addToMap(this);

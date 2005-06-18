@@ -100,18 +100,12 @@ public final class CanvasKeyListener implements KeyListener {
             case KeyEvent.VK_PAGE_UP:
                 inGameController.moveActiveUnit(Map.NE);
                 break;
-            case KeyEvent.VK_ENTER:
-                inGameController.endTurn();
-                break;
             case KeyEvent.VK_S:
                 /*
                 if (parent.getGUI().getActiveUnit() != null) {
                     parent.getClient().getInGameController().changeState(parent.getGUI().getActiveUnit(), Unit.SENTRY);
                 }
                 */
-                break;
-            case KeyEvent.VK_T:
-                parent.showChatPanel();
                 break;
             case KeyEvent.VK_PLUS:
             case KeyEvent.VK_EQUALS:

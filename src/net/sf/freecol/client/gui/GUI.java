@@ -840,7 +840,7 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
         synchronized (this) {
             BufferedImage si = createStringImage(g, "getSizes", Color.WHITE, bounds.width, 12);
 
-            yy = (int) bounds.getHeight() - 200 - getMessageCount() * si.getHeight();//* 25-115 ;
+            yy = (int) bounds.getHeight() - 300 - getMessageCount() * si.getHeight();// 200 ;
             xx = 40;
 
             for (int i = 0; i < getMessageCount(); i++) {

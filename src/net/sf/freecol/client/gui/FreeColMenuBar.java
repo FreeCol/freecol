@@ -133,6 +133,16 @@ public class FreeColMenuBar extends JMenuBar {
 
         gameMenu.addSeparator();
 
+        final JMenuItem chatMenuItem = new JMenuItem(am.getFreeColAction(ChatAction.ID));
+        chatMenuItem.setOpaque(false);
+        gameMenu.add(chatMenuItem);
+
+        final JMenuItem endTurnMenuItem = new JMenuItem(am.getFreeColAction(EndTurnAction.ID));
+        endTurnMenuItem.setOpaque(false);
+        gameMenu.add(endTurnMenuItem);
+        
+        gameMenu.addSeparator();
+
         JMenuItem quitMenuItem = new JMenuItem(Messages.message("menuBar.game.quit"));
         quitMenuItem.setOpaque(false);
         quitMenuItem.setMnemonic(KeyEvent.VK_Q);
