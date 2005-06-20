@@ -286,27 +286,29 @@ public class FreeColMenuBar extends JMenuBar {
             }
         });
 
-        JMenuItem foreignMenuItem = new JMenuItem(Messages.message("menuBar.report.foreign"));
-        foreignMenuItem.setOpaque(false);
-        foreignMenuItem.setMnemonic(KeyEvent.VK_F);
-        //foreignMenuItem.setAccelerator(KeyStroke.getKeyStroke('L', InputEvent.CTRL_MASK));
-        reportMenu.add(foreignMenuItem);
-        foreignMenuItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                canvas.showReportPanel(ReportForeignAffairPanel.class.getName());
-            }
-        });
+        if (freeColClient.isSingleplayer()) {
+            JMenuItem foreignMenuItem = new JMenuItem(Messages.message("menuBar.report.foreign"));
+            foreignMenuItem.setOpaque(false);
+            foreignMenuItem.setMnemonic(KeyEvent.VK_F);
+            //foreignMenuItem.setAccelerator(KeyStroke.getKeyStroke('L', InputEvent.CTRL_MASK));
+            reportMenu.add(foreignMenuItem);
+            foreignMenuItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    canvas.showReportPanel(ReportForeignAffairPanel.class.getName());
+                }
+            });
 
-        JMenuItem indianMenuItem = new JMenuItem(Messages.message("menuBar.report.indian"));
-        indianMenuItem.setOpaque(false);
-        indianMenuItem.setMnemonic(KeyEvent.VK_I);
-        //indianMenuItem.setAccelerator(KeyStroke.getKeyStroke('I', InputEvent.CTRL_MASK));
-        reportMenu.add(indianMenuItem);
-        indianMenuItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                canvas.showReportPanel(ReportIndianPanel.class.getName());
-            }
-        });
+            JMenuItem indianMenuItem = new JMenuItem(Messages.message("menuBar.report.indian"));
+            indianMenuItem.setOpaque(false);
+            indianMenuItem.setMnemonic(KeyEvent.VK_I);
+            //indianMenuItem.setAccelerator(KeyStroke.getKeyStroke('I', InputEvent.CTRL_MASK));
+            reportMenu.add(indianMenuItem);
+            indianMenuItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    canvas.showReportPanel(ReportIndianPanel.class.getName());
+                }
+            });
+        }
 
         // --> Colopedia
 

@@ -577,6 +577,9 @@ public class Player extends FreeColGameObject {
             Iterator unitIterator = getUnitIterator();
             while (unitIterator.hasNext()) {
                 Unit unit = (Unit) unitIterator.next();
+                if (unit.getLocation() == null || !(unit.getLocation() instanceof Tile)) {
+                    continue;
+                }
 
                 Map.Position position = unit.getTile().getPosition();
                 canSeeTiles[position.getX()][position.getY()] = true;
@@ -1069,6 +1072,21 @@ public class Player extends FreeColGameObject {
 
                     units.add(u);
                 }
+            }
+            if (t.getSettlement() != null && t.getSettlement().getOwner().equals(this)) {
+                Iterator unitIterator = t.getUnitIterator();
+                while (unitIterator.hasNext()) {
+                    Unit u = (Unit) unitIterator.next();
+                    units.add(u);
+                }
+            }
+        }
+        
+        if (getEurope() != null) {
+            Iterator unitIterator = getEurope().getUnitIterator();
+            while (unitIterator.hasNext()) {
+                Unit u = (Unit) unitIterator.next();
+                units.add(u);
             }
         }
 

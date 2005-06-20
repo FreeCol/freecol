@@ -89,6 +89,9 @@ public class AIPlayer extends AIObject {
         aiUnitsIterator = getAIUnitIterator();
         while (aiUnitsIterator.hasNext()) {
             AIUnit aiUnit = (AIUnit) aiUnitsIterator.next();
+            if (aiUnit.getMission() == null) {
+                continue;
+            }
             if (!aiUnit.getMission().isValid() || aiUnit.getMission() instanceof UnitWanderHostileMission
                     || aiUnit.getMission() instanceof UnitWanderMission) {
                 aiUnit.setMission(null);
@@ -106,7 +109,7 @@ public class AIPlayer extends AIObject {
         aiUnitsIterator = getAIUnitIterator();
         while (aiUnitsIterator.hasNext()) {
             AIUnit aiUnit = (AIUnit) aiUnitsIterator.next();
-            if (!aiUnit.hasMission()) {
+            if (!aiUnit.hasMission() && aiUnit.getUnit().getLocation() instanceof Tile) {
                 aiUnit.setMission(new UnitWanderHostileMission(getAIMain(), aiUnit));
             }
         }
@@ -115,7 +118,9 @@ public class AIPlayer extends AIObject {
         aiUnitsIterator = getAIUnitIterator();
         while (aiUnitsIterator.hasNext()) {
             AIUnit aiUnit = (AIUnit) aiUnitsIterator.next();
-            aiUnit.doMission(getConnection());
+            if (aiUnit.getUnit().getLocation() instanceof Tile) {
+                aiUnit.doMission(getConnection());
+            }
         }
     }
 
@@ -160,7 +165,9 @@ public class AIPlayer extends AIObject {
                 AIUnit chosenOne = null;
                 while (it2.hasNext()) {
                     chosenOne = (AIUnit) getAIMain().getAIObject((Unit) it2.next());
-                    if (chosenOne.getMission() == null) {
+                    if (!(chosenOne.getUnit().getLocation() instanceof Tile)) {
+                        chosenOne = null;
+                    } else if (chosenOne.getMission() == null) {
                         break;
                     }
                 }

@@ -1,12 +1,14 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.GridLayout;
+import java.awt.BorderLayout;
 import java.awt.Image;
 import java.awt.event.ActionListener;
 import java.util.Iterator;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
@@ -100,6 +102,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
     
     private int[] unitCount;
 
+
     /**
      * The constructor that will add the items to this panel.
      * @param parent The parent of this panel.
@@ -120,15 +123,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
             Unit unit = (Unit) units.next();
             unitCount[unit.getType()]++;
         }
-        Iterator colonies = parent.getClient().getMyPlayer().getColonyIterator();
-        while (colonies.hasNext()) {
-            Colony colony = (Colony) colonies.next();
-            units = colony.getUnitIterator();
-            while (units.hasNext()) {
-                Unit unit = (Unit) units.next();
-                unitCount[unit.getType()]++;
-            }
-        }
+
         // Display Panel
         reportPanel.removeAll();
         reportPanel.setLayout(new GridLayout(7, 4));
@@ -154,7 +149,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
         buildLabourLabel(Unit.EXPERT_SILVER_MINER,    EXPERT_SILVER_MINER,      1f); //ImageLibrary.EXPERT_SILVER_MINER);
         buildLabourLabel(Unit.HARDY_PIONEER,          HARDY_PIONEER_WITH_TOOLS, 1f); //ImageLibrary.HARDY_PIONEER_WITH_TOOLS);
         buildLabourLabel(Unit.VETERAN_SOLDIER,        VETERAN_SOLDIER,          1f); //ImageLibrary.VETERAN_SOLDIER);
-        buildLabourLabel(Unit.SEASONED_SCOUT,         SEASONED_SCOUT_MOUNTED,   1f); //ImageLibrary.SEASONED_SCOUT_MOUNTED);
+        buildLabourLabel(Unit.SEASONED_SCOUT,         SEASONED_SCOUT_NOT_MOUNTED, 1f); //ImageLibrary.SEASONED_SCOUT_NOT_MOUNTED);
         buildLabourLabel(Unit.JESUIT_MISSIONARY,      JESUIT_MISSIONARY,        1f); //ImageLibrary.JESUIT_MISSIONARY);
         buildLabourLabel(Unit.ELDER_STATESMAN,        ELDER_STATESMAN,          1f); //ImageLibrary.ELDER_STATESMAN);
         buildLabourLabel(Unit.FIREBRAND_PREACHER,     FIREBRAND_PREACHER,       1f); //ImageLibrary.FIREBRAND_PREACHER);
@@ -168,9 +163,21 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
      * @param scale
      */
     private void buildLabourLabel(int unit, int unitIcon, float scale) {
-        String labour = "<html><p align=center>" + Unit.getName(unit) +
-                        "<p align=center>" + unitCount[unit] + "</html>";
-        JLabel label;
+        JPanel p1 = new JPanel(null);
+        p1.setOpaque(false);
+
+        String labour = "<html><p align=\"left\">" + Unit.getName(unit) +
+                        "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + unitCount[unit] + "</p></html>";
+
+        JLabel label = new JLabel(labour, JLabel.CENTER);
+        label.setVerticalAlignment(JLabel.TOP);
+        label.setVerticalTextPosition(JLabel.TOP);
+        label.setLocation(65, 0);
+        label.setSize(label.getPreferredSize());
+        //label.setSize(100, label.getPreferredSize().height);
+        p1.add(label, BorderLayout.CENTER);
+
+        JLabel imageLabel = null;
         if (unitIcon >= 0) {
             ImageIcon icon = library.getUnitImageIcon(unitIcon);
             if (scale != 1) {
@@ -181,13 +188,12 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
               image = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
               icon = new ImageIcon(image);
             }
-            label = new JLabel(labour, icon, JLabel.LEFT);
-            label.setVerticalAlignment(JLabel.TOP);
-            label.setVerticalTextPosition(JLabel.TOP);
+            imageLabel = new JLabel(icon);
+            imageLabel.setLocation(0, 0);
+            imageLabel.setSize(65, imageLabel.getPreferredSize().height);
+            p1.add(imageLabel, BorderLayout.WEST);
         }
-        else {
-            label = new JLabel(labour);
-        }
-        reportPanel.add(label);
+
+        reportPanel.add(p1);
     }
 }
