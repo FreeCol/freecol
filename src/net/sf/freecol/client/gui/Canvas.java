@@ -371,10 +371,20 @@ public final class Canvas extends JLayeredPane {
         String message = m.getMessageID();
 
         if (message.equals("EventPanel.MEETING_EUROPEANS")) {
-            showEventDialog(EventPanel.MEETING_EUROPEANS);
+            // Skip for now:
+            //showEventDialog(EventPanel.MEETING_EUROPEANS);
             freeColClient.getInGameController().nextModelMessage();
         } else if (message.equals("EventPanel.MEETING_NATIVES")) {
-            showEventDialog(EventPanel.MEETING_NATIVES);
+            // Skip for now:
+            //showEventDialog(EventPanel.MEETING_NATIVES);
+            freeColClient.getInGameController().nextModelMessage();
+        } else if (message.equals("EventPanel.MEETING_AZTEC")) {
+            // Skip for now:
+            //showEventDialog(EventPanel.MEETING_AZTEC);
+            freeColClient.getInGameController().nextModelMessage();
+        } else if (message.equals("EventPanel.MEETING_INCA")) {
+            // Skip for now:
+            //showEventDialog(EventPanel.MEETING_INCA);
             freeColClient.getInGameController().nextModelMessage();
         } else {
             try {
