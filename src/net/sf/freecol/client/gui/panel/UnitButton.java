@@ -8,6 +8,7 @@ import javax.swing.JComponent;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.action.MapControlsAction;
 import net.sf.freecol.client.FreeColClient;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -27,7 +28,6 @@ public final class UnitButton extends JButton {
     public static final int EUROPE = 2;
     
     private JComponent             container;
-    //private UserInputHandler       userInputHandler;
     private int                    buttonType;
     private GUI                    gui;
     private FreeColClient freeColClient;
@@ -42,14 +42,27 @@ public final class UnitButton extends JButton {
                             UNIT_BUTTON_ROAD = 6,
                             UNIT_BUTTON_BUILD = 7,
                             UNIT_BUTTON_DISBAND = 8,
-                            UNIT_BUTTON_COUNT = 9;
+                            UNIT_BUTTON_ZOOM_IN = 9,
+                            UNIT_BUTTON_ZOOM_OUT = 10,
+                            UNIT_BUTTON_COUNT = 11;
+
+                            
+    /**
+    * The basic constructor
+    */
+    public UnitButton(FreeColClient freeColClient, int index) {
+        this.freeColClient = freeColClient;
+        this.gui = freeColClient.getGUI();
+        initialize(index, freeColClient.getImageLibrary());
+    }
     
+
     /**
     * The basic constructor
     */
     public UnitButton(FreeColClient freeColClient, GUI gui) {
-      this.gui = gui;
-      this.freeColClient = freeColClient;
+        this.gui = gui;
+        this.freeColClient = freeColClient;
     }
         
 
@@ -176,7 +189,6 @@ public final class UnitButton extends JButton {
                     freeColClient.getInGameController().disbandActiveUnit();
                 }
                 break;
-
             default:
                 break;
         }

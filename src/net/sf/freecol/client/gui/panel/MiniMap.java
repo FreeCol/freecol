@@ -104,20 +104,20 @@ public final class MiniMap extends JPanel implements MouseInputListener {
             setSize(skin.getWidth(null), skin.getHeight(null));
             setOpaque(false);
             usingSkin = true;
-            // The values below should be specified by a skin-configuration-file:
+            // TODO-LATER: The values below should be specified by a skin-configuration-file:
             mapX = 38;
             mapY = 75;
         }
 
         // Add buttons:
-        miniMapZoomOutButton = new JButton("-");
+        miniMapZoomOutButton = new UnitButton(freeColClient, UnitButton.UNIT_BUTTON_ZOOM_OUT);
         miniMapZoomOutButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 zoomOut();
             }
         });
 
-        miniMapZoomInButton = new JButton("+");
+        miniMapZoomInButton = new UnitButton(freeColClient, UnitButton.UNIT_BUTTON_ZOOM_IN);
         miniMapZoomInButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 zoomIn();
@@ -126,10 +126,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
 
         miniMapZoomOutButton.setFocusable(false);
         miniMapZoomInButton.setFocusable(false);
-        miniMapZoomOutButton.setOpaque(true);
-        miniMapZoomInButton.setOpaque(true);
-        miniMapZoomOutButton.setSize(50, 20);
-        miniMapZoomInButton.setSize(50, 20);
+
         miniMapZoomOutButton.setActionCommand(String.valueOf(MINIMAP_ZOOMOUT));
         miniMapZoomInButton.setActionCommand(String.valueOf(MINIMAP_ZOOMIN));
 
@@ -141,8 +138,10 @@ public final class MiniMap extends JPanel implements MouseInputListener {
             bw += insets.left;
         }
 
-        miniMapZoomOutButton.setLocation(bw, bh);
-        miniMapZoomInButton.setLocation(bw + miniMapZoomOutButton.getWidth(), bh);
+        // TODO-LATER: The values below should be specified by a skin-configuration-file:
+        miniMapZoomInButton.setLocation(4, 174);
+        miniMapZoomOutButton.setLocation(300, 174);
+
         add(miniMapZoomInButton);
         add(miniMapZoomOutButton);
     }

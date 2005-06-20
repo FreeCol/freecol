@@ -267,6 +267,11 @@ public final class FreeColClient {
             return;
         }
     }
+
+
+    public ImageLibrary getImageLibrary() {
+        return imageLibrary;
+    }
     
     
     /**

@@ -167,7 +167,9 @@ public final class ImageLibrary extends ImageProvider {
                             UNIT_BUTTON_ROAD = 6,
                             UNIT_BUTTON_BUILD = 7,
                             UNIT_BUTTON_DISBAND = 8,
-                            UNIT_BUTTON_COUNT = 9;
+                            UNIT_BUTTON_ZOOM_IN = 9,
+                            UNIT_BUTTON_ZOOM_OUT = 10,
+                            UNIT_BUTTON_COUNT = 11;
 
     private static final int COLONY_SMALL = 0,
                             COLONY_MEDIUM = 1,
