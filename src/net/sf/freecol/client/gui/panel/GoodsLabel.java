@@ -31,6 +31,7 @@ public final class GoodsLabel extends JLabel implements ActionListener {
     private final Goods goods;
     private final Canvas parent;
     private boolean selected;
+    private boolean partialChosen;
 
     /**
     * Initializes this JLabel with the given goods data.
@@ -43,6 +44,7 @@ public final class GoodsLabel extends JLabel implements ActionListener {
         setToolTipText(goods.getName());
         this.parent = parent;
         selected = false;
+        partialChosen = false;
     }
 
     
@@ -54,6 +56,16 @@ public final class GoodsLabel extends JLabel implements ActionListener {
     public GoodsLabel(Goods goods, Canvas parent, boolean isSmall) {
         this(goods, parent);
         setSmall(true);
+    }
+
+
+    public boolean isPartialChosen() {
+        return partialChosen;
+    }
+    
+    
+    public void setPartialChosen(boolean partialChosen) {
+        this.partialChosen = partialChosen;
     }
 
 

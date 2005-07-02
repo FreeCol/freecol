@@ -197,17 +197,15 @@ public final class DragListener extends MouseAdapter {
 
             if (e.isShiftDown()) {
                 if (comp instanceof GoodsLabel) {
-                    ((GoodsLabel) comp).getGoods().setAmount(-1);
+                    ((GoodsLabel) comp).setPartialChosen(true);
                 } else if (comp instanceof MarketLabel) {
-                    ((MarketLabel) comp).setAmount(-1);
+                    ((MarketLabel) comp).setPartialChosen(true);
                 }
             } else {
-                // We can have less than 100 of the goods so we must not do setAmount(100).
-                //if (comp instanceof GoodsLabel) {
-                    //((GoodsLabel) comp).getGoods().setAmount(100);
-                //} else
-                
-                if (comp instanceof MarketLabel) {
+                if (comp instanceof GoodsLabel) {
+                    ((GoodsLabel) comp).setPartialChosen(false);
+                } else if (comp instanceof MarketLabel) {
+                    ((MarketLabel) comp).setPartialChosen(false);
                     ((MarketLabel) comp).setAmount(100);
                 }
             }

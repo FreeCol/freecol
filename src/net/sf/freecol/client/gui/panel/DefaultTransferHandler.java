@@ -199,7 +199,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                     return false;
                 }
 
-                if (!unit.isNaval() && (comp instanceof EuropePanel.InPortPanel 
+                if (!unit.isNaval() && (comp instanceof EuropePanel.InPortPanel
                         || comp instanceof ColonyPanel.InPortPanel
                         || comp instanceof EuropePanel.ToEuropePanel
                         || comp instanceof EuropePanel.ToAmericaPanel)) {
@@ -209,7 +209,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                 if (comp instanceof EuropePanel.MarketPanel || comp instanceof ColonyPanel.WarehousePanel) {
                     return false;
                 }
-                
+
                 if (unit.isNaval() && (comp instanceof EuropePanel.CargoPanel
                         || comp instanceof EuropePanel.DocksPanel
                         || comp instanceof ColonyPanel.OutsideColonyPanel
@@ -268,7 +268,7 @@ public final class DefaultTransferHandler extends TransferHandler {
 
                 // Import the data.
 
-                if (((GoodsLabel) data).getGoods().getAmount() == -1) {
+                if (((GoodsLabel) data).isPartialChosen()) {
                     int amount = getAmount();
                     if (amount == -1) {
                         return false;
@@ -324,7 +324,7 @@ public final class DefaultTransferHandler extends TransferHandler {
 
                 // Import the data.
 
-                if (((MarketLabel) data).getAmount() == -1) {
+                if (((MarketLabel) data).isPartialChosen()) {
                     int amount = getAmount();
                     if (amount == -1) {
                         return false;
@@ -504,6 +504,7 @@ public final class DefaultTransferHandler extends TransferHandler {
         public void dragDropEnd(DragSourceDropEvent dsde) {
             DragSourceContext dsc = dsde.getDragSourceContext();
             JComponent c = (JComponent)dsc.getComponent();
+            
             if (dsde.getDropSuccess()) {
                 ((DefaultTransferHandler) c.getTransferHandler()).exportDone(c, dsc.getTransferable(), dsde.getDropAction());
             } else {
@@ -516,19 +517,15 @@ public final class DefaultTransferHandler extends TransferHandler {
         public void dropActionChanged(DragSourceDragEvent dsde) {
             DragSourceContext dsc = dsde.getDragSourceContext();
             JComponent comp = (JComponent)dsc.getComponent();
-
-            if (dsde.getUserAction() == MOVE) {
-                if (comp instanceof GoodsLabel) {
-                    ((GoodsLabel) comp).getGoods().setAmount(-1);
-                } else if (comp instanceof MarketLabel) {
-                    ((MarketLabel) comp).setAmount(-1);
-                }
-            } else {
-                if (comp instanceof GoodsLabel) {
-                    ((GoodsLabel) comp).getGoods().setAmount(100);
-                } else if (comp instanceof MarketLabel) {
-                    ((MarketLabel) comp).setAmount(100);
-                }
+            updatePartialChosen(comp, dsde.getUserAction() == MOVE);
+        }
+        
+        
+        private void updatePartialChosen(JComponent comp, boolean partialChosen) {
+            if (comp instanceof GoodsLabel) {
+                ((GoodsLabel) comp).setPartialChosen(partialChosen);
+            } else if (comp instanceof MarketLabel) {
+                ((MarketLabel) comp).setPartialChosen(partialChosen);
             }
         }
     }

@@ -952,7 +952,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
                 return getSpaceLeft() >= locatable.getTakeSpace();
             } else if (locatable instanceof Goods) {
                 Goods g = (Goods) locatable;
-                return getSpaceLeft() > 0 || getGoodsContainer().getGoodsCount(g.getType()) % 100 + g.getAmount() <= 100;
+                return getSpaceLeft() > 0 || 
+                       (getGoodsContainer().getGoodsCount(g.getType()) % 100 != 0
+                        && getGoodsContainer().getGoodsCount(g.getType()) % 100 + g.getAmount() <= 100);
             } else { // Is there another class that implements Locatable ??
                 logger.warning("Oops, not implemented...");
                 return false;

@@ -30,6 +30,7 @@ public final class MarketLabel extends JLabel implements ActionListener {
     private int amount;
     private final Market market;
     private final Canvas parent;
+    private boolean partialChosen;
 
     /**
     * Initializes this JLabel with the given goods type.
@@ -48,9 +49,11 @@ public final class MarketLabel extends JLabel implements ActionListener {
 
         this.market = market;
         this.parent = parent;
+        partialChosen = false;
+        amount = 100;
     }
 
-    
+
     /**
     * Initializes this JLabel with the given goods type.
     * @param goods The Goods type that this JLabel will visually represent.
@@ -59,7 +62,16 @@ public final class MarketLabel extends JLabel implements ActionListener {
     public MarketLabel(int type, Market market, Canvas parent, boolean isSmall) {
         this(type, market, parent);
         setSmall(true);
-        amount = 100;
+    }
+
+
+    public boolean isPartialChosen() {
+        return partialChosen;
+    }
+    
+    
+    public void setPartialChosen(boolean partialChosen) {
+        this.partialChosen = partialChosen;
     }
 
 
