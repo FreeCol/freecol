@@ -97,7 +97,6 @@ public final class MetaServer extends Thread {
      * Creates a new network server. Use {@link #run metaServer.start()} to start
      * listening for new connections.
      *
-     * @param freeColServer The owner of this <code>Server</code>.
      * @param port The TCP port to use for the public socket.
      * @throws IOException if the public socket cannot be created.
      */

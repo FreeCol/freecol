@@ -18,14 +18,14 @@ public abstract class ImageProvider {
     
     /**
     * Should return the Image of the Unit with the given type.
-    * @param index The type of the Unit of which we need the Image.
+    * @param type The type of the Unit of which we need the Image.
     * @return The Image of the Unit with the given type.
     */
     public abstract Image getUnitImage(int type);
     
     /**
     * Should return the Image of the terrain with the given type.
-    * @param index The type of the terrain of which we need the Image.
+    * @param type The type of the terrain of which we need the Image.
     * @param x The x-coordinate of the location of the tile that is being drawn.
     * @param y The x-coordinate of the location of the tile that is being drawn.
     * @return The Image of the terrain with the given type.
@@ -34,35 +34,35 @@ public abstract class ImageProvider {
     
     /**
     * Should return the Image of the graphic with the given type.
-    * @param index The type of the graphic of which we need the Image.
+    * @param type The type of the graphic of which we need the Image.
     * @return The Image of the graphic with the given type.
     */
     public abstract Image getGoodsImage(int type);
 
     /**
     * Should return the Image of the graphic with the given type.
-    * @param index The type of the graphic of which we need the Image.
+    * @param type The type of the graphic of which we need the Image.
     * @return The Image of the graphic with the given type.
     */
     public abstract ImageIcon getGoodsImageIcon(int type);
 
     /**
     * Should return the Image of the graphic with the given type.
-    * @param index The type of the graphic of which we need the Image.
+    * @param type The type of the graphic of which we need the Image.
     * @return The Image of the graphic with the given type.
     */
     public abstract Image getMiscImage(int type);
     
     /**
     * Should return the Image of the color chip with the given color.
-    * @param index The color of the color chip of which we need the Image.
+    * @param color The color of the color chip of which we need the Image.
     * @return The Image of the color chip with the given color.
     */
     public abstract Image getColorChip(Color color);
     
     /**
     * Should return the ImageIcon of the Unit with the given type.
-    * @param index The type of the Unit of which we need the ImageIcon.
+    * @param type The type of the Unit of which we need the ImageIcon.
     * @return The ImageIcon of the Unit with the given type.
     */
     public abstract ImageIcon getUnitImageIcon(int type);

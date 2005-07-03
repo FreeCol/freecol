@@ -211,7 +211,7 @@ public final class Canvas extends JLayeredPane {
 
     /**
     * Returns the <code>ClientOptionsDialog</code>.
-    * @see ClientOptions
+    * @see net.sf.freecol.client.ClientOptions
     */
     public ClientOptionsDialog getClientOptionsDialog() {
         return clientOptionsDialog;
@@ -493,10 +493,11 @@ public final class Canvas extends JLayeredPane {
         return response;
     }
 
-    
+
     /**
     * Is this <code>Canvas</code> displaying another panel.
-    * {@link InfoPanel} and {@link Minimap} is ignored..
+    * {@link net.sf.freecol.client.gui.panel.InfoPanel} and
+    * {@link net.sf.freecol.client.gui.panel.MiniMap} is ignored.
     */
     public boolean isShowingSubPanel() {
         if (getColonyPanel().isShowing() || getEuropePanel().isShowing()) {
@@ -919,7 +920,7 @@ public final class Canvas extends JLayeredPane {
     * Shows a panel where the player may choose the next founding father to recruit.
     * @param possibleFoundingFathers The different founding fathers the player may choose.
     * @return The founding father the player has chosen.
-    * @see FoundingFather
+    * @see net.sf.freecol.common.model.FoundingFather
     */
     public int showChooseFoundingFatherDialog(int[] possibleFoundingFathers) {
         chooseFoundingFatherDialog.initialize(possibleFoundingFathers);

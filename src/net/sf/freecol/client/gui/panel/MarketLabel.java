@@ -34,7 +34,7 @@ public final class MarketLabel extends JLabel implements ActionListener {
 
     /**
     * Initializes this JLabel with the given goods type.
-    * @param goods The Goods type that this JLabel will visually represent.
+    * @param type The Goods type that this JLabel will visually represent.
     * @param parent The parent that knows more than we do.
     */
     public MarketLabel(int type, Market market, Canvas parent) {
@@ -56,7 +56,7 @@ public final class MarketLabel extends JLabel implements ActionListener {
 
     /**
     * Initializes this JLabel with the given goods type.
-    * @param goods The Goods type that this JLabel will visually represent.
+    * @param type The Goods type that this JLabel will visually represent.
     * @param parent The parent that knows more than we do.
     */
     public MarketLabel(int type, Market market, Canvas parent, boolean isSmall) {

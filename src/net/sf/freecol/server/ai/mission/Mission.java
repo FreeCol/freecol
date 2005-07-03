@@ -33,9 +33,8 @@ public abstract class Mission extends AIObject {
 
 
     /**
-    * Creates a mission for the given <code>AIUnit</code>.
-    * @param aiUnit The <code>AIUnit</code> this mission
-    *        is created for.
+    * Creates a mission.
+    * @param aiMain The main AI-object.
     */
     public Mission(AIMain aiMain) {
         this(aiMain, null);
@@ -44,6 +43,8 @@ public abstract class Mission extends AIObject {
 
     /**
     * Creates a mission for the given <code>AIUnit</code>.
+    *
+    * @param aiMain The main AI-object.
     * @param aiUnit The <code>AIUnit</code> this mission
     *        is created for.
     */
@@ -63,7 +64,7 @@ public abstract class Mission extends AIObject {
     *         or {@link #NO_MORE_MOVES_LEFT} if there are no more moves left and
     *         {@link #NO_PATH_TO_TARGET} if there is no path to follow.
     *         If a direction is returned, it is guarantied that moving in that direction
-    *         is not an {@link #ILLEGAL_MOVE}.
+    *         is not an {@link Unit#ILLEGAL_MOVE}.
     */
     protected int moveTowards(Connection connection, Tile tile) {
         Map map = getAIMain().getGame().getMap();
@@ -90,11 +91,11 @@ public abstract class Mission extends AIObject {
     * This is done in a loop until the end of the path is reached, the next step is not a move
     * or when there are no moves left.
     *
-    * @param tile The <code>Tile</code> the unit should move towards.
+    * @param pathNode The first node of the path.
     * @return The direction to take the final move (greater than or equal to zero),
-    *         or {@link #NO_MORE_MOVES_LEFT} if there are no more moves left.    
+    *         or {@link #NO_MORE_MOVES_LEFT} if there are no more moves left.
     *         If a direction is returned, it is guarantied that moving in that direction
-    *         is not an {@link #ILLEGAL_MOVE}.
+    *         is not an {@link Unit#ILLEGAL_MOVE}.
     */
     protected int moveTowards(Connection connection, PathNode pathNode) {
         int direction = pathNode.getDirection();
@@ -129,8 +130,8 @@ public abstract class Mission extends AIObject {
     /**
     * Finds the best target to attack within the given range.
     *
-    * @param maxTurn The maximum number of turns the unit is allowed
-    *                to spend in order to reach the target.
+    * @param maxTurns The maximum number of turns the unit is allowed
+    *                 to spend in order to reach the target.
     * @return The path to the target or <code>null</code> if no target can
     *         be found.
     */

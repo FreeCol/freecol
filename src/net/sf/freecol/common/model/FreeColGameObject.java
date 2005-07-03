@@ -157,8 +157,6 @@ abstract public class FreeColGameObject {
     * This method should return an XML-representation of this object.
     * All attributes will be made visable.
     *
-    * @param player The <code>Player</code> this XML-representation is
-    *               made for.
     * @param document The document to use when creating new componenets.
     * @return The DOM-element ("Document Object Model").
     * @see #toXMLElement(Player, Document, boolean, boolean)
@@ -172,11 +170,9 @@ abstract public class FreeColGameObject {
     * This method should return an XML-representation of this object
     * for the purpose of storing this object when saving the game.
     *
-    * @param player The <code>Player</code> this XML-representation is
-    *               made for.
     * @param document The document to use when creating new componenets.
     * @return The DOM-element ("Document Object Model").
-    * @see #toXMLElement(Player, Document, boolean, boolean)    
+    * @see #toXMLElement(Player, Document, boolean, boolean)
     */
     public Element toSavedXMLElement(Document document) {
         return toXMLElement(null, document, true, true);
@@ -222,7 +218,7 @@ abstract public class FreeColGameObject {
     /**
     * Gets the unique ID of this object.
     *
-    * @param the unique ID of this object,
+    * @return The unique ID of this object,
     */
     public String getID() {
         return id;
@@ -234,7 +230,7 @@ abstract public class FreeColGameObject {
     * it it automatically registered at the corresponding <code>Game</code>
     * with the new ID.
     *
-    * @param newId the unique ID of this object,
+    * @param newID the unique ID of this object,
     */
     public void setID(String newID) {
         if (!(this instanceof Game)) {
@@ -256,7 +252,7 @@ abstract public class FreeColGameObject {
     * <code>toXMLElement</code>. This method does not
     * register the object.
     *
-    * @param newId the unique ID of this object,
+    * @param newID the unique ID of this object,
     */
     public void setFakeID(String newID) {
         this.id = newID;

@@ -566,7 +566,7 @@ public class Player extends FreeColGameObject {
     * all the tiles within a {@link Unit}s line of sight visible.
     * The other tiles are made unvisible.
     * <br><br>
-    * Use {@link updateCanSeeTiles} whenever possible.
+    * Use {@link #invalidateCanSeeTiles} whenever possible.
     */
     public void resetCanSeeTiles() {
         Map map = getGame().getMap();
@@ -662,7 +662,7 @@ public class Player extends FreeColGameObject {
     * <code>Tile</code>. The <code>Tile</code> can be seen if
     * it is in a {@link Unit}'s line of sight.
     *
-    * @param The given <code>Tile</code>.
+    * @param tile The given <code>Tile</code>.
     * @return <i>true</i> if the <code>Player</code> can see
     *         the given <code>Tile</code> and <i>false</i>
     *         otherwise.
@@ -1224,7 +1224,7 @@ public class Player extends FreeColGameObject {
     /**
     * Gets the number of crosses this player possess.
     * @return The number.
-    * @see setCrosses
+    * @see #setCrosses
     */
     public int getCrosses() {
         return crosses;

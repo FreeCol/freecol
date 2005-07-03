@@ -459,7 +459,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     * Handles an "attack"-message from a client.
     *
     * @param connection The connection the message came from.
-    * @param moveElement The element containing the request.
+    * @param attackElement The element containing the request.
     * @exception IllegalArgumentException If the data format of the message is invalid.
     * @exception IllegalStateException If the request is not accepted by the model.
     *
@@ -1115,7 +1115,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     * Handles a "buyGoods"-message from a client.
     *
     * @param connection The connection the message came from.
-    * @param boardShipElement The element containing the request.
+    * @param buyGoodsElement The element containing the request.
     */
     private Element buyGoods(Connection connection, Element buyGoodsElement) {
         Game game = getFreeColServer().getGame();
@@ -1143,7 +1143,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     * Handles a "sellGoods"-message from a client.
     *
     * @param connection The connection the message came from.
-    * @param leaveShipElement The element containing the request.
+    * @param sellGoodsElement The element containing the request.
     */
     private Element sellGoods(Connection connection, Element sellGoodsElement) {
         Game game = getFreeColServer().getGame();
@@ -1210,7 +1210,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     * Handles a "moveToAmerica"-message from a client.
     *
     * @param connection The connection the message came from.
-    * @param element The element containing the request.
+    * @param moveToAmericaElement The element containing the request.
     */
     private Element moveToAmerica(Connection connection, Element moveToAmericaElement) {
         Game game = getFreeColServer().getGame();
@@ -1232,7 +1232,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     * Handles a "buildColony"-request from a client.
     *
     * @param connection The connection the message came from.
-    * @param element The element containing the request.
+    * @param buildColonyElement The element containing the request.
     */
     private Element buildColony(Connection connection, Element buildColonyElement) {
         Game game = getFreeColServer().getGame();
@@ -1281,7 +1281,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     * Handles a "recruitUnitInEurope"-request from a client.
     *
     * @param connection The connection the message came from.
-    * @param element The element containing the request.
+    * @param recruitUnitInEuropeElement The element containing the request.
     */
     private Element recruitUnitInEurope(Connection connection, Element recruitUnitInEuropeElement) {
         Game game = getFreeColServer().getGame();
@@ -1307,7 +1307,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     * Handles an "emigrateUnitInEurope"-request from a client.
     *
     * @param connection The connection the message came from.
-    * @param element The element containing the request.
+    * @param emigrateUnitInEuropeElement The element containing the request.
     */
     private Element emigrateUnitInEurope(Connection connection, Element emigrateUnitInEuropeElement) {
         Game game = getFreeColServer().getGame();
@@ -1343,7 +1343,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     * Handles a "trainUnitInEurope"-request from a client.
     *
     * @param connection The connection the message came from.
-    * @param element The element containing the request.
+    * @param trainUnitInEuropeElement The element containing the request.
     */
     private Element trainUnitInEurope(Connection connection, Element trainUnitInEuropeElement) {
         Game game = getFreeColServer().getGame();
@@ -1492,7 +1492,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     * Handles a "changeState"-message from a client.
     *
     * @param connection The connection the message came from.
-    * @param moveElement The element containing the request.
+    * @param changeStateElement The element containing the request.
     * @exception IllegalArgumentException If the data format of the message is invalid.
     * @exception IllegalStateException If the request is not accepted by the model.
     *

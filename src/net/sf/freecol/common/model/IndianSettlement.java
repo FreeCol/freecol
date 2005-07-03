@@ -560,7 +560,8 @@ public class IndianSettlement extends Settlement {
     * server, since the settlement's {@link GoodsContainer}
     * is hidden from the clients.
     *
-    * @param goods The <code>Goods</code> to price.
+    * @param type The type of <code>Goods</code> to price.
+    * @param amount The amount of <code>Goods</code> to price.
     * @return The price.
     */
     public int getPrice(int type, int amount) {
@@ -931,8 +932,8 @@ public class IndianSettlement extends Settlement {
     /**
     * Creates the {@link GoodsContainer}.
     * <br><br>
-    * DO NOT USE OTHER THAN IN {@link FreeColServer#loadGame}: Only for compatibility when loading
-    * save games with pre-0.0.3 protocols.
+    * DO NOT USE OTHER THAN IN {@link net.sf.freecol.server.FreeColServer#loadGame}:
+    * Only for compatibility when loading savegames with pre-0.0.3 protocols.
     */
     public void createGoodsContainer() {
         goodsContainer = new GoodsContainer(getGame(), this);

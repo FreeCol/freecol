@@ -488,7 +488,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     /**
     * Selects a unit that is located somewhere on this panel.
     *
-    * @param unit The unit that is being selected.
+    * @param unitLabel The unit that is being selected.
     */
     public void setSelectedUnitLabel(UnitLabel unitLabel) {
         if (selectedUnit != unitLabel) {

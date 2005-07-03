@@ -193,7 +193,7 @@ public class MapGenerator {
      * Finds a suitable location for a settlement and builds it there. If no
      * location can be found (the iterator is exhausted) the settlement will
      * be discarded.
-     * @param settlement The settlement to place
+     *
      * @param iterator The nation's iterator to use
      * @throws FreeColException if thrown by a called method
      */
@@ -252,22 +252,20 @@ public class MapGenerator {
 
     /**
     * Generates wanted goods for a given location (indian settlement)
-
-    * @param tile The tile where the settlement is located.
+    * @param mainTile The tile where the settlement is located.
     * @return An int array containing the 3 wanted goods.
     */
-
     private int[] generateWantedGoodsForLocation(Map map, Tile mainTile) {
 
         Iterator iter = map.getAdjacentIterator(mainTile.getPosition());
-  
+
         //logger.info("creating want list for settlement");
 
-        /* this probably needs finetuning. 
+        /* this probably needs finetuning.
            The indians should prefer manufactured goods.
 
            TODO: take hills and mountains into consideration
-        
+
         */
 
         // for every good there's a counter, some of them are randomized

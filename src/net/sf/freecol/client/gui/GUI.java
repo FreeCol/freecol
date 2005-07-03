@@ -1076,8 +1076,6 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
      * (in pixels).
      * @param y The y-coordinate of the location where to draw the Tile
      * (in pixels).
-     * @param drawUnexploredBorders If true; draws border between explored and
-     *        unexplored terrain.
      */
     public void displayColonyTile(Graphics2D g, Map map, Tile tile, int x, int y, Colony colony) {
         displayTile(g, map, tile, x, y, false, false);

@@ -414,7 +414,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
     /**
     * Selects a unit that is located somewhere on this panel.
     *
-    * @param unit The unit that is being selected.
+    * @param unitLabel The unit that is being selected.
     */
     public void setSelectedUnitLabel(UnitLabel unitLabel) {
         if (selectedUnit != unitLabel) {
@@ -966,7 +966,6 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
 
         /**
         * The constructor to use.
-        * @param actionListener The ActionListener for this panel's buttons.
         */
         public RecruitDialog() {
             setFocusCycleRoot(true);
@@ -1153,7 +1152,6 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
 
         /**
         * The constructor to use.
-        * @param actionListener The ActionListener for this panel's buttons.
         */
         public PurchaseDialog() {
             setFocusCycleRoot(true);
@@ -1428,7 +1426,6 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
 
         /**
         * The constructor to use.
-        * @param actionListener The ActionListener for this panel's buttons.
         */
         public TrainDialog() {
             setFocusCycleRoot(true);

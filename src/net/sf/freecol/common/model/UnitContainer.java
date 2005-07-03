@@ -34,7 +34,7 @@ public class UnitContainer extends FreeColGameObject {
     * Creates an empty <code>UnitContainer</code>.
     *
     * @param game The <code>Game</code> in which this <code>UnitContainer</code> belong.
-    * @param location The <code>Location</code> this <code>UnitContainer</code> will be containg units for.
+    * @param parent The <code>Location</code> this <code>UnitContainer</code> will be containg units for.
     */
     public UnitContainer(Game game, Location parent) {
         super(game);
@@ -71,9 +71,9 @@ public class UnitContainer extends FreeColGameObject {
 
     /**
     * Adds a <code>Unit</code> to this containter.
-    * @param u The Unit to add to this container.
+    * @param unit The Unit to add to this container.
     */
-    public void addUnit(Unit unit) {    
+    public void addUnit(Unit unit) {
         if (!units.contains(unit)) {
             units.add(unit);
         }
@@ -100,7 +100,7 @@ public class UnitContainer extends FreeColGameObject {
     /**
     * Checks if the specified <code>Unit</code> is in this container.
     *
-    * @param The <code>Unit</code> to test the presence of.
+    * @param u The <code>Unit</code> to test the presence of.
     * @return The result.
     */
     public boolean contains(Unit u) {

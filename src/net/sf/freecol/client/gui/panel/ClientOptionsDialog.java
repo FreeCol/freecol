@@ -19,7 +19,7 @@ import javax.swing.*;
 
 
 /**
-* Dialog for changing the {@link ClientOptions}.
+* Dialog for changing the {@link net.sf.freecol.client.ClientOptions}.
 */
 public final class ClientOptionsDialog extends FreeColDialog implements ActionListener {
     private static final Logger logger = Logger.getLogger(ClientOptionsDialog.class.getName());

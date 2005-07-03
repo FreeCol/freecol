@@ -60,7 +60,7 @@ public class Connection {
     *
     * @param host The host to connect to.
     * @param port The port to connect to.
-    * @param p The MessageHandler to call for each message received.
+    * @param messageHandler The MessageHandler to call for each message received.
     * @throws IOException
     */
     public Connection(String host, int port, MessageHandler messageHandler) throws IOException {
@@ -228,7 +228,7 @@ public class Connection {
 
     /**
     * Sets the MessageHandler for this Connection.
-    * @param The new MessageHandler for this Connection.
+    * @param mh The new MessageHandler for this Connection.
     */
     public void setMessageHandler(MessageHandler mh) {
         messageHandler = mh;

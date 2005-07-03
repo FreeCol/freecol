@@ -743,7 +743,6 @@ public final class InGameController implements NetworkConstants {
     * Leave a ship. This method should only be invoked if the ship is in a harbour.
     *
     * @param unit The unit who is going to leave the ship where it is located.
-    * @param carrier The carrier.
     */
     public void leaveShip(Unit unit) {
         Client client = freeColClient.getClient();
@@ -786,7 +785,7 @@ public final class InGameController implements NetworkConstants {
     * Unload cargo. This method should only be invoked if the unit carrying the
     * cargo is in a harbour.
     *
-    * @param unit The goods which are going to leave the ship where it is located.
+    * @param goods The goods which are going to leave the ship where it is located.
     */
     public void unloadCargo(Goods goods) {
         Client client = freeColClient.getClient();
@@ -1007,7 +1006,7 @@ public final class InGameController implements NetworkConstants {
     /**
     * Changes the current construction project of a <code>Colony</code>.
     * @param colony The <code>Colony</code>
-    * @param typ The new type of building to build.
+    * @param type The new type of building to build.
     */
     public void setCurrentlyBuilding(Colony colony, int type) {
         Client client = freeColClient.getClient();
@@ -1025,7 +1024,7 @@ public final class InGameController implements NetworkConstants {
     /**
     * Changes the state of this <code>Unit</code>.
     * @param unit The <code>Unit</code>
-    * @param occupation The state of the unit.
+    * @param state The state of the unit.
     */
     public void changeState(Unit unit, int state) {
         Client client = freeColClient.getClient();

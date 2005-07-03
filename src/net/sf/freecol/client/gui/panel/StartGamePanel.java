@@ -206,8 +206,8 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
     /**
     * Initializes the data that is displayed in this panel.
     *
-    * @param singlePlayerMode 'true' if the user wants to start a single player game,
-    *        'false' otherwise.
+    * @param singlePlayerGame <code>true</code> if the user
+    *        wants to start a single player game, <code>false</code> otherwise.
     */
     public void initialize(boolean singlePlayerGame) {
         this.singlePlayerGame = singlePlayerGame;

@@ -79,8 +79,6 @@ public class SoundPlayer {
     *                       stop the sound currently playing and play the new instead.
     *
     * @param isMIDIEnabled Should MIDI be enabled?
-    * @param defaultRepeatMode This is the default repeat-mode for a playlist. Refer to the field summary of the {@link Playlist}-class to get the different values.
-    * @param defaultPickMode This is the default pick-mode for a playlist. Refer to the field summary of the {@link Playlist}-class to get the different values.
     * @param defaultPlayContinues Should the player continue playing after it it finished with a sound-clip? This is the default used with the <i>play(Playlist playlist)</i>.
     *
     */
@@ -346,7 +344,7 @@ public class SoundPlayer {
 
         /**
         * Play the sound in <i>currentSound<i>.
-        * @see loadSound
+        * @see #loadSound
         */
         private void playSound() {
             midiEOM = audioEOM = false;

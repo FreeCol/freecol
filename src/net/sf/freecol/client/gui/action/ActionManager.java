@@ -49,7 +49,7 @@ public class ActionManager extends OptionGroup {
     
     /**
     * Adds the given <code>FreeColAction</code>.
-    * @param The <code>FreeColAction</code> that should be added to this
+    * @param freeColAction The <code>FreeColAction</code> that should be added to this
     *        <code>ActionManager</code>.
     */
     public void add(FreeColAction freeColAction) {
@@ -69,7 +69,7 @@ public class ActionManager extends OptionGroup {
                 return fa;
             }
         }
-        
+
         return null;
     }
     

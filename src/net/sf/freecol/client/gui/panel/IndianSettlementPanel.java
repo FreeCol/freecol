@@ -35,7 +35,6 @@ public final class IndianSettlementPanel extends FreeColDialog implements Action
 
     /**
     * The constructor that will add the items to this panel.
-    * @param parent The parent of this panel.
     */
     public IndianSettlementPanel() {
         int[] w = {10, 0, 0, 10};

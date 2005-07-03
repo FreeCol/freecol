@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 
 
 /**
-* An action for displaying the {@link EuropePanel}.
+* An action for displaying the {@link net.sf.freecol.client.gui.panel.EuropePanel}.
 */
 public class EuropeAction extends MapboardAction {
     private static final Logger logger = Logger.getLogger(EuropeAction.class.getName());

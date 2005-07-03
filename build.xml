@@ -116,6 +116,7 @@
              overview="${freecol.overview.file}"
              destdir="${freecol.javadoc.dir}"
              packagenames="net.sf.freecol.*"
+             classpath="${basedir}/jars/higlayout.jar"
              Author="true"
              Windowtitle="FreeCol Code Documentation"
     />

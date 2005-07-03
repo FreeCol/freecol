@@ -13,10 +13,9 @@ import javax.swing.*;
 import net.sf.freecol.client.gui.Canvas;
 
 /**
- * This panel displays the different founding fathers the player can work towards
- * recruiting.
+ * Panel for chosing the goods to capture.
  *
- * @see Unit#winAttack(net.sf.freecol.common.model.Unit)
+ * @see Unit#attack
  */
 public final class CaptureGoodsDialog extends FreeColDialog implements ActionListener {
     private static final Logger logger = Logger.getLogger(CaptureGoodsDialog.class.getName());
@@ -162,7 +161,7 @@ public final class CaptureGoodsDialog extends FreeColDialog implements ActionLis
     /**
     * This function analyses an event and calls the right methods to take
     * care of the user's requests. The response is an ArrayList of Goods.
-    * @param event The incoming ActionEvent.
+    * @param e The incoming ActionEvent.
     */
     public void actionPerformed(ActionEvent e) {
         ArrayList list = new ArrayList(4);

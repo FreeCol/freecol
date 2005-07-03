@@ -130,13 +130,13 @@ public class Map extends FreeColGameObject {
     * <br><br>
     *
     * <i>Important: This method will not include colonies in a possible
-    * path, and {@link PathNode#getTurns}, {@link PathNode#getTotalTurns and
-    * {@link PathNode#getMovesLeft will all return <code>-1</code> for
+    * path, and {@link PathNode#getTurns}, {@link PathNode#getTotalTurns} and
+    * {@link PathNode#getMovesLeft} will all return <code>-1</code> for
     * the generated {@link PathNode}s.
     *
     * <br><br>
     *
-    * Use {@link #findPath(unit, tile, tile)} whenever possible.</i>
+    * Use {@link #findPath(Unit, Tile, Tile)} whenever possible.</i>
     *
     * @param start The <code>Tile</code> in which the path starts from.
     * @param end The end of the path.
@@ -148,8 +148,8 @@ public class Map extends FreeColGameObject {
     *             {@link PathNode#getDirection} will return the direction you
     *             need to take in order to reach that tile.
     *             This method returns <code>null</code> if no path is found.    
-    * @see findPath(unit, tile , tile)
-    * @see Unit#findPath(tile)
+    * @see #findPath(Unit, Tile, Tile)
+    * @see Unit#findPath(Tile)
     * @exception NullPointerException if either <code>start</code> or <code>end</code>
     *             are <code>null</code>.
     */
@@ -173,8 +173,8 @@ public class Map extends FreeColGameObject {
     *             {@link PathNode#getDirection} will return the direction you
     *             need to take in order to reach that tile.
     *             This method returns <code>null</code> if no path is found.
-    * @see findPath(tile, tile, options)
-    * @see Unit#findPath(tile)
+    * @see #findPath(Tile, Tile, int)
+    * @see Unit#findPath(Tile)
     * @exception NullPointerException if either <code>unit</code>, <code>start</code> or <code>end</code>
     *             are <code>null</code>.
     */

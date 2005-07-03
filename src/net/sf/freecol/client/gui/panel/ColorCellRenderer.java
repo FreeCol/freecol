@@ -36,7 +36,7 @@ public class ColorCellRenderer extends JLabel implements TableCellRenderer {
     /**
     * Returns the component used to render the cell's value.
     * @param table The table whose cell needs to be rendered.
-    * @param value The value of the cell being rendered.
+    * @param color The value of the cell being rendered.
     * @param hasFocus Indicates whether or not the cell in question has focus.
     * @param row The row index of the cell that is being rendered.
     * @param column The column index of the cell that is being rendered.

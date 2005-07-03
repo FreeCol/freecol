@@ -278,7 +278,7 @@ public final class Market extends FreeColGameObject {
     /**
     * Initialize this object from an XML-representation of this object.
     *
-    * @param mapElement The DOM-element ("Document Object Model") made to represent this "Map".
+    * @param marketElement The DOM-element ("Document Object Model") made to represent this "Map".
     */
     public void readFromXMLElement(Element marketElement) {
         setID(marketElement.getAttribute("ID"));
@@ -350,7 +350,7 @@ public final class Market extends FreeColGameObject {
         /**
         * Initialize this object from an XML-representation of this object.
         *
-        * @param marketDataElement The DOM-element ("Document Object Model") made to represent this "Data".
+        * @param dataElement The DOM-element ("Document Object Model") made to represent this "Data".
         */
         public void readFromXMLElement(Element dataElement) {
             setID(dataElement.getAttribute("ID"));

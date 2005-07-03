@@ -311,7 +311,7 @@ public final class ImageLibrary extends ImageProvider {
     /**
     * Finds the image file in the given <code>filePath</code>.
     *
-    * @doLookup If <i>true</i> then the <code>resourceLocator</code>
+    * @param doLookup If <i>true</i> then the <code>resourceLocator</code>
     *           is used when searching for the image file.
     * @return An ImageIcon with data loaded from the image file.
     */

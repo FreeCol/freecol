@@ -54,7 +54,7 @@ public abstract class FreeColAction extends AbstractAction implements Option {
 
 
     /**
-    * Disables this option is {@link ClientOptionsDialog} is visible.
+    * Disables this option if the {@link net.sf.freecol.client.gui.panel.ClientOptionsDialog} is visible.
     */
     public void update() {
         if (freeColClient.getCanvas() != null) {

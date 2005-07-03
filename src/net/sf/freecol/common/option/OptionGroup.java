@@ -37,14 +37,14 @@ public class OptionGroup extends AbstractOption {
 
     /**
     * Adds the given <code>Option</code>.
-    * @param The <code>Option</code> that should be added to this
-    *        <code>OptionGroup</code>.
+    * @param option The <code>Option</code> that should be
+    *               added to this <code>OptionGroup</code>.
     */
     public void add(Option option) {
         options.add(option);
     }
 
-    
+
     /**
     * Removes all of the <code>Option</code>s from this <code>OptionGroup</code>.
     */

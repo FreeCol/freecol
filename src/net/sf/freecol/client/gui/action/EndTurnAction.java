@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 
 /**
 * An action for ending the turn.
-* @see MapControls
+* @see net.sf.freecol.client.gui.panel.MapControls
 */
 public class EndTurnAction extends MapboardAction {
     private static final Logger logger = Logger.getLogger(EndTurnAction.class.getName());

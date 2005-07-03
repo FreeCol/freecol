@@ -268,9 +268,6 @@ public final class FreeColServer {
     /**
     * Removes this server from the metaserver's list.
     * The information is only sent if <code>public == true</code>.
-    *
-    * @param firstTime Should be set to <i>true></i> when calling
-    *                  this method for the first time.
     */
     public void removeFromMetaServer() {
         if (!publicServer) {

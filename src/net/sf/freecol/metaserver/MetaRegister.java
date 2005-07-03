@@ -13,7 +13,7 @@ import net.sf.freecol.common.networking.Message;
 
 /**
 * The <code>MetaRegister</code> stores information about running servers.
-* Each server has it's own {@link MetaInfo} object.
+* Each server has it's own {@link MetaItem} object.
 */
 public final class MetaRegister {
     private static Logger logger = Logger.getLogger(MetaRegister.class.getName());

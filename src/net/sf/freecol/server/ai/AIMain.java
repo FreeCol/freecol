@@ -44,7 +44,7 @@ public class AIMain implements FreeColGameObjectListener {
         this.freeColServer = freeColServer;
         findNewObjects();
     }
-    
+
     
     /**
     * Creates a new <code>AIMain</code> and reads the given element.

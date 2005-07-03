@@ -71,9 +71,8 @@ public final class MiniMap extends JPanel implements MouseInputListener {
 
     /**
      * The constructor that will initialize this component.
-     * @param map The map that is displayed on the screen.
      * @param imageProvider The ImageProvider that can provide us with images to display
-     * and information about those images (such as the width of a tile image).
+     *        and information about those images (such as the width of a tile image).
      * @param container The component that contains the minimap.
      */
     public MiniMap(FreeColClient freeColClient, ImageProvider imageProvider, JComponent container) {

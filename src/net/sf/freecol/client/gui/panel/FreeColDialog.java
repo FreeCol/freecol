@@ -783,7 +783,8 @@ public class FreeColDialog extends FreeColPanel {
     
     
     /**
-    * Returns a filter accepting all files containing a {@link GameOptions}.
+    * Returns a filter accepting all files containing a
+    * {@link net.sf.freecol.common.model.GameOptions}.
     * That is; both "*.fgo" and "*.fsg".
     */
     public static FileFilter getGameOptionsFileFilter() {

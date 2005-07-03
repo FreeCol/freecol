@@ -34,7 +34,7 @@ public class GoodsContainer extends FreeColGameObject {
     * Creates an empty <code>GoodsContainer</code>.
     *
     * @param game The <code>Game</code> in which this <code>GoodsContainer</code> belong.
-    * @param location The <code>Location</code> this <code>GoodsContainer</code> will be containg goods for.
+    * @param parent The <code>Location</code> this <code>GoodsContainer</code> will be containg goods for.
     */
     public GoodsContainer(Game game, Location parent) {
         super(game);
@@ -71,7 +71,7 @@ public class GoodsContainer extends FreeColGameObject {
 
     /**
     * Adds a <code>Goods</code> to this containter.
-    * @param goods The Goods to add to this container.
+    * @param g The Goods to add to this container.
     */
     public void addGoods(Goods g) {
         addGoods(g.getType(), g.getAmount());
@@ -130,7 +130,7 @@ public class GoodsContainer extends FreeColGameObject {
     /**
     * Checks if the specified <code>Goods</code> is in this container.
     *
-    * @param The <code>Goods</code> to test the presence of.
+    * @param g The <code>Goods</code> to test the presence of.
     * @return The result.
     */
     public boolean contains(Goods g) {

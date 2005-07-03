@@ -24,7 +24,6 @@ public final class CanvasMouseListener implements MouseListener {
     /**
     * The constructor to use.
     * @param g The GUI that holds information such as screen resolution.
-    * @param uih The handler for the user's input.
     */
     public CanvasMouseListener(Canvas canvas, GUI g) {
         this.canvas = canvas;

@@ -147,7 +147,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     * to {@link #ACTIVE} if a carrier and {@link #SENTRY} otherwise. The
     * {@link Location} is set to <i>null</i>.
     *
-    * @param The <code>Game</code> in which this <code>Unit</code> belong.
+    * @param game The <code>Game</code> in which this <code>Unit</code> belong.
     * @param owner The Player owning the unit.
     * @param type The type of the unit.
     */
@@ -214,7 +214,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     /**
     * Initialize this object from an XML-representation of this object.
     *
-    * @param The <code>Game</code> in which this <code>Unit</code> belong.
+    * @param game The <code>Game</code> in which this <code>Unit</code> belong.
     * @param element The DOM-element ("Document Object Model") made to represent this "Unit".
     */
     public Unit(Game game, Element element) {
@@ -239,7 +239,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
 
 
     /**
-     * the current amount of treasure in this unit.
+     * The current amount of treasure in this unit.
      * Should be type of TREASURE_TRAIN.
      * @param amt    The amount of treasure
      */
@@ -526,8 +526,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     *             {@link PathNode#getDirection} will return the direction you
     *             need to take in order to reach that tile.
     *             This method returns <code>null</code> if no path is found.
-    * @see Map#findPath(tile, tile, options)
-    * @see Map#findPath(unit, tile , tile)
+    * @see Map#findPath(Tile, Tile, int)
+    * @see Map#findPath(Unit, Tile , Tile)
     * @exception NullPointerException if <code>end == null</code>
     */
     public PathNode findPath(Tile end) {
@@ -826,8 +826,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     /**
     * Leave the ship. This method should only be invoked if the ship is in a harbour.
     *
-    * @param unit The unit who is going to leave the ship where it is located.
-    * @param carrier The carrier.
     * @exception IllegalStateException If not in harbour.
     * @exception ClassCastException If not this unit is located on a ship.
     */
@@ -863,7 +861,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
 
     /**
     * Adds a locatable to this <code>Unit</code>.
-    * @param u The Unit to add to this Unit.
+    * @param locatable The <code>Locatable</code> to add to this <code>Unit</code>.
     */
     public void add(Locatable locatable) {
         if (isCarrier()) {
@@ -1278,7 +1276,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
 
     /**
     * Sets the mounted attribute of this unit.
-    * @param <i>true</i> if this unit should be mounted and <i>false</i> otherwise.
+    * @param b <i>true</i> if this unit should be mounted and <i>false</i> otherwise.
     * @param isCombat Whether this is a result of combat.
     */
     public void setMounted(boolean b, boolean isCombat) {
@@ -1389,7 +1387,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     * {@link Europe}.
     *
     * @param type The type of goods to buy.
-    * @param The amount of goods to buy.
+    * @param amount The amount of goods to buy.
     */
     public void buyGoods(int type, int amount) {
         if (!isCarrier() || !(getLocation() instanceof Europe && getState() != TO_EUROPE && getState() != TO_AMERICA)) {
@@ -1532,7 +1530,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
 
     /**
     * Sets the owner of this Unit.
-    * @param type The new owner of this Unit.
+    * @param owner The new owner of this Unit.
     */
     public void setOwner(Player owner) {
         Player oldOwner = this.owner;
@@ -2345,7 +2343,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     * <br><br>
     * <i>WARNING:</i> Only the server has the information to determine which
     *                 <code>Tile</code> is occupied. Use
-    *                 {@link ModelController#getVacantEntryLocation] instead.
+    *                 {@link ModelController#setToVacantEntryLocation} instead.
     *
     * @return The <code>Location</code>.
     * @see #getEntryLocation

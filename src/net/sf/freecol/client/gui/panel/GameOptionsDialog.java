@@ -19,7 +19,7 @@ import javax.swing.*;
 
 
 /**
-* Dialog for changing the {@link GameOptions}.
+* Dialog for changing the {@link net.sf.freecol.common.model.GameOptions}.
 */
 public final class GameOptionsDialog extends FreeColDialog implements ActionListener {
     private static final Logger logger = Logger.getLogger(GameOptionsDialog.class.getName());

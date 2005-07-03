@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 
 /**
 * An action for initiating chatting.
-* @see MapControls
+* @see net.sf.freecol.client.gui.panel.MapControls
 */
 public class ChatAction extends MapboardAction {
     private static final Logger logger = Logger.getLogger(ChatAction.class.getName());

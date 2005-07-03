@@ -138,7 +138,7 @@ public final class Client {
     * The <code>MessageHandler</code> is the class responsible for receiving
     * and handling the network messages.
     *
-    * @param The new <code>MessageHandler</code> for this <code>Client</code>.
+    * @param mh The new <code>MessageHandler</code> for this <code>Client</code>.
     */
     public void setMessageHandler(MessageHandler mh) {
         c.setMessageHandler(mh);

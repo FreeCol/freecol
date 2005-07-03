@@ -116,7 +116,7 @@ public class Game extends FreeColGameObject {
     /**
     * Initiate a new <code>Game</code> object from a <code>Element</code>
     * in a DOM-parsed XML-tree.
-    * @param viewOwner The username of the owner of this view of the game.
+    * @param viewOwnerUsername The username of the owner of this view of the game.
     */
     public Game(ModelController modelController, Element element, String viewOwnerUsername) {
         super(null, element);
@@ -564,7 +564,7 @@ public class Game extends FreeColGameObject {
     /**
     * Checks if all players are ready to launch.
     *
-    * @param <i>true</i> if all players are ready to launch and <i>false</i> otherwise.
+    * @return <i>true</i> if all players are ready to launch and <i>false</i> otherwise.
     */
     public boolean isAllPlayersReadyToLaunch() {
         Iterator playerIterator = getPlayerIterator();

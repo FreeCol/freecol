@@ -621,7 +621,7 @@ public final class Tile extends FreeColGameObject implements Location {
 
     /**
     * Sets whether the tile is forested or not.
-    * @param Value new value for forested
+    * @param value New value for forested.
     */
     public void setForested(boolean value) {
         forested = value;
@@ -630,7 +630,7 @@ public final class Tile extends FreeColGameObject implements Location {
 
     /**
     * Sets whether the tile is plowed or not.
-    * @param Value new value for forested
+    * @param value New value.
     */
     public void setPlowed(boolean value) {
         plowed = value;
@@ -638,7 +638,7 @@ public final class Tile extends FreeColGameObject implements Location {
 
     /**
     * Sets whether the tile has a road or not.
-    * @param Value new value for forested
+    * @param value New value.
     */
     public void setRoad(boolean value) {
         road = value;
@@ -646,7 +646,7 @@ public final class Tile extends FreeColGameObject implements Location {
 
     /**
     * Sets whether the tile has a bonus or not.
-    * @param Value new value for bonus
+    * @param value New value for bonus
     */
     public void setBonus(boolean value) {
         bonus = value;

@@ -865,7 +865,7 @@ public final class Colony extends Settlement implements Location {
     *
     * @exception IllegalStateException If the owner of this <code>Colony</code>
     *            has an insufficient amount of gold.
-    * @see getPriceForBuilding
+    * @see #getPriceForBuilding
     */
     public void payForBuilding() {
         // Any changes in this method should also be reflected in "getPriceForBuilding()"

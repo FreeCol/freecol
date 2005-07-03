@@ -210,9 +210,9 @@ public final class Europe extends FreeColGameObject implements Location {
 
 
     /**
-    * Checks if the specified <code>Unit</code> is at this <code>Location</code>.
+    * Checks if the specified <code>Locatable</code> is at this <code>Location</code>.
     *
-    * @param The <code>Unit</code> to test the presence of.
+    * @param locatable The <code>Locatable</code> to test the presence of.
     * @return The result.
     */
     public boolean contains(Locatable locatable) {
