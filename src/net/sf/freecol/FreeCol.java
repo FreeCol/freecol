@@ -39,7 +39,7 @@ public final class FreeCol {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    private  static final String FREECOL_VERSION = "0.4.0";
+    private  static final String FREECOL_VERSION = "0.4.1";
 
     public static final String  META_SERVER_ADDRESS = "meta.freecol.org";
     public static final int     META_SERVER_PORT = 3540;

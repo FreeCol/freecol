@@ -113,10 +113,12 @@ public final class ConnectController {
         }
 
         freeColClient.setSingleplayer(true);
-        login(username, "127.0.0.1", 3541);
+        boolean loggedIn = login(username, "127.0.0.1", 3541);
 
-        freeColClient.getPreGameController().setReady(true);
-        freeColClient.getCanvas().showStartGamePanel(freeColClient.getGame(), freeColClient.getMyPlayer(), true);
+        if (loggedIn) {
+            freeColClient.getPreGameController().setReady(true);
+            freeColClient.getCanvas().showStartGamePanel(freeColClient.getGame(), freeColClient.getMyPlayer(), true);
+        }
     }
 
 
