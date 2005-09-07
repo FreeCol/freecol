@@ -420,7 +420,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             switch (Integer.valueOf(command).intValue()) {
                 case BUY_BUILDING:
                     freeColClient.getInGameController().payForBuilding(colony);
-                    updateProgressLabel();
+                    //updateProgressLabel();
+                    reinitialize();
                     freeColClient.getCanvas().updateGoldLabel();
                     break;
                 case EXIT:
