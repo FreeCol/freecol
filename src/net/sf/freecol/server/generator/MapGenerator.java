@@ -583,18 +583,13 @@ public class MapGenerator {
             Tile startTile = map.getTile(x,y);
             player.setEntryLocation(startTile);
 
-            int unitType;
-            if (player.getNation() == ServerPlayer.DUTCH) {
-                unitType = Unit.MERCHANTMAN;
-            } else {
-                unitType = Unit.CARAVEL;
-            }
-            
-            Unit unit1 = new Unit(game, startTile, player, unitType, Unit.ACTIVE);
-            Unit unit2 = new Unit(game, unit1, player, Unit.HARDY_PIONEER, Unit.SENTRY);
-            Unit unit3 = new Unit(game, unit1, player, Unit.FREE_COLONIST, Unit.SENTRY);
-            unit3.setArmed(true, true);
-            unit3.setMovesLeft(unit3.getInitialMovesLeft());
+            int navalUnitType = (player.getNation() == ServerPlayer.DUTCH) ? Unit.MERCHANTMAN : Unit.CARAVEL;
+            int pioneerUnitType = (player.getNation() == ServerPlayer.FRENCH) ? Unit.HARDY_PIONEER : Unit.FREE_COLONIST;
+            int soldierUnitType = (player.getNation() == ServerPlayer.SPANISH) ? Unit.VETERAN_SOLDIER : Unit.FREE_COLONIST;
+
+            Unit unit1 = new Unit(game, startTile, player, navalUnitType, Unit.ACTIVE);
+            Unit unit2 = new Unit(game, unit1, player, pioneerUnitType, Unit.SENTRY, false, false, 100, false);
+            Unit unit3 = new Unit(game, unit1, player, soldierUnitType, Unit.SENTRY, true, false, 0, false);
 
             // START DEBUG:
             if (net.sf.freecol.FreeCol.isInDebugMode()) {

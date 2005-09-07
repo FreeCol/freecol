@@ -166,6 +166,29 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     * @param s The initial state for this Unit (one of {@link #ACTIVE}, {@link #FORTIFY}...).
     */
     public Unit(Game game, Location location, Player owner, int type, int s) {
+        this(game, location, owner, type, s,
+                (type == VETERAN_SOLDIER),
+                (type == SEASONED_SCOUT),
+                (type == HARDY_PIONEER) ? 100 : 0,
+                (type == JESUIT_MISSIONARY));
+    }
+
+
+    /**
+    * Initiate a new <code>Unit</code> with the specified parameters.
+    *
+    * @param game The <code>Game</code> in which this <code>Unit</code> belong.
+    * @param location The <code>Location/code> to place this <code>Unit</code> upon.
+    * @param owner The <code>Player</code> owning this unit.
+    * @param type The type of the unit.
+    * @param s The initial state for this Unit (one of {@link #ACTIVE}, {@link #FORTIFY}...).
+    * @param armed Determines wether the unit should be armed or not.
+    * @param mounted Determines wether the unit should be mounted or not.
+    * @param numberOfTools The number of tools the unit will be carrying.
+    * @param missionary Determines wether this unit should be dressed like a missionary or not.
+    */
+    public Unit(Game game, Location location, Player owner, int type, int s,
+                boolean armed, boolean mounted, int numberOfTools, boolean missionary) {
         super(game);
 
         unitContainer = new UnitContainer(game, this);
@@ -173,6 +196,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
         this.owner = owner;
         this.type = type;
+        this.armed = armed;
+        this.mounted = mounted;
+        this.numberOfTools = numberOfTools;
+        this.missionary = missionary;
 
         setLocation(location);
 
@@ -180,30 +207,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         workLeft = -1;
         workType = Goods.FOOD;
 
-        if (type == VETERAN_SOLDIER) {
-            armed = true;
-        } else {
-            armed = false;
-        }
-
-        if (type == SEASONED_SCOUT) {
-            mounted = true;
-        } else {
-            mounted = false;
-        }
-
-        if (type == HARDY_PIONEER) {
-            numberOfTools = 100;
-        } else {
-            numberOfTools = 0;
-        }
-
-        if (type == JESUIT_MISSIONARY) {
-            missionary = true;
-        } else {
-            missionary = false;
-        }
-        
         this.movesLeft = getInitialMovesLeft();
         setHitpoints(getInitialHitpoints(getType()));       
 
