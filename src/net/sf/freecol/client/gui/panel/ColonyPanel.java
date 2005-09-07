@@ -1124,6 +1124,9 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                     }
 
                     if (!selectedUnit.getUnit().canAdd(g)) {
+                        if (oldParent != null) {
+                            oldParent.add(comp);
+                        }
                         return null;
                     }
 
