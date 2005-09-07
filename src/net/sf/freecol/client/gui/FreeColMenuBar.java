@@ -246,6 +246,10 @@ public class FreeColMenuBar extends JMenuBar {
         skipMenuItem.setOpaque(false);
         ordersMenu.add(skipMenuItem);
 
+        final JMenuItem changeMenuItem = new JMenuItem(am.getFreeColAction(ChangeAction.ID));
+        changeMenuItem.setOpaque(false);
+        ordersMenu.add(changeMenuItem);
+
         final JMenuItem clearOrdersMenuItem = new JMenuItem(am.getFreeColAction(ClearOrdersAction.ID));
         clearOrdersMenuItem.setOpaque(false);
         ordersMenu.add(clearOrdersMenuItem);
