@@ -49,10 +49,10 @@ public class PlowAction extends MapboardAction {
             Tile tile = selectedOne.getTile();
             if(tile.isLand() && tile.isForested()) {
                 putValue(NAME, Messages.message("unit.state.4"));
-                setEnabled(selectedOne.isPioneer());
+                setEnabled(selectedOne.isPioneer() && selectedOne.checkSetState(Unit.PLOW));
             } else if (tile.isLand() && !tile.isForested() && !tile.isPlowed()) {
                 putValue(NAME, Messages.message("unit.state.5"));
-                setEnabled(selectedOne.isPioneer());
+                setEnabled(selectedOne.isPioneer() && selectedOne.checkSetState(Unit.PLOW));
             } else {
                 putValue(NAME, Messages.message("unit.state.5"));
                 setEnabled(false);

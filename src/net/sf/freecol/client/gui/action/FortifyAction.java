@@ -43,6 +43,8 @@ public class FortifyAction extends MapboardAction {
         
         if (getFreeColClient().getGUI().getActiveUnit() == null) {
             setEnabled(false);
+        } else {
+            setEnabled(getFreeColClient().getGUI().getActiveUnit().checkSetState(Unit.FORTIFY));
         }
     }
 

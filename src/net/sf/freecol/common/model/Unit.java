@@ -2193,6 +2193,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     * new value, 'false' otherwise.
     */
     public boolean checkSetState(int s) {
+        if (movesLeft <= 0 && (s == PLOW || s == BUILD_ROAD || s == FORTIFY)) {
+            return false;
+        }
         switch (s) {
             case ACTIVE:
                 return true;

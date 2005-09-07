@@ -43,11 +43,7 @@ public class BuildRoadAction extends MapboardAction {
         Unit selectedOne = getFreeColClient().getGUI().getActiveUnit();
         if (enabled && selectedOne != null && selectedOne.getTile() != null && selectedOne.isPioneer()) {
             Tile tile = selectedOne.getTile();
-            if(tile.isLand() && !tile.hasRoad()) {
-                setEnabled(true);
-            } else {
-                setEnabled(false);
-            }
+            setEnabled(tile.isLand() && !tile.hasRoad() && selectedOne.checkSetState(Unit.BUILD_ROAD));
         } else {
             setEnabled(false);
         }
