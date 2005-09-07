@@ -1447,11 +1447,9 @@ public final class InGameController implements NetworkConstants {
     * @param colony The {@link Colony} where the building should be bought.
     */
     public void payForBuilding(Colony colony) {
-        /*
-        if (!freeColClient.getCanvas().showConfirmDialog("payForBuilding.text", "payForBuilding.yes", "payForBuilding.no")) {
+        if (!freeColClient.getCanvas().showConfirmDialog("payForBuilding.text", "payForBuilding.yes", "payForBuilding.no", Integer.toString(colony.getPriceForBuilding()))) {
             return;
         }
-        */
 
         if (colony.getPriceForBuilding() > freeColClient.getMyPlayer().getGold()) {
             freeColClient.getCanvas().errorMessage("notEnoughGold");
