@@ -95,7 +95,7 @@ public class WorkerWish extends Wish {
         id = element.getAttribute("ID");
         destination = (Location) getAIMain().getFreeColGameObject(element.getAttribute("destination"));
         if (element.hasAttribute("transportable")) {
-            transportable = (Transportable) getAIMain().getFreeColGameObject(element.getAttribute("transportable"));
+            transportable = (Transportable) getAIMain().getAIObject(element.getAttribute("transportable"));
         } else {
             transportable = null;
         }

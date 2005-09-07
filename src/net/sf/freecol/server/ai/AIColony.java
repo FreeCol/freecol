@@ -667,7 +667,13 @@ public class AIColony extends AIObject {
         Iterator wishesIterator = wishes.iterator();
         while (wishesIterator.hasNext()) {
             Wish w = (Wish) wishesIterator.next();
-            Element wElement = document.createElement(w.getXMLElementTagName() + "WishListElement");
+            Element wElement;
+            if (w instanceof WorkerWish) {
+                wElement = document.createElement(WorkerWish.getXMLElementTagName() + "WishListElement");
+            } else {
+                logger.warning("Unknown type of wish.");
+                continue;
+            }
             wElement.setAttribute("ID", w.getID());
             element.appendChild(wElement);
         }
@@ -680,6 +686,7 @@ public class AIColony extends AIObject {
         colony = (Colony) getAIMain().getFreeColGameObject(element.getAttribute("ID"));
 
         aiGoods.clear();
+        wishes.clear();
 
         colonyPlan = new ColonyPlan(getAIMain(), colony);
         colonyPlan.create();
@@ -695,7 +702,11 @@ public class AIColony extends AIObject {
                 aiGoods.add(ag);
             } else if (e.getTagName().equals(WorkerWish.getXMLElementTagName() + "WishListElement")) {
                 Wish w = (Wish) getAIMain().getAIObject(e.getAttribute("ID"));
-                wishes.add(w);
+                if (w != null) {
+                    wishes.add(w);
+                } else {
+                    logger.warning("Wish with ID: " + e.getAttribute("ID") + " could not be found.");
+                }
             } else {
                 logger.warning("Unknown tag name: " + e.getTagName());
             }
