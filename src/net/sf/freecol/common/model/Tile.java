@@ -378,6 +378,8 @@ public final class Tile extends FreeColGameObject implements Location {
         } else if ((getAddition() == ADD_RIVER_MINOR || getAddition() == ADD_RIVER_MAJOR) &&
                    (fromTile.getAddition() == ADD_RIVER_MINOR || fromTile.getAddition() == ADD_RIVER_MAJOR)) {
             return 1;
+        } else if (getSettlement() != null) {
+            return 3;
         } else if (getType() == ARCTIC) {
             return 6;
         } else if (getAddition() == ADD_MOUNTAINS) {
