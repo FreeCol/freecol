@@ -10,7 +10,7 @@ import org.w3c.dom.Element;
 /**
 * Represents a locatable goods of a specified type and amount.
 */
-public final class Goods implements Locatable {
+public class Goods implements Locatable, Ownable {
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
@@ -78,6 +78,21 @@ public final class Goods implements Locatable {
         readFromXMLElement(element);
     }
 
+    
+    /**
+    * Gets the owner of this <code>Ownable</code>.
+    *
+    * @return The <code>Player</code> controlling this
+    *         {@link Ownable}.
+    */
+    public Player getOwner() {
+        if (location instanceof Ownable) {
+            return ((Ownable) location).getOwner();
+        } else {
+            return null;
+        }
+    }
+
 
     /**
     * Returns a textual representation of this object.
@@ -96,6 +111,22 @@ public final class Goods implements Locatable {
     */
     public String getName() {
         return getName(type);
+    }
+    
+    
+    /**
+    * Returns the <code>Tile</code> where this <code>Goods</code> is located, 
+    * or <code>null</code> if it's location is <code>Europe</code>.
+    *
+    * @return The Tile where this Unit is located. Or null if
+    * its location is Europe.
+    */
+    public Tile getTile() {
+        if (location == null) {
+            return null;
+        } else {
+            return location.getTile();
+        }
     }
 
 
@@ -118,6 +149,51 @@ public final class Goods implements Locatable {
             case MUSKETS: return TOOLS;
             case HAMMERS: return LUMBER;
             default: return -1;
+        }
+    }
+    
+    
+    /**
+    * Gets the type of goods which can be produced by the given
+    * raw material.
+    *
+    * @param rawMaterialGoodsType The type of raw material.
+    * @return The type of manufactured goods or <code>-1</code> if the given type
+    *         of goods does not have a manufactured goods.
+    */
+    public static int getManufactoredGoods(int rawMaterialGoodsType) {
+        switch (rawMaterialGoodsType) {
+            case FOOD: return HORSES;
+            case SUGAR: return RUM;
+            case TOBACCO: return CIGARS;
+            case COTTON: return CLOTH;
+            case FURS: return COATS;
+            case ORE: return TOOLS;
+            case TOOLS: return MUSKETS;
+            case LUMBER: return HAMMERS;
+            default: return -1;
+        }
+    }
+
+
+    /**
+    * Checks if the given type of goods can be produced on a {@link ColonyTile}.
+    * @param goodsType The type of goods to test.    
+    * @return The result.
+    */
+    public static boolean isFarmedGoods(int goodsType) {
+        switch (goodsType) {
+            case FOOD:
+            case SUGAR:
+            case TOBACCO:
+            case COTTON:
+            case FURS:
+            case ORE:
+            case SILVER:
+            case LUMBER:
+                return true;
+            default:
+                return false;
         }
     }
 
@@ -161,15 +237,21 @@ public final class Goods implements Locatable {
     * @param location The new location of the goods,
     */
     public void setLocation(Location location) {
-        if ((this.location != null)) {
-            this.location.remove(this);
-        }
+        try {
+            if ((this.location != null)) {
+                this.location.remove(this);
+            }
 
-        if (location != null) {
-            location.add(this);
-        }
+            if (location != null) {
+                location.add(this);
+            }
 
-        this.location = location;
+            this.location = location;
+        } catch (IllegalStateException e) {
+            throw (IllegalStateException) new IllegalStateException("Could not move the goods of type: "
+                    + getName(getType()) + " (" + type + ") with amount: " + getAmount() + " from "
+                    + this.location + " to " + location).initCause(e);
+        }
     }
 
 

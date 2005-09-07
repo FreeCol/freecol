@@ -74,7 +74,7 @@ public class IndianBringGiftMission extends Mission {
             if (getUnit().getTile() != getUnit().getIndianSettlement().getTile()) {
                 // Move to the owning settlement:
                 int r = moveTowards(connection, getUnit().getIndianSettlement().getTile());
-                if (r >= 0) {
+                if (r >= 0 && getUnit().getMoveType(r) == Unit.MOVE) {
                     move(connection, r);
                 }
             } else {
@@ -95,7 +95,7 @@ public class IndianBringGiftMission extends Mission {
         } else {
             // Move to the target's colony and deliver
             int r = moveTowards(connection, target.getTile());
-            if (r >= 0) { // We have arrived.
+            if (r >= 0 && getGame().getMap().getNeighbourOrNull(r, getUnit().getTile()) == target.getTile()) { // We have arrived.
                 Element deliverGiftElement = Message.createNewRootElement("deliverGift");
                 deliverGiftElement.setAttribute("unit", getUnit().getID());
                 deliverGiftElement.setAttribute("settlement", target.getID());

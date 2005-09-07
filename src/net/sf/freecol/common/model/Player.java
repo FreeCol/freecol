@@ -194,7 +194,7 @@ public class Player extends FreeColGameObject {
     * @param name The name that this player will use.
     */
     public Player(Game game, String name) {
-        this(game, name, false);
+        this(game, name, false, game.getVacantNation());
     }
 
     /**
@@ -205,10 +205,23 @@ public class Player extends FreeColGameObject {
     * @param admin Whether or not this AI player shall be considered an Admin.
     * @param ai Whether or not this AI player shall be considered an AI player (usually true here).
     */
-    public Player(Game game, String name, boolean admin, boolean ai) {
-        this(game, name, admin);
+    public Player(Game game, String name, boolean admin, boolean ai, int nation) {
+        this(game, name, admin, nation);
 
         this.ai = ai;
+    }
+
+    
+    /**
+    * Creates a new <code>Player</code> with specified name.
+    *
+    * @param game The <code>Game</code> this <code>Player</code> belongs to.
+    * @param name The name that this player will use.
+    * @param admin 'true' if this Player is an admin,
+    * 'false' otherwise.
+    */
+    public Player(Game game, String name, boolean admin) {
+        this(game, name, admin, game.getVacantNation());
     }
 
     /**
@@ -219,19 +232,19 @@ public class Player extends FreeColGameObject {
     * @param admin 'true' if this Player is an admin,
     * 'false' otherwise.
     */
-    public Player(Game game, String name, boolean admin) {
+    public Player(Game game, String name, boolean admin, int nation) {
         super(game);
 
         this.name = name;
         this.admin = admin;
+        this.nation = nation;
 
-        nation = game.getVacantNation();
         color = getDefaultNationColor(nation);
         europe = new Europe(game, this);
 
         if (isEuropean(nation)) {
             /*
-              Setting the amount of gold to "getGameOptions().getInteger(GameOptions.STARTING_MONEY)"            
+              Setting the amount of gold to "getGameOptions().getInteger(GameOptions.STARTING_MONEY)"
               just before starting the game. See "net.sf.freecol.server.control.PreGameController".
             */
             gold = 0;
@@ -261,7 +274,7 @@ public class Player extends FreeColGameObject {
 
         readFromXMLElement(element);
     }
-
+   
 
     /**
     * Checks if this player is a "royal expeditionary force.
@@ -574,34 +587,42 @@ public class Player extends FreeColGameObject {
         if (map != null) {
             canSeeTiles = new boolean[map.getWidth()][map.getHeight()];
 
-            Iterator unitIterator = getUnitIterator();
-            while (unitIterator.hasNext()) {
-                Unit unit = (Unit) unitIterator.next();
-                if (unit.getLocation() == null || !(unit.getLocation() instanceof Tile)) {
-                    continue;
-                }
-
-                Map.Position position = unit.getTile().getPosition();
-                canSeeTiles[position.getX()][position.getY()] = true;
-
-                Iterator positionIterator = map.getCircleIterator(position, true, unit.getLineOfSight());
+            if (!getGameOptions().getBoolean(GameOptions.FOG_OF_WAR)) {
+                Iterator positionIterator = getGame().getMap().getWholeMapIterator();
                 while (positionIterator.hasNext()) {
                     Map.Position p = (Map.Position) positionIterator.next();
-                    canSeeTiles[p.getX()][p.getY()] = true;
+                    canSeeTiles[p.getX()][p.getY()] = hasExplored(getGame().getMap().getTile(p));
                 }
-            }
-            
-            Iterator colonyIterator = getColonyIterator();
-            while (colonyIterator.hasNext()) {
-                Colony colony = (Colony) colonyIterator.next();
-                
-                Map.Position position = colony.getTile().getPosition();
-                canSeeTiles[position.getX()][position.getY()] = true;
+            } else {
+                Iterator unitIterator = getUnitIterator();
+                while (unitIterator.hasNext()) {
+                    Unit unit = (Unit) unitIterator.next();
+                    if (unit.getLocation() == null || !(unit.getLocation() instanceof Tile)) {
+                        continue;
+                    }
 
-                Iterator positionIterator = map.getCircleIterator(position, true, colony.getLineOfSight());
-                while (positionIterator.hasNext()) {
-                    Map.Position p = (Map.Position) positionIterator.next();
-                    canSeeTiles[p.getX()][p.getY()] = true;
+                    Map.Position position = unit.getTile().getPosition();
+                    canSeeTiles[position.getX()][position.getY()] = true;
+
+                    Iterator positionIterator = map.getCircleIterator(position, true, unit.getLineOfSight());
+                    while (positionIterator.hasNext()) {
+                        Map.Position p = (Map.Position) positionIterator.next();
+                        canSeeTiles[p.getX()][p.getY()] = true;
+                    }
+                }
+
+                Iterator colonyIterator = getColonyIterator();
+                while (colonyIterator.hasNext()) {
+                    Colony colony = (Colony) colonyIterator.next();
+
+                    Map.Position position = colony.getTile().getPosition();
+                    canSeeTiles[position.getX()][position.getY()] = true;
+
+                    Iterator positionIterator = map.getCircleIterator(position, true, colony.getLineOfSight());
+                    while (positionIterator.hasNext()) {
+                        Map.Position p = (Map.Position) positionIterator.next();
+                        canSeeTiles[p.getX()][p.getY()] = true;
+                    }
                 }
             }
         }
@@ -671,15 +692,15 @@ public class Player extends FreeColGameObject {
         if (tile == null) {
             return false;
         }
-        
+
         if (canSeeTiles == null) {
             resetCanSeeTiles();
         }
 
         return canSeeTiles[tile.getX()][tile.getY()];
     }
-    
-        
+
+
     /**
     * Returns the state of this players rebellion status.
     * <pre>0 = Have not declared independence
@@ -689,6 +710,17 @@ public class Player extends FreeColGameObject {
     */
     public int getRebellionState() {
         return rebellionState;
+    }
+    
+    
+    /**
+    * Checks if this <code>Player</code> can build colonies.
+    * @return <code>true</code> if this player is european, not the
+    *         royal expeditionary force and not currently fighting
+    *         the war of independence.
+    */
+    public boolean canBuildColonies() {
+        return isEuropean() && getRebellionState() != REBELLION_IN_WAR && !isREF();
     }
 
 

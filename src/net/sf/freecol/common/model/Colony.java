@@ -171,6 +171,54 @@ public final class Colony extends Settlement implements Location {
 
 
     /**
+    * Returns the building for producing the given type of goods.
+    * @return The <code>Building</code> which produces the given type
+    *         of goods, or <code>null</code> if such a building cannot
+    *         be found.
+    */
+    public Building getBuildingForProducing(int goodsType) {
+        Building b;
+        switch (goodsType) {
+            case Goods.MUSKETS:
+                b = getBuilding(Building.ARMORY);
+                break;
+            case Goods.RUM:
+                b = getBuilding(Building.DISTILLER);
+                break;
+            case Goods.CIGARS:
+                b = getBuilding(Building.TOBACCONIST);
+                break;
+            case Goods.CLOTH:
+                b = getBuilding(Building.WEAVER);
+                break;
+            case Goods.COATS:
+                b = getBuilding(Building.FUR_TRADER);
+                break;
+            case Goods.TOOLS:
+                b = getBuilding(Building.BLACKSMITH);
+                break;
+            case Goods.CROSSES:
+                b = getBuilding(Building.CHURCH);
+                break;
+            case Goods.HAMMERS:
+                b = getBuilding(Building.CARPENTER);
+                break;
+            case Goods.BELLS:
+                b = getBuilding(Building.TOWN_HALL);
+                break;
+            default:
+                b = null;
+        }
+
+        if (b != null && b.isBuilt()) {
+            return b;
+        } else {
+            return null;
+        }
+    } 
+
+
+    /**
     * Gets an <code>Iterator</code> of every location in this <code>Colony</code>
     * where a {@link Unit} can work.
     *
@@ -324,7 +372,7 @@ public final class Colony extends Settlement implements Location {
                         return;
                     }
                 }
-                
+
                 Iterator it = getWorkLocationIterator();
                 while (it.hasNext()) {
                     w = (WorkLocation) it.next();
@@ -339,7 +387,7 @@ public final class Colony extends Settlement implements Location {
             } else {
                 locatable.setLocation(getTile());
             }
-            
+
             updatePopulation();
         } else if (locatable instanceof Goods) {
             goodsContainer.addGoods((Goods)locatable);
@@ -484,7 +532,12 @@ public final class Colony extends Settlement implements Location {
     * @return The <code>Unit</code> that has been choosen to defend this colony.
     */
     public Unit getDefendingUnit() {
-        return (Unit) getUnitIterator().next();
+        Iterator ui = getUnitIterator();
+        if (ui.hasNext()) {
+            return (Unit) ui.next();
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -648,11 +701,16 @@ public final class Colony extends Settlement implements Location {
         } else if ((getTory() * getUnitCount()) / 100 > 4) {
             bonus -= 1;
         }
-        
+
         if (getSoL() == 100) {
             bonus += 2;
         } else if (getSoL() >= 50) {
             bonus += 1;
+        }
+        
+        // TODO-LATER: REMOVE THIS WHEN THE AI CAN HANDLE PRODUCTION PENALTIES:
+        if (getOwner().isAI()) {
+            bonus = Math.max(0, bonus);
         }
         
         return bonus;
@@ -694,7 +752,7 @@ public final class Colony extends Settlement implements Location {
     */
     public int getProductionOf(int goodsType) {
         int amount = 0;
-        
+
         if (goodsType == Goods.HORSES) {
             return getHorseProduction();
         }

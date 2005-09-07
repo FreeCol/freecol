@@ -24,6 +24,7 @@ public class AIMain implements FreeColGameObjectListener {
 
     private FreeColServer freeColServer;
     private Random random = new Random();
+    private int nextID = 1;
 
     /**
     * Contains mappings between <code>FreeColGameObject</code>s
@@ -55,7 +56,18 @@ public class AIMain implements FreeColGameObjectListener {
         readFromXMLElement(element);
     }
 
-    
+
+
+    /**
+    * Gets a unique ID for identifying an <code>AIObject</code>.
+    * @return A unique ID.
+    */
+    public String getNextID() {
+        String id = "aiMain:" + Integer.toString(nextID);
+        nextID++;
+        return id;
+    }
+
 
     /**
     * Returns the game.
@@ -68,11 +80,11 @@ public class AIMain implements FreeColGameObjectListener {
     /**
     * Returns an instance of the class <code>Random</code>. It that can be
     * used to generate random numbers.
-    */    
+    */
     public Random getRandom() {
         return random;
-    } 
-    
+    }
+
 
     /**
     * Searches for new {@link FreeColGameObject FreeColGameObjects}. An AI-object is
@@ -88,7 +100,7 @@ public class AIMain implements FreeColGameObjectListener {
 
 
     /**
-    * Gets the <code>AIObject</code> for the given 
+    * Gets the <code>AIObject</code> for the given
     * <code>FreeColGameObject</code>.
     *
     * @param fcgo The <code>FreeColGameObject</code> to find
@@ -98,16 +110,13 @@ public class AIMain implements FreeColGameObjectListener {
     public AIObject getAIObject(FreeColGameObject fcgo) {
         return getAIObject(fcgo.getID());
     }
-    
+
 
     /**
-    * Gets the <code>AIObject</code> for the given 
-    * <code>FreeColGameObject</code>.
+    * Gets the <code>AIObject</code> identified by the given ID.
     *
-    * @param id The ID of the <code>FreeColGameObject</code> to find
-    *        the <code>AIObject</code> for.
+    * @param id The ID of the <code>AIObject</code>.
     * @see #getAIObject(FreeColGameObject)
-    * @see FreeColGameObject#getID
     */
     public AIObject getAIObject(String id) {
         return (AIObject) aiObjects.get(id);
@@ -117,8 +126,7 @@ public class AIMain implements FreeColGameObjectListener {
     /**
     * Adds a reference to the given <code>AIObject</code>.
     *
-    * @param id The ID of the <code>FreeColGameObject</code> the
-    *        <code>AIObject</code> is connected to.
+    * @param id The ID of the <code>AIObject</code>.
     * @param aiObject The <code>AIObject</code> to store a reference
     *        for.
     */
@@ -126,12 +134,11 @@ public class AIMain implements FreeColGameObjectListener {
         aiObjects.put(id, aiObject);
     }
 
-    
+
     /**
     * Removes a reference to the given <code>AIObject</code>.
     *
-    * @param id The ID of the <code>FreeColGameObject</code> the
-    *        <code>AIObject</code> is connected to.
+    * @param id The ID of the <code>AIObject</code>.
     */
     public void removeAIObject(String id) {
         aiObjects.remove(id);
@@ -152,7 +159,7 @@ public class AIMain implements FreeColGameObjectListener {
 
     /**
     * Creates a new <code>AIObject</code> for a given
-    * <code>FreeColGameObject</code>. This method gets called 
+    * <code>FreeColGameObject</code>. This method gets called
     * whenever a new object gets added to the {@link Game}.
     *
     * @param id The ID of the <code>FreeColGameObject</code> to add.
@@ -166,18 +173,22 @@ public class AIMain implements FreeColGameObjectListener {
             addAIObject(id, new AIUnit(this, (Unit) freeColGameObject));
         } else if (freeColGameObject instanceof ServerPlayer) {
             addAIObject(id, new AIPlayer(this, (ServerPlayer) freeColGameObject));
+        } else if (freeColGameObject instanceof Colony) {
+            addAIObject(id, new AIColony(this, (Colony) freeColGameObject));
         }
     }
 
-    
+
     /**
     * Removes the <code>AIObject</code> for the given <code>FreeColGameObject</code>.
     * @param id The ID of the <code>FreeColGameObject</code>.
     */
     public void removeFreeColGameObject(String id) {
-        //AIObject o = getAIObject(id);
-        //o.dispose();
-        removeAIObject(id);
+        AIObject o = getAIObject(id);
+        if (o != null) {
+            o.dispose();
+        }
+        //removeAIObject(id);
     }
 
 
@@ -191,6 +202,8 @@ public class AIMain implements FreeColGameObjectListener {
     */
     public Element toXMLElement(Document document) {
         Element element = document.createElement(getXMLElementTagName());
+
+        element.setAttribute("nextID", Integer.toString(nextID));
 
         Iterator i = aiObjects.values().iterator();
         while (i.hasNext()) {
@@ -216,15 +229,43 @@ public class AIMain implements FreeColGameObjectListener {
     * @param element The XML-<code>Element</code> containing the information.
     */
     public void readFromXMLElement(Element element) {
+        if (element.hasAttribute("nextID")) {
+            nextID = Integer.parseInt(element.getAttribute("nextID"));
+        }
         NodeList nl = element.getChildNodes();
         for (int i=0; i<nl.getLength(); i++) {
-            Element childElement = (Element) nl.item(i);
+            Node n = nl.item(i);
+            if (!(n instanceof Element)) {
+                continue;
+            }
+            Element childElement = (Element) n;
             if (childElement.getTagName().equals(AIUnit.getXMLElementTagName())) {
                 addAIObject(childElement.getAttribute("ID"), new AIUnit(this, childElement));
             } else if (childElement.getTagName().equals(AIPlayer.getXMLElementTagName())) {
                 addAIObject(childElement.getAttribute("ID"), new AIPlayer(this, childElement));
+            } else if (childElement.getTagName().equals(AIColony.getXMLElementTagName())) {
+                addAIObject(childElement.getAttribute("ID"), new AIColony(this, childElement));
+            } else if (childElement.getTagName().equals(AIGoods.getXMLElementTagName())) {
+                addAIObject(childElement.getAttribute("ID"), new AIGoods(this, childElement));
+            } else if (childElement.getTagName().equals(WorkerWish.getXMLElementTagName())) {
+                addAIObject(childElement.getAttribute("ID"), new WorkerWish(this, childElement));
             } else {
                 logger.warning("Unkown AI-object read: " + childElement.getTagName());
+            }
+        }
+
+        // TODO: Avoid this:
+        logger.info("Second pass.");
+        nl = element.getChildNodes();
+        for (int i=0; i<nl.getLength(); i++) {
+            Node n = nl.item(i);
+            if (!(n instanceof Element)) {
+                continue;
+            }
+            Element childElement = (Element) n;
+            AIObject ao = getAIObject(childElement.getAttribute("ID"));
+            if (ao != null) {
+                ao.readFromXMLElement(childElement);
             }
         }
     }

@@ -17,7 +17,7 @@ import org.w3c.dom.Document;
 * Europe is the place where you can {@link #recruit}
 * and {@link #train} new units. You may also sell/buy goods.
 */
-public final class Europe extends FreeColGameObject implements Location {
+public final class Europe extends FreeColGameObject implements Location, Ownable {
     private static final Logger logger = Logger.getLogger(Europe.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";

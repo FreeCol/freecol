@@ -1592,7 +1592,9 @@ public final class InGameController implements NetworkConstants {
     public void centerActiveUnit() {
         GUI gui = freeColClient.getGUI();
 
-        gui.setFocus(gui.getActiveUnit().getTile().getPosition());
+        if (gui.getActiveUnit() != null && gui.getActiveUnit().getTile() != null) {
+            gui.setFocus(gui.getActiveUnit().getTile().getPosition());
+        }
     }
 
 

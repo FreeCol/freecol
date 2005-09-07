@@ -34,6 +34,14 @@ public abstract class AIObject {
         return aiMain;
     }
 
+    
+    /**
+    * Returns the ID of this <code>AIObject</code>.
+    * @return The ID of this <code>AIObject</code>. This is normally
+    *         the ID of the {@link FreeColGameObject} this object
+    *         represents.
+    */
+    public abstract String getID();
 
     public abstract Element toXMLElement(Document document);
 
@@ -50,6 +58,11 @@ public abstract class AIObject {
     }
 
     
+    public void dispose() {
+        getAIMain().removeAIObject(getID());
+    }
+    
+        
     /**
     * Returns the game.
     */

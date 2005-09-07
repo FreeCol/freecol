@@ -25,6 +25,7 @@ public class PathNode implements Comparable {
     private int direction;
     private int movesLeft;
     private int turns;
+    private boolean onCarrier = false;
 
     /**
     * The next node in the path.
@@ -89,6 +90,67 @@ public class PathNode implements Comparable {
         return tile;
     }
 
+    
+    /**
+    * Checks if the unit using this path is still onboard
+    * it's transport.
+    *
+    * @see #getTransportDropTurns
+    */
+    public boolean isOnCarrier() {
+        return onCarrier;
+    }
+    
+
+    /**
+    * Sets if the unit using this path is still onboard
+    * it's transport.
+    *
+    * @see #getTransportDropTurns
+    */
+    public void setOnCarrier(boolean onCarrier) {
+        this.onCarrier = onCarrier;
+    }
+
+
+    /**
+    * Returns the number of turns it takes to reach the 
+    * {@link #getTransportDropNode transport node}
+    */
+    public int getTransportDropTurns() {
+        PathNode temp = this;
+        while (temp.next != null && temp.isOnCarrier()) {
+            temp = temp.next;
+        }
+        return temp.getTurns();
+    }
+    
+
+    /**
+    * Returns the node where the unit using this path should
+    * leave it's transport.
+    */
+    public PathNode getTransportDropNode() {
+        PathNode temp = this;
+        while (temp.next != null && temp.isOnCarrier()) {
+            temp = temp.next;
+        }
+        return temp;
+    }
+    
+    
+    /**
+    * Returns the last node of this path.
+    * @return The last <code>PathNode</code>.
+    */
+    public PathNode getLastNode() {
+        PathNode temp = this;
+        while (temp.next != null) {
+            temp = temp.next;
+        }
+        return temp;
+    }
+
 
     /**
     * Returns the estimated cost of the path at this stage.
@@ -147,6 +209,15 @@ public class PathNode implements Comparable {
     */
     public int getMovesLeft() {
         return movesLeft;
+    }
+
+    
+    /**
+    * Sets the number of moves remaining at this point in the path.
+    * @param movesLeft The number of moves remaining.
+    */
+    public void setMovesLeft(int movesLeft) {
+        this.movesLeft = movesLeft;
     }
 
 

@@ -6,6 +6,8 @@ import java.util.Iterator;
 
 /**
 * A place where a <code>Locatable</code> can be put.
+*
+* @see Locatable
 */
 public interface Location {
 
@@ -33,7 +35,7 @@ public interface Location {
 
 
     /**
-    * Removes a code>Locatable</code> from this Location.
+    * Removes a <code>Locatable</code> from this Location.
     *
     * @param locatable The <code>Locatable</code> to remove from this Location.
     */

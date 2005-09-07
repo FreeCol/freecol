@@ -74,30 +74,40 @@ public final class PreGameController extends Controller {
             freeColServer.setAIMain(aiMain);
             game.setFreeColGameObjectListener(aiMain);
 
-            // Add any AI players:
-            // TODO: AI player to represent the other European nations
-            for (int i = Player.INCA; i <= Player.TUPI; i++) {
-                DummyConnection theConnection = new DummyConnection(freeColServer.getInGameInputHandler());
-                ServerPlayer indianPlayer = new ServerPlayer(game,
-                                                             "Indian_" + Integer.toString(i - 3),
-                                                             false,
-                                                             true,
-                                                             null,
-                                                             theConnection);
-                indianPlayer.setNation(i);
-                indianPlayer.setColor(Player.getDefaultNationColor(i));
+            // Add AI players:
+            for (int i = 0; i < Player.NUMBER_OF_NATIONS; i++) {
+                if (game.getPlayer(i) != null) {
+                    continue;
+                }
 
-                DummyConnection aiConnection = new DummyConnection(new AIInGameInputHandler(freeColServer, indianPlayer, aiMain));
+                DummyConnection theConnection = new DummyConnection(freeColServer.getInGameInputHandler());
+                
+                String name;
+                if (i >= Player.INCA && i<=Player.TUPI) {
+                    name = "Indian_" + Integer.toString(i - 3);
+                } else {
+                    name = "European_" + Integer.toString(i);
+                }
+
+                ServerPlayer aiPlayer = new ServerPlayer(game,
+                                                         name,
+                                                         false,
+                                                         true,
+                                                         null,
+                                                         theConnection,
+                                                         i);
+
+                DummyConnection aiConnection = new DummyConnection(new AIInGameInputHandler(freeColServer, aiPlayer, aiMain));
                 aiConnection.setOutgoingMessageHandler(theConnection);
                 theConnection.setOutgoingMessageHandler(aiConnection);
 
                 freeColServer.getServer().addConnection(theConnection, 3 - i);
 
-                freeColServer.getGame().addPlayer(indianPlayer);
+                freeColServer.getGame().addPlayer(aiPlayer);
 
                 // Send message to all players except to the new player:
                 Element addNewPlayer = Message.createNewRootElement("addPlayer");
-                addNewPlayer.appendChild(indianPlayer.toXMLElement(null, addNewPlayer.getOwnerDocument()));
+                addNewPlayer.appendChild(aiPlayer.toXMLElement(null, addNewPlayer.getOwnerDocument()));
                 freeColServer.getServer().sendToAll(addNewPlayer, theConnection);
             }
 
@@ -149,7 +159,10 @@ public final class PreGameController extends Controller {
             ServerPlayer player = (ServerPlayer) playerIterator.next();
 
             player.resetExploredTiles(map);
-            player.setGold(game.getGameOptions().getInteger(GameOptions.STARTING_MONEY));
+            
+            if (player.isEuropean()) {
+                player.setGold(game.getGameOptions().getInteger(GameOptions.STARTING_MONEY));
+            }
 
             Element updateGameElement = Message.createNewRootElement("updateGame");
             updateGameElement.appendChild(game.toXMLElement(player, updateGameElement.getOwnerDocument()));

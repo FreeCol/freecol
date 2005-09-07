@@ -2,6 +2,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
@@ -250,6 +251,75 @@ public final class Tile extends FreeColGameObject implements Location {
 
     public GoodsContainer getGoodsContainer() {
         return null;
+    }
+
+
+    /**
+    * Calculates the value of a future colony at this tile.
+    * @return The value of a future colony located on this tile.
+    *         This value is used by the AI when deciding
+    *         where to build a new colony.
+    */
+    public int getColonyValue() {
+        if (!isLand()) {
+            return 0;
+        } else if (potential(Goods.FOOD) < 2) {
+            return 0;
+        } else if (getSettlement() != null) {
+            return 0;
+        } else {
+            int value = potential(Goods.FOOD) * 3;
+
+            boolean nearbyTileHasForest = false;
+            boolean nearbyTileIsOcean = false;
+
+            List v = getGame().getMap().getSurroundingTiles(this, 1);
+            for (int j=0; j<v.size(); j++) {
+                if (((Tile) v.get(j)).getColony() != null) {
+                    return 0;
+                }
+                if (((Tile) v.get(j)).getSettlement() != null) {
+                    value -= 10;
+                    continue;
+                }
+                if (((Tile) v.get(j)).getOwner() != null) {
+                    continue;
+                }
+
+                for (int i=0; i<Goods.NUMBER_OF_TYPES; i++) {
+                    value += ((Tile) v.get(j)).potential(i);
+                }
+                if (((Tile) v.get(j)).isForested()) {
+                    nearbyTileHasForest = true;
+                }
+                if (!((Tile) v.get(j)).isLand()) {
+                    nearbyTileIsOcean = true;
+                }
+                if (((Tile) v.get(j)).getNationOwner() != Player.NO_NATION &&
+                        !getGame().getPlayer(((Tile) v.get(j)).getNationOwner()).isEuropean()) {
+                    value -= 5;
+                }
+            }
+
+            if (hasBonus()) {
+                value -= 10;
+            }
+
+            if (isForested()) {
+                value -= 5;
+            }
+
+            if (!nearbyTileHasForest) {
+                value -= 30;
+            }
+            if (!nearbyTileIsOcean) {
+                // TODO: Uncomment when wagon train code has been written:
+                //value -= 20;
+                value = 0;
+            }
+            
+            return Math.max(0, value);
+        }
     }
 
 
@@ -888,6 +958,43 @@ public final class Tile extends FreeColGameObject implements Location {
     * @return The normal potential of this tile to produce that amount of goods.
     */
     public int potential(int goods) {
+        return getTileTypePotential(getType(), goods, addition_type, hasBonus(), isForested(), isPlowed(), hasRoad());
+    }
+    
+    
+    /**
+    * Gets the maximum potential for producing the given type of goods.
+    * The maximum potential is the potential of a tile after the tile has
+    * been plowed/built road on.
+    *
+    * @param goodsType The type of goods.
+    * @return The maximum potential.
+    */
+    public int getMaximumPotential(int goodsType) {
+        if (goodsType == Goods.FURS || goodsType == Goods.LUMBER || goodsType == Goods.ORE || goodsType == Goods.SILVER) {
+            return getTileTypePotential(getType(), goodsType, addition_type, hasBonus(),
+                                        isForested(), false, true);
+        } else {
+            return getTileTypePotential(getType(), goodsType, addition_type, hasBonus() && !isForested(),
+                                        false, true, true);
+        }
+    }
+        
+    
+    /**
+    * The potential of a given type of tile to produce a certain type of goods.
+    *
+    * @param tileType The type of tile
+    * @param goods The type of goods to check the potential for.
+    * @return The amount of goods.
+    */
+    public static int getTileTypePotential(int tileType, int goods, int addition_type, boolean bonus,
+                                            boolean forested, boolean plowed, boolean road) {
+    
+        if (!Goods.isFarmedGoods(goods)) {
+            return 0;
+        }
+
         // Please someone tell me they want to put this data into a separate file... -sjm
         // Twelve tile types, sixteen goods types, and forested/unforested.
         int potentialtable[][][] = {
@@ -910,7 +1017,7 @@ public final class Tile extends FreeColGameObject implements Location {
 
         int basepotential = 0;
         if (addition_type <= ADD_RIVER_MAJOR) {
-            basepotential = potentialtable[type][goods][(forested ? 1 : 0)];
+            basepotential = potentialtable[tileType][goods][(forested ? 1 : 0)];
         } else if (addition_type == ADD_HILLS) {
             basepotential = potentialtable[12][goods][0];
         } else if (addition_type == ADD_MOUNTAINS) {
@@ -924,10 +1031,10 @@ public final class Tile extends FreeColGameObject implements Location {
             }
         }
 
-        if (hasBonus()) {
+        if (bonus) {
             if (addition_type <= ADD_RIVER_MAJOR) {
-                if (isForested()) {
-                    if (getType() == GRASSLANDS || getType() == SAVANNAH) {
+                if (forested) {
+                    if (tileType == GRASSLANDS || tileType == SAVANNAH) {
                         if (goods == Goods.LUMBER) {
                             basepotential += 6;
                         }
@@ -936,15 +1043,15 @@ public final class Tile extends FreeColGameObject implements Location {
                             basepotential += 6;
                         }
                     }
-                } else if (getType() == PLAINS && goods == Goods.FOOD) {
+                } else if (tileType == PLAINS && goods == Goods.FOOD) {
                     basepotential += 4;
-                } else if (getType() == SAVANNAH && goods == Goods.SUGAR) {
+                } else if (tileType == SAVANNAH && goods == Goods.SUGAR) {
                     basepotential += 7;
-                } else if (getType() == GRASSLANDS && goods == Goods.TOBACCO) {
+                } else if (tileType == GRASSLANDS && goods == Goods.TOBACCO) {
                     basepotential += 6;
-                } else if (getType() == PRAIRIE && goods == Goods.COTTON) {
+                } else if (tileType == PRAIRIE && goods == Goods.COTTON) {
                     basepotential += 6;
-                } else if (getType() == OCEAN && goods == Goods.FOOD) {
+                } else if (tileType == OCEAN && goods == Goods.FOOD) {
                     basepotential += 5;
                 }
             } else if (addition_type == ADD_HILLS && goods == Goods.ORE) {
@@ -1365,25 +1472,27 @@ public final class Tile extends FreeColGameObject implements Location {
             if (getColony() != null) {
                 Element colonyElement = getChildElement(tileElement, Colony.getXMLElementTagName());
 
-                if (colonyUnitCount != 0) {
-                    if (colonyElement.hasAttribute("unitCount")) {
-                        colonyElement.setAttribute("unitCount", Integer.toString(colonyUnitCount));
-                    }
+                if (!player.canSee(getTile())) {
+                    if (colonyUnitCount != 0) {
+                        if (colonyElement.hasAttribute("unitCount")) {
+                            colonyElement.setAttribute("unitCount", Integer.toString(colonyUnitCount));
+                        }
 
-                    NodeList childNodes = colonyElement.getChildNodes();
-                    for (int i=0; i<childNodes.getLength(); i++) {
-                        Element childElement = (Element) childNodes.item(i);
+                        NodeList childNodes = colonyElement.getChildNodes();
+                        for (int i=0; i<childNodes.getLength(); i++) {
+                            Element childElement = (Element) childNodes.item(i);
 
-                        if (childElement.getTagName().equals(Building.getXMLElementTagName())) {
-                            Building b = (Building) getGame().getFreeColGameObject(childElement.getAttribute("ID"));
+                            if (childElement.getTagName().equals(Building.getXMLElementTagName())) {
+                                Building b = (Building) getGame().getFreeColGameObject(childElement.getAttribute("ID"));
 
-                            if (b.getType() == Building.STOCKADE) {
-                                childElement.setAttribute("level", Integer.toString(colonyStockadeLevel));
+                                if (b.getType() == Building.STOCKADE) {
+                                    childElement.setAttribute("level", Integer.toString(colonyStockadeLevel));
+                                }
                             }
                         }
+                    } else {    // Colony not discovered.
+                        colonyElement.getParentNode().removeChild(colonyElement);
                     }
-                } else {    // Colony not discovered.
-                    colonyElement.getParentNode().removeChild(colonyElement);
                 }
             } else if ((getSettlement() != null) && (getSettlement() instanceof IndianSettlement)) {
                 Element settlementElement = getChildElement(tileElement, IndianSettlement.getXMLElementTagName());

@@ -107,7 +107,8 @@ public class GoodsContainer extends FreeColGameObject {
     */
     public void removeGoods(int type, int amount) {
         if (storedGoods[type] - amount < 0) {
-            throw new IllegalStateException("Operation would leave " + (storedGoods[type] - amount) + " goods of type " + type + " here.");
+            throw new IllegalStateException("Operation would leave " + (storedGoods[type] - amount) + " goods of type " 
+                    + Goods.getName(type) + " (" + type + ") here. Location: " + parent);
         }
 
         storedGoods[type] -= amount;

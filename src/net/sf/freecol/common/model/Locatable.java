@@ -28,7 +28,23 @@ public interface Locatable {
     
     
     /**
+    * Returns the <code>Tile</code> where this <code>Locatable</code> is located,
+    * or <code>null</code> if it's location is <code>Europe</code>.
+    *
+    * @return The Tile where this Unit is located. Or null if
+    * its location is Europe.
+    */
+    public Tile getTile();
+
+    
+    /**
     * Gets the amount of space this <code>Locatable</code> take.
     */
     public int getTakeSpace();
+    
+    
+    /**
+    * Returns the name of this <code>Locatable</code>.
+    */
+    public String getName();
 }

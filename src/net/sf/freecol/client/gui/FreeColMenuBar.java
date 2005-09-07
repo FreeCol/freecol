@@ -401,6 +401,17 @@ public class FreeColMenuBar extends JMenuBar {
                 }
             });
 
+            JCheckBoxMenuItem cv = new JCheckBoxMenuItem(Messages.message("menuBar.debug.showColonyValue"));
+            cv.setOpaque(false);
+            cv.setMnemonic(KeyEvent.VK_C);
+            debugMenu.add(cv);
+            cv.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    gui.displayColonyValue = ((JCheckBoxMenuItem) e.getSource()).isSelected();
+                    canvas.refresh();
+                }
+            });
+
             final JMenuItem reveal = new JCheckBoxMenuItem(Messages.message("menuBar.debug.revealEntireMap"));
             reveal.setOpaque(false);
             reveal.setMnemonic(KeyEvent.VK_R);
@@ -414,7 +425,26 @@ public class FreeColMenuBar extends JMenuBar {
                     reveal.setEnabled(false);
                 }
             });
-            
+
+            debugMenu.addSeparator();
+
+            final JMenuItem useAI = new JMenuItem("Use AI");
+            useAI.setOpaque(false);
+            useAI.setMnemonic(KeyEvent.VK_A);
+            useAI.setAccelerator(KeyStroke.getKeyStroke('A', InputEvent.CTRL_MASK | InputEvent.ALT_MASK));
+            debugMenu.add(useAI);
+            useAI.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    if (freeColClient.getFreeColServer() != null) {
+                        net.sf.freecol.server.ai.AIMain am = freeColClient.getFreeColServer().getAIMain();
+                        net.sf.freecol.server.ai.AIPlayer ap = (net.sf.freecol.server.ai.AIPlayer) am.getAIObject(freeColClient.getMyPlayer().getID());
+                        ap.setDebuggingConnection(freeColClient.getClient().getConnection());
+                        ap.startWorking();
+                        //freeColClient.getConnectController().reconnect();
+                    }
+                }
+            });
+
             debugMenu.addSeparator();
 
             final JMenuItem compareMaps = new JMenuItem(Messages.message("menuBar.debug.compareMaps"));

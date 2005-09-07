@@ -65,8 +65,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
     * @param socket The socket to the player's client.
     * @param connection The <code>Connection</code> for the above mentioned socket.
     */
-    public ServerPlayer(Game game, String name, boolean admin, boolean ai, Socket socket, Connection connection) {
-        super(game, name, admin, ai);
+    public ServerPlayer(Game game, String name, boolean admin, boolean ai, Socket socket, Connection connection, int nation) {
+        super(game, name, admin, ai, nation);
 
         this.socket = socket;
         this.connection = connection;
@@ -196,6 +196,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
             Map.Position p = (Map.Position) positionIterator.next();
             setExplored(getGame().getMap().getTile(p));
         }
+        
+        resetCanSeeTiles();
     }
 
 

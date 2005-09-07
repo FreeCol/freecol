@@ -11,7 +11,7 @@ import org.w3c.dom.Document;
 /**
 * Represents a work location on a tile.
 */
-public class ColonyTile extends FreeColGameObject implements WorkLocation {
+public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownable {
     private static final Logger logger = Logger.getLogger(ColonyTile.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
@@ -61,7 +61,17 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation {
 
 
 
-    
+    /**
+    * Gets the owner of this <code>Ownable</code>.
+    *
+    * @return The <code>Player</code> controlling this
+    *         {@link Ownable}.
+    */
+    public Player getOwner() {
+        return colony.getOwner();
+    }
+
+
     /**
     * Checks if this is the tile where the <code>Colony</code> is located.
     * @return The result.
@@ -206,7 +216,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation {
             getWorkTile().setOwner(null);
         }
     }
-
+    
 
     /**
     * Remove the specified <code>Locatable</code> from this <code>WorkLocation</code>.
@@ -349,6 +359,44 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation {
                 return 0;
             }
         }
+    }
+    
+    
+    /**
+    * Returns the unit type producing the greatest amount of the
+    * given goods at this tile.
+    *
+    * @param goodsType The type of goods.
+    * @return The {@link Unit#getType unit type}.
+    * @see Unit#getExpertWorkType
+    * @see Building#getExpertUnitType
+    */
+    public int getExpertForProducing(int goodsType) {
+        switch (goodsType) {
+            case Goods.FOOD:
+                if (getWorkTile().isLand()) {
+                    return Unit.EXPERT_FARMER;
+                } else {
+                    return Unit.EXPERT_FISHERMAN;
+                }
+            case Goods.FURS:
+                return Unit.EXPERT_FUR_TRAPPER;
+            case Goods.SILVER:
+                return Unit.EXPERT_SILVER_MINER;
+            case Goods.LUMBER:
+                return Unit.EXPERT_LUMBER_JACK;
+            case Goods.ORE:
+                return Unit.EXPERT_ORE_MINER;
+            case Goods.SUGAR:
+                return Unit.MASTER_SUGAR_PLANTER;
+            case Goods.COTTON:
+                return Unit.MASTER_COTTON_PLANTER;
+            case Goods.TOBACCO:
+                return Unit.MASTER_TOBACCO_PLANTER;
+            default:
+                logger.warning("Unknown type of goods.");
+                return Unit.FREE_COLONIST;
+            }
     }
 
 

@@ -115,6 +115,7 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
 
     // Debug variables:
     boolean displayCoordinates = false;
+    boolean displayColonyValue = false;
 
 
 
@@ -1364,8 +1365,14 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
             g.drawImage(lib.getMiscImage(ImageLibrary.UNIT_SELECT), x, y, null);
         }*/
 
+        g.setColor(Color.BLACK);
+
         if (displayCoordinates) {
             String posString = tile.getX() + ", " + tile.getY();
+            g.drawString(posString, x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(posString))/2, y + (lib.getTerrainImageHeight(tile.getType()) - g.getFontMetrics().getAscent())/2);
+        }
+        if (displayColonyValue && tile.getType() != Tile.UNEXPLORED && tile.isLand()) {
+            String posString = Integer.toString(tile.getColonyValue());
             g.drawString(posString, x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(posString))/2, y + (lib.getTerrainImageHeight(tile.getType()) - g.getFontMetrics().getAscent())/2);
         }
 

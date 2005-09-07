@@ -52,7 +52,6 @@ public final class Messages {
     public static String message(String messageId) {
 
         if (null == defaultMessages) {
-
             defaultMessages = new Messages(Locale.getDefault());
         }
 

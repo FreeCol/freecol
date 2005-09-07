@@ -1483,7 +1483,6 @@ public final class Canvas extends JLayeredPane {
         //       of GUI::inGame.)
         //       If GUI thinks we're still in the game then log an error because at this
         //       point the GUI should have been informed.
-
         closeMenus();
         removeInGameComponents();
         showMainPanel();
@@ -1513,6 +1512,27 @@ public final class Canvas extends JLayeredPane {
         if (jMenuBar != null) {
             remove(jMenuBar);
         }
+    }
+    
+    
+    public boolean containsInGameComponents() {
+        // remove listeners, they will be added when launching the new game...
+        KeyListener[] keyListeners = getKeyListeners();
+        if (keyListeners.length > 0) {
+            return true;
+        }
+
+        MouseListener[] mouseListeners = getMouseListeners();
+        if (mouseListeners.length > 0) {
+            return true;
+        }
+
+        MouseMotionListener[] mouseMotionListeners = getMouseMotionListeners();
+        if (mouseMotionListeners.length > 0) {
+            return true;
+        }
+        
+        return false;
     }
 
 

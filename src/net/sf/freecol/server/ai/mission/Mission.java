@@ -26,6 +26,9 @@ public abstract class Mission extends AIObject {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
+    protected static final int MINIMUM_TRANSPORT_PRIORITY = 60,     // A transport can be used
+                               NORMAL_TRANSPORT_PRIORITY = 100;     // Transport is required
+
     protected int NO_PATH_TO_TARGET = -2,
                   NO_MORE_MOVES_LEFT = -1;
 
@@ -54,6 +57,11 @@ public abstract class Mission extends AIObject {
     }
 
     
+    public String getID() {
+        return null;
+    }
+    
+    
     /**
     * Moves the unit owning this mission towards the given <code>Tile</code>.
     * This is done in a loop until the tile is reached, there are no moves left,
@@ -64,47 +72,47 @@ public abstract class Mission extends AIObject {
     *         or {@link #NO_MORE_MOVES_LEFT} if there are no more moves left and
     *         {@link #NO_PATH_TO_TARGET} if there is no path to follow.
     *         If a direction is returned, it is guarantied that moving in that direction
-    *         is not an {@link Unit#ILLEGAL_MOVE}.
+    *         is not an {@link Unit#ILLEGAL_MOVE}, but a direction also gets returned
+    *         if the resulting move would be an {@link Unit#ATTACK} etc. A direction
+    *         can also be returned during the path, if the path has been blocked.
     */
     protected int moveTowards(Connection connection, Tile tile) {
         Map map = getAIMain().getGame().getMap();
         PathNode pathNode = getUnit().findPath(tile);
+        
         if (pathNode != null) {
-            int direction = pathNode.getDirection();
-            int turns = pathNode.getTurns();
-            while (pathNode != null && pathNode.getTile() != tile && pathNode.getTurns() == turns && getUnit().getMoveType(direction) == Unit.MOVE) {
-                move(connection, direction);
-                pathNode = pathNode.next;
-            }
-            if (pathNode.getTile() == tile && pathNode.getTurns() == turns && getUnit().getMoveType(direction) != Unit.ILLEGAL_MOVE) {
-                return pathNode.getDirection();
-            }
-            return NO_MORE_MOVES_LEFT;
+            return moveTowards(connection, pathNode);
         } else {
             return NO_PATH_TO_TARGET;
         }
     }
-    
-    
+
+
     /**
     * Moves the unit owning this mission using the given <code>pathNode</code>.
     * This is done in a loop until the end of the path is reached, the next step is not a move
     * or when there are no moves left.
     *
     * @param pathNode The first node of the path.
-    * @return The direction to take the final move (greater than or equal to zero),
+    * @return The direction to continue moving the path (greater than or equal to zero),
     *         or {@link #NO_MORE_MOVES_LEFT} if there are no more moves left.
     *         If a direction is returned, it is guarantied that moving in that direction
-    *         is not an {@link Unit#ILLEGAL_MOVE}.
+    *         is not an {@link Unit#ILLEGAL_MOVE}. A directions gets returned when
+    *         moving in the given direction would not be a {@link Unit#MOVE} or
+    *         {@link Unit#MOVE_HIGH_SEAS}.
     */
     protected int moveTowards(Connection connection, PathNode pathNode) {
-        int direction = pathNode.getDirection();
-        int turns = pathNode.getTurns();
-        while (pathNode != null && pathNode.getTurns() == turns && getUnit().getMoveType(direction) == Unit.MOVE) {
-            move(connection, direction);
+        if (getUnit().getMovesLeft() <= 0) {
+            return NO_MORE_MOVES_LEFT;
+        }
+        
+        while (pathNode.next != null && pathNode.getTurns() == 0
+                && (getUnit().getMoveType(pathNode.getDirection()) == Unit.MOVE
+                || getUnit().getMoveType(pathNode.getDirection()) == Unit.MOVE_HIGH_SEAS)) {
+            move(connection, pathNode.getDirection());
             pathNode = pathNode.next;
         }
-        if (pathNode.getTurns() == turns && getUnit().getMoveType(direction) != Unit.ILLEGAL_MOVE) {
+        if (pathNode.getTurns() == 0 && getUnit().getMoveType(pathNode.getDirection()) != Unit.ILLEGAL_MOVE) {
             return pathNode.getDirection();
         }
         return NO_MORE_MOVES_LEFT;
@@ -312,6 +320,32 @@ public abstract class Mission extends AIObject {
         }
     }
 
+    
+    /**
+    * Returns the destination of a required transport.
+    * @return The destination of a required transport or 
+    *         <code>null</code> if no transport is needed.
+    */
+    public Tile getTransportDestination() {
+        return null;
+    }
+    
+    
+    /**
+    * Returns the priority of getting the unit to the
+    * transport destination.
+    *
+    * @return The priority.
+    */
+    public int getTransportPriority() {
+        return 0;
+    }
+
+    
+    public void dispose() {
+    
+    }
+    
 
     /**
     * Performs the mission. This method should be implemented by a subclass.

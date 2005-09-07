@@ -6,6 +6,7 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.FoundingFather;
 
 import net.sf.freecol.server.control.*;
 import net.sf.freecol.server.networking.*;
@@ -19,7 +20,8 @@ import java.util.logging.Logger;
 import java.util.Iterator;
 
 import java.io.IOException;
-
+import java.io.StringWriter;
+import java.io.PrintWriter;
 
 
 /**
@@ -49,11 +51,11 @@ public final class AIInGameInputHandler implements MessageHandler {
         this.aiMain = aiMain;
         
         if (freeColServer == null) {
-            throw new NullPointerException();
+            throw new NullPointerException("freeColServer == null");
         } else if (me == null) {
-            throw new NullPointerException();
+            throw new NullPointerException("me == null");
         } else if (aiMain == null) {
-            throw new NullPointerException();
+            throw new NullPointerException("aiMain == null");
         }
 
         if (!me.isAI()) {
@@ -70,37 +72,42 @@ public final class AIInGameInputHandler implements MessageHandler {
     public synchronized Element handle(Connection connection, Element element) {
         Element reply = null;
 
-        if (element != null) {
+        try {
+            if (element != null) {
 
-            String type = element.getTagName();
+                String type = element.getTagName();
 
-            // Since we're the server, we can see everything.
-            // Therefore most of these messages are useless.
-            if (type.equals("update")) {
-            } else if (type.equals("remove")) {
-            } else if (type.equals("startGame")) {
-            } else if (type.equals("updateGame")) {
-            } else if (type.equals("addPlayer")) {
-            } else if (type.equals("opponentMove")) {
-            } else if (type.equals("opponentAttack")) {
-            } else if (type.equals("attackResult")) {
-            } else if (type.equals("setCurrentPlayer")) {
-                reply = setCurrentPlayer((DummyConnection) connection, element);
-            } else if (type.equals("emigrateUnitInEuropeConfirmed")) {
-            } else if (type.equals("newTurn")) {
-            } else if (type.equals("setDead")) {
-            } else if (type.equals("gameEnded")) {
-            } else if (type.equals("disconnect")) {
-            } else if (type.equals("logout")) {
-            } else if (type.equals("error")) {
-            } else if (type.equals("chooseFoundingFather")) {
-                // TODO: Implement
-                logger.warning("TODO: Implement chooseFoundingFather");
-            } else if (type.equals("reconnect")) {            
-                logger.warning("The server requests a reconnect. This means an illegal operation has been performed. Please refer to any previous error message.");
-            } else {
-                logger.warning("Message is of unsupported type \"" + type + "\".");
+                // Since we're the server, we can see everything.
+                // Therefore most of these messages are useless.
+                if (type.equals("update")) {
+                } else if (type.equals("remove")) {
+                } else if (type.equals("startGame")) {
+                } else if (type.equals("updateGame")) {
+                } else if (type.equals("addPlayer")) {
+                } else if (type.equals("opponentMove")) {
+                } else if (type.equals("opponentAttack")) {
+                } else if (type.equals("attackResult")) {
+                } else if (type.equals("setCurrentPlayer")) {
+                    reply = setCurrentPlayer((DummyConnection) connection, element);
+                } else if (type.equals("emigrateUnitInEuropeConfirmed")) {
+                } else if (type.equals("newTurn")) {
+                } else if (type.equals("setDead")) {
+                } else if (type.equals("gameEnded")) {
+                } else if (type.equals("disconnect")) {
+                } else if (type.equals("logout")) {
+                } else if (type.equals("error")) {
+                } else if (type.equals("chooseFoundingFather")) {
+                    reply = chooseFoundingFather((DummyConnection) connection, element);
+                } else if (type.equals("reconnect")) {            
+                    logger.warning("The server requests a reconnect. This means an illegal operation has been performed. Please refer to any previous error message.");
+                } else {
+                    logger.warning("Message is of unsupported type \"" + type + "\".");
+                }
             }
+        } catch (Exception e) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            logger.warning(sw.toString());
         }
 
         return reply;
@@ -118,13 +125,18 @@ public final class AIInGameInputHandler implements MessageHandler {
     private Element setCurrentPlayer(DummyConnection connection, Element setCurrentPlayerElement) {
         Game game = freeColServer.getGame();
         Player currentPlayer = (Player) game.getFreeColGameObject(setCurrentPlayerElement.getAttribute("player"));
-        Element reply = null;
 
         if (me.getID() == currentPlayer.getID()) {
-            getAIPlayer().startWorking();
+            try {
+                getAIPlayer().startWorking();
+            } catch (Exception e) {
+                StringWriter sw = new StringWriter();
+                e.printStackTrace(new PrintWriter(sw));
+                logger.warning(sw.toString());
+            }
 
             Element replyElement = Message.createNewRootElement("endTurn");
-            
+
             try {
                 connection.send(replyElement);
             } catch (IOException e) {
@@ -134,7 +146,31 @@ public final class AIInGameInputHandler implements MessageHandler {
 
         return null;
     }
-    
+
+
+    /**
+    * Handles a "chooseFoundingFather"-message.
+    *
+    * @param connection The connectio the message was received on.
+    * @param element The element (root element in a DOM-parsed XML tree) that
+    *                holds all the information.
+    */
+    private Element chooseFoundingFather(DummyConnection connection, Element element) {
+        int[] possibleFoundingFathers = new int[FoundingFather.TYPE_COUNT];
+        for (int i=0; i<FoundingFather.TYPE_COUNT; i++) {
+            possibleFoundingFathers[i] = Integer.parseInt(element.getAttribute("foundingFather" + Integer.toString(i)));
+        }
+
+        int foundingFather = possibleFoundingFathers[0]; // TODO: Make a good choice.
+
+        Element reply = Message.createNewRootElement("chosenFoundingFather");
+        reply.setAttribute("foundingFather", Integer.toString(foundingFather));
+
+        me.setCurrentFather(foundingFather);
+
+        return reply;
+    }
+
     
     public AIPlayer getAIPlayer() {
         return (AIPlayer) aiMain.getAIObject(me);

@@ -147,7 +147,7 @@ public class Map extends FreeColGameObject {
     *             <code>Tile</code> right after the specified starting tile, and
     *             {@link PathNode#getDirection} will return the direction you
     *             need to take in order to reach that tile.
-    *             This method returns <code>null</code> if no path is found.    
+    *             This method returns <code>null</code> if no path is found.
     * @see #findPath(Unit, Tile, Tile)
     * @see Unit#findPath(Tile)
     * @exception NullPointerException if either <code>start</code> or <code>end</code>
@@ -182,7 +182,37 @@ public class Map extends FreeColGameObject {
         if (unit == null) {
             throw new NullPointerException();
         }
-        return findPath(unit, start, end, -1);
+        return findPath(unit, start, end, -1, null);
+    }
+
+
+    /**
+    * Finds a shortest path between the given tiles. The <code>Tile</code>
+    * at the <code>end</code> will not be checked against the
+    * <code>unit</code>'s legal moves.
+    *
+    * @param unit The <code>Unit</code> that should be used to determine
+    *             wether or not a path is legal.
+    * @param start The <code>Tile</code> in which the path starts from.
+    * @param end The end of the path.
+    * @param carrier A carrier that currently holds the <code>unit</code>, or <code>null</code>
+    *             if the <code>unit</code> is not presently on a carrier.
+    * @return A <code>PathNode</code> for the first tile in the path. Calling
+    *             {@link PathNode#getTile} on this object, will return the
+    *             <code>Tile</code> right after the specified starting tile, and
+    *             {@link PathNode#getDirection} will return the direction you
+    *             need to take in order to reach that tile.
+    *             This method returns <code>null</code> if no path is found.
+    * @see #findPath(Tile, Tile, int)
+    * @see Unit#findPath(Tile)
+    * @exception NullPointerException if either <code>unit</code>, <code>start</code> or <code>end</code>
+    *             are <code>null</code>.
+    */
+    public PathNode findPath(Unit unit, Tile start, Tile end, Unit carrier) {
+        if (unit == null) {
+            throw new NullPointerException();
+        }
+        return findPath(unit, start, end, -1, carrier);
     }
 
 
@@ -210,13 +240,59 @@ public class Map extends FreeColGameObject {
     * @exception IllegalArgumentException if <code>start == end</code>.
     */
     private PathNode findPath(Unit unit, Tile start, Tile end, int type) {
+        return findPath(unit, start, end, type, null);
+    }
+
+
+    /**
+    * Finds a shortest path between the given tiles. The <code>Tile</code>
+    * at the <code>end</code> will not be checked against validity
+    * (neither the <code>options</code> nor allowed movement by the <code>unit</code>.
+    *
+    * @param unit The <code>Unit</code> that should be used to determine
+    *             wether or not a path is legal. The <code>options</code>
+    *             are used instead if <code>unit == null</code>.
+    * @param start The <code>Tile</code> in which the path starts from.
+    * @param end The end of the path.
+    * @param type One of: {@link #BOTH_LAND_AND_SEA}, {@link #BOTH_LAND_AND_SEA},
+    *             {@link #ONLY_LAND} and {@link #ONLY_SEA}. This argument if
+    *             ignored if <code>unit != null</code>.
+    * @param carrier A carrier that currently holds the <code>unit</code>, or <code>null</code>
+    *             if the <code>unit</code> is not presently on a carrier.
+    * @return A <code>PathNode</code> for the first tile in the path. Calling
+    *             {@link PathNode#getTile} on this object, will return the
+    *             <code>Tile</code> right after the specified starting tile, and
+    *             {@link PathNode#getDirection} will return the direction you
+    *             need to take in order to reach that tile.
+    *             This method returns <code>null</code> if no path is found.
+    * @exception NullPointerException if either <code>start</code> or <code>end</code>
+    *             are <code>null</code>.
+    * @exception IllegalArgumentException if <code>start == end</code>.
+    */
+    private PathNode findPath(Unit unit, Tile start, Tile end, int type, Unit carrier) {
         if (start == end) {
             throw new IllegalArgumentException("start == end");
+        }
+        if (start == null) {
+            throw new NullPointerException("start == null");
+        }
+        if (end == null) {
+            throw new NullPointerException("end == null");
+        }
+
+        if (carrier != null && unit == null) {
+            throw new NullPointerException("unit == null");
+        }
+
+        final Unit theUnit = unit;
+        if (carrier != null) {
+            unit = carrier;
         }
 
         PathNode firstNode;
         if (unit != null) {
             firstNode = new PathNode(start, 0, getDistance(start.getPosition(), end.getPosition()), -1, unit.getMovesLeft(), 0);
+            firstNode.setOnCarrier(carrier != null);
         } else {
             firstNode = new PathNode(start, 0, getDistance(start.getPosition(), end.getPosition()), -1, -1, -1);
         }
@@ -245,6 +321,12 @@ public class Map extends FreeColGameObject {
                 return currentNode.next;
             }
 
+            if (currentNode.isOnCarrier()) {
+                unit = carrier;
+            } else {
+                unit = theUnit;
+            }
+
             // Try every direction:
             for (int direction=0; direction<8; direction++) {
                 Tile newTile = getNeighbourOrNull(direction, currentNode.getTile());
@@ -263,7 +345,9 @@ public class Map extends FreeColGameObject {
                     } else if (newTile.isLand() && unit.isNaval()) {
                         if ((newTile.getSettlement() == null || newTile.getSettlement().getOwner() != unit.getOwner()) && newTile != end) {
                             // Not allowed to move a naval unit on land:
-                            continue;
+                            if (carrier == null) {
+                                continue;
+                            }
                         } else {
                             // Entering a settlement costs all of the remaining moves for a naval unit:
                             cost += movesLeft;
@@ -301,21 +385,36 @@ public class Map extends FreeColGameObject {
                                 mc += movesLeft;
                                 movesLeft = 0;
                             }
+                            if (carrier != null && unit != carrier && theUnit.getInitialMovesLeft() < carrier.getInitialMovesLeft()) {
+                                mc *= (carrier.getInitialMovesLeft() - theUnit.getInitialMovesLeft());
+                            }
                             cost += mc;
                         } else if (movesLeft == unit.getInitialMovesLeft()) {
                             // Entering a terrain with a higher move cost, but no moves have been spent yet.
-                            cost += movesLeft;
+                            if (carrier != null && unit != carrier && theUnit.getInitialMovesLeft() < carrier.getInitialMovesLeft()) {
+                                movesLeft *= (carrier.getInitialMovesLeft() - theUnit.getInitialMovesLeft());
+                            } else {
+                                cost += movesLeft;
+                            }
                             movesLeft = 0;
                         } else {
                             // This move takes an extra turn to complete:
                             turns++;
                             if (mc > unit.getInitialMovesLeft()) {
                                 // Entering a terrain with a higher move cost than the initial moves:
-                                cost += movesLeft + unit.getInitialMovesLeft();
+                                if (carrier != null && unit != carrier && theUnit.getInitialMovesLeft() < carrier.getInitialMovesLeft()) {
+                                    cost += (movesLeft + unit.getInitialMovesLeft()) * (carrier.getInitialMovesLeft() - theUnit.getInitialMovesLeft());
+                                } else {
+                                    cost += movesLeft + unit.getInitialMovesLeft();
+                                }
                                 movesLeft = 0;
                             } else {
                                 // Normal move:
-                                cost += movesLeft + mc;
+                                if (carrier != null && unit != carrier && theUnit.getInitialMovesLeft() < carrier.getInitialMovesLeft()) {
+                                    cost += (movesLeft + mc) * (carrier.getInitialMovesLeft() - theUnit.getInitialMovesLeft());
+                                } else {
+                                    cost += movesLeft + mc;
+                                }
                                 movesLeft = unit.getInitialMovesLeft() - mc;
                             }
                         }
@@ -326,6 +425,18 @@ public class Map extends FreeColGameObject {
                     } else {
                         cost += newTile.getMoveCost(currentNode.getTile());
                     }
+                }
+
+                // Disembark from 'carrier':
+                if (carrier != null && newTile.isLand() && unit.isNaval()
+                        && (newTile.getSettlement() == null || newTile.getSettlement().getOwner() != unit.getOwner())
+                        && newTile != end) {
+                    int mc = newTile.getMoveCost(currentNode.getTile());
+                    if (theUnit.getInitialMovesLeft() < carrier.getInitialMovesLeft()) {
+                        mc *= (carrier.getInitialMovesLeft() - theUnit.getInitialMovesLeft());
+                    }
+                    cost = mc;
+                    movesLeft = Math.max(0, theUnit.getInitialMovesLeft() - mc);
                 }
 
                 int f = cost + getDistance(newTile.getPosition(), end.getPosition());
@@ -365,6 +476,15 @@ public class Map extends FreeColGameObject {
 
                 successor = new PathNode(newTile, cost, f, direction, movesLeft, turns);
                 successor.previous = currentNode;
+                successor.setOnCarrier(currentNode.isOnCarrier());
+
+                // Disembark from 'carrier':
+                if (carrier != null && newTile.isLand() && unit == carrier
+                        && (newTile.getSettlement() == null || newTile.getSettlement().getOwner() != unit.getOwner())
+                        && newTile != end) {
+                    successor.setOnCarrier(false);
+                }
+
                 openList.add(successor);
             }
 

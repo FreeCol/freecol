@@ -76,7 +76,7 @@ public class MapGenerator {
 
         TerrainGenerator terrainGenerator = new TerrainGenerator(landMap);
         Map map = terrainGenerator.createMap();
-        
+
         game.setMap(map);
 
         createIndianSettlements(map, players);
@@ -560,11 +560,16 @@ public class MapGenerator {
      */
     protected void createEuropeanUnits(Map map, int width, int height, Vector players) throws FreeColException {
         int[] shipYPos = new int[4];
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 4; i++) {
             shipYPos[i] = 0;
+        }
+
         for (int i = 0; i < players.size(); i++) {
             ServerPlayer player = (ServerPlayer)players.elementAt(i);
-            if (player.getNation() >= Player.INCA) break; // Stop once you get into the Indian players -sjm
+            if (!player.isEuropean()) {
+                continue;
+            }
+
             int y = random.nextInt(height - 20) + 10;
             int x = width - 1;
             while (isAShipTooClose(y, shipYPos)) {
@@ -584,7 +589,7 @@ public class MapGenerator {
             } else {
                 unitType = Unit.CARAVEL;
             }
-
+            
             Unit unit1 = new Unit(game, startTile, player, unitType, Unit.ACTIVE);
             Unit unit2 = new Unit(game, unit1, player, Unit.HARDY_PIONEER, Unit.SENTRY);
             Unit unit3 = new Unit(game, unit1, player, Unit.FREE_COLONIST, Unit.SENTRY);
@@ -642,6 +647,17 @@ public class MapGenerator {
                     }
 
                     Unit scout = new Unit(game, colonyTile, player, Unit.SEASONED_SCOUT, Unit.ACTIVE);
+                    
+                    /* DEBUGGING LINES FOR AI (0.4.1): 
+                    for (int j=0; j<10; j++) {
+                        Unit u = new Unit(game, null, player, Unit.FREE_COLONIST, Unit.ACTIVE);
+                        colony.add(u);
+                    }
+                    for (int j=0; j<3; j++) {
+                        Unit u = new Unit(game, null, player, Unit.PETTY_CRIMINAL, Unit.ACTIVE);
+                        colony.add(u);
+                    }
+                    */
 
                     break;
                 }

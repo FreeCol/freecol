@@ -155,7 +155,7 @@ public class UnitContainer extends FreeColGameObject {
     * @return The <code>Iterator</code>.
     */
     public Iterator getUnitIterator() {
-        return units.iterator();
+        return getUnitsClone().iterator();
     }
 
 

@@ -27,14 +27,17 @@ import org.w3c.dom.NodeList;
 * <br>Level {@link #FACTORY}: "Fortress"
 *
 */
-public final class Building extends FreeColGameObject implements WorkLocation {
+public final class Building extends FreeColGameObject implements WorkLocation, Ownable {
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
 
-    /** The maximum level of units in a building ({@value}): */
-    private static final int MAX_LEVEL = 3;
+    /** 
+     * The maximum level of units in a building ({@value}).
+     * {@link #getMaxUnits} should be used whenever possible.
+     **/
+    public static final int MAX_LEVEL = 3;
 
     /** The type of a building. */
     public static final int TOWN_HALL = 0,
@@ -151,6 +154,16 @@ public final class Building extends FreeColGameObject implements WorkLocation {
 
 
 
+    /**
+    * Gets the owner of this <code>Ownable</code>.
+    *
+    * @return The <code>Player</code> controlling this
+    *         {@link Ownable}.
+    */
+    public Player getOwner() {
+        return colony.getOwner();
+    }
+        
 
     /**
     * Gets the <code>Tile</code> where this <code>Building</code> is located.
@@ -413,6 +426,29 @@ public final class Building extends FreeColGameObject implements WorkLocation {
 
         units.add(unit);
         getColony().updatePopulation();
+    }
+
+    
+    /**
+    * Returns the unit type being an expert in this <code>Building</code>.
+    *
+    * @return The {@link Unit#getType unit type}.
+    * @see Unit#getExpertWorkType
+    * @see ColonyTile#getExpertForProducing
+    */
+    public int getExpertUnitType() {
+        switch (getType()) {    
+            case TOWN_HALL:     return Unit.ELDER_STATESMAN;
+            case CARPENTER:     return Unit.MASTER_CARPENTER;
+            case BLACKSMITH:    return Unit.MASTER_BLACKSMITH;
+            case TOBACCONIST:   return Unit.MASTER_TOBACCONIST;
+            case WEAVER:        return Unit.MASTER_WEAVER;
+            case DISTILLER:     return Unit.MASTER_DISTILLER;
+            case FUR_TRADER:    return Unit.MASTER_FUR_TRADER;
+            case ARMORY:        return Unit.MASTER_GUNSMITH;
+            case CHURCH:        return Unit.FIREBRAND_PREACHER;
+            default:            return -1;
+        }
     }
 
 

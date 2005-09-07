@@ -22,7 +22,7 @@ import org.w3c.dom.Document;
 * Every <code>Unit</code> is owned by a {@link Player} and has a
 * {@link Location}.
 */
-public class Unit extends FreeColGameObject implements Location, Locatable {
+public class Unit extends FreeColGameObject implements Location, Locatable, Ownable {
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
@@ -390,9 +390,22 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     /**
     * Gets the skill level.
     */
+    public int getSkillLevel() {
+        return getSkillLevel(getType());
+    }
+
+
+    /**
+    * Gets the skill level.
+    */
     public static int getSkillLevel(int unitType) {
         switch (unitType) {
+            case PETTY_CRIMINAL:
+                return -2;
+            case INDENTURED_SERVANT:
+                return -1;
             case FREE_COLONIST:
+            case INDIAN_CONVERT:
                 return 0;
             case EXPERT_FISHERMAN:
             case EXPERT_FARMER:
@@ -486,12 +499,70 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         }
     }
 
+
      /**
      * Sets the type of goods this unit is producing in its current occupation.
      * @param type The type of goods to attempt to produce.
      */
     public void setWorkType(int type) {
+        if (!Goods.isFarmedGoods(type)) {
+            return;
+        }
+        
         workType = type;
+    }
+
+
+    /**
+    * Gets the type of goods this unit is an expert
+    * at producing.
+    *
+    * @return The type of goods or <code>-1</code> if this unit is not an
+    *         expert at producing any type of goods.
+    * @see ColonyTile#getExpertForProducing
+    */
+    public int getExpertWorkType() {
+        switch (getType()) {
+            case EXPERT_FARMER:
+            case EXPERT_FISHERMAN:
+            case INDIAN_CONVERT:
+            case MILKMAID:
+                return Goods.FOOD;
+            case EXPERT_FUR_TRAPPER:
+                return Goods.FURS;
+            case EXPERT_SILVER_MINER:
+                return Goods.SILVER;
+            case EXPERT_LUMBER_JACK:
+                return Goods.LUMBER;
+            case EXPERT_ORE_MINER:
+                return Goods.ORE;
+            case MASTER_SUGAR_PLANTER:
+                return Goods.SUGAR;
+            case MASTER_COTTON_PLANTER:
+                return Goods.COTTON;
+            case MASTER_TOBACCO_PLANTER:
+                return Goods.TOBACCO;
+            case FIREBRAND_PREACHER:
+                return Goods.CROSSES;
+            case ELDER_STATESMAN:
+                return Goods.BELLS;
+            case MASTER_CARPENTER:
+                return Goods.HAMMERS;
+            case MASTER_DISTILLER:
+                return Goods.RUM;
+            case MASTER_WEAVER:
+                return Goods.CLOTH;
+            case MASTER_TOBACCONIST:
+                return Goods.CIGARS;
+            case MASTER_FUR_TRADER:
+                return Goods.COATS;
+            case MASTER_BLACKSMITH:
+                return Goods.TOOLS;
+            case MASTER_GUNSMITH:
+                return Goods.MUSKETS;
+            default:
+                return -1;
+        }
     }
 
 
@@ -503,6 +574,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
      *         when there are no moves left.
      */
     public int getMoveType(int direction) {
+        if (getTile() == null) {
+            throw new IllegalStateException("getTile() == null");
+        }
+
         Tile target = getGame().getMap().getNeighbourOrNull(direction, getTile());
 
         return getMoveType(target);
@@ -531,7 +606,38 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     * @exception NullPointerException if <code>end == null</code>
     */
     public PathNode findPath(Tile end) {
+        if (getTile() == null) {
+            logger.warning("getTile() == null for " + getName() + " at location: " + getLocation());
+        }
         return getGame().getMap().findPath(this, getTile(), end);
+    }
+    
+    
+    /**
+    * Returns the number of turns this <code>Unit</code> will have to use
+    * in order to reach the given <codeTile</code>.
+    *
+    * @param end The <code>Tile</code> to be reached by this <code>Unit</code>.
+    * @return The number of turns it will take to reach the <code>end</code>,
+    *        or <code>Integer.MAX_VALUE</code> if no path can be found.
+    */
+    public int getTurnsToReach(Tile end) {
+        if (getTile() == end) {
+            return 0;
+        } else {
+            if (getLocation() instanceof Unit) {
+                PathNode p = getGame().getMap().findPath(this, getTile(), end, (Unit) getLocation());
+                if (p != null) {
+                    return p.getTotalTurns();
+                }
+            }
+            PathNode p = findPath(end);
+            if (p != null) {
+                return p.getTotalTurns();
+            } else {
+                return -1;
+            }
+        }
     }
 
 
@@ -571,7 +677,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
      *         when there are no moves left.
      */
     public int getMoveType(Tile target) {
-
+        if (getTile() == null) {
+            throw new IllegalStateException("getTile() == null");
+        }
+        
         if (isUnderRepair()) {
             return ILLEGAL_MOVE;
         }
@@ -752,7 +861,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         int type = getMoveType(direction);
 
         if (type != MOVE && type != DISEMBARK && type != MOVE_HIGH_SEAS) {
-            throw new IllegalStateException("Illegal move requested: " + type);
+            throw new IllegalStateException("\nIllegal move requested: " + type
+                    + " while trying to move a " + getName() + " located at "
+                    + getTile().getPosition().toString() + ". Direction: "
+                    + direction + " Moves Left: " + getMovesLeft());
         }
 
         setState(ACTIVE);
@@ -874,7 +986,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             } else if (locatable instanceof Goods) {
                 goodsContainer.addGoods((Goods) locatable);
                 if (getSpaceLeft() < 0) {
-                    throw new IllegalStateException();
+                    throw new IllegalStateException("Not enough space for the given locatable!");
                 }
             } else {
                 logger.warning("Tried to add an unrecognized 'Locatable' to a unit.");
@@ -2156,7 +2268,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     * its location is Europe.
     */
     public Tile getTile() {
-        return location.getTile();
+        if (location == null) {
+            return null;
+        } else {
+            return location.getTile();
+        }
     }
 
 
@@ -2999,87 +3115,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
     public int getProducedAmount(int goods) {
         int base = 0;
 
-        switch (type) {
-            case MASTER_DISTILLER:
-                if (goods == Goods.RUM) {
-                    base = 6;
-                } else {
-                    return 3;
-                }
-                break;
-            case MASTER_WEAVER:
-                if (goods == Goods.CLOTH) {
-                    base = 6;
-                } else {
-                    base = 3;
-                }
-                break;
-            case MASTER_TOBACCONIST:
-                if (goods == Goods.CIGARS) {
-                    base = 6;
-                } else {
-                    base = 3;
-                }
-                break;
-            case MASTER_FUR_TRADER:
-                if (goods == Goods.COATS) {
-                    base = 6;
-                } else {
-                    base = 3;
-                }
-                break;
-            case MASTER_BLACKSMITH:
-                if (goods == Goods.TOOLS) {
-                    base = 6;
-                } else {
-                    base = 3;
-                }
-                break;
-            case MASTER_GUNSMITH:
-                if (goods == Goods.MUSKETS) {
-                    base = 6;
-                } else {
-                    base = 3;
-                }
-                break;
-            case ELDER_STATESMAN:
-                if (goods == Goods.BELLS) {
-                    base = 6;
-                } else {
-                    base = 3;
-                }
-                break;
-            case FIREBRAND_PREACHER:
-                if (goods == Goods.CROSSES) {
-                    base = 6;
-                } else {
-                    base = 3;
-                }
-                break;
-            case MASTER_CARPENTER:
-                if (goods == Goods.HAMMERS) {
-                    base = 6;
-                } else {
-                    base = 3;
-                }
-                break;
-            case FREE_COLONIST:
-                base = 3;
-                break;
-            case INDENTURED_SERVANT:
-                base = 2;
-                break;
-            case PETTY_CRIMINAL:
-            case INDIAN_CONVERT:
-                base = 1;
-                break;
-            default: // Beats me who or what is working here, but he doesn't get a bonus.
-                if (isColonist()) {
-                    base = 3;
-                } else {
-                    base = 0; // Can't work if you're not a colonist.
-                }
-        }
+        base = getProductionUsing(getType(), goods, base);
 
         if (base == 0) {
             return 0;
@@ -3104,63 +3140,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
         }
 
         int base = tile.potential(goods);
-        switch (type) {
-            case EXPERT_FARMER:
-                if ((goods == Goods.FOOD) && tile.isLand()) {
-                    //TODO: Special tile stuff. He gets +6/+4 for wheat/deer tiles respectively...
-                    base += 2;
-                }
-                break;
-            case EXPERT_FISHERMAN:
-                if ((goods == Goods.FOOD) && !tile.isLand()) {
-                    //TODO: Special tile stuff. He gets +6 for a fishery tile.
-                    base += 2;
-                }
-                break;
-            case EXPERT_FUR_TRAPPER:
-                if (goods == Goods.FURS) {
-                    base *= 2;
-                }
-                break;
-            case EXPERT_SILVER_MINER:
-                if (goods == Goods.SILVER) {
-                    //TODO: Mountain should be +1, not *2, but mountain didn't exist at type of writing.
-                    base *= 2;
-                }
-                break;
-            case EXPERT_LUMBER_JACK:
-                if (goods == Goods.LUMBER) {
-                    base *= 2;
-                }
-                break;
-            case EXPERT_ORE_MINER:
-                if (goods == Goods.ORE) {
-                    base *= 2;
-                }
-                break;
-            case MASTER_SUGAR_PLANTER:
-                if (goods == Goods.SUGAR) {
-                    base *= 2;
-                }
-                break;
-            case MASTER_COTTON_PLANTER:
-                if (goods == Goods.COTTON) {
-                    base *= 2;
-                }
-                break;
-            case MASTER_TOBACCO_PLANTER:
-                if (goods == Goods.TOBACCO) {
-                    base *= 2;
-                }
-                break;
-            case INDIAN_CONVERT:
-                if ((goods == Goods.FOOD) || (goods == Goods.SUGAR) || (goods == Goods.COTTON) || (goods == Goods.TOBACCO) || (goods == Goods.FURS) || (goods == Goods.ORE || (goods == Goods.SILVER))) {
-                    base += 1;
-                }
-                break;
-            default: // Beats me who or what is working here, but he doesn't get a bonus.
-                break;
-        }
+        base = getProductionUsing(getType(), goods, base, tile);
 
         if (getLocation() instanceof ColonyTile && !((ColonyTile) getLocation()).getWorkTile().isLand()
                 && !((ColonyTile) getLocation()).getColony().getBuilding(Building.DOCK).isBuilt()) {
@@ -3175,8 +3155,190 @@ public class Unit extends FreeColGameObject implements Location, Locatable {
             base *= 2;
         }
 
-        base += getTile().getColony().getProductionBonus();
+        if (getTile() != null && getTile().getColony() != null) {
+            base += getTile().getColony().getProductionBonus();
+        }
+
         return Math.max(base, 1);
+    }
+
+
+    /**
+    * Applies unit-type specific bonuses to a goods production in a
+    * <code>Building</code>.
+    *
+    * @param unitType The {@link #getType type} of the unit.
+    * @param goodsType The type of goods that is being produced.
+    * @param base The production not including the unit-type specific bonuses.
+    * @return The production.
+    */
+    public static int getProductionUsing(int unitType, int goodsType, int base) {
+        if (Goods.isFarmedGoods(goodsType)) {
+            throw new IllegalArgumentException("\"goodsType\" is not produced in buildings.");
+        }
+
+        switch (unitType) {
+            case MASTER_DISTILLER:
+                if (goodsType == Goods.RUM) {
+                    base = 6;
+                } else {
+                    base = 3;
+                }
+                break;
+            case MASTER_WEAVER:
+                if (goodsType == Goods.CLOTH) {
+                    base = 6;
+                } else {
+                    base = 3;
+                }
+                break;
+            case MASTER_TOBACCONIST:
+                if (goodsType == Goods.CIGARS) {
+                    base = 6;
+                } else {
+                    base = 3;
+                }
+                break;
+            case MASTER_FUR_TRADER:
+                if (goodsType == Goods.COATS) {
+                    base = 6;
+                } else {
+                    base = 3;
+                }
+                break;
+            case MASTER_BLACKSMITH:
+                if (goodsType == Goods.TOOLS) {
+                    base = 6;
+                } else {
+                    base = 3;
+                }
+                break;
+            case MASTER_GUNSMITH:
+                if (goodsType == Goods.MUSKETS) {
+                    base = 6;
+                } else {
+                    base = 3;
+                }
+                break;
+            case ELDER_STATESMAN:
+                if (goodsType == Goods.BELLS) {
+                    base = 6;
+                } else {
+                    base = 3;
+                }
+                break;
+            case FIREBRAND_PREACHER:
+                if (goodsType == Goods.CROSSES) {
+                    base = 6;
+                } else {
+                    base = 3;
+                }
+                break;
+            case MASTER_CARPENTER:
+                if (goodsType == Goods.HAMMERS) {
+                    base = 6;
+                } else {
+                    base = 3;
+                }
+                break;
+            case FREE_COLONIST:
+                base = 3;
+                break;
+            case INDENTURED_SERVANT:
+                base = 2;
+                break;
+            case PETTY_CRIMINAL:
+            case INDIAN_CONVERT:
+                base = 1;
+                break;
+            default: // Beats me who or what is working here, but he doesn't get a bonus.
+                base = 3;
+        }
+
+        return base;
+    }
+
+
+    /**
+    * Applies unit-type specific bonuses to a goods production on a
+    * <code>Tile</code>.
+    *
+    * @param unitType The {@link #getType type} of the unit.
+    * @param goodsType The type of goods that is being produced.
+    * @param base The production not including the unit-type specific bonuses.
+    * @param tile The <code>Tile</code> in which the given type of goods is being produced.
+    * @return The production.
+    */
+    public static int getProductionUsing(int unitType, int goodsType, int base, Tile tile) {
+        if (!Goods.isFarmedGoods(goodsType)) {
+            throw new IllegalArgumentException("\"goodsType\" is produced in buildings and not on tiles.");
+        }
+
+        switch (unitType) {
+            case EXPERT_FARMER:
+                if ((goodsType == Goods.FOOD) && tile.isLand()) {
+                    //TODO: Special tile stuff. He gets +6/+4 for wheat/deer tiles respectively...
+                    base += 2;
+                }
+                break;
+            case EXPERT_FISHERMAN:
+                if ((goodsType == Goods.FOOD) && !tile.isLand()) {
+                    //TODO: Special tile stuff. He gets +6 for a fishery tile.
+                    base += 2;
+                }
+                break;
+            case EXPERT_FUR_TRAPPER:
+                if (goodsType == Goods.FURS) {
+                    base *= 2;
+                }
+                break;
+            case EXPERT_SILVER_MINER:
+                if (goodsType == Goods.SILVER) {
+                    //TODO: Mountain should be +1, not *2, but mountain didn't exist at type of writing.
+                    base *= 2;
+                }
+                break;
+            case EXPERT_LUMBER_JACK:
+                if (goodsType == Goods.LUMBER) {
+                    base *= 2;
+                }
+                break;
+            case EXPERT_ORE_MINER:
+                if (goodsType == Goods.ORE) {
+                    base *= 2;
+                }
+                break;
+            case MASTER_SUGAR_PLANTER:
+                if (goodsType == Goods.SUGAR) {
+                    base *= 2;
+                }
+                break;
+            case MASTER_COTTON_PLANTER:
+                if (goodsType == Goods.COTTON) {
+                    base *= 2;
+                }
+                break;
+            case MASTER_TOBACCO_PLANTER:
+                if (goodsType == Goods.TOBACCO) {
+                    base *= 2;
+                }
+                break;
+            case INDIAN_CONVERT:
+                if ((goodsType == Goods.FOOD)
+                        || (goodsType == Goods.SUGAR)
+                        || (goodsType == Goods.COTTON)
+                        || (goodsType == Goods.TOBACCO)
+                        || (goodsType == Goods.FURS)
+                        || (goodsType == Goods.ORE
+                        || (goodsType == Goods.SILVER))) {
+                    base += 1;
+                }
+                break;
+            default: // Beats me who or what is working here, but he doesn't get a bonus.
+                break;
+        }
+
+        return base;
     }
 
 

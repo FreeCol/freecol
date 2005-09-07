@@ -29,6 +29,8 @@ public class GameOptions extends OptionMap {
     /** The cost of a single hammer when buying a building in a colony. */
     public static final String HAMMER_PRICE = "hammerPrice";
 
+    /** Enables/disables fog of war. */
+    public static final String FOG_OF_WAR = "fogOfWar";
 
 
     /**
@@ -68,6 +70,12 @@ public class GameOptions extends OptionMap {
             starting.add(new IntegerOption(STARTING_MONEY, "gameOptions.startingMoney.name", "gameOptions.startingMoney.shortDescription", 0, 50000, 0));
         }
         add(starting);
+
+        /* Map options: */
+        OptionGroup map = new OptionGroup("gameOptions.map.name", "gameOptions.map.shortDescription");
+        map.add(new BooleanOption(FOG_OF_WAR, "gameOptions.fogOfWar.name", "gameOptions.fogOfWar.shortDescription", true));
+        add(map);
+        
 
         /* Colony options: */
         OptionGroup colony = new OptionGroup("gameOptions.colony.name", "gameOptions.colony.shortDescription");

@@ -2,6 +2,10 @@
 package net.sf.freecol.server.ai;
 
 import java.util.*;
+import java.util.logging.Logger;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.PrintWriter;
 
 import net.sf.freecol.server.ai.mission.*;
 import net.sf.freecol.common.model.Map;
@@ -10,6 +14,7 @@ import net.sf.freecol.server.model.*;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.server.networking.DummyConnection;
+import net.sf.freecol.common.networking.Connection;
 
 import org.w3c.dom.*;
 
@@ -18,6 +23,8 @@ import org.w3c.dom.*;
 * Objects of this class contains AI-information for a single {@link Player}.
 */
 public class AIPlayer extends AIObject {
+    private static final Logger logger = Logger.getLogger(AIPlayer.class.getName());
+
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
@@ -29,12 +36,16 @@ public class AIPlayer extends AIObject {
 
     /* Stores temporary information for sessions (trading with another player etc). */
     private HashMap sessionRegister = new HashMap();
-        
+
 
     /**
     * The FreeColGameObject this AIObject contains AI-information for:
     */
     private ServerPlayer player;
+
+    /** Temporary variables: */
+    private ArrayList aiUnits = new ArrayList();
+    private Connection debuggingConnection;
 
 
     /**
@@ -72,9 +83,13 @@ public class AIPlayer extends AIObject {
     public void startWorking() {
         Iterator aiUnitsIterator, playerIterator;
 
+        //logger.info("Entering AI code for: " + player.getNationAsString());
+
         sessionRegister.clear();
+        aiUnits.clear();
 
         // Determines the stance towards the other players:
+        logger.fine("AI: determining stance.");
         playerIterator = getGame().getPlayerIterator();
         while (playerIterator.hasNext()) {
             Player p = (Player) playerIterator.next();
@@ -86,7 +101,9 @@ public class AIPlayer extends AIObject {
         }
 
         // Abort missions that are no longer valid:
+        logger.fine("AI: Finding the AI-units ");
         aiUnitsIterator = getAIUnitIterator();
+        logger.fine("AI: Aborting mission which are no longer valid. ");
         while (aiUnitsIterator.hasNext()) {
             AIUnit aiUnit = (AIUnit) aiUnitsIterator.next();
             if (aiUnit.getMission() == null) {
@@ -98,14 +115,126 @@ public class AIPlayer extends AIObject {
             }
         }
 
+        // Assign transport missions:
+        if (player.isEuropean()) {
+            logger.fine("AI: Assigning transport missions to naval units.");
+
+            aiUnitsIterator = getAIUnitIterator();
+            while (aiUnitsIterator.hasNext()) {
+                AIUnit aiUnit = (AIUnit) aiUnitsIterator.next();
+                if (aiUnit.getUnit().isNaval() && !aiUnit.hasMission()) {
+                    aiUnit.setMission(new TransportMission(getAIMain(), aiUnit));
+                }
+            }
+        }
+
+        logger.fine("AI: Rearranges the workers in the colonies.");
+        if (player.isEuropean()) {
+            rearrangeWorkersInColonies();
+        }
+
+        logger.fine("AI: Securing the settlements.");
         secureSettlements();
+
+        // Find a mission for each unit:
+        if (player.isEuropean()) {
+            // Create a datastructure for the unit wishes:
+            ArrayList[] unitWishes = new ArrayList[Unit.UNIT_COUNT];
+            for (int i=0; i<unitWishes.length; i++) {
+                if (unitWishes[i] == null) {
+                    unitWishes[i] = new ArrayList();
+                }
+            }
+            Iterator aIterator = getAIColonyIterator();
+            while (aIterator.hasNext()) {
+                Iterator wIterator = ((AIColony) aIterator.next()).getWishIterator();
+                while (wIterator.hasNext()) {
+                    Wish w = (Wish) wIterator.next();
+                    if (w instanceof WorkerWish && w.getTransportable() == null) {
+                        unitWishes[((WorkerWish) w).getUnitType()].add(w);
+                    }
+                }
+            }
+
+            logger.fine("AI: Finding a mission for each unit.");
+            aiUnitsIterator = getAIUnitIterator();
+            while (aiUnitsIterator.hasNext()) {
+                AIUnit aiUnit = (AIUnit) aiUnitsIterator.next();
+                Unit unit = aiUnit.getUnit();
+
+                //if (aiUnit.getUnit().isPioneer() && !aiUnit.hasMission()) {
+                if (1==2) {
+                    //aiUnit.setMission(new PioneeringMission(getAIMain(), aiUnit));
+                } else if (aiUnit.getUnit().isColonist()
+                        && !aiUnit.hasMission()
+                        && (aiUnit.getUnit().getLocation() instanceof Tile
+                        || aiUnit.getUnit().getLocation() instanceof Unit)) {
+                    // Check if this unit is needed as an expert (using: "WorkerWish"):
+                    ArrayList wishList = unitWishes[aiUnit.getUnit().getType()];
+                    WorkerWish bestWish = null;
+                    int bestTurns = Integer.MAX_VALUE;
+                    for (int i=0; i<wishList.size(); i++) {
+                        WorkerWish ww = (WorkerWish) wishList.get(i);
+                        int turns = unit.getTurnsToReach(ww.getDestination().getTile());
+                        if (bestWish == null
+                                || turns < bestTurns
+                                || turns == bestTurns && ww.getValue() > bestWish.getValue()) {
+                            bestWish = ww;
+                            bestTurns = turns;
+                        }
+                    }
+                    if (bestWish != null) {
+                        bestWish.setTransportable(aiUnit);
+                        aiUnit.setMission(new WishRealizationMission(getAIMain(), aiUnit, bestWish));
+                        continue;
+                    }
+                    // Find a site for a new colony:
+                    Tile colonyTile = findColonyLocation(aiUnit.getUnit());
+                    if (colonyTile != null) {
+                        bestTurns = unit.getTurnsToReach(colonyTile);
+                    }
+                    // Check if we can find a better site to work than a new colony:
+                    for (int i=0; i<unitWishes.length; i++) {
+                        wishList = unitWishes[i];
+                        for (int j=0; j<wishList.size(); j++) {
+                            WorkerWish ww = (WorkerWish) wishList.get(j);
+                            int turns = unit.getTurnsToReach(ww.getDestination().getTile());
+                            // TODO: Choose to build colony if the value of the wish is low.
+                            if (bestWish == null && turns < bestTurns || bestWish != null && (
+                                    turns < bestTurns
+                                    || turns == bestTurns && ww.getValue() > bestWish.getValue())) {
+                                bestWish = ww;
+                                bestTurns = turns;
+                            }
+                        }
+                    }
+                    if (bestWish != null) {
+                        bestWish.setTransportable(aiUnit);
+                        aiUnit.setMission(new WishRealizationMission(getAIMain(), aiUnit, bestWish));
+                        continue;
+                    }
+
+                    // Choose to build a new colony:
+                    if (colonyTile != null) {
+                        aiUnit.setMission(new BuildColonyMission(getAIMain(), aiUnit, colonyTile, colonyTile.getColonyValue()));
+                        if (aiUnit.getUnit().getLocation() instanceof Unit) {
+                            AIUnit carrier = (AIUnit) getAIMain().getAIObject((FreeColGameObject) aiUnit.getUnit().getLocation());
+                            ((TransportMission) carrier.getMission()).addToTransportList(aiUnit);
+                        }
+                        continue;
+                    }
+                }
+            }
+        }
 
         // Bring gifts to nice players:
         if (!player.isEuropean()) {
+            logger.fine("AI: Bringing gifts to nice players.");
             bringGifts();
         }
 
         // Assign a mission to every unit:
+        logger.fine("AI: Assigning a simple mission to the remaining units.");
         aiUnitsIterator = getAIUnitIterator();
         while (aiUnitsIterator.hasNext()) {
             AIUnit aiUnit = (AIUnit) aiUnitsIterator.next();
@@ -114,13 +243,245 @@ public class AIPlayer extends AIObject {
             }
         }
 
+        if (player.isEuropean()) {
+            createAIGoodsInColonies();
+            createTransportLists();
+        }
+
         // Make every unit perform their mission:
+        logger.fine("AI: Making every unit perform their mission.");
         aiUnitsIterator = getAIUnitIterator();
         while (aiUnitsIterator.hasNext()) {
             AIUnit aiUnit = (AIUnit) aiUnitsIterator.next();
-            if (aiUnit.getUnit().getLocation() instanceof Tile) {
-                aiUnit.doMission(getConnection());
+            if (aiUnit.hasMission() && (aiUnit.getUnit().getLocation() instanceof Tile
+                    || aiUnit.getUnit().getLocation() instanceof Unit
+                    || aiUnit.getUnit().isNaval() && aiUnit.getUnit().getLocation() instanceof Europe)
+                    && aiUnit.getMission().isValid()) {
+                try {
+                    aiUnit.doMission(getConnection());
+                } catch  (Exception e) {
+                    StringWriter sw = new StringWriter();
+                    e.printStackTrace(new PrintWriter(sw));
+                    logger.warning(sw.toString());
+                }
             }
+        }
+        
+        aiUnits.clear();
+        logger.fine("AI: Rearranges the workers in the colonies.");
+        rearrangeWorkersInColonies();        
+        logger.fine("AI: Leaving");
+    }
+
+
+    /**
+    * Maps <code>Transportable</code>s to carrier's using a
+    * <code>TransportMission</code>.
+    */
+    private void createTransportLists() {
+        List transportables = new ArrayList();
+        // Add units
+        Iterator aui = getAIUnitIterator();
+        while (aui.hasNext()) {
+            AIUnit au = (AIUnit) aui.next();
+            if (au.getTransportDestination() != null && au.getTransport() == null) {
+                transportables.add(au);
+            }
+        }
+        // Add goods
+        Iterator aci = getAIColonyIterator();
+        while (aci.hasNext()) {
+            AIColony ac = (AIColony) aci.next();
+            Iterator agi = ac.getAIGoodsIterator();
+            while (agi.hasNext()) {
+                AIGoods ag = (AIGoods) agi.next();
+                if (ag.getTransportDestination() != null && ag.getTransport() == null) {
+                    transportables.add(ag);
+                }
+            }
+        }
+        Collections.sort(transportables, new Comparator() {
+            public int compare(Object o1, Object o2) {
+                Integer i = new Integer(((Transportable) o1).getTransportPriority());
+                Integer j = new Integer(((Transportable) o2).getTransportPriority());
+
+                return j.compareTo(i);
+            }
+        });
+
+        List vacantTransports = new ArrayList();
+        Iterator iter = getAIUnitIterator();
+        while (iter.hasNext()) {
+            AIUnit au = (AIUnit) iter.next();
+            if (au.hasMission() && au.getMission() instanceof TransportMission
+                    && !(au.getUnit().getLocation() instanceof Europe)) {
+                vacantTransports.add(au.getMission());
+            }
+        }
+
+        Iterator ti = transportables.iterator();
+        while (ti.hasNext()) {
+            Transportable t = (Transportable) ti.next();
+            t.increaseTransportPriority();
+            if (t.getTransportLocatable().getLocation() instanceof Unit) {
+                Mission m = ((AIUnit) getAIMain().getAIObject((FreeColGameObject) t.getTransportLocatable().getLocation())).getMission();
+                if (m instanceof TransportMission) {
+                    ((TransportMission) m).addToTransportList(t);
+                }
+                ti.remove();
+            }
+        }
+        while (transportables.size() > 0) {
+            Transportable t = (Transportable) transportables.get(0);
+
+            TransportMission bestTransport = null;
+            int bestTransportSpace = 0;
+            int bestTransportTurns = Integer.MAX_VALUE;
+            for (int i=0; i<vacantTransports.size(); i++) {
+                TransportMission tm = (TransportMission) vacantTransports.get(i);
+                if (t.getTransportSource().getTile() == tm.getUnit().getLocation().getTile()) {
+                    int transportSpace = tm.getAvailableSpace(t);
+                    if (transportSpace > 0) {
+                        bestTransport = tm;
+                        bestTransportSpace = transportSpace;
+                        bestTransportTurns = 0;
+                        break;
+                    } else {
+                        continue;
+                    }
+                }
+                PathNode path = tm.getPath(t);
+                if (path != null && path.getTotalTurns() <= bestTransportTurns) {
+                    int transportSpace = tm.getAvailableSpace(t);
+                    if (transportSpace > 0 && (path.getTotalTurns() < bestTransportTurns
+                            || transportSpace > bestTransportSpace)) {
+                        bestTransport = tm;
+                        bestTransportSpace = transportSpace;
+                        bestTransportTurns = path.getTotalTurns();
+                    }
+                }
+            }
+            if (bestTransport == null) {
+                // No more transports available:
+                break;
+            }
+            bestTransport.addToTransportList(t);
+            transportables.remove(t);
+            vacantTransports.remove(bestTransport);
+            bestTransportSpace--;
+
+            for (int i=0; i<transportables.size() && bestTransportSpace > 0; i++) {
+                Transportable t2 = (Transportable) transportables.get(0);
+                if (t2.getTransportLocatable().getLocation().getTile() == t.getTransportLocatable().getLocation().getTile()) {
+                    bestTransport.addToTransportList(t2);
+                    transportables.remove(t2);
+                    bestTransportSpace--;
+                }
+            }
+        }
+    }
+
+
+    /**
+    * Returns an <code>Iterator</code> for all the wishes.
+    * The items are sorted by the {@link Wish#getValue value},
+    * with the item having the highest value appearing 
+    * first in the <code>Iterator</code>.
+    *
+    * @return The <code>Iterator</code>.
+    * @see Wish
+    */
+    public Iterator getWishIterator() {
+        ArrayList wishList = new ArrayList();
+        Iterator ai = getAIColonyIterator();
+        while (ai.hasNext()) {
+            AIColony ac = (AIColony) ai.next();
+            Iterator wishIterator = ac.getWishIterator();
+            while (wishIterator.hasNext()) {
+                Wish w = (Wish) wishIterator.next();
+                wishList.add(w);
+            }
+        }
+
+        Collections.sort(wishList, new Comparator() {
+            public int compare(Object o1, Object o2) {
+                Integer a = new Integer(((Wish) o1).getValue());
+                Integer b = new Integer(((Wish) o2).getValue());
+                return b.compareTo(a);
+            }
+        });
+        return wishList.iterator();
+    }
+
+
+    /**
+    * Calls {@link Colony#rearrangeWorkersInColonies} for every colony
+    * this player owns.
+    */
+    private void rearrangeWorkersInColonies() {
+        Iterator ci = getAIColonyIterator();
+        while (ci.hasNext()) {
+            AIColony c = (AIColony) ci.next();
+            c.rearrangeWorkers();
+        }
+    }
+
+
+    /**
+    * Calls {@link Colony#createAIGoodsInColonies} for every colony
+    * this player owns.
+    */
+    private void createAIGoodsInColonies() {
+        Iterator ci = getAIColonyIterator();
+        while (ci.hasNext()) {
+            AIColony c = (AIColony) ci.next();
+            c.createAIGoods();
+        }
+    }
+
+
+    /**
+    * Finds a site for a new colony.
+    */
+    private Tile findColonyLocation(Unit unit) {
+        Tile bestTile = null;
+        int highestColonyValue = 0;
+
+        Iterator it = getGame().getMap().getFloodFillIterator(unit.getTile().getPosition());
+        for (int i=0; it.hasNext() && i<500; i++) {
+            Tile tile = (Tile) getGame().getMap().getTile((Map.Position) it.next());
+            if (tile.getColonyValue() > 0) {
+                if (tile != unit.getTile()) {
+                    PathNode path;
+                    if (unit.getLocation() instanceof Unit) {
+                        Unit carrier = (Unit) unit.getLocation();
+                        path = getGame().getMap().findPath(unit, carrier.getTile(), tile, carrier);
+                    } else {
+                        path = getGame().getMap().findPath(unit, unit.getTile(), tile);
+                    }
+
+                    if (path != null) {
+                        int newColonyValue = 10000 + tile.getColonyValue() - path.getTotalTurns() 
+                                * ((unit.getGame().getTurn().getNumber() < 10 && unit.getLocation() instanceof Unit) ? 25 : 4);
+                        if (newColonyValue > highestColonyValue) {
+                            highestColonyValue = newColonyValue;
+                            bestTile = tile;
+                        }
+                    }
+                } else {
+                    int newColonyValue = 10000 + tile.getColonyValue();
+                    if (newColonyValue > highestColonyValue) {
+                        highestColonyValue = newColonyValue;
+                        bestTile = tile;
+                    }
+                }
+            }
+        }
+
+        if (bestTile != null && bestTile.getColonyValue() > 0) {
+            return bestTile;
+        } else {
+            return null;
         }
     }
 
@@ -182,7 +543,7 @@ public class AIPlayer extends AIObject {
             }
         }
     }
-    
+
 
     /**
     * Takes the necessary actions to secure the settlements.
@@ -293,18 +654,46 @@ public class AIPlayer extends AIObject {
     * @return The <code>Iterator</code>.
     */
     public Iterator getAIUnitIterator() {
-        ArrayList au = new ArrayList();
+        if (aiUnits.size() == 0) {
+            ArrayList au = new ArrayList();
 
-        Iterator unitsIterator = player.getUnitIterator();
-        while (unitsIterator.hasNext()) {
-            Unit theUnit = (Unit) unitsIterator.next();
-            au.add(getAIMain().getAIObject(theUnit.getID()));
+            Iterator unitsIterator = player.getUnitIterator();
+            while (unitsIterator.hasNext()) {
+                Unit theUnit = (Unit) unitsIterator.next();
+                au.add(getAIMain().getAIObject(theUnit.getID()));
+            }
+
+            aiUnits = au;
         }
 
-        return au.iterator();
+        return aiUnits.iterator();
     }
 
     
+    /**
+    * Returns an iterator over all the <code>AIColony</code>s
+    * owned by this player.
+    *
+    * @return The <code>Iterator</code>.
+    */
+    public Iterator getAIColonyIterator() {
+        ArrayList ac = new ArrayList();
+
+        Iterator colonyIterator = player.getColonyIterator();
+        while (colonyIterator.hasNext()) {
+            Colony colony = (Colony) colonyIterator.next();
+            AIObject a = getAIMain().getAIObject(colony.getID());
+            if (a != null) {
+                ac.add(a);
+            } else {
+                logger.warning("Could not find the AIColony for: " + colony);
+            }
+        }
+
+        return ac.iterator();
+    }
+
+
     /**
     * Returns the <code>Player</code> this <code>AIPlayer</code> is controlling.
     */
@@ -319,25 +708,50 @@ public class AIPlayer extends AIObject {
     * @return The connection that can be used when communication
     *         with the server.
     */
-    public DummyConnection getConnection() {
-        return ((DummyConnection) player.getConnection()).getOtherConnection();
+    public Connection getConnection() {
+        if (debuggingConnection != null) {
+            return debuggingConnection;
+        } else {
+            return ((DummyConnection) player.getConnection()).getOtherConnection();
+        }
+    }
+    
+    
+    /**
+    * Sets the <code>Connection</code> to be used while communicating with the server.
+    * This method is only used for debugging.
+    */
+    public void setDebuggingConnection(Connection debuggingConnection) {
+        this.debuggingConnection = debuggingConnection;
+    }
+
+
+    /**
+    * Returns the ID for this <code>AIPlayer</code>.
+    * This is the same as the ID for the {@link Player}
+    * this <code>AIPlayer</code> controls.
+    *
+    * @return The ID.
+    */
+    public String getID() {
+        return player.getID();
     }
 
 
     public Element toXMLElement(Document document) {
         Element element = document.createElement(getXMLElementTagName());
 
-        element.setAttribute("ID", player.getID());
+        element.setAttribute("ID", getID());
 
         return element;
     }
 
-    
+
     public void readFromXMLElement(Element element) {
         player = (ServerPlayer) getAIMain().getFreeColGameObject(element.getAttribute("ID"));
-    }    
-    
-    
+    }
+
+
     /**
     * Returns the tag name of the root element representing this object.
     * @return the tag name.
