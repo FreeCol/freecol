@@ -47,12 +47,14 @@ public class PlowAction extends MapboardAction {
         Unit selectedOne = getFreeColClient().getGUI().getActiveUnit();
         if (enabled && selectedOne != null && selectedOne.getTile() != null) {
             Tile tile = selectedOne.getTile();
-            if(tile.isLand() && tile.isForested()) {
-                putValue(NAME, Messages.message("unit.state.4"));
-                setEnabled(selectedOne.isPioneer() && selectedOne.checkSetState(Unit.PLOW));
-            } else if (tile.isLand() && !tile.isForested() && !tile.isPlowed()) {
-                putValue(NAME, Messages.message("unit.state.5"));
-                setEnabled(selectedOne.isPioneer() && selectedOne.checkSetState(Unit.PLOW));
+            if(selectedOne.canPlow()) {
+                if (tile.isForested()) {
+                    putValue(NAME, Messages.message("unit.state.4"));
+                    setEnabled(selectedOne.isPioneer() && selectedOne.checkSetState(Unit.PLOW));
+                } else {
+                    putValue(NAME, Messages.message("unit.state.5"));
+                    setEnabled(selectedOne.isPioneer() && selectedOne.checkSetState(Unit.PLOW));
+                }
             } else {
                 putValue(NAME, Messages.message("unit.state.5"));
                 setEnabled(false);

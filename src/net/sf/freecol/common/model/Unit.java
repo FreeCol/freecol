@@ -2187,7 +2187,20 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     }
 
 
-    /*
+    /**
+    * Checks wether this unit can plow the <code>Tile</code>
+    * it is currently located on or not.
+    * @return The result.
+    */
+    public boolean canPlow() {
+        return (!getTile().isPlowed() 
+                && getTile().isLand() 
+                && getNumberOfTools() >= 20
+                && getTile().getAddition() != Tile.ADD_HILLS
+                && getTile().getAddition() != Tile.ADD_MOUNTAINS);
+    }
+
+    /**
     * Checks if a <code>Unit</code> can get the given state set.
     *
     * @param s The new state for this Unit. Should be one of
@@ -2203,10 +2216,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             case ACTIVE:
                 return true;
             case PLOW:
-                if (getTile().isPlowed()) {
-                    return false;
-                }
-                return (getNumberOfTools() >= 20);
+                return canPlow();
             case BUILD_ROAD:
                 if (getTile().hasRoad()) {
                     return false;
