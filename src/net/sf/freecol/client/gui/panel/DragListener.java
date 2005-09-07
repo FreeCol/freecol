@@ -110,7 +110,7 @@ public final class DragListener extends MouseAdapter {
                         if (tempUnit.isArmed()) {
                             menuItem = new JMenuItem("Disarm");
                         } else {
-                            if (tempUnit.getLocation() instanceof Europe) {
+                            if (tempUnit.getTile() == null) { // -> in Europe
                                 menuItem = new JMenuItem("Arm (" + tempUnit.getGame().getMarket().getBidPrice(Goods.MUSKETS, 50) + " gold)");
                             } else {
                                 menuItem = new JMenuItem("Arm");
@@ -125,7 +125,7 @@ public final class DragListener extends MouseAdapter {
                         if (tempUnit.isMounted()) {
                             menuItem = new JMenuItem("Remove Horses");
                         } else {
-                            if (tempUnit.getLocation() instanceof Europe) {
+                            if (tempUnit.getTile() == null) { // -> in Europe
                                 menuItem = new JMenuItem("Mount (" + tempUnit.getGame().getMarket().getBidPrice(Goods.HORSES, 50) + " gold)");
                             } else {
                                 menuItem = new JMenuItem("Mount");
@@ -140,7 +140,7 @@ public final class DragListener extends MouseAdapter {
                         if (tempUnit.isPioneer()) {
                             menuItem = new JMenuItem("Remove Tools");
                         } else {
-                            if (tempUnit.getLocation() instanceof Europe) {
+                            if (tempUnit.getTile() == null) { // -> in Europe
                                 int amount = 100;
                                 int price = tempUnit.getGame().getMarket().getBidPrice(Goods.TOOLS, amount);
                                 if (price <= tempUnit.getOwner().getGold()) {
