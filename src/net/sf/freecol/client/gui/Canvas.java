@@ -996,10 +996,7 @@ public final class Canvas extends JLayeredPane {
     * @see ColonyPanel
     */
     public void showColonyPanel(Colony colony) {
-        closeMenus();
-
-        gui.setActiveUnit(null);
-        gui.setSelectedTile(null);
+        closeMenus();                                               
 
         colonyPanel.initialize(colony, freeColClient.getGame());
         colonyPanel.setLocation(getWidth() / 2 - colonyPanel.getWidth() / 2,
