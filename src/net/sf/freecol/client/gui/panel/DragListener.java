@@ -13,6 +13,7 @@ import javax.swing.TransferHandler;
 
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.ColonyTile;
 
@@ -51,146 +52,153 @@ public final class DragListener extends MouseAdapter {
         //Does not work on some platforms:
         //if (e.isPopupTrigger() && (comp instanceof UnitLabel)) {
         if (e.getButton() == MouseEvent.BUTTON3 && (comp instanceof UnitLabel)) {
-            UnitLabel unitLabel = (UnitLabel)comp;
+            UnitLabel unitLabel = (UnitLabel) comp;
             Unit tempUnit = unitLabel.getUnit();
 
-            if (tempUnit.isColonist() || tempUnit.getType() == Unit.INDIAN_CONVERT) {
-                JPopupMenu menu = new JPopupMenu("Unit");
-                JMenuItem menuItem;
+            JPopupMenu menu = new JPopupMenu("Unit");
+            JMenuItem menuItem;
+            
+            if (tempUnit.getLocation() instanceof Tile && tempUnit.getTile().getColony() != null) {
+                menuItem = new JMenuItem("Activate unit");
+                menuItem.setActionCommand(String.valueOf(UnitLabel.ACTIVATE_UNIT));
+                menuItem.addActionListener(unitLabel);
+                menuItem.setEnabled((tempUnit.getMovesLeft() > 0));
+                menu.add(menuItem);   
+                menu.addSeparator();
+            }
+            
+            if ((tempUnit.isColonist() || tempUnit.getType() == Unit.INDIAN_CONVERT) && tempUnit.getLocation() instanceof ColonyTile) {
+                ColonyTile colonyTile = (ColonyTile) tempUnit.getLocation();
+                menuItem = new JMenuItem("Be a Farmer (" + tempUnit.getFarmedPotential(Goods.FOOD, colonyTile.getWorkTile()) + "/"
+                        + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.FOOD) + ")");
+                menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_FOOD));
+                menuItem.addActionListener(unitLabel);
+                menu.add(menuItem);
+                menuItem = new JMenuItem("Be a Sugar Planter (" + tempUnit.getFarmedPotential(Goods.SUGAR, colonyTile.getWorkTile()) + "/"
+                        + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.SUGAR) + ")");
+                menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_SUGAR));
+                menuItem.addActionListener(unitLabel);
+                menu.add(menuItem);
+                menuItem = new JMenuItem("Be a Tobacco Planter (" + tempUnit.getFarmedPotential(Goods.TOBACCO, colonyTile.getWorkTile()) + "/"
+                        + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.TOBACCO) + ")");
+                menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_TOBACCO));
+                menuItem.addActionListener(unitLabel);
+                menu.add(menuItem);
+                menuItem = new JMenuItem("Be a Cotton Planter (" + tempUnit.getFarmedPotential(Goods.COTTON, colonyTile.getWorkTile()) + "/"
+                        + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.COTTON) + ")");
+                menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_COTTON));
+                menuItem.addActionListener(unitLabel);
+                menu.add(menuItem);
+                menuItem = new JMenuItem("Be a Fur Trapper (" + tempUnit.getFarmedPotential(Goods.FURS, colonyTile.getWorkTile()) + "/"
+                        + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.FURS) + ")");
+                menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_FURS));
+                menuItem.addActionListener(unitLabel);
+                menu.add(menuItem);
+                menuItem = new JMenuItem("Be a Lumberjack (" + tempUnit.getFarmedPotential(Goods.LUMBER, colonyTile.getWorkTile()) + "/"
+                        + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.LUMBER) + ")");
+                menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_LUMBER));
+                menuItem.addActionListener(unitLabel);
+                menu.add(menuItem);
+                menuItem = new JMenuItem("Be an Ore Miner (" + tempUnit.getFarmedPotential(Goods.ORE, colonyTile.getWorkTile()) + "/"
+                        + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.ORE) + ")");
+                menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_ORE));
+                menuItem.addActionListener(unitLabel);
+                menu.add(menuItem);
+                menuItem = new JMenuItem("Be a Silver Miner (" + tempUnit.getFarmedPotential(Goods.SILVER, colonyTile.getWorkTile()) + "/"
+                        + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.SILVER) + ")");
+                menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_SILVER));
+                menuItem.addActionListener(unitLabel);
+                menu.add(menuItem);
 
-                if (tempUnit.getLocation() instanceof ColonyTile) {
-                    ColonyTile colonyTile = (ColonyTile) tempUnit.getLocation();
-                    menuItem = new JMenuItem("Be a Farmer (" + tempUnit.getFarmedPotential(Goods.FOOD, colonyTile.getWorkTile()) + "/"
-                            + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.FOOD) + ")");
-                    menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_FOOD));
-                    menuItem.addActionListener(unitLabel);
-                    menu.add(menuItem);
-                    menuItem = new JMenuItem("Be a Sugar Planter (" + tempUnit.getFarmedPotential(Goods.SUGAR, colonyTile.getWorkTile()) + "/"
-                            + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.SUGAR) + ")");
-                    menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_SUGAR));
-                    menuItem.addActionListener(unitLabel);
-                    menu.add(menuItem);
-                    menuItem = new JMenuItem("Be a Tobacco Planter (" + tempUnit.getFarmedPotential(Goods.TOBACCO, colonyTile.getWorkTile()) + "/"
-                            + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.TOBACCO) + ")");
-                    menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_TOBACCO));
-                    menuItem.addActionListener(unitLabel);
-                    menu.add(menuItem);
-                    menuItem = new JMenuItem("Be a Cotton Planter (" + tempUnit.getFarmedPotential(Goods.COTTON, colonyTile.getWorkTile()) + "/"
-                            + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.COTTON) + ")");
-                    menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_COTTON));
-                    menuItem.addActionListener(unitLabel);
-                    menu.add(menuItem);
-                    menuItem = new JMenuItem("Be a Fur Trapper (" + tempUnit.getFarmedPotential(Goods.FURS, colonyTile.getWorkTile()) + "/"
-                            + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.FURS) + ")");
-                    menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_FURS));
-                    menuItem.addActionListener(unitLabel);
-                    menu.add(menuItem);
-                    menuItem = new JMenuItem("Be a Lumberjack (" + tempUnit.getFarmedPotential(Goods.LUMBER, colonyTile.getWorkTile()) + "/"
-                            + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.LUMBER) + ")");
-                    menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_LUMBER));
-                    menuItem.addActionListener(unitLabel);
-                    menu.add(menuItem);
-                    menuItem = new JMenuItem("Be an Ore Miner (" + tempUnit.getFarmedPotential(Goods.ORE, colonyTile.getWorkTile()) + "/"
-                            + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.ORE) + ")");
-                    menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_ORE));
-                    menuItem.addActionListener(unitLabel);
-                    menu.add(menuItem);
-                    menuItem = new JMenuItem("Be a Silver Miner (" + tempUnit.getFarmedPotential(Goods.SILVER, colonyTile.getWorkTile()) + "/"
-                            + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.SILVER) + ")");
-                    menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_SILVER));
-                    menuItem.addActionListener(unitLabel);
-                    menu.add(menuItem);
+                menu.addSeparator();
+            }
 
-                    menu.addSeparator();
+
+            if (tempUnit.isColonist()) {
+                if (!tempUnit.isPioneer() && !tempUnit.isMissionary() && tempUnit.canArm()) {
+                    if (tempUnit.isArmed()) {
+                        menuItem = new JMenuItem("Disarm");
+                    } else {
+                        if (tempUnit.getTile() == null) { // -> in Europe
+                            menuItem = new JMenuItem("Arm (" + tempUnit.getGame().getMarket().getBidPrice(Goods.MUSKETS, 50) + " gold)");
+                        } else {
+                            menuItem = new JMenuItem("Arm");
+                        }
+                    }
+                    menuItem.setActionCommand(String.valueOf(UnitLabel.ARM));
+                    menuItem.addActionListener(unitLabel);
+                    menu.add(menuItem);
                 }
 
-
-                if (tempUnit.isColonist()) {
-                    if (!tempUnit.isPioneer() && !tempUnit.isMissionary() && tempUnit.canArm()) {
-                        if (tempUnit.isArmed()) {
-                            menuItem = new JMenuItem("Disarm");
+                if (!tempUnit.isPioneer() && !tempUnit.isMissionary() && tempUnit.canMount()) {
+                    if (tempUnit.isMounted()) {
+                        menuItem = new JMenuItem("Remove Horses");
+                    } else {
+                        if (tempUnit.getTile() == null) { // -> in Europe
+                            menuItem = new JMenuItem("Mount (" + tempUnit.getGame().getMarket().getBidPrice(Goods.HORSES, 50) + " gold)");
                         } else {
-                            if (tempUnit.getTile() == null) { // -> in Europe
-                                menuItem = new JMenuItem("Arm (" + tempUnit.getGame().getMarket().getBidPrice(Goods.MUSKETS, 50) + " gold)");
-                            } else {
-                                menuItem = new JMenuItem("Arm");
-                            }
+                            menuItem = new JMenuItem("Mount");
                         }
-                        menuItem.setActionCommand(String.valueOf(UnitLabel.ARM));
-                        menuItem.addActionListener(unitLabel);
-                        menu.add(menuItem);
                     }
+                    menuItem.setActionCommand(String.valueOf(UnitLabel.MOUNT));
+                    menuItem.addActionListener(unitLabel);
+                    menu.add(menuItem);
+                }
 
-                    if (!tempUnit.isPioneer() && !tempUnit.isMissionary() && tempUnit.canMount()) {
-                        if (tempUnit.isMounted()) {
-                            menuItem = new JMenuItem("Remove Horses");
-                        } else {
-                            if (tempUnit.getTile() == null) { // -> in Europe
-                                menuItem = new JMenuItem("Mount (" + tempUnit.getGame().getMarket().getBidPrice(Goods.HORSES, 50) + " gold)");
+                if (!tempUnit.isArmed() && !tempUnit.isMounted() && !tempUnit.isMissionary() && tempUnit.canEquipWithTools()) {
+                    if (tempUnit.isPioneer()) {
+                        menuItem = new JMenuItem("Remove Tools");
+                    } else {
+                        if (tempUnit.getTile() == null) { // -> in Europe
+                            int amount = 100;
+                            int price = tempUnit.getGame().getMarket().getBidPrice(Goods.TOOLS, amount);
+                            if (price <= tempUnit.getOwner().getGold()) {
+                                menuItem = new JMenuItem("Equip with Tools (" + price + " gold)");
                             } else {
-                                menuItem = new JMenuItem("Mount");
-                            }
-                        }
-                        menuItem.setActionCommand(String.valueOf(UnitLabel.MOUNT));
-                        menuItem.addActionListener(unitLabel);
-                        menu.add(menuItem);
-                    }
-
-                    if (!tempUnit.isArmed() && !tempUnit.isMounted() && !tempUnit.isMissionary() && tempUnit.canEquipWithTools()) {
-                        if (tempUnit.isPioneer()) {
-                            menuItem = new JMenuItem("Remove Tools");
-                        } else {
-                            if (tempUnit.getTile() == null) { // -> in Europe
-                                int amount = 100;
-                                int price = tempUnit.getGame().getMarket().getBidPrice(Goods.TOOLS, amount);
-                                if (price <= tempUnit.getOwner().getGold()) {
-                                    menuItem = new JMenuItem("Equip with Tools (" + price + " gold)");
-                                } else {
-                                    while (price > tempUnit.getOwner().getGold()) {
-                                        amount -= 20;
-                                        price = tempUnit.getGame().getMarket().getBidPrice(Goods.TOOLS, amount);
-                                    }
-                                    menuItem = new JMenuItem("Equip with " + amount + " Tools (" + price + " gold)");
-
+                                while (price > tempUnit.getOwner().getGold()) {
+                                    amount -= 20;
+                                    price = tempUnit.getGame().getMarket().getBidPrice(Goods.TOOLS, amount);
                                 }
-                            } else {
-                                menuItem = new JMenuItem("Equip with Tools");
+                                menuItem = new JMenuItem("Equip with " + amount + " Tools (" + price + " gold)");
+
                             }
-                        }
-                        menuItem.setActionCommand(String.valueOf(UnitLabel.TOOLS));
-                        menuItem.addActionListener(unitLabel);
-                        menu.add(menuItem);
-                    }
-
-                    if (!tempUnit.isArmed() && !tempUnit.isMounted() && !tempUnit.isPioneer() && tempUnit.canDressAsMissionary()) {
-
-                        if (tempUnit.isMissionary()) {
-                            menuItem = new JMenuItem("Take Off Silly Clothes");
                         } else {
-                            menuItem = new JMenuItem("Dress as Missionaries");
+                            menuItem = new JMenuItem("Equip with Tools");
                         }
-                        menuItem.setActionCommand(String.valueOf(UnitLabel.DRESS));
-                        menuItem.addActionListener(unitLabel);
-                        menu.add(menuItem);
                     }
-
-                    if (tempUnit.getType() != Unit.INDIAN_CONVERT && tempUnit.getType() != Unit.PETTY_CRIMINAL &&
-                            tempUnit.getType() != Unit.INDENTURED_SERVANT && tempUnit.getType() != Unit.FREE_COLONIST) {
-
-                        if (menu.getSubElements().length > 0) {
-                            menu.addSeparator();
-                        }
-
-                        menuItem = new JMenuItem("Clear speciality");
-                        menuItem.setActionCommand(String.valueOf(UnitLabel.CLEAR_SPECIALITY));
-                        menuItem.addActionListener(unitLabel);
-                        menu.add(menuItem);
-                    }
+                    menuItem.setActionCommand(String.valueOf(UnitLabel.TOOLS));
+                    menuItem.addActionListener(unitLabel);
+                    menu.add(menuItem);
                 }
 
-                if (menu.getSubElements().length > 0) {
-                    menu.show(comp, e.getX(), e.getY());
+                if (!tempUnit.isArmed() && !tempUnit.isMounted() && !tempUnit.isPioneer() && tempUnit.canDressAsMissionary()) {
+
+                    if (tempUnit.isMissionary()) {
+                        menuItem = new JMenuItem("Take Off Silly Clothes");
+                    } else {
+                        menuItem = new JMenuItem("Dress as Missionaries");
+                    }
+                    menuItem.setActionCommand(String.valueOf(UnitLabel.DRESS));
+                    menuItem.addActionListener(unitLabel);
+                    menu.add(menuItem);
                 }
+
+                if (tempUnit.getType() != Unit.INDIAN_CONVERT && tempUnit.getType() != Unit.PETTY_CRIMINAL &&
+                        tempUnit.getType() != Unit.INDENTURED_SERVANT && tempUnit.getType() != Unit.FREE_COLONIST) {
+
+                    if (menu.getSubElements().length > 0) {
+                        menu.addSeparator();
+                    }
+
+                    menuItem = new JMenuItem("Clear speciality");
+                    menuItem.setActionCommand(String.valueOf(UnitLabel.CLEAR_SPECIALITY));
+                    menuItem.addActionListener(unitLabel);
+                    menu.add(menuItem);
+                }
+            }
+
+            if (menu.getSubElements().length > 0) {
+                menu.show(comp, e.getX(), e.getY());
             }
         } else {
             TransferHandler handler = comp.getTransferHandler();

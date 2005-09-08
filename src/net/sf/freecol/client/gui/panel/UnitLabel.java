@@ -49,7 +49,8 @@ public final class UnitLabel extends JLabel implements ActionListener {
                             WORKTYPE_LUMBER = 9,
                             WORKTYPE_ORE = 10,
                             WORKTYPE_SILVER = 11,
-                            CLEAR_SPECIALITY = 12;
+                            CLEAR_SPECIALITY = 12,
+                            ACTIVATE_UNIT = 13;
 
     private final Unit unit;
     private final Canvas parent;
@@ -175,7 +176,9 @@ public final class UnitLabel extends JLabel implements ActionListener {
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         try {
-            if (!unit.isCarrier()) {
+            if (Integer.valueOf(command).intValue() == ACTIVATE_UNIT) {
+                parent.getGUI().setActiveUnit(unit);
+            } else if (!unit.isCarrier()) {
                 switch (Integer.valueOf(command).intValue()) {
                     case ARM:
                         inGameController.equipUnit(unit, Goods.MUSKETS, ((unit.isArmed()) ? 0 : 50));
@@ -215,6 +218,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
                         break;
                     case CLEAR_SPECIALITY:
                         inGameController.clearSpeciality(unit);
+                        break;
                     default:
                         logger.warning("Invalid action");
                 }
