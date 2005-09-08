@@ -509,7 +509,7 @@ public class Player extends FreeColGameObject {
     * Sets the <code>Location</code> where the units
     * arriving from {@link Europe} will be put as a default.
     *
-    * @return The <code>Location</code>.
+    * @param entryLocation The <code>Location</code>.
     * @see #getEntryLocation
     */
     public void setEntryLocation(Location entryLocation) {
@@ -1287,7 +1287,7 @@ public class Player extends FreeColGameObject {
 
     /**
     * Sets the number of crosses required to cause a new colonist to emigrate.
-    * @return The number of crosses required to cause a new colonist to emigrate.
+    * @param crossesRequired The number of crosses required to cause a new colonist to emigrate.
     */
     public void setCrossesRequired(int crossesRequired) {
         this.crossesRequired = crossesRequired;

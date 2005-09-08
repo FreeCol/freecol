@@ -220,9 +220,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
 
     /**
     * Remove the specified <code>Locatable</code> from this <code>WorkLocation</code>.
-    *
     * @param locatable The <code>Locatable</code> that shall be removed from this <code>WorkLocation</code>.
-    * @return <code>true</code> if the code>Locatable</code> was removed and <code>false</code> otherwise.
     */
     public void remove(Locatable locatable) {
         if (getUnit() == null) {
