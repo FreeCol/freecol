@@ -84,6 +84,12 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
         setFocusCycleRoot(true);
 
+        // Use ESCAPE for closing the ColonyPanel:
+        InputMap inputMap = new ComponentInputMap(exitButton);
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false), "pressed");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, true), "released");
+        SwingUtilities.replaceUIInputMap(exitButton, JComponent.WHEN_IN_FOCUSED_WINDOW, inputMap);        
+        
         productionPanel = new ProductionPanel(this);
         outsideColonyPanel = new OutsideColonyPanel(this);
         inPortPanel = new InPortPanel();
@@ -421,8 +427,9 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 case BUY_BUILDING:
                     freeColClient.getInGameController().payForBuilding(colony);
                     //updateProgressLabel();
-                    reinitialize();
+                    reinitialize();                    
                     freeColClient.getCanvas().updateGoldLabel();
+                    requestFocus();
                     break;
                 case EXIT:
                     closeColonyPanel();
