@@ -208,7 +208,9 @@ public class AIUnit extends AIObject implements Transportable {
         if (transport != null) {
             element.setAttribute("transport", transport.getUnit().getID());
         }
-        element.appendChild(mission.toXMLElement(document));
+        if (mission != null) {
+            element.appendChild(mission.toXMLElement(document));
+        }
 
         return element;
     }
@@ -227,30 +229,30 @@ public class AIUnit extends AIObject implements Transportable {
             transport = null;
         }
 
-        Element missionElement = (Element) element.getChildNodes().item(0);
-        if (missionElement != null) {
-            if (missionElement.getTagName().equals(UnitWanderHostileMission.getXMLElementTagName())) {
-                mission = new UnitWanderHostileMission(getAIMain(), missionElement);
-            } else if (missionElement.getTagName().equals(UnitWanderMission.getXMLElementTagName())) {
-                mission = new UnitWanderMission(getAIMain(), missionElement);
-            } else if (missionElement.getTagName().equals(IndianBringGiftMission.getXMLElementTagName())) {
-                mission = new IndianBringGiftMission(getAIMain(), missionElement);
-            } else if (missionElement.getTagName().equals(BuildColonyMission.getXMLElementTagName())) {
-                mission = new BuildColonyMission(getAIMain(), missionElement);
-            } else if (missionElement.getTagName().equals(TransportMission.getXMLElementTagName())) {
-                mission = new TransportMission(getAIMain(), missionElement);
-            } else if (missionElement.getTagName().equals(WishRealizationMission.getXMLElementTagName())) {
-                mission = new WishRealizationMission(getAIMain(), missionElement);
-            } else {
-                logger.warning("Could not find mission-class for: " + missionElement.getTagName());
-                mission = new UnitWanderHostileMission(getAIMain(), this);
+        if (element.getChildNodes().getLength() > 0) {
+            Element missionElement = (Element) element.getChildNodes().item(0);
+            if (missionElement != null) {
+                if (missionElement.getTagName().equals(UnitWanderHostileMission.getXMLElementTagName())) {
+                    mission = new UnitWanderHostileMission(getAIMain(), missionElement);
+                } else if (missionElement.getTagName().equals(UnitWanderMission.getXMLElementTagName())) {
+                    mission = new UnitWanderMission(getAIMain(), missionElement);
+                } else if (missionElement.getTagName().equals(IndianBringGiftMission.getXMLElementTagName())) {
+                    mission = new IndianBringGiftMission(getAIMain(), missionElement);
+                } else if (missionElement.getTagName().equals(BuildColonyMission.getXMLElementTagName())) {
+                    mission = new BuildColonyMission(getAIMain(), missionElement);
+                } else if (missionElement.getTagName().equals(TransportMission.getXMLElementTagName())) {
+                    mission = new TransportMission(getAIMain(), missionElement);
+                } else if (missionElement.getTagName().equals(WishRealizationMission.getXMLElementTagName())) {
+                    mission = new WishRealizationMission(getAIMain(), missionElement);
+                } else {
+                    logger.warning("Could not find mission-class for: " + missionElement.getTagName());
+                    mission = new UnitWanderHostileMission(getAIMain(), this);
+                }
             }
-        } else {
-            mission = new UnitWanderHostileMission(getAIMain(), this);
         }
     }
-    
-    
+
+
     /**
     * Returns the tag name of the root element representing this object.
     * @return "aiUnit"
