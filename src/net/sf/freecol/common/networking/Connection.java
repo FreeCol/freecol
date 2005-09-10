@@ -152,8 +152,19 @@ public class Connection {
     * @see #ask
     */
     public void send(Element element) throws IOException {
-        out.print(convertElementToString(element) + '\n');
-        out.flush();
+        synchronized (out) {
+            try {
+                xmlTransformer.transform(new DOMSource(element), new StreamResult(out));
+            } catch (TransformerException e) {
+                StringWriter sw = new StringWriter();
+                e.printStackTrace(new PrintWriter(sw));
+                logger.warning(sw.toString());
+            }
+
+            //out.print(convertElementToString(element) + '\n');
+            out.print('\n');
+            out.flush();
+        }
     }
 
 
@@ -167,18 +178,20 @@ public class Connection {
     * @return The string representation of the given Element without the xml version tag.
     */
     String convertElementToString(Element element) {
-        String xml;
-        try {
-            StringWriter stringWriter = new StringWriter();
-            xmlTransformer.transform(new DOMSource(element), new StreamResult(stringWriter));
-            xml = stringWriter.toString();
-        } catch (TransformerException e) {
-            xml = e.getMessage();
-            StringWriter sw = new StringWriter();
-            e.printStackTrace(new PrintWriter(sw));
-            logger.warning(sw.toString());
+        synchronized (out) { // Also a lock for: xmlTransformer
+            String xml;
+            try {
+                StringWriter stringWriter = new StringWriter();
+                xmlTransformer.transform(new DOMSource(element), new StreamResult(stringWriter));
+                xml = stringWriter.toString();
+            } catch (TransformerException e) {
+                xml = e.getMessage();
+                StringWriter sw = new StringWriter();
+                e.printStackTrace(new PrintWriter(sw));
+                logger.warning(sw.toString());
+            }
+            return xml;
         }
-        return xml;
     }
 
 

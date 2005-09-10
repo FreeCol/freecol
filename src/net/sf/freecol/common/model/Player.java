@@ -1303,10 +1303,8 @@ public class Player extends FreeColGameObject {
         // [(colonist count in colonies + total colonist count) * 2] + 8.
         // So every unit counts as 2 unless they're in a colony,
         // wherein they count as 4.
-        // This does that, I think. -sjm
         int count = 8;
 
-        //ArrayList units = new ArrayList();
         Map map = getGame().getMap();
 
         Iterator tileIterator = map.getWholeMapIterator();
@@ -1326,23 +1324,24 @@ public class Player extends FreeColGameObject {
 
                     count += 2;
                 }
-            } else if (t != null && t.getSettlement() != null && (t.getSettlement() instanceof Colony)) {
-              count += (((Colony)t.getSettlement()).getUnitCount()) * 4; // Units in colonies count doubly. -sjm
+            } else if (t != null && t.getColony() != null && t.getColony().getOwner() == this) {
+                count += t.getColony().getUnitCount() * 4; // Units in colonies count doubly. -sjm
             }
         }
-
         Iterator europeUnitIterator = getEurope().getUnitIterator();
         while (europeUnitIterator.hasNext()) {
             europeUnitIterator.next();
             count += 2;
         }
 
-        if (nation == ENGLISH) count = (count * 2) / 3;
+        if (nation == ENGLISH) {
+            count = (count * 2) / 3;
+        }
 
         setCrossesRequired(count);
     }
 
-    
+
     /**
     * Modifies the hostiliy against the given player.
     *

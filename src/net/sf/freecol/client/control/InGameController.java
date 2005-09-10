@@ -156,6 +156,7 @@ public final class InGameController implements NetworkConstants {
                         ? freeColClient.getCanvas().showEmigrationPanel() : 0
                     );
             }
+
             freeColClient.getInGameController().nextActiveUnit();
         }
     }
@@ -1528,7 +1529,7 @@ public final class InGameController implements NetworkConstants {
         Unit unit = new Unit(game, (Element) reply.getChildNodes().item(0));
         int newRecruitable = Integer.parseInt(reply.getAttribute("newRecruitable"));
         europe.emigrate(slot, unit, newRecruitable);
-        
+
         freeColClient.getCanvas().updateGoldLabel();
     }
 

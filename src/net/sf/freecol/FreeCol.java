@@ -60,6 +60,8 @@ public final class FreeCol {
     private static int serverPort;
     
     private static File saveDirectory;
+    
+    private static File savegameFile = null;
 
 
 
@@ -84,7 +86,7 @@ public final class FreeCol {
         
         if (Runtime.getRuntime().maxMemory() < 128000000) {
             System.out.println("You need to assign more memory to the JVM. Restart FreeCol with:");
-            System.out.println("java -Xmx128M -jar FreeCol.jar");
+            System.out.println("java -Xmx512M -jar FreeCol.jar");
             return;
         }
 
@@ -182,6 +184,16 @@ public final class FreeCol {
             }
 
             freeColClient = new FreeColClient(windowed, windowSize, lib, musicLibrary, sfxLibrary);
+
+            if (savegameFile != null) {
+                final FreeColClient theFreeColClient = freeColClient;
+                final File theSavegameFile = savegameFile;
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        theFreeColClient.getConnectController().loadGame(theSavegameFile);
+                    }
+                });
+            }
         }
     }
 
@@ -285,6 +297,18 @@ public final class FreeCol {
                     printUsage();
                     System.exit(-1);
                 }
+            } else if (args[i].equals("--load-savegame")) {
+                i++;
+                if (i < args.length) {
+                    savegameFile = new File(args[i]);
+                    if (!savegameFile.exists() || !savegameFile.isFile()) {
+                        System.out.println("The given savegame file could not be found: " + args[i]);
+                        System.exit(0);
+                    }
+                } else {
+                    printUsage();
+                    System.exit(0);
+                }
             } else {
                 printUsage();
                 System.exit(0);
@@ -333,6 +357,8 @@ public final class FreeCol {
         System.out.println("  has a subdirectory called 'images'");
         System.out.println("--windowed[[=]WIDTHxHEIGHT]");
         System.out.println("  runs FreeCol in windowed mode instead of full screen mode");
+        System.out.println("--load-savegame SAVEGAME_FILE");
+        System.out.println("  loads the given savegame.");
         System.out.println("--no-sound");
         System.out.println("  runs FreeCol without sound");
         System.out.println("--no-java-check");

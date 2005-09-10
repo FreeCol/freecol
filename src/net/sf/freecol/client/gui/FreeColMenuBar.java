@@ -430,6 +430,22 @@ public class FreeColMenuBar extends JMenuBar {
                 }
             });
 
+            final JMenuItem crossBug = new JCheckBoxMenuItem("Fix \"not enough crosses\"-bug");
+            crossBug.setOpaque(false);
+            crossBug.setMnemonic(KeyEvent.VK_B);
+            debugMenu.add(crossBug);
+            crossBug.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    freeColClient.getMyPlayer().updateCrossesRequired();
+                    if (freeColClient.getFreeColServer() != null) {
+                        Iterator pi = freeColClient.getFreeColServer().getGame().getPlayerIterator();
+                        while (pi.hasNext()) {
+                            ((Player) pi.next()).updateCrossesRequired();
+                        }
+                    }
+                }
+            });
+
             debugMenu.addSeparator();
 
             final JMenuItem useAI = new JMenuItem("Use AI");
