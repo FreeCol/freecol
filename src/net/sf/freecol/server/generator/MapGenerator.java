@@ -624,6 +624,7 @@ public class MapGenerator {
                         ct.setPlowed(true);
                         ct.setAddition(Tile.ADD_NONE);
                     }
+                    colony.getBuilding(Building.SCHOOLHOUSE).setLevel(Building.SHOP);
 
                     Unit carpenter = new Unit(game, colonyTile, player, Unit.MASTER_CARPENTER, Unit.ACTIVE);
                     carpenter.setLocation(colony.getBuilding(Building.CARPENTER));
@@ -642,8 +643,8 @@ public class MapGenerator {
                     }
 
                     Unit scout = new Unit(game, colonyTile, player, Unit.SEASONED_SCOUT, Unit.ACTIVE);
-                    
-                    /* DEBUGGING LINES FOR AI (0.4.1): 
+
+                    /* DEBUGGING LINES FOR AI (0.4.1):
                     for (int j=0; j<10; j++) {
                         Unit u = new Unit(game, null, player, Unit.FREE_COLONIST, Unit.ACTIVE);
                         colony.add(u);

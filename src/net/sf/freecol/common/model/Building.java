@@ -184,8 +184,12 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         return level;
     }
 
-    /* Sets the level of the building.
-    * @param level The new level of the building.
+
+    /**
+    * Sets the level of the building.
+    * @param level The new level of the building. This should be
+    *       one of {@link #NOT_BUILT}, {@link #HOUSE},
+    *       {@link #SHOP} and {@link #FACTORY}.
     */
     public void setLevel(int level) {
         this.level = level;
@@ -631,6 +635,8 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
                         student.setTurnsOfTraining(0);
                         addModelMessage(this, "model.unit.unitImproved", new String[][] {{"%oldName%", oldName}, {"%newName%", student.getName()}});
                     }
+                } else {
+                    addModelMessage(this, "model.building.noStudent", new String[][] {{"%teacher%", teacher.getName()}, {"%colony%", colony.getName()}});
                 }
             }
         } else if (getGoodsOutputType() != -1) {
@@ -640,7 +646,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             int goodsOutputType = getGoodsOutputType();
 
             if (getGoodsInput() == 0 && getMaximumGoodsInput() > 0) {
-                addModelMessage(this, "model.building.notEnoughInput", new String[][] {{"%building%", getName()}, {"%colony%", colony.getName()}});
+                addModelMessage(this, "model.building.notEnoughInput", new String[][] {{"%inputGoods%", Goods.getName(goodsInputType)}, {"%building%", getName()}, {"%colony%", colony.getName()}});
             }
 
             if (goodsOutput <= 0) return;

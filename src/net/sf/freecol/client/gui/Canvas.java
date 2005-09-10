@@ -59,6 +59,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Position;
@@ -410,7 +411,7 @@ public final class Canvas extends JLayeredPane {
 
             FreeColGameObject source = m.getSource();
             if (source instanceof Europe && !europePanel.isShowing() ||
-                    source instanceof Colony && !colonyPanel.isShowing()) {
+                    (source instanceof Colony || source instanceof WorkLocation) && !colonyPanel.isShowing()) {
 
                 FreeColDialog confirmDialog = FreeColDialog.createConfirmDialog(message, okText, cancelText);
                 confirmDialog.setLocation(getWidth() / 2 - confirmDialog.getWidth() / 2, getHeight() / 2 - confirmDialog.getHeight() / 2);
@@ -423,6 +424,8 @@ public final class Canvas extends JLayeredPane {
                         showEuropePanel();
                     } else if (source instanceof Colony) {
                         showColonyPanel((Colony) source);
+                    } else if (source instanceof WorkLocation) {
+                        showColonyPanel(((WorkLocation) source).getColony());
                     }
                 } else {
                     remove(confirmDialog);

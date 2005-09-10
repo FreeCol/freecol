@@ -15,4 +15,12 @@ public interface WorkLocation extends Location {
     * Returns the production of the given type of goods.
     */
     public int getProductionOf(int goodsType);
+    
+    /**
+    * Returns the <code>Colony</code> this <code>WorkLocation</code> is
+    * located in.
+    *
+    * @return The <code>Colony</code>.
+    */
+    public Colony getColony();
 }
