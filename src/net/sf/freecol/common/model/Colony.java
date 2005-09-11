@@ -645,8 +645,12 @@ public final class Colony extends Settlement implements Location {
     public void addBells(int amount) {
         bells += amount;
 
-        if (bells >= ((getUnitCount() + 1) * 50)) {
-            bells = ((getUnitCount() + 1) * 50) * 100;
+        // This is by 51 now because the removal of bells
+        // happens *after* the bells are added;
+        // each unit will eat one bell at 100% membership,
+        // hence the extra 1.
+        if (bells >= ((getUnitCount() + 1) * 51)) {
+            bells = ((getUnitCount() + 1) * 51);
         } else if (bells <= 0) {
             bells = 0;
         }
