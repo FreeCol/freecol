@@ -65,6 +65,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
 
     private final JLabel                    cargoLabel;
     private final JLabel                    goldLabel;
+    private final JLabel                    toAmericaLabel;
     private final ToAmericaPanel            toAmericaPanel;
     private final ToEuropePanel             toEuropePanel;
     private final InPortPanel               inPortPanel;
@@ -154,8 +155,8 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     docksScroll = new JScrollPane(docksPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER),
                     cargoScroll = new JScrollPane(cargoPanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED),
                     marketScroll = new JScrollPane(marketPanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        JLabel  toAmericaLabel = new JLabel("Going to America"),
-                toEuropeLabel = new JLabel("Going to Europe"),
+                toAmericaLabel = new JLabel("Going to America");
+        JLabel  toEuropeLabel = new JLabel("Going to Europe"),
                 inPortLabel = new JLabel("In port"),
                 docksLabel = new JLabel("Docks");
 
@@ -388,6 +389,14 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
 
         setSelectedUnitLabel(carrier);
         updateGoldLabel();
+
+        if (freeColClient.getMyPlayer() != null) {
+            String newLandName = freeColClient.getMyPlayer().getNewLandName();
+            if (newLandName == null) {
+                newLandName = freeColClient.getMyPlayer().getDefaultNewLandName();
+            }
+            toAmericaLabel.setText("Going to " + newLandName);
+        }
     }
 
 
@@ -397,7 +406,6 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
     public void updateGoldLabel() {
         goldLabel.setText("Gold: " + freeColClient.getMyPlayer().getGold());
     }
-
 
     /**
     * Reinitializes the panel, but keeps the currently selected unit.
