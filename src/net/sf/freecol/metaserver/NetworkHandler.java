@@ -92,8 +92,9 @@ public final class NetworkHandler implements MessageHandler {
         int slotsAvailable = Integer.parseInt(element.getAttribute("slotsAvailable"));
         int currentlyPlaying = Integer.parseInt(element.getAttribute("currentlyPlaying"));
         boolean isGameStarted = Boolean.valueOf(element.getAttribute("isGameStarted")).booleanValue();
+        String version = element.getAttribute("version");
 
-        metaRegister.addServer(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted);
+        metaRegister.addServer(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted, version);
 
         return null;
     }
@@ -110,13 +111,14 @@ public final class NetworkHandler implements MessageHandler {
         int slotsAvailable = Integer.parseInt(element.getAttribute("slotsAvailable"));
         int currentlyPlaying = Integer.parseInt(element.getAttribute("currentlyPlaying"));
         boolean isGameStarted = Boolean.valueOf(element.getAttribute("isGameStarted")).booleanValue();
+        String version = element.getAttribute("version");
 
-        metaRegister.updateServer(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted);
-        
+        metaRegister.updateServer(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted, version);
+
         return null;
     }
 
-    
+
     /**
     * Handles a "remove"-request.
     * @param element The element containing the request.
@@ -126,11 +128,11 @@ public final class NetworkHandler implements MessageHandler {
         int port = Integer.parseInt(element.getAttribute("port"));
 
         metaRegister.removeServer(address, port);
-        
+
         return null;
     }
-    
-    
+
+
     /**
     * Handles a "disconnect"-request.
     * @param element The element containing the request.
@@ -143,7 +145,7 @@ public final class NetworkHandler implements MessageHandler {
         }
 
         metaServer.removeConnection(connection);
-        
+
         return null;
     }
 }

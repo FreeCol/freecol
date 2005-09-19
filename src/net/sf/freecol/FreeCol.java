@@ -290,11 +290,17 @@ public final class FreeCol {
             } else if (args[i].equals("--server")) {
                 standAloneServer = true;
                 i++;
+                if (i >= args.length) {
+                    printUsage();
+                    System.out.println("You will need to specify a port number when using the \"--server\" option.");
+                    System.exit(-1);
+                }
 
                 try {
                     serverPort = Integer.parseInt(args[i]);
                 } catch (NumberFormatException nfe) {
                     printUsage();
+                    System.out.println("The text after the \"--server\" option should be a valid port number.");
                     System.exit(-1);
                 }
             } else if (args[i].equals("--load-savegame")) {
@@ -349,11 +355,11 @@ public final class FreeCol {
     * arguments).
     */
     private static void printUsage() {
-        System.out.println("Usage: java -Xmx128M -jar FreeCol.jar [OPTIONS]");
+        System.out.println("Usage: java -Xmx512M -jar FreeCol.jar [OPTIONS]");
         System.out.println("");
         System.out.println("Options:");
-        System.out.println("--freecol-data [DIR]");
-        System.out.println("  [DIR] should be the directory with FreeCol's data files, it");
+        System.out.println("--freecol-data DIR");
+        System.out.println("  DIR should be the directory with FreeCol's data files, it");
         System.out.println("  has a subdirectory called 'images'");
         System.out.println("--windowed[[=]WIDTHxHEIGHT]");
         System.out.println("  runs FreeCol in windowed mode instead of full screen mode");

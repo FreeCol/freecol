@@ -6,6 +6,7 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -25,6 +26,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.*;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.ConnectController;
@@ -135,6 +137,16 @@ public final class ServerListPanel extends FreeColPanel implements ActionListene
     public void initialize(String username, ArrayList arrayList) {
         this.username = username;
         
+        // TODO: This should be added as a filtering rule:
+        // Remove servers with an incorrect version from the list:
+        Iterator it = arrayList.iterator();
+        while (it.hasNext()) {
+            ServerInfo si = (ServerInfo) it.next();
+            if (!si.getVersion().equals(FreeCol.getVersion())) {
+                it.remove();
+            }
+        }
+
         tableModel.setItems(arrayList);
         setEnabled(true);
         if (arrayList.size() == 0) {

@@ -19,6 +19,7 @@ public class ServerInfo {
     private int currentlyPlaying;
     private int slotsAvailable;
     private boolean isGameStarted;
+    private String version;
 
 
     /**
@@ -39,8 +40,8 @@ public class ServerInfo {
     * @param currentlyPlaying Number of players that are currently connected.
     * @param isGameStarted <i>true</i> if the game has started.
     */
-    public ServerInfo(String name, String address, int port, int slotsAvailable, int currentlyPlaying, boolean isGameStarted) {
-        update(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted);
+    public ServerInfo(String name, String address, int port, int slotsAvailable, int currentlyPlaying, boolean isGameStarted, String version) {
+        update(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted, version);
     }
 
     
@@ -64,13 +65,15 @@ public class ServerInfo {
     * @param currentlyPlaying Number of players that are currently connected.
     * @param isGameStarted <i>true</i> if the game has started.
     */
-    public void update(String name, String address, int port, int slotsAvailable, int currentlyPlaying, boolean isGameStarted) {
+    public void update(String name, String address, int port, int slotsAvailable, 
+                       int currentlyPlaying, boolean isGameStarted, String version) {
         this.name = name;
         this.address = address;
         this.port = port;
         this.slotsAvailable = slotsAvailable;
         this.currentlyPlaying = currentlyPlaying;
         this.isGameStarted = isGameStarted;
+        this.version = version;
     }
 
     
@@ -112,6 +115,17 @@ public class ServerInfo {
         return slotsAvailable;
     }
 
+    
+    /**
+    * Returns the FreeCol version of the server.
+    *
+    * @return The version.
+    * @see FreeCol#getVersion
+    */
+    public String getVersion() {
+        return version;
+    }
+
 
     /**
     * Creates an XML-representation of this object.
@@ -127,6 +141,7 @@ public class ServerInfo {
         element.setAttribute("slotsAvailable", Integer.toString(slotsAvailable));
         element.setAttribute("currentlyPlaying", Integer.toString(currentlyPlaying));
         element.setAttribute("isGameStarted", Boolean.toString(isGameStarted));
+        element.setAttribute("version", version);
         
         return element;
     }
@@ -142,7 +157,8 @@ public class ServerInfo {
                 Integer.parseInt(element.getAttribute("port")),
                 Integer.parseInt(element.getAttribute("slotsAvailable")),
                 Integer.parseInt(element.getAttribute("currentlyPlaying")),
-                Boolean.valueOf(element.getAttribute("slotsAvailable")).booleanValue());
+                Boolean.valueOf(element.getAttribute("slotsAvailable")).booleanValue(),
+                element.getAttribute("version"));
     }
 
 
@@ -159,7 +175,8 @@ public class ServerInfo {
     * Returns a <code>String</code> representation of this object for debugging purposes.
     */
     public String toString() {
-        return name + "(" + address + ":" + port + ") " + currentlyPlaying + ", " + slotsAvailable + ", " + isGameStarted;
+        return name + "(" + address + ":" + port + ") " + currentlyPlaying 
+                + ", " + slotsAvailable + ", " + isGameStarted + ", " + version;
     }
 
 }

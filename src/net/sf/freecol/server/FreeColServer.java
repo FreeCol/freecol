@@ -83,6 +83,9 @@ public final class FreeColServer {
     // Networking:
     private Server server;
 
+    /** The name of this server. */
+    private String name;
+
     // Control:
     private UserConnectionHandler userConnectionHandler;
     private PreGameController preGameController;
@@ -243,11 +246,16 @@ public final class FreeColServer {
             }
 
             // TODO: Add possibillity of choosing a name:
-            element.setAttribute("name", mc.getSocket().getLocalAddress().getHostAddress() + ":" + Integer.toString(port));
+            if (name != null) {
+                element.setAttribute("name", name);
+            } else {
+                element.setAttribute("name", mc.getSocket().getLocalAddress().getHostAddress() + ":" + Integer.toString(port));
+            }
             element.setAttribute("port", Integer.toString(port));
             element.setAttribute("slotsAvailable", Integer.toString(getSlotsAvailable()));
             element.setAttribute("currentlyPlaying", Integer.toString(getNumberOfLivingHumanPlayers()));
             element.setAttribute("isGameStarted", Boolean.toString(gameState != STARTING_GAME));
+            element.setAttribute("version", FreeCol.getVersion());
 
             mc.send(element);
         } catch (IOException e) {

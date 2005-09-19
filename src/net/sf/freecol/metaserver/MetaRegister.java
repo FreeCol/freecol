@@ -87,13 +87,13 @@ public final class MetaRegister {
     * @param currentlyPlaying Number of players that are currently connected.
     * @param isGameStarted <i>true</i> if the game has started.
     */
-    public synchronized void addServer(String name, String address, int port, int slotsAvailable, int currentlyPlaying, boolean isGameStarted) {
+    public synchronized void addServer(String name, String address, int port, int slotsAvailable, int currentlyPlaying, boolean isGameStarted, String version) {
         MetaItem mi = getItem(address, port);
         if (mi == null) {
-            items.add(new MetaItem(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted));
+            items.add(new MetaItem(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted, version));
             logger.info("Server added:" + address + ":" + port);
         } else {
-            updateServer(mi, name, address, port, slotsAvailable, currentlyPlaying, isGameStarted);
+            updateServer(mi, name, address, port, slotsAvailable, currentlyPlaying, isGameStarted, version);
         }
     }
 
@@ -108,12 +108,12 @@ public final class MetaRegister {
     * @param currentlyPlaying Number of players that are currently connected.
     * @param isGameStarted <i>true</i> if the game has started.
     */
-    public synchronized void updateServer(String name, String address, int port, int slotsAvailable, int currentlyPlaying, boolean isGameStarted) {
+    public synchronized void updateServer(String name, String address, int port, int slotsAvailable, int currentlyPlaying, boolean isGameStarted, String version) {
         MetaItem mi = getItem(address, port);
         if (mi == null) {
-            addServer(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted);
+            addServer(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted, version);
         } else {
-            updateServer(mi, name, address, port, slotsAvailable, currentlyPlaying, isGameStarted);
+            updateServer(mi, name, address, port, slotsAvailable, currentlyPlaying, isGameStarted, version);
         }
     }
 
@@ -158,8 +158,8 @@ public final class MetaRegister {
     * @param currentlyPlaying Number of players that are currently connected.
     * @param isGameStarted <i>true</i> if the game has started.
     */
-    private void updateServer(MetaItem mi, String name, String address, int port, int slotsAvailable, int currentlyPlaying, boolean isGameStarted) {
-        mi.update(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted);
+    private void updateServer(MetaItem mi, String name, String address, int port, int slotsAvailable, int currentlyPlaying, boolean isGameStarted, String version) {
+        mi.update(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted, version);
         logger.info("Server updated:" + mi.toString());
     }
 }

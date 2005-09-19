@@ -29,9 +29,9 @@ public class MetaItem extends ServerInfo {
     * @param currentlyPlaying Number of players that are currently connected.
     * @param isGameStarted <i>true</i> if the game has started.
     */
-    public MetaItem(String name, String address, int port, int slotsAvailable, int currentlyPlaying, boolean isGameStarted) {
+    public MetaItem(String name, String address, int port, int slotsAvailable, int currentlyPlaying, boolean isGameStarted, String version) {
         super();
-        update(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted);
+        update(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted, version);
     }
 
 
@@ -45,8 +45,8 @@ public class MetaItem extends ServerInfo {
     * @param currentlyPlaying Number of players that are currently connected.
     * @param isGameStarted <i>true</i> if the game has started.
     */
-    public void update(String name, String address, int port, int slotsAvailable, int currentlyPlaying, boolean isGameStarted) {
-        super.update(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted);
+    public void update(String name, String address, int port, int slotsAvailable, int currentlyPlaying, boolean isGameStarted, String version) {
+        super.update(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted, version);
         lastUpdated = System.currentTimeMillis();
     }
     
