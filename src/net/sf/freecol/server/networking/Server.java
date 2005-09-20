@@ -108,7 +108,7 @@ public final class Server extends Thread {
 
                     logger.info("Got client connection from " + clientSocket.getInetAddress().toString());
                     Connection connection = new Connection(clientSocket, freeColServer.getUserConnectionHandler());
-                    connections.put(clientSocket, connection);
+                    //connections.put(clientSocket, connection);
                 } catch (IOException e) {
                     if (running) {
                         StringWriter sw = new StringWriter();
@@ -244,8 +244,15 @@ public final class Server extends Thread {
     public void addConnection(Connection connection, int fakesocket) {
         connections.put(new Socket(), connection);
     }
-    
-    
+
+    /**
+    * Adds a Connection into the hashmap.
+    * @param connection The connection to add.
+    */
+    public void addConnection(Connection connection) {
+        connections.put(connection.getSocket(), connection);
+    }
+
     /**
     * Removes the given connection
     * @param connection The connection that should be removed.

@@ -2,6 +2,7 @@
 package net.sf.freecol.server.control;
 
 import java.util.logging.Logger;
+import java.util.Iterator;
 
 import org.w3c.dom.Element;
 
@@ -12,6 +13,7 @@ import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.Connection;
 
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.networking.Server;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.common.model.*;
 
@@ -59,8 +61,37 @@ public final class UserConnectionHandler implements MessageHandler {
         if (element != null) {
             if (type.equals("login")) {
                 reply = login(connection, element);
+            } else if (type.equals("getVacantPlayers")) {
+                reply = getVacantPlayers(connection, element);
             } else {
                 logger.warning("Unkown request: " + type);
+            }
+        }
+
+        return reply;
+    }
+
+
+    /**
+    * Handles a "getVacantPlayers"-request.
+    * @param element The element containing the request.
+    */
+    private Element getVacantPlayers(Connection connection, Element element) {
+        Game game = freeColServer.getGame();
+
+        if (freeColServer.getGameState() == FreeColServer.STARTING_GAME) {
+            return null;
+        }
+
+        Element reply = Message.createNewRootElement("vacantPlayers");
+        Iterator playerIterator = game.getPlayerIterator();
+        while (playerIterator.hasNext()) {
+            ServerPlayer player = (ServerPlayer) playerIterator.next();
+            if (!player.isDead() && player.isEuropean() && !player.isREF()
+                    && (!player.isConnected() || player.isAI())) {
+                Element playerElement = reply.getOwnerDocument().createElement("player");
+                playerElement.setAttribute("username", player.getUsername());
+                reply.appendChild(playerElement);
             }
         }
 
@@ -76,6 +107,7 @@ public final class UserConnectionHandler implements MessageHandler {
         // TODO: Do not allow more than one (human) player to connect to a singleplayer game.
 
         Game game = freeColServer.getGame();
+        Server server = freeColServer.getServer();
 
         if (!element.hasAttribute("username")) {
             throw new IllegalArgumentException("The attribute 'username' is missing.");
@@ -98,8 +130,19 @@ public final class UserConnectionHandler implements MessageHandler {
             }
 
             ServerPlayer player = (ServerPlayer) game.getPlayerByName(username);
+            if (player.isConnected() && !player.isAI()) {
+                return Message.createError("server.usernameInUse", "The specified username is already in use.");
+            }
             player.setConnection(connection);
             player.setConnected(true);
+
+            if (player.isAI()) {
+                player.setAI(false);
+                Element setAIElement = Message.createNewRootElement("setAI");
+                setAIElement.setAttribute("player", player.getID());
+                setAIElement.setAttribute("ai", Boolean.toString(false));
+                server.sendToAll(setAIElement);
+            }
 
             // In case this player is the first to reconnect:
             boolean isCurrentPlayer = (game.getCurrentPlayer() == null);
@@ -117,6 +160,9 @@ public final class UserConnectionHandler implements MessageHandler {
             reply.setAttribute("startGame", "true");
             reply.setAttribute("isCurrentPlayer", Boolean.toString(isCurrentPlayer));
             reply.appendChild(freeColServer.getGame().toXMLElement(player, reply.getOwnerDocument()));
+
+            // Successful login:
+            server.addConnection(connection);
 
             return reply;
         }
@@ -162,6 +208,9 @@ public final class UserConnectionHandler implements MessageHandler {
         Element reply = Message.createNewRootElement("loginConfirmed");
         reply.setAttribute("admin", (admin ? "true" : "false"));
         reply.appendChild(freeColServer.getGame().toXMLElement(newPlayer, reply.getOwnerDocument()));
+
+        // Successful login:
+        server.addConnection(connection);
 
         return reply;
     }

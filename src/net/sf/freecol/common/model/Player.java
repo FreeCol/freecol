@@ -843,6 +843,15 @@ public class Player extends FreeColGameObject {
         return ai;
     }
 
+
+    /**
+    * Sets whether this player is an AI player.
+    */
+    public void setAI(boolean ai) {
+        this.ai = ai;
+    }
+
+
     /**
     * Modifies the amount of gold that this player has. The argument
     * can be both positive and negative.

@@ -151,10 +151,6 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         port2Label.setEnabled(false);
         publicServer.setEnabled(false);
         port2.setEnabled(false);
-        
-        if (!FreeCol.isInDebugMode()) {
-            meta.setEnabled(false);
-        }
 
         add(name);
         add(nameLabel);
@@ -217,15 +213,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
             port1.setEnabled(false);
             port2Label.setEnabled(true);
             port2.setEnabled(true);
-            if (!FreeCol.isInDebugMode()) {
-                publicServer.setEnabled(false);
-            } else {
-                publicServer.setEnabled(true);
-            }
-        }
-        
-        if (!FreeCol.isInDebugMode()) {
-            meta.setEnabled(false);
+            publicServer.setEnabled(true);
         }
     }
 
@@ -300,11 +288,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                     port1.setEnabled(false);
                     port2Label.setEnabled(true);
                     port2.setEnabled(true);
-                    if (!FreeCol.isInDebugMode()) {
-                        publicServer.setEnabled(false);
-                    } else {
-                        publicServer.setEnabled(true);
-                    }
+                    publicServer.setEnabled(true);
                     break;
                 case META_SERVER:
                     ipLabel.setEnabled(false);

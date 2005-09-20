@@ -58,6 +58,7 @@ public final class FreeCol {
     private static boolean inDebugMode = false;
 
     private static int serverPort;
+    private static String serverName = null;
     
     private static File saveDirectory;
     
@@ -119,7 +120,7 @@ public final class FreeCol {
         if (standAloneServer) {
             logger.info("Starting stand-alone server.");
             try {
-                final FreeColServer freeColServer = new FreeColServer(true, false, serverPort);
+                final FreeColServer freeColServer = new FreeColServer(true, false, serverPort, serverName);
 
                 Runtime runtime = Runtime.getRuntime();
                 runtime.addShutdownHook(new Thread() {
@@ -279,7 +280,7 @@ public final class FreeCol {
                 windowed = true;
             } else if (args[i].equals("--no-sound")) {
                 sound = false;
-            } else if (args[i].equals("--usage")) {
+            } else if (args[i].equals("--usage") || args[i].equals("--help")) {
                 printUsage();
                 System.exit(0);
             } else if (args[i].equals("--version")) {
@@ -293,7 +294,7 @@ public final class FreeCol {
                 if (i >= args.length) {
                     printUsage();
                     System.out.println("You will need to specify a port number when using the \"--server\" option.");
-                    System.exit(-1);
+                    System.exit(1);
                 }
 
                 try {
@@ -301,7 +302,7 @@ public final class FreeCol {
                 } catch (NumberFormatException nfe) {
                     printUsage();
                     System.out.println("The text after the \"--server\" option should be a valid port number.");
-                    System.exit(-1);
+                    System.exit(1);
                 }
             } else if (args[i].equals("--load-savegame")) {
                 i++;
@@ -309,15 +310,30 @@ public final class FreeCol {
                     savegameFile = new File(args[i]);
                     if (!savegameFile.exists() || !savegameFile.isFile()) {
                         System.out.println("The given savegame file could not be found: " + args[i]);
-                        System.exit(0);
+                        System.exit(1);
                     }
                 } else {
                     printUsage();
                     System.exit(0);
                 }
+            } else if (args[i].equals("--server-help")) {
+                printServerUsage();
+                System.exit(0);
+            } else if (args[i].equals("--server-name")) {
+                if (!standAloneServer) {
+                    printServerUsage();
+                    System.exit(1);
+                }
+                i++;
+                if (i >= args.length) {
+                    printUsage();
+                    System.out.println("You will need to specify a name when using the \"--server-name\" option.");
+                    System.exit(1);
+                }
+                serverName = args[i];
             } else {
                 printUsage();
-                System.exit(0);
+                System.exit(1);
             }
         }
     }
@@ -351,6 +367,21 @@ public final class FreeCol {
 
 
     /**
+    * Prints the command-line usage for the server options.
+    */
+    private static void printServerUsage() {
+        System.out.println("Usage: java -Xmx512M -jar FreeCol.jar --server PORT [OPTIONS]");
+        System.out.println("");
+        System.out.println("Starts a stand-alone server on the specifed port");
+        System.out.println("");
+        System.out.println("Options:");
+        System.out.println("--server-name NAME");
+        System.out.println("  specifies a custom name for the server");
+        System.out.println();
+    }
+
+
+    /**
     * Prints the command-line usage (the 'help' for command-line
     * arguments).
     */
@@ -375,6 +406,8 @@ public final class FreeCol {
         System.out.println("  displays the version number");
         System.out.println("--server PORT");
         System.out.println("  starts a stand-alone server on the specifed port");
+        System.out.println("--server-help");
+        System.out.println("  displays a help screen for the more advanced server options");
         System.out.println();
     }
 }

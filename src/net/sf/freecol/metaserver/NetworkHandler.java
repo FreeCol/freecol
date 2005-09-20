@@ -93,8 +93,9 @@ public final class NetworkHandler implements MessageHandler {
         int currentlyPlaying = Integer.parseInt(element.getAttribute("currentlyPlaying"));
         boolean isGameStarted = Boolean.valueOf(element.getAttribute("isGameStarted")).booleanValue();
         String version = element.getAttribute("version");
+        int gameState = Integer.parseInt(element.getAttribute("gameState"));
 
-        metaRegister.addServer(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted, version);
+        metaRegister.addServer(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted, version, gameState);
 
         return null;
     }
@@ -112,8 +113,9 @@ public final class NetworkHandler implements MessageHandler {
         int currentlyPlaying = Integer.parseInt(element.getAttribute("currentlyPlaying"));
         boolean isGameStarted = Boolean.valueOf(element.getAttribute("isGameStarted")).booleanValue();
         String version = element.getAttribute("version");
+        int gameState = Integer.parseInt(element.getAttribute("gameState"));
 
-        metaRegister.updateServer(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted, version);
+        metaRegister.updateServer(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted, version, gameState);
 
         return null;
     }

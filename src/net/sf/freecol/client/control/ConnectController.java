@@ -6,6 +6,7 @@ import java.io.*;
 import java.net.ConnectException;
 import java.util.logging.Logger;
 import java.util.ArrayList;
+import java.util.List;
 import javax.swing.SwingUtilities;
 
 import net.sf.freecol.FreeCol;
@@ -72,7 +73,7 @@ public final class ConnectController {
         }
 
         try {
-            FreeColServer freeColServer = new FreeColServer(publicServer, false, port);
+            FreeColServer freeColServer = new FreeColServer(publicServer, false, port, null);
             freeColClient.setFreeColServer(freeColServer);
         } catch (IOException e) {
             freeColClient.getCanvas().errorMessage("server.couldNotStart");
@@ -105,7 +106,7 @@ public final class ConnectController {
         }
 
         try {
-            FreeColServer freeColServer = new FreeColServer(false, true, port);
+            FreeColServer freeColServer = new FreeColServer(false, true, port, null);
             freeColClient.setFreeColServer(freeColServer);
         } catch (IOException e) {
             freeColClient.getCanvas().errorMessage("server.couldNotStart");
@@ -130,13 +131,27 @@ public final class ConnectController {
     * @param port The port to use when connecting to the host.
     */
     public void joinMultiplayerGame(String username, String host, int port) {
+        final Canvas canvas = freeColClient.getCanvas();
+
         if (freeColClient.isLoggedIn()) {
             logout(true);
         }
 
+        List vacantPlayers = getVacantPlayers(host, port);
+        if (vacantPlayers != null) {
+            Object choice = canvas.showChoiceDialog(Messages.message("connectController.choicePlayer"),
+                                                    Messages.message("cancel"),
+                                                    vacantPlayers.iterator());
+            if (choice != null) {
+                username = (String) choice;
+            } else {
+                return;
+            }
+        }
+
         freeColClient.setSingleplayer(false);
         if (login(username, host, port) && !freeColClient.getGUI().isInGame()) {
-            freeColClient.getCanvas().showStartGamePanel(freeColClient.getGame(), freeColClient.getMyPlayer(), false);
+            canvas.showStartGamePanel(freeColClient.getGame(), freeColClient.getMyPlayer(), false);
         }
     }
 
@@ -331,7 +346,7 @@ public final class ConnectController {
     * <i>true</i>.
     * If a server is running through this client and bStopServer is true then the clients
     * connected to that server will be notified. If a local client is connected to a server
-    * then the server will be notified with a logout in case <i>notifyServer</i> is true.
+    * then the server will be notified with a logout in casgetVacantPlayerse <i>notifyServer</i> is true.
     *
     * @param bStopServer Indicates whether or not a server that was started through this
     * client should be stopped.
@@ -367,7 +382,55 @@ public final class ConnectController {
     public void quitGame(boolean bStopServer) {
         quitGame(bStopServer, true);
     }
-    
+
+
+    /**
+    * Returns a list of vacant players on a given server.
+    *
+    * @param host The name of the machine running the <code>FreeColServer</code>.
+    * @param port The port to use when connecting to the host.
+    * @return A list of available {@link Player#getUsername usernames}.
+    */
+    private List getVacantPlayers(String host, int port) {
+        Client client = freeColClient.getClient();
+        Canvas canvas = freeColClient.getCanvas();
+
+        if (client != null) {
+            client.disconnect();
+        }
+
+        try {
+            client = new Client(host, port, freeColClient.getPreGameInputHandler());
+        } catch (ConnectException e) {
+            canvas.errorMessage("server.couldNotConnect");
+            return null;
+        } catch (IOException e) {
+            canvas.errorMessage("server.couldNotConnect");
+            return null;
+        }
+
+        freeColClient.setClient(client);
+
+        Element element = Message.createNewRootElement("getVacantPlayers");
+
+        Element reply = client.ask(element);
+        if (reply == null) {
+            logger.warning("The server did not return a list.");
+            return null;
+        }
+        if (!reply.getTagName().equals("vacantPlayers")) {
+            logger.warning("The reply has an unknown type: " + reply.getTagName());
+            return null;
+        }
+
+        List items = new ArrayList();
+        NodeList nl = reply.getChildNodes();
+        for (int i=0; i<nl.getLength(); i++) {
+            items.add(((Element) nl.item(i)).getAttribute("username"));
+        }
+        return items;
+    }
+
 
     /**
     * Gets a list of servers from the meta server.

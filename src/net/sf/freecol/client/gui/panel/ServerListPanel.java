@@ -31,6 +31,7 @@ import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.i18n.Messages;
 
 
 /**
@@ -217,7 +218,7 @@ public final class ServerListPanel extends FreeColPanel implements ActionListene
 
 class ServerListTableModel extends AbstractTableModel {
 
-    private static final String[] columnNames = {"Name", "Address", "Port", "Players"};
+    private static final String[] columnNames = {"Name", "Address", "Port", "Players", "Game state"};
 
     private ArrayList items;
 
@@ -286,6 +287,8 @@ class ServerListTableModel extends AbstractTableModel {
                     return Integer.toString(si.getPort());
                 case 3:
                     return Integer.toString(si.getCurrentlyPlaying()) + "/" + Integer.toString(si.getCurrentlyPlaying()+si.getSlotsAvailable());
+                case 4:
+                    return Messages.message("gameState." + Integer.toString(si.getGameState()));
                 default:
                     return null;
             }

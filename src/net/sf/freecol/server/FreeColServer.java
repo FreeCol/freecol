@@ -83,9 +83,6 @@ public final class FreeColServer {
     // Networking:
     private Server server;
 
-    /** The name of this server. */
-    private String name;
-
     // Control:
     private UserConnectionHandler userConnectionHandler;
     private PreGameController preGameController;
@@ -104,6 +101,9 @@ public final class FreeColServer {
     private boolean publicServer = false;
     private final int port;
 
+    /** The name of this server. */
+    private String name;
+
 
 
 
@@ -120,10 +120,11 @@ public final class FreeColServer {
     *                     will be logged by this class).
     *
     */
-    public FreeColServer(boolean publicServer, boolean singleplayer, int port) throws IOException {
+    public FreeColServer(boolean publicServer, boolean singleplayer, int port, String name) throws IOException {
         this.publicServer = publicServer;
         this.singleplayer = singleplayer;
         this.port = port;
+        this.name = name;
 
         modelController = new ServerModelController(this);
 
@@ -218,6 +219,24 @@ public final class FreeColServer {
 
 
     /**
+    * Returns the name of this server.
+    * @return The name.
+    */
+    public String getName() {
+        return name;
+    }
+
+
+    /**
+    * Sets the name of this server.
+    * @param name The name.
+    */
+    public void getName(String name) {
+        this.name = name;
+    }
+
+
+    /**
     * Sends information about this server to the meta-server.
     * The information is only sent if <code>public == true</code>.
     *
@@ -256,6 +275,7 @@ public final class FreeColServer {
             element.setAttribute("currentlyPlaying", Integer.toString(getNumberOfLivingHumanPlayers()));
             element.setAttribute("isGameStarted", Boolean.toString(gameState != STARTING_GAME));
             element.setAttribute("version", FreeCol.getVersion());
+            element.setAttribute("gameState", Integer.toString(getGameState()));
 
             mc.send(element);
         } catch (IOException e) {
@@ -318,10 +338,11 @@ public final class FreeColServer {
 
         int n = game.getMaximumPlayers();
         for (int i=0; i<players.size(); i++) {
-            if (!((ServerPlayer) players.get(i)).isEuropean() || ((ServerPlayer) players.get(i)).isREF()) {
+            ServerPlayer p = (ServerPlayer) players.get(i);
+            if (!p.isEuropean() || p.isREF()) {
                 continue;
             }
-            if (((ServerPlayer) players.get(i)).isDead() || ((ServerPlayer) players.get(i)).isConnected()) {
+            if (p.isDead() || p.isConnected() && !p.isAI()) {
                 n--;
             }
         }

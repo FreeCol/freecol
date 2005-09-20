@@ -20,6 +20,7 @@ public class ServerInfo {
     private int slotsAvailable;
     private boolean isGameStarted;
     private String version;
+    private int gameState;
 
 
     /**
@@ -40,8 +41,8 @@ public class ServerInfo {
     * @param currentlyPlaying Number of players that are currently connected.
     * @param isGameStarted <i>true</i> if the game has started.
     */
-    public ServerInfo(String name, String address, int port, int slotsAvailable, int currentlyPlaying, boolean isGameStarted, String version) {
-        update(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted, version);
+    public ServerInfo(String name, String address, int port, int slotsAvailable, int currentlyPlaying, boolean isGameStarted, String version, int gameState) {
+        update(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted, version, gameState);
     }
 
     
@@ -66,7 +67,7 @@ public class ServerInfo {
     * @param isGameStarted <i>true</i> if the game has started.
     */
     public void update(String name, String address, int port, int slotsAvailable, 
-                       int currentlyPlaying, boolean isGameStarted, String version) {
+                       int currentlyPlaying, boolean isGameStarted, String version, int gameState) {
         this.name = name;
         this.address = address;
         this.port = port;
@@ -74,6 +75,7 @@ public class ServerInfo {
         this.currentlyPlaying = currentlyPlaying;
         this.isGameStarted = isGameStarted;
         this.version = version;
+        this.gameState = gameState;
     }
 
     
@@ -128,6 +130,15 @@ public class ServerInfo {
 
 
     /**
+    * Gets the current state of the game.
+    * @see net.sf.freecol.server.FreeColServer#getGameState
+    */
+    public int getGameState() {
+        return gameState;
+    }
+
+
+    /**
     * Creates an XML-representation of this object.
     * @param document The document in which the element should be created.
     * @return The XML DOM Element representing this object.
@@ -142,6 +153,7 @@ public class ServerInfo {
         element.setAttribute("currentlyPlaying", Integer.toString(currentlyPlaying));
         element.setAttribute("isGameStarted", Boolean.toString(isGameStarted));
         element.setAttribute("version", version);
+        element.setAttribute("gameState", Integer.toString(gameState));
         
         return element;
     }
@@ -158,7 +170,8 @@ public class ServerInfo {
                 Integer.parseInt(element.getAttribute("slotsAvailable")),
                 Integer.parseInt(element.getAttribute("currentlyPlaying")),
                 Boolean.valueOf(element.getAttribute("slotsAvailable")).booleanValue(),
-                element.getAttribute("version"));
+                element.getAttribute("version"),
+                Integer.parseInt(element.getAttribute("gameState")));
     }
 
 
@@ -176,7 +189,8 @@ public class ServerInfo {
     */
     public String toString() {
         return name + "(" + address + ":" + port + ") " + currentlyPlaying 
-                + ", " + slotsAvailable + ", " + isGameStarted + ", " + version;
+                + ", " + slotsAvailable + ", " + isGameStarted + ", " + version
+                + ", " + gameState;
     }
 
 }

@@ -81,6 +81,7 @@ public final class AIInGameInputHandler implements MessageHandler {
                 // Therefore most of these messages are useless.
                 if (type.equals("update")) {
                 } else if (type.equals("remove")) {
+                } else if (type.equals("setAI")) {
                 } else if (type.equals("startGame")) {
                 } else if (type.equals("updateGame")) {
                 } else if (type.equals("addPlayer")) {

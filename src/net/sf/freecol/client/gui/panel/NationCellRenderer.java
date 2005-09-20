@@ -53,8 +53,17 @@ public final class NationCellRenderer implements TableCellRenderer {
     public Component getTableCellRendererComponent(JTable table, Object value,
             boolean isSelected, boolean hasFocus, int row, int column) {
 
-        Player player = (Player)players.get(row);
+        Player player = (Player) players.get(row);
+
+        JComboBox component;
+        if (player.isEuropean()) {
+            component = standardNationsComboBox;
+        } else {
+            component = indianTribesComboBox;
+        }
+
         if (player.isAI()) {
+        /*
             int nation = player.getNation();
             if ((nation != Player.DUTCH) && (nation != Player.ENGLISH)
                     && (nation != Player.FRENCH) && (nation != Player.SPANISH)) {
@@ -62,20 +71,20 @@ public final class NationCellRenderer implements TableCellRenderer {
 
                 indianTribesComboBox.setForeground(Color.LIGHT_GRAY);
                 return indianTribesComboBox;
-            }
-            else {
+            } else {
                 standardNationsComboBox.setForeground(Color.LIGHT_GRAY);
             }
+            */
         }
-        else if (player.isReady()) {
-            standardNationsComboBox.setForeground(Color.GRAY);
-        }
-        else {
-            standardNationsComboBox.setForeground(table.getForeground());
-        }
-        standardNationsComboBox.setBackground(table.getBackground());
 
-        standardNationsComboBox.setSelectedItem(value);
-        return standardNationsComboBox;
+        if (player.isReady()) {
+            component.setForeground(Color.GRAY);
+        } else {
+            component.setForeground(table.getForeground());
+        }
+        component.setBackground(table.getBackground());
+
+        component.setSelectedItem(value);
+        return component;
     }
 }

@@ -85,6 +85,8 @@ public final class InGameInputHandler extends InputHandler {
                 reply = deliverGift(element);
             } else if (type.equals("reconnect")) {
                 reply = reconnect(element);
+            } else if (type.equals("setAI")) {
+                reply = setAI(element);
             } else {
                 logger.warning("Message is of unsupported type \"" + type + "\".");
             }
@@ -448,7 +450,23 @@ public final class InGameInputHandler extends InputHandler {
         return null;
     }
 
-   
+
+    /**
+    * Handles a "setAI"-message.
+    *
+    * @param element The element (root element in a DOM-parsed XML tree) that
+    *                holds all the information.
+    */
+    private Element setAI(Element element) {
+        Game game = getFreeColClient().getGame();
+
+        Player p = (Player) game.getFreeColGameObject(element.getAttribute("player"));
+        p.setAI(Boolean.valueOf(element.getAttribute("ai")).booleanValue());
+
+        return null;
+    }
+
+
     /**
     * Handles an "chooseFoundingFather"-request.
     *
