@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.client.gui.i18n.Messages;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Document;
@@ -1725,38 +1726,36 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     * @throws IllegalArgumentException
     */
     public String getName() {
-        // TODO: Use i18n:
-
         String name = "";
-        boolean addP = false;
-
+        boolean addP = false;        
+        
         if (isPioneer() && getType() != HARDY_PIONEER) {
-            name = "Pioneer (";
+            name = Messages.message("model.unit.pioneer") + " (";
             addP = true;
         } else if (isArmed() && getType() != KINGS_REGULAR && getType() != COLONIAL_REGULAR && getType() != BRAVE && getType() != VETERAN_SOLDIER) {
             if (!isMounted()) {
-                name = "Soldier (";
+                name = Messages.message("model.unit.soldier") + " (";
             } else {
-                name = "Dragoon (";
+                name = Messages.message("model.unit.dragoon") + " (";
             }
             addP = true;
         } else if (isMounted() && getType() != SEASONED_SCOUT && getType() != BRAVE) {
-            name = "Scout (";
+            name = Messages.message("model.unit.scout")+  " (";
             addP = true;
         } else if (isMissionary() && getType() != JESUIT_MISSIONARY) {
-            name = "Missionary (";
+            name = Messages.message("model.unit.missionary") + " (";
             addP = true;
         }
 
         if (!isArmed() && (getType() == KINGS_REGULAR || getType() == COLONIAL_REGULAR || getType() == VETERAN_SOLDIER)) {
-            name = "Unarmed ";
+            name = Messages.message("model.unit.unarmed") + " ";
         }
 
         if (getType() == BRAVE) {
             if (isArmed() && !isMounted()) {
-                name = "Armed ";
+                name = Messages.message("model.unit.unarmed") + " ";
             } else if (isMounted()) {
-                name = "Mounted ";
+                name = Messages.message("model.unit.mounted") + " ";
             }
         }
 
@@ -1764,16 +1763,16 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
         if (isArmed() && isMounted()) {
             if (getType() == KINGS_REGULAR) {
-                name = "King's cavalry";
+                name = Messages.message("model.unit.kingsCavalry");
                 addP = false;
             } else if (getType() == COLONIAL_REGULAR) {
-                name = "Colonial cavalry";
+                name = Messages.message("model.unit.colonialCavalry");
                 addP = false;
             } else if (getType() == VETERAN_SOLDIER) {
-                name = "Veteran Dragoon";
+                name = Messages.message("model.unit.veteranDragoon");
                 addP = false;
             } else if (getType() == BRAVE) {
-                name = "Indian Dragoon";
+                name = Messages.message("model.unit.indianDragoon");
                 addP = false;
             }
         }
@@ -1794,89 +1793,87 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     * @throws IllegalArgumentException
     */
     public static String getName(int someType) {
-        // TODO: USE i18n !
-
         switch (someType) {
             case FREE_COLONIST:
-                return "Free Colonist";
+                return Messages.message("model.unit.freeColonist");
             case EXPERT_FARMER:
-                return "Expert Farmer";
+                return Messages.message("model.unit.expertFarmer");
             case EXPERT_FISHERMAN:
-                return "Expert Fisherman";
+                return Messages.message("model.unit.expertFisherman");
             case EXPERT_FUR_TRAPPER:
-                return "Expert FurTrapper";
+                return Messages.message("model.unit.expertFurTrapper");
             case EXPERT_SILVER_MINER:
-                return "Expert SilverMiner";
+                return Messages.message("model.unit.expertSilverMiner");
             case EXPERT_LUMBER_JACK:
-                return "Expert LumberJack";
+                return Messages.message("model.unit.expertLumberJack");
             case EXPERT_ORE_MINER:
-                return "Expert Ore Miner";
+                return Messages.message("model.unit.expertOreMiner");
             case MASTER_SUGAR_PLANTER:
-                return "Master Sugar Planter";
+                return Messages.message("model.unit.masterSugarPlanter");             
             case MASTER_COTTON_PLANTER:
-                return "Master Cotton Planter";
+                return Messages.message("model.unit.masterCottonPlanter");
             case MASTER_TOBACCO_PLANTER:
-                return "Master Tobacco Planter";
+                return Messages.message("model.unit.masterTobaccoPlanter");
             case FIREBRAND_PREACHER:
-                return "Firebrand Preacher";
+                return Messages.message("model.unit.firebrandPreacher");
             case ELDER_STATESMAN:
-                return "Elder Statesman";
+                return Messages.message("model.unit.elderStatesman");
             case MASTER_CARPENTER:
-                return "Master Carpenter";
+                return Messages.message("model.unit.masterCarpenter");
             case MASTER_DISTILLER:
-                return "Master Distiller";
+                return Messages.message("model.unit.masterDistiller");
             case MASTER_WEAVER:
-                return "Master Weaver";
+                return Messages.message("model.unit.masterWeaver");
             case MASTER_TOBACCONIST:
-                return "Master Tobacconist";
+                return Messages.message("model.unit.masterTobacconist");
             case MASTER_FUR_TRADER:
-                return "Master Fur Trader";
+                return Messages.message("model.unit.masterFurTrader");
             case MASTER_BLACKSMITH:
-                return "Master Blacksmith";
+                return Messages.message("model.unit.masterBlacksmith");
             case MASTER_GUNSMITH:
-                return "Master Gunsmith";
+                return Messages.message("model.unit.masterGunsmith");
             case SEASONED_SCOUT:
-                return "Seasoned Scout";
+                return Messages.message("model.unit.seasonedScout");
             case HARDY_PIONEER:
-                return "Hardy Pioneer";
+                return Messages.message("model.unit.hardyPioneer");
             case VETERAN_SOLDIER:
-                return "Veteran Soldier";
+                return Messages.message("model.unit.veteranSoldier");
             case JESUIT_MISSIONARY:
-                return "Jesuit Missionary";
+                return Messages.message("model.unit.jesuitMissionary");
             case INDENTURED_SERVANT:
-                return "Indentured Servant";
+                return Messages.message("model.unit.indenturedServant");
             case PETTY_CRIMINAL:
-                return "Petty Criminal";
+                return Messages.message("model.unit.pettyCriminal");
             case INDIAN_CONVERT:
-                return "Indian Convert";
+                return Messages.message("model.unit.indianConvert");
             case BRAVE:
-                return "Brave";
+                return Messages.message("model.unit.brave");
             case COLONIAL_REGULAR:
-                return "Colonial Regular";
+                return Messages.message("model.unit.colonialRegular");
             case KINGS_REGULAR:
-                return "King's Regular";
+                return Messages.message("model.unit.kingsRegular");
             case CARAVEL:
-                return "Caravel";
+                return Messages.message("model.unit.caravel");
             case FRIGATE:
-                return "Frigate";
+                return Messages.message("model.unit.frigate");
             case GALLEON:
-                return "Galleon";
+                return Messages.message("model.unit.galleon");
             case MAN_O_WAR:
-                return "Man of War";
+                return Messages.message("model.unit.manOWar");
             case MERCHANTMAN:
-                return "Merchantman";
+                return Messages.message("model.unit.merchantman");
             case PRIVATEER:
-                return "Privateer";
+                return Messages.message("model.unit.privateer");
             case ARTILLERY:
-                return "Artillery";
+                return Messages.message("model.unit.artillery");
             case DAMAGED_ARTILLERY:
-                return "Damaged Artillery";
+                return Messages.message("model.unit.damagedArtillery");
             case TREASURE_TRAIN:
-                return "Treasure Train";
+                return Messages.message("model.unit.treasureTrain");
             case WAGON_TRAIN:
-                return "Wagon Train";
+                return Messages.message("model.unit.wagonTrain");        
             case MILKMAID:
-                return "Milkmaid";
+                return Messages.message("model.unit.milkmaid");
             default:
                 throw new IllegalArgumentException("Unit has an invalid type.");
         }
