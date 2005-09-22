@@ -496,7 +496,7 @@ public class TransportMission extends Mission {
 
         // Try training the unit:
         if (unitType != Unit.ARTILLERY && Unit.getPrice(unitType) >= 0 && player.getGold() >= Unit.getPrice(unitType)
-                || player.getGold() >= europe.getArtilleryPrice()) {
+                || unitType == Unit.ARTILLERY && player.getGold() >= europe.getArtilleryPrice()) {
             Element trainUnitInEuropeElement = Message.createNewRootElement("trainUnitInEurope");
             trainUnitInEuropeElement.setAttribute("unitType", Integer.toString(unitType));
             try {
