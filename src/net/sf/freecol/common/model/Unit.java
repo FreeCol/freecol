@@ -1354,7 +1354,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
                 getGoodsDumpLocation().removeGoods(Goods.MUSKETS, 50);
                 armed = true;
-            } else if (location instanceof Europe) {
+            } else if (isInEurope()) {
                 getGame().getMarket().buy(Goods.MUSKETS, 50, getOwner());
                 armed = true;
             } else {
@@ -1365,7 +1365,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
             if (getGoodsDumpLocation() != null) {
                 getGoodsDumpLocation().addGoods(Goods.MUSKETS, 50);
-            } else if (location instanceof Europe) {
+            } else if (isInEurope()) {
                 getGame().getMarket().sell(Goods.MUSKETS, 50, getOwner());
             } else {
                 throw new IllegalStateException();
@@ -1421,7 +1421,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
                 getGoodsDumpLocation().removeGoods(Goods.HORSES, 50);
                 mounted = true;
-            } else if (location instanceof Europe) {
+            } else if (isInEurope()) {
                 getGame().getMarket().buy(Goods.HORSES, 50, getOwner());
                 mounted = true;
             } else {
@@ -1432,7 +1432,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
             if (getGoodsDumpLocation() != null) {
                 getGoodsDumpLocation().addGoods(Goods.HORSES, 50);
-            } else if (location instanceof Europe) {
+            } else if (isInEurope()) {
                 getGame().getMarket().sell(Goods.HORSES, 50, getOwner());
             }
         }
@@ -1455,6 +1455,16 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         return mounted;
     }
 
+    
+    /**
+    * Checks if this <code>Unit</code> is located in Europe.
+    * That is; either directly or onboard a carrier which is in Europe.
+    * @return The result.
+    */
+    public boolean isInEurope() {
+        return getTile() == null;
+    }
+
 
     /**
     * Sets the unit to be a missionary.
@@ -1465,9 +1475,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         setMovesLeft(0);
 
         if (b) {
-            if (!(getLocation() instanceof Europe)
-                    && (!(getLocation() instanceof Unit) || !(((Unit) getLocation()).getLocation() instanceof Europe))
-                    && !getTile().getColony().getBuilding(Building.CHURCH).isBuilt()) {
+            if (!isInEurope() && !getTile().getColony().getBuilding(Building.CHURCH).isBuilt()) {
                 throw new IllegalStateException("Can only dress as a missionary when the unit is located in Europe or a Colony with a church.");
             } else {
                 if (isPioneer()) {
@@ -1562,7 +1570,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                if (changeAmount <= 0) return;
                getGoodsDumpLocation().removeGoods(Goods.TOOLS, changeAmount);
                this.numberOfTools = this.numberOfTools + changeAmount;
-            } else if (location instanceof Europe) {
+            } else if (isInEurope()) {
                int maximumAmount = ((getOwner().getGold()) / (getGame().getMarket().costToBuy(Goods.TOOLS)));
                if (maximumAmount < changeAmount) changeAmount = maximumAmount;
                if ((this.numberOfTools + changeAmount) % 20 > 0) changeAmount -= (this.numberOfTools + changeAmount)%20;
@@ -1577,7 +1585,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
             if (getGoodsDumpLocation() != null) {
                 getGoodsDumpLocation().addGoods(Goods.TOOLS, -changeAmount);
-            } else if (location instanceof Europe) {
+            } else if (isInEurope()) {
                 getGame().getMarket().sell(Goods.TOOLS, -changeAmount, getOwner());
             }
         }
