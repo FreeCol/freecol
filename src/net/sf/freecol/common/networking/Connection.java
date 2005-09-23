@@ -3,8 +3,9 @@ package net.sf.freecol.common.networking;
 
 import java.io.InputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.OutputStream;
 import java.io.StringWriter;
+import java.io.PrintWriter;
 import java.net.Socket;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -37,7 +38,7 @@ public class Connection {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    private final PrintWriter out;
+    private final OutputStream out;
     private final InputStream in;
     private final Socket socket;
     private final Transformer xmlTransformer;
@@ -80,7 +81,7 @@ public class Connection {
         this.messageHandler = messageHandler;
         this.socket = socket;
 
-        out = new PrintWriter(socket.getOutputStream(), true);
+        out = socket.getOutputStream();
         in = socket.getInputStream();
 
         Transformer myTransformer;
@@ -161,8 +162,7 @@ public class Connection {
                 logger.warning(sw.toString());
             }
 
-            //out.print(convertElementToString(element) + '\n');
-            out.print('\n');
+            out.write('\n');
             out.flush();
         }
     }

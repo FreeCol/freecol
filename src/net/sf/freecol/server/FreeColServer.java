@@ -415,11 +415,11 @@ public final class FreeColServer {
         try {
             TransformerFactory factory = TransformerFactory.newInstance();
             Transformer xmlTransformer = factory.newTransformer();
-            xmlTransformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            xmlTransformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
 
             if (DEBUG) {
                 // No compression
-                PrintWriter out = new PrintWriter(new FileOutputStream(file));
+                OutputStream out = new FileOutputStream(file);
                 xmlTransformer.transform(new DOMSource(savedGameElement), new StreamResult(out));
                 out.close();
             } else {
@@ -442,18 +442,18 @@ public final class FreeColServer {
     * @return The username of the player saving the game.
     */
     public String loadGame(File file) throws IOException {
-        BufferedReader in;
+        InputStream in;
         if (DEBUG) {
             // No compression
-            in = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+            in = new FileInputStream(file);
         } else {
             // Compression
-            in = new BufferedReader(new InputStreamReader(new InflaterInputStream(new FileInputStream(file))));
+            in = new InflaterInputStream(new FileInputStream(file));
         }
 
         Message message;
         try {
-            message = new Message(in.readLine());
+            message = new Message(in);
         } catch (SAXException sxe) {
             // Error generated during parsing
             Exception  x = sxe;
