@@ -562,6 +562,8 @@ public class AIPlayer extends AIObject {
                 if (is.getUnitCount() > 2) {
                     int defenders = is.getTile().getUnitCount();
                     int threat = 0;
+                    int worstThreat = 0;
+                    FreeColGameObject bestTarget = null;
 
                     Iterator positionIterator = map.getCircleIterator(is.getTile().getPosition(), true, 2);
                     while (positionIterator.hasNext()) {
@@ -571,9 +573,25 @@ public class AIPlayer extends AIObject {
                                 defenders++;
                             } else {
                                 if (player.getTension(t.getFirstUnit().getOwner()) >= Player.TENSION_ADD_MAJOR) {
-                                    threat = 2;
+                                    threat += 2;
+                                    if (t.getUnitCount() * 2 > worstThreat) {
+                                        if (t.getSettlement() != null) {
+                                            bestTarget = t.getSettlement();
+                                        } else {
+                                            bestTarget = t.getFirstUnit();
+                                        }
+                                        worstThreat = t.getUnitCount() * 2;
+                                    }
                                 } else if (player.getTension(t.getFirstUnit().getOwner()) >= Player.TENSION_ADD_MINOR){
-                                    threat = 1;
+                                    threat += 1;
+                                    if (t.getUnitCount() > worstThreat) {
+                                        if (t.getSettlement() != null) {
+                                            bestTarget = t.getSettlement();
+                                        } else {
+                                            bestTarget = t.getFirstUnit();
+                                        }
+                                        worstThreat = t.getUnitCount();
+                                    }
                                 }
                             }
                         }
@@ -584,8 +602,11 @@ public class AIPlayer extends AIObject {
                         newDefender.setState(Unit.ACTIVE);                        
                         newDefender.setLocation(is.getTile());
                         AIUnit newDefenderAI = (AIUnit) getAIMain().getAIObject(newDefender);
-                        // TODO: Use a mission like; InterceptUnitMission, SeekAndDestroyMission....
-                        newDefenderAI.setMission(new UnitWanderHostileMission(getAIMain(), newDefenderAI));
+                        if (bestTarget != null) {
+                            newDefenderAI.setMission(new UnitSeekAndDestroyMission(getAIMain(), newDefenderAI, bestTarget));
+                        } else {
+                            newDefenderAI.setMission(new UnitWanderHostileMission(getAIMain(), newDefenderAI));
+                        }
                     }
                 }
             }
