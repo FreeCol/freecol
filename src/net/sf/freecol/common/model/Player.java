@@ -1178,6 +1178,9 @@ public class Player extends FreeColGameObject {
         Iterator colonyIterator = getColonyIterator();
         while (colonyIterator.hasNext()) {
             Colony colony = (Colony) colonyIterator.next();
+            if (colony == null || colony.getBuilding(Building.DOCK) == null) {
+                continue; // This has happened before, oddly ~ smelenchuk
+            } 
             int distance;
             if (colony.getBuilding(Building.DOCK).getLevel() >= Building.SHOP &&
                     (distance = unit.getTile().getDistanceTo(colony.getTile())) < shortestDistance) {

@@ -2836,7 +2836,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         return modified_power;
     }
 
-
     /**
     * Attack a unit with the given outcome.
     *
@@ -2971,8 +2970,15 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             } else if (isNaval()) {
                 if (type==PRIVATEER || type==FRIGATE || type==MAN_O_WAR) { // can capture goods; regardless attacking/defending
                     Iterator iter = defender.getGoodsIterator();
-                    if(iter.hasNext()) {
-                        //TODO: show CaptureGoodsDialog
+                    while(iter.hasNext() && getSpaceLeft() > 0) {
+                        // TODO: show CaptureGoodsDialog if there's not enough
+                        // room for everything.
+                        Goods g = ((Goods)iter.next());
+                        
+                        // MESSY, but will mess up the iterator if we do this
+                        // besides, this gets cleared out later
+                        //defender.getGoodsContainer().removeGoods(g);
+                        getGoodsContainer().addGoods(g); 
                     }
                 }
 
