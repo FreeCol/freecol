@@ -157,7 +157,7 @@ public final class InGameController implements NetworkConstants {
                     );
             }
 
-            freeColClient.getInGameController().nextActiveUnit();
+            nextActiveUnit();
         }
     }
 

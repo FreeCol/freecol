@@ -118,7 +118,6 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
     boolean displayColonyValue = false;
 
 
-
     /**
     * The constructor to use.
     *
@@ -349,7 +348,8 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
         //TODO: update only within the bounds of InfoPanel
         freeColClient.getCanvas().repaint(0, 0, getWidth(), getHeight());
 
-        if (activeUnit != null && !activeUnit.getTile().getPosition().equals(selectedTile)) {
+        //if (activeUnit != null && !activeUnit.getTile().getPosition().equals(selectedTile)) {
+        if (activeUnit != null) {
             setSelectedTile(activeUnit.getTile().getPosition());
         }
     }
@@ -1652,7 +1652,11 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
                 leftOffset = (int) bounds.getWidth() - (gameData.getMap().getWidth() - focus.getX() - 1) * tileWidth - tileWidth / 2;
             }
         } else {
-            leftOffset = (int) (bounds.getWidth() / 2);
+            if ((focus.getY() % 2) == 0) {
+                leftOffset = (int) (bounds.getWidth() / 2);
+            } else {
+                leftOffset = (int) (bounds.getWidth() / 2) + tileWidth / 2;;
+            }
         }
 
         int topOffset;
@@ -2104,7 +2108,6 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
                 }
             }
         }
-
         return new Map.Position(focus.getX() - diffLeft, focus.getY() - diffUp);
     }
 
