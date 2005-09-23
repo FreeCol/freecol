@@ -4,18 +4,22 @@ The main package of the ai package tree.
 
 <br><br>
 
-The main AI-class is {@link net.sf.freecol.server.ai.AIMain}.
+{@link net.sf.freecol.server.ai.AIMain} has
+the responsibility for creating and managing AI-objects.
+
+An instance of {@link net.sf.freecol.server.ai.AIObject} stores AI-specific information
+relating to a single <code>FreeColGameObject</code>.
 
 <br><br>
-
-The super class of the AI-objects that are linked to a <code>FreeColGameObject</code>
-is {@link net.sf.freecol.server.ai.AIObject}.
-
+<br><b>Communication with the server</b>
 <br><br>
-
-The main class for a given AI-player is {@link net.sf.freecol.server.ai.AIPlayer}.
-When it is an AI-player's turn, the method {@link net.sf.freecol.server.ai.AIPlayer#startWorking}
-gets called for each AI-controlled player.
+The server uses a <code>Connection</code> when communicating with the clients.
+The subclass {@link net.sf.freecol.server.networking.DummyConnection DummyConnection}
+is used for the computer controlled players, in order to avoid unnecessary network traffic.
+{@link AIInGameInputHandler} handles the messages received on the <code>DummyConnection</code>
+and calls the appropriate methods in {@link AIPlayer}. An example: the method
+{@link net.sf.freecol.server.ai.AIPlayer#startWorking} gets invoked when it is the
+AI-player's turn.
 
 </body>
 </html>
