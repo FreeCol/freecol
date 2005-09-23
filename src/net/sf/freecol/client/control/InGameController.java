@@ -534,7 +534,7 @@ public final class InGameController implements NetworkConstants {
         Game game = freeColClient.getGame();
         Map map = game.getMap();
 
-        if (unit.getType() == Unit.ARTILLERY || unit.getType() == Unit.DAMAGED_ARTILLERY) {
+        if (unit.getType() == Unit.ARTILLERY || unit.getType() == Unit.DAMAGED_ARTILLERY || unit.isNaval()) {
             freeColClient.playSound(SfxLibrary.ARTILLERY);
         }
 
@@ -548,7 +548,6 @@ public final class InGameController implements NetworkConstants {
         int result = Integer.parseInt(attackResultElement.getAttribute("result"));
         int plunderGold = Integer.parseInt(attackResultElement.getAttribute("plunderGold"));
         Tile newTile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
-
         // If a successful attack against a colony, we need to update the tile:
         Element utElement = getChildElement(attackResultElement, Tile.getXMLElementTagName());
         if (utElement != null) {
@@ -571,8 +570,34 @@ public final class InGameController implements NetworkConstants {
             throw new NullPointerException("defender == null");
         }
 
-        unit.attack(defender, result, plunderGold);
+        if (!unit.isNaval()) { 
+            Unit winner;
+            if (result >= Unit.ATTACK_EVADES) {
+                winner = unit;
+            } else {
+                winner = defender;
+            }
+            if (winner.isArmed()) {
+                if (winner.isMounted()) {
+                    if (winner.getType() == Unit.BRAVE) {
+                        freeColClient.playSound(SfxLibrary.MUSKETSHORSES);
+                    } else {
+                        freeColClient.playSound(SfxLibrary.DRAGOON);
+                    }
+                } else {
+                        freeColClient.playSound(SfxLibrary.ATTACK);
+                }
+            } else if (winner.isMounted()) {
+                freeColClient.playSound(SfxLibrary.DRAGOON);
+            } 
+         } else {
+            if (result >= Unit.ATTACK_GREAT_WIN || result <= Unit.ATTACK_GREAT_LOSS) {
+                freeColClient.playSound(SfxLibrary.SUNK);
+            } 
+         } 
 
+
+        unit.attack(defender, result, plunderGold);
         if (!defender.isDisposed() && (defender.getLocation() == null || !defender.isVisibleTo(freeColClient.getMyPlayer()))) {
             defender.dispose();
         }

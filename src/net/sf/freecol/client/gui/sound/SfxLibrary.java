@@ -21,6 +21,10 @@ public final class SfxLibrary extends SoundLibrary {
     public static final int LOAD_CARGO = 3;
     public static final int SELL_CARGO = 4;
     public static final int ARTILLERY = 5;
+    public static final int HORSES = 6;
+    public static final int MUSKETSHORSES = 7;
+    public static final int DRAGOON = 8;
+    public static final int SUNK = 9;
 
     
     /**
