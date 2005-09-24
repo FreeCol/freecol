@@ -2857,6 +2857,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             throw new NullPointerException();
         }
 
+        // Wake up if you're attacking something.
+        // Before, a unit could stay fortified during execution of an
+        // attack. - sjm
+        state = ACTIVE;
         movesLeft = 0;
 
         Tile newTile = defender.getTile();
