@@ -128,7 +128,7 @@ public abstract class Mission extends AIObject {
         moveElement.setAttribute("direction", Integer.toString(direction));
 
         try {
-            connection.send(moveElement);
+            connection.sendAndWait(moveElement);
         } catch (IOException e) {
             logger.warning("Could not send \"move\"-message!");
         }

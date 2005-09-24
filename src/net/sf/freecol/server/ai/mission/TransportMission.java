@@ -281,7 +281,7 @@ public class TransportMission extends Mission {
                     Element moveToAmericaElement = Message.createNewRootElement("moveToAmerica");
                     moveToAmericaElement.setAttribute("unit", carrier.getID());
                     try {
-                        connection.send(moveToAmericaElement);
+                        connection.sendAndWait(moveToAmericaElement);
                     } catch (IOException e) {
                         logger.warning("Could not send \"moveToAmericaElement\"-message!");
                     }
@@ -331,7 +331,7 @@ public class TransportMission extends Mission {
                         Element moveToEuropeElement = Message.createNewRootElement("moveToEurope");
                         moveToEuropeElement.setAttribute("unit", carrier.getID());
                         try {
-                            connection.send(moveToEuropeElement);
+                            connection.sendAndWait(moveToEuropeElement);
                         } catch (IOException e) {
                             logger.warning("Could not send \"moveToEuropeElement\"-message!");
                         }
@@ -652,7 +652,7 @@ public class TransportMission extends Mission {
                             Element leaveShipElement = Message.createNewRootElement("leaveShip");
                             leaveShipElement.setAttribute("unit", u.getID());
                             try {
-                                connection.send(leaveShipElement);
+                                connection.sendAndWait(leaveShipElement);
                             } catch (IOException e) {
                                 logger.warning("Could not send \"leaveShipElement\"-message!");
                             }
@@ -681,7 +681,7 @@ public class TransportMission extends Mission {
                         Element sellGoodsElement = Message.createNewRootElement("sellGoods");
                         sellGoodsElement.appendChild(ag.getGoods().toXMLElement(carrier.getOwner(), sellGoodsElement.getOwnerDocument()));
                         try {
-                            connection.send(sellGoodsElement);
+                            connection.sendAndWait(sellGoodsElement);
                             tli.remove();
                             ag.dispose();
                             transportListChanged = true;
@@ -692,7 +692,7 @@ public class TransportMission extends Mission {
                         Element unloadCargoElement = Message.createNewRootElement("unloadCargo");
                         unloadCargoElement.appendChild(ag.getGoods().toXMLElement(carrier.getOwner(), unloadCargoElement.getOwnerDocument()));
                         try {
-                            connection.send(unloadCargoElement);
+                            connection.sendAndWait(unloadCargoElement);
                             tli.remove();
                             ag.dispose();
                             transportListChanged = true;

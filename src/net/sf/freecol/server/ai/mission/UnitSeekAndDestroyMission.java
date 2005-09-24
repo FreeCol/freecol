@@ -75,7 +75,7 @@ public class UnitSeekAndDestroyMission extends Mission {
                     element.setAttribute("direction", Integer.toString(direction));
 
                     try {
-                        connection.send(element);
+                        Element reply = connection.ask(element);
                     } catch (IOException e) {
                         logger.warning("Could not send message!");
                     }
@@ -86,7 +86,7 @@ public class UnitSeekAndDestroyMission extends Mission {
                     element.setAttribute("direction", Integer.toString(direction));
 
                     try {
-                        connection.send(element);
+                        connection.sendAndWait(element);
                     } catch (IOException e) {
                         logger.warning("Could not send message!");
                     }

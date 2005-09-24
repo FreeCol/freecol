@@ -70,7 +70,7 @@ public class UnitWanderHostileMission extends Mission {
                 element.setAttribute("direction", Integer.toString(direction));
 
                 try {
-                    connection.send(element);
+                    Element reply = connection.ask(element);
                 } catch (IOException e) {
                     logger.warning("Could not send message!");
                 }

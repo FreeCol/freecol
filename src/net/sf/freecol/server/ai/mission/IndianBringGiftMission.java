@@ -102,7 +102,7 @@ public class IndianBringGiftMission extends Mission {
                 deliverGiftElement.appendChild(((Goods) getUnit().getGoodsIterator().next()).toXMLElement(null, deliverGiftElement.getOwnerDocument()));
 
                 try {
-                    connection.send(deliverGiftElement);
+                    connection.sendAndWait(deliverGiftElement);
                 } catch (IOException e) {
                     logger.warning("Could not send \"deliverGift\"-message!");
                 }
