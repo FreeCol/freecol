@@ -102,7 +102,7 @@ public class BuildColonyMission extends Mission {
     * Returns the destination for this <code>Transportable</code>.
     * This can either be the target {@link Tile} of the transport
     * or the target for the entire <code>Transportable</code>'s
-    * mission. The target for the tansport is determined by
+    * mission. The target for the transport is determined by
     * {@link TransportMission} in the latter case.
     *
     * @return The destination for this <codeTransportable</code>.

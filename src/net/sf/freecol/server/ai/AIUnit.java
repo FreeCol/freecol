@@ -244,6 +244,8 @@ public class AIUnit extends AIObject implements Transportable {
                     mission = new TransportMission(getAIMain(), missionElement);
                 } else if (missionElement.getTagName().equals(WishRealizationMission.getXMLElementTagName())) {
                     mission = new WishRealizationMission(getAIMain(), missionElement);
+                } else if (missionElement.getTagName().equals(UnitSeekAndDestroyMission.getXMLElementTagName())) {
+                    mission = new UnitSeekAndDestroyMission(getAIMain(), missionElement);
                 } else {
                     logger.warning("Could not find mission-class for: " + missionElement.getTagName());
                     mission = new UnitWanderHostileMission(getAIMain(), this);
