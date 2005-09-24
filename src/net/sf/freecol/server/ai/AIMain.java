@@ -249,6 +249,8 @@ public class AIMain implements FreeColGameObjectListener {
                 addAIObject(childElement.getAttribute("ID"), new AIGoods(this, childElement));
             } else if (childElement.getTagName().equals(WorkerWish.getXMLElementTagName())) {
                 addAIObject(childElement.getAttribute("ID"), new WorkerWish(this, childElement));
+           } else if (childElement.getTagName().equals(GoodsWish.getXMLElementTagName())) {
+                addAIObject(childElement.getAttribute("ID"), new GoodsWish(this, childElement));
             } else {
                 logger.warning("Unkown AI-object read: " + childElement.getTagName());
             }

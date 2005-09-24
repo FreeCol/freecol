@@ -398,6 +398,13 @@ public class TransportMission extends Mission {
                 if (!aiColonies.contains(ac)) {
                     aiColonies.add(ac);
                 }
+            } else if (w instanceof GoodsWish) {
+                GoodsWish gw = (GoodsWish) w;
+                Colony c = (Colony) gw.getDestination();
+                AIColony ac = (AIColony) getAIMain().getAIObject(c);
+                if (!aiColonies.contains(ac)) {
+                    aiColonies.add(ac);
+                }
             } else {
                 logger.warning("Unknown type of wish: " + w);
             }
@@ -422,6 +429,14 @@ public class TransportMission extends Mission {
                         newUnit.setMission(new WishRealizationMission(getAIMain(), newUnit, ww));
                         ww.setTransportable(newUnit);
                         addToTransportList(newUnit);
+                        space--;
+                    }
+                } else if (w instanceof GoodsWish) {
+                    GoodsWish gw = (GoodsWish) w;
+                    AIGoods ag = new AIGoods(getAIMain(), null, gw.getGoodsType(), 100, gw.getDestination());
+                    if (ag != null) {
+                        gw.setTransportable(ag);
+                        addToTransportList(ag);
                         space--;
                     }
                 } else {
@@ -513,7 +528,6 @@ public class TransportMission extends Mission {
 
         return null;
     }
-
 
     /**
     * Returns the path the carrier should use to get/drop the given <code>Transportable</code>.

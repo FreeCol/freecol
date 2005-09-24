@@ -738,7 +738,7 @@ public class AIPlayer extends AIObject {
                 // Actually go through and arm our people.
                 boolean needMuskets = false;
                 boolean needHorses = false;
-//                while (recruitCount > 0) {
+
                     ui = recruits.iterator();
                     while (ui.hasNext() && recruitCount > 0) {
 
@@ -799,14 +799,54 @@ public class AIPlayer extends AIObject {
                             break;
                         }
                     }
-//                    if (needMuskets == true) break;
-//                }
 
-                if (needMuskets) {
-                    //TODO: make a GoodsWish
+                AIColony ac = null;
+                if (needMuskets || needHorses) {
+                    Iterator aIterator = getAIColonyIterator();
+                    while (aIterator.hasNext()) {
+                        AIColony temp = (AIColony)aIterator.next();
+                        if (temp != null && temp.getColony() == colony) {
+                            ac = temp;
+                            break;
+                        }
+                    }
                 }
-                if (needHorses) {
-                    //TODO: make a GoodsWish
+
+                if (needMuskets && ac != null) {
+                    // Check and see if we have already made a GoodsWish for here.
+                    Iterator wishes = ac.getWishIterator();
+                    boolean made = false;
+                    while (wishes.hasNext()) {
+                        GoodsWish gw = (GoodsWish)wishes.next();
+                        if (gw == null) {
+                            continue;
+                        }
+                        if (gw.getGoodsType() == Goods.MUSKETS) {
+                            made = true;
+                        }
+                    }
+                    if (made == false) {
+                        //Add a new GoodsWish onto the stack.
+                        ac.addGoodsWish(new GoodsWish(getAIMain(), colony, (threat - olddefenders) * 50, Goods.MUSKETS));
+                    }
+                }
+                if (needHorses && ac != null) {
+                    // Check and see if we have already made a GoodsWish for here.
+                    Iterator wishes = ac.getWishIterator();
+                    boolean made = false;
+                    while (wishes.hasNext()) {
+                        GoodsWish gw = (GoodsWish)wishes.next();
+                        if (gw == null) {
+                            continue;
+                        }
+                        if (gw.getGoodsType() == Goods.HORSES) {
+                            made = true;
+                        }
+                    }
+                    if (made == false) {
+                        //Add a new GoodsWish onto the stack.
+                        ac.addGoodsWish(new GoodsWish(getAIMain(), colony, (threat - defenders) * 50, Goods.HORSES));
+                    }
                 }
 
                 defenders = olddefenders;

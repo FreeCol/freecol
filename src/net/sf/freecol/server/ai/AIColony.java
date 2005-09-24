@@ -199,8 +199,9 @@ public class AIColony extends AIObject {
 
         Iterator wishIterator = wishes.iterator();
         while (wishIterator.hasNext()) {
-            WorkerWish ww = (WorkerWish) wishIterator.next();
-            if (ww.getTransportable() != null) {
+            Wish w = (Wish) wishIterator.next();
+            if (w instanceof WorkerWish) {
+                WorkerWish ww = (WorkerWish) w;
                 Iterator newWishIterator = newWishes.iterator();
                 boolean wishFound = false;
                 while (!wishFound && newWishIterator.hasNext()) {
@@ -212,6 +213,13 @@ public class AIColony extends AIObject {
                 }
                 if (!wishFound) {
                     ((AIUnit) ww.getTransportable()).setMission(null);
+                }
+            }
+            if (w instanceof GoodsWish) {
+                GoodsWish gw = (GoodsWish) w;
+                //TODO: check for a certain required amount?
+                if (getColony().getGoodsCount(gw.getGoodsType()) == 0) {
+                    newWishes.add(gw);
                 }
             }
         }
@@ -226,6 +234,13 @@ public class AIColony extends AIObject {
     public void createAIGoods() {
         createExportAIGoodsList();
         // TODO: createGoodsWishes()
+    }
+
+    /**
+    * Add a <code>GoodsWish</code> to the wish list. 
+    */
+    public void addGoodsWish(GoodsWish gw) {
+        wishes.add(gw);
     }
 
 
