@@ -112,8 +112,9 @@ public final class MetaServer extends Thread {
                 mr.removeDeadServers();
             }
         };
-        new Timer(REMOVE_DEAD_SERVERS_INTERVAL, deadServerRemover).start();
-
+        Timer timer = new Timer(REMOVE_DEAD_SERVERS_INTERVAL, deadServerRemover);
+        timer.setRepeats(true);
+        timer.start();
     }
 
 
