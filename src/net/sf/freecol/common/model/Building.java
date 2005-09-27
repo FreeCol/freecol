@@ -219,14 +219,9 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     *         if the improvement does not exist.
     */
     public String getNextName() {
-        if (getType() == CUSTOM_HOUSE) {
+        if (!canBuildNext()) {
             return null;
         }
-
-        if (level+1 >= FACTORY && !getColony().getOwner().hasFather(FoundingFather.ADAM_SMITH)) {
-            return null;
-        }
-
 
         if (level < MAX_LEVEL) {
             return buildingNames[type][level];
@@ -235,6 +230,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         }
     }
 
+
     /**
     * Gets the number of hammers required for the improved building of the same type.
     *
@@ -242,11 +238,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     *         or -1 if the building does not exist.
     */
     public int getNextHammers() {
-        if (getType() == CUSTOM_HOUSE) {
-            return -1;
-        }
-
-        if (level+1 >= FACTORY && !getColony().getOwner().hasFather(FoundingFather.ADAM_SMITH)) {
+        if (!canBuildNext()) {
             return -1;
         }
 
@@ -257,6 +249,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         }
     }
 
+
     /**
     * Gets the number of tools required for the improved building of the same type.
     *
@@ -264,11 +257,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     *         or -1 if the building does not exist.
     */
     public int getNextTools() {
-        if (getType() == CUSTOM_HOUSE) {
-            return -1;
-        }
-
-        if (level+1 >= FACTORY && !getColony().getOwner().hasFather(FoundingFather.ADAM_SMITH)) {
+        if (!canBuildNext()) {
             return -1;
         }
 
@@ -287,11 +276,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     *         or -1 if the building does not exist.
     */
     public int getNextPop() {
-        if (getType() == CUSTOM_HOUSE) {
-            return -1;
-        }
-
-        if (level+1 >= FACTORY && !getColony().getOwner().hasFather(FoundingFather.ADAM_SMITH)) {
+        if (!canBuildNext()) {
             return -1;
         }
 
@@ -301,6 +286,32 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             return -1;
         }
     }
+
+
+    /**
+    * Checks if this building can have a higher level.
+    * @return If this <code>Building</code> can have a
+    *   higher level and that {@link FoundingFather Adam Smith}
+    *   is present for manufactoring factory level buildings.
+    */
+    public boolean canBuildNext() {
+        if (level >= MAX_LEVEL) {
+            return false;
+        }
+        if (getType() == CUSTOM_HOUSE) {
+            return false;
+        }
+        if (level+1 >= FACTORY && !getColony().getOwner().hasFather(FoundingFather.ADAM_SMITH)
+                && (type == BLACKSMITH || type == TOBACCONIST || type == WEAVER
+                || type == DISTILLER || type == FUR_TRADER || type == ARMORY)) {
+            return false;
+        }
+        if (requiredTable[type][level][0] == -1) {
+            return false;
+        }
+        return true;
+    }
+
 
     /**
     * Checks if the building has been built.
@@ -432,7 +443,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         getColony().updatePopulation();
     }
 
-    
+
     /**
     * Returns the unit type being an expert in this <code>Building</code>.
     *
@@ -441,7 +452,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     * @see ColonyTile#getExpertForProducing
     */
     public int getExpertUnitType() {
-        switch (getType()) {    
+        switch (getType()) {
             case TOWN_HALL:     return Unit.ELDER_STATESMAN;
             case CARPENTER:     return Unit.MASTER_CARPENTER;
             case BLACKSMITH:    return Unit.MASTER_BLACKSMITH;
