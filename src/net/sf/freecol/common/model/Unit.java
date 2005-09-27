@@ -1735,8 +1735,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     */
     public String getName() {
         String name = "";
-        boolean addP = false;        
-        
+        boolean addP = false;
+
         if (isPioneer() && getType() != HARDY_PIONEER) {
             name = Messages.message("model.unit.pioneer") + " (";
             addP = true;
@@ -1748,14 +1748,14 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             }
             addP = true;
         } else if (isMounted() && getType() != SEASONED_SCOUT && getType() != BRAVE) {
-            name = Messages.message("model.unit.scout")+  " (";
+            name = Messages.message("model.unit.scout") +  " (";
             addP = true;
         } else if (isMissionary() && getType() != JESUIT_MISSIONARY) {
             name = Messages.message("model.unit.missionary") + " (";
             addP = true;
         }
 
-        if (!isArmed() && (getType() == KINGS_REGULAR || getType() == COLONIAL_REGULAR || getType() == VETERAN_SOLDIER)) {
+        if (!isArmed() && !isMounted() && (getType() == KINGS_REGULAR || getType() == COLONIAL_REGULAR || getType() == VETERAN_SOLDIER)) {
             name = Messages.message("model.unit.unarmed") + " ";
         }
 
