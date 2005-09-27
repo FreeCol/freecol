@@ -156,7 +156,10 @@ public class TransportMission extends Mission {
     */
     public void addToTransportList(Transportable newTransportable) {
         Unit carrier = getUnit();
-
+        if (newTransportable.getTransportLocatable() instanceof Unit
+                && ((Unit) newTransportable.getTransportLocatable()).isCarrier()) {
+            throw new IllegalArgumentException("You cannot add a carrier to the transport list.");
+        }
         Location newSource = newTransportable.getTransportSource();
         Location newDestination = newTransportable.getTransportDestination();
         if (newDestination == null || (newSource == null && !isCarrying(newTransportable))) {
@@ -410,8 +413,6 @@ public class TransportMission extends Mission {
             }
         }
 
-
-
         for (int i=0; i<aiColonies.size(); i++) {
             AIColony ac = (AIColony) aiColonies.get(i);
             // Assuming that all colonists which can be bought in Europe take the same space:
@@ -433,7 +434,7 @@ public class TransportMission extends Mission {
                     }
                 } else if (w instanceof GoodsWish) {
                     GoodsWish gw = (GoodsWish) w;
-                    AIGoods ag = new AIGoods(getAIMain(), null, gw.getGoodsType(), 100, gw.getDestination());
+                    AIGoods ag = buyGoodsInEurope(connection, gw.getGoodsType(), 100, gw.getDestination());
                     if (ag != null) {
                         gw.setTransportable(ag);
                         addToTransportList(ag);
@@ -443,6 +444,57 @@ public class TransportMission extends Mission {
                     logger.warning("Unknown type of wish: " + w);
                 }
             }
+        }
+
+        // Fill the transport with cheap colonists:
+        int space = getAvailableSpace();
+        while (space > 0) {
+            AIUnit newUnit = getCheapestUnitInEurope(connection);
+            if (newUnit != null) {
+                addToTransportList(newUnit);
+                space--;
+            } else {
+                break;
+            }
+        }
+    }
+
+
+    /**
+    * Buys the given cargo.
+    *
+    * <br><br>
+    *
+    * <b>Warning:</b> This method can only be called
+    * when the carrier is located in {@link Europe}.
+    *
+    * @param type The type of goods to buy.
+    * @param amount The amount of goods to buy.
+    * @param destination The <code>Location</code> to which the goods should be
+    *       transported.
+    * @return The goods.
+    */
+    public AIGoods buyGoodsInEurope(Connection connection, int type, int amount, Location destination) {
+        AIPlayer aiPlayer = (AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getID());
+        Player player = aiPlayer.getPlayer();
+        Europe europe = player.getEurope();
+        Market market = getAIMain().getGame().getMarket();
+
+        if (player.getGold() >= market.getBidPrice(type, amount)) {
+            Element buyGoodsElement = Message.createNewRootElement("buyGoods");
+            buyGoodsElement.setAttribute("carrier", getUnit().getID());
+            buyGoodsElement.setAttribute("type", Integer.toString(type));
+            buyGoodsElement.setAttribute("amount", Integer.toString(amount));
+            try {
+                connection.sendAndWait(buyGoodsElement);
+            } catch (IOException e) {
+                logger.warning("Could not send \"trainUnitInEurope\"-message to the server.");
+                return null;
+            }
+            AIGoods ag = new AIGoods(getAIMain(), getUnit(), type, amount, destination);
+            return ag;
+        } else {
+            return null;
         }
     }
 
@@ -471,7 +523,6 @@ public class TransportMission extends Mission {
     * @return The <code>AIUnit</code>.
     */
     private AIUnit getUnitInEurope(Connection connection, int unitType) {
-        // Check if the given type of unit appear on the docks:
         AIPlayer aiPlayer = (AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getID());
         Player player = aiPlayer.getPlayer();
         Europe europe = player.getEurope();
@@ -480,6 +531,7 @@ public class TransportMission extends Mission {
             throw new IllegalStateException("Carrier not in Europe");
         }
 
+        // Check if the given type of unit appear on the docks:
         Iterator ui = europe.getUnitIterator();
         while (ui.hasNext()) {
             Unit u = (Unit) ui.next();
@@ -489,6 +541,7 @@ public class TransportMission extends Mission {
         }
 
         // Try recruiting the unit:
+        // TODO: Check if it will be cheaper to train the unit instead.
         if (player.getGold() >= player.getRecruitPrice()) {
             for (int i=1; i<=3; i++) {
                 if (europe.getRecruitable(i) == unitType) {
@@ -528,6 +581,66 @@ public class TransportMission extends Mission {
 
         return null;
     }
+
+
+    /**
+    * Returns the cheapest unit which can be bought in <code>Europe</code>.
+    * @return The <code>AIUnit</code>.
+    */
+    private AIUnit getCheapestUnitInEurope(Connection connection) {
+        AIPlayer aiPlayer = (AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getID());
+        Player player = aiPlayer.getPlayer();
+        Europe europe = player.getEurope();
+
+        if (!(getUnit().getLocation() instanceof Europe)) {
+            throw new IllegalStateException("Carrier not in Europe");
+        }
+
+        // Check if there are any units on the docks:
+        Iterator ui = europe.getUnitIterator();
+        while (ui.hasNext()) {
+            Unit u = (Unit) ui.next();
+            if (!u.isCarrier()) {
+                return (AIUnit) getAIMain().getAIObject(u.getID());
+            }
+        }
+
+        // Try recruiting the unit:
+        if (player.getGold() >= player.getRecruitPrice() && player.getRecruitPrice() < Unit.getPrice(Unit.EXPERT_ORE_MINER)) {
+            Element recruitUnitInEuropeElement = Message.createNewRootElement("recruitUnitInEurope");
+            // TODO: Take the best unit (Seasoned scout, pioneer, soldier etc):
+            recruitUnitInEuropeElement.setAttribute("slot", Integer.toString(1));
+            try {
+                Element reply = connection.ask(recruitUnitInEuropeElement);
+                if (reply.getTagName().equals("recruitUnitInEuropeConfirmed")) {
+                    return (AIUnit) getAIMain().getAIObject(((Element) reply.getChildNodes().item(0)).getAttribute("ID"));
+                } else {
+                    logger.warning("Could not recruit the specified unit in europe.");
+                }
+            } catch (IOException e) {
+                logger.warning("Could not send \"recruitUnitInEurope\"-message to the server.");
+            }
+        }
+
+        // Try training the unit:
+        if (player.getGold() >= Unit.getPrice(Unit.EXPERT_ORE_MINER)) {
+            Element trainUnitInEuropeElement = Message.createNewRootElement("trainUnitInEurope");
+            trainUnitInEuropeElement.setAttribute("unitType", Integer.toString(Unit.EXPERT_ORE_MINER));
+            try {
+                Element reply = connection.ask(trainUnitInEuropeElement);
+                if (reply.getTagName().equals("trainUnitInEuropeConfirmed")) {
+                    return (AIUnit) getAIMain().getAIObject(((Element) reply.getChildNodes().item(0)).getAttribute("ID"));
+                } else {
+                    logger.warning("Could not train the specified unit in europe.");
+                }
+            } catch (IOException e) {
+                logger.warning("Could not send \"trainUnitInEurope\"-message to the server.");
+            }
+        }
+
+        return null;
+    }
+
 
     /**
     * Returns the path the carrier should use to get/drop the given <code>Transportable</code>.
@@ -620,6 +733,16 @@ public class TransportMission extends Mission {
     * @return The space available
     */
     public int getAvailableSpace(int unitType, Location source, Location destination) {
+        // TODO: Implement this method properly:
+        return Math.max(0, getUnit().getSpaceLeft() - transportList.size());
+    }
+
+
+    /**
+    * Returns the available space for any type of unit going to any type of location.
+    * @return The space available
+    */
+    public int getAvailableSpace() {
         // TODO: Implement this method properly:
         return Math.max(0, getUnit().getSpaceLeft() - transportList.size());
     }

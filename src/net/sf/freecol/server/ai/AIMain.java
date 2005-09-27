@@ -3,6 +3,8 @@ package net.sf.freecol.server.ai;
 
 import java.util.*;
 import java.util.logging.Logger;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 import net.sf.freecol.common.model.*;
 import net.sf.freecol.common.networking.Message;
@@ -88,13 +90,31 @@ public class AIMain implements FreeColGameObjectListener {
 
     /**
     * Searches for new {@link FreeColGameObject FreeColGameObjects}. An AI-object is
-    * created for each new object.
+    * created for each object.
+    *
+    * <br><br>
+    *
+    * Note: Any existing <code>AIObject</code>s will be overwritten.
+    * @see #findNewObjects(boolean)
     */
     private void findNewObjects() {
+        findNewObjects(true);
+    }
+
+
+    /**
+    * Searches for new {@link FreeColGameObject FreeColGameObjects}. An AI-object is
+    * created for each new object.
+    * @param overwrite Determines wether any old <code>AIObject</code>
+    *       should be overwritten or not.
+    */
+    private void findNewObjects(boolean overwrite) {
         Iterator i = freeColServer.getGame().getFreeColGameObjectIterator();
         while (i.hasNext()) {
             FreeColGameObject fcgo = (FreeColGameObject) i.next();
-            setFreeColGameObject(fcgo.getID(), fcgo);
+            if (overwrite || getAIObject(fcgo) == null) {
+                setFreeColGameObject(fcgo.getID(), fcgo);
+            }
         }
     }
 
@@ -215,7 +235,13 @@ public class AIMain implements FreeColGameObjectListener {
                 continue;
             }
 
-            element.appendChild(aio.toXMLElement(document));
+            try {
+                element.appendChild(aio.toXMLElement(document));
+            } catch (Exception e) {
+                StringWriter sw = new StringWriter();
+                e.printStackTrace(new PrintWriter(sw));
+                logger.warning(sw.toString());
+            }
         }
 
         return element;
@@ -270,6 +296,9 @@ public class AIMain implements FreeColGameObjectListener {
                 ao.readFromXMLElement(childElement);
             }
         }
+
+        // This should not be necessary - but just in case:
+        findNewObjects(false);
     }
 
 

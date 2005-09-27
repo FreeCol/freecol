@@ -817,7 +817,11 @@ public class AIPlayer extends AIObject {
                     Iterator wishes = ac.getWishIterator();
                     boolean made = false;
                     while (wishes.hasNext()) {
-                        GoodsWish gw = (GoodsWish)wishes.next();
+                        Wish w = (Wish) wishes.next();
+                        if (!(w instanceof GoodsWish)) {
+                            continue;
+                        }
+                        GoodsWish gw = (GoodsWish) w;
                         if (gw == null) {
                             continue;
                         }
@@ -835,7 +839,11 @@ public class AIPlayer extends AIObject {
                     Iterator wishes = ac.getWishIterator();
                     boolean made = false;
                     while (wishes.hasNext()) {
-                        GoodsWish gw = (GoodsWish)wishes.next();
+                        Wish w = (Wish) wishes.next();
+                        if (!(w instanceof GoodsWish)) {
+                            continue;
+                        }
+                        GoodsWish gw = (GoodsWish) w;
                         if (gw == null) {
                             continue;
                         }
@@ -949,7 +957,12 @@ public class AIPlayer extends AIObject {
             Iterator unitsIterator = player.getUnitIterator();
             while (unitsIterator.hasNext()) {
                 Unit theUnit = (Unit) unitsIterator.next();
-                au.add(getAIMain().getAIObject(theUnit.getID()));
+                AIObject a = getAIMain().getAIObject(theUnit.getID());
+                if (a != null) {
+                    au.add(a);
+                } else {
+                    logger.warning("Could not find the AIUnit for: " + theUnit);
+                }
             }
 
             aiUnits = au;
@@ -958,7 +971,7 @@ public class AIPlayer extends AIObject {
         return aiUnits.iterator();
     }
 
-    
+
     /**
     * Returns an iterator over all the <code>AIColony</code>s
     * owned by this player.

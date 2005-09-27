@@ -151,6 +151,9 @@ public class AIGoods extends AIObject implements Transportable {
 
 
     public void setGoods(Goods goods) {
+        if (goods == null) {
+            throw new NullPointerException();
+        }
         this.goods = goods;
     }
     
