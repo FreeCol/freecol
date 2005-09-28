@@ -11,11 +11,10 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.TransferHandler;
 
-import net.sf.freecol.common.model.Europe;
-import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.ColonyTile;
+import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
 
 /**
 * A DragListener should be attached to Swing components that have a

@@ -3,12 +3,10 @@ package net.sf.freecol.client.gui.panel;
 
 import javax.swing.JComponent;
 
-import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
 
 
 /**
@@ -200,7 +198,7 @@ public final class MapControls {
             return;
         }
 
-        int unitType = selectedOne.getType();
+        //int unitType = selectedOne.getType();
 
         /* Wait
         *  All units can wait

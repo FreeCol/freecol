@@ -2,14 +2,11 @@
 
 package net.sf.freecol.client.gui;
 
+import java.awt.GraphicsDevice;
+import java.util.logging.Logger;
+
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import java.awt.image.BufferStrategy;
-import java.awt.GraphicsDevice;
-import java.awt.Graphics2D;
-import java.awt.Graphics;
-import java.awt.Color;
-import java.util.logging.Logger;
 
 
 /**

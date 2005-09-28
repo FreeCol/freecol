@@ -1,18 +1,16 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import net.sf.freecol.client.gui.Canvas;
-
-import net.sf.freecol.client.gui.i18n.Messages;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.NumberFormatException;
-import java.util.logging.Logger;
 import java.util.LinkedList;
+import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+
+import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.i18n.Messages;
 
 /**
  * This is the panel that pops up when an error needs to be reported.

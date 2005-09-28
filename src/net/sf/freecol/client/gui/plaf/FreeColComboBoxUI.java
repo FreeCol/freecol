@@ -1,8 +1,9 @@
 package net.sf.freecol.client.gui.plaf;
 
-import         javax.swing.plaf.metal.MetalComboBoxUI;
-import         javax.swing.plaf.*;
-import         javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.ListCellRenderer;
+import javax.swing.plaf.ComponentUI;
+import javax.swing.plaf.metal.MetalComboBoxUI;
 
 
 /**

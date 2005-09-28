@@ -1,13 +1,15 @@
 
 package net.sf.freecol.common.model;
 
-import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.option.*;
-
 import java.util.logging.Logger;
-import java.util.*;
 
-import org.w3c.dom.*;
+import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.option.BooleanOption;
+import net.sf.freecol.common.option.IntegerOption;
+import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.common.option.OptionMap;
+
+import org.w3c.dom.Element;
 
 
 /**

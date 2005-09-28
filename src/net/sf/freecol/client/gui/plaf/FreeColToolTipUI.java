@@ -1,9 +1,19 @@
 package net.sf.freecol.client.gui.plaf;
 
-import javax.swing.plaf.basic.*;
-import javax.swing.plaf.*;
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.Rectangle;
+
+import javax.swing.JComponent;
+import javax.swing.JToolTip;
+import javax.swing.UIManager;
+import javax.swing.plaf.ComponentUI;
+import javax.swing.plaf.basic.BasicHTML;
+import javax.swing.plaf.basic.BasicToolTipUI;
 import javax.swing.text.View;
 
 

@@ -1,11 +1,11 @@
 package net.sf.freecol.client.gui.plaf;
 
-import         javax.swing.plaf.basic.BasicPanelUI;
-import         javax.swing.plaf.*;
-import         javax.swing.*;
 import java.awt.Image;
 
+import javax.swing.JComponent;
 import javax.swing.UIManager;
+import javax.swing.plaf.ComponentUI;
+import javax.swing.plaf.basic.BasicPanelUI;
 
 
 /**

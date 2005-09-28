@@ -1,17 +1,16 @@
 
 package net.sf.freecol.common.model;
 
-import net.sf.freecol.client.gui.i18n.Messages;
-
 import java.awt.Color;
-import java.util.Vector;
-import java.util.Iterator;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.MissingResourceException;
 
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.FreeColException;
 
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 
 
@@ -1330,7 +1329,8 @@ public class Player extends FreeColGameObject {
 
                     Iterator childUnitIterator = u.getUnitIterator();
                     while (childUnitIterator.hasNext()) {
-                        Unit childUnit = (Unit) childUnitIterator.next();
+                        //Unit childUnit = (Unit) childUnitIterator.next();
+                    	childUnitIterator.next();
                         count += 2;
                     }
 

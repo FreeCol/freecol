@@ -1,12 +1,14 @@
 
 package net.sf.freecol.common.networking;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.StringWriter;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.Socket;
+import java.util.logging.Logger;
+
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -14,10 +16,9 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import java.util.logging.Logger;
 import net.sf.freecol.common.FreeColException;
 
-import org.w3c.dom.*;
+import org.w3c.dom.Element;
 
 
 

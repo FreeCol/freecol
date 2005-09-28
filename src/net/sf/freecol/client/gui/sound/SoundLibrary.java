@@ -2,8 +2,8 @@
 package net.sf.freecol.client.gui.sound;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import net.sf.freecol.common.FreeColException;
 

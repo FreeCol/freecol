@@ -2,16 +2,16 @@
 package net.sf.freecol.client.gui.panel;
 
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.JButton;
 import javax.swing.JComponent;
 
-import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.action.MapControlsAction;
 import net.sf.freecol.client.FreeColClient;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Unit;
 
 /**
 * A button with a set of images which is used to give commands

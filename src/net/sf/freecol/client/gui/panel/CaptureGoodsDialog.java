@@ -1,16 +1,26 @@
 package net.sf.freecol.client.gui.panel;
 
-import net.sf.freecol.common.model.*;
-import net.sf.freecol.client.gui.i18n.Messages;
-
-import java.awt.event.*;
-import java.awt.*;
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.logging.Logger;
-import java.util.*;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JList;
+import javax.swing.JScrollPane;
+import javax.swing.ListCellRenderer;
+import javax.swing.UIManager;
 
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.Unit;
 
 /**
  * Panel for chosing the goods to capture.

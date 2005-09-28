@@ -1,13 +1,14 @@
 
 package net.sf.freecol.common.logging;
 
-import net.sf.freecol.common.FreeColException;
-import java.util.logging.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.networking.Message;
 
 

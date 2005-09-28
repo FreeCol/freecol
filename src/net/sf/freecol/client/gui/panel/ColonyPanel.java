@@ -1,21 +1,62 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import net.sf.freecol.client.*;
-import net.sf.freecol.client.control.*;
-import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.*;
-import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.model.*;
-
-import javax.swing.*;
-import javax.swing.border.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridLayout;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.dnd.Autoscroll;
-import java.awt.event.*;
-import java.awt.image.*;
-import java.util.*;
-import java.util.logging.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
+import java.util.Iterator;
+import java.util.logging.Logger;
+
+import javax.swing.ComponentInputMap;
+import javax.swing.ImageIcon;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JViewport;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
+
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.InGameController;
+import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.ColonyTile;
+import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
 
 
 /**
@@ -986,7 +1027,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             if (editState) {
                 if (comp instanceof GoodsLabel) {
                     comp.getParent().remove(comp);
-                    Goods g = ((GoodsLabel)comp).getGoods();
+                    //Goods g = ((GoodsLabel)comp).getGoods();
                     ((GoodsLabel) comp).setSmall(false);
                     //inGameController.unloadCargo(g, selectedUnit.getUnit());
                     //colonyPanel.getWarehousePanel().revalidate();
@@ -1009,9 +1050,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         }
 
         public void remove(Component comp) {
-        if (comp instanceof GoodsLabel) {
-                Goods g = ((GoodsLabel)comp).getGoods();
-                //inGameController.leaveShip(unit);
+        	if (comp instanceof GoodsLabel) {
+                //Goods g = ((GoodsLabel)comp).getGoods();
 
                 super.remove(comp);
                 
@@ -1212,7 +1252,6 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
 
         public void initialize() {
-            GUI gui = ((Canvas) parent).getGUI();
             int layer = 2;
 
             for (int x=0; x<3; x++) {
@@ -1387,7 +1426,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             /**
             * Checks if this <code>JComponent</code> contains the given coordinate.
             */
-            public boolean contains(int x, int y) {
+            public boolean contains(int px, int py) {
                 /**
                 * We are assuming the tile size is 128x64.                
                 *
@@ -1411,21 +1450,20 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 */
 
                 int activePixels;
-                boolean returnValue = false;
 
                 // Check if the value is in the rectangle at all.
-                if (!super.contains(x,y)) {
+                if (!super.contains(px,py)) {
                     return false;
                 }
 
-                if (y>=32) {
-                    y = 32 - (y-31);
+                if (py>=32) {
+                    py = 32 - (py-31);
                 }
 
                 // Determine active amount of pixels
-                activePixels = (y * 128) / 64;  // 64 --> /32 /2
+                activePixels = (py * 128) / 64;  // 64 --> /32 /2
                 // Now determine if x is in the diamond.
-                return ( (x >= 63 - activePixels) && (x <= 63 + activePixels) );
+                return ( (px >= 63 - activePixels) && (px <= 63 + activePixels) );
             }
         }
 

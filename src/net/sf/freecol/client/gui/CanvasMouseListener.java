@@ -1,11 +1,11 @@
 
 package net.sf.freecol.client.gui;
 
-import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.PathNode;
+import net.sf.freecol.common.model.Unit;
 
 
 

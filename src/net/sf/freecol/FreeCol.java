@@ -1,27 +1,24 @@
 
 package net.sf.freecol;
 
+import java.awt.Rectangle;
+import java.io.File;
+import java.io.IOException;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 
-import java.awt.Rectangle;
-
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.UIManager;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
-import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.logging.DefaultHandler;
-
-import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
 import net.sf.freecol.client.gui.sound.MusicLibrary;
 import net.sf.freecol.client.gui.sound.SfxLibrary;
-
+import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.logging.DefaultHandler;
 import net.sf.freecol.server.FreeColServer;
-import java.io.IOException;
-import java.io.File;
 
 
 

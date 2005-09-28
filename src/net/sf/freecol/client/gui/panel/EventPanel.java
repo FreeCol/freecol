@@ -1,22 +1,21 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Font;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.logging.Logger;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.UIManager;
+
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
-
-import javax.swing.border.EmptyBorder;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.lang.NumberFormatException;
-import java.util.logging.Logger;
-
-import javax.swing.*;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-
-import cz.autel.dmi.*;
+import cz.autel.dmi.HIGLayout;
 
 /**
  * This panel is displayed when an imporantant event in the game has happened.

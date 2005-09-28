@@ -1,32 +1,41 @@
 
 package net.sf.freecol.client.gui;
 
-import java.util.*;
+import java.awt.AlphaComposite;
+import java.awt.Color;
+import java.awt.Composite;
+import java.awt.Cursor;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.MediaTracker;
+import java.awt.Polygon;
+import java.awt.Rectangle;
+import java.awt.geom.GeneralPath;
+import java.awt.image.BufferedImage;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.Random;
+import java.util.Vector;
 import java.util.logging.Logger;
+
 import javax.swing.ImageIcon;
 import javax.swing.UIManager;
 
-import java.awt.Rectangle;
-import java.awt.Graphics2D;
-import java.awt.Color;
-import java.awt.Image;
-import java.awt.MediaTracker;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.image.BufferedImage;
-import java.awt.AlphaComposite;
-import java.awt.Polygon;
-import java.awt.Composite;
-import java.awt.geom.GeneralPath;
-import java.awt.Cursor;
-
-import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.FreeCol;
-
-import net.sf.freecol.common.*;
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.PathNode;
+import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Map.Position;
-import net.sf.freecol.common.model.*;
 
 
 
@@ -1431,7 +1440,7 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
     *        or <code>null</code> if no path should be drawn.
     */
     public void setDragPath(PathNode dragPath) {
-        PathNode tempPath = this.dragPath;
+        //PathNode tempPath = this.dragPath;
         this.dragPath = dragPath;
 
         freeColClient.getCanvas().refresh();

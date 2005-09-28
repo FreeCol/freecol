@@ -1,12 +1,13 @@
 
 package net.sf.freecol.server.ai;
 
-import net.sf.freecol.common.model.*;
-import net.sf.freecol.common.networking.Message;
+import java.util.Random;
 
-import java.util.*;
+import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.Game;
 
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 
 /**

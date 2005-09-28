@@ -2,25 +2,24 @@
 package net.sf.freecol.client.gui.panel;
 
 
-import java.awt.image.BufferedImage;
-import java.awt.Graphics;
-import java.awt.Image;
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.Color;
-import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
+import net.sf.freecol.client.control.InGameController;
+import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.ColonyTile;
-import net.sf.freecol.client.gui.Canvas;
-
-import net.sf.freecol.client.control.InGameController;
 
 /**
  * This label holds Unit data in addition to the JLabel data, which makes

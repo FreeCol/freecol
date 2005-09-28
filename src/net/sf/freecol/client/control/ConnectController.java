@@ -2,28 +2,30 @@
 package net.sf.freecol.client.control;
 
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.ConnectException;
-import java.util.logging.Logger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
+
 import javax.swing.SwingUtilities;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
-
-import net.sf.freecol.common.model.*;
-import net.sf.freecol.common.networking.Message;
-import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.common.ServerInfo;
-
-import org.w3c.dom.*;
-
-
+import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.FreeColServer;
+
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 
 /**

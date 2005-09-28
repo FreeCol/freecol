@@ -1,9 +1,16 @@
 package net.sf.freecol.client.gui.plaf;
 
-import         javax.swing.plaf.metal.MetalButtonUI;
-import         javax.swing.plaf.*;
-import         javax.swing.*;
-import         java.awt.*;
+import java.awt.AlphaComposite;
+import java.awt.Color;
+import java.awt.Composite;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+
+import javax.swing.AbstractButton;
+import javax.swing.JComponent;
+import javax.swing.plaf.ComponentUI;
+import javax.swing.plaf.metal.MetalButtonUI;
 
 
 /**

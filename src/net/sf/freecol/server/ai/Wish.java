@@ -1,16 +1,12 @@
 
 package net.sf.freecol.server.ai;
 
-import net.sf.freecol.server.ai.mission.*;
-import net.sf.freecol.common.model.*;
-import net.sf.freecol.common.networking.Message;
-import net.sf.freecol.common.networking.Connection;
-
-import org.w3c.dom.*;
 import java.util.logging.Logger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Iterator;
+
+import net.sf.freecol.common.model.Location;
+import net.sf.freecol.server.ai.mission.WishRealizationMission;
+
+import org.w3c.dom.Element;
 
 
 /**

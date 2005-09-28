@@ -5,9 +5,10 @@ import java.io.IOException;
 import java.net.Socket;
 
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.networking.*;
+import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.MessageHandler;
 
-import org.w3c.dom.*;
+import org.w3c.dom.Element;
 
 
 

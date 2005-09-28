@@ -1,40 +1,48 @@
 package net.sf.freecol.client;
 
-import java.util.logging.Logger;
-
-import java.io.*;
-
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.logging.Logger;
 
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
-
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
-
-
-import net.sf.freecol.client.gui.*;
-import net.sf.freecol.client.gui.sound.*;
-import net.sf.freecol.client.control.*;
-import net.sf.freecol.client.networking.*;
-import net.sf.freecol.client.gui.action.ActionManager;
-
-import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Player;
-
-import net.sf.freecol.server.FreeColServer;
-
-import net.sf.freecol.common.networking.Message;
-
-// XML:
-import org.xml.sax.SAXException;
-import org.w3c.dom.*;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
+import net.sf.freecol.client.control.ClientModelController;
+import net.sf.freecol.client.control.ConnectController;
+import net.sf.freecol.client.control.InGameController;
+import net.sf.freecol.client.control.InGameInputHandler;
+import net.sf.freecol.client.control.PreGameController;
+import net.sf.freecol.client.control.PreGameInputHandler;
+import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.FullScreenFrame;
+import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.WindowedFrame;
+import net.sf.freecol.client.gui.action.ActionManager;
+import net.sf.freecol.client.gui.sound.MusicLibrary;
+import net.sf.freecol.client.gui.sound.SfxLibrary;
+import net.sf.freecol.client.gui.sound.SoundPlayer;
+import net.sf.freecol.client.networking.Client;
+import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.server.FreeColServer;
+
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 
 
@@ -124,14 +132,10 @@ public final class FreeColClient {
         modelController = new ClientModelController(this);
 
         // Gui:
-        final boolean theWindowed = windowed;
         final Rectangle theWindowSize = windowSize;
-        final ImageLibrary theImageLibrary = imageLibrary;
-        final MusicLibrary theMusicLibrary = musicLibrary;
-        final SfxLibrary theSfxLibrary = sfxLibrary;
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                startGUI(theWindowed, theWindowSize, theImageLibrary, theMusicLibrary, theSfxLibrary);
+                startGUI(theWindowSize);
             }
         });
 
@@ -181,7 +185,7 @@ public final class FreeColClient {
     /**
     * Starts the GUI by creating and displaying the GUI-objects.
     */
-    private void startGUI(boolean windowed, Rectangle windowSize, ImageLibrary lib, MusicLibrary musicLibrary, SfxLibrary sfxLibrary) {
+    private void startGUI(Rectangle windowSize) {
         if (musicLibrary != null) {
             musicPlayer = new SoundPlayer(false, true, true);
         } else {
@@ -217,7 +221,7 @@ public final class FreeColClient {
             }
         }
 
-        gui = new GUI(this, frame.getBounds(), lib);
+        gui = new GUI(this, frame.getBounds(), imageLibrary);
         canvas = new Canvas(this, frame.getBounds(), gui);
 
         if (frame instanceof WindowedFrame) {

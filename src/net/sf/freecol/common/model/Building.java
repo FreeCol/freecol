@@ -1,15 +1,11 @@
 package net.sf.freecol.common.model;
 
 
-import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Goods;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.w3c.dom.Element;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 

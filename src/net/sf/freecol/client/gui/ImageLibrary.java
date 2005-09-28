@@ -1,24 +1,28 @@
 package net.sf.freecol.client.gui;
 
-import java.util.logging.Logger;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
-import java.awt.image.BufferedImage;
 import java.awt.geom.GeneralPath;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.URL;
 import java.util.Hashtable;
 import java.util.Vector;
+import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 
-import net.sf.freecol.common.model.*;
-import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.client.gui.panel.ImageProvider;
+import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
 
 
 /**
@@ -943,12 +947,11 @@ public final class ImageLibrary extends ImageProvider {
                 return COLONY_LARGE;
             }
 
-        } else {  // IndianSettlement
-            IndianSettlement indianSettlement = (IndianSettlement) settlement;
-
+        } else {  // IndianSettlement            
             return INDIAN_SETTLEMENT_CAMP;
 
             /* TODO: Use when we have graphics:
+            IndianSettlement indianSettlement = (IndianSettlement) settlement;
             if (indianSettlement.getKind() == IndianSettlement.CAMP) {
                 return INDIAN_SETTLEMENT_CAMP;
             } else if (indianSettlement.getKind() == IndianSettlement.VILLAGE) {

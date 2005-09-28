@@ -5,15 +5,14 @@ import java.awt.Color;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.logging.Logger;
-import org.w3c.dom.Element;
-
 
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.Connection;
-
+import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
+
+import org.w3c.dom.Element;
 
 
 

@@ -4,14 +4,18 @@ package net.sf.freecol.client.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.logging.Logger;
 import java.util.Iterator;
+import java.util.logging.Logger;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import net.sf.freecol.common.model.*;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
 
 
 /**

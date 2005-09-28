@@ -1,28 +1,46 @@
 
 package net.sf.freecol.client.gui;
 
+import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.awt.geom.Rectangle2D;
+import java.util.Iterator;
+
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
+
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.action.ActionManager;
+import net.sf.freecol.client.gui.action.BuildColonyAction;
+import net.sf.freecol.client.gui.action.BuildRoadAction;
+import net.sf.freecol.client.gui.action.ChangeAction;
+import net.sf.freecol.client.gui.action.ChatAction;
+import net.sf.freecol.client.gui.action.ClearOrdersAction;
+import net.sf.freecol.client.gui.action.DisbandUnitAction;
+import net.sf.freecol.client.gui.action.EndTurnAction;
+import net.sf.freecol.client.gui.action.EuropeAction;
+import net.sf.freecol.client.gui.action.FortifyAction;
+import net.sf.freecol.client.gui.action.MapControlsAction;
+import net.sf.freecol.client.gui.action.PlowAction;
+import net.sf.freecol.client.gui.action.SkipUnitAction;
+import net.sf.freecol.client.gui.action.WaitAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ColopediaPanel;
 import net.sf.freecol.client.gui.panel.ReportForeignAffairPanel;
 import net.sf.freecol.client.gui.panel.ReportIndianPanel;
 import net.sf.freecol.client.gui.panel.ReportLabourPanel;
 import net.sf.freecol.client.gui.panel.ReportReligiousPanel;
-import net.sf.freecol.client.gui.action.*;
-import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.FreeCol;
-
-import java.awt.geom.*;
-import java.awt.*;
-import javax.swing.*;
-
-import java.awt.event.*;
-import java.util.Iterator;
-import java.util.ArrayList;
-import java.util.List;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
 
 
 /**
@@ -456,8 +474,8 @@ public class FreeColMenuBar extends JMenuBar {
             useAI.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     if (freeColClient.getFreeColServer() != null) {
-                        net.sf.freecol.server.ai.AIMain am = freeColClient.getFreeColServer().getAIMain();
-                        net.sf.freecol.server.ai.AIPlayer ap = (net.sf.freecol.server.ai.AIPlayer) am.getAIObject(freeColClient.getMyPlayer().getID());
+                        net.sf.freecol.server.ai.AIMain aiMain = freeColClient.getFreeColServer().getAIMain();
+                        net.sf.freecol.server.ai.AIPlayer ap = (net.sf.freecol.server.ai.AIPlayer) aiMain.getAIObject(freeColClient.getMyPlayer().getID());
                         ap.setDebuggingConnection(freeColClient.getClient().getConnection());
                         ap.startWorking();
                         //freeColClient.getConnectController().reconnect();

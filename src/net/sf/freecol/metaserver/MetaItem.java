@@ -2,6 +2,7 @@
 package net.sf.freecol.metaserver;
 
 import java.util.logging.Logger;
+
 import net.sf.freecol.common.ServerInfo;
 
 

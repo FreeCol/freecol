@@ -1,14 +1,22 @@
 package net.sf.freecol.server.generator;
 
-import java.util.*;
-
-import net.sf.freecol.server.model.ServerPlayer;
-import net.sf.freecol.common.model.*;
-import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Map.Position;
-import net.sf.freecol.common.FreeColException;
-
+import java.util.Iterator;
+import java.util.Random;
+import java.util.Vector;
 import java.util.logging.Logger;
+
+import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.ColonyTile;
+import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.server.model.ServerPlayer;
 
 
 /**

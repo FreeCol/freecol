@@ -2,11 +2,11 @@
 
 package net.sf.freecol.client.gui.action;
 
-import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.common.option.OptionGroup;
-
 import java.util.Iterator;
 import java.util.logging.Logger;
+
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.option.OptionGroup;
 
 
 /**

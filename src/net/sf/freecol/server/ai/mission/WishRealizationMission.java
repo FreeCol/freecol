@@ -1,17 +1,20 @@
 
 package net.sf.freecol.server.ai.mission;
 
-import java.io.IOException;
 import java.util.logging.Logger;
-import java.util.*;
 
-import net.sf.freecol.server.ai.*;
-import net.sf.freecol.common.model.*;
-import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Ownable;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.server.ai.AIMain;
+import net.sf.freecol.server.ai.AIUnit;
+import net.sf.freecol.server.ai.Wish;
 
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 
 /**

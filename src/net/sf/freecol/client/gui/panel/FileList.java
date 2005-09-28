@@ -1,8 +1,10 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import javax.swing.*;
-import java.io.*;
+import java.io.File;
+import java.io.FileFilter;
+
+import javax.swing.JList;
 
 
 /**

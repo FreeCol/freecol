@@ -1,24 +1,26 @@
 
 package net.sf.freecol.client.control;
 
-import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.FreeColGameObject;
-import net.sf.freecol.common.model.*;
-import net.sf.freecol.common.networking.Message;
+import java.util.logging.Logger;
+
+import javax.swing.SwingUtilities;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.Message;
 
-import org.w3c.dom.NodeList;
 import org.w3c.dom.Element;
-
-import java.util.logging.Logger;
-import javax.swing.SwingUtilities;
+import org.w3c.dom.NodeList;
 
 
 /**
@@ -262,9 +264,8 @@ public final class InGameInputHandler extends InputHandler {
     */
     private Element opponentAttack(Element opponentAttackElement) {
         Game game = getFreeColClient().getGame();
-        Map map = game.getMap();
 
-        int direction = Integer.parseInt(opponentAttackElement.getAttribute("direction"));
+        // For later use: int direction = Integer.parseInt(opponentAttackElement.getAttribute("direction"));
         int result = Integer.parseInt(opponentAttackElement.getAttribute("result"));
         int plunderGold = Integer.parseInt(opponentAttackElement.getAttribute("plunderGold"));
 

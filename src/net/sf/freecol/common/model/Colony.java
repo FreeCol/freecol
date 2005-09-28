@@ -5,11 +5,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
-import org.w3c.dom.Element;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-
-import net.sf.freecol.common.model.Settlement;
 
 
 /**
@@ -545,9 +543,6 @@ public final class Colony extends Settlement implements Location {
     * @param amount The number of hammers to add.
     */
     public void addHammers(int amount) {
-        int required = 0;
-        int tools = 0;
-
         if (currentlyBuilding == -1) {
             addModelMessage(this, "model.colony.cannotBuild", new String[][] {{"%colony%", getName()}});
             return;

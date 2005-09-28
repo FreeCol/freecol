@@ -1,14 +1,15 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import net.sf.freecol.common.model.Player;
-
 import java.awt.Color;
 import java.awt.Component;
 import java.util.Vector;
+
 import javax.swing.JComboBox;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
+
+import net.sf.freecol.common.model.Player;
 
 /**
 * A table cell renderer that should be used to display the chosen nation in a table.

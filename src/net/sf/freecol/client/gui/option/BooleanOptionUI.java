@@ -1,13 +1,14 @@
 
 package net.sf.freecol.client.gui.option;
 
-import net.sf.freecol.common.option.*;
+import java.awt.FlowLayout;
+import java.util.logging.Logger;
 
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
-import java.awt.FlowLayout;
-import java.util.Iterator;
-import java.util.logging.Logger;
+
+import net.sf.freecol.common.option.BooleanOption;
+import net.sf.freecol.common.option.Option;
 
 
 

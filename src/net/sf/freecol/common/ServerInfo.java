@@ -2,12 +2,10 @@
 package net.sf.freecol.common;
 
 
-import java.util.logging.Logger;
-import org.w3c.dom.*;
+import net.sf.freecol.FreeCol;
 
-import java.util.ArrayList;
-
-import net.sf.freecol.common.networking.Message;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 
 

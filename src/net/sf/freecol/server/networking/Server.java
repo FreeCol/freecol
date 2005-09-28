@@ -3,21 +3,18 @@ package net.sf.freecol.server.networking;
 
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-
-import java.util.logging.Logger;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.logging.Logger;
 
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.MessageHandler;
-
-import net.sf.freecol.server.control.UserConnectionHandler;
 import net.sf.freecol.server.FreeColServer;
-
-import java.io.StringWriter;
-import java.io.PrintWriter;
+import net.sf.freecol.server.control.UserConnectionHandler;
 
 import org.w3c.dom.Element;
 

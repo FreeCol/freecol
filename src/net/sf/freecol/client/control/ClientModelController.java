@@ -2,13 +2,20 @@
 
 package net.sf.freecol.client.control;
 
-import net.sf.freecol.client.networking.Client;
-import net.sf.freecol.common.networking.Message;
-import net.sf.freecol.common.model.*;
-import net.sf.freecol.client.FreeColClient;
-import java.util.logging.Logger;
 import java.util.ArrayList;
-import org.w3c.dom.*;
+import java.util.logging.Logger;
+
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.networking.Client;
+import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.ModelController;
+import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.networking.Message;
+
+import org.w3c.dom.Element;
 
 
 /**

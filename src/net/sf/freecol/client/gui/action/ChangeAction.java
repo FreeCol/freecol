@@ -2,17 +2,17 @@
 
 package net.sf.freecol.client.gui.action;
 
-import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Tile;
-
-import java.awt.event.KeyEvent;
-import javax.swing.KeyStroke;
 import java.awt.event.ActionEvent;
-import javax.swing.AbstractAction;
-import java.util.logging.Logger;
+import java.awt.event.KeyEvent;
 import java.util.Iterator;
+import java.util.logging.Logger;
+
+import javax.swing.KeyStroke;
+
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
 
 
 /**

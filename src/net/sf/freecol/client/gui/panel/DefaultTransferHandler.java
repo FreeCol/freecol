@@ -1,27 +1,37 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Dimension;
+import java.awt.GraphicsEnvironment;
+import java.awt.Image;
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
+import java.awt.dnd.DragGestureEvent;
+import java.awt.dnd.DragGestureListener;
+import java.awt.dnd.DragGestureRecognizer;
+import java.awt.dnd.DragSource;
+import java.awt.dnd.DragSourceContext;
+import java.awt.dnd.DragSourceDragEvent;
+import java.awt.dnd.DragSourceDropEvent;
+import java.awt.dnd.DragSourceEvent;
+import java.awt.dnd.DragSourceListener;
+import java.awt.event.InputEvent;
+import java.awt.event.MouseEvent;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.logging.Logger;
-import java.awt.event.*;
-import java.awt.GraphicsEnvironment;
-import java.awt.dnd.*;
+
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.TransferHandler;
-import java.awt.Toolkit;
-import javax.swing.ImageIcon;
-import java.awt.Point;
-import java.awt.Image;
-import java.awt.Dimension;
-import java.io.StringWriter;
-import java.io.PrintWriter;
 
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.common.model.Unit;
 
 /**
 * The transferhandler that is capable of creating ImageSelection objects.

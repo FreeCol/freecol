@@ -1,15 +1,13 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.Iterator;
 import java.util.ArrayList;
-import java.util.logging.Logger;
+import java.util.Iterator;
 import java.util.StringTokenizer;
+import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import java.util.Vector;
 
 
 /**

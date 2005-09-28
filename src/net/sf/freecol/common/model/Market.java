@@ -1,12 +1,9 @@
 
 package net.sf.freecol.common.model;
 
-import net.sf.freecol.common.model.FreeColGameObject;
-import net.sf.freecol.common.model.Game;
-
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Element;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 /**
  * This class implements a simple economic model whereby a market holds all

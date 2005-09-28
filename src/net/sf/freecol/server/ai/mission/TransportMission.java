@@ -2,15 +2,37 @@
 package net.sf.freecol.server.ai.mission;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Logger;
-import java.util.*;
 
-import net.sf.freecol.server.ai.*;
-import net.sf.freecol.common.model.*;
-import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.Locatable;
+import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Market;
+import net.sf.freecol.common.model.PathNode;
+import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.server.ai.AIColony;
+import net.sf.freecol.server.ai.AIGoods;
+import net.sf.freecol.server.ai.AIMain;
+import net.sf.freecol.server.ai.AIObject;
+import net.sf.freecol.server.ai.AIPlayer;
+import net.sf.freecol.server.ai.AIUnit;
+import net.sf.freecol.server.ai.GoodsWish;
+import net.sf.freecol.server.ai.Transportable;
+import net.sf.freecol.server.ai.Wish;
+import net.sf.freecol.server.ai.WorkerWish;
 
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 
 /**
@@ -325,7 +347,7 @@ public class TransportMission extends Mission {
 
             // Move towards the next target:
             if (path != null) {
-                Tile oldTile = carrier.getTile();
+                //Tile oldTile = carrier.getTile();
 
                 int r = moveTowards(connection, path);
                 if (r >= 0 && (carrier.getMoveType(r) == Unit.MOVE || carrier.getMoveType(r) == Unit.MOVE_HIGH_SEAS)) {

@@ -1,8 +1,8 @@
 
 package net.sf.freecol.server.ai;
 
-import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Locatable;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.server.ai.mission.TransportMission;
 

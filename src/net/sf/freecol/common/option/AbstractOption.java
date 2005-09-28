@@ -1,9 +1,9 @@
 
 package net.sf.freecol.common.option;
 
-import net.sf.freecol.client.gui.i18n.Messages;
-
 import java.util.logging.Logger;
+
+import net.sf.freecol.client.gui.i18n.Messages;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

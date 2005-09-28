@@ -1,13 +1,17 @@
 
 package net.sf.freecol.server.ai;
 
-import net.sf.freecol.server.ai.mission.*;
-import net.sf.freecol.common.model.*;
-import net.sf.freecol.common.networking.Message;
-import net.sf.freecol.common.networking.Connection;
-
-import org.w3c.dom.*;
 import java.util.logging.Logger;
+
+import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.Locatable;
+import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.server.ai.mission.TransportMission;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 
 /**

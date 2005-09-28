@@ -8,8 +8,8 @@ import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.Player;
 
 /**
  * This panel displays the Foreign Affairs Report.

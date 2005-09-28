@@ -3,11 +3,8 @@ package net.sf.freecol.server.control;
 
 import java.util.logging.Logger;
 
-import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.networking.Server;
-
-import org.w3c.dom.Element;
 
 
 /**

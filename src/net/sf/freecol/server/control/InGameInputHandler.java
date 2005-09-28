@@ -1,26 +1,37 @@
 
 package net.sf.freecol.server.control;
 
-import java.util.ArrayList;
-import java.util.Vector;
-import java.util.logging.Logger;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.Random;
-import org.w3c.dom.Element;
+import java.util.Vector;
+import java.util.logging.Logger;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.io.PrintWriter;
-
-import net.sf.freecol.common.model.*;
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsContainer;
+import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.Map.Position;
-import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
-
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
+
+import org.w3c.dom.Element;
 
 
 /**
@@ -264,8 +275,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     *
     */
     private Element getRandom(Connection connection, Element element) {
-        Game game = getFreeColServer().getGame();
-
         logger.info("Receiving \"getRandom\"-request.");
 
         String taskID = element.getAttribute("taskID");

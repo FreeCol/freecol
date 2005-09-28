@@ -4,12 +4,15 @@ package net.sf.freecol.server.ai.mission;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-import net.sf.freecol.server.ai.*;
-import net.sf.freecol.common.model.*;
-import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.server.ai.AIMain;
+import net.sf.freecol.server.ai.AIUnit;
 
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 
 /**

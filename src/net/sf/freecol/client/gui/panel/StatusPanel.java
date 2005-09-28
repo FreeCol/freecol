@@ -1,9 +1,10 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import javax.swing.*;
 import java.awt.FlowLayout;
 import java.util.logging.Logger;
+
+import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.Canvas;
 

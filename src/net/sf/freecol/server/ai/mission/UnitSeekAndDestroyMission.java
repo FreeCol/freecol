@@ -4,12 +4,20 @@ package net.sf.freecol.server.ai.mission;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-import net.sf.freecol.server.ai.*;
-import net.sf.freecol.common.model.*;
-import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.Ownable;
+import net.sf.freecol.common.model.PathNode;
+import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.server.ai.AIMain;
+import net.sf.freecol.server.ai.AIUnit;
 
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 
 /**
@@ -57,9 +65,7 @@ public class UnitSeekAndDestroyMission extends Mission {
     * @param connection The <code>Connection</code> to the server.
     */
     public void doMission(Connection connection) {
-        Tile thisTile = getUnit().getTile();
         Unit unit = getUnit();
-        Map map = getGame().getMap();
 
         PathNode pathToTarget = null;
         if (unit.isOffensiveUnit() && getDestination() != null) {
@@ -75,7 +81,7 @@ public class UnitSeekAndDestroyMission extends Mission {
                     element.setAttribute("direction", Integer.toString(direction));
 
                     try {
-                        Element reply = connection.ask(element);
+                        connection.ask(element);
                     } catch (IOException e) {
                         logger.warning("Could not send message!");
                     }

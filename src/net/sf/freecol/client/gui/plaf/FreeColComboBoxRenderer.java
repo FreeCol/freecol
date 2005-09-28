@@ -1,7 +1,16 @@
 package net.sf.freecol.client.gui.plaf;
 
-import         javax.swing.*;
-import         java.awt.*;
+import java.awt.AlphaComposite;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Composite;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+
+import javax.swing.Icon;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.ListCellRenderer;
 
 
 public class FreeColComboBoxRenderer implements ListCellRenderer {

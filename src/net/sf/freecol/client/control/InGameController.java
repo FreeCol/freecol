@@ -3,6 +3,7 @@ package net.sf.freecol.client.control;
 
 import java.util.logging.Logger;
 import java.util.Iterator;
+import java.util.List;
 import java.util.ArrayList;
 import java.io.*;
 import javax.swing.SwingUtilities;
@@ -253,7 +254,6 @@ public final class InGameController implements NetworkConstants {
      * @param direction The direction in which to move the Unit.
      */
     public void move(Unit unit, int direction) {
-        Game game = freeColClient.getGame();
         Canvas canvas = freeColClient.getCanvas();
 
         // Be certain the tile we are about to move into has been updated by the server:
@@ -485,7 +485,6 @@ public final class InGameController implements NetworkConstants {
     * @param direction The direction in which to move the Unit.
     */
     private void reallyMove(Unit unit, int direction) {
-        Game game = freeColClient.getGame();
         GUI gui = freeColClient.getGUI();
         Canvas canvas = freeColClient.getCanvas();
         Client client = freeColClient.getClient();
@@ -1322,7 +1321,7 @@ public final class InGameController implements NetworkConstants {
         Map map = freeColClient.getGame().getMap();
         IndianSettlement settlement = (IndianSettlement) map.getNeighbourOrNull(direction, unit.getTile()).getSettlement();
 
-        ArrayList response = canvas.showUseMissionaryDialog(settlement);
+        List response = canvas.showUseMissionaryDialog(settlement);
         int action = ((Integer)response.get(0)).intValue();
 
         Element missionaryMessage = Message.createNewRootElement("missionaryAtSettlement");
@@ -1531,7 +1530,6 @@ public final class InGameController implements NetworkConstants {
     */
     private void emigrateUnitInEurope(int slot) {
         Client client = freeColClient.getClient();
-        Canvas canvas = freeColClient.getCanvas();
         Game game = freeColClient.getGame();
         Player myPlayer = freeColClient.getMyPlayer();
         Europe europe = myPlayer.getEurope();

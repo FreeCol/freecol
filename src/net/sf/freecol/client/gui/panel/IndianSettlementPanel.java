@@ -1,19 +1,16 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import net.sf.freecol.client.gui.i18n.Messages;
-
-import net.sf.freecol.common.model.Goods;
-import net.sf.freecol.common.model.IndianSettlement;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.NumberFormatException;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
 
+import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.IndianSettlement;
 import cz.autel.dmi.HIGLayout;
 
 /**

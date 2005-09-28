@@ -2,15 +2,13 @@
 
 package net.sf.freecol.client.gui.action;
 
-import net.sf.freecol.client.FreeColClient;
-
-import javax.swing.AbstractButton;
-import java.awt.event.KeyEvent;
-import java.awt.event.InputEvent;
-import javax.swing.KeyStroke;
 import java.awt.event.ActionEvent;
-import javax.swing.AbstractAction;
+import java.awt.event.KeyEvent;
 import java.util.logging.Logger;
+
+import javax.swing.KeyStroke;
+
+import net.sf.freecol.client.FreeColClient;
 
 
 /**

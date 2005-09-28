@@ -10,36 +10,33 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseAdapter;
 import java.awt.event.KeyEvent;
-import java.util.logging.Logger;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseListener;
 import java.util.Iterator;
+import java.util.logging.Logger;
 
-import javax.swing.UIManager;
+import javax.swing.ComponentInputMap;
+import javax.swing.InputMap;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.border.BevelBorder;
-import javax.swing.InputMap;
-import javax.swing.ComponentInputMap;
-import javax.swing.SwingUtilities;
-import javax.swing.JComponent;
 import javax.swing.KeyStroke;
-
-
-import net.sf.freecol.client.gui.Canvas;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.border.BevelBorder;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
-
-import net.sf.freecol.common.model.Game;
+import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Goods;
 
 
 /**

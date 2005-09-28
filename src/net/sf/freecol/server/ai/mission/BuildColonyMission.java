@@ -3,15 +3,16 @@ package net.sf.freecol.server.ai.mission;
 
 import java.io.IOException;
 import java.util.logging.Logger;
-import java.util.*;
 
-import net.sf.freecol.server.ai.*;
-import net.sf.freecol.common.model.*;
-import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.server.ai.AIMain;
+import net.sf.freecol.server.ai.AIUnit;
 
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 
 /**
@@ -87,7 +88,7 @@ public class BuildColonyMission extends Mission {
                 buildColonyElement.setAttribute("unit", unit.getID());
 
                 try {
-                    Element reply = connection.ask(buildColonyElement);
+                    connection.ask(buildColonyElement);
                     colonyBuilt = true;
                 } catch (IOException e) {
                     logger.warning("Could not send \"buildColonyElement\"-message!");

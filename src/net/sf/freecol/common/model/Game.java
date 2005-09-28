@@ -1,15 +1,15 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.logging.Logger;
-import java.util.Vector;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Vector;
+import java.util.logging.Logger;
 
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Element;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 
 /**

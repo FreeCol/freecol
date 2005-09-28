@@ -1,7 +1,7 @@
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.GridLayout;
 import java.awt.BorderLayout;
+import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionListener;
 import java.util.Iterator;
@@ -12,7 +12,6 @@ import javax.swing.JPanel;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Unit;
 
 /**

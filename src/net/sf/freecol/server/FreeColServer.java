@@ -1,19 +1,24 @@
 
 package net.sf.freecol.server;
 
-import java.io.*;
-import java.util.*;
-import java.util.logging.Logger;
-import java.util.Iterator;
-import javax.swing.Timer;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Vector;
+import java.util.logging.Logger;
+import java.util.zip.DeflaterOutputStream;
+import java.util.zip.InflaterInputStream;
 
-import net.sf.freecol.FreeCol;
-
-// XML:
-import org.xml.sax.SAXException;
-import org.w3c.dom.*;
+import javax.swing.Timer;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -21,33 +26,32 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-
-// Networking:
+import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
-import net.sf.freecol.server.networking.DummyConnection;
-
-// Control:
+import net.sf.freecol.server.ai.AIInGameInputHandler;
+import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.control.Controller;
-import net.sf.freecol.server.control.UserConnectionHandler;
+import net.sf.freecol.server.control.InGameController;
+import net.sf.freecol.server.control.InGameInputHandler;
 import net.sf.freecol.server.control.PreGameController;
 import net.sf.freecol.server.control.PreGameInputHandler;
-import net.sf.freecol.server.control.InGameInputHandler;
-import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.control.ServerModelController;
-
-// Model:
+import net.sf.freecol.server.control.UserConnectionHandler;
+import net.sf.freecol.server.model.ServerModelObject;
+import net.sf.freecol.server.model.ServerPlayer;
+import net.sf.freecol.server.networking.DummyConnection;
 import net.sf.freecol.server.networking.Server;
-import net.sf.freecol.server.model.*;
-import net.sf.freecol.common.model.*;
-import net.sf.freecol.common.model.Map;
 
-// AI:
-import net.sf.freecol.server.ai.*;
-
-// Zip:
-import java.util.zip.InflaterInputStream;
-import java.util.zip.DeflaterOutputStream;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 
 /**

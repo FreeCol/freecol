@@ -1,27 +1,22 @@
 
 package net.sf.freecol.server.ai;
 
-import net.sf.freecol.common.networking.Message;
-import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.MessageHandler;
-import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Game;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.logging.Logger;
+
 import net.sf.freecol.common.model.FoundingFather;
-
-import net.sf.freecol.server.control.*;
-import net.sf.freecol.server.networking.*;
-import net.sf.freecol.server.model.ServerPlayer;
-
+import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.model.ServerPlayer;
+import net.sf.freecol.server.networking.DummyConnection;
 
 import org.w3c.dom.Element;
-
-import java.util.logging.Logger;
-import java.util.Iterator;
-
-import java.io.IOException;
-import java.io.StringWriter;
-import java.io.PrintWriter;
 
 
 /**

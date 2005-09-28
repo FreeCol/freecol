@@ -1,23 +1,18 @@
 
 package net.sf.freecol.common.networking;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Vector;
+import java.util.logging.Logger;
+
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 
-import java.io.InputStreamReader;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.IOException;
-import java.net.SocketException;
-import java.util.logging.Logger;
-import java.io.StringWriter;
-import java.io.PrintWriter;
-
-import java.util.Vector;
-
-import org.xml.sax.SAXException;
 import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 
 /**

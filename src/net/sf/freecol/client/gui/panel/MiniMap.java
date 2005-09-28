@@ -1,25 +1,23 @@
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.Insets;
-
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.util.logging.Logger;
 
-import javax.swing.UIManager;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.JButton;
-import javax.swing.event.MouseInputListener;
+import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
+import javax.swing.event.MouseInputListener;
 
 import net.sf.freecol.client.FreeColClient;
-
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
@@ -86,7 +84,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         addMouseMotionListener(this);
         setLayout(null);
 
-        boolean usingSkin;
+        //boolean usingSkin;
         Image skin = (Image) UIManager.get("MiniMap.skin");
         if (skin == null) {
             try {
@@ -95,14 +93,14 @@ public final class MiniMap extends JPanel implements MouseInputListener {
             } catch (Exception e) {}
             setSize(MAP_WIDTH, MAP_HEIGHT);
             setOpaque(true);
-            usingSkin = false;
+            //usingSkin = false;
             mapX = 0;
             mapY = 0;
         } else {
             setBorder(null);
             setSize(skin.getWidth(null), skin.getHeight(null));
             setOpaque(false);
-            usingSkin = true;
+            //usingSkin = true;
             // TODO-LATER: The values below should be specified by a skin-configuration-file:
             mapX = 38;
             mapY = 75;

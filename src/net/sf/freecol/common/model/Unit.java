@@ -1,17 +1,16 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.Vector;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Vector;
 import java.util.logging.Logger;
 
-import net.sf.freecol.common.model.Map.Position;
-import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Map.Position;
 
-import org.w3c.dom.Element;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 
 /**
@@ -875,7 +874,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         setStateToAllChildren(SENTRY);
 
         Tile newTile = getGame().getMap().getNeighbourOrNull(direction, getTile());
-        Tile oldTile = getTile();
+        //Tile oldTile = getTile();
 
         int moveCost = getMoveCost(newTile);
 

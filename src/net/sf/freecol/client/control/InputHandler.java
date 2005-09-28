@@ -1,12 +1,11 @@
 
 package net.sf.freecol.client.control;
 
+import java.util.logging.Logger;
+
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.MessageHandler;
-
-import java.io.IOException;
-import java.util.logging.Logger;
 
 import org.w3c.dom.Element;
 

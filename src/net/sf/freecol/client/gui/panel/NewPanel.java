@@ -1,16 +1,23 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import javax.swing.*;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.event.*;
-import java.util.logging.Logger;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.logging.Logger;
+
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.control.ConnectController;
+import net.sf.freecol.client.gui.Canvas;
 
 
 /**

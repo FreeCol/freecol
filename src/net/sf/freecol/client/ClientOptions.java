@@ -1,12 +1,11 @@
 
 package net.sf.freecol.client;
 
-import net.sf.freecol.common.option.*;
-
 import java.util.logging.Logger;
-import java.util.*;
 
-import org.w3c.dom.*;
+import net.sf.freecol.common.option.OptionMap;
+
+import org.w3c.dom.Element;
 
 
 /**

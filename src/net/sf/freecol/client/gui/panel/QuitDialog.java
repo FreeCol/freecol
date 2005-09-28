@@ -7,10 +7,9 @@ import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.border.BevelBorder;
 
 import net.sf.freecol.client.gui.Canvas;
-import cz.autel.dmi.*;
+import cz.autel.dmi.HIGLayout;
 
 /**
 * Asks the user if he's sure he wants to quit.

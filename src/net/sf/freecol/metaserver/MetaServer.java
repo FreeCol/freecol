@@ -2,28 +2,20 @@
 package net.sf.freecol.metaserver;
 
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-
-import java.util.logging.Logger;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.logging.Logger;
 
 import javax.swing.Timer;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.MessageHandler;
-
-import net.sf.freecol.server.control.UserConnectionHandler;
-import net.sf.freecol.server.FreeColServer;
-
-import java.io.StringWriter;
-import java.io.PrintWriter;
-
-import org.w3c.dom.Element;
 
 
 

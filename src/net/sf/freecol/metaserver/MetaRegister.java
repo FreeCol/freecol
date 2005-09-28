@@ -2,12 +2,12 @@
 package net.sf.freecol.metaserver;
 
 
-import java.util.logging.Logger;
-import org.w3c.dom.*;
-
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 import net.sf.freecol.common.networking.Message;
+
+import org.w3c.dom.Element;
 
 
 

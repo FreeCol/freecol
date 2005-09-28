@@ -9,66 +9,60 @@ import java.awt.Rectangle;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.MissingResourceException;
 import java.util.logging.Logger;
-import java.util.Iterator;
-import java.util.ArrayList;
-import java.util.List;
-import javax.swing.filechooser.FileFilter;
-import java.io.File;
 
 import javax.swing.JComponent;
 import javax.swing.JLayeredPane;
-import javax.swing.JPopupMenu;
-
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.filechooser.FileFilter;
 
-import net.sf.freecol.client.gui.action.FreeColAction;
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ChatPanel;
+import net.sf.freecol.client.gui.panel.ChooseFoundingFatherDialog;
+import net.sf.freecol.client.gui.panel.ClientOptionsDialog;
+import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.ColopediaPanel;
+import net.sf.freecol.client.gui.panel.EmigrationPanel;
+import net.sf.freecol.client.gui.panel.ErrorPanel;
+import net.sf.freecol.client.gui.panel.EuropePanel;
+import net.sf.freecol.client.gui.panel.EventPanel;
+import net.sf.freecol.client.gui.panel.FreeColDialog;
+import net.sf.freecol.client.gui.panel.FreeColPanel;
+import net.sf.freecol.client.gui.panel.GameOptionsDialog;
+import net.sf.freecol.client.gui.panel.ImageProvider;
+import net.sf.freecol.client.gui.panel.IndianSettlementPanel;
+import net.sf.freecol.client.gui.panel.InfoPanel;
+import net.sf.freecol.client.gui.panel.MainPanel;
+import net.sf.freecol.client.gui.panel.NewPanel;
+import net.sf.freecol.client.gui.panel.QuitDialog;
 import net.sf.freecol.client.gui.panel.ReportForeignAffairPanel;
 import net.sf.freecol.client.gui.panel.ReportIndianPanel;
 import net.sf.freecol.client.gui.panel.ReportLabourPanel;
-import net.sf.freecol.client.gui.panel.FreeColDialog;
-import net.sf.freecol.client.gui.panel.FreeColPanel;
-import net.sf.freecol.client.gui.panel.MainPanel;
-import net.sf.freecol.client.gui.panel.NewPanel;
-import net.sf.freecol.client.gui.panel.ErrorPanel;
 import net.sf.freecol.client.gui.panel.ReportPanel;
 import net.sf.freecol.client.gui.panel.ReportReligiousPanel;
+import net.sf.freecol.client.gui.panel.ServerListPanel;
 import net.sf.freecol.client.gui.panel.StartGamePanel;
-import net.sf.freecol.client.gui.panel.QuitDialog;
-import net.sf.freecol.client.gui.panel.ColonyPanel;
-import net.sf.freecol.client.gui.panel.InfoPanel;
-import net.sf.freecol.client.gui.panel.EuropePanel;
 import net.sf.freecol.client.gui.panel.StatusPanel;
 import net.sf.freecol.client.gui.panel.VictoryPanel;
-import net.sf.freecol.client.gui.panel.ChooseFoundingFatherDialog;
-import net.sf.freecol.client.gui.panel.EventPanel;
-import net.sf.freecol.client.gui.panel.EmigrationPanel;
-import net.sf.freecol.client.gui.panel.IndianSettlementPanel;
-import net.sf.freecol.client.gui.panel.ServerListPanel;
-import net.sf.freecol.client.gui.panel.GameOptionsDialog;
-import net.sf.freecol.client.gui.panel.ClientOptionsDialog;
-
-import net.sf.freecol.client.gui.panel.ImageProvider;
-
-import net.sf.freecol.client.gui.i18n.Messages;
-
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.WorkLocation;
-import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.ModelMessage;
-import net.sf.freecol.common.model.IndianSettlement;
-
-import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.model.WorkLocation;
+import net.sf.freecol.common.model.Map.Position;
 
 
 /**
@@ -144,8 +138,6 @@ public final class Canvas extends JLayeredPane {
     private final ClientOptionsDialog clientOptionsDialog;
     private TakeFocusThread         takeFocusThread;
     private JMenuBar                jMenuBar;
-    private final List actionList = new ArrayList();
-
 
 
     /**
@@ -674,7 +666,7 @@ public final class Canvas extends JLayeredPane {
     *            (requests their support for war against another European power),
     *         FreeColDialog.MISSIONARY_CANCEL if the action was cancelled.
     */
-    public ArrayList showUseMissionaryDialog(IndianSettlement settlement) {
+    public List showUseMissionaryDialog(IndianSettlement settlement) {
         FreeColDialog missionaryDialog = FreeColDialog.createUseMissionaryDialog(settlement);
         missionaryDialog.setLocation(getWidth() / 2 - missionaryDialog.getWidth() / 2, getHeight() / 2 - missionaryDialog.getHeight() / 2);
         add(missionaryDialog, new Integer(POPUP_LAYER.intValue() - 1));
@@ -1329,7 +1321,7 @@ public final class Canvas extends JLayeredPane {
         add(infoDialog, new Integer(POPUP_LAYER.intValue() - 1));
         infoDialog.requestFocus();
 
-        Object response = infoDialog.getResponse();
+        infoDialog.getResponse();
 
         remove(infoDialog);
     }

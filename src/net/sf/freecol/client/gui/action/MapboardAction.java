@@ -2,11 +2,11 @@
 
 package net.sf.freecol.client.gui.action;
 
-import net.sf.freecol.client.FreeColClient;
-
-import javax.swing.AbstractAction;
-import javax.swing.KeyStroke;
 import java.util.logging.Logger;
+
+import javax.swing.KeyStroke;
+
+import net.sf.freecol.client.FreeColClient;
 
 
 /**

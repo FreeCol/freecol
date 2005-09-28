@@ -1,20 +1,22 @@
 
 package net.sf.freecol.client.gui.option;
 
-import net.sf.freecol.common.option.*;
-import net.sf.freecol.client.gui.action.FreeColAction;
-
-import java.awt.Dimension;
-import java.awt.Component;
 import java.awt.FlowLayout;
-import javax.swing.BorderFactory;
-import javax.swing.JPanel;
-import javax.swing.JComponent;
-import javax.swing.KeyStroke;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Logger;
+
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.KeyStroke;
+
+import net.sf.freecol.client.gui.action.FreeColAction;
+import net.sf.freecol.common.option.BooleanOption;
+import net.sf.freecol.common.option.IntegerOption;
+import net.sf.freecol.common.option.Option;
+import net.sf.freecol.common.option.OptionGroup;
 
 
 

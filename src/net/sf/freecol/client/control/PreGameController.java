@@ -3,27 +3,15 @@ package net.sf.freecol.client.control;
 
 
 import java.awt.Color;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.logging.Logger;
-import java.io.*;
+import java.util.zip.InflaterInputStream;
 
-import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.FreeColMenuBar;
-import net.sf.freecol.client.gui.CanvasMouseMotionListener;
-import net.sf.freecol.client.gui.CanvasMouseListener;
-import net.sf.freecol.client.gui.CanvasKeyListener;
-import net.sf.freecol.client.gui.panel.MapControls;
-
-
-import net.sf.freecol.common.model.*;
-import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.networking.Message;
-
-
-// XML:
-import org.xml.sax.SAXException;
-import org.w3c.dom.*;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -31,8 +19,21 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-// Zip:
-import java.util.zip.InflaterInputStream;
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.CanvasKeyListener;
+import net.sf.freecol.client.gui.CanvasMouseListener;
+import net.sf.freecol.client.gui.CanvasMouseMotionListener;
+import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.model.GameOptions;
+import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.networking.Message;
+
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 
 
@@ -168,8 +169,6 @@ public final class PreGameController {
     * Reads the {@link GameOptions} from the given file.
     */
     public void loadGameOptions(File loadFile) throws IOException {
-        Canvas canvas = freeColClient.getCanvas();
-
         //BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(loadFile)));
         Element element;
         try {

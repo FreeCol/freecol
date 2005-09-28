@@ -1,16 +1,16 @@
 
 package net.sf.freecol.client.control;
 
-import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Game;
+import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.networking.Connection;
 
 import org.w3c.dom.Element;
-import java.util.logging.Logger;
 
 
 

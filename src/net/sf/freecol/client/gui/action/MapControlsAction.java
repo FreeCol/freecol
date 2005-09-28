@@ -2,17 +2,16 @@
 
 package net.sf.freecol.client.gui.action;
 
-import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.panel.MapControls;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractButton;
-import java.awt.event.KeyEvent;
-import java.awt.event.InputEvent;
 import javax.swing.KeyStroke;
-import java.awt.event.ActionEvent;
-import javax.swing.AbstractAction;
-import java.util.logging.Logger;
+
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.panel.MapControls;
 
 
 /**
@@ -80,17 +79,17 @@ public class MapControlsAction extends MapboardAction {
     }
 
 
-    private void showMapControls(boolean selected) {
-        if (selected && getFreeColClient().getGUI().isInGame()) {
+    private void showMapControls(boolean value) {
+        if (value && getFreeColClient().getGUI().isInGame()) {
             if (mapControls == null ) {
                 mapControls = new MapControls(getFreeColClient(), getFreeColClient().getGUI());
             }
             mapControls.update();
         }
         if (mapControls != null) {
-            if (selected && !mapControls.isShowing()) {
+            if (value && !mapControls.isShowing()) {
                 mapControls.addToComponent(getFreeColClient().getCanvas());
-            } else if (!selected && mapControls.isShowing()) {
+            } else if (!value && mapControls.isShowing()) {
                 mapControls.removeFromComponent(getFreeColClient().getCanvas());
             }
         }

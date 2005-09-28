@@ -1,15 +1,13 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.common.model.Player;
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Vector;
 import java.util.logging.Logger;
+
 import javax.swing.AbstractCellEditor;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
@@ -18,6 +16,9 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.border.BevelBorder;
 import javax.swing.table.TableCellEditor;
+
+import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.common.model.Player;
 
 /**
 * A table cell editor that can be used to edit colors.

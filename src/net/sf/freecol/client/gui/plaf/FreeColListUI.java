@@ -1,9 +1,14 @@
 package net.sf.freecol.client.gui.plaf;
 
-import         javax.swing.plaf.basic.*;
-import         javax.swing.plaf.*;
-import         javax.swing.*;
-import         java.awt.*;
+import java.awt.Graphics;
+import java.awt.Image;
+
+import javax.swing.JComponent;
+import javax.swing.JList;
+import javax.swing.ListCellRenderer;
+import javax.swing.UIManager;
+import javax.swing.plaf.ComponentUI;
+import javax.swing.plaf.basic.BasicListUI;
 
 
 public class FreeColListUI extends BasicListUI {

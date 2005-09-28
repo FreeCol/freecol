@@ -1,10 +1,10 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import net.sf.freecol.common.model.Player;
-
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
+
+import net.sf.freecol.common.model.Player;
 
 /**
 * A table cell editor that can be used to select a nation.

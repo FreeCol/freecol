@@ -1,14 +1,15 @@
 
 package net.sf.freecol.server.control;
 
-import java.util.logging.Logger;
-import org.w3c.dom.Element;
 import java.io.IOException;
+import java.util.logging.Logger;
 
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
+
+import org.w3c.dom.Element;
 
 
 /**

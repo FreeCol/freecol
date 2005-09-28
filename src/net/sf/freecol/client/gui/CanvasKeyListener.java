@@ -1,15 +1,13 @@
 
 package net.sf.freecol.client.gui;
 
-import java.awt.event.KeyListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.logging.Logger;
 
-import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.client.gui.panel.MapControls;
-import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.control.InGameController;
+import net.sf.freecol.common.model.Map;
 
 
 /**
@@ -25,7 +23,7 @@ public final class CanvasKeyListener implements KeyListener {
     private final Canvas            parent;
     private final InGameController inGameController;
 
-    private KeyEvent keyEvent;
+    //private KeyEvent keyEvent;
 
     
     /**

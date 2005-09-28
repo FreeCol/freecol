@@ -1,19 +1,22 @@
 
 package net.sf.freecol.server.control;
 
-import java.util.logging.Logger;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.Random;
-import org.w3c.dom.Element;
+import java.util.logging.Logger;
 
-import java.io.IOException;
-
-import net.sf.freecol.common.model.*;
+import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Message;
-
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
+
+import org.w3c.dom.Element;
 
 
 /**

@@ -1,23 +1,25 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
-
+import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.GridLayout;
-import java.awt.BorderLayout;
-import java.awt.Image;
 import java.util.logging.Logger;
 
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JLabel;
 import javax.swing.ImageIcon;
-import javax.swing.border.*;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.UIManager;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.Canvas;
 
 /**
 * A panel filled with 'main' items.

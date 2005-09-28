@@ -1,6 +1,7 @@
 package net.sf.freecol.server.model;
 
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public interface ServerModelObject  {
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";

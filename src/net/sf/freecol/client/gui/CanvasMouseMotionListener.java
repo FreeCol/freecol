@@ -1,10 +1,12 @@
 
 package net.sf.freecol.client.gui;
 
-import net.sf.freecol.common.model.*;
-
-import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
+
+import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.PathNode;
+import net.sf.freecol.common.model.Tile;
 
 
 /**
@@ -23,6 +25,105 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
     private static final int SCROLLSPACE = 3;
     //private static final int SCROLLSPACE = 100;
 
+    
+
+    /**
+     * The constructor to use.
+     * @param g The GUI that holds information such as screen resolution.
+     * @param m The Map that is currently being drawn on the
+     * Canvas (by the GUI).
+     */
+    public CanvasMouseMotionListener(Canvas canvas, GUI g, Map m) {
+        this.canvas = canvas;
+        gui = g;
+        map = m;
+        scrollThread = null;
+    }
+    
+
+    /**
+     * Invoked when the mouse has been moved.
+     * @param e The MouseEvent that holds all the information.
+     */
+    public void mouseMoved(MouseEvent e) {
+        if (1==1) return; // <-- Remove this to enable scrolling.
+
+        int x = e.getX(),
+            y = e.getY(),
+            direction;
+        if ((x < SCROLLSPACE) && (y < SCROLLSPACE)) {
+            // Upper-Left
+            direction = Map.NW;
+        } else if ((x >= gui.getWidth() - SCROLLSPACE) && (y < SCROLLSPACE)) {
+            // Upper-Right
+            direction = Map.NE;
+        } else if ((x >= gui.getWidth() - SCROLLSPACE) && (y >= gui.getHeight() - SCROLLSPACE)) {
+            // Bottom-Right
+            direction = Map.SE;
+        } else if ((x < SCROLLSPACE) && (y >= gui.getHeight() - SCROLLSPACE)) {
+            // Bottom-Left
+            direction = Map.SW;
+        } else if (y < SCROLLSPACE) {
+            // Top
+            direction = Map.N;
+        } else if (x >= gui.getWidth() - SCROLLSPACE) {
+            // Right
+            direction = Map.E;
+        } else if (y >= gui.getHeight() - SCROLLSPACE) {
+            // Bottom
+            direction = Map.S;
+        } else if (x < SCROLLSPACE) {
+            // Left
+            direction = Map.W;
+        } else {
+            // Center
+            if (scrollThread != null) {
+                scrollThread.stopScrolling();
+                scrollThread = null;
+            }
+            return;
+        }
+
+        if (scrollThread != null) {
+            scrollThread.setDirection(direction);
+        } else if (e.getComponent().isEnabled()) {
+            scrollThread = new ScrollThread(map, gui);
+            scrollThread.setDirection(direction);
+            scrollThread.start();
+        }
+    }
+
+    /**
+     * Invoked when the mouse has been dragged.
+     * @param e The MouseEvent that holds all the information.
+     */
+    public void mouseDragged(MouseEvent e) {
+        Map.Position p = gui.convertToMapCoordinates(e.getX(), e.getY());
+        if (p == null || !map.isValid(p)) {
+            return;
+        }
+
+        Tile tile = map.getTile(p);
+        if (tile != null) {
+            if (gui.getActiveUnit() == null) {
+                gui.stopDrag();
+            } else if (gui.getActiveUnit().getTile() != tile) {
+                if (gui.isDragStarted()) {
+                    PathNode dragPath = gui.getActiveUnit().findPath(tile);
+                    // ONLY FOR DEBUGGING: PathNode dragPath = map.findPath(gui.getActiveUnit(), gui.getActiveUnit().getTile(), tile, (Unit) gui.getActiveUnit().getLocation());
+                    gui.setDragPath(dragPath);
+                }
+            } else {
+                if (!gui.isDragStarted()) {
+                    gui.startDrag();
+                } else {
+                    gui.setDragPath(null);
+                }
+            }
+        }
+    }
+    
+    
     /**
      * Scrolls the view of the Map by moving its focus.
      */
@@ -126,100 +227,5 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
                 gui.setFocus(x, y);
             } while (cont);
         }
-    }
-
-    /**
-     * The constructor to use.
-     * @param g The GUI that holds information such as screen resolution.
-     * @param m The Map that is currently being drawn on the
-     * Canvas (by the GUI).
-     */
-    public CanvasMouseMotionListener(Canvas canvas, GUI g, Map m) {
-        this.canvas = canvas;
-        gui = g;
-        map = m;
-        scrollThread = null;
-    }
-
-    /**
-     * Invoked when the mouse has been moved.
-     * @param e The MouseEvent that holds all the information.
-     */
-    public void mouseMoved(MouseEvent e) {
-        if (1==1) return; // <-- Remove this to enable scrolling.
-
-        int x = e.getX(),
-            y = e.getY(),
-            direction;
-        if ((x < SCROLLSPACE) && (y < SCROLLSPACE)) {
-            // Upper-Left
-            direction = Map.NW;
-        } else if ((x >= gui.getWidth() - SCROLLSPACE) && (y < SCROLLSPACE)) {
-            // Upper-Right
-            direction = Map.NE;
-        } else if ((x >= gui.getWidth() - SCROLLSPACE) && (y >= gui.getHeight() - SCROLLSPACE)) {
-            // Bottom-Right
-            direction = Map.SE;
-        } else if ((x < SCROLLSPACE) && (y >= gui.getHeight() - SCROLLSPACE)) {
-            // Bottom-Left
-            direction = Map.SW;
-        } else if (y < SCROLLSPACE) {
-            // Top
-            direction = Map.N;
-        } else if (x >= gui.getWidth() - SCROLLSPACE) {
-            // Right
-            direction = Map.E;
-        } else if (y >= gui.getHeight() - SCROLLSPACE) {
-            // Bottom
-            direction = Map.S;
-        } else if (x < SCROLLSPACE) {
-            // Left
-            direction = Map.W;
-        } else {
-            // Center
-            if (scrollThread != null) {
-                scrollThread.stopScrolling();
-                scrollThread = null;
-            }
-            return;
-        }
-
-        if (scrollThread != null) {
-            scrollThread.setDirection(direction);
-        } else if (e.getComponent().isEnabled()) {
-            scrollThread = new ScrollThread(map, gui);
-            scrollThread.setDirection(direction);
-            scrollThread.start();
-        }
-    }
-
-    /**
-     * Invoked when the mouse has been dragged.
-     * @param e The MouseEvent that holds all the information.
-     */
-    public void mouseDragged(MouseEvent e) {
-        Map.Position p = gui.convertToMapCoordinates(e.getX(), e.getY());
-        if (p == null || !map.isValid(p)) {
-            return;
-        }
-
-        Tile tile = map.getTile(p);
-        if (tile != null) {
-            if (gui.getActiveUnit() == null) {
-                gui.stopDrag();
-            } else if (gui.getActiveUnit().getTile() != tile) {
-                if (gui.isDragStarted()) {
-                    PathNode dragPath = gui.getActiveUnit().findPath(tile);
-                    // ONLY FOR DEBUGGING: PathNode dragPath = map.findPath(gui.getActiveUnit(), gui.getActiveUnit().getTile(), tile, (Unit) gui.getActiveUnit().getLocation());
-                    gui.setDragPath(dragPath);
-                }
-            } else {
-                if (!gui.isDragStarted()) {
-                    gui.startDrag();
-                } else {
-                    gui.setDragPath(null);
-                }
-            }
-        }
-    }
+    }    
 }

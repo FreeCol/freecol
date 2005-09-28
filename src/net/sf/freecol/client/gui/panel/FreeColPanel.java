@@ -1,14 +1,25 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import cz.autel.dmi.*;
-
+import java.awt.FlowLayout;
+import java.awt.LayoutManager;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
 import java.util.logging.Logger;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.border.*;
+import javax.swing.AbstractButton;
+import javax.swing.ComponentInputMap;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+
+import cz.autel.dmi.HIGConstraints;
 
 
 /**

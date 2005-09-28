@@ -1,17 +1,25 @@
 
 package net.sf.freecol.server.ai;
 
-import java.util.*;
-import java.util.logging.Logger;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Random;
+import java.util.logging.Logger;
 
-import net.sf.freecol.common.model.*;
-import net.sf.freecol.common.networking.Message;
-import net.sf.freecol.server.model.*;
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.FreeColGameObjectListener;
+import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 
 /**

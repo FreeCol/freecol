@@ -2,19 +2,18 @@
 
 package net.sf.freecol.client.gui.action;
 
-import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.common.option.Option;
-
-import java.awt.event.KeyEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.lang.reflect.Modifier;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.logging.Logger;
+
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
-import javax.swing.*;
+
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.option.Option;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -69,7 +68,7 @@ public abstract class FreeColAction extends AbstractAction implements Option {
     *        is the same as disabling the keyboard accelerator.
     */
     public void setAccelerator(KeyStroke accelerator) {
-        KeyStroke oldValue = (KeyStroke) getValue(ACCELERATOR_KEY);
+        //KeyStroke oldValue = (KeyStroke) getValue(ACCELERATOR_KEY);
         putValue(ACCELERATOR_KEY, accelerator);
     }
 
