@@ -646,7 +646,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
     /**
     * Gets the cost of moving this <code>Unit</code> onto the given <code>Tile</code>.
-    * A call to {@link #getMoveType} will return <code>ILLEGAL_MOVE</code>, if {@link #getMoveCost}
+    * A call to {@link #getMoveType(Tile)} will return <code>ILLEGAL_MOVE</code>, if {@link #getMoveCost}
     * returns a move cost larger than the {@link #getMovesLeft moves left}.
     *
     * @param target The <code>Tile</code> this <code>Unit</code> will move onto.
@@ -857,7 +857,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     /**
     * Moves this unit in the specified direction.
     *
-    * @see #getMoveType
+    * @see #getMoveType(int)
     * @exception IllegalStateException If the move is illegal.
     */
     public void move(int direction) {

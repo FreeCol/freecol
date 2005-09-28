@@ -12,7 +12,8 @@ import org.w3c.dom.Element;
 
 /**
 * Represents the need for goods within a <code>Colony</code>.
-* @todo Deal in amounts of goods.
+* <br><br>
+* TODO: Deal in amounts of goods.
 */
 public class GoodsWish extends Wish {
     private static final Logger logger = Logger.getLogger(GoodsWish.class.getName());
@@ -27,7 +28,7 @@ public class GoodsWish extends Wish {
     * Creates a new <code>GoodsWish</code>.
     *
     * @param destination The <code>Location</code> in which the
-    *       {@link #getTransportable transportable} assigned to
+    *       {@link Wish#getTransportable transportable} assigned to
     *       this <code>GoodsWish</code> will have to reach.
     * @param value The value identifying the importance of
     *       this <code>Wish</code>.

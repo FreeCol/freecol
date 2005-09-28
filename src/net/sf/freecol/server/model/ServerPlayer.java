@@ -153,7 +153,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     * Sets the given tile to be explored by this player and updates the player's
     * information about the tile.
     *
-    * @see Tile#updatePlayerExploredTile
+    * @see Tile#updatePlayerExploredTile(Player)
     */
     public void setExplored(Tile tile) {
         tile.getPlayerExploredTile(this).setExplored(true);

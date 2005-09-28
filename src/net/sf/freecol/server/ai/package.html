@@ -16,8 +16,9 @@ relating to a single <code>FreeColGameObject</code>.
 The server uses a <code>Connection</code> when communicating with the clients.
 The subclass {@link net.sf.freecol.server.networking.DummyConnection DummyConnection}
 is used for the computer controlled players, in order to avoid unnecessary network traffic.
-{@link AIInGameInputHandler} handles the messages received on the <code>DummyConnection</code>
-and calls the appropriate methods in {@link AIPlayer}. An example: the method
+{@link net.sf.freecol.server.ai.AIInGameInputHandler} handles the messages received on 
+the <code>DummyConnection</code> and calls the appropriate methods in 
+{@link net.sf.freecol.server.ai.AIPlayer}. An example: the method
 {@link net.sf.freecol.server.ai.AIPlayer#startWorking} gets invoked when it is the
 AI-player's turn.
 

@@ -287,11 +287,12 @@ public final class ImageLibrary extends ImageProvider {
 
     /**
      * Performs all necessary init operations such as loading of data files.
-     * @throws FreeColException If one of the data files could not be found.
+     * 
      * @param doLookup Must be set to 'false' if the path to the image files
-     * has been manually provided by the user. If set to 'true' then a
-     * lookup will be done to search for image files from net.sf.freecol,
-     * in this case the images need to be placed in net.sf.freecol/images.
+     *     has been manually provided by the user. If set to 'true' then a
+     *     lookup will be done to search for image files from net.sf.freecol,
+     *     in this case the images need to be placed in net.sf.freecol/images.
+     * @throws FreeColException If one of the data files could not be found.     * 
      */
     private void init(boolean doLookup) throws FreeColException {
         GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();

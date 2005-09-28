@@ -28,7 +28,7 @@ public class WorkerWish extends Wish {
     * Creates a new <code>WorkerWish</code>.
     *
     * @param destination The <code>Location</code> in which the
-    *       {@link #getTransportable transportable} assigned to
+    *       {@link Wish#getTransportable transportable} assigned to
     *       this <code>WorkerWish</code> will have to reach.
     * @param value The value identifying the importance of
     *       this <code>Wish</code>.

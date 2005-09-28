@@ -209,7 +209,7 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
     *                     to be selected.
     * @see #getSelectedTile
     * @see #setActiveUnit
-    * @see #setFocus
+    * @see #setFocus(Map.Position)
     */
     public void setSelectedTile(Position selectedTile) {
         Game gameData = freeColClient.getGame();
@@ -370,7 +370,7 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
     *
     * @return The <code>Position</code> of the center tile of the
     *         displayed map
-    * @see #setFocus
+    * @see #setFocus(Map.Position)
     */
     public Position getFocus() {
         return focus;

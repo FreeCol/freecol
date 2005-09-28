@@ -211,7 +211,7 @@ public abstract class OptionMap extends OptionGroup {
     * Gets the tag name of the root element representing this object.
     * @exception UnsupportedOperationException at any time, since this
     *            class should get it's XML tag name in the
-    *            {@link #OptionMap constructor}
+    *            {@link #OptionMap(String, String, String) constructor}
     */
     public static String getXMLElementTagName() {
         throw new UnsupportedOperationException();

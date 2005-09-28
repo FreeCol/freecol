@@ -531,7 +531,7 @@ public class Player extends FreeColGameObject {
     * Sets the given tile to be explored by this player and updates the player's
     * information about the tile.
     *
-    * @see Tile#updatePlayerExploredTile
+    * @see Tile#updatePlayerExploredTile(Player)
     */
     public void setExplored(Tile tile) {
         // Implemented by ServerPlayer.

@@ -150,7 +150,7 @@ public final class Colony extends Settlement implements Location {
     * Sets the owner of this <code>Colony</code>, including all units within.
     *
     * @param owner The <code>Player</code> that shall own this <code>Settlement</code>.
-    * @see #getOwner
+    * @see Settlement#getOwner
     */
     public void setOwner(Player owner) {
         this.owner = owner;

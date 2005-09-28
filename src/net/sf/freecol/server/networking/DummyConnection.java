@@ -31,7 +31,6 @@ public final class DummyConnection extends Connection {
     * Sets up a dummy connection using the specified {@link MessageHandler}s.
     *
     * @param incomingMessageHandler The MessageHandler to call for each message received.
-    * @throws IOException
     */
     public DummyConnection(MessageHandler incomingMessageHandler) {
         super();

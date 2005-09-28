@@ -44,13 +44,13 @@ public class Map extends FreeColGameObject {
                             W = 6,
                             NW = 7;
 
-    /** The infinity cost as used by {@link #findPath}. */
+    /** The infinity cost as used by {@link #findPath(Unit, Tile, Tile)}. */
     public static final int COST_INFINITY = Integer.MAX_VALUE - 100000000;
     
     private static final int COST_UNIT_BLOCKING = 20,
                              COST_MAY_BLOCK = 10;
     
-    /** Constant used for given options in {@link #findPath} */
+    /** Constant used for given options in {@link #findPath(Unit, Tile, Tile)} */
     public static final int BOTH_LAND_AND_SEA = 0,
                             ONLY_LAND = 1,
                             ONLY_SEA = 2;

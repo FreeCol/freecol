@@ -62,7 +62,7 @@ import org.xml.sax.SAXException;
 * <br><br>
 *
 * If you would like to start a new server you just create a new object of
-* {@link #FreeColServer}.
+* this class.
 *
 */
 public final class FreeColServer {
