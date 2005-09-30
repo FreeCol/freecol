@@ -5,7 +5,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 
-
+/**
+ * An option describes something which can be customized by the user.
+ * 
+ * @see net.sf.freecol.common.model.GameOptions
+ */
 public interface Option {
 
     public static final String NO_ID = "NO_ID";

@@ -36,7 +36,9 @@ public final class Colony extends Settlement implements Location {
     private int bells;
     
     /**
-    * The type of the "Building" that is beeing built,
+    * Identifies what this colony is currently building.
+    *
+    * This is the type of the "Building" that is beeing built,
     * or if <code>currentlyBuilding >= BUILDING_UNIT_ADDITION</code>
     * the type of the <code>Unit</code> (+BUILDING_UNIT_ADDITION)
     * that is currently beeing build
@@ -292,7 +294,7 @@ public final class Colony extends Settlement implements Location {
     }
 
     /**
-    * Gets a <code>Tile</code> of this<code>Colony</code>
+    * Gets a <code>Tile</code> of this<code>Colony</code>.
     * @return The <code>Tile</code>.
     */
     public Tile getTile() {
@@ -300,7 +302,7 @@ public final class Colony extends Settlement implements Location {
     }
     
     /**
-    * Gets a <code>Tile</code> from the neighbourhood of this <code>Colony</code>
+    * Gets a <code>Tile</code> from the neighbourhood of this <code>Colony</code>.
     * @return The <code>Tile</code>.
     */
     public Tile getTile(int x, int y) {
@@ -349,7 +351,7 @@ public final class Colony extends Settlement implements Location {
 
     /**
     * Adds a <code>Locatable</code> to this Location.
-    * @param locatable The code>Locatable</code> to add to this Location.
+    * @param locatable The <code>Locatable</code> to add to this Location.
     */
     public void add(Locatable locatable) {
         if (locatable instanceof Unit) {
@@ -396,7 +398,7 @@ public final class Colony extends Settlement implements Location {
 
 
     /**
-    * Removes a code>Locatable</code> from this Location.
+    * Removes a <code>Locatable</code> from this Location.
     * @param locatable The <code>Locatable</code> to remove from this Location.
     */
     public void remove(Locatable locatable) {
@@ -670,7 +672,7 @@ public final class Colony extends Settlement implements Location {
     }
     
     /**
-    * Returns the SoL memebership of the colony
+    * Returns the SoL memebership of the colony.
     * @return The current SoL membership of the colony.
     */
     public int getSoL() {
@@ -681,7 +683,7 @@ public final class Colony extends Settlement implements Location {
     }
     
     /**
-    * Returns the Tory memebership of the colony
+    * Returns the Tory memebership of the colony.
     * @return The current Tory membership of the colony.
     */
     public int getTory() {
@@ -827,7 +829,7 @@ public final class Colony extends Settlement implements Location {
 
 
     /**
-    * Gets the production of horses in this <code>Colony</code>
+    * Gets the production of horses in this <code>Colony</code>.
     */
     public int getHorseProduction() {
         int eat = getUnitCount() * 2;

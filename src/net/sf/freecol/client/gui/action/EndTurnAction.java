@@ -26,13 +26,16 @@ public class EndTurnAction extends MapboardAction {
 
 
     /**
-    * Creates a new <code>EndTurnAction</code>
+    * Creates a new <code>EndTurnAction</code>.
     */
     EndTurnAction(FreeColClient freeColClient) {
         super(freeColClient, "menuBar.game.endTurn", null, KeyEvent.VK_E, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
     }
 
 
+    /**
+     * Disables this option if the mapboard is not selected and otherwise enables this option.
+     */    
     public void update() {
         super.update();
     }
@@ -47,6 +50,10 @@ public class EndTurnAction extends MapboardAction {
     }
 
 
+    /**
+     * Applies this action.
+     * @param e The <code>ActionEvent</code>.
+     */    
     public void actionPerformed(ActionEvent e) {
         getFreeColClient().getInGameController().endTurn();
     }

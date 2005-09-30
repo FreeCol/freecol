@@ -32,7 +32,7 @@ public class AIUnit extends AIObject implements Transportable {
     public static final String  REVISION = "$Revision$";
     
     /**
-    * The FreeColGameObject this AIObject contains AI-information for:
+    * The FreeColGameObject this AIObject contains AI-information for.
     */
     private Unit unit;
 
@@ -44,6 +44,12 @@ public class AIUnit extends AIObject implements Transportable {
     private AIUnit transport = null;
 
 
+    /**
+     * Creates a new <code>AIUnit</code>.
+     * 
+     * @param aiMain The main AI-object.
+     * @param unit The unit to make an {@link AIObject} for.
+     */    
     public AIUnit(AIMain aiMain, Unit unit) {
         super(aiMain);
 
@@ -52,6 +58,14 @@ public class AIUnit extends AIObject implements Transportable {
         mission = new UnitWanderHostileMission(aiMain, this);
     }
 
+    
+    /**
+     * Creates a new <code>AIUnit</code>.
+     * 
+     * @param aiMain The main AI-object.
+     * @param element An <code>Element</code> containing an
+     * 		XML-representation of this object.
+     */    
     public AIUnit(AIMain aiMain, Element element) {
         super(aiMain);
         readFromXMLElement(element);
@@ -60,13 +74,12 @@ public class AIUnit extends AIObject implements Transportable {
 
     /**
     * Gets the <code>Unit</code> this <code>AIUnit</code> controls.
+    * @return The <code>Unit</code>.
     */
     public Unit getUnit() {
         return unit;
     }
-    
-    
-    
+          
     
     /**
     * Gets the <code>Locatable</code> which should be transported.
@@ -82,7 +95,7 @@ public class AIUnit extends AIObject implements Transportable {
     * This is normally the location of the
     * {@link #getTransportLocatable locatable}.
     *
-    * @return The source for this <codeTransportable</code>.
+    * @return The source for this <code>Transportable</code>.
     */
     public Location getTransportSource() {
         return getUnit().getLocation();
@@ -96,7 +109,7 @@ public class AIUnit extends AIObject implements Transportable {
     * mission. The target for the tansport is determined by
     * {@link TransportMission} in the latter case.
     *
-    * @return The destination for this <codeTransportable</code>.
+    * @return The destination for this <code>Transportable</code>.
     */
     public Location getTransportDestination() {
         if (mission == null) {
@@ -165,6 +178,7 @@ public class AIUnit extends AIObject implements Transportable {
 
     /**
     * Gets the mission this unit has been assigned.
+    * @return The <code>Mission</code>.
     */
     public Mission getMission() {
         return mission;
@@ -173,6 +187,7 @@ public class AIUnit extends AIObject implements Transportable {
 
     /**
     * Checks if this unit has been assigned a mission.
+    * @return <code>true</code> if this unit has a mission.
     */
     public boolean hasMission() {
         return (mission != null);
@@ -181,6 +196,7 @@ public class AIUnit extends AIObject implements Transportable {
     
     /**
     * Assignes a mission to unit.
+    * @param mission The new <code>Mission</code>.
     */
     public void setMission(Mission mission) {
         this.mission = mission;
@@ -199,6 +215,9 @@ public class AIUnit extends AIObject implements Transportable {
     }
     
     
+    /**
+     * Disposes this object and any attached mission.
+     */
     public void dispose() {
         if (hasMission()) {
             getMission().dispose();
@@ -207,11 +226,22 @@ public class AIUnit extends AIObject implements Transportable {
     }
     
     
+    /**
+     * Returns the ID of this <code>AIObject</code>.
+     * @return The same ID as the <code>Unit</code> this
+     * 		<code>AIObject</code> controls.
+     */
     public String getID() {
         return unit.getID();
     }
 
 
+    /**
+     * Creates an XML-representation of this object.
+     * @param document The <code>Document</code> in which
+     * 		the XML-representation should be created.
+     * @return The XML-representation.
+     */    
     public Element toXMLElement(Document document) {
         Element element = document.createElement(getXMLElementTagName());
 
@@ -226,7 +256,12 @@ public class AIUnit extends AIObject implements Transportable {
         return element;
     }
 
-
+    /**
+     * Updates this object from an XML-representation of
+     * a <code>AIUnit</code>.
+     * 
+     * @param element The XML-representation.
+     */
     public void readFromXMLElement(Element element) {
         unit = (Unit) getAIMain().getFreeColGameObject(element.getAttribute("ID"));
 

@@ -29,7 +29,7 @@ public class WorkLocationPlan {
     
 
     /**
-    * The FreeColGameObject this AIObject contains AI-information for:
+    * The FreeColGameObject this AIObject contains AI-information for.
     */
     private WorkLocation workLocation;
     private int priority;

@@ -185,7 +185,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
 
     /**
     * Adds a <code>Locatable</code> to this Location.
-    * @param locatable The code>Locatable</code> to add to this Location.
+    * @param locatable The <code>Locatable</code> to add to this Location.
     */
     public void add(Locatable locatable) {
         if (locatable instanceof Unit) {
@@ -197,7 +197,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
 
 
     /**
-    * Removes a code>Locatable</code> from this Location.
+    * Removes a <code>Locatable</code> from this Location.
     * @param locatable The <code>Locatable</code> to remove from this Location.
     */
     public void remove(Locatable locatable) {

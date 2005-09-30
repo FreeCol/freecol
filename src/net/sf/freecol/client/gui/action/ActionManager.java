@@ -23,6 +23,7 @@ public class ActionManager extends OptionGroup {
 
     /**
     * Creates a new <code>ActionManager</code>.
+    * @param freeColClient The main client controller.
     */
     public ActionManager(FreeColClient freeColClient) {
         super("actionManager.name", "actionManager.shortDescription");
@@ -60,7 +61,9 @@ public class ActionManager extends OptionGroup {
     
     /**
     * Gets the <code>FreeColAction</code> specified by the given <code>id</code>.
+    * 
     * @param id The string identifying the action.
+    * @return The <code>FreeColAction</code>.
     */
     public FreeColAction getFreeColAction(String id) {
         Iterator it = iterator();

@@ -157,7 +157,7 @@ public final class MapControls {
 
 
     /**
-    * Zooms in the mini map
+    * Zooms in the mini map.
     */
     public void zoomIn() {
         miniMap.zoomIn();
@@ -165,7 +165,7 @@ public final class MapControls {
 
 
     /**
-    * Zooms out the mini map
+    * Zooms out the mini map.
     */
     public void zoomOut() {
         miniMap.zoomOut();

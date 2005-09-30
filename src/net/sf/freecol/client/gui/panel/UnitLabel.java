@@ -105,7 +105,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
 
 
     /**
-    * Makes a smaller version
+    * Makes a smaller version.
     */
     public void setSmall(boolean isSmall) {
         if (isSmall) {

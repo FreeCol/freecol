@@ -77,7 +77,10 @@ public class ChangeAction extends MapboardAction {
         return ID;
     }
 
-
+    /**
+     * Applies this action.
+     * @param e The <code>ActionEvent</code>.
+     */
     public void actionPerformed(ActionEvent e) {
         Unit unit = getFreeColClient().getGUI().getActiveUnit();
         Tile tile = unit.getTile();

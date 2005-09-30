@@ -114,6 +114,14 @@ public final class FreeColClient {
     /**
     * Creates a new <code>FreeColClient</code>. Creates the control
     * objects and starts the GUI.
+    * 
+    * @param windowed Determines if the <code>Canvas</code> should be displayed
+    * 		within a <code>JFrame</code> (when <code>true</code>) or in fullscreen
+    * 		mode (when <code>false</code>).
+    * @param windowSize The size of the window if not in fullscreen mode.
+    * @param imageLibrary The object holding the images.
+    * @param musicLibrary The object holding the music.
+    * @param sfxLibrary The object holding the sound effects.
     */
     public FreeColClient(boolean windowed, Rectangle windowSize, ImageLibrary imageLibrary, MusicLibrary musicLibrary, SfxLibrary sfxLibrary) {
         this.windowed = windowed;
@@ -273,6 +281,10 @@ public final class FreeColClient {
     }
 
 
+    /**
+     * Gets the <code>ImageLibrary</code>.
+     * @return The <code>ImageLibrary</code>.
+     */
     public ImageLibrary getImageLibrary() {
         return imageLibrary;
     }
@@ -288,6 +300,7 @@ public final class FreeColClient {
 
     /**
     * Reads the {@link ClientOptions} from the given file.
+    * @param loadFile The <code>File</code> to read the <code>ClientOptions</code> from.
     */
     public void loadClientOptions(File loadFile) {
         if (loadFile == null || !loadFile.exists()) {
@@ -318,6 +331,7 @@ public final class FreeColClient {
 
     /**
     * Gets the object responsible for keeping and updating the actions.
+    * @return The <code>ActionManager</code>.
     */
     public ActionManager getActionManager() {
         return actionManager;
@@ -326,6 +340,7 @@ public final class FreeColClient {
     
     /**
     * Returns the object keeping the current client options.
+    * @return The <code>ClientOptions</code>.
     */
     public ClientOptions getClientOptions() {
         return clientOptions;
@@ -354,11 +369,23 @@ public final class FreeColClient {
     }
 
 
+    /**
+     * Sets the <code>FreeColServer</code> which has been started
+     * by the client gui.
+     * 
+     * @param freeColServer The <code>FreeColServer</code>.
+     * @see #getFreeColServer
+     */
     public void setFreeColServer(FreeColServer freeColServer) {
         this.freeColServer = freeColServer;
     }
 
 
+    /**
+     * Gets the <code>FreeColServer</code> started by the client.
+     * @return The <code>FreeColServer</code> or <code>null</code>
+     * 		if no server has been started.
+     */
     public FreeColServer getFreeColServer() {
         return freeColServer;
     }
@@ -400,7 +427,7 @@ public final class FreeColClient {
 
     /**
     * Gets the <code>GUI</code> that is beeing used to draw the map
-    * on the {@link Canvas}
+    * on the {@link Canvas}.
     *
     * @return The <code>GUI</code>.
     */
@@ -473,6 +500,8 @@ public final class FreeColClient {
     /**
     * Gets the controller responsible for starting a server and
     * connecting to it.
+    * 
+    * @return The <code>ConnectController</code>.
     */
     public ConnectController getConnectController() {
         return connectController;
@@ -482,6 +511,8 @@ public final class FreeColClient {
     /**
     * Gets the controller that will be used before the game
     * has been started.
+    * 
+    * @return The <code>PreGameController</code>.
     */
     public PreGameController getPreGameController() {
         return preGameController;
@@ -491,6 +522,8 @@ public final class FreeColClient {
     /**
     * Gets the input handler that will be used before the game
     * has been started.
+    * 
+    * @return The <code>PreGameInputHandler</code>.
     */
     public PreGameInputHandler getPreGameInputHandler() {
         return preGameInputHandler;
@@ -500,6 +533,8 @@ public final class FreeColClient {
     /**
     * Gets the controller that will be used when the game
     * has been started.
+    * 
+    * @return The <code>InGameController</code>.
     */
     public InGameController getInGameController() {
         return inGameController;
@@ -509,6 +544,8 @@ public final class FreeColClient {
     /**
     * Gets the input handler that will be used when the game
     * has been started.
+    * 
+    * @return The <code>InGameInputHandler</code>.
     */
     public InGameInputHandler getInGameInputHandler() {
         return inGameInputHandler;
@@ -517,6 +554,7 @@ public final class FreeColClient {
 
     /**
     * Gets the <code>ClientModelController</code>.
+    * @return The <code>ClientModelController</code>.
     */
     public ClientModelController getModelController() {
         return modelController;
@@ -546,6 +584,10 @@ public final class FreeColClient {
     }
 
 
+    /**
+     * Plays the given sound effect. 
+     * @param sound The key sound effect given by {@link SfxLibrary}.
+     */
     public void playSound(int sound) {
         if (sfxPlayer != null) {
             sfxPlayer.play(sfxLibrary.get(sound));

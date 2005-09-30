@@ -12,7 +12,9 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
-
+/**
+ * A <code>ListCellRenderer</code> to be used by <code>FreeColListUI</code>.
+ */
 public class FreeColComboBoxRenderer implements ListCellRenderer {
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
@@ -22,6 +24,16 @@ public class FreeColComboBoxRenderer implements ListCellRenderer {
     private final NormalComponent NORMAL_COMPONENT = new NormalComponent();
 
 
+    /**
+     * Returns a <code>ListCellRenderer</code> for the given <code>JList</code>.
+     * 
+     * @param list The <code>JList</code>.
+     * @param value The list cell.
+     * @param index The index in the list.
+     * @param isSelected <code>true</code> if the given list cell is selected.
+     * @param hasFocus <code>false</code> if the given list cell has the focus.
+     * @return The <code>ListCellRenderer</code>
+     */
     public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean hasFocus) {
         JLabel c;
 
@@ -44,7 +56,7 @@ public class FreeColComboBoxRenderer implements ListCellRenderer {
     }
 
 
-    public class SelectedComponent extends JLabel {
+    private class SelectedComponent extends JLabel {
 
         public SelectedComponent() {
             setOpaque(false);
@@ -65,7 +77,7 @@ public class FreeColComboBoxRenderer implements ListCellRenderer {
     }
     
 
-    public class NormalComponent extends JLabel {
+    private class NormalComponent extends JLabel {
 
         public NormalComponent() {
             setOpaque(false);
@@ -73,7 +85,9 @@ public class FreeColComboBoxRenderer implements ListCellRenderer {
     }
     
 
+    /**
+     * The <code>FreeColComboBoxRenderer</code> as an <code>UIResource</code>.
+     */
     public static class UIResource extends FreeColComboBoxRenderer implements javax.swing.plaf.UIResource {
     }
-
 }

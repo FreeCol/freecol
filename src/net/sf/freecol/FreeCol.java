@@ -198,6 +198,7 @@ public final class FreeCol {
 
     /**
     * Returns the directory where the savegames should be put.
+    * @return The directory where the savegames should be put.
     */
     public static File getSaveDirectory() {
         return saveDirectory;
@@ -349,6 +350,8 @@ public final class FreeCol {
 
     /**
     * Checks if the program is in "Debug mode".
+    * @return <code>true</code> if the program is in debug
+    * 		mode and <code>false</code> otherwise.
     */
     public static boolean isInDebugMode() {
         return inDebugMode;
@@ -357,6 +360,9 @@ public final class FreeCol {
     
     /**
     * Sets the "debug mode" to be active or not.
+    * @param debug Should be <code>true</code> in order
+    * 		to active debug mode and <code>false</code>
+    * 		otherwise.
     */
     public static void setInDebugMode(boolean debug) {
         inDebugMode = debug;

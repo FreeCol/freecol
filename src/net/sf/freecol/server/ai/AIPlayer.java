@@ -62,12 +62,14 @@ public class AIPlayer extends AIObject {
 
 
     /**
-    * The FreeColGameObject this AIObject contains AI-information for:
+    * The FreeColGameObject this AIObject contains AI-information for.
     */
     private ServerPlayer player;
 
-    /** Temporary variables: */
+    /** Temporary variable. */
     private ArrayList aiUnits = new ArrayList();
+    
+    /** Temporary variable. */
     private Connection debuggingConnection;
 
 
@@ -922,6 +924,8 @@ public class AIPlayer extends AIObject {
     *             goods.
     * @param goods The goods the given <code>Unit</code> is trying to sell.
     * @param gold The suggested price.
+    * @return The price this <code>AIPlayer</code> suggests or
+    * 		{@link NetworkConstants#NO_TRADE}.
     */
     public int tradeProposition(Unit unit, Settlement settlement, Goods goods, int gold) {
         if (settlement instanceof IndianSettlement) {
@@ -1021,6 +1025,7 @@ public class AIPlayer extends AIObject {
 
     /**
     * Returns the <code>Player</code> this <code>AIPlayer</code> is controlling.
+    * @return The <code>Player</code>.
     */
     public Player getPlayer() {
         return player;
@@ -1045,6 +1050,8 @@ public class AIPlayer extends AIObject {
     /**
     * Sets the <code>Connection</code> to be used while communicating with the server.
     * This method is only used for debugging.
+    * 
+    * @param debuggingConnection The connection to be used for debugging.
     */
     public void setDebuggingConnection(Connection debuggingConnection) {
         this.debuggingConnection = debuggingConnection;
@@ -1063,6 +1070,12 @@ public class AIPlayer extends AIObject {
     }
 
 
+    /**
+     * Creates an XML-representation of this object.
+     * @param document The <code>Document</code> in which
+     * 		the XML-representation should be created.
+     * @return The XML-representation.
+     */    
     public Element toXMLElement(Document document) {
         Element element = document.createElement(getXMLElementTagName());
 
@@ -1072,6 +1085,12 @@ public class AIPlayer extends AIObject {
     }
 
 
+    /**
+     * Updates this object from an XML-representation of
+     * a <code>AIPlayer</code>.
+     * 
+     * @param element The XML-representation.
+     */    
     public void readFromXMLElement(Element element) {
         player = (ServerPlayer) getAIMain().getFreeColGameObject(element.getAttribute("ID"));
     }

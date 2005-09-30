@@ -25,12 +25,17 @@ public abstract class AIObject {
     
     /**
     * Creates a new <code>AIObject</code>.
+    * @param aiMain The main AI-object.
     */
     public AIObject(AIMain aiMain) {
         this.aiMain = aiMain;
     }
     
     
+    /**
+     * Returns the main AI-object.
+     * @return The <code>AIMain</code>.
+     */
     public AIMain getAIMain() {
         return aiMain;
     }
@@ -44,21 +49,41 @@ public abstract class AIObject {
     */
     public abstract String getID();
 
-    public abstract Element toXMLElement(Document document);
-
     
+    /**
+     * Creates an XML-representation of this object.
+     * @param document The <code>Document</code> in which
+     * 		the XML-representation should be created.
+     * @return The XML-representation.
+     */    
+    public abstract Element toXMLElement(Document document);
+    
+    
+    /**
+     * Updates this object from an XML-representation of
+     * a <code>AIObject</code> of the same type as the
+     * implementing class.
+     * 
+     * @param element The XML-representation.
+     */    
     public abstract void readFromXMLElement(Element element);
     
     
     /**
     * Returns an instance of the class <code>Random</code>. It that can be
     * used to generate random numbers.
+    * 
+    * @return An instance of <code>Random</code>.
     */
     protected Random getRandom() {
         return aiMain.getRandom();
     }
 
     
+    /**
+     * Disposes this <code>AIObject</code> by removing
+     * any referances to this object.
+     */
     public void dispose() {
         getAIMain().removeAIObject(getID());
     }
@@ -66,6 +91,7 @@ public abstract class AIObject {
         
     /**
     * Returns the game.
+    * @return The <code>Game</code>.
     */
     public Game getGame() {
         return aiMain.getGame();

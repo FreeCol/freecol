@@ -26,13 +26,16 @@ public class ChatAction extends MapboardAction {
 
 
     /**
-    * Creates a new <code>ChatAction</code>
+    * Creates a new <code>ChatAction</code>.
     */
     ChatAction(FreeColClient freeColClient) {
         super(freeColClient, "menuBar.game.chat", null, KeyEvent.VK_T, KeyStroke.getKeyStroke('T', 0));
     }
 
 
+    /**
+     * Disables this option if the mapboard is not selected and otherwise enables this option.
+     */    
     public void update() {
         super.update();
     }
@@ -46,7 +49,11 @@ public class ChatAction extends MapboardAction {
         return ID;
     }
 
-
+    
+    /**
+     * Applies this action.
+     * @param e The <code>ActionEvent</code>.
+     */
     public void actionPerformed(ActionEvent e) {
         getFreeColClient().getCanvas().showChatPanel();
     }

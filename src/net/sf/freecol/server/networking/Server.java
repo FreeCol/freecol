@@ -251,7 +251,7 @@ public final class Server extends Thread {
     }
 
     /**
-    * Removes the given connection
+    * Removes the given connection.
     * @param connection The connection that should be removed.
     */
     public void removeConnection(Connection connection) {

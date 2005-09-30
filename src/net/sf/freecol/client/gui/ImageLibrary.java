@@ -759,7 +759,7 @@ public final class ImageLibrary extends ImageProvider {
     }
 
     /**
-     * Returns the unit-button image at the given index in the given state
+     * Returns the unit-button image at the given index in the given state.
      * @param index The index of the image to return.
      * @param state The state (normal, highlighted, pressed, disabled)
      * @return The image pointer
@@ -769,7 +769,7 @@ public final class ImageLibrary extends ImageProvider {
     }
 
     /**
-     * Returns the indian settlement image at the given index
+     * Returns the indian settlement image at the given index.
      * @param index The index of the image to return.
      * @return The image pointer
      */
@@ -796,7 +796,7 @@ public final class ImageLibrary extends ImageProvider {
     }
 
     /**
-     * Returns the colony image at the given index
+     * Returns the colony image at the given index.
      * @param index The index of the image to return.
      * @return The image pointer
      */

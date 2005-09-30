@@ -186,7 +186,7 @@ public class ServerModelController implements ModelController {
 
     
     /**
-    * Puts the specified <code>Unit</code in America.
+    * Puts the specified <code>Unit</code> in America.
     * @param unit The <code>Unit</code>.
     * @return The <code>Location</code> where the <code>Unit</code> appears.
     */

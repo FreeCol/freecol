@@ -1278,7 +1278,9 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             }
         }
 
-
+        /**
+         * Panel for visualizing a <code>ColonyTile</code>.
+         */
         public final class ASingleTilePanel extends JPanel {
 
             private ColonyTile colonyTile;

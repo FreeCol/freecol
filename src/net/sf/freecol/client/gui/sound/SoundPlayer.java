@@ -199,18 +199,18 @@ public class SoundPlayer {
         /** The sound that is prepared for/is playing. A <i>Sequence</i>, <i>BufferedInputStream</i> or a <i>Clip</i>. */
         private Object currentSound;
 
-        /** True if MIDI is finished playing */
+        /** True if MIDI is finished playing. */
         private boolean midiEOM;
 
-        /** True if (not MIDI) audio is finished playing */
+        /** True if (not MIDI) audio is finished playing. */
         private boolean audioEOM;
 
-        /** The <i>Sequencer</i> to use while playing MIDI */
+        /** The <i>Sequencer</i> to use while playing MIDI. */
         private Sequencer sequencer;
 
         private Synthesizer synthesizer;
 
-        /** An array of <i>MidiChannel</i> to use while playing MIDI */
+        /** An array of <i>MidiChannel</i> to use while playing MIDI. */
         private MidiChannel channels[];
 
 
@@ -343,7 +343,7 @@ public class SoundPlayer {
 
 
         /**
-        * Play the sound in <i>currentSound<i>.
+        * Play the sound in <code>currentSound</code>.
         * @see #loadSound
         */
         private void playSound() {

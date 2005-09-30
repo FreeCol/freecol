@@ -44,6 +44,17 @@ public class ClientModelController implements ModelController {
     /**
     * Returns a pseudorandom int, uniformly distributed between 0
     * (inclusive) and the specified value (exclusive).
+    * 
+    * @param taskID The <code>taskID</code> should be a unique identifier.
+    *               One method to make a unique <code>taskID</code>:
+    *               <br><br>
+    *               getID() + "methodName:taskDescription"
+    *               <br><br>
+    *               As long as the "taskDescription" is unique
+    *               within the method ("methodName"), you get a unique
+    *               identifier.
+    * @param n The specified value.
+    * @return The generated number.
     */
     public int getRandom(String taskID, int n) {
         Client client = freeColClient.getClient();
@@ -65,6 +76,23 @@ public class ClientModelController implements ModelController {
     }
     
 
+    /**
+     * Creates a new unit.
+     *
+     * @param taskID The <code>taskID</code> should be a unique identifier.
+     *               One method to make a unique <code>taskID</code>:
+     *               <br><br>
+     *               getID() + "methodName:taskDescription"
+     *               <br><br>
+     *               As long as the "taskDescription" is unique
+     *               within the method ("methodName"), you get a unique
+     *               identifier.
+     * @param location The <code>Location</code> where the <code>Unit</code>
+     *               will be created.
+     * @param owner  The <code>Player</code> owning the <code>Unit</code>.
+     * @param type   The type of unit (Unit.FREE_COLONIST...).
+     * @return The created <code>Unit</code>.
+     */
     public Unit createUnit(String taskID, Location location, Player owner, int type) {
         Client client = freeColClient.getClient();
 
@@ -90,6 +118,12 @@ public class ClientModelController implements ModelController {
     }
 
 
+    /**
+     * Puts the specified <code>Unit</code> in America.
+     * 
+     * @param unit The <code>Unit</code>.
+     * @return The <code>Location</code> where the <code>Unit</code> appears.
+     */    
     public Location setToVacantEntryLocation(Unit unit) {
         Game game = freeColClient.getGame();
         Client client = freeColClient.getClient();
@@ -111,11 +145,23 @@ public class ClientModelController implements ModelController {
     }
 
     
+    /**
+     * Explores the given tiles for the given player.
+     * 
+     * @param player The <code>Player</code> that should see more tiles.
+     * @param tiles The tiles to explore.
+     */    
     public void exploreTiles(Player player, ArrayList tiles) {
         // Nothing to do on the client side.
     }
 
 
+    /**
+     * Tells the <code>ModelController</code> that an internal
+     * change (that is; not caused by the control) has occured in the model.
+     * 
+     * @param tile The <code>Tile</code> which will need an update.
+     */    
     public void update(Tile tile) {
         // Nothing to do on the client side.
     }

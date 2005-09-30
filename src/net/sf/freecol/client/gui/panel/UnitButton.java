@@ -48,7 +48,7 @@ public final class UnitButton extends JButton {
 
                             
     /**
-    * The basic constructor
+    * The basic constructor.
     */
     public UnitButton(FreeColClient freeColClient, int index) {
         this.freeColClient = freeColClient;
@@ -58,7 +58,7 @@ public final class UnitButton extends JButton {
     
 
     /**
-    * The basic constructor
+    * The basic constructor.
     */
     public UnitButton(FreeColClient freeColClient, GUI gui) {
         this.gui = gui;
@@ -67,7 +67,7 @@ public final class UnitButton extends JButton {
         
 
     /**
-    * A constructor which initializes the container
+    * A constructor which initializes the container.
     * @param container The JComponent that contains this button
     */
     public UnitButton(JComponent container, FreeColClient freeColClient, GUI gui) {
@@ -81,7 +81,7 @@ public final class UnitButton extends JButton {
 
 
     /**
-    * Sets various attributes about the button, as well as the picture set
+    * Sets various attributes about the button, as well as the picture set.
     * @param index The picture set to use (see definitions in ImageLibrary.java)
     * @param imageProvider The ImageProvider used to retrive the Images
     */
@@ -114,7 +114,7 @@ public final class UnitButton extends JButton {
 
 
     /**
-    * Sets the container
+    * Sets the container.
     * @param container The JComponent to set as the container
     */
     public void setContainer(JComponent container) {
@@ -123,7 +123,7 @@ public final class UnitButton extends JButton {
 
 
     /**
-    * A function that removes this button from its container
+    * A function that removes this button from its container.
     */
     public void removeFromContainer() {
         container.remove(this);
@@ -131,7 +131,7 @@ public final class UnitButton extends JButton {
     
 
     /**
-    * Gets called when this button becomes pressed
+    * Gets called when this button becomes pressed.
     * The button will determine what it is supposed to do
     */
     public void push() {

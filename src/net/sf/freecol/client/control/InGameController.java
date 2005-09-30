@@ -119,6 +119,9 @@ public final class InGameController implements NetworkConstants {
     * Sets the "debug mode" to be active or not. Calls
     * {@link FreeCol#setInDebugMode} and reinitialize the
     * <code>FreeColMenuBar</code>.
+    * 
+    * @param debug Should be set to <code>true</code> in order
+    * 		to enable debug mode.
     */
     public void setInDebugMode(boolean debug) {
         FreeCol.setInDebugMode(debug);
@@ -129,6 +132,7 @@ public final class InGameController implements NetworkConstants {
 
     /**
     * Sends a public chat message.
+    * @param message The chat message.
     */
     public void sendChat(String message) {
         Element chatElement = Message.createNewRootElement("chat");
@@ -304,6 +308,7 @@ public final class InGameController implements NetworkConstants {
 
     /**
     * Buys the given land from the indians.
+    * @param tile The land which should be bought from the indians. 
     */
     public void buyLand(Tile tile) {
         Element buyLandElement = Message.createNewRootElement("buyLand");
@@ -989,7 +994,10 @@ public final class InGameController implements NetworkConstants {
 
     /**
     * Puts the specified unit outside the colony.
+    * 
     * @param unit The <code>Unit</code>
+    * @param skipCheck The confirmation dialog for abandoning the colony
+    * 		will not be displayed if this parameter is set to <code>true</code>.
     * @return <i>true</i> if the unit was successfully put outside the colony.
     */
     public boolean putOutsideColony(Unit unit, boolean skipCheck) {
@@ -1717,6 +1725,8 @@ public final class InGameController implements NetworkConstants {
     *
     * @param element The <code>Element</code> to search for the child element.
     * @param tagName The tag name of the child element to be found.
+    * @return The child of the given <code>Element</code> with the given
+    * 		<code>tagName</code> or <code>null</code> if no such child exists.
     */
     protected Element getChildElement(Element element, String tagName) {
         NodeList n = element.getChildNodes();

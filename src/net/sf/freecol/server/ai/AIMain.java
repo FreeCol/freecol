@@ -81,6 +81,7 @@ public class AIMain implements FreeColGameObjectListener {
 
     /**
     * Returns the game.
+    * @return The <code>Game</code>.
     */
     public Game getGame() {
         return freeColServer.getGame();
@@ -90,6 +91,7 @@ public class AIMain implements FreeColGameObjectListener {
     /**
     * Returns an instance of the class <code>Random</code>. It that can be
     * used to generate random numbers.
+    * @return The instance of <code>Random</code>.
     */
     public Random getRandom() {
         return random;
@@ -134,6 +136,7 @@ public class AIMain implements FreeColGameObjectListener {
     * @param fcgo The <code>FreeColGameObject</code> to find
     *        the <code>AIObject</code> for.
     * @see #getAIObject(String)
+    * @return The <code>AIObject</code>.
     */
     public AIObject getAIObject(FreeColGameObject fcgo) {
         return getAIObject(fcgo.getID());
@@ -145,6 +148,7 @@ public class AIMain implements FreeColGameObjectListener {
     *
     * @param id The ID of the <code>AIObject</code>.
     * @see #getAIObject(FreeColGameObject)
+    * @return The <code>AIObject</code>.
     */
     public AIObject getAIObject(String id) {
         return (AIObject) aiObjects.get(id);
@@ -179,6 +183,7 @@ public class AIMain implements FreeColGameObjectListener {
     * {@link Game#getFreeColGameObject}
     *
     * @param id The ID of the <code>FreeColGameObject</code> to find.
+    * @return The <code>FreeColGameObject</code>.
     */
     public FreeColGameObject getFreeColGameObject(String id) {
         return freeColServer.getGame().getFreeColGameObject(id);

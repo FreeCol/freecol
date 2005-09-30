@@ -22,7 +22,7 @@ public interface Transportable {
     * This is normally the location of the
     * {@link #getTransportLocatable locatable}.
     *
-    * @return The source for this <codeTransportable</code>.
+    * @return The source for this <code>Transportable</code>.
     */
     public Location getTransportSource();
     
@@ -34,7 +34,7 @@ public interface Transportable {
     * mission. The target for the tansport is determined by
     * {@link TransportMission} in the latter case.
     *
-    * @return The destination for this <codeTransportable</code>.
+    * @return The destination for this <code>Transportable</code>.
     */
     public Location getTransportDestination();
 

@@ -50,7 +50,7 @@ public class Map extends FreeColGameObject {
     private static final int COST_UNIT_BLOCKING = 20,
                              COST_MAY_BLOCK = 10;
     
-    /** Constant used for given options in {@link #findPath(Unit, Tile, Tile)} */
+    /** Constant used for given options in {@link #findPath(Unit, Tile, Tile)}. */
     public static final int BOTH_LAND_AND_SEA = 0,
                             ONLY_LAND = 1,
                             ONLY_SEA = 2;
@@ -102,7 +102,7 @@ public class Map extends FreeColGameObject {
 
     /**
     * Create a new <code>Map</code> from an <code>Element</code>
-    * in a DOM-parsed XML-tree
+    * in a DOM-parsed XML-tree.
     *
     * @param game The <code>Game</code> this map belongs to.
     * @param element The <code>Element</code> in a DOM-parsed XML-tree that describes
@@ -760,7 +760,7 @@ public class Map extends FreeColGameObject {
 
     /**
      * Gets an <code>Iterator</code> of every <code>Tile</code> on the map.
-     * @return the code>Iterator</code>
+     * @return the <code>Iterator</code>.
      */
     public WholeMapIterator getWholeMapIterator() {
         return new WholeMapIterator();

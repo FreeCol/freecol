@@ -88,7 +88,7 @@ public final class GoodsLabel extends JLabel implements ActionListener {
 
 
     /**
-    * Makes a smaller version
+    * Sets that this <code>GoodsLabel</code> should be small.
     */
     public void setSmall(boolean isSmall) {
         if (isSmall) {

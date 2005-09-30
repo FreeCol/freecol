@@ -9,6 +9,9 @@ import net.sf.freecol.common.networking.MessageHandler;
 
 import org.w3c.dom.Element;
 
+/**
+ * Provides common methods for input handlers.
+ */
 public abstract class InputHandler implements MessageHandler {
     private static final Logger logger = Logger.getLogger(InputHandler.class.getName());
 
@@ -43,6 +46,7 @@ public abstract class InputHandler implements MessageHandler {
     *
     * @param connection The <code>Connection</code> the message was received on.
     * @param element The root element of the message.
+    * @return The reply.
     */
     public abstract Element handle(Connection connection, Element element);
 
@@ -52,6 +56,7 @@ public abstract class InputHandler implements MessageHandler {
     *
     * @param disconnectElement The element (root element in a DOM-parsed XML tree) that
     *                holds all the information.
+    * @return <code>null</code>.
     */
     protected Element disconnect(Element disconnectElement) {
         // Updating the GUI should always be done in the EDT:

@@ -259,7 +259,7 @@ public class MapGenerator {
 
 
     /**
-    * Generates wanted goods for a given location (indian settlement)
+    * Generates wanted goods for a given location (indian settlement).
     * @param mainTile The tile where the settlement is located.
     * @return An int array containing the 3 wanted goods.
     */

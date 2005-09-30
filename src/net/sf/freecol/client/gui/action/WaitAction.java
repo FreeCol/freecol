@@ -42,6 +42,10 @@ public class WaitAction extends MapboardAction {
     }
 
 
+    /**
+     * Applies this action.
+     * @param e The <code>ActionEvent</code>.
+     */    
     public void actionPerformed(ActionEvent e) {
         getFreeColClient().getInGameController().nextActiveUnit();
     }

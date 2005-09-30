@@ -29,7 +29,7 @@ public interface Location {
     /**
     * Adds a <code>Locatable</code> to this Location.
     *
-    * @param locatable The code>Locatable</code> to add to this Location.
+    * @param locatable The <code>Locatable</code> to add to this Location.
     */
     public void add(Locatable locatable);
 

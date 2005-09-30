@@ -53,7 +53,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
     private int tileSize; //tileSize is the size (in pixels) that each tile will take up on the mini map
 
     /**
-    * The top left tile on the mini map represents the tile
+    * The top left tile on the mini map represents the tile.
     * (xOffset, yOffset) in the world map
     */
     private int xOffset, yOffset;
@@ -153,7 +153,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
 
 
     /**
-     * Zooms in the mini map
+     * Zooms in the mini map.
      */
     public void zoomIn() {
         tileSize += 4;
@@ -168,7 +168,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
 
 
     /**
-     * Zooms out the mini map
+     * Zooms out the mini map.
      */
     public void zoomOut() {
         if (tileSize > 8) {

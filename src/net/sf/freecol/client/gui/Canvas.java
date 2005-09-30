@@ -934,6 +934,10 @@ public final class Canvas extends JLayeredPane {
     }
 
 
+    /**
+     * Gets the dialog which is used for choosing a founding father.
+     * @return The dialog.
+     */
     public ChooseFoundingFatherDialog getChooseFoundingFatherDialog() {
         return chooseFoundingFatherDialog;
     }
@@ -941,6 +945,8 @@ public final class Canvas extends JLayeredPane {
 
     /**
     * Shows the {@link EventPanel}.
+    * @param eventID The type of <code>EventPanel</code> to be displayed.
+    * @return <code>true</code>.
     */
     public boolean showEventDialog(int eventID) {
         eventPanel.initialize(eventID);
@@ -959,6 +965,10 @@ public final class Canvas extends JLayeredPane {
     }
 
 
+    /**
+     * Gets the <code>EventPanel</code>.
+     * @return The panel.
+     */
     public EventPanel getEventPanel() {
         return eventPanel;
     }
@@ -1301,7 +1311,7 @@ public final class Canvas extends JLayeredPane {
     * <br><code>canvas.showInformationMessage("noNeedForTheGoods", new String[][] {{"%goods%", goods.getName()}});</code>
     * @param messageId The messageId of the message to display.
     * @param replace All occurances of <code>replace[i][0]</code> in
-    *                the message gets replaced by <code>replace[i][1].
+    *                the message gets replaced by <code>replace[i][1]</code>.
     */
     public void showInformationMessage(String messageId, String[][] replace) {
         String text = Messages.message(messageId);
@@ -1507,6 +1517,13 @@ public final class Canvas extends JLayeredPane {
     }
     
     
+    /**
+     * Checks if this <code>Canvas</code> contains any
+     * ingame components.
+     * 
+     * @return <code>true</code> if there is a single ingame
+     * 		component.
+     */
     public boolean containsInGameComponents() {
         // remove listeners, they will be added when launching the new game...
         KeyListener[] keyListeners = getKeyListeners();

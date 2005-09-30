@@ -45,6 +45,7 @@ public class BooleanOption extends AbstractOption {
 
     /**
     * Gets the current value of this <code>BooleanOption</code>.
+    * @return The value.
     */
     public boolean getValue() {
         return value;
@@ -53,6 +54,7 @@ public class BooleanOption extends AbstractOption {
     
     /**
     * Sets the current value of this <code>BooleanOption</code>.
+    * @param value The value.
     */
     public void setValue(boolean value) {
         this.value = value;

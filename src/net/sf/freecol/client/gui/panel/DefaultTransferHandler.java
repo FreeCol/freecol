@@ -441,7 +441,7 @@ public final class DefaultTransferHandler extends TransferHandler {
         // --- DragGestureListener methods -----------------------------------
 
         /**
-         * a Drag gesture has been recognized
+         * A Drag gesture has been recognized.
          */
         public void dragGestureRecognized(DragGestureEvent dge) {
             JComponent c = (JComponent) dge.getComponent();
@@ -488,28 +488,28 @@ public final class DefaultTransferHandler extends TransferHandler {
         // --- DragSourceListener methods -----------------------------------
 
         /**
-         * as the hotspot enters a platform dependent drop site
+         * as the hotspot enters a platform dependent drop site.
          */
         public void dragEnter(DragSourceDragEvent dsde) {
         }
 
 
         /**
-         * as the hotspot moves over a platform dependent drop site
+         * as the hotspot moves over a platform dependent drop site.
          */
         public void dragOver(DragSourceDragEvent dsde) {
         }
 
 
         /**
-         * as the hotspot exits a platform dependent drop site
+         * as the hotspot exits a platform dependent drop site.
          */
         public void dragExit(DragSourceEvent dsde) {
         }
 
 
         /**
-         * as the operation completes
+         * as the operation completes.
          */
         public void dragDropEnd(DragSourceDropEvent dsde) {
             DragSourceContext dsc = dsde.getDragSourceContext();
@@ -557,14 +557,14 @@ public final class DefaultTransferHandler extends TransferHandler {
 
 
         /**
-         * register this DragGestureRecognizer's Listeners with the Component
+         * register this DragGestureRecognizer's Listeners with the Component.
          */
         protected void registerListeners() {
         }
 
 
         /**
-         * unregister this DragGestureRecognizer's Listeners with the Component
+         * unregister this DragGestureRecognizer's Listeners with the Component.
          *
          * subclasses must override this method
          */

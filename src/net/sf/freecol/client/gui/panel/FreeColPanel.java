@@ -71,7 +71,7 @@ public class FreeColPanel extends JPanel {
     }
 
     /**
-     * Registers enter key for a jbutton
+     * Registers enter key for a jbutton.
      * @param button
      */
     public static void enterPressesWhenFocused(JButton button) {

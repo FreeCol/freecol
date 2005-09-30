@@ -160,7 +160,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     * Initiate a new <code>Unit</code> with the specified parameters.
     *
     * @param game The <code>Game</code> in which this <code>Unit</code> belong.
-    * @param location The <code>Location/code> to place this <code>Unit</code> upon.
+    * @param location The <code>Location</code> to place this <code>Unit</code> upon.
     * @param owner The <code>Player</code> owning this unit.
     * @param type The type of the unit.
     * @param s The initial state for this Unit (one of {@link #ACTIVE}, {@link #FORTIFY}...).
@@ -178,7 +178,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     * Initiate a new <code>Unit</code> with the specified parameters.
     *
     * @param game The <code>Game</code> in which this <code>Unit</code> belong.
-    * @param location The <code>Location/code> to place this <code>Unit</code> upon.
+    * @param location The <code>Location</code> to place this <code>Unit</code> upon.
     * @param owner The <code>Player</code> owning this unit.
     * @param type The type of the unit.
     * @param s The initial state for this Unit (one of {@link #ACTIVE}, {@link #FORTIFY}...).
@@ -618,7 +618,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     
     /**
     * Returns the number of turns this <code>Unit</code> will have to use
-    * in order to reach the given <codeTile</code>.
+    * in order to reach the given <code>Tile</code>.
     *
     * @param end The <code>Tile</code> to be reached by this <code>Unit</code>.
     * @return The number of turns it will take to reach the <code>end</code>,
@@ -2365,7 +2365,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
 
     /**
-    * This method does all the work :-)
+    * This method does all the work.
     */
     public void doAssignedWork() {
         if (workLeft > 0) {
@@ -2849,7 +2849,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     * @param defender The <code>Unit</code> defending against attack.
     * @param result The result of the attack.
     * @param plunderGold The amount of gold to plunder in case of
-    *        a successful attack on a <code>Settlement</cdoe>.
+    *        a successful attack on a <code>Settlement</code>.
     */
     public void attack(Unit defender, int result, int plunderGold) {
         if (defender == null) {
@@ -3086,7 +3086,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
 
     /**
-    * Gets the Colony this unit is in
+    * Gets the Colony this unit is in.
     * @return The Colony it's in, or null if it is not in a Colony
     */
     public Colony getColony() {

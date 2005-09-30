@@ -30,7 +30,7 @@ public class Game extends FreeColGameObject {
 
 
 
-    /** Contains all the players in the game: */
+    /** Contains all the players in the game. */
     private Vector players = new Vector();
 
     private Map map;
@@ -46,7 +46,7 @@ public class Game extends FreeColGameObject {
      */
     private Player viewOwner;
 
-    /** The maximum number of (human) players allowed in this game */
+    /** The maximum number of (human) players allowed in this game. */
     private int maxPlayers = 4;
 
     /** Contains references to all objects created in this game. */
@@ -58,7 +58,7 @@ public class Game extends FreeColGameObject {
     /** The next availeble ID, that can be given to a new <code>FreeColGameObject</code>. */
     private int nextId = 1;
 
-    /** Indicates wether or not this object may give ID's */
+    /** Indicates wether or not this object may give IDs. */
     private boolean canGiveID;
 
     /* The market for Europe. */
@@ -449,7 +449,7 @@ public class Game extends FreeColGameObject {
     /**
     * Gets an <code>Iterator</code> of every registered <code>FreeColGameObject</code>.
     *
-    * @return an <codeIterator</code> containing every registered <code>FreeColGameObject</code>.
+    * @return an <code>Iterator</code> containing every registered <code>FreeColGameObject</code>.
     * @see #setFreeColGameObject
     */
     public Iterator getFreeColGameObjectIterator() {

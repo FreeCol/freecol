@@ -100,13 +100,13 @@ public class Player extends FreeColGameObject {
     public static final int MAX_LINE_OF_SIGHT = 2;
 
     /**
-    * Contains booleans to see which tribes this player has met:
+    * Contains booleans to see which tribes this player has met.
     */
     private boolean[] contacted = new boolean[NUMBER_OF_NATIONS];
 
     /**
     * Only used by AI - stores the tension levels,
-    * 0-1000 with 1000 maximum hostillity:
+    * 0-1000 with 1000 maximum hostillity.
     */
     private int[] tension = new int[NUMBER_OF_NATIONS];
 
@@ -425,7 +425,7 @@ public class Player extends FreeColGameObject {
     }
 
     /**
-     * Returns whether this player has met with <code>type</code>
+     * Returns whether this player has met with <code>type</code>.
      */
     public boolean hasContacted(int type) {
         return contacted[type];
@@ -433,7 +433,7 @@ public class Player extends FreeColGameObject {
 
 
     /**
-     * Sets whether this player has contacted <code>type</code>
+     * Sets whether this player has contacted <code>type</code>.
      */
     public void setContacted(Player player, boolean b) {
         int type = player.getNation();
@@ -481,7 +481,7 @@ public class Player extends FreeColGameObject {
 
 
     /**
-     * Sets whether this player has contacted <code>type</code>
+     * Sets whether this player has contacted <code>type</code>.
      */
     public void setContacted(int type, boolean b) {
         if (type == getNation()) {
@@ -734,7 +734,7 @@ public class Player extends FreeColGameObject {
 
 
     /**
-    * Adds a founding father to this players continental congress
+    * Adds a founding father to this players continental congress.
     * @param type The type of Founding Father to add
     * @see FoundingFather
     */
@@ -772,7 +772,7 @@ public class Player extends FreeColGameObject {
 
     /**
     * Sets this players liberty bell production to work towards recruiting <code>father</code>
-    * to its congress
+    * to its congress.
     * @param father The type of FoundingFather to recruit
     * @see FoundingFather
     */

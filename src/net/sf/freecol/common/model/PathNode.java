@@ -115,7 +115,7 @@ public class PathNode implements Comparable {
 
     /**
     * Returns the number of turns it takes to reach the 
-    * {@link #getTransportDropNode transport node}
+    * {@link #getTransportDropNode transport node}.
     */
     public int getTransportDropTurns() {
         PathNode temp = this;

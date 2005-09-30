@@ -42,6 +42,7 @@ public final class PreGameInputHandler extends InputHandler {
     *
     * @param connection The <code>Connection</code> the message was received on.
     * @param element The root element of the message.
+    * @return The reply.
     */
     public synchronized Element handle(Connection connection, Element element) {
         Element reply = null;

@@ -16,7 +16,7 @@ import org.w3c.dom.Element;
 
 
 /**
-* Mission for building a <code>Colony</code>
+* Mission for building a <code>Colony</code>.
 * @see net.sf.freecol.common.model.Colony Colony
 */
 public class BuildColonyMission extends Mission {
@@ -106,7 +106,7 @@ public class BuildColonyMission extends Mission {
     * mission. The target for the transport is determined by
     * {@link TransportMission} in the latter case.
     *
-    * @return The destination for this <codeTransportable</code>.
+    * @return The destination for this <code>Transportable</code>.
     */    
     public Tile getTransportDestination() {
         if (getUnit().getLocation() instanceof Unit) {

@@ -33,7 +33,7 @@ public class AIColony extends AIObject {
     public static final String  REVISION = "$Revision$";
 
     /**
-    * The FreeColGameObject this AIObject contains AI-information for:
+    * The FreeColGameObject this AIObject contains AI-information for.
     */
     private Colony colony;
 
@@ -42,6 +42,12 @@ public class AIColony extends AIObject {
     private List wishes = new ArrayList();
 
 
+    /**
+     * Creates a new <code>AIColony</code>.
+     * 
+     * @param aiMain The main AI-object.
+     * @param colony The colony to make an {@link AIObject} for.
+     */
     public AIColony(AIMain aiMain, Colony colony) {
         super(aiMain);
 
@@ -50,7 +56,13 @@ public class AIColony extends AIObject {
     }
 
 
-
+    /**
+     * Creates a new <code>AIColony</code>.
+     * 
+     * @param aiMain The main AI-object.
+     * @param element An <code>Element</code> containing an
+     * 		XML-representation of this object.
+     */
     public AIColony(AIMain aiMain, Element element) {
         super(aiMain);
         readFromXMLElement(element);
@@ -59,6 +71,7 @@ public class AIColony extends AIObject {
 
     /**
     * Gets the <code>Colony</code> this <code>AIColony</code> controls.
+    * @return The <code>Colony</code>.
     */
     public Colony getColony() {
         return colony;
@@ -244,7 +257,8 @@ public class AIColony extends AIObject {
     }
 
     /**
-    * Add a <code>GoodsWish</code> to the wish list. 
+    * Add a <code>GoodsWish</code> to the wish list.
+    * @param gw The <code>GoodsWish</code> to be added. 
     */
     public void addGoodsWish(GoodsWish gw) {
         wishes.add(gw);
@@ -668,11 +682,23 @@ public class AIColony extends AIObject {
     }
 
 
+    /**
+     * Gets the ID of this object.
+     * @return The same ID as the <code>Colony</code>
+     * 		this <code>AIColony</code> stores AI-specific
+     * 		information for.
+     */
     public String getID() {
         return colony.getID();
     }
 
 
+    /**
+     * Creates an XML-representation of this object.
+     * @param document The <code>Document</code> in which
+     * 		the XML-representation should be created.
+     * @return The XML-representation.
+     */
     public Element toXMLElement(Document document) {
         Element element = document.createElement(getXMLElementTagName());
 
@@ -704,6 +730,12 @@ public class AIColony extends AIObject {
     }
 
 
+    /**
+     * Updates this object from an XML-representation of
+     * a <code>AIColony</code>.
+     * 
+     * @param element The XML-representation.
+     */
     public void readFromXMLElement(Element element) {
         colony = (Colony) getAIMain().getFreeColGameObject(element.getAttribute("ID"));
 

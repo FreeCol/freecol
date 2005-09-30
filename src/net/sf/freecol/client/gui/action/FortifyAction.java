@@ -58,6 +58,10 @@ public class FortifyAction extends MapboardAction {
     }
 
 
+    /**
+     * Applies this action.
+     * @param e The <code>ActionEvent</code>.
+     */    
     public void actionPerformed(ActionEvent e) {
         getFreeColClient().getInGameController().changeState(getFreeColClient().getGUI().getActiveUnit(), Unit.FORTIFY);
     }

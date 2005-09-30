@@ -18,7 +18,7 @@ import org.w3c.dom.Element;
 
 
 /**
-* Mission for realizing a <code>Wish</code>
+* Mission for realizing a <code>Wish</code>.
 * @see Wish
 */
 public class WishRealizationMission extends Mission {
@@ -103,7 +103,7 @@ public class WishRealizationMission extends Mission {
     * mission. The target for the tansport is determined by
     * {@link TransportMission} in the latter case.
     *
-    * @return The destination for this <codeTransportable</code>.
+    * @return The destination for this <code>Transportable</code>.
     */    
     public Tile getTransportDestination() {
         if (getUnit().getLocation() instanceof Unit) {

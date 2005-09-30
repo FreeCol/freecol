@@ -886,7 +886,7 @@ public final class Tile extends FreeColGameObject implements Location {
 
     /**
     * Adds a <code>Locatable</code> to this Location.
-    * @param locatable The code>Locatable</code> to add to this Location.
+    * @param locatable The <code>Locatable</code> to add to this Location.
     */
     public void add(Locatable locatable) {
         if (locatable instanceof Unit) {
@@ -898,7 +898,7 @@ public final class Tile extends FreeColGameObject implements Location {
 
 
     /**
-    * Removes a code>Locatable</code> from this Location.
+    * Removes a <code>Locatable</code> from this Location.
     * @param locatable The <code>Locatable</code> to remove from this Location.
     */
     public void remove(Locatable locatable) {

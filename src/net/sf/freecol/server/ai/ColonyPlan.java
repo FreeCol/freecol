@@ -35,7 +35,7 @@ public class ColonyPlan {
     public static final String  REVISION = "$Revision$";
 
     /**
-    * The FreeColGameObject this AIObject contains AI-information for:
+    * The FreeColGameObject this AIObject contains AI-information for.
     */
     private Colony colony;
     

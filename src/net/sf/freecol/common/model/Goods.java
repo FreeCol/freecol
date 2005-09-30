@@ -199,7 +199,7 @@ public class Goods implements Locatable, Ownable {
 
 
     /**
-     * Returns a textual representation of the Good of type <code>type<code>.
+     * Returns a textual representation of the Good of type <code>type</code>.
      * @param type  The type of good to return
      * @return
      *

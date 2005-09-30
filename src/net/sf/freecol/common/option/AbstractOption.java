@@ -50,6 +50,8 @@ abstract public class AbstractOption implements Option {
     /**
     * Gives a short description of this <code>Option</code>.
     * Can for instance be used as a tooltip text.
+    * 
+    * @return A short description of this <code>Option</code>.
     */
     public String getShortDescription() {
         return Messages.message(shortDescription);

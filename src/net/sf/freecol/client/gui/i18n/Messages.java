@@ -35,7 +35,7 @@ public final class Messages {
     private static Map  messagesByLocale;
 
     /**
-     * These are the messages for the default locale
+     * These are the messages for the default locale.
      */
     private static Messages  defaultMessages;
 

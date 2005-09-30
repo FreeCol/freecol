@@ -35,6 +35,16 @@ public class AIGoods extends AIObject implements Transportable {
     private AIUnit transport = null;
 
 
+    /**
+     * Creates a new <code>AIGoods</code>.
+     * 
+     * @param aiMain The main AI-object.
+     * @param location The location of the goods.
+     * @param type The type of goods.
+     * @param amount The amount of goods.
+     * @param destination The destination of the goods. This is the
+     * 		<code>Location</code> to which the goods should be transported.
+     */
     public AIGoods(AIMain aiMain, Location location, int type, int amount, Location destination) {
         super(aiMain);
 
@@ -46,6 +56,13 @@ public class AIGoods extends AIObject implements Transportable {
     }
 
 
+    /**
+     * Creates a new <code>AIGoods</code>.
+     * 
+     * @param aiMain The main AI-object.
+     * @param element An <code>Element</code> containing an
+     * 		XML-representation of this object.
+     */    
     public AIGoods(AIMain aiMain, Element element) {
         super(aiMain);
         aiMain.addAIObject(element.getAttribute("ID"), this);
@@ -58,7 +75,7 @@ public class AIGoods extends AIObject implements Transportable {
     * This is normally the location of the
     * {@link #getTransportLocatable locatable}.
     *
-    * @return The source for this <codeTransportable</code>.
+    * @return The source for this <code>Transportable</code>.
     */
     public Location getTransportSource() {
         return goods.getLocation();
@@ -72,7 +89,7 @@ public class AIGoods extends AIObject implements Transportable {
     * mission. The target for the tansport is determined by
     * {@link TransportMission} in the latter case.
     *
-    * @return The destination for this <codeTransportable</code>.
+    * @return The destination for this <code>Transportable</code>.
     */
     public Location getTransportDestination() {
         return destination;
@@ -144,16 +161,28 @@ public class AIGoods extends AIObject implements Transportable {
     }
     
 
+    /**
+     * Sets the priority of getting the goods to the {@link #getTransportDestination}.
+     * @param transportPriority The priority.
+     */
     public void setTransportPriority(int transportPriority) {
         this.transportPriority = transportPriority;
     }
 
     
+    /**
+    * Gets the goods this <code>AIGoods</code> is controlling.
+    * @return The <code>Goods</code>.
+    */
     public Goods getGoods() {
         return goods;
     }
 
 
+    /**
+     * Sets the goods this <code>AIGoods</code> is controlling.
+     * @param goods The <code>Goods</code>.
+     */    
     public void setGoods(Goods goods) {
         if (goods == null) {
             throw new NullPointerException();
@@ -162,11 +191,21 @@ public class AIGoods extends AIObject implements Transportable {
     }
     
     
+    /**
+     * Returns the ID of this {@link AIObject}.
+     * @return The ID.
+     */
     public String getID() {
         return id;
     }
 
 
+    /**
+     * Creates an XML-representation of this object.
+     * @param document The <code>Document</code> in which
+     * 		the XML-representation should be created.
+     * @return The XML-representation.
+     */    
     public Element toXMLElement(Document document) {
         if (document == null) {
             throw new NullPointerException("document == null");
@@ -187,6 +226,12 @@ public class AIGoods extends AIObject implements Transportable {
     }
 
 
+    /**
+     * Updates this object from an XML-representation of
+     * a <code>AIGoods</code>.
+     * 
+     * @param element The XML-representation.
+     */    
     public void readFromXMLElement(Element element) {
         id = element.getAttribute("ID");
         if (element.hasAttribute("destination")) {
@@ -211,6 +256,10 @@ public class AIGoods extends AIObject implements Transportable {
     }
 
     
+    /**
+     * Returns a <code>String</code>-representation of this object.
+     * @return A <code>String</code> representing this objecy for debugging purposes.
+     */
     public String toString() {
         return "AIGoods@" + hashCode() + " type: " + getGoods().getName() + " amount: " + getGoods().getAmount();
     }

@@ -58,7 +58,10 @@ public class BuildRoadAction extends MapboardAction {
         return ID;
     }
 
-
+    /**
+     * Applies this action.
+     * @param e The <code>ActionEvent</code>.
+     */
     public void actionPerformed(ActionEvent e) {
         getFreeColClient().getInGameController().changeState(getFreeColClient().getGUI().getActiveUnit(), Unit.BUILD_ROAD);
     }

@@ -39,6 +39,7 @@ public final class AIInGameInputHandler implements MessageHandler {
     * The constructor to use.
     * @param freeColServer The main server.
     * @param me The AI player that is being managed by this AIInGameInputHandler.
+    * @param aiMain The main AI-object.
     */
     public AIInGameInputHandler(FreeColServer freeColServer, ServerPlayer me, AIMain aiMain) {
         this.freeColServer = freeColServer;
@@ -63,6 +64,7 @@ public final class AIInGameInputHandler implements MessageHandler {
     *
     * @param connection The <code>Connection</code> the message was received on.
     * @param element The root element of the message.
+    * @return The reply.
     */
     public synchronized Element handle(Connection connection, Element element) {
         Element reply = null;
@@ -168,6 +170,12 @@ public final class AIInGameInputHandler implements MessageHandler {
     }
 
     
+    /**
+     * Gets the <code>AIPlayer</code> using this
+     * <code>AIInGameInputHandler</code>.
+     * 
+     * @return The <code>AIPlayer</code>.
+     */
     public AIPlayer getAIPlayer() {
         return (AIPlayer) aiMain.getAIObject(me);
     }

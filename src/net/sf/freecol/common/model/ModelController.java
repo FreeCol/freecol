@@ -30,7 +30,7 @@ public interface ModelController {
     *               One method to make a unique <code>taskID</code>:
     *               <br><br>
     *               getID() + "methodName:taskDescription"
-    *               <br>br>
+    *               <br><br>
     *               As long as the "taskDescription" is unique
     *               within the method ("methodName"), you get a unique
     *               identifier.
@@ -38,11 +38,12 @@ public interface ModelController {
     *               will be created.
     * @param owner  The <code>Player</code> owning the <code>Unit</code>.
     * @param type   The type of unit (Unit.FREE_COLONIST...).
+    * @return The created <code>Unit</code>.
     */
     public Unit createUnit(String taskID, Location location, Player owner, int type);
 
     /**
-    * Puts the specified <code>Unit</code in America.
+    * Puts the specified <code>Unit</code> in America.
     * @param unit The <code>Unit</code>.
     * @return The <code>Location</code> where the <code>Unit</code> appears.
     */
@@ -66,6 +67,17 @@ public interface ModelController {
     /**
     * Returns a pseudorandom int, uniformly distributed between 0
     * (inclusive) and the specified value (exclusive).
+    * 
+    * @param taskID The <code>taskID</code> should be a unique identifier.
+    *               One method to make a unique <code>taskID</code>:
+    *               <br><br>
+    *               getID() + "methodName:taskDescription"
+    *               <br><br>
+    *               As long as the "taskDescription" is unique
+    *               within the method ("methodName"), you get a unique
+    *               identifier.
+    * @param n The specified value. 
+    * @return The generated number.
     */
     public int getRandom(String taskID, int n);
 }

@@ -55,6 +55,10 @@ public class ClearOrdersAction extends MapboardAction {
     }
 
 
+    /**
+     * Applies this action.
+     * @param e The <code>ActionEvent</code>.
+     */    
     public void actionPerformed(ActionEvent e) {
         getFreeColClient().getInGameController().clearOrders(getFreeColClient().getGUI().getActiveUnit());
     }

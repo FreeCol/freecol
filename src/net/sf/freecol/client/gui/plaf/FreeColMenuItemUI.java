@@ -4,7 +4,9 @@ import javax.swing.JComponent;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicMenuItemUI;
 
-
+/**
+ * UI-class for menu items.
+ */
 public class FreeColMenuItemUI extends BasicMenuItemUI {
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";

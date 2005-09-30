@@ -51,6 +51,7 @@ public final class InGameInputHandler extends InputHandler {
     *
     * @param connection The <code>Connection</code> the message was received on.
     * @param element The root element of the message.
+    * @return The reply.
     */
     public synchronized Element handle(Connection connection, Element element) {
         Element reply = null;
@@ -125,6 +126,7 @@ public final class InGameInputHandler extends InputHandler {
     *
     * @param updateElement The element (root element in a DOM-parsed XML tree) that
     *                holds all the information.
+    * @return The reply.
     */
     public Element update(Element updateElement) {
         Game game = getFreeColClient().getGame();

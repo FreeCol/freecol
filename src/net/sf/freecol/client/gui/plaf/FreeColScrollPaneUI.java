@@ -5,7 +5,9 @@ import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicScrollPaneUI;
 
 
-
+/**
+ * UI-class for scroll panes.
+ */
 public class FreeColScrollPaneUI extends BasicScrollPaneUI {
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";

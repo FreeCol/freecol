@@ -167,6 +167,11 @@ public final class PreGameController {
     
     /**
     * Reads the {@link GameOptions} from the given file.
+    * *
+    * @param loadFile The <code>File</code> from which the
+    * 		<code>GameOptions</code> should be loaded.
+    * @throws IOException If the exception is thrown
+    * 		while opening or reading the file. 
     */
     public void loadGameOptions(File loadFile) throws IOException {
         //BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(loadFile)));
@@ -203,6 +208,11 @@ public final class PreGameController {
 
     /**
     * Writes the {@link GameOptions} to the given file.
+    * 
+    * @param saveFile The <code>File</code> to which the
+    * 		<code>GameOptions</code> should be written.
+    * @throws IOException If the exception is thrown
+    * 		while creating or writing to the file.
     */
     public void saveGameOptions(File saveFile) throws IOException {
         Element element = freeColClient.getGame().getGameOptions().toXMLElement(Message.createNewDocument());

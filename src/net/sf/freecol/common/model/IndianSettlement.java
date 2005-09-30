@@ -46,7 +46,7 @@ public class IndianSettlement extends Settlement {
     /** The amount of goods a brave can produce a single turn. */
     private static final int WORK_AMOUNT = 5;
 
-    /** The amount of raw material that should be available before producing manufactured goods: */
+    /** The amount of raw material that should be available before producing manufactured goods. */
     public static final int KEEP_RAW_MATERIAL = 50;
 
     // These are the learnable skills for an Indian settlement.
@@ -103,8 +103,8 @@ public class IndianSettlement extends Settlement {
 
 
     /**
-    * Only used by AI - stores the alarm levels,
-    * 0-1000 with 1000 as the maximum alarm level:
+    * Stores the alarm levels. <b>Only used by AI.</b>
+    * 0-1000 with 1000 as the maximum alarm level.
     */
     private int[] alarm = new int[Player.NUMBER_OF_NATIONS];
 
@@ -444,7 +444,7 @@ public class IndianSettlement extends Settlement {
     /**
     * Adds a <code>Locatable</code> to this Location.
     *
-    * @param locatable The code>Locatable</code> to add to this Location.
+    * @param locatable The <code>Locatable</code> to add to this Location.
     */
     public void add(Locatable locatable) {
         if (locatable instanceof Unit) {
@@ -458,7 +458,7 @@ public class IndianSettlement extends Settlement {
 
 
     /**
-    * Removes a code>Locatable</code> from this Location.
+    * Removes a <code>Locatable</code> from this Location.
     *
     * @param locatable The <code>Locatable</code> to remove from this Location.
     */
