@@ -55,7 +55,8 @@ public final class DummyConnection extends Connection {
     /**
     * Closes this connection.
     *
-    * @throws IOException
+    * @throws IOException Will not be thrown by a <code>DummyConnection</code>,
+    * 		but added because of the superclass' specification.
     */
     public void close() throws IOException {
         // Do nothing.
@@ -140,6 +141,7 @@ public final class DummyConnection extends Connection {
     /**
     * Gets the <code>DummyConnection</code> this object is
     * connected to.
+    * @return The <code>DummyConnection</code> .
     */
     public DummyConnection getOtherConnection() {
         return otherConnection;

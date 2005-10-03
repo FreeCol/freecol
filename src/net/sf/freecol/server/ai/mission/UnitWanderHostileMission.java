@@ -32,6 +32,8 @@ public class UnitWanderHostileMission extends Mission {
 
     /**
     * Creates a mission for the given <code>AIUnit</code>.
+    * 
+    * @param aiMain The main AI-object.
     * @param aiUnit The <code>AIUnit</code> this mission
     *        is created for.
     */
@@ -41,8 +43,12 @@ public class UnitWanderHostileMission extends Mission {
 
 
     /**
-    * Loads a mission from the given element.
-    */
+     * Loads a mission from the given element.
+     * 
+     * @param aiMain The main AI-object.
+     * @param element An <code>Element</code> containing an
+     * 		XML-representation of this object.
+     */
     public UnitWanderHostileMission(AIMain aiMain, Element element) {
         super(aiMain);
         readFromXMLElement(element);

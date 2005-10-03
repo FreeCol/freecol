@@ -54,6 +54,17 @@ public class ServerModelController implements ModelController {
     /**
     * Returns a pseudorandom int, uniformly distributed between 0
     * (inclusive) and the specified value (exclusive).
+    * 
+    * @param taskID The <code>taskID</code> should be a unique identifier.
+    *               One method to make a unique <code>taskID</code>:
+    *               <br><br>
+    *               getID() + "methodName:taskDescription"
+    *               <br><br>
+    *               As long as the "taskDescription" is unique
+    *               within the method ("methodName"), you get a unique
+    *               identifier.
+    * @param n The specified value.  
+    * @return The generated number.
     */
     public synchronized int getRandom(String taskID, int n) {
         String extendedTaskID = taskID + Integer.toString(freeColServer.getGame().getTurn().getNumber());
@@ -117,6 +128,7 @@ public class ServerModelController implements ModelController {
     *               will be created.
     * @param owner  The <code>Player</code> owning the <code>Unit</code>.
     * @param type   The type of unit (Unit.FREE_COLONIST...).
+    * @return A reference to the <code>Unit</code> which has been created.
     */
     public synchronized Unit createUnit(String taskID, Location location, Player owner, int type) {
         return createUnit(taskID, location, owner, type, true, null);
@@ -143,6 +155,7 @@ public class ServerModelController implements ModelController {
     *               signals that the request might be illegal.
     * @param connection The connection that has requested to create the unit, or null if this
     *               request is internal to the server.
+    * @return A reference to the <code>Unit</code> which has been created.
     */
     public synchronized Unit createUnit(String taskID, Location location, Player owner, int type, boolean secure, Connection connection) {
         String extendedTaskID = taskID + owner.getID() + Integer.toString(freeColServer.getGame().getTurn().getNumber());
@@ -230,6 +243,12 @@ public class ServerModelController implements ModelController {
     }
 
 
+    /**
+     * Sends an update of the given <code>Tile</code>
+     * to all the players.
+     * 
+     * @param tile The <code>Tile</code> to be updated.
+     */          
     public void update(Tile tile) {
         update(tile, null);
     }
@@ -255,6 +274,13 @@ public class ServerModelController implements ModelController {
     }
 
 
+    /**
+     * Sends an update of the given <code>Tile</code>
+     * to the other players.
+     * 
+     * @param newTile The <code>Tile</code> to be updated.
+     * @param p The player which should not receive an update (the source of the change).
+     */    
     public void update(Tile newTile, Player p) {
         ServerPlayer player = (ServerPlayer) p;
         Game game = freeColServer.getGame();
@@ -275,12 +301,19 @@ public class ServerModelController implements ModelController {
                     enemyPlayer.getConnection().send(updateElement);
                 }
             } catch (IOException e) {
-                logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection " + enemyPlayer.getConnection());
+                logger.warning("Could not send message to: " + enemyPlayer.getName() 
+                			   + " with connection " + enemyPlayer.getConnection());
             }
         }
     }
 
 
+    /**
+     * Sends an update of the unit to the other players.
+     * 
+     * @param unit The <code>Unit</code> to be updated.
+     * @param p The player which should not receive an update (the source of the change).
+     */
     public void update(Unit unit, Player p) {
         ServerPlayer player = (ServerPlayer) p;
         Game game = freeColServer.getGame();

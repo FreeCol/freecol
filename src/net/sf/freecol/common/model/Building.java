@@ -121,6 +121,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     /**
     * Creates a new <code>Building</code>.
     *
+    * @param game The <code>Game</code> this object belongs to.
     * @param colony The colony in which this building is located.
     * @param type The type of building.
     * @param level The level of the building: {@link #NOT_BUILT}, {@link #HOUSE}, {@link #SHOP} or {@link #FACTORY}.
@@ -589,10 +590,15 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         return bestUnit;
     }
 
+    /**
+     * Gets this <code>Location</code>'s <code>GoodsContainer</code>.
+     * @return <code>null</code>.
+     */
     public GoodsContainer getGoodsContainer() {
         return null;
     }
 
+    
     private Unit getTeacher(int unitType) {
         Iterator i = colony.getUnitIterator();
         while (i.hasNext()) {

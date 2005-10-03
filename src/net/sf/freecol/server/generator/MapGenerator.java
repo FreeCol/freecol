@@ -72,6 +72,11 @@ public class MapGenerator {
     * have random starting locations. During this process,
     * <code>game.setMap(...)</code> is invoked.
     *
+    * @param players The players to create <code>Settlement</code>s
+    * 		and starting locations for. That is; both indian and 
+    * 		european players.
+    * @param width The width of the map to create.
+    * @param height The height of the map to create.
     * @see LandGenerator
     * @see TerrainGenerator
     */
@@ -96,6 +101,11 @@ public class MapGenerator {
     /**
      * Create the Indian settlements, at least a capital for every nation and
      * random numbers of other settlements.
+     * 
+     * @param map The <code>Map</code> to place the indian settlments on.
+     * @param players The players to create <code>Settlement</code>s
+    * 		and starting locations for. That is; both indian and 
+    * 		european players.
      * @throws FreeColException if thrown by a called method
      */
     protected void createIndianSettlements(Map map, Vector players) throws FreeColException {
@@ -563,7 +573,13 @@ public class MapGenerator {
     /**
      * Create two ships, one with a colonist, for each player, and
      * select suitable starting positions.
-     * @param players List of players
+     * 
+     * @param map The <code>Map</code> to place the european units on.
+     * @param width The width of the map to create.
+     * @param height The height of the map to create.
+     * @param players The players to create <code>Settlement</code>s
+     * 		and starting locations for. That is; both indian and 
+     * 		european players.
      * @throws FreeColException if thrown by a called method
      */
     protected void createEuropeanUnits(Map map, int width, int height, Vector players) throws FreeColException {
@@ -706,11 +722,26 @@ public class MapGenerator {
     }
 
 
-
+    /**
+     * Checks if the given position is valid.
+     * 
+     * @param x The x-coordinate of the position.
+     * @param y The y-coordinate of the position.
+     * @return <code>true</code> if the given position is 
+     * 		  within the bounds of the map and <code>false</code> otherwise
+     */
     protected boolean isValid(int x, int y) {
         return x>=0 && x < width && y >= 0 && y < height;
     }
 
+    
+    /**
+     * Checks if the given position is valid.
+     * 
+     * @param p The position.
+     * @return <code>true</code> if the given position is 
+     * 		  within the bounds of the map and <code>false</code> otherwise.
+     */    
     protected boolean isValid(Position p) {
         return isValid(p.getX(), p.getY());
     }
@@ -779,6 +810,7 @@ public class MapGenerator {
 
         /**
         * Creates the map.
+        * @return The new <code>Map</code>.
         */
         public Map createMap() {
             Vector columns = new Vector(width);
@@ -840,6 +872,7 @@ public class MapGenerator {
 
         /**
         * Places "high seas"-tiles on the border of the given map.
+        * @param map The <code>Map</code> to create high seas on.
         */
         protected void createHighSeas(Map map) {
             for (int y = 0; y < height; y++) {

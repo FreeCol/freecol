@@ -146,6 +146,12 @@ public class WorkLocationPlan {
     }
 
     
+    /**
+     * Creates an XML-representation of this object.
+     * @param document The <code>Document</code> in which
+     * 		the XML-representation should be created.
+     * @return The XML-representation.
+     */    
     public Element toXMLElement(Document document) {
         Element element = document.createElement(getXMLElementTagName());
 
@@ -157,6 +163,12 @@ public class WorkLocationPlan {
     }
 
 
+    /**
+     * Updates this object from an XML-representation of
+     * a <code>WorkLocationPlan</code>.
+     * 
+     * @param element The XML-representation.
+     */    
     public void readFromXMLElement(Element element) {
         workLocation = (WorkLocation) getAIMain().getFreeColGameObject(element.getAttribute("ID"));
         priority = Integer.parseInt(element.getAttribute("priority"));

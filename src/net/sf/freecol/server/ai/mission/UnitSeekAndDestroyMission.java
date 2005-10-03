@@ -38,6 +38,8 @@ public class UnitSeekAndDestroyMission extends Mission {
 
     /**
     * Creates a mission for the given <code>AIUnit</code>.
+    * 
+    * @param aiMain The main AI-object.
     * @param aiUnit The <code>AIUnit</code> this mission
     *        is created for.
     */
@@ -48,8 +50,12 @@ public class UnitSeekAndDestroyMission extends Mission {
 
 
     /**
-    * Loads a mission from the given element.
-    */
+     * Loads a mission from the given element.
+     * 
+     * @param aiMain The main AI-object.
+     * @param element An <code>Element</code> containing an
+     * 		XML-representation of this object.
+     */
     public UnitSeekAndDestroyMission(AIMain aiMain, Element element) {
         super(aiMain);
         readFromXMLElement(element);
@@ -145,6 +151,12 @@ public class UnitSeekAndDestroyMission extends Mission {
     }
 
 
+    /**
+     * Creates an XML-representation of this object.
+     * @param document The <code>Document</code> in which
+     * 		the XML-representation should be created.
+     * @return The XML-representation.
+     */    
     public Element toXMLElement(Document document) {
         Element element = document.createElement(getXMLElementTagName());
         
@@ -155,6 +167,12 @@ public class UnitSeekAndDestroyMission extends Mission {
     }
 
 
+    /**
+     * Updates this object from an XML-representation of
+     * a <code>UnitSeekAndDestroyMission</code>.
+     * 
+     * @param element The XML-representation.
+     */    
     public void readFromXMLElement(Element element) {
         setAIUnit((AIUnit) getAIMain().getAIObject(element.getAttribute("unit")));
         setTarget((FreeColGameObject) getGame().getFreeColGameObject(element.getAttribute("target")));

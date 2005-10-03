@@ -64,6 +64,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     *
     * @param connection The <code>Connection</code> the message came from.
     * @param element The message to be processed.
+    * @return The reply.
     */
     public synchronized Element handle(Connection connection, Element element) {
         Element reply = null;
@@ -1852,6 +1853,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     * @param connection The <code>Connection</code> the message was received on.
     * @param logoutElement The element (root element in a DOM-parsed XML tree) that
     *                holds all the information.
+    * @return The reply.
     */
     protected Element logout(Connection connection, Element logoutElement) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);

@@ -36,6 +36,7 @@ public abstract class Wish extends AIObject {
 
     /**
     * Creates a new <code>Wish</code>.
+    * @param aiMain The main AI-object.
     */
     public Wish(AIMain aiMain) {
         super(aiMain);
@@ -45,7 +46,9 @@ public abstract class Wish extends AIObject {
     /**
     * Creates a new <code>Wish</code> from the given XML-representation.
     *
-    * @param element The root element for the XML-representation of a <code>Wish</code>.
+    * @param aiMain The main AI-object.
+    * @param element The root element for the XML-representation 
+    * 		of a <code>Wish</code>.
     */
     public Wish(AIMain aiMain, Element element) {
         super(aiMain);

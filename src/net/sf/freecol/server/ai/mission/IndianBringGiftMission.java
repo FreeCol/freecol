@@ -49,8 +49,10 @@ public class IndianBringGiftMission extends Mission {
 
     /**
     * Creates a mission for the given <code>AIUnit</code>.
+    * @param aiMain The main AI-object.
     * @param aiUnit The <code>AIUnit</code> this mission
     *        is created for.
+    * @param target The <code>Colony</code> receiving the gift.    
     */
     public IndianBringGiftMission(AIMain aiMain, AIUnit aiUnit, Colony target) {
         super(aiMain, aiUnit);
@@ -65,8 +67,12 @@ public class IndianBringGiftMission extends Mission {
 
     
     /**
-    * Loads a mission from the given element.
-    */
+     * Loads a mission from the given element.
+     *
+     * @param aiMain The main AI-object.
+     * @param element An <code>Element</code> containing an
+     * 		XML-representation of this object.
+     */    
     public IndianBringGiftMission(AIMain aiMain, Element element) {
         super(aiMain);
         readFromXMLElement(element);
@@ -139,6 +145,8 @@ public class IndianBringGiftMission extends Mission {
     * This mission will be invalidated when the gift has been delivered.
     * In case of the stances {@link Player#WAR WAR} or {@link Player#CEASE_FIRE CEASE_FIRE} towards the target player,
     * the mission would be invalidated as well.
+    * 
+    * @return <code>true</code> if this mission is still valid.
     */
     public boolean isValid() {
         // The last check is to ensure that the colony have not been burned to the ground.
@@ -150,6 +158,11 @@ public class IndianBringGiftMission extends Mission {
     /**
     * Checks if the player <code>owner</code> can bring a gift to the
     * <code>targetPlayer</code>.
+    * 
+    * @param owner The owner of this mission.
+    * @param targetPlayer The target of the gift.
+    * @return <code>true</code> if this mission is still valid to perform
+    * 		with regard to the tension towards the target player.
     */
     public static boolean isValidMission(Player owner, Player targetPlayer) {
         int stance = owner.getStance(targetPlayer);
@@ -157,6 +170,12 @@ public class IndianBringGiftMission extends Mission {
     }
 
 
+    /**
+     * Creates an XML-representation of this object.
+     * @param document The <code>Document</code> in which
+     * 		the XML-representation should be created.
+     * @return The XML-representation.
+     */    
     public Element toXMLElement(Document document) {
         Element element = document.createElement(getXMLElementTagName());
 
@@ -168,6 +187,12 @@ public class IndianBringGiftMission extends Mission {
     }
 
 
+    /**
+     * Updates this object from an XML-representation of
+     * a <code>IndianBringGiftMission</code>.
+     * 
+     * @param element The XML-representation.
+     */    
     public void readFromXMLElement(Element element) {
         setAIUnit((AIUnit) getAIMain().getAIObject(element.getAttribute("unit")));
         

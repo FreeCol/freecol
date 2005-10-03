@@ -42,6 +42,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /**
     * Creates a new <code>ServerPlayer</code>.
     *
+    * @param game The <code>Game</code> this object belongs to.
     * @param name The player name.
     * @param admin Whether the player is the game administrator or not.
     * @param socket The socket to the player's client.
@@ -63,11 +64,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /**
     * Creates a new <code>ServerPlayer</code>.
     *
+    * @param game The <code>Game</code> this object belongs to.
     * @param name The player name.
     * @param admin Whether the player is the game administrator or not.
     * @param ai Whether this is an AI player.
     * @param socket The socket to the player's client.
     * @param connection The <code>Connection</code> for the above mentioned socket.
+    * @param nation The nation of the <code>Player</code>.
     */
     public ServerPlayer(Game game, String name, boolean admin, boolean ai, Socket socket, Connection connection, int nation) {
         super(game, name, admin, ai, nation);
@@ -88,7 +91,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
 
     /**
-    * Returns <i>true</i> if this player is currently connected to the server.
+    * Checks if this player is currently connected to the server.
+    * @return <i>true</i> if this player is currently connected to the server
+    * 		  and <code>false</code> otherwise.
     */
     public boolean isConnected() {
         return connected;
@@ -97,6 +102,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
     /**
     * Sets the "connected"-status of this player.
+    * 
+    * @param connected Should be <i>true</i> if this player is currently 
+    * 		  connected to the server and <code>false</code> otherwise.
     * @see #isConnected
     */
     public void setConnected(boolean connected) {
@@ -241,6 +249,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
     
     
+    /**
+     * Sets the ID of the super class to be <code>serverID</code>.
+     */
     public void updateID() {
         setID(serverID);
     }

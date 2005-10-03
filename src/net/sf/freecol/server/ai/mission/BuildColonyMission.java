@@ -38,8 +38,13 @@ public class BuildColonyMission extends Mission {
 
     /**
     * Creates a mission for the given <code>AIUnit</code>.
+    * @param aiMain The main AI-object.
     * @param aiUnit The <code>AIUnit</code> this mission
     *        is created for.
+    * @param target The <code>Tile</code> where the <code>Colony</code> should be built.
+    * @param colonyValue The value of the <code>Tile</code> to build a <code>Colony</code>
+    * 		 upon. This mission will be invalidated if <code>target.getColonyValue()</code>
+    * 		 is less than this value.
     */
     public BuildColonyMission(AIMain aiMain, AIUnit aiUnit, Tile target, int colonyValue) {
         super(aiMain, aiUnit);
@@ -55,8 +60,12 @@ public class BuildColonyMission extends Mission {
 
 
     /**
-    * Loads a mission from the given element.
-    */
+     * Creates a new <code>BuildColonyMission</code>.
+     * 
+     * @param aiMain The main AI-object.
+     * @param element An <code>Element</code> containing an
+     * 		XML-representation of this object.
+     */
     public BuildColonyMission(AIMain aiMain, Element element) {
         super(aiMain);
         readFromXMLElement(element);
@@ -156,6 +165,12 @@ public class BuildColonyMission extends Mission {
     }
 
 
+    /**
+     * Creates an XML-representation of this object.
+     * @param document The <code>Document</code> in which
+     * 		the XML-representation should be created.
+     * @return The XML-representation.
+     */    
     public Element toXMLElement(Document document) {
         Element element = document.createElement(getXMLElementTagName());
 
@@ -167,6 +182,12 @@ public class BuildColonyMission extends Mission {
     }
 
 
+    /**
+     * Updates this object from an XML-representation of
+     * a <code>BuildColonyMission</code>.
+     * 
+     * @param element The XML-representation.
+     */    
     public void readFromXMLElement(Element element) {
         setAIUnit((AIUnit) getAIMain().getAIObject(element.getAttribute("unit")));
         

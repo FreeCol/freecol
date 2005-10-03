@@ -49,6 +49,7 @@ public abstract class InputHandler implements MessageHandler {
     *
     * @param connection The <code>Connection</code> the message was received on.
     * @param element The root element of the message.
+    * @return The reply.
     */
     public abstract Element handle(Connection connection, Element element);
 
@@ -59,6 +60,7 @@ public abstract class InputHandler implements MessageHandler {
     * @param connection The <code>Connection</code> the message was received on.
     * @param logoutElement The element (root element in a DOM-parsed XML tree) that
     *                holds all the information.
+    * @return The reply.
     */
     abstract protected Element logout(Connection connection, Element logoutElement);
 
@@ -69,6 +71,7 @@ public abstract class InputHandler implements MessageHandler {
     * @param connection The <code>Connection</code> the message was received on.
     * @param disconnectElement The element (root element in a DOM-parsed XML tree) that
     *                holds all the information.
+    * @return The reply.
     */
     protected Element disconnect(Connection connection, Element disconnectElement) {
         // The player should be logged out by now, but just in case:

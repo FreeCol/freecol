@@ -27,6 +27,7 @@ public class GoodsWish extends Wish {
     /**
     * Creates a new <code>GoodsWish</code>.
     *
+    * @param aiMain The main AI-object.
     * @param destination The <code>Location</code> in which the
     *       {@link Wish#getTransportable transportable} assigned to
     *       this <code>GoodsWish</code> will have to reach.
@@ -50,6 +51,7 @@ public class GoodsWish extends Wish {
     /**
     * Creates a new <code>GoodsWish</code> from the given XML-representation.
     *
+    * @param aiMain The main AI-object.
     * @param element The root element for the XML-representation of a <code>GoodsWish</code>.
     */
     public GoodsWish(AIMain aiMain, Element element) {
@@ -68,6 +70,12 @@ public class GoodsWish extends Wish {
     }
 
 
+    /**
+     * Creates an XML-representation of this object.
+     * @param document The <code>Document</code> in which
+     * 		the XML-representation should be created.
+     * @return The XML-representation.
+     */    
     public Element toXMLElement(Document document) {
         Element element = document.createElement(getXMLElementTagName());
 
@@ -84,6 +92,12 @@ public class GoodsWish extends Wish {
     }
 
 
+    /**
+     * Updates this object from an XML-representation of
+     * a <code>GoodsWish</code>.
+     * 
+     * @param element The XML-representation.
+     */    
     public void readFromXMLElement(Element element) {
         id = element.getAttribute("ID");
         destination = (Location) getAIMain().getFreeColGameObject(element.getAttribute("destination"));

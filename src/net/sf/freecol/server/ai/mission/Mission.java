@@ -61,6 +61,10 @@ public abstract class Mission extends AIObject {
     }
 
     
+    /**
+     * Gets the ID of this mission.
+     * @return The ID.
+     */
     public String getID() {
         return null;
     }
@@ -71,6 +75,8 @@ public abstract class Mission extends AIObject {
     * This is done in a loop until the tile is reached, there are no moves left,
     * the path to the target cannot be found or that the next step is not a move.
     *
+    * @param connection The <code>Connection</code> to use
+    *         when communicating with the server.
     * @param tile The <code>Tile</code> the unit should move towards.
     * @return The direction to take the final move (greater than or equal to zero),
     *         or {@link #NO_MORE_MOVES_LEFT} if there are no more moves left and
@@ -96,6 +102,8 @@ public abstract class Mission extends AIObject {
     * This is done in a loop until the end of the path is reached, the next step is not a move
     * or when there are no moves left.
     *
+    * @param connection The <code>Connection</code> to use
+    *         when communicating with the server.
     * @param pathNode The first node of the path.
     * @return The direction to continue moving the path (greater than or equal to zero),
     *         or {@link #NO_MORE_MOVES_LEFT} if there are no more moves left.
@@ -124,6 +132,10 @@ public abstract class Mission extends AIObject {
 
     /**
     * Moves the unit owning this mission in the given direction.
+    * 
+    * @param connection The <code>Connection</code> to use
+    *         when communicating with the server.    
+    * @param direction The direction to move the unit.         
     */
     protected void move(Connection connection, int direction) {
         Element moveElement = Message.createNewRootElement("move");
@@ -345,8 +357,11 @@ public abstract class Mission extends AIObject {
     }
 
     
+    /**
+     * Disposes this mission by removing any referances to it.
+     */
     public void dispose() {
-    
+    	// Nothing to do yet.
     }
     
 
@@ -365,6 +380,8 @@ public abstract class Mission extends AIObject {
     * A mission can be invalidated for a number of reasons. For example:
     * a seek-and-destroy mission can be invalidated in case the
     * relationship towards the targeted player improves.
+    * 
+    * @return The default value: <code>true</code>.
     */
     public boolean isValid() {
         return true;
@@ -373,6 +390,7 @@ public abstract class Mission extends AIObject {
 
     /**
     * Gets the unit this mission has been created for.
+    * @return The <code>Unit</code>.
     */
     public Unit getUnit() {
         return aiUnit.getUnit();
@@ -381,12 +399,17 @@ public abstract class Mission extends AIObject {
 
     /**
     * Gets the AI-unit this mission has been created for.
+    * @return The <code>AIUnit</code>.
     */
     public AIUnit getAIUnit() {
         return aiUnit;
     }
     
     
+    /**
+     * Sets the AI-unit this mission has been created for.
+     * @param aiUnit The <code>AIUnit</code>.
+     */    
     protected void setAIUnit(AIUnit aiUnit) {
         this.aiUnit = aiUnit;
     }

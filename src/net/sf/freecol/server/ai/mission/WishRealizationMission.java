@@ -33,8 +33,12 @@ public class WishRealizationMission extends Mission {
 
     /**
     * Creates a mission for the given <code>AIUnit</code>.
+    * 
+    * @param aiMain The main AI-object.
     * @param aiUnit The <code>AIUnit</code> this mission
     *        is created for.
+    * @param wish The <code>Wish</code> which will be realized by
+    * 		 the unit and this mission.
     */
     public WishRealizationMission(AIMain aiMain, AIUnit aiUnit, Wish wish) {
         super(aiMain, aiUnit);
@@ -43,8 +47,12 @@ public class WishRealizationMission extends Mission {
 
 
     /**
-    * Loads a mission from the given element.
-    */
+     * Loads a mission from the given element.
+     * 
+     * @param aiMain The main AI-object.
+     * @param element An <code>Element</code> containing an
+     * 		XML-representation of this object.
+     */
     public WishRealizationMission(AIMain aiMain, Element element) {
         super(aiMain);
         readFromXMLElement(element);
@@ -153,6 +161,12 @@ public class WishRealizationMission extends Mission {
     }
 
 
+    /**
+     * Creates an XML-representation of this object.
+     * @param document The <code>Document</code> in which
+     * 		the XML-representation should be created.
+     * @return The XML-representation.
+     */    
     public Element toXMLElement(Document document) {
         Element element = document.createElement(getXMLElementTagName());
 
@@ -163,6 +177,12 @@ public class WishRealizationMission extends Mission {
     }
 
 
+    /**
+     * Updates this object from an XML-representation of
+     * a <code>WishRealizationMission</code>.
+     * 
+     * @param element The XML-representation.
+     */    
     public void readFromXMLElement(Element element) {
         setAIUnit((AIUnit) getAIMain().getAIObject(element.getAttribute("unit")));
         

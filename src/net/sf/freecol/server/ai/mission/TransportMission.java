@@ -54,6 +54,8 @@ public class TransportMission extends Mission {
 
     /**
     * Creates a mission for the given <code>AIUnit</code>.
+    * 
+    * @param aiMain The main AI-object.
     * @param aiUnit The <code>AIUnit</code> this mission
     *        is created for.
     */
@@ -69,8 +71,12 @@ public class TransportMission extends Mission {
 
 
     /**
-    * Loads a mission from the given element.
-    */
+     * Loads a <code>TransportMission</code> from the given element.
+     *
+     * @param aiMain The main AI-object.
+     * @param element An <code>Element</code> containing an
+     * 		XML-representation of this object.
+     */
     public TransportMission(AIMain aiMain, Element element) {
         super(aiMain);
         readFromXMLElement(element);
@@ -490,6 +496,8 @@ public class TransportMission extends Mission {
     * <b>Warning:</b> This method can only be called
     * when the carrier is located in {@link Europe}.
     *
+    * @param connection The <code>Connection</code> to use
+    *       when communicating with the server.
     * @param type The type of goods to buy.
     * @param amount The amount of goods to buy.
     * @param destination The <code>Location</code> to which the goods should be
@@ -751,6 +759,8 @@ public class TransportMission extends Mission {
     *
     * @param unitType The type of {@link Unit} or <code>-1</code> for
     *           {@link Goods}
+    * @param source The source for the unit. This is where the unit
+    * 		is presently located.
     * @param destination The destination for the unit.
     * @return The space available
     */
@@ -947,6 +957,7 @@ public class TransportMission extends Mission {
 
     /**
     * Checks if this mission is still valid to perform.
+    * @return <code>true</code>
     */
     public boolean isValid() {
         return true;
@@ -1105,6 +1116,13 @@ public class TransportMission extends Mission {
         return null;
     }
 
+    
+    /**
+     * Creates an XML-representation of this object.
+     * @param document The <code>Document</code> in which
+     * 		the XML-representation should be created.
+     * @return The XML-representation.
+     */    
     public Element toXMLElement(Document document) {
         Element element = document.createElement(getXMLElementTagName());
 
@@ -1122,6 +1140,12 @@ public class TransportMission extends Mission {
     }
 
 
+    /**
+     * Updates this object from an XML-representation of
+     * a <code>TransportMission</code>.
+     * 
+     * @param element The XML-representation.
+     */    
     public void readFromXMLElement(Element element) {
         setAIUnit((AIUnit) getAIMain().getAIObject(element.getAttribute("unit")));
 

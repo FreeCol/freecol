@@ -1,6 +1,7 @@
 
 package net.sf.freecol.server.ai;
 
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Locatable;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Tile;
@@ -86,5 +87,14 @@ public interface Transportable {
     */
     public void setTransport(AIUnit transport);
     
+    
+    /**
+     * Returns the ID of the <code>AIObject</code> implementing
+     * this interface.
+     * 
+     * @return The ID of the <code>AIObject</code>. This is normally
+     *         the ID of the {@link FreeColGameObject} that object
+     *         represents.
+     */    
     public String getID();
 }

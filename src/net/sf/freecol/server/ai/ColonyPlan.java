@@ -45,29 +45,55 @@ public class ColonyPlan {
     private List workLocationPlans = new ArrayList();
 
 
+    /**
+     * Creates a new <code>ColonyPlan</code>.
+     * 
+     * @param aiMain The main AI-object.
+     * @param colony The colony to make a <code>ColonyPlan</code> for.
+     */    
     public ColonyPlan(AIMain aiMain, Colony colony) {
         this.aiMain = aiMain;
         this.colony = colony;
     }
 
 
-
+    /**
+     * Creates a new <code>ColonyPlan</code>.
+     * 
+     * @param aiMain The main AI-object.
+     * @param element An <code>Element</code> containing an
+     * 		XML-representation of this object.
+     */    
     public ColonyPlan(AIMain aiMain, Element element) {
         this.aiMain = aiMain;
         readFromXMLElement(element);
     }
 
     
+    /**
+     * Returns the <code>WorkLocationPlan</code>s 
+     * associated with this <code>ColonyPlan</code>.
+     * 
+     * @return The list of <code>WorkLocationPlan</code>s .
+     */
     public List getWorkLocationPlans() {
         return workLocationPlans;
     }
 
     
+    /**
+     * Gets the main AI-object.
+     * @return The main AI-object.
+     */
     public AIMain getAIMain() {
         return aiMain;
     }
 
     
+    /**
+     * Get the <code>Game</code> this object is associated to.
+     * @return The <code>Game</code>.
+     */
     public Game getGame() {
         return aiMain.getGame();
     }
@@ -428,12 +454,19 @@ public class ColonyPlan {
 
     /**
     * Gets the <code>Colony</code> this <code>ColonyPlan</code> controls.
+    * @return The <code>Colony</code>.
     */
     public Colony getColony() {
         return colony;
     }
 
 
+    /**
+     * Creates an XML-representation of this object.
+     * @param document The <code>Document</code> in which
+     * 		the XML-representation should be created.
+     * @return The XML-representation.
+     */    
     public Element toXMLElement(Document document) {
         Element element = document.createElement(getXMLElementTagName());
 
@@ -443,6 +476,12 @@ public class ColonyPlan {
     }
 
 
+    /**
+     * Updates this object from an XML-representation of
+     * a <code>ColonyPlan</code>.
+     * 
+     * @param element The XML-representation.
+     */    
     public void readFromXMLElement(Element element) {
         colony = (Colony) getAIMain().getFreeColGameObject(element.getAttribute("ID"));
     }
