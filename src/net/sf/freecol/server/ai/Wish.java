@@ -60,6 +60,7 @@ public abstract class Wish extends AIObject {
 
     /**
     * Returns the ID for this <code>Wish</code>.
+    * @return The ID of this <code>Wish</code>.
     */
     public String getID() {
         return id;

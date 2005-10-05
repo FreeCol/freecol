@@ -33,8 +33,8 @@ public abstract class Mission extends AIObject {
     protected static final int MINIMUM_TRANSPORT_PRIORITY = 60,     // A transport can be used
                                NORMAL_TRANSPORT_PRIORITY = 100;     // Transport is required
 
-    protected int NO_PATH_TO_TARGET = -2,
-                  NO_MORE_MOVES_LEFT = -1;
+    protected static final int NO_PATH_TO_TARGET = -2,
+                               NO_MORE_MOVES_LEFT = -1;
 
     private AIUnit aiUnit;
 

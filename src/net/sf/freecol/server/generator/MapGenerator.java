@@ -41,10 +41,10 @@ public class MapGenerator {
 
     // Deltas for moving to adjacent squares. Different due to the
     // isometric map. Starting north and going clockwise.
-    private final int[] ODD_DX = {0, 1, 1, 1, 0, 0, -1, 0};
-    private final int[] ODD_DY = {-2, -1, 0, 1, 2, 1, 0, -1};
-    private final int[] EVEN_DX = {0, 0, 1, 0, 0, -1, -1, -1};
-    private final int[] EVEN_DY = {-2, -1, 0, 1, 2, 1, 0, -1};
+    private final static int[] ODD_DX = {0, 1, 1, 1, 0, 0, -1, 0};
+    private final static int[] ODD_DY = {-2, -1, 0, 1, 2, 1, 0, -1};
+    private final static int[] EVEN_DX = {0, 0, 1, 0, 0, -1, -1, -1};
+    private final static int[] EVEN_DY = {-2, -1, 0, 1, 2, 1, 0, -1};
 
     private Random random = new Random();
     private Game game;
@@ -375,8 +375,9 @@ public class MapGenerator {
             }*/
         }       
         
-        int good,good1,good2;
-        good=good1=good2=0;
+        int good = 0;
+        int good1 = 0;
+        int good2 = 0;
         int curval;
 
         for (int i=0;i<=15;i++) {

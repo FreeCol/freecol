@@ -36,6 +36,15 @@ public class WorkLocationPlan {
     private int goodsType;
 
 
+    /**
+     * Creates a new <code>WorkLocationPlan</code>.
+     * 
+     * @param aiMain The main AI-object.
+     * @param workLocation The <code>WorkLocation</code> to create
+     * 		a plan for.
+     * @param goodsType The goodsType to be produced on the 
+     * 		<code>workLocation</code> using this plan.
+     */
     public WorkLocationPlan(AIMain aiMain, WorkLocation workLocation, int goodsType) {
         this.aiMain = aiMain;
         this.workLocation = workLocation;
@@ -43,25 +52,42 @@ public class WorkLocationPlan {
     }
 
 
-
+    /**
+     * Creates a new <code>WorkLocationPlan</code>.
+     * 
+     * @param aiMain The main AI-object.
+     * @param element An <code>Element</code> containing an
+     * 		XML-representation of this object.
+     */
     public WorkLocationPlan(AIMain aiMain, Element element) {
         this.aiMain = aiMain;
         readFromXMLElement(element);
     }
 
 
+    /**
+     * Gets the main AI-object.
+     * @return The main AI-object.
+     */
     public AIMain getAIMain() {
         return aiMain;
     }
 
     
+    /**
+     * Get the <code>Game</code> this object is associated to.
+     * @return The <code>Game</code>.
+     */    
     public Game getGame() {
         return aiMain.getGame();
     }
     
 
     /**
-    * Gets the <code>WorkLocation</code> this <code>WorkLocationPlan</code> controls.
+    * Gets the <code>WorkLocation</code> this 
+    * <code>WorkLocationPlan</code> controls.
+    * 
+    * @return The <code>WorkLocation</code>.
     */
     public WorkLocation getWorkLocation() {
         return workLocation;

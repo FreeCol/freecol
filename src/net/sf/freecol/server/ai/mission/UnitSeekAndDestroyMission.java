@@ -31,8 +31,8 @@ public class UnitSeekAndDestroyMission extends Mission {
     public static final String  REVISION = "$Revision$";
 
     /**
-     * What are we trying to destroy? This can be a
-     * Settlement or a Unit.
+     * The object we are trying to destroy. This can be a
+     * either <code>Settlement</code> or a <code>Unit</code>.
      */
     private FreeColGameObject target;
 
@@ -42,6 +42,8 @@ public class UnitSeekAndDestroyMission extends Mission {
     * @param aiMain The main AI-object.
     * @param aiUnit The <code>AIUnit</code> this mission
     *        is created for.
+    * @param target The object we are trying to destroy. This can be either a
+    * 		 <code>Settlement</code> or a <code>Unit</code>.
     */
     public UnitSeekAndDestroyMission(AIMain aiMain, AIUnit aiUnit, FreeColGameObject target) {
         super(aiMain, aiUnit);
@@ -117,6 +119,7 @@ public class UnitSeekAndDestroyMission extends Mission {
 
     /**
     * Check to see if this is a valid hostility with a valid target.
+    * @return <code>true</code> if this mission is valid.
     */
     public boolean isValid() {
         Player owner = getUnit().getOwner();
@@ -131,10 +134,11 @@ public class UnitSeekAndDestroyMission extends Mission {
         return (stance == Player.WAR) && (owner.getTension(targetPlayer) >= Player.TENSION_CONTENT) && (getTarget() != null) && ((target instanceof Unit) || (target instanceof Settlement));
     }
 
-    public FreeColGameObject getTarget() {
-        return target;
-    }
-
+    
+    /**
+     * Gets the destination of this mission.
+     * @return The <code>Tile</code> containing the target.
+     */
     public Tile getDestination() {
         if (target instanceof Unit) {
             return ((Unit)target).getTile();
@@ -145,7 +149,26 @@ public class UnitSeekAndDestroyMission extends Mission {
         }
     }
 
+    
+    /**
+     * Returns the object we are trying to destroy. 
+     * 
+     * @return The object which should be destroyed. 
+     * 		This can be either a <code>Settlement</code> 
+     * 		or a <code>Unit</code>.
+     */    
+    public FreeColGameObject getTarget() {
+        return target;
+    }    
 
+    
+    /**
+     * Sets the object we are trying to destroy. 
+     * 
+     * @param target The object which should be destroyed. 
+     * 		This can be either a <code>Settlement</code> 
+     * 		or a <code>Unit</code>.
+     */
     public void setTarget(FreeColGameObject target) {
         this.target = target;
     }

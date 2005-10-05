@@ -50,6 +50,7 @@ public final class UserConnectionHandler implements MessageHandler {
     *
     * @param connection The <code>Connection</code> the message came from.
     * @param element The message to be processed.
+    * @return The reply.
     */
     public synchronized Element handle(Connection connection, Element element) {
         Element reply = null;

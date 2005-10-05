@@ -153,11 +153,7 @@ public class WishRealizationMission extends Mission {
     */
     public boolean isValid() {
         Location l = wish.getDestination();
-        if (l instanceof Ownable && ((Ownable) l).getOwner() != getUnit().getOwner()) {
-            return false;
-        } else {
-            return true;
-        }
+        return !(l instanceof Ownable && ((Ownable) l).getOwner() != getUnit().getOwner());
     }
 
 

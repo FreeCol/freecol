@@ -114,9 +114,9 @@ public final class FreeColServer {
     /**
     * Starts a new server in a specified mode and with a specified port.
     *
-    * @param publicServer This value should be set to <code>true</code> in
-    * 					  order to appear on the meta server's listing.
-    * 
+    * @param publicServer This value should be set to <code>true</code>
+    * 					  in order to appear on the meta server's listing.
+    *                     
     * @param singleplayer Sets the game as singleplayer (if <i>true</i>)
     *                     or multiplayer (if <i>false</i>).
 
@@ -241,7 +241,7 @@ public final class FreeColServer {
     * Sets the name of this server.
     * @param name The name.
     */
-    public void getName(String name) {
+    public void setName(String name) {
         this.name = name;
     }
 

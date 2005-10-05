@@ -279,7 +279,6 @@ public class Map extends FreeColGameObject {
         if (end == null) {
             throw new NullPointerException("end == null");
         }
-
         if (carrier != null && unit == null) {
             throw new NullPointerException("unit == null");
         }
@@ -426,7 +425,7 @@ public class Map extends FreeColGameObject {
                         cost += newTile.getMoveCost(currentNode.getTile());
                     }
                 }
-
+                
                 // Disembark from 'carrier':
                 if (carrier != null && newTile.isLand() && unit.isNaval()
                         && (newTile.getSettlement() == null || newTile.getSettlement().getOwner() != unit.getOwner())
