@@ -2,9 +2,9 @@
 package net.sf.freecol.server.ai.mission;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.model.GoalDecider;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
@@ -151,191 +151,64 @@ public abstract class Mission extends AIObject {
     
     
     /**
-    * Finds the best target to attack within the given range.
-    *
-    * @param maxTurns The maximum number of turns the unit is allowed
-    *                 to spend in order to reach the target.
-    * @return The path to the target or <code>null</code> if no target can
-    *         be found.
-    */
+     * Finds the best target to attack within the given range.
+     *
+     * @param maxTurns The maximum number of turns the unit is allowed
+     *                 to spend in order to reach the target.
+     * @return The path to the target or <code>null</code> if no target can
+     *         be found.
+     */
     protected PathNode findTarget(int maxTurns) {
-        // This is just a temporary implementation; modify at will ;-)
-
         if (!getUnit().isOffensiveUnit()) {
             throw new IllegalStateException("A target can only be found for offensive units. You tried with: " + getUnit().getName());
         }
-
-        PathNode bestTarget = null;
-
-        Unit unit = getUnit();
-        PathNode firstNode = new PathNode(unit.getTile(), 0, 0, -1, unit.getMovesLeft(), 0);
-
-        // TODO: Choose a better datastructur:
-        ArrayList openList = new ArrayList();
-        ArrayList closedList = new ArrayList();
-
-        openList.add(firstNode);
-
-        while (openList.size() > 0) {
-            // TODO: Better method for choosing the node with the lowest f:
-            PathNode currentNode = (PathNode) openList.get(0);
-            for (int i=1; i<openList.size(); i++) {
-                if (currentNode.compareTo(openList.get(i)) < 0) {
-                    currentNode = (PathNode) openList.get(i);
-                }
+        
+    	GoalDecider gd = new GoalDecider() {
+            private PathNode bestTarget = null;
+            
+            public PathNode getGoal() {
+            	return bestTarget;            	
             }
-
-            // Reached the end
-            if (currentNode.getTurns() > maxTurns) {
-                break;
+            
+            public boolean hasSubGoals() {
+            	return true;
             }
-
-            // Try every direction:
-            int[] directions = getGame().getMap().getRandomDirectionArray();
-            for (int j=0; j<8; j++) {
-                int direction = directions[j];
-
-                Tile newTile = getGame().getMap().getNeighbourOrNull(direction, currentNode.getTile());
-
-                if (newTile == null) {
-                    continue;
-                }
-
-                int cost = currentNode.getCost();
-                int movesLeft = currentNode.getMovesLeft();
-                int turns = currentNode.getTurns();
-
-                if (newTile.isLand() && unit.isNaval()) {
-                    if ((newTile.getSettlement() == null || newTile.getSettlement().getOwner() != unit.getOwner())) {
-                        // Not allowed to move a naval unit on land:
-                        continue;
-                    } else {
-                        // Entering a settlement costs all of the remaining moves for a naval unit:
-                        cost += movesLeft;
-                        movesLeft = 0;
-                    }
-                } else if ((!newTile.isLand() && !unit.isNaval())) {
-                    // Not allowed to move a land unit on water:
-                    continue;
-                } else {
-                    int mc = newTile.getMoveCost(currentNode.getTile());
-                    if (mc - 2 <= movesLeft) {
-                        // Normal move: Using -2 in order to make 1/3 and 2/3 move count as 3/3.
-                        movesLeft -= mc;
-                        if (movesLeft < 0) {
-                            mc += movesLeft;
-                            movesLeft = 0;
-                        }
-                        cost += mc;
-                    } else if (movesLeft == unit.getInitialMovesLeft()) {
-                        // Entering a terrain with a higher move cost, but no moves have been spent yet.
-                        cost += movesLeft;
-                        movesLeft = 0;
-                    } else {
-                        // This move takes an extra turn to complete:
-                        turns++;
-                        if (mc > unit.getInitialMovesLeft()) {
-                            // Entering a terrain with a higher move cost than the initial moves:
-                            cost += movesLeft + unit.getInitialMovesLeft();
-                            movesLeft = 0;
-                        } else {
-                            // Normal move:
-                            cost += movesLeft + mc;
-                            movesLeft = unit.getInitialMovesLeft() - mc;
-                        }
-                    }
-                }
-
-
-                int f = cost; // + getDistance(newTile.getPosition(), end.getPosition());
-
-                PathNode successor = null;
-                // TODO: Better method for finding the node on the open list:
-                int i;
-                for (i=0; i<openList.size(); i++) {
-                    if (((PathNode) openList.get(i)).getTile() == newTile) {
-                        successor = (PathNode) openList.get(i);
-                        break;
-                    }
-                }
-
-                if (successor != null) {
-                    if (successor.getF() <= f) {
-                        continue;
-                    } else {
-                        openList.remove(i);
-                    }
-                } else {
-                    // TODO: Better method for finding the node on the closed list:
-                    for (i=0; i<closedList.size(); i++) {
-                        if (((PathNode) closedList.get(i)).getTile() == newTile) {
-                            successor = (PathNode) closedList.get(i);
-                            break;
-                        }
-                    }
-                    if (successor != null) {
-                        if (successor.getF() <= f) {
-                            continue;
-                        } else {
-                            closedList.remove(i);
-                        }
-                    }
-                }
-
-                successor = new PathNode(newTile, cost, f, direction, movesLeft, turns);
-                successor.previous = currentNode;
-
-                if ((newTile.isLand() && !unit.isNaval() || !newTile.isLand() && unit.isNaval()) &&
-                        newTile.getDefendingUnit(unit) != null && newTile.getDefendingUnit(unit).getOwner() != unit.getOwner()) {
-
-                    int tension = unit.getOwner().getTension(newTile.getDefendingUnit(unit).getOwner());
-                    if (unit.getIndianSettlement() != null) {
-                        tension += unit.getIndianSettlement().getAlarm(newTile.getDefendingUnit(unit).getOwner());
-                    }
-                    if (newTile.getDefendingUnit(unit).getType() == Unit.TREASURE_TRAIN) {
-                        tension += Math.min(newTile.getDefendingUnit(unit).getTreasureAmount() / 10, 600);
-                    }
-                    if (newTile.getDefendingUnit(unit).getType() == Unit.ARTILLERY && newTile.getSettlement() == null) {
-                        tension += 100 - newTile.getDefendingUnit(unit).getDefensePower(unit) * 2;
-                    }
-                    if (newTile.getDefendingUnit(unit).getType() == Unit.VETERAN_SOLDIER && !newTile.getDefendingUnit(unit).isArmed()) {
-                        tension += 50 - newTile.getDefendingUnit(unit).getDefensePower(unit) * 2;
-                    }
-                    if (tension > Player.TENSION_CONTENT) {
-                        if (bestTarget == null) {
-                            bestTarget = successor;                           
-                        } else if (bestTarget.getTurns() == successor.getTurns()) {
-                            // TODO: Check if the new target is better than the previous:
-                        }
-                    }
-                } else {
-                    openList.add(successor);
-                }
-            }
-
-            closedList.add(currentNode);
-
-            // TODO: Better method for removing the node on the open list:
-            for (int i=0; i<openList.size(); i++) {
-                if (((PathNode) openList.get(i)) == currentNode) {
-                    openList.remove(i);
-                    break;
-                }
-            }
-        }
-
-        if (bestTarget != null) {
-            while (bestTarget.previous != null) {
-                bestTarget.previous.next = bestTarget;
-                bestTarget = bestTarget.previous;
-            }
-            return bestTarget.next;
-        } else {
-            return null;
-        }
+            
+    		public boolean check(Unit unit, PathNode pathNode) {
+    			Tile newTile = pathNode.getTile();
+    			if ((newTile.isLand() && !unit.isNaval() || !newTile.isLand() && unit.isNaval()) &&
+    					newTile.getDefendingUnit(unit) != null && newTile.getDefendingUnit(unit).getOwner() != unit.getOwner()) {
+    				
+    				int tension = unit.getOwner().getTension(newTile.getDefendingUnit(unit).getOwner());
+    				if (unit.getIndianSettlement() != null) {
+    					tension += unit.getIndianSettlement().getAlarm(newTile.getDefendingUnit(unit).getOwner());
+    				}
+    				if (newTile.getDefendingUnit(unit).getType() == Unit.TREASURE_TRAIN) {
+    					tension += Math.min(newTile.getDefendingUnit(unit).getTreasureAmount() / 10, 600);
+    				}
+    				if (newTile.getDefendingUnit(unit).getType() == Unit.ARTILLERY && newTile.getSettlement() == null) {
+    					tension += 100 - newTile.getDefendingUnit(unit).getDefensePower(unit) * 2;
+    				}
+    				if (newTile.getDefendingUnit(unit).getType() == Unit.VETERAN_SOLDIER && !newTile.getDefendingUnit(unit).isArmed()) {
+    					tension += 50 - newTile.getDefendingUnit(unit).getDefensePower(unit) * 2;
+    				}
+    				if (tension > Player.TENSION_CONTENT) {
+    					if (bestTarget == null) {
+    						bestTarget = pathNode;                           
+    					} else if (bestTarget.getTurns() == pathNode.getTurns()) {
+    						// TODO: Check if the new target is better than the previous:
+    					}
+    				}
+    				return true;
+    			} else {
+    				return false;
+    			}
+    		}
+    	};
+    	return getGame().getMap().search(getUnit(), gd, maxTurns);
     }
-
     
+   
     /**
     * Returns the destination of a required transport.
     * @return The destination of a required transport or 
