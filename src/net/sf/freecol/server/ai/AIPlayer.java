@@ -223,19 +223,21 @@ public class AIPlayer extends AIObject {
                         bestTurns = unit.getTurnsToReach(colonyTile);
                     }
                     // Check if we can find a better site to work than a new colony:
-                    for (int i=0; i<unitWishes.length; i++) {
-                        wishList = unitWishes[i];
-                        for (int j=0; j<wishList.size(); j++) {
-                            WorkerWish ww = (WorkerWish) wishList.get(j);
-                            int turns = unit.getTurnsToReach(ww.getDestination().getTile());
-                            // TODO: Choose to build colony if the value of the wish is low.
-                            if (bestWish == null && turns < bestTurns || bestWish != null && (
-                                    turns < bestTurns
-                                    || turns == bestTurns && ww.getValue() > bestWish.getValue())) {
-                                bestWish = ww;
-                                bestTurns = turns;
-                            }
-                        }
+                    if (!hasFewColonies() || colonyTile == null || bestTurns > 10) {
+                    	for (int i=0; i<unitWishes.length; i++) {
+                    		wishList = unitWishes[i];
+                    		for (int j=0; j<wishList.size(); j++) {
+                    			WorkerWish ww = (WorkerWish) wishList.get(j);
+                    			int turns = unit.getTurnsToReach(ww.getDestination().getTile());
+                    			// TODO: Choose to build colony if the value of the wish is low.
+                    			if (bestWish == null && turns < bestTurns
+                    					|| bestWish != null && (turns < bestTurns || 
+                    							turns == bestTurns && ww.getValue() > bestWish.getValue())) {
+                    				bestWish = ww;
+                    				bestTurns = turns;
+                    			}
+                    		}
+                    	}
                     }
                     if (bestWish != null) {
                         bestWish.setTransportable(aiUnit);
@@ -302,7 +304,31 @@ public class AIPlayer extends AIObject {
         logger.fine("AI: Leaving");
     }
 
+    
+    /**
+     * This is a temporary method which are used for 
+     * forcing the computer players into building more 
+     * colonies. The method will be removed after the
+     * proper code for deciding wether a colony should 
+     * be built or not has been implemented.
+     * 
+     * @return <code>true</code> if the AI should build
+     * 		   more colonies.
+     */
+    public boolean hasFewColonies() {
+    	Iterator it = getPlayer().getColonyIterator();
+    	int numberOfColonies = 0;
+    	int numberOfWorkers = 0;
+    	while (it.hasNext()) {
+    		Colony c = (Colony) it.next();
+    		numberOfColonies++;
+    		numberOfWorkers += c.getUnitCount();
+    	}
+    	return numberOfColonies <= 2  || numberOfColonies >= 3 
+    			&& numberOfWorkers / numberOfColonies > numberOfColonies - 2;
+    }
 
+    
     /**
     * Maps <code>Transportable</code>s to carrier's using a
     * <code>TransportMission</code>.

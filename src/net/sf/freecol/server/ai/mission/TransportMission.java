@@ -395,18 +395,37 @@ public class TransportMission extends Mission {
     * @param connection The <code>Connection</code> to the server.
     */
     private void buyCargo(Connection connection) {
-        // TODO: Buy goods
+    	AIPlayer aiPlayer = (AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getID());    	
 
         if (!(getUnit().getLocation() instanceof Europe)) {
             throw new IllegalStateException("Carrier not in Europe");
         }
 
+        /* 
+         * Quick fix for forcing the AI to build more colonies.
+         * This fix should be removed after a proper implementation
+         * has been created.
+         */
+        if (aiPlayer.hasFewColonies()) {
+        	int space = getAvailableSpace();
+        	while (space > 0) {
+        		AIUnit newUnit = getCheapestUnitInEurope(connection);
+        		if (newUnit != null) {
+        			addToTransportList(newUnit);
+        			space--;
+        		} else {
+        			return;
+        		}
+        	}
+        }        
+        
         /* Add colonies containing wishes with the same destination as
            an item in the transport list to the "aiColonies"-list: */
         ArrayList aiColonies = new ArrayList();
         for (int i=0; i<transportList.size(); i++) {
             Transportable t = (Transportable) transportList.get(i);
-            if (t.getTransportDestination().getTile() != null
+            if (t.getTransportDestination() != null 
+            		&& t.getTransportDestination().getTile() != null
                     && t.getTransportDestination().getTile().getColony() != null
                     && t.getTransportDestination().getTile().getColony().getOwner() == getUnit().getOwner()) {
                 AIColony ac = (AIColony) getAIMain().getAIObject(t.getTransportDestination().getTile().getColony().getID());

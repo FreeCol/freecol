@@ -231,16 +231,17 @@ public class AIColony extends AIObject {
                         wishFound = true;
                     }
                 }
-                if (!wishFound) {
+                if (!wishFound && ww.getTransportable() != null) {
                     ((AIUnit) ww.getTransportable()).setMission(null);
                 }
-            }
-            if (w instanceof GoodsWish) {
+            } else if (w instanceof GoodsWish) {
                 GoodsWish gw = (GoodsWish) w;
                 //TODO: check for a certain required amount?
                 if (getColony().getGoodsCount(gw.getGoodsType()) == 0) {
                     newWishes.add(gw);
                 }
+            } else {
+            	logger.warning("Unknown type of Wish.");
             }
         }
 
@@ -278,6 +279,11 @@ public class AIColony extends AIObject {
         for (int goodsType=0; goodsType<Goods.NUMBER_OF_TYPES; goodsType++) {
             if (goodsType == Goods.FOOD || goodsType == Goods.LUMBER || goodsType == Goods.HORSES) {
                 continue;
+            }
+            if (goodsType == Goods.MUSKETS 
+            		&& colony.getProductionOf(Goods.MUSKETS) > 0
+            		&& colony.getGoodsCount(Goods.MUSKETS) > colony.getWarehouseCapacity() - 50) {
+            	continue;
             }
             if (colony.getGoodsCount(goodsType) > 0) {
                 List alreadyAdded = new ArrayList();
@@ -399,7 +405,7 @@ public class AIColony extends AIObject {
                     WorkLocation wl = wlp.getWorkLocation();
                     if (unit.getExpertWorkType() == wlp.getGoodsType() && wlp.getWorkLocation().canAdd(unit)
                             && (wlp.getGoodsType() != Goods.FOOD
-                            || !((ColonyTile) wl).getWorkTile().isLand() && unit.getType() == Unit.EXPERT_FISHERMAN
+                            || !((ColonyTile) wl).getWorkTile().isLand() && unit.getType() == Unit.EXPERT_FISHERMAN && colony.getBuilding(Building.DOCK).isBuilt()
                             || ((ColonyTile) wl).getWorkTile().isLand() && unit.getType() != Unit.EXPERT_FISHERMAN)) {
                         unit.setLocation(wlp.getWorkLocation());
                         unit.setWorkType(wlp.getGoodsType());
