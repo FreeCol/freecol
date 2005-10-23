@@ -925,11 +925,12 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
     /**
     * Creates an illustration for a goods production.
     *
-    * @param goodsIcon The icon representing the goods.
-    * @param production The amount of goods that is beeing produced.
-    * @param width The width of the image to deliver.
-    * @param height The height of the image to deliver.
-    * @return The image.
+    * @param goodsIcon   int  The icon representing the goods.
+    * @param production  int  The amount of goods that is being produced.
+    * @param width       int  The width of the image to deliver.
+    * @param height      int  The height of the image to deliver.
+    * 
+    * @return BufferedImage   The image.
     */
     public BufferedImage createProductionImage(ImageIcon goodsIcon, int production, int width, int height) {
         return createProductionImage(goodsIcon, production,  width,  height, 6);
@@ -939,46 +940,207 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
     /**
     * Creates an illustration for a goods production.
     *
-    * @param goodsIcon The icon representing the goods.
-    * @param production The amount of goods that is beeing produced.
-    * @param width The width of the image to deliver.
-    * @param height The height of the image to deliver.
-    * @param limit The maximum amount of goods icons to display.
-    *              if the production is above this limit, a number
-    *              is used instead.
-    * @return The image.
+    * @param goodsIcon   int  The icon representing the goods.
+    * @param production  int  The amount of goods that is being produced.
+    * @param width       int  The width of the image to deliver.
+    * @param height      int  The height of the image to deliver.
+    * @param limit       int  The maximum amount of goods icons to display.
+    *                         if the production is above this limit, a number
+    *                         is used instead.
+    * 
+    * @return BufferedImage   The image.
     */
-    public BufferedImage createProductionImage(ImageIcon goodsIcon, int production, int width, int height, int limit) {
+    public BufferedImage createProductionImage(ImageIcon goodsIcon, final int production, int width, int height, int limit) {
+        final BufferedImage bi = createProductionImage(goodsIcon, production, width, height, limit, false);
+        return bi;
+    }
+
+    /**
+    * Creates an illustration for a goods production, allows the plus to be requested for drawing.
+    *
+    * @param goodsIcon   int   The icon representing the goods.
+    * @param production  int   The amount of goods that is being produced.
+    * @param width       int   The width of the image to deliver.
+    * @param height      int   The height of the image to deliver.
+    * @param limit       int   The maximum amount of goods icons to display.
+    *                          if the production is above this limit, a number
+    *                          is used instead.
+    * @param drawPlus boolean  Flag to determine if a "+" should preceed the number drawn
+    * 
+    * @return BufferedImage   The image.
+    * 
+    * @date Oct 2, 2005 11:30:14 PM by chris
+    */
+    public BufferedImage createProductionImage(ImageIcon goodsIcon, final int production, int width, int height, int limit, boolean drawPlus) {
+        final UserPreference userPreference = _userPreference;
+        final BufferedImage bi = createProductionImage(goodsIcon, production, width, height, limit, drawPlus, userPreference);
+        return bi;
+    }
+    /**
+    * Creates an illustration for a goods production, allows the plus to be requested for drawing.
+    * This version takes into account a preliminary user preferences object.
+    *
+    * @param goodsIcon   int   The icon representing the goods.
+    * @param production  int   The amount of goods that is being produced.
+    * @param width       int   The width of the image to deliver.
+    * @param height      int   The height of the image to deliver.
+    * @param limit       int   The maximum amount of goods icons to display.
+    *                          if the production is above this limit, a number
+    *                          is used instead.
+    * @param drawPlus boolean  Flag to determine if a "+" should preceed the number drawn
+    * @param userPreference UserPreference
+    *                          If set, it can override some preferences (esp. limit)
+    * 
+    * @return BufferedImage   The image.
+    * 
+    * @date Oct 2, 2005 11:39:19 PM by CHRIS
+    */
+    public BufferedImage createProductionImage(ImageIcon goodsIcon, final int production, int width, int height, int limit, boolean drawPlus, UserPreference userPreference) {
+        final int displayIconCutoffCount = Math.min(limit,                      userPreference.getGoodsIconsMaxToShow());
+        final int displayIconsIfOverMax = Math.max(1, Math.min(displayIconCutoffCount,      userPreference.getGoodsIconsDisplayWhenOverMax()));
+        final int displayNumbersIfOverCount = Math.min(displayIconCutoffCount,  userPreference.getGoodsIconsDisplayCountAfterCount());
+        
+        final BufferedImage bi = createProductionImage(goodsIcon, production, width, height, 
+                displayIconCutoffCount, displayIconsIfOverMax, displayNumbersIfOverCount, drawPlus);
+        return bi;
+    }
+
+    /**
+    * Creates an illustration for a goods production.
+    *     
+    * @param goodsIcon                   ImageIcon The icon representing the goods.
+    * @param production                  int       The amount of goods that is beeing produced.
+    * @param width                       int       The width of the image to deliver.
+    * @param height                      int       The height of the image to deliver.
+    * @param displayIconCutoffCount      int       If production is over this amount, then instead of showing all production icons
+    * @param displayIconsIfOverMax       int           we show displayIconsIfOverMax icons.
+    * @param displayNumbersIfOverCount   int       If production is over this number, then we display a count
+    * @param drawPlus                    boolean   If true, then a plus is drawn preceeding non-negative numbers (>= 0)
+    * 
+    * @return BufferedImage              The image.
+    * 
+    * @date Oct 2, 2005 11:27:14 PM by CHRIS
+    */
+    public BufferedImage createProductionImage(ImageIcon goodsIcon, final int production, int width, int height, 
+            int displayIconCutoffCount, int displayIconsIfOverMax, int displayNumbersIfOverCount, boolean drawPlus) {
+        
+        final BufferedImage image = createProductionImage( goodsIcon, production, width, height, 
+            displayIconCutoffCount, displayIconsIfOverMax, displayNumbersIfOverCount, drawPlus, false);
+        return image;
+    }
+
+    /**
+    * Creates an illustration for a set of goods: production, storage, debt, etc.
+    * Text is always shown for zero and negative numbers, and can be requested for positives.
+    * Text is always centered on the drawn images.
+    * 
+    * Worker method, all other createProductionImage()s call this method.
+    *     
+    * @param goodsIcon                   ImageIcon The icon representing the goods.
+    * @param production                  int       The amount of goods that is beeing produced.
+    * @param width                       int       The width of the image to deliver.
+    * @param height                      int       The height of the image to deliver.
+    * @param displayIconCutoffCount      int       If production is over this amount, then instead of showing all production icons
+    * @param displayIconsIfOverMax       int           we show displayIconsIfOverMax icons.
+    * @param displayNumbersIfOverCount   int       If production is over this number, then we display a count
+    * @param drawPlus                    boolean   If true, then a plus is drawn preceeding non-negative numbers (>= 0)
+    * @param center                      boolean   When false everything is left-justified.  When true, the image is centered within width.
+    * 
+    * @return BufferedImage              The image.
+    * 
+    * @date Oct 22, 2005 9:34:15 AM by chris
+    */
+    public BufferedImage createProductionImage(ImageIcon goodsIcon, final int production, int width, int height, 
+            int displayIconCutoffCount, int displayIconsIfOverMax, int displayNumbersIfOverCount, boolean drawPlus, boolean center) {
+    
         BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = bi.createGraphics();
 
-        if (production > 0) {
-            int p = width / production;
-            if (p-goodsIcon.getIconWidth() < 0) {
-                p = (width - goodsIcon.getIconWidth()) / production;
-            }
+        final int drawMax = displayIconCutoffCount;
+        int drawImageCount = Math.abs(production);              // Can only draw a positive number of images.
+        
+        if (drawImageCount > drawMax) {
+            drawImageCount = Math.max(1,displayIconsIfOverMax);
+        }
+        final boolean drawNoImages = drawImageCount == 0; 
+        if( drawNoImages ) {
+            drawImageCount = 1;
+        }
+        
+        final int iconWidth = goodsIcon.getIconWidth();
+        int pixelsPerIcon = width / drawImageCount;
+        if (pixelsPerIcon-iconWidth < 0) {                      // 
+            pixelsPerIcon = (width - iconWidth) / drawImageCount;
+        }
+        final int maxSpacing = iconWidth;
+        final boolean iconsTooFarApart = pixelsPerIcon > maxSpacing;    // TODO Tune this: all icons are the same width, but many do not take up the whole width, eg. bells
+        if (iconsTooFarApart) {
+            pixelsPerIcon = maxSpacing;
+        }
+        final int coverage = pixelsPerIcon * (drawImageCount-1) + iconWidth;
+        int leftOffset = 0;
+        final boolean needToCenterImages = center && coverage < width; 
+        if (needToCenterImages) {
+            leftOffset = (width - coverage)/2;
+        }
+        
+        for (int i=0; i<drawImageCount; i++) {                  // Draw the icons onto the image
+            goodsIcon.paintIcon(null, g, leftOffset + i*pixelsPerIcon, 0);
+        }
 
-            if (production > limit) { // TODO: Or the user chooses it:
-                goodsIcon.paintIcon(null, g, width/2 - goodsIcon.getIconWidth()/2, 0);
-                BufferedImage stringImage = createStringImage((Graphics2D) g, Integer.toString(production), Color.WHITE, goodsIcon.getIconWidth()*2, 12);
-                g.drawImage(stringImage, width/2-stringImage.getWidth()/2, goodsIcon.getIconHeight()/2 - stringImage.getHeight()/2, null);
-            } else {
-                for (int i=0; i<production; i++) {
-                    goodsIcon.paintIcon(null, g, i*p, 0);
-                }
+        final boolean drawnImagesDontMatchProduction = production != drawImageCount;
+        final boolean displayNumbers = production > displayNumbersIfOverCount || drawnImagesDontMatchProduction;
+        if (displayNumbers) {
+            Color textColor = (production < 0)?Color.RED:Color.WHITE;       // Red only if negative
+            String number = Integer.toString(production);
+            if( production >= 0 && drawPlus ) {
+                number = "+"+ number;
             }
-
-        } else if (production == 0) {
-            goodsIcon.paintIcon(null, g, width/2 - goodsIcon.getIconWidth()/2, 0);
-            BufferedImage stringImage = createStringImage((Graphics2D) g, "0", Color.WHITE, goodsIcon.getIconWidth()*2, 12);
-            g.drawImage(stringImage, width/2-stringImage.getWidth()/2, goodsIcon.getIconHeight()/2 - stringImage.getHeight()/2, null);
-        } else {
-            goodsIcon.paintIcon(null, g, width/2 - goodsIcon.getIconWidth()/2, 0);
-            BufferedImage stringImage = createStringImage((Graphics2D) g, Integer.toString(Math.abs(production)), Color.RED, goodsIcon.getIconWidth()*2, 12);
-            g.drawImage(stringImage, width/2-stringImage.getWidth()/2, goodsIcon.getIconHeight()/2 - stringImage.getHeight()/2, null);
+            BufferedImage stringImage = createStringImage((Graphics2D) g, number, textColor, goodsIcon.getIconWidth()*2, 12);
+            int textOffset = leftOffset + (coverage-stringImage.getWidth())/2;
+            textOffset = ( textOffset >= 0 )? textOffset:0;
+            g.drawImage(stringImage, textOffset, goodsIcon.getIconHeight()/2 - stringImage.getHeight()/2, null);
         }
 
         return bi;
+    }
+    
+    /**
+     * TODO  Make this an external class, or at least externally accessible/settable, either by properties file or gui or both.  2005Oct20 CHRIS
+     */
+    static UserPreference _userPreference = new UserPreference();
+    public static class UserPreference {
+        /**
+         * This is the maximum number of goods icons the user wants to see in one grouping
+         */
+        int goodsIconsMaxToShow = 6;
+        /**
+         * The user wants to see the numbers displayed when there are more than this number
+         */
+        int goodsIconsDisplayCountAfterCount = 1;
+        /**
+         * When goodsIconsMaxToShow is crossed, how many do the user want to see?
+         */
+        int goodsIconsDisplayWhenOverMax = 6;
+        
+        public int getGoodsIconsMaxToShow() {
+            return this.goodsIconsMaxToShow;
+        }
+        public void setGoodsIconsMaxToShow(int goodsIconsMaxToShow) {
+            this.goodsIconsMaxToShow = goodsIconsMaxToShow;
+        }
+        public int getGoodsIconsDisplayCountAfterCount() {
+            return this.goodsIconsDisplayCountAfterCount;
+        }
+        public void setGoodsIconsDisplayCountAfterCount(int goodsIconsDisplayCountAfterCount) {
+            this.goodsIconsDisplayCountAfterCount = goodsIconsDisplayCountAfterCount;
+        }
+        public int getGoodsIconsDisplayWhenOverMax() {
+            return this.goodsIconsDisplayWhenOverMax;
+        }
+        public void setGoodsIconsDisplayWhenOverMax(int goodsIconsDisplayWhenOverMax) {
+            this.goodsIconsDisplayWhenOverMax = goodsIconsDisplayWhenOverMax;
+        }
     }
 
 
