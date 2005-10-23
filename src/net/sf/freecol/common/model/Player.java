@@ -255,7 +255,7 @@ public class Player extends FreeColGameObject {
         crosses = 0;
         bells = 0;
 
-        currentFather = -1;
+        currentFather = FoundingFather.NONE;
         rebellionState = 0;
     }
 
@@ -1431,14 +1431,25 @@ public class Player extends FreeColGameObject {
     public void incrementBells(int num) {
         bells += num;
     }
+    
+    /**
+     * 
+     *
+     * @return
+     * 
+     * @date Oct 2, 2005 10:50:00 PM by CHRIS
+     */
+    public int getBellsCurrent() {
+    	return bells;
+    }
 
 
     /**
     * Prepares this <code>Player</code> for a new turn.
     */
     public void newTurn() {
-        // TODO: founding fathers - need real formula to calculate req. number of bells for next father
-        if (isEuropean() && bells >= (getFatherCount() * 100) + 200 ) {
+        final int bellCost = FoundingFather.costTotalForNextFoundingFather(this);
+        if (isEuropean() && bells >= bellCost ) {
             fathers[currentFather] = true;
 
             if (currentFather == FoundingFather.JOHN_PAUL_JONES) {
@@ -1497,7 +1508,7 @@ public class Player extends FreeColGameObject {
                             new String[][] {{"%foundingFather%",
                             Messages.message(FoundingFather.getName(currentFather))}});
 
-            currentFather = -1;
+            currentFather = FoundingFather.NONE;
             bells = 0;
         }
 

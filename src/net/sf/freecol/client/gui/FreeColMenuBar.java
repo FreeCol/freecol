@@ -33,6 +33,7 @@ import net.sf.freecol.client.gui.action.SkipUnitAction;
 import net.sf.freecol.client.gui.action.WaitAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ColopediaPanel;
+import net.sf.freecol.client.gui.panel.ReportContinentalCongressPanel;
 import net.sf.freecol.client.gui.panel.ReportForeignAffairPanel;
 import net.sf.freecol.client.gui.panel.ReportIndianPanel;
 import net.sf.freecol.client.gui.panel.ReportLabourPanel;
@@ -331,6 +332,16 @@ public class FreeColMenuBar extends JMenuBar {
                 }
             });
         }
+        
+        JMenuItem reportCongressMenuItem = new JMenuItem(Messages.message("menuBar.report.congress"));
+        reportCongressMenuItem.setOpaque(false);
+        reportCongressMenuItem.setMnemonic(KeyEvent.VK_F);
+        reportMenu.add(reportCongressMenuItem);
+        reportCongressMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                canvas.showReportPanel(ReportContinentalCongressPanel.class.getName());
+            }
+        });
 
         // --> Colopedia
 

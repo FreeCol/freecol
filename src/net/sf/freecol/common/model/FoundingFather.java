@@ -11,7 +11,8 @@ public class FoundingFather {
     public static final String  REVISION = "$Revision$";
     
     // Remember to update the list in "getWeight" when you add an effect to a founding father:
-    public static final int ADAM_SMITH = 0,
+    public static final int NONE = -1,
+                            ADAM_SMITH = 0,
                             JACOB_FUGGER = 1, //TODO
                             PETER_MINUIT = 2,
                             PETER_STUYVESANT = 3, //TODO
@@ -161,6 +162,35 @@ public class FoundingFather {
         } else {
             return getWeight3(foundingFather);
         }
+    }
+    
+    /**
+     * 
+     *
+     * @param player
+     * @return
+     * 
+     * @date Oct 3, 2005 1:15:04 AM by CHRIS
+     */
+    public static int costRemainingForNextFoundingFather(Player player) {
+        // TODO: founding fathers - need real formula to calculate req. number of bells for next father
+        final int totalCost = costTotalForNextFoundingFather(player);
+        final int remaining = totalCost - player.getBellsCurrent(); 
+        return remaining;
+    }
+    /**
+     * 
+     *
+     * @param player
+     * @return
+     * 
+     * @date Oct 3, 2005 1:15:04 AM by CHRIS
+     */
+    public static int costTotalForNextFoundingFather(Player player) {
+        // TODO: founding fathers - need real formula to calculate req. number of bells for next father
+        final int hasFatherCount = player.getFatherCount();
+        final int totalCost = (hasFatherCount * 100) + 200;
+        return totalCost;
     }
     
 

@@ -44,6 +44,7 @@ import net.sf.freecol.client.gui.panel.MainPanel;
 import net.sf.freecol.client.gui.panel.NewPanel;
 import net.sf.freecol.client.gui.panel.QuitDialog;
 import net.sf.freecol.client.gui.panel.ReportForeignAffairPanel;
+import net.sf.freecol.client.gui.panel.ReportContinentalCongressPanel;
 import net.sf.freecol.client.gui.panel.ReportIndianPanel;
 import net.sf.freecol.client.gui.panel.ReportLabourPanel;
 import net.sf.freecol.client.gui.panel.ReportPanel;
@@ -133,6 +134,7 @@ public final class Canvas extends JLayeredPane {
     private final ReportLabourPanel        reportLabourPanel;
     private final ReportForeignAffairPanel reportForeignAffairPanel;
     private final ReportIndianPanel        reportIndianPanel;
+    private final ReportContinentalCongressPanel reportContinentalCongressPanel;
     private final ServerListPanel   serverListPanel;
     private final GameOptionsDialog gameOptionsDialog;
     private final ClientOptionsDialog clientOptionsDialog;
@@ -180,6 +182,7 @@ public final class Canvas extends JLayeredPane {
         reportLabourPanel = new ReportLabourPanel(this);
         reportForeignAffairPanel = new ReportForeignAffairPanel(this);
         reportIndianPanel = new ReportIndianPanel(this);
+        reportContinentalCongressPanel = new ReportContinentalCongressPanel(this);
         gameOptionsDialog = new GameOptionsDialog(this, freeColClient);
         clientOptionsDialog = new ClientOptionsDialog(this, freeColClient);
 
@@ -899,6 +902,10 @@ public final class Canvas extends JLayeredPane {
             reportPanel = reportForeignAffairPanel;
         } else if ("net.sf.freecol.client.gui.panel.ReportIndianPanel".equals(classname)) {
             reportPanel = reportIndianPanel;
+        } else if ("net.sf.freecol.client.gui.panel.ReportContinentalCongressPanel".equals(classname)) {
+            reportPanel = reportContinentalCongressPanel;
+        } else {
+            logger.warning("Request for Report panel could not be processed.  Name="+ classname );
         }
 
         if (reportPanel != null) {
