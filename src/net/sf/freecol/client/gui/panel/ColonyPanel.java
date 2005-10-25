@@ -891,8 +891,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         }
 
         public void paintComponent(Graphics g) {
-            final int need = colony.getUnitCount() * 2;
-            final int surplus = colony.getFoodProduction() - need;
+            int need = colony.getFoodNeededByColonistsPerTurn();
+            int surplus = colony.getFoodProduction() - need;
             final int horses = colony.getHorseProduction();
             final int bells = colony.getProductionOf(Goods.BELLS);
             final int crosses = colony.getProductionOf(Goods.CROSSES);
@@ -908,6 +908,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 if (horses == 0) {
                     productionImage = parent.getGUI().createProductionImage(goodsIcon, need, nextX, getHeight(), 12);
                 } else {
+                    need += horses;
+                    surplus -= horses;
                     nextX = goodsIcon.getIconWidth();
                     productionImage = parent.getGUI().createProductionImage(goodsIcon, need, nextX, getHeight(), 1);
                 }
@@ -918,13 +920,19 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             // Food surplus:
             if (surplus != 0) {
                 if (surplus > 6 || surplus < 0 || surplus == 1) {
-                    productionImage = parent.getGUI().createProductionImage(goodsIcon, surplus, goodsIcon.getIconWidth(), getHeight(), 6);
+                    productionImage = parent.getGUI().createProductionImage(goodsIcon, surplus, goodsIcon.getIconWidth(), getHeight(), 6, true);
                     add = goodsIcon.getIconWidth();
                 } else {
-                    productionImage = parent.getGUI().createProductionImage(goodsIcon, surplus, goodsIcon.getIconWidth() * 2, getHeight(), 6);
+                    productionImage = parent.getGUI().createProductionImage(goodsIcon, surplus, goodsIcon.getIconWidth() * 2, getHeight(), 6, true);
                     add = goodsIcon.getIconWidth() * 3;
                 }
                 
+                g.drawImage(productionImage, nextX, 0, null);
+                nextX += productionImage.getWidth()/4 + add;
+            } else {
+                // Show it even if zero surplus
+                productionImage = parent.getGUI().createProductionImage(goodsIcon, surplus, goodsIcon.getIconWidth(), getHeight(), -1, 1, -1, true);
+                add = goodsIcon.getIconWidth();
                 g.drawImage(productionImage, nextX, 0, null);
                 nextX += productionImage.getWidth()/4 + add;
             }
