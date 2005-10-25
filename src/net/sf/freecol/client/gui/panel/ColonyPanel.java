@@ -6,6 +6,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
@@ -92,6 +93,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     private final JLabel                    solLabel;
     private final JLabel                    hammersLabel;
     private final JLabel                    toolsLabel;
+    private final JLabel                    colonyNameLabel;	// CHRIS
+
     private final ProductionPanel           productionPanel;
     private final BuildingBox               buildingBox;
     private final OutsideColonyPanel        outsideColonyPanel;
@@ -119,6 +122,9 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
      * @param parent The parent of this panel
      */
     public ColonyPanel(Canvas parent, FreeColClient freeColClient) {
+        final int windowHeight = 630;
+    	final int windowWidth  = 850;
+
         this.parent = parent;
         this.freeColClient = freeColClient;
         this.inGameController = freeColClient.getInGameController();
@@ -184,6 +190,10 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 tilesLabel = new JLabel("Tiles"),
                 buildingsLabel = new JLabel("Buildings");
 
+        // Make the colony label
+        colonyNameLabel = new JLabel("", JLabel.CENTER);	// CHRIS
+        colonyNameLabel.setFont(new Font(colonyNameLabel.getFont().getName(),Font.BOLD,24));
+
         buildingsScroll.setAutoscrolls(true);
 
         buyBuilding.setSize(132, 20);
@@ -208,27 +218,12 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         outsideColonyScroll.setBorder(new CompoundBorder(new TitledBorder("Outside Colony"), eBorder));
 
         buildingBox.setSize(265, 20);
-        hammersLabel.setSize(150, 20);
+        hammersLabel.setSize(180, 20);	// was: 150,20  CHRIS
         toolsLabel.setSize(150, 20);
+        colonyNameLabel.setSize(windowWidth, 30);
+        
 
-        exitButton.setLocation(760, 570);
-        outsideColonyScroll.setLocation(635, 285);
-        inPortScroll.setLocation(10, 330);
-        cargoScroll.setLocation(265, 330);
-        warehouseScroll.setLocation(10, 450);
-        productionPanel.setLocation(10, 235);
-        tilesScroll.setLocation(10, 10);
-
-
-        buildingsScroll.setLocation(415, 10); // 400,40
-        buildingBox.setLocation(417, 240); // 15,305
-        hammersLabel.setLocation(695, 240); // 185,305 (345, 305)
-        toolsLabel.setLocation(695, 260);
-        solLabel.setLocation(15, 275);
-        goldLabel.setLocation(15, 295);
-        buyBuilding.setLocation(550, 260); //682
-
-        setLayout(null);
+        assignLocations(outsideColonyScroll, inPortScroll, cargoScroll, warehouseScroll, tilesScroll, buildingsScroll);
 
         buyBuilding.setActionCommand(String.valueOf(BUY_BUILDING));
         exitButton.setActionCommand(String.valueOf(EXIT));
@@ -236,6 +231,41 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         buyBuilding.addActionListener(this);
         exitButton.addActionListener(this);
 
+        setContents(outsideColonyScroll, inPortScroll, cargoScroll, warehouseScroll, tilesScroll, buildingsScroll, outsideColonyLabel, inPortLabel, tilesLabel, buildingsLabel);
+
+        try {
+            BevelBorder border = new BevelBorder(BevelBorder.RAISED);
+            setBorder(border);
+        } catch(Exception e) {}
+
+        setSize(windowWidth, windowHeight);	// was: 850,600  CHRIS
+
+        selectedUnit = null;
+
+        // See the message of Ulf Onnen for more information about the presence of this fake mouse listener.
+        addMouseListener(new MouseAdapter() {});
+    }
+
+
+
+
+    /**
+     *
+     * @param outsideColonyScroll
+     * @param inPortScroll
+     * @param cargoScroll
+     * @param warehouseScroll
+     * @param tilesScroll
+     * @param buildingsScroll
+     * @param outsideColonyLabel
+     * @param inPortLabel
+     * @param tilesLabel
+     * @param buildingsLabel
+     * 
+     * @date Oct 3, 2005 1:26:56 AM by chris
+     */
+    private void setContents(JScrollPane outsideColonyScroll, JScrollPane inPortScroll, JScrollPane cargoScroll, JScrollPane warehouseScroll, JScrollPane tilesScroll, JScrollPane buildingsScroll, JLabel outsideColonyLabel, JLabel inPortLabel, JLabel tilesLabel, JLabel buildingsLabel) {
+        setLayout(null);
         add(exitButton);
         add(outsideColonyScroll);
         add(inPortScroll);
@@ -254,21 +284,62 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         add(hammersLabel);
         add(toolsLabel);
         add(buyBuilding);
-
-        try {
-            BevelBorder border = new BevelBorder(BevelBorder.RAISED);
-            setBorder(border);
-        } catch(Exception e) {}
-
-        setSize(850, 600);
-
-        selectedUnit = null;
-
-        // See the message of Ulf Onnen for more information about the presence of this fake mouse listener.
-        addMouseListener(new MouseAdapter() {});
+        add(colonyNameLabel);
     }
 
 
+
+
+    /**
+     *
+     * @param outsideColonyScroll
+     * @param inPortScroll
+     * @param cargoScroll
+     * @param warehouseScroll
+     * @param tilesScroll
+     * @param buildingsScroll
+     * 
+     * @date Oct 3, 2005 1:23:22 AM by CHRIS
+     */
+    private void assignLocations(JScrollPane outsideColonyScroll, JScrollPane inPortScroll, JScrollPane cargoScroll, JScrollPane warehouseScroll, JScrollPane tilesScroll, JScrollPane buildingsScroll) {
+        int y = 10;
+        colonyNameLabel.setLocation (0,y);   //602);
+        
+        y+= 30;
+        tilesScroll.setLocation     (10, y);         //10);
+        buildingsScroll.setLocation (415, y);    //10); // 400,40
+        
+        y+= 225;
+        productionPanel.setLocation (10, y);    //235);
+        
+        y+= 5;
+        buildingBox.setLocation     (417, y);   //240); // 15,305
+        hammersLabel.setLocation    (695, y);   //240); // 185,305 (345, 305)
+
+        y+= 20;
+        buyBuilding.setLocation     (550, y);   //260); //682
+        toolsLabel.setLocation      (695, y);   //260); //682
+
+        y+= 15;
+        solLabel.setLocation        (15, y);    //275);
+        
+        y+= 10;
+        outsideColonyScroll.setLocation(635, y);    //285);
+        
+        y+= 10;
+        goldLabel.setLocation       (15, y);    //295);
+
+        y+= 35;
+        inPortScroll.setLocation    (10, y);    //330);
+        cargoScroll.setLocation     (265, y);    //330);
+        
+        y+= 120;
+        warehouseScroll.setLocation (10, y);    //450);
+
+        y+= 120;
+        exitButton.setLocation      (760, y);   //570);
+
+    }
 
 
     public void requestFocus() {
@@ -372,6 +443,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
         updateSoLLabel();
         updateProgressLabel();
+        this.colonyNameLabel.setText( colony.getName() );
     }
 
 
@@ -422,15 +494,19 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     * Updates the building progress label.
     */
     private void updateProgressLabel() {
-        if (colony.getCurrentlyBuilding() == -1) {
+        if (colony.getCurrentlyBuilding() == Building.NONE) {
             hammersLabel.setText("");
             toolsLabel.setText("");
         } else {
+        	final Building carpenter = colony.getBuildingForProducing( Goods.HAMMERS );
+        	final int hammers = carpenter.getProductionNextTurn();
+        	final String hammerDelta = (hammers == 0)?"":(hammers>0)?"+"+ hammers:String.valueOf(hammers);
+        	final String hammerDisplay = "Hammers: "+ colony.getHammers() + hammerDelta;
             if (colony.getCurrentlyBuilding() < Colony.BUILDING_UNIT_ADDITION) {
-                hammersLabel.setText("Hammers: " + colony.getHammers() + "/" + colony.getBuilding(colony.getCurrentlyBuilding()).getNextHammers());
+                hammersLabel.setText(hammerDisplay + "/" + colony.getBuilding(colony.getCurrentlyBuilding()).getNextHammers());
                 toolsLabel.setText("Tools: " + colony.getGoodsCount(Goods.TOOLS) + "/" + colony.getBuilding(colony.getCurrentlyBuilding()).getNextTools());
             } else {
-                hammersLabel.setText("Hammers: " + colony.getHammers() + "/" + Unit.getNextHammers(colony.getCurrentlyBuilding() - Colony.BUILDING_UNIT_ADDITION));
+                hammersLabel.setText(hammerDisplay + "/" + Unit.getNextHammers(colony.getCurrentlyBuilding() - Colony.BUILDING_UNIT_ADDITION));
                 toolsLabel.setText("Tools: " + colony.getGoodsCount(Goods.TOOLS) + "/" + Unit.getNextTools(colony.getCurrentlyBuilding() - Colony.BUILDING_UNIT_ADDITION));
             }
             buyBuilding.setEnabled(colony.getCurrentlyBuilding() >= 0 && colony.getPriceForBuilding() <= freeColClient.getMyPlayer().getGold());

@@ -36,7 +36,8 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     public static final int MAX_LEVEL = 3;
 
     /** The type of a building. */
-    public static final int TOWN_HALL = 0,
+    public static final int NONE = -1,
+                            TOWN_HALL = 0,
                             CARPENTER = 1,
                             BLACKSMITH = 2,
                             TOBACCONIST = 3,
