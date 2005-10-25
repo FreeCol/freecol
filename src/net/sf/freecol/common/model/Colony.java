@@ -1042,7 +1042,7 @@ public final class Colony extends Settlement implements Location {
         if (getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) {
             int unitType = getCurrentlyBuilding() - BUILDING_UNIT_ADDITION;
             hammersRemaining = Math.max(Unit.getNextHammers(unitType) - hammers, 0);
-            toolsRemaining = Math.max(Unit.getNextTools(unitType) - hammers, 0);
+            toolsRemaining = Math.max(Unit.getNextTools(unitType) - getGoodsCount(Goods.TOOLS), 0);
         } else if (getCurrentlyBuilding() != -1) {
             hammersRemaining = Math.max(getBuilding(currentlyBuilding).getNextHammers() - hammers, 0);
             toolsRemaining = Math.max(getBuilding(currentlyBuilding).getNextTools() - getGoodsCount(Goods.TOOLS), 0);
@@ -1075,7 +1075,7 @@ public final class Colony extends Settlement implements Location {
         if (getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) {
             int unitType = getCurrentlyBuilding() - BUILDING_UNIT_ADDITION;
             hammersRemaining = Math.max(Unit.getNextHammers(unitType) - hammers, 0);
-            toolsRemaining = Math.max(Unit.getNextTools(unitType) - hammers, 0);
+            toolsRemaining = Math.max(Unit.getNextTools(unitType) - getGoodsCount(Goods.TOOLS), 0);
             hammers = Math.max(Unit.getNextHammers(unitType), hammers);
         } else if (getCurrentlyBuilding() != -1) {
             hammersRemaining = Math.max(getBuilding(currentlyBuilding).getNextHammers() - hammers, 0);
