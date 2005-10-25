@@ -50,7 +50,7 @@ public final class DragListener extends MouseAdapter {
 
         //Does not work on some platforms:
         //if (e.isPopupTrigger() && (comp instanceof UnitLabel)) {
-        if (e.getButton() == MouseEvent.BUTTON3 && (comp instanceof UnitLabel)) {
+        if ((e.getButton() == MouseEvent.BUTTON3 || e.isPopupTrigger()) && (comp instanceof UnitLabel)) {
             UnitLabel unitLabel = (UnitLabel) comp;
             Unit tempUnit = unitLabel.getUnit();
 

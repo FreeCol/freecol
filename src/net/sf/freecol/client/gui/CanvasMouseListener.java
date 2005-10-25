@@ -50,7 +50,7 @@ public final class CanvasMouseListener implements MouseListener {
         if (e.getButton() == MouseEvent.BUTTON1) {
             gui.setSelectedTile(gui.convertToMapCoordinates(e.getX(), e.getY()));
             canvas.requestFocus();
-        } else if (e.getButton() == MouseEvent.BUTTON3) {
+        } else if (e.getButton() == MouseEvent.BUTTON3 || e.isPopupTrigger()) {
             canvas.showTilePopup(gui.convertToMapCoordinates(e.getX(), e.getY()), e.getX(), e.getY());
         }
     }
