@@ -114,7 +114,7 @@ public final class Colony extends Settlement implements Location {
             workLocations.add(new Building(getGame(),this, Building.PRINTING_PRESS, Building.NOT_BUILT));
             workLocations.add(new Building(getGame(),this, Building.CUSTOM_HOUSE, Building.NOT_BUILT));
         }
-            }
+    }
 
 
     public void updatePopulation() {
@@ -1013,6 +1013,9 @@ public final class Colony extends Settlement implements Location {
                 hammers = hammersRequired;
                 if (getGoodsCount(Goods.TOOLS) >= toolsRequired) {
                     //TODO: Adam Smith check for factory level buildings
+                    if (!getBuilding(currentlyBuilding).canBuildNext()) {
+                        throw new IllegalStateException("Cannot build the selected building.");
+                    }
                     if (toolsRequired > 0) {
                         removeGoods(Goods.TOOLS, toolsRequired);
                     }
@@ -1172,7 +1175,7 @@ public final class Colony extends Settlement implements Location {
         }
     }
 
-    
+
     /**
     * Returns the capacity of this colony's warehouse. All goods above this limit,
     * except {@link Goods#FOOD}, will be removed when calling {@link #newTurn}.
