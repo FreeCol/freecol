@@ -24,6 +24,7 @@ import javax.swing.ImageIcon;
 import javax.swing.UIManager;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FoundingFather;
@@ -930,7 +931,7 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
     * @param width       int  The width of the image to deliver.
     * @param height      int  The height of the image to deliver.
     * 
-    * @return BufferedImage   The image.
+    * @return                  The image.
     */
     public BufferedImage createProductionImage(ImageIcon goodsIcon, int production, int width, int height) {
         return createProductionImage(goodsIcon, production,  width,  height, 6);
@@ -948,7 +949,7 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
     *                         if the production is above this limit, a number
     *                         is used instead.
     * 
-    * @return BufferedImage   The image.
+    * @return                  The image.
     */
     public BufferedImage createProductionImage(ImageIcon goodsIcon, final int production, int width, int height, int limit) {
         final BufferedImage bi = createProductionImage(goodsIcon, production, width, height, limit, false);
@@ -967,38 +968,19 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
     *                          is used instead.
     * @param drawPlus boolean  Flag to determine if a "+" should preceed the number drawn
     * 
-    * @return BufferedImage   The image.
+    * @return                  The image.
     * 
     * @date Oct 2, 2005 11:30:14 PM by chris
     */
     public BufferedImage createProductionImage(ImageIcon goodsIcon, final int production, int width, int height, int limit, boolean drawPlus) {
-        final UserPreference userPreference = _userPreference;
-        final BufferedImage bi = createProductionImage(goodsIcon, production, width, height, limit, drawPlus, userPreference);
-        return bi;
-    }
-    /**
-    * Creates an illustration for a goods production, allows the plus to be requested for drawing.
-    * This version takes into account a preliminary user preferences object.
-    *
-    * @param goodsIcon   int   The icon representing the goods.
-    * @param production  int   The amount of goods that is being produced.
-    * @param width       int   The width of the image to deliver.
-    * @param height      int   The height of the image to deliver.
-    * @param limit       int   The maximum amount of goods icons to display.
-    *                          if the production is above this limit, a number
-    *                          is used instead.
-    * @param drawPlus boolean  Flag to determine if a "+" should preceed the number drawn
-    * @param userPreference UserPreference
-    *                          If set, it can override some preferences (esp. limit)
-    * 
-    * @return BufferedImage   The image.
-    * 
-    * @date Oct 2, 2005 11:39:19 PM by CHRIS
-    */
-    public BufferedImage createProductionImage(ImageIcon goodsIcon, final int production, int width, int height, int limit, boolean drawPlus, UserPreference userPreference) {
-        final int displayIconCutoffCount = Math.min(limit,                      userPreference.getGoodsIconsMaxToShow());
-        final int displayIconsIfOverMax = Math.max(1, Math.min(displayIconCutoffCount,      userPreference.getGoodsIconsDisplayWhenOverMax()));
-        final int displayNumbersIfOverCount = Math.min(displayIconCutoffCount,  userPreference.getGoodsIconsDisplayCountAfterCount());
+        final ClientOptions prefs = freeColClient.getClientOptions();
+        final int minCount = prefs.getInteger( ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT );
+        final int maxIcons = prefs.getInteger( ClientOptions.MAX_NUMBER_OF_GOODS_IMAGES );
+        final int maxDisplay = prefs.getInteger( ClientOptions.DISPLAY_GOODS_IMAGES_WHEN_OVER_MAX_GOODS );
+        
+        final int displayIconCutoffCount =    Math.max(1, Math.min(limit, maxIcons));
+        final int displayIconsIfOverMax =     Math.max(1, Math.min(displayIconCutoffCount, maxDisplay));
+        final int displayNumbersIfOverCount = Math.max(1, Math.min(displayIconCutoffCount, minCount));
         
         final BufferedImage bi = createProductionImage(goodsIcon, production, width, height, 
                 displayIconCutoffCount, displayIconsIfOverMax, displayNumbersIfOverCount, drawPlus);
@@ -1007,6 +989,7 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
 
     /**
     * Creates an illustration for a goods production.
+    * This defaults the more detailed method to NOT draw a plus sign if the count drawn and is positive.
     *     
     * @param goodsIcon                   ImageIcon The icon representing the goods.
     * @param production                  int       The amount of goods that is beeing produced.
@@ -1017,7 +1000,7 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
     * @param displayNumbersIfOverCount   int       If production is over this number, then we display a count
     * @param drawPlus                    boolean   If true, then a plus is drawn preceeding non-negative numbers (>= 0)
     * 
-    * @return BufferedImage              The image.
+    * @return                            The image.
     * 
     * @date Oct 2, 2005 11:27:14 PM by CHRIS
     */
@@ -1046,7 +1029,7 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
     * @param drawPlus                    boolean   If true, then a plus is drawn preceeding non-negative numbers (>= 0)
     * @param center                      boolean   When false everything is left-justified.  When true, the image is centered within width.
     * 
-    * @return BufferedImage              The image.
+    * @return                            The image.
     * 
     * @date Oct 22, 2005 9:34:15 AM by chris
     */
@@ -1062,7 +1045,7 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
         if (drawImageCount > drawMax) {
             drawImageCount = Math.max(1,displayIconsIfOverMax);
         }
-        final boolean drawNoImages = drawImageCount == 0; 
+        final boolean drawNoImages = (drawImageCount == 0); 
         if( drawNoImages ) {
             drawImageCount = 1;
         }
