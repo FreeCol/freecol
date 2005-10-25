@@ -5,14 +5,12 @@ import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.util.Iterator;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
@@ -58,7 +56,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel implements
         Player player = parent.getClient().getMyPlayer();
         final int fatherCount = player.getFatherCount();
         final int currFatherId = player.getCurrentFather();
-        playerLibertyBells = player.getBellsCurrent();
+        playerLibertyBells = player.getCurrentBells();
 
         int displayed = 0;
 
@@ -91,13 +89,8 @@ public final class ReportContinentalCongressPanel extends ReportPanel implements
         label.setVerticalTextPosition(JLabel.TOP);
         reportPanel.add(label);
 
-        bellsNextTurn = 0;
-        for (Iterator colonies = player.getColonyIterator(); colonies.hasNext();) {
-            Colony colony = (Colony) colonies.next();
-            bellsNextTurn += colony.getProductionOf(Goods.BELLS);
-        }
-
-        bellsNeededTotal = FoundingFather.costTotalForNextFoundingFather(player);
+        bellsNextTurn = player.getBellsProductionNextTurn();
+        bellsNeededTotal = player.getTotalBellsRequiredForFoundingFather();
 
         reportPanel.doLayout();
     }

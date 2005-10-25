@@ -1433,13 +1433,16 @@ public class Player extends FreeColGameObject {
     }
     
     /**
-     * 
-     *
-     * @return
-     * 
-     * @date Oct 2, 2005 10:50:00 PM by CHRIS
-     */
-    public int getBellsCurrent() {
+    * Gets the current amount of bells this <code>Player</code> has.
+    *
+    * @return      This player's number of bells earned towards the current Founding Father.
+    * 
+    * @see Goods#BELLS
+    * @see #incrementBells
+    * 
+    * @date Oct 2, 2005 10:50:00 PM by CHRIS
+    */
+    public int getCurrentBells() {
     	return bells;
     }
 
@@ -1448,8 +1451,9 @@ public class Player extends FreeColGameObject {
     * Prepares this <code>Player</code> for a new turn.
     */
     public void newTurn() {
-        final int bellCost = FoundingFather.costTotalForNextFoundingFather(this);
-        if (isEuropean() && bells >= bellCost ) {
+        final int bellsHave = this.getCurrentBells();
+        final int bellCost = this.getTotalBellsRequiredForFoundingFather();
+        if (isEuropean() && bellsHave >= bellCost ) {
             fathers[currentFather] = true;
 
             if (currentFather == FoundingFather.JOHN_PAUL_JONES) {
@@ -1742,6 +1746,60 @@ public class Player extends FreeColGameObject {
 
 
 
+
+    /**
+    * Returns how many more bells are needed to earn the current Founding Father.
+    *
+    * @return          How many more bells the <code>Player</code> needs.
+    * 
+    * @see Goods#BELLS
+    * @see #incrementBells
+    * 
+    * @date Oct 3, 2005 1:15:04 AM by CHRIS
+    */
+    public int getRemainingBellsRequiredForFoundingFather() {
+        // TODO: founding fathers - need real formula to calculate req. number of bells for next father
+        final int totalCost = this.getTotalBellsRequiredForFoundingFather();
+        final int remaining = totalCost - this.getCurrentBells(); 
+        return remaining;
+    }
+
+
+    /**
+    * Returns how many bells in total are needed to earn the current Founding Father.
+    *
+    * @return          Total number of bells the <code>Player</code> needs.
+    * 
+    * @see Goods#BELLS
+    * @see #incrementBells
+    * 
+    * @date Oct 3, 2005 1:15:04 AM by CHRIS
+    */
+    public int getTotalBellsRequiredForFoundingFather() {
+        // TODO: founding fathers - need real formula to calculate req. number of bells for next father
+        final int hasFatherCount = this.getFatherCount();
+        final int totalCost = (hasFatherCount * 100) + 200;
+        return totalCost;
+    }
+
+    /**
+    * Returns how many total bells will be produced if no colonies are lost and nothing unexpected happens.
+    *
+    * @return          Total number of bells this <code>Player</code>'s <code>Colony</code>s will make.
+    * 
+    * @see Goods#BELLS
+    * @see #incrementBells
+    * 
+    * @date Oct 3, 2005 1:15:04 AM by CHRIS
+    */
+    public int getBellsProductionNextTurn() {
+        int bellsNextTurn = 0;
+        for (Iterator colonies = this.getColonyIterator(); colonies.hasNext();) {
+            Colony colony = (Colony) colonies.next();
+            bellsNextTurn += colony.getProductionOf(Goods.BELLS);
+        }
+        return bellsNextTurn;
+    }
 
     /**
     * An <code>Iterator</code> of {@link Unit}s that can be made active.

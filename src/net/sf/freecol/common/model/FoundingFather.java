@@ -164,36 +164,6 @@ public class FoundingFather {
         }
     }
     
-    /**
-     * 
-     *
-     * @param player
-     * @return
-     * 
-     * @date Oct 3, 2005 1:15:04 AM by CHRIS
-     */
-    public static int costRemainingForNextFoundingFather(Player player) {
-        // TODO: founding fathers - need real formula to calculate req. number of bells for next father
-        final int totalCost = costTotalForNextFoundingFather(player);
-        final int remaining = totalCost - player.getBellsCurrent(); 
-        return remaining;
-    }
-    /**
-     * 
-     *
-     * @param player
-     * @return
-     * 
-     * @date Oct 3, 2005 1:15:04 AM by CHRIS
-     */
-    public static int costTotalForNextFoundingFather(Player player) {
-        // TODO: founding fathers - need real formula to calculate req. number of bells for next father
-        final int hasFatherCount = player.getFatherCount();
-        final int totalCost = (hasFatherCount * 100) + 200;
-        return totalCost;
-    }
-    
-
     private static int getWeight1(int foundingFather) {
         switch (foundingFather) {
             case ADAM_SMITH: return 2;
