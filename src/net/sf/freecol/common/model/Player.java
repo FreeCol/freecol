@@ -1506,6 +1506,13 @@ public class Player extends FreeColGameObject {
                         }
                     }
                 }
+            } else if (currentFather == FoundingFather.WILLIAM_BREWSTER) {
+                for (int i=1; i<=3; i++) {
+                    if (getEurope().getRecruitable(i) == Unit.PETTY_CRIMINAL
+                            || getEurope().getRecruitable(i) == Unit.INDENTURED_SERVANT) {
+                        getEurope().setRecruitable(i, Unit.FREE_COLONIST);
+                    }
+                }
             }
 
             addModelMessage(this, "model.player.foundingFatherJoinedCongress",

@@ -105,8 +105,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
     public void setRecruitable(int slot, int type) {
         if ((slot > 0) && (slot < 4) && (type >= 0) && (type < Unit.UNIT_COUNT)) {
             recruitables[slot - 1] = type;
-        }
-        else {
+        } else {
             logger.warning("setRecruitable: invalid slot(" + slot + ") or type(" + type + ") given.");
         }
     }
