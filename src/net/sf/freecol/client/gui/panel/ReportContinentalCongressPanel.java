@@ -33,8 +33,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel implements
     /**
      * The constructor that will add the items to this panel.
      * 
-     * @param parent
-     *            The parent of this panel.
+     * @param parent The parent of this panel.
      */
     public ReportContinentalCongressPanel(Canvas parent) {
         super(parent, title);
@@ -124,7 +123,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel implements
 
         // The right-half of the row is total production
         productionImage = parent.getGUI().createProductionImage(goodsIcon, playerLibertyBells,
-                halfWidth, iconHeight, 100, 100, -1, false);
+                halfWidth, iconHeight, 100, 100, -1, false, false, halfWidth);
         g.drawString(bellCurrent, x, y1);
         g.drawImage(productionImage, x, y2, null);
 
@@ -132,14 +131,14 @@ public final class ReportContinentalCongressPanel extends ReportPanel implements
         // TODO NOT actually shown in Colonization
         final int eighth = halfWidth / 4;
         productionImage = parent.getGUI().createProductionImage(goodsIcon, bellsNextTurn, eighth,
-                iconHeight, 50, 50, -1, true);
+                iconHeight, 50, 50, -1, true, false, eighth);
         x += halfWidth + eighth;
         g.drawString(bellChange, x, y1);
         g.drawImage(productionImage, x, y2, null);
 
         // The last image (far right) shows how many more are required.
         productionImage = parent.getGUI().createProductionImage(goodsIcon, this.bellsNeededTotal,
-                iconWidth * 3, iconHeight, 5, 5, -1, false);
+                iconWidth * 3, iconHeight, 5, 5, -1, false, false, iconWidth * 3);
         x = insetHorizontal + drawWidth - productionImage.getWidth();
         g.drawString(bellReq, x, y1);
         g.drawImage(productionImage, x, y2, null);

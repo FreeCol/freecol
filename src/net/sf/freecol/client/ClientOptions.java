@@ -4,6 +4,7 @@ package net.sf.freecol.client;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.option.IntegerOption;
+import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.OptionMap;
 
 import org.w3c.dom.Element;
@@ -31,26 +32,16 @@ public class ClientOptions extends OptionMap {
     
     /**
      * Used by GUI, the number will be displayed when a group of goods are higher than this number.
-     * 
-     * @see GUI
+     * @see net.sf.freecol.client.gui.GUI
      */
     public static final String MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT = "guiMinNumberToDisplayGoodsCount";
+
     /**
      * Used by GUI, this is the most repetitions drawn of a goods image for a single goods grouping.
      * 
-     * @see GUI
+     * @see net.sf.freecol.client.gui.GUI
      */
-    public static final String MAX_NUMBER_OF_GOODS_IMAGES = "guiMaxNumberOfGoodsImages"; 
-    /**
-     * Used by GUI, this is how many goods icons should be drawn when the actual count is over the maximum (other option).
-     * 
-     * @see GUI
-     */
-    public static final String DISPLAY_GOODS_IMAGES_WHEN_OVER_MAX_GOODS = "guiDisplayGoodsImagesWhenOverMaxGoods"; 
-    
-    
-    /** This is an example key: */
-    //public static final String EXAMPLE = "example";
+    public static final String MAX_NUMBER_OF_GOODS_IMAGES = "guiMaxNumberOfGoodsImages";
 
 
 
@@ -83,19 +74,10 @@ public class ClientOptions extends OptionMap {
     protected void addDefaultOptions() {
         /* Add options here: */
 
-        /* Example: */
-        /*
-        OptionGroup exampleGroup = new OptionGroup("gameOptions.exampleGroup.name", "gameOptions.exampleGroup.shortDescription");
-        exampleGroup.add(new IntegerOption(EXAMPLE, "gameOptions.example.name", "gameOptions.example.shortDescription", 0, 50000, 0));
-        add(exampleGroup);
-        */
-        
-        // TODO FIXME  Add these to the GUI interface - and to the properties file.
-//        ClientOptions exampleGroup = new ClientOptions();   //"gameOptions."+ GROUP_GUI +".name", "gameOptions."+ GROUP_GUI +".shortDescription");
-        this.add(new IntegerOption(MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT, "gameOptions."+ MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT +".name", "gameOptions."+ MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT +".shortDescription", 0, 20, 7));
-        this.add(new IntegerOption(MAX_NUMBER_OF_GOODS_IMAGES, "gameOptions."+ MAX_NUMBER_OF_GOODS_IMAGES +".name", "gameOptions."+ MAX_NUMBER_OF_GOODS_IMAGES +".shortDescription", 1, 20, 10));
-        this.add(new IntegerOption(DISPLAY_GOODS_IMAGES_WHEN_OVER_MAX_GOODS, "gameOptions."+ DISPLAY_GOODS_IMAGES_WHEN_OVER_MAX_GOODS +".name", "gameOptions."+ DISPLAY_GOODS_IMAGES_WHEN_OVER_MAX_GOODS +".shortDescription", 1, 20, 10));
-//        this.add(exampleGroup);
+        OptionGroup guiGroup = new OptionGroup("clientOptions.gui.name", "clientOptions.gui.shortDescription");
+        guiGroup.add(new IntegerOption(MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT, "clientOptions.gui."+ MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT +".name", "clientOptions.gui."+ MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT +".shortDescription", 0, 10, 7));
+        guiGroup.add(new IntegerOption(MAX_NUMBER_OF_GOODS_IMAGES, "clientOptions.gui."+ MAX_NUMBER_OF_GOODS_IMAGES +".name", "clientOptions.gui."+ MAX_NUMBER_OF_GOODS_IMAGES +".shortDescription", 1, 10, 7));
+        add(guiGroup);
 
     }
 
