@@ -55,7 +55,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel implements
         Player player = parent.getClient().getMyPlayer();
         final int fatherCount = player.getFatherCount();
         final int currFatherId = player.getCurrentFather();
-        playerLibertyBells = player.getCurrentBells();
+        playerLibertyBells = player.getBells();
 
         int displayed = 0;
 
@@ -67,7 +67,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel implements
             for (int fatherId = 0; fatherId < FoundingFather.FATHER_COUNT
                     && displayed < fatherCount; fatherId++) {
                 if (player.hasFather(fatherId)) {
-                    final String name = FoundingFather.getName(fatherId);
+                    final String name = Messages.message(FoundingFather.getName(fatherId));
                     buffer.append("<p>").append(name);
                     displayed++;
                 }
@@ -89,7 +89,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel implements
         reportPanel.add(label);
 
         bellsNextTurn = player.getBellsProductionNextTurn();
-        bellsNeededTotal = player.getTotalBellsRequiredForFoundingFather();
+        bellsNeededTotal = player.getTotalFoundingFatherCost();
 
         reportPanel.doLayout();
     }
