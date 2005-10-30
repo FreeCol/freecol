@@ -679,8 +679,6 @@ public class MapGenerator {
                         colony.add(u);
                     }
                     */
-
-                    break;
                 }
             }
             // END DEBUG

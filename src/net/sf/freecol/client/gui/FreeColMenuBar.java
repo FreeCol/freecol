@@ -459,6 +459,16 @@ public class FreeColMenuBar extends JMenuBar {
                 }
             });
 
+            final JMenuItem gc = new JMenuItem("Run the garbage collector");
+            gc.setOpaque(false);
+            gc.setMnemonic(KeyEvent.VK_G);
+            debugMenu.add(gc);
+            gc.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    System.gc();
+                }
+            });
+            
             final JMenuItem crossBug = new JCheckBoxMenuItem("Fix \"not enough crosses\"-bug");
             crossBug.setOpaque(false);
             crossBug.setMnemonic(KeyEvent.VK_B);

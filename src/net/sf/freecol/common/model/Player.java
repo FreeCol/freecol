@@ -1448,7 +1448,8 @@ public class Player extends FreeColGameObject {
     * Prepares this <code>Player</code> for a new turn.
     */
     public void newTurn() {
-        if (isEuropean() && getBells() >= getTotalFoundingFatherCost()) {
+        if (isEuropean() && getBells() >= getTotalFoundingFatherCost()
+                && currentFather != FoundingFather.NONE) {
             fathers[currentFather] = true;
 
             if (currentFather == FoundingFather.JOHN_PAUL_JONES) {

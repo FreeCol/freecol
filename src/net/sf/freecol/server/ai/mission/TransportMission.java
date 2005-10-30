@@ -213,8 +213,10 @@ public class TransportMission extends Mission {
             }
             for (int i=1; i<transportList.size() && bestSourceDistance > 0; i++) {
                 Transportable t1 = (Transportable) transportList.get(i-1);
-                if (t1.getTransportSource().getTile() == newSource.getTile()
-                        || t1.getTransportDestination().getTile() == newSource.getTile()) {
+                if (t1.getTransportSource() != null && 
+                        t1.getTransportSource().getTile() == newSource.getTile()
+                        || t1.getTransportDestination() != null && 
+                        t1.getTransportDestination().getTile() == newSource.getTile()) {
                     bestSourceIndex = i;
                     bestSourceDistance = 0;
                 }

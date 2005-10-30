@@ -116,7 +116,7 @@ public class WishRealizationMission extends Mission {
     public Tile getTransportDestination() {
         if (getUnit().getLocation() instanceof Unit) {
             return wish.getDestination().getTile();
-        } else if (getUnit().getLocation().getTile() == wish.getDestination().getTile()) {
+        } else if (getUnit().getTile() == wish.getDestination().getTile()) {
             return null;
         } else if (getUnit().getTile() == null || getUnit().findPath(wish.getDestination().getTile()) == null) {
             return wish.getDestination().getTile();
