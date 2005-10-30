@@ -43,7 +43,7 @@ public class AIGoods extends AIObject implements Transportable {
      * @param type The type of goods.
      * @param amount The amount of goods.
      * @param destination The destination of the goods. This is the
-     * 		<code>Location</code> to which the goods should be transported.
+     *      <code>Location</code> to which the goods should be transported.
      */
     public AIGoods(AIMain aiMain, Location location, int type, int amount, Location destination) {
         super(aiMain);
@@ -61,7 +61,7 @@ public class AIGoods extends AIObject implements Transportable {
      * 
      * @param aiMain The main AI-object.
      * @param element An <code>Element</code> containing an
-     * 		XML-representation of this object.
+     *      XML-representation of this object.
      */    
     public AIGoods(AIMain aiMain, Element element) {
         super(aiMain);
@@ -203,7 +203,7 @@ public class AIGoods extends AIObject implements Transportable {
     /**
      * Creates an XML-representation of this object.
      * @param document The <code>Document</code> in which
-     * 		the XML-representation should be created.
+     *      the XML-representation should be created.
      * @return The XML-representation.
      */    
     public Element toXMLElement(Document document) {

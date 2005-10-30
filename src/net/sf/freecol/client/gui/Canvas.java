@@ -1529,7 +1529,7 @@ public final class Canvas extends JLayeredPane {
      * ingame components.
      * 
      * @return <code>true</code> if there is a single ingame
-     * 		component.
+     *      component.
      */
     public boolean containsInGameComponents() {
         // remove listeners, they will be added when launching the new game...

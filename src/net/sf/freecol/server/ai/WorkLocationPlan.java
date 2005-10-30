@@ -41,9 +41,9 @@ public class WorkLocationPlan {
      * 
      * @param aiMain The main AI-object.
      * @param workLocation The <code>WorkLocation</code> to create
-     * 		a plan for.
+     *      a plan for.
      * @param goodsType The goodsType to be produced on the 
-     * 		<code>workLocation</code> using this plan.
+     *      <code>workLocation</code> using this plan.
      */
     public WorkLocationPlan(AIMain aiMain, WorkLocation workLocation, int goodsType) {
         this.aiMain = aiMain;
@@ -57,7 +57,7 @@ public class WorkLocationPlan {
      * 
      * @param aiMain The main AI-object.
      * @param element An <code>Element</code> containing an
-     * 		XML-representation of this object.
+     *      XML-representation of this object.
      */
     public WorkLocationPlan(AIMain aiMain, Element element) {
         this.aiMain = aiMain;
@@ -175,7 +175,7 @@ public class WorkLocationPlan {
     /**
      * Creates an XML-representation of this object.
      * @param document The <code>Document</code> in which
-     * 		the XML-representation should be created.
+     *      the XML-representation should be created.
      * @return The XML-representation.
      */    
     public Element toXMLElement(Document document) {

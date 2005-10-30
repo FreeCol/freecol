@@ -116,8 +116,8 @@ public final class FreeColClient {
     * objects and starts the GUI.
     * 
     * @param windowed Determines if the <code>Canvas</code> should be displayed
-    * 		within a <code>JFrame</code> (when <code>true</code>) or in fullscreen
-    * 		mode (when <code>false</code>).
+    *       within a <code>JFrame</code> (when <code>true</code>) or in fullscreen
+    *       mode (when <code>false</code>).
     * @param windowSize The size of the window if not in fullscreen mode.
     * @param imageLibrary The object holding the images.
     * @param musicLibrary The object holding the music.
@@ -384,7 +384,7 @@ public final class FreeColClient {
     /**
      * Gets the <code>FreeColServer</code> started by the client.
      * @return The <code>FreeColServer</code> or <code>null</code>
-     * 		if no server has been started.
+     *      if no server has been started.
      */
     public FreeColServer getFreeColServer() {
         return freeColServer;

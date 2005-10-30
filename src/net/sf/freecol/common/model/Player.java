@@ -1330,7 +1330,7 @@ public class Player extends FreeColGameObject {
                     Iterator childUnitIterator = u.getUnitIterator();
                     while (childUnitIterator.hasNext()) {
                         //Unit childUnit = (Unit) childUnitIterator.next();
-                    	childUnitIterator.next();
+                        childUnitIterator.next();
                         count += 2;
                     }
 
@@ -1440,7 +1440,7 @@ public class Player extends FreeColGameObject {
     * @see #incrementBells
     */
     public int getBells() {
-    	return bells;
+        return bells;
     }
 
 

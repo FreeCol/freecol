@@ -43,7 +43,7 @@ public class UnitSeekAndDestroyMission extends Mission {
     * @param aiUnit The <code>AIUnit</code> this mission
     *        is created for.
     * @param target The object we are trying to destroy. This can be either a
-    * 		 <code>Settlement</code> or a <code>Unit</code>.
+    *        <code>Settlement</code> or a <code>Unit</code>.
     */
     public UnitSeekAndDestroyMission(AIMain aiMain, AIUnit aiUnit, FreeColGameObject target) {
         super(aiMain, aiUnit);
@@ -56,7 +56,7 @@ public class UnitSeekAndDestroyMission extends Mission {
      * 
      * @param aiMain The main AI-object.
      * @param element An <code>Element</code> containing an
-     * 		XML-representation of this object.
+     *      XML-representation of this object.
      */
     public UnitSeekAndDestroyMission(AIMain aiMain, Element element) {
         super(aiMain);
@@ -154,8 +154,8 @@ public class UnitSeekAndDestroyMission extends Mission {
      * Returns the object we are trying to destroy. 
      * 
      * @return The object which should be destroyed. 
-     * 		This can be either a <code>Settlement</code> 
-     * 		or a <code>Unit</code>.
+     *      This can be either a <code>Settlement</code> 
+     *      or a <code>Unit</code>.
      */    
     public FreeColGameObject getTarget() {
         return target;
@@ -166,8 +166,8 @@ public class UnitSeekAndDestroyMission extends Mission {
      * Sets the object we are trying to destroy. 
      * 
      * @param target The object which should be destroyed. 
-     * 		This can be either a <code>Settlement</code> 
-     * 		or a <code>Unit</code>.
+     *      This can be either a <code>Settlement</code> 
+     *      or a <code>Unit</code>.
      */
     public void setTarget(FreeColGameObject target) {
         this.target = target;
@@ -177,7 +177,7 @@ public class UnitSeekAndDestroyMission extends Mission {
     /**
      * Creates an XML-representation of this object.
      * @param document The <code>Document</code> in which
-     * 		the XML-representation should be created.
+     *      the XML-representation should be created.
      * @return The XML-representation.
      */    
     public Element toXMLElement(Document document) {

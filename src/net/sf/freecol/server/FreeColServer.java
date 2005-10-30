@@ -115,7 +115,7 @@ public final class FreeColServer {
     * Starts a new server in a specified mode and with a specified port.
     *
     * @param publicServer This value should be set to <code>true</code>
-    * 					  in order to appear on the meta server's listing.
+    *                     in order to appear on the meta server's listing.
     *                     
     * @param singleplayer Sets the game as singleplayer (if <i>true</i>)
     *                     or multiplayer (if <i>false</i>).
@@ -123,8 +123,8 @@ public final class FreeColServer {
     * @param port         The TCP port to use for the public socket.
     *                     That is the port the clients will connect to.
     *
-    * @param name 		  The name of the server, or <code>null</code> if the 
-    * 					  default name should be used.
+    * @param name         The name of the server, or <code>null</code> if the 
+    *                     default name should be used.
     * 
     * @throws IOException if the public socket cannot be created (the exception
     *                     will be logged by this class).
@@ -343,8 +343,8 @@ public final class FreeColServer {
     /**
     * Gets the number of player that may connect.
     * @return The number of available slots for human
-    * 		players. This number also includes 
-    * 		european players currently controlled by the AI.
+    *       players. This number also includes 
+    *       european players currently controlled by the AI.
     */
     public int getSlotsAvailable() {
         Vector players = game.getPlayers();
@@ -398,7 +398,7 @@ public final class FreeColServer {
     * @param file The file where the data will be written.
     * @param username The username of the player saving the game.
     * @throws IOException If a problem was encountered while trying
-    * 		 to open, write or close the file.
+    *        to open, write or close the file.
     */
     public void saveGame(File file, String username) throws IOException {
         Game game = getGame();
@@ -458,7 +458,7 @@ public final class FreeColServer {
     * @param file The file where the game data is located.
     * @return The username of the player saving the game.
     * @throws IOException If a problem was encountered while trying
-    * 		 to open, read or close the file.
+    *        to open, read or close the file.
     */
     public String loadGame(File file) throws IOException {
         InputStream in;
@@ -681,7 +681,7 @@ public final class FreeColServer {
     /**
      * Gets the <code>ModelController</code>.
      * @return The controller used for generating random numbers
-     * 		and creating new {@link FreeColGameObject}s.
+     *      and creating new {@link FreeColGameObject}s.
      */
     public ServerModelController getModelController() {
         return modelController;
@@ -701,7 +701,7 @@ public final class FreeColServer {
     /**
      * Sets the main AI-object.
      * @param aiMain The main AI-object which is responsible for 
-     * 		controlling, updating and saving the AI objects.
+     *      controlling, updating and saving the AI objects.
      */
     public void setAIMain(AIMain aiMain) {
         this.aiMain = aiMain;
@@ -711,7 +711,7 @@ public final class FreeColServer {
     /**
      * Gets the main AI-object.
      * @return The main AI-object which is responsible for 
-     * 		controlling, updating and saving the AI objects.
+     *      controlling, updating and saving the AI objects.
      */    
     public AIMain getAIMain() {
         return aiMain;

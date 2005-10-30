@@ -38,7 +38,7 @@ public class WishRealizationMission extends Mission {
     * @param aiUnit The <code>AIUnit</code> this mission
     *        is created for.
     * @param wish The <code>Wish</code> which will be realized by
-    * 		 the unit and this mission.
+    *        the unit and this mission.
     */
     public WishRealizationMission(AIMain aiMain, AIUnit aiUnit, Wish wish) {
         super(aiMain, aiUnit);
@@ -51,7 +51,7 @@ public class WishRealizationMission extends Mission {
      * 
      * @param aiMain The main AI-object.
      * @param element An <code>Element</code> containing an
-     * 		XML-representation of this object.
+     *      XML-representation of this object.
      */
     public WishRealizationMission(AIMain aiMain, Element element) {
         super(aiMain);
@@ -160,7 +160,7 @@ public class WishRealizationMission extends Mission {
     /**
      * Creates an XML-representation of this object.
      * @param document The <code>Document</code> in which
-     * 		the XML-representation should be created.
+     *      the XML-representation should be created.
      * @return The XML-representation.
      */    
     public Element toXMLElement(Document document) {

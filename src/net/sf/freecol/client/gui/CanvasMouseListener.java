@@ -35,24 +35,7 @@ public final class CanvasMouseListener implements MouseListener {
     * @param e The MouseEvent that holds all the information.
     */
     public void mouseClicked(MouseEvent e) {
-        if (!e.getComponent().isEnabled()) {
-            return;
-        }
-
-        /*
-        This doesn't seem to work, weird...
-        if (e.isPopupTrigger()) {
-            userInputHandler.popupRequested(gui.convertToMapCoordinates(e.getX(), e.getY()), e.getX(), e.getY());
-        } else {
-            userInputHandler.tileSelected(gui.convertToMapCoordinates(e.getX(), e.getY()));
-        }*/
-
-        if (e.getButton() == MouseEvent.BUTTON1) {
-            gui.setSelectedTile(gui.convertToMapCoordinates(e.getX(), e.getY()));
-            canvas.requestFocus();
-        } else if (e.getButton() == MouseEvent.BUTTON3 || e.isPopupTrigger()) {
-            canvas.showTilePopup(gui.convertToMapCoordinates(e.getX(), e.getY()), e.getX(), e.getY());
-        }
+        // Ignore for now.
     }
 
     /**
@@ -76,7 +59,16 @@ public final class CanvasMouseListener implements MouseListener {
     * @param e The MouseEvent that holds all the information.
     */
     public void mousePressed(MouseEvent e) {
-        // Ignore for now.
+        if (!e.getComponent().isEnabled()) {
+            return;
+        }
+
+        if (e.getButton() == MouseEvent.BUTTON3 || e.isPopupTrigger()) {
+            canvas.showTilePopup(gui.convertToMapCoordinates(e.getX(), e.getY()), e.getX(), e.getY());
+        } else if (e.getButton() == MouseEvent.BUTTON1) {
+            gui.setSelectedTile(gui.convertToMapCoordinates(e.getX(), e.getY()));
+            canvas.requestFocus();
+        }
     }
 
     /**

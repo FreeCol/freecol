@@ -53,7 +53,7 @@ public abstract class AIObject {
     /**
      * Creates an XML-representation of this object.
      * @param document The <code>Document</code> in which
-     * 		the XML-representation should be created.
+     *      the XML-representation should be created.
      * @return The XML-representation.
      */    
     public abstract Element toXMLElement(Document document);

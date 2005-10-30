@@ -302,7 +302,7 @@ public class ServerModelController implements ModelController {
                 }
             } catch (IOException e) {
                 logger.warning("Could not send message to: " + enemyPlayer.getName() 
-                			   + " with connection " + enemyPlayer.getConnection());
+                               + " with connection " + enemyPlayer.getConnection());
             }
         }
     }

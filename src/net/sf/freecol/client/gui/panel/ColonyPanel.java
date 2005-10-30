@@ -93,7 +93,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     private final JLabel                    solLabel;
     private final JLabel                    hammersLabel;
     private final JLabel                    toolsLabel;
-    private final JLabel                    colonyNameLabel;	// CHRIS
+    private final JLabel                    colonyNameLabel;    // CHRIS
 
     private final ProductionPanel           productionPanel;
     private final BuildingBox               buildingBox;
@@ -123,7 +123,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
      */
     public ColonyPanel(Canvas parent, FreeColClient freeColClient) {
         final int windowHeight = 630;
-    	final int windowWidth  = 850;
+        final int windowWidth  = 850;
 
         this.parent = parent;
         this.freeColClient = freeColClient;
@@ -191,7 +191,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 buildingsLabel = new JLabel("Buildings");
 
         // Make the colony label
-        colonyNameLabel = new JLabel("", JLabel.CENTER);	// CHRIS
+        colonyNameLabel = new JLabel("", JLabel.CENTER);    // CHRIS
         colonyNameLabel.setFont(new Font(colonyNameLabel.getFont().getName(),Font.BOLD,24));
 
         buildingsScroll.setAutoscrolls(true);
@@ -218,7 +218,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         outsideColonyScroll.setBorder(new CompoundBorder(new TitledBorder("Outside Colony"), eBorder));
 
         buildingBox.setSize(265, 20);
-        hammersLabel.setSize(180, 20);	// was: 150,20  CHRIS
+        hammersLabel.setSize(180, 20);  // was: 150,20  CHRIS
         toolsLabel.setSize(150, 20);
         colonyNameLabel.setSize(windowWidth, 30);
         
@@ -238,7 +238,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             setBorder(border);
         } catch(Exception e) {}
 
-        setSize(windowWidth, windowHeight);	// was: 850,600  CHRIS
+        setSize(windowWidth, windowHeight); // was: 850,600  CHRIS
 
         selectedUnit = null;
 
@@ -498,10 +498,10 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             hammersLabel.setText("");
             toolsLabel.setText("");
         } else {
-        	final Building carpenter = colony.getBuildingForProducing( Goods.HAMMERS );
-        	final int hammers = carpenter.getProductionNextTurn();
-        	final String hammerDelta = (hammers == 0)?"":(hammers>0)?"+"+ hammers:String.valueOf(hammers);
-        	final String hammerDisplay = "Hammers: "+ colony.getHammers() + hammerDelta;
+            final Building carpenter = colony.getBuildingForProducing( Goods.HAMMERS );
+            final int hammers = carpenter.getProductionNextTurn();
+            final String hammerDelta = (hammers == 0)?"":(hammers>0)?"+"+ hammers:String.valueOf(hammers);
+            final String hammerDisplay = "Hammers: "+ colony.getHammers() + hammerDelta;
             if (colony.getCurrentlyBuilding() < Colony.BUILDING_UNIT_ADDITION) {
                 hammersLabel.setText(hammerDisplay + "/" + colony.getBuilding(colony.getCurrentlyBuilding()).getNextHammers());
                 toolsLabel.setText("Tools: " + colony.getGoodsCount(Goods.TOOLS) + "/" + colony.getBuilding(colony.getCurrentlyBuilding()).getNextTools());
@@ -1134,7 +1134,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         }
 
         public void remove(Component comp) {
-        	if (comp instanceof GoodsLabel) {
+            if (comp instanceof GoodsLabel) {
                 //Goods g = ((GoodsLabel)comp).getGoods();
 
                 super.remove(comp);

@@ -73,8 +73,8 @@ public class MapGenerator {
     * <code>game.setMap(...)</code> is invoked.
     *
     * @param players The players to create <code>Settlement</code>s
-    * 		and starting locations for. That is; both indian and 
-    * 		european players.
+    *       and starting locations for. That is; both indian and 
+    *       european players.
     * @param width The width of the map to create.
     * @param height The height of the map to create.
     * @see LandGenerator
@@ -104,8 +104,8 @@ public class MapGenerator {
      * 
      * @param map The <code>Map</code> to place the indian settlments on.
      * @param players The players to create <code>Settlement</code>s
-    * 		and starting locations for. That is; both indian and 
-    * 		european players.
+    *       and starting locations for. That is; both indian and 
+    *       european players.
      * @throws FreeColException if thrown by a called method
      */
     protected void createIndianSettlements(Map map, Vector players) throws FreeColException {
@@ -579,8 +579,8 @@ public class MapGenerator {
      * @param width The width of the map to create.
      * @param height The height of the map to create.
      * @param players The players to create <code>Settlement</code>s
-     * 		and starting locations for. That is; both indian and 
-     * 		european players.
+     *      and starting locations for. That is; both indian and 
+     *      european players.
      * @throws FreeColException if thrown by a called method
      */
     protected void createEuropeanUnits(Map map, int width, int height, Vector players) throws FreeColException {
@@ -729,7 +729,7 @@ public class MapGenerator {
      * @param x The x-coordinate of the position.
      * @param y The y-coordinate of the position.
      * @return <code>true</code> if the given position is 
-     * 		  within the bounds of the map and <code>false</code> otherwise
+     *        within the bounds of the map and <code>false</code> otherwise
      */
     protected boolean isValid(int x, int y) {
         return x>=0 && x < width && y >= 0 && y < height;
@@ -741,7 +741,7 @@ public class MapGenerator {
      * 
      * @param p The position.
      * @return <code>true</code> if the given position is 
-     * 		  within the bounds of the map and <code>false</code> otherwise.
+     *        within the bounds of the map and <code>false</code> otherwise.
      */    
     protected boolean isValid(Position p) {
         return isValid(p.getX(), p.getY());

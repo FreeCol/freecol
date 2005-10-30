@@ -93,7 +93,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /**
     * Checks if this player is currently connected to the server.
     * @return <i>true</i> if this player is currently connected to the server
-    * 		  and <code>false</code> otherwise.
+    *         and <code>false</code> otherwise.
     */
     public boolean isConnected() {
         return connected;
@@ -104,7 +104,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     * Sets the "connected"-status of this player.
     * 
     * @param connected Should be <i>true</i> if this player is currently 
-    * 		  connected to the server and <code>false</code> otherwise.
+    *         connected to the server and <code>false</code> otherwise.
     * @see #isConnected
     */
     public void setConnected(boolean connected) {

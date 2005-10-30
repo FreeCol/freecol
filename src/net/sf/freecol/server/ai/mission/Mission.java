@@ -163,49 +163,49 @@ public abstract class Mission extends AIObject {
             throw new IllegalStateException("A target can only be found for offensive units. You tried with: " + getUnit().getName());
         }
         
-    	GoalDecider gd = new GoalDecider() {
+        GoalDecider gd = new GoalDecider() {
             private PathNode bestTarget = null;
             
             public PathNode getGoal() {
-            	return bestTarget;            	
+                return bestTarget;              
             }
             
             public boolean hasSubGoals() {
-            	return true;
+                return true;
             }
             
-    		public boolean check(Unit unit, PathNode pathNode) {
-    			Tile newTile = pathNode.getTile();
-    			if ((newTile.isLand() && !unit.isNaval() || !newTile.isLand() && unit.isNaval()) &&
-    					newTile.getDefendingUnit(unit) != null && newTile.getDefendingUnit(unit).getOwner() != unit.getOwner()) {
-    				
-    				int tension = unit.getOwner().getTension(newTile.getDefendingUnit(unit).getOwner());
-    				if (unit.getIndianSettlement() != null) {
-    					tension += unit.getIndianSettlement().getAlarm(newTile.getDefendingUnit(unit).getOwner());
-    				}
-    				if (newTile.getDefendingUnit(unit).getType() == Unit.TREASURE_TRAIN) {
-    					tension += Math.min(newTile.getDefendingUnit(unit).getTreasureAmount() / 10, 600);
-    				}
-    				if (newTile.getDefendingUnit(unit).getType() == Unit.ARTILLERY && newTile.getSettlement() == null) {
-    					tension += 100 - newTile.getDefendingUnit(unit).getDefensePower(unit) * 2;
-    				}
-    				if (newTile.getDefendingUnit(unit).getType() == Unit.VETERAN_SOLDIER && !newTile.getDefendingUnit(unit).isArmed()) {
-    					tension += 50 - newTile.getDefendingUnit(unit).getDefensePower(unit) * 2;
-    				}
-    				if (tension > Player.TENSION_CONTENT) {
-    					if (bestTarget == null) {
-    						bestTarget = pathNode;                           
-    					} else if (bestTarget.getTurns() == pathNode.getTurns()) {
-    						// TODO: Check if the new target is better than the previous:
-    					}
-    				}
-    				return true;
-    			} else {
-    				return false;
-    			}
-    		}
-    	};
-    	return getGame().getMap().search(getUnit(), gd, maxTurns);
+            public boolean check(Unit unit, PathNode pathNode) {
+                Tile newTile = pathNode.getTile();
+                if ((newTile.isLand() && !unit.isNaval() || !newTile.isLand() && unit.isNaval()) &&
+                        newTile.getDefendingUnit(unit) != null && newTile.getDefendingUnit(unit).getOwner() != unit.getOwner()) {
+                    
+                    int tension = unit.getOwner().getTension(newTile.getDefendingUnit(unit).getOwner());
+                    if (unit.getIndianSettlement() != null) {
+                        tension += unit.getIndianSettlement().getAlarm(newTile.getDefendingUnit(unit).getOwner());
+                    }
+                    if (newTile.getDefendingUnit(unit).getType() == Unit.TREASURE_TRAIN) {
+                        tension += Math.min(newTile.getDefendingUnit(unit).getTreasureAmount() / 10, 600);
+                    }
+                    if (newTile.getDefendingUnit(unit).getType() == Unit.ARTILLERY && newTile.getSettlement() == null) {
+                        tension += 100 - newTile.getDefendingUnit(unit).getDefensePower(unit) * 2;
+                    }
+                    if (newTile.getDefendingUnit(unit).getType() == Unit.VETERAN_SOLDIER && !newTile.getDefendingUnit(unit).isArmed()) {
+                        tension += 50 - newTile.getDefendingUnit(unit).getDefensePower(unit) * 2;
+                    }
+                    if (tension > Player.TENSION_CONTENT) {
+                        if (bestTarget == null) {
+                            bestTarget = pathNode;                           
+                        } else if (bestTarget.getTurns() == pathNode.getTurns()) {
+                            // TODO: Check if the new target is better than the previous:
+                        }
+                    }
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        };
+        return getGame().getMap().search(getUnit(), gd, maxTurns);
     }
     
    
@@ -234,7 +234,7 @@ public abstract class Mission extends AIObject {
      * Disposes this mission by removing any referances to it.
      */
     public void dispose() {
-    	// Nothing to do yet.
+        // Nothing to do yet.
     }
     
 

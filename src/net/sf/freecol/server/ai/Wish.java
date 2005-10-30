@@ -48,7 +48,7 @@ public abstract class Wish extends AIObject {
     *
     * @param aiMain The main AI-object.
     * @param element The root element for the XML-representation 
-    * 		of a <code>Wish</code>.
+    *       of a <code>Wish</code>.
     */
     public Wish(AIMain aiMain, Element element) {
         super(aiMain);

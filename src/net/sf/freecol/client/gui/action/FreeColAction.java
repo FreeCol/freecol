@@ -124,7 +124,7 @@ public abstract class FreeColAction extends AbstractAction implements Option {
      * 
      * @return A <code>String</code> that produces a key stroke
      *         equal to the given <code>KeyStroke</code> if passed
-     * 		   as a parameter to <code>getAWTKeyStroke(String)</code>.
+     *         as a parameter to <code>getAWTKeyStroke(String)</code>.
      */
     public static String getKeyStrokeText(KeyStroke keyStroke) {
         /* 

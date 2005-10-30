@@ -56,7 +56,7 @@ public final class DummyConnection extends Connection {
     * Closes this connection.
     *
     * @throws IOException Will not be thrown by a <code>DummyConnection</code>,
-    * 		but added because of the superclass' specification.
+    *       but added because of the superclass' specification.
     */
     public void close() throws IOException {
         // Do nothing.

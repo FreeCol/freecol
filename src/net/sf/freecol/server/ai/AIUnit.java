@@ -64,7 +64,7 @@ public class AIUnit extends AIObject implements Transportable {
      * 
      * @param aiMain The main AI-object.
      * @param element An <code>Element</code> containing an
-     * 		XML-representation of this object.
+     *      XML-representation of this object.
      */    
     public AIUnit(AIMain aiMain, Element element) {
         super(aiMain);
@@ -229,7 +229,7 @@ public class AIUnit extends AIObject implements Transportable {
     /**
      * Returns the ID of this <code>AIObject</code>.
      * @return The same ID as the <code>Unit</code> this
-     * 		<code>AIObject</code> controls.
+     *      <code>AIObject</code> controls.
      */
     public String getID() {
         return unit.getID();
@@ -239,7 +239,7 @@ public class AIUnit extends AIObject implements Transportable {
     /**
      * Creates an XML-representation of this object.
      * @param document The <code>Document</code> in which
-     * 		the XML-representation should be created.
+     *      the XML-representation should be created.
      * @return The XML-representation.
      */    
     public Element toXMLElement(Document document) {

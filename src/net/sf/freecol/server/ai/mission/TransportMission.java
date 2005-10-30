@@ -75,7 +75,7 @@ public class TransportMission extends Mission {
      *
      * @param aiMain The main AI-object.
      * @param element An <code>Element</code> containing an
-     * 		XML-representation of this object.
+     *      XML-representation of this object.
      */
     public TransportMission(AIMain aiMain, Element element) {
         super(aiMain);
@@ -395,7 +395,7 @@ public class TransportMission extends Mission {
     * @param connection The <code>Connection</code> to the server.
     */
     private void buyCargo(Connection connection) {
-    	AIPlayer aiPlayer = (AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getID());    	
+        AIPlayer aiPlayer = (AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getID());       
 
         if (!(getUnit().getLocation() instanceof Europe)) {
             throw new IllegalStateException("Carrier not in Europe");
@@ -407,16 +407,16 @@ public class TransportMission extends Mission {
          * has been created.
          */
         if (aiPlayer.hasFewColonies()) {
-        	int space = getAvailableSpace();
-        	while (space > 0) {
-        		AIUnit newUnit = getCheapestUnitInEurope(connection);
-        		if (newUnit != null) {
-        			addToTransportList(newUnit);
-        			space--;
-        		} else {
-        			return;
-        		}
-        	}
+            int space = getAvailableSpace();
+            while (space > 0) {
+                AIUnit newUnit = getCheapestUnitInEurope(connection);
+                if (newUnit != null) {
+                    addToTransportList(newUnit);
+                    space--;
+                } else {
+                    return;
+                }
+            }
         }        
         
         /* Add colonies containing wishes with the same destination as
@@ -425,7 +425,7 @@ public class TransportMission extends Mission {
         for (int i=0; i<transportList.size(); i++) {
             Transportable t = (Transportable) transportList.get(i);
             if (t.getTransportDestination() != null 
-            		&& t.getTransportDestination().getTile() != null
+                    && t.getTransportDestination().getTile() != null
                     && t.getTransportDestination().getTile().getColony() != null
                     && t.getTransportDestination().getTile().getColony().getOwner() == getUnit().getOwner()) {
                 AIColony ac = (AIColony) getAIMain().getAIObject(t.getTransportDestination().getTile().getColony().getID());
@@ -779,7 +779,7 @@ public class TransportMission extends Mission {
     * @param unitType The type of {@link Unit} or <code>-1</code> for
     *           {@link Goods}
     * @param source The source for the unit. This is where the unit
-    * 		is presently located.
+    *       is presently located.
     * @param destination The destination for the unit.
     * @return The space available
     */
@@ -1139,7 +1139,7 @@ public class TransportMission extends Mission {
     /**
      * Creates an XML-representation of this object.
      * @param document The <code>Document</code> in which
-     * 		the XML-representation should be created.
+     *      the XML-representation should be created.
      * @return The XML-representation.
      */    
     public Element toXMLElement(Document document) {

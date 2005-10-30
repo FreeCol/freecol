@@ -29,7 +29,7 @@ import javax.sound.sampled.LineListener;
 */
 public class SoundPlayer {
 
-	private static final Logger logger = Logger.getLogger(SoundPlayer.class.getName());
+    private static final Logger logger = Logger.getLogger(SoundPlayer.class.getName());
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
@@ -271,7 +271,7 @@ public class SoundPlayer {
                     FileInputStream fileInputStream = new FileInputStream(file);
                     currentSound = new BufferedInputStream(fileInputStream, 1024);
                 } catch (Exception e3) {
-                	logger.warning("Error while loading audio file: " + e3.getMessage());
+                    logger.warning("Error while loading audio file: " + e3.getMessage());
                     currentSound = null;
                     return false;
                 }
@@ -307,7 +307,7 @@ public class SoundPlayer {
                     clip.open(stream);
                     currentSound = clip;
                 } catch (Exception ex) {
-                	logger.warning("Error while reading audio-stream: " + ex.getMessage());
+                    logger.warning("Error while reading audio-stream: " + ex.getMessage());
                     currentSound = null;
                     return false;
                 }
@@ -322,16 +322,16 @@ public class SoundPlayer {
                         }
 
                     } catch (InvalidMidiDataException imde) {
-                    	logger.warning("Unsupported audio file: " + imde.getMessage());
+                        logger.warning("Unsupported audio file: " + imde.getMessage());
                         currentSound = null;
                         return false;
                     } catch (Exception ex) {
-                    	logger.warning("Error while loading MIDI-file: " + ex.getMessage());
+                        logger.warning("Error while loading MIDI-file: " + ex.getMessage());
                         currentSound = null;
                         return false;
                     }
                 } else {
-                	logger.info("Could not load MIDI-file, because it has been disabled.");
+                    logger.info("Could not load MIDI-file, because it has been disabled.");
                     currentSound = null;
                     return false;
                 }

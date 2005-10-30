@@ -61,7 +61,7 @@ public class AIColony extends AIObject {
      * 
      * @param aiMain The main AI-object.
      * @param element An <code>Element</code> containing an
-     * 		XML-representation of this object.
+     *      XML-representation of this object.
      */
     public AIColony(AIMain aiMain, Element element) {
         super(aiMain);
@@ -241,7 +241,7 @@ public class AIColony extends AIObject {
                     newWishes.add(gw);
                 }
             } else {
-            	logger.warning("Unknown type of Wish.");
+                logger.warning("Unknown type of Wish.");
             }
         }
 
@@ -281,9 +281,9 @@ public class AIColony extends AIObject {
                 continue;
             }
             if (goodsType == Goods.MUSKETS 
-            		&& colony.getProductionOf(Goods.MUSKETS) > 0
-            		&& colony.getGoodsCount(Goods.MUSKETS) > colony.getWarehouseCapacity() - 50) {
-            	continue;
+                    && colony.getProductionOf(Goods.MUSKETS) > 0
+                    && colony.getGoodsCount(Goods.MUSKETS) > colony.getWarehouseCapacity() - 50) {
+                continue;
             }
             if (colony.getGoodsCount(goodsType) > 0) {
                 List alreadyAdded = new ArrayList();
@@ -691,8 +691,8 @@ public class AIColony extends AIObject {
     /**
      * Gets the ID of this object.
      * @return The same ID as the <code>Colony</code>
-     * 		this <code>AIColony</code> stores AI-specific
-     * 		information for.
+     *      this <code>AIColony</code> stores AI-specific
+     *      information for.
      */
     public String getID() {
         return colony.getID();
@@ -702,7 +702,7 @@ public class AIColony extends AIObject {
     /**
      * Creates an XML-representation of this object.
      * @param document The <code>Document</code> in which
-     * 		the XML-representation should be created.
+     *      the XML-representation should be created.
      * @return The XML-representation.
      */
     public Element toXMLElement(Document document) {

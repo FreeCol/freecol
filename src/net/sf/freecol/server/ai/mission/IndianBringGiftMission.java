@@ -71,7 +71,7 @@ public class IndianBringGiftMission extends Mission {
      *
      * @param aiMain The main AI-object.
      * @param element An <code>Element</code> containing an
-     * 		XML-representation of this object.
+     *      XML-representation of this object.
      */    
     public IndianBringGiftMission(AIMain aiMain, Element element) {
         super(aiMain);
@@ -162,7 +162,7 @@ public class IndianBringGiftMission extends Mission {
     * @param owner The owner of this mission.
     * @param targetPlayer The target of the gift.
     * @return <code>true</code> if this mission is still valid to perform
-    * 		with regard to the tension towards the target player.
+    *       with regard to the tension towards the target player.
     */
     public static boolean isValidMission(Player owner, Player targetPlayer) {
         int stance = owner.getStance(targetPlayer);
@@ -173,7 +173,7 @@ public class IndianBringGiftMission extends Mission {
     /**
      * Creates an XML-representation of this object.
      * @param document The <code>Document</code> in which
-     * 		the XML-representation should be created.
+     *      the XML-representation should be created.
      * @return The XML-representation.
      */    
     public Element toXMLElement(Document document) {

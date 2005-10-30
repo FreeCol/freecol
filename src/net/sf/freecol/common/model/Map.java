@@ -513,12 +513,12 @@ public class Map extends FreeColGameObject {
      * 
      * @param unit The <code>Unit</code> to find the path for.
      * @param gd The object responsible for determining 
-     * 		wether a given <code>PathNode</code> is a goal or not.
+     *      wether a given <code>PathNode</code> is a goal or not.
      * @param maxTurns The maximum number of turns the given
-     * 		<code>Unit</code> is allowed to move. This is the
-     * 		maximum search range for a goal.
+     *      <code>Unit</code> is allowed to move. This is the
+     *      maximum search range for a goal.
      * @return The path to a goal determined by the given 
-     * 		<code>GoalDecider</code>.
+     *      <code>GoalDecider</code>.
      */
     public PathNode search(Unit unit, GoalDecider gd, int maxTurns) {
         // This is just a temporary implementation; modify at will ;-)
@@ -640,7 +640,7 @@ public class Map extends FreeColGameObject {
                 successor.previous = currentNode;
 
                 if (!gd.check(unit, successor)) {
-                	openList.add(successor);
+                    openList.add(successor);
                 } else if (!gd.hasSubGoals()) {
                     PathNode bestTarget = gd.getGoal();
                     if (bestTarget != null) {
@@ -651,7 +651,7 @@ public class Map extends FreeColGameObject {
                         return bestTarget.next;
                     } else {
                         return null;
-                    }                	
+                    }                   
                 }
             }
 

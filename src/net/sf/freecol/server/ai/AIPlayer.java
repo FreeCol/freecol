@@ -224,20 +224,20 @@ public class AIPlayer extends AIObject {
                     }
                     // Check if we can find a better site to work than a new colony:
                     if (!hasFewColonies() || colonyTile == null || bestTurns > 10) {
-                    	for (int i=0; i<unitWishes.length; i++) {
-                    		wishList = unitWishes[i];
-                    		for (int j=0; j<wishList.size(); j++) {
-                    			WorkerWish ww = (WorkerWish) wishList.get(j);
-                    			int turns = unit.getTurnsToReach(ww.getDestination().getTile());
-                    			// TODO: Choose to build colony if the value of the wish is low.
-                    			if (bestWish == null && turns < bestTurns
-                    					|| bestWish != null && (turns < bestTurns || 
-                    							turns == bestTurns && ww.getValue() > bestWish.getValue())) {
-                    				bestWish = ww;
-                    				bestTurns = turns;
-                    			}
-                    		}
-                    	}
+                        for (int i=0; i<unitWishes.length; i++) {
+                            wishList = unitWishes[i];
+                            for (int j=0; j<wishList.size(); j++) {
+                                WorkerWish ww = (WorkerWish) wishList.get(j);
+                                int turns = unit.getTurnsToReach(ww.getDestination().getTile());
+                                // TODO: Choose to build colony if the value of the wish is low.
+                                if (bestWish == null && turns < bestTurns
+                                        || bestWish != null && (turns < bestTurns || 
+                                                turns == bestTurns && ww.getValue() > bestWish.getValue())) {
+                                    bestWish = ww;
+                                    bestTurns = turns;
+                                }
+                            }
+                        }
                     }
                     if (bestWish != null) {
                         bestWish.setTransportable(aiUnit);
@@ -313,19 +313,19 @@ public class AIPlayer extends AIObject {
      * be built or not has been implemented.
      * 
      * @return <code>true</code> if the AI should build
-     * 		   more colonies.
+     *         more colonies.
      */
     public boolean hasFewColonies() {
-    	Iterator it = getPlayer().getColonyIterator();
-    	int numberOfColonies = 0;
-    	int numberOfWorkers = 0;
-    	while (it.hasNext()) {
-    		Colony c = (Colony) it.next();
-    		numberOfColonies++;
-    		numberOfWorkers += c.getUnitCount();
-    	}
-    	return numberOfColonies <= 2  || numberOfColonies >= 3 
-    			&& numberOfWorkers / numberOfColonies > numberOfColonies - 2;
+        Iterator it = getPlayer().getColonyIterator();
+        int numberOfColonies = 0;
+        int numberOfWorkers = 0;
+        while (it.hasNext()) {
+            Colony c = (Colony) it.next();
+            numberOfColonies++;
+            numberOfWorkers += c.getUnitCount();
+        }
+        return numberOfColonies <= 2  || numberOfColonies >= 3 
+                && numberOfWorkers / numberOfColonies > numberOfColonies - 2;
     }
 
     
@@ -951,7 +951,7 @@ public class AIPlayer extends AIObject {
     * @param goods The goods the given <code>Unit</code> is trying to sell.
     * @param gold The suggested price.
     * @return The price this <code>AIPlayer</code> suggests or
-    * 		{@link NetworkConstants#NO_TRADE}.
+    *       {@link NetworkConstants#NO_TRADE}.
     */
     public int tradeProposition(Unit unit, Settlement settlement, Goods goods, int gold) {
         if (settlement instanceof IndianSettlement) {
@@ -1099,7 +1099,7 @@ public class AIPlayer extends AIObject {
     /**
      * Creates an XML-representation of this object.
      * @param document The <code>Document</code> in which
-     * 		the XML-representation should be created.
+     *      the XML-representation should be created.
      * @return The XML-representation.
      */    
     public Element toXMLElement(Document document) {
