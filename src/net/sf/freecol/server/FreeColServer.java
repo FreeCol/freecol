@@ -49,6 +49,7 @@ import net.sf.freecol.server.networking.DummyConnection;
 import net.sf.freecol.server.networking.Server;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -72,7 +73,7 @@ public final class FreeColServer {
 
     private static Logger logger = Logger.getLogger(FreeColServer.class.getName());
 
-    private static final boolean DEBUG = false;
+    private static final boolean DISABLE_SAVEGAME_COMPRESSION = false;
 
     private static final int META_SERVER_UPDATE_INTERVAL = 60000;
 
@@ -433,8 +434,9 @@ public final class FreeColServer {
             TransformerFactory factory = TransformerFactory.newInstance();
             Transformer xmlTransformer = factory.newTransformer();
             xmlTransformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+            xmlTransformer.setOutputProperty(OutputKeys.INDENT, "yes");
 
-            if (DEBUG) {
+            if (DISABLE_SAVEGAME_COMPRESSION) {
                 // No compression
                 OutputStream out = new FileOutputStream(file);
                 xmlTransformer.transform(new DOMSource(savedGameElement), new StreamResult(out));
@@ -462,7 +464,7 @@ public final class FreeColServer {
     */
     public String loadGame(File file) throws IOException {
         InputStream in;
-        if (DEBUG) {
+        if (DISABLE_SAVEGAME_COMPRESSION) {
             // No compression
             in = new FileInputStream(file);
         } else {
@@ -500,7 +502,11 @@ public final class FreeColServer {
         ArrayList serverPlayerElements = new ArrayList();
         NodeList serverObjectsNodeList = serverObjectsElement.getChildNodes();
         for (int i=0; i<serverObjectsNodeList.getLength(); i++) {
-            Element element = (Element) serverObjectsNodeList.item(i);
+            Node node = serverObjectsNodeList.item(i);
+            if (!(node instanceof Element)) {
+                continue;
+            }
+            Element element = (Element) node;
             if (element.getTagName().equals(ServerPlayer.getServerAdditionXMLElementTagName())) {
                 serverObjects.add(new ServerPlayer(element));
                 serverPlayerElements.add(element);
@@ -511,26 +517,6 @@ public final class FreeColServer {
         Element gameElement = (Element) savedGameElement.getElementsByTagName(Game.getXMLElementTagName()).item(0);
         game = new Game(aiMain, getModelController(), gameElement, (FreeColGameObject[]) serverObjects.toArray(new FreeColGameObject[0]));
         game.setCurrentPlayer(null);
-
-        // Support for pre-0.0.2 protocols:
-        if (version.compareTo(Message.getFreeColProtocolVersion()) < 0) {
-            for (int k=0; k<serverPlayerElements.size(); k++) {
-                Element spElement = (Element) serverPlayerElements.get(k);
-                ServerPlayer sp = (ServerPlayer) game.getFreeColGameObject(spElement.getAttribute("ID"));
-
-                Element exploredTileElement = Message.getChildElement(spElement, "exploredTiles");
-                if (exploredTileElement != null) {
-                    boolean[][] exploredTiles = Message.readFromArrayElement("exploredTiles", exploredTileElement, new boolean[0][0]);
-                    for (int i=0; i<exploredTiles.length; i++) {
-                        for (int j=0; j<exploredTiles[0].length; j++) {
-                            game.getMap().getTile(i, j).createPlayerExploredTile(sp);
-                            game.getMap().getTile(i, j).getPlayerExploredTile(sp).setExplored(exploredTiles[i][j]);
-                        }
-                    }
-                }
-
-            }
-        }
 
         gameState = IN_GAME;
 

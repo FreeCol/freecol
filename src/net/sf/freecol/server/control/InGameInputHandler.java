@@ -455,8 +455,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             reply.setAttribute("skill", Integer.toString(settlement.getLearnableSkill()));
 
             // Set the Tile.PlayerExploredTile attribute.
-            Tile.PlayerExploredTile playerExploredTile = settlement.getTile().getPlayerExploredTile(player);
-            playerExploredTile.setSkill(settlement.getLearnableSkill());
+            settlement.getTile().updateIndianSettlementSkill(player);           
 
             return reply;
         } else {
@@ -793,9 +792,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             settlement.setLearnableSkill(IndianSettlement.NONE);
 
             // Set the Tile.PlayerExploredTile attribute.
-            Tile.PlayerExploredTile playerExploredTile = settlement.getTile().getPlayerExploredTile(player);
-            playerExploredTile.setSkill(IndianSettlement.NONE);
-
+            settlement.getTile().updateIndianSettlementSkill(player);
         }
 
         return null;
@@ -846,11 +843,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             reply.setAttribute("wantedGoods2", Integer.toString(settlement.getWantedGoods2()));
 
             // Set the Tile.PlayerExploredTile attribute.
-            Tile.PlayerExploredTile playerExploredTile = settlement.getTile().getPlayerExploredTile(player);
-            playerExploredTile.setSkill(settlement.getLearnableSkill());
-            playerExploredTile.setHighlyWantedGoods(settlement.getHighlyWantedGoods());
-            playerExploredTile.setWantedGoods1(settlement.getWantedGoods1());
-            playerExploredTile.setWantedGoods2(settlement.getWantedGoods2());
+            settlement.getTile().updateIndianSettlementInformation(player);
         } else if (action.equals("speak")) {
             if (!settlement.hasBeenVisited()) {
                 // This can probably be randomized, I don't think the AI needs to do anything here.

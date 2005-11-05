@@ -19,6 +19,7 @@ import net.sf.freecol.server.ai.mission.WishRealizationMission;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 
 /**
@@ -276,7 +277,14 @@ public class AIUnit extends AIObject implements Transportable {
         }
 
         if (element.getChildNodes().getLength() > 0) {
-            Element missionElement = (Element) element.getChildNodes().item(0);
+            Element missionElement = null;
+            NodeList nl = element.getChildNodes();
+            for (int i=0; i<nl.getLength(); i++) {
+                if (nl.item(i) instanceof Element) {
+                    missionElement = (Element) nl.item(i);
+                    break;
+                }
+            }            
             if (missionElement != null) {
                 if (missionElement.getTagName().equals(UnitWanderHostileMission.getXMLElementTagName())) {
                     mission = new UnitWanderHostileMission(getAIMain(), missionElement);

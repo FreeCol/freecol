@@ -153,7 +153,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     *         <i>false</i> otherwise.
     */
     public boolean hasExplored(Tile tile) {
-        return tile.getPlayerExploredTile(this).isExplored();
+        return tile.isExploredBy(this);
     }
 
 
@@ -164,8 +164,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     * @see Tile#updatePlayerExploredTile(Player)
     */
     public void setExplored(Tile tile) {
-        tile.getPlayerExploredTile(this).setExplored(true);
-        tile.updatePlayerExploredTile(this);
+        tile.setExploredBy(this, true);
     }
 
 

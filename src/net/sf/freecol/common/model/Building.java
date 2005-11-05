@@ -6,6 +6,7 @@ import java.util.Iterator;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 
@@ -931,7 +932,11 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
         NodeList unitNodeList = buildingElement.getChildNodes();
         for (int i=0; i<unitNodeList.getLength(); i++) {
-            Element unitElement = (Element) unitNodeList.item(i);
+            Node node = unitNodeList.item(i);
+            if (!(node instanceof Element)) {
+                continue;
+            }
+            Element unitElement = (Element) node;
 
             Unit unit = (Unit) getGame().getFreeColGameObject(unitElement.getAttribute("ID"));
             if (unit != null) {

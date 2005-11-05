@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 
@@ -1268,7 +1269,11 @@ public final class Colony extends Settlement implements Location {
 
         NodeList childNodes = colonyElement.getChildNodes();
         for (int i=0; i<childNodes.getLength(); i++) {
-            Element childElement = (Element) childNodes.item(i);
+            Node node = childNodes.item(i);
+            if (!(node instanceof Element)) {
+                continue;
+            }        
+            Element childElement = (Element) node;
 
             if (childElement.getTagName().equals(ColonyTile.getXMLElementTagName())) {
                 ColonyTile ct = (ColonyTile) getGame().getFreeColGameObject(childElement.getAttribute("ID"));

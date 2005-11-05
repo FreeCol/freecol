@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 
@@ -246,7 +247,11 @@ public class UnitContainer extends FreeColGameObject {
         units.clear();
 
         for (int i=0; i<unitNodeList.getLength(); i++) {
-            Element unitElement = (Element) unitNodeList.item(i);
+            Node node = unitNodeList.item(i);
+            if (!(node instanceof Element)) {
+                continue;
+            }
+            Element unitElement = (Element) node;
 
             // Check if the unit is already here -> only update:
             Unit u = (Unit) getGame().getFreeColGameObject(unitElement.getAttribute("ID"));

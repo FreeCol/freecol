@@ -3,6 +3,7 @@ package net.sf.freecol.common.model;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
@@ -283,7 +284,11 @@ public final class Market extends FreeColGameObject {
         NodeList dataList = marketElement.getElementsByTagName(Data.getXMLElementTagName());
 
         for (int i=0; i<dataList.getLength(); i++) {
-            Element dataElement = (Element) dataList.item(i);
+            Node node = dataList.item(i);
+            if (!(node instanceof Element)) {
+                continue;
+            }        
+            Element dataElement = (Element) node;
 
             dataForGoodType[i] = new Data(getGame(), dataElement);
         }

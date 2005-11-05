@@ -268,7 +268,8 @@ public final class Message {
     public static Element getChildElement(Element element, String tagName) {
         NodeList n = element.getChildNodes();
         for (int i=0; i<n.getLength(); i++) {
-            if (((Element) n.item(i)).getTagName().equals(tagName)) {
+            if (n.item(i) instanceof Element &&
+                    ((Element) n.item(i)).getTagName().equals(tagName)) {
                 return (Element) n.item(i);
             }
         }

@@ -12,6 +12,7 @@ import net.sf.freecol.common.FreeColException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 
@@ -1535,7 +1536,11 @@ public class Map extends FreeColGameObject {
         NodeList tileList = mapElement.getElementsByTagName(Tile.getXMLElementTagName());
 
         for (int i=0; i<tileList.getLength(); i++) {
-            Element tileElement = (Element) tileList.item(i);
+            Node node = tileList.item(i);
+            if (!(node instanceof Element)) {
+                continue;
+            }        
+            Element tileElement = (Element) node;
             int x = Integer.parseInt(tileElement.getAttribute("x"));
             int y = Integer.parseInt(tileElement.getAttribute("y"));
 

@@ -10,6 +10,7 @@ import net.sf.freecol.common.model.Map.Position;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 
@@ -101,10 +102,6 @@ public final class Tile extends FreeColGameObject implements Location {
 
         if (getGame().getViewOwner() == null) {
             playerExploredTiles = new PlayerExploredTile[Player.NUMBER_OF_NATIONS];
-
-            for (int i=0; i<playerExploredTiles.length; i++) {
-                playerExploredTiles[i] = new PlayerExploredTile(getGame(), i);
-            }
         }
     }
 
@@ -138,11 +135,6 @@ public final class Tile extends FreeColGameObject implements Location {
 
         if (getGame().getViewOwner() == null) {
             playerExploredTiles = new PlayerExploredTile[Player.NUMBER_OF_NATIONS];
-
-            for (int i=0; i<playerExploredTiles.length; i++) {
-                playerExploredTiles[i] = new PlayerExploredTile(getGame(), i);
-                updatePlayerExploredTile(i);
-            }
         }
     }
 
@@ -1155,13 +1147,23 @@ public final class Tile extends FreeColGameObject implements Location {
         tileElement.setAttribute("x", Integer.toString(x));
         tileElement.setAttribute("y", Integer.toString(y));
         tileElement.setAttribute("type", Integer.toString(type));
-        tileElement.setAttribute("addition", Integer.toString(addition_type));
-        tileElement.setAttribute("road", Boolean.toString(road));
-        tileElement.setAttribute("plowed", Boolean.toString(plowed));
-        tileElement.setAttribute("forested", Boolean.toString(forested));
-        tileElement.setAttribute("bonus", Boolean.toString(bonus));
+        if (addition_type != ADD_NONE) {
+            tileElement.setAttribute("addition", Integer.toString(addition_type));
+        }
+        if (road) {
+            tileElement.setAttribute("road", Boolean.toString(road));
+        }
+        if (plowed) {
+            tileElement.setAttribute("plowed", Boolean.toString(plowed));
+        }
+        if (forested) {
+            tileElement.setAttribute("forested", Boolean.toString(forested));
+        }
+        if (bonus) {
+            tileElement.setAttribute("bonus", Boolean.toString(bonus));
+        }
 
-        if (showAll || player.canSee(this)) {
+        if (nationOwner != Player.NO_NATION && (showAll || player.canSee(this))) {
             tileElement.setAttribute("nationOwner", Integer.toString(nationOwner));
         }
 
@@ -1186,7 +1188,9 @@ public final class Tile extends FreeColGameObject implements Location {
         if (!showAll) {
             // We're sending the Tile from the server to the client and showAll is false.
             if (player != null) {
-                playerExploredTiles[player.getNation()].setAttributes(tileElement, player, document);
+                if (playerExploredTiles[player.getNation()] != null) {
+                    playerExploredTiles[player.getNation()].setAttributes(tileElement, player, document);
+                }
             } else {
                 logger.warning("player == null");
             }
@@ -1194,7 +1198,7 @@ public final class Tile extends FreeColGameObject implements Location {
 
         if (toSavedGame) {
             for (int i=0; i<playerExploredTiles.length; i++) {
-                if (playerExploredTiles[i] != null) {
+                if (playerExploredTiles[i] != null && playerExploredTiles[i].isExplored()) {
                     tileElement.appendChild(playerExploredTiles[i].toXMLElement(player, document, showAll, toSavedGame));
                 }
             }
@@ -1214,11 +1218,31 @@ public final class Tile extends FreeColGameObject implements Location {
         x = Integer.parseInt(tileElement.getAttribute("x"));
         y = Integer.parseInt(tileElement.getAttribute("y"));
         type = Integer.parseInt(tileElement.getAttribute("type"));
-        addition_type = Integer.parseInt(tileElement.getAttribute("addition"));
-        road = Boolean.valueOf(tileElement.getAttribute("road")).booleanValue();
-        plowed = Boolean.valueOf(tileElement.getAttribute("plowed")).booleanValue();
-        forested = Boolean.valueOf(tileElement.getAttribute("forested")).booleanValue();
-        bonus = Boolean.valueOf(tileElement.getAttribute("bonus")).booleanValue();
+        if (tileElement.hasAttribute("addition")) {
+            addition_type = Integer.parseInt(tileElement.getAttribute("addition"));
+        } else {
+            addition_type = ADD_NONE;
+        }
+        if (tileElement.hasAttribute("road")) {
+            road = Boolean.valueOf(tileElement.getAttribute("road")).booleanValue();
+        } else {
+            road = false;
+        }
+        if (tileElement.hasAttribute("plowed")) {
+            plowed = Boolean.valueOf(tileElement.getAttribute("plowed")).booleanValue();
+        } else {
+            plowed = false;
+        }
+        if (tileElement.hasAttribute("forested")) {
+            forested = Boolean.valueOf(tileElement.getAttribute("forested")).booleanValue();
+        } else {
+            forested = false;
+        }
+        if (tileElement.hasAttribute("bonus")) {
+            bonus = Boolean.valueOf(tileElement.getAttribute("bonus")).booleanValue();
+        } else {
+            bonus = false;
+        }
 
         if (tileElement.hasAttribute("nationOwner")) {
             nationOwner = Integer.parseInt(tileElement.getAttribute("nationOwner"));
@@ -1263,16 +1287,21 @@ public final class Tile extends FreeColGameObject implements Location {
         // Only from a savegame:
         NodeList nl = tileElement.getElementsByTagName("playerExploredTile");
         for (int i=0; i<nl.getLength(); i++) {
-            Element petElement = (Element) nl.item(i);
-            if (playerExploredTiles[Integer.parseInt(petElement.getAttribute("nation"))] == null) {
-                PlayerExploredTile pet = new PlayerExploredTile(getGame(), petElement);
-                playerExploredTiles[pet.getNation()] = pet;
-            } else {
-                playerExploredTiles[Integer.parseInt(petElement.getAttribute("nation"))].readFromXMLElement(petElement);
+            Node node = nl.item(i);
+            if (!(node instanceof Element)) {
+                continue;
+            }
+            Element petElement = (Element) node;
+            if (Boolean.valueOf(petElement.getAttribute("explored")).booleanValue()) {
+                if (playerExploredTiles[Integer.parseInt(petElement.getAttribute("nation"))] == null) {
+                    PlayerExploredTile pet = new PlayerExploredTile(petElement);
+                    playerExploredTiles[pet.getNation()] = pet;
+                } else {
+                    playerExploredTiles[Integer.parseInt(petElement.getAttribute("nation"))].readFromXMLElement(petElement);
+                }
             }
         }
     }
-
 
     /**
     * Returns the tag name of the root element representing this object.
@@ -1283,27 +1312,57 @@ public final class Tile extends FreeColGameObject implements Location {
         return "tile";
     }
 
-
-
-    public PlayerExploredTile getPlayerExploredTile(Player player) {
+    /**
+     * Gets the <code>PlayerExploredTile</code> for the given
+     * <code>Player</code>.
+     *
+     * @param player The <code>Player</code>.
+     * @see PlayerExploredTile
+     */
+    private PlayerExploredTile getPlayerExploredTile(Player player) {
         if (playerExploredTiles == null) {
             return null;
         }
         return playerExploredTiles[player.getNation()];
     }
 
-
-    public void createPlayerExploredTile(Player player) {
-        playerExploredTiles[player.getNation()] = new PlayerExploredTile(getGame(), player.getNation());
+    /**
+     * Creates a <code>PlayerExploredTile</code> for the given
+     * <code>Player</code>.
+     *
+     * @param player The <code>Player</code>.
+     * @see PlayerExploredTile
+     */
+    private void createPlayerExploredTile(Player player) {
+        playerExploredTiles[player.getNation()] = new PlayerExploredTile(player.getNation());
     }
 
-
+    /**
+     * Updates the information about this <code>Tile</code> for the
+     * given <code>Player</code>.
+     *
+     * @param player The <code>Player</code>.
+     */
     public void updatePlayerExploredTile(Player player) {
         updatePlayerExploredTile(player.getNation());
     }
 
+    /**
+     * Updates the information about this <code>Tile</code> for the
+     * given <code>Player</code>.
+     *
+     * @param nation The {@link Player#getNation nation} identifying the
+     *      <code>Player</code>.
+     */
     public void updatePlayerExploredTile(int nation) {
         if (playerExploredTiles == null || getGame().getViewOwner() != null) {
+            return;
+        }
+        if (playerExploredTiles[nation] == null && !Player.isEuropean(nation)) {
+            return;
+        }
+        if (playerExploredTiles[nation] == null) {
+            logger.warning("'playerExploredTiles' for " + Player.getNationAsString(nation) + " is 'null'.");
             return;
         }
 
@@ -1325,6 +1384,86 @@ public final class Tile extends FreeColGameObject implements Location {
         }
     }
 
+    /**
+     * Checks if this <code>Tile</code> has been explored by the given
+     * <code>Player</code>.
+     *
+     * @param player The <code>Player</code>.
+     * @return <code>true</code> if this <code>Tile</code> has been
+     *      explored by the given <code>Player</code> and
+     *      <code>false</code> otherwise.
+     */
+    public boolean isExploredBy(Player player) {
+        if (player.isIndian()) {
+            return true;
+        }
+        if (playerExploredTiles[player.getNation()] == null || !isExplored()) {
+            return false;
+        } else {
+            return getPlayerExploredTile(player).isExplored();
+        }
+    }
+
+    /**
+     * Sets this <code>Tile</code> to be explored by the given
+     * <code>Player</code>.
+     *
+     * @param player The <code>Player</code>.
+     * @param explored <code>true</code> if this <code>Tile</code>
+     *      should be explored by the given <code>Player</code>
+     *      and <code>false</code> otherwise.
+     */    
+    public void setExploredBy(Player player, boolean explored) {
+        if (player.isIndian()) {
+            return;
+        }
+        if (playerExploredTiles[player.getNation()] == null) {
+            createPlayerExploredTile(player);
+        }
+        getPlayerExploredTile(player).setExplored(explored);
+        updatePlayerExploredTile(player);
+    }
+
+    /**
+     * Updates the skill available from the <code>IndianSettlement</code> located
+     * on this <code>Tile</code>.
+     * <p>
+     * @param player The <code>Player</code> which should get the updated
+     *      information.
+     * @exception NullPointerException If there is no settlement on this
+     *      <code>Tile</code>.
+     * @exception ClassCastException If the <code>Settlement</code> on this
+     *      <code>Tile</code> is not an <code>IndianSettlement</code>.
+     * @see IndianSettlement
+     */
+    public void updateIndianSettlementSkill(Player player) {
+        IndianSettlement is = (IndianSettlement) getSettlement();
+        getPlayerExploredTile(player).setSkill(is.getLearnableSkill());
+    }
+
+    /**
+     * Updates the information about the <code>IndianSettlement</code> located
+     * on this <code>Tile</code>.
+     * <p>
+     * @param player The <code>Player</code> which should get the updated
+     *      information.
+     * @exception NullPointerException If there is no settlement on this
+     *      <code>Tile</code>.
+     * @exception ClassCastException If the <code>Settlement</code> on this
+     *      <code>Tile</code> is not an <code>IndianSettlement</code>.
+     * @see IndianSettlement
+     */
+    public void updateIndianSettlementInformation(Player player) {
+        if (player.isIndian()) {
+            return;
+        }
+        PlayerExploredTile playerExploredTile = getPlayerExploredTile(player);
+        IndianSettlement is = (IndianSettlement) getSettlement();
+        playerExploredTile.setSkill(is.getLearnableSkill());
+        playerExploredTile.setHighlyWantedGoods(is.getHighlyWantedGoods());
+        playerExploredTile.setWantedGoods1(is.getWantedGoods1());
+        playerExploredTile.setWantedGoods2(is.getWantedGoods2());
+    }
 
 
     /**
@@ -1341,8 +1480,8 @@ public final class Tile extends FreeColGameObject implements Location {
     * The <code>toXMLElement</code> of {@link Tile} uses {@link #setAttributes}
     * in this class to hide information that is not available.
     */
-    public class PlayerExploredTile extends FreeColGameObject {
-        
+    public class PlayerExploredTile {
+
         private int nation;
         private boolean explored = false;
 
@@ -1355,7 +1494,7 @@ public final class Tile extends FreeColGameObject implements Location {
         // Colony data:
         private int     colonyUnitCount = 0,
                         colonyStockadeLevel;
-                        
+
         // IndianSettlement data:
         private int     skill = IndianSettlement.UNKNOWN,
                         highlyWantedGoods = IndianSettlement.UNKNOWN,
@@ -1369,9 +1508,7 @@ public final class Tile extends FreeColGameObject implements Location {
         /**
         * Creates a new <code>PlayerExploredTile</code>.
         */
-        public PlayerExploredTile(Game game, int nation) {
-            super(game);
-
+        public PlayerExploredTile(int nation) {
             this.nation = nation;
         }
 
@@ -1380,8 +1517,7 @@ public final class Tile extends FreeColGameObject implements Location {
         * Initialize this object from an XML-representation of this object.
         * @param element The DOM-element ("Document Object Model") made to represent this "PlayerExploredTile".
         */
-        public PlayerExploredTile(Game game, Element element) {
-            super(game, element);
+        public PlayerExploredTile(Element element) {
             readFromXMLElement(element);
         }
 
@@ -1520,14 +1656,6 @@ public final class Tile extends FreeColGameObject implements Location {
 
 
         /**
-        * Empty method.
-        */
-        public void newTurn() {
-            // Nothing to do.
-        }
-
-
-        /**
         * Make a XML-representation of this object.
         *
         * @param document The document to use when creating new componenets.
@@ -1535,8 +1663,6 @@ public final class Tile extends FreeColGameObject implements Location {
         */
         public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
             Element tileElement = document.createElement("playerExploredTile");
-
-            tileElement.setAttribute("ID", getID());
 
             tileElement.setAttribute("explored", Boolean.toString(explored));
             tileElement.setAttribute("nation", Integer.toString(nation));
@@ -1568,8 +1694,6 @@ public final class Tile extends FreeColGameObject implements Location {
         * @param tileElement The DOM-element ("Document Object Model") made to represent this "PlayerExploredTile".
         */
         public void readFromXMLElement(Element tileElement) {
-            setID(tileElement.getAttribute("ID"));
-
             explored = Boolean.valueOf(tileElement.getAttribute("explored")).booleanValue();
             nation = Integer.parseInt(tileElement.getAttribute("nation"));
 
