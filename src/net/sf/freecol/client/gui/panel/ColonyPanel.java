@@ -891,7 +891,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         }
 
         public void paintComponent(Graphics g) {
-            int need = colony.getFoodNeededByColonistsPerTurn();
+            int need = colony.getFoodConsumption();
             int surplus = colony.getFoodProduction() - need;
             final int horses = colony.getHorseProduction();
             final int bells = colony.getProductionOf(Goods.BELLS);

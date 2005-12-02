@@ -219,15 +219,12 @@ public final class Colony extends Settlement implements Location {
     }
     
     /**
-     * Return the colony's existing building for the given goods' type
+     * Returns the colony's existing building for the given goods type.
      *
-     * @param goodsType   int   The goods' type.
-     *
-     * @return                  The Building for the goodsType, or null if not exists or not fully built.
-     *
+     * @param goodsType The goods type.
+     * @return The Building for the <code>goodsType</code>, or 
+     *      <code>null</code> if not exists or not fully built.
      * @see Goods
-     * 
-     * @date Oct 3, 2005 2:21:16 AM by CHRIS
      */
     public Building getBuildingForConsuming(int goodsType) {
         Building b;
@@ -489,14 +486,10 @@ public final class Colony extends Settlement implements Location {
     
     /**
      * Gives the food needed to keep all current colonists alive in this colony.
-     *
-     * @return          The amount of food.
-     * 
-     * @date Oct 3, 2005 1:31:05 AM by CHRIS
+     * @return The amount of food eaten in this colony each this turn.
      */
-    public int getFoodNeededByColonistsPerTurn() {
-        final int food = 2 * this.getUnitCount();
-        return food;
+    public int getFoodConsumption() {
+        return 2 * getUnitCount();
     }
 
     /**
@@ -831,16 +824,20 @@ public final class Colony extends Settlement implements Location {
     */
     public ColonyTile getVacantColonyTileFor(Unit unit, int goodsType) {
         ColonyTile bestPick = null;
-        int highestProduction = 0;
+        int highestProduction = -2;
 
         Iterator colonyTileIterator = getColonyTileIterator();
         while (colonyTileIterator.hasNext()) {
-            ColonyTile colonyTile = (ColonyTile) colonyTileIterator.next();
+            ColonyTile colonyTile = (ColonyTile) colonyTileIterator.next();              
             
-            final boolean workable = verifyWorkerCanWorkLand(unit, colonyTile);
-            if ( workable && unit.getFarmedPotential(goodsType, colonyTile.getWorkTile()) > highestProduction ) {
-                highestProduction = unit.getFarmedPotential(goodsType, colonyTile.getWorkTile());
-                bestPick = colonyTile;
+            if (colonyTile.canAdd(unit)) {
+                Tile workTile = colonyTile.getWorkTile();
+                boolean ourLand = workTile.getNationOwner() == Player.NO_NATION 
+                                  || workTile.getNationOwner()== unit.getNation();
+                if (ourLand && unit.getFarmedPotential(goodsType, colonyTile.getWorkTile()) > highestProduction) {
+                    highestProduction = unit.getFarmedPotential(goodsType, colonyTile.getWorkTile());
+                    bestPick = colonyTile;
+                }
             }
         }
 
@@ -854,97 +851,37 @@ public final class Colony extends Settlement implements Location {
     * of the given <code>goodsType</code>.
     */
     public int getVacantColonyTileProductionFor(Unit unit, int goodsType) {
-        int highestProduction = 0;
-
-        Iterator colonyTileIterator = getColonyTileIterator();
-        while (colonyTileIterator.hasNext()) {
-            ColonyTile colonyTile = (ColonyTile) colonyTileIterator.next();
-            
-            final boolean workable = verifyWorkerCanWorkLand(unit, colonyTile);
-            if ( workable && unit.getFarmedPotential(goodsType, colonyTile.getWorkTile()) > highestProduction ) {
-                highestProduction = unit.getFarmedPotential(goodsType, colonyTile.getWorkTile());
-            }
-        }
-
-        return highestProduction;
-    }
-
-
-    /**
-     *
-     * @param unit
-     * @param colonyTile
-     * @return
-     * 
-     * @date Oct 1, 2005 9:13:41 PM by chris
-     */
-    public boolean verifyWorkerCanWorkLand(Unit unit, ColonyTile colonyTile) {
-        final boolean spaceForWorker = colonyTile.canAdd(unit);     // CHRIS
-        final boolean landIsAccessible = (colonyTile.getWorkTile().isLand() || getBuilding(Building.DOCK).isBuilt());
-        final boolean workerAllowedToWorkLand = (colonyTile.getWorkTile().getNationOwner() == Player.NO_NATION || colonyTile.getWorkTile().getNationOwner() == unit.getNation());
-        final boolean workable = spaceForWorker && landIsAccessible && workerAllowedToWorkLand;
-        return workable;
+        ColonyTile bestPick = getVacantColonyTileFor(unit, goodsType);
+        return unit.getFarmedPotential(goodsType, bestPick.getWorkTile());
     }
 
 
     /**
     * Returns the horse production (given that enough food
-    * is being produced).
+    * is being produced and a sufficient storage capacity).
     *
-    * @return       The number of producable horses.
+    * @return The number of producable horses.
     */
     public int getPotentialHorseProduction() {
-        return getPotentialHorseProductionGross();
-    }
-    
-    /**
-    * Returns the horse production possible based ONLY on the
-    * number of free horses in the colony.  No horses from
-    * scouts or dragoons are taken into account.
-    *
-    * @return       The number of producible horses.
-    */
-    public int getPotentialHorseProductionGross() {
         if (getGoodsCount(Goods.HORSES) < 2) {
             return 0;
         }
+        int maxAmount = Math.max(1, getGoodsCount(Goods.HORSES) / 10);
+        int maxSpace = Math.max(0, getWarehouseCapacity() - getGoodsCount(Goods.HORSES));
 
-        final int currHorses = getGoodsCount(Goods.HORSES);
-        int maxAmount = currHorses / 10;
-
-        return (maxAmount>=1) ? maxAmount : 1;
+        return Math.min(maxAmount, maxSpace);
+        
     }
-
-    /**
-     * Gives the possible horses producible, limited by the colony's horse storage.
-     *
-     * @return
-     * 
-     * @date Oct 3, 2005 5:37:39 PM by CHRIS
-     */
-    public int getPotentialHorseProductionMax() {
-        int amount = getPotentialHorseProductionGross();
-        final int currHorses = getGoodsCount(Goods.HORSES);
-        final int maxHorses = 200;          // TODO Is it always 200 for horses?  Or is it: this.getWarehouseCapacity();
-        final int mostNewHorses = maxHorses - currHorses;
-        amount = Math.min( amount, mostNewHorses);
-
-        return amount;
-    }
-
 
     /**
     * Gets the production of horses in this <code>Colony</code>.
     */
     public int getHorseProduction() {
-        final int eaten = getFoodNeededByColonistsPerTurn();
-        final int surplus = getFoodProduction() - eaten;
-        final int potential = getPotentialHorseProductionMax();
+        int surplus = getFoodProduction() - getFoodConsumption();
+        int potential = getPotentialHorseProduction();
 
-        final boolean horsesCanReproduce = getGoodsCount(Goods.HORSES) >= 2 && surplus > 1;
-        if (horsesCanReproduce) {
-            final boolean missingStable = !getBuilding(Building.STABLES).isBuilt();
-            if (missingStable) {
+        if (getGoodsCount(Goods.HORSES) >= 2 && surplus > 1) {
+            if (!getBuilding(Building.STABLES).isBuilt()) {
                 return Math.min(surplus / 2, potential);
             } else {
                 return Math.min(surplus, potential);
@@ -957,26 +894,24 @@ public final class Colony extends Settlement implements Location {
     
     
     /**
-     * Returns how much of a Good will be produced by this colony this turn, taking
-     * into account how much is consumed - by workers, horses, etc.
+     * Returns how much of a Good will be produced by this colony this turn, 
+     * taking into account how much is consumed - by workers, horses, etc.
      *
-     * @param goodsType int         The goods' type.
-     *
-     * @return                      The amount of the given goods currently unallocated for next turn.
-     * 
-     * @date Oct 3, 2005 1:43:51 AM by CHRIS
+     * @param goodsType The goods' type.
+     * @return The amount of the given goods currently unallocated for next 
+     *      turn.
      */
     public int getProductionNetOf(int goodsType) {
-        int count = this.getProductionOf( goodsType );
+        int count = getProductionOf( goodsType );
         int used = 0;
         switch (goodsType) {
             case Goods.FOOD:
-                used = this.getFoodNeededByColonistsPerTurn();
-                used += this.getHorseProduction();
+                used = getFoodConsumption();
+                used += getHorseProduction();
                 break;
             default:
-                Building bldg = this.getBuildingForConsuming(goodsType);
-                if( bldg != null ) {
+                Building bldg = getBuildingForConsuming(goodsType);
+                if (bldg != null) {
                     used = bldg.getGoodsInput();
                 }
                 // TODO FIXME  This should also take into account tools needed for a current building project
@@ -1127,7 +1062,7 @@ public final class Colony extends Settlement implements Location {
         }
 
         // Eat food:
-        int eat = getUnitCount() * 2;
+        int eat = getFoodConsumption();
         int food = getGoodsCount(Goods.FOOD);
 
         if (eat > food) {
