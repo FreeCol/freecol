@@ -342,25 +342,15 @@ public class Map extends FreeColGameObject {
                     if (newTile.getType() == Tile.UNEXPLORED && newTile != end) {
                         // Not allowed to use an unexplored tile for a path:
                         continue;
-                    } else if (newTile.isLand() && unit.isNaval()) {
-                        if ((newTile.getSettlement() == null || newTile.getSettlement().getOwner() != unit.getOwner()) && newTile != end) {
-                            // Not allowed to move a naval unit on land:
-                            if (carrier == null) {
-                                continue;
-                            }
-                        } else {
-                            // Entering a settlement costs all of the remaining moves for a naval unit:
-                            cost += movesLeft;
-                            movesLeft = 0;
+                    } else if (newTile.isLand() && unit.isNaval() && (newTile.getSettlement() == null 
+                            || newTile.getSettlement().getOwner() != unit.getOwner()) && newTile != end) {
+                        // Not allowed to move a naval unit on land:
+                        if (carrier == null) {
+                            continue;
                         }
                     } else if ((!newTile.isLand() && !unit.isNaval()) && newTile != end) {
                         // Not allowed to move a land unit on water:
                         continue;
-                    } else if (unit.getType() == Unit.WAGON_TRAIN && newTile.getSettlement() != null
-                               && newTile.getSettlement().getOwner() == unit.getOwner()) {
-                        // Entering a settlement costs all of the remaining moves for a wagon train:
-                        cost += movesLeft;
-                        movesLeft = 0;
                     } else {
                         int mc = newTile.getMoveCost(currentNode.getTile());
                         if (newTile != end && newTile.getSettlement() != null
@@ -561,15 +551,10 @@ public class Map extends FreeColGameObject {
                 int movesLeft = currentNode.getMovesLeft();
                 int turns = currentNode.getTurns();
 
-                if (newTile.isLand() && unit.isNaval()) {
-                    if ((newTile.getSettlement() == null || newTile.getSettlement().getOwner() != unit.getOwner())) {
-                        // Not allowed to move a naval unit on land:
-                        continue;
-                    } else {
-                        // Entering a settlement costs all of the remaining moves for a naval unit:
-                        cost += movesLeft;
-                        movesLeft = 0;
-                    }
+                if (newTile.isLand() && unit.isNaval() && (newTile.getSettlement() == null
+                        || newTile.getSettlement().getOwner() != unit.getOwner())) {
+                    // Not allowed to move a naval unit on land:
+                    continue;
                 } else if ((!newTile.isLand() && !unit.isNaval())) {
                     // Not allowed to move a land unit on water:
                     continue;

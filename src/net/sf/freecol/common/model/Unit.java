@@ -665,6 +665,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             } else {
                 return cost;
             }
+        } else if ((isNaval() || getType() == WAGON_TRAIN) && target.getSettlement() != null) {            
+            return getMovesLeft();
         } else {
             return cost;
         }
@@ -874,7 +876,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         setStateToAllChildren(SENTRY);
 
         Tile newTile = getGame().getMap().getNeighbourOrNull(direction, getTile());
-        //Tile oldTile = getTile();
 
         int moveCost = getMoveCost(newTile);
 
@@ -883,13 +884,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         } else {
             throw new IllegalStateException("Illegal move requested!");
         }
-
-        if ((isNaval() || getType() == WAGON_TRAIN) && newTile.getSettlement() != null) {
-            // If this behaviour should change, remember to correct map.findPath(...):
-            setMovesLeft(0);
-        } else {
-            setMovesLeft(getMovesLeft() - moveCost);
-        }
+        setMovesLeft(getMovesLeft() - moveCost);
     }
 
 
