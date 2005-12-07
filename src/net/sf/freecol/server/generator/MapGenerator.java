@@ -110,21 +110,21 @@ public class MapGenerator {
      */
     protected void createIndianSettlements(Map map, Vector players) throws FreeColException {
         Iterator incaIterator = map.getFloodFillIterator
-                                                (getRandomStartingPos(map));
+                                                (getRandomLandPosition(map));
         Iterator aztecIterator = map.getFloodFillIterator
-                                                (getRandomStartingPos(map));
+                                                (getRandomLandPosition(map));
         Iterator arawakIterator = map.getFloodFillIterator
-                                                (getRandomStartingPos(map));
+                                                (getRandomLandPosition(map));
         Iterator cherokeeIterator = map.getFloodFillIterator
-                                                (getRandomStartingPos(map));
+                                                (getRandomLandPosition(map));
         Iterator iroquoisIterator = map.getFloodFillIterator
-                                                (getRandomStartingPos(map));
+                                                (getRandomLandPosition(map));
         Iterator siouxIterator = map.getFloodFillIterator
-                                                (getRandomStartingPos(map));
+                                                (getRandomLandPosition(map));
         Iterator apacheIterator = map.getFloodFillIterator
-                                                (getRandomStartingPos(map));
+                                                (getRandomLandPosition(map));
         Iterator tupiIterator = map.getFloodFillIterator
-                                                (getRandomStartingPos(map));
+                                                (getRandomLandPosition(map));
 
         placeIndianSettlement(IndianSettlement.INCA,
                               IndianSettlement.CITY,
@@ -560,13 +560,13 @@ public class MapGenerator {
      * Select a random position on the map to use as a starting position.
      * @return Position selected
      */
-    private Position getRandomStartingPos(Map map) {
-        int x = 0;
-        int y = 0;
-        while (!map.getTile(x, y).isLand()) {
+    private Position getRandomLandPosition(Map map) {
+        int x;
+        int y;
+        do {
             x = random.nextInt(width - 20) + 10;
             y = random.nextInt(height - 20) + 10;
-        }
+        } while (!map.getTile(x, y).isLand());
         return new Map.Position(x, y);
     }
 
@@ -780,30 +780,30 @@ public class MapGenerator {
         *        the y-axis and 0% is on the top/bottom of the map.
         */
         private int getRandomTileType(int percent) {
-          int thisValue = Math.max(((percent - tileType.nextInt(20) - 1)) / 10, 0);
-
-          int minWoD = 0;
-          int maxWoD = 99;
-          int dryOrWet = tileType.nextInt(maxWoD - minWoD) + minWoD;
-          dryOrWet /= 33;
-          switch(thisValue) {
+            int thisValue = Math.max(((percent - tileType.nextInt(20) - 1)) / 10, 0);
+    
+            int minWoD = 0;
+            int maxWoD = 99;
+            int dryOrWet = tileType.nextInt(maxWoD - minWoD) + minWoD;
+            dryOrWet /= 33;
+            switch(thisValue) {
             case 0: return Tile.ARCTIC;
             case 1: case 2: switch (dryOrWet) {
-              case 0: return Tile.TUNDRA;
-              case 1: default: return Tile.TUNDRA;
-              case 2: return Tile.MARSH;
+                case 0: return Tile.TUNDRA;
+                case 1: default: return Tile.TUNDRA;
+                case 2: return Tile.MARSH;
             }
             case 3: case 4: case 5: default: switch (dryOrWet) {
-              case 0: return Tile.PLAINS;
-              case 1: default: return Tile.PRAIRIE;
-              case 2: return Tile.DESERT;
+                case 0: return Tile.PLAINS;
+                case 1: default: return Tile.PRAIRIE;
+                case 2: return Tile.DESERT;
             }
             case 6: case 7: case 8: case 9: switch (dryOrWet) {
-              case 0: return Tile.GRASSLANDS;
-              case 1: default: return Tile.SAVANNAH;
-              case 2: return Tile.SWAMP;
+                case 0: return Tile.GRASSLANDS;
+                case 1: default: return Tile.SAVANNAH;
+                case 2: return Tile.SWAMP;
             }
-          }
+            }
         }
 
 
