@@ -411,12 +411,15 @@ public class Player extends FreeColGameObject {
     */
     public void buyLand(Tile tile) {
         int nation = tile.getNationOwner();
-        if (nation == NO_NATION || nation == getNation()) {
-            throw new IllegalStateException();
+        if (nation == NO_NATION) {
+            throw new IllegalStateException("The Tile is not owned by any nation!");
+        }        
+        if (nation == getNation()) {
+            throw new IllegalStateException("The Player already owns the Tile.");
         }
         Player owner = getGame().getPlayer(nation);
         if (owner.isEuropean()) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("The owner is an european player");
         }
 
         int price = owner.getLandPrice(tile);

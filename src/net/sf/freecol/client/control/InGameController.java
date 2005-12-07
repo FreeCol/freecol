@@ -310,13 +310,13 @@ public final class InGameController implements NetworkConstants {
     * Buys the given land from the indians.
     * @param tile The land which should be bought from the indians. 
     */
-    public void buyLand(Tile tile) {
+    public void buyLand(Tile tile) {   
         Element buyLandElement = Message.createNewRootElement("buyLand");
         buyLandElement.setAttribute("tile", tile.getID());
 
         freeColClient.getMyPlayer().buyLand(tile);
 
-        freeColClient.getClient().send(buyLandElement);
+        freeColClient.getClient().sendAndWait(buyLandElement);
         
         freeColClient.getCanvas().updateGoldLabel();
     }
