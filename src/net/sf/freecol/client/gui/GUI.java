@@ -12,6 +12,8 @@ import java.awt.Image;
 import java.awt.MediaTracker;
 import java.awt.Polygon;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
 import java.util.Date;
@@ -21,6 +23,7 @@ import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
+import javax.swing.Timer;
 import javax.swing.UIManager;
 
 import net.sf.freecol.FreeCol;
@@ -45,7 +48,7 @@ import net.sf.freecol.common.model.Map.Position;
 * In addition, the graphical state of the map (focus, active unit..) is also a responsibillity
 * of this class.
 */
-public final class GUI extends Thread { // Thread to have a blinking loop and animation in general
+public final class GUI {
     private static final Logger logger = Logger.getLogger(GUI.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
@@ -142,10 +145,6 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
 
         cursor = true;
 
-        // Because I'm a thread but my priority must be low -FV
-        setPriority(Thread.MIN_PRIORITY);
-        start();
-
         tileHeight = lib.getTerrainImageHeight(0);
         tileWidth = lib.getTerrainImageWidth(0);
 
@@ -168,25 +167,39 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
         messages = new Vector(MESSAGE_COUNT);
     }
 
-
     /**
-    * As a Thread this <code>GUI</code> object has a life loop. Now it only change cursor every 0.5 sec
-    * for blinking feedback.
-    */
-    public void run(){
-        while (true){
-            cursor = !cursor;
-
-            if (freeColClient != null && freeColClient.getCanvas() != null
-                    && getActiveUnit() != null && getActiveUnit().getTile() != null) {
-              //freeColClient.getCanvas().repaint(0, 0, getWidth(), getHeight());
-                freeColClient.getCanvas().refreshTile(getActiveUnit().getTile());
+     * Starts the unit-selection-cursor blinking animation.
+     */
+    public void startCursorBlinking() {
+        final int delay = 500; // Milliseconds
+        final FreeColClient theFreeColClient = freeColClient;
+        ActionListener taskPerformer = new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                setCursor(!hasCursor());
+  
+                if (getActiveUnit() != null && getActiveUnit().getTile() != null) {
+                    //freeColClient.getCanvas().repaint(0, 0, getWidth(), getHeight());
+                    freeColClient.getCanvas().refreshTile(getActiveUnit().getTile());            
+                }               
             }
-
-            try {
-                sleep(500);
-            } catch (InterruptedException e) {}
-        }
+        };
+        Timer timer = new Timer(delay, taskPerformer);  
+        timer.start();
+    }    
+    
+    /**
+     * Checks if the unit selection cursor is currently being displayed.
+     */
+    public boolean hasCursor() {
+        return cursor;
+    }
+    
+    
+    /**
+    * Sets that the unit selection cursor should be displayed.
+    */
+    public void setCursor(boolean cursor) {
+        this.cursor = cursor;
     }
 
 
@@ -299,7 +312,7 @@ public final class GUI extends Thread { // Thread to have a blinking loop and an
         }
     }
 
-
+    
     /**
     * Gets the selected tile.
     *

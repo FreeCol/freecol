@@ -112,17 +112,17 @@ public class ColonyPlan {
         while (colonyTileIterator.hasNext()) {
             ColonyTile ct = (ColonyTile) colonyTileIterator.next();
 
-            if (ct.getWorkTile().getOwner() != null
+            if (ct.getWorkTile().getOwner() != null 
                     && ct.getWorkTile().getOwner() != colony
-                    || ct.isColonyCenterTile()) {
+                    || ct.isColonyCenterTile()) {   
                 continue;
-            }
+            }            
 
             int goodsType = getBestGoodsToProduce(ct.getWorkTile());
             WorkLocationPlan wlp = new WorkLocationPlan(getAIMain(), ct, goodsType);
             workLocationPlans.add(wlp);
         }
-
+                
         // Ensure that we produce lumber:
         if (getProductionOf(Goods.LUMBER) <= 0) {
             WorkLocationPlan bestChoice = null;

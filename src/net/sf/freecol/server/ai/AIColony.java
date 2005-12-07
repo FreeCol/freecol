@@ -385,7 +385,7 @@ public class AIColony extends AIObject {
                 return j.compareTo(i);
             }
         });
-
+        
         // Remove all colonists from the colony:
         Iterator ui = colony.getUnitIterator();
         while (ui.hasNext()) {
