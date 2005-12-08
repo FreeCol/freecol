@@ -20,6 +20,7 @@ import net.sf.freecol.client.gui.panel.ImageProvider;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -40,7 +41,7 @@ public final class ImageLibrary extends ImageProvider {
                             PLOWED = 4,
                             TILE_TAKEN = 5,
                             TILE_OWNED_BY_INDIANS = 6,
-                            MISC_COUNT = 7;
+	                    MISC_COUNT = 7;
 
     /**
      * These finals represent the EXTRA terrain graphics; the ones that
@@ -252,6 +253,7 @@ public final class ImageLibrary extends ImageProvider {
                    bonus, //Holds ImageIcon objects
                    ui; // Holds ImageIcon objects
     private Vector[] unitButtons; //Holds the unit-order buttons
+    private Image[] alarmChips;
     private Hashtable colorChips;  // Color is key, BufferedImage is value
     private Hashtable missionChips;  // Color is key, BufferedImage is value
     private Hashtable expertMissionChips;  // Color is key, BufferedImage is value
@@ -308,6 +310,7 @@ public final class ImageLibrary extends ImageProvider {
         loadGoods(gc, resourceLocator, doLookup);
         loadBonus(gc, resourceLocator, doLookup);
 
+	alarmChips = new Image[IndianSettlement.NUMBER_OF_ALARM_LEVELS];
         colorChips = new Hashtable();
         missionChips = new Hashtable();
         expertMissionChips = new Hashtable();
@@ -643,6 +646,43 @@ public final class ImageLibrary extends ImageProvider {
         }
     }
 
+    /**
+     * Generates a alarm chip image and stores it in memory.
+     * @param gc The GraphicsConfiguration is needed to create images that are compatible with the
+     * local environment.
+     * @param alarm The alarm level.
+     */
+    private void loadAlarmChip(GraphicsConfiguration gc, int alarm) {
+        BufferedImage tempImage = gc.createCompatibleImage(10, 17);
+        Graphics2D g = (Graphics2D)tempImage.getGraphics();
+
+	g.setColor(Color.BLACK);
+        g.drawRect(0, 0, 10, 16);
+
+	if (alarm == IndianSettlement.HAPPY) {
+	    g.setColor(Color.GREEN);
+	} else if (alarm == IndianSettlement.CONTENT) {
+	    g.setColor(Color.BLUE);
+	} else if (alarm == IndianSettlement.DISPLEASED) {
+	    g.setColor(Color.YELLOW);
+	} else if (alarm == IndianSettlement.ANGRY) {
+	    g.setColor(Color.ORANGE);
+	} else if (alarm == IndianSettlement.HATEFUL) {
+	    g.setColor(Color.RED);
+	} else {
+	    logger.warning("Unknown alarm level: " + alarm);
+	    return;
+	}
+
+        g.fillRect(1, 1, 8, 15);
+	g.setColor(Color.BLACK);
+
+	g.fillRect(4, 3, 2, 7);
+	g.fillRect(4, 12, 2, 2);
+	
+	alarmChips[alarm] = tempImage;
+    }
+
 
     /**
      * Returns the bonus-image for the given tile.
@@ -847,6 +887,22 @@ public final class ImageLibrary extends ImageProvider {
             }
         }
         return missionChip;
+    }
+
+    /**
+     * Returns the alarm chip with the given color.
+     * @param alarm The alarm level.
+     * @return The alarm chip.
+     */
+    public Image getAlarmChip(int alarm) {
+        Image alarmChip = (Image)alarmChips[alarm];
+
+        if (alarmChip == null) {
+            GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+            loadAlarmChip(gc, alarm);
+	    alarmChip = (Image)alarmChips[alarm];
+	}
+        return alarmChip;
     }
 
     /**

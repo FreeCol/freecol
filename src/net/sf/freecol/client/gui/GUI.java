@@ -113,7 +113,9 @@ public final class GUI {
     TEXT_OFFSET_Y = 13, // Relative to the state indicator.
     STATE_OFFSET_X = 25,
     STATE_OFFSET_Y = 10,
-    MISSION_OFFSET_X = 37,
+    ALARM_OFFSET_X = 37,
+    ALARM_OFFSET_Y = 10,
+    MISSION_OFFSET_X = 49,
     MISSION_OFFSET_Y = 10,
     OTHER_UNITS_OFFSET_X = -5, // Relative to the state indicator.
     OTHER_UNITS_OFFSET_Y = 1,
@@ -1449,6 +1451,11 @@ public final class GUI {
                         Unit missionary = ((IndianSettlement)settlement).getMissionary();
                         boolean expert = (missionary.getType() == Unit.JESUIT_MISSIONARY);
                         g.drawImage(lib.getMissionChip(missionary.getOwner().getColor(), expert), x + MISSION_OFFSET_X, y + MISSION_OFFSET_Y, null);
+                    }
+
+                    // Draw the alarm chip if needed.
+                    if (freeColClient.getMyPlayer().hasContacted(((IndianSettlement)settlement).getOwner().getNation())) {
+                        g.drawImage(lib.getAlarmChip(((IndianSettlement)settlement).getAlarmLevel(freeColClient.getMyPlayer())), x + ALARM_OFFSET_X, y + ALARM_OFFSET_Y, null);
                     }
 
                     g.setColor(Color.BLACK);
