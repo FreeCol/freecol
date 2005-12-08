@@ -42,6 +42,28 @@ public class IndianSettlement extends Settlement {
     
     public static final int MAX_CONVERT_DISTANCE = 10;
 
+    /** The AI player is happy if <code>alarm <= ALARM_HAPPY</code>. */
+    public static final int ALARM_HAPPY = 100;
+
+    /** The AI player is content if <code>alarm <= ALARM_CONTENT && alarm > ALARM_HAPPY</code>. */
+    public static final int ALARM_CONTENT = 600;
+
+    /** The AI player is displeased if <code>alarm <= ALARM_DISPLEASED && alarm > ALARM_CONTENT</code>. */
+    public static final int ALARM_DISPLEASED = 700;
+
+    /** The AI player is angry if <code>alarm <= ALARM_ANGRY && alarm > ALARM_DISPLEASED</code>. */
+    public static final int ALARM_ANGRY = 800;
+
+    /** The AI player is hateful if <code>alarm > ALARM_ANGRY</code>. */
+    public static final int ALARM_HATEFUL = 1000;
+
+    /** AI alarm levels. */
+    public static final int HAPPY = 0,
+	CONTENT = 1,
+	DISPLEASED = 2,
+	ANGRY = 3,
+	HATEFUL = 4,
+        NUMBER_OF_ALARM_LEVELS = 5;
 
     /** The amount of goods a brave can produce a single turn. */
     private static final int WORK_AMOUNT = 5;
@@ -237,6 +259,26 @@ public class IndianSettlement extends Settlement {
         return alarm[player.getNation()];
     }
 
+    /**
+     * Gets the alarm level of this player.
+     *
+     * @param player The other player.
+     * @return A alarm level.
+     */
+    public int getAlarmLevel(Player player) {
+	int level = alarm[player.getNation()];
+	if (level <= ALARM_HAPPY) {
+	    return HAPPY;
+	} else if (level <= ALARM_CONTENT) {
+	    return CONTENT;
+	} else if (level <= ALARM_DISPLEASED) {
+	    return DISPLEASED;
+	} else if (level <= ALARM_ANGRY) {
+	    return ANGRY;
+	} else {
+	    return HATEFUL;
+	}
+    }
 
     /**
     * Returns true if a European player has visited this settlement to speak with the chief.
