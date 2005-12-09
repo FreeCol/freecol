@@ -30,6 +30,7 @@ import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
 import net.sf.freecol.server.ai.mission.IndianBringGiftMission;
 import net.sf.freecol.server.ai.mission.Mission;
+import net.sf.freecol.server.ai.mission.PioneeringMission;
 import net.sf.freecol.server.ai.mission.TransportMission;
 import net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission;
 import net.sf.freecol.server.ai.mission.UnitWanderHostileMission;
@@ -112,7 +113,7 @@ public class AIPlayer extends AIObject {
 
         sessionRegister.clear();
         aiUnits.clear();
-
+        
         // Determines the stance towards the other players:
         logger.fine("AI: determining stance.");
         playerIterator = getGame().getPlayerIterator();
@@ -191,9 +192,8 @@ public class AIPlayer extends AIObject {
                 AIUnit aiUnit = (AIUnit) aiUnitsIterator.next();
                 Unit unit = aiUnit.getUnit();
 
-                //if (aiUnit.getUnit().isPioneer() && !aiUnit.hasMission()) {
-                if (1==2) {
-                    //aiUnit.setMission(new PioneeringMission(getAIMain(), aiUnit));
+                if (aiUnit.getUnit().isPioneer() && !aiUnit.hasMission() && PioneeringMission.isValid(aiUnit)) {
+                    aiUnit.setMission(new PioneeringMission(getAIMain(), aiUnit));
                 } else if (aiUnit.getUnit().isColonist()
                         && !aiUnit.hasMission()
                         && (aiUnit.getUnit().getLocation() instanceof Tile
@@ -304,6 +304,30 @@ public class AIPlayer extends AIObject {
         logger.fine("AI: Leaving");
     }
 
+    
+    /**
+     * Returns an <code>Iterator</code> over all the 
+     * <code>TileImprovement</code>s needed by all
+     * of this player's colonies.
+     * 
+     * @return The <code>Iterator</code>.
+     * @see TileImprovement
+     */
+    public Iterator getTileImprovementIterator() {
+    	List tileImprovements = new ArrayList();
+    	
+    	Iterator acIterator = getAIColonyIterator();
+    	while (acIterator.hasNext()) {
+    		AIColony ac = (AIColony) acIterator.next();
+    		Iterator it = ac.getTileImprovementIterator();
+    		while (it.hasNext()) {
+    			tileImprovements.add(it.next());
+    		}
+    	}
+    	
+    	return tileImprovements.iterator();
+    }    
+    
     
     /**
      * This is a temporary method which are used for 

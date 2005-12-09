@@ -973,8 +973,35 @@ public final class Tile extends FreeColGameObject implements Location {
                                         false, true, true);
         }
     }
-        
+
     
+    /**
+     * Checks wether this <code>Tile</code> can be plowed or not.
+     * This method will return <code>false</code> if the tile
+     * has already been plowed.
+     *  
+     * @return The result.
+     * @see Unit#canPlow
+     */
+    public boolean canBePlowed() {
+    	return (!isPlowed() && isLand() 
+    			&& getAddition() != Tile.ADD_HILLS
+    			&& getAddition() != Tile.ADD_MOUNTAINS);
+    }    
+
+    
+    /**
+     * Checks wether this <code>Tile</code> can have a road or not.
+     * This method will return <code>false</code> if a road has already
+     * been built.
+     * 
+     * @return The result.
+     */
+    public boolean canGetRoad() {
+    	return isLand() && !hasRoad();
+    }    
+        
+     
     /**
     * The potential of a given type of tile to produce a certain type of goods.
     *

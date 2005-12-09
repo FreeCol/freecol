@@ -29,7 +29,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
     private static final Logger logger = Logger.getLogger(Unit.class.getName());
 
-    // The type of a unit; used only for gameplaying purposes NOT painting purposes.
+    /** The type of a unit; used only for gameplaying purposes NOT painting purposes. */
     public static final int FREE_COLONIST = 0,
                             EXPERT_FARMER = 1,
                             EXPERT_FISHERMAN = 2,
@@ -72,7 +72,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                             MILKMAID = 39,
                             UNIT_COUNT = 40;
 
-    // The states a Unit can have.
+    /** A state a Unit can have. */
     public static final int ACTIVE = 0,
                             FORTIFY = 1,
                             SENTRY = 2,
@@ -84,7 +84,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                             TO_AMERICA = 8;
 
 
-    // The move types
+    /**
+     * A move type.
+     * @see #getMoveType
+     */
     public static final int MOVE = 0,
                             MOVE_HIGH_SEAS = 1,
                             ATTACK = 2,
@@ -2192,11 +2195,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     * @return The result.
     */
     public boolean canPlow() {
-        return (!getTile().isPlowed() 
-                && getTile().isLand() 
-                && getNumberOfTools() >= 20
-                && getTile().getAddition() != Tile.ADD_HILLS
-                && getTile().getAddition() != Tile.ADD_MOUNTAINS);
+        return getTile().canBePlowed() && getNumberOfTools() >= 20;
     }
 
     /**

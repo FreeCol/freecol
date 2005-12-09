@@ -2,6 +2,8 @@
 package net.sf.freecol.server.ai;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
@@ -77,9 +79,31 @@ public class ColonyPlan {
      * @return The list of <code>WorkLocationPlan</code>s .
      */
     public List getWorkLocationPlans() {
-        return workLocationPlans;
+        return (List) ((ArrayList) workLocationPlans).clone();
     }
 
+    
+    /**
+     * Returns the <code>WorkLocationPlan</code>s 
+     * associated with this <code>ColonyPlan</code>
+     * sorted by production in an increasing order.
+     * 
+     * @return The list of <code>WorkLocationPlan</code>s .
+     */   
+    public List getSortedWorkLocationPlans() {
+    	List workLocationPlans = getWorkLocationPlans();
+    	Collections.sort(workLocationPlans, new Comparator() {
+    		public int compare(Object o, Object p) {
+    			Integer i = new Integer(((WorkLocationPlan) o).getProductionOf(((WorkLocationPlan) o).getGoodsType()));
+    			Integer j = new Integer(((WorkLocationPlan) p).getProductionOf(((WorkLocationPlan) p).getGoodsType()));
+    			
+    			return j.compareTo(i);
+    		}
+    	});
+    	
+    	return workLocationPlans;
+	}
+    
     
     /**
      * Gets the main AI-object.

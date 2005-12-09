@@ -80,7 +80,7 @@ public class UnitContainer extends FreeColGameObject {
         }
     }
 
-
+    
     /**
     * Removes a Unit from this containter.
     *
