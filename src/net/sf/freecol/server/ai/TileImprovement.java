@@ -58,6 +58,9 @@ public class TileImprovement extends AIObject {
     public TileImprovement(AIMain aiMain, Tile target, int type, int value) {
         super(aiMain);
         
+        id = aiMain.getNextID();
+        aiMain.addAIObject(id, this);       
+        
         this.target = target;
         this.type = type;
         this.value = value;
@@ -83,7 +86,7 @@ public class TileImprovement extends AIObject {
      * no longer wanted.
      */
     public void dispose() {
-    	if (pioneer != null) {
+    	if (pioneer != null && pioneer.getMission() != null) {
     		((PioneeringMission) pioneer.getMission()).setTileImprovement(null);
     	}
     	super.dispose();
@@ -183,7 +186,9 @@ public class TileImprovement extends AIObject {
         element.setAttribute("ID", id);
         element.setAttribute("type", Integer.toString(type));
         element.setAttribute("value", Integer.toString(value));
-        element.setAttribute("pioneer", pioneer.getID());
+        if (pioneer != null) {
+        	element.setAttribute("pioneer", pioneer.getID());
+        }
         element.setAttribute("target", target.getID());
 
         return element;
@@ -199,7 +204,11 @@ public class TileImprovement extends AIObject {
         id = element.getAttribute("ID");
         type = Integer.parseInt(element.getAttribute("type"));
         value = Integer.parseInt(element.getAttribute("value"));
-        pioneer = (AIUnit) getAIMain().getAIObject(element.getAttribute("pioneer"));
+        if (element.hasAttribute("pioneer")) {
+        	pioneer = (AIUnit) getAIMain().getAIObject(element.getAttribute("pioneer"));
+        } else {
+        	pioneer = null;
+        }
         target = (Tile) getAIMain().getFreeColGameObject(element.getAttribute("target"));        
     }
 

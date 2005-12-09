@@ -260,7 +260,9 @@ public class PioneeringMission extends Mission {
         Element element = document.createElement(getXMLElementTagName());
 
         element.setAttribute("unit", getUnit().getID());
-        element.setAttribute("tileImprovement", tileImprovement.getID());
+        if (tileImprovement != null) {
+        	element.setAttribute("tileImprovement", tileImprovement.getID());
+        }
 
         return element;
     }
@@ -274,7 +276,11 @@ public class PioneeringMission extends Mission {
     public void readFromXMLElement(Element element) {
         setAIUnit((AIUnit) getAIMain().getAIObject(element.getAttribute("unit")));
         
-        tileImprovement = (TileImprovement) getAIMain().getAIObject(element.getAttribute("tileImprovement"));
+        if (element.hasAttribute("tileImprovement")) {
+        	tileImprovement = (TileImprovement) getAIMain().getAIObject(element.getAttribute("tileImprovement"));
+        } else {
+        	tileImprovement = null;
+        }
     }
 
     /**

@@ -361,8 +361,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalStateException("Not your unit!");
         }
 
-        boolean disembark = !unit.getTile().isLand() && game.getMap().getNeighbourOrNull(direction, unit.getTile()).isLand();
         Tile newTile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
+        boolean disembark = !unit.getTile().isLand() && newTile.isLand() && newTile.getSettlement() == null;        
 
         Iterator enemyPlayerIterator = game.getPlayerIterator();
         while (enemyPlayerIterator.hasNext()) {
