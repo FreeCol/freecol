@@ -2386,13 +2386,14 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                         break;
                     case BUILD_ROAD:
                         getTile().setRoad(true);
-                        numberOfTools -= 20;
+                        expendTools(20);
                         break;
                     case PLOW:
                         if (getTile().isForested()) {
-                            getTile().setForested(false);
                             // Give Lumber to adjacent colony
-                            int lumberAmount = 100;
+                            // Yes, the amount of lumber may exceed 100 units,
+                            // but this was also true for the original game, IIRC.
+                            int lumberAmount = getTile().potential(Goods.LUMBER) * 15 + 10;
                             if (getTile().getColony() != null && getTile().getColony().getOwner().equals(getOwner())) {
                                 getTile().getColony().addGoods(Goods.LUMBER, lumberAmount);
                             } else {
@@ -2417,16 +2418,34 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                                     }
                                 }
                             }
+                            getTile().setForested(false);                                                        
                         } else {
                             getTile().setPlowed(true);
                         }
-                        numberOfTools -= 20;
+                        expendTools(20);
                         break;
                     default:
                         logger.warning("Unknown work completed. State: " + state);
                 }
 
                 setState(ACTIVE);
+            }
+        }
+    }
+
+    /**
+     * Reduces the number of tools and produces a warning if all tools
+     * are used up.
+     *
+     * @param amount The number of tools to remove.
+     */
+    private void expendTools(int amount) {
+        numberOfTools -= 20;
+        if (numberOfTools == 0) {
+            if (getType() == HARDY_PIONEER) {
+                addModelMessage(this, "model.unit.noMoreToolsPioneer", null);
+            } else {
+                addModelMessage(this, "model.unit.noMoreTools", new String [][] {{"%name%", getName()}});
             }
         }
     }
