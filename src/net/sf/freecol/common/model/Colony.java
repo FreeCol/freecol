@@ -1102,7 +1102,7 @@ public final class Colony extends Settlement implements Location {
         checkBuildingComplete();
 
         // Throw away goods there is no room for.
-        goodsContainer.removeAbove(getWarehouseCapacity());
+        goodsContainer.cleanAndReport(getWarehouseCapacity(), new int [] {200, 100});
 
         // Remove bells:
         bells -= (getSoL() * getUnitCount()) / 100;

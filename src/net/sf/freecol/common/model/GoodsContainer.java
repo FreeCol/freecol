@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import net.sf.freecol.common.model.ModelMessage;
 
 /**
 * Contains goods and can be used by a {@link Location} to make certain
@@ -23,6 +24,9 @@ public class GoodsContainer extends FreeColGameObject {
 
     /** The list of Goods stored in this <code>GoodsContainer</code>. */
     private int[] storedGoods = new int[Goods.NUMBER_OF_TYPES];
+
+    /** The previous list of Goods stored in this <code>GoodsContainer</code>. */
+    private int[] oldStoredGoods = new int[Goods.NUMBER_OF_TYPES];
 
     /** The owner of this <code>GoodsContainer</code>. */
     private Location parent;
@@ -242,8 +246,55 @@ public class GoodsContainer extends FreeColGameObject {
     */
     public void newTurn() {
 
+        for (int i = 0; i < Goods.NUMBER_OF_TYPES; i++) {
+            oldStoredGoods[i] = storedGoods[i];
+        }
+
     }
 
+    /**
+     * Removes goods exceeding limit and reports on goods exceeding levels.
+     *
+     * Note: The levels should be in descending order.
+     *
+     * @param limit The capacity of this <code>GoodsContainer</code>.
+     * @param levels An array of level to report about (probably {200, 100}).
+     */
+    public void cleanAndReport(int limit, int[] levels) {
+
+        FreeColGameObject source = (FreeColGameObject) parent;
+        
+        for (int i = 0; i < Goods.NUMBER_OF_TYPES; i++) {
+            if (i == Goods.FOOD) {
+                // ignore food
+                continue;
+            } else if (storedGoods[i] > limit ) {
+                // limit has been exceeded
+                storedGoods[i] = limit;
+                addModelMessage(source, "model.building.warehouseOverfull",
+                                new String [][] {{"%goods%", Goods.getName(i)},
+                                                 {"%colony%", ((Colony) parent).getName()}});
+            } else if (storedGoods[i] == limit && oldStoredGoods[i] < limit) {
+                // limit has been reached during this turn
+                addModelMessage(source, "model.building.warehouseOverfull",
+                                new String [][] {{"%goods%", Goods.getName(i)},
+                                                 {"%colony%", ((Colony) parent).getName()}}) ;
+            } else {
+                // check whether certain levels have been exceeded
+                for (int k = 0; k < levels.length; k++) {
+                    if (storedGoods[i] > levels[k] && oldStoredGoods[i] <= levels[k]) {
+                        addModelMessage(source, "model.building.warehouseFull",
+                                        new String [][] {{"%goods%", Goods.getName(i)},
+                                                         {"%level%", String.valueOf(levels[k])},
+                                                         {"%colony%", ((Colony) parent).getName()}}) ;
+                        // don't report on more than one level
+                        break;
+                    }
+                }
+            }
+        }
+
+    }
 
     /**
     * Makes an XML-representation of this object.
