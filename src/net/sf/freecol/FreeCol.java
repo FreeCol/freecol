@@ -81,10 +81,11 @@ public final class FreeCol {
                             " Use --no-java-check to skip this check.");
             return;
         }
-        
-        if (Runtime.getRuntime().maxMemory() < 128000000) {
+
+        int  minMemory = 128;  // million bytes
+        if (Runtime.getRuntime().maxMemory() < minMemory * 1000000) {
             System.out.println("You need to assign more memory to the JVM. Restart FreeCol with:");
-            System.out.println("java -Xmx512M -jar FreeCol.jar");
+            System.out.println("java -Xmx" + minMemory + "M -jar FreeCol.jar");
             return;
         }
 
