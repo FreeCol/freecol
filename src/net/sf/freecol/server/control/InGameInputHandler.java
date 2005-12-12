@@ -161,6 +161,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                         reply = buyLand(connection, element);
                     } else if (type.equals("payForBuilding")) {
                         reply = payForBuilding(connection, element);
+                    } else if (type.equals("payArrears")) {
+                        reply = payArrears(connection, element);
                     } else {
                         logger.warning("Unknown request from client " + element.getTagName());
                     }
@@ -1570,6 +1572,27 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
 
         colony.payForBuilding();
+
+        return null;
+    }
+
+    /**
+    * Handles a "payArrears"-request from a client.
+    *
+    * @param connection The connection the message came from.
+    * @param payArrearsElement The element containing the request.
+    */
+    private Element payArrears(Connection connection, Element payArrearsElement) {
+        Game game = getFreeColServer().getGame();
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
+
+        int goods = new Integer(payArrearsElement.getAttribute("goods")).intValue();
+        int arrears = player.getArrears(goods);
+        if (player.getGold() < arrears) {
+            throw new IllegalStateException("Not enough gold to pay tax arrears!");
+        }
+        player.modifyGold(-arrears);
+        player.setArrears(goods, 0);
 
         return null;
     }

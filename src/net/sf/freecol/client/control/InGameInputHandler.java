@@ -7,11 +7,13 @@ import javax.swing.SwingUtilities;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
@@ -90,6 +92,10 @@ public final class InGameInputHandler extends InputHandler {
                 reply = reconnect(element);
             } else if (type.equals("setAI")) {
                 reply = setAI(element);
+	    } else if (type.equals("acceptTax")) {
+		reply = acceptTax(element);
+	    } else if (type.equals("removeGoods")) {
+		reply = removeGoods(element);
             } else {
                 logger.warning("Message is of unsupported type \"" + type + "\".");
             }
@@ -513,4 +519,69 @@ public final class InGameInputHandler extends InputHandler {
 
         return null;
     }
+
+
+    /**
+     * Handles an "acceptTax"-request.
+     *
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *                holds all the information.
+     */
+    private Element acceptTax(Element element) {
+
+        Element reply = Message.createNewRootElement("acceptTax");
+        final FreeColClient freeColClient = getFreeColClient();
+        if (freeColClient.getCanvas().showConfirmDialog("model.player.taxRate.changed",
+							"model.player.taxRate.accept",
+							"model.player.taxRate.reject",
+							element.getAttribute("amount"))) {
+            int amount = new Integer(element.getAttribute("amount")).intValue();
+            freeColClient.getMyPlayer().setTax(amount);
+            freeColClient.getCanvas().getEuropePanel().updateTaxLabel();
+            reply.setAttribute("accepted", String.valueOf(true));
+        } else {
+            reply.setAttribute("accepted", String.valueOf(false));
+            
+        }
+
+        return reply;
+
+    }
+
+
+    /**
+     * Handles a "removeGoods"-request.
+     *
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *                holds all the information.
+     */
+    private Element removeGoods(Element element) {
+        final FreeColClient freeColClient = getFreeColClient();
+        String colonyID = element.getAttribute("colony");
+        ModelMessage m = null;
+        
+        if (colonyID.equals("")) {
+            // player has no colony or nothing to trade
+            m = new ModelMessage(null, "model.player.taxWaived", null);
+        } else {
+            Colony colony = (Colony) freeColClient.getGame().getFreeColGameObject(colonyID);
+            String amount = element.getAttribute("amount");
+            int goods = new Integer(element.getAttribute("goods")).intValue();
+
+            colony.removeGoods(goods, new Integer(amount).intValue());
+            freeColClient.getMyPlayer().setArrears(goods);
+        
+            m = new ModelMessage(colony,
+                                 "model.player.bostonTeaParty",
+                                 new String [][] {{"%colony%", colony.getName()},
+                                                  {"%amount%", amount},
+                                                  {"%goods%", Goods.getName(goods)}});
+        }
+        freeColClient.getCanvas().showModelMessage(m);
+                         
+        return null;
+    }
+
+
+    
 }

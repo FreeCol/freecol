@@ -98,6 +98,9 @@ public final class AIInGameInputHandler implements MessageHandler {
                     reply = chooseFoundingFather((DummyConnection) connection, element);
                 } else if (type.equals("reconnect")) {            
                     logger.warning("The server requests a reconnect. This means an illegal operation has been performed. Please refer to any previous error message.");
+                } else if (type.equals("acceptTax")) {
+                    reply = acceptTax((DummyConnection) connection, element);
+                } else if (type.equals("removeGoods")) {
                 } else {
                     logger.warning("Message is of unsupported type \"" + type + "\".");
                 }
@@ -168,6 +171,21 @@ public final class AIInGameInputHandler implements MessageHandler {
 
         return reply;
     }
+
+
+    /**
+     * Handles an "acceptTax"-message.
+     *
+     * @param connection The connectio the message was received on.
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *                holds all the information.
+     */
+    private Element acceptTax(DummyConnection connection, Element element) {
+        Element reply = Message.createNewRootElement("acceptTax");
+        reply.setAttribute("accepted", String.valueOf(true));
+
+        return reply;
+    }   
 
     
     /**

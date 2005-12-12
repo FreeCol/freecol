@@ -7,8 +7,11 @@ import java.util.Random;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -115,8 +118,11 @@ public final class InGameController extends Controller {
         freeColServer.getServer().sendToAll(setCurrentPlayerElement, null);
 
         // Ask the player to choose a founding father if none has been chosen:
-        if (nextPlayer.isEuropean() && nextPlayer.getCurrentFather() == -1) {
-            chooseFoundingFather(nextPlayer);
+        if (nextPlayer.isEuropean()) {
+	    if (nextPlayer.getCurrentFather() == -1) {
+		chooseFoundingFather(nextPlayer);
+	    }
+	    getNewTax(nextPlayer);
         }
     }
 
@@ -281,4 +287,81 @@ public final class InGameController extends Controller {
             return true;
         }
     }
+
+    /**
+     * Checks whether the monarch wants to raise taxes.
+     *
+     * @param player The server player.
+     */
+    private void getNewTax(ServerPlayer player) {
+        final ServerPlayer nextPlayer = player;
+        Thread t = new Thread() {
+            public void run() {
+
+                int turn = getFreeColServer().getGame().getTurn().getNumber();
+                int adjustment = ( 6 - nextPlayer.getDifficulty() ) * 10;
+                //remove me
+                //if (turn > adjustment && random.nextInt(adjustment + 40) < 10) {
+                if (true) {
+                    int newTax = nextPlayer.getTax() + random.nextInt(5 + turn/adjustment) + 1;
+		    Element acceptTaxElement = Message.createNewRootElement("acceptTax");
+		    acceptTaxElement.setAttribute("amount", String.valueOf(newTax));
+		    try {
+                        Element reply = nextPlayer.getConnection().ask(acceptTaxElement);
+                        boolean accepted = Boolean.valueOf(reply.getAttribute("accepted")).booleanValue();
+
+			if (accepted) {
+			    nextPlayer.setTax(newTax);
+			} else {
+                            Colony colony = null;
+                            int goods = -1;
+                            int amount = 0;
+                            int value = 0;
+                            Market market = getFreeColServer().getGame().getMarket();
+                            
+                            Iterator colonyIterator = nextPlayer.getColonyIterator();
+                            while (colonyIterator.hasNext()) {
+                                Colony c = (Colony) colonyIterator.next();
+                                Iterator goodsIterator = c.getCompactGoodsIterator();
+                                while (goodsIterator.hasNext()) {
+                                    Goods g = (Goods) goodsIterator.next();
+                                    int type = g.getType();
+                                    if (nextPlayer.getArrears(type) == 0) {
+                                        int number = g.getAmount();
+                                        // never discard more than 100 units
+                                        if (number > 100) {
+                                            number = 100;
+                                        }
+                                        int goodsValue = market.getSalePrice(type, number);
+                                        if (goodsValue > value) {
+                                            value = goodsValue;
+                                            colony = c;
+                                            goods = type;
+                                            amount = number;
+                                        }
+                                    }
+                                }
+                            }                                        
+
+                            Element removeGoodsElement = Message.createNewRootElement("removeGoods");
+                            if (value > 0) {
+                                colony.removeGoods(goods, amount);
+                                nextPlayer.setArrears(goods);
+                                removeGoodsElement.setAttribute("colony", colony.getID());
+                                removeGoodsElement.setAttribute("amount", String.valueOf(amount));
+                                removeGoodsElement.setAttribute("goods", String.valueOf(goods));
+                            }
+                            nextPlayer.getConnection().send(removeGoodsElement);
+                        }
+                    } catch (IOException e) {
+                        logger.warning("Could not send message to: " + nextPlayer.getName());
+                    }
+                }
+            }
+        };
+
+        t.start();
+    }
+
+
 }

@@ -100,8 +100,15 @@ public final class Market extends FreeColGameObject {
      * @param  player The player selling the goods
      */
     public void sell(int type, int amount, Player player) {
-        player.modifyGold(getSalePrice(type, amount));
-        add(type, (player.getNation() == Player.DUTCH) ? (amount/2) : amount);
+        if (player.canSell(type)) {
+            int proceeds = getSalePrice(type, amount);
+            proceeds = ( 100 - player.getTax() ) * proceeds / 100;
+            player.modifyGold(proceeds);
+            add(type, (player.getNation() == Player.DUTCH) ? (amount/2) : amount);
+        } else {
+            addModelMessage(this, "model.europe.market",
+                            new String [][] {{"%goods%", Goods.getName(type)}});
+        }
     }
 
 

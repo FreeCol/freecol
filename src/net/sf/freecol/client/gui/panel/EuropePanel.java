@@ -62,6 +62,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
 
     private final JLabel                    cargoLabel;
     private final JLabel                    goldLabel;
+    private final JLabel                    taxLabel;
     private final JLabel                    toAmericaLabel;
     private final ToAmericaPanel            toAmericaPanel;
     private final ToEuropePanel             toEuropePanel;
@@ -142,6 +143,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
 
         cargoLabel = new JLabel("<html><strike>Cargo</strike></html>");
         goldLabel = new JLabel("Gold: 0");
+	taxLabel = new JLabel("Tax: 0");
 
         JButton recruitButton = new JButton("Recruit"),
                 purchaseButton = new JButton("Purchase"),
@@ -173,6 +175,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         docksLabel.setSize(200, 20);
         cargoLabel.setSize(410, 20);
         goldLabel.setSize(100, 20);
+	taxLabel.setSize(100, 20);
 
         exitButton.setLocation(760, 570);
         recruitButton.setLocation(690, 90);
@@ -190,7 +193,8 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         docksLabel.setLocation(640, 225);
         cargoLabel.setLocation(220, 345);
         goldLabel.setLocation(15, 345);
-
+	taxLabel.setLocation(15, 365);
+	
         setLayout(null);
 
         exitButton.setActionCommand(String.valueOf(EXIT));
@@ -219,6 +223,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         add(docksLabel);
         add(cargoLabel);
         add(goldLabel);
+	add(taxLabel);
 
         try {
             BevelBorder border = new BevelBorder(BevelBorder.RAISED);
@@ -377,6 +382,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             }
         }
 
+        Player player = freeColClient.getMyPlayer();
         for (int i = 0; i < Goods.NUMBER_OF_TYPES; i++) {
             MarketLabel marketLabel = new MarketLabel(i, game.getMarket(), parent);
             marketLabel.setTransferHandler(defaultTransferHandler);
@@ -393,7 +399,9 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                 newLandName = freeColClient.getMyPlayer().getDefaultNewLandName();
             }
             toAmericaLabel.setText("Going to " + newLandName);
-        }
+	    taxLabel.setText("Tax: " + freeColClient.getMyPlayer().getTax() + "%");
+
+	}
     }
 
 
@@ -402,6 +410,13 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
     */
     public void updateGoldLabel() {
         goldLabel.setText("Gold: " + freeColClient.getMyPlayer().getGold());
+    }
+
+    /**
+    * Updates the tax label.
+    */
+    public void updateTaxLabel() {
+        taxLabel.setText("Tax: " + freeColClient.getMyPlayer().getTax() + "%");
     }
 
     /**
@@ -890,10 +905,16 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             if (editState) {
                 if (comp instanceof GoodsLabel) {
                     //comp.getParent().remove(comp);
-                    inGameController.sellGoods(((GoodsLabel)comp).getGoods());
-                    updateCargoLabel();
-                    goldLabel.setText("Gold: " + freeColClient.getMyPlayer().getGold());
-                    goldLabel.repaint(0, 0, goldLabel.getWidth(), goldLabel.getHeight());
+                    Goods goods = ((GoodsLabel) comp).getGoods();
+                    Player player = freeColClient.getMyPlayer();
+                    if (freeColClient.getMyPlayer().canSell(goods)) {
+                        inGameController.sellGoods(goods);
+                        updateCargoLabel();
+                        goldLabel.setText("Gold: " + player.getGold());
+                        goldLabel.repaint(0, 0, goldLabel.getWidth(), goldLabel.getHeight());
+                    } else {
+                        inGameController.payArrears(goods);
+                    }
                     europePanel.getCargoPanel().revalidate();
                     revalidate();
                     europePanel.refresh();

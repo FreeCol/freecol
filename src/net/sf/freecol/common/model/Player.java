@@ -99,6 +99,18 @@ public class Player extends FreeColGameObject {
     /** The maximum line of sight a unit can have in the game. */
     public static final int MAX_LINE_OF_SIGHT = 2;
 
+    /** Constants for describing difficulty level. */
+    public static final int VERY_EASY = 0,
+	EASY = 1,
+	MEDIUM = 2,
+	HARD = 3,
+	VERY_HARD = 4;
+
+    /** 5000 in the original game, IIRC. */
+    public static final int DEFAULT_ARREARS = 50;
+    
+    private int difficulty = 2;
+    
     /**
     * Contains booleans to see which tribes this player has met.
     */
@@ -106,7 +118,7 @@ public class Player extends FreeColGameObject {
 
     /**
     * Only used by AI - stores the tension levels,
-    * 0-1000 with 1000 maximum hostillity.
+    * 0-1000 with 1000 maximum hostility.
     */
     private int[] tension = new int[NUMBER_OF_NATIONS];
 
@@ -155,6 +167,10 @@ public class Player extends FreeColGameObject {
     // any founding fathers in this Player's congress
     private boolean[]       fathers = new boolean[FoundingFather.FATHER_COUNT];
     private int             currentFather;
+
+    /** Market data */
+    private int[]           arrears = new int[Goods.NUMBER_OF_TYPES];
+    private int             tax = 0;     
 
     // 0 = pre-rebels; 1 = in rebellion; 2 = independence granted
     private int             rebellionState;
@@ -247,6 +263,11 @@ public class Player extends FreeColGameObject {
               just before starting the game. See "net.sf.freecol.server.control.PreGameController".
             */
             gold = 0;
+	    
+	    /** No initial arrears. */
+	    for ( int i = 0; i < arrears.length; i++ ) {
+		arrears[i] = 0;
+	    }
         } else {
             gold = 1500;
         }
@@ -869,7 +890,7 @@ public class Player extends FreeColGameObject {
     *
     * @param amount The amount of gold that should be added to this
     *               player's gold amount (can be negative!).
-    * @exception IllegalArgumentException if the player gets a negativ
+    * @exception IllegalArgumentException if the player gets a negative
     *            amount of gold after adding <code>amount</code>.
     */
     public void modifyGold(int amount) {
@@ -1555,8 +1576,11 @@ public class Player extends FreeColGameObject {
         playerElement.setAttribute("dead", Boolean.toString(dead));
         playerElement.setAttribute("rebellionState", Integer.toString(rebellionState));
         playerElement.setAttribute("ai", Boolean.toString(ai));
+        playerElement.setAttribute("tax", Integer.toString(tax));
+        playerElement.setAttribute("difficulty", Integer.toString(difficulty));
         playerElement.appendChild(toArrayElement("tension", tension, document));
         playerElement.appendChild(toArrayElement("stance", stance, document));
+        playerElement.appendChild(toArrayElement("arrears", arrears, document));
 
         if (showAll || equals(player)) {
             playerElement.setAttribute("gold", Integer.toString(gold));
@@ -1621,6 +1645,8 @@ public class Player extends FreeColGameObject {
         ready = (new Boolean(playerElement.getAttribute("ready"))).booleanValue();
         ai = (new Boolean(playerElement.getAttribute("ai"))).booleanValue();
         dead = (new Boolean(playerElement.getAttribute("dead"))).booleanValue();
+        tax = Integer.parseInt(playerElement.getAttribute("tax"));
+        difficulty = Integer.parseInt(playerElement.getAttribute("difficulty"));
         rebellionState = Integer.parseInt(playerElement.getAttribute("rebellionState"));
         currentFather = Integer.parseInt(playerElement.getAttribute("currentFather"));
         crossesRequired = Integer.parseInt(playerElement.getAttribute("crossesRequired"));
@@ -1635,6 +1661,12 @@ public class Player extends FreeColGameObject {
             stance = readFromArrayElement("stance", getChildElement(playerElement, "stance"), new int[0]);
         } else {
             stance = new int[TRIBES.length + NATIONS.length];
+        }
+
+        if (getChildElement(playerElement, "arrears") != null) {
+            arrears = readFromArrayElement("arrears", getChildElement(playerElement, "arrears"), new int[0]);
+        } else {
+            arrears = new int[Goods.NUMBER_OF_TYPES];
         }
 
         if (playerElement.hasAttribute("contacted")) {
@@ -1801,6 +1833,130 @@ public class Player extends FreeColGameObject {
         return bellsNextTurn;
     }
 
+    /**
+     * Returns the arrears due for a type of goods.
+     *
+     * @param typeOfGoods The type of goods.
+     * @return The arrears due for this type of goods.
+     */
+    public int getArrears(int typeOfGoods) {
+	return arrears[typeOfGoods];
+    }
+
+    /**
+     * Returns the arrears due for a type of goods.
+     *
+     * @param goods The goods.
+     * @return The arrears due for this type of goods.
+     */
+    public int getArrears(Goods goods) {
+	return arrears[goods.getType()];
+    }
+
+    /**
+     * Sets the arrears for a type of goods.
+     *
+     * @param typeOfGoods The type of goods.
+     * @param amount The arrears due for this type of goods.
+     */
+    public void setArrears(int typeOfGoods, int amount) {
+	if ( amount < 0 ) {
+	    amount = 0;
+	}
+	arrears[typeOfGoods] = amount;
+    }
+
+    /**
+     * Sets the default arrears for a type of goods.
+     *
+     * @param typeOfGoods The type of goods.
+     */
+    public void setArrears(int typeOfGoods) {
+	arrears[typeOfGoods] = DEFAULT_ARREARS;
+    }
+
+    /**
+     * Sets the arrears for these goods.
+     *
+     * @param goods The goods.
+     * @param amount The arrears due for this type of goods.
+     */
+    public void setArrears(Goods goods, int amount) {
+        setArrears(goods.getType(), amount);
+    }
+    
+    /**
+     * Sets the default arrears for these goods.
+     *
+     * @param goods The goods.
+     */
+    public void setArrears(Goods goods) {
+        setArrears(goods.getType());
+    }
+    
+    /**
+     * Returns true if there are no arrears due for a type of goods.
+     *
+     * @param typeOfGoods The type of goods.
+     * @return True if there are no arrears due for this type of goods.
+     */
+    public boolean canSell(int typeOfGoods) {
+	return arrears[typeOfGoods] == 0;
+    }
+
+    /**
+     * Returns true if there are no arrears due for a type of goods.
+     *
+     * @param goods The goods.
+     * @return True if there are no arrears due for this type of goods.
+     */
+    public boolean canSell(Goods goods) {
+	return arrears[goods.getType()] == 0;
+    }
+
+    /**
+     * Returns the current tax.
+     *
+     * @return The current tax.
+     */
+    public int getTax() {
+	return tax;
+    }
+
+    /**
+     * Sets the current tax.
+     *
+     * @param amount The new tax.
+     */
+    public void setTax(int amount) {
+        tax = amount;
+    }
+
+    /**
+     * Returns the difficulty level.
+     *
+     * @return The difficulty level.
+     */
+    public int getDifficulty() {
+	return difficulty;
+    }
+
+    /**
+     * Sets the difficulty level.
+     *
+     * @param level The difficulty level.
+     */
+    public void setDifficulty(int value) {
+	if ( value == VERY_EASY ||
+	     value == EASY ||
+	     value == MEDIUM ||
+	     value == HARD ||
+	     value == VERY_HARD ) {
+	    difficulty = value;
+	}
+    }
+
+    
     /**
     * An <code>Iterator</code> of {@link Unit}s that can be made active.
     */

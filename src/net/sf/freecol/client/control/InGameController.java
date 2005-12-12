@@ -1565,6 +1565,33 @@ public final class InGameController implements NetworkConstants {
     }
 
 
+    public void payArrears(Goods goods) {
+        Client client = freeColClient.getClient();
+        Game game = freeColClient.getGame();
+        Player player = freeColClient.getMyPlayer();
+        //        Europe europe = myPlayer.getEurope();
+
+        int arrears = player.getArrears(goods);
+        if (player.getGold() >= arrears) {
+            if (freeColClient.getCanvas().
+                showConfirmDialog("model.europe.payArrears",
+                                  "ok", "cancel",
+                                  String.valueOf(arrears))) {
+                player.modifyGold(-arrears);
+                freeColClient.getCanvas().updateGoldLabel();
+                player.setArrears(goods, 0);
+                // send to server
+                Element payArrearsElement = Message.createNewRootElement("payArrears");
+                payArrearsElement.setAttribute("goods", String.valueOf(goods.getType()));
+                client.send(payArrearsElement);        
+            }
+        } else {
+            freeColClient.getCanvas().
+                showInformationMessage("model.europe.cantPayArrears",
+                                       new String [][] {{"%amount%", String.valueOf(arrears)}});
+        }
+    }
+    
     /**
     * Purchases a unit of a specified type in Europe.
     * @param unitType The type of unit to be purchased.
