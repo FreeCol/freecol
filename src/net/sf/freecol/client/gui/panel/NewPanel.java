@@ -18,6 +18,7 @@ import javax.swing.JTextField;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.i18n.Messages;
 
 
 /**
@@ -53,7 +54,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
     private final Canvas        parent;
 
     private final ConnectController connectController;
-    private JButton ok = new JButton("OK");
+    private JButton ok = new JButton( Messages.message("ok") );
 
 
     /**
@@ -64,24 +65,24 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         this.parent = parent;
         this.connectController = connectController;
 
-        JButton         cancel = new JButton("Cancel");
+        JButton         cancel = new JButton( Messages.message("cancel") );
         ButtonGroup     group = new ButtonGroup();
-        JLabel          nameLabel = new JLabel("Name");
+        JLabel          nameLabel = new JLabel( Messages.message("name") );
 
         setCancelComponent(cancel);
 
-        ipLabel = new JLabel("Host");
-        port1Label = new JLabel("Port");
-        port2Label = new JLabel("Start server on port");
-        publicServer = new JCheckBox("Public server");
-        name = new JTextField(System.getProperty("user.name", "Player Name"));
+        ipLabel = new JLabel( Messages.message("host") );
+        port1Label = new JLabel( Messages.message("port") );
+        port2Label = new JLabel( Messages.message("startServerOnPort") );
+        publicServer = new JCheckBox( Messages.message("publicServer") );
+        name = new JTextField( System.getProperty("user.name", Messages.message("defaultPlayerName")) );
         server = new JTextField("127.0.0.1");
         port1 = new JTextField("3541");
         port2 = new JTextField("3541");
-        single = new JRadioButton("Single player game", true);
-        join = new JRadioButton("Join multiplayer game", false);
-        start = new JRadioButton("Start multiplayer game", false);
-        meta = new JRadioButton("Get server list (" + FreeCol.META_SERVER_ADDRESS + ")", false);
+        single = new JRadioButton(Messages.message("singlePlayerGame"), true);
+        join = new JRadioButton(Messages.message("joinMultiPlayerGame"), false);
+        start = new JRadioButton(Messages.message("startMultiplayerGame"), false);
+        meta = new JRadioButton( Messages.message("getServerList") + " (" + FreeCol.META_SERVER_ADDRESS + ")", false);
 
         group.add(single);
         group.add(join);
