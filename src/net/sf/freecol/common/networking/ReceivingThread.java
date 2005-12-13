@@ -26,15 +26,12 @@ final class ReceivingThread extends Thread {
     public static final String  REVISION = "$Revision$";
 
     private final FreeColNetworkInputStream in;
-    private boolean halt;
+    private boolean shouldRun;
 
     private int nextNetworkReplyId = 0;
 
     private Vector threadsWaitingForNetworkReply = new Vector();
     private final Connection connection;
-
-
-
 
 
     /**
@@ -49,11 +46,8 @@ final class ReceivingThread extends Thread {
 
         this.connection = connection;
         this.in = new FreeColNetworkInputStream(in);
-        halt = false;
+        shouldRun = true;
     }
-
-
-
 
 
     /**
@@ -84,140 +78,169 @@ final class ReceivingThread extends Thread {
 
 
     /**
+     * This method is invoked When the thread starts and the thread will stop
+     * when this method returns.
+     */
+    public void run() {
+
+        int  timesFailed = 0;
+
+        // while this thread should run..
+        while ( shouldRun() ) {
+
+            // this core means that no exception will stop this thread unless it
+            // is intended to do so
+            try {
+                listen();
+                timesFailed = 0;
+            }
+            catch ( Exception e ) {
+
+                if ( shouldRun() ) {
+
+                    timesFailed ++;
+
+                    // determine if the message reception should be re-tried and
+                    // unpack the exception if necessary
+                    boolean    shouldRetry;
+                    Exception  exception;
+                    if ( e instanceof SAXException ) {
+
+                        exception = ((SAXException) e).getException();
+                        if ( null == exception ) { exception = e; }
+                        shouldRetry = true;
+                    }
+                    else {
+                        exception = e;
+                        shouldRetry = false;
+                    }
+
+                    // warn of the exception
+                    warnOf( exception );
+
+                    // if the client should be disconnected..
+                    if ( ! shouldRetry  ||  10 < timesFailed ) {
+
+                        disconnect();
+                    }
+                }
+            }
+        }
+    }
+
+
+    /**
     * The method that does it all. Listens to the inputstream and then tries to
     * recognize messages. Calls the messagehandler for each message received.
     */
-    public void run() {
-        Message msg = null;
-        int retry = 0;
+    public void listen() throws Exception {
 
-        while (!isHalted() && (msg == null || !msg.isType("disconnect"))) {
-            msg = null;
-            in.enable();
+        Message  msg = null;
 
-            try {
-                msg = new Message(in);
-            } catch (SAXException sxe) {
-                if (!isHalted()) {
-                    // Error generated during parsing
-                    Exception  x = sxe;
-                    if (sxe.getException() != null) {
-                        x = sxe.getException();
-                    }
-                    StringWriter sw = new StringWriter();
-                    x.printStackTrace(new PrintWriter(sw));
-                    logger.warning(sw.toString());
-                    retry++;
-                    if (retry > 10) {
-                        try {
-                            Element disconnectElement = Message.createNewRootElement("disconnect");
-                            disconnectElement.setAttribute("reason", "SAXException");
-                            connection.getMessageHandler().handle(connection, disconnectElement);
-                        } catch (FreeColException e) {}
-                        break;
-                    } else {
-                        continue;
-                    }
-                } else {
-                    return;
-                }
-            } catch (IOException ioe) {
-                if (!isHalted()) {
-                    // I/O error
-                    StringWriter sw = new StringWriter();
-                    ioe.printStackTrace(new PrintWriter(sw));
-                    logger.warning(sw.toString());
+        in.enable();
 
-                    try {
-                        Element disconnectElement = Message.createNewRootElement("disconnect");
-                        disconnectElement.setAttribute("reason", "IOException");
-                        connection.getMessageHandler().handle(connection, disconnectElement);
-                    } catch (FreeColException e) {}
-                    break;
-                } else {
-                    return;
-                }
-            }
+        msg = new Message(in);
 
-            retry = 0;
-            
-            if (isHalted()) {
-                return;
-            }
-
-            if (msg.isType("invalid")) {
-                logger.warning("--INVALID MESSAGE RECIEVED--");
-            }
-
-            // START DEBUG-LINES:
-            if (FreeCol.isInDebugMode()) {
-                System.out.println(connection.convertElementToString(msg.getDocument().getDocumentElement()));
-                System.out.println();
-                System.out.flush();
-            }
-            // END DEBUB
-
-            if (msg.isType("reply")) { // == this is a reply-message:
-                boolean foundNetworkReplyObject = false;
-
-                for (int i=0; i<threadsWaitingForNetworkReply.size(); i++) {
-                    NetworkReplyObject nro = (NetworkReplyObject) threadsWaitingForNetworkReply.get(i);
-
-                    if (nro.getNetworkReplyId() == Integer.parseInt(msg.getAttribute("networkReplyId"))) {
-                        nro.setResponse(msg);
-                        threadsWaitingForNetworkReply.remove(i);
-                        foundNetworkReplyObject = true;
-                        break; // Should only be one 'NetworkReplyObject' for each 'networkReplyId'.
-                    }
-                }
-
-                if (!foundNetworkReplyObject) {
-                    logger.warning("Could not find networkReplyId=" + msg.getAttribute("networkReplyId"));
-                }
-
-            } else { // == this is not a reply-message:
-                final Message theMsg  = msg;
-
-                /*
-                TODO: The tag "urgent" should be used to mark messages
-                        that should be processed in a separate thread:
-                */
-                Thread t = new Thread() {
-                    public void run() {
-                        connection.handleAndSendReply(theMsg);
-                    }
-                };
-                t.setName("MessageHandler:"+t.getName());
-                t.start();
-            }
+        if ( ! shouldRun() ) {
+            return;
         }
-        
-        stopWorking();
+
+        if (msg.isType("invalid")) {
+            logger.warning("--INVALID MESSAGE RECIEVED--");
+        }
+
+        // START DEBUG-LINES:
+        if (FreeCol.isInDebugMode()) {
+            System.out.println(connection.convertElementToString(msg.getDocument().getDocumentElement()));
+            System.out.println();
+            System.out.flush();
+        }
+        // END DEBUB
+
+        if (msg.isType("reply")) { // == this is a reply-message:
+            boolean foundNetworkReplyObject = false;
+
+            for (int i=0; i<threadsWaitingForNetworkReply.size(); i++) {
+                NetworkReplyObject nro = (NetworkReplyObject) threadsWaitingForNetworkReply.get(i);
+
+                if (nro.getNetworkReplyId() == Integer.parseInt(msg.getAttribute("networkReplyId"))) {
+                    nro.setResponse(msg);
+                    threadsWaitingForNetworkReply.remove(i);
+                    foundNetworkReplyObject = true;
+                    break; // Should only be one 'NetworkReplyObject' for each 'networkReplyId'.
+                }
+            }
+
+            if (!foundNetworkReplyObject) {
+                logger.warning("Could not find networkReplyId=" + msg.getAttribute("networkReplyId"));
+            }
+
+        } else { // == this is not a reply-message:
+            final Message theMsg  = msg;
+
+            /*
+            TODO: The tag "urgent" should be used to mark messages
+                    that should be processed in a separate thread:
+            */
+            Thread t = new Thread() {
+                public void run() {
+                    connection.handleAndSendReply(theMsg);
+                }
+            };
+            t.setName("MessageHandler:"+t.getName());
+            t.start();
+        }
+
+        if ( msg.isType("disconnect") ) {
+
+            askToStop();
+        }
     }
-    
-    
+
+
     /**
     * Checks if this thread has been halted.
     */
-    private synchronized boolean isHalted() {
-        return halt;
+    private synchronized boolean shouldRun() {
+
+        return shouldRun;
     }
 
 
     /**
     * Tells this thread that it doesn't need to do any more work.
     */
-    synchronized void stopWorking() {
-        halt = true;
+    synchronized void askToStop() {
+
+        shouldRun = false;
     }
 
-    
-    
+
+    private void disconnect()
+    {
+        try {
+            Element  disconnectElement = Message.createNewRootElement( "disconnect" );
+            disconnectElement.setAttribute( "reason", "reception exception" );
+            connection.getMessageHandler().handle( connection, disconnectElement );
+        }
+        catch ( FreeColException e ) {
+
+            e.printStackTrace();
+        }
+    }
 
 
-    
+    private void warnOf( Exception e )
+    {
+        StringWriter  stringWriter = new StringWriter();
+        PrintWriter  printWriter = new PrintWriter( stringWriter );
+        e.printStackTrace( printWriter );
+        printWriter.close();
+        logger.warning( stringWriter.toString() );
+    }
 
 
+    // ----------------------------------------------------------- nested types
 
     /**
     * Input stream for buffering the data from the network.
@@ -347,7 +370,7 @@ final class ReceivingThread extends Thread {
         * @param off The offset to use when writing the data to <code>b</code>.
         * @param len Number of bytes to read.
         * @return The actual number of bytes read and <code>-1</code> if the
-        *         message has ended, that is; if the token {@link #END_OF_STREAM} 
+        *         message has ended, that is; if the token {@link #END_OF_STREAM}
         *         is encountered.
         *
         */
@@ -395,4 +418,5 @@ final class ReceivingThread extends Thread {
             return len;
         }
     }
+
 }

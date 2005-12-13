@@ -125,7 +125,7 @@ public class Connection {
     */
     public void reallyClose() throws IOException {
         if (thread != null) {
-            thread.stopWorking();
+            thread.askToStop();
         }
             
         if (out != null) {
