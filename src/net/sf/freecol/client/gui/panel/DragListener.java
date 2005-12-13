@@ -11,10 +11,12 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.TransferHandler;
 
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+
 
 /**
 * A DragListener should be attached to Swing components that have a
@@ -23,6 +25,7 @@ import net.sf.freecol.common.model.Unit;
 * precise).
 */
 public final class DragListener extends MouseAdapter {
+
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
@@ -58,52 +61,52 @@ public final class DragListener extends MouseAdapter {
             JMenuItem menuItem;
             
             if (tempUnit.getLocation() instanceof Tile && tempUnit.getTile().getColony() != null) {
-                menuItem = new JMenuItem("Activate unit");
+                menuItem = new JMenuItem( Messages.message("activateUnit") );
                 menuItem.setActionCommand(String.valueOf(UnitLabel.ACTIVATE_UNIT));
                 menuItem.addActionListener(unitLabel);
                 menuItem.setEnabled((tempUnit.getMovesLeft() > 0));
-                menu.add(menuItem);   
+                menu.add(menuItem);
                 menu.addSeparator();
             }
             
             if ((tempUnit.isColonist() || tempUnit.getType() == Unit.INDIAN_CONVERT) && tempUnit.getLocation() instanceof ColonyTile) {
                 ColonyTile colonyTile = (ColonyTile) tempUnit.getLocation();
-                menuItem = new JMenuItem("Be a Farmer (" + tempUnit.getFarmedPotential(Goods.FOOD, colonyTile.getWorkTile()) + "/"
+                menuItem = new JMenuItem( Messages.message("beAFarmer") + " (" + tempUnit.getFarmedPotential(Goods.FOOD, colonyTile.getWorkTile()) + "/"
                         + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.FOOD) + ")");
                 menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_FOOD));
                 menuItem.addActionListener(unitLabel);
                 menu.add(menuItem);
-                menuItem = new JMenuItem("Be a Sugar Planter (" + tempUnit.getFarmedPotential(Goods.SUGAR, colonyTile.getWorkTile()) + "/"
+                menuItem = new JMenuItem( Messages.message("beASugarPlanter") + " (" + tempUnit.getFarmedPotential(Goods.SUGAR, colonyTile.getWorkTile()) + "/"
                         + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.SUGAR) + ")");
                 menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_SUGAR));
                 menuItem.addActionListener(unitLabel);
                 menu.add(menuItem);
-                menuItem = new JMenuItem("Be a Tobacco Planter (" + tempUnit.getFarmedPotential(Goods.TOBACCO, colonyTile.getWorkTile()) + "/"
+                menuItem = new JMenuItem( Messages.message("beATobaccoPlanter") + " (" + tempUnit.getFarmedPotential(Goods.TOBACCO, colonyTile.getWorkTile()) + "/"
                         + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.TOBACCO) + ")");
                 menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_TOBACCO));
                 menuItem.addActionListener(unitLabel);
                 menu.add(menuItem);
-                menuItem = new JMenuItem("Be a Cotton Planter (" + tempUnit.getFarmedPotential(Goods.COTTON, colonyTile.getWorkTile()) + "/"
+                menuItem = new JMenuItem( Messages.message("beAcottonPlanter") + " (" + tempUnit.getFarmedPotential(Goods.COTTON, colonyTile.getWorkTile()) + "/"
                         + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.COTTON) + ")");
                 menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_COTTON));
                 menuItem.addActionListener(unitLabel);
                 menu.add(menuItem);
-                menuItem = new JMenuItem("Be a Fur Trapper (" + tempUnit.getFarmedPotential(Goods.FURS, colonyTile.getWorkTile()) + "/"
+                menuItem = new JMenuItem( Messages.message("beAFurTrapper") + " (" + tempUnit.getFarmedPotential(Goods.FURS, colonyTile.getWorkTile()) + "/"
                         + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.FURS) + ")");
                 menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_FURS));
                 menuItem.addActionListener(unitLabel);
                 menu.add(menuItem);
-                menuItem = new JMenuItem("Be a Lumberjack (" + tempUnit.getFarmedPotential(Goods.LUMBER, colonyTile.getWorkTile()) + "/"
+                menuItem = new JMenuItem( Messages.message("beALumberjack") + " (" + tempUnit.getFarmedPotential(Goods.LUMBER, colonyTile.getWorkTile()) + "/"
                         + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.LUMBER) + ")");
                 menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_LUMBER));
                 menuItem.addActionListener(unitLabel);
                 menu.add(menuItem);
-                menuItem = new JMenuItem("Be an Ore Miner (" + tempUnit.getFarmedPotential(Goods.ORE, colonyTile.getWorkTile()) + "/"
+                menuItem = new JMenuItem( Messages.message("beAnOreMiner") + " (" + tempUnit.getFarmedPotential(Goods.ORE, colonyTile.getWorkTile()) + "/"
                         + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.ORE) + ")");
                 menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_ORE));
                 menuItem.addActionListener(unitLabel);
                 menu.add(menuItem);
-                menuItem = new JMenuItem("Be a Silver Miner (" + tempUnit.getFarmedPotential(Goods.SILVER, colonyTile.getWorkTile()) + "/"
+                menuItem = new JMenuItem( Messages.message("beASilverMiner") + " (" + tempUnit.getFarmedPotential(Goods.SILVER, colonyTile.getWorkTile()) + "/"
                         + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.SILVER) + ")");
                 menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_SILVER));
                 menuItem.addActionListener(unitLabel);
@@ -116,12 +119,12 @@ public final class DragListener extends MouseAdapter {
             if (tempUnit.isColonist()) {
                 if (!tempUnit.isPioneer() && !tempUnit.isMissionary() && tempUnit.canArm()) {
                     if (tempUnit.isArmed()) {
-                        menuItem = new JMenuItem("Disarm");
+                        menuItem = new JMenuItem( Messages.message("disarm") );
                     } else {
                         if (tempUnit.getTile() == null) { // -> in Europe
-                            menuItem = new JMenuItem("Arm (" + tempUnit.getGame().getMarket().getBidPrice(Goods.MUSKETS, 50) + " gold)");
+                            menuItem = new JMenuItem( Messages.message("arm") + " (" + tempUnit.getGame().getMarket().getBidPrice(Goods.MUSKETS, 50) + " gold)");
                         } else {
-                            menuItem = new JMenuItem("Arm");
+                            menuItem = new JMenuItem( Messages.message("arm") );
                         }
                     }
                     menuItem.setActionCommand(String.valueOf(UnitLabel.ARM));
@@ -131,12 +134,12 @@ public final class DragListener extends MouseAdapter {
 
                 if (!tempUnit.isPioneer() && !tempUnit.isMissionary() && tempUnit.canMount()) {
                     if (tempUnit.isMounted()) {
-                        menuItem = new JMenuItem("Remove Horses");
+                        menuItem = new JMenuItem( Messages.message("removeHorses") );
                     } else {
                         if (tempUnit.getTile() == null) { // -> in Europe
-                            menuItem = new JMenuItem("Mount (" + tempUnit.getGame().getMarket().getBidPrice(Goods.HORSES, 50) + " gold)");
+                            menuItem = new JMenuItem( Messages.message("mount") + " (" + tempUnit.getGame().getMarket().getBidPrice(Goods.HORSES, 50) + " gold)" );
                         } else {
-                            menuItem = new JMenuItem("Mount");
+                            menuItem = new JMenuItem( Messages.message("mount") );
                         }
                     }
                     menuItem.setActionCommand(String.valueOf(UnitLabel.MOUNT));
@@ -146,13 +149,13 @@ public final class DragListener extends MouseAdapter {
 
                 if (!tempUnit.isArmed() && !tempUnit.isMounted() && !tempUnit.isMissionary() && tempUnit.canEquipWithTools()) {
                     if (tempUnit.isPioneer()) {
-                        menuItem = new JMenuItem("Remove Tools");
+                        menuItem = new JMenuItem( Messages.message("removeTools") );
                     } else {
                         if (tempUnit.getTile() == null) { // -> in Europe
                             int amount = 100;
                             int price = tempUnit.getGame().getMarket().getBidPrice(Goods.TOOLS, amount);
                             if (price <= tempUnit.getOwner().getGold()) {
-                                menuItem = new JMenuItem("Equip with Tools (" + price + " gold)");
+                                menuItem = new JMenuItem( Messages.message("equipWithTools") + " (" + price + " gold)" );
                             } else {
                                 while (price > tempUnit.getOwner().getGold()) {
                                     amount -= 20;
@@ -162,7 +165,7 @@ public final class DragListener extends MouseAdapter {
 
                             }
                         } else {
-                            menuItem = new JMenuItem("Equip with Tools");
+                            menuItem = new JMenuItem( Messages.message("equipWithTools") );
                         }
                     }
                     menuItem.setActionCommand(String.valueOf(UnitLabel.TOOLS));
@@ -173,9 +176,9 @@ public final class DragListener extends MouseAdapter {
                 if (!tempUnit.isArmed() && !tempUnit.isMounted() && !tempUnit.isPioneer() && tempUnit.canDressAsMissionary()) {
 
                     if (tempUnit.isMissionary()) {
-                        menuItem = new JMenuItem("Take Off Silly Clothes");
+                        menuItem = new JMenuItem( Messages.message("cancelMissionaryStatus") );
                     } else {
-                        menuItem = new JMenuItem("Dress as Missionaries");
+                        menuItem = new JMenuItem( Messages.message("blessAsMissionaries") );
                     }
                     menuItem.setActionCommand(String.valueOf(UnitLabel.DRESS));
                     menuItem.addActionListener(unitLabel);
@@ -189,7 +192,7 @@ public final class DragListener extends MouseAdapter {
                         menu.addSeparator();
                     }
 
-                    menuItem = new JMenuItem("Clear speciality");
+                    menuItem = new JMenuItem( Messages.message("clearSpeciality") );
                     menuItem.setActionCommand(String.valueOf(UnitLabel.CLEAR_SPECIALITY));
                     menuItem.addActionListener(unitLabel);
                     menu.add(menuItem);

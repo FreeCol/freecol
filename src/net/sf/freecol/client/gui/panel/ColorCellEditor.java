@@ -18,6 +18,7 @@ import javax.swing.border.BevelBorder;
 import javax.swing.table.TableCellEditor;
 
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Player;
 
 /**
@@ -61,8 +62,8 @@ public final class ColorCellEditor extends AbstractCellEditor implements TableCe
         public ColorChooserPanel(ActionListener l) {
             lastRow = -1;
 
-            JButton okButton = new JButton("OK");
-            JButton cancelButton = new JButton("Cancel");
+            JButton okButton = new JButton( Messages.message("ok") );
+            JButton cancelButton = new JButton( Messages.message("cancel") );
 
             colorChooser.setSize(450, 350);
             okButton.setSize(80, 20);
