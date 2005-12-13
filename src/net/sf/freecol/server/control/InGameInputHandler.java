@@ -1588,11 +1588,15 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
 
         int goods = new Integer(payArrearsElement.getAttribute("goods")).intValue();
         int arrears = player.getArrears(goods);
-        if (player.getGold() < arrears) {
+        
+        if (player.hasFather(FoundingFather.JACOB_FUGGER)) {
+            player.setArrears(goods, 0);
+        } else if (player.getGold() < arrears) {
             throw new IllegalStateException("Not enough gold to pay tax arrears!");
+        } else {
+            player.modifyGold(-arrears);
+            player.setArrears(goods, 0);
         }
-        player.modifyGold(-arrears);
-        player.setArrears(goods, 0);
 
         return null;
     }

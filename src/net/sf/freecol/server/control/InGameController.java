@@ -313,31 +313,26 @@ public final class InGameController extends Controller {
 			if (accepted) {
 			    nextPlayer.setTax(newTax);
 			} else {
-                            Colony colony = null;
-                            int goods = -1;
-                            int amount = 0;
+                            Goods goods = null;
+                            Game game = getFreeColServer().getGame();
+                            Market market = game.getMarket();
                             int value = 0;
-                            Market market = getFreeColServer().getGame().getMarket();
                             
                             Iterator colonyIterator = nextPlayer.getColonyIterator();
                             while (colonyIterator.hasNext()) {
-                                Colony c = (Colony) colonyIterator.next();
-                                Iterator goodsIterator = c.getCompactGoodsIterator();
+                                Colony colony = (Colony) colonyIterator.next();
+                                Iterator goodsIterator = colony.getCompactGoodsIterator();
                                 while (goodsIterator.hasNext()) {
-                                    Goods g = (Goods) goodsIterator.next();
-                                    int type = g.getType();
-                                    if (nextPlayer.getArrears(type) == 0) {
-                                        int number = g.getAmount();
+                                    Goods currentGoods = (Goods) goodsIterator.next();
+                                    if (nextPlayer.getArrears(currentGoods) == 0) {
                                         // never discard more than 100 units
-                                        if (number > 100) {
-                                            number = 100;
+                                        if (currentGoods.getAmount() > 100) {
+                                            currentGoods.setAmount(100);
                                         }
-                                        int goodsValue = market.getSalePrice(type, number);
+                                        int goodsValue = market.getSalePrice(currentGoods);
                                         if (goodsValue > value) {
                                             value = goodsValue;
-                                            colony = c;
-                                            goods = type;
-                                            amount = number;
+                                            goods = currentGoods;
                                         }
                                     }
                                 }
@@ -345,11 +340,12 @@ public final class InGameController extends Controller {
 
                             Element removeGoodsElement = Message.createNewRootElement("removeGoods");
                             if (value > 0) {
-                                colony.removeGoods(goods, amount);
-                                nextPlayer.setArrears(goods);
-                                removeGoodsElement.setAttribute("colony", colony.getID());
-                                removeGoodsElement.setAttribute("amount", String.valueOf(amount));
-                                removeGoodsElement.setAttribute("goods", String.valueOf(goods));
+                                ((Colony) goods.getLocation()).removeGoods(goods);
+                                if (!nextPlayer.hasFather(FoundingFather.JACOB_FUGGER)) {
+                                    nextPlayer.setArrears(goods);
+                                }
+                                removeGoodsElement.appendChild(goods.toXMLElement(nextPlayer,
+                                                                                  removeGoodsElement.getOwnerDocument()));
                             }
                             nextPlayer.getConnection().send(removeGoodsElement);
                         }

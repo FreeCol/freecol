@@ -557,25 +557,30 @@ public final class InGameInputHandler extends InputHandler {
      */
     private Element removeGoods(Element element) {
         final FreeColClient freeColClient = getFreeColClient();
-        String colonyID = element.getAttribute("colony");
+        Game game = getFreeColClient().getGame();
         ModelMessage m = null;
-        
-        if (colonyID.equals("")) {
+
+        NodeList nodeList = element.getChildNodes();
+        Element goodsElement = (Element) nodeList.item(0);
+
+        if (goodsElement == null) {
             // player has no colony or nothing to trade
             m = new ModelMessage(null, "model.player.taxWaived", null);
         } else {
-            Colony colony = (Colony) freeColClient.getGame().getFreeColGameObject(colonyID);
-            String amount = element.getAttribute("amount");
-            int goods = new Integer(element.getAttribute("goods")).intValue();
+            Goods goods = new Goods(game, goodsElement);
+            Colony colony = (Colony) goods.getLocation();
+            colony.removeGoods(goods);
 
-            colony.removeGoods(goods, new Integer(amount).intValue());
-            freeColClient.getMyPlayer().setArrears(goods);
+            Player player = freeColClient.getMyPlayer();
+            if (!player.hasFather(FoundingFather.JACOB_FUGGER)) {
+                player.setArrears(goods);
+            }
         
             m = new ModelMessage(colony,
                                  "model.player.bostonTeaParty",
                                  new String [][] {{"%colony%", colony.getName()},
-                                                  {"%amount%", amount},
-                                                  {"%goods%", Goods.getName(goods)}});
+                                                  {"%amount%", String.valueOf(goods.getAmount())},
+                                                  {"%goods%", goods.getName()}});
         }
         freeColClient.getCanvas().showModelMessage(m);
                          

@@ -1565,11 +1565,15 @@ public final class InGameController implements NetworkConstants {
     }
 
 
+    /**
+     * Pays the tax arrears on this type of goods.
+     *
+     * @param goods The goods for which to pay arrears.
+     */
     public void payArrears(Goods goods) {
         Client client = freeColClient.getClient();
         Game game = freeColClient.getGame();
         Player player = freeColClient.getMyPlayer();
-        //        Europe europe = myPlayer.getEurope();
 
         int arrears = player.getArrears(goods);
         if (player.getGold() >= arrears) {
@@ -1579,6 +1583,7 @@ public final class InGameController implements NetworkConstants {
                                   String.valueOf(arrears))) {
                 player.modifyGold(-arrears);
                 freeColClient.getCanvas().updateGoldLabel();
+                freeColClient.getCanvas().getEuropePanel().updateGoldLabel();
                 player.setArrears(goods, 0);
                 // send to server
                 Element payArrearsElement = Message.createNewRootElement("payArrears");
