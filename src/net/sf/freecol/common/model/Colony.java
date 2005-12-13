@@ -515,6 +515,10 @@ public final class Colony extends Settlement implements Location {
     public void removeGoods(int type, int amount) {
         goodsContainer.removeGoods(type, amount);
     }
+
+    public void removeGoods(Goods goods) {
+        goodsContainer.removeGoods(goods.getType(), goods.getAmount());
+    }
     
     
     public void addGoods(int type, int amount) {

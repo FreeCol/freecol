@@ -1901,7 +1901,8 @@ public class Player extends FreeColGameObject {
      * @return True if there are no arrears due for this type of goods.
      */
     public boolean canSell(int typeOfGoods) {
-	return arrears[typeOfGoods] == 0;
+	return (arrears[typeOfGoods] == 0 ||
+                hasFather(FoundingFather.JACOB_FUGGER));
     }
 
     /**
@@ -1911,7 +1912,8 @@ public class Player extends FreeColGameObject {
      * @return True if there are no arrears due for this type of goods.
      */
     public boolean canSell(Goods goods) {
-	return arrears[goods.getType()] == 0;
+	return (arrears[goods.getType()] == 0 ||
+                hasFather(FoundingFather.JACOB_FUGGER));
     }
 
     /**

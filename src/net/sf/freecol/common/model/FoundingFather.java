@@ -13,7 +13,7 @@ public class FoundingFather {
     // Remember to update the list in "getWeight" when you add an effect to a founding father:
     public static final int NONE = -1,
                             ADAM_SMITH = 0,
-                            JACOB_FUGGER = 1, //TODO
+                            JACOB_FUGGER = 1,
                             PETER_MINUIT = 2,
                             PETER_STUYVESANT = 3, //TODO
                             JAN_DE_WITT = 4, //TODO
@@ -149,10 +149,10 @@ public class FoundingFather {
 
     public static int getWeight(int foundingFather, int age) {
         // This is the list of the founding fathers without effects:
-        if (foundingFather == JACOB_FUGGER || foundingFather == PETER_STUYVESANT ||
-                foundingFather == JAN_DE_WITT || foundingFather == HERNANDO_DE_SOTO ||
-                foundingFather == THOMAS_PAINE || foundingFather == BENJAMIN_FRANKLIN ||
-                foundingFather == JUAN_DE_SEPULVEDA) {
+        if (foundingFather == PETER_STUYVESANT ||
+            foundingFather == JAN_DE_WITT || foundingFather == HERNANDO_DE_SOTO ||
+            foundingFather == THOMAS_PAINE || foundingFather == BENJAMIN_FRANKLIN ||
+            foundingFather == JUAN_DE_SEPULVEDA) {
             return 0;
         }
         if (age == 1) {

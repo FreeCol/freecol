@@ -217,6 +217,10 @@ public final class Market extends FreeColGameObject {
         return (amount * data.paidForSale);
     }
 
+    public int getSalePrice(Goods goods) {
+        return getSalePrice(goods.getType(), goods.getAmount());
+    }
+
 
     // -------------------------------------------------------- support methods
 

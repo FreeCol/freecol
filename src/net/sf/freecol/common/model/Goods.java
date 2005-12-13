@@ -3,9 +3,10 @@ package net.sf.freecol.common.model;
 
 import java.util.logging.Logger;
 
+import net.sf.freecol.client.gui.i18n.Messages;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 
 /**
 * Represents a locatable goods of a specified type and amount.
@@ -107,12 +108,23 @@ public class Goods implements Locatable, Ownable {
 
 
     /**
-    * Returns the name of this type of goods.
-    */
+     * Returns the name of this type of goods.
+     *
+     * @returns The name of this type of goods.
+     */
     public String getName() {
         return getName(type);
     }
     
+    /**
+     * Returns the name of this type of goods.
+     *
+     * @param sellable Whether this type of goods is sellable;
+     * @returns The name of this type of goods.
+     */
+    public String getName(boolean sellable) {
+        return getName(type, sellable);
+    }
     
     /**
     * Returns the <code>Tile</code> where this <code>Goods</code> is located, 
@@ -207,27 +219,35 @@ public class Goods implements Locatable, Ownable {
      */
     public static String getName(int type) {
         switch(type) {
-            case FOOD: return "Food";
-            case SUGAR: return "Sugar";
-            case TOBACCO: return "Tobacco";
-            case COTTON: return "Cotton";
-            case FURS: return "Furs";
-            case LUMBER: return "Lumber";
-            case ORE:return "Ore";
-            case SILVER: return "Silver";
-            case HORSES: return "Horses";
-            case RUM: return "Rum";
-            case CIGARS: return "Cigars";
-            case CLOTH: return "Cloth";
-            case COATS: return "Coats";
-            case TRADE_GOODS: return "Trade Goods";
-            case TOOLS: return "Tools";
-            case MUSKETS: return "Muskets";
-            case FISH: return "Fish";// = 16, // Stored as food.
-            case BELLS: return "Bells";
-            case CROSSES: return "Crosses";
-            case HAMMERS: return "Hammers";
-            default: return "Unknown";
+            case FOOD: return Messages.message("model.goods.Food");
+            case SUGAR: return Messages.message("model.goods.Sugar");
+            case TOBACCO: return Messages.message("model.goods.Tobacco");
+            case COTTON: return Messages.message("model.goods.Cotton");
+            case FURS: return Messages.message("model.goods.Furs");
+            case LUMBER: return Messages.message("model.goods.Lumber");
+            case ORE:return Messages.message("model.goods.Ore");
+            case SILVER: return Messages.message("model.goods.Silver");
+            case HORSES: return Messages.message("model.goods.Horses");
+            case RUM: return Messages.message("model.goods.Rum");
+            case CIGARS: return Messages.message("model.goods.Cigars");
+            case CLOTH: return Messages.message("model.goods.Cloth");
+            case COATS: return Messages.message("model.goods.Coats");
+            case TRADE_GOODS: return Messages.message("model.goods.TradeGoods");
+            case TOOLS: return Messages.message("model.goods.Tools");
+            case MUSKETS: return Messages.message("model.goods.Muskets");
+            case FISH: return Messages.message("model.goods.Fish");// = 16, // Stored as food.
+            case BELLS: return Messages.message("model.goods.Bells");
+            case CROSSES: return Messages.message("model.goods.Crosses");
+            case HAMMERS: return Messages.message("model.goods.Hammers");
+            default: return Messages.message("model.goods.Unknown");
+        }
+    }
+
+    public static String getName(int type, boolean sellable) {
+        if (sellable) {
+            return getName(type);
+        } else {
+            return getName(type) + " (" + Messages.message("model.goods.Boycotted") + ")";
         }
     }
 
