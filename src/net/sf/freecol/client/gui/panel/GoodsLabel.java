@@ -15,6 +15,9 @@ import javax.swing.JLabel;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Ownable;
+import net.sf.freecol.common.model.Player;
 
 
 /**
@@ -105,12 +108,22 @@ public final class GoodsLabel extends JLabel implements ActionListener {
     * @param g The graphics context in which to do the painting.
     */
     public void paintComponent(Graphics g) {
-        if (!getToolTipText().equals(goods.getName())) {
+        Player player = null;
+        Location location = goods.getLocation();
+        
+        if (location instanceof Ownable) {
+            player = ((Ownable) location).getOwner();
+        }
+        if (player == null || player.canSell(goods)) {
             setToolTipText(goods.getName());
+            setEnabled(true);
+        } else {
+            setToolTipText(goods.getName(false));
+            setEnabled(false);
         }
 
-        if (goods.getType() != Goods.FOOD && goods.getLocation() instanceof Colony 
-                && ((Colony) goods.getLocation()).getWarehouseCapacity() < goods.getAmount()) {
+        if (goods.getType() != Goods.FOOD && location instanceof Colony 
+                && ((Colony) location).getWarehouseCapacity() < goods.getAmount()) {
             setForeground(Color.RED);
         } else {
             setForeground(Color.BLACK);
