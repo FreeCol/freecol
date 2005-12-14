@@ -67,10 +67,8 @@
   	<!-- Copy the jar files unless the "nojars" property has been defined -->
   	<antcall target="copy-jar-files"/>
     
-    <copy todir="${freecol.build.dir}">
-        <fileset dir="${freecol.src.dir}" includes="**/*.properties"
-            excludes="classes/**" />
-    </copy>
+    <native2ascii src="${freecol.src.dir}" dest="${freecol.build.dir}"
+                  includes="**/*.properties" excludes="classes/**" />
   </target>
 
   <target name="package" depends="init,build">
