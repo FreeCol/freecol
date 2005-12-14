@@ -168,7 +168,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         outsideColonyPanel.setLayout(new GridLayout(0 , 2));
         inPortPanel.setLayout(new GridLayout(0 , 2));
         cargoPanel.setLayout(new GridLayout(1 , 0));
-        warehousePanel.setLayout(new GridLayout(1 , 0));
+        warehousePanel.setLayout(new GridLayout(2 , 8));
 
         goldLabel = new JLabel("Gold: 0");
 
@@ -1147,7 +1147,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
         public void initialize() {
             warehousePanel.removeAll();
-            Iterator goodsIterator = colony.getCompactGoodsIterator();
+            Iterator goodsIterator = colony.getGoodsContainer().getFullGoodsIterator();
             while (goodsIterator.hasNext()) {
                 Goods goods = (Goods) goodsIterator.next();
 

@@ -214,6 +214,24 @@ public class GoodsContainer extends FreeColGameObject {
         return totalGoods.iterator();
     }
 
+    /**
+    * Gets an <code>Iterator</code> of every <code>Goods</code> in this
+    * <code>GoodsContainer</code>. There is only one <code>Goods</code>
+    * for each type of goods.
+    *
+    * @return The <code>Iterator</code>.
+    * @see #getGoodsIterator
+    */
+    public Iterator getFullGoodsIterator() {
+        ArrayList totalGoods = new ArrayList();
+
+        for (int i=0; i<storedGoods.length; i++) {
+            totalGoods.add(new Goods(getGame(), parent, i, storedGoods[i]));
+        }
+
+        return totalGoods.iterator();
+    }
+
 
     /**
     * Gets the first <code>Goods</code> in this <code>GoodsContainer</code>.

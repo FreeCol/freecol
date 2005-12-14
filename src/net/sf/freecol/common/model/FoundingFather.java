@@ -15,7 +15,7 @@ public class FoundingFather {
                             ADAM_SMITH = 0,
                             JACOB_FUGGER = 1,
                             PETER_MINUIT = 2,
-                            PETER_STUYVESANT = 3, //TODO
+                            PETER_STUYVESANT = 3, 
                             JAN_DE_WITT = 4, //TODO
                             FERDINAND_MAGELLAN = 5, //TODO - decreased sailing time to europe
                             FRANSICO_DE_CORONADO = 6,
@@ -149,8 +149,7 @@ public class FoundingFather {
 
     public static int getWeight(int foundingFather, int age) {
         // This is the list of the founding fathers without effects:
-        if (foundingFather == PETER_STUYVESANT ||
-            foundingFather == JAN_DE_WITT || foundingFather == HERNANDO_DE_SOTO ||
+        if (foundingFather == JAN_DE_WITT || foundingFather == HERNANDO_DE_SOTO ||
             foundingFather == THOMAS_PAINE || foundingFather == BENJAMIN_FRANKLIN ||
             foundingFather == JUAN_DE_SEPULVEDA) {
             return 0;

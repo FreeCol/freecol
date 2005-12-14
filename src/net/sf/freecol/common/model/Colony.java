@@ -32,7 +32,8 @@ public final class Colony extends Settlement implements Location {
     private ArrayList workLocations = new ArrayList();
 
     private GoodsContainer goodsContainer;
-
+    private boolean[] exports;
+    
     private int hammers;
     private int bells;
     
@@ -78,7 +79,11 @@ public final class Colony extends Settlement implements Location {
         super(game, owner, tile);
 
         goodsContainer = new GoodsContainer(game, this);
-
+        exports = new boolean[Goods.NUMBER_OF_TYPES];
+        for (int i = 0; i < exports.length; i++) {
+            exports[i] = false;
+        }
+        
         this.name = name;
         
         hammers = 0;
@@ -548,7 +553,6 @@ public final class Colony extends Settlement implements Location {
     public Iterator getGoodsIterator() {
         return goodsContainer.getGoodsIterator();
     }
-    
 
     /**
     * Gets an <code>Iterator</code> of every <code>Goods</code> in this
@@ -561,7 +565,26 @@ public final class Colony extends Settlement implements Location {
         return goodsContainer.getCompactGoodsIterator();
     }
 
+    public boolean getExports(int type) {
+        return exports[type];
+    }
 
+    public boolean getExports(Goods goods) {
+        return exports[goods.getType()];
+    }
+    
+    public void toggleExports(int type) {
+        if (exports[type]) {
+            exports[type] = false;
+        } else {
+            exports[type] = true;
+        }
+    }
+
+    public void toggleExports(Goods goods) {
+        toggleExports(goods.getType());
+    }
+    
     public boolean contains(Locatable locatable) {
         throw new UnsupportedOperationException();
     }
@@ -1105,6 +1128,17 @@ public final class Colony extends Settlement implements Location {
         // Build:
         checkBuildingComplete();
 
+        // Export goods if custom house is built
+        if (getBuilding(Building.CUSTOM_HOUSE).isBuilt()) {
+            Iterator goodsIterator = getCompactGoodsIterator();
+            while (goodsIterator.hasNext()) {
+                Goods goods = (Goods) goodsIterator.next();
+                if (getExports(goods) && owner.canSell(goods)) {
+                    getGame().getMarket().sell(goods, owner);
+                }
+            }
+        }                
+        
         // Throw away goods there is no room for.
         goodsContainer.cleanAndReport(getWarehouseCapacity(), new int [] {200, 100});
 
@@ -1156,6 +1190,12 @@ public final class Colony extends Settlement implements Location {
             colonyElement.setAttribute("bells", Integer.toString(bells));
             colonyElement.setAttribute("currentlyBuilding", Integer.toString(currentlyBuilding));
 
+            char[] exportsCharArray = new char[exports.length];
+            for(int i = 0; i < exports.length; i++) {
+                exportsCharArray[i] = (exports[i] ? '1' : '0');
+            }
+            colonyElement.setAttribute("exports", new String(exportsCharArray));
+
             Iterator workLocationIterator = workLocations.iterator();
             while (workLocationIterator.hasNext()) {
                 colonyElement.appendChild(((FreeColGameObject) workLocationIterator.next()).toXMLElement(player, document, showAll, toSavedGame));
@@ -1204,6 +1244,14 @@ public final class Colony extends Settlement implements Location {
             unitCount = Integer.parseInt(colonyElement.getAttribute("unitCount"));
         } else {
             unitCount = -1;
+        }
+
+        if (colonyElement.hasAttribute("exports")) {
+            exports = new boolean[Goods.NUMBER_OF_TYPES];
+            String exportString = colonyElement.getAttribute("exports");
+            for(int i = 0; i < exportString.length(); i++) {
+                exports[i] = ( (exportString.charAt(i) == '1') ? true : false );
+            }
         }
 
         NodeList childNodes = colonyElement.getChildNodes();

@@ -107,7 +107,7 @@ public class Player extends FreeColGameObject {
 	VERY_HARD = 4;
 
     /** 5000 in the original game, IIRC. */
-    public static final int DEFAULT_ARREARS = 50;
+    public static final int DEFAULT_ARREARS = 5000;
     
     private int difficulty = 2;
     
@@ -1872,7 +1872,7 @@ public class Player extends FreeColGameObject {
      * @param typeOfGoods The type of goods.
      */
     public void setArrears(int typeOfGoods) {
-	arrears[typeOfGoods] = DEFAULT_ARREARS;
+	arrears[typeOfGoods] = (difficulty + 3) * 1000;
     }
 
     /**

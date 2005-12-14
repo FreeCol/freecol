@@ -299,10 +299,9 @@ public final class InGameController extends Controller {
             public void run() {
 
                 int turn = getFreeColServer().getGame().getTurn().getNumber();
-                int adjustment = ( 6 - nextPlayer.getDifficulty() ) * 10;
-                //remove me
-                //if (turn > adjustment && random.nextInt(adjustment + 40) < 10) {
-                if (true) {
+                // don't raise taxes during the first few turns
+                int adjustment = ( 6 - nextPlayer.getDifficulty() ) * 10; // 20-60
+                if (turn > adjustment && random.nextInt(adjustment + 40) < 10) {
                     int newTax = nextPlayer.getTax() + random.nextInt(5 + turn/adjustment) + 1;
 		    Element acceptTaxElement = Message.createNewRootElement("acceptTax");
 		    acceptTaxElement.setAttribute("amount", String.valueOf(newTax));

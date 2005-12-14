@@ -298,7 +298,11 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             return false;
         }
         if (getType() == CUSTOM_HOUSE) {
-            return false;
+            if (getColony().getOwner().hasFather(FoundingFather.PETER_STUYVESANT)) {
+                return true;
+            } else {
+                return false;
+            }
         }
         if (level+1 >= FACTORY && !getColony().getOwner().hasFather(FoundingFather.ADAM_SMITH)
                 && (type == BLACKSMITH || type == TOBACCONIST || type == WEAVER

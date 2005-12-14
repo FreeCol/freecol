@@ -125,6 +125,11 @@ public final class GoodsLabel extends JLabel implements ActionListener {
         if (goods.getType() != Goods.FOOD && location instanceof Colony 
                 && ((Colony) location).getWarehouseCapacity() < goods.getAmount()) {
             setForeground(Color.RED);
+        } else if (location instanceof Colony && location != null &&
+                   ((Colony) location).getExports(goods)) {
+            setForeground(Color.GREEN);
+        } else if (goods.getAmount() == 0) {
+            setForeground(Color.GRAY);
         } else {
             setForeground(Color.BLACK);
         }
