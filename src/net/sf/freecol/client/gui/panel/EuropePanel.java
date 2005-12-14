@@ -32,6 +32,8 @@ import javax.swing.border.BevelBorder;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.MessageLabel;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
@@ -145,19 +147,19 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         goldLabel = new JLabel("Gold: 0");
 	taxLabel = new JLabel("Tax: 0");
 
-        JButton recruitButton = new JButton("Recruit"),
-                purchaseButton = new JButton("Purchase"),
-                trainButton = new JButton("Train");
+        JButton recruitButton = new JButton( Messages.message("recruit") ),
+                purchaseButton = new JButton( Messages.message("purchase") ),
+                trainButton = new JButton( Messages.message("train") );
         JScrollPane toAmericaScroll = new JScrollPane(toAmericaPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER),
                     toEuropeScroll = new JScrollPane(toEuropePanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER),
                     inPortScroll = new JScrollPane(inPortPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER),
                     docksScroll = new JScrollPane(docksPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER),
                     cargoScroll = new JScrollPane(cargoPanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED),
                     marketScroll = new JScrollPane(marketPanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-                toAmericaLabel = new JLabel("Going to America");
-        JLabel  toEuropeLabel = new JLabel("Going to Europe"),
-                inPortLabel = new JLabel("In port"),
-                docksLabel = new JLabel("Docks");
+                toAmericaLabel = new JLabel( Messages.message("goingToAmerica") );
+        JLabel  toEuropeLabel = new JLabel( Messages.message("goingToEurope") ),
+                inPortLabel = new JLabel( Messages.message("inPort") ),
+                docksLabel = new JLabel( Messages.message("docks") );
 
         exitButton.setSize(80, 20);
         recruitButton.setSize(100, 20);
@@ -398,8 +400,8 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             if (newLandName == null) {
                 newLandName = freeColClient.getMyPlayer().getDefaultNewLandName();
             }
-            toAmericaLabel.setText("Going to " + newLandName);
-	    taxLabel.setText("Tax: " + freeColClient.getMyPlayer().getTax() + "%");
+            toAmericaLabel.setText( Messages.message("goingTo") + " " + newLandName );
+	    taxLabel.setText( Messages.message("tax") + ": " + freeColClient.getMyPlayer().getTax() + "%" );
 
 	}
     }
@@ -409,14 +411,14 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
     * Updates the gold label.
     */
     public void updateGoldLabel() {
-        goldLabel.setText("Gold: " + freeColClient.getMyPlayer().getGold());
+        goldLabel.setText( Messages.message("goldTitle") + ": " + freeColClient.getMyPlayer().getGold() );
     }
 
     /**
     * Updates the tax label.
     */
     public void updateTaxLabel() {
-        taxLabel.setText("Tax: " + freeColClient.getMyPlayer().getTax() + "%");
+        taxLabel.setText( Messages.message("tax") + ": " + freeColClient.getMyPlayer().getTax() + "%" );
     }
 
     /**
@@ -841,7 +843,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     inGameController.buyGoods(((MarketLabel)comp).getType(), ((MarketLabel)comp).getAmount(), selectedUnit.getUnit());
 
                     updateCargoLabel();
-                    goldLabel.setText("Gold: " + freeColClient.getMyPlayer().getGold());
+                    goldLabel.setText( Messages.message("goldTitle") + ": " + freeColClient.getMyPlayer().getGold() );
                     goldLabel.repaint(0, 0, goldLabel.getWidth(), goldLabel.getHeight());
 
                     // TODO: Make this look prettier :-)
@@ -1010,10 +1012,10 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             setFocusCycleRoot(true);
             ActionListener actionListener = this;
 
-            JLabel  question = new JLabel("Click one of the following individuals to"),
-                    question2 = new JLabel("recruit them."),
-                    priceLabel = new JLabel("Their price:");
-            cancel = new JButton("Cancel");
+            JLabel  question = new MessageLabel( "clickAnIndividual" ),
+                    question2 = new MessageLabel( "recruitThem" ),
+                    priceLabel = new MessageLabel( "theirPrice" );
+            cancel = new JButton( Messages.message("cancel") );
             setCancelComponent(cancel);
 
             price = new JLabel();
@@ -1083,7 +1085,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         */
         public void initialize() {
             if ((game != null) && (freeColClient.getMyPlayer() != null)) {
-                price.setText(Integer.toString(freeColClient.getMyPlayer().getRecruitPrice()) + " gold");
+                price.setText(Integer.toString(freeColClient.getMyPlayer().getRecruitPrice()) + " " + Messages.message("gold"));
 
                 person1.setText(Unit.getName(europe.getRecruitable(1)));
                 person2.setText(Unit.getName(europe.getRecruitable(2)));
