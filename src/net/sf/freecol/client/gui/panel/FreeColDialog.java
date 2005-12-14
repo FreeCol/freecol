@@ -11,12 +11,16 @@ import java.awt.MenuComponent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.util.Vector;
 import java.util.logging.Logger;
 
+import javax.print.CancelablePrintJob;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -264,51 +268,86 @@ public class FreeColDialog extends FreeColPanel {
     * @return The <code>FreeColDialog</code>.
     */
     public static FreeColDialog createConfirmDialog(String text, String okText, String cancelText) {
-        final JButton okButton = new JButton(okText);
 
-        final FreeColDialog confirmDialog = new FreeColDialog() {
+        // create the OK button early so that the dialog may refer to it
+        final JButton  okButton = new JButton();
+
+        // create the dialog
+        final FreeColDialog  confirmDialog = new FreeColDialog() {
+
             public void requestFocus() {
+
                 okButton.requestFocus();
             }
         };
 
-        confirmDialog.setLayout(new BorderLayout());
-
-        JPanel labelPanel = new JPanel(new FlowLayout());
-        labelPanel.add(new JLabel(text));
-
-        JPanel p1 = new JPanel(new FlowLayout(FlowLayout.CENTER));
-
-        JButton cancelButton = new JButton(cancelText);
-
-        okButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                confirmDialog.setResponse(new Boolean(true));
-            }
-        });
-
-        cancelButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                confirmDialog.setResponse(new Boolean(false));
-            }
-        });
-
-        p1.add(okButton);
-        p1.add(cancelButton);
-
-        confirmDialog.add(labelPanel, BorderLayout.CENTER);
-        confirmDialog.add(p1, BorderLayout.SOUTH);
-
-        confirmDialog.setSize(confirmDialog.getPreferredSize());
-
+        // build the label panel
+        JPanel  labelPanel = new JPanel( new FlowLayout() );
         labelPanel.setOpaque(false);
-        p1.setOpaque(false);
+        labelPanel.add( new JLabel(text) );
 
-        if (cancelButton != null) {
-            confirmDialog.setCancelComponent(cancelButton);
-        } else {
-            confirmDialog.setCancelComponent(okButton);
+        // decide on some mnemonics for the actions
+        char  okButtonMnemonic = '\0';
+        char  cancelButtonMnemonic = '\0';
+        String  okLower = okText.toLowerCase();
+        String  cancelLower = cancelText.toLowerCase();
+        String  menuMnemonics = "gvorc";
+        for ( int ci = 0, nc = okLower.length();  ci < nc;  ci ++ ) {
+            char  ch = Character.toLowerCase( okLower.charAt(ci) );
+
+            // if the character at "ci" in "okText" is not claimed by the menu..
+            if ( -1 == menuMnemonics.indexOf(ch) ) {
+
+                okButtonMnemonic = ch;
+                break;
+            }
         }
+        for ( int ci = 0, nc = cancelLower.length();  ci < nc;  ci ++ ) {
+            char  ch = Character.toLowerCase( cancelLower.charAt(ci) );
+
+            // if the character at "ci" in "cancelText" is not claimed by the
+            // menu nor by "okText"..
+            if ( -1 == menuMnemonics.indexOf(ch)  &&  -1 == okLower.indexOf(ch) ) {
+
+                cancelButtonMnemonic = ch;
+                break;
+            }
+        }
+
+        // build the button actions
+        Action  okAction = new AbstractAction( okText ) {
+
+            public void actionPerformed( ActionEvent event ) {
+
+                confirmDialog.setResponse( Boolean.TRUE );
+            }
+        };
+        okAction.putValue( Action.ACCELERATOR_KEY, new Integer(KeyEvent.VK_ENTER) );
+        okAction.putValue( Action.MNEMONIC_KEY, new Integer(okButtonMnemonic) );
+        okButton.setAction( okAction );
+
+        Action  cancelAction = new AbstractAction( cancelText ) {
+
+            public void actionPerformed( ActionEvent event ) {
+
+                confirmDialog.setResponse( Boolean.FALSE );
+            }
+        };
+        cancelAction.putValue( Action.ACCELERATOR_KEY, new Integer(KeyEvent.VK_ESCAPE) );
+        cancelAction.putValue( Action.MNEMONIC_KEY, new Integer(cancelButtonMnemonic) );
+
+        // build the button panel
+        JPanel  buttonPanel = new JPanel( new FlowLayout(FlowLayout.CENTER) );
+        buttonPanel.setOpaque(false);
+        buttonPanel.add( okButton );
+        buttonPanel.add( new JButton(cancelAction) );
+
+        // finish building the dialog
+        confirmDialog.setLayout( new BorderLayout() );
+        confirmDialog.add( labelPanel, BorderLayout.CENTER );
+        confirmDialog.add( buttonPanel, BorderLayout.SOUTH );
+        confirmDialog.setSize( confirmDialog.getPreferredSize() );
+        confirmDialog.setCancelComponent( new JButton(cancelAction) );
 
         return confirmDialog;
     }
