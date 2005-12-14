@@ -76,6 +76,9 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
                 addIndianSettlement((IndianSettlement) settlement);
             }
         }
+
+        addTile(tile);
+        
     }
 
 
@@ -121,6 +124,21 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
         hasAnItem = true;
     }
 
+    /**
+     * Adds a tile entry to this popup.
+     * @param tile The tile that will be represented on the popup.
+     */
+    private void addTile(Tile tile) {
+        JMenuItem menuItem = new JMenuItem(tile.getName());
+        menuItem.setActionCommand("tile");
+        menuItem.addActionListener(this);
+        add(menuItem);
+        /**
+         * Don't set hasAnItem to true, we want the tile panel to open
+         * automatically whenever there is no other item on the list.
+         */        
+        // hasAnItem = true;
+    }    
 
     /**
     * Returns true if this popup has at least one menuitem so that we know that we can
@@ -153,6 +171,8 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
             canvas.showColonyPanel((Colony) tile.getSettlement());
         } else if (command == "indianSettlement") {
             canvas.showIndianSettlementPanel((IndianSettlement) tile.getSettlement());
+        } else if (command == "tile") {
+            canvas.showTilePanel(tile);
         } else {
             logger.warning("Invalid actioncommand.");
         }

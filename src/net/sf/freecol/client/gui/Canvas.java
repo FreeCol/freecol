@@ -52,6 +52,7 @@ import net.sf.freecol.client.gui.panel.ReportReligiousPanel;
 import net.sf.freecol.client.gui.panel.ServerListPanel;
 import net.sf.freecol.client.gui.panel.StartGamePanel;
 import net.sf.freecol.client.gui.panel.StatusPanel;
+import net.sf.freecol.client.gui.panel.TilePanel;
 import net.sf.freecol.client.gui.panel.VictoryPanel;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
@@ -120,6 +121,7 @@ public final class Canvas extends JLayeredPane {
     private final QuitDialog        quitDialog;
     private final ColonyPanel       colonyPanel;
     private final IndianSettlementPanel indianSettlementPanel;
+    private final TilePanel         tilePanel;
     private final EuropePanel       europePanel;
     private final StatusPanel       statusPanel;
     private final ChatPanel         chatPanel;
@@ -168,6 +170,7 @@ public final class Canvas extends JLayeredPane {
         quitDialog = new QuitDialog(this);
         colonyPanel = new ColonyPanel(this, freeColClient);
         indianSettlementPanel = new IndianSettlementPanel();
+        tilePanel = new TilePanel(this);
 
         europePanel = new EuropePanel(this, freeColClient, freeColClient.getInGameController());
         statusPanel = new StatusPanel(this);
@@ -1042,6 +1045,26 @@ public final class Canvas extends JLayeredPane {
         remove(indianSettlementPanel);
     }
 
+    /**
+    * Displays the tile panel of the given <code>Tile</code>.
+    * @param tile The tile whose panel needs to be displayed.
+    * @see Tile
+    */
+    public void showTilePanel(Tile tile) {
+        closeMenus();
+
+        tilePanel.initialize(tile);
+        tilePanel.setLocation(getWidth() / 2 - tilePanel.getWidth() / 2,
+                              getHeight() / 2 - tilePanel.getHeight() / 2);
+
+        add(tilePanel);
+
+        tilePanel.requestFocus();
+
+        tilePanel.getResponseBoolean();
+
+        remove(tilePanel);
+    }
 
     /**
     * Shows the panel that allows the user to choose which unit will emigrate
@@ -1251,6 +1274,8 @@ public final class Canvas extends JLayeredPane {
                 TilePopup tp = new TilePopup(t, freeColClient, this, getGUI());
                 if (tp.hasItem()) {
                     showPopup(tp, x, y);
+                } else {
+                    showTilePanel(t);
                 }
             }
         }
