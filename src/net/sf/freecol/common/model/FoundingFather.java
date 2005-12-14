@@ -149,8 +149,9 @@ public class FoundingFather {
 
     public static int getWeight(int foundingFather, int age) {
         // This is the list of the founding fathers without effects:
-        if (foundingFather == JAN_DE_WITT || foundingFather == HERNANDO_DE_SOTO ||
-            foundingFather == THOMAS_PAINE || foundingFather == BENJAMIN_FRANKLIN ||
+        if (foundingFather == JAN_DE_WITT ||
+            foundingFather == HERNANDO_DE_SOTO ||
+            foundingFather == BENJAMIN_FRANKLIN ||
             foundingFather == JUAN_DE_SEPULVEDA) {
             return 0;
         }

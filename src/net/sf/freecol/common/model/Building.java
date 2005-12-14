@@ -879,6 +879,9 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             if (getColony().getOwner().hasFather(FoundingFather.THOMAS_JEFFERSON)) {
                 goodsOutput += goodsOutput/2;
             }
+            if (getColony().getOwner().hasFather(FoundingFather.THOMAS_PAINE)) {
+                goodsOutput = (goodsOutput * (100 + bellsBonus))/100;
+            }
         }
         
         if (goodsOutputType == Goods.CROSSES && getColony().getOwner().hasFather(FoundingFather.WILLIAM_PENN)) {

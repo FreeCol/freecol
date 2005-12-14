@@ -162,6 +162,8 @@ public class Player extends FreeColGameObject {
 
     private int             crosses;
     private int             bells;
+    /** Bells bonus granted by Thomas Paine. */
+    private int             bellsBonus = 0;
     private boolean         dead = false;
 
     // any founding fathers in this Player's congress
@@ -1542,6 +1544,8 @@ public class Player extends FreeColGameObject {
                         getEurope().setRecruitable(i, Unit.FREE_COLONIST);
                     }
                 }
+            } else if (currentFather == FoundingFather.THOMAS_PAINE) {
+                bellsBonus = tax;
             }
 
             addModelMessage(this, "model.player.foundingFatherJoinedCongress",
@@ -1586,6 +1590,7 @@ public class Player extends FreeColGameObject {
             playerElement.setAttribute("gold", Integer.toString(gold));
             playerElement.setAttribute("crosses", Integer.toString(crosses));
             playerElement.setAttribute("bells", Integer.toString(bells));
+            playerElement.setAttribute("bellsBonus", Integer.toString(bellsBonus));
             playerElement.setAttribute("currentFather", Integer.toString(currentFather));
             playerElement.setAttribute("crossesRequired", Integer.toString(crossesRequired));
 
@@ -1642,6 +1647,7 @@ public class Player extends FreeColGameObject {
         gold = Integer.parseInt(playerElement.getAttribute("gold"));
         crosses = Integer.parseInt(playerElement.getAttribute("crosses"));
         bells = Integer.parseInt(playerElement.getAttribute("bells"));
+        bellsBonus = Integer.parseInt(playerElement.getAttribute("bellsBonus"));
         ready = (new Boolean(playerElement.getAttribute("ready"))).booleanValue();
         ai = (new Boolean(playerElement.getAttribute("ai"))).booleanValue();
         dead = (new Boolean(playerElement.getAttribute("dead"))).booleanValue();
