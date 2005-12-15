@@ -856,6 +856,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
         int goodsOutput = 0;
         int goodsOutputType = getGoodsOutputType();
+        Player player = colony.getOwner();
 
         if (getType() == CHURCH || getType() == TOWN_HALL) {
             goodsOutput = 1;
@@ -875,16 +876,14 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
         if (goodsOutputType == Goods.BELLS) {
             goodsOutput += goodsOutput * colony.getBuilding(Building.PRINTING_PRESS).getLevel();
-            
-            if (getColony().getOwner().hasFather(FoundingFather.THOMAS_JEFFERSON)) {
-                goodsOutput += goodsOutput/2;
-            }
-            if (getColony().getOwner().hasFather(FoundingFather.THOMAS_PAINE)) {
-                goodsOutput = (goodsOutput * (100 + bellsBonus))/100;
+
+            if (player.hasFather(FoundingFather.THOMAS_JEFFERSON) ||
+                player.hasFather(FoundingFather.THOMAS_PAINE)) {
+                goodsOutput = (goodsOutput * (100 + player.getBellsBonus()))/100;
             }
         }
         
-        if (goodsOutputType == Goods.CROSSES && getColony().getOwner().hasFather(FoundingFather.WILLIAM_PENN)) {
+        if (goodsOutputType == Goods.CROSSES && player.hasFather(FoundingFather.WILLIAM_PENN)) {
             goodsOutput += goodsOutput/2;
         }
 

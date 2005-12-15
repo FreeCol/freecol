@@ -825,6 +825,13 @@ public class Player extends FreeColGameObject {
         return currentFather;
     }
 
+    /**
+     * Returns the bell production bonus.
+     */
+    public int getBellsBonus() {
+        return bellsBonus;
+    }
+    
 
     /**
     * Gets called when this player's turn has ended.
@@ -1544,8 +1551,10 @@ public class Player extends FreeColGameObject {
                         getEurope().setRecruitable(i, Unit.FREE_COLONIST);
                     }
                 }
+            } else if (currentFather == FoundingFather.THOMAS_JEFFERSON) {
+                bellsBonus += 50;
             } else if (currentFather == FoundingFather.THOMAS_PAINE) {
-                bellsBonus = tax;
+                bellsBonus += tax;
             }
 
             addModelMessage(this, "model.player.foundingFatherJoinedCongress",
@@ -1582,6 +1591,7 @@ public class Player extends FreeColGameObject {
         playerElement.setAttribute("ai", Boolean.toString(ai));
         playerElement.setAttribute("tax", Integer.toString(tax));
         playerElement.setAttribute("difficulty", Integer.toString(difficulty));
+        playerElement.setAttribute("bellsBonus", Integer.toString(bellsBonus));
         playerElement.appendChild(toArrayElement("tension", tension, document));
         playerElement.appendChild(toArrayElement("stance", stance, document));
         playerElement.appendChild(toArrayElement("arrears", arrears, document));
@@ -1590,7 +1600,6 @@ public class Player extends FreeColGameObject {
             playerElement.setAttribute("gold", Integer.toString(gold));
             playerElement.setAttribute("crosses", Integer.toString(crosses));
             playerElement.setAttribute("bells", Integer.toString(bells));
-            playerElement.setAttribute("bellsBonus", Integer.toString(bellsBonus));
             playerElement.setAttribute("currentFather", Integer.toString(currentFather));
             playerElement.setAttribute("crossesRequired", Integer.toString(crossesRequired));
 
