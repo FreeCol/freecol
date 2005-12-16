@@ -397,14 +397,15 @@ public class FreeColDialog extends FreeColPanel {
     *
     * @return The FreeColDialog that asks the question to the user.
     */
-    public static FreeColDialog createScoutIndianSettlementDialog(IndianSettlement settlement) {
-        String mainText;
+    public static FreeColDialog createScoutIndianSettlementDialog(IndianSettlement settlement, Player player) {
+        String mainText = Messages.message(settlement.getAlarmLevelMessage(player));
+        mainText = mainText.replaceAll("%nation%", settlement.getOwner().getNationAsString());
         int skill = settlement.getLearnableSkill();
         if (skill >= 0) {
-            mainText = Messages.message("scoutSettlement.question1").replaceAll("%replace_skill%", Unit.getName(skill).toLowerCase());
+            mainText += Messages.message("scoutSettlement.question1").replaceAll("%replace_skill%", Unit.getName(skill).toLowerCase());
         }
         else {
-            mainText = Messages.message("scoutSettlement.question2");
+            mainText += Messages.message("scoutSettlement.question2");
         }
         mainText = mainText.replaceAll("%replace_good1%", Goods.getName(settlement.getHighlyWantedGoods()).toLowerCase());
         mainText = mainText.replaceAll("%replace_good2%", Goods.getName(settlement.getWantedGoods1()).toLowerCase());
@@ -472,8 +473,10 @@ public class FreeColDialog extends FreeColPanel {
     *
     * @return The FreeColDialog that asks the question to the user.
     */
-    public static FreeColDialog createUseMissionaryDialog(IndianSettlement settlement) {
-        String mainText = Messages.message("missionarySettlement.question");
+    public static FreeColDialog createUseMissionaryDialog(IndianSettlement settlement, Player player) {
+        String mainText = Messages.message(settlement.getAlarmLevelMessage(player));
+        mainText = mainText.replaceAll("%nation%", settlement.getOwner().getNationAsString());
+        mainText += Messages.message("missionarySettlement.question");
 
         final JLabel question = new JLabel("<html><body>" + mainText + "</body></html>");
         final JButton establishOrHeresy = new JButton(),

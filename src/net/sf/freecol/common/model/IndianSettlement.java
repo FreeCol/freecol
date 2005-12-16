@@ -228,11 +228,18 @@ public class IndianSettlement extends Settlement {
     * @param addToAlarm The amount to add to the current alarm level.
     */
     public void modifyAlarm(Player player, int addToAlarm) {
-        alarm[player.getNation()] += addToAlarm;
+        modifyAlarm(player.getNation(), addToAlarm);
+    }
 
-        if (alarm[player.getNation()]>1000) {
-            alarm[player.getNation()] = 1000;
+    public void modifyAlarm(int nation, int addToAlarm) {
+        alarm[nation] += addToAlarm;
+
+        if (alarm[nation]>1000) {
+            alarm[nation] = 1000;
         }
+
+        // propagate alarm upwards
+        owner.modifyTension(nation, addToAlarm/2);
     }
 
 
@@ -255,6 +262,10 @@ public class IndianSettlement extends Settlement {
     /**
     * Gets the alarm level towards the given player.
     */
+    public int getAlarm(int nation) {
+        return alarm[nation];
+    }
+
     public int getAlarm(Player player) {
         return alarm[player.getNation()];
     }
@@ -263,7 +274,7 @@ public class IndianSettlement extends Settlement {
      * Gets the alarm level of this player.
      *
      * @param player The other player.
-     * @return A alarm level.
+     * @return An alarm level.
      */
     public int getAlarmLevel(Player player) {
 	int level = alarm[player.getNation()];
@@ -277,6 +288,28 @@ public class IndianSettlement extends Settlement {
 	    return ANGRY;
 	} else {
 	    return HATEFUL;
+	}
+    }
+
+    /**
+     * Gets the ID of the alarm message associated with the alarm
+     * level of this player.
+     *
+     * @param player The other player.
+     * @return The ID of an alarm level message.
+     */
+    public String getAlarmLevelMessage(Player player) {
+	int level = alarm[player.getNation()];
+	if (level <= ALARM_HAPPY) {
+	    return "indianSettlement.alarm.happy";
+	} else if (level <= ALARM_CONTENT) {
+	    return "indianSettlement.alarm.content";
+	} else if (level <= ALARM_DISPLEASED) {
+	    return "indianSettlement.alarm.displeased";
+	} else if (level <= ALARM_ANGRY) {
+	    return "indianSettlement.alarm.angry";
+	} else {
+	    return "indianSettlement.alarm.hateful";
 	}
     }
 
