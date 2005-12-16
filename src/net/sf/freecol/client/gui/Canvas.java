@@ -644,7 +644,7 @@ public final class Canvas extends JLayeredPane {
     *         FreeColDialog.SCOUT_INDIAN_SETTLEMENT_ATTACK if he wants to attack the settlement.
     */
     public int showScoutIndianSettlementDialog(IndianSettlement settlement) {
-        FreeColDialog scoutDialog = FreeColDialog.createScoutIndianSettlementDialog(settlement);
+        FreeColDialog scoutDialog = FreeColDialog.createScoutIndianSettlementDialog(settlement, freeColClient.getMyPlayer());
         scoutDialog.setLocation(getWidth() / 2 - scoutDialog.getWidth() / 2, getHeight() / 2 - scoutDialog.getHeight() / 2);
         add(scoutDialog, new Integer(POPUP_LAYER.intValue() - 1));
         scoutDialog.requestFocus();
@@ -673,7 +673,7 @@ public final class Canvas extends JLayeredPane {
     *         FreeColDialog.MISSIONARY_CANCEL if the action was cancelled.
     */
     public List showUseMissionaryDialog(IndianSettlement settlement) {
-        FreeColDialog missionaryDialog = FreeColDialog.createUseMissionaryDialog(settlement);
+        FreeColDialog missionaryDialog = FreeColDialog.createUseMissionaryDialog(settlement, freeColClient.getMyPlayer());
         missionaryDialog.setLocation(getWidth() / 2 - missionaryDialog.getWidth() / 2, getHeight() / 2 - missionaryDialog.getHeight() / 2);
         add(missionaryDialog, new Integer(POPUP_LAYER.intValue() - 1));
         missionaryDialog.requestFocus();

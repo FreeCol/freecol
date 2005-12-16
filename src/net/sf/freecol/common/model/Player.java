@@ -1004,29 +1004,29 @@ public class Player extends FreeColGameObject {
     public static String getNationAsString(int nation) {
         switch (nation) {
             case DUTCH:
-                return "Dutch";
+                return Messages.message("model.nation.Dutch");
             case ENGLISH:
-                return "English";
+                return Messages.message("model.nation.English");
             case FRENCH:
-                return "French";
+                return Messages.message("model.nation.French");
             case SPANISH:
-                return "Spanish";
+                return Messages.message("model.nation.Spanish");
             case INCA:
-                return "Inca";
+                return Messages.message("model.nation.Inca");
             case AZTEC:
-                return "Aztec";
+                return Messages.message("model.nation.Aztec");
             case ARAWAK:
-                return "Arawak";
+                return Messages.message("model.nation.Arawak");
             case CHEROKEE:
-                return "Cherokee";
+                return Messages.message("model.nation.Cherokee");
             case IROQUOIS:
-                return "Iroquois";
+                return Messages.message("model.nation.Iroquois");
             case SIOUX:
-                return "Sioux";
+                return Messages.message("model.nation.Sioux");
             case APACHE:
-                return "Apache";
+                return Messages.message("model.nation.Apache");
             case TUPI:
-                return "Tupi";
+                return Messages.message("model.nation.Tupi");
             default:
                 return "INVALID";
         }
@@ -1403,10 +1403,14 @@ public class Player extends FreeColGameObject {
     * @param addToTension The amount to add to the current tension level.
     */
     public void modifyTension(Player player, int addToTension) {
-        tension[player.getNation()] += addToTension;
+        modifyTension(player.getNation(), addToTension);
+    }
 
-        if (tension[player.getNation()]>1000) {
-            tension[player.getNation()] = 1000;
+    public void modifyTension(int nation, int addToTension) {        
+        tension[nation] += addToTension;
+
+        if (tension[nation]>1000) {
+            tension[nation] = 1000;
         }
     }
 
@@ -1444,6 +1448,10 @@ public class Player extends FreeColGameObject {
     public int getStance(Player player) {
         return stance[player.getNation()];
     }
+
+    public int getStance(int nation) {
+        return stance[nation];
+    }
     
     
     /**
@@ -1457,6 +1465,30 @@ public class Player extends FreeColGameObject {
         stance[player.getNation()] = theStance;
     }
 
+    public void setStance(int nation, int theStance) {
+        stance[nation] = theStance;
+    }
+    
+    /**
+     * Declares war on this player.
+     *
+     * @param enemy The player who declares war on this one.
+     */
+    public void declareWar(Player enemy) {
+        declareWar(enemy.getNation());
+    }
+
+    public void declareWar(int nation) {
+        setStance(nation, WAR);
+        modifyTension(nation, TENSION_HATEFUL);
+        if (!isEuropean()) {
+            Iterator settlementIterator = getIndianSettlementIterator();
+            while (settlementIterator.hasNext()) {
+                IndianSettlement settlement = (IndianSettlement) settlementIterator.next();
+                settlement.modifyAlarm(nation, IndianSettlement.ALARM_HATEFUL);
+            }
+        }
+    }    
 
     /**
     * Gets the price for a recruit in europe.

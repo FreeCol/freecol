@@ -274,7 +274,47 @@ public final class InGameController implements NetworkConstants {
 
         switch (move) {
             case Unit.MOVE:             reallyMove(unit, direction); break;
-            case Unit.ATTACK:           attack(unit, direction); break;
+            case Unit.ATTACK:
+                Player enemy;
+                Tile target = freeColClient.getGame().getMap().getNeighbourOrNull(direction, unit.getTile());
+                Unit defender = target.getDefendingUnit(unit);
+                if (defender == null) {
+                    enemy = target.getSettlement().getOwner();
+                } else {
+                    enemy = defender.getOwner();
+                }
+                int stance = unit.getOwner().getStance(enemy);
+                /**
+                 * If the owner and the other player are already at
+                 * war, attack.  Otherwise make sure the player knows
+                 * what he/she is doing.
+                 */
+                switch (stance) {
+                case Player.WAR:
+                    attack(unit, direction);
+                    break;
+                case Player.CEASE_FIRE:
+                    if (canvas.showConfirmDialog("model.diplomacy.attack.ceaseFire",
+                                                 "model.diplomacy.attack.confirm",
+                                                 "cancel",
+                                                 enemy.getNationAsString())) {
+                        attack(unit, direction);
+                    }
+                    break;
+                case Player.PEACE:
+                    if (canvas.showConfirmDialog("model.diplomacy.attack.peace",
+                                                 "model.diplomacy.attack.confirm",
+                                                 "cancel",
+                                                 enemy.getNationAsString())) {
+                        attack(unit, direction);
+                    }
+                    break;
+                case Player.ALLIANCE:
+                    freeColClient.playSound(SfxLibrary.ILLEGAL_MOVE); 
+                    canvas.showInformationMessage("model.diplomacy.attack.alliance",
+                                                  new String [][] {{"%replace%", enemy.getNationAsString()}});
+                }
+                break;
             case Unit.DISEMBARK:        disembark(unit, direction); break;
             case Unit.EMBARK:           embark(unit, direction); break;
             case Unit.MOVE_HIGH_SEAS:   moveHighSeas(unit, direction); break;
@@ -573,6 +613,9 @@ public final class InGameController implements NetworkConstants {
             logger.warning("defender == null");
             throw new NullPointerException("defender == null");
         }
+
+        // make sure we are at war
+        unit.getOwner().setStance(defender.getOwner(), Player.WAR);
 
         if (!unit.isNaval()) { 
             Unit winner;

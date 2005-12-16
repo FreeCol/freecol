@@ -273,17 +273,46 @@ public final class InGameInputHandler extends InputHandler {
     private Element opponentAttack(Element opponentAttackElement) {
         Game game = getFreeColClient().getGame();
 
-        // For later use: int direction = Integer.parseInt(opponentAttackElement.getAttribute("direction"));
-        int result = Integer.parseInt(opponentAttackElement.getAttribute("result"));
-        int plunderGold = Integer.parseInt(opponentAttackElement.getAttribute("plunderGold"));
+        int attackerNation = Integer.parseInt(opponentAttackElement.getAttribute("attackerNation"));
+        int defenderNation = Integer.parseInt(opponentAttackElement.getAttribute("defenderNation"));
 
+        Player player = getFreeColClient().getMyPlayer();
+        int playerNation = player.getNation();
+        if (playerNation == attackerNation) {
+            // we started it, so we know all about it
+            logger.info("We are at war with the " + player.getNationAsString(defenderNation));
+        } else if (playerNation == defenderNation) {
+            if (player.getStance(attackerNation) != Player.WAR) {
+                player.declareWar(attackerNation);
+                Canvas canvas = getFreeColClient().getCanvas();
+                canvas.showInformationMessage("model.diplomacy.war.declared",
+                                              new String [][] {{"%nation%",
+                                                                player.getNationAsString(attackerNation)}});
+            }
+        } else {
+            if (game.getPlayer(defenderNation).getStance(attackerNation) != Player.WAR) {
+                Canvas canvas = getFreeColClient().getCanvas();
+                logger.info("war happening");
+                canvas.showInformationMessage("model.diplomacy.war.others",
+                                              new String [][] {{"%attacker%",
+                                                                player.getNationAsString(attackerNation)},
+                                                               {"%defender%",
+                                                                player.getNationAsString(defenderNation)}});
+            }
+        }
+        
         Unit unit = (Unit) game.getFreeColGameObject(opponentAttackElement.getAttribute("unit"));
         Unit defender = (Unit) game.getFreeColGameObject(opponentAttackElement.getAttribute("defender"));
 
         if (unit == null && defender == null) {
-            logger.warning("Both \"unit\" and \"defender\" is \"null\"!");
-            throw new NullPointerException();
+            //logger.warning("Both \"unit\" and \"defender\" is \"null\"!");
+            //throw new NullPointerException();
+            return null;
         }
+
+        // For later use: int direction = Integer.parseInt(opponentAttackElement.getAttribute("direction"));
+        int result = Integer.parseInt(opponentAttackElement.getAttribute("result"));
+        int plunderGold = Integer.parseInt(opponentAttackElement.getAttribute("plunderGold"));
 
         if (opponentAttackElement.hasAttribute("update")) {
             if (opponentAttackElement.getAttribute("update").equals("unit")) {

@@ -509,8 +509,12 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Unit defender = newTile.getDefendingUnit(unit);
         if (defender == null) {
             throw new IllegalStateException("Nothing to attack in direction " + direction + " from unit with ID " + attackElement.getAttribute("unit"));
+        } else if (player.getStance(defender.getOwner()) == Player.ALLIANCE) {
+            throw new IllegalArgumentException("Can not attack allied player.");
+        } else {
+            player.setStance(defender.getOwner(), Player.WAR);
+            defender.getOwner().declareWar(player);
         }
-
 
         int result = generateAttackResult(unit, defender);
         int plunderGold = -1;
@@ -528,14 +532,17 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 continue;
             }
 
+            Element opponentAttackElement = Message.createNewRootElement("opponentAttack");
+            opponentAttackElement.setAttribute("attackerNation", Integer.toString(unit.getOwner().getNation()));
+            opponentAttackElement.setAttribute("defenderNation", Integer.toString(defender.getOwner().getNation()));
+
             if (unit.isVisibleTo(enemyPlayer) || defender.isVisibleTo(enemyPlayer)) {
-                Element opponentAttackElement = Message.createNewRootElement("opponentAttack");
                 opponentAttackElement.setAttribute("direction", Integer.toString(direction));
                 opponentAttackElement.setAttribute("result", Integer.toString(result));
                 opponentAttackElement.setAttribute("plunderGold", Integer.toString(plunderGold));
                 opponentAttackElement.setAttribute("unit", unit.getID());
                 opponentAttackElement.setAttribute("defender", defender.getID());
-
+            
                 if (!defender.isVisibleTo(enemyPlayer)) {
                     opponentAttackElement.setAttribute("update", "defender");
                     if (!enemyPlayer.canSee(defender.getTile())) {
@@ -547,12 +554,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     opponentAttackElement.setAttribute("update", "unit");
                     opponentAttackElement.appendChild(unit.toXMLElement(enemyPlayer, opponentAttackElement.getOwnerDocument()));
                 }
-
-                try {
-                    enemyPlayer.getConnection().send(opponentAttackElement);
-                } catch (IOException e) {
-                    logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection " + enemyPlayer.getConnection());
-                }
+            }
+            try {
+                enemyPlayer.getConnection().send(opponentAttackElement);
+            } catch (IOException e) {
+                logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection " + enemyPlayer.getConnection());
             }
         }
 
