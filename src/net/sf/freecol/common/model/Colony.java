@@ -90,35 +90,39 @@ public final class Colony extends Settlement implements Location {
         bells = 0;
         currentlyBuilding = Building.DOCK;
 
-        tile.setNationOwner(owner.getNation());
-
+        Map map = game.getMap();
+        int ownerNation = owner.getNation();
+        tile.setNationOwner(ownerNation);
+        for (int direction = 0; direction < Map.NUMBER_OF_DIRECTIONS; direction++) {
+            Tile t = map.getNeighbourOrNull(direction, tile);
+            if (t.getNationOwner() == Player.NO_NATION) {
+                t.setNationOwner(ownerNation);
+                //t.setOwner(this);
+            }
+            if (initializeWorkLocations) {
+                workLocations.add(new ColonyTile(game, this, t));
+            }
+        }
+            
         if (initializeWorkLocations) {
-            workLocations.add(new ColonyTile(getGame(), this, tile));
-            workLocations.add(new ColonyTile(getGame(), this, getGame().getMap().getNeighbourOrNull(Map.N, tile)));
-            workLocations.add(new ColonyTile(getGame(),this, getGame().getMap().getNeighbourOrNull(Map.NE, tile)));
-            workLocations.add(new ColonyTile(getGame(),this, getGame().getMap().getNeighbourOrNull(Map.E, tile)));
-            workLocations.add(new ColonyTile(getGame(),this, getGame().getMap().getNeighbourOrNull(Map.NW, tile)));
-            workLocations.add(new ColonyTile(getGame(),this, getGame().getMap().getNeighbourOrNull(Map.SE, tile)));
-            workLocations.add(new ColonyTile(getGame(),this, getGame().getMap().getNeighbourOrNull(Map.W, tile)));
-            workLocations.add(new ColonyTile(getGame(),this, getGame().getMap().getNeighbourOrNull(Map.SW, tile)));
-            workLocations.add(new ColonyTile(getGame(),this, getGame().getMap().getNeighbourOrNull(Map.S, tile)));
+            workLocations.add(new ColonyTile(game, this, tile));
 
-            workLocations.add(new Building(getGame(),this, Building.TOWN_HALL, Building.HOUSE));
-            workLocations.add(new Building(getGame(),this, Building.CARPENTER, Building.HOUSE));
-            workLocations.add(new Building(getGame(),this, Building.BLACKSMITH, Building.HOUSE));
-            workLocations.add(new Building(getGame(),this, Building.TOBACCONIST, Building.HOUSE));
-            workLocations.add(new Building(getGame(),this, Building.WEAVER, Building.HOUSE));
-            workLocations.add(new Building(getGame(),this, Building.DISTILLER, Building.HOUSE));
-            workLocations.add(new Building(getGame(),this, Building.FUR_TRADER, Building.HOUSE));
-            workLocations.add(new Building(getGame(),this, Building.STOCKADE, Building.NOT_BUILT));
-            workLocations.add(new Building(getGame(),this, Building.ARMORY, Building.NOT_BUILT));
-            workLocations.add(new Building(getGame(),this, Building.DOCK, Building.NOT_BUILT));
-            workLocations.add(new Building(getGame(),this, Building.SCHOOLHOUSE, Building.NOT_BUILT));
-            workLocations.add(new Building(getGame(),this, Building.WAREHOUSE, Building.NOT_BUILT));
-            workLocations.add(new Building(getGame(),this, Building.STABLES, Building.NOT_BUILT));
-            workLocations.add(new Building(getGame(),this, Building.CHURCH, Building.NOT_BUILT));
-            workLocations.add(new Building(getGame(),this, Building.PRINTING_PRESS, Building.NOT_BUILT));
-            workLocations.add(new Building(getGame(),this, Building.CUSTOM_HOUSE, Building.NOT_BUILT));
+            workLocations.add(new Building(game, this, Building.TOWN_HALL, Building.HOUSE));
+            workLocations.add(new Building(game, this, Building.CARPENTER, Building.HOUSE));
+            workLocations.add(new Building(game, this, Building.BLACKSMITH, Building.HOUSE));
+            workLocations.add(new Building(game, this, Building.TOBACCONIST, Building.HOUSE));
+            workLocations.add(new Building(game, this, Building.WEAVER, Building.HOUSE));
+            workLocations.add(new Building(game, this, Building.DISTILLER, Building.HOUSE));
+            workLocations.add(new Building(game, this, Building.FUR_TRADER, Building.HOUSE));
+            workLocations.add(new Building(game, this, Building.STOCKADE, Building.NOT_BUILT));
+            workLocations.add(new Building(game, this, Building.ARMORY, Building.NOT_BUILT));
+            workLocations.add(new Building(game, this, Building.DOCK, Building.NOT_BUILT));
+            workLocations.add(new Building(game, this, Building.SCHOOLHOUSE, Building.NOT_BUILT));
+            workLocations.add(new Building(game, this, Building.WAREHOUSE, Building.NOT_BUILT));
+            workLocations.add(new Building(game, this, Building.STABLES, Building.NOT_BUILT));
+            workLocations.add(new Building(game, this, Building.CHURCH, Building.NOT_BUILT));
+            workLocations.add(new Building(game, this, Building.PRINTING_PRESS, Building.NOT_BUILT));
+            workLocations.add(new Building(game, this, Building.CUSTOM_HOUSE, Building.NOT_BUILT));
         }
     }
 
@@ -565,14 +569,34 @@ public final class Colony extends Settlement implements Location {
         return goodsContainer.getCompactGoodsIterator();
     }
 
+    /**
+     * Returns true if the custom house should export this type of
+     * goods.
+     *
+     * @param type The type of goods.
+     * @return True if the custom house should export this type of
+     * goods.
+     */
     public boolean getExports(int type) {
         return exports[type];
     }
 
+    /**
+     * Returns true if the custom house should export these goods.
+     *
+     * @param goods The goods.
+     * @return True if the custom house should export these goods.
+     */
     public boolean getExports(Goods goods) {
         return exports[goods.getType()];
     }
-    
+
+    /**
+     * Toggles the custom house's export settings for this type of
+     * goods.
+     *
+     * @param type The type of goods.
+     */
     public void toggleExports(int type) {
         if (exports[type]) {
             exports[type] = false;
@@ -581,6 +605,11 @@ public final class Colony extends Settlement implements Location {
         }
     }
 
+    /**
+     * Toggles the custom house's export settings for these goods.
+     *
+     * @param goods The goods.
+     */
     public void toggleExports(Goods goods) {
         toggleExports(goods.getType());
     }
@@ -773,10 +802,12 @@ public final class Colony extends Settlement implements Location {
     */
     public int getProductionBonus() {
         int bonus = 0;
-        //TODO: account for difficulty levels in the 4 and 8below
-        if ((getTory() * getUnitCount()) / 100 > 8) {
+	int tories = (getTory() * getUnitCount()) / 100;
+	int difficulty = getOwner().getDifficulty();
+
+        if (tories > 10 - difficulty) {
             bonus -= 2;
-        } else if ((getTory() * getUnitCount()) / 100 > 4) {
+        } else if (tories > 6 - difficulty) {
             bonus -= 1;
         }
 

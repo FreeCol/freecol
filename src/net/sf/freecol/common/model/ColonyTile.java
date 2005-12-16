@@ -159,6 +159,10 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
             return false;
         }
 
+        if (!(workTile.isLand() || getColony().getBuilding(Building.DOCK).isBuilt())) {
+            return false;
+        }
+
         if (!isColonyCenterTile() && locatable instanceof Unit && (getUnit() == null || locatable == getUnit())) {
             return true;
         } else {
@@ -209,7 +213,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         setUnit(u);
         
         getColony().updatePopulation();
-        
+
         if (unit != null) {
             getWorkTile().setOwner(getColony());
         } else {
@@ -401,9 +405,6 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     public void dispose() {
         if (unit != null) {
             getWorkTile().setOwner(null);
-        }
-
-        if (unit != null) {
             unit.dispose();
         }
 
