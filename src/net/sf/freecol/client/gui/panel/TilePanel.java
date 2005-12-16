@@ -4,6 +4,7 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 
 import java.util.logging.Logger;
 
+import javax.swing.BoxLayout;
 import javax.swing.ComponentInputMap;
 import javax.swing.InputMap;
 import javax.swing.JButton;
@@ -23,6 +25,7 @@ import javax.swing.SwingUtilities;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 
 /**
@@ -43,6 +46,7 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
     
     private final JPanel goodsPanel;
     private final JLabel tileNameLabel;
+    private final JLabel ownerLabel;
     private final JButton okButton;
     private final JLabel[] labels;
     
@@ -51,13 +55,17 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
     */
     public TilePanel(Canvas parent) {
         canvas = parent;
-        
-        setLayout(new FlowLayout());
 
-        tileNameLabel = new JLabel();
-        tileNameLabel.setSize(300, 40);
+        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+        
+        tileNameLabel = new JLabel("", JLabel.CENTER);
+        tileNameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         add(tileNameLabel);
 
+        ownerLabel = new JLabel("", JLabel.CENTER);
+        ownerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        add(ownerLabel);        
+        
         ArrayList farmedGoods = new ArrayList();
         for (int i = 0; i < Goods.NUMBER_OF_TYPES; i++) {
             if (Goods.isFarmedGoods(i)) {
@@ -68,8 +76,7 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
         number = farmedGoods.size();
 
         goodsPanel = new JPanel();
-        goodsPanel.setSize(380, 40);
-        goodsPanel.setLayout(new GridLayout(1, 8));
+        goodsPanel.setLayout(new FlowLayout());
 
         goods = new int[number];
         labels = new JLabel[number];
@@ -82,10 +89,11 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
         
         goodsPanel.setSize(getPreferredSize());
         add(goodsPanel);
-        
+
         okButton = new JButton(Messages.message("ok"));
         okButton.setActionCommand(String.valueOf(OK));
         okButton.addActionListener(this);
+        okButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Use ESCAPE for closing the panel:
         InputMap inputMap = new ComponentInputMap(okButton);
@@ -95,8 +103,7 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
 
         add(okButton);
 
-        //setSize(getPreferredSize());
-        setSize(380, 120);
+        setSize(450, 120);
     }
 
 
@@ -112,6 +119,12 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
     */
     public void initialize(Tile tile) {
         tileNameLabel.setText(tile.getName());
+        String ownerName = Player.getNationAsString(tile.getNationOwner());
+        if (ownerName.equals("INVALID")) {
+            ownerLabel.setText("");
+        } else {
+            ownerLabel.setText(ownerName);
+        }
         for (int i = 0; i < number; i++) {
             labels[i].setText(String.valueOf(tile.potential(goods[i])));
         }
