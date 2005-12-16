@@ -43,7 +43,8 @@ public class Map extends FreeColGameObject {
                             S = 4,
                             SW = 5,
                             W = 6,
-                            NW = 7;
+                            NW = 7,
+                            NUMBER_OF_DIRECTIONS = 8;
 
     /** The infinity cost as used by {@link #findPath(Unit, Tile, Tile)}. */
     public static final int COST_INFINITY = Integer.MAX_VALUE - 100000000;
