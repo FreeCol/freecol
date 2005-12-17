@@ -25,6 +25,7 @@ import javax.swing.table.TableColumn;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.PreGameController;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 
@@ -46,9 +47,23 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
                                 CHAT = 4,
                                 GAME_OPTIONS = 5;
 
-    private final String[]  mapSizes = {"Small", "Medium", "Large", "Huge"};
-    private final String[]  colors = {"Black", "Blue", "Cyan", "Gray", "Green", "Magenta",
-                                        "Orange", "Pink", "Red", "White", "Yellow"};
+    private final String[]  mapSizes = { Messages.message("small"),
+                                         Messages.message("medium"),
+                                         Messages.message("large"),
+                                         Messages.message("huge"),
+                                        };
+    private final String[]  colors = { Messages.message("black"),
+                                       Messages.message("blue"),
+                                       Messages.message("cyan"),
+                                       Messages.message("gray"),
+                                       Messages.message("green"),
+                                       Messages.message("magenta"),
+                                       Messages.message("orange"),
+                                       Messages.message("pink"),
+                                       Messages.message("red"),
+                                       Messages.message("white"),
+                                       Messages.message("yellow"),
+                                      };
 
     private final Canvas        parent;
     private final FreeColClient freeColClient;
@@ -80,18 +95,18 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         this.parent = parent;
         this.freeColClient = freeColClient;
 
-        JButton     cancel = new JButton("Cancel");
-        JLabel      mapSizeLabel = new JLabel("Map Size");
+        JButton     cancel = new JButton( Messages.message("cancel") );
+        JLabel      mapSizeLabel = new JLabel( Messages.message("mapSize") );
         JScrollPane chatScroll,
                     tableScroll;
 
         setCancelComponent(cancel);
 
-        start = new JButton("Start Game");
-        gameOptions = new JButton("Game options");
+        start = new JButton(Messages.message("startGame") );
+        gameOptions = new JButton(Messages.message("gameOptions"));
 
         optionsPanel = new JPanel();
-        readyBox = new JCheckBox("I'm Ready");
+        readyBox = new JCheckBox(Messages.message("iAmReady"));
         mapSize = new JComboBox(mapSizes);
 
         chatPanel = new JPanel();

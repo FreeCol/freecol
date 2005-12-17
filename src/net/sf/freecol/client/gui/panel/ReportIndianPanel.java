@@ -7,6 +7,7 @@ import java.util.Iterator;
 import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Player;
 
 /**
@@ -68,12 +69,12 @@ public final class ReportIndianPanel extends ReportPanel implements ActionListen
             tensionString = "Happy";
         }
         else if (tension < 5 * Player.TENSION_HAPPY) {
-            tensionString = "Wary";
+            tensionString = Messages.message("wary");
         }
         else {
-            tensionString = "Angry";
+            tensionString = Messages.message("angry");
         }
-        report += "<p>Tension: " + tensionString;
+        report += "<p>" + Messages.message("tension") + ": " + tensionString;
         report += "</html>";
         JLabel label;
         label = new JLabel(report);

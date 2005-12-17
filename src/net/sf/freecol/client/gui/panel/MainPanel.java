@@ -20,6 +20,7 @@ import javax.swing.border.EmptyBorder;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.i18n.Messages;
 
 /**
 * A panel filled with 'main' items.
@@ -50,11 +51,11 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
         this.parent = parent;
         this.freeColClient = freeColClient;
 
-        JButton         openButton = new JButton("Open"),
-                        quitButton = new JButton("Quit");
+        JButton         openButton = new JButton( Messages.message("menuBar.game.open") ),
+                        quitButton = new JButton( Messages.message("menuBar.game.quit") );
         
         setCancelComponent(quitButton);
-        newButton = new JButton("New");
+        newButton = new JButton( Messages.message("menuBar.game.new") );
 
         newButton.setActionCommand(String.valueOf(NEW));
         openButton.setActionCommand(String.valueOf(OPEN));

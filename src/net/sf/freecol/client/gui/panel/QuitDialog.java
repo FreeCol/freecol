@@ -9,6 +9,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.i18n.Messages;
 import cz.autel.dmi.HIGLayout;
 
 /**
@@ -43,8 +44,8 @@ public final class QuitDialog extends FreeColDialog implements ActionListener {
         l.setColumnWeight(2, 1);
         setLayout(l);
 
-        cancel = new JButton("No");
-        JLabel qLabel = new JLabel("Are you sure you want to Quit?");
+        cancel = new JButton( Messages.message("no") );
+        JLabel qLabel = new JLabel( Messages.message("areYouSureYouWantToQuit") );
         qLabel.setHorizontalAlignment(JLabel.CENTER);
 
 //        qLabel.setSize(200, 20);

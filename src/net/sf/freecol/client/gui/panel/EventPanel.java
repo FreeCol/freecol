@@ -59,7 +59,7 @@ public final class EventPanel extends FreeColDialog implements ActionListener {
 
         imageLabel = new JLabel();
 
-        okButton = new JButton("OK");
+        okButton = new JButton( Messages.message("ok") );
         okButton.setActionCommand(String.valueOf(OK));
         okButton.addActionListener(this);
 

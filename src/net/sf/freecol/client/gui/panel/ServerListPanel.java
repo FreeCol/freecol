@@ -64,7 +64,7 @@ public final class ServerListPanel extends FreeColPanel implements ActionListene
 
         setCancelComponent(cancel);
 
-        connect = new JButton("Connect");
+        connect = new JButton( Messages.message("connect") );
 
         tableModel = new ServerListTableModel(new ArrayList());
         table = new JTable(tableModel);
@@ -207,7 +207,12 @@ public final class ServerListPanel extends FreeColPanel implements ActionListene
 
 class ServerListTableModel extends AbstractTableModel {
 
-    private static final String[] columnNames = {"Name", "Address", "Port", "Players", "Game state"};
+    private static final String[] columnNames = { Messages.message("name"),
+                                                  Messages.message("host"),
+                                                  Messages.message("port"),
+                                                  Messages.message("players"),
+                                                  Messages.message("gameState"),
+                                                 };
 
     private ArrayList items;
 

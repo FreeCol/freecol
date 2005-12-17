@@ -798,21 +798,8 @@ public class FreeColDialog extends FreeColPanel {
     * Returns a filter accepting "*.fsg".
     */
     public static FileFilter getFSGFileFilter() {
-        FileFilter fsgFilter = new FileFilter() {
-            public boolean accept(File f) {
-                if (f.getName().endsWith(".fsg") || f.isDirectory()) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
 
-            public String getDescription() {
-                return "FreeCol Save Game (*.fsg)";
-            }
-        };
-        
-        return fsgFilter;
+        return new FreeColFileFilter( ".fsg", "filter.savedGames" );
     }
     
 
@@ -820,21 +807,8 @@ public class FreeColDialog extends FreeColPanel {
     * Returns a filter accepting "*.fgo".
     */
     public static FileFilter getFGOFileFilter() {
-        FileFilter fgoFilter = new FileFilter() {
-            public boolean accept(File f) {
-                if (f.getName().endsWith(".fgo") || f.isDirectory()) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
 
-            public String getDescription() {
-                return "FreeCol Game Options (*.fgo)";
-            }
-        };
-        
-        return fgoFilter;
+        return new FreeColFileFilter( ".fgo", "filter.gameOptions" );
     }
     
     
@@ -844,20 +818,43 @@ public class FreeColDialog extends FreeColPanel {
     * That is; both "*.fgo" and "*.fsg".
     */
     public static FileFilter getGameOptionsFileFilter() {
-        FileFilter goFilter = new FileFilter() {
-            public boolean accept(File f) {
-                if (f.getName().endsWith(".fgo") || f.getName().endsWith(".fsg") || f.isDirectory()) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
 
-            public String getDescription() {
-                return "FreeCol Game Options and Save Games (*.fgo and *.fsg)";
-            }
-        };
-        
-        return goFilter;
+        return new FreeColFileFilter( ".fgo", ".fsg", "filter.gameOptionsAndSavedGames" );
     }
+
+
+    static final class FreeColFileFilter extends FileFilter {
+
+        private final String  extension1;
+        private final String  extension2;
+        private final String  description;
+
+        FreeColFileFilter( String  extension1,
+                           String  extension2,
+                           String  descriptionMessage ) {
+
+            this.extension1 = extension1;
+            this.extension2 = extension2;
+            description = Messages.message(descriptionMessage);
+        }
+
+        FreeColFileFilter( String  extension, String  descriptionMessage ) {
+
+            this.extension1 = extension;
+            this.extension2 = "....";
+            description = Messages.message(descriptionMessage);
+        }
+
+        public boolean accept(File f) {
+
+            return f.isDirectory() || f.getName().endsWith(extension1)
+                || f.getName().endsWith(extension2);
+        }
+
+        public String getDescription() {
+
+            return description;
+        }
+    }
+
 }

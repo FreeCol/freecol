@@ -17,6 +17,7 @@ import javax.swing.JLabel;
 
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Unit;
@@ -161,7 +162,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
         }
 
         if (unit.isUnderRepair()) {
-            BufferedImage repairImage = parent.getGUI().createStringImage((Graphics2D) g, "Under repair", Color.RED, getWidth(), 12);
+            BufferedImage repairImage = parent.getGUI().createStringImage((Graphics2D) g, Messages.message("underRepair"), Color.RED, getWidth(), 12);
             g.drawImage(repairImage, (getWidth() - repairImage.getWidth())/2, (getHeight() - repairImage.getHeight())/2, null);
         }
     }

@@ -55,7 +55,7 @@ public final class Messages {
             defaultMessages = new Messages(Locale.getDefault());
         }
 
-        return (String) defaultMessages.findMessage(messageId);
+        return defaultMessages.findMessage(messageId);
     }
 
 

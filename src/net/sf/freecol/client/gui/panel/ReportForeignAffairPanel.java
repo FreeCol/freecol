@@ -7,6 +7,7 @@ import java.util.Iterator;
 import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Player;
@@ -58,8 +59,8 @@ public final class ReportForeignAffairPanel extends ReportPanel implements Actio
             rebels += sol;
             tories += (colony.getUnitCount() - sol);
         }
-        report += "<p>Rebels:" + rebels +
-                  "<p>Tories:" + tories;
+        report += "<p>" + Messages.message("rebels") + ":" + rebels +
+                  "<p>" + Messages.message("tories") + ":" + tories;
         if (player.hasFather(FoundingFather.JAN_DE_WITT)) {
           // Foreign Affair Reports become more revealing
         }

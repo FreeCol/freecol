@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Player;
 
 /**
@@ -33,7 +34,7 @@ public final class ReportReligiousPanel extends ReportPanel implements ActionLis
         // Display Panel
         reportPanel.removeAll();
 //      reportPanel.setLayout(new GridLayout(8, 1));
-        String report = "<html><p align=center>Crosses ";
+        String report = "<html><p align=center>" + Messages.message("crosses") + " ";
         report += crosses + " / " + required;
         report += "</html>";
         JLabel label;

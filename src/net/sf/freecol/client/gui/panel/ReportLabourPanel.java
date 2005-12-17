@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Unit;
 
 /**
@@ -107,7 +108,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
      * @param parent The parent of this panel.
      */
     public ReportLabourPanel(Canvas parent) {
-        super(parent, "Labour Report");
+        super(parent, Messages.message("report.labour"));
         this.library = (ImageLibrary) parent.getImageProvider();
     }
 
