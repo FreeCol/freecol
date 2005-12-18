@@ -621,10 +621,11 @@ public final class InGameInputHandler extends InputHandler {
 
         Element reply = Message.createNewRootElement("acceptTax");
         final FreeColClient freeColClient = getFreeColClient();
-        if (freeColClient.getCanvas().showConfirmDialog("model.player.taxRate.changed",
-							"model.player.taxRate.accept",
-							"model.player.taxRate.reject",
-							element.getAttribute("amount"))) {
+        if (freeColClient.getCanvas().
+            showConfirmDialog("model.player.taxRate.changed",
+                              "model.player.taxRate.accept",
+                              "model.player.taxRate.reject",
+                              new String [][] {{"%replace%", element.getAttribute("amount")}})) {
             int amount = new Integer(element.getAttribute("amount")).intValue();
             freeColClient.getMyPlayer().setTax(amount);
             freeColClient.getCanvas().getEuropePanel().updateTaxLabel();

@@ -389,22 +389,9 @@ public final class Canvas extends JLayeredPane {
             try {
                 okText = Messages.message(okText);
                 cancelText = Messages.message(cancelText);
-                message = Messages.message(message);
+                message = Messages.message(message, m.getData());
             } catch (MissingResourceException e) {
                 logger.warning("could not find message with id: " + okText + ".");
-            }
-
-            String[][] data = m.getData();
-            if (data != null) {
-                for (int i=0; i<data.length; i++) {
-                    if (data[i] == null) {
-                        logger.warning("Data has a wrong format for message: " + message);
-                    } else if (data[i][0] == null || data[i][1] == null) {
-                        logger.warning("Data in model message is 'null': " + message + ", " + data[i][0] + ", " + data[i][1]);
-                    } else {
-                        message = message.replaceAll(data[i][0], data[i][1]);
-                    }
-                }
             }
 
             FreeColGameObject source = m.getSource();
@@ -412,7 +399,8 @@ public final class Canvas extends JLayeredPane {
                     (source instanceof Colony || source instanceof WorkLocation) && !colonyPanel.isShowing()) {
 
                 FreeColDialog confirmDialog = FreeColDialog.createConfirmDialog(message, okText, cancelText);
-                confirmDialog.setLocation(getWidth() / 2 - confirmDialog.getWidth() / 2, getHeight() / 2 - confirmDialog.getHeight() / 2);
+                confirmDialog.setLocation(getWidth() / 2 - confirmDialog.getWidth() / 2,
+                                          getHeight() / 2 - confirmDialog.getHeight() / 2);
                 add(confirmDialog, new Integer(POPUP_LAYER.intValue() - 1));
                 confirmDialog.requestFocus();
 
@@ -470,12 +458,9 @@ public final class Canvas extends JLayeredPane {
     *         and <i>false</i> otherwise.
     * @see FreeColDialog
     */
-    public boolean showConfirmDialog(String text, String okText, String cancelText, String textParameter) {
+    public boolean showConfirmDialog(String text, String okText, String cancelText, String[][] replace) {
         try {
-            text = Messages.message(text);
-            if (textParameter != null) {
-                text = text.replaceAll("%replace%", textParameter);
-            }
+            text = Messages.message(text, replace);
             okText = Messages.message(okText);
             cancelText = Messages.message(cancelText);
         } catch (MissingResourceException e) {
@@ -483,7 +468,8 @@ public final class Canvas extends JLayeredPane {
         }
 
         FreeColDialog confirmDialog = FreeColDialog.createConfirmDialog(text, okText, cancelText);
-        confirmDialog.setLocation(getWidth() / 2 - confirmDialog.getWidth() / 2, getHeight() / 2 - confirmDialog.getHeight() / 2);
+        confirmDialog.setLocation(getWidth() / 2 - confirmDialog.getWidth() / 2,
+                                  getHeight() / 2 - confirmDialog.getHeight() / 2);
         add(confirmDialog, new Integer(POPUP_LAYER.intValue() - 1));
         confirmDialog.requestFocus();
 
@@ -1346,20 +1332,11 @@ public final class Canvas extends JLayeredPane {
     *                the message gets replaced by <code>replace[i][1]</code>.
     */
     public void showInformationMessage(String messageId, String[][] replace) {
-        String text = Messages.message(messageId);
-
-        /*if (replaceString != null) {
-            text = text.replaceAll("%replace%", replaceString);
-        }*/
-        if (replace != null) {
-            for (int i=0; i<replace.length; i++) {
-                text = text.replaceAll(replace[i][0], replace[i][1]);
-            }
-        }
-
+        String text = Messages.message(messageId, replace);
         FreeColDialog infoDialog = FreeColDialog.createInformationDialog(text);
 
-        infoDialog.setLocation(getWidth() / 2 - infoDialog.getWidth() / 2, getHeight() / 2 - infoDialog.getHeight() / 2);
+        infoDialog.setLocation(getWidth() / 2 - infoDialog.getWidth() / 2,
+                               getHeight() / 2 - infoDialog.getHeight() / 2);
         add(infoDialog, new Integer(POPUP_LAYER.intValue() - 1));
         infoDialog.requestFocus();
 

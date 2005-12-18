@@ -4,6 +4,7 @@ package net.sf.freecol.client.gui.i18n;
 
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.logging.Logger;
 import java.util.Map;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
@@ -27,6 +28,7 @@ public final class Messages {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
+    private static final Logger logger = Logger.getLogger(Messages.class.getName());
 
     /**
      * Construction of this map is avoided if only the default locale is used,
@@ -56,6 +58,36 @@ public final class Messages {
         }
 
         return defaultMessages.findMessage(messageId);
+    }
+
+    /**
+     * Convenience method that finds the message with a particular id in the
+     * default locale and performs string replacements.
+     *
+     * @param  messageId  the id of the message to find
+     * @return  the message with the specified id
+     */
+    public static String message(String messageId, String [][] data) {
+
+        if (null == defaultMessages) {
+            defaultMessages = new Messages(Locale.getDefault());
+        }
+
+        String message = defaultMessages.findMessage(messageId);
+        if (data != null) {
+                for (int i = 0; i < data.length; i++) {
+                    if (data[i] == null) {
+                        logger.warning("Data has a wrong format for message: " + message);
+                    } else if (data[i][0] == null || data[i][1] == null) {
+                        logger.warning("Data in model message is 'null': " +
+                                       message + ", " + data[i][0] + ", " + data[i][1]);
+                    } else {
+                        message = message.replaceAll(data[i][0], data[i][1]);
+                    }
+                }
+        }
+
+        return message;
     }
 
 

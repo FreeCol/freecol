@@ -297,7 +297,7 @@ public final class InGameController implements NetworkConstants {
                     if (canvas.showConfirmDialog("model.diplomacy.attack.ceaseFire",
                                                  "model.diplomacy.attack.confirm",
                                                  "cancel",
-                                                 enemy.getNationAsString())) {
+                                                 new String [][] {{"%replace%", enemy.getNationAsString()}})) {
                         attack(unit, direction);
                     }
                     break;
@@ -305,7 +305,7 @@ public final class InGameController implements NetworkConstants {
                     if (canvas.showConfirmDialog("model.diplomacy.attack.peace",
                                                  "model.diplomacy.attack.confirm",
                                                  "cancel",
-                                                 enemy.getNationAsString())) {
+                                                 new String [][] {{"%replace%", enemy.getNationAsString()}})) {
                         attack(unit, direction);
                     }
                     break;
@@ -1240,7 +1240,10 @@ public final class InGameController implements NetworkConstants {
                 learnSkill.setAttribute("unit", unit.getID());
                 learnSkill.setAttribute("direction", Integer.toString(direction));
 
-                if (canvas.showConfirmDialog("learnSkill.text", "learnSkill.yes", "learnSkill.no", skillName)) {
+                if (canvas.showConfirmDialog("learnSkill.text",
+                                             "learnSkill.yes",
+                                             "learnSkill.no",
+                                             new String [][] {{"%replace%", skillName}})) {
                     unit.setType(skill);
                     settlement.setLearnableSkill(IndianSettlement.NONE);
                 }
@@ -1523,7 +1526,11 @@ public final class InGameController implements NetworkConstants {
     * @param colony The {@link Colony} where the building should be bought.
     */
     public void payForBuilding(Colony colony) {
-        if (!freeColClient.getCanvas().showConfirmDialog("payForBuilding.text", "payForBuilding.yes", "payForBuilding.no", Integer.toString(colony.getPriceForBuilding()))) {
+        if (!freeColClient.getCanvas().
+            showConfirmDialog("payForBuilding.text",
+                              "payForBuilding.yes",
+                              "payForBuilding.no",
+                              new String [][] {{"%replace%", Integer.toString(colony.getPriceForBuilding())}})) {
             return;
         }
 
@@ -1623,7 +1630,7 @@ public final class InGameController implements NetworkConstants {
             if (freeColClient.getCanvas().
                 showConfirmDialog("model.europe.payArrears",
                                   "ok", "cancel",
-                                  String.valueOf(arrears))) {
+                                  new String [][] {{"%replace%", String.valueOf(arrears)}})) {
                 player.modifyGold(-arrears);
                 freeColClient.getCanvas().updateGoldLabel();
                 freeColClient.getCanvas().getEuropePanel().updateGoldLabel();
