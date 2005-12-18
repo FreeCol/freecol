@@ -506,14 +506,20 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalArgumentException("Could not find tile in direction " + direction + " from unit with ID " + attackElement.getAttribute("unit"));
         }
 
+        Element dowElement = null;
         Unit defender = newTile.getDefendingUnit(unit);
         if (defender == null) {
             throw new IllegalStateException("Nothing to attack in direction " + direction + " from unit with ID " + attackElement.getAttribute("unit"));
         } else if (player.getStance(defender.getOwner()) == Player.ALLIANCE) {
             throw new IllegalArgumentException("Can not attack allied player.");
-        } else {
+        } else if (player.getStance(defender.getOwner()) != Player.WAR) {
             player.setStance(defender.getOwner(), Player.WAR);
             defender.getOwner().declareWar(player);
+            // create diplomatic message
+            dowElement = Message.createNewRootElement("diplomaticMessage");
+            dowElement.setAttribute("type", "declarationOfWar");
+            dowElement.setAttribute("attacker", player.getID());
+            dowElement.setAttribute("defender", defender.getOwner().getID());
         }
 
         int result = generateAttackResult(unit, defender);
@@ -532,10 +538,17 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 continue;
             }
 
+            if (dowElement != null) {
+                try {
+                    enemyPlayer.getConnection().send(dowElement);
+                } catch (IOException e) {
+                    logger.warning("Could not send message to: " +
+                                   enemyPlayer.getName() + " with connection " +
+                                   enemyPlayer.getConnection());
+                }
+            }
+            
             Element opponentAttackElement = Message.createNewRootElement("opponentAttack");
-            opponentAttackElement.setAttribute("attackerNation", Integer.toString(unit.getOwner().getNation()));
-            opponentAttackElement.setAttribute("defenderNation", Integer.toString(defender.getOwner().getNation()));
-
             if (unit.isVisibleTo(enemyPlayer) || defender.isVisibleTo(enemyPlayer)) {
                 opponentAttackElement.setAttribute("direction", Integer.toString(direction));
                 opponentAttackElement.setAttribute("result", Integer.toString(result));
@@ -554,11 +567,14 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     opponentAttackElement.setAttribute("update", "unit");
                     opponentAttackElement.appendChild(unit.toXMLElement(enemyPlayer, opponentAttackElement.getOwnerDocument()));
                 }
-            }
-            try {
-                enemyPlayer.getConnection().send(opponentAttackElement);
-            } catch (IOException e) {
-                logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection " + enemyPlayer.getConnection());
+                
+                try {
+                    enemyPlayer.getConnection().send(opponentAttackElement);
+                } catch (IOException e) {
+                    logger.warning("Could not send message to: " +
+                                   enemyPlayer.getName() + " with connection " +
+                                   enemyPlayer.getConnection());
+                }
             }
         }
 

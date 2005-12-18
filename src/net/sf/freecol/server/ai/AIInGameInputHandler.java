@@ -100,6 +100,8 @@ public final class AIInGameInputHandler implements MessageHandler {
                     logger.warning("The server requests a reconnect. This means an illegal operation has been performed. Please refer to any previous error message.");
                 } else if (type.equals("acceptTax")) {
                     reply = acceptTax((DummyConnection) connection, element);
+                } else if (type.equals("diplomaticMessage")) {
+                } else if (type.equals("monarchAction")) {
                 } else if (type.equals("removeGoods")) {
                 } else {
                     logger.warning("Message is of unsupported type \"" + type + "\".");

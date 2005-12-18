@@ -155,6 +155,7 @@ public class Player extends FreeColGameObject {
     private boolean         admin;
     private int             gold;
     private Europe          europe;
+    private Monarch         monarch;
     private boolean         ready;
 
     /** True if this is an AI player. */
@@ -258,6 +259,11 @@ public class Player extends FreeColGameObject {
 
         color = getDefaultNationColor(nation);
         europe = new Europe(game, this);
+        monarch = new Monarch(game, this, "");
+        /** No initial arrears. */
+        for ( int i = 0; i < arrears.length; i++ ) {
+            arrears[i] = 0;
+        }
 
         if (isEuropean(nation)) {
             /*
@@ -266,10 +272,6 @@ public class Player extends FreeColGameObject {
             */
             gold = 0;
 	    
-	    /** No initial arrears. */
-	    for ( int i = 0; i < arrears.length; i++ ) {
-		arrears[i] = 0;
-	    }
         } else {
             gold = 1500;
         }
@@ -848,6 +850,15 @@ public class Player extends FreeColGameObject {
     */
     public Europe getEurope() {
         return europe;
+    }
+
+    /**
+     * Returns the monarch object this player has.
+     *
+     * @return The monarch object this player has.
+     */
+    public Monarch getMonarch() {
+        return monarch;
     }
 
 
@@ -1668,6 +1679,7 @@ public class Player extends FreeColGameObject {
 
         if (showAll || equals(player)) {
             playerElement.appendChild(europe.toXMLElement(player, document, showAll, toSavedGame));
+            playerElement.appendChild(monarch.toXMLElement(player, document, showAll, toSavedGame));
         }
 
         return playerElement;
@@ -1751,6 +1763,14 @@ public class Player extends FreeColGameObject {
             }
         }
         
+        Element monarchElement = getChildElement(playerElement, Monarch.getXMLElementTagName());
+        if (monarchElement != null) {
+            if (monarch != null) {
+                monarch.readFromXMLElement(monarchElement);
+            } else {
+                monarch = new Monarch(getGame(), monarchElement);
+            }
+        }
         resetCanSeeTiles();        
     }
 
@@ -2005,6 +2025,46 @@ public class Player extends FreeColGameObject {
 	}
     }
 
+
+    /**
+     * Returns the most valuable goods available in one of the
+     * player's colonies. The goods must not be boycotted, and the
+     * amount will not exceed 100.
+     *
+     * @return A goods object, or null.
+     */
+    public Goods getMostValuableGoods() {
+        Goods goods = null;
+
+        if (!isEuropean()) {
+            return goods;
+        }
+        
+        Market market = getGame().getMarket();
+        int value = 0;
+
+        Iterator colonyIterator = getColonyIterator();
+        while (colonyIterator.hasNext()) {
+            Colony colony = (Colony) colonyIterator.next();
+            Iterator goodsIterator = colony.getCompactGoodsIterator();
+            while (goodsIterator.hasNext()) {
+                Goods currentGoods = (Goods) goodsIterator.next();
+                if (getArrears(currentGoods) == 0) {
+                    // never discard more than 100 units
+                    if (currentGoods.getAmount() > 100) {
+                        currentGoods.setAmount(100);
+                    }
+                    int goodsValue = market.getSalePrice(currentGoods);
+                    if (goodsValue > value) {
+                        value = goodsValue;
+                        goods = currentGoods;
+                    }
+                }
+            }
+        }                                        
+
+        return goods;
+    }
     
     /**
     * An <code>Iterator</code> of {@link Unit}s that can be made active.

@@ -14,6 +14,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.ModelMessage;
+import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
@@ -94,6 +95,8 @@ public final class InGameInputHandler extends InputHandler {
                 reply = setAI(element);
 	    } else if (type.equals("acceptTax")) {
 		reply = acceptTax(element);
+	    } else if (type.equals("monarchAction")) {
+		reply = monarchAction(element);
 	    } else if (type.equals("removeGoods")) {
 		reply = removeGoods(element);
             } else {
@@ -272,42 +275,12 @@ public final class InGameInputHandler extends InputHandler {
     */
     private Element opponentAttack(Element opponentAttackElement) {
         Game game = getFreeColClient().getGame();
-
-        int attackerNation = Integer.parseInt(opponentAttackElement.getAttribute("attackerNation"));
-        int defenderNation = Integer.parseInt(opponentAttackElement.getAttribute("defenderNation"));
-
-        Player player = getFreeColClient().getMyPlayer();
-        int playerNation = player.getNation();
-        if (playerNation == attackerNation) {
-            // we started it, so we know all about it
-            logger.info("We are at war with the " + player.getNationAsString(defenderNation));
-        } else if (playerNation == defenderNation) {
-            if (player.getStance(attackerNation) != Player.WAR) {
-                player.declareWar(attackerNation);
-                Canvas canvas = getFreeColClient().getCanvas();
-                canvas.showInformationMessage("model.diplomacy.war.declared",
-                                              new String [][] {{"%nation%",
-                                                                player.getNationAsString(attackerNation)}});
-            }
-        } else {
-            if (game.getPlayer(defenderNation).getStance(attackerNation) != Player.WAR) {
-                Canvas canvas = getFreeColClient().getCanvas();
-                logger.info("war happening");
-                canvas.showInformationMessage("model.diplomacy.war.others",
-                                              new String [][] {{"%attacker%",
-                                                                player.getNationAsString(attackerNation)},
-                                                               {"%defender%",
-                                                                player.getNationAsString(defenderNation)}});
-            }
-        }
-        
         Unit unit = (Unit) game.getFreeColGameObject(opponentAttackElement.getAttribute("unit"));
         Unit defender = (Unit) game.getFreeColGameObject(opponentAttackElement.getAttribute("defender"));
 
         if (unit == null && defender == null) {
-            //logger.warning("Both \"unit\" and \"defender\" is \"null\"!");
-            //throw new NullPointerException();
-            return null;
+            logger.warning("Both \"unit\" and \"defender\" is \"null\"!");
+            throw new NullPointerException();
         }
 
         // For later use: int direction = Integer.parseInt(opponentAttackElement.getAttribute("direction"));
@@ -549,6 +522,94 @@ public final class InGameInputHandler extends InputHandler {
         return null;
     }
 
+
+    /**
+     * Handles a "monarchAction"-request.
+     *
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *                holds all the information.
+     */
+    private Element monarchAction(Element element) {
+        final FreeColClient freeColClient = getFreeColClient();
+        Player player = freeColClient.getMyPlayer();
+        Canvas canvas = freeColClient.getCanvas();
+        int action = Integer.parseInt(element.getAttribute("action"));
+
+        switch (action) {
+        case Monarch.ADD_TO_REF:
+            Monarch monarch = player.getMonarch();
+            int type = Integer.parseInt(element.getAttribute("type"));
+            int number = Integer.parseInt(element.getAttribute("number"));
+            Monarch.Addition addition = new Monarch.Addition(type, number);
+            monarch.addToREF(addition);
+            canvas.showInformationMessage("model.monarch.addToREF",
+                                          new String [][] {{"%addition%", addition.getName()}});
+            break;
+        case Monarch.DECLARE_WAR:
+            int nation = Integer.parseInt(element.getAttribute("nation"));
+            player.setStance(nation, Player.WAR);
+            canvas.showInformationMessage("model.monarch.declareWar",
+                                          new String [][] {{"%nation%", player.getNationAsString(nation)}});
+            break;
+        case Monarch.SUPPORT_LAND:
+            NodeList landList = element.getChildNodes();
+            for (int i = 0; i < landList.getLength(); i++) {
+                Element unitElement = (Element) landList.item(i);
+                Unit newUnit = new Unit(freeColClient.getGame(), unitElement);
+                player.getEurope().add(newUnit);
+            }
+            canvas.showModelMessage(new ModelMessage(player.getEurope(),
+                                                     "model.monarch.supportLand",
+                                                     null));
+            break;
+        case Monarch.SUPPORT_SEA:
+            NodeList seaList = element.getChildNodes();
+            for (int i = 0; i < seaList.getLength(); i++) {
+                Element unitElement = (Element) seaList.item(i);
+                Unit newUnit = new Unit(freeColClient.getGame(), unitElement);
+                player.getEurope().add(newUnit);
+            }
+            canvas.showModelMessage(new ModelMessage(player.getEurope(),
+                                                     "model.monarch.supportSea",
+                                                     null));
+            break;
+        }
+        return null;
+    }
+
+    /**
+     * Handles a "diplomaticMessage"-request.
+     *
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *                holds all the information.
+     */
+    private Element diplomaticMessage(Element element) {
+        final FreeColClient freeColClient = getFreeColClient();
+        Game game = freeColClient.getGame();
+        Player player = freeColClient.getMyPlayer();
+        Canvas canvas = freeColClient.getCanvas();
+
+        String type = element.getAttribute("type");
+        if (type.equals("declarationOfWar")) {
+            Player attacker = (Player) game.getFreeColGameObject(element.getAttribute("attacker"));
+            Player defender = (Player) game.getFreeColGameObject(element.getAttribute("defender"));
+        
+            if (player.equals(defender)) {
+                canvas.showInformationMessage("model.diplomacy.war.declared",
+                                              new String [][] {{"%nation%",
+                                                                attacker.getNationAsString()}});
+                player.declareWar(attacker);
+            } else {
+                canvas.showInformationMessage("model.diplomacy.war.others",
+                                              new String [][] {{"%attacker%",
+                                                                attacker.getNationAsString()},
+                                                               {"%defender%",
+                                                                defender.getNationAsString()}});
+            }
+        }
+            
+        return null;
+    }
 
     /**
      * Handles an "acceptTax"-request.
