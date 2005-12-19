@@ -36,7 +36,7 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    private static final Logger logger = Logger.getLogger(EventPanel.class.getName());
+    private static final Logger logger = Logger.getLogger(TilePanel.class.getName());
 
     private static final int OK = 0;
     private final Canvas canvas;
@@ -87,7 +87,7 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
             goodsPanel.add(labels[k]);
         }
         
-        goodsPanel.setSize(getPreferredSize());
+        goodsPanel.setSize(goodsPanel.getPreferredSize());
         add(goodsPanel);
 
         okButton = new JButton(Messages.message("ok"));
@@ -115,7 +115,8 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
     /**
     * Initializes the information that is being displayed on this panel.
     * The information displayed will be based on the given tile.
-    * @param settlement The Tile whose information should be displayed.
+    *
+    * @param tile The Tile whose information should be displayed.
     */
     public void initialize(Tile tile) {
         tileNameLabel.setText(tile.getName());

@@ -41,6 +41,7 @@ import net.sf.freecol.client.gui.panel.ImageProvider;
 import net.sf.freecol.client.gui.panel.IndianSettlementPanel;
 import net.sf.freecol.client.gui.panel.InfoPanel;
 import net.sf.freecol.client.gui.panel.MainPanel;
+import net.sf.freecol.client.gui.panel.MonarchPanel;
 import net.sf.freecol.client.gui.panel.NewPanel;
 import net.sf.freecol.client.gui.panel.QuitDialog;
 import net.sf.freecol.client.gui.panel.ReportForeignAffairPanel;
@@ -122,6 +123,7 @@ public final class Canvas extends JLayeredPane {
     private final ColonyPanel       colonyPanel;
     private final IndianSettlementPanel indianSettlementPanel;
     private final TilePanel         tilePanel;
+    private final MonarchPanel         monarchPanel;
     private final EuropePanel       europePanel;
     private final StatusPanel       statusPanel;
     private final ChatPanel         chatPanel;
@@ -171,6 +173,7 @@ public final class Canvas extends JLayeredPane {
         colonyPanel = new ColonyPanel(this, freeColClient);
         indianSettlementPanel = new IndianSettlementPanel();
         tilePanel = new TilePanel(this);
+        monarchPanel = new MonarchPanel(this);
 
         europePanel = new EuropePanel(this, freeColClient, freeColClient.getInGameController());
         statusPanel = new StatusPanel(this);
@@ -1050,6 +1053,31 @@ public final class Canvas extends JLayeredPane {
         tilePanel.getResponseBoolean();
 
         remove(tilePanel);
+    }
+
+    /**
+     * Displays the monarch action panel.
+     * @param action The monarch action.
+     * @param replace The replacement strings.
+     * @return true or false
+     * @see Monarch
+     */
+    public boolean showMonarchPanel(int action, String [][] replace) {
+        closeMenus();
+
+        monarchPanel.initialize(action, replace);
+        monarchPanel.setLocation(getWidth() / 2 - monarchPanel.getWidth() / 2,
+                                 getHeight() / 2 - monarchPanel.getHeight() / 2);
+
+        add(monarchPanel);
+
+        monarchPanel.requestFocus();
+
+        boolean response = monarchPanel.getResponseBoolean();
+
+        remove(monarchPanel);
+
+        return response;
     }
 
     /**

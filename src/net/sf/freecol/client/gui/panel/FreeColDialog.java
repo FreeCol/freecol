@@ -398,20 +398,27 @@ public class FreeColDialog extends FreeColPanel {
     * @return The FreeColDialog that asks the question to the user.
     */
     public static FreeColDialog createScoutIndianSettlementDialog(IndianSettlement settlement, Player player) {
-        String mainText = Messages.message(settlement.getAlarmLevelMessage(player));
-        mainText = mainText.replaceAll("%nation%", settlement.getOwner().getNationAsString());
+        String intro = Messages.message(settlement.getAlarmLevelMessage(player),
+                                        new String [][] {{"%nation%", settlement.getOwner().getNationAsString()}});
         int skill = settlement.getLearnableSkill();
+        String messageID;
+        String skillName = "";
         if (skill >= 0) {
-            mainText += Messages.message("scoutSettlement.question1").replaceAll("%replace_skill%", Unit.getName(skill).toLowerCase());
+            messageID = "scoutSettlement.question1";
+            skillName = Unit.getName(skill).toLowerCase();
+        } else {
+            messageID = "scoutSettlement.question2";
         }
-        else {
-            mainText += Messages.message("scoutSettlement.question2");
-        }
-        mainText = mainText.replaceAll("%replace_good1%", Goods.getName(settlement.getHighlyWantedGoods()).toLowerCase());
-        mainText = mainText.replaceAll("%replace_good2%", Goods.getName(settlement.getWantedGoods1()).toLowerCase());
-        mainText = mainText.replaceAll("%replace_good3%", Goods.getName(settlement.getWantedGoods2()).toLowerCase());
+        String [][] data = new String [][] {
+            {"%replace_skill%", skillName},
+            {"%replace_good1%", Goods.getName(settlement.getHighlyWantedGoods()).toLowerCase()},
+            {"%replace_good2%", Goods.getName(settlement.getWantedGoods1()).toLowerCase()},
+            {"%replace_good3%", Goods.getName(settlement.getWantedGoods2()).toLowerCase()}};
+    
+        String mainText = Messages.message(messageID, data);
 
-        final JLabel question = new JLabel("<html><body>" + mainText + "</body></html>");
+        final JLabel question = new JLabel("<html><body><p>" + intro +
+                                           "</p><p>" + mainText + "</p></body></html>");
         final JButton speak = new JButton(Messages.message("scoutSettlement.speak")),
                 demand = new JButton(Messages.message("scoutSettlement.tribute")),
                 attack = new JButton(Messages.message("scoutSettlement.attack")),
@@ -474,11 +481,12 @@ public class FreeColDialog extends FreeColPanel {
     * @return The FreeColDialog that asks the question to the user.
     */
     public static FreeColDialog createUseMissionaryDialog(IndianSettlement settlement, Player player) {
-        String mainText = Messages.message(settlement.getAlarmLevelMessage(player));
-        mainText = mainText.replaceAll("%nation%", settlement.getOwner().getNationAsString());
-        mainText += Messages.message("missionarySettlement.question");
+        String intro = Messages.message(settlement.getAlarmLevelMessage(player),
+                                        new String [][] {{"%nation%", settlement.getOwner().getNationAsString()}});
+        String mainText = Messages.message("missionarySettlement.question");
 
-        final JLabel question = new JLabel("<html><body>" + mainText + "</body></html>");
+        final JLabel question = new JLabel("<html><body><p>" + intro +
+                                           "</p><p>" + mainText + "</p></body></html>");
         final JButton establishOrHeresy = new JButton(),
                 incite = new JButton(Messages.message("missionarySettlement.incite")),
                 cancel = new JButton(Messages.message("missionarySettlement.cancel"));

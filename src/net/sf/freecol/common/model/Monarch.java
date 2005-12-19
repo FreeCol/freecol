@@ -35,7 +35,8 @@ public final class Monarch extends FreeColGameObject {
         DECLARE_WAR = 3,
         SUPPORT_SEA = 4,
         SUPPORT_LAND = 5,
-        NUMBER_OF_ACTIONS = 6;
+        NUMBER_OF_ACTIONS = 6,
+        WAIVE_TAX = 7;
 
     /** Constants describing the REF. */
     public static final int INFANTRY = 0,
@@ -207,18 +208,21 @@ public final class Monarch extends FreeColGameObject {
                 } else {
                     name = Messages.message("model.monarch.infantries");
                 }
+                break;
             case DRAGOON:
                 if (number == 1) {
                     name = Messages.message("model.monarch.dragoon");
                 } else {
                     name = Messages.message("model.monarch.dragoons");
                 }
+                break;
             case ARTILLERY:
                 if (number == 1) {
                     name = Messages.message("model.monarch.artillery");
                 } else {
                     name = Messages.message("model.monarch.artilleries");
                 }
+                break;
             }
             return String.valueOf(number) + " " + name;
         }

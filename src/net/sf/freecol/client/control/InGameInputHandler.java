@@ -93,8 +93,6 @@ public final class InGameInputHandler extends InputHandler {
                 reply = reconnect(element);
             } else if (type.equals("setAI")) {
                 reply = setAI(element);
-	    } else if (type.equals("acceptTax")) {
-		reply = acceptTax(element);
 	    } else if (type.equals("monarchAction")) {
 		reply = monarchAction(element);
 	    } else if (type.equals("removeGoods")) {
@@ -536,20 +534,34 @@ public final class InGameInputHandler extends InputHandler {
         int action = Integer.parseInt(element.getAttribute("action"));
 
         switch (action) {
+        case Monarch.RAISE_TAX:
+            Element reply = Message.createNewRootElement("acceptTax");
+            if (freeColClient.getCanvas().
+                showMonarchPanel(action,
+                                 new String [][] {{"%replace%", element.getAttribute("amount")}})) {
+                int amount = new Integer(element.getAttribute("amount")).intValue();
+                freeColClient.getMyPlayer().setTax(amount);
+                freeColClient.getCanvas().getEuropePanel().updateTaxLabel();
+                reply.setAttribute("accepted", String.valueOf(true));
+            } else {
+                reply.setAttribute("accepted", String.valueOf(false));
+                
+            }
+            return reply;
         case Monarch.ADD_TO_REF:
             Monarch monarch = player.getMonarch();
             int type = Integer.parseInt(element.getAttribute("type"));
             int number = Integer.parseInt(element.getAttribute("number"));
             Monarch.Addition addition = new Monarch.Addition(type, number);
             monarch.addToREF(addition);
-            canvas.showInformationMessage("model.monarch.addToREF",
-                                          new String [][] {{"%addition%", addition.getName()}});
+            canvas.showMonarchPanel(action,
+                                    new String [][] {{"%addition%", addition.getName()}});
             break;
         case Monarch.DECLARE_WAR:
             int nation = Integer.parseInt(element.getAttribute("nation"));
             player.setStance(nation, Player.WAR);
-            canvas.showInformationMessage("model.monarch.declareWar",
-                                          new String [][] {{"%nation%", player.getNationAsString(nation)}});
+            canvas.showMonarchPanel(action,
+                                    new String [][] {{"%nation%", player.getNationAsString(nation)}});
             break;
         case Monarch.SUPPORT_LAND:
             NodeList landList = element.getChildNodes();
@@ -558,9 +570,9 @@ public final class InGameInputHandler extends InputHandler {
                 Unit newUnit = new Unit(freeColClient.getGame(), unitElement);
                 player.getEurope().add(newUnit);
             }
-            canvas.showModelMessage(new ModelMessage(player.getEurope(),
-                                                     "model.monarch.supportLand",
-                                                     null));
+            if (!canvas.showMonarchPanel(action, null)) {
+                canvas.showEuropePanel();
+            }
             break;
         case Monarch.SUPPORT_SEA:
             NodeList seaList = element.getChildNodes();
@@ -569,9 +581,9 @@ public final class InGameInputHandler extends InputHandler {
                 Unit newUnit = new Unit(freeColClient.getGame(), unitElement);
                 player.getEurope().add(newUnit);
             }
-            canvas.showModelMessage(new ModelMessage(player.getEurope(),
-                                                     "model.monarch.supportSea",
-                                                     null));
+            if (!canvas.showMonarchPanel(action, null)) {
+                canvas.showEuropePanel();
+            }
             break;
         }
         return null;
@@ -611,33 +623,6 @@ public final class InGameInputHandler extends InputHandler {
         return null;
     }
 
-    /**
-     * Handles an "acceptTax"-request.
-     *
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *                holds all the information.
-     */
-    private Element acceptTax(Element element) {
-
-        Element reply = Message.createNewRootElement("acceptTax");
-        final FreeColClient freeColClient = getFreeColClient();
-        if (freeColClient.getCanvas().
-            showConfirmDialog("model.player.taxRate.changed",
-                              "model.player.taxRate.accept",
-                              "model.player.taxRate.reject",
-                              new String [][] {{"%replace%", element.getAttribute("amount")}})) {
-            int amount = new Integer(element.getAttribute("amount")).intValue();
-            freeColClient.getMyPlayer().setTax(amount);
-            freeColClient.getCanvas().getEuropePanel().updateTaxLabel();
-            reply.setAttribute("accepted", String.valueOf(true));
-        } else {
-            reply.setAttribute("accepted", String.valueOf(false));
-            
-        }
-
-        return reply;
-
-    }
 
 
     /**
@@ -656,7 +641,7 @@ public final class InGameInputHandler extends InputHandler {
 
         if (goodsElement == null) {
             // player has no colony or nothing to trade
-            m = new ModelMessage(null, "model.player.taxWaived", null);
+            freeColClient.getCanvas().showMonarchPanel(Monarch.WAIVE_TAX, null);
         } else {
             Goods goods = new Goods(game, goodsElement);
             Colony colony = (Colony) goods.getLocation();
@@ -668,12 +653,12 @@ public final class InGameInputHandler extends InputHandler {
             }
         
             m = new ModelMessage(colony,
-                                 "model.player.bostonTeaParty",
+                                 "model.monarch.bostonTeaParty",
                                  new String [][] {{"%colony%", colony.getName()},
                                                   {"%amount%", String.valueOf(goods.getAmount())},
                                                   {"%goods%", goods.getName()}});
+            freeColClient.getCanvas().showModelMessage(m);
         }
-        freeColClient.getCanvas().showModelMessage(m);
                          
         return null;
     }

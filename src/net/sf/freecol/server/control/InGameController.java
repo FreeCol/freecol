@@ -311,10 +311,9 @@ public final class InGameController extends Controller {
                         logger.warning("Tax rate exceeds 100 percent.");
                         return;
                     }
-		    Element acceptTaxElement = Message.createNewRootElement("acceptTax");
-		    acceptTaxElement.setAttribute("amount", String.valueOf(newTax));
+                    monarchActionElement.setAttribute("amount", String.valueOf(newTax));
 		    try {
-                        Element reply = nextPlayer.getConnection().ask(acceptTaxElement);
+                        Element reply = nextPlayer.getConnection().ask(monarchActionElement);
                         boolean accepted = Boolean.valueOf(reply.getAttribute("accepted")).booleanValue();
 
 			if (accepted) {
