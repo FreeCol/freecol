@@ -29,7 +29,6 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-
     private final Tile tile;
     private final FreeColClient freeColClient;
     private final Canvas canvas;
@@ -91,7 +90,7 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
     */
     private void addUnit(Unit unit) {
         JMenuItem menuItem = new JMenuItem(unit.toString());
-        menuItem.setActionCommand("unit " + unit.getID());
+        menuItem.setActionCommand(Unit.getXMLElementTagName() + unit.getID());
         menuItem.addActionListener(this);
         add(menuItem);
         hasAnItem = true;
@@ -104,7 +103,7 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
     */
     private void addColony(Colony colony) {
         JMenuItem menuItem = new JMenuItem(colony.toString());
-        menuItem.setActionCommand("colony");
+        menuItem.setActionCommand(Colony.getXMLElementTagName());
         menuItem.addActionListener(this);
         add(menuItem);
         hasAnItem = true;
@@ -118,7 +117,7 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
     private void addIndianSettlement(IndianSettlement settlement) {
         JMenuItem menuItem = new JMenuItem(
                 settlement.getOwner().getNationAsString() + " settlement");
-        menuItem.setActionCommand("indianSettlement");
+        menuItem.setActionCommand(IndianSettlement.getXMLElementTagName());
         menuItem.addActionListener(this);
         add(menuItem);
         hasAnItem = true;
@@ -130,7 +129,7 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
      */
     private void addTile(Tile tile) {
         JMenuItem menuItem = new JMenuItem(tile.getName());
-        menuItem.setActionCommand("tile");
+        menuItem.setActionCommand(Tile.getXMLElementTagName());
         menuItem.addActionListener(this);
         add(menuItem);
         /**
@@ -157,21 +156,21 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
     */
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
-        if (command.startsWith("unit ")) {
+        if (command.startsWith(Unit.getXMLElementTagName())) {
             String unitId = null;
 
             try {
-                unitId = command.substring(5, command.length());
+                unitId = command.substring(Unit.getXMLElementTagName().length());
             } catch (IndexOutOfBoundsException e) {
                 e.printStackTrace();
             }
 
             gui.setActiveUnit((Unit) freeColClient.getGame().getFreeColGameObject(unitId));
-        } else if (command == "colony") {
+        } else if (command.equals(Colony.getXMLElementTagName())) {
             canvas.showColonyPanel((Colony) tile.getSettlement());
-        } else if (command == "indianSettlement") {
+        } else if (command.equals(IndianSettlement.getXMLElementTagName())) {
             canvas.showIndianSettlementPanel((IndianSettlement) tile.getSettlement());
-        } else if (command == "tile") {
+        } else if (command.equals(Tile.getXMLElementTagName())) {
             canvas.showTilePanel(tile);
         } else {
             logger.warning("Invalid actioncommand.");

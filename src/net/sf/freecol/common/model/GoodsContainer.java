@@ -9,8 +9,6 @@ import java.util.logging.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import net.sf.freecol.common.model.ModelMessage;
-
 /**
 * Contains goods and can be used by a {@link Location} to make certain
 * tasks easier.
