@@ -12,6 +12,7 @@ import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Monarch;
@@ -97,6 +98,8 @@ public final class InGameInputHandler extends InputHandler {
 		reply = monarchAction(element);
 	    } else if (type.equals("removeGoods")) {
 		reply = removeGoods(element);
+            } else if (type.equals("lostCityRumour")) {
+                reply = lostCityRumour(element);
             } else {
                 logger.warning("Message is of unsupported type \"" + type + "\".");
             }
@@ -663,6 +666,87 @@ public final class InGameInputHandler extends InputHandler {
         return null;
     }
 
+    /**
+     * Handles a "lostCityRumour"-request.
+     *
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *                holds all the information.
+     */
+    private Element lostCityRumour(Element element) {
+        final FreeColClient freeColClient = getFreeColClient();
+        Game game = getFreeColClient().getGame();
+        Player player = freeColClient.getMyPlayer();
+        Canvas canvas = freeColClient.getCanvas();
 
-    
+        int type = Integer.parseInt(element.getAttribute("type"));
+        Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
+
+        if (unit == null) {
+            throw new IllegalArgumentException("Unit is null.");
+        }
+        Tile tile = unit.getTile();
+        tile.setLostCityRumour(false);
+        
+        Unit newUnit;
+        NodeList unitList;
+        ModelMessage m;
+        switch (type) {            
+        case LostCityRumour.BURIAL_GROUND:
+            Player indianPlayer = game.getPlayer(tile.getNationOwner());
+            indianPlayer.modifyTension(player, Player.TENSION_HATEFUL);
+            m = new ModelMessage(tile, "lostCityRumour.BurialGround", 
+                                 new String [][] {{"%nation%", indianPlayer.getNationAsString()}});
+        case LostCityRumour.EXPEDITION_VANISHES: 
+            m = new ModelMessage(tile, "lostCityRumour.ExpeditionVanishes", null);
+            unit.dispose();
+            break;
+        case LostCityRumour.NOTHING:
+            m = new ModelMessage(tile, "lostCityRumour.Nothing", null);
+            break;
+        case LostCityRumour.SEASONED_SCOUT:
+            m = new ModelMessage(tile, "lostCityRumour.SeasonedScout",
+                                 new String [][] {{"%unit%", unit.getName()}});
+            unit.setType(Unit.SEASONED_SCOUT);
+            break;
+        case LostCityRumour.TRIBAL_CHIEF:
+            String amount = element.getAttribute("amount");
+            m = new ModelMessage(tile, "lostCityRumour.TribalChief", 
+                                 new String [][] {{"%money%", amount}});
+            player.modifyGold(Integer.parseInt(amount));
+            break;
+        case LostCityRumour.COLONIST:
+            m = new ModelMessage(tile, "lostCityRumour.Colonist", null);
+            unitList = element.getChildNodes();
+            for (int i = 0; i < unitList.getLength(); i++) {
+                Element unitElement = (Element) unitList.item(i);
+                newUnit = new Unit(game, unitElement);
+                tile.add(newUnit);
+            }
+            break;
+        case LostCityRumour.TREASURE_TRAIN:
+            String treasure = element.getAttribute("amount");
+            m = new ModelMessage(tile, "lostCityRumour.TreasureTrain",
+                                 new String [][] {{"%money%", treasure}});
+            unitList = element.getChildNodes();
+            for (int i = 0; i < unitList.getLength(); i++) {
+                Element unitElement = (Element) unitList.item(i);
+                newUnit = new Unit(game, unitElement);
+                tile.add(newUnit);
+            }
+            break;
+        case LostCityRumour.FOUNTAIN_OF_YOUTH:
+            m = new ModelMessage(player.getEurope(), "lostCityRumour.FountainOfYouth", null);
+            unitList = element.getChildNodes();
+            for (int i = 0; i < unitList.getLength(); i++) {
+                Element unitElement = (Element) unitList.item(i);
+                newUnit = new Unit(game, unitElement);
+                player.getEurope().add(newUnit);
+            }
+            break;
+        default:
+            throw new IllegalStateException( "No such rumour." );
+        }
+        canvas.showModelMessage(m);
+        return null;
+    }
 }

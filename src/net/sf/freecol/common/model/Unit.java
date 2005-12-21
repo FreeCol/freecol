@@ -98,7 +98,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                             ENTER_INDIAN_VILLAGE_WITH_MISSIONARY = 7,
                             ENTER_FOREIGN_COLONY_WITH_SCOUT = 8,
                             ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS = 9,
-                            ILLEGAL_MOVE = 10;
+                            EXPLORE_LOST_CITY_RUMOUR = 10,
+                            ILLEGAL_MOVE = 11;
 
     public static final int ATTACK_GREAT_LOSS = -2,
                             ATTACK_LOSS = -1,
@@ -793,7 +794,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
             return ILLEGAL_MOVE;
         }
-
+        
+        if (target.getLostCityRumour()) {
+            return EXPLORE_LOST_CITY_RUMOUR;
+        }
+        
         return MOVE;
     }
 
@@ -868,7 +873,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     public void move(int direction) {
         int type = getMoveType(direction);
 
-        if (type != MOVE && type != DISEMBARK && type != MOVE_HIGH_SEAS) {
+        if (type != MOVE && type != DISEMBARK && type != MOVE_HIGH_SEAS &&
+            type != EXPLORE_LOST_CITY_RUMOUR) {
             throw new IllegalStateException("\nIllegal move requested: " + type
                     + " while trying to move a " + getName() + " located at "
                     + getTile().getPosition().toString() + ". Direction: "

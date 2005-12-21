@@ -61,7 +61,7 @@ public class Game extends FreeColGameObject {
     /** Indicates wether or not this object may give IDs. */
     private boolean canGiveID;
 
-    /* The market for Europe. */
+    /** The market for Europe. */
     private Market market;
 
     private Turn turn = new Turn(1);
@@ -69,7 +69,10 @@ public class Game extends FreeColGameObject {
     private final ModelController modelController;
     private FreeColGameObjectListener freeColGameObjectListener;
 
+    /** The lost city rumour class. */
+    private final static LostCityRumour lostCityRumour = new LostCityRumour();
 
+    
     /**
     * Creates a new game model.
     */
@@ -164,6 +167,13 @@ public class Game extends FreeColGameObject {
         return turn;
     }
 
+    /**
+     * Returns this game's LostCityRumour.
+     * @return This game's LostCityRumour.
+     */
+    public LostCityRumour getLostCityRumour() {
+        return lostCityRumour;
+    }
 
     /**
     * Resets this game's Market.

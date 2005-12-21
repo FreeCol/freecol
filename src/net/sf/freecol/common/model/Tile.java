@@ -56,7 +56,8 @@ public final class Tile extends FreeColGameObject implements Location {
     private boolean road,
                     plowed,
                     forested,
-                    bonus;
+                    bonus,
+                    lostCityRumour;
 
     private int     type;
 
@@ -126,6 +127,7 @@ public final class Tile extends FreeColGameObject implements Location {
         plowed = false;
         forested = false;
         bonus = false;
+        lostCityRumour = false;
 
         x = locX;
         y = locY;
@@ -763,7 +765,25 @@ public final class Tile extends FreeColGameObject implements Location {
         return new Position(x, y);
     }
 
+    /**
+     * Returns true if there is a lost city rumour on this tile.
+     *
+     * @return True or false.
+     */
+    public boolean getLostCityRumour() {
+        return lostCityRumour;
+    }
 
+    /**
+     * Sets the lost city rumour for this tile.
+     *
+     * @param rumour True or false.
+     */
+    public void setLostCityRumour(boolean rumour) {
+        lostCityRumour = rumour;
+    }
+
+    
     /**
     * Check if the tile type is suitable for a <code>Settlement</code>, either by a
     * <code>Colony</code> or an <code>IndianSettlement</code>.
@@ -984,9 +1004,9 @@ public final class Tile extends FreeColGameObject implements Location {
      * @see Unit#canPlow
      */
     public boolean canBePlowed() {
-    	return (!isPlowed() && isLand() 
-    			&& getAddition() != Tile.ADD_HILLS
-    			&& getAddition() != Tile.ADD_MOUNTAINS);
+        return (!isPlowed() && isLand() 
+                        && getAddition() != Tile.ADD_HILLS
+                        && getAddition() != Tile.ADD_MOUNTAINS);
     }    
 
     
@@ -998,7 +1018,7 @@ public final class Tile extends FreeColGameObject implements Location {
      * @return The result.
      */
     public boolean canGetRoad() {
-    	return isLand() && !hasRoad();
+        return isLand() && !hasRoad();
     }    
         
      
@@ -1190,6 +1210,10 @@ public final class Tile extends FreeColGameObject implements Location {
             tileElement.setAttribute("bonus", Boolean.toString(bonus));
         }
 
+        if (lostCityRumour) {
+            tileElement.setAttribute("lostCityRumour", Boolean.toString(lostCityRumour));
+        }
+        
         if (nationOwner != Player.NO_NATION && (showAll || player.canSee(this))) {
             tileElement.setAttribute("nationOwner", Integer.toString(nationOwner));
         }
@@ -1269,6 +1293,12 @@ public final class Tile extends FreeColGameObject implements Location {
             bonus = Boolean.valueOf(tileElement.getAttribute("bonus")).booleanValue();
         } else {
             bonus = false;
+        }
+
+        if (tileElement.hasAttribute("lostCityRumour")) {
+            lostCityRumour = Boolean.valueOf(tileElement.getAttribute("lostCityRumour")).booleanValue();
+        } else {
+            lostCityRumour = false;
         }
 
         if (tileElement.hasAttribute("nationOwner")) {
@@ -1397,7 +1427,8 @@ public final class Tile extends FreeColGameObject implements Location {
         playerExploredTiles[nation].setPlowed(plowed);
         playerExploredTiles[nation].setForested(forested);
         playerExploredTiles[nation].setBonus(bonus);
-
+        playerExploredTiles[nation].setLostCityRumour(lostCityRumour);
+        
         if (getColony() != null) {
             playerExploredTiles[nation].setColonyUnitCount(getSettlement().getUnitCount());
             playerExploredTiles[nation].setColonyStockadeLevel(getColony().getBuilding(Building.STOCKADE).getLevel());
@@ -1531,6 +1562,7 @@ public final class Tile extends FreeColGameObject implements Location {
 
         //private Settlement settlement;
 
+        private boolean lostCityRumour;
 
         /**
         * Creates a new <code>PlayerExploredTile</code>.
@@ -1578,6 +1610,9 @@ public final class Tile extends FreeColGameObject implements Location {
             this.bonus = bonus;
         }
 
+        public void setLostCityRumour(boolean lostCityRumour) {
+            this.lostCityRumour = lostCityRumour;
+        }
 
         public void setExplored(boolean explored) {
             this.explored = explored;
@@ -1633,6 +1668,7 @@ public final class Tile extends FreeColGameObject implements Location {
             tileElement.setAttribute("plowed", Boolean.toString(plowed));
             tileElement.setAttribute("forested", Boolean.toString(forested));
             tileElement.setAttribute("bonus", Boolean.toString(bonus));
+            tileElement.setAttribute("lostCityRumour", Boolean.toString(lostCityRumour));
 
             if (getColony() != null) {
                 Element colonyElement = getChildElement(tileElement, Colony.getXMLElementTagName());
@@ -1698,6 +1734,7 @@ public final class Tile extends FreeColGameObject implements Location {
             tileElement.setAttribute("plowed", Boolean.toString(plowed));
             tileElement.setAttribute("forested", Boolean.toString(forested));
             tileElement.setAttribute("bonus", Boolean.toString(bonus));
+            tileElement.setAttribute("lostCityRumour", Boolean.toString(lostCityRumour));
 
             tileElement.setAttribute("colonyUnitCount", Integer.toString(colonyUnitCount));
             tileElement.setAttribute("colonyStockadeLevel", Integer.toString(colonyStockadeLevel));
@@ -1728,6 +1765,7 @@ public final class Tile extends FreeColGameObject implements Location {
             plowed = Boolean.valueOf(tileElement.getAttribute("plowed")).booleanValue();
             forested = Boolean.valueOf(tileElement.getAttribute("forested")).booleanValue();
             bonus = Boolean.valueOf(tileElement.getAttribute("bonus")).booleanValue();
+            lostCityRumour = Boolean.valueOf(tileElement.getAttribute("lostCityRumour")).booleanValue();
 
             colonyUnitCount = Integer.parseInt(tileElement.getAttribute("colonyUnitCount"));
             colonyStockadeLevel = Integer.parseInt(tileElement.getAttribute("colonyStockadeLevel"));

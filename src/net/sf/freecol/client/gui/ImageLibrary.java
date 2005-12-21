@@ -41,7 +41,8 @@ public final class ImageLibrary extends ImageProvider {
                             PLOWED = 4,
                             TILE_TAKEN = 5,
                             TILE_OWNED_BY_INDIANS = 6,
-	                    MISC_COUNT = 7;
+                            LOST_CITY_RUMOUR = 7,
+                            MISC_COUNT = 8;
 
     /**
      * These finals represent the EXTRA terrain graphics; the ones that
@@ -310,7 +311,7 @@ public final class ImageLibrary extends ImageProvider {
         loadGoods(gc, resourceLocator, doLookup);
         loadBonus(gc, resourceLocator, doLookup);
 
-	alarmChips = new Image[IndianSettlement.NUMBER_OF_ALARM_LEVELS];
+        alarmChips = new Image[IndianSettlement.NUMBER_OF_ALARM_LEVELS];
         colorChips = new Hashtable();
         missionChips = new Hashtable();
         expertMissionChips = new Hashtable();
@@ -656,31 +657,31 @@ public final class ImageLibrary extends ImageProvider {
         BufferedImage tempImage = gc.createCompatibleImage(10, 17);
         Graphics2D g = (Graphics2D)tempImage.getGraphics();
 
-	g.setColor(Color.BLACK);
+        g.setColor(Color.BLACK);
         g.drawRect(0, 0, 10, 16);
 
-	if (alarm == IndianSettlement.HAPPY) {
-	    g.setColor(Color.GREEN);
-	} else if (alarm == IndianSettlement.CONTENT) {
-	    g.setColor(Color.BLUE);
-	} else if (alarm == IndianSettlement.DISPLEASED) {
-	    g.setColor(Color.YELLOW);
-	} else if (alarm == IndianSettlement.ANGRY) {
-	    g.setColor(Color.ORANGE);
-	} else if (alarm == IndianSettlement.HATEFUL) {
-	    g.setColor(Color.RED);
-	} else {
-	    logger.warning("Unknown alarm level: " + alarm);
-	    return;
-	}
+        if (alarm == IndianSettlement.HAPPY) {
+            g.setColor(Color.GREEN);
+        } else if (alarm == IndianSettlement.CONTENT) {
+            g.setColor(Color.BLUE);
+        } else if (alarm == IndianSettlement.DISPLEASED) {
+            g.setColor(Color.YELLOW);
+        } else if (alarm == IndianSettlement.ANGRY) {
+            g.setColor(Color.ORANGE);
+        } else if (alarm == IndianSettlement.HATEFUL) {
+            g.setColor(Color.RED);
+        } else {
+            logger.warning("Unknown alarm level: " + alarm);
+            return;
+        }
 
         g.fillRect(1, 1, 8, 15);
-	g.setColor(Color.BLACK);
+        g.setColor(Color.BLACK);
 
-	g.fillRect(4, 3, 2, 7);
-	g.fillRect(4, 12, 2, 2);
-	
-	alarmChips[alarm] = tempImage;
+        g.fillRect(4, 3, 2, 7);
+        g.fillRect(4, 12, 2, 2);
+        
+        alarmChips[alarm] = tempImage;
     }
 
 
@@ -900,8 +901,8 @@ public final class ImageLibrary extends ImageProvider {
         if (alarmChip == null) {
             GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
             loadAlarmChip(gc, alarm);
-	    alarmChip = (Image)alarmChips[alarm];
-	}
+            alarmChip = (Image)alarmChips[alarm];
+        }
         return alarmChip;
     }
 

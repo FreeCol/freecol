@@ -17,6 +17,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
@@ -91,6 +92,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                         reply = chat(connection, element);
                     } else if (type.equals("move")) {
                         reply = move(connection, element);
+                    } else if (type.equals("explore")) {
+                        reply = explore(connection, element);
                     } else if (type.equals("askSkill")) {
                         reply = askSkill(connection, element);
                     } else if (type.equals("attack")) {
@@ -405,6 +408,106 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         return reply;
     }
 
+
+    /**
+    * Handles an "explore"-message from a client.
+    *
+    * @param connection The connection the message came from.
+    * @param moveElement The element containing the request.
+    * @exception IllegalArgumentException If the data format of the message is invalid.
+    * @exception IllegalStateException If the request is not accepted by the model.
+    *
+    */
+    private Element explore(Connection connection, Element exploreElement) {
+        FreeColServer freeColServer = getFreeColServer();
+        Game game = freeColServer.getGame();
+
+        ServerPlayer player = freeColServer.getPlayer(connection);
+
+        Unit unit = (Unit) game.getFreeColGameObject(exploreElement.getAttribute("unit"));
+        if (unit == null) {
+            throw new IllegalArgumentException("Unit is null.");
+        }
+
+        Tile tile = unit.getTile();
+        if (tile.getLostCityRumour()) {
+            tile.setLostCityRumour(false);
+        } else {
+            throw new IllegalStateException("No rumour to explore.");
+        }
+            
+        int type = game.getLostCityRumour().explore(unit);
+        Element rumourElement = Message.createNewRootElement("lostCityRumour");
+        rumourElement.setAttribute("type", Integer.toString(type));
+        rumourElement.setAttribute("unit", unit.getID());
+        Unit newUnit;
+
+        switch (type) {
+        case LostCityRumour.BURIAL_GROUND:
+            Player indianPlayer = game.getPlayer(unit.getTile().getNationOwner());
+            indianPlayer.modifyTension(player, Player.TENSION_HATEFUL);
+        case LostCityRumour.EXPEDITION_VANISHES:
+            unit.dispose();
+            break;
+        case LostCityRumour.NOTHING:
+            break;
+        case LostCityRumour.SEASONED_SCOUT:
+            unit.setType(Unit.SEASONED_SCOUT);
+            break;
+        case LostCityRumour.TRIBAL_CHIEF:
+            int amount = attackCalculator.nextInt((10 - player.getDifficulty()) * 10); // 60-100
+            player.modifyGold(amount);
+            rumourElement.setAttribute("amount", Integer.toString(amount));
+            break;
+        case LostCityRumour.COLONIST:
+            newUnit = new Unit(game, tile, player, Unit.FREE_COLONIST, Unit.ACTIVE);
+            unit.getTile().add(newUnit);
+            rumourElement.appendChild(newUnit.toXMLElement(player, rumourElement.getOwnerDocument()));
+            break;
+        case LostCityRumour.TREASURE_TRAIN:
+            int treasure = attackCalculator.nextInt((10 - player.getDifficulty()) * 600); // 3600-6000
+            newUnit = new Unit(game, tile, player, Unit.TREASURE_TRAIN, Unit.ACTIVE);
+            newUnit.setTreasureAmount(treasure);
+            unit.getTile().add(newUnit);
+            rumourElement.setAttribute("amount", Integer.toString(treasure));
+            rumourElement.appendChild(newUnit.toXMLElement(player, rumourElement.getOwnerDocument()));
+            break;
+        case LostCityRumour.FOUNTAIN_OF_YOUTH:
+            for (int k = 0; k < (10 - player.getDifficulty()); k++) {
+                newUnit = new Unit(game, player.getEurope(), player,
+                                   player.generateRecruitable(), Unit.SENTRY);
+                player.getEurope().add(newUnit);
+                rumourElement.appendChild(newUnit.toXMLElement(player, rumourElement.getOwnerDocument()));
+            }
+            break;
+        default:
+            throw new IllegalStateException( "No such rumour." );
+        }
+
+        // tell everyone the rumour has been explored
+        Iterator updateIterator = game.getPlayerIterator();
+        while (updateIterator.hasNext()) {
+            ServerPlayer updatePlayer = (ServerPlayer) updateIterator.next();
+
+            if (player.equals(updatePlayer) || updatePlayer.getConnection() == null) {
+                continue;
+            } else if (updatePlayer.canSee(tile)) {
+                try {
+                    Element rumourUpdate = Message.createNewRootElement("update");
+                    rumourUpdate.appendChild(tile.toXMLElement(updatePlayer, rumourUpdate.getOwnerDocument()));
+                    updatePlayer.getConnection().send(rumourUpdate);
+                } catch (IOException e) {
+                    logger.warning("Could not send update message to: " +
+                                   updatePlayer.getName() + " with connection " +
+                                   updatePlayer.getConnection());
+                }
+            }
+        }
+        
+        return rumourElement;
+    }
+        
+    
 
     /**
     * Handles an "askSkill"-message from a client.

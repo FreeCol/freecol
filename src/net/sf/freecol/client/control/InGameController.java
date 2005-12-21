@@ -329,6 +329,8 @@ public final class InGameController implements NetworkConstants {
                                         freeColClient.playSound(SfxLibrary.ILLEGAL_MOVE); break;
             case Unit.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS:
                                         tradeWithSettlement(unit, direction); break;
+            case Unit.EXPLORE_LOST_CITY_RUMOUR:
+                                        exploreLostCityRumour(unit, direction); break;
             case Unit.ILLEGAL_MOVE:     freeColClient.playSound(SfxLibrary.ILLEGAL_MOVE); break;
             default:                    throw new RuntimeException("unrecognised move: " + move);
         }
@@ -494,6 +496,26 @@ public final class InGameController implements NetworkConstants {
         unit.deliverGift(settlement, goods);
     }
 
+    /**
+     * Explores a lost city rumour.
+     *
+     * @param unit The unit to be moved.
+     * @param direction The direction in which to move the Unit.
+     */
+    private void exploreLostCityRumour(Unit unit, int direction) {
+        Client client = freeColClient.getClient();
+        // first, really move in that direction
+        reallyMove(unit, direction);
+
+        // next, see what we find there
+        Element exploreElement = Message.createNewRootElement("explore");
+        exploreElement.setAttribute("unit", unit.getID());
+
+        Element reply = client.ask(exploreElement);
+        freeColClient.getInGameInputHandler().handle(client.getConnection(), reply);
+
+        nextModelMessage();
+    }
 
     /**
      * Transfers the gold carried by this unit to the {@link Player owner}.

@@ -115,6 +115,8 @@ public final class GUI {
     STATE_OFFSET_Y = 10,
     ALARM_OFFSET_X = 37,
     ALARM_OFFSET_Y = 10,
+    RUMOUR_OFFSET_X = 40,
+    RUMOUR_OFFSET_Y = 5,
     MISSION_OFFSET_X = 49,
     MISSION_OFFSET_Y = 10,
     OTHER_UNITS_OFFSET_X = -5, // Relative to the state indicator.
@@ -1463,6 +1465,9 @@ public final class GUI {
                 } else {
                     logger.warning("Requested to draw unknown settlement type.");
                 }
+            } else if (tile.getLostCityRumour()) {
+                g.drawImage(lib.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR),
+                            x + RUMOUR_OFFSET_X, y + RUMOUR_OFFSET_Y, null);
             }
 
             if (FreeCol.isInDebugMode() && !freeColClient.getMyPlayer().canSee(tile)) {
