@@ -19,6 +19,7 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
@@ -160,6 +161,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                         reply = trade(connection, element);
                     } else if (type.equals("deliverGift")) {
                         reply = deliverGift(connection, element);
+                    } else if (type.equals("indianDemand")) {
+                        reply = indianDemand(connection, element);
                     } else if (type.equals("buyLand")) {
                         reply = buyLand(connection, element);
                     } else if (type.equals("payForBuilding")) {
@@ -1987,6 +1990,116 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
 
         unit.deliverGift(settlement, goods);
+
+        return null;
+    }
+
+
+    /**
+     * Handles a "indianDemand"-message.
+     *
+     * @param connection The <code>Connection</code> the message was received on.
+     * @param element The element containing the request.
+     */
+    private Element indianDemand(Connection connection, Element element) {
+        Game game = getFreeColServer().getGame();
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
+
+        Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
+        Settlement settlement = (Settlement) game.getFreeColGameObject(element.getAttribute("settlement"));
+
+        if (unit == null) {
+            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: " +
+                                               element.getAttribute("unit"));
+        }
+
+        if (unit.getMovesLeft() <= 0) {
+            throw new IllegalStateException("No moves left!");
+        }
+
+        if (settlement == null) {
+            throw new IllegalArgumentException("Could not find 'Settlement' with specified ID: " +
+                                               element.getAttribute("settlement"));
+        }
+
+        if (unit.getOwner() != player) {
+            throw new IllegalStateException("Not your unit!");
+        }
+
+        if (unit.getTile().getDistanceTo(settlement.getTile()) > 1) {
+            throw new IllegalStateException("Not adjacent to settlemen!");
+        }
+
+        ServerPlayer receiver = (ServerPlayer) settlement.getOwner();
+        if (!receiver.isAI() && receiver.isConnected()) {
+
+            int tension = player.getTension(receiver);
+            int dx = player.getDifficulty() + 1;
+            Goods goods = null;
+            GoodsContainer warehouse = settlement.getGoodsContainer();
+            if (tension <= Player.TENSION_DISPLEASED &&
+                warehouse.getGoodsCount(Goods.FOOD) >= 100) {
+                goods = new Goods(game, settlement, Goods.FOOD,
+                                  (warehouse.getGoodsCount(Goods.FOOD) * dx)/6);
+            } else if (tension <= Player.TENSION_HATEFUL) {
+                Market market = game.getMarket();
+                int value = 0;
+                Iterator iterator = warehouse.getCompactGoodsIterator();
+                while (iterator.hasNext()) {
+                    Goods currentGoods = (Goods) iterator.next();
+                    int goodsValue = market.getSalePrice(currentGoods);
+                    if (currentGoods.getType() == Goods.FOOD ||
+                        currentGoods.getType() == Goods.HORSES ||
+                        currentGoods.getType() == Goods.MUSKETS) {
+                        continue;
+                    } else if (goodsValue > value) {
+                        value = goodsValue;
+                        goods = currentGoods;
+                    }
+                }
+                if (goods != null) {
+                    goods.setAmount(Math.max((goods.getAmount() * dx)/6, 1));
+                }
+            } else {
+                int[] preferred = new int[] {Goods.MUSKETS,
+                                             Goods.HORSES,
+                                             Goods.TOOLS,
+                                             Goods.TRADE_GOODS,
+                                             Goods.RUM,
+                                             Goods.CLOTH,
+                                             Goods.COATS,
+                                             Goods.CIGARS};
+                for (int i = 0; i < preferred.length; i++) {
+                    int amount = warehouse.getGoodsCount(preferred[i]);
+                    if (amount > 0) {
+                        goods = new Goods(game, settlement, preferred[i],
+                                          Math.max((amount * dx)/6, 1));
+                        break;
+                    }
+                }
+            }
+
+            if (goods == null) {
+                // all for nothing
+                return null;
+            } else {
+                Element demandElement = Message.createNewRootElement("indianDemand");
+                demandElement.setAttribute("settlement", settlement.getID());
+                demandElement.appendChild(unit.toXMLElement(receiver, demandElement.getOwnerDocument()));
+                demandElement.appendChild(goods.toXMLElement(receiver, demandElement.getOwnerDocument()));
+
+                try {
+                    Element reply = receiver.getConnection().ask(demandElement);
+                    boolean accepted = Boolean.valueOf(reply.getAttribute("accepted")).booleanValue();
+                    if (accepted) {
+                        settlement.getGoodsContainer().removeGoods(goods);
+                    }
+                    return reply;
+                } catch (IOException e) {
+                    logger.warning("Could not send \"demand\"-message!");
+                }
+            }
+        }
 
         return null;
     }

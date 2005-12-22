@@ -102,6 +102,8 @@ public final class AIInGameInputHandler implements MessageHandler {
                 } else if (type.equals("monarchAction")) {
                     reply = monarchAction((DummyConnection) connection, element);
                 } else if (type.equals("removeGoods")) {
+                } else if (type.equals("indianDemand")) {
+                    reply = indianDemand((DummyConnection) connection, element);
                 } else {
                     logger.warning("Message is of unsupported type \"" + type + "\".");
                 }
@@ -175,14 +177,28 @@ public final class AIInGameInputHandler implements MessageHandler {
 
 
     /**
-     * Handles an "acceptTax"-message.
+     * Handles a "monarchAction"-message.
      *
-     * @param connection The connectio the message was received on.
+     * @param connection The connection the message was received on.
      * @param element The element (root element in a DOM-parsed XML tree) that
      *                holds all the information.
      */
     private Element monarchAction(DummyConnection connection, Element element) {
         Element reply = Message.createNewRootElement("acceptTax");
+        reply.setAttribute("accepted", String.valueOf(true));
+
+        return reply;
+    }   
+
+    /**
+     * Handles an "indianDemand"-message.
+     *
+     * @param connection The connection the message was received on.
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *                holds all the information.
+     */
+    private Element indianDemand(DummyConnection connection, Element element) {
+        Element reply = Message.createNewRootElement("indianDemandReply");
         reply.setAttribute("accepted", String.valueOf(true));
 
         return reply;

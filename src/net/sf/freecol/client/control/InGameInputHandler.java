@@ -90,6 +90,8 @@ public final class InGameInputHandler extends InputHandler {
                 reply = chooseFoundingFather(element);
             } else if (type.equals("deliverGift")) {
                 reply = deliverGift(element);
+            } else if (type.equals("indianDemand")) {
+                reply = indianDemand(element);
             } else if (type.equals("reconnect")) {
                 reply = reconnect(element);
             } else if (type.equals("setAI")) {
@@ -521,6 +523,47 @@ public final class InGameInputHandler extends InputHandler {
         unit.deliverGift(settlement, goods);
 
         return null;
+    }
+
+    /**
+     * Handles an "indianDemand"-request.
+     *
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *                holds all the information.
+     */
+    private Element indianDemand(Element element) {
+        Game game = getFreeColClient().getGame();
+        Element unitElement = Message.getChildElement(element, Unit.getXMLElementTagName());
+
+        Unit unit = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
+        //unit.readFromXMLElement(unitElement);
+
+        Settlement settlement = (Settlement) game.getFreeColGameObject(element.getAttribute("settlement"));
+        Goods goods = new Goods(game, Message.getChildElement(element, Goods.getXMLElementTagName()));
+
+        boolean accepted;
+        if (goods.getType() == Goods.FOOD) {
+            accepted = getFreeColClient().getCanvas().
+                showConfirmDialog("indianDemand.food.text",
+                                  "indianDemand.food.yes",
+                                  "indianDemand.food.no",
+                                  new String [][] {{"%nation%", unit.getOwner().getNationAsString()}});
+        } else {
+            accepted = getFreeColClient().getCanvas().
+                showConfirmDialog("indianDemand.other.text",
+                                  "indianDemand.other.yes",
+                                  "indianDemand.other.no",
+                                  new String [][] {{"%nation%", unit.getOwner().getNationAsString()},
+                                                   {"%amount%", String.valueOf(goods.getAmount())},
+                                                   {"%goods%", goods.getName()}});
+        }
+
+        if (accepted) {
+            settlement.getGoodsContainer().removeGoods(goods);
+        }
+        element.setAttribute("accepted", String.valueOf(accepted));
+
+        return element;
     }
 
 

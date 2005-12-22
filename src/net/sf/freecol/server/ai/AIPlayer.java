@@ -29,6 +29,7 @@ import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
 import net.sf.freecol.server.ai.mission.IndianBringGiftMission;
+import net.sf.freecol.server.ai.mission.IndianDemandMission;
 import net.sf.freecol.server.ai.mission.Mission;
 import net.sf.freecol.server.ai.mission.PioneeringMission;
 import net.sf.freecol.server.ai.mission.TransportMission;
@@ -57,7 +58,9 @@ public class AIPlayer extends AIObject {
     private static final int MAX_DISTANCE_TO_BRING_GIFT = 5;
     private static final int MAX_NUMBER_OF_GIFTS_BEING_DELIVERED = 1;
     
-
+    private static final int MAX_DISTANCE_TO_MAKE_DEMANDS = 5;
+    private static final int MAX_NUMBER_OF_DEMANDS = 1;
+    
     /* Stores temporary information for sessions (trading with another player etc). */
     private HashMap sessionRegister = new HashMap();
 
@@ -262,6 +265,8 @@ public class AIPlayer extends AIObject {
         if (!player.isEuropean()) {
             logger.fine("AI: Bringing gifts to nice players.");
             bringGifts();
+            logger.fine("AI: Demanding gifts from players.");
+            indianDemands();
         }
 
         // Assign a mission to every unit:
@@ -616,6 +621,70 @@ public class AIPlayer extends AIObject {
                     PathNode pn = getGame().getMap().findPath(chosenOne.getUnit(), indianSettlement.getTile(), target.getTile());
                     if (pn != null && pn.getTotalTurns() <= MAX_DISTANCE_TO_BRING_GIFT) {
                         chosenOne.setMission(new IndianBringGiftMission(getAIMain(), chosenOne, target));
+                    }
+                }
+
+            }
+        }
+    }
+
+    /**
+     * Demands goods from players with nearby colonies.  Should only
+     * be called for an indian player.
+     */
+    private void indianDemands() {
+        Iterator indianSettlementIterator = player.getIndianSettlementIterator();
+        while (indianSettlementIterator.hasNext()) {
+            IndianSettlement indianSettlement = (IndianSettlement) indianSettlementIterator.next();
+
+            // Do not demand goods all the time:
+            if (getRandom().nextInt(10) != 1) {
+                continue;
+            }
+
+            int alreadyAssignedUnits = 0;
+            Iterator ownedUnits = indianSettlement.getOwnedUnitsIterator();
+            while (ownedUnits.hasNext()) {
+                if (((AIUnit) getAIMain().getAIObject((Unit) ownedUnits.next())).getMission()
+                    instanceof IndianDemandMission) {
+                    alreadyAssignedUnits++;
+                }
+            }
+            if (alreadyAssignedUnits > MAX_NUMBER_OF_DEMANDS) {
+                continue;
+            }
+
+            // Creates a list of nearby colonies:
+            List nearbyColonies = new ArrayList();
+            Iterator it = getGame().getMap().
+                getCircleIterator(indianSettlement.getTile().getPosition(),
+                                  true,
+                                  MAX_DISTANCE_TO_MAKE_DEMANDS);
+            while (it.hasNext()) {
+                Tile t = getGame().getMap().getTile((Map.Position) it.next());
+                if (t.getColony() != null ) {
+                    nearbyColonies.add(t.getColony());
+                }
+            }
+            if (nearbyColonies.size() > 0) {
+                Colony target = (Colony) nearbyColonies.get(getRandom().nextInt(nearbyColonies.size()));
+                Iterator it2 = indianSettlement.getOwnedUnitsIterator();
+                AIUnit chosenOne = null;
+                while (it2.hasNext()) {
+                    chosenOne = (AIUnit) getAIMain().getAIObject((Unit) it2.next());
+                    if (!(chosenOne.getUnit().getLocation() instanceof Tile)) {
+                        chosenOne = null;
+                    } else if (chosenOne.getMission() == null) {
+                        break;
+                    }
+                }
+                if (chosenOne != null) {
+                    // Check that the colony can be reached:
+                    PathNode pn = getGame().getMap().findPath(chosenOne.getUnit(),
+                                                              indianSettlement.getTile(),
+                                                              target.getTile());
+                    if (pn != null && pn.getTotalTurns() <= MAX_DISTANCE_TO_MAKE_DEMANDS) {
+                        chosenOne.setMission(new IndianDemandMission(getAIMain(), chosenOne, target));
                     }
                 }
 
