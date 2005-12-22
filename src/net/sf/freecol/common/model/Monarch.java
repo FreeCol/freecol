@@ -294,16 +294,16 @@ public final class Monarch extends FreeColGameObject {
      * Only attributes visible to <code>player</code> will be added to
      * that representation if <code>showAll</code> is set to <i>false</i>.
      *
-     * @param player The <code>Player</code> this XML-representation is
-     *               made for.
+     * @param xmlPlayer The <code>Player</code> this XML-representation is
+     *         made for.
      * @param document The document to use when creating new components.
      * @param showAll Only attributes visible to <code>player</code> will be added to
-     *                the representation if <code>showAll</code> is set to <i>false</i>.
+     *         the representation if <code>showAll</code> is set to <i>false</i>.
      * @param toSavedGame If <i>true</i> then information that is only needed when saving a
-     *                    game is added.
+     *         game is added.
      * @return The DOM-element ("Document Object Model").
      */    
-    public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
+    public Element toXMLElement(Player xmlPlayer, Document document, boolean showAll, boolean toSavedGame) {
         Element monarchElement = document.createElement(getXMLElementTagName());
         monarchElement.setAttribute("ID", getID());
         monarchElement.setAttribute("player", player.getID());
