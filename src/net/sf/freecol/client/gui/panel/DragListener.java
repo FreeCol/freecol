@@ -208,9 +208,10 @@ public final class DragListener extends MouseAdapter {
 
             } else if (comp instanceof GoodsLabel) {
                 if (parentPanel instanceof ColonyPanel) {
-                    Colony colony = ((ColonyPanel) parentPanel).getColony();
+                    ColonyPanel colonyPanel = (ColonyPanel) parentPanel;
+                    Colony colony = colonyPanel.getColony();
                     if (colony.getBuilding(Building.CUSTOM_HOUSE).isBuilt()) {
-                        colony.toggleExports(((GoodsLabel) comp).getGoods());
+                        colonyPanel.toggleExports(((GoodsLabel) comp).getGoods());
                         comp.repaint();
                     }
                 }

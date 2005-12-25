@@ -698,6 +698,16 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         return colony;
     }
 
+
+    /**
+     * Toggles the export settings of the custom house.
+     *
+     * @param goods The goods for which to toggle the settings.
+     */
+    public void toggleExports(Goods goods) {
+        inGameController.toggleExports(colony, goods);
+    }
+    
     /**
     * This panel is a list of the colony's buildings.
     */

@@ -9,6 +9,7 @@ import java.util.Random;
 import java.util.Vector;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
@@ -169,6 +170,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                         reply = payForBuilding(connection, element);
                     } else if (type.equals("payArrears")) {
                         reply = payArrears(connection, element);
+                    } else if (type.equals("toggleExports")) {
+                        reply = toggleExports(connection, element);
                     } else {
                         logger.warning("Unknown request from client " + element.getTagName());
                     }
@@ -1727,6 +1730,31 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         return null;
     }
 
+    /**
+     * Handles a "toggleExports"-request from a client.
+     *
+     * @param connection The connection the message came from.
+     * @param payArrearsElement The element containing the request.
+     */
+    private Element toggleExports(Connection connection, Element toggleExportsElement) {
+        Game game = getFreeColServer().getGame();
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
+
+        Colony colony = (Colony) game.getFreeColGameObject(toggleExportsElement.getAttribute("colony"));
+        if (colony == null) {
+            throw new IllegalArgumentException("Found no colony with ID " +
+                                               toggleExportsElement.getAttribute("colony"));
+        } else if (colony.getOwner() != player) {
+            throw new IllegalStateException("Not your colony!");
+        } else if (!colony.getBuilding(Building.CUSTOM_HOUSE).isBuilt()) {
+            throw new IllegalStateException("Colony has no custom house!");
+        }
+        
+        int goods = new Integer(toggleExportsElement.getAttribute("goods")).intValue();
+        colony.toggleExports(goods);
+
+        return null;
+    }
 
     /**
     * Handles a "clearSpeciality"-request from a client.

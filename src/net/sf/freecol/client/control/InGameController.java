@@ -968,6 +968,24 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
+     * Toggles the export settings of the custom house.
+     *
+     * @param colony The colony with the custom house.
+     * @param goods The goods for which to toggle the settings.
+     */
+    public void toggleExports(Colony colony, Goods goods) {
+        Client client = freeColClient.getClient();
+
+        Element toggleExportsElement = Message.createNewRootElement("toggleExports");
+        toggleExportsElement.setAttribute("colony", colony.getID());
+        toggleExportsElement.setAttribute("goods", String.valueOf(goods.getType()));
+
+        colony.toggleExports(goods);
+        client.send(toggleExportsElement);
+    }
+        
+    
+    /**
     * Equips or unequips a <code>Unit</code> with a certain type of <code>Goods</code>.
     *
     * @param unit The <code>Unit</code>.
