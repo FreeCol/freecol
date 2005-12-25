@@ -1288,7 +1288,7 @@ public final class Canvas extends JLayeredPane {
                 TilePopup tp = new TilePopup(t, freeColClient, this, getGUI());
                 if (tp.hasItem()) {
                     showPopup(tp, x, y);
-                } else {
+                } else if (t.getType() != Tile.UNEXPLORED) {
                     showTilePanel(t);
                 }
             }

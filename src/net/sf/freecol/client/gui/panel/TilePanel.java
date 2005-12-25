@@ -49,6 +49,7 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
     private final JLabel ownerLabel;
     private final JButton okButton;
     private final JLabel[] labels;
+    private final JLabel fishLabel;
     
     /**
     * The constructor that will add the items to this panel.
@@ -84,8 +85,9 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
             int index = ((Integer) farmedGoods.get(k)).intValue();
             goods[k] = index;
             labels[k] = new JLabel(canvas.getImageProvider().getGoodsImageIcon(index));
-            goodsPanel.add(labels[k]);
+            //goodsPanel.add(labels[k]);
         }
+        fishLabel = new JLabel(canvas.getImageProvider().getGoodsImageIcon(Goods.FISH));
         
         goodsPanel.setSize(goodsPanel.getPreferredSize());
         add(goodsPanel);
@@ -103,7 +105,6 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
 
         add(okButton);
 
-        setSize(450, 120);
     }
 
 
@@ -126,8 +127,17 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
         } else {
             ownerLabel.setText(ownerName);
         }
-        for (int i = 0; i < number; i++) {
-            labels[i].setText(String.valueOf(tile.potential(goods[i])));
+        goodsPanel.removeAll();
+        if (tile.isLand()) {
+            for (int i = 0; i < number; i++) {
+                labels[i].setText(String.valueOf(tile.potential(goods[i])));
+                goodsPanel.add(labels[i]);
+            }
+            setSize(450, 120);
+        } else {
+            fishLabel.setText(String.valueOf(tile.potential(Goods.FOOD)));
+            goodsPanel.add(fishLabel);
+            setSize(150, 120);
         }
     }
 
