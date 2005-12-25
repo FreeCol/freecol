@@ -114,7 +114,7 @@ public final class GoodsLabel extends JLabel implements ActionListener {
         if (location instanceof Ownable) {
             player = ((Ownable) location).getOwner();
         }
-        if (player == null || player.canSell(goods)) {
+        if (player == null || player.canTrade(goods)) {
             setToolTipText(goods.getName());
             setEnabled(true);
         } else {

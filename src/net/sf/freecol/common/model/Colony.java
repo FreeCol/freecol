@@ -1164,9 +1164,8 @@ public final class Colony extends Settlement implements Location {
             Iterator goodsIterator = getCompactGoodsIterator();
             while (goodsIterator.hasNext()) {
                 Goods goods = (Goods) goodsIterator.next();
-                if (getExports(goods) && owner.canSell(goods)) {
+                if (getExports(goods) && owner.canTrade(goods)) {
                     getGame().getMarket().sell(goods, owner);
-                    removeGoods(goods);
                 }
             }
         }                

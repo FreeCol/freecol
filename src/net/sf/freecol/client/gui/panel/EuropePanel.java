@@ -840,21 +840,30 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
 
                     return comp;
                 } else if (comp instanceof MarketLabel) {
-                    inGameController.buyGoods(((MarketLabel)comp).getType(), ((MarketLabel)comp).getAmount(), selectedUnit.getUnit());
+                    MarketLabel label = (MarketLabel) comp;
+                    if (freeColClient.getMyPlayer().canTrade(label.getType())) {
+                        inGameController.buyGoods(label.getType(),
+                                                  label.getAmount(),
+                                                  selectedUnit.getUnit());
 
-                    updateCargoLabel();
-                    goldLabel.setText( Messages.message("goldTitle") + ": " + freeColClient.getMyPlayer().getGold() );
-                    goldLabel.repaint(0, 0, goldLabel.getWidth(), goldLabel.getHeight());
+                        updateCargoLabel();
+                        goldLabel.setText( Messages.message("goldTitle") + ": " +
+                                           freeColClient.getMyPlayer().getGold() );
+                        goldLabel.repaint(0, 0, goldLabel.getWidth(), goldLabel.getHeight());
 
-                    // TODO: Make this look prettier :-)
-                    UnitLabel t = selectedUnit;
-                    selectedUnit = null;
-                    setSelectedUnitLabel(t);
+                        // TODO: Make this look prettier :-)
+                        UnitLabel t = selectedUnit;
+                        selectedUnit = null;
+                        setSelectedUnitLabel(t);
 
-                    europePanel.getMarketPanel().revalidate();
-                    revalidate();
-                    europePanel.refresh();
-                    return comp;
+                        europePanel.getMarketPanel().revalidate();
+                        revalidate();
+                        europePanel.refresh();
+                        return comp;
+                    } else {
+                        inGameController.payArrears(label.getType());
+                        return null;
+                    }
                 } else {
                     logger.warning("An invalid component got dropped on this CargoPanel.");
                     return null;
@@ -909,7 +918,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     //comp.getParent().remove(comp);
                     Goods goods = ((GoodsLabel) comp).getGoods();
                     Player player = freeColClient.getMyPlayer();
-                    if (freeColClient.getMyPlayer().canSell(goods)) {
+                    if (freeColClient.getMyPlayer().canTrade(goods)) {
                         inGameController.sellGoods(goods);
                         updateCargoLabel();
                         goldLabel.setText("Gold: " + player.getGold());

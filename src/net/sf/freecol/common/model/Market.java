@@ -100,9 +100,9 @@ public final class Market extends FreeColGameObject {
      * @param  player The player selling the goods
      */
     public void sell(int type, int amount, Player player) {
-        if (player.canSell(type)) {
+        if (player.canTrade(type)) {
             int proceeds = getSalePrice(type, amount);
-            proceeds = ( 100 - player.getTax() ) * proceeds / 100;
+            proceeds = ((100 - player.getTax()) * proceeds) / 100;
             player.modifyGold(proceeds);
             add(type, (player.getNation() == Player.DUTCH) ? (amount/2) : amount);
         } else {

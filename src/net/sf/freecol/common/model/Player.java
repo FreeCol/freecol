@@ -1537,16 +1537,23 @@ public class Player extends FreeColGameObject {
                 && currentFather != FoundingFather.NONE) {
             fathers[currentFather] = true;
 
-            if (currentFather == FoundingFather.JOHN_PAUL_JONES) {
-                getGame().getModelController().createUnit(getID() + "newTurnJohnPaulJones", getEurope(), this, Unit.FRIGATE);
-            } else if (currentFather == FoundingFather.BARTOLOME_DE_LAS_CASAS) {
+            switch (currentFather) {
+            case FoundingFather.JOHN_PAUL_JONES:
+                // get new frigate
+                getGame().getModelController().createUnit(getID() + "newTurnJohnPaulJones",
+                                                          getEurope(), this, Unit.FRIGATE);
+                break;
+            case FoundingFather.BARTOLOME_DE_LAS_CASAS:
+                // make all converts free colonists
                 for(Iterator iter = getUnitIterator(); iter.hasNext(); ) {
                     Unit u = (Unit)iter.next();
                     if (u.getType() == Unit.INDIAN_CONVERT) {
                         u.setType(Unit.FREE_COLONIST);
                     }
                 }
-            } else if (currentFather == FoundingFather.FRANSICO_DE_CORONADO) {
+                break;
+            case FoundingFather.FRANSICO_DE_CORONADO:
+                // explore all tiles surrounding colonies
                 ArrayList tiles = new ArrayList();
 
                 Iterator tileIterator = getGame().getMap().getWholeMapIterator();
@@ -1564,17 +1571,23 @@ public class Player extends FreeColGameObject {
                 }
 
                 getGame().getModelController().exploreTiles(this, tiles);
-            } else if (currentFather == FoundingFather.LA_SALLE) {
+                break;
+            case FoundingFather.LA_SALLE:
+                // all colonies get a stockade for free
                 Iterator colonyIterator = getColonyIterator();
                 while (colonyIterator.hasNext()) {
                     ((Colony) colonyIterator.next()).updatePopulation();
                 }
-            } else if (currentFather == FoundingFather.SIMON_BOLIVAR) {
-                Iterator colonyIterator = getColonyIterator();
-                while (colonyIterator.hasNext()) {
-                    ((Colony) colonyIterator.next()).addSoL(20);
+                break;
+            case FoundingFather.SIMON_BOLIVAR:
+                // SoL increase by 20 %
+                Iterator colonyIterator2 = getColonyIterator();
+                while (colonyIterator2.hasNext()) {
+                    ((Colony) colonyIterator2.next()).addSoL(20);
                 }
-            } else if (currentFather == FoundingFather.POCAHONTAS) {
+                break;
+            case FoundingFather.POCAHONTAS:
+                // reduce indian tension and alarm
                 Iterator pi = getGame().getPlayerIterator();
                 while (pi.hasNext()) {
                     Player p = (Player) pi.next();
@@ -1587,17 +1600,30 @@ public class Player extends FreeColGameObject {
                         }
                     }
                 }
-            } else if (currentFather == FoundingFather.WILLIAM_BREWSTER) {
+                break;
+            case FoundingFather.WILLIAM_BREWSTER:
+                // don't recruit any more criminals or servants
                 for (int i=1; i<=3; i++) {
                     if (getEurope().getRecruitable(i) == Unit.PETTY_CRIMINAL
                             || getEurope().getRecruitable(i) == Unit.INDENTURED_SERVANT) {
                         getEurope().setRecruitable(i, Unit.FREE_COLONIST);
                     }
                 }
-            } else if (currentFather == FoundingFather.THOMAS_JEFFERSON) {
+                break;
+            case FoundingFather.THOMAS_JEFFERSON:
+                // increase bells production by 50 %
                 bellsBonus += 50;
-            } else if (currentFather == FoundingFather.THOMAS_PAINE) {
+                break;
+            case FoundingFather.THOMAS_PAINE:
+                // increase bell production by current tax rate
                 bellsBonus += tax;
+                break;
+            case FoundingFather.JACOB_FUGGER:
+                // lift all current boycotts
+                for (int goods = 0; goods < Goods.NUMBER_OF_TYPES; goods++) {
+                    setArrears(goods, 0);
+                }
+                break;
             }
 
             addModelMessage(this, "model.player.foundingFatherJoinedCongress",
@@ -1967,9 +1993,8 @@ public class Player extends FreeColGameObject {
      * @param typeOfGoods The type of goods.
      * @return True if there are no arrears due for this type of goods.
      */
-    public boolean canSell(int typeOfGoods) {
-	return (arrears[typeOfGoods] == 0 ||
-                hasFather(FoundingFather.JACOB_FUGGER));
+    public boolean canTrade(int typeOfGoods) {
+	return (arrears[typeOfGoods] == 0);
     }
 
     /**
@@ -1978,9 +2003,8 @@ public class Player extends FreeColGameObject {
      * @param goods The goods.
      * @return True if there are no arrears due for this type of goods.
      */
-    public boolean canSell(Goods goods) {
-	return (arrears[goods.getType()] == 0 ||
-                hasFather(FoundingFather.JACOB_FUGGER));
+    public boolean canTrade(Goods goods) {
+	return (arrears[goods.getType()] == 0);
     }
 
     /**

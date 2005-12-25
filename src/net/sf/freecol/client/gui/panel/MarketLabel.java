@@ -14,6 +14,7 @@ import javax.swing.JLabel;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Market;
+import net.sf.freecol.common.model.Player;
 
 
 /**
@@ -125,10 +126,14 @@ public final class MarketLabel extends JLabel implements ActionListener {
     * @param g The graphics context in which to do the painting.
     */
     public void paintComponent(Graphics g) {
-        setEnabled(true);
 
-        if (!getToolTipText().equals(Goods.getName(type))) {
+        Player player = market.getGame().getViewOwner();
+        if (player == null || player.canTrade(type)) {
             setToolTipText(Goods.getName(type));
+            setEnabled(true);
+        } else {
+            setToolTipText(Goods.getName(type, false));
+            setEnabled(false);
         }
 
         super.setText(Integer.toString(market.paidForSale(type)) + "/" + Integer.toString(market.costToBuy(type)));
