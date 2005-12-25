@@ -274,47 +274,7 @@ public final class InGameController implements NetworkConstants {
 
         switch (move) {
             case Unit.MOVE:             reallyMove(unit, direction); break;
-            case Unit.ATTACK:
-                Player enemy;
-                Tile target = freeColClient.getGame().getMap().getNeighbourOrNull(direction, unit.getTile());
-                Unit defender = target.getDefendingUnit(unit);
-                if (defender == null) {
-                    enemy = target.getSettlement().getOwner();
-                } else {
-                    enemy = defender.getOwner();
-                }
-                int stance = unit.getOwner().getStance(enemy);
-                /**
-                 * If the owner and the other player are already at
-                 * war, attack.  Otherwise make sure the player knows
-                 * what he/she is doing.
-                 */
-                switch (stance) {
-                case Player.WAR:
-                    attack(unit, direction);
-                    break;
-                case Player.CEASE_FIRE:
-                    if (canvas.showConfirmDialog("model.diplomacy.attack.ceaseFire",
-                                                 "model.diplomacy.attack.confirm",
-                                                 "cancel",
-                                                 new String [][] {{"%replace%", enemy.getNationAsString()}})) {
-                        attack(unit, direction);
-                    }
-                    break;
-                case Player.PEACE:
-                    if (canvas.showConfirmDialog("model.diplomacy.attack.peace",
-                                                 "model.diplomacy.attack.confirm",
-                                                 "cancel",
-                                                 new String [][] {{"%replace%", enemy.getNationAsString()}})) {
-                        attack(unit, direction);
-                    }
-                    break;
-                case Player.ALLIANCE:
-                    freeColClient.playSound(SfxLibrary.ILLEGAL_MOVE); 
-                    canvas.showInformationMessage("model.diplomacy.attack.alliance",
-                                                  new String [][] {{"%replace%", enemy.getNationAsString()}});
-                }
-                break;
+            case Unit.ATTACK:           attack(unit, direction); break;
             case Unit.DISEMBARK:        disembark(unit, direction); break;
             case Unit.EMBARK:           embark(unit, direction); break;
             case Unit.MOVE_HIGH_SEAS:   moveHighSeas(unit, direction); break;
@@ -597,8 +557,46 @@ public final class InGameController implements NetworkConstants {
     */
     private void attack(Unit unit, int direction) {
         Client client = freeColClient.getClient();
+        Canvas canvas = freeColClient.getCanvas();
         Game game = freeColClient.getGame();
         Map map = game.getMap();
+        Player enemy;
+        Tile target = game.getMap().getNeighbourOrNull(direction, unit.getTile());
+        Unit defender = target.getDefendingUnit(unit);
+        if (defender == null) {
+            enemy = target.getSettlement().getOwner();
+        } else {
+            enemy = defender.getOwner();
+        }
+        int stance = unit.getOwner().getStance(enemy);
+        /**
+         * If the owner and the other player are already at
+         * war, attack.  Otherwise make sure the player knows
+         * what he/she is doing.
+         */
+        switch (stance) {
+        case Player.CEASE_FIRE:
+            if (!canvas.showConfirmDialog("model.diplomacy.attack.ceaseFire",
+                                          "model.diplomacy.attack.confirm",
+                                          "cancel",
+                                          new String [][] {{"%replace%", enemy.getNationAsString()}})) {
+                return;
+            }
+            break;
+        case Player.PEACE:
+            if (!canvas.showConfirmDialog("model.diplomacy.attack.peace",
+                                          "model.diplomacy.attack.confirm",
+                                          "cancel",
+                                          new String [][] {{"%replace%", enemy.getNationAsString()}})) {
+                return;
+            }
+            break;
+        case Player.ALLIANCE:
+            freeColClient.playSound(SfxLibrary.ILLEGAL_MOVE); 
+            canvas.showInformationMessage("model.diplomacy.attack.alliance",
+                                          new String [][] {{"%replace%", enemy.getNationAsString()}});
+            return;
+        }
 
         if (unit.getType() == Unit.ARTILLERY || unit.getType() == Unit.DAMAGED_ARTILLERY || unit.isNaval()) {
             freeColClient.playSound(SfxLibrary.ARTILLERY);
@@ -613,7 +611,7 @@ public final class InGameController implements NetworkConstants {
 
         int result = Integer.parseInt(attackResultElement.getAttribute("result"));
         int plunderGold = Integer.parseInt(attackResultElement.getAttribute("plunderGold"));
-        Tile newTile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
+
         // If a successful attack against a colony, we need to update the tile:
         Element utElement = getChildElement(attackResultElement, Tile.getXMLElementTagName());
         if (utElement != null) {
@@ -622,11 +620,10 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Get the defender:
-        Unit defender;
         Element unitElement = getChildElement(attackResultElement, Unit.getXMLElementTagName());
         if (unitElement != null) {
             defender = new Unit(game, unitElement);
-            defender.setLocation(newTile);
+            defender.setLocation(target);
         } else {
             defender = map.getNeighbourOrNull(direction, unit.getTile()).getDefendingUnit(unit);
         }
@@ -691,7 +688,9 @@ public final class InGameController implements NetworkConstants {
      * @param direction The direction in which to disembark the Unit.
      */
     private void disembark(Unit unit, int direction) {
+        Game game = freeColClient.getGame();
         Canvas canvas = freeColClient.getCanvas();
+        Tile destinationTile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
 
         if (canvas.showConfirmDialog("disembark.text", "disembark.yes", "disembark.no")) {
             unit.setStateToAllChildren(Unit.ACTIVE);
@@ -702,7 +701,11 @@ public final class InGameController implements NetworkConstants {
                 Unit u = (Unit) unitIterator.next();
 
                 if ((u.getState() == Unit.ACTIVE) && u.getMovesLeft() > 0) {
-                    reallyMove(u, direction);
+                    if (destinationTile.getLostCityRumour()) {
+                        exploreLostCityRumour(u, direction);
+                    } else {
+                        reallyMove(u, direction);
+                    }
                     return;
                 }
             }
@@ -1643,11 +1646,20 @@ public final class InGameController implements NetworkConstants {
      * @param goods The goods for which to pay arrears.
      */
     public void payArrears(Goods goods) {
+        payArrears(goods.getType());
+    }
+
+    /**
+     * Pays the tax arrears on this type of goods.
+     *
+     * @param type The type of goods for which to pay arrears.
+     */
+    public void payArrears(int type) {
         Client client = freeColClient.getClient();
         Game game = freeColClient.getGame();
         Player player = freeColClient.getMyPlayer();
 
-        int arrears = player.getArrears(goods);
+        int arrears = player.getArrears(type);
         if (player.getGold() >= arrears) {
             if (freeColClient.getCanvas().
                 showConfirmDialog("model.europe.payArrears",
@@ -1656,10 +1668,10 @@ public final class InGameController implements NetworkConstants {
                 player.modifyGold(-arrears);
                 freeColClient.getCanvas().updateGoldLabel();
                 freeColClient.getCanvas().getEuropePanel().updateGoldLabel();
-                player.setArrears(goods, 0);
+                player.setArrears(type, 0);
                 // send to server
                 Element payArrearsElement = Message.createNewRootElement("payArrears");
-                payArrearsElement.setAttribute("goods", String.valueOf(goods.getType()));
+                payArrearsElement.setAttribute("type", String.valueOf(type));
                 client.send(payArrearsElement);        
             }
         } else {

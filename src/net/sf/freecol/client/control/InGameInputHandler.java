@@ -680,7 +680,6 @@ public final class InGameInputHandler extends InputHandler {
     private Element removeGoods(Element element) {
         final FreeColClient freeColClient = getFreeColClient();
         Game game = getFreeColClient().getGame();
-        ModelMessage m = null;
 
         NodeList nodeList = element.getChildNodes();
         Element goodsElement = (Element) nodeList.item(0);
@@ -693,17 +692,15 @@ public final class InGameInputHandler extends InputHandler {
             Colony colony = (Colony) goods.getLocation();
             colony.removeGoods(goods);
 
-            Player player = freeColClient.getMyPlayer();
-            if (!player.hasFather(FoundingFather.JACOB_FUGGER)) {
-                player.setArrears(goods);
-            }
+            // JACOB_FUGGER does not protect against new boycotts
+            freeColClient.getMyPlayer().setArrears(goods);
         
-            m = new ModelMessage(colony,
-                                 "model.monarch.bostonTeaParty",
-                                 new String [][] {{"%colony%", colony.getName()},
-                                                  {"%amount%", String.valueOf(goods.getAmount())},
-                                                  {"%goods%", goods.getName()}});
-            freeColClient.getCanvas().showModelMessage(m);
+            freeColClient.getCanvas().
+                showModelMessage(new ModelMessage(colony,
+                                                  "model.monarch.bostonTeaParty",
+                                                  new String [][] {{"%colony%", colony.getName()},
+                                                                   {"%amount%", String.valueOf(goods.getAmount())},
+                                                                   {"%goods%", goods.getName()}})); 
         }
                          
         return null;

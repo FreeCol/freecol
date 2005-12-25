@@ -323,9 +323,7 @@ public final class InGameController extends Controller {
                             Element removeGoodsElement = Message.createNewRootElement("removeGoods");
                             if (goods != null) {
                                 ((Colony) goods.getLocation()).removeGoods(goods);
-                                if (!nextPlayer.hasFather(FoundingFather.JACOB_FUGGER)) {
-                                    nextPlayer.setArrears(goods);
-                                }
+                                nextPlayer.setArrears(goods);
                                 removeGoodsElement.appendChild(goods.toXMLElement(nextPlayer,
                                                                                   removeGoodsElement.getOwnerDocument()));
                             }
