@@ -101,9 +101,12 @@ public final class Market extends FreeColGameObject {
      */
     public void sell(int type, int amount, Player player) {
         if (player.canTrade(type)) {
-            int proceeds = getSalePrice(type, amount);
-            proceeds = ((100 - player.getTax()) * proceeds) / 100;
-            player.modifyGold(proceeds);
+            int incomeBeforeTaxes = getSalePrice(type, amount);
+            int incomeAfterTaxes = ((100 - player.getTax()) * incomeBeforeTaxes) / 100;
+            player.modifyGold(incomeAfterTaxes);
+            player.modifySales(type, amount);
+            player.modifyIncomeBeforeTaxes(type, incomeBeforeTaxes);
+            player.modifyIncomeAfterTaxes(type, incomeAfterTaxes);
             add(type, (player.getNation() == Player.DUTCH) ? (amount/2) : amount);
         } else {
             addModelMessage(this, "model.europe.market",
@@ -146,7 +149,11 @@ public final class Market extends FreeColGameObject {
             throw new IllegalStateException();
         }
 
-        player.modifyGold(-getBidPrice(type, amount));
+        int price = getBidPrice(type, amount);
+        player.modifyGold(-price);
+        player.modifySales(type, -amount);
+        player.modifyIncomeBeforeTaxes(type, -price);
+        player.modifyIncomeAfterTaxes(type, -price);
         remove(type, ((player.getNation() == Player.DUTCH) ? (amount / 2) : amount));
     }
 
