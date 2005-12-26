@@ -163,7 +163,7 @@ public class Player extends FreeColGameObject {
 
     private int             crosses;
     private int             bells;
-    /** Bells bonus granted by Thomas Paine. */
+    /** Bells bonus granted by Thomas Paine and Thomas Jefferson. */
     private int             bellsBonus = 0;
     private boolean         dead = false;
 
@@ -172,8 +172,11 @@ public class Player extends FreeColGameObject {
     private int             currentFather;
 
     /** Market data */
+    private int             tax = 0;
     private int[]           arrears = new int[Goods.NUMBER_OF_TYPES];
-    private int             tax = 0;     
+    private int[]           sales = new int[Goods.NUMBER_OF_TYPES];
+    private int[]           incomeBeforeTaxes = new int[Goods.NUMBER_OF_TYPES];
+    private int[]           incomeAfterTaxes = new int[Goods.NUMBER_OF_TYPES];
 
     // 0 = pre-rebels; 1 = in rebellion; 2 = independence granted
     private int             rebellionState;
@@ -1637,6 +1640,34 @@ public class Player extends FreeColGameObject {
         if (crossesRequired != -1) {
             updateCrossesRequired();
         }
+
+        int oldSoL = 0;
+        int newSoL = 0;
+        int numberOfColonies = 0;
+        Iterator iterator = getColonyIterator();
+        while (iterator.hasNext()) {
+            Colony colony = (Colony) iterator.next();
+            colony.updateSoL();
+            numberOfColonies++;
+            oldSoL += colony.getOldSoL();
+            newSoL += colony.getSoL();
+        }
+        if (numberOfColonies > 0) {
+            oldSoL = oldSoL / numberOfColonies;
+            newSoL = newSoL / numberOfColonies;
+            if (oldSoL/10 != newSoL/10) {
+                if (newSoL > oldSoL) {
+                    addModelMessage(this, "model.player.SoLIncrease",
+                                    new String [][] {{"%oldSoL%", String.valueOf(oldSoL)},
+                                                     {"%newSoL%", String.valueOf(newSoL)}});
+                } else {
+                    addModelMessage(this, "model.player.SoLDecrease",
+                                    new String [][] {{"%oldSoL%", String.valueOf(oldSoL)},
+                                                     {"%newSoL%", String.valueOf(newSoL)}});
+                }
+            }
+        }
+
     }
 
 
@@ -1664,6 +1695,9 @@ public class Player extends FreeColGameObject {
         playerElement.appendChild(toArrayElement("tension", tension, document));
         playerElement.appendChild(toArrayElement("stance", stance, document));
         playerElement.appendChild(toArrayElement("arrears", arrears, document));
+        playerElement.appendChild(toArrayElement("sales", sales, document));
+        playerElement.appendChild(toArrayElement("incomeBeforeTaxes", incomeBeforeTaxes, document));
+        playerElement.appendChild(toArrayElement("incomeAfterTayes", incomeAfterTaxes, document));
 
         if (showAll || equals(player)) {
             playerElement.setAttribute("gold", Integer.toString(gold));
@@ -1752,6 +1786,28 @@ public class Player extends FreeColGameObject {
             arrears = readFromArrayElement("arrears", getChildElement(playerElement, "arrears"), new int[0]);
         } else {
             arrears = new int[Goods.NUMBER_OF_TYPES];
+        }
+
+        if (getChildElement(playerElement, "sales") != null) {
+            sales = readFromArrayElement("sales", getChildElement(playerElement, "sales"), new int[0]);
+        } else {
+            sales = new int[Goods.NUMBER_OF_TYPES];
+        }
+
+        if (getChildElement(playerElement, "incomeBeforeTaxes") != null) {
+            incomeBeforeTaxes = readFromArrayElement("incomeBeforeTaxes",
+                                                     getChildElement(playerElement,
+                                                                     "incomeBeforeTaxes"), new int[0]);
+        } else {
+            incomeBeforeTaxes = new int[Goods.NUMBER_OF_TYPES];
+        }
+
+        if (getChildElement(playerElement, "incomeAfterTaxes") != null) {
+            incomeAfterTaxes = readFromArrayElement("incomeAfterTaxes",
+                                                    getChildElement(playerElement,
+                                                                    "incomeAfterTaxes"), new int[0]);
+        } else {
+            incomeAfterTaxes = new int[Goods.NUMBER_OF_TYPES];
         }
 
         if (playerElement.hasAttribute("contacted")) {
@@ -2023,6 +2079,66 @@ public class Player extends FreeColGameObject {
      */
     public void setTax(int amount) {
         tax = amount;
+    }
+
+    /**
+     * Returns the current sales.
+     *
+     * @param type The type of goods.
+     * @return The current sales.
+     */
+    public int getSales(int type) {
+	return sales[type];
+    }
+
+    /**
+     * Modifies the current sales.
+     *
+     * @param type The type of goods.
+     * @param amount The new sales.
+     */
+    public void modifySales(int type, int amount) {
+        sales[type] += amount;
+    }
+
+    /**
+     * Returns the current incomeBeforeTaxes.
+     *
+     * @param type The type of goods.
+     * @return The current incomeBeforeTaxes.
+     */
+    public int getIncomeBeforeTaxes(int type) {
+	return incomeBeforeTaxes[type];
+    }
+
+    /**
+     * Modifies the current incomeBeforeTaxes.
+     *
+     * @param type The type of goods.
+     * @param amount The new incomeBeforeTaxes.
+     */
+    public void modifyIncomeBeforeTaxes(int type, int amount) {
+        incomeBeforeTaxes[type] += amount;
+    }
+
+    /**
+     * Returns the current incomeAfterTaxes.
+     *
+     * @param type The type of goods.
+     * @return The current incomeAfterTaxes.
+     */
+    public int getIncomeAfterTaxes(int type) {
+	return incomeAfterTaxes[type];
+    }
+
+    /**
+     * Modifies the current incomeAfterTaxes.
+     *
+     * @param type The type of goods.
+     * @param amount The new incomeAfterTaxes.
+     */
+    public void modifyIncomeAfterTaxes(int type, int amount) {
+        incomeAfterTaxes[type] += amount;
     }
 
     /**

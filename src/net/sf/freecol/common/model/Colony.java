@@ -36,6 +36,7 @@ public final class Colony extends Settlement implements Location {
     
     private int hammers;
     private int bells;
+    private int sonsOfLiberty, oldSonsOfLiberty;
     
     /**
     * Identifies what this colony is currently building.
@@ -88,6 +89,8 @@ public final class Colony extends Settlement implements Location {
         
         hammers = 0;
         bells = 0;
+        sonsOfLiberty = 0;
+        oldSonsOfLiberty = 0;
         currentlyBuilding = Building.DOCK;
 
         Map map = game.getMap();
@@ -778,18 +781,47 @@ public final class Colony extends Settlement implements Location {
     }
     
     /**
-    * Returns the SoL memebership of the colony.
+    * Returns the current SoL membership of the colony.
     * @return The current SoL membership of the colony.
     */
     public int getSoL() {
+        return sonsOfLiberty;
+    }
+
+    /**
+    * Returns the previous SoL membership of the colony.
+    * @return The previous SoL membership of the colony.
+    */
+    public int getOldSoL() {
+        return oldSonsOfLiberty;
+    }
+
+    /**
+     * Calculates the current SoL membership of the colony.
+     */
+    public void updateSoL() {
         int membership = (bells * 2) / (getUnitCount() + 1);
         if (membership < 0) membership = 0;
         if (membership > 100) membership = 100;
-        return membership;
+        oldSonsOfLiberty = sonsOfLiberty;
+        sonsOfLiberty = membership;
+        if (sonsOfLiberty/10 != oldSonsOfLiberty/10) {
+            if (sonsOfLiberty > oldSonsOfLiberty) {
+                addModelMessage(this, "model.colony.SoLIncrease",
+                                new String [][] {{"%oldSoL%", String.valueOf(oldSonsOfLiberty)},
+                                                 {"%newSoL%", String.valueOf(sonsOfLiberty)},
+                                                 {"%colony%", getName()}});
+            } else {
+                addModelMessage(this, "model.colony.SoLDecrease",
+                                new String [][] {{"%oldSoL%", String.valueOf(oldSonsOfLiberty)},
+                                                 {"%newSoL%", String.valueOf(sonsOfLiberty)},
+                                                 {"%colony%", getName()}});
+            }
+        }
     }
     
     /**
-    * Returns the Tory memebership of the colony.
+    * Returns the Tory membership of the colony.
     * @return The current Tory membership of the colony.
     */
     public int getTory() {
@@ -1219,6 +1251,8 @@ public final class Colony extends Settlement implements Location {
         if (showAll || player == getOwner()) {
             colonyElement.setAttribute("hammers", Integer.toString(hammers));
             colonyElement.setAttribute("bells", Integer.toString(bells));
+            colonyElement.setAttribute("sonsOfLiberty", Integer.toString(sonsOfLiberty));
+            colonyElement.setAttribute("oldSonsOfLiberty", Integer.toString(oldSonsOfLiberty));
             colonyElement.setAttribute("currentlyBuilding", Integer.toString(currentlyBuilding));
 
             char[] exportsCharArray = new char[exports.length];
@@ -1263,6 +1297,18 @@ public final class Colony extends Settlement implements Location {
             bells = Integer.parseInt(colonyElement.getAttribute("bells"));
         } else {
             bells = 0;
+        }
+
+        if (colonyElement.hasAttribute("sonsOfLiberty")) {
+            sonsOfLiberty = Integer.parseInt(colonyElement.getAttribute("sonsOfLiberty"));
+        } else {
+            sonsOfLiberty = 0;
+        }
+
+        if (colonyElement.hasAttribute("oldSonsOfLiberty")) {
+            oldSonsOfLiberty = Integer.parseInt(colonyElement.getAttribute("oldSonsOfLiberty"));
+        } else {
+            oldSonsOfLiberty = 0;
         }
 
         if (colonyElement.hasAttribute("currentlyBuilding")) {
