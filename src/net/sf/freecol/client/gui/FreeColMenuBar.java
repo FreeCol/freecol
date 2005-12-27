@@ -38,6 +38,7 @@ import net.sf.freecol.client.gui.panel.ReportForeignAffairPanel;
 import net.sf.freecol.client.gui.panel.ReportIndianPanel;
 import net.sf.freecol.client.gui.panel.ReportLabourPanel;
 import net.sf.freecol.client.gui.panel.ReportReligiousPanel;
+import net.sf.freecol.client.gui.panel.ReportTradePanel;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
@@ -340,6 +341,16 @@ public class FreeColMenuBar extends JMenuBar {
         reportCongressMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 canvas.showReportPanel(ReportContinentalCongressPanel.class.getName());
+            }
+        });
+
+        JMenuItem reportTradeMenuItem = new JMenuItem(Messages.message("menuBar.report.trade"));
+        reportTradeMenuItem.setOpaque(false);
+        reportTradeMenuItem.setMnemonic(KeyEvent.VK_T);
+        reportMenu.add(reportTradeMenuItem);
+        reportTradeMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                canvas.showReportPanel(ReportTradePanel.class.getName());
             }
         });
 
