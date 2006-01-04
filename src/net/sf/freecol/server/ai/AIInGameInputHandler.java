@@ -8,6 +8,8 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
@@ -184,8 +186,18 @@ public final class AIInGameInputHandler implements MessageHandler {
      *                holds all the information.
      */
     private Element monarchAction(DummyConnection connection, Element element) {
-        Element reply = Message.createNewRootElement("acceptTax");
-        reply.setAttribute("accepted", String.valueOf(true));
+        int action = Integer.parseInt(element.getAttribute("action"));
+
+        Element reply = null;
+        // at the moment, raising taxes is the only action that requires a reply
+        switch (action) {
+        case Monarch.RAISE_TAX:
+            int tax = Integer.parseInt(element.getAttribute("amount"));
+            boolean accept = getAIPlayer().acceptTax(tax);
+            reply = Message.createNewRootElement("acceptTax");
+            reply.setAttribute("accepted", String.valueOf(accept));
+            break;
+        }
 
         return reply;
     }   

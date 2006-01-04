@@ -1091,6 +1091,47 @@ public class AIPlayer extends AIObject {
 
 
     /**
+     * Decides whether to accept the monarch's tax raise or not.
+     *
+     * @return true if the tax raise should be accepted.
+     */
+    public boolean acceptTax(int tax) {
+        Goods toBeDestroyed = player.getMostValuableGoods();
+        if (toBeDestroyed == null) {
+            return false;
+        }
+        switch (toBeDestroyed.getType()) {
+        case Goods.FOOD:
+        case Goods.HORSES:
+            // we should be able to produce goods and horses
+            // ourselves
+            return false;
+        case Goods.TRADE_GOODS:
+        case Goods.TOOLS:
+        case Goods.MUSKETS:
+            if (getGame().getTurn().getAge() == 3) {
+                // by this time, we should be able to produce
+                // enough ourselves
+                return false;
+            } else {
+                return true;
+            }
+        default:
+            int averageIncome = 0;
+            for (int i = 0; i < Goods.NUMBER_OF_TYPES; i++) {
+                averageIncome += player.getIncomeAfterTaxes(i);
+            }
+            averageIncome = averageIncome / Goods.NUMBER_OF_TYPES;
+            if (player.getIncomeAfterTaxes(toBeDestroyed.getType()) > averageIncome) {
+                // this is a more valuable type of goods
+                return false;
+            } else {
+                return true;
+            }
+        }
+    }
+
+    /**
     * Returns an iterator over all the <code>AIUnit</code>s
     * owned by this player.
     *
