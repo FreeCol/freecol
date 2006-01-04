@@ -193,7 +193,8 @@ public class Player extends FreeColGameObject {
 
     private Location entryLocation;
 
-    private Iterator nextActiveUnitIterator = new NextActiveUnitIterator(this);
+    private Iterator nextActiveUnitIterator = new UnitIterator(this, new ActivePredicate());
+    private Iterator nextGoingToUnitIterator = new UnitIterator(this, new GoingToPredicate());
 
 
     // Temporary variables:
@@ -937,7 +938,14 @@ public class Player extends FreeColGameObject {
     public Unit getNextActiveUnit() {
         return (Unit) nextActiveUnitIterator.next();
     }
-    
+
+    /**
+    * Gets a new going_to unit.
+    * @return A <code>Unit</code> that can be made active.
+    */
+    public Unit getNextGoingToUnit() {
+        return (Unit) nextGoingToUnitIterator.next();
+    }
     
     /**
     * Checks if a new active unit can be made active.
@@ -945,6 +953,15 @@ public class Player extends FreeColGameObject {
     */
     public boolean hasNextActiveUnit() {
         return nextActiveUnitIterator.hasNext();
+    }
+
+    
+    /**
+    * Checks if a new active unit can be made active.
+    * @return <i>true</i> if this is the case and <i>false</i> otherwise.
+    */
+    public boolean hasNextGoingToUnit() {
+        return nextGoingToUnitIterator.hasNext();
     }
 
 
@@ -2206,29 +2223,77 @@ public class Player extends FreeColGameObject {
         return goods;
     }
     
+
+    /**
+     * A predicate that can be applied to a unit.
+     *
+     */
+    public abstract class UnitPredicate {
+
+        public abstract boolean obtains(Unit unit);
+
+    }
+
+    /**
+     * A predicate for determining active units.
+     */
+    public class ActivePredicate extends UnitPredicate {
+
+        /**
+         * Returns true if the unit is active.
+         */
+        public boolean obtains(Unit unit) {
+            return (!unit.isDisposed() &&
+                    (unit.getMovesLeft() > 0) &&
+                    (unit.getState() == Unit.ACTIVE) &&
+                    !(unit.getLocation() instanceof WorkLocation) &&
+                    unit.getTile() != null);
+        }
+
+    }
+
+    /**
+     * A predicate for determining units going somewhere.
+     */
+    public class GoingToPredicate extends UnitPredicate {
+
+        /**
+         * Returns true if the unit has order to go somewhere.
+         */
+        public boolean obtains(Unit unit) {
+            return (!unit.isDisposed() &&
+                    (unit.getMovesLeft() > 0) &&
+                    (unit.getState() == Unit.GOING_TO) &&
+                    !(unit.getLocation() instanceof WorkLocation) &&
+                    unit.getTile() != null);
+        }
+    }
+
+
     /**
     * An <code>Iterator</code> of {@link Unit}s that can be made active.
     */
-    public class NextActiveUnitIterator implements Iterator {
+    public class UnitIterator implements Iterator {
 
         private Iterator unitIterator = null;
         private Player owner;
         private Unit nextUnit = null;
-
+        private UnitPredicate predicate;
 
 
         /**
         * Creates a new <code>NextActiveUnitIterator</code>.
         * @param owner The <code>Player</code> that needs an iterator of it's units.
         */
-        public NextActiveUnitIterator(Player owner) {
+        public UnitIterator(Player owner, UnitPredicate predicate) {
             this.owner = owner;
+            this.predicate = predicate;
         }
 
 
 
         public boolean hasNext() {
-            if (nextUnit != null && isActive(nextUnit)) {
+            if (nextUnit != null && predicate.obtains(nextUnit)) {
                 return true;
             }
 
@@ -2237,14 +2302,14 @@ public class Player extends FreeColGameObject {
             }
             while (unitIterator.hasNext()) {
                 nextUnit = (Unit) unitIterator.next();
-                if (isActive(nextUnit)) {
+                if (predicate.obtains(nextUnit)) {
                     return true;
                 }
             }
             unitIterator = createUnitIterator();
             while (unitIterator.hasNext()) {
                 nextUnit = (Unit) unitIterator.next();
-                if (isActive(nextUnit)) {
+                if (predicate.obtains(nextUnit)) {
                     return true;
                 }
             }
@@ -2255,19 +2320,13 @@ public class Player extends FreeColGameObject {
 
 
         public Object next() {
-            if (nextUnit == null || !isActive(nextUnit)) {
+            if (nextUnit == null || !predicate.obtains(nextUnit)) {
                 hasNext();
             }
 
             Unit temp = nextUnit;
             nextUnit = null;
             return temp;
-        }
-
-
-        public boolean isActive(Unit u) {
-            return !u.isDisposed() && (u.getMovesLeft() > 0) && (u.getState() == Unit.ACTIVE)
-                    && !(u.getLocation() instanceof WorkLocation) && u.getTile() != null;
         }
 
 
@@ -2302,11 +2361,11 @@ public class Player extends FreeColGameObject {
                         while (childUnitIterator.hasNext()) {
                             Unit childUnit = (Unit) childUnitIterator.next();
 
-                            if (isActive(childUnit)) {
+                            if (predicate.obtains(childUnit)) {
                                 units.add(childUnit);
                             }
                         }
-                        if (isActive(u)) {
+                        if (predicate.obtains(u)) {
                             units.add(u);
                         }
                     }
@@ -2316,5 +2375,8 @@ public class Player extends FreeColGameObject {
             return units.iterator();
         }
     }
+
+
+
 }
 

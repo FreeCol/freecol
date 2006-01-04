@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.model.PathNode;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -81,7 +82,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                             BUILD_ROAD = 5,
                             TO_EUROPE = 6,
                             IN_EUROPE = 7,
-                            TO_AMERICA = 8;
+                            TO_AMERICA = 8,
+                            GOING_TO = 9,
+                            NUMBER_OF_STATES = 10;
 
 
     /**
@@ -127,7 +130,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     private Location        entryLocation;
     private Location        location;
     private IndianSettlement indianSettlement = null; // only used by BRAVE.
-
+    private PathNode        path = null;
+    private Location        destination = null;
+    
     // to be used only for type == TREASURE_TRAIN
     private int             treasureAmount;
 
@@ -574,6 +579,42 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
 
     /**
+     * Returns the path this unit is following.
+     *
+     * @return The path this unit is following.
+     */
+    public PathNode getPath() {
+        return path;
+    }
+
+    /**
+     * Sets the path this unit is following.
+     *
+     * @return The path this unit is following.
+     */
+    public void setPath(PathNode newPath) {
+        this.path = newPath;
+    }
+    
+    /**
+     * Returns the destination of this unit.
+     *
+     * @return The destination of this unit.
+     */
+    public Location getDestination() {
+        return destination;
+    }
+
+    /**
+     * Sets the destination of this unit.
+     *
+     * @return The destination of this unit.
+     */
+    public void setDestination(Location newDestination) {
+        this.destination = newDestination;
+    }
+    
+    /**
      * Gets the type of a move made in a specified direction.
      *
      * @param direction The direction of the move.
@@ -873,16 +914,31 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     public void move(int direction) {
         int type = getMoveType(direction);
 
-        if (type != MOVE && type != DISEMBARK && type != MOVE_HIGH_SEAS &&
-            type != EXPLORE_LOST_CITY_RUMOUR) {
+        switch (type) {
+        case MOVE:
+        case MOVE_HIGH_SEAS:
+        case DISEMBARK:
+        case EXPLORE_LOST_CITY_RUMOUR:
+            break;    
+        case ATTACK:
+        case EMBARK:
+        case ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST:
+        case ENTER_INDIAN_VILLAGE_WITH_SCOUT:
+        case ENTER_INDIAN_VILLAGE_WITH_MISSIONARY:
+        case ENTER_FOREIGN_COLONY_WITH_SCOUT:
+        case ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS:
+        case ILLEGAL_MOVE:
+        default:
             throw new IllegalStateException("\nIllegal move requested: " + type
-                    + " while trying to move a " + getName() + " located at "
-                    + getTile().getPosition().toString() + ". Direction: "
-                    + direction + " Moves Left: " + getMovesLeft());
+                                            + " while trying to move a " + getName() + " located at "
+                                            + getTile().getPosition().toString() + ". Direction: "
+                                            + direction + " Moves Left: " + getMovesLeft());
         }
 
-        setState(ACTIVE);
-        setStateToAllChildren(SENTRY);
+        if (getState() != GOING_TO) {
+            setState(ACTIVE);
+            setStateToAllChildren(SENTRY);
+        }
 
         Tile newTile = getGame().getMap().getNeighbourOrNull(direction, getTile());
 
@@ -895,6 +951,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         }
         setMovesLeft(getMovesLeft() - moveCost);
     }
+
 
 
     /**
@@ -2125,7 +2182,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 if (s == BUILD_ROAD) workLeft /= 2;
                 movesLeft = 0;
             case TO_EUROPE:
-                if ((state == ACTIVE) && (!(location instanceof Europe))) {
+                if ((state == ACTIVE ||
+                     state == GOING_TO) &&
+                    (!(location instanceof Europe))) {
                     workLeft = 3;
                 } else if ((state == TO_AMERICA) && (location instanceof Europe)) {
                     // I think '4' was also used in the original game.
@@ -2240,6 +2299,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                         || (getEntryLocation() == getLocation());
             case TO_AMERICA:
                 return (location instanceof Europe && isNaval());
+            case GOING_TO:
+                return true;
             default:
                 logger.warning("Invalid unit state: " + s);
                 return false;
@@ -2446,7 +2507,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * @param amount The number of tools to remove.
      */
     private void expendTools(int amount) {
-        numberOfTools -= 20;
+        numberOfTools -= amount;
         if (numberOfTools == 0) {
             if (getType() == HARDY_PIONEER) {
                 addModelMessage(this, "model.unit.noMoreToolsPioneer", null);
@@ -2996,7 +3057,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         if (isMounted()) {
             if (isArmed() && getType() != BRAVE) {
                 // dragoon
-                setMounted(false);
+                setMounted(false, true);
                 if (enemyUnit.getType() == BRAVE) {
                     addModelMessage(this, "model.unit.braveMounted",
                                     new String [][] {{"%nation%", enemyUnit.getOwner().getNationAsString()}});
@@ -3009,7 +3070,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             }
         } else if (isArmed()) {
             // soldier
-            setArmed(false);
+            setArmed(false, true);
             if (enemyUnit.getType() == BRAVE) {
                 addModelMessage(this, "model.unit.braveArmed",
                                 new String [][] {{"%nation%", enemyUnit.getOwner().getNationAsString()}});
@@ -3578,7 +3639,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         doAssignedWork();
     }
 
-
     /**
     * Make a XML-representation of this object.
     *
@@ -3619,6 +3679,17 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 unitElement.setAttribute("location", getTile().getColony().getID());
             }
         }
+
+        /* REMOVE
+        if (path != null) {
+            int length = path.size();
+            int[] pathArray = new int[length];
+            for (int i = 0; i < length; i++) {
+                pathArray[i] = ((Integer) path.get(i)).intValue();
+            }
+            unitElement.appendChild(toArrayElement("path", pathArray, document));
+        }
+        */
 
         // Do not show enemy units hidden in a carrier:
         if (isCarrier()) {
@@ -3701,6 +3772,18 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 throw new NullPointerException("The unit's location could not be found.");
             }
         }
+
+        /* REMOVE
+        if (getChildElement(unitElement, "path") != null) {
+            int[] pathArray = readFromArrayElement("path", getChildElement(unitElement, "path"), new int[0]);
+            path = new ArrayList();
+            for (int i = 0; i < pathArray.length; i++) {
+                path.add(new Integer(pathArray[i]));
+            }
+        } else {
+            path = null;
+        }
+        */
 
         if (isCarrier()) {
             Element unitContainerElement = getChildElement(unitElement, UnitContainer.getXMLElementTagName());

@@ -4,6 +4,7 @@ package net.sf.freecol.server.control;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.Vector;
@@ -1657,6 +1658,21 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             return null;
         }
         unit.setState(state);
+
+        /**
+        if (state == Unit.GOING_TO) {
+            Element pathElement = Message.getChildElement(changeStateElement, "path");
+            if (pathElement != null) {
+                ArrayList path = new ArrayList();
+                int length = Integer.parseInt(pathElement.getAttribute("xLength"));
+                for (int i = 0; i < length; i++) {
+                    path.add(new Integer(pathElement.getAttribute("x" + Integer.toString(i))));
+                }
+                unit.setPath(path);
+                unit.moveAlongPath();
+            }
+        }
+        */
 
         sendUpdatedTileToAll(oldTile, player);
 

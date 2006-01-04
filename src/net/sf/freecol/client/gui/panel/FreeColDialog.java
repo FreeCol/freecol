@@ -226,7 +226,7 @@ public class FreeColDialog extends FreeColPanel {
         });
 
         choiceDialog.setLayout(new BorderLayout());
-        JLabel l = new JLabel(text);
+        JLabel l = new JLabel(text, JLabel.CENTER);
 
         int height = l.getMinimumSize().height + cancelButton.getMinimumSize().height + 40;
 
@@ -250,7 +250,8 @@ public class FreeColDialog extends FreeColPanel {
         objectsPanel.add(cancelButton);
         choiceDialog.add(objectsPanel, BorderLayout.CENTER);
 
-        choiceDialog.setSize(width, height);
+        //choiceDialog.setSize(width, height);
+        choiceDialog.setSize(choiceDialog.getPreferredSize());
         choiceDialog.setCancelComponent(cancelButton);
 
         return choiceDialog;

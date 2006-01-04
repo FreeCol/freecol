@@ -31,6 +31,7 @@ import net.sf.freecol.client.gui.action.MapControlsAction;
 import net.sf.freecol.client.gui.action.PlowAction;
 import net.sf.freecol.client.gui.action.SkipUnitAction;
 import net.sf.freecol.client.gui.action.WaitAction;
+import net.sf.freecol.client.gui.action.GotoAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ColopediaPanel;
 import net.sf.freecol.client.gui.panel.ReportContinentalCongressPanel;
@@ -229,6 +230,10 @@ public class FreeColMenuBar extends JMenuBar {
         final JMenuItem fortifyMenuItem = new JMenuItem(am.getFreeColAction(FortifyAction.ID));
         fortifyMenuItem.setOpaque(false);
         ordersMenu.add(fortifyMenuItem);
+
+        final JMenuItem gotoMenuItem = new JMenuItem(am.getFreeColAction(GotoAction.ID));
+        fortifyMenuItem.setOpaque(false);
+        ordersMenu.add(gotoMenuItem);
 
         /*
         final JMenuItem sentryMenuItem = new JMenuItem(Messages.message("unit.state.3"));

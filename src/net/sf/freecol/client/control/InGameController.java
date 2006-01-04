@@ -21,6 +21,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
 
 import net.sf.freecol.common.model.*;
+import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
 
@@ -248,6 +249,158 @@ public final class InGameController implements NetworkConstants {
         if (unit != null) {
             move(unit, direction);
         } // else: nothing: There is no active unit that can be moved.
+    }
+
+    /**
+     * Selects a destination for this unit. Europe and the player's
+     * colonies are valid destinations.
+     *
+     * @param unit The unit for which to select a destination.
+     */
+    public void selectDestination(Unit unit) {
+        Player player = freeColClient.getMyPlayer();
+        Map map = freeColClient.getGame().getMap();
+        boolean naval = unit.isNaval();
+        Iterator colonyIterator = player.getColonyIterator();
+        ArrayList destinations = new ArrayList();
+        if (naval) {
+            destinations.add(player.getEurope());
+        }
+        while (colonyIterator.hasNext()) {
+            Colony colony = (Colony) colonyIterator.next();
+            if (naval) {
+                boolean inland = true;
+                Iterator tileIterator = map.getAdjacentIterator(colony.getTile().getPosition());
+                while (tileIterator.hasNext()) {
+                    Position p = (Position) tileIterator.next();
+                    if (!map.getTile(p).isLand()) {
+                        inland = false;
+                        break;
+                    }
+                }
+                if (inland) {
+                    continue;
+                }
+            } // TODO: check if unit can really reach colony
+            destinations.add(colony);
+        }
+
+        Canvas canvas = freeColClient.getCanvas();
+        Object destination = canvas.showChoiceDialog(Messages.message("selectDestination.text"),
+                                                     Messages.message("selectDestination.cancel"),
+                                                     destinations.toArray());
+
+        unit.setDestination((Location) destination);
+        if (destination == null) {
+            // user aborted
+            return;
+        } else if (destination instanceof Europe) {
+            // TODO: find a better way
+            /*
+            Iterator tileIterator = map.getFloodFillIterator(unit.getTile().getPosition());
+            while (tileIterator.hasNext()) {
+                Position p = (Position) tileIterator.next();
+                if (map.getTile(p).getType() == Tile.HIGH_SEAS) {
+                    PathNode path = map.findPath(unit, unit.getTile(), map.getTile(p));
+                    break;
+                }
+            }
+            */
+            PathNode path = map.findPath(unit, unit.getTile(), (Tile) unit.getEntryLocation());
+            if (path == null) {
+                canvas.showInformationMessage("selectDestination.failed",
+                                              new String [][] {{"%destination%",
+                                                                ((Europe) destination).toString()}});
+            } else {
+                moveAlongPath(path);
+            }
+        } else if (destination instanceof Colony) {
+            PathNode path = map.findPath(unit, unit.getTile(), ((Colony) destination).getTile());
+            if (path == null) {
+                canvas.showInformationMessage("selectDestination.failed",
+                                              new String [][] {{"%destination%",
+                                                                ((Colony) destination).getName()}});
+            } else {
+                moveAlongPath(path);
+            }
+        } else {
+            throw new IllegalArgumentException("Unknown type of destination");
+        }
+    }
+
+    /**
+     * Moves the active unit along a given path. The path may be the
+     * result of a unit drag or of selecting a destination.
+     *
+     * @param path The path to follow.
+     */
+    public void moveAlongPath(PathNode path) {
+        Unit unit = freeColClient.getGUI().getActiveUnit();
+
+        if (unit != null && path != null) {
+            unit.setPath(path);
+            unit.setState(Unit.GOING_TO);
+            unit.setStateToAllChildren(Unit.SENTRY);
+            moveAlongPath(unit);
+        } // else: nothing: There is no active unit that can be moved.
+    }
+        
+
+    /**
+     * Moves the given unit along the unit's path.
+     *
+     * @param unit The unit to move.
+     */
+    public void moveAlongPath(Unit unit) {
+        Map map = freeColClient.getGame().getMap();
+        PathNode path = unit.getPath();
+        boolean active = false;
+        while (unit.getMovesLeft() > 0) {
+            if (path == null) {
+                if (unit.getDestination() instanceof Europe) {
+                    moveToEurope(unit);
+                    unit.setDestination(null);
+                } else {
+                    active = true;
+                }
+                break;
+            }                
+            int direction = path.getDirection();
+            Tile target = map.getNeighbourOrNull(direction, unit.getTile());
+            int moveCost = unit.getMoveCost(target);
+            if (moveCost > unit.getMovesLeft()) {
+                // we can't go there now, but we don't want to wake up
+                unit.setMovesLeft(0);
+                logger.info("Setting moves to zero.");
+                break;
+            } else {
+                int moveType = unit.getMoveType(target);
+                if (moveType == Unit.MOVE) {
+                    reallyMove(unit, direction);
+                    path = path.next;
+                    freeColClient.getActionManager().update();
+                    freeColClient.getCanvas().updateJMenuBar();
+                } else {
+                    // something has got in our way
+                    logger.info("Aborting goto: move type was " + moveType);
+                    path = null;
+                    unit.setDestination(null);
+                    active = true;
+                    break;
+                }
+            }
+        }
+        unit.setPath(path);
+        freeColClient.getActionManager().update();
+        freeColClient.getCanvas().updateJMenuBar();
+
+        if (active) {
+            unit.setState(Unit.ACTIVE);
+            unit.setStateToAllChildren(Unit.SENTRY);
+            freeColClient.getGUI().setActiveUnit(unit);
+        } else {
+            nextActiveUnit();
+        }
     }
 
 
@@ -1785,11 +1938,17 @@ public final class InGameController implements NetworkConstants {
 
         if (nextActiveUnit != null) {
             gui.setActiveUnit(nextActiveUnit);
-        } else if (tile != null) {
-            gui.setSelectedTile(tile.getPosition());
-            gui.setActiveUnit(null);
         } else {
-            gui.setActiveUnit(null);
+            // no more active units, so we can move the others
+            nextActiveUnit = myPlayer.getNextGoingToUnit();
+            if (nextActiveUnit != null) {
+                moveAlongPath(nextActiveUnit);
+            } else if (tile != null) {
+                gui.setSelectedTile(tile.getPosition());
+                gui.setActiveUnit(null);
+            } else {
+                gui.setActiveUnit(null);
+            }
         }
     }
 
@@ -1873,3 +2032,4 @@ public final class InGameController implements NetworkConstants {
         return null;
     }
 }
+

@@ -51,13 +51,14 @@ public class ChangeAction extends MapboardAction {
         super.update();
 
         if (enabled) {
-            if (getFreeColClient().getGUI().getActiveUnit() == null) {
+            Unit unit = getFreeColClient().getGUI().getActiveUnit();
+            if (unit == null) {
                 setEnabled(false);
             } else {
-                Unit unit = getFreeColClient().getGUI().getActiveUnit();
                 Tile tile = unit.getTile();
-
-                if (tile.getColony() != null) {
+                if (tile == null) {
+                    setEnabled(false);
+                } else if (tile.getColony() != null) {
                     putValue(NAME, Messages.message("menuBar.orders.enterColony"));
                 } else if (unit.getLocation() instanceof Unit) {
                     putValue(NAME, Messages.message("menuBar.orders.selectCarrier"));

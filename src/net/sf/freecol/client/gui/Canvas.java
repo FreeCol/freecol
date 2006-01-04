@@ -25,6 +25,8 @@ import javax.swing.filechooser.FileFilter;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.*;
+/**
 import net.sf.freecol.client.gui.panel.ChatPanel;
 import net.sf.freecol.client.gui.panel.ChooseFoundingFatherDialog;
 import net.sf.freecol.client.gui.panel.ClientOptionsDialog;
@@ -56,6 +58,7 @@ import net.sf.freecol.client.gui.panel.StartGamePanel;
 import net.sf.freecol.client.gui.panel.StatusPanel;
 import net.sf.freecol.client.gui.panel.TilePanel;
 import net.sf.freecol.client.gui.panel.VictoryPanel;
+*/
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -124,7 +127,7 @@ public final class Canvas extends JLayeredPane {
     private final ColonyPanel       colonyPanel;
     private final IndianSettlementPanel indianSettlementPanel;
     private final TilePanel         tilePanel;
-    private final MonarchPanel         monarchPanel;
+    private final MonarchPanel      monarchPanel;
     private final EuropePanel       europePanel;
     private final StatusPanel       statusPanel;
     private final ChatPanel         chatPanel;

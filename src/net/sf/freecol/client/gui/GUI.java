@@ -1700,6 +1700,9 @@ public final class GUI {
                 case Unit.BUILD_ROAD:
                     occupationString = "R";
                     break;
+                case Unit.GOING_TO:
+                    occupationString = "G";
+                    break;
                 default:
                     occupationString = "?";
                     logger.warning("Unit has an invalid occpuation: " + unit.getState());

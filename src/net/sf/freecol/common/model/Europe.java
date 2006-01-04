@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import net.sf.freecol.client.gui.i18n.Messages;
 
 /**
 * Represents Europe in the game. Each <code>Player</code> has it's own
@@ -333,6 +334,14 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         }
     }
 
+    /**
+     * Returns a suitable name.
+     */
+    // TODO: make this depend on the player's nation
+    public String toString() {
+        return Messages.message("menuBar.view.europe");
+    }
+    
 
     /**
     * Makes an XML-representation of this object.
