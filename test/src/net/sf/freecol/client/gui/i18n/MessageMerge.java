@@ -1,0 +1,176 @@
+
+package net.sf.freecol.client.gui.i18n;
+
+
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.WindowConstants;
+
+
+public final class MessageMerge
+{
+
+    public static void main( String[] args )
+    {
+        String  pathToFile1 = args[0];
+        final String  pathToFile2 = args[1];
+
+        final MergeTableModel  mergeTableModel = new MergeTableModel();
+        mergeTableModel.merge = new Merge();
+        mergeTableModel.merge.lineFromFile1 = loadLinesFromFile( pathToFile1 );
+        mergeTableModel.merge.lineFromFile2 = loadLinesFromFile( pathToFile2 );
+
+        final JTable  mergeTable = new JTable( mergeTableModel );
+        mergeTable.setSelectionMode( ListSelectionModel.SINGLE_INTERVAL_SELECTION );
+        mergeTable.setDefaultRenderer( Object.class, new MergeTableCellRenderer() );
+
+        Action  insertInRightAction = new AbstractAction( "insert in right" )
+        {
+            public void actionPerformed( ActionEvent event )
+            {
+                int  from = mergeTable.getSelectionModel().getMinSelectionIndex();
+                int  to = mergeTable.getSelectionModel().getMaxSelectionIndex();
+                mergeTableModel.insertInRight( from, to );
+            }
+        };
+
+        Action  deleteFromRightAction = new AbstractAction( "delete from right" )
+        {
+            public void actionPerformed( ActionEvent event )
+            {
+                int  from = mergeTable.getSelectionModel().getMinSelectionIndex();
+                int  to = mergeTable.getSelectionModel().getMaxSelectionIndex();
+                mergeTableModel.deleteFromRight( from, to );
+            }
+        };
+
+        Action  saveRightAction = new AbstractAction( "save right" )
+        {
+            public void actionPerformed( ActionEvent event )
+            {
+                saveLinesToFile( mergeTableModel.merge.lineFromFile2, pathToFile2 );
+            }
+        };
+
+        JPanel  controlPanel = new JPanel( new GridLayout(1, 3) );
+        controlPanel.add( new JButton(insertInRightAction) );
+        controlPanel.add( new JButton(deleteFromRightAction) );
+        controlPanel.add( new JButton(saveRightAction) );
+
+        JPanel  rootPane = new JPanel( new BorderLayout() );
+        rootPane.setBorder( BorderFactory.createEmptyBorder(3, 3, 3, 3) );
+        rootPane.add( new JScrollPane(mergeTable), BorderLayout.CENTER );
+        rootPane.add( controlPanel, BorderLayout.SOUTH );
+
+        JFrame  frame = new JFrame( "MessageMerge" );
+        frame.getContentPane().add( rootPane );
+        frame.setDefaultCloseOperation( WindowConstants.DISPOSE_ON_CLOSE );
+        frame.addWindowListener(
+            new WindowAdapter()
+            {
+                // for when the window is closed by the OS
+                public void windowClosing( WindowEvent event )
+                {
+                    System.exit( 0 );
+                }
+
+                // for when the window is closed by Java
+                public void windowClosed( WindowEvent event )
+                {
+                    windowClosing(event);
+                }
+            }
+        );
+
+        frame.pack();
+        frame.setVisible( true );
+    }
+
+
+    private static List loadLinesFromFile( String pathToFile )
+    {
+        try {
+            List  lineList = new ArrayList();
+            FileInputStream  in = new FileInputStream( pathToFile );
+            StringBuffer  line = new StringBuffer();
+            while ( true )
+            {
+                int  data = in.read();
+                if ( -1 == data )
+                {
+                    if ( 0 < line.length() ) { lineList.add( line.toString() ); }
+                    break;
+                }
+                char  c = (char) data;
+                if ( '\r' == c )
+                {
+                    // do nothing
+                }
+                if ( '\n' == c )
+                {
+                    lineList.add( line.toString() );
+                    line.setLength( 0 );
+                }
+                else {
+                    line.append( c );
+                }
+            }
+            in.close();
+            return lineList;
+        }
+        catch ( FileNotFoundException e )
+        {
+            throw new RuntimeException( e );
+        }
+        catch ( IOException e )
+        {
+            throw new RuntimeException( e );
+        }
+    }
+
+
+    private static void saveLinesToFile( List lineList, String pathToFile )
+    {
+        try {
+            FileOutputStream  out = new FileOutputStream( pathToFile );
+            for ( int lineNumber = 0, lines = lineList.size();  lineNumber < lines;  lineNumber ++ )
+            {
+                String  line = (String) lineList.get( lineNumber );
+                for ( int i = 0;  i < line.length();  i ++ )
+                {
+                    out.write( line.charAt(i) );
+                }
+                out.write( '\n' );
+            }
+            out.close();
+        }
+        catch ( FileNotFoundException e )
+        {
+            throw new RuntimeException( e );
+        }
+        catch ( IOException e )
+        {
+            throw new RuntimeException( e );
+        }
+    }
+
+}
