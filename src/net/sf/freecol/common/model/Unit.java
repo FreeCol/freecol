@@ -615,24 +615,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     }
     
     /**
-     * Gets the type of a move made in a specified direction.
-     *
-     * @param direction The direction of the move.
-     * @return The move type. Notice: <code>Unit.ILLEGAL_MOVE</code>
-     *         when there are no moves left.
-     */
-    public int getMoveType(int direction) {
-        if (getTile() == null) {
-            throw new IllegalStateException("getTile() == null");
-        }
-
-        Tile target = getGame().getMap().getNeighbourOrNull(direction, getTile());
-
-        return getMoveType(target);
-    }
-
-
-    /**
     * Finds a shortest path from the current <code>Tile</code>
     * to the one specified. Only paths on water are allowed if
     * <code>isNaval()</code> and only paths on land if not.
@@ -717,6 +699,35 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         }
     }
 
+    /**
+     * Returns true if this unit can enter a settlement in order to trade.
+     *
+     * @param settlement The settlement to enter.
+     */
+    public boolean canTradeWith(Settlement settlement) {
+        return (isCarrier() && 
+                goodsContainer.getGoodsCount() > 0 &&
+                getOwner().getStance(settlement.getOwner()) != Player.WAR &&
+                ((settlement instanceof IndianSettlement) ||
+                 getOwner().hasFather(FoundingFather.JAN_DE_WITT)));
+    }
+
+    /**
+     * Gets the type of a move made in a specified direction.
+     *
+     * @param direction The direction of the move.
+     * @return The move type. Notice: <code>Unit.ILLEGAL_MOVE</code>
+     *         when there are no moves left.
+     */
+    public int getMoveType(int direction) {
+        if (getTile() == null) {
+            throw new IllegalStateException("getTile() == null");
+        }
+
+        Tile target = getGame().getMap().getNeighbourOrNull(direction, getTile());
+
+        return getMoveType(target);
+    }
 
     /**
      * Gets the type of a move that is made when moving to the
@@ -729,120 +740,158 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     public int getMoveType(Tile target) {
         if (getTile() == null) {
             throw new IllegalStateException("getTile() == null");
-        }
-        
-        if (isUnderRepair()) {
+        } else if (isUnderRepair()) {
             return ILLEGAL_MOVE;
-        }
-
-        if (getMovesLeft() <= 0) {
+        } else if (getMovesLeft() <= 0) {
             return ILLEGAL_MOVE;
+        } else if (getMoveCost(target) > getMovesLeft()) {
+            return ILLEGAL_MOVE;
+        } else {
+            if (isNaval()) {
+                return getNavalMoveType(target);
+            } else {
+                return getLandMoveType(target);
+            }
         }
+    }
 
+    /**
+     * Gets the type of a move that is made when moving to the
+     * specified <code>Tile</code> from the current one.
+     *
+     * @param target The target tile of the move
+     * @return The move type. Notice: <code>Unit.ILLEGAL_MOVE</code>
+     *         when there are no moves left.
+     */
+    private int getNavalMoveType(Tile target) {
         if (target == null) { // TODO: do not allow "MOVE_HIGH_SEAS" north and south.
-            return isNaval() ? MOVE_HIGH_SEAS : ILLEGAL_MOVE;
-        }
-
-        // Trade with settlement
-        if (target.getSettlement() != null && target.getSettlement().getOwner() != getOwner()
-                && isCarrier() && goodsContainer.getGoodsCount() > 0) {
-            return ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS;
-        }
-
-        // Check for disembark.
-        if (isNaval() && target.isLand()) {
-            if (target.getSettlement() != null && target.getSettlement().getOwner() == getOwner()) {
-                return MOVE;
-            } else if (target.getSettlement() != null && target.getSettlement().getOwner() != getOwner()) {
-                return ILLEGAL_MOVE;
-            } else if (target.getDefendingUnit(this) != null && target.getDefendingUnit(this).getOwner() != getOwner()) {
-                return ILLEGAL_MOVE;
-            }
-
-            Iterator unitIterator = getUnitIterator();
-
-            while (unitIterator.hasNext()) {
-                Unit u = (Unit) unitIterator.next();
-                if (u.getMovesLeft() > 0) {
-                    return DISEMBARK;
-                }
-            }
-
-            return ILLEGAL_MOVE;
-        }
-
-        /*
-        if (target.getMoveCost(getTile()) > getMovesLeft() + 1 && getMovesLeft() < getInitialMovesLeft()) {
-            return ILLEGAL_MOVE;
-        }
-        */
-        if (getMoveCost(target) > getMovesLeft()) {
-            return ILLEGAL_MOVE;
-        }
-
-
-        // Check for an 'attack' instead of 'move'.
-        if ((target.getSettlement() != null && target.getSettlement().getOwner() != getOwner())
-                || ((target.getUnitCount() > 0) && (target.getDefendingUnit(this) != null)
-                && (target.getDefendingUnit(this).getNation() != getNation())
-                && ((target.isLand() && !isNaval()) || (isNaval() && !target.isLand())))) {
-
+            return MOVE_HIGH_SEAS;
+        } else if (target.getType() == Tile.HIGH_SEAS) {
+            return MOVE_HIGH_SEAS;
+        } else if (target.isLand()) {
             Settlement settlement = target.getSettlement();
-
-            if ((settlement != null) && (!isOffensiveUnit() || isScout()) && getTile().isLand()) {
-                // Entering indian village or colony.
-                if (isScout()) {
-                    if (settlement instanceof IndianSettlement) {
-                        return ENTER_INDIAN_VILLAGE_WITH_SCOUT;
-                    } else {
-                        return ENTER_FOREIGN_COLONY_WITH_SCOUT;
-                    }
-                } else if (isMissionary() && (settlement instanceof IndianSettlement)) {
-                    return ENTER_INDIAN_VILLAGE_WITH_MISSIONARY;
-                } else if (((getType() == FREE_COLONIST) || (getType() == INDENTURED_SERVANT)) && (settlement instanceof IndianSettlement)) {
-                    return ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST;
+            if (settlement != null) {
+                if (settlement.getOwner() == getOwner()) {
+                    return MOVE;
+                } else if (canTradeWith(settlement)) {
+                    return ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS;
                 } else {
                     return ILLEGAL_MOVE;
                 }
-            } else if (isOffensiveUnit()) {
-                return ATTACK;
+            } else if (target.getDefendingUnit(this) != null &&
+                       target.getDefendingUnit(this).getOwner() != getOwner()) {
+                // enemy units on target
+                return ILLEGAL_MOVE;
             } else {
-                return ILLEGAL_MOVE;
-            }
-        }
+                // Check for disembark.
+                Iterator unitIterator = getUnitIterator();
 
-        if (target.getType() == Tile.HIGH_SEAS) {
-            return isNaval() ? MOVE_HIGH_SEAS : ILLEGAL_MOVE;
-        }
-
-        // Check for an embark:
-        if (!isNaval() && !target.isLand()) {
-            //boolean foundOneCarrier = false;
-
-            if (target.getFirstUnit() == null || target.getFirstUnit().getNation() != getNation()) {
-                return ILLEGAL_MOVE;
-            }
-
-            Iterator unitIterator = target.getUnitIterator();
-
-            while (unitIterator.hasNext()) {
-                Unit u = (Unit) unitIterator.next();
-
-                if (u.getSpaceLeft() >= getTakeSpace()) {
-                    return EMBARK;
+                while (unitIterator.hasNext()) {
+                    Unit u = (Unit) unitIterator.next();
+                    if (u.getMovesLeft() > 0) {
+                        return DISEMBARK;
+                    }
                 }
+                // no units to disembark
+                return ILLEGAL_MOVE;
             }
+        } else if (target.getDefendingUnit(this) != null &&
+                   target.getDefendingUnit(this).getOwner() != getOwner()) {
+            // enemy units at sea
+            return ATTACK;
+        } else {
+            // this must be ocean
+            return MOVE;
+        }
 
-            return ILLEGAL_MOVE;
-        }
-        
-        if (target.getLostCityRumour()) {
-            return EXPLORE_LOST_CITY_RUMOUR;
-        }
-        
-        return MOVE;
     }
 
+    /**
+     * Gets the type of a move that is made when moving to the
+     * specified <code>Tile</code> from the current one.
+     *
+     * @param target The target tile of the move
+     * @return The move type. Notice: <code>Unit.ILLEGAL_MOVE</code>
+     *         when there are no moves left.
+     */
+    private int getLandMoveType(Tile target) {
+        if (target == null) {
+            // only naval units are allowed to do this
+            return ILLEGAL_MOVE;
+        } else if (target.isLand()) {
+            Settlement settlement = target.getSettlement();
+            if (settlement != null) {
+                if (settlement.getOwner() == getOwner()) {
+                    // our colony
+                    return MOVE;
+                } else if (canTradeWith(settlement)) {
+                    return ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS;
+                } else if (getTile().isLand()) {
+                    if (settlement instanceof IndianSettlement) {
+                        if (isScout()) {
+                            return ENTER_INDIAN_VILLAGE_WITH_SCOUT;
+                        } else if (isMissionary()) {
+                            return ENTER_INDIAN_VILLAGE_WITH_MISSIONARY;
+                        } else if (((getType() == FREE_COLONIST) ||
+                                    (getType() == INDENTURED_SERVANT))) {
+                            return ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST;
+                        } else if (isOffensiveUnit()) {
+                            return ATTACK;
+                        } else {
+                            return ILLEGAL_MOVE;
+                        }
+                    } else if (settlement instanceof Colony) {
+                        if (isScout()) {
+                            return ENTER_FOREIGN_COLONY_WITH_SCOUT;
+                        } else if (isOffensiveUnit()) {
+                            return ATTACK;
+                        } else {
+                            return ILLEGAL_MOVE;
+                        }
+                    }
+                } else {
+                    // no disembarkation
+                    return ILLEGAL_MOVE;
+                }
+            } else if (target.getDefendingUnit(this) != null &&
+                       target.getDefendingUnit(this).getOwner() != getOwner()) {
+                if (getTile().isLand()) {
+                    if (isOffensiveUnit() || isScout()) {
+                        return ATTACK;
+                    } else {
+                        return ILLEGAL_MOVE;
+                    }
+                } else {
+                    // no marine assaults
+                    return ILLEGAL_MOVE;
+                }
+            } else if (target.getLostCityRumour()) {
+                return EXPLORE_LOST_CITY_RUMOUR;
+            } else {
+                return MOVE;
+            }
+        } else {
+            // check for embarkation
+            if (target.getFirstUnit() == null || 
+                target.getFirstUnit().getNation() != getNation()) {
+                return ILLEGAL_MOVE;
+            } else {
+                Iterator unitIterator = target.getUnitIterator();
+                        
+                while (unitIterator.hasNext()) {
+                    Unit u = (Unit) unitIterator.next();
+                            
+                    if (u.getSpaceLeft() >= getTakeSpace()) {
+                        return EMBARK;
+                    }
+                }
+                        
+                return ILLEGAL_MOVE;
+            }
+        }
+
+        return ILLEGAL_MOVE;
+    }
 
     /**
     * Sets the <code>movesLeft</code>. If <code>movesLeft < 0</code>
@@ -883,6 +932,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         int type = getType();
 
         if (isScout() || type == FRIGATE || type == GALLEON || type == MAN_O_WAR || type == PRIVATEER) {
+            return 2;
+        } else if (getOwner().hasFather(FoundingFather.HERNANDO_DE_SOTO)) {
             return 2;
         } else {
             return 1;
@@ -2190,6 +2241,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                     // I think '4' was also used in the original game.
                     workLeft = 4 - workLeft;
                 }
+                if (getOwner().hasFather(FoundingFather.FERDINAND_MAGELLAN)) {
+                    workLeft = workLeft/2;
+                }
                 break;
             case TO_AMERICA:
                 if ((state == ACTIVE) && (location instanceof Europe)) {
@@ -2197,6 +2251,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 } else if ((state == TO_EUROPE) && (location instanceof Europe)) {
                     // I think '4' was also used in the original game.
                     workLeft = 4 - workLeft;
+                }
+                if (getOwner().hasFather(FoundingFather.FERDINAND_MAGELLAN)) {
+                    workLeft = workLeft/2;
                 }
                 break;
             default:
