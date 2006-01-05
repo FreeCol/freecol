@@ -1714,7 +1714,7 @@ public class Player extends FreeColGameObject {
         playerElement.appendChild(toArrayElement("arrears", arrears, document));
         playerElement.appendChild(toArrayElement("sales", sales, document));
         playerElement.appendChild(toArrayElement("incomeBeforeTaxes", incomeBeforeTaxes, document));
-        playerElement.appendChild(toArrayElement("incomeAfterTayes", incomeAfterTaxes, document));
+        playerElement.appendChild(toArrayElement("incomeAfterTaxes", incomeAfterTaxes, document));
 
         if (showAll || equals(player)) {
             playerElement.setAttribute("gold", Integer.toString(gold));
