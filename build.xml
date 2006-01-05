@@ -25,6 +25,17 @@
     />
   </target>
 
+  <target name="compile-test" depends="init">
+    <mkdir dir="${freecol.build.dir}"/>
+    <javac srcdir="test/src"
+           destdir="${freecol.build.dir}"
+           debug="on"
+           optimize="on"
+           deprecation="off"
+           source="1.4"
+    />
+  </target>
+
   <target name="copy-sound-files" depends="init" unless="nosound">
     <copy todir="${freecol.build.dir}/net/sf/freecol/data/audio">
       <fileset dir="${freecol.data.dir}/audio">

@@ -31,7 +31,13 @@ public final class MessageMerge
 
     public static void main( String[] args )
     {
-        String  pathToFile1 = args[0];
+        if ( args.length != 2 )
+        {
+            System.err.println( "use: MessageMerge path-to-file-1 path-to-file-2" );
+            System.exit( 1 );
+        }
+
+              String  pathToFile1 = args[0];
         final String  pathToFile2 = args[1];
 
         final MergeTableModel  mergeTableModel = new MergeTableModel();
