@@ -448,6 +448,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         rumourElement.setAttribute("type", Integer.toString(type));
         rumourElement.setAttribute("unit", unit.getID());
         Unit newUnit;
+        int dx = 10 - player.getDifficulty(); // 6-10
 
         switch (type) {
         case LostCityRumour.BURIAL_GROUND:
@@ -462,7 +463,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             unit.setType(Unit.SEASONED_SCOUT);
             break;
         case LostCityRumour.TRIBAL_CHIEF:
-            int amount = attackCalculator.nextInt((10 - player.getDifficulty()) * 10); // 60-100
+            int amount = attackCalculator.nextInt(dx * 10) + dx * 5;
             player.modifyGold(amount);
             rumourElement.setAttribute("amount", Integer.toString(amount));
             break;
@@ -472,7 +473,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             rumourElement.appendChild(newUnit.toXMLElement(player, rumourElement.getOwnerDocument()));
             break;
         case LostCityRumour.TREASURE_TRAIN:
-            int treasure = attackCalculator.nextInt((10 - player.getDifficulty()) * 600); // 3600-6000
+            int treasure = attackCalculator.nextInt(dx * 600) + dx * 300;
             newUnit = new Unit(game, tile, player, Unit.TREASURE_TRAIN, Unit.ACTIVE);
             newUnit.setTreasureAmount(treasure);
             unit.getTile().add(newUnit);
@@ -480,7 +481,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             rumourElement.appendChild(newUnit.toXMLElement(player, rumourElement.getOwnerDocument()));
             break;
         case LostCityRumour.FOUNTAIN_OF_YOUTH:
-            for (int k = 0; k < (10 - player.getDifficulty()); k++) {
+            for (int k = 0; k < dx; k++) {
                 newUnit = new Unit(game, player.getEurope(), player,
                                    player.generateRecruitable(), Unit.SENTRY);
                 player.getEurope().add(newUnit);
@@ -1658,21 +1659,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             return null;
         }
         unit.setState(state);
-
-        /**
-        if (state == Unit.GOING_TO) {
-            Element pathElement = Message.getChildElement(changeStateElement, "path");
-            if (pathElement != null) {
-                ArrayList path = new ArrayList();
-                int length = Integer.parseInt(pathElement.getAttribute("xLength"));
-                for (int i = 0; i < length; i++) {
-                    path.add(new Integer(pathElement.getAttribute("x" + Integer.toString(i))));
-                }
-                unit.setPath(path);
-                unit.moveAlongPath();
-            }
-        }
-        */
 
         sendUpdatedTileToAll(oldTile, player);
 
