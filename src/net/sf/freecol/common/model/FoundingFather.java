@@ -1,6 +1,8 @@
 
 package net.sf.freecol.common.model;
 
+import net.sf.freecol.client.gui.i18n.Messages;
+
 /**
 * Represents one founding father to be contained in a Player object.
 * Stateful information is in the Player object.
@@ -17,9 +19,9 @@ public class FoundingFather {
                             PETER_MINUIT = 2,
                             PETER_STUYVESANT = 3, 
                             JAN_DE_WITT = 4, //TODO
-                            FERDINAND_MAGELLAN = 5, //TODO - decreased sailing time to europe
+                            FERDINAND_MAGELLAN = 5,
                             FRANSICO_DE_CORONADO = 6,
-                            HERNANDO_DE_SOTO = 7, //TODO
+                            HERNANDO_DE_SOTO = 7,
                             HENRY_HUDSON = 8,
                             LA_SALLE = 9,
                             HERNAN_CORTES = 10,
@@ -29,7 +31,7 @@ public class FoundingFather {
                             JOHN_PAUL_JONES = 14,
                             THOMAS_JEFFERSON = 15,
                             POCAHONTAS = 16,
-                            THOMAS_PAINE = 17,//TODO
+                            THOMAS_PAINE = 17,
                             SIMON_BOLIVAR = 18,
                             BENJAMIN_FRANKLIN = 19,//TODO
                             WILLIAM_BREWSTER = 20,//TODO: show a panel where you can pick the emigrant.
@@ -136,11 +138,11 @@ public class FoundingFather {
 
     public static String getTypeAsString(int type) {
         switch (type) {
-            case TRADE: return "Trade";
-            case EXPLORATION: return "Exploration";
-            case MILITARY: return "Military";
-            case POLITICAL: return "Political";
-            case RELIGIOUS: return "Religious";
+            case TRADE: return Messages.message("foundingFather.trade");
+            case EXPLORATION: return Messages.message("foundingFather.exploration");
+            case MILITARY: return Messages.message("foundingFather.military");
+            case POLITICAL: return Messages.message("foundingFather.political");
+            case RELIGIOUS: return Messages.message("foundingFather.religious");
         }
         
         return "";
@@ -150,7 +152,6 @@ public class FoundingFather {
     public static int getWeight(int foundingFather, int age) {
         // This is the list of the founding fathers without effects:
         if (foundingFather == JAN_DE_WITT ||
-            foundingFather == HERNANDO_DE_SOTO ||
             foundingFather == BENJAMIN_FRANKLIN ||
             foundingFather == JUAN_DE_SEPULVEDA) {
             return 0;

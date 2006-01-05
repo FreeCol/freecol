@@ -99,15 +99,18 @@ public final class Monarch extends FreeColGameObject {
 
         boolean canDeclareWar = false;
         boolean atWar = false;
-        for (int i = 0; i < Player.NUMBER_OF_NATIONS; i++) {
-            if (player.hasContacted(i)) {
-                switch (player.getStance(i)) {
-                case Player.WAR:
-                    atWar = true;
-                    break;
-                case Player.PEACE:
-                case Player.CEASE_FIRE:
-                    canDeclareWar = true;
+        // Benjamin Franklin puts an end to the monarch's interference
+        if (!player.hasFather(FoundingFather.BENJAMIN_FRANKLIN)) {
+            for (int i = 0; i < Player.NUMBER_OF_NATIONS; i++) {
+                if (player.hasContacted(i)) {
+                    switch (player.getStance(i)) {
+                    case Player.WAR:
+                        atWar = true;
+                        break;
+                    case Player.PEACE:
+                    case Player.CEASE_FIRE:
+                        canDeclareWar = true;
+                    }
                 }
             }
         }
