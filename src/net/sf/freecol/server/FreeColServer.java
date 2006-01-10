@@ -31,6 +31,8 @@ import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Monarch;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
@@ -49,8 +51,8 @@ import net.sf.freecol.server.networking.DummyConnection;
 import net.sf.freecol.server.networking.Server;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -552,6 +554,15 @@ public final class FreeColServer {
                 ((IndianSettlement) t.getSettlement()).createGoodsContainer();
             }
         }
+        
+        // Support for pre-0.1.3 protocols:
+        Iterator monarchPlayerIterator = game.getPlayerIterator();
+        while (monarchPlayerIterator.hasNext()) {
+        	Player p = (Player) monarchPlayerIterator.next();
+        	if (p.getMonarch() == null) {
+        		p.setMonarch(new Monarch(game, p, ""));
+        	}
+        }  	
 
         return savedGameElement.getAttribute("owner");
     }

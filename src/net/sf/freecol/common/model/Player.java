@@ -864,7 +864,15 @@ public class Player extends FreeColGameObject {
     public Monarch getMonarch() {
         return monarch;
     }
-
+    
+    /**
+     * Sets the monarch object this player has.
+     *
+     * @param monarch The monarch object this player should have.
+     */
+    public void setMonarch(Monarch monarch) {
+        this.monarch = monarch;
+    }    
 
     /**
     * Returns the amount of gold that this player has.
@@ -1777,7 +1785,11 @@ public class Player extends FreeColGameObject {
         gold = Integer.parseInt(playerElement.getAttribute("gold"));
         crosses = Integer.parseInt(playerElement.getAttribute("crosses"));
         bells = Integer.parseInt(playerElement.getAttribute("bells"));
-        bellsBonus = Integer.parseInt(playerElement.getAttribute("bellsBonus"));
+        if (playerElement.hasAttribute("bellsBonus")) {
+        	bellsBonus = Integer.parseInt(playerElement.getAttribute("bellsBonus"));
+        } else {
+        	bellsBonus = 0;
+        }
         ready = (new Boolean(playerElement.getAttribute("ready"))).booleanValue();
         ai = (new Boolean(playerElement.getAttribute("ai"))).booleanValue();
         dead = (new Boolean(playerElement.getAttribute("dead"))).booleanValue();

@@ -834,7 +834,10 @@ public class AIColony extends AIObject {
      * @param element The XML-representation.
      */
     public void readFromXMLElement(Element element) {
-        colony = (Colony) getAIMain().getFreeColGameObject(element.getAttribute("ID"));
+        colony = (Colony) getAIMain().getFreeColGameObject(element.getAttribute("ID"));       
+        if (colony == null) {
+        	throw new NullPointerException("Could not find Colony with ID: " + element.getAttribute("ID"));
+        }
 
         aiGoods.clear();
         wishes.clear();

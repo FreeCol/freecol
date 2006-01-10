@@ -832,11 +832,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                             return ENTER_INDIAN_VILLAGE_WITH_SCOUT;
                         } else if (isMissionary()) {
                             return ENTER_INDIAN_VILLAGE_WITH_MISSIONARY;
+                        } else if (isOffensiveUnit()) {
+                            return ATTACK;                            
                         } else if (((getType() == FREE_COLONIST) ||
                                     (getType() == INDENTURED_SERVANT))) {
                             return ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST;
-                        } else if (isOffensiveUnit()) {
-                            return ATTACK;
                         } else {
                             return ILLEGAL_MOVE;
                         }
@@ -2419,7 +2419,15 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     * @return The amount of units/goods than can be moved onto this Unit.
     */
     public int getSpaceLeft() {
-        return getInitialSpaceLeft() - (getUnitCount() + getGoodsCount());
+    	int space = getInitialSpaceLeft() - getGoodsCount();
+    	
+    	Iterator unitIterator = getUnitIterator();
+    	while (unitIterator.hasNext()) {
+    		Unit u = (Unit) unitIterator.next();
+    		space -= u.getTakeSpace();
+    	}
+    	
+        return space;
     }
 
 
@@ -3014,10 +3022,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             break;
         case ATTACK_LOSS:
             if (isNaval()) {
-                defender.captureGoods(this);
                 shipDamaged();
             } else {
-                demote(defender);
+                demote(defender, false);
                 if (defender.getOwner().hasFather(FoundingFather.GEORGE_WASHINGTON)) {
                     defender.promote();
                 }
@@ -3025,10 +3032,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             break;
         case ATTACK_GREAT_LOSS:
             if (isNaval()) {
-                defender.captureGoods(this);
                 shipSunk();
             } else {
-                demote(defender);
+                demote(defender, true);
                 defender.promote();
             }
             break;
@@ -3051,7 +3057,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 if (getOwner().hasFather(FoundingFather.GEORGE_WASHINGTON)) {
                     promote();
                 }
-                defender.demote(this);
+                defender.demote(this, false);
             }
             break;
         case ATTACK_GREAT_WIN:
@@ -3060,7 +3066,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 defender.shipSunk();
             } else {
                 promote();
-                defender.demote(this);
+                defender.demote(this, true);
             }
             break;
         default:
@@ -3106,8 +3112,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * destroyed. The enemy may plunder horses and muskets.
      *
      * @param enemyUnit The unit we are fighting against.
+     * @param greatDemote <code>true</code> indicates that
+     * 		muskets/horses should be taken by the <code>enemyUnit</code>.
      */
-    public void demote(Unit enemyUnit) {
+    public void demote(Unit enemyUnit, boolean greatDemote) {
         String oldName = getName();
         String messageID = "model.unit.unitDemoted";
         String nation = owner.getNationAsString();
@@ -3115,7 +3123,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             if (isArmed() && getType() != BRAVE) {
                 // dragoon
                 setMounted(false, true);
-                if (enemyUnit.getType() == BRAVE) {
+                if (enemyUnit.getType() == BRAVE && greatDemote) {
                     addModelMessage(this, "model.unit.braveMounted",
                                     new String [][] {{"%nation%", enemyUnit.getOwner().getNationAsString()}});
                     enemyUnit.setMounted(true, true);
@@ -3128,7 +3136,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         } else if (isArmed()) {
             // soldier
             setArmed(false, true);
-            if (enemyUnit.getType() == BRAVE) {
+            if (enemyUnit.getType() == BRAVE && greatDemote) {
                 addModelMessage(this, "model.unit.braveArmed",
                                 new String [][] {{"%nation%", enemyUnit.getOwner().getNationAsString()}});
                 enemyUnit.setArmed(true, true);

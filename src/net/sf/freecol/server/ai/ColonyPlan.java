@@ -56,6 +56,10 @@ public class ColonyPlan {
     public ColonyPlan(AIMain aiMain, Colony colony) {
         this.aiMain = aiMain;
         this.colony = colony;
+        
+        if (colony == null) {
+        	throw new NullPointerException("colony == null");
+        }
     }
 
 

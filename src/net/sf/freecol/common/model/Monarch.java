@@ -115,9 +115,9 @@ public final class Monarch extends FreeColGameObject {
         // TODO: check whether the player has been attacked by privateers
         boolean privateers = true;
 
-	for (int j = 0; j < NUMBER_OF_ACTIONS; j++ ) {
-	     probability[j] = 0;
-	}
+        for (int j = 0; j < NUMBER_OF_ACTIONS; j++ ) {
+        	probability[j] = 0;
+        }
 
         // the more time has passed, the less likely the monarch will
         // do nothing
@@ -142,17 +142,17 @@ public final class Monarch extends FreeColGameObject {
         }
         
         int accumulator = 0;
-	for (int k = 0; k < NUMBER_OF_ACTIONS; k++ ) {
-	    accumulator += probability[k];
-	    probability[k] = accumulator;
-	}
-
-	int randomInt = random.nextInt(accumulator);
-
-	for (int action = 0; action < NUMBER_OF_ACTIONS; action++) {
-	    if (randomInt < probability[action]) {
-                return action;
-            }
+        for (int k = 0; k < NUMBER_OF_ACTIONS; k++ ) {
+        	accumulator += probability[k];
+        	probability[k] = accumulator;
+        }
+        
+        int randomInt = random.nextInt(accumulator);
+        
+        for (int action = 0; action < NUMBER_OF_ACTIONS; action++) {
+        	if (randomInt < probability[action]) {
+        		return action;
+        	}
         }
 
         return NO_ACTION;

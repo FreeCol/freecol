@@ -277,23 +277,29 @@ public class AIMain implements FreeColGameObjectListener {
             if (!(n instanceof Element)) {
                 continue;
             }
-            Element childElement = (Element) n;
-            if (childElement.getTagName().equals(AIUnit.getXMLElementTagName())) {
-                addAIObject(childElement.getAttribute("ID"), new AIUnit(this, childElement));
-            } else if (childElement.getTagName().equals(AIPlayer.getXMLElementTagName())) {
-                addAIObject(childElement.getAttribute("ID"), new AIPlayer(this, childElement));
-            } else if (childElement.getTagName().equals(AIColony.getXMLElementTagName())) {
-                addAIObject(childElement.getAttribute("ID"), new AIColony(this, childElement));
-            } else if (childElement.getTagName().equals(AIGoods.getXMLElementTagName())) {
-                addAIObject(childElement.getAttribute("ID"), new AIGoods(this, childElement));
-            } else if (childElement.getTagName().equals(WorkerWish.getXMLElementTagName())) {
-                addAIObject(childElement.getAttribute("ID"), new WorkerWish(this, childElement));
-            } else if (childElement.getTagName().equals(GoodsWish.getXMLElementTagName())) {
-                addAIObject(childElement.getAttribute("ID"), new GoodsWish(this, childElement));
-            } else if (childElement.getTagName().equals(TileImprovement.getXMLElementTagName())) {
-                addAIObject(childElement.getAttribute("ID"), new TileImprovement(this, childElement));                
-            } else {
-                logger.warning("Unkown AI-object read: " + childElement.getTagName());
+            try {
+            	Element childElement = (Element) n;
+            	if (childElement.getTagName().equals(AIUnit.getXMLElementTagName())) {
+            		addAIObject(childElement.getAttribute("ID"), new AIUnit(this, childElement));
+            	} else if (childElement.getTagName().equals(AIPlayer.getXMLElementTagName())) {
+            		addAIObject(childElement.getAttribute("ID"), new AIPlayer(this, childElement));
+            	} else if (childElement.getTagName().equals(AIColony.getXMLElementTagName())) {
+            		addAIObject(childElement.getAttribute("ID"), new AIColony(this, childElement));
+            	} else if (childElement.getTagName().equals(AIGoods.getXMLElementTagName())) {
+            		addAIObject(childElement.getAttribute("ID"), new AIGoods(this, childElement));
+            	} else if (childElement.getTagName().equals(WorkerWish.getXMLElementTagName())) {
+            		addAIObject(childElement.getAttribute("ID"), new WorkerWish(this, childElement));
+            	} else if (childElement.getTagName().equals(GoodsWish.getXMLElementTagName())) {
+            		addAIObject(childElement.getAttribute("ID"), new GoodsWish(this, childElement));
+            	} else if (childElement.getTagName().equals(TileImprovement.getXMLElementTagName())) {
+            		addAIObject(childElement.getAttribute("ID"), new TileImprovement(this, childElement));                
+            	} else {
+            		logger.warning("Unkown AI-object read: " + childElement.getTagName());
+            	}
+            } catch (Exception e) {
+            	StringWriter sw = new StringWriter();
+            	e.printStackTrace(new PrintWriter(sw));
+            	logger.warning("Exception while reading an AIObject: " + sw.toString());
             }
         }
 
