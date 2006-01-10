@@ -102,6 +102,8 @@ public final class InGameInputHandler extends InputHandler {
 		reply = removeGoods(element);
             } else if (type.equals("lostCityRumour")) {
                 reply = lostCityRumour(element);
+            } else if (type.equals("diplomaticMessage")) {
+                reply = diplomaticMessage(element);
             } else {
                 logger.warning("Message is of unsupported type \"" + type + "\".");
             }
@@ -533,34 +535,51 @@ public final class InGameInputHandler extends InputHandler {
      */
     private Element indianDemand(Element element) {
         Game game = getFreeColClient().getGame();
-        Element unitElement = Message.getChildElement(element, Unit.getXMLElementTagName());
-
-        Unit unit = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
-        //unit.readFromXMLElement(unitElement);
-
-        Settlement settlement = (Settlement) game.getFreeColGameObject(element.getAttribute("settlement"));
-        Goods goods = new Goods(game, Message.getChildElement(element, Goods.getXMLElementTagName()));
-
+        Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
+        Colony colony = (Colony) game.getFreeColGameObject(element.getAttribute("colony"));
+        int gold = 0;
+        Goods goods = null;
         boolean accepted;
-        if (goods.getType() == Goods.FOOD) {
-            accepted = getFreeColClient().getCanvas().
-                showConfirmDialog("indianDemand.food.text",
-                                  "indianDemand.food.yes",
-                                  "indianDemand.food.no",
-                                  new String [][] {{"%nation%", unit.getOwner().getNationAsString()}});
-        } else {
-            accepted = getFreeColClient().getCanvas().
-                showConfirmDialog("indianDemand.other.text",
-                                  "indianDemand.other.yes",
-                                  "indianDemand.other.no",
-                                  new String [][] {{"%nation%", unit.getOwner().getNationAsString()},
-                                                   {"%amount%", String.valueOf(goods.getAmount())},
-                                                   {"%goods%", goods.getName()}});
-        }
 
-        if (accepted) {
-            settlement.getGoodsContainer().removeGoods(goods);
+        Element goodsElement = Message.getChildElement(element, Goods.getXMLElementTagName());
+        if (goodsElement == null) {
+            gold = Integer.parseInt(element.getAttribute("gold"));
+            accepted = getFreeColClient().getCanvas().
+                showConfirmDialog("indianDemand.gold.text",
+                                  "indianDemand.gold.yes",
+                                  "indianDemand.gold.no",
+                                  new String [][] {{"%nation%", unit.getOwner().getNationAsString()},
+                                                   {"%colony%", colony.getName()},
+                                                   {"%amount%", String.valueOf(gold)}});
+            if (accepted) {
+                colony.getOwner().modifyGold(-gold);
+            }
+        } else {
+            goods = new Goods(game, goodsElement);
+
+            if (goods.getType() == Goods.FOOD) {
+                accepted = getFreeColClient().getCanvas().
+                    showConfirmDialog("indianDemand.food.text",
+                                      "indianDemand.food.yes",
+                                      "indianDemand.food.no",
+                                      new String [][] {{"%nation%", unit.getOwner().getNationAsString()},
+                                                       {"%colony%", colony.getName()}});
+            } else {
+                accepted = getFreeColClient().getCanvas().
+                    showConfirmDialog("indianDemand.other.text",
+                                      "indianDemand.other.yes",
+                                      "indianDemand.other.no",
+                                      new String [][] {{"%nation%", unit.getOwner().getNationAsString()},
+                                                       {"%colony%", colony.getName()},
+                                                       {"%amount%", String.valueOf(goods.getAmount())},
+                                                       {"%goods%", goods.getName()}});
+            }
+
+            if (accepted) {
+                colony.getGoodsContainer().removeGoods(goods);
+            }
         }
+        
         element.setAttribute("accepted", String.valueOf(accepted));
 
         return element;
@@ -651,12 +670,12 @@ public final class InGameInputHandler extends InputHandler {
         if (type.equals("declarationOfWar")) {
             Player attacker = (Player) game.getFreeColGameObject(element.getAttribute("attacker"));
             Player defender = (Player) game.getFreeColGameObject(element.getAttribute("defender"));
+            defender.warDeclaredBy(attacker);
         
             if (player.equals(defender)) {
                 canvas.showInformationMessage("model.diplomacy.war.declared",
                                               new String [][] {{"%nation%",
                                                                 attacker.getNationAsString()}});
-                player.declareWar(attacker);
             } else {
                 canvas.showInformationMessage("model.diplomacy.war.others",
                                               new String [][] {{"%attacker%",

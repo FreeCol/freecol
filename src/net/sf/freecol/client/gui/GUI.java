@@ -241,7 +241,9 @@ public final class GUI {
         this.selectedTile = selectedTile;
 
         if (selectedTile != null) {
-            if (activeUnit == null || !activeUnit.getTile().getPosition().equals(selectedTile)) {
+            if (activeUnit == null ||
+                (activeUnit.getTile() != null &&
+                 !activeUnit.getTile().getPosition().equals(selectedTile))) {
                 Tile t = gameData.getMap().getTile(selectedTile);
                 if (t != null && t.getSettlement() != null && t.getSettlement() instanceof Colony
                     && t.getSettlement().getOwner().equals(freeColClient.getMyPlayer())) {

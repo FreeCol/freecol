@@ -268,20 +268,12 @@ public final class InGameController implements NetworkConstants {
         }
         while (colonyIterator.hasNext()) {
             Colony colony = (Colony) colonyIterator.next();
-            if (naval) {
-                boolean inland = true;
-                Iterator tileIterator = map.getAdjacentIterator(colony.getTile().getPosition());
-                while (tileIterator.hasNext()) {
-                    Position p = (Position) tileIterator.next();
-                    if (!map.getTile(p).isLand()) {
-                        inland = false;
-                        break;
-                    }
-                }
-                if (inland) {
-                    continue;
-                }
-            } // TODO: check if unit can really reach colony
+            if (naval && colony.isLandLocked()) {
+                continue;
+            } else if (unit.getTile() == colony.getTile()) {
+                continue;
+            }
+            // TODO: check if unit can really reach colony
             destinations.add(colony);
         }
 
@@ -295,18 +287,7 @@ public final class InGameController implements NetworkConstants {
             // user aborted
             return;
         } else if (destination instanceof Europe) {
-            // TODO: find a better way
-            /*
-            Iterator tileIterator = map.getFloodFillIterator(unit.getTile().getPosition());
-            while (tileIterator.hasNext()) {
-                Position p = (Position) tileIterator.next();
-                if (map.getTile(p).getType() == Tile.HIGH_SEAS) {
-                    PathNode path = map.findPath(unit, unit.getTile(), map.getTile(p));
-                    break;
-                }
-            }
-            */
-            PathNode path = map.findPath(unit, unit.getTile(), (Tile) unit.getEntryLocation());
+            PathNode path = map.findPathToEurope(unit, unit.getTile());
             if (path == null) {
                 canvas.showInformationMessage("selectDestination.failed",
                                               new String [][] {{"%destination%",
@@ -339,8 +320,9 @@ public final class InGameController implements NetworkConstants {
 
         if (unit != null && path != null) {
             unit.setPath(path);
-            unit.setState(Unit.GOING_TO);
-            unit.setStateToAllChildren(Unit.SENTRY);
+            //unit.setState(Unit.GOING_TO);
+            //unit.setStateToAllChildren(Unit.SENTRY);
+            changeState(unit, Unit.GOING_TO);
             moveAlongPath(unit);
         } // else: nothing: There is no active unit that can be moved.
     }
@@ -379,8 +361,7 @@ public final class InGameController implements NetworkConstants {
                     moveType == Unit.MOVE_HIGH_SEAS) {
                     reallyMove(unit, direction);
                     path = path.next;
-                    freeColClient.getActionManager().update();
-                    freeColClient.getCanvas().updateJMenuBar();
+                    freeColClient.getCanvas().refresh();
                 } else {
                     // something has got in our way
                     logger.info("Aborting goto: move type was " + moveType);
@@ -396,8 +377,9 @@ public final class InGameController implements NetworkConstants {
         freeColClient.getCanvas().updateJMenuBar();
 
         if (active) {
-            unit.setState(Unit.ACTIVE);
-            unit.setStateToAllChildren(Unit.SENTRY);
+            //unit.setState(Unit.ACTIVE);
+            //unit.setStateToAllChildren(Unit.SENTRY);
+            changeState(unit, Unit.ACTIVE);
             freeColClient.getGUI().setActiveUnit(unit);
         } else {
             nextActiveUnit();
@@ -752,6 +734,9 @@ public final class InGameController implements NetworkConstants {
                                               new String [][] {{"%replace%", enemy.getNationAsString()}});
                 return;
             }
+            // make sure we are at war
+            unit.getOwner().setStance(enemy, Player.WAR);
+
         }
         
         if (unit.getType() == Unit.ARTILLERY || unit.getType() == Unit.DAMAGED_ARTILLERY || unit.isNaval()) {
@@ -789,8 +774,6 @@ public final class InGameController implements NetworkConstants {
             throw new NullPointerException("defender == null");
         }
 
-        // make sure we are at war
-        unit.getOwner().setStance(defender.getOwner(), Player.WAR);
 
         if (!unit.isNaval()) { 
             Unit winner;
@@ -1947,7 +1930,11 @@ public final class InGameController implements NetworkConstants {
             if (nextActiveUnit != null) {
                 moveAlongPath(nextActiveUnit);
             } else if (tile != null) {
-                gui.setSelectedTile(tile.getPosition());
+                Position p = tile.getPosition();
+                if (p != null) {
+                    // this really shouldn't happen
+                    gui.setSelectedTile(p);
+                }
                 gui.setActiveUnit(null);
             } else {
                 gui.setActiveUnit(null);

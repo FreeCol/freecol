@@ -738,11 +738,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      *         when there are no moves left.
      */
     public int getMoveType(Tile target) {
-        if (isUnderRepair()) {
+        if (getTile() == null) {
+            throw new IllegalStateException("getTile() == null");
+        } else if (isUnderRepair()) {
             return ILLEGAL_MOVE;
         } else if (getMovesLeft() <= 0) {
-            return ILLEGAL_MOVE;
-        } else if (target != null && getMoveCost(target) > getMovesLeft()) {
             return ILLEGAL_MOVE;
         } else {
             if (isNaval()) {
@@ -774,11 +774,14 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 } else if (canTradeWith(settlement)) {
                     return ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS;
                 } else {
+                    logger.warning("Trying to enter another player's settlement with " +
+                                   getName());
                     return ILLEGAL_MOVE;
                 }
             } else if (target.getDefendingUnit(this) != null &&
                        target.getDefendingUnit(this).getOwner() != getOwner()) {
-                // enemy units on target
+                logger.warning("Trying to sail into tile occupied by enemy units with " +
+                               getName());
                 return ILLEGAL_MOVE;
             } else {
                 // Check for disembark.
@@ -790,7 +793,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                         return DISEMBARK;
                     }
                 }
-                // no units to disembark
+                logger.warning("No units to disembark from " + getName());
                 return ILLEGAL_MOVE;
             }
         } else if (target.getDefendingUnit(this) != null &&
@@ -818,6 +821,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     private int getLandMoveType(Tile target) {
         if (target == null) {
             // only naval units are allowed to do this
+            logger.warning("Trying to enter null tile with land unit " +
+                           getName());
             return ILLEGAL_MOVE;
         } else if (target.isLand()) {
             Settlement settlement = target.getSettlement();
@@ -839,6 +844,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                                     (getType() == INDENTURED_SERVANT))) {
                             return ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST;
                         } else {
+                            logger.warning("Trying to enter Indian settlement with " +
+                                           getName());
                             return ILLEGAL_MOVE;
                         }
                     } else if (settlement instanceof Colony) {
@@ -847,11 +854,14 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                         } else if (isOffensiveUnit()) {
                             return ATTACK;
                         } else {
+                            logger.warning("Trying to enter foreign colony with " +
+                                           getName());
                             return ILLEGAL_MOVE;
                         }
                     }
                 } else {
-                    // no disembarkation
+                    logger.warning("Trying to disembark into foreign colony with " +
+                                   getName());
                     return ILLEGAL_MOVE;
                 }
             } else if (target.getDefendingUnit(this) != null &&
@@ -860,12 +870,17 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                     if (isOffensiveUnit() && getTile().getSettlement() != null) {
                         return ATTACK;
                     } else {
+                        logger.warning("Trying to attack with civilian " +
+                                       getName());
                         return ILLEGAL_MOVE;
                     }
                 } else {
-                    // no marine assaults
+                    logger.warning("Attempting marine assault with " +
+                                   getName());
                     return ILLEGAL_MOVE;
                 }
+            } else if (getMoveCost(target) > getMovesLeft()) {
+                return ILLEGAL_MOVE;
             } else if (target.hasLostCityRumour()) {
                 return EXPLORE_LOST_CITY_RUMOUR;
             } else {
@@ -875,6 +890,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             // check for embarkation
             if (target.getFirstUnit() == null || 
                 target.getFirstUnit().getNation() != getNation()) {
+                logger.warning("Trying to embark on tile occupied by foreign units with " +
+                               getName());
                 return ILLEGAL_MOVE;
             } else {
                 Iterator unitIterator = target.getUnitIterator();
@@ -886,11 +903,13 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                         return EMBARK;
                     }
                 }
-                        
+                logger.warning("Trying to board full vessel with " +
+                               getName());
                 return ILLEGAL_MOVE;
             }
         }
 
+        logger.warning("Default illegal move for " + getName());
         return ILLEGAL_MOVE;
     }
 
@@ -1316,7 +1335,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         }
 
         // Check for adjacent units owned by a player that our owner has not met before:
-        if (getGame().getMap() != null && location != null && location instanceof Tile && !isNaval()) {
+        if (getGame().getMap() != null &&
+            location != null &&
+            location instanceof Tile && !isNaval()) {
             Iterator tileIterator = getGame().getMap().getAdjacentIterator(getTile().getPosition());
             while (tileIterator.hasNext()) {
                 Tile t = getGame().getMap().getTile((Position) tileIterator.next());
@@ -1329,10 +1350,13 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                     throw new NullPointerException();
                 }
 
-                if (t.getSettlement() != null && !t.getSettlement().getOwner().hasContacted(getOwner().getNation())) {
+                if (t.getSettlement() != null &&
+                    !t.getSettlement().getOwner().hasContacted(getOwner().getNation())) {
                     t.getSettlement().getOwner().setContacted(getOwner(), true);
                     getOwner().setContacted(t.getSettlement().getOwner(), true);
-                } else if (t.isLand() && t.getFirstUnit() != null && !t.getFirstUnit().getOwner().hasContacted(getOwner().getNation())) {
+                } else if (t.isLand()
+                           && t.getFirstUnit() != null &&
+                           !t.getFirstUnit().getOwner().hasContacted(getOwner().getNation())) {
                     t.getFirstUnit().getOwner().setContacted(getOwner(), true);
                     getOwner().setContacted(t.getFirstUnit().getOwner(), true);
                 }
@@ -2257,6 +2281,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                     workLeft = workLeft/2;
                 }
                 break;
+            case GOING_TO:
+                setStateToAllChildren(SENTRY);
+                break;
             default:
                 workLeft = -1;
         }
@@ -3156,9 +3183,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 setHitpoints(getInitialHitpoints(enemyUnit.getType()));
                 setLocation(enemyUnit.getTile());
                 setOwner(enemyUnit.getOwner());
+            } else {
+                messageID = "model.unit.unitSlaughtered";
+                dispose();
             }
-            messageID = "model.unit.unitSlaughtered";
-            dispose();
         }
         String newName = getName();
         addModelMessage(this, messageID,
@@ -3275,24 +3303,27 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         Player enemy = settlement.getOwner();
         boolean wasCapital = settlement.isCapital();
         Tile newTile = settlement.getTile();
+        ModelController modelController = getGame().getModelController();
         settlement.dispose();
 
         enemy.modifyTension(getOwner(), Player.TENSION_ADD_MAJOR);
 
-        int randomTreasure = getGame().
-            getModelController().getRandom(getID() + "indianTreasureRandom" +
-                                           getID(), 11);
-        Unit tTrain = getGame().getModelController().
-            createUnit(getID() + "indianTreasure" + getID(),
-                       newTile, getOwner(), Unit.TREASURE_TRAIN);
+        int randomTreasure = modelController.getRandom(getID() + "indianTreasureRandom" +
+                                                       getID(), 11);
+        Unit tTrain = modelController.createUnit(getID() + "indianTreasure" + getID(),
+                                                 newTile, getOwner(), Unit.TREASURE_TRAIN);
 
         // Larger treasure if Hernan Cortes is present in the congress:
         int bonus = (getOwner().hasFather(FoundingFather.HERNAN_CORTES)) ? 2 : 1;
 
-        // Incan and Aztecs give more gold
+        // The number of Indian converts
+        int converts = (4 - getOwner().getDifficulty());
+
+        // Incan and Aztecs give more gold and converts
         if (enemy.getNation() == Player.INCA ||
             enemy.getNation() == Player.AZTEC) {
             tTrain.setTreasureAmount(randomTreasure * 500 * bonus + 10000);
+            converts += 2;
         } else {
             tTrain.setTreasureAmount(randomTreasure * 50 * bonus + 300);
         }
@@ -3300,6 +3331,15 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         // capitals give more gold
         if (wasCapital) {
             tTrain.setTreasureAmount((tTrain.getTreasureAmount()*3)/2);
+        }
+
+        if (!getOwner().hasFather(FoundingFather.JUAN_DE_SEPULVEDA)) {
+            converts = converts/2;
+        }
+
+        for (int i = 0; i < converts; i++) {
+            Unit newUnit = modelController.createUnit(getID() + "indianConvert" + i,
+                                                      newTile, getOwner(), Unit.INDIAN_CONVERT);
         }
 
         addModelMessage(this, "model.unit.indianTreasure",
@@ -3746,17 +3786,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             }
         }
 
-        /* REMOVE
-        if (path != null) {
-            int length = path.size();
-            int[] pathArray = new int[length];
-            for (int i = 0; i < length; i++) {
-                pathArray[i] = ((Integer) path.get(i)).intValue();
-            }
-            unitElement.appendChild(toArrayElement("path", pathArray, document));
-        }
-        */
-
         // Do not show enemy units hidden in a carrier:
         if (isCarrier()) {
             if (showAll || getOwner().equals(player)) {
@@ -3838,18 +3867,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 throw new NullPointerException("The unit's location could not be found.");
             }
         }
-
-        /* REMOVE
-        if (getChildElement(unitElement, "path") != null) {
-            int[] pathArray = readFromArrayElement("path", getChildElement(unitElement, "path"), new int[0]);
-            path = new ArrayList();
-            for (int i = 0; i < pathArray.length; i++) {
-                path.add(new Integer(pathArray[i]));
-            }
-        } else {
-            path = null;
-        }
-        */
 
         if (isCarrier()) {
             Element unitContainerElement = getChildElement(unitElement, UnitContainer.getXMLElementTagName());

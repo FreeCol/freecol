@@ -2,9 +2,16 @@
 package net.sf.freecol.server.ai.mission;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsContainer;
+import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
@@ -70,51 +77,157 @@ public class IndianDemandMission extends Mission {
     * @param connection The <code>Connection</code> to the server.
     */
     public void doMission(Connection connection) {
-        // Move to the target's colony and deliver
-        Unit unit = getUnit();
-        int r = moveTowards(connection, target.getTile());
-        if (r >= 0 && getGame().getMap().getNeighbourOrNull(r, unit.getTile()) == target.getTile() &&
-            unit.getMovesLeft() > 0) {
-            // We have arrived.
-            Element demandElement = Message.createNewRootElement("indianDemand");
-            demandElement.setAttribute("unit", unit.getID());
-            demandElement.setAttribute("settlement", target.getID());
-            
-            try {
-                Element reply = connection.ask(demandElement);
-                if (reply == null) {
-                    // nothing to demand, for example
+        if (!hasGift()) {
+            if (getUnit().getTile() != getUnit().getIndianSettlement().getTile()) {
+                // Move to the owning settlement:
+                int r = moveTowards(connection, getUnit().getIndianSettlement().getTile());
+                if (r >= 0 && getUnit().getMoveType(r) == Unit.MOVE) {
+                    move(connection, r);
+                }
+            } else {
+                // Load the goods:
+                List goodsList = new ArrayList();
+                GoodsContainer gc = getUnit().getIndianSettlement().getGoodsContainer();
+                for (int i=1; i<=4; i++) {
+                    if (gc.getGoodsCount(i) >= IndianSettlement.KEEP_RAW_MATERIAL + 25) {
+                        goodsList.add(new Goods(getGame(), getUnit().getIndianSettlement(),
+                                                i, getRandom().nextInt(15)+10));
+                    }
+                }
+                
+                if (goodsList.size() > 0) {
+                    Goods goods = (Goods) goodsList.get(getRandom().nextInt(goodsList.size()));
+                    goods.setLocation(getUnit());
+                }
+            }
+        } else {
+            // Move to the target's colony and deliver
+            Unit unit = getUnit();
+            int r = moveTowards(connection, target.getTile());
+            if (r >= 0 && getGame().getMap().getNeighbourOrNull(r, unit.getTile()) == target.getTile() &&
+                unit.getMovesLeft() > 0) {
+                // We have arrived.
+                Element demandElement = Message.createNewRootElement("indianDemand");
+                demandElement.setAttribute("unit", unit.getID());
+                demandElement.setAttribute("colony", target.getID());
+
+                Player enemy = target.getOwner();
+                Goods goods = selectGoods(target);
+                if (goods == null) {
+                    demandElement.setAttribute("gold", String.valueOf(enemy.getGold()/20));
+                } else {
+                    demandElement.appendChild(goods.toXMLElement(null, demandElement.getOwnerDocument()));
+                }
+
+                Element reply;
+                try {
+                    reply = connection.ask(demandElement);
+                } catch (IOException e) {
+                    logger.warning("Could not send \"demand\"-message!");
                     completed = true;
                     return;
                 }
-                boolean accepted =  Boolean.valueOf(reply.getAttribute("accepted")).booleanValue();
-                Player enemy = target.getOwner();
+                
+                boolean accepted = Boolean.valueOf(reply.getAttribute("accepted")).booleanValue();
                 int tension = 0;
                 if (accepted) {
+                    // TODO: if very happy, the brave should convert
                     tension = -(5 - enemy.getDifficulty()) * 50;
                     unit.getOwner().modifyTension(enemy, tension);
-                } else {
-                    tension = (enemy.getDifficulty() + 1) * 50;
-                    unit.getOwner().modifyTension(enemy, tension);
-                    if (unit.getOwner().getTension(enemy) >=
-                        Player.TENSION_ANGRY) {
-                        // if we didn't get what we wanted, attack
-                        getAIUnit().setMission(new UnitSeekAndDestroyMission(getAIMain(),
-                                                                             getAIUnit(),
-                                                                             target));
+                    if (unit.getOwner().getTension(enemy) <= Player.TENSION_DISPLEASED &&
+                        (goods == null || goods.getType() == Goods.FOOD)) {
+                        Element deliverGiftElement = Message.createNewRootElement("deliverGift");
+                        deliverGiftElement.setAttribute("unit", getUnit().getID());
+                        deliverGiftElement.setAttribute("settlement", target.getID());
+                        deliverGiftElement.appendChild(((Goods) getUnit().getGoodsIterator().next()).toXMLElement(null, deliverGiftElement.getOwnerDocument()));
+                        
+                        try {
+                            connection.sendAndWait(deliverGiftElement);
+                        } catch (IOException e) {
+                            logger.warning("Could not send \"deliverGift\"-message!");
+                        }
+                    } else {
+                        tension = (enemy.getDifficulty() + 1) * 50;
+                        unit.getOwner().modifyTension(enemy, tension);
+                        if (unit.getOwner().getTension(enemy) >=
+                            Player.TENSION_ANGRY) {
+                            // if we didn't get what we wanted, attack
+                            getAIUnit().setMission(new UnitSeekAndDestroyMission(getAIMain(),
+                                                                                 getAIUnit(),
+                                                                                 target));
+                        }
                     }
-                }
-
-            } catch (IOException e) {
-                logger.warning("Could not send \"demand\"-message!");
-            }
                 
-            completed = true;
+                }
+                completed = true;
+            }
         }
+
     }
 
-
+    /**
+     * Selects the most desirable goods from the colony.
+     *
+     * @param target The colony.
+     * @return The goods to demand.
+     */
+    public Goods selectGoods(Colony target) {
+        int tension = getUnit().getOwner().getTension(target.getOwner());
+        int dx = target.getOwner().getDifficulty() + 1;
+        Goods goods = null;
+        GoodsContainer warehouse = target.getGoodsContainer();
+        if (tension <= Player.TENSION_CONTENT &&
+            warehouse.getGoodsCount(Goods.FOOD) >= 100) {
+            goods = new Goods(getGame(), target, Goods.FOOD,
+                              (warehouse.getGoodsCount(Goods.FOOD) * dx)/6);
+        } else if (tension <= Player.TENSION_DISPLEASED) {
+            Market market = getGame().getMarket();
+            int value = 0;
+            Iterator iterator = warehouse.getCompactGoodsIterator();
+            while (iterator.hasNext()) {
+                Goods currentGoods = (Goods) iterator.next();
+                int goodsValue = market.getSalePrice(currentGoods);
+                if (currentGoods.getType() == Goods.FOOD ||
+                    currentGoods.getType() == Goods.HORSES ||
+                    currentGoods.getType() == Goods.MUSKETS) {
+                    continue;
+                } else if (goodsValue > value) {
+                    value = goodsValue;
+                    goods = currentGoods;
+                }
+            }
+            if (goods != null) {
+                goods.setAmount(Math.max((goods.getAmount() * dx)/6, 1));
+            }
+        } else {
+            int[] preferred = new int[] {Goods.MUSKETS,
+                                         Goods.HORSES,
+                                         Goods.TOOLS,
+                                         Goods.TRADE_GOODS,
+                                         Goods.RUM,
+                                         Goods.CLOTH,
+                                         Goods.COATS,
+                                         Goods.CIGARS};
+            for (int i = 0; i < preferred.length; i++) {
+                int amount = warehouse.getGoodsCount(preferred[i]);
+                if (amount > 0) {
+                    goods = new Goods(getGame(), target, preferred[i],
+                                      Math.max((amount * dx)/6, 1));
+                    break;
+                }
+            }
+        }
+        return goods;
+    }
     
+    /**
+    * Checks if the unit is carrying a gift (goods).
+    * @return <i>true</i> if <code>getUnit().getSpaceLeft() == 0</code> and false otherwise.
+    */
+    private boolean hasGift() {
+        return (getUnit().getSpaceLeft() == 0);
+    }
+
     /**
     * Checks if this mission is still valid to perform.
     *

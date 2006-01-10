@@ -20,7 +20,7 @@ public class FoundingFather {
                             PETER_STUYVESANT = 3, 
                             JAN_DE_WITT = 4, //TODO
                             FERDINAND_MAGELLAN = 5,
-                            FRANSICO_DE_CORONADO = 6,
+                            FRANSISCO_DE_CORONADO = 6,
                             HERNANDO_DE_SOTO = 7,
                             HENRY_HUDSON = 8,
                             LA_SALLE = 9,
@@ -78,7 +78,7 @@ public class FoundingFather {
             case PETER_STUYVESANT: return "foundingFather.peterStuyvesant";
             case JAN_DE_WITT: return "foundingFather.janDeWitt";
             case FERDINAND_MAGELLAN: return "foundingFather.ferdinandMagellan";
-            case FRANSICO_DE_CORONADO: return "foundingFather.fransicoDeCoronado";
+            case FRANSISCO_DE_CORONADO: return "foundingFather.fransiscoDeCoronado";
             case HERNANDO_DE_SOTO: return "foundingFather.hernandoDeSoto";
             case HENRY_HUDSON: return "foundingFather.henryHudson";
             case LA_SALLE: return "foundingFather.laSalle";
@@ -111,7 +111,7 @@ public class FoundingFather {
             case PETER_STUYVESANT: return TRADE;
             case JAN_DE_WITT: return TRADE;
             case FERDINAND_MAGELLAN: return EXPLORATION;
-            case FRANSICO_DE_CORONADO: return EXPLORATION;
+            case FRANSISCO_DE_CORONADO: return EXPLORATION;
             case HERNANDO_DE_SOTO: return EXPLORATION;
             case HENRY_HUDSON: return EXPLORATION;
             case LA_SALLE: return EXPLORATION;
@@ -151,8 +151,7 @@ public class FoundingFather {
 
     public static int getWeight(int foundingFather, int age) {
         // This is the list of the founding fathers without effects:
-        if (foundingFather == JAN_DE_WITT ||
-            foundingFather == BENJAMIN_FRANKLIN ||
+        if (foundingFather == BENJAMIN_FRANKLIN ||
             foundingFather == JUAN_DE_SEPULVEDA) {
             return 0;
         }
@@ -173,7 +172,7 @@ public class FoundingFather {
             case PETER_STUYVESANT: return 2;
             case JAN_DE_WITT: return 2;
             case FERDINAND_MAGELLAN: return 2;
-            case FRANSICO_DE_CORONADO: return 3;
+            case FRANSISCO_DE_CORONADO: return 3;
             case HERNANDO_DE_SOTO: return 5;
             case HENRY_HUDSON: return 10;
             case LA_SALLE: return 7;
@@ -206,7 +205,7 @@ public class FoundingFather {
             case PETER_STUYVESANT: return 4;
             case JAN_DE_WITT: return 6;
             case FERDINAND_MAGELLAN: return 10;
-            case FRANSICO_DE_CORONADO: return 5;
+            case FRANSISCO_DE_CORONADO: return 5;
             case HERNANDO_DE_SOTO: return 10;
             case HENRY_HUDSON: return 1;
             case LA_SALLE: return 5;
@@ -239,7 +238,7 @@ public class FoundingFather {
             case PETER_STUYVESANT: return 8;
             case JAN_DE_WITT: return 10;
             case FERDINAND_MAGELLAN: return 10;
-            case FRANSICO_DE_CORONADO: return 7;
+            case FRANSISCO_DE_CORONADO: return 7;
             case HERNANDO_DE_SOTO: return 5;
             case HENRY_HUDSON: return 1; // 0
             case LA_SALLE: return 3;

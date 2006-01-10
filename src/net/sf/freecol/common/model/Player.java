@@ -1513,18 +1513,18 @@ public class Player extends FreeColGameObject {
      *
      * @param enemy The player who declares war on this one.
      */
-    public void declareWar(Player enemy) {
-        declareWar(enemy.getNation());
+    public void warDeclaredBy(Player enemy) {
+        warDeclaredBy(enemy.getNation());
     }
 
-    public void declareWar(int nation) {
+    public void warDeclaredBy(int nation) {
         setStance(nation, WAR);
-        modifyTension(nation, TENSION_HATEFUL);
+        modifyTension(nation, TENSION_ANGRY);
         if (!isEuropean()) {
             Iterator settlementIterator = getIndianSettlementIterator();
             while (settlementIterator.hasNext()) {
                 IndianSettlement settlement = (IndianSettlement) settlementIterator.next();
-                settlement.modifyAlarm(nation, IndianSettlement.ALARM_HATEFUL);
+                settlement.modifyAlarm(nation, IndianSettlement.ALARM_ANGRY);
             }
         }
     }    
@@ -1580,7 +1580,7 @@ public class Player extends FreeColGameObject {
                     }
                 }
                 break;
-            case FoundingFather.FRANSICO_DE_CORONADO:
+            case FoundingFather.FRANSISCO_DE_CORONADO:
                 // explore all tiles surrounding colonies
                 ArrayList tiles = new ArrayList();
 

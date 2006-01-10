@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -60,7 +61,16 @@ public class AIPlayer extends AIObject {
     
     private static final int MAX_DISTANCE_TO_MAKE_DEMANDS = 5;
     private static final int MAX_NUMBER_OF_DEMANDS = 1;
-    
+
+    private static final int STRATEGY_NONE = 0,
+        STRATEGY_TRADE = 1,
+        STRATEGY_IMMIGRATION = 2,
+        STRATEGY_COOPERATION = 3,
+        STRATEGY_CONQUEST = 4;
+
+    /** The strategy of this player. */
+    private int strategy = STRATEGY_NONE;
+
     /* Stores temporary information for sessions (trading with another player etc). */
     private HashMap sessionRegister = new HashMap();
 
@@ -88,6 +98,16 @@ public class AIPlayer extends AIObject {
         super(aiMain);
 
         this.player = player;
+        switch (player.getNation()) {
+        case Player.DUTCH:
+            this.strategy = STRATEGY_TRADE; break;
+        case Player.ENGLISH:
+            this.strategy = STRATEGY_TRADE; break;
+        case Player.FRENCH:
+            this.strategy = STRATEGY_TRADE; break;
+        case Player.SPANISH:
+            this.strategy = STRATEGY_TRADE; break;
+        }
     }
 
 
@@ -569,7 +589,162 @@ public class AIPlayer extends AIObject {
         }
     }
 
-
+    /**
+     * Selects the most useful founding father offered.
+     *
+     * @param foundingFathers The founding fathers on offer.
+     * @return The founding father selected.
+     */
+    public int selectFoundingFather(int[] foundingFathers) {
+        int choice = -1;
+        int bestValue = -1;
+        for (int i = 0; i < FoundingFather.TYPE_COUNT; i++) {
+            int value = -1;
+            switch (foundingFathers[i]) {
+            case FoundingFather.ADAM_SMITH:
+                if (strategy == STRATEGY_TRADE) {
+                    value = 10;
+                } else {
+                    value = 5;
+                }
+                break;
+            case FoundingFather.JACOB_FUGGER:
+                if (strategy == STRATEGY_TRADE) {
+                    value = 6;
+                } else {
+                    value = 3;
+                }
+                break;
+            case FoundingFather.PETER_MINUIT:
+                if (strategy == STRATEGY_CONQUEST) {
+                    value = 1;
+                } else {
+                    value = 6;
+                }
+                break;
+            case FoundingFather.PETER_STUYVESANT:
+                if (strategy == STRATEGY_TRADE) {
+                    value = 8;
+                } else {
+                    value = 4;
+                }
+                break;
+            case FoundingFather.JAN_DE_WITT:
+                if (strategy == STRATEGY_TRADE) {
+                    value = 6;
+                } else {
+                    value = 3;
+                }
+                break;
+            case FoundingFather.FERDINAND_MAGELLAN:
+                value = 5;
+                break;
+            case FoundingFather.FRANSISCO_DE_CORONADO:
+                value = 4;
+                break;
+            case FoundingFather.HERNANDO_DE_SOTO:
+                value = 7;
+                break;
+            case FoundingFather.HENRY_HUDSON:
+                if (strategy == STRATEGY_TRADE) {
+                    value = 8;
+                } else {
+                    value = 4;
+                }
+                break;
+            case FoundingFather.LA_SALLE:
+                value = 3;
+                break;
+            case FoundingFather.HERNAN_CORTES: 
+                if (strategy == STRATEGY_CONQUEST) {
+                    value = 10;
+                } else if (strategy == STRATEGY_COOPERATION) {
+                    value = 1;
+                } else {
+                    value = 3;
+                }
+                break;
+            case FoundingFather.GEORGE_WASHINGTON:
+                value = 5;
+                break;
+            case FoundingFather.PAUL_REVERE:
+                value = 2;
+                break;
+            case FoundingFather.FRANCIS_DRAKE:
+                value = 3;
+                break;
+            case FoundingFather.JOHN_PAUL_JONES:
+                value = 3;
+                break;
+            case FoundingFather.THOMAS_JEFFERSON:
+                value = 10;
+                break;
+            case FoundingFather.POCAHONTAS:
+                if (strategy == STRATEGY_CONQUEST) {
+                    value = 1;
+                } else if (strategy == STRATEGY_COOPERATION) {
+                    value = 7;
+                } else {
+                    value = 3;
+                }
+                break;
+            case FoundingFather.THOMAS_PAINE:
+                value = Math.max(1, player.getTax()/10);
+                break;
+            case FoundingFather.SIMON_BOLIVAR:
+                value = 6;
+                break;
+            case FoundingFather.BENJAMIN_FRANKLIN:
+                value = 5;
+                break;
+            case FoundingFather.WILLIAM_BREWSTER:
+                if (strategy == STRATEGY_IMMIGRATION) {
+                    value = 7;
+                } else {
+                    value = 5;
+                }
+                break;
+            case FoundingFather.WILLIAM_PENN:
+                if (strategy == STRATEGY_IMMIGRATION) {
+                    value = 5;
+                } else {
+                    value = 3;
+                }
+                break;
+            case FoundingFather.FATHER_JEAN_DE_BREBEUF: 
+                if (strategy == STRATEGY_CONQUEST) {
+                    value = 2;
+                } else {
+                    value = 4;
+                }
+                break;
+            case FoundingFather.JUAN_DE_SEPULVEDA:
+                if (strategy == STRATEGY_CONQUEST) {
+                    value = 7;
+                } else {
+                    value = 3;
+                }
+                break;
+            case FoundingFather.BARTOLOME_DE_LAS_CASAS: 
+                if (strategy == STRATEGY_CONQUEST) {
+                    value = 6;
+                } else {
+                    value = 5;
+                }
+                break;
+            case FoundingFather.NONE:
+                break;
+            default:
+                throw new IllegalArgumentException("FoundingFather has invalid type.");
+            }
+            if (value > bestValue) {
+                bestValue = value;
+                choice = foundingFathers[i];
+            }
+        }
+        return choice;
+    }
+    
     /**
     * Brings gifts to nice players with nearby colonies.
     * Should only be called for an indian player.
@@ -1084,8 +1259,34 @@ public class AIPlayer extends AIObject {
                     return NetworkConstants.NO_TRADE;
                 }
             }
+        } else if (settlement instanceof Colony) {
+            Colony colony = (Colony) settlement;
+            Player otherPlayer = unit.getOwner();
+            // the client should have prevented this
+            if (player.getStance(otherPlayer) == Player.WAR) {
+                return NetworkConstants.NO_TRADE;
+            }
+            // don't pay for more than fits in the warehouse
+            int amount = colony.getWarehouseCapacity() - colony.getGoodsCount(goods.getType());
+            amount = Math.min(amount, goods.getAmount());
+            // get a good price
+            int percentage = 50;
+            int tension = player.getTension(otherPlayer);
+            if (tension <= Player.TENSION_HAPPY) {
+                percentage = 90;
+            } else if (tension <= Player.TENSION_CONTENT) {
+                percentage = 80;
+            } else if (tension <= Player.TENSION_DISPLEASED) {
+                percentage = 70;
+            } else if (tension <= Player.TENSION_ANGRY) {
+                percentage = 60;
+            }
+            // what we could get for the goods in Europe (minus taxes)
+            int netProfits = ((100 - player.getTax()) * getGame().getMarket().getSalePrice(goods.getType(), amount)) / 100;
+            int price = (netProfits * percentage) / 100;
+            return price;
         } else {
-            throw new IllegalStateException("Trade with colonies not yet implemented!");
+            throw new IllegalArgumentException("Unknown type of settlement.");
         }
     }
 
@@ -1131,6 +1332,24 @@ public class AIPlayer extends AIObject {
         }
     }
 
+    /**
+     * Decides whether to accept an Indian demand, or not.
+     *
+     * @param unit The unit making demands.
+     * @param colony The colony where demands are being made.
+     * @param goods The goods demanded.
+     * @param gold The amount of gold demanded.
+     */
+    public boolean acceptIndianDemand(Unit unit, Colony colony, Goods goods, int gold) {
+        // TODO: make a better choice
+        if (strategy == STRATEGY_CONQUEST) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    
     /**
     * Returns an iterator over all the <code>AIUnit</code>s
     * owned by this player.

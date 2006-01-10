@@ -711,7 +711,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalArgumentException("Can not attack allied player.");
         } else if (player.getStance(defender.getOwner()) != Player.WAR) {
             player.setStance(defender.getOwner(), Player.WAR);
-            defender.getOwner().declareWar(player);
+            defender.getOwner().warDeclaredBy(player);
             // create diplomatic message
             dowElement = Message.createNewRootElement("diplomaticMessage");
             dowElement.setAttribute("type", "declarationOfWar");
@@ -2110,7 +2110,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
 
 
     /**
-     * Handles a "indianDemand"-message.
+     * Handles an "indianDemand"-message.
      *
      * @param connection The <code>Connection</code> the message was received on.
      * @param element The element containing the request.
@@ -2120,7 +2120,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         ServerPlayer player = getFreeColServer().getPlayer(connection);
 
         Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
-        Settlement settlement = (Settlement) game.getFreeColGameObject(element.getAttribute("settlement"));
+        Colony colony = (Colony) game.getFreeColGameObject(element.getAttribute("colony"));
 
         if (unit == null) {
             throw new IllegalArgumentException("Could not find 'Unit' with specified ID: " +
@@ -2131,87 +2131,43 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalStateException("No moves left!");
         }
 
-        if (settlement == null) {
-            throw new IllegalArgumentException("Could not find 'Settlement' with specified ID: " +
-                                               element.getAttribute("settlement"));
+        if (colony == null) {
+            throw new IllegalArgumentException("Could not find 'Colony' with specified ID: " +
+                                               element.getAttribute("colony"));
         }
 
         if (unit.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
         }
 
-        if (unit.getTile().getDistanceTo(settlement.getTile()) > 1) {
-            throw new IllegalStateException("Not adjacent to settlemen!");
+        if (unit.getTile().getDistanceTo(colony.getTile()) > 1) {
+            throw new IllegalStateException("Not adjacent to colony!");
         }
 
-        ServerPlayer receiver = (ServerPlayer) settlement.getOwner();
-        if (!receiver.isAI() && receiver.isConnected()) {
-
-            int tension = player.getTension(receiver);
-            int dx = player.getDifficulty() + 1;
+        ServerPlayer receiver = (ServerPlayer) colony.getOwner();
+        if (receiver.isConnected()) {
+            int gold = 0;
             Goods goods = null;
-            GoodsContainer warehouse = settlement.getGoodsContainer();
-            if (tension <= Player.TENSION_DISPLEASED &&
-                warehouse.getGoodsCount(Goods.FOOD) >= 100) {
-                goods = new Goods(game, settlement, Goods.FOOD,
-                                  (warehouse.getGoodsCount(Goods.FOOD) * dx)/6);
-            } else if (tension <= Player.TENSION_HATEFUL) {
-                Market market = game.getMarket();
-                int value = 0;
-                Iterator iterator = warehouse.getCompactGoodsIterator();
-                while (iterator.hasNext()) {
-                    Goods currentGoods = (Goods) iterator.next();
-                    int goodsValue = market.getSalePrice(currentGoods);
-                    if (currentGoods.getType() == Goods.FOOD ||
-                        currentGoods.getType() == Goods.HORSES ||
-                        currentGoods.getType() == Goods.MUSKETS) {
-                        continue;
-                    } else if (goodsValue > value) {
-                        value = goodsValue;
-                        goods = currentGoods;
-                    }
-                }
-                if (goods != null) {
-                    goods.setAmount(Math.max((goods.getAmount() * dx)/6, 1));
-                }
+            Element goodsElement = Message.getChildElement(element, Goods.getXMLElementTagName());
+            if (goodsElement == null) {
+                gold = Integer.parseInt(element.getAttribute("gold"));
             } else {
-                int[] preferred = new int[] {Goods.MUSKETS,
-                                             Goods.HORSES,
-                                             Goods.TOOLS,
-                                             Goods.TRADE_GOODS,
-                                             Goods.RUM,
-                                             Goods.CLOTH,
-                                             Goods.COATS,
-                                             Goods.CIGARS};
-                for (int i = 0; i < preferred.length; i++) {
-                    int amount = warehouse.getGoodsCount(preferred[i]);
-                    if (amount > 0) {
-                        goods = new Goods(game, settlement, preferred[i],
-                                          Math.max((amount * dx)/6, 1));
-                        break;
-                    }
-                }
+                goods = new Goods(game, goodsElement);
             }
 
-            if (goods == null) {
-                // all for nothing
-                return null;
-            } else {
-                Element demandElement = Message.createNewRootElement("indianDemand");
-                demandElement.setAttribute("settlement", settlement.getID());
-                demandElement.appendChild(unit.toXMLElement(receiver, demandElement.getOwnerDocument()));
-                demandElement.appendChild(goods.toXMLElement(receiver, demandElement.getOwnerDocument()));
-
-                try {
-                    Element reply = receiver.getConnection().ask(demandElement);
-                    boolean accepted = Boolean.valueOf(reply.getAttribute("accepted")).booleanValue();
-                    if (accepted) {
-                        settlement.getGoodsContainer().removeGoods(goods);
+            try {
+                Element reply = receiver.getConnection().ask(element);
+                boolean accepted = Boolean.valueOf(reply.getAttribute("accepted")).booleanValue();
+                if (accepted) {
+                    if (goods == null) {
+                        receiver.modifyGold(-gold);
+                    } else {
+                        colony.getGoodsContainer().removeGoods(goods);
                     }
-                    return reply;
-                } catch (IOException e) {
-                    logger.warning("Could not send \"demand\"-message!");
                 }
+                return reply;
+            } catch (IOException e) {
+                logger.warning("Could not send \"demand\"-message!");
             }
         }
 
@@ -2219,6 +2175,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     }
 
 
+    
     /**
     * Handles a "logout"-message.
     *

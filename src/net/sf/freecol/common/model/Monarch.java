@@ -41,11 +41,11 @@ public final class Monarch extends FreeColGameObject {
         ARTILLERY = 2,
         NUMBER_OF_TYPES = 3;
 
-    /* The number of units in the REF. */
+    /** The number of units in the REF. */
     private int[] ref = new int[NUMBER_OF_TYPES];       
-    
-    /** The probabilities of these actions. */
-    private final int probability[] = new int[NUMBER_OF_ACTIONS];
+
+    /** Whether a frigate has been provided. */
+    private boolean supportSea = false;
     
     public static final Random random = new Random();
 
@@ -58,8 +58,8 @@ public final class Monarch extends FreeColGameObject {
 
 
     /**
-     * Initiates a new <code>Player</code> from an <code>Element</code>
-     * and registers this <code>Player</code> at the specified game.
+     * Initiates a new <code>Monarch</code> from an <code>Element</code>
+     * and registers this <code>Monarch</code> at the specified game.
      *
      * @param game The <code>Game</code> this object belongs to.
      * @param element The <code>Element</code> in a DOM-parsed XML-tree that describes
@@ -115,9 +115,12 @@ public final class Monarch extends FreeColGameObject {
         // TODO: check whether the player has been attacked by privateers
         boolean privateers = true;
 
-        for (int j = 0; j < NUMBER_OF_ACTIONS; j++ ) {
-        	probability[j] = 0;
-        }
+        /** The probabilities of these actions. */
+        int probability[] = new int[NUMBER_OF_ACTIONS];
+    
+	for (int j = 0; j < NUMBER_OF_ACTIONS; j++ ) {
+	     probability[j] = 0;
+	}
 
         // the more time has passed, the less likely the monarch will
         // do nothing
@@ -132,27 +135,28 @@ public final class Monarch extends FreeColGameObject {
         if (canDeclareWar) {
             probability[DECLARE_WAR] = 5 + dx;
         }
-        
-        if (privateers) {
-            probability[SUPPORT_SEA] = 7 - dx;
+
+        // provide no more than one frigate
+        if (privateers && !supportSea) {
+            probability[SUPPORT_SEA] = 6 - dx;
         }
         
         if (atWar) {
-            probability[SUPPORT_LAND] = 7 - dx;
+            probability[SUPPORT_LAND] = 6 - dx;
         }
         
         int accumulator = 0;
         for (int k = 0; k < NUMBER_OF_ACTIONS; k++ ) {
-        	accumulator += probability[k];
-        	probability[k] = accumulator;
+            accumulator += probability[k];
+            probability[k] = accumulator;
         }
         
         int randomInt = random.nextInt(accumulator);
         
         for (int action = 0; action < NUMBER_OF_ACTIONS; action++) {
-        	if (randomInt < probability[action]) {
-        		return action;
-        	}
+            if (randomInt < probability[action]) {
+                return action;
+            }
         }
 
         return NO_ACTION;
@@ -242,17 +246,17 @@ public final class Monarch extends FreeColGameObject {
     public int declareWar() {
         int offset = random.nextInt(Player.NUMBER_OF_NATIONS);
         for (int i = 0; i < Player.NUMBER_OF_NATIONS; i++) {
-            int index = (i + offset) % Player.NUMBER_OF_NATIONS;
-            if (index == player.getNation()) {
+            int nation = (i + offset) % Player.NUMBER_OF_NATIONS;
+            if (nation == player.getNation()) {
                 continue;
-            } else if (!player.hasContacted(index)) {
+            } else if (!player.hasContacted(nation)) {
                 continue;
             }
-            int stance = player.getStance(index);
+            int stance = player.getStance(nation);
             if (stance == Player.PEACE ||
                 stance == Player.CEASE_FIRE) {
-                player.setStance(index, Player.WAR);
-                return index;
+                player.setStance(nation, Player.WAR);
+                return nation;
             }
         }
         return Player.NO_NATION;
@@ -313,6 +317,7 @@ public final class Monarch extends FreeColGameObject {
         monarchElement.setAttribute("ID", getID());
         monarchElement.setAttribute("player", player.getID());
         monarchElement.setAttribute("name", name);
+        monarchElement.setAttribute("supportSea", String.valueOf(supportSea));
         monarchElement.appendChild(toArrayElement("ref", ref, document));
         return monarchElement;
     }
@@ -327,6 +332,7 @@ public final class Monarch extends FreeColGameObject {
         setID(monarchElement.getAttribute("ID"));
         player = (Player) getGame().getFreeColGameObject(monarchElement.getAttribute("player"));
         name = monarchElement.getAttribute("name");
+        supportSea = Boolean.valueOf(monarchElement.getAttribute("supportSea")).booleanValue();
         if (getChildElement(monarchElement, "ref") != null) {
             ref = readFromArrayElement("ref", getChildElement(monarchElement, "ref"), new int[0]);
         } else {

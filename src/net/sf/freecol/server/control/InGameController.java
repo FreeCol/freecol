@@ -349,7 +349,7 @@ public final class InGameController extends Controller {
                         logger.info( "Declared war on nobody." );
                         return;
                     }
-                    game.getPlayer(nation).declareWar(nextPlayer);
+                    game.getPlayer(nation).warDeclaredBy(nextPlayer);
                     // inform all relevant players about the declaration of war
                     Element dowElement = Message.createNewRootElement("diplomaticMessage");
                     dowElement.setAttribute("type", "declarationOfWar");

@@ -6,10 +6,14 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MessageHandler;
@@ -100,6 +104,7 @@ public final class AIInGameInputHandler implements MessageHandler {
                 } else if (type.equals("reconnect")) {            
                     logger.warning("The server requests a reconnect. This means an illegal operation has been performed. Please refer to any previous error message.");
                 } else if (type.equals("diplomaticMessage")) {
+                    reply = diplomaticMessage((DummyConnection) connection, element);
                 } else if (type.equals("monarchAction")) {
                     reply = monarchAction((DummyConnection) connection, element);
                 } else if (type.equals("removeGoods")) {
@@ -166,7 +171,7 @@ public final class AIInGameInputHandler implements MessageHandler {
             possibleFoundingFathers[i] = Integer.parseInt(element.getAttribute("foundingFather" + Integer.toString(i)));
         }
 
-        int foundingFather = possibleFoundingFathers[0]; // TODO: Make a good choice.
+        int foundingFather = getAIPlayer().selectFoundingFather(possibleFoundingFathers);
 
         Element reply = Message.createNewRootElement("chosenFoundingFather");
         reply.setAttribute("foundingFather", Integer.toString(foundingFather));
@@ -209,13 +214,42 @@ public final class AIInGameInputHandler implements MessageHandler {
      *                holds all the information.
      */
     private Element indianDemand(DummyConnection connection, Element element) {
-        Element reply = Message.createNewRootElement("indianDemandReply");
-        reply.setAttribute("accepted", String.valueOf(true));
+        Game game = freeColServer.getGame();
+        Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
+        Colony colony = (Colony) game.getFreeColGameObject(element.getAttribute("colony"));
+        int gold = 0;
+        Goods goods = null;
+        Element goodsElement = Message.getChildElement(element, Goods.getXMLElementTagName());
+        if (goodsElement == null) {
+            gold = Integer.parseInt(element.getAttribute("gold"));
+        } else {
+            goods = new Goods(game, goodsElement);
+        }
+        boolean accept = getAIPlayer().acceptIndianDemand(unit, colony, goods, gold);
+        element.setAttribute("accepted", String.valueOf(accept));
 
-        return reply;
+        return element;
     }   
 
-    
+    /**
+     * Handles a "diplomaticMessage"-request.
+     *
+     * @param connection The connection the message was received on.
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *                holds all the information.
+     */
+    private Element diplomaticMessage(DummyConnection connection, Element element) {
+        Game game = freeColServer.getGame();
+        String type = element.getAttribute("type");
+        if (type.equals("declarationOfWar")) {
+            Player attacker = (Player) game.getFreeColGameObject(element.getAttribute("attacker"));
+            Player defender = (Player) game.getFreeColGameObject(element.getAttribute("defender"));
+            defender.warDeclaredBy(attacker);
+        }
+        return null;
+    }
+
+            
     /**
      * Gets the <code>AIPlayer</code> using this
      * <code>AIInGameInputHandler</code>.
