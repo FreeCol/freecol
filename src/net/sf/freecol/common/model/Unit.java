@@ -738,13 +738,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      *         when there are no moves left.
      */
     public int getMoveType(Tile target) {
-        if (getTile() == null) {
-            throw new IllegalStateException("getTile() == null");
-        } else if (isUnderRepair()) {
+        if (isUnderRepair()) {
             return ILLEGAL_MOVE;
         } else if (getMovesLeft() <= 0) {
             return ILLEGAL_MOVE;
-        } else if (getMoveCost(target) > getMovesLeft()) {
+        } else if (target != null && getMoveCost(target) > getMovesLeft()) {
             return ILLEGAL_MOVE;
         } else {
             if (isNaval()) {
@@ -798,12 +796,15 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         } else if (target.getDefendingUnit(this) != null &&
                    target.getDefendingUnit(this).getOwner() != getOwner()) {
             // enemy units at sea
-            return ATTACK;
+        	if (isOffensiveUnit()) {
+        		return ATTACK;
+        	} else {
+        		return ILLEGAL_MOVE;
+        	}
         } else {
             // this must be ocean
             return MOVE;
         }
-
     }
 
     /**
@@ -856,7 +857,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             } else if (target.getDefendingUnit(this) != null &&
                        target.getDefendingUnit(this).getOwner() != getOwner()) {
                 if (getTile().isLand()) {
-                    if (isOffensiveUnit() || isScout()) {
+                    if (isOffensiveUnit() && getTile().getSettlement() != null) {
                         return ATTACK;
                     } else {
                         return ILLEGAL_MOVE;
