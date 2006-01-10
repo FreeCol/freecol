@@ -590,7 +590,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     /**
      * Sets the path this unit is following.
      *
-     * @return The path this unit is following.
+     * @param newPath The path this unit should be following.
      */
     public void setPath(PathNode newPath) {
         this.path = newPath;
@@ -608,7 +608,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     /**
      * Sets the destination of this unit.
      *
-     * @return The destination of this unit.
+     * @param newDestination The new destination of this unit.
      */
     public void setDestination(Location newDestination) {
         this.destination = newDestination;

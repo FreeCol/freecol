@@ -110,7 +110,7 @@ public class Goods implements Locatable, Ownable {
     /**
      * Returns the name of this type of goods.
      *
-     * @returns The name of this type of goods.
+     * @return The name of this type of goods.
      */
     public String getName() {
         return getName(type);
@@ -120,7 +120,7 @@ public class Goods implements Locatable, Ownable {
      * Returns the name of this type of goods.
      *
      * @param sellable Whether this type of goods is sellable;
-     * @returns The name of this type of goods.
+     * @return The name of this type of goods.
      */
     public String getName(boolean sellable) {
         return getName(type, sellable);

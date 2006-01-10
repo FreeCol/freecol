@@ -462,7 +462,7 @@ public final class Canvas extends JLayeredPane {
     * @param text The text that explains the choice for the user.
     * @param okText The text displayed on the "ok"-button.
     * @param cancelText The text displayed on the "cancel"-button.
-    * @param textParameter A string that will be inserted somewhere in the text.
+    * @param replace An array of strings that will be inserted somewhere in the text.
     * @return <i>true</i> if the user clicked the "ok"-button
     *         and <i>false</i> otherwise.
     * @see FreeColDialog
@@ -1068,7 +1068,7 @@ public final class Canvas extends JLayeredPane {
      * @param action The monarch action.
      * @param replace The replacement strings.
      * @return true or false
-     * @see Monarch
+     * @see net.sf.freecol.common.model.Monarch
      */
     public boolean showMonarchPanel(int action, String [][] replace) {
         closeMenus();

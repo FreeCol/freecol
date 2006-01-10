@@ -2,21 +2,15 @@
 package net.sf.freecol.server.ai.mission;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.Goods;
-import net.sf.freecol.common.model.GoodsContainer;
-import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIUnit;
-import net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

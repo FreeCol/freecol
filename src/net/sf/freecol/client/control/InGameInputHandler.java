@@ -607,7 +607,7 @@ public final class InGameInputHandler extends InputHandler {
             int nation = Integer.parseInt(element.getAttribute("nation"));
             player.setStance(nation, Player.WAR);
             canvas.showMonarchPanel(action,
-                                    new String [][] {{"%nation%", player.getNationAsString(nation)}});
+                                    new String [][] {{"%nation%", Player.getNationAsString(nation)}});
             break;
         case Monarch.SUPPORT_LAND:
             NodeList landList = element.getChildNodes();

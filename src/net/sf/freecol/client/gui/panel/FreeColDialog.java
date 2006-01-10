@@ -18,7 +18,6 @@ import java.io.File;
 import java.util.Vector;
 import java.util.logging.Logger;
 
-import javax.print.CancelablePrintJob;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;

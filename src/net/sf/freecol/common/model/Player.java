@@ -2006,7 +2006,7 @@ public class Player extends FreeColGameObject {
      * @return The arrears due for this type of goods.
      */
     public int getArrears(int typeOfGoods) {
-	return arrears[typeOfGoods];
+    	return arrears[typeOfGoods];
     }
 
     /**
@@ -2016,7 +2016,7 @@ public class Player extends FreeColGameObject {
      * @return The arrears due for this type of goods.
      */
     public int getArrears(Goods goods) {
-	return arrears[goods.getType()];
+    	return arrears[goods.getType()];
     }
 
     /**
@@ -2026,10 +2026,10 @@ public class Player extends FreeColGameObject {
      * @param amount The arrears due for this type of goods.
      */
     public void setArrears(int typeOfGoods, int amount) {
-	if ( amount < 0 ) {
-	    amount = 0;
-	}
-	arrears[typeOfGoods] = amount;
+		if ( amount < 0 ) {
+		    amount = 0;
+		}
+		arrears[typeOfGoods] = amount;
     }
 
     /**
@@ -2038,7 +2038,7 @@ public class Player extends FreeColGameObject {
      * @param typeOfGoods The type of goods.
      */
     public void setArrears(int typeOfGoods) {
-	arrears[typeOfGoods] = (difficulty + 3) * 1000;
+    	arrears[typeOfGoods] = (difficulty + 3) * 1000;
     }
 
     /**
@@ -2067,7 +2067,7 @@ public class Player extends FreeColGameObject {
      * @return True if there are no arrears due for this type of goods.
      */
     public boolean canTrade(int typeOfGoods) {
-	return (arrears[typeOfGoods] == 0);
+		return (arrears[typeOfGoods] == 0);
     }
 
     /**
@@ -2077,7 +2077,7 @@ public class Player extends FreeColGameObject {
      * @return True if there are no arrears due for this type of goods.
      */
     public boolean canTrade(Goods goods) {
-	return (arrears[goods.getType()] == 0);
+    	return (arrears[goods.getType()] == 0);
     }
 
     /**
@@ -2086,7 +2086,7 @@ public class Player extends FreeColGameObject {
      * @return The current tax.
      */
     public int getTax() {
-	return tax;
+    	return tax;
     }
 
     /**
@@ -2105,7 +2105,7 @@ public class Player extends FreeColGameObject {
      * @return The current sales.
      */
     public int getSales(int type) {
-	return sales[type];
+    	return sales[type];
     }
 
     /**
@@ -2125,7 +2125,7 @@ public class Player extends FreeColGameObject {
      * @return The current incomeBeforeTaxes.
      */
     public int getIncomeBeforeTaxes(int type) {
-	return incomeBeforeTaxes[type];
+    	return incomeBeforeTaxes[type];
     }
 
     /**
@@ -2145,7 +2145,7 @@ public class Player extends FreeColGameObject {
      * @return The current incomeAfterTaxes.
      */
     public int getIncomeAfterTaxes(int type) {
-	return incomeAfterTaxes[type];
+    	return incomeAfterTaxes[type];
     }
 
     /**
@@ -2164,22 +2164,22 @@ public class Player extends FreeColGameObject {
      * @return The difficulty level.
      */
     public int getDifficulty() {
-	return difficulty;
+    	return difficulty;
     }
 
     /**
      * Sets the difficulty level.
      *
-     * @param level The difficulty level.
+     * @param value The difficulty level.
      */
     public void setDifficulty(int value) {
-	if ( value == VERY_EASY ||
-	     value == EASY ||
-	     value == MEDIUM ||
-	     value == HARD ||
-	     value == VERY_HARD ) {
-	    difficulty = value;
-	}
+    	if ( value == VERY_EASY ||
+    			value == EASY ||
+    			value == MEDIUM ||
+    			value == HARD ||
+    			value == VERY_HARD ) {
+    		difficulty = value;
+    	}
     }
 
 
@@ -2375,8 +2375,6 @@ public class Player extends FreeColGameObject {
             return units.iterator();
         }
     }
-
-
 
 }
 

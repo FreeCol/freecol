@@ -5,7 +5,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import net.sf.freecol.common.model.PathNode;
-import net.sf.freecol.common.model.Unit;
 
 
 

@@ -13,7 +13,9 @@ import net.sf.freecol.common.model.Unit;
 
 
 /**
-* An action for displaying the {@link net.sf.freecol.client.gui.panel.GotoPanel}.
+* An action for making a unit move to a specific location.
+* This action first displays a panel from which the player can choose
+* a location the unit should move towards.
 */
 public class GotoAction extends MapboardAction {
     private static final Logger logger = Logger.getLogger(GotoAction.class.getName());

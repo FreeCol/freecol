@@ -3,13 +3,10 @@ package net.sf.freecol.common.model;
 
 import java.util.Random;
 
+import net.sf.freecol.client.gui.i18n.Messages;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.model.Player;
 
 /**
  * This class implements the player's monarch, whose functions prior
@@ -323,7 +320,8 @@ public final class Monarch extends FreeColGameObject {
 
     /**
      * Initialize this object from an XML-representation of this object.
-     * @param element The DOM-element ("Document Object Model") made to represent this object.
+     * @param monarchElement The DOM-element ("Document Object Model") 
+     * 		made to represent this object.
      */
     public void readFromXMLElement(Element monarchElement) {
         setID(monarchElement.getAttribute("ID"));
