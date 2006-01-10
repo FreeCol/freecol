@@ -576,13 +576,18 @@ public final class Canvas extends JLayeredPane {
     public File showLoadDialog(File directory, FileFilter[] fileFilters) {
         FreeColDialog loadDialog = FreeColDialog.createLoadDialog(directory, fileFilters);
         loadDialog.setLocation(getWidth() / 2 - loadDialog.getWidth() / 2, getHeight() / 2 - loadDialog.getHeight() / 2);
-        add(loadDialog, new Integer(POPUP_LAYER.intValue()-1));
+        add(loadDialog, new Integer(MODAL_LAYER.intValue()-1));
         loadDialog.requestFocus();
 
         File response = (File) loadDialog.getResponse();
+        
+        while (response != null && !response.isFile()) {
+          	errorMessage("noSuchFile");
+          	response = (File) loadDialog.getResponse();
+        }        
 
         remove(loadDialog);
-
+        
         return response;
     }
 
@@ -616,7 +621,7 @@ public final class Canvas extends JLayeredPane {
     public File showSaveDialog(File directory, String standardName, FileFilter[] fileFilters) {
         FreeColDialog saveDialog = FreeColDialog.createSaveDialog(directory, standardName, fileFilters);
         saveDialog.setLocation(getWidth() / 2 - saveDialog.getWidth() / 2, getHeight() / 2 - saveDialog.getHeight() / 2);
-        add(saveDialog, new Integer(POPUP_LAYER.intValue()-1));
+        add(saveDialog, new Integer(MODAL_LAYER.intValue()-1));
         saveDialog.requestFocus();
 
         File response = (File) saveDialog.getResponse();
