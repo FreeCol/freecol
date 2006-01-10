@@ -865,7 +865,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                     // no marine assaults
                     return ILLEGAL_MOVE;
                 }
-            } else if (target.getLostCityRumour()) {
+            } else if (target.hasLostCityRumour()) {
                 return EXPLORE_LOST_CITY_RUMOUR;
             } else {
                 return MOVE;

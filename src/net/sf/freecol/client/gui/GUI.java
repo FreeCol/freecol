@@ -1465,7 +1465,7 @@ public final class GUI {
                 } else {
                     logger.warning("Requested to draw unknown settlement type.");
                 }
-            } else if (tile.getLostCityRumour()) {
+            } else if (tile.hasLostCityRumour()) {
                 g.drawImage(lib.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR),
                             x + RUMOUR_OFFSET_X, y + RUMOUR_OFFSET_Y, null);
             }

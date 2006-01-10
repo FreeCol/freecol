@@ -770,14 +770,16 @@ public final class Tile extends FreeColGameObject implements Location {
      *
      * @return True or false.
      */
-    public boolean getLostCityRumour() {
+    public boolean hasLostCityRumour() {
         return lostCityRumour;
     }
 
     /**
      * Sets the lost city rumour for this tile.
      *
-     * @param rumour True or false.
+     * @param rumour If <code>true</code> then this <code>Tile</code>
+     * 		will have a lost city rumour. The type of rumour will be
+     * 		determined by the server.
      */
     public void setLostCityRumour(boolean rumour) {
         lostCityRumour = rumour;

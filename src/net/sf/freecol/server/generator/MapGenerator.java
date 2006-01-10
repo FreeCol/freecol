@@ -13,7 +13,6 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Map.Position;
@@ -94,10 +93,8 @@ public class MapGenerator {
         game.setMap(map);
 
         createIndianSettlements(map, players);
-
-        createLostCityRumours(map);
-
         createEuropeanUnits(map, width, height, players);
+        createLostCityRumours(map);        
     }
 
 
@@ -108,33 +105,25 @@ public class MapGenerator {
      * @param map The map to use.
      */
     public void createLostCityRumours(Map map) {
-
         int number = (width * height) / 100;
         int counter = 0;
-        int x, y;
-        Position p;
-        Tile t;
 
         for (int i = 0; i < number; i++) {
-            p = getRandomLandPosition(map);
-            t = map.getTile(p);
-            if (t.getNationOwner() != Player.NO_NATION && t.isLand()) {
-                t.setLostCityRumour(true);
-                counter++;
-            } else {
-                Iterator iterator = map.getCircleIterator(p, true, width);
-                while (iterator.hasNext()) {
-                    t = map.getTile((Position) iterator.next());
-                    if (t.getNationOwner() != Player.NO_NATION && t.isLand()) {
-                        t.setLostCityRumour(true);
-                        counter++;
-                        break;
-                    }
-                }
-            }
+        	for (int tries=0; tries<100; tries++) {
+        		Position p = new Position(random.nextInt(width), random.nextInt(height));
+                Tile t = map.getTile(p);
+        		if (map.getTile(p).isLand()
+        				&& !t.hasLostCityRumour()
+        				&& t.getSettlement() == null
+        				&& t.getUnitCount() == 0) { 
+        			counter++;
+        			t.setLostCityRumour(true);
+        			break;
+        		}
+        	}
         }
 
-        logger.info( "Created " + counter + " lost city rumours." );
+        logger.info("Created " + counter + " lost city rumours of maximum " + number + ".");
     }
         
 

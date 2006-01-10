@@ -857,7 +857,7 @@ public final class InGameController implements NetworkConstants {
                 Unit u = (Unit) unitIterator.next();
 
                 if ((u.getState() == Unit.ACTIVE) && u.getMovesLeft() > 0) {
-                    if (destinationTile.getLostCityRumour()) {
+                    if (destinationTile.hasLostCityRumour()) {
                         exploreLostCityRumour(u, direction);
                     } else {
                         reallyMove(u, direction);
