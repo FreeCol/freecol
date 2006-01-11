@@ -312,18 +312,8 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         if (requiredTable[type][level][0] == -1) {
             return false;
         }
-        if (getType() == DOCK) {
-            boolean oceanNearby = false;
-            Iterator cti = getColony().getColonyTileIterator();
-            while (cti.hasNext()) {
-                ColonyTile ct = (ColonyTile) cti.next();
-                if (!ct.getWorkTile().isLand()) {
-                    oceanNearby = true;
-                }
-            }
-            if (!oceanNearby) {
-                return false;
-            }
+        if (getType() == DOCK && getColony().isLandLocked()) {
+            return false;
         }
         return true;
     }
