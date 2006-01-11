@@ -268,30 +268,38 @@ public final class Tile extends FreeColGameObject implements Location {
             boolean nearbyTileIsOcean = false;
 
             List v = getGame().getMap().getSurroundingTiles(this, 1);
-            for (int j=0; j<v.size(); j++) {
-                if (((Tile) v.get(j)).getColony() != null) {
+            Iterator tileIterator = v.iterator();
+            while (tileIterator.hasNext()) {
+                Tile tile = (Tile) tileIterator.next();
+                if (tile.getColony() != null) {
+                    // can't build next to colony
                     return 0;
-                }
-                if (((Tile) v.get(j)).getSettlement() != null) {
+                } else if (tile.getSettlement() != null) {
+                    // can build next to an indian settlement
                     value -= 10;
-                    continue;
-                }
-                if (((Tile) v.get(j)).getOwner() != null) {
-                    continue;
-                }
+                } else {
 
-                for (int i=0; i<Goods.NUMBER_OF_TYPES; i++) {
-                    value += ((Tile) v.get(j)).potential(i);
-                }
-                if (((Tile) v.get(j)).isForested()) {
-                    nearbyTileHasForest = true;
-                }
-                if (!((Tile) v.get(j)).isLand()) {
-                    nearbyTileIsOcean = true;
-                }
-                if (((Tile) v.get(j)).getNationOwner() != Player.NO_NATION &&
-                        !getGame().getPlayer(((Tile) v.get(j)).getNationOwner()).isEuropean()) {
-                    value -= 5;
+                    if (tile.isLand()) {
+                        for (int i = 0; i < Goods.NUMBER_OF_TYPES; i++) {
+                            value += tile.potential(i);
+                        }
+                        if (tile.isForested()) {
+                            nearbyTileHasForest = true;
+                        }
+                    } else {
+                        nearbyTileIsOcean = true;
+                        value += tile.potential(Goods.FISH);
+                    }
+
+                    if (tile.getNationOwner() != Player.NO_NATION) {
+                        // tile is already owned by someone
+                        if (Player.isEuropean(tile.getNationOwner())) {
+                            // TODO: check whether it is owned by us
+                            value -= 20;
+                        } else {
+                            value -= 5;
+                        }
+                    }
                 }
             }
 
