@@ -20,7 +20,6 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
@@ -481,7 +480,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
          * outside indian territory:
          */          
         if (tile.getNationOwner() == Player.NO_NATION
-        		|| tile.getGame().getPlayer(tile.getNationOwner()).isIndian()) {
+        		|| !tile.getGame().getPlayer(tile.getNationOwner()).isIndian()) {
         	probability[LostCityRumour.BURIAL_GROUND] = 0;
         }
 
