@@ -48,6 +48,9 @@ public final class Colony extends Settlement implements Location {
     */
     private int currentlyBuilding;
 
+    // Whether this colony is landlocked
+    private boolean landLocked = true;
+    
     // Will only be used on enemy colonies:
     private int unitCount = -1;
 
@@ -105,6 +108,9 @@ public final class Colony extends Settlement implements Location {
             if (initializeWorkLocations) {
                 workLocations.add(new ColonyTile(game, this, t));
             }
+            if (t.getType() == Tile.OCEAN) {
+                landLocked = false;
+            }
         }
             
         if (initializeWorkLocations) {
@@ -160,6 +166,13 @@ public final class Colony extends Settlement implements Location {
         return 2;
     }
 
+    /**
+     * Returns whether this colony is landlocked, or has access to the
+     * ocean.
+     */
+    public boolean isLandLocked() {
+        return landLocked;
+    }
 
     /**
     * Sets the owner of this <code>Colony</code>, including all units within.
@@ -623,7 +636,13 @@ public final class Colony extends Settlement implements Location {
 
 
     public boolean canAdd(Locatable locatable) {
-        throw new UnsupportedOperationException();
+        //throw new UnsupportedOperationException();
+        if (locatable instanceof Unit &&
+            ((Unit) locatable).getOwner() == getOwner()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -1254,6 +1273,7 @@ public final class Colony extends Settlement implements Location {
             colonyElement.setAttribute("sonsOfLiberty", Integer.toString(sonsOfLiberty));
             colonyElement.setAttribute("oldSonsOfLiberty", Integer.toString(oldSonsOfLiberty));
             colonyElement.setAttribute("currentlyBuilding", Integer.toString(currentlyBuilding));
+            colonyElement.setAttribute("landLocked", Boolean.toString(landLocked));
 
             char[] exportsCharArray = new char[exports.length];
             for(int i = 0; i < exports.length; i++) {
@@ -1315,6 +1335,12 @@ public final class Colony extends Settlement implements Location {
             currentlyBuilding = Integer.parseInt(colonyElement.getAttribute("currentlyBuilding"));
         } else {
             currentlyBuilding = -1;
+        }
+
+        if (colonyElement.hasAttribute("landLocked")) {
+            landLocked = Boolean.valueOf(colonyElement.getAttribute("landLocked")).booleanValue();
+        } else {
+            landLocked = true;
         }
 
         if (colonyElement.hasAttribute("unitCount")) {
