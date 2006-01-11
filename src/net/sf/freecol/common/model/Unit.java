@@ -774,13 +774,13 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 } else if (canTradeWith(settlement)) {
                     return ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS;
                 } else {
-                    logger.warning("Trying to enter another player's settlement with " +
+                    logger.info("Trying to enter another player's settlement with " +
                                    getName());
                     return ILLEGAL_MOVE;
                 }
             } else if (target.getDefendingUnit(this) != null &&
                        target.getDefendingUnit(this).getOwner() != getOwner()) {
-                logger.warning("Trying to sail into tile occupied by enemy units with " +
+                logger.info("Trying to sail into tile occupied by enemy units with " +
                                getName());
                 return ILLEGAL_MOVE;
             } else {
@@ -793,7 +793,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                         return DISEMBARK;
                     }
                 }
-                logger.warning("No units to disembark from " + getName());
+                logger.info("No units to disembark from " + getName());
                 return ILLEGAL_MOVE;
             }
         } else if (target.getDefendingUnit(this) != null &&
@@ -821,10 +821,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     private int getLandMoveType(Tile target) {
         if (target == null) {
             // only naval units are allowed to do this
-            logger.warning("Trying to enter null tile with land unit " +
-                           getName());
+            logger.info("Trying to enter null tile with land unit " + getName());
             return ILLEGAL_MOVE;
-        } else if (target.isLand()) {
+        }
+        
+        if (target.isLand()) {
             Settlement settlement = target.getSettlement();
             if (settlement != null) {
                 if (settlement.getOwner() == getOwner()) {
@@ -832,51 +833,47 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                     return MOVE;
                 } else if (canTradeWith(settlement)) {
                     return ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS;
-                } else if (getTile().isLand()) {
-                    if (settlement instanceof IndianSettlement) {
-                        if (isScout()) {
-                            return ENTER_INDIAN_VILLAGE_WITH_SCOUT;
-                        } else if (isMissionary()) {
-                            return ENTER_INDIAN_VILLAGE_WITH_MISSIONARY;
-                        } else if (isOffensiveUnit()) {
-                            return ATTACK;                            
-                        } else if (((getType() == FREE_COLONIST) ||
-                                    (getType() == INDENTURED_SERVANT))) {
-                            return ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST;
-                        } else {
-                            logger.warning("Trying to enter Indian settlement with " +
-                                           getName());
-                            return ILLEGAL_MOVE;
-                        }
-                    } else if (settlement instanceof Colony) {
-                        if (isScout()) {
-                            return ENTER_FOREIGN_COLONY_WITH_SCOUT;
-                        } else if (isOffensiveUnit()) {
-                            return ATTACK;
-                        } else {
-                            logger.warning("Trying to enter foreign colony with " +
-                                           getName());
-                            return ILLEGAL_MOVE;
-                        }
-                    }
-                } else {
-                    logger.warning("Trying to disembark into foreign colony with " +
-                                   getName());
-                    return ILLEGAL_MOVE;
+                } else if (!getTile().isLand()) {
+                	logger.info("Trying to disembark into foreign colony with " +
+                            getName());
+                	return ILLEGAL_MOVE;
+                } else if (settlement instanceof IndianSettlement) {
+                	if (isScout()) {
+                		return ENTER_INDIAN_VILLAGE_WITH_SCOUT;
+                	} else if (isMissionary()) {
+                		return ENTER_INDIAN_VILLAGE_WITH_MISSIONARY;
+                	} else if (isOffensiveUnit()) {
+                		return ATTACK;                            
+                	} else if (((getType() == FREE_COLONIST) ||
+                			(getType() == INDENTURED_SERVANT))) {
+                		return ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST;
+                	} else {
+                		logger.info("Trying to enter Indian settlement with " +
+                				getName());
+                		return ILLEGAL_MOVE;
+                	}
+                } else if (settlement instanceof Colony) {
+                	if (isScout()) {
+                		return ENTER_FOREIGN_COLONY_WITH_SCOUT;
+                	} else if (isOffensiveUnit()) {
+                		return ATTACK;
+                	} else {
+                		logger.info("Trying to enter foreign colony with " +
+                				getName());
+                		return ILLEGAL_MOVE;
+                	}
                 }
             } else if (target.getDefendingUnit(this) != null &&
                        target.getDefendingUnit(this).getOwner() != getOwner()) {
                 if (getTile().isLand()) {
-                    if (isOffensiveUnit() && getTile().getSettlement() != null) {
+                    if (isOffensiveUnit()) {
                         return ATTACK;
                     } else {
-                        logger.warning("Trying to attack with civilian " +
-                                       getName());
+                        logger.info("Trying to attack with civilian " + getName());
                         return ILLEGAL_MOVE;
                     }
                 } else {
-                    logger.warning("Attempting marine assault with " +
-                                   getName());
+                    logger.info("Attempting marine assault with " + getName());
                     return ILLEGAL_MOVE;
                 }
             } else if (getMoveCost(target) > getMovesLeft()) {
@@ -890,7 +887,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             // check for embarkation
             if (target.getFirstUnit() == null || 
                 target.getFirstUnit().getNation() != getNation()) {
-                logger.warning("Trying to embark on tile occupied by foreign units with " +
+                logger.info("Trying to embark on tile occupied by foreign units with " +
                                getName());
                 return ILLEGAL_MOVE;
             } else {
@@ -903,13 +900,13 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                         return EMBARK;
                     }
                 }
-                logger.warning("Trying to board full vessel with " +
+                logger.info("Trying to board full vessel with " +
                                getName());
                 return ILLEGAL_MOVE;
             }
         }
 
-        logger.warning("Default illegal move for " + getName());
+        logger.info("Default illegal move for " + getName());
         return ILLEGAL_MOVE;
     }
 
