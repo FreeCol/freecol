@@ -269,8 +269,11 @@ public class Map extends FreeColGameObject {
                 Tile newTile = getGame().getMap().getNeighbourOrNull(direction, currentNode.getTile());
 
                 if (newTile == null) {
-                    // TODO: this should actually be success, shouldn't it?
-                    continue;
+                    while (currentNode.previous != null) {
+                        currentNode.previous.next = currentNode;
+                        currentNode = currentNode.previous;
+                    }
+                    return currentNode.next;
                 } else if (newTile.getType() == Tile.UNEXPLORED) {
                     continue;
                 }

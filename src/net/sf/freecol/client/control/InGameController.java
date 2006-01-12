@@ -320,9 +320,9 @@ public final class InGameController implements NetworkConstants {
 
         if (unit != null && path != null) {
             unit.setPath(path);
-            //unit.setState(Unit.GOING_TO);
-            //unit.setStateToAllChildren(Unit.SENTRY);
-            changeState(unit, Unit.GOING_TO);
+            // only for the client
+            unit.setState(Unit.GOING_TO);
+            unit.setStateToAllChildren(Unit.SENTRY);
             moveAlongPath(unit);
         } // else: nothing: There is no active unit that can be moved.
     }
@@ -337,11 +337,12 @@ public final class InGameController implements NetworkConstants {
         Map map = freeColClient.getGame().getMap();
         PathNode path = unit.getPath();
         boolean active = false;
-        while (unit.getMovesLeft() > 0) {
+        while (unit.getMovesLeft() >= 0) {
             if (path == null) {
                 if (unit.getDestination() instanceof Europe) {
                     moveToEurope(unit);
                     unit.setDestination(null);
+                    unit.setPath(null);
                 } else {
                     active = true;
                 }
@@ -365,8 +366,6 @@ public final class InGameController implements NetworkConstants {
                 } else {
                     // something has got in our way
                     logger.info("Aborting goto: move type was " + moveType);
-                    path = null;
-                    unit.setDestination(null);
                     active = true;
                     break;
                 }
@@ -377,11 +376,14 @@ public final class InGameController implements NetworkConstants {
         freeColClient.getCanvas().updateJMenuBar();
 
         if (active) {
-            //unit.setState(Unit.ACTIVE);
-            //unit.setStateToAllChildren(Unit.SENTRY);
-            changeState(unit, Unit.ACTIVE);
+            // only for the client
+            unit.setState(Unit.ACTIVE);
+            unit.setPath(null);
+            unit.setDestination(null);
             freeColClient.getGUI().setActiveUnit(unit);
         } else {
+            // only for the client
+            unit.setState(Unit.GOING_TO);
             nextActiveUnit();
         }
     }
