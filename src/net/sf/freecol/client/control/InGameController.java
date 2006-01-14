@@ -340,9 +340,9 @@ public final class InGameController implements NetworkConstants {
         while (unit.getMovesLeft() >= 0) {
             if (path == null) {
                 if (unit.getDestination() instanceof Europe) {
-                    moveToEurope(unit);
                     unit.setDestination(null);
                     unit.setPath(null);
+                    moveToEurope(unit);
                 } else {
                     active = true;
                 }
@@ -383,7 +383,9 @@ public final class InGameController implements NetworkConstants {
             freeColClient.getGUI().setActiveUnit(unit);
         } else {
             // only for the client
-            unit.setState(Unit.GOING_TO);
+            if (path != null) {
+                unit.setState(Unit.GOING_TO);
+            }
             nextActiveUnit();
         }
     }
