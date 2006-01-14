@@ -2,14 +2,19 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
 import java.awt.event.ActionListener;
-import java.awt.GridLayout;
+//import java.awt.GridLayout;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
+
+import cz.autel.dmi.HIGLayout;
 
 /**
  * This panel displays the Trade Report.
@@ -19,8 +24,24 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
+    /** How many colums are defined per label. */
+    private final int columnsPerLabel = 2;
+    /** How many additional columns are defined. */
+    private final int extraColumns = 3; // labels and margins
+    /** How many additional rows are defined. */
+    private final int extraRows = 7; // labels and margins
+    /** How many columns are defined all together. */
+    private final int columns = columnsPerLabel * Goods.NUMBER_OF_TYPES + extraColumns;
+    /** How much space to leave between labels. */
+    private final int columnSeparatorWidth = 5;
+    /** How wide the margins should be. */
+    private final int marginWidth = 12;
+    /** The widths of the columns. */
+    private final int widths[] = new int[columns];
+    /** The heights of the rows. */
+    private final int heights[];
+
     private final JLabel[] goodsLabels;
-    private final JLabel blankLabel;
     private final JLabel salesLabel;
     private final JLabel beforeTaxesLabel;
     private final JLabel afterTaxesLabel;
@@ -33,13 +54,23 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
     public ReportTradePanel(Canvas parent) {
         super(parent, "Trade Advisor");
         goodsLabels = new JLabel[Goods.NUMBER_OF_TYPES];
-        for (int i = 0; i < Goods.NUMBER_OF_TYPES; i++) {
+        for (int i = 0; i < goodsLabels.length; i++) {
             goodsLabels[i] = new JLabel(parent.getImageProvider().getGoodsImageIcon(i));
         }
-        blankLabel = new JLabel();
+            
         salesLabel = new JLabel(Messages.message("report.trade.unitsSold"), JLabel.TRAILING);
         beforeTaxesLabel = new JLabel(Messages.message("report.trade.beforeTaxes"), JLabel.TRAILING);
         afterTaxesLabel = new JLabel(Messages.message("report.trade.afterTaxes"), JLabel.TRAILING);
+
+        widths[0] = marginWidth; // left margin
+        widths[1] = 0; // labels
+        for (int w = 0; w < goodsLabels.length; w++) {
+            widths[columnsPerLabel * w + 2] = columnSeparatorWidth;
+            widths[columnsPerLabel * w + 3] = 0;
+        }
+        widths[widths.length - 1] = marginWidth; // right margin
+
+        heights = null;
     }
 
     /**
@@ -47,43 +78,75 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
      */
     public void initialize() {
         Player player = parent.getClient().getMyPlayer();
-        int crosses = player.getCrosses();
-        int required = player.getCrossesRequired();
         // Display Panel
         reportPanel.removeAll();
-        reportPanel.setLayout(new GridLayout(Goods.NUMBER_OF_TYPES + 1, 4));
-        reportPanel.add(blankLabel);
-        reportPanel.add(salesLabel);
-        reportPanel.add(beforeTaxesLabel);
-        reportPanel.add(afterTaxesLabel);
+
+        Iterator colonyIterator = player.getColonyIterator();
+        ArrayList colonies = new ArrayList();
+        while (colonyIterator.hasNext()) {
+            colonies.add(colonyIterator.next());
+        }
+        int heights[] = new int[colonies.size() + extraRows];
+        for (int h = 0; h < heights.length; h++) {
+            heights[h] = 0;
+        }
+        heights[0] = marginWidth;
+        heights[5] = marginWidth;
+        heights[heights.length - 1] = marginWidth;
+
+        reportPanel.setLayout(new HIGLayout(widths, heights));
+
+        reportPanel.add(salesLabel, higConst.rc(3, 2));
+        reportPanel.add(beforeTaxesLabel, higConst.rc(4, 2));
+        reportPanel.add(afterTaxesLabel, higConst.rc(5, 2));
 
         int sales, beforeTaxes, afterTaxes;
         JLabel currentLabel;
         for (int i = 0; i < Goods.NUMBER_OF_TYPES; i++) {
+            int column = columnsPerLabel * i + 4;
             sales = player.getSales(i);
             beforeTaxes = player.getIncomeBeforeTaxes(i);
             afterTaxes = player.getIncomeAfterTaxes(i);
-            reportPanel.add(goodsLabels[i]);
+            reportPanel.add(goodsLabels[i], higConst.rc(2, column));
             
             currentLabel = new JLabel(String.valueOf(sales), JLabel.TRAILING);
             if (sales < 0) {
                 currentLabel.setForeground(Color.RED);
             }
-            reportPanel.add(currentLabel);
+            reportPanel.add(currentLabel, higConst.rc(3, column));
 
             currentLabel = new JLabel(String.valueOf(beforeTaxes), JLabel.TRAILING);
             if (beforeTaxes < 0) {
                 currentLabel.setForeground(Color.RED);
             }
-            reportPanel.add(currentLabel);
+            reportPanel.add(currentLabel, higConst.rc(4, column));
 
             currentLabel = new JLabel(String.valueOf(afterTaxes), JLabel.TRAILING);
             if (afterTaxes < 0) {
                 currentLabel.setForeground(Color.RED);
             }
-            reportPanel.add(currentLabel);
+            reportPanel.add(currentLabel, higConst.rc(5, column));
         }
 
-        reportPanel.doLayout();
+        colonyIterator = colonies.iterator();
+        int row = extraRows;
+        while (colonyIterator.hasNext()) {
+            Colony colony = (Colony) colonyIterator.next();
+            currentLabel = new JLabel(colony.getName());
+            reportPanel.add(currentLabel, higConst.rc(row, 2));
+            for (int i = 0; i < Goods.NUMBER_OF_TYPES; i++) {
+                int column = columnsPerLabel * i + 4;
+                int amount = colony.getGoodsCount(i);
+                currentLabel = new JLabel(String.valueOf(amount),
+                                          JLabel.TRAILING);
+                if (amount > 100) {
+                    currentLabel.setForeground(Color.GREEN);
+                } else if (amount > 200) {
+                    currentLabel.setForeground(Color.BLUE);
+                }
+                reportPanel.add(currentLabel, higConst.rc(row, column));
+            }
+            row++;
+        }
     }
 }
