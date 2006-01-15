@@ -714,7 +714,9 @@ public final class InGameController implements NetworkConstants {
          * war, attack.  Otherwise make sure the player knows
          * what he/she is doing.
          */
-        if (unit.getType() != Unit.PRIVATEER) {
+        if (unit.getType() == Unit.PRIVATEER) {
+            enemy.setAttackedByPrivateers();
+        } else {
             switch (stance) {
             case Player.CEASE_FIRE:
                 if (!canvas.showConfirmDialog("model.diplomacy.attack.ceaseFire",

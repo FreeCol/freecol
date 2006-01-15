@@ -346,10 +346,11 @@ public final class InGameController extends Controller {
                     int nation = monarch.declareWar();
                     if (nation == Player.NO_NATION) {
                         // this should not happen
-                        logger.info( "Declared war on nobody." );
+                        logger.warning( "Declared war on nobody." );
                         return;
                     }
                     game.getPlayer(nation).warDeclaredBy(nextPlayer);
+                    nextPlayer.setStance(nation, Player.WAR);
                     // inform all relevant players about the declaration of war
                     Element dowElement = Message.createNewRootElement("diplomaticMessage");
                     dowElement.setAttribute("type", "declarationOfWar");

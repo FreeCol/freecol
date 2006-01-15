@@ -3173,6 +3173,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                    getType() == KINGS_REGULAR) {
             messageID = "model.unit.unitDestroyed";
             dispose();
+        } else if (getType() == BRAVE) {
+            messageID = "model.unit.unitSlaughtered";
+            dispose();
         } else {
             // civilians
             if (enemyUnit.getOwner().isEuropean()) {

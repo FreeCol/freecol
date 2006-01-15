@@ -107,13 +107,11 @@ public final class Monarch extends FreeColGameObject {
                     case Player.PEACE:
                     case Player.CEASE_FIRE:
                         canDeclareWar = true;
+                        break;
                     }
                 }
             }
         }
-
-        // TODO: check whether the player has been attacked by privateers
-        boolean privateers = true;
 
         /** The probabilities of these actions. */
         int probability[] = new int[NUMBER_OF_ACTIONS];
@@ -137,7 +135,7 @@ public final class Monarch extends FreeColGameObject {
         }
 
         // provide no more than one frigate
-        if (privateers && !supportSea) {
+        if (player.hasBeenAttackedByPrivateers() && !supportSea) {
             probability[SUPPORT_SEA] = 6 - dx;
         }
         

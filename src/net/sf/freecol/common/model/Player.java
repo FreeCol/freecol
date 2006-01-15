@@ -176,6 +176,9 @@ public class Player extends FreeColGameObject {
     /** True if this is an AI player. */
     private boolean         ai;
 
+    /** True if player has been attacked by privateers. */
+    private boolean         attackedByPrivateers = false;
+    
     private int             crosses;
     private int             bells;
     /** Bells bonus granted by Thomas Paine and Thomas Jefferson. */
@@ -483,6 +486,16 @@ public class Player extends FreeColGameObject {
         return contacted[type];
     }
 
+    /** Returns whether this player has been attacked by privateers. */
+    public boolean hasBeenAttackedByPrivateers() {
+        return attackedByPrivateers;
+    }
+    
+    /** Sets the variable attackedByPrivateers to true. */
+    public void setAttackedByPrivateers() {
+        attackedByPrivateers = true;
+    }
+    
 
     /**
      * Sets whether this player has contacted <code>type</code>.
@@ -1497,7 +1510,23 @@ public class Player extends FreeColGameObject {
     public int getStance(int nation) {
         return stance[nation];
     }
-    
+
+    /**
+     * Returns a string describing the given stance.
+     *
+     * @param stance The stance.
+     * @return A matching string.
+     */
+    public static String getStanceAsString(int stance) {
+        switch (stance) {
+        case WAR: return Messages.message("model.player.war");
+        case CEASE_FIRE: return Messages.message("model.player.ceaseFire");
+        case PEACE: return Messages.message("model.player.peace");
+        case ALLIANCE: return Messages.message("model.player.alliance");
+        default: return "Unknown type of stance.";
+        }
+    }
+
     
     /**
     * Sets the stance towards a given player.
@@ -1523,6 +1552,11 @@ public class Player extends FreeColGameObject {
         warDeclaredBy(enemy.getNation());
     }
 
+    /**
+     * Declares war on this player.
+     *
+     * @param nation The nation which declares war on the player.
+     */
     public void warDeclaredBy(int nation) {
         setStance(nation, WAR);
         modifyTension(nation, TENSION_ANGRY);
@@ -1736,7 +1770,8 @@ public class Player extends FreeColGameObject {
             playerElement.setAttribute("bells", Integer.toString(bells));
             playerElement.setAttribute("currentFather", Integer.toString(currentFather));
             playerElement.setAttribute("crossesRequired", Integer.toString(crossesRequired));
-
+            playerElement.setAttribute("attackedByPrivateers", Boolean.toString(attackedByPrivateers));
+            
             char[] fatherCharArray = new char[FoundingFather.FATHER_COUNT];
             for(int i = 0; i < fathers.length; i++) {
                 fatherCharArray[i] = (fathers[i] ? '1' : '0');
@@ -1867,6 +1902,10 @@ public class Player extends FreeColGameObject {
             }
         }
 
+        if (playerElement.hasAttribute("attackedByPrivateers")) {
+            attackedByPrivateers = Boolean.valueOf(playerElement.getAttribute("attackedByPrivateers")).booleanValue();
+        }
+        
         if (playerElement.hasAttribute("entryLocation")) {
             entryLocation = (Location) getGame().getFreeColGameObject(playerElement.getAttribute("entryLocation"));
         }

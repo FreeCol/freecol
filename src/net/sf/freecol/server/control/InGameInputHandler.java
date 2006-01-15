@@ -705,7 +705,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Element dowElement = null;
         Unit defender = newTile.getDefendingUnit(unit);
         if (defender == null) {
-            throw new IllegalStateException("Nothing to attack in direction " + direction + " from unit with ID " + attackElement.getAttribute("unit"));
+            throw new IllegalStateException("Nothing to attack in direction " +
+                                            direction + " from unit with ID " +
+                                            attackElement.getAttribute("unit"));
+        } else if (unit.getType() == Unit.PRIVATEER) {
+            defender.getOwner().setAttackedByPrivateers();
         } else if (player.getStance(defender.getOwner()) == Player.ALLIANCE) {
             throw new IllegalArgumentException("Can not attack allied player.");
         } else if (player.getStance(defender.getOwner()) != Player.WAR) {
@@ -725,7 +729,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             plunderGold = newTile.getSettlement().getOwner().getGold()/10; // 10% of their gold
         }
 
-        // Inform the other players (other then the player attacking) about the attack:
+        // Inform the players (other then the player attacking) about the attack:
         Iterator enemyPlayerIterator = game.getPlayerIterator();
         while (enemyPlayerIterator.hasNext()) {
             ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
