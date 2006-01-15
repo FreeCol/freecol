@@ -36,6 +36,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
@@ -170,28 +172,28 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         cargoPanel.setLayout(new GridLayout(1 , 0));
         warehousePanel.setLayout(new GridLayout(2 , 8));
 
-        goldLabel = new JLabel("Gold: 0");
+        goldLabel = new JLabel(Messages.message("goldTitle") + ": 0");
 
-        solLabel = new JLabel("SoL: 0%, Tory: 100%");
-        hammersLabel = new JLabel("Hammers: 0/0");
-        toolsLabel = new JLabel("Tools: 0/0");
+        solLabel = new JLabel(Messages.message("sonsOfLiberty") + ": 0%, " + Messages.message("tory") + ": 100%");
+        hammersLabel = new JLabel(Messages.message("model.goods.Hammers")+": 0/0");
+        toolsLabel = new JLabel(Messages.message("model.goods.Tools") + ": 0/0");
 
 
         buildingBox = new BuildingBox(this);
 
-        JScrollPane outsideColonyScroll = new JScrollPane(outsideColonyPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER),
-                    inPortScroll = new JScrollPane(inPortPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER),
-                    cargoScroll = new JScrollPane(cargoPanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED),
-                    warehouseScroll = new JScrollPane(warehousePanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED),
-                    tilesScroll = new JScrollPane(tilePanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED),
-                    buildingsScroll = new JScrollPane(buildingsPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        JLabel  outsideColonyLabel = new JLabel("In front of colony"),
-                inPortLabel = new JLabel("In port"),
-                tilesLabel = new JLabel("Tiles"),
-                buildingsLabel = new JLabel("Buildings");
+        JScrollPane outsideColonyScroll = new JScrollPane(outsideColonyPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER),
+                    inPortScroll = new JScrollPane(inPortPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER),
+                    cargoScroll = new JScrollPane(cargoPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED),
+                    warehouseScroll = new JScrollPane(warehousePanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED),
+                    tilesScroll = new JScrollPane(tilePanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED),
+                    buildingsScroll = new JScrollPane(buildingsPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        JLabel  outsideColonyLabel = new JLabel(Messages.message("outsideColony")),
+                inPortLabel = new JLabel(Messages.message("inPort")),
+                tilesLabel = new JLabel(Messages.message("surroundingArea")),
+                buildingsLabel = new JLabel(Messages.message("buildings"));
 
         // Make the colony label
-        colonyNameLabel = new JLabel("", JLabel.CENTER);    // CHRIS
+        colonyNameLabel = new JLabel("", SwingConstants.CENTER);    // CHRIS
         colonyNameLabel.setFont(new Font(colonyNameLabel.getFont().getName(),Font.BOLD,24));
 
         buildingsScroll.setAutoscrolls(true);
@@ -210,12 +212,12 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         solLabel.setSize(180, 20);
 
         EtchedBorder eBorder = new EtchedBorder();
-        tilesScroll.setBorder(new CompoundBorder(new TitledBorder("Tiles"), new BevelBorder(BevelBorder.LOWERED)));
-        buildingsScroll.setBorder(new CompoundBorder(new TitledBorder("Buildings"), eBorder));
-        warehouseScroll.setBorder(new CompoundBorder(new TitledBorder("Goods"), eBorder));
-        cargoScroll.setBorder(new CompoundBorder(cargoBorder = new TitledBorder("Cargo of ..."), eBorder));
-        inPortScroll.setBorder(new CompoundBorder(new TitledBorder("Port"), eBorder));
-        outsideColonyScroll.setBorder(new CompoundBorder(new TitledBorder("Outside Colony"), eBorder));
+        tilesScroll.setBorder(new CompoundBorder(new TitledBorder(Messages.message("surroundingArea")), new BevelBorder(BevelBorder.LOWERED)));
+        buildingsScroll.setBorder(new CompoundBorder(new TitledBorder(Messages.message("buildings")), eBorder));
+        warehouseScroll.setBorder(new CompoundBorder(new TitledBorder(Messages.message("goods")), eBorder));
+        cargoScroll.setBorder(new CompoundBorder(cargoBorder = new TitledBorder(Messages.message("cargoOnShip")), eBorder));
+        inPortScroll.setBorder(new CompoundBorder(new TitledBorder(Messages.message("inPort")), eBorder));
+        outsideColonyScroll.setBorder(new CompoundBorder(new TitledBorder(Messages.message("outsideColony")), eBorder));
 
         buildingBox.setSize(265, 20);
         hammersLabel.setSize(180, 20);  // was: 150,20  CHRIS
@@ -1131,10 +1133,9 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                     //initialize();
                     reinitialize();
                     return comp;
-                } else {
-                    logger.warning("An invalid component got dropped on this WarehousePanel.");
-                    return null;
                 }
+                logger.warning("An invalid component got dropped on this WarehousePanel.");
+                return null;
             }
 
             Component c = add(comp);
@@ -1477,9 +1478,9 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                                 if (price > freeColClient.getMyPlayer().getGold()) {
                                     parent.errorMessage("notEnoughGold");
                                     return null;
-                                } else {
-                                    inGameController.buyLand(colonyTile.getWorkTile());
                                 }
+
+                                inGameController.buyLand(colonyTile.getWorkTile());
                             }
                         }
 
@@ -1618,7 +1619,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
             Iterator buildableUnitIterator = colonyPanel.getColony().getBuildableUnitIterator();
             while (buildableUnitIterator.hasNext()) {
-                int unitID = (int) ((Integer) buildableUnitIterator.next()).intValue();
+                int unitID = ((Integer) buildableUnitIterator.next()).intValue();
 
                 String theText = new String(Unit.getName(unitID) +
                     " (" + Unit.getNextHammers(unitID) + " hammers");

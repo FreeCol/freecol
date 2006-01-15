@@ -1,14 +1,16 @@
+
 package net.sf.freecol.common.model;
 
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import net.sf.freecol.FreeCol;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
 
 
 /**
@@ -25,7 +27,8 @@ import org.w3c.dom.NodeList;
 *
 */
 public final class Building extends FreeColGameObject implements WorkLocation, Ownable {
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
+
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
@@ -56,7 +59,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
                             CUSTOM_HOUSE = 15;
 
     /** The maximum number of building types. */
-    public static final int NUMBER_OF_TYPES = 16;
+    public static final int NUMBER_OF_TYPES = FreeCol.specification.numberOfBuildingTypes();
 
     /** The level of a building. */
     public static final int NOT_BUILT = 0,
@@ -64,47 +67,8 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
                             SHOP = 2,
                             FACTORY = 3;
 
-    //private static final String[][] buildingNames = {{"Town hall", null, null}, {"Carpenter's house", "Lumber mill", null}, {"Blacksmith's house", "Blacksmith's shop", "Iron works"}, {"Tobacconist's house", "Tobacconist's shop", "Cigar factory"}, {"Weaver's house", "Weaver's shop", "Textile mill"}, {"Distiller's house", "Rum distillery", "Rum factory"}, {"Fur trader's house", "Fur trading post", "Fur factory"}, {"Stockade", "Fort", "Fortress"}, {"Armory", "Magazine", "Arsenal"}, {"Docks", "Drydock", "Shipyard"}, {"Schoolhouse", "College", "University"}, {"Warehouse", "Warehouse expansion", null}, {"Stables", null, null}, {"Church", "Cathedral", null}, {"Printing press", "Newspaper", null}, {"Custom house", null, null}};
-    private static final String[][] buildingNames = {
-        {"Town hall", null, null},
-        {"Carpenter's house", "Lumber mill", null},
-        {"Blacksmith's house", "Blacksmith's shop", "Iron works"},
-        {"Tobacconist's house", "Tobacconist's shop", "Cigar factory"},
-        {"Weaver's house", "Weaver's shop", "Textile mill"},
-        {"Distiller's house", "Rum distillery", "Rum factory"},
-        {"Fur trader's house", "Fur trading post", "Fur factory"},
-        {"Schoolhouse", "College", "University"},
-        {"Armory", "Magazine", "Arsenal"},
-        {"Church", "Cathedral", null},
-        {"Stockade", "Fort", "Fortress"},
-        {"Warehouse", "Warehouse expansion", null},
-        {"Stables", null, null},
-        {"Docks", "Drydock", "Shipyard"},
-        {"Printing press", "Newspaper", null},
-        {"Custom house", null, null}
-    };
-
     // Sets the maximum number of units in one building (will become a non-constant later):
     private static final int MAX_UNITS = 3;
-
-    public static final int requiredTable[][][] = {
-        {{  0,  0,  1},{ -1, -1, -1},{ -1, -1, -1},{ -1, -1, -1}}, // TOWNHALL
-        {{  0,  0,  1},{ 52,  0,  3},{ -1, -1, -1},{ -1, -1, -1}}, // CARPENTER
-        {{  0,  0,  1},{ 64, 20,  1},{240,100,  8},{ -1, -1, -1}}, // BLACKSMITH
-        {{  0,  0,  1},{ 64, 20,  1},{160,100,  8},{ -1, -1, -1}}, // TOBACCONIST
-        {{  0,  0,  1},{ 64, 20,  1},{160,100,  8},{ -1, -1, -1}}, // WEAVER
-        {{  0,  0,  1},{ 64, 20,  1},{160,100,  8},{ -1, -1, -1}}, // DISTILLER
-        {{  0,  0,  1},{ 56, 20,  1},{160,100,  6},{ -1, -1, -1}}, // FUR_TRADER
-        {{ 64,  0,  4},{160, 50,  8},{200,100, 10},{ -1, -1, -1}}, // SCHOOLHOUSE
-        {{ 52,  0,  1},{120, 50,  8},{240,100,  8},{ -1, -1, -1}}, // ARMORY
-        {{ 64,  0,  3},{176,100,  8},{ -1, -1, -1},{ -1, -1, -1}}, // CHURCH
-        {{ 64,  0,  3},{120,100,  3},{320,200,  8},{ -1, -1, -1}}, // STOCKADE
-        {{ 80,  0,  1},{ 80, 20,  1},{ -1, -1, -1},{ -1, -1, -1}}, // WAREHOUSE
-        {{ 64,  0,  1},{ -1, -1, -1},{ -1, -1, -1},{ -1, -1, -1}}, // STABLES
-        {{ 52,  0,  1},{ 80, 50,  4},{240,100,  8},{ -1, -1, -1}}, // DOCK
-        {{ 52, 20,  1},{120, 50,  4},{ -1, -1, -1},{ -1, -1, -1}}, // PRINTING_PRESS
-        {{160, 50,  1},{ -1, -1, -1},{ -1, -1, -1},{ -1, -1, -1}}  // CUSTOM_HOUSE
-    };
 
     // The colony containing this building.
     private Colony colony;
@@ -117,6 +81,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
     private ArrayList units = new ArrayList();
 
+    private final  BuildingType  buildingType;
 
 
 
@@ -134,6 +99,8 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         this.colony = colony;
         this.type = type;
         this.level = level;
+
+        buildingType = FreeCol.specification.buildingType( type );
     }
 
 
@@ -148,6 +115,8 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         super(game, element);
 
         readFromXMLElement(element);
+
+        buildingType = FreeCol.specification.buildingType( type );
     }
 
 
@@ -202,11 +171,10 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     *         <i>null</i> if the building has not been built.
     */
     public String getName() {
-        if (isBuilt()) {
-            return buildingNames[type][level - 1];
-        } else {
-            return null;
-        }
+
+        return isBuilt()  &&  (level - 1) < buildingType.numberOfLevels()
+            ? buildingType.level(level - 1).name
+            : null;
     }
 
 
@@ -218,17 +186,13 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     *         if the improvement does not exist.
     */
     public String getNextName() {
-        if (!canBuildNext()) {
+
+        if ( ! canBuildNext() ) {
             return null;
         }
 
-        if (level < MAX_LEVEL) {
-            return buildingNames[type][level];
-        } else {
-            return null;
-        }
+        return level < buildingType.numberOfLevels() ? buildingType.level(level).name : null;
     }
-
 
     /**
     * Gets the number of hammers required for the improved building of the same type.
@@ -241,11 +205,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             return -1;
         }
 
-        if (level < MAX_LEVEL) {
-            return requiredTable[type][level][0];
-        } else {
-            return -1;
-        }
+        return level < buildingType.numberOfLevels() ? buildingType.level(level).hammersRequired : -1;
     }
 
 
@@ -260,11 +220,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             return -1;
         }
 
-        if (level < MAX_LEVEL) {
-            return requiredTable[type][level][1];
-        } else {
-            return -1;
-        }
+        return level < buildingType.numberOfLevels() ? buildingType.level(level).toolsRequired : -1;
     }
 
 
@@ -279,11 +235,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             return -1;
         }
 
-        if (level < MAX_LEVEL) {
-            return requiredTable[type][level][2];
-        } else {
-            return -1;
-        }
+        return level < buildingType.numberOfLevels() ? buildingType.level(level).populationRequired : -1;
     }
 
 
@@ -300,16 +252,18 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         if (getType() == CUSTOM_HOUSE) {
             if (getColony().getOwner().hasFather(FoundingFather.PETER_STUYVESANT)) {
                 return true;
-            } else {
-                return false;
             }
+
+            return false;
         }
         if (level+1 >= FACTORY && !getColony().getOwner().hasFather(FoundingFather.ADAM_SMITH)
                 && (type == BLACKSMITH || type == TOBACCONIST || type == WEAVER
                 || type == DISTILLER || type == FUR_TRADER || type == ARMORY)) {
             return false;
         }
-        if (requiredTable[type][level][0] == -1) {
+        BuildingType  buildingType = FreeCol.specification.buildingType( type );
+        // if there are no more improvements available for this building type..
+        if ( buildingType.numberOfLevels() == level ) {
             return false;
         }
         if (getType() == DOCK && getColony().isLandLocked()) {
@@ -324,11 +278,8 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     * @return The result.
     */
     public boolean isBuilt() {
-        if (level > 0) {
-            return true;
-        } else {
-            return false;
-        }
+
+        return 0 < level;
     }
 
 
@@ -482,7 +433,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             throw new IllegalStateException();
         }
 
-        int index = units.indexOf((Unit) locatable);
+        int index = units.indexOf(locatable);
 
         if (index != -1) {
             units.remove(index);
@@ -505,11 +456,11 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     */
     public boolean contains(Locatable locatable) {
         if (locatable instanceof Unit) {
-            int index = units.indexOf((Unit) locatable);
+            int index = units.indexOf(locatable);
             return (index != -1) ? true:false;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
 
@@ -520,9 +471,9 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     public Unit getFirstUnit() {
         if (units.size() > 0) {
             return (Unit) units.get(0);
-        } else {
-            return null;
         }
+
+        return null;
     }
 
 
@@ -533,9 +484,9 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     public Unit getLastUnit() {
         if (units.size() > 0) {
             return (Unit) units.get(units.size()-1);
-        } else {
-            return null;
         }
+
+        return null;
     }
 
 
@@ -766,9 +717,9 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     public int getGoodsInput() {
         if ((getGoodsInputType() > -1) && (colony.getGoodsCount(getGoodsInputType()) < getMaximumGoodsInput()))  { // Not enough goods to do this?
             return colony.getGoodsCount(getGoodsInputType());
-        } else {
-            return getMaximumGoodsInput();
         }
+
+        return getMaximumGoodsInput();
     }
 
 
@@ -828,9 +779,9 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     public int getProductionOf(int goodsType) {
         if (goodsType == getGoodsOutputType()) {
             return getProduction();
-        } else {
-            return 0;
         }
+
+        return 0;
     }
 
 

@@ -1,6 +1,7 @@
 
 package net.sf.freecol.common.model;
 
+
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -11,7 +12,6 @@ import net.sf.freecol.common.FreeColException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 
 
 /**
@@ -88,11 +88,26 @@ public class Player extends FreeColGameObject {
                             REF_SPANISH = 15;
 
     /** An array holding all the European nations in String form. */
-    public static final String[] NATIONS = {"Dutch", "French", "English", "Spanish"};
+    public static final String[] NATIONS =
+    {
+        Messages.message("model.nation.Dutch"),
+        Messages.message("model.nation.French"),
+        Messages.message("model.nation.English"),
+        Messages.message("model.nation.Spanish"),
+    };
 
     /** An array holding all the Native American tribes in String form. */
-    public static final String[] TRIBES = {"Apache", "Arawak", "Aztec", "Cherokee",
-                                        "Inca", "Iroquois", "Sioux", "Tupi"};
+    public static final String[] TRIBES =
+    {
+        Messages.message("model.nation.Apache"),
+        Messages.message("model.nation.Arawak"),
+        Messages.message("model.nation.Aztec"),
+        Messages.message("model.nation.Cherokee"),
+        Messages.message("model.nation.Inca"),
+        Messages.message("model.nation.Iroquois"),
+        Messages.message("model.nation.Sioux"),
+        Messages.message("model.nation.Tupi"),
+    };
 
     public static final int NUMBER_OF_NATIONS = TRIBES.length + NATIONS.length;
 
@@ -414,12 +429,8 @@ public class Player extends FreeColGameObject {
     * @return <i>true</i> if this player is european and <i>false</i> otherwise.
     */
     public static boolean isEuropean(int nation) {
-        if (nation == DUTCH || nation == ENGLISH || nation == FRENCH || nation == SPANISH ||
-                nation == REF_DUTCH || nation == REF_ENGLISH || nation == REF_FRENCH || nation == REF_SPANISH) {
-            return true;
-        } else {
-            return false;
-        }
+        return (nation == DUTCH || nation == ENGLISH || nation == FRENCH || nation == SPANISH ||
+                nation == REF_DUTCH || nation == REF_ENGLISH || nation == REF_FRENCH || nation == REF_SPANISH);
     }
     
     
@@ -1271,9 +1282,8 @@ public class Player extends FreeColGameObject {
 
         if (closestLocation != null) {
             return closestLocation;
-        } else {
-            return getEurope();
         }
+        return getEurope();
     }
 
 
@@ -1360,11 +1370,7 @@ public class Player extends FreeColGameObject {
     * @return Whether a new colonist should immigrate.
     */
     public boolean checkEmigrate() {
-        if (crosses >= getCrossesRequired()) {
-            return true;
-        } else {
-            return false;
-        }
+        return getCrossesRequired() <= crosses;
     }
 
 
@@ -1921,7 +1927,7 @@ public class Player extends FreeColGameObject {
                 return Unit.FREE_COLONIST;
             } else {
                 // Make sure random is a number from 0 to 17:
-                random = (int) ((chance - 62) / 2);
+                random = ((chance - 62) / 2);
             }
         }
 

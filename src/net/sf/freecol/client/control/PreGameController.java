@@ -25,6 +25,7 @@ import net.sf.freecol.client.gui.CanvasKeyListener;
 import net.sf.freecol.client.gui.CanvasMouseListener;
 import net.sf.freecol.client.gui.CanvasMouseMotionListener;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Player;
@@ -135,7 +136,7 @@ public final class PreGameController {
         freeColClient.getClient().send(requestLaunchElement);
 
         canvas.setEnabled(false);
-        canvas.showStatusPanel("Please wait: Starting game");
+        canvas.showStatusPanel( Messages.message("status.startingGame") );
     }
 
 
@@ -269,7 +270,7 @@ public final class PreGameController {
             canvas.requestFocus();
         } else {
             canvas.setEnabled(false);
-            canvas.showStatusPanel("Waiting for the other players to complete their turn...");
+            canvas.showStatusPanel(Messages.message("waitingForOtherPlayers"));
         }
     }
 }

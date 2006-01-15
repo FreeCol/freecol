@@ -20,10 +20,12 @@ import javax.swing.JTextArea;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Tile;
@@ -725,7 +727,9 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         requires.setWrapStyleWord(true);
         requires.setFocusable(false);
         requires.setFont(requires.getFont().deriveFont(Font.BOLD));
-        String requiresText = Building.requiredTable[building][level][2] + " colonists";
+        BuildingType  buildingType = FreeCol.specification.buildingType( building );
+        BuildingType.Level  buildingLevel = level < buildingType.numberOfLevels() ? buildingType.level(level) : null;
+        String requiresText = (buildingLevel != null ? buildingLevel.populationRequired : -1) + " colonists";
         if (level > 0) {
           requiresText = requiresText + "\n" +
                          Messages.message("colopedia.buildings.name." + buildingCalls[building][level-1]);
@@ -747,8 +751,8 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         overview.add(new JLabel(Messages.message("colopedia.buildings.cost")));
         JPanel costs = new JPanel();
         costs.setLayout(new FlowLayout(FlowLayout.LEFT));
-        costs.add(new JLabel(Integer.toString(Building.requiredTable[building][level][0]), library.getGoodsImageIcon(ImageLibrary.GOODS_HAMMERS), JLabel.LEFT));
-        costs.add(new JLabel(Integer.toString(Building.requiredTable[building][level][1]), library.getGoodsImageIcon(ImageLibrary.GOODS_TOOLS), JLabel.LEFT));
+        costs.add(new JLabel(Integer.toString(buildingLevel != null ? buildingLevel.hammersRequired : -1), library.getGoodsImageIcon(ImageLibrary.GOODS_HAMMERS), JLabel.LEFT));
+        costs.add(new JLabel(Integer.toString(buildingLevel != null ? buildingLevel.toolsRequired : -1), library.getGoodsImageIcon(ImageLibrary.GOODS_TOOLS), JLabel.LEFT));
         overview.add(costs);
         // Specialist
         overview.add(new JLabel(Messages.message("colopedia.buildings.specialist")));

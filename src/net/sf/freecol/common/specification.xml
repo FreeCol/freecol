@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Revision$ -->
+<freecol-specification>
+
+  <building-types>
+
+    <building-type>
+      <building-level name="colopedia.buildings.name.TownHall" hammers-required="0" tools-required="0" population-required="1" />
+    </building-type>
+
+    <building-type>
+      <building-level name="colopedia.buildings.name.CarpenterHouse" hammers-required="0"  tools-required="0" population-required="1" />
+      <building-level name="colopedia.buildings.name.LumberMill"     hammers-required="52" tools-required="0" population-required="3" />
+    </building-type>
+
+    <building-type>
+      <building-level name="colopedia.buildings.name.BlacksmithHouse" hammers-required="0"   tools-required="0"   population-required="1" />
+      <building-level name="colopedia.buildings.name.BlacksmithShop"  hammers-required="64"  tools-required="20"  population-required="1" />
+      <building-level name="colopedia.buildings.name.IronWorks"       hammers-required="240" tools-required="100" population-required="8" />
+    </building-type>
+
+    <building-type>
+      <building-level name="colopedia.buildings.name.TobacconistHouse" hammers-required="0"   tools-required="0"   population-required="1" />
+      <building-level name="colopedia.buildings.name.TobacconistShop"  hammers-required="64"  tools-required="20"  population-required="1" />
+      <building-level name="colopedia.buildings.name.CigarFactory"     hammers-required="160" tools-required="100" population-required="8" />
+    </building-type>
+
+    <building-type>
+      <building-level name="colopedia.buildings.name.WeaverHouse" hammers-required="0"   tools-required="0"   population-required="1" />
+      <building-level name="colopedia.buildings.name.WeaverShop"  hammers-required="64"  tools-required="20"  population-required="1" />
+      <building-level name="colopedia.buildings.name.TextileMill" hammers-required="160" tools-required="100" population-required="8" />
+    </building-type>
+
+    <building-type>
+      <building-level name="colopedia.buildings.name.DistillerHouse" hammers-required="0"   tools-required="0"   population-required="1" />
+      <building-level name="colopedia.buildings.name.RumDistillery"  hammers-required="64"  tools-required="20"  population-required="1" />
+      <building-level name="colopedia.buildings.name.RumFactory"     hammers-required="160" tools-required="100" population-required="8" />
+    </building-type>
+
+    <building-type>
+      <building-level name="colopedia.buildings.name.FurTraderHouse" hammers-required="0"   tools-required="0"   population-required="1" />
+      <building-level name="colopedia.buildings.name.FurTradingPost" hammers-required="56"  tools-required="20"  population-required="1" />
+      <building-level name="colopedia.buildings.name.FurFactory"     hammers-required="160" tools-required="100" population-required="6" />
+    </building-type>
+
+    <building-type>
+      <building-level name="colopedia.buildings.name.Schoolhouse" hammers-required="64"  tools-required="0"   population-required="4" />
+      <building-level name="colopedia.buildings.name.College"     hammers-required="160" tools-required="50"  population-required="8" />
+      <building-level name="colopedia.buildings.name.University"  hammers-required="200" tools-required="100" population-required="10" />
+    </building-type>
+
+    <building-type>
+      <building-level name="colopedia.buildings.name.Armory"   hammers-required="52"  tools-required="0"   population-required="1" />
+      <building-level name="colopedia.buildings.name.Magazine" hammers-required="120" tools-required="50"  population-required="8" />
+      <building-level name="colopedia.buildings.name.Arsenal"  hammers-required="240" tools-required="100" population-required="8" />
+    </building-type>
+
+    <building-type>
+      <building-level name="colopedia.buildings.name.Church"    hammers-required="64"  tools-required="0"   population-required="3" />
+      <building-level name="colopedia.buildings.name.Cathedral" hammers-required="176" tools-required="100" population-required="8" />
+    </building-type>
+
+    <building-type>
+      <building-level name="colopedia.buildings.name.Stockade" hammers-required="64"  tools-required="0"   population-required="3" />
+      <building-level name="colopedia.buildings.name.Fort"     hammers-required="120" tools-required="100" population-required="3" />
+      <building-level name="colopedia.buildings.name.Fortress" hammers-required="320" tools-required="200" population-required="8" />
+    </building-type>
+
+    <building-type>
+      <building-level name="colopedia.buildings.name.Warehouse"          hammers-required="80" tools-required="0"  population-required="1" />
+      <building-level name="colopedia.buildings.name.WarehouseExpansion" hammers-required="80" tools-required="20" population-required="1" />
+    </building-type>
+
+    <building-type>
+      <building-level name="colopedia.buildings.name.Stables" hammers-required="64" tools-required="0" population-required="1" />
+    </building-type>
+
+    <building-type>
+      <building-level name="colopedia.buildings.name.Docks"    hammers-required="52"  tools-required="0"   population-required="1" />
+      <building-level name="colopedia.buildings.name.Drydock"  hammers-required="80"  tools-required="50"  population-required="4" />
+      <building-level name="colopedia.buildings.name.Shipyard" hammers-required="240" tools-required="100" population-required="8" />
+    </building-type>
+
+    <building-type>
+      <building-level name="colopedia.buildings.name.PrintingPress" hammers-required="52"  tools-required="20" population-required="1" />
+      <building-level name="colopedia.buildings.name.Newspaper"     hammers-required="120" tools-required="50" population-required="4" />
+    </building-type>
+
+    <building-type>
+      <building-level name="colopedia.buildings.name.CustomHouse" hammers-required="160" tools-required="50" population-required="1" />
+    </building-type>
+
+  </building-types>
+
+</freecol-specification>

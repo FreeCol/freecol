@@ -17,6 +17,7 @@ import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
 import net.sf.freecol.client.gui.sound.MusicLibrary;
 import net.sf.freecol.client.gui.sound.SfxLibrary;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.logging.DefaultHandler;
 import net.sf.freecol.server.FreeColServer;
 
@@ -35,6 +36,8 @@ public final class FreeCol {
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
+
+    public static final  Specification  specification = new Specification();
 
     private  static final String FREECOL_VERSION = "0.4.1";
 

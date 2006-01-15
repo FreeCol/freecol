@@ -217,7 +217,7 @@ public final class InfoPanel extends FreeColPanel {
             if (unit != null) {
                 unitLabel.setIcon(imageProvider.getUnitImageIcon(imageProvider.getUnitGraphicsType(unit)));
                 unitNameLabel.setText(unit.getName());
-                unitMovesLabel.setText("Moves: " + unit.getMovesAsString());
+                unitMovesLabel.setText(Messages.message("moves") + unit.getMovesAsString());
                 if (unit.isPioneer()) {
                     unitToolsLabel.setText("Tools: " + unit.getNumberOfTools());
                 } else if (unit.getType() == Unit.TREASURE_TRAIN) {

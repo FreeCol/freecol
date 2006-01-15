@@ -381,7 +381,12 @@ class PlayersTableModel extends AbstractTableModel {
     private Player thisPlayer;
     private final PreGameController preGameController;
 
-    private static final String[] columnNames = {"Player", "Nation", "Color"};
+    private static final String[] columnNames =
+    {
+        Messages.message("player"),
+        Messages.message("nation"),
+        Messages.message("color"),
+    };
 
     /**
     * A standard constructor.

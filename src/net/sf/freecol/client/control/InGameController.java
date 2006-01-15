@@ -1997,7 +1997,7 @@ public final class InGameController implements NetworkConstants {
         Canvas canvas = freeColClient.getCanvas();
 
         canvas.setEnabled(false);
-        canvas.showStatusPanel("Waiting for the other players to complete their turn...");
+        canvas.showStatusPanel(Messages.message("waitingForOtherPlayers"));
 
         Element endTurnElement = Message.createNewRootElement("endTurn");
         client.send(endTurnElement);
