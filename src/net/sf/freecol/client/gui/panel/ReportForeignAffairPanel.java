@@ -36,12 +36,30 @@ public final class ReportForeignAffairPanel extends ReportPanel implements Actio
         Iterator opponents = parent.getClient().getFreeColServer().getGame().getEuropeanPlayers().iterator();
         // Display Panel
         reportPanel.removeAll();
-        reportPanel.setLayout(new GridLayout(4, 1));
+        reportPanel.setLayout(new GridLayout(5, 5));
+        reportPanel.add(new JLabel());
+        int nation;
+        for (nation = 0; nation < 4; nation++) {
+            reportPanel.add(new JLabel(Player.getNationAsString(nation)));
+        }
         while (opponents.hasNext()) {
-            buildForeignAffairLabel(player, (Player) opponents.next());
+            Player enemy = (Player) opponents.next();
+            buildForeignAffairLabel(player, enemy);
+            for (nation = 0; nation < 4; nation++) {
+                if (nation == enemy.getNation()) {
+                    reportPanel.add(new JLabel());
+                } else {
+                    String stance = Player.getStanceAsString(enemy.getStance(nation));
+                    JLabel label = new JLabel(stance);
+                    label.setVerticalAlignment(JLabel.TOP);
+                    label.setVerticalTextPosition(JLabel.TOP);
+                    reportPanel.add(label);
+                }
+            }
         }
         reportPanel.doLayout();
     }
+
 
     /**
      * 
