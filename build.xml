@@ -43,7 +43,7 @@
       </fileset>
     </copy>
   </target>
-  
+
   <target name="copy-jar-files" depends="init" unless="nojars">
     <mkdir dir="${freecol.build.dir}/jars"/>
     <copy todir="${freecol.build.dir}/jars">
@@ -66,7 +66,7 @@
         <exclude name="**/CVS/**"/>
       </fileset>
     </copy>
-    
+
     <!-- Copy the sound files unless the "nosound" property has been defined -->
     <antcall target="copy-sound-files"/>
   </target>
@@ -74,10 +74,14 @@
   <target name="build" depends="init,compile">
     <!-- Copy the data files unless the "nodata" property has been defined -->
     <antcall target="copy-data-files"/>
-  	
-  	<!-- Copy the jar files unless the "nojars" property has been defined -->
-  	<antcall target="copy-jar-files"/>
-    
+
+    <!-- Copy the jar files unless the "nojars" property has been defined -->
+    <antcall target="copy-jar-files"/>
+
+    <copy todir="${freecol.build.dir}">
+      <fileset dir="${freecol.src.dir}" includes="**/*.xml" />
+    </copy>
+
     <native2ascii src="${freecol.src.dir}" dest="${freecol.build.dir}"
                   includes="**/*.properties" excludes="classes/**" />
   </target>
@@ -89,7 +93,7 @@
          excludes="**/CVS/**, **/metaserver/**"
     />
   </target>
-  
+
   <target name="fullpackage" depends="init,build">
     <jar jarfile="${freecol.jar.file}"
          basedir="${freecol.build.dir}"
@@ -107,7 +111,7 @@
     <delete quiet="true" dir="${freecol.javadoc.dir}"/>
     <delete quiet="true" dir="${freecol.build.dir}"/>
   </target>
-  
+
   <target name="fix" depends="init">
     <fixcrlf srcdir="${freecol.src.dir}"
              includes="**/*.java"
@@ -118,7 +122,7 @@
              eof="asis"
     />
   </target>
-  
+
   <target name="javadoc" depends="init">
     <mkdir dir="${freecol.javadoc.dir}"/>
     <javadoc sourcepath="${freecol.src.dir}"
