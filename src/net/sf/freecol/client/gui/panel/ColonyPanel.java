@@ -114,8 +114,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     private Game        game;
     private UnitLabel   selectedUnit;
 
-    private JButton exitButton = new JButton("Close");
-    private JButton buyBuilding = new JButton("Buy building");
+    private JButton exitButton = new JButton(Messages.message("close"));
+    private JButton buyBuilding = new JButton(Messages.message("buyBuilding"));
 
 
 
@@ -439,7 +439,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
         tilePanel.initialize();
 
-        goldLabel.setText("Gold: " + freeColClient.getMyPlayer().getGold());
+        goldLabel.setText(Messages.message("goldTitle") + ": " + freeColClient.getMyPlayer().getGold());
 
         buildingBox.initialize();
 
@@ -476,8 +476,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     * Updates the SoL membership label.
     */
     private void updateSoLLabel() {
-        solLabel.setText("SoL: " + colony.getSoL() + "% (" + ((colony.getUnitCount() * colony.getSoL()) / 100) +
-                         "), Tory: " + colony.getTory() + "% (" +
+        solLabel.setText(Messages.message("sonsOfLiberty") + ": " + colony.getSoL() + "% (" + ((colony.getUnitCount() * colony.getSoL()) / 100) +
+                         "), " + Messages.message("tory") + ": " + colony.getTory() + "% (" +
                          (colony.getUnitCount() - ((colony.getUnitCount() * colony.getSoL()) / 100)) + ")");
     }
 
@@ -503,13 +503,13 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             final Building carpenter = colony.getBuildingForProducing( Goods.HAMMERS );
             final int hammers = carpenter.getProductionNextTurn();
             final String hammerDelta = (hammers == 0)?"":(hammers>0)?"+"+ hammers:String.valueOf(hammers);
-            final String hammerDisplay = "Hammers: "+ colony.getHammers() + hammerDelta;
+            final String hammerDisplay = Messages.message("model.goods.Hammers") + ": "+ colony.getHammers() + hammerDelta;
             if (colony.getCurrentlyBuilding() < Colony.BUILDING_UNIT_ADDITION) {
                 hammersLabel.setText(hammerDisplay + "/" + colony.getBuilding(colony.getCurrentlyBuilding()).getNextHammers());
-                toolsLabel.setText("Tools: " + colony.getGoodsCount(Goods.TOOLS) + "/" + colony.getBuilding(colony.getCurrentlyBuilding()).getNextTools());
+                toolsLabel.setText(Messages.message("model.goods.Tools") + ": " + colony.getGoodsCount(Goods.TOOLS) + "/" + colony.getBuilding(colony.getCurrentlyBuilding()).getNextTools());
             } else {
                 hammersLabel.setText(hammerDisplay + "/" + Unit.getNextHammers(colony.getCurrentlyBuilding() - Colony.BUILDING_UNIT_ADDITION));
-                toolsLabel.setText("Tools: " + colony.getGoodsCount(Goods.TOOLS) + "/" + Unit.getNextTools(colony.getCurrentlyBuilding() - Colony.BUILDING_UNIT_ADDITION));
+                toolsLabel.setText(Messages.message("model.goods.Tools") + ": " + colony.getGoodsCount(Goods.TOOLS) + "/" + Unit.getNextTools(colony.getCurrentlyBuilding() - Colony.BUILDING_UNIT_ADDITION));
             }
             buyBuilding.setEnabled(colony.getCurrentlyBuilding() >= 0 && colony.getPriceForBuilding() <= freeColClient.getMyPlayer().getGold());
         }

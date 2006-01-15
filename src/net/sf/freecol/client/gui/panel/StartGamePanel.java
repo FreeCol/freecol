@@ -204,7 +204,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         add(chatPanel);
 
         try {
-            TitledBorder border2 = new TitledBorder("Options");
+            TitledBorder border2 = new TitledBorder(Messages.message("options"));
             optionsPanel.setBorder(border2);
         } catch(Exception e) {}
 

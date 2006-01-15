@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
+import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Map.Position;
 
 import org.w3c.dom.Document;
@@ -166,65 +168,18 @@ public final class Tile extends FreeColGameObject implements Location {
     */
     public String getName() {
         if (getAddition() == ADD_MOUNTAINS) {
-            return "Mountains";
-        } else if (getAddition() == ADD_HILLS) {
-            return "Hills";
-        } else if (getType() == UNEXPLORED) {
+            return Messages.message("mountains");
+        }
+        else if (getAddition() == ADD_HILLS) {
+            return Messages.message("hills");
+        }
+        else if (getType() == UNEXPLORED) {
             return "Unexplored";
-        } else if (getType() == PLAINS) {
-            if (isForested()) {
-                return "Mixed forest";
-            } else {
-                return "Plains";
-            }
-        } else if (getType() == GRASSLANDS) {
-            if (isForested()) {
-                return "Conifer forest";
-            } else {
-                return "Grassland";
-            }
-        } else if (getType() == PRAIRIE) {
-            if (isForested()) {
-                return "Broadleaf forest";
-            } else {
-                return "Prairie";
-            }
-        } else if (getType() == SAVANNAH) {
-            if (isForested()) {
-                return "Tropical forest";
-            } else {
-                return "Savannah";
-            }
-        } else if (getType() == MARSH) {
-            if (isForested()) {
-                return "Wetland forest";
-            } else {
-                return "Marsh";
-            }
-        } else if (getType() == SWAMP) {
-            if (isForested()) {
-                return "Rain forest";
-            } else {
-                return "Swamp";
-            }
-        } else if (getType() == DESERT) {
-            if (isForested()) {
-                return "Scrub forest";
-            } else {
-                return "Desert";
-            }
-        } else if (getType() == TUNDRA) {
-            if (isForested()) {
-                return "Boreal forest";
-            } else {
-                return "Tundra";
-            }
-        } else if (getType() == ARCTIC) {
-            return "Arctic";
-        } else if (getType() == OCEAN) {
-            return "Ocean";
-        } else if (getType() == HIGH_SEAS) {
-            return "High seas";
+        }
+        else if ( 0 < getType()  &&  getType() < FreeCol.specification.numberOfTileTypes() ) {
+
+            TileType  t = FreeCol.specification.tileType( type );
+            return forested ? t.whenForested.name : t.name;
         }
 
         return "Unknown";
@@ -349,12 +304,12 @@ public final class Tile extends FreeColGameObject implements Location {
         if (settlement != null) {
             if (defender == null || defender.isColonist() && !defender.isArmed() && !defender.isMounted()) {
                 return settlement.getDefendingUnit(attacker);
-            } else {
-                return defender;
             }
-        } else {
+
             return defender;
         }
+
+        return defender;
     }
 
 
@@ -371,40 +326,25 @@ public final class Tile extends FreeColGameObject implements Location {
     * @see Unit#getMoveCost
     */
     public int getMoveCost(Tile fromTile) {
-        if (!isLand()) {
-            return 3;
-        }
 
         if (hasRoad() && fromTile.hasRoad()) {
             return 1;
-        } else if ((getAddition() == ADD_RIVER_MINOR || getAddition() == ADD_RIVER_MAJOR) &&
-                   (fromTile.getAddition() == ADD_RIVER_MINOR || fromTile.getAddition() == ADD_RIVER_MAJOR)) {
+        }
+        else if (hasRiver() && fromTile.hasRiver()) {
             return 1;
-        } else if (getSettlement() != null) {
+        }
+        else if (getSettlement() != null) {
             return 3;
-        } else if (getType() == ARCTIC) {
-            return 6;
-        } else if (getAddition() == ADD_MOUNTAINS) {
+        }
+        else if (getAddition() == ADD_MOUNTAINS) {
             return 9;
-        } else if (getAddition() == ADD_HILLS) {
+        }
+        else if (getAddition() == ADD_HILLS) {
             return 6;
         }
 
-        if (!isForested()) {
-            if (getType() == MARSH || getType() == SWAMP) {
-                return 6;
-            } else {
-                return 3;
-            }
-        } else {
-            if (getType() == DESERT) {
-                return 3;
-            } else if (getType() == MARSH || getType() == SWAMP) {
-                return 9;
-            } else {
-                return 6;
-            }
-        }
+        TileType  t = FreeCol.specification.tileType( type );
+        return forested ? t.whenForested.basicMoveCost : t.basicMoveCost;
     }
 
 
@@ -460,9 +400,9 @@ public final class Tile extends FreeColGameObject implements Location {
     public boolean contains(Locatable locatable) {
         if (locatable instanceof Unit) {
             return unitContainer.contains((Unit) locatable);
-        } else {
-            logger.warning("Tile.contains(" + locatable + ") Not implemented yet!");
         }
+
+        logger.warning("Tile.contains(" + locatable + ") Not implemented yet!");
 
         return false;
     }
@@ -491,11 +431,7 @@ public final class Tile extends FreeColGameObject implements Location {
     * @return 'true' if this Tile is a land Tile, 'false' otherwise.
     */
     public boolean isLand() {
-        if ((getType() == OCEAN) || (getType() == HIGH_SEAS)) {
-            return false;
-        } else {
-            return true;
-        }
+        return (getType() != OCEAN)  &&  (getType() != HIGH_SEAS);
     }
 
 
@@ -505,6 +441,13 @@ public final class Tile extends FreeColGameObject implements Location {
     */
     public boolean hasRoad() {
         return road || (getSettlement() != null);
+    }
+
+
+    public boolean hasRiver() {
+
+        return ADD_RIVER_MINOR == addition_type
+                ||  ADD_RIVER_MAJOR == addition_type;
     }
 
 
@@ -662,11 +605,12 @@ public final class Tile extends FreeColGameObject implements Location {
     * @see #getSettlement
     */
     public Colony getColony() {
-        if (settlement != null && settlement instanceof Colony) {
+
+        if (settlement != null  &&  settlement instanceof Colony) {
             return ((Colony) settlement);
-        } else {
-            return null;
         }
+
+        return null;
     }
 
 
@@ -806,9 +750,9 @@ public final class Tile extends FreeColGameObject implements Location {
 
         if (type == ARCTIC || type == OCEAN || type == HIGH_SEAS || getAddition() == ADD_MOUNTAINS) {
             return false;
-        } else {
-            return true;
         }
+
+        return true;
     }
 
 
@@ -998,10 +942,10 @@ public final class Tile extends FreeColGameObject implements Location {
         if (goodsType == Goods.FURS || goodsType == Goods.LUMBER || goodsType == Goods.ORE || goodsType == Goods.SILVER) {
             return getTileTypePotential(getType(), goodsType, addition_type, hasBonus(),
                                         isForested(), false, true);
-        } else {
-            return getTileTypePotential(getType(), goodsType, addition_type, hasBonus() && !isForested(),
-                                        false, true, true);
         }
+
+        return getTileTypePotential(getType(), goodsType, addition_type, hasBonus() && !isForested(),
+                                    false, true, true);
     }
 
     
@@ -1146,27 +1090,16 @@ public final class Tile extends FreeColGameObject implements Location {
     * @return The defense modifier (in percent) of this tile.
     */
     public int defenseBonus () {
-        int defenseTable[][] = {
-            { 0, 0}, // Unexp
-            { 0,50}, // Plains
-            { 0,50}, // Grasslands
-            { 0,50}, // Prairie
-            { 0,50}, // Savannah
-            {25,50}, // Marsh
-            { 0,75}, // Swamp
-            { 0,50}, // Desert
-            { 0,50}, // Tundra
-            { 0, 0}, // Arctic
-            { 0, 0}, // Ocean
-            { 0, 0} // High seas
-        };
 
         if (addition_type == ADD_HILLS) {
             return 100;
-        } else if (addition_type == ADD_MOUNTAINS) {
+        }
+        else if (addition_type == ADD_MOUNTAINS) {
             return 150;
         }
-        return defenseTable[type][(forested ? 1 : 0)];
+
+        TileType  t = FreeCol.specification.tileType( type );
+        return forested ? t.whenForested.defenceBonus : t.defenceBonus;
     }
 
     /**
@@ -1467,9 +1400,9 @@ public final class Tile extends FreeColGameObject implements Location {
         }
         if (playerExploredTiles[player.getNation()] == null || !isExplored()) {
             return false;
-        } else {
-            return getPlayerExploredTile(player).isExplored();
         }
+
+        return getPlayerExploredTile(player).isExplored();
     }
 
     /**

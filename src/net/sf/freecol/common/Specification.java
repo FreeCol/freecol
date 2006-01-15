@@ -9,6 +9,7 @@ import java.util.List;
 
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.BuildingType;
+import net.sf.freecol.common.model.TileType;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -26,6 +27,7 @@ import com.sun.org.apache.xerces.internal.parsers.SAXParser;
 public final class Specification
 {
     private final  List  buildingTypeList;
+    private final  List  tileTypeList;
 
 
     // ----------------------------------------------------------- constructors
@@ -34,6 +36,7 @@ public final class Specification
 
         try {
             buildingTypeList = new ArrayList();
+            tileTypeList = new ArrayList();
 
             SAXParser  parser = new SAXParser();
             parser.setContentHandler( new XmlHandler() );
@@ -63,11 +66,24 @@ public final class Specification
     }
 
 
+    public int numberOfTileTypes() {
+
+        return tileTypeList.size();
+    }
+
+
+    public TileType tileType( int tileTypeIndex ) {
+
+        return (TileType) tileTypeList.get( tileTypeIndex );
+    }
+
+
     // ----------------------------------------------------------- nested types
 
     private final class XmlHandler extends DefaultHandler {
 
         private  BuildingType  contextBuildingType;
+        private  TileType      contextTileType;
 
         public void startElement( String      namespaceUuri,
                                   String      localName,
@@ -96,6 +112,27 @@ public final class Specification
                     );
                 contextBuildingType.add( level );
             }
+            else if ( "tile-types".equals(elementName) ) {
+
+                // do nothing
+            }
+            else if ( "tile-type".equals(elementName) ) {
+
+                contextTileType =
+                    new TileType( Messages.message(attributes.getValue("name")),
+                                  Integer.parseInt(attributes.getValue("basic-move-cost")),
+                                  Integer.parseInt(attributes.getValue("defence-bonus")) );
+
+            }
+            else if ( "when-forested".equals(elementName) ) {
+
+                TileType  tileType =
+                    new TileType( Messages.message(attributes.getValue("name")),
+                                  Integer.parseInt(attributes.getValue("basic-move-cost")),
+                                  Integer.parseInt(attributes.getValue("defence-bonus")) );
+
+                contextTileType.whenForested = tileType;
+            }
             else {
                 throw new RuntimeException( elementName );
             }
@@ -116,8 +153,22 @@ public final class Specification
             else if ( "building-type".equals(elementName) ) {
 
                 buildingTypeList.add( contextBuildingType );
+                contextBuildingType = null;
             }
             else if ( "building-level".equals(elementName) ) {
+
+                // do nothing
+            }
+            else if ( "tile-types".equals(elementName) ) {
+
+                // do nothing
+            }
+            else if ( "tile-type".equals(elementName) ) {
+
+                tileTypeList.add( contextTileType );
+                contextTileType = null;
+            }
+            else if ( "when-forested".equals(elementName) ) {
 
                 // do nothing
             }
