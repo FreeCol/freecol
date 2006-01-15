@@ -328,6 +328,30 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     }
 
 
+   
+    /**
+     * Returns a worktype for a unit.
+     *
+     * @param unit a <code>Unit</code> value
+     * @return a workType
+     */
+    public int getWorkType(Unit unit) {
+        int workType = unit.getWorkType();
+        int amount = unit.getFarmedPotential(workType, workTile);
+        if (amount == 0) {
+            for (int goods = 0; goods < Goods.NUMBER_OF_TYPES; goods++) {
+                if (Goods.isFarmedGoods(goods)) {
+                    int newAmount = unit.getFarmedPotential(goods, workTile);
+                    if (newAmount > amount) {
+                        amount = newAmount;
+                        workType = goods;
+                    }
+                }
+            }
+        }
+        return workType;
+    }
+    
     /**
     * Returns the production of the given type of goods.
     */

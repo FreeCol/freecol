@@ -1489,6 +1489,12 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
                             inGameController.work(unit, colonyTile);
 
+                            // check whether worktype is suitable
+                            int workType = colonyTile.getWorkType(unit);
+                            if (workType != unit.getWorkType()) {
+                                inGameController.changeWorkType(unit, workType);
+                            }
+                            
                             updateBuildingBox();
                             updateWarehouse();
 
