@@ -152,9 +152,15 @@ public class IndianDemandMission extends Mission {
                         if (unit.getOwner().getTension(enemy) >=
                             Player.TENSION_ANGRY) {
                             // if we didn't get what we wanted, attack
-                            getAIUnit().setMission(new UnitSeekAndDestroyMission(getAIMain(),
-                                                                                 getAIUnit(),
-                                                                                 target));
+                            Element element = Message.createNewRootElement("attack");
+                            element.setAttribute("unit", unit.getID());
+                            element.setAttribute("direction", Integer.toString(r));
+
+                            try {
+                                connection.ask(element);
+                            } catch (IOException e) {
+                                logger.warning("Could not send message!");
+                            }
                         }
                     }
                 
