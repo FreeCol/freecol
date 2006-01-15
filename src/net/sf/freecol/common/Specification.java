@@ -7,6 +7,10 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.TileType;
@@ -15,8 +19,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
-
-import com.sun.org.apache.xerces.internal.parsers.SAXParser;
 
 
 /**
@@ -38,16 +40,15 @@ public final class Specification
             buildingTypeList = new ArrayList();
             tileTypeList = new ArrayList();
 
-            SAXParser  parser = new SAXParser();
-            parser.setContentHandler( new XmlHandler() );
+            SAXParser  parser = SAXParserFactory.newInstance().newSAXParser();            
             InputStream  in = Specification.class.getResourceAsStream("specification.xml");
-            parser.parse( new InputSource(in) );
-        }
-        catch ( SAXException e ) {
+            parser.parse(new InputSource(in), new XmlHandler());
+        } catch ( SAXException e ) {
             throw new RuntimeException( e );
-        }
-        catch ( IOException e ) {
+        } catch ( IOException e ) {
             throw new RuntimeException( e );
+        } catch (ParserConfigurationException f) {
+            throw new RuntimeException( f );
         }
     }
 
