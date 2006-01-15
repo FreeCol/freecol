@@ -117,6 +117,38 @@ public final class Canvas extends JLayeredPane {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
+    public static final Integer START_GAME_LAYER = DEFAULT_LAYER,
+                                SERVER_LIST_LAYER = DEFAULT_LAYER,
+                                VICTORY_LAYER = DEFAULT_LAYER,
+                                CHAT_LAYER = DEFAULT_LAYER,
+                                NEW_GAME_LAYER = DEFAULT_LAYER,
+                                MODEL_MESSAGE_LAYER = new Integer(DEFAULT_LAYER.intValue() + 11),
+                                CONFIRM_LAYER = new Integer(DEFAULT_LAYER.intValue() + 12),
+                                GAME_OPTIONS_LAYER = new Integer(DEFAULT_LAYER.intValue() + 9),
+                                CLIENT_OPTIONS_LAYER = new Integer(DEFAULT_LAYER.intValue() + 9),
+                                LOAD_LAYER = new Integer(DEFAULT_LAYER.intValue() + 10),
+                                SAVE_LAYER = new Integer(DEFAULT_LAYER.intValue() + 10),
+                                SCOUT_INDIAN_SETTLEMENT_LAYER = new Integer(DEFAULT_LAYER.intValue() + 9),
+                                USE_MISSIONARY_LAYER = new Integer(DEFAULT_LAYER.intValue() + 9),
+                                INCITE_LAYER = new Integer(DEFAULT_LAYER.intValue() + 9),
+                                INPUT_LAYER = new Integer(DEFAULT_LAYER.intValue() + 11),
+                                CHOICE_LAYER = new Integer(DEFAULT_LAYER.intValue() + 11),
+                                STATUS_LAYER = new Integer(DEFAULT_LAYER.intValue() + 7),
+                                COLOPEDIA_LAYER = new Integer(DEFAULT_LAYER.intValue() + 1),
+                                REPORT_LAYER = new Integer(DEFAULT_LAYER.intValue() + 1),
+                                MAIN_LAYER = DEFAULT_LAYER,
+                                QUIT_LAYER = new Integer(DEFAULT_LAYER.intValue() + 15),
+                                INFORMATION_LAYER = new Integer(DEFAULT_LAYER.intValue() + 13),
+                                ERROR_LAYER = new Integer(DEFAULT_LAYER.intValue() + 13),
+                                EMIGRATION_LAYER = new Integer(DEFAULT_LAYER.intValue() + 1),
+                                MONARCH_LAYER = new Integer(DEFAULT_LAYER.intValue() + 1),
+                                TILE_LAYER = new Integer(DEFAULT_LAYER.intValue() + 1),
+                                INDIAN_SETTLEMENT_LAYER = DEFAULT_LAYER,
+                                COLONY_LAYER = DEFAULT_LAYER,
+                                EUROPE_LAYER = DEFAULT_LAYER,
+                                EVENT_LAYER = new Integer(DEFAULT_LAYER.intValue() + 1),
+                                CHOOSE_FOUNDING_FATHER = new Integer(DEFAULT_LAYER.intValue() + 1);                                
+    
     private final FreeColClient     freeColClient;
 
     private final MainPanel         mainPanel;
@@ -292,13 +324,13 @@ public final class Canvas extends JLayeredPane {
         if (game != null && player != null) {
             startGamePanel.initialize(singlePlayerMode);
             startGamePanel.setLocation(getWidth() / 2 - startGamePanel.getWidth() / 2, getHeight() / 2 - startGamePanel.getHeight() / 2);
-            add(startGamePanel);
+            add(startGamePanel, START_GAME_LAYER);
             startGamePanel.requestFocus();
         } else {
             logger.warning("Tried to open 'StartGamePanel' without having 'game' and/or 'player' set.");
         }
     }
-
+    
 
     /**
     * Displays the <code>ServerListPanel</code>.
@@ -314,7 +346,7 @@ public final class Canvas extends JLayeredPane {
 
         serverListPanel.initialize(username, serverList);
         serverListPanel.setLocation(getWidth() / 2 - serverListPanel.getWidth() / 2, getHeight() / 2 - serverListPanel.getHeight() / 2);
-        add(serverListPanel);
+        add(serverListPanel, SERVER_LIST_LAYER);
         serverListPanel.requestFocus();
     }
 
@@ -331,7 +363,7 @@ public final class Canvas extends JLayeredPane {
         victoryPanel.requestFocus();
     }
 
-
+    
     /**
     * Displays the <code>ChatPanel</code>.
     * @see ChatPanel
@@ -355,7 +387,7 @@ public final class Canvas extends JLayeredPane {
         add(newPanel);
         newPanel.requestFocus();
     }
-
+    
 
     /**
     * Displays a <code>ModelMessage</code> in a modal dialog.
@@ -410,7 +442,7 @@ public final class Canvas extends JLayeredPane {
                 FreeColDialog confirmDialog = FreeColDialog.createConfirmDialog(message, okText, cancelText);
                 confirmDialog.setLocation(getWidth() / 2 - confirmDialog.getWidth() / 2,
                                           getHeight() / 2 - confirmDialog.getHeight() / 2);
-                add(confirmDialog, new Integer(POPUP_LAYER.intValue() - 1));
+                add(confirmDialog, MODEL_MESSAGE_LAYER);
                 confirmDialog.requestFocus();
 
                 if (!confirmDialog.getResponseBoolean()) {
@@ -429,7 +461,7 @@ public final class Canvas extends JLayeredPane {
             } else {
                 FreeColDialog informationDialog = FreeColDialog.createInformationDialog(message, okText);
                 informationDialog.setLocation(getWidth() / 2 - informationDialog.getWidth() / 2, getHeight() / 2 - informationDialog.getHeight() / 2);
-                add(informationDialog, new Integer(POPUP_LAYER.intValue() - 1));
+                add(informationDialog, MODEL_MESSAGE_LAYER);
                 informationDialog.requestFocus();
 
                 informationDialog.getResponse();
@@ -479,7 +511,7 @@ public final class Canvas extends JLayeredPane {
         FreeColDialog confirmDialog = FreeColDialog.createConfirmDialog(text, okText, cancelText);
         confirmDialog.setLocation(getWidth() / 2 - confirmDialog.getWidth() / 2,
                                   getHeight() / 2 - confirmDialog.getHeight() / 2);
-        add(confirmDialog, new Integer(POPUP_LAYER.intValue() - 1));
+        add(confirmDialog, CONFIRM_LAYER);
         confirmDialog.requestFocus();
 
         boolean response = confirmDialog.getResponseBoolean();
@@ -520,7 +552,7 @@ public final class Canvas extends JLayeredPane {
         gameOptionsDialog.initialize();
 
         gameOptionsDialog.setLocation(getWidth() / 2 - gameOptionsDialog.getWidth() / 2, getHeight() / 2 - gameOptionsDialog.getHeight() / 2);
-        add(gameOptionsDialog, new Integer(POPUP_LAYER.intValue() - 2));
+        add(gameOptionsDialog, GAME_OPTIONS_LAYER);
         gameOptionsDialog.requestFocus();
 
         boolean r = gameOptionsDialog.getResponseBoolean();
@@ -539,7 +571,7 @@ public final class Canvas extends JLayeredPane {
         clientOptionsDialog.initialize();
 
         clientOptionsDialog.setLocation(getWidth() / 2 - clientOptionsDialog.getWidth() / 2, getHeight() / 2 - clientOptionsDialog.getHeight() / 2);
-        add(clientOptionsDialog, new Integer(POPUP_LAYER.intValue() - 2));
+        add(clientOptionsDialog, CLIENT_OPTIONS_LAYER);
         clientOptionsDialog.requestFocus();
 
         boolean r = clientOptionsDialog.getResponseBoolean();
@@ -576,7 +608,7 @@ public final class Canvas extends JLayeredPane {
     public File showLoadDialog(File directory, FileFilter[] fileFilters) {
         FreeColDialog loadDialog = FreeColDialog.createLoadDialog(directory, fileFilters);
         loadDialog.setLocation(getWidth() / 2 - loadDialog.getWidth() / 2, getHeight() / 2 - loadDialog.getHeight() / 2);
-        add(loadDialog, new Integer(MODAL_LAYER.intValue()-1));
+        add(loadDialog, LOAD_LAYER);
         loadDialog.requestFocus();
 
         File response = (File) loadDialog.getResponse();
@@ -621,7 +653,7 @@ public final class Canvas extends JLayeredPane {
     public File showSaveDialog(File directory, String standardName, FileFilter[] fileFilters) {
         FreeColDialog saveDialog = FreeColDialog.createSaveDialog(directory, standardName, fileFilters);
         saveDialog.setLocation(getWidth() / 2 - saveDialog.getWidth() / 2, getHeight() / 2 - saveDialog.getHeight() / 2);
-        add(saveDialog, new Integer(MODAL_LAYER.intValue()-1));
+        add(saveDialog, SAVE_LAYER);
         saveDialog.requestFocus();
 
         File response = (File) saveDialog.getResponse();
@@ -646,7 +678,7 @@ public final class Canvas extends JLayeredPane {
     public int showScoutIndianSettlementDialog(IndianSettlement settlement) {
         FreeColDialog scoutDialog = FreeColDialog.createScoutIndianSettlementDialog(settlement, freeColClient.getMyPlayer());
         scoutDialog.setLocation(getWidth() / 2 - scoutDialog.getWidth() / 2, getHeight() / 2 - scoutDialog.getHeight() / 2);
-        add(scoutDialog, new Integer(POPUP_LAYER.intValue() - 1));
+        add(scoutDialog, SCOUT_INDIAN_SETTLEMENT_LAYER);
         scoutDialog.requestFocus();
 
         int response = scoutDialog.getResponseInt();
@@ -675,7 +707,7 @@ public final class Canvas extends JLayeredPane {
     public List showUseMissionaryDialog(IndianSettlement settlement) {
         FreeColDialog missionaryDialog = FreeColDialog.createUseMissionaryDialog(settlement, freeColClient.getMyPlayer());
         missionaryDialog.setLocation(getWidth() / 2 - missionaryDialog.getWidth() / 2, getHeight() / 2 - missionaryDialog.getHeight() / 2);
-        add(missionaryDialog, new Integer(POPUP_LAYER.intValue() - 1));
+        add(missionaryDialog, USE_MISSIONARY_LAYER);
         missionaryDialog.requestFocus();
 
         Integer response = (Integer)missionaryDialog.getResponse();
@@ -687,7 +719,7 @@ public final class Canvas extends JLayeredPane {
         if (response.intValue() == FreeColDialog.MISSIONARY_INCITE_INDIANS) {
             FreeColDialog inciteDialog = FreeColDialog.createInciteDialog(freeColClient.getGame().getEuropeanPlayers(), freeColClient.getMyPlayer());
             inciteDialog.setLocation(getWidth() / 2 - inciteDialog.getWidth() / 2, getHeight() / 2 - inciteDialog.getHeight() / 2);
-            add(inciteDialog, new Integer(POPUP_LAYER.intValue() - 1));
+            add(inciteDialog, USE_MISSIONARY_LAYER);
             inciteDialog.requestFocus();
 
             Player response2 = (Player)inciteDialog.getResponse();
@@ -722,7 +754,7 @@ public final class Canvas extends JLayeredPane {
 
         FreeColDialog confirmDialog = FreeColDialog.createConfirmDialog(message, Messages.message("yes"), Messages.message("no"));
         confirmDialog.setLocation(getWidth() / 2 - confirmDialog.getWidth() / 2, getHeight() / 2 - confirmDialog.getHeight() / 2);
-        add(confirmDialog, new Integer(POPUP_LAYER.intValue() - 1));
+        add(confirmDialog, INCITE_LAYER);
         confirmDialog.requestFocus();
         boolean result = confirmDialog.getResponseBoolean();
         remove(confirmDialog);
@@ -756,7 +788,7 @@ public final class Canvas extends JLayeredPane {
 
         FreeColDialog inputDialog = FreeColDialog.createInputDialog(text, defaultValue, okText, cancelText);
         inputDialog.setLocation(getWidth() / 2 - inputDialog.getWidth() / 2, getHeight() / 2 - inputDialog.getHeight() / 2);
-        add(inputDialog, new Integer(POPUP_LAYER.intValue() - 1));
+        add(inputDialog, INPUT_LAYER);
         inputDialog.requestFocus();
 
         String response = (String) inputDialog.getResponse();
@@ -778,13 +810,13 @@ public final class Canvas extends JLayeredPane {
 
             do {
                 remove(inputDialog);
-                add(informationDialog, new Integer(POPUP_LAYER.intValue() - 1));
+                add(informationDialog, INPUT_LAYER);
                 informationDialog.requestFocus();
 
                 informationDialog.getResponse();
                 remove(informationDialog);
 
-                add(inputDialog, new Integer(POPUP_LAYER.intValue() - 1));
+                add(inputDialog, INPUT_LAYER);
                 inputDialog.requestFocus();
 
                 response = (String) inputDialog.getResponse();
@@ -840,7 +872,7 @@ public final class Canvas extends JLayeredPane {
 
         FreeColDialog choiceDialog = FreeColDialog.createChoiceDialog(text, cancelText, objects);
         choiceDialog.setLocation(getWidth() / 2 - choiceDialog.getWidth() / 2, getHeight() / 2 - choiceDialog.getHeight() / 2);
-        add(choiceDialog, new Integer(POPUP_LAYER.intValue() - 1));
+        add(choiceDialog, CHOICE_LAYER);
         choiceDialog.requestFocus();
 
         Object response = choiceDialog.getResponse();
@@ -849,7 +881,7 @@ public final class Canvas extends JLayeredPane {
         return response;
     }
 
-
+    
     /**
     * Shows a status message that cannot be dismissed.
     * The panel will be removed when another component
@@ -866,9 +898,9 @@ public final class Canvas extends JLayeredPane {
         statusPanel.setStatusMessage(message);
 
         statusPanel.setLocation(getWidth() / 2 - statusPanel.getWidth() / 2, getHeight() / 2 - statusPanel.getHeight() / 2);
-        add(statusPanel, new Integer(POPUP_LAYER.intValue() - 10));
+        add(statusPanel, STATUS_LAYER);
     }
-
+    
 
     /**
     * Closes the <code>StatusPanel</code>.
@@ -887,7 +919,7 @@ public final class Canvas extends JLayeredPane {
 
         colopediaPanel.setLocation(getWidth() / 2 - colopediaPanel.getWidth() / 2, getHeight() / 2 - colopediaPanel.getHeight() / 2);
         setEnabled(false);
-        add(colopediaPanel, JLayeredPane.PALETTE_LAYER);
+        add(colopediaPanel, COLOPEDIA_LAYER);
         colopediaPanel.requestFocus();
     }
 
@@ -917,7 +949,7 @@ public final class Canvas extends JLayeredPane {
             reportPanel.initialize();
             reportPanel.setLocation(getWidth() / 2 - reportPanel.getWidth() / 2, getHeight() / 2 - reportPanel.getHeight() / 2);
             setEnabled(false);
-            add(reportPanel, JLayeredPane.PALETTE_LAYER);
+            add(reportPanel, REPORT_LAYER);
             reportPanel.requestFocus();
         }
     }
@@ -933,7 +965,7 @@ public final class Canvas extends JLayeredPane {
         chooseFoundingFatherDialog.initialize(possibleFoundingFathers);
 
         chooseFoundingFatherDialog.setLocation(getWidth() / 2 - chooseFoundingFatherDialog.getWidth() / 2, getHeight() / 2 - chooseFoundingFatherDialog.getHeight() / 2);
-        add(chooseFoundingFatherDialog, new Integer(POPUP_LAYER.intValue() - 1));
+        add(chooseFoundingFatherDialog, CHOOSE_FOUNDING_FATHER);
         setEnabled(false);
         chooseFoundingFatherDialog.requestFocus();
 
@@ -944,7 +976,7 @@ public final class Canvas extends JLayeredPane {
 
         return response;
     }
-
+    
 
     /**
      * Gets the dialog which is used for choosing a founding father.
@@ -964,7 +996,7 @@ public final class Canvas extends JLayeredPane {
         eventPanel.initialize(eventID);
 
         eventPanel.setLocation(getWidth() / 2 - eventPanel.getWidth() / 2, getHeight() / 2 - eventPanel.getHeight() / 2);
-        add(eventPanel, new Integer(POPUP_LAYER.intValue() - 1));
+        add(eventPanel, EVENT_LAYER);
         setEnabled(false);
         eventPanel.requestFocus();
 
@@ -1000,7 +1032,7 @@ public final class Canvas extends JLayeredPane {
             europePanel.setLocation(getWidth() / 2 - europePanel.getWidth() / 2,
                                     getHeight() / 2 - europePanel.getHeight() / 2);
             setEnabled(false);
-            add(europePanel);
+            add(europePanel, EUROPE_LAYER);
 
             europePanel.requestFocus();
         }
@@ -1019,7 +1051,7 @@ public final class Canvas extends JLayeredPane {
         colonyPanel.setLocation(getWidth() / 2 - colonyPanel.getWidth() / 2,
                                 getHeight() / 2 - colonyPanel.getHeight() / 2);
         setEnabled(false);
-        add(colonyPanel);
+        add(colonyPanel, COLONY_LAYER);
 
         colonyPanel.requestFocus();
     }
@@ -1038,7 +1070,7 @@ public final class Canvas extends JLayeredPane {
                                 getWidth() / 2 - indianSettlementPanel.getWidth() / 2,
                                 getHeight() / 2 - indianSettlementPanel.getHeight() / 2);
 
-        add(indianSettlementPanel);
+        add(indianSettlementPanel, INDIAN_SETTLEMENT_LAYER);
 
         indianSettlementPanel.requestFocus();
 
@@ -1047,6 +1079,7 @@ public final class Canvas extends JLayeredPane {
         remove(indianSettlementPanel);
     }
 
+    
     /**
     * Displays the tile panel of the given <code>Tile</code>.
     * @param tile The tile whose panel needs to be displayed.
@@ -1059,7 +1092,7 @@ public final class Canvas extends JLayeredPane {
         tilePanel.setLocation(getWidth() / 2 - tilePanel.getWidth() / 2,
                               getHeight() / 2 - tilePanel.getHeight() / 2);
 
-        add(tilePanel);
+        add(tilePanel, TILE_LAYER);
 
         tilePanel.requestFocus();
 
@@ -1068,6 +1101,7 @@ public final class Canvas extends JLayeredPane {
         remove(tilePanel);
     }
 
+    
     /**
      * Displays the monarch action panel.
      * @param action The monarch action.
@@ -1082,7 +1116,7 @@ public final class Canvas extends JLayeredPane {
         monarchPanel.setLocation(getWidth() / 2 - monarchPanel.getWidth() / 2,
                                  getHeight() / 2 - monarchPanel.getHeight() / 2);
 
-        add(monarchPanel);
+        add(monarchPanel, MONARCH_LAYER);
 
         monarchPanel.requestFocus();
 
@@ -1093,6 +1127,7 @@ public final class Canvas extends JLayeredPane {
         return response;
     }
 
+    
     /**
     * Shows the panel that allows the user to choose which unit will emigrate
     * from Europe. This method may only be called if the user has William Brewster
@@ -1103,7 +1138,7 @@ public final class Canvas extends JLayeredPane {
         emigrationPanel.initialize(freeColClient.getMyPlayer().getEurope());
 
         emigrationPanel.setLocation(getWidth() / 2 - emigrationPanel.getWidth() / 2, getHeight() / 2 - emigrationPanel.getHeight() / 2);
-        add(emigrationPanel, new Integer(PALETTE_LAYER.intValue() - 1));
+        add(emigrationPanel, EMIGRATION_LAYER);
         emigrationPanel.requestFocus();
 
         int response = emigrationPanel.getResponseInt();
@@ -1337,7 +1372,7 @@ public final class Canvas extends JLayeredPane {
         errorPanel.initialize(message);
         errorPanel.setLocation(getWidth() / 2 - errorPanel.getWidth() / 2, getHeight() / 2 - errorPanel.getHeight() / 2);
         //setEnabled(false);
-        add(errorPanel, JLayeredPane.MODAL_LAYER);
+        add(errorPanel, ERROR_LAYER);
         errorPanel.requestFocus();
         errorPanel.getResponse();
         closeErrorPanel();
@@ -1378,7 +1413,7 @@ public final class Canvas extends JLayeredPane {
 
         infoDialog.setLocation(getWidth() / 2 - infoDialog.getWidth() / 2,
                                getHeight() / 2 - infoDialog.getHeight() / 2);
-        add(infoDialog, new Integer(POPUP_LAYER.intValue() - 1));
+        add(infoDialog, INFORMATION_LAYER);
         infoDialog.requestFocus();
 
         infoDialog.getResponse();
@@ -1464,11 +1499,11 @@ public final class Canvas extends JLayeredPane {
     public void showMainPanel() {
         closeMenus();
         mainPanel.setLocation(getWidth() / 2 - mainPanel.getWidth() / 2, getHeight() / 2 - mainPanel.getHeight() / 2);
-        add(mainPanel);
+        add(mainPanel, MAIN_LAYER);
         mainPanel.requestFocus();
     }
 
-
+    
     /**
     * Closes the {@link MainPanel}.
     */
@@ -1604,12 +1639,12 @@ public final class Canvas extends JLayeredPane {
     */
     public boolean confirmQuitDialog() {
         quitDialog.setLocation(getWidth() / 2 - quitDialog.getWidth() / 2, getHeight() / 2 - quitDialog.getHeight() / 2);
-        add(quitDialog, JLayeredPane.POPUP_LAYER);
+        add(quitDialog, QUIT_LAYER);
         quitDialog.requestFocus();
 
         return quitDialog.getResponseBoolean();
     }
-
+    
 
     /**
     * Returns this <code>Canvas</code>'s <code>GUI</code>.
