@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.SwingConstants;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -26,7 +27,7 @@ public final class QuitDialog extends FreeColDialog implements ActionListener {
                                 CANCEL = 1;
 
     private final Canvas    parent;
-    private JButton         ok = new JButton("Yes");
+    private JButton         ok = new JButton(Messages.message("yes"));
     private JButton         cancel;
     
     
@@ -46,7 +47,7 @@ public final class QuitDialog extends FreeColDialog implements ActionListener {
 
         cancel = new JButton( Messages.message("no") );
         JLabel qLabel = new JLabel( Messages.message("areYouSureYouWantToQuit") );
-        qLabel.setHorizontalAlignment(JLabel.CENTER);
+        qLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
 //        qLabel.setSize(200, 20);
 //        ok.setSize(60, 20);

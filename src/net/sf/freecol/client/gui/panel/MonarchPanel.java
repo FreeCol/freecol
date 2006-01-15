@@ -1,6 +1,7 @@
 
 package net.sf.freecol.client.gui.panel;
 
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -15,16 +16,19 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Monarch;
 
+
 /**
  * This panel is used to show information about a tile.
  */
 public final class MonarchPanel extends FreeColDialog implements ActionListener {
+
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
@@ -51,9 +55,9 @@ public final class MonarchPanel extends FreeColDialog implements ActionListener 
 
         setLayout(new BorderLayout());
         
-        header = new JLabel("", JLabel.CENTER);
+        header = new JLabel("", SwingConstants.CENTER);
         header.setFont(((Font) UIManager.get("HeaderFont")).deriveFont(0, 36));
-        header.setText("A message from the Crown");
+        header.setText(Messages.message("aMessageFromTheCrown"));
         
         header.setAlignmentX(Component.CENTER_ALIGNMENT);
         add(header, BorderLayout.PAGE_START);
@@ -63,7 +67,7 @@ public final class MonarchPanel extends FreeColDialog implements ActionListener 
         imageLabel.setIcon(new ImageIcon(image));
         add(imageLabel, BorderLayout.LINE_START);
 
-        textLabel = new JLabel("", JLabel.CENTER);
+        textLabel = new JLabel("", SwingConstants.CENTER);
         textLabel.setPreferredSize(new Dimension(180, 380));
         add(textLabel, BorderLayout.LINE_END);
 
@@ -162,4 +166,5 @@ public final class MonarchPanel extends FreeColDialog implements ActionListener 
             logger.warning("Invalid Actioncommand: not a number.");
         }
     }
+
 }

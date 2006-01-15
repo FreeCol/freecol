@@ -52,7 +52,7 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
      * @param parent The parent of this panel.
      */
     public ReportTradePanel(Canvas parent) {
-        super(parent, "Trade Advisor");
+        super(parent, Messages.message("menuBar.report.trade"));
         goodsLabels = new JLabel[Goods.NUMBER_OF_TYPES];
         for (int i = 0; i < goodsLabels.length; i++) {
             goodsLabels[i] = new JLabel(parent.getImageProvider().getGoodsImageIcon(i));

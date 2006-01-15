@@ -25,6 +25,7 @@ import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
@@ -150,12 +151,12 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         JButton recruitButton = new JButton( Messages.message("recruit") ),
                 purchaseButton = new JButton( Messages.message("purchase") ),
                 trainButton = new JButton( Messages.message("train") );
-        JScrollPane toAmericaScroll = new JScrollPane(toAmericaPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER),
-                    toEuropeScroll = new JScrollPane(toEuropePanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER),
-                    inPortScroll = new JScrollPane(inPortPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER),
-                    docksScroll = new JScrollPane(docksPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER),
-                    cargoScroll = new JScrollPane(cargoPanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED),
-                    marketScroll = new JScrollPane(marketPanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        JScrollPane toAmericaScroll = new JScrollPane(toAmericaPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER),
+                    toEuropeScroll = new JScrollPane(toEuropePanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER),
+                    inPortScroll = new JScrollPane(inPortPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER),
+                    docksScroll = new JScrollPane(docksPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER),
+                    cargoScroll = new JScrollPane(cargoPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED),
+                    marketScroll = new JScrollPane(marketPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
                 toAmericaLabel = new JLabel( Messages.message("goingToAmerica") );
         JLabel  toEuropeLabel = new JLabel( Messages.message("goingToEurope") ),
                 inPortLabel = new JLabel( Messages.message("inPort") ),
@@ -384,7 +385,6 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             }
         }
 
-        Player player = freeColClient.getMyPlayer();
         for (int i = 0; i < Goods.NUMBER_OF_TYPES; i++) {
             MarketLabel marketLabel = new MarketLabel(i, game.getMarket(), parent);
             marketLabel.setTransferHandler(defaultTransferHandler);
@@ -860,10 +860,10 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                         revalidate();
                         europePanel.refresh();
                         return comp;
-                    } else {
-                        inGameController.payArrears(label.getType());
-                        return null;
                     }
+
+                    inGameController.payArrears(label.getType());
+                    return null;
                 } else {
                     logger.warning("An invalid component got dropped on this CargoPanel.");
                     return null;
@@ -936,10 +936,10 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     setSelectedUnitLabel(t);
 
                     return comp;
-                } else {
-                    logger.warning("An invalid component got dropped on this MarketPanel.");
-                    return null;
                 }
+
+                logger.warning("An invalid component got dropped on this MarketPanel.");
+                return null;
             }
             europePanel.refresh();
             return comp;
@@ -1482,8 +1482,8 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
 
             ActionListener actionListener = this;
 
-            JLabel  question = new JLabel("Click one of the following individuals to"),
-                    question2 = new JLabel("train them."),
+            JLabel  question = new JLabel(Messages.message("clickOneOfTheFollowingIndividuals")),
+                    question2 = new JLabel(Messages.message("trainThem")),
                     expertOreMinerLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.EXPERT_ORE_MINER))),
                     expertLumberJackLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.EXPERT_LUMBER_JACK))),
                     masterGunsmithLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.MASTER_GUNSMITH))),
@@ -1501,7 +1501,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     firebrandPreacherLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.FIREBRAND_PREACHER))),
                     elderStatesmanLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.ELDER_STATESMAN))),
                     veteranSoldierLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.VETERAN_SOLDIER)));
-            cancel = new JButton("Cancel");
+            cancel = new JButton(Messages.message("cancel"));
             setCancelComponent(cancel);
 
             expertOreMinerButton = new JButton(Unit.getName(Unit.EXPERT_ORE_MINER));

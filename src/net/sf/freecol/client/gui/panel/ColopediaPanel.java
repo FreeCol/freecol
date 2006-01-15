@@ -1,4 +1,6 @@
+
 package net.sf.freecol.client.gui.panel;
+
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -17,6 +19,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
@@ -31,10 +34,12 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 
+
 /**
 * This panel displays the Colopedia.
 */
 public final class ColopediaPanel extends FreeColPanel implements ActionListener {
+
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
@@ -163,7 +168,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         
         setLayout(new BorderLayout());
         
-        header = new JLabel("Colonizopedia", JLabel.CENTER);
+        header = new JLabel(Messages.message("menuBar.colopedia"), SwingConstants.CENTER);
         header.setFont(((Font) UIManager.get("HeaderFont")).deriveFont(0, 48));
         header.setBorder(new EmptyBorder(20, 0, 0, 0));
         add(header, BorderLayout.NORTH);
@@ -234,20 +239,20 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      */
     private void buildTerrainList() {
         listPanel.setLayout(new GridLayout(7, 2));
-        buildTerrainButton("Plains",     Tile.PLAINS);
-        buildTerrainButton("Grasslands", Tile.GRASSLANDS);
-        buildTerrainButton("Prairie",    Tile.PRAIRIE);
-        buildTerrainButton("Savannah",   Tile.SAVANNAH);
-        buildTerrainButton("Marsh",      Tile.MARSH);
-        buildTerrainButton("Swamp",      Tile.SWAMP);
-        buildTerrainButton("Desert",     Tile.DESERT);
-        buildTerrainButton("Tundra",     Tile.TUNDRA);
-        buildTerrainButton("Arctic",     Tile.ARCTIC);
-        buildTerrainButton("Ocean",      Tile.OCEAN);
-        buildTerrainButton("High Seas",  Tile.HIGH_SEAS);
-        buildTerrainButton("Forest",     ImageLibrary.FOREST);
-        buildTerrainButton("Hill",       ImageLibrary.HILLS);
-        buildTerrainButton("Mountain",   ImageLibrary.MOUNTAINS);
+        buildTerrainButton(Tile.PLAINS);
+        buildTerrainButton(Tile.GRASSLANDS);
+        buildTerrainButton(Tile.PRAIRIE);
+        buildTerrainButton(Tile.SAVANNAH);
+        buildTerrainButton(Tile.MARSH);
+        buildTerrainButton(Tile.SWAMP);
+        buildTerrainButton(Tile.DESERT);
+        buildTerrainButton(Tile.TUNDRA);
+        buildTerrainButton(Tile.ARCTIC);
+        buildTerrainButton(Tile.OCEAN);
+        buildTerrainButton(Tile.HIGH_SEAS);
+        buildTerrainButton(Messages.message("forest"),    ImageLibrary.FOREST);
+        buildTerrainButton(Messages.message("hills"),     ImageLibrary.HILLS);
+        buildTerrainButton(Messages.message("mountains"), ImageLibrary.MOUNTAINS);
     }
 
     /**
@@ -388,7 +393,16 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     private void buildTerrainButton(String name, int terrain) {
         ImageIcon icon = new ImageIcon(library.getTerrainImage(terrain, 0, 0));
         JButton button = new JButton(name, icon);
-        button.setHorizontalAlignment(JButton.LEFT);
+        button.setHorizontalAlignment(SwingConstants.LEFT);
+        button.setActionCommand(String.valueOf(terrain));
+        button.addActionListener(this);
+        listPanel.add(button);
+    }
+
+    private void buildTerrainButton(int terrain) {
+        ImageIcon icon = new ImageIcon(library.getTerrainImage(terrain, 0, 0));
+        JButton button = new JButton(FreeCol.specification.tileType(terrain).name, icon);
+        button.setHorizontalAlignment(SwingConstants.LEFT);
         button.setActionCommand(String.valueOf(terrain));
         button.addActionListener(this);
         listPanel.add(button);
@@ -413,13 +427,13 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
               icon = new ImageIcon(image);
             }
             button = new JButton(name, icon);
-            button.setVerticalAlignment(JButton.TOP);
-            button.setVerticalTextPosition(JButton.TOP);
+            button.setVerticalAlignment(SwingConstants.TOP);
+            button.setVerticalTextPosition(SwingConstants.TOP);
         }
         else {
             button = new JButton(name);
         }
-        button.setHorizontalAlignment(JButton.LEFT);
+        button.setHorizontalAlignment(SwingConstants.LEFT);
         button.setActionCommand(String.valueOf(unit));
         button.addActionListener(this);
         listPanel.add(button);
@@ -434,7 +448,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         String name = Goods.getName(goods);
         ImageIcon icon = library.getGoodsImageIcon(goodsIcon);
         JButton button = new JButton(name, icon);
-        button.setHorizontalAlignment(JButton.LEFT);
+        button.setHorizontalAlignment(SwingConstants.LEFT);
         button.setActionCommand(String.valueOf(goods));
         button.addActionListener(this);
         listPanel.add(button);
@@ -473,7 +487,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         detailPanel.removeAll();
         detailPanel.setLayout(new FlowLayout());
 
-        JLabel name = new JLabel("Terrain", JLabel.CENTER);
+        JLabel name = new JLabel("Terrain", SwingConstants.CENTER);
         name.setFont(((Font) UIManager.get("HeaderFont")).deriveFont(0, 24));
         name.setPreferredSize(new Dimension(detailPanel.getWidth(), 50));
         detailPanel.add(name);
@@ -556,7 +570,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         detailPanel.removeAll();
         detailPanel.setLayout(new FlowLayout());
 
-        JLabel name = new JLabel(Unit.getName(unit), JLabel.CENTER);
+        JLabel name = new JLabel(Unit.getName(unit), SwingConstants.CENTER);
         name.setFont(((Font) UIManager.get("HeaderFont")).deriveFont(0, 24));
         name.setPreferredSize(new Dimension(detailPanel.getWidth(), 50));
         detailPanel.add(name);
@@ -584,7 +598,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         detailPanel.removeAll();
         detailPanel.setLayout(new FlowLayout());
 
-        JLabel name = new JLabel(Goods.getName(goods), JLabel.CENTER);
+        JLabel name = new JLabel(Goods.getName(goods), SwingConstants.CENTER);
         name.setFont(((Font) UIManager.get("HeaderFont")).deriveFont(0, 24));
         name.setPreferredSize(new Dimension(detailPanel.getWidth(), 50));
         detailPanel.add(name);
@@ -710,7 +724,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             {15, -1, -1}                // Custom house
         };
 
-        JLabel name = new JLabel(Messages.message("colopedia.buildings.name." + buildingCalls[building][level]), JLabel.CENTER);
+        JLabel name = new JLabel(Messages.message("colopedia.buildings.name." + buildingCalls[building][level]), SwingConstants.CENTER);
         name.setFont(((Font) UIManager.get("HeaderFont")).deriveFont(0, 24));
         name.setPreferredSize(new Dimension(detailPanel.getWidth(), 50));
         detailPanel.add(name);
@@ -751,24 +765,24 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         overview.add(new JLabel(Messages.message("colopedia.buildings.cost")));
         JPanel costs = new JPanel();
         costs.setLayout(new FlowLayout(FlowLayout.LEFT));
-        costs.add(new JLabel(Integer.toString(buildingLevel != null ? buildingLevel.hammersRequired : -1), library.getGoodsImageIcon(ImageLibrary.GOODS_HAMMERS), JLabel.LEFT));
-        costs.add(new JLabel(Integer.toString(buildingLevel != null ? buildingLevel.toolsRequired : -1), library.getGoodsImageIcon(ImageLibrary.GOODS_TOOLS), JLabel.LEFT));
+        costs.add(new JLabel(Integer.toString(buildingLevel != null ? buildingLevel.hammersRequired : -1), library.getGoodsImageIcon(ImageLibrary.GOODS_HAMMERS), SwingConstants.LEFT));
+        costs.add(new JLabel(Integer.toString(buildingLevel != null ? buildingLevel.toolsRequired : -1), library.getGoodsImageIcon(ImageLibrary.GOODS_TOOLS), SwingConstants.LEFT));
         overview.add(costs);
         // Specialist
         overview.add(new JLabel(Messages.message("colopedia.buildings.specialist")));
-        overview.add(buildingSpecialist[building]>=0 ? new JLabel(Unit.getName(buildingSpecialist[building]), library.getUnitImageIcon(buildingSpecialistIcon[building]), JLabel.LEFT) : new JLabel());
+        overview.add(buildingSpecialist[building]>=0 ? new JLabel(Unit.getName(buildingSpecialist[building]), library.getUnitImageIcon(buildingSpecialistIcon[building]), SwingConstants.LEFT) : new JLabel());
         // Production - Needs & Produces
         overview.add(new JLabel(Messages.message("colopedia.buildings.production")));
         JPanel production = new JPanel();
         production.setLayout(new FlowLayout(FlowLayout.LEFT));
         if (buildingNeeds[building] >= 0) {
-            JLabel label = new JLabel(Messages.message("colopedia.buildings.needs"), library.getGoodsImageIcon(buildingNeeds[building]), JLabel.LEADING);
-            label.setHorizontalTextPosition(JLabel.LEADING);
+            JLabel label = new JLabel(Messages.message("colopedia.buildings.needs"), library.getGoodsImageIcon(buildingNeeds[building]), SwingConstants.LEADING);
+            label.setHorizontalTextPosition(SwingConstants.LEADING);
             production.add(label);
         }
         if (buildingProduces[building] >= 0) {
-            JLabel label = new JLabel(Messages.message("colopedia.buildings.produces"), library.getGoodsImageIcon(buildingProduces[building]), JLabel.LEADING);
-            label.setHorizontalTextPosition(JLabel.LEADING);
+            JLabel label = new JLabel(Messages.message("colopedia.buildings.produces"), library.getGoodsImageIcon(buildingProduces[building]), SwingConstants.LEADING);
+            label.setHorizontalTextPosition(SwingConstants.LEADING);
             production.add(label);
         }
         overview.add(production);
@@ -812,7 +826,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         detailPanel.removeAll();
         detailPanel.setLayout(new FlowLayout());
 
-        JLabel name = new JLabel(Messages.message(FoundingFather.getName(foundingFather)), JLabel.CENTER);
+        JLabel name = new JLabel(Messages.message(FoundingFather.getName(foundingFather)), SwingConstants.CENTER);
         name.setFont(((Font) UIManager.get("HeaderFont")).deriveFont(0, 24));
         name.setPreferredSize(new Dimension(detailPanel.getWidth(), 50));
         detailPanel.add(name);
