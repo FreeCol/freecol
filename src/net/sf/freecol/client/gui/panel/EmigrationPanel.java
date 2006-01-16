@@ -1,4 +1,6 @@
+
 package net.sf.freecol.client.gui.panel;
+
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -8,18 +10,21 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.border.BevelBorder;
 
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Unit;
+
 
 /**
 * The panel that allows a user to choose which unit will emigrate from Europe.
 */
 public final class EmigrationPanel extends FreeColDialog implements ActionListener {
-    private static final Logger logger = Logger.getLogger(EmigrationPanel.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
+
+    private static final Logger logger = Logger.getLogger(EmigrationPanel.class.getName());
 
     private final JButton   person1,
                             person2,
@@ -35,7 +40,7 @@ public final class EmigrationPanel extends FreeColDialog implements ActionListen
     public EmigrationPanel() {
         //setFocusCycleRoot(true);
 
-        JLabel  question = new JLabel("Choose which unit will emigrate from Europe.");
+        JLabel  question = new JLabel(Messages.message("chooseImmigrant"));
 
         person1 = new JButton();
         person2 = new JButton();
@@ -119,4 +124,5 @@ public final class EmigrationPanel extends FreeColDialog implements ActionListen
             logger.warning("Invalid Actioncommand: not a number.");
         }
     }
+
 }

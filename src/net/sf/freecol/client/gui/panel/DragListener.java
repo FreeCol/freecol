@@ -1,9 +1,9 @@
 
 package net.sf.freecol.client.gui.panel;
 
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.logging.Logger;
 
 import javax.swing.JComponent;
 import javax.swing.JLayeredPane;
@@ -31,8 +31,6 @@ public final class DragListener extends MouseAdapter {
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
-    
-    private static Logger logger = Logger.getLogger(DragListener.class.getName());
     
     private final JLayeredPane parentPanel;
 
@@ -164,7 +162,7 @@ public final class DragListener extends MouseAdapter {
                                         amount -= 20;
                                         price = tempUnit.getGame().getMarket().getBidPrice(Goods.TOOLS, amount);
                                     }
-                                    menuItem = new JMenuItem("Equip with " + amount + " Tools (" + price + " gold)");
+                                    menuItem = new JMenuItem(Messages.message("equipWith") + ' ' + amount + " " + Messages.message("model.goods.Tools") + " (" + price + " " + Messages.message("gold") + ")");
 
                                 }
                             } else {
