@@ -274,42 +274,49 @@ public final class ConnectController {
         canvas.showStatusPanel(Messages.message("status.loadingGame"));
 
         final File theFile = file;
-        Thread t = new Thread() {
+
+        Runnable  loadGameJob = new Runnable() {
             public void run() {
+
+                class ErrorJob implements Runnable {
+
+                    private final  String  message;
+
+                    ErrorJob( String message ) {
+                        this.message = message;
+                    }
+
+                    public void run() {
+                        canvas.closeMenus();
+                        canvas.showMainPanel();
+                        canvas.errorMessage( message );
+                    }
+                };
+
                 try {
-                    FreeColServer freeColServer = new FreeColServer(theFile, port);
-                    freeColClient.setFreeColServer(freeColServer);
+                    FreeColServer  freeColServer = new FreeColServer( theFile, port );
+                    freeColClient.setFreeColServer( freeColServer );
 
                     final String username = freeColServer.getOwner();
 
-                    freeColClient.setSingleplayer(freeColServer.isSingleplayer());
+                    freeColClient.setSingleplayer( freeColServer.isSingleplayer() );
 
-                    SwingUtilities.invokeLater(new Runnable() {
+                    SwingUtilities.invokeLater( new Runnable() {
                         public void run() {
-                            login(username, "127.0.0.1", 3541);
+                            login( username, "127.0.0.1", 3541 );
                             canvas.closeStatusPanel();
                         }
-                    });
-                } catch (FileNotFoundException fe) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            canvas.closeMenus();
-                            canvas.showMainPanel();
-                            canvas.errorMessage("fileNotFound");
-                        }
-                    });
-                } catch (IOException e) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            canvas.closeMenus();
-                            canvas.showMainPanel();
-                            freeColClient.getCanvas().errorMessage("server.couldNotStart");
-                        }
-                    });
+                    } );
+                }
+                catch ( FileNotFoundException e ) {
+                    SwingUtilities.invokeLater( new ErrorJob("fileNotFound") );
+                }
+                catch ( IOException e ) {
+                    SwingUtilities.invokeLater( new ErrorJob("server.couldNotStart") );
                 }
             }
         };
-        t.start();
+        freeColClient.worker.schedule( loadGameJob );
     }
 
 

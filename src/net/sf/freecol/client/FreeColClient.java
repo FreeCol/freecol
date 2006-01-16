@@ -1,4 +1,6 @@
+
 package net.sf.freecol.client;
+
 
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -43,7 +45,6 @@ import net.sf.freecol.server.FreeColServer;
 
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
-
 
 
 /**
@@ -100,6 +101,7 @@ public final class FreeColClient {
     private ClientOptions clientOptions = new ClientOptions();
     private final ActionManager actionManager;
 
+    public final  Worker  worker;
 
     /**
     * Indicated whether or not there is an open connection to the server.
@@ -146,6 +148,13 @@ public final class FreeColClient {
                 startGUI(theWindowSize);
             }
         });
+
+        worker = new Worker();
+        new Thread("worker") {
+            public void run() {
+                worker.run();
+            }
+        }.start();
 
         createFreeColDirs();
         loadClientOptions();
