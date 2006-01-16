@@ -1399,7 +1399,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                     add(unitLabel);
                 }
 
-                ImageLibrary lib = ((Canvas)parent).getGUI().getImageLibrary();
+                ImageLibrary lib = parent.getGUI().getImageLibrary();
 
                 if (colonyTile.isColonyCenterTile()) {
                     setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
@@ -1407,14 +1407,14 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
                     ImageIcon goodsIcon = parent.getImageProvider().getGoodsImageIcon(Goods.FOOD);
                     BufferedImage productionImage = parent.getGUI().createProductionImage(goodsIcon, colonyTile.getTile().potential(Goods.FOOD), width, goodsIcon.getIconHeight());
-                    JLabel sl = new JLabel(new ImageIcon(productionImage), JLabel.CENTER);
+                    JLabel sl = new JLabel(new ImageIcon(productionImage), SwingConstants.CENTER);
                     sl.setSize(lib.getTerrainImageWidth(1), goodsIcon.getIconHeight());
                     add(sl);
 
                     if (colonyTile.getTile().potential(colonyTile.getTile().secondaryGoods()) != 0) {
                         goodsIcon = parent.getImageProvider().getGoodsImageIcon(colonyTile.getTile().secondaryGoods());
                         productionImage = parent.getGUI().createProductionImage(goodsIcon, colonyTile.getTile().potential(colonyTile.getTile().secondaryGoods()), width, goodsIcon.getIconHeight());
-                        sl = new JLabel(new ImageIcon(productionImage), JLabel.CENTER);
+                        sl = new JLabel(new ImageIcon(productionImage), SwingConstants.CENTER);
                         sl.setSize(lib.getTerrainImageWidth(1), goodsIcon.getIconHeight());
                         add(sl);
                     }
@@ -1607,10 +1607,11 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                         colony.getBuilding(i).getNextName() +
                         " (" +
                         Integer.toString(colonyPanel.getColony().getBuilding(i).getNextHammers()) +
-                        " hammers");
+                        " " + Messages.message("model.goods.Hammers").toLowerCase() );
 
                     if (colonyPanel.getColony().getBuilding(i).getNextTools() > 0) {
-                        theText += ", " + Integer.toString(colony.getBuilding(i).getNextTools()) + " tools";
+                        theText += ", " + Integer.toString(colony.getBuilding(i).getNextTools()) + " "
+                        + Messages.message("model.goods.Tools").toLowerCase();
                     }
 
                     theText += ")";

@@ -29,6 +29,7 @@
     <mkdir dir="${freecol.build.dir}"/>
     <javac srcdir="test/src"
            destdir="${freecol.build.dir}"
+           classpath="test/lib/junit.jar"
            debug="on"
            optimize="on"
            deprecation="off"
