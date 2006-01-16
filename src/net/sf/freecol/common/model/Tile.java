@@ -173,9 +173,6 @@ public final class Tile extends FreeColGameObject implements Location {
         else if (getAddition() == ADD_HILLS) {
             return Messages.message("hills");
         }
-        else if (getType() == UNEXPLORED) {
-            return "Unexplored";
-        }
         else if ( 0 < getType()  &&  getType() < FreeCol.specification.numberOfTileTypes() ) {
 
             TileType  t = FreeCol.specification.tileType( type );

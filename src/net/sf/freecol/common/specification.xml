@@ -107,4 +107,28 @@
     <tile-type name="highSeas"   basic-move-cost="3" defence-bonus="0" />
   </tile-types>
 
+  <!-- goods.  a good must be defined before it is referenced -->
+  <goods>
+    <good ref="food"        name="model.goods.Food"       is-farmed="yes" />
+    <good ref="sugar"       name="model.goods.Sugar"      is-farmed="yes" />
+    <good ref="tobacco"     name="model.goods.Tobacco"    is-farmed="yes" />
+    <good ref="cotton"      name="model.goods.Cotton"     is-farmed="yes" />
+    <good ref="furs"        name="model.goods.Furs"       is-farmed="yes" />
+    <good ref="lumber"      name="model.goods.Lumber"     is-farmed="yes" />
+    <good ref="ore"         name="model.goods.Ore"        is-farmed="yes" />
+    <good ref="silver"      name="model.goods.Silver"     is-farmed="yes" />
+    <good ref="horses"      name="model.goods.Horses"     is-farmed="no" made-from="food" />
+    <good ref="rum"         name="model.goods.Rum"        is-farmed="no" made-from="sugar" />
+    <good ref="cigars"      name="model.goods.Cigars"     is-farmed="no" made-from="tobacco" />
+    <good ref="cloth"       name="model.goods.Cloth"      is-farmed="no" made-from="cotton" />
+    <good ref="coats"       name="model.goods.Coats"      is-farmed="no" made-from="furs" />
+    <good ref="trade-goods" name="model.goods.TradeGoods" is-farmed="no" />
+    <good ref="tools"       name="model.goods.Tools"      is-farmed="no" made-from="ore" />
+    <good ref="muskets"     name="model.goods.Muskets"    is-farmed="no" made-from="tools" />
+    <good ref="fish"        name="model.goods.Fish"       is-farmed="no" />
+    <good ref="bells"       name="model.goods.Bells"      is-farmed="no" />
+    <good ref="crosses"     name="model.goods.Crosses"    is-farmed="no" />
+    <good ref="hammers"     name="model.goods.Hammers"    is-farmed="no" made-from="lumber" />
+  </goods>
+
 </freecol-specification>

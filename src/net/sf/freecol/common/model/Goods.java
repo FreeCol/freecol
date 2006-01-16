@@ -1,17 +1,21 @@
 
 package net.sf.freecol.common.model;
 
+
 import java.util.logging.Logger;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+
 /**
 * Represents a locatable goods of a specified type and amount.
 */
 public class Goods implements Locatable, Ownable {
+
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
@@ -73,13 +77,13 @@ public class Goods implements Locatable, Ownable {
         this.amount = amount;
     }
 
-    
+
     public Goods(Game game, Element element) {
         this.game = game;
         readFromXMLElement(element);
     }
 
-    
+
     /**
     * Gets the owner of this <code>Ownable</code>.
     *
@@ -87,11 +91,7 @@ public class Goods implements Locatable, Ownable {
     *         {@link Ownable}.
     */
     public Player getOwner() {
-        if (location instanceof Ownable) {
-            return ((Ownable) location).getOwner();
-        } else {
-            return null;
-        }
+        return (location instanceof Ownable) ? ((Ownable) location).getOwner() : null;
     }
 
 
@@ -115,7 +115,7 @@ public class Goods implements Locatable, Ownable {
     public String getName() {
         return getName(type);
     }
-    
+
     /**
      * Returns the name of this type of goods.
      *
@@ -125,20 +125,16 @@ public class Goods implements Locatable, Ownable {
     public String getName(boolean sellable) {
         return getName(type, sellable);
     }
-    
+
     /**
-    * Returns the <code>Tile</code> where this <code>Goods</code> is located, 
+    * Returns the <code>Tile</code> where this <code>Goods</code> is located,
     * or <code>null</code> if it's location is <code>Europe</code>.
     *
     * @return The Tile where this Unit is located. Or null if
     * its location is Europe.
     */
     public Tile getTile() {
-        if (location == null) {
-            return null;
-        } else {
-            return location.getTile();
-        }
+        return (location != null) ? location.getTile() : null;
     }
 
 
@@ -151,20 +147,12 @@ public class Goods implements Locatable, Ownable {
     *         of goods does not have a raw material.
     */
     public static int getRawMaterial(int goodsType) {
-        switch (goodsType) {
-            case HORSES: return FOOD;
-            case RUM: return SUGAR;
-            case CIGARS: return TOBACCO;
-            case CLOTH: return COTTON;
-            case COATS: return FURS;
-            case TOOLS: return ORE;
-            case MUSKETS: return TOOLS;
-            case HAMMERS: return LUMBER;
-            default: return -1;
-        }
+
+        Good  good = FreeCol.specification.good( goodsType );
+        return good.isRawMaterial() ? good.makes.index : -1;
     }
-    
-    
+
+
     /**
     * Gets the type of goods which can be produced by the given
     * raw material.
@@ -174,39 +162,20 @@ public class Goods implements Locatable, Ownable {
     *         of goods does not have a manufactured goods.
     */
     public static int getManufactoredGoods(int rawMaterialGoodsType) {
-        switch (rawMaterialGoodsType) {
-            case FOOD: return HORSES;
-            case SUGAR: return RUM;
-            case TOBACCO: return CIGARS;
-            case COTTON: return CLOTH;
-            case FURS: return COATS;
-            case ORE: return TOOLS;
-            case TOOLS: return MUSKETS;
-            case LUMBER: return HAMMERS;
-            default: return -1;
-        }
+
+        Good  good = FreeCol.specification.good( rawMaterialGoodsType );
+        return good.isRefined() ? good.madeFrom.index : -1;
     }
 
 
     /**
     * Checks if the given type of goods can be produced on a {@link ColonyTile}.
-    * @param goodsType The type of goods to test.    
+    * @param goodsType The type of goods to test.
     * @return The result.
     */
     public static boolean isFarmedGoods(int goodsType) {
-        switch (goodsType) {
-            case FOOD:
-            case SUGAR:
-            case TOBACCO:
-            case COTTON:
-            case FURS:
-            case ORE:
-            case SILVER:
-            case LUMBER:
-                return true;
-            default:
-                return false;
-        }
+
+        return FreeCol.specification.good(goodsType).isFarmed;
     }
 
 
@@ -218,37 +187,21 @@ public class Goods implements Locatable, Ownable {
      * TODO - needs to be completed
      */
     public static String getName(int type) {
-        switch(type) {
-            case FOOD: return Messages.message("model.goods.Food");
-            case SUGAR: return Messages.message("model.goods.Sugar");
-            case TOBACCO: return Messages.message("model.goods.Tobacco");
-            case COTTON: return Messages.message("model.goods.Cotton");
-            case FURS: return Messages.message("model.goods.Furs");
-            case LUMBER: return Messages.message("model.goods.Lumber");
-            case ORE:return Messages.message("model.goods.Ore");
-            case SILVER: return Messages.message("model.goods.Silver");
-            case HORSES: return Messages.message("model.goods.Horses");
-            case RUM: return Messages.message("model.goods.Rum");
-            case CIGARS: return Messages.message("model.goods.Cigars");
-            case CLOTH: return Messages.message("model.goods.Cloth");
-            case COATS: return Messages.message("model.goods.Coats");
-            case TRADE_GOODS: return Messages.message("model.goods.TradeGoods");
-            case TOOLS: return Messages.message("model.goods.Tools");
-            case MUSKETS: return Messages.message("model.goods.Muskets");
-            case FISH: return Messages.message("model.goods.Fish");// = 16, // Stored as food.
-            case BELLS: return Messages.message("model.goods.Bells");
-            case CROSSES: return Messages.message("model.goods.Crosses");
-            case HAMMERS: return Messages.message("model.goods.Hammers");
-            default: return Messages.message("model.goods.Unknown");
+
+        if ( 0 <= type  &&  type < FreeCol.specification.numberOfGoods() ) {
+            return FreeCol.specification.good(type).name;
         }
+        return Messages.message("model.goods.Unknown");
     }
 
+
     public static String getName(int type, boolean sellable) {
+
         if (sellable) {
             return getName(type);
-        } else {
-            return getName(type) + " (" + Messages.message("model.goods.Boycotted") + ")";
         }
+
+        return getName(type) + " (" + Messages.message("model.goods.Boycotted") + ")";
     }
 
 
@@ -315,7 +268,7 @@ public class Goods implements Locatable, Ownable {
     public int getType() {
         return type;
     }
-    
+
 
     /**
     * If the amount of goods is greater than the source can supply,
@@ -331,7 +284,7 @@ public class Goods implements Locatable, Ownable {
     * Prepares the <code>Goods</code> for a new turn.
     */
     public void newTurn() {
-    
+
     }
 
     /**
@@ -376,9 +329,9 @@ public class Goods implements Locatable, Ownable {
         } else {
             throw new IllegalStateException("Goods may only leave a ship while in a harbour.");
         }
-    }    
-    
-    
+    }
+
+
     /**
     * Gets the game object this <code>Goods</code> belongs to.
     * @return The <code>Game</code>.
@@ -386,18 +339,6 @@ public class Goods implements Locatable, Ownable {
     public Game getGame() {
         return game;
     }
-    
-
-    /**
-    * Removes all references to this object.
-    */
-    /*public void dispose() {
-        if (location != null) {
-            location.remove(this);
-        }
-
-        super.dispose();
-    }*/
 
 
     /**

@@ -1,11 +1,15 @@
+
 package net.sf.freecol.common.model;
 
+
 import java.util.Arrays;
+
 
 /**
 * Contains a message about a change in the model.
 */
 public class ModelMessage {
+
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
@@ -109,15 +113,12 @@ public class ModelMessage {
     * @return <i>true</i> if the sources, message IDs and data are equal.
     */
     public boolean equals(Object o) {
-        if (o instanceof ModelMessage) {
-            ModelMessage m = (ModelMessage) o;
-            if (getSource() == m.getSource() && getMessageID().equals(m.getMessageID()) && Arrays.equals(getData(), m.getData())) {
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
+
+        if ( ! (o instanceof ModelMessage) ) { return false; }
+
+        ModelMessage m = (ModelMessage) o;
+        return ( getSource() == m.getSource()
+                &&  getMessageID().equals(m.getMessageID())
+                &&  Arrays.equals(getData(), m.getData()) );
     }
 }

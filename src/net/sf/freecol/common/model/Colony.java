@@ -1,6 +1,7 @@
 
 package net.sf.freecol.common.model;
 
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Logger;
@@ -17,6 +18,7 @@ import org.w3c.dom.NodeList;
 * possible.
 */
 public final class Colony extends Settlement implements Location {
+
     private static final Logger logger = Logger.getLogger(Colony.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
@@ -236,11 +238,7 @@ public final class Colony extends Settlement implements Location {
                 b = null;
         }
 
-        if (b != null && b.isBuilt()) {
-            return b;
-        } else {
-            return null;
-        }
+        return (b != null && b.isBuilt()) ? b : null;
     }
     
     /**
@@ -640,9 +638,9 @@ public final class Colony extends Settlement implements Location {
         if (locatable instanceof Unit &&
             ((Unit) locatable).getOwner() == getOwner()) {
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
@@ -663,9 +661,9 @@ public final class Colony extends Settlement implements Location {
         Iterator ui = getUnitIterator();
         if (ui.hasNext()) {
             return (Unit) ui.next();
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
@@ -729,7 +727,7 @@ public final class Colony extends Settlement implements Location {
     public boolean canBuildUnit(int unitType) {
         Iterator buildableUnitIterator = getBuildableUnitIterator();
         while (buildableUnitIterator.hasNext()) {
-            if (unitType == (int) ((Integer) buildableUnitIterator.next()).intValue()) {
+            if (unitType == ((Integer) buildableUnitIterator.next()).intValue()) {
                 return true;
             }
         }
@@ -992,9 +990,9 @@ public final class Colony extends Settlement implements Location {
         if (getGoodsCount(Goods.HORSES) >= 2 && surplus > 1) {
             if (!getBuilding(Building.STABLES).isBuilt()) {
                 return Math.min(surplus / 2, potential);
-            } else {
-                return Math.min(surplus, potential);
             }
+
+            return Math.min(surplus, potential);
         }
 
         return 0;
@@ -1033,9 +1031,9 @@ public final class Colony extends Settlement implements Location {
         // In order to avoid duplicate messages:
         if (lastVisited == getGame().getTurn().getNumber()) {
             return;
-        } else {
-            lastVisited = getGame().getTurn().getNumber();
         }
+
+        lastVisited = getGame().getTurn().getNumber();
 
         if (getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) {
             int unitType = getCurrentlyBuilding() - BUILDING_UNIT_ADDITION;

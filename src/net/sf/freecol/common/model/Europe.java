@@ -1,6 +1,7 @@
 
 package net.sf.freecol.common.model;
 
+
 import java.util.Iterator;
 import java.util.logging.Logger;
 
@@ -8,6 +9,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import net.sf.freecol.client.gui.i18n.Messages;
+
 
 /**
 * Represents Europe in the game. Each <code>Player</code> has it's own
@@ -19,11 +21,12 @@ import net.sf.freecol.client.gui.i18n.Messages;
 * and {@link #train} new units. You may also sell/buy goods.
 */
 public final class Europe extends FreeColGameObject implements Location, Ownable {
-    private static final Logger logger = Logger.getLogger(Europe.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
+
+    private static final Logger logger = Logger.getLogger(Europe.class.getName());
 
 
     /**
@@ -89,9 +92,8 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
     public int getRecruitable(int slot) {
         if ((slot > 0) && (slot < 4)) {
             return recruitables[slot - 1];
-        } else {
-            throw new IllegalArgumentException("Wrong recruitement slot: " + slot);
         }
+        throw new IllegalArgumentException("Wrong recruitement slot: " + slot);
     }
 
 
@@ -218,9 +220,9 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
     public boolean contains(Locatable locatable) {
         if (locatable instanceof Unit) {
             return unitContainer.contains((Unit) locatable);
-        } else {
-            return false;
         }
+
+        return false;
     }
 
 

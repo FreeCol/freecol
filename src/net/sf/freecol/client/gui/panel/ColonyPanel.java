@@ -465,10 +465,10 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     private void updateCargoLabel() {
         if (selectedUnit != null) {
             cargoPanel.getParent().setEnabled(true);
-            cargoBorder.setTitle("Cargo of " + selectedUnit.getUnit().getName() + " (" + selectedUnit.getUnit().getSpaceLeft() + " left)");
+            cargoBorder.setTitle(Messages.message("cargoOnShip") + ' ' + selectedUnit.getUnit().getName() + " (" + selectedUnit.getUnit().getSpaceLeft() + " left)");
         } else {
             cargoPanel.getParent().setEnabled(false);
-            cargoBorder.setTitle("Cargo of ...");
+            cargoBorder.setTitle(Messages.message("cargoOnShip"));
         }
     }
 

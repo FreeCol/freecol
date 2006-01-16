@@ -1,18 +1,15 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.logging.Logger;
-
 
 /**
 * Represents a given turn in the game.
 */
 public class Turn {
+
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
-
-    private static final Logger logger = Logger.getLogger(Turn.class.getName());
 
 
     public static final int STARTING_YEAR = 1492;
@@ -75,11 +72,10 @@ public class Turn {
     * Checks if this turn is equal to another turn.
     */
     public boolean equals(Object o) {
-        if (!(o instanceof Turn)) {
-            return false;
-        } else {
-            return (getNumber() == ((Turn) o).getNumber());
-        }
+
+        if ( ! (o instanceof Turn) ) { return false; }
+
+        return turn == ((Turn) o).turn;
     }
 
     
@@ -89,10 +85,10 @@ public class Turn {
     public int getYear() {
         if (STARTING_YEAR + turn - 1 < SEASON_YEAR) {
             return STARTING_YEAR + turn - 1;
-        } else {
-            int c = turn - (SEASON_YEAR - STARTING_YEAR - 1);
-            return SEASON_YEAR + c/2 - 1;
         }
+
+        int c = turn - (SEASON_YEAR - STARTING_YEAR - 1);
+        return SEASON_YEAR + c/2 - 1;
     }
 
 
@@ -104,9 +100,9 @@ public class Turn {
     public String toString() {
         if (STARTING_YEAR + turn - 1 < SEASON_YEAR) {
             return Integer.toString(STARTING_YEAR + turn - 1);
-        } else {
-            int c = turn - (SEASON_YEAR - STARTING_YEAR - 1);
-            return ((c%2==0) ? "Spring " : "Autumn ") + Integer.toString(SEASON_YEAR + c/2 - 1);
         }
+
+        int c = turn - (SEASON_YEAR - STARTING_YEAR - 1);
+        return ((c%2==0) ? "Spring " : "Autumn ") + Integer.toString(SEASON_YEAR + c/2 - 1);
     }
 }

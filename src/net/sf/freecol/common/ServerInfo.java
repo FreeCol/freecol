@@ -15,6 +15,11 @@ import org.w3c.dom.Element;
  * @see net.sf.freecol.metaserver
  */
 public class ServerInfo {
+
+    public static final  String  COPYRIGHT = "Copyright (C) 2006 The FreeCol Team";
+    public static final  String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
+    public static final  String  REVISION = "$Revision$";
+
     private String name;
     private String address;
     private int port;

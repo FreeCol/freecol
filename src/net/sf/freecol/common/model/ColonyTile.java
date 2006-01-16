@@ -1,6 +1,7 @@
 
 package net.sf.freecol.common.model;
 
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Logger;
@@ -8,15 +9,17 @@ import java.util.logging.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+
 /**
 * Represents a work location on a tile.
 */
 public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownable {
-    private static final Logger logger = Logger.getLogger(ColonyTile.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
+
+    private static final Logger logger = Logger.getLogger(ColonyTile.class.getName());
 
 
     private Colony colony;
@@ -140,11 +143,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     * @return The amount of Units at this <code>ColonyTile</code>.
     */
     public int getUnitCount() {
-        if (getUnit() != null) {
-            return 1;
-        } else {
-            return 0;
-        }
+        return (getUnit() != null) ? 1 : 0;
     }
 
 
@@ -163,11 +162,8 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
             return false;
         }
 
-        if (!isColonyCenterTile() && locatable instanceof Unit && (getUnit() == null || locatable == getUnit())) {
-            return true;
-        } else {
-            return false;
-        }
+        return ( ! isColonyCenterTile()  &&  locatable instanceof Unit
+                &&  ( getUnit() == null || locatable == getUnit()) );
     }
 
 
@@ -183,9 +179,8 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         if (!canAdd(locatable)) {
             if (getWorkTile().getOwner() != null && getWorkTile().getOwner() != getColony()) {
                 throw new IllegalArgumentException("Cannot add locatable to this location: somebody else owns this land!");
-            } else {                
-                throw new IllegalArgumentException("Cannot add locatable to this location: there is a unit here already!");
             }
+            throw new IllegalArgumentException("Cannot add locatable to this location: there is a unit here already!");
         }
 
         Unit u = (Unit) locatable;
@@ -376,14 +371,14 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
             }*/
             
             return Math.max(0, amount);
+        }
+
+        if (goodsType == Goods.FOOD) {
+            return workTile.potential(Goods.FOOD);
+        } else if (goodsType == workTile.secondaryGoods()) {
+            return workTile.potential(workTile.secondaryGoods());
         } else {
-            if (goodsType == Goods.FOOD) {
-                return workTile.potential(Goods.FOOD);
-            } else if (goodsType == workTile.secondaryGoods()) {
-                return workTile.potential(workTile.secondaryGoods());
-            } else {
-                return 0;
-            }
+            return 0;
         }
     }
     
@@ -400,11 +395,9 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     public int getExpertForProducing(int goodsType) {
         switch (goodsType) {
             case Goods.FOOD:
-                if (getWorkTile().isLand()) {
-                    return Unit.EXPERT_FARMER;
-                } else {
-                    return Unit.EXPERT_FISHERMAN;
-                }
+                return ( getWorkTile().isLand() )
+                    ? Unit.EXPERT_FARMER
+                    : Unit.EXPERT_FISHERMAN;
             case Goods.FURS:
                 return Unit.EXPERT_FUR_TRAPPER;
             case Goods.SILVER:
