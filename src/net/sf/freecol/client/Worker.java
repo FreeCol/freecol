@@ -25,6 +25,36 @@ public final class Worker implements Runnable
 
     // ------------------------------------------------------------ API methods
 
+    public void run() {
+
+        while ( shouldRun() ) {
+
+            try {
+                // run any waiting jobs
+                Runnable  job;
+                while ( (job = nextJob()) != null ) {
+
+                    try {
+                        job.run();
+                    }
+                    catch ( Exception e ) {
+
+                        System.err.println( "a job produced an error:" );
+                        e.printStackTrace();
+                    }
+                }
+
+                // sleep a bit so as not to redline the CPU
+                Thread.sleep( 1 );
+            }
+            catch ( InterruptedException e ) {
+
+                e.printStackTrace();
+            }
+        }
+    }
+
+
     public void schedule( Runnable job ) {
 
         synchronized ( lock ) {
@@ -39,29 +69,6 @@ public final class Worker implements Runnable
         synchronized ( lock ) {
 
             shouldRun = false;
-        }
-    }
-
-
-    public void run() {
-
-        while ( shouldRun() ) {
-
-            try {
-                // run any waiting jobs
-                Runnable  job;
-                while ( (job = nextJob()) != null ) {
-
-                    job.run();
-                }
-
-                // sleep a bit so as not to redline the CPU
-                Thread.sleep( 1 );
-            }
-            catch ( InterruptedException e ) {
-
-                e.printStackTrace();
-            }
         }
     }
 
