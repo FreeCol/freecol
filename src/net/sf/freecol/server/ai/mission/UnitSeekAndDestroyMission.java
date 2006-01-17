@@ -9,6 +9,7 @@ import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
@@ -131,7 +132,10 @@ public class UnitSeekAndDestroyMission extends Mission {
         targetPlayer = ((Ownable)target).getOwner();
         int stance = owner.getStance(targetPlayer);
 
-        return (stance == Player.WAR) && (owner.getTension(targetPlayer) >= Player.TENSION_CONTENT) && (getTarget() != null) && ((target instanceof Unit) || (target instanceof Settlement));
+        return (stance == Player.WAR) &&
+            (owner.getTension(targetPlayer).getLevel() >= Tension.CONTENT) &&
+            (getTarget() != null) &&
+            ((target instanceof Unit) || (target instanceof Settlement));
     }
 
     

@@ -22,6 +22,7 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 
@@ -311,7 +312,7 @@ public final class ImageLibrary extends ImageProvider {
         loadGoods(gc, resourceLocator, doLookup);
         loadBonus(gc, resourceLocator, doLookup);
 
-        alarmChips = new Image[IndianSettlement.NUMBER_OF_ALARM_LEVELS];
+        alarmChips = new Image[Tension.NUMBER_OF_LEVELS];
         colorChips = new Hashtable();
         missionChips = new Hashtable();
         expertMissionChips = new Hashtable();
@@ -660,15 +661,15 @@ public final class ImageLibrary extends ImageProvider {
         g.setColor(Color.BLACK);
         g.drawRect(0, 0, 10, 16);
 
-        if (alarm == IndianSettlement.HAPPY) {
+        if (alarm == Tension.HAPPY) {
             g.setColor(Color.GREEN);
-        } else if (alarm == IndianSettlement.CONTENT) {
+        } else if (alarm == Tension.CONTENT) {
             g.setColor(Color.BLUE);
-        } else if (alarm == IndianSettlement.DISPLEASED) {
+        } else if (alarm == Tension.DISPLEASED) {
             g.setColor(Color.YELLOW);
-        } else if (alarm == IndianSettlement.ANGRY) {
+        } else if (alarm == Tension.ANGRY) {
             g.setColor(Color.ORANGE);
-        } else if (alarm == IndianSettlement.HATEFUL) {
+        } else if (alarm == Tension.HATEFUL) {
             g.setColor(Color.RED);
         } else {
             logger.warning("Unknown alarm level: " + alarm);

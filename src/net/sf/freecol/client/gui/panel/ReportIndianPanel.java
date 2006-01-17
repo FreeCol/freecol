@@ -12,6 +12,7 @@ import javax.swing.SwingConstants;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Tension;
 
 
 /**
@@ -68,17 +69,7 @@ public final class ReportIndianPanel extends ReportPanel implements ActionListen
             colonies.next();
         }
         report += "<p>" + settlementCount + " camps";
-        int tension = opponent.getTension(player);
-        String tensionString = null;
-        if (tension < Player.TENSION_HAPPY) {
-            tensionString = "Happy";
-        }
-        else if (tension < 5 * Player.TENSION_HAPPY) {
-            tensionString = Messages.message("wary");
-        }
-        else {
-            tensionString = Messages.message("angry");
-        }
+        String tensionString = opponent.getTension(player).getLevelAsString();
         report += "<p>" + Messages.message("tension") + ": " + tensionString;
         report += "</html>";
         JLabel label;

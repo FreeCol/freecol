@@ -37,33 +37,7 @@ public class IndianSettlement extends Settlement {
     public static final int LAST_KIND = 2;
 
 
-    public static final int ADD_ALARM_UNIT_DESTROYED = 400;
-    public static final int ADD_ALARM_SETTLEMENT_ATTACKED = 500;
-    
     public static final int MAX_CONVERT_DISTANCE = 10;
-
-    /** The AI player is happy if <code>alarm <= ALARM_HAPPY</code>. */
-    public static final int ALARM_HAPPY = 100;
-
-    /** The AI player is content if <code>alarm <= ALARM_CONTENT && alarm > ALARM_HAPPY</code>. */
-    public static final int ALARM_CONTENT = 600;
-
-    /** The AI player is displeased if <code>alarm <= ALARM_DISPLEASED && alarm > ALARM_CONTENT</code>. */
-    public static final int ALARM_DISPLEASED = 700;
-
-    /** The AI player is angry if <code>alarm <= ALARM_ANGRY && alarm > ALARM_DISPLEASED</code>. */
-    public static final int ALARM_ANGRY = 800;
-
-    /** The AI player is hateful if <code>alarm > ALARM_ANGRY</code>. */
-    public static final int ALARM_HATEFUL = 1000;
-
-    /** AI alarm levels. */
-    public static final int HAPPY = 0,
-	CONTENT = 1,
-	DISPLEASED = 2,
-	ANGRY = 3,
-	HATEFUL = 4,
-        NUMBER_OF_ALARM_LEVELS = 5;
 
     /** The amount of goods a brave can produce a single turn. */
     private static final int WORK_AMOUNT = 5;
@@ -128,7 +102,7 @@ public class IndianSettlement extends Settlement {
     * Stores the alarm levels. <b>Only used by AI.</b>
     * 0-1000 with 1000 as the maximum alarm level.
     */
-    private int[] alarm = new int[Player.NUMBER_OF_NATIONS];
+    private Tension[] alarm = new Tension[Player.NUMBER_OF_NATIONS];
 
 
 
@@ -194,6 +168,11 @@ public class IndianSettlement extends Settlement {
         goodsContainer.addGoods(Goods.LUMBER, 300);
         //updateWantedGoods();
         convertProgress = 0;
+
+        for (int k = 0; k < alarm.length; k++) {
+            alarm[k] = new Tension(0);
+        }
+
     }
 
 
@@ -232,12 +211,7 @@ public class IndianSettlement extends Settlement {
     }
 
     public void modifyAlarm(int nation, int addToAlarm) {
-        alarm[nation] += addToAlarm;
-
-        if (alarm[nation]>1000) {
-            alarm[nation] = 1000;
-        }
-
+        alarm[nation].modify(addToAlarm);
         // propagate alarm upwards
         owner.modifyTension(nation, addToAlarm/2);
     }
@@ -247,14 +221,10 @@ public class IndianSettlement extends Settlement {
     * Sets alarm towards the given player.
     *
     * @param player The <code>Player</code>.
-    * @param alarmLevel The alarm level.
+    * @param newAlarm The new alarm value.
     */
-    public void setAlarm(Player player, int alarmLevel) {
-        alarm[player.getNation()] = alarmLevel;
-
-        if (alarm[player.getNation()]>1000) {
-            alarm[player.getNation()] = 1000;
-        }
+    public void setAlarm(Player player, Tension newAlarm) {
+        alarm[player.getNation()] = newAlarm;
     }
 
 
@@ -262,33 +232,12 @@ public class IndianSettlement extends Settlement {
     /**
     * Gets the alarm level towards the given player.
     */
-    public int getAlarm(int nation) {
+    public Tension getAlarm(int nation) {
         return alarm[nation];
     }
 
-    public int getAlarm(Player player) {
-        return alarm[player.getNation()];
-    }
-
-    /**
-     * Gets the alarm level of this player.
-     *
-     * @param player The other player.
-     * @return An alarm level.
-     */
-    public int getAlarmLevel(Player player) {
-	int level = alarm[player.getNation()];
-	if (level <= ALARM_HAPPY) {
-	    return HAPPY;
-	} else if (level <= ALARM_CONTENT) {
-	    return CONTENT;
-	} else if (level <= ALARM_DISPLEASED) {
-	    return DISPLEASED;
-	} else if (level <= ALARM_ANGRY) {
-	    return ANGRY;
-	} else {
-	    return HATEFUL;
-	}
+    public Tension getAlarm(Player player) {
+        return getAlarm(player.getNation());
     }
 
     /**
@@ -299,18 +248,7 @@ public class IndianSettlement extends Settlement {
      * @return The ID of an alarm level message.
      */
     public String getAlarmLevelMessage(Player player) {
-	int level = alarm[player.getNation()];
-	if (level <= ALARM_HAPPY) {
-	    return "indianSettlement.alarm.happy";
-	} else if (level <= ALARM_CONTENT) {
-	    return "indianSettlement.alarm.content";
-	} else if (level <= ALARM_DISPLEASED) {
-	    return "indianSettlement.alarm.displeased";
-	} else if (level <= ALARM_ANGRY) {
-	    return "indianSettlement.alarm.angry";
-	} else {
-	    return "indianSettlement.alarm.hateful";
-	}
+        return "indianSettlement.alarm." + alarm[player.getNation()].getLevelAsString();
     }
 
     /**
@@ -319,6 +257,14 @@ public class IndianSettlement extends Settlement {
     */
     public boolean hasBeenVisited() {
         return isVisited;
+    }
+
+    /**
+    * Sets the visited status of this settlement to true, indicating that a European has had
+    * a chat with the chief.
+    */
+    public void setVisited() {
+        this.isVisited = true;
     }
 
     /**
@@ -427,15 +373,6 @@ public class IndianSettlement extends Settlement {
         this.missionary = missionary;
         missionary.setLocation(null);
         getTile().updatePlayerExploredTile(missionary.getOwner());
-    }
-
-
-    /**
-    * Sets the visited status of this settlement to true, indicating that a European has had
-    * a chat with the chief.
-    */
-    public void setVisited() {
-        this.isVisited = true;
     }
 
 
@@ -934,10 +871,8 @@ public class IndianSettlement extends Settlement {
 
             /* Decrease alarm slightly: */
             for (int i=0; i<alarm.length; i++) {
-                alarm[i] -= 4 + alarm[i]/100;
-                if (alarm[i] < 0) {
-                    alarm[i] = 0;
-                }
+                int newAlarm = 4 + alarm[i].getValue()/100;
+                modifyAlarm(i, -newAlarm);
             }
         }
 
@@ -951,7 +886,7 @@ public class IndianSettlement extends Settlement {
             }
 
             // Increase increment if alarm level is high.
-            increment += 2 * alarm[missionary.getOwner().getNation()] / 100;
+            increment += 2 * alarm[missionary.getOwner().getNation()].getValue() / 100;
             convertProgress += increment;
 
             int extra = Math.max(0, 8-getUnitCount()*getUnitCount());
@@ -977,7 +912,8 @@ public class IndianSettlement extends Settlement {
                     convertProgress = 0;
 
                     Unit u = getGame().getModelController().createUnit(getID() + "newTurn100missionary", targetTile, missionary.getOwner(), Unit.INDIAN_CONVERT);
-                    //addModelMessage(this, "model.colony.newConvert", new String[][] {{"%nation%", getOwner().getNationAsString()}});
+                    addModelMessage(this, "model.colony.newConvert",
+                                    new String[][] {{"%nation%", getOwner().getNationAsString()}});
                     logger.info("New convert created for " + missionary.getOwner().getName() + " with ID=" + u.getID());
                 }
             }
@@ -1052,7 +988,12 @@ public class IndianSettlement extends Settlement {
         indianSettlementElement.setAttribute("highlyWantedGoods", Integer.toString(highlyWantedGoods));
         indianSettlementElement.setAttribute("wantedGoods1", Integer.toString(wantedGoods1));
         indianSettlementElement.setAttribute("wantedGoods2", Integer.toString(wantedGoods2));
-        indianSettlementElement.appendChild(toArrayElement("alarm", alarm, document));
+
+        int[] tensionArray = new int[alarm.length];
+        for (int i = 0; i < alarm.length; i++) {
+            tensionArray[i] = alarm[i].getValue();
+        }
+        indianSettlementElement.appendChild(toArrayElement("alarm", tensionArray, document));
 
         if (missionary != null) {
             Element missionaryElement = document.createElement("missionary");
@@ -1104,9 +1045,13 @@ public class IndianSettlement extends Settlement {
         }
 
         if (getChildElement(indianSettlementElement, "alarm") != null) {
-            alarm = readFromArrayElement("alarm", getChildElement(indianSettlementElement, "alarm"), new int[0]);
+            int tensionArray[] = readFromArrayElement("alarm", getChildElement(indianSettlementElement, "alarm"), new int[0]);
+            for (int i = 0; i < tensionArray.length; i++) {
+                alarm[i] = new Tension(tensionArray[i]);
+            }
         } else {
-            alarm = new int[Player.NUMBER_OF_NATIONS];
+            alarm = new Tension
+                [Player.NUMBER_OF_NATIONS];
         }
 
         if (indianSettlementElement.hasAttribute("learnableSkill")) {

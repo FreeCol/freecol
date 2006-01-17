@@ -13,6 +13,7 @@ import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
@@ -134,7 +135,7 @@ public class IndianDemandMission extends Mission {
                     // TODO: if very happy, the brave should convert
                     tension = -(5 - enemy.getDifficulty()) * 50;
                     unit.getOwner().modifyTension(enemy, tension);
-                    if (unit.getOwner().getTension(enemy) <= Player.TENSION_DISPLEASED &&
+                    if (unit.getOwner().getTension(enemy).getLevel() <= Tension.DISPLEASED &&
                         (goods == null || goods.getType() == Goods.FOOD)) {
                         Element deliverGiftElement = Message.createNewRootElement("deliverGift");
                         deliverGiftElement.setAttribute("unit", getUnit().getID());
@@ -149,8 +150,8 @@ public class IndianDemandMission extends Mission {
                     } else {
                         tension = (enemy.getDifficulty() + 1) * 50;
                         unit.getOwner().modifyTension(enemy, tension);
-                        if (unit.getOwner().getTension(enemy) >=
-                            Player.TENSION_ANGRY) {
+                        if (unit.getOwner().getTension(enemy).getLevel() >=
+                            Tension.ANGRY) {
                             // if we didn't get what we wanted, attack
                             Element element = Message.createNewRootElement("attack");
                             element.setAttribute("unit", unit.getID());
@@ -178,15 +179,15 @@ public class IndianDemandMission extends Mission {
      * @return The goods to demand.
      */
     public Goods selectGoods(Colony target) {
-        int tension = getUnit().getOwner().getTension(target.getOwner());
+        int tension = getUnit().getOwner().getTension(target.getOwner()).getLevel();
         int dx = target.getOwner().getDifficulty() + 1;
         Goods goods = null;
         GoodsContainer warehouse = target.getGoodsContainer();
-        if (tension <= Player.TENSION_CONTENT &&
+        if (tension <= Tension.CONTENT &&
             warehouse.getGoodsCount(Goods.FOOD) >= 100) {
             goods = new Goods(getGame(), target, Goods.FOOD,
                               (warehouse.getGoodsCount(Goods.FOOD) * dx)/6);
-        } else if (tension <= Player.TENSION_DISPLEASED) {
+        } else if (tension <= Tension.DISPLEASED) {
             Market market = getGame().getMarket();
             int value = 0;
             Iterator iterator = warehouse.getCompactGoodsIterator();

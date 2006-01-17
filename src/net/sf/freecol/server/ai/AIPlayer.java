@@ -23,6 +23,7 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
@@ -144,9 +145,9 @@ public class AIPlayer extends AIObject {
             Player p = (Player) playerIterator.next();
             if ((getPlayer().getNation() == Player.SPANISH) && !p.isEuropean()) {
                 // HACK: Spanish should really hate the natives at all times
-                getPlayer().setTension(p, 1000);
+                getPlayer().getTension(p).setValue(1000);
             }
-            if (getPlayer().getTension(p) >= Player.TENSION_ADD_NORMAL) {
+            if (getPlayer().getTension(p).getValue() >= Tension.TENSION_ADD_NORMAL) {
                 getPlayer().setStance(p, Player.WAR);
             } else {
                 getPlayer().setStance(p, Player.PEACE);
@@ -895,7 +896,8 @@ public class AIPlayer extends AIObject {
                             if (t.getFirstUnit().getOwner() == player) {
                                 defenders++;
                             } else {
-                                if (player.getTension(t.getFirstUnit().getOwner()) >= Player.TENSION_ADD_MAJOR) {
+                                if (player.getTension(t.getFirstUnit().getOwner()).getValue() >=
+                                    Tension.TENSION_ADD_MAJOR) {
                                     threat += 2;
                                     if (t.getUnitCount() * 2 > worstThreat) {
                                         if (t.getSettlement() != null) {
@@ -905,7 +907,8 @@ public class AIPlayer extends AIObject {
                                         }
                                         worstThreat = t.getUnitCount() * 2;
                                     }
-                                } else if (player.getTension(t.getFirstUnit().getOwner()) >= Player.TENSION_ADD_MINOR) {
+                                } else if (player.getTension(t.getFirstUnit().getOwner()).getValue() >=
+                                           Tension.TENSION_ADD_MINOR) {
                                     threat += 1;
                                     if (t.getUnitCount() > worstThreat) {
                                         if (t.getSettlement() != null) {
@@ -970,14 +973,16 @@ public class AIPlayer extends AIObject {
                         }
                     } else {
                         int thisThreat = 0;
-                        if (player.getTension(t.getFirstUnit().getOwner()) >= Player.TENSION_ADD_MAJOR) {
+                        if (player.getTension(t.getFirstUnit().getOwner()).getValue() >=
+                            Tension.TENSION_ADD_MAJOR) {
                             Iterator uit = t.getUnitIterator();
                             while (uit.hasNext()) {
                                 if (((Unit)(uit.next())).isOffensiveUnit()) {
                                     thisThreat += 2;
                                 }
                             }
-                        } else if (player.getTension(t.getFirstUnit().getOwner()) >= Player.TENSION_ADD_MINOR) {
+                        } else if (player.getTension(t.getFirstUnit().getOwner()).getValue() >= 
+                                   Tension.TENSION_ADD_MINOR) {
                             Iterator uit = t.getUnitIterator();
                             while (uit.hasNext()) {
                                 if (((Unit)(uit.next())).isOffensiveUnit()) {
@@ -1231,7 +1236,8 @@ public class AIPlayer extends AIObject {
                     return price;
                 }
             } else {
-                price = ((IndianSettlement) settlement).getPrice(goods) - player.getTension(unit.getOwner());
+                price = ((IndianSettlement) settlement).getPrice(goods) -
+                    player.getTension(unit.getOwner()).getValue();
                 price = Math.min(price, player.getGold()/2);
                 if (price <= 0) {
                     return 0;
@@ -1270,17 +1276,8 @@ public class AIPlayer extends AIObject {
             int amount = colony.getWarehouseCapacity() - colony.getGoodsCount(goods.getType());
             amount = Math.min(amount, goods.getAmount());
             // get a good price
-            int percentage = 50;
-            int tension = player.getTension(otherPlayer);
-            if (tension <= Player.TENSION_HAPPY) {
-                percentage = 90;
-            } else if (tension <= Player.TENSION_CONTENT) {
-                percentage = 80;
-            } else if (tension <= Player.TENSION_DISPLEASED) {
-                percentage = 70;
-            } else if (tension <= Player.TENSION_ANGRY) {
-                percentage = 60;
-            }
+            int tensionLevel = player.getTension(otherPlayer).getLevel();
+            int percentage = (9 - tensionLevel) * 10;
             // what we could get for the goods in Europe (minus taxes)
             int netProfits = ((100 - player.getTax()) * getGame().getMarket().getSalePrice(goods.getType(), amount)) / 100;
             int price = (netProfits * percentage) / 100;

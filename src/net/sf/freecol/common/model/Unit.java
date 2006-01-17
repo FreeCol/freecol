@@ -3230,9 +3230,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     public void adjustTension(Unit enemyUnit) {
         Player myPlayer = getOwner();
         Player enemy = enemyUnit.getOwner();
-        myPlayer.modifyTension(enemy, -Player.TENSION_ADD_MINOR);
+        myPlayer.modifyTension(enemy, -Tension.TENSION_ADD_MINOR);
         if (getIndianSettlement() != null) {
-            getIndianSettlement().modifyAlarm(enemy, -IndianSettlement.ADD_ALARM_UNIT_DESTROYED/2);
+            getIndianSettlement().modifyAlarm(enemy, -Tension.TENSION_ADD_UNIT_DESTROYED/2);
         }
 
         // Increases the enemy's tension levels:
@@ -3243,18 +3243,18 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 // we are attacking a settlement
                 if (settlement instanceof IndianSettlement &&
                     ((IndianSettlement) settlement).isCapital()) {
-                    enemy.modifyTension(myPlayer, Player.TENSION_ADD_MAJOR);
+                    enemy.modifyTension(myPlayer, Tension.TENSION_ADD_MAJOR);
                 } else {
-                    enemy.modifyTension(myPlayer, Player.TENSION_ADD_NORMAL);
+                    enemy.modifyTension(myPlayer, Tension.TENSION_ADD_NORMAL);
                 }
                 if (homeTown != null) {
-                    homeTown.modifyAlarm(myPlayer, IndianSettlement.ADD_ALARM_SETTLEMENT_ATTACKED);
+                    homeTown.modifyAlarm(myPlayer, Tension.TENSION_ADD_SETTLEMENT_ATTACKED);
                 }
             } else {
                 // we are attacking an enemy unit in the open
-                enemy.modifyTension(myPlayer, Player.TENSION_ADD_MINOR);
+                enemy.modifyTension(myPlayer, Tension.TENSION_ADD_MINOR);
                 if (homeTown != null) {
-                    homeTown.modifyAlarm(myPlayer, IndianSettlement.ADD_ALARM_UNIT_DESTROYED);
+                    homeTown.modifyAlarm(myPlayer, Tension.TENSION_ADD_UNIT_DESTROYED);
                 }
             }
         }
@@ -3306,7 +3306,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         ModelController modelController = getGame().getModelController();
         settlement.dispose();
 
-        enemy.modifyTension(getOwner(), Player.TENSION_ADD_MAJOR);
+        enemy.modifyTension(getOwner(), Tension.TENSION_ADD_MAJOR);
 
         int randomTreasure = modelController.getRandom(getID() + "indianTreasureRandom" +
                                                        getID(), 11);
@@ -3357,7 +3357,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     public void captureColony(Colony colony, int plunderGold) {
         Player enemy = colony.getOwner();
         Player myPlayer = getOwner();
-        enemy.modifyTension(getOwner(), Player.TENSION_ADD_MAJOR);
+        enemy.modifyTension(getOwner(), Tension.TENSION_ADD_MAJOR);
 
         if (myPlayer.isEuropean()) {
             myPlayer.modifyGold(plunderGold);

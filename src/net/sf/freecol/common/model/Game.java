@@ -696,12 +696,14 @@ public class Game extends FreeColGameObject {
     */
     public static int getInciteAmount(Player payingPlayer, Player targetPlayer, Player attackingPlayer) {
         int amount = 0;
-        if (attackingPlayer.getTension(payingPlayer) > attackingPlayer.getTension(targetPlayer)) {
+        if (attackingPlayer.getTension(payingPlayer).getValue() >
+            attackingPlayer.getTension(targetPlayer).getValue()) {
             amount = 10000;
         } else {
             amount = 5000;
         }
-        amount += 20 * (attackingPlayer.getTension(payingPlayer) - attackingPlayer.getTension(targetPlayer));
+        amount += 20 * (attackingPlayer.getTension(payingPlayer).getValue() -
+                        attackingPlayer.getTension(targetPlayer).getValue());
 
         return Math.max(amount, 650);
     }

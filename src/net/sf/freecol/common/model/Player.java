@@ -24,34 +24,10 @@ import org.w3c.dom.Element;
 * {@link #getEntryLocation entry location}.
 */
 public class Player extends FreeColGameObject {
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    /**
-    * Constants for adding to the tension levels.
-    */
-    public static final int TENSION_ADD_TAKE_LAND = 350, // Grab land without paying
-                            TENSION_ADD_MINOR = 100,    // Unit destroyed, etc
-                            TENSION_ADD_NORMAL = 200,   // Unit destroyed in a Settlement, etc
-                            TENSION_ADD_MAJOR = 300;    // Unit destroyed in a capital, etc
-
-    /** The AI player is happy if <code>tension <= TENSION_HAPPY</code>. */
-    public static final int TENSION_HAPPY = 100;
-
-    /** The AI player is content if <code>tension <= TENSION_CONTENT && tension > TENSION_HAPPY</code>. */
-    public static final int TENSION_CONTENT = 600;
-
-    /** The AI player is displeased if <code>tension <= TENSION_DISPLEASED && tension > TENSION_CONTENT</code>. */
-    public static final int TENSION_DISPLEASED = 700;
-
-    /** The AI player is angry if <code>tension <= TENSION_ANGRY && tension > TENSION_DISPLEASED</code>. */
-    public static final int TENSION_ANGRY = 800;
-
-    /** The AI player is hateful if <code>tension > TENSION_ANGRY</code>. */
-    public static final int TENSION_HATEFUL = 1000;
-
-    
 
     /**
     * Contants for describing the stance towards a player.
@@ -135,7 +111,7 @@ public class Player extends FreeColGameObject {
     * Only used by AI - stores the tension levels,
     * 0-1000 with 1000 maximum hostility.
     */
-    private int[] tension = new int[NUMBER_OF_NATIONS];
+    private Tension[] tension = new Tension[NUMBER_OF_NATIONS];
 
     /**
     * Stores the stance towards the other players. One of:
@@ -283,8 +259,12 @@ public class Player extends FreeColGameObject {
         europe = new Europe(game, this);
         monarch = new Monarch(game, this, "");
         /** No initial arrears. */
-        for ( int i = 0; i < arrears.length; i++ ) {
+        for (int i = 0; i < arrears.length; i++) {
             arrears[i] = 0;
+        }
+
+        for (int k = 0; k < tension.length; k++) {
+            tension[k] = new Tension(0);
         }
 
         if (isEuropean(nation)) {
@@ -1465,11 +1445,7 @@ public class Player extends FreeColGameObject {
     }
 
     public void modifyTension(int nation, int addToTension) {        
-        tension[nation] += addToTension;
-
-        if (tension[nation]>1000) {
-            tension[nation] = 1000;
-        }
+        tension[nation].modify(addToTension);
     }
 
     
@@ -1477,21 +1453,17 @@ public class Player extends FreeColGameObject {
     * Sets the hostiliy against the given player.
     *
     * @param player The <code>Player</code>.
-    * @param tensionLevel The tension level.
+    * @param tension The <code>Tension</code>.
     */
-    public void setTension(Player player, int tensionLevel) {
-        tension[player.getNation()] = tensionLevel;
-        
-        if (tension[player.getNation()]>1000) {
-            tension[player.getNation()] = 1000;
-        }
+    public void setTension(Player player, Tension newTension) {
+        tension[player.getNation()] = newTension;
     }
 
 
     /**
     * Gets the hostility this player has against the given player.
     */
-    public int getTension(Player player) {
+    public Tension getTension(Player player) {
         return tension[player.getNation()];
     }
 
@@ -1559,12 +1531,12 @@ public class Player extends FreeColGameObject {
      */
     public void warDeclaredBy(int nation) {
         setStance(nation, WAR);
-        modifyTension(nation, TENSION_ANGRY);
+        modifyTension(nation, Tension.ANGRY);
         if (!isEuropean()) {
             Iterator settlementIterator = getIndianSettlementIterator();
             while (settlementIterator.hasNext()) {
                 IndianSettlement settlement = (IndianSettlement) settlementIterator.next();
-                settlement.modifyAlarm(nation, IndianSettlement.ALARM_ANGRY);
+                settlement.modifyAlarm(nation, Tension.TENSION_ANGRY);
             }
         }
     }    
@@ -1660,11 +1632,11 @@ public class Player extends FreeColGameObject {
                 while (pi.hasNext()) {
                     Player p = (Player) pi.next();
                     if (!p.isEuropean()) {
-                        p.setTension(this, 0);
+                        p.getTension(this).setValue(0);
                         Iterator isi = p.getIndianSettlementIterator();
                         while (isi.hasNext()) {
                             IndianSettlement is = (IndianSettlement) isi.next();
-                            is.setAlarm(this, 0);
+                            is.getAlarm(this).setValue(0);
                         }
                     }
                 }
@@ -1757,7 +1729,12 @@ public class Player extends FreeColGameObject {
         playerElement.setAttribute("tax", Integer.toString(tax));
         playerElement.setAttribute("difficulty", Integer.toString(difficulty));
         playerElement.setAttribute("bellsBonus", Integer.toString(bellsBonus));
-        playerElement.appendChild(toArrayElement("tension", tension, document));
+
+        int[] tensionArray = new int[tension.length];
+        for (int i = 0; i < tension.length; i++) {
+            tensionArray[i] = tension[i].getValue();
+        }            
+        playerElement.appendChild(toArrayElement("tension", tensionArray, document));
         playerElement.appendChild(toArrayElement("stance", stance, document));
         playerElement.appendChild(toArrayElement("arrears", arrears, document));
         playerElement.appendChild(toArrayElement("sales", sales, document));
@@ -1841,9 +1818,12 @@ public class Player extends FreeColGameObject {
         crossesRequired = Integer.parseInt(playerElement.getAttribute("crossesRequired"));
 
         if (getChildElement(playerElement, "tension") != null) {
-            tension = readFromArrayElement("tension", getChildElement(playerElement, "tension"), new int[0]);
+            int tensionArray[] = readFromArrayElement("tension", getChildElement(playerElement, "tension"), new int[0]);
+            for (int i = 0; i < tensionArray.length; i++) {
+                tension[i] = new Tension(tensionArray[i]);
+            }
         } else {
-            tension = new int[TRIBES.length + NATIONS.length];
+            tension = new Tension[TRIBES.length + NATIONS.length];
         }
         
         if (getChildElement(playerElement, "stance") != null) {

@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 import net.sf.freecol.common.model.GoalDecider;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
@@ -179,9 +180,9 @@ public abstract class Mission extends AIObject {
                 if ((newTile.isLand() && !unit.isNaval() || !newTile.isLand() && unit.isNaval()) &&
                         newTile.getDefendingUnit(unit) != null && newTile.getDefendingUnit(unit).getOwner() != unit.getOwner()) {
                     
-                    int tension = unit.getOwner().getTension(newTile.getDefendingUnit(unit).getOwner());
+                    int tension = unit.getOwner().getTension(newTile.getDefendingUnit(unit).getOwner()).getValue();
                     if (unit.getIndianSettlement() != null) {
-                        tension += unit.getIndianSettlement().getAlarm(newTile.getDefendingUnit(unit).getOwner());
+                        tension += unit.getIndianSettlement().getAlarm(newTile.getDefendingUnit(unit).getOwner()).getValue();
                     }
                     if (newTile.getDefendingUnit(unit).getType() == Unit.TREASURE_TRAIN) {
                         tension += Math.min(newTile.getDefendingUnit(unit).getTreasureAmount() / 10, 600);
@@ -192,7 +193,7 @@ public abstract class Mission extends AIObject {
                     if (newTile.getDefendingUnit(unit).getType() == Unit.VETERAN_SOLDIER && !newTile.getDefendingUnit(unit).isArmed()) {
                         tension += 50 - newTile.getDefendingUnit(unit).getDefensePower(unit) * 2;
                     }
-                    if (tension > Player.TENSION_CONTENT) {
+                    if (tension > Tension.TENSION_CONTENT) {
                         if (bestTarget == null) {
                             bestTarget = pathNode;                           
                         } else if (bestTarget.getTurns() == pathNode.getTurns()) {

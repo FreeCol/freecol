@@ -1459,7 +1459,7 @@ public final class GUI {
 
                     // Draw the alarm chip if needed.
                     if (freeColClient.getMyPlayer().hasContacted(((IndianSettlement)settlement).getOwner().getNation())) {
-                        g.drawImage(lib.getAlarmChip(((IndianSettlement)settlement).getAlarmLevel(freeColClient.getMyPlayer())), x + ALARM_OFFSET_X, y + ALARM_OFFSET_Y, null);
+                        g.drawImage(lib.getAlarmChip(((IndianSettlement)settlement).getAlarm(freeColClient.getMyPlayer()).getLevel()), x + ALARM_OFFSET_X, y + ALARM_OFFSET_Y, null);
                     }
 
                     g.setColor(Color.BLACK);

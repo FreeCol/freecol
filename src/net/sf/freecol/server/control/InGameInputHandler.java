@@ -22,6 +22,7 @@ import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
@@ -538,7 +539,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         switch (type) {
         case LostCityRumour.BURIAL_GROUND:
             Player indianPlayer = game.getPlayer(unit.getTile().getNationOwner());
-            indianPlayer.modifyTension(player, Player.TENSION_HATEFUL);
+            indianPlayer.modifyTension(player, Tension.TENSION_HATEFUL);
         case LostCityRumour.EXPEDITION_VANISHES:
             unit.dispose();
             break;
@@ -1120,7 +1121,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             } else {
                 reply.setAttribute("result", "disagree");
             }
-            settlement.getOwner().modifyTension(player, Player.TENSION_ADD_MINOR);
+            settlement.getOwner().modifyTension(player, Tension.TENSION_ADD_MINOR);
         } else if (action.equals("attack")) {
             // The movesLeft has been set to 0 when the scout initiated its action.
             // If it wants to attack then it can and it will need some moves to do it.

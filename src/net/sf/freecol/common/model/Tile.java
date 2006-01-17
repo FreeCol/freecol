@@ -516,7 +516,7 @@ public final class Tile extends FreeColGameObject implements Location {
             Player otherPlayer = getGame().getPlayer(getNationOwner());
             if (otherPlayer != null) {
                 if (!otherPlayer.isEuropean()) {
-                    otherPlayer.modifyTension(player, Player.TENSION_ADD_TAKE_LAND);
+                    otherPlayer.modifyTension(player, Tension.TENSION_ADD_LAND_TAKEN);
                 }
             } else {
                 logger.warning("Could not find player with nation: " + getNationOwner());
