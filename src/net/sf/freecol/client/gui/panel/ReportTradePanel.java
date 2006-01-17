@@ -2,11 +2,12 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
 import java.awt.event.ActionListener;
-//import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -45,7 +46,8 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
     private final JLabel salesLabel;
     private final JLabel beforeTaxesLabel;
     private final JLabel afterTaxesLabel;
-    
+    private final JScrollPane scrollPane;
+    private final JPanel tradeReportPanel;
 
     /**
      * The constructor that will add the items to this panel.
@@ -71,6 +73,11 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
         widths[widths.length - 1] = marginWidth; // right margin
 
         heights = null;
+
+        tradeReportPanel = new JPanel();
+        scrollPane = new JScrollPane(tradeReportPanel,
+                                     JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                                     JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     }
 
     /**
@@ -94,11 +101,11 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
         heights[5] = marginWidth;
         heights[heights.length - 1] = marginWidth;
 
-        reportPanel.setLayout(new HIGLayout(widths, heights));
+        tradeReportPanel.setLayout(new HIGLayout(widths, heights));
 
-        reportPanel.add(salesLabel, higConst.rc(3, 2));
-        reportPanel.add(beforeTaxesLabel, higConst.rc(4, 2));
-        reportPanel.add(afterTaxesLabel, higConst.rc(5, 2));
+        tradeReportPanel.add(salesLabel, higConst.rc(3, 2));
+        tradeReportPanel.add(beforeTaxesLabel, higConst.rc(4, 2));
+        tradeReportPanel.add(afterTaxesLabel, higConst.rc(5, 2));
 
         int sales, beforeTaxes, afterTaxes;
         JLabel currentLabel;
@@ -107,25 +114,25 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
             sales = player.getSales(i);
             beforeTaxes = player.getIncomeBeforeTaxes(i);
             afterTaxes = player.getIncomeAfterTaxes(i);
-            reportPanel.add(goodsLabels[i], higConst.rc(2, column));
+            tradeReportPanel.add(goodsLabels[i], higConst.rc(2, column));
             
             currentLabel = new JLabel(String.valueOf(sales), JLabel.TRAILING);
             if (sales < 0) {
                 currentLabel.setForeground(Color.RED);
             }
-            reportPanel.add(currentLabel, higConst.rc(3, column));
+            tradeReportPanel.add(currentLabel, higConst.rc(3, column));
 
             currentLabel = new JLabel(String.valueOf(beforeTaxes), JLabel.TRAILING);
             if (beforeTaxes < 0) {
                 currentLabel.setForeground(Color.RED);
             }
-            reportPanel.add(currentLabel, higConst.rc(4, column));
+            tradeReportPanel.add(currentLabel, higConst.rc(4, column));
 
             currentLabel = new JLabel(String.valueOf(afterTaxes), JLabel.TRAILING);
             if (afterTaxes < 0) {
                 currentLabel.setForeground(Color.RED);
             }
-            reportPanel.add(currentLabel, higConst.rc(5, column));
+            tradeReportPanel.add(currentLabel, higConst.rc(5, column));
         }
 
         colonyIterator = colonies.iterator();
@@ -133,7 +140,7 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
         while (colonyIterator.hasNext()) {
             Colony colony = (Colony) colonyIterator.next();
             currentLabel = new JLabel(colony.getName());
-            reportPanel.add(currentLabel, higConst.rc(row, 2));
+            tradeReportPanel.add(currentLabel, higConst.rc(row, 2));
             for (int i = 0; i < Goods.NUMBER_OF_TYPES; i++) {
                 int column = columnsPerLabel * i + 4;
                 int amount = colony.getGoodsCount(i);
@@ -144,9 +151,11 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
                 } else if (amount > 200) {
                     currentLabel.setForeground(Color.BLUE);
                 }
-                reportPanel.add(currentLabel, higConst.rc(row, column));
+                tradeReportPanel.add(currentLabel, higConst.rc(row, column));
             }
             row++;
         }
+
+        reportPanel.add(tradeReportPanel);
     }
 }

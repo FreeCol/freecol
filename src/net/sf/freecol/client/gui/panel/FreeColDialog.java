@@ -24,6 +24,7 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.border.CompoundBorder;
@@ -247,7 +248,10 @@ public class FreeColDialog extends FreeColPanel {
             height += objectButton.getMinimumSize().height;
         }
         objectsPanel.add(cancelButton);
-        choiceDialog.add(objectsPanel, BorderLayout.CENTER);
+        JScrollPane scrollPane = new JScrollPane(objectsPanel,
+                                                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                                                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        choiceDialog.add(scrollPane, BorderLayout.CENTER);
 
         //choiceDialog.setSize(width, height);
         choiceDialog.setSize(choiceDialog.getPreferredSize());
