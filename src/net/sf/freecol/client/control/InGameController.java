@@ -230,6 +230,7 @@ public final class InGameController implements NetworkConstants {
             }
 
             Colony colony = new Colony(game, (Element) reply.getChildNodes().item(0));
+            changeWorkType(unit, Goods.FOOD);
             unit.buildColony(colony);
             gui.setActiveUnit(null);
             gui.setSelectedTile(colony.getTile().getPosition());
@@ -1354,6 +1355,9 @@ public final class InGameController implements NetworkConstants {
         if (unit == null) {
             return;
         }
+        // affect client only
+        unit.setDestination(null);
+        unit.setPath(null);
         changeState(unit, Unit.ACTIVE);
     }
 
