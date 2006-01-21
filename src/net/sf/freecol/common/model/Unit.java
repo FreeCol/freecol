@@ -3378,6 +3378,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 colony.dispose();
             } else {
                 Unit victim = colony.getRandomUnit();
+                if (victim == null) {
+                    return;
+                }
                 addModelMessage(colony, "model.unit.colonistSlaughtered",
                                 new String[][] {{"%colony%", colony.getName()},
                                                 {"%unit%", victim.getName()}});

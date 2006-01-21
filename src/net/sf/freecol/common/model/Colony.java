@@ -422,7 +422,8 @@ public final class Colony extends Settlement implements Location {
         if (locatable instanceof Unit) {
             if (((Unit) locatable).isColonist()) {
                 WorkLocation w = getVacantColonyTileFor(((Unit) locatable), Goods.FOOD);
-                if (w != null && w.canAdd(locatable)) {
+                if (w != null && w.canAdd(locatable) &&
+                    getVacantColonyTileProductionFor((Unit) locatable, Goods.FOOD) > 0) {
                     locatable.setLocation(w);
                     updatePopulation();
                     return;
@@ -940,7 +941,7 @@ public final class Colony extends Settlement implements Location {
             if (colonyTile.canAdd(unit)) {
                 Tile workTile = colonyTile.getWorkTile();
                 boolean ourLand = workTile.getNationOwner() == Player.NO_NATION 
-                                  || workTile.getNationOwner()== unit.getNation();
+                                  || workTile.getNationOwner() == unit.getNation();
                 if (ourLand && unit.getFarmedPotential(goodsType, colonyTile.getWorkTile()) > highestProduction) {
                     highestProduction = unit.getFarmedPotential(goodsType, colonyTile.getWorkTile());
                     bestPick = colonyTile;
@@ -1146,7 +1147,11 @@ public final class Colony extends Settlement implements Location {
     * in the colony.
     */
     public Unit getRandomUnit() {
-        return ((Unit) getUnitIterator().next());
+        if (getUnitIterator().hasNext()) {
+            return ((Unit) getUnitIterator().next());
+        } else {
+            return null;
+        }
     }
 
 
