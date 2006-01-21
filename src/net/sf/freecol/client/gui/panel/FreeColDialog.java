@@ -402,8 +402,8 @@ public class FreeColDialog extends FreeColPanel {
     * @return The FreeColDialog that asks the question to the user.
     */
     public static FreeColDialog createScoutIndianSettlementDialog(IndianSettlement settlement, Player player) {
-        String intro = Messages.message(settlement.getAlarmLevelMessage(player),
-                                        new String [][] {{"%nation%", settlement.getOwner().getNationAsString()}});
+        String introText = Messages.message(settlement.getAlarmLevelMessage(player),
+                                            new String [][] {{"%nation%", settlement.getOwner().getNationAsString()}});
         int skill = settlement.getLearnableSkill();
         String messageID;
         String skillName = "";
@@ -421,8 +421,8 @@ public class FreeColDialog extends FreeColPanel {
     
         String mainText = Messages.message(messageID, data);
 
-        final JLabel question = new JLabel("<html><body><p>" + intro +
-                                           "</p><p>" + mainText + "</p></body></html>");
+        final JLabel intro = new JLabel("<html><body><p>" + introText + "</p></body></html>");
+        final JLabel question = new JLabel("<html><body><p>" + mainText + "</p></body></html>");
         final JButton speak = new JButton(Messages.message("scoutSettlement.speak")),
                 demand = new JButton(Messages.message("scoutSettlement.tribute")),
                 attack = new JButton(Messages.message("scoutSettlement.attack")),
@@ -435,7 +435,7 @@ public class FreeColDialog extends FreeColPanel {
         };
 
         int w1[] = {10, 30, 200, 30, 10};
-        int h1[] = {10, 100, 10, 20, 10, 20, 10, 20, 10, 20, 10};
+        int h1[] = {10, 100, 10, 100, 10, 20, 10, 20, 10, 20, 10, 20, 10};
         HIGLayout layout = new HIGLayout(w1, h1);
         higConst.clearCorrection();
         layout.setRowWeight(2,1);
@@ -462,11 +462,12 @@ public class FreeColDialog extends FreeColPanel {
             }
         });
 
-        scoutDialog.add(question, higConst.rcwh(2, 2, 3, 1));
-        scoutDialog.add(speak, higConst.rc(4, 3));
-        scoutDialog.add(demand, higConst.rc(6, 3));
-        scoutDialog.add(attack, higConst.rc(8, 3));
-        scoutDialog.add(cancel, higConst.rc(10, 3));
+        scoutDialog.add(intro, higConst.rcwh(2, 2, 3, 1));
+        scoutDialog.add(question, higConst.rcwh(4, 2, 3, 1));
+        scoutDialog.add(speak, higConst.rc(6, 3));
+        scoutDialog.add(demand, higConst.rc(8, 3));
+        scoutDialog.add(attack, higConst.rc(10, 3));
+        scoutDialog.add(cancel, higConst.rc(12, 3));
 
         scoutDialog.setSize(scoutDialog.getPreferredSize());
 
