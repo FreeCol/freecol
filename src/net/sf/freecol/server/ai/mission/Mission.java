@@ -54,10 +54,16 @@ public abstract class Mission extends AIObject {
     * @param aiMain The main AI-object.
     * @param aiUnit The <code>AIUnit</code> this mission
     *        is created for.
+    * @exception NullPointerException if <code>aiUnit == null</code>.
     */
     public Mission(AIMain aiMain, AIUnit aiUnit) {
         super(aiMain);
         this.aiUnit = aiUnit;
+        
+        if (aiUnit == null) {
+            logger.warning("aiUnit == null");
+            throw new NullPointerException("aiUnit == null");
+        }        
     }
 
     
@@ -215,7 +221,51 @@ public abstract class Mission extends AIObject {
     *         <code>null</code> if no transport is needed.
     */
     public Tile getTransportDestination() {
-        return null;
+        if (getUnit().getTile() == null) {
+            if (getUnit().getLocation() instanceof Unit) {
+                return (Tile) ((Unit) getUnit().getLocation()).getEntryLocation();
+            } else {
+                return (Tile) getUnit().getOwner().getEntryLocation();
+            }
+        } else if (!(getUnit().getLocation() instanceof Unit)) {
+            return null;
+        }
+        
+        Unit carrier = (Unit) getUnit().getLocation();
+        
+        GoalDecider gd = new GoalDecider() {
+            private PathNode bestTarget = null;
+            
+            public PathNode getGoal() {
+                return bestTarget;              
+            }
+            
+            public boolean hasSubGoals() {
+                return false;
+            }
+            
+            public boolean check(Unit unit, PathNode pathNode) {
+                Tile newTile = pathNode.getTile();
+                boolean hasOurSettlement = (newTile.getSettlement() != null) 
+                        && newTile.getSettlement().getOwner() == unit.getOwner();
+                if (hasOurSettlement) {
+                    bestTarget = pathNode;
+                }
+                return hasOurSettlement;
+            }
+        };
+        PathNode path;
+        if (carrier.getTile() != null) {
+            path = getGame().getMap().search(carrier, gd, Integer.MAX_VALUE);       
+        } else {
+            path = getGame().getMap().search(carrier, (Tile) carrier.getEntryLocation(), gd, Integer.MAX_VALUE);
+        }
+        
+        if (path == null) {
+            return null;
+        } else {
+            return path.getLastNode().getTile();
+        }
     }
     
     
@@ -226,7 +276,11 @@ public abstract class Mission extends AIObject {
     * @return The priority.
     */
     public int getTransportPriority() {
-        return 0;
+        if (getTransportDestination() != null) {
+            return NORMAL_TRANSPORT_PRIORITY;
+        } else {
+            return 0;
+        }
     }
 
     

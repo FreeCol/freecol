@@ -68,6 +68,10 @@ public class UnitWanderHostileMission extends Mission {
         Unit unit = getUnit();
         Map map = getGame().getMap();
 
+        if (!(unit.getLocation() instanceof Tile)) {
+            return;
+        }
+        
         PathNode pathToTarget = null;
         if (unit.isOffensiveUnit()) {
             pathToTarget = findTarget(5);

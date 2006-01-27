@@ -372,9 +372,18 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     *         <i>false</i> otherwise.
     */
     public boolean isColonist() {
-        if (isNaval() || getType() == INDIAN_CONVERT || getType() == ARTILLERY || getType() == DAMAGED_ARTILLERY || getType() == WAGON_TRAIN || getType() == TREASURE_TRAIN) {
+        if (isNaval()) {
             return false;
-        } else {
+        }
+        switch (getType()) {
+        case INDIAN_CONVERT:
+        case ARTILLERY:
+        case DAMAGED_ARTILLERY:
+        case WAGON_TRAIN:
+        case TREASURE_TRAIN:
+        case BRAVE:
+            return false;
+        default:
             return true;
         }
     }
@@ -665,7 +674,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             if (p != null) {
                 return p.getTotalTurns();
             } else {
-                return -1;
+                return Integer.MAX_VALUE;
             }
         }
     }
@@ -774,13 +783,13 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 } else if (canTradeWith(settlement)) {
                     return ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS;
                 } else {
-                    logger.info("Trying to enter another player's settlement with " +
+                    logger.fine("Trying to enter another player's settlement with " +
                                    getName());
                     return ILLEGAL_MOVE;
                 }
             } else if (target.getDefendingUnit(this) != null &&
                        target.getDefendingUnit(this).getOwner() != getOwner()) {
-                logger.info("Trying to sail into tile occupied by enemy units with " +
+                logger.fine("Trying to sail into tile occupied by enemy units with " +
                                getName());
                 return ILLEGAL_MOVE;
             } else {
@@ -793,17 +802,17 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                         return DISEMBARK;
                     }
                 }
-                logger.info("No units to disembark from " + getName());
+                logger.fine("No units to disembark from " + getName());
                 return ILLEGAL_MOVE;
             }
         } else if (target.getDefendingUnit(this) != null &&
                    target.getDefendingUnit(this).getOwner() != getOwner()) {
             // enemy units at sea
-        	if (isOffensiveUnit()) {
-        		return ATTACK;
-        	} else {
-        		return ILLEGAL_MOVE;
-        	}
+            if (isOffensiveUnit()) {
+                return ATTACK;
+            } else {
+                return ILLEGAL_MOVE;
+            }
         } else {
             // this must be ocean
             return MOVE;
@@ -821,7 +830,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     private int getLandMoveType(Tile target) {
         if (target == null) {
             // only naval units are allowed to do this
-            logger.info("Trying to enter null tile with land unit " + getName());
+            logger.fine("Trying to enter null tile with land unit " + getName());
             return ILLEGAL_MOVE;
         }
         
@@ -834,34 +843,34 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 } else if (canTradeWith(settlement)) {
                     return ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS;
                 } else if (!getTile().isLand()) {
-                	logger.info("Trying to disembark into foreign colony with " +
+                    logger.fine("Trying to disembark into foreign colony with " +
                             getName());
-                	return ILLEGAL_MOVE;
+                    return ILLEGAL_MOVE;
                 } else if (settlement instanceof IndianSettlement) {
-                	if (isScout()) {
-                		return ENTER_INDIAN_VILLAGE_WITH_SCOUT;
-                	} else if (isMissionary()) {
-                		return ENTER_INDIAN_VILLAGE_WITH_MISSIONARY;
-                	} else if (isOffensiveUnit()) {
-                		return ATTACK;                            
-                	} else if (((getType() == FREE_COLONIST) ||
-                			(getType() == INDENTURED_SERVANT))) {
-                		return ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST;
-                	} else {
-                		logger.info("Trying to enter Indian settlement with " +
-                				getName());
-                		return ILLEGAL_MOVE;
-                	}
+                    if (isScout()) {
+                        return ENTER_INDIAN_VILLAGE_WITH_SCOUT;
+                    } else if (isMissionary()) {
+                        return ENTER_INDIAN_VILLAGE_WITH_MISSIONARY;
+                    } else if (isOffensiveUnit()) {
+                        return ATTACK;                            
+                    } else if (((getType() == FREE_COLONIST) ||
+                            (getType() == INDENTURED_SERVANT))) {
+                        return ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST;
+                    } else {
+                        logger.fine("Trying to enter Indian settlement with " +
+                                getName());
+                        return ILLEGAL_MOVE;
+                    }
                 } else if (settlement instanceof Colony) {
-                	if (isScout()) {
-                		return ENTER_FOREIGN_COLONY_WITH_SCOUT;
-                	} else if (isOffensiveUnit()) {
-                		return ATTACK;
-                	} else {
-                		logger.info("Trying to enter foreign colony with " +
-                				getName());
-                		return ILLEGAL_MOVE;
-                	}
+                    if (isScout()) {
+                        return ENTER_FOREIGN_COLONY_WITH_SCOUT;
+                    } else if (isOffensiveUnit()) {
+                        return ATTACK;
+                    } else {
+                        logger.fine("Trying to enter foreign colony with " +
+                                getName());
+                        return ILLEGAL_MOVE;
+                    }
                 }
             } else if (target.getDefendingUnit(this) != null &&
                        target.getDefendingUnit(this).getOwner() != getOwner()) {
@@ -869,11 +878,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                     if (isOffensiveUnit()) {
                         return ATTACK;
                     } else {
-                        logger.info("Trying to attack with civilian " + getName());
+                        logger.fine("Trying to attack with civilian " + getName());
                         return ILLEGAL_MOVE;
                     }
                 } else {
-                    logger.info("Attempting marine assault with " + getName());
+                    logger.fine("Attempting marine assault with " + getName());
                     return ILLEGAL_MOVE;
                 }
             } else if (getMoveCost(target) > getMovesLeft()) {
@@ -887,7 +896,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             // check for embarkation
             if (target.getFirstUnit() == null || 
                 target.getFirstUnit().getNation() != getNation()) {
-                logger.info("Trying to embark on tile occupied by foreign units with " +
+                logger.fine("Trying to embark on tile occupied by foreign units with " +
                                getName());
                 return ILLEGAL_MOVE;
             } else {
@@ -900,7 +909,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                         return EMBARK;
                     }
                 }
-                logger.info("Trying to board full vessel with " +
+                logger.fine("Trying to board full vessel with " +
                                getName());
                 return ILLEGAL_MOVE;
             }
@@ -1237,8 +1246,13 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     * Checks if this unit is visible to the given player.
     */
     public boolean isVisibleTo(Player player) {
-        return (getTile() != null && player.canSee(getTile()) && (getTile().getSettlement() == null
-                || getTile().getSettlement().getOwner() == player));
+        return getTile() != null && player.canSee(getTile()) 
+                    && (getTile().getSettlement() == null 
+                            || getTile().getSettlement().getOwner() == player
+                            || !getGameOptions().getBoolean(GameOptions.UNIT_HIDING))
+                    && (!(getLocation() instanceof Unit)
+                            || ((Unit) getLocation()).getOwner() == player
+                            || !getGameOptions().getBoolean(GameOptions.UNIT_HIDING));
     }
 
 
@@ -2444,14 +2458,14 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     * @return The amount of units/goods than can be moved onto this Unit.
     */
     public int getSpaceLeft() {
-    	int space = getInitialSpaceLeft() - getGoodsCount();
-    	
-    	Iterator unitIterator = getUnitIterator();
-    	while (unitIterator.hasNext()) {
-    		Unit u = (Unit) unitIterator.next();
-    		space -= u.getTakeSpace();
-    	}
-    	
+        int space = getInitialSpaceLeft() - getGoodsCount();
+        
+        Iterator unitIterator = getUnitIterator();
+        while (unitIterator.hasNext()) {
+            Unit u = (Unit) unitIterator.next();
+            space -= u.getTakeSpace();
+        }
+        
         return space;
     }
 
@@ -2916,6 +2930,15 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         return (getOffensePower(this) > 0);
     }
 
+    
+    /**
+     * Checks if this is an defensive unit.
+     * That is: a unit which can be used to defend a <code>Settlement</code>.
+     */
+     public boolean isDefensiveUnit() {
+         return isOffensiveUnit() && !isNaval();
+     }
+     
 
     /**
     * Returns the current offensive power of this unit.
@@ -3138,7 +3161,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      *
      * @param enemyUnit The unit we are fighting against.
      * @param greatDemote <code>true</code> indicates that
-     * 		muskets/horses should be taken by the <code>enemyUnit</code>.
+     *      muskets/horses should be taken by the <code>enemyUnit</code>.
      */
     public void demote(Unit enemyUnit, boolean greatDemote) {
         String oldName = getName();
@@ -3791,7 +3814,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
         // Do not show enemy units hidden in a carrier:
         if (isCarrier()) {
-            if (showAll || getOwner().equals(player)) {
+            if (showAll || getOwner().equals(player) || !getGameOptions().getBoolean(GameOptions.UNIT_HIDING) && player.canSee(getTile())) {
                 unitElement.appendChild(unitContainer.toXMLElement(player, document, showAll, toSavedGame));
                 unitElement.appendChild(goodsContainer.toXMLElement(player, document, showAll, toSavedGame));
             } else {

@@ -58,7 +58,7 @@ public class ColonyPlan {
         this.colony = colony;
         
         if (colony == null) {
-        	throw new NullPointerException("colony == null");
+            throw new NullPointerException("colony == null");
         }
     }
 
@@ -95,18 +95,18 @@ public class ColonyPlan {
      * @return The list of <code>WorkLocationPlan</code>s .
      */   
     public List getSortedWorkLocationPlans() {
-    	List workLocationPlans = getWorkLocationPlans();
-    	Collections.sort(workLocationPlans, new Comparator() {
-    		public int compare(Object o, Object p) {
-    			Integer i = new Integer(((WorkLocationPlan) o).getProductionOf(((WorkLocationPlan) o).getGoodsType()));
-    			Integer j = new Integer(((WorkLocationPlan) p).getProductionOf(((WorkLocationPlan) p).getGoodsType()));
-    			
-    			return j.compareTo(i);
-    		}
-    	});
-    	
-    	return workLocationPlans;
-	}
+        List workLocationPlans = getWorkLocationPlans();
+        Collections.sort(workLocationPlans, new Comparator() {
+            public int compare(Object o, Object p) {
+                Integer i = new Integer(((WorkLocationPlan) o).getProductionOf(((WorkLocationPlan) o).getGoodsType()));
+                Integer j = new Integer(((WorkLocationPlan) p).getProductionOf(((WorkLocationPlan) p).getGoodsType()));
+                
+                return j.compareTo(i);
+            }
+        });
+        
+        return workLocationPlans;
+    }
     
     
     /**

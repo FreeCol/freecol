@@ -98,17 +98,17 @@ public class Tension {
      * Returns the current tension level.
      */
     public int getLevel() {
-	if (value <= TENSION_HAPPY) {
-	    return HAPPY;
-	} else if (value <= TENSION_CONTENT) {
-	    return CONTENT;
-	} else if (value <= TENSION_DISPLEASED) {
-	    return DISPLEASED;
-	} else if (value <= TENSION_ANGRY) {
-	    return ANGRY;
-	} else {
-	    return HATEFUL;
-	}
+    if (value <= TENSION_HAPPY) {
+        return HAPPY;
+    } else if (value <= TENSION_CONTENT) {
+        return CONTENT;
+    } else if (value <= TENSION_DISPLEASED) {
+        return DISPLEASED;
+    } else if (value <= TENSION_ANGRY) {
+        return ANGRY;
+    } else {
+        return HATEFUL;
+    }
     }
 
     public void setLevel(int level) {
@@ -132,17 +132,17 @@ public class Tension {
      * Returns the current tension level as a string.
      */
     public String getLevelAsString() {
-	if (value <= TENSION_HAPPY) {
-	    return Messages.message(level[HAPPY]);
-	} else if (value <= TENSION_CONTENT) {
-	    return Messages.message(level[CONTENT]);
-	} else if (value <= TENSION_DISPLEASED) {
+    if (value <= TENSION_HAPPY) {
+        return Messages.message(level[HAPPY]);
+    } else if (value <= TENSION_CONTENT) {
+        return Messages.message(level[CONTENT]);
+    } else if (value <= TENSION_DISPLEASED) {
             return Messages.message(level[DISPLEASED]);
-	} else if (value <= TENSION_ANGRY) {
+    } else if (value <= TENSION_ANGRY) {
             return Messages.message(level[ANGRY]);
-	} else {
-	    return Messages.message(level[HATEFUL]);
-	}
+    } else {
+        return Messages.message(level[HATEFUL]);
+    }
     }
 
     /**

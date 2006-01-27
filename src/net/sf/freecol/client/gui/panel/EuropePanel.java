@@ -146,7 +146,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
 
         cargoLabel = new JLabel("<html><strike>Cargo</strike></html>");
         goldLabel = new JLabel("Gold: 0");
-	taxLabel = new JLabel("Tax: 0");
+    taxLabel = new JLabel("Tax: 0");
 
         JButton recruitButton = new JButton( Messages.message("recruit") ),
                 purchaseButton = new JButton( Messages.message("purchase") ),
@@ -178,7 +178,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         docksLabel.setSize(200, 20);
         cargoLabel.setSize(410, 20);
         goldLabel.setSize(100, 20);
-	taxLabel.setSize(100, 20);
+    taxLabel.setSize(100, 20);
 
         exitButton.setLocation(760, 570);
         recruitButton.setLocation(690, 90);
@@ -196,8 +196,8 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         docksLabel.setLocation(640, 225);
         cargoLabel.setLocation(220, 345);
         goldLabel.setLocation(15, 345);
-	taxLabel.setLocation(15, 365);
-	
+    taxLabel.setLocation(15, 365);
+    
         setLayout(null);
 
         exitButton.setActionCommand(String.valueOf(EXIT));
@@ -226,7 +226,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         add(docksLabel);
         add(cargoLabel);
         add(goldLabel);
-	add(taxLabel);
+    add(taxLabel);
 
         try {
             BevelBorder border = new BevelBorder(BevelBorder.RAISED);
@@ -401,9 +401,9 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                 newLandName = freeColClient.getMyPlayer().getDefaultNewLandName();
             }
             toAmericaLabel.setText( Messages.message("goingTo") + " " + newLandName );
-	    taxLabel.setText( Messages.message("tax") + ": " + freeColClient.getMyPlayer().getTax() + "%" );
+        taxLabel.setText( Messages.message("tax") + ": " + freeColClient.getMyPlayer().getTax() + "%" );
 
-	}
+    }
     }
 
 

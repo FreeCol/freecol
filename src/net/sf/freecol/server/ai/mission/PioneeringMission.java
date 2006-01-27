@@ -25,11 +25,11 @@ import org.w3c.dom.Element;
  * @see Unit#isPioneer
  */
 public class PioneeringMission extends Mission {
-	/* 
-	 * TODO-LATER: "updateTileImprovement" should be called
-	 *             only once (in the beginning of the turn).
-	 */
-	
+    /* 
+     * TODO-LATER: "updateTileImprovement" should be called
+     *             only once (in the beginning of the turn).
+     */
+    
     private static final Logger logger = Logger.getLogger(PioneeringMission.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
@@ -71,8 +71,8 @@ public class PioneeringMission extends Mission {
      */
     public void dispose() {
         if (tileImprovement != null) {
-        	tileImprovement.setPioneer(null);
-        	tileImprovement = null;
+            tileImprovement.setPioneer(null);
+            tileImprovement = null;
         }
         super.dispose();
     }
@@ -84,44 +84,47 @@ public class PioneeringMission extends Mission {
      * @param tileImprovement The <code>TileImprovement</code>.
      */
     public void setTileImprovement(TileImprovement tileImprovement) {
-    	this.tileImprovement = tileImprovement;
+        this.tileImprovement = tileImprovement;
     }
 
     private void updateTileImprovement() {
-    	if (tileImprovement != null) {
-    		return;
-    	}
-    	AIPlayer aiPlayer = (AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getID());
-    	
-    	TileImprovement bestChoice = null;
-    	int bestValue = 0;
-    	Iterator tiIterator = aiPlayer.getTileImprovementIterator();        	
-    	while (tiIterator.hasNext()) {
-    		TileImprovement ti = (TileImprovement) tiIterator.next();
-    		if (ti.getPioneer() == null) {
-    			PathNode path = null;
-    			int value;
-    			if (getUnit().getTile() != ti.getTarget()) {
-    				path = getUnit().findPath(ti.getTarget());
-    				if (path != null) {
-    					value = ti.getValue() + 10000 - (path.getTotalTurns()*5);
-    				} else {
-    					value = ti.getValue();
-    				}
-    			} else {
-    				value = ti.getValue() + 10000;
-    			}
-    			if (value > bestValue) {
-    				bestChoice = ti;
-    				bestValue = value;
-    			}
-    		}
-    	}
-    	
-    	if (bestChoice != null) {
-    		tileImprovement = bestChoice;
-    		bestChoice.setPioneer(getAIUnit());
-    	}    
+        if (getUnit().getTile() == null) {
+            return;
+        }
+        if (tileImprovement != null) {
+            return;
+        }
+        AIPlayer aiPlayer = (AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getID());
+        
+        TileImprovement bestChoice = null;
+        int bestValue = 0;
+        Iterator tiIterator = aiPlayer.getTileImprovementIterator();            
+        while (tiIterator.hasNext()) {
+            TileImprovement ti = (TileImprovement) tiIterator.next();
+            if (ti.getPioneer() == null) {
+                PathNode path = null;
+                int value;
+                if (getUnit().getTile() != ti.getTarget()) {
+                    path = getUnit().findPath(ti.getTarget());
+                    if (path != null) {
+                        value = ti.getValue() + 10000 - (path.getTotalTurns()*5);
+                    } else {
+                        value = ti.getValue();
+                    }
+                } else {
+                    value = ti.getValue() + 10000;
+                }
+                if (value > bestValue) {
+                    bestChoice = ti;
+                    bestValue = value;
+                }
+            }
+        }
+        
+        if (bestChoice != null) {
+            tileImprovement = bestChoice;
+            bestChoice.setPioneer(getAIUnit());
+        }    
     }
     
     /**
@@ -134,39 +137,39 @@ public class PioneeringMission extends Mission {
         }
                
         if (!getUnit().isPioneer()) {
-        	// TODO: Get tools from a Colony
-        	return;
+            // TODO: Get tools from a Colony
+            return;
         }
         
         if (tileImprovement == null) {
-        	updateTileImprovement();
+            updateTileImprovement();
         }
 
         if (getUnit().getState() != Unit.ACTIVE) {
-        	return;
+            return;
         }
         
         if (tileImprovement != null) {
-        	if (getUnit().getTile() != null) {
-        		if (getUnit().getTile() == tileImprovement.getTarget()) {
-        	        Element changeStateElement = Message.createNewRootElement("changeState");
-        	        changeStateElement.setAttribute("unit", getUnit().getID());
-        	        changeStateElement.setAttribute("state", Integer.toString(tileImprovement.getType()));
+            if (getUnit().getTile() != null) {
+                if (getUnit().getTile() == tileImprovement.getTarget()) {
+                    Element changeStateElement = Message.createNewRootElement("changeState");
+                    changeStateElement.setAttribute("unit", getUnit().getID());
+                    changeStateElement.setAttribute("state", Integer.toString(tileImprovement.getType()));
                     try {
                         connection.sendAndWait(changeStateElement);
                     } catch (IOException e) {
                         logger.warning("Could not send message!");
                     }
-        		} else {
-        			PathNode pathToTarget = getUnit().findPath(tileImprovement.getTarget());
-        			if (pathToTarget != null) {
-        				int direction = moveTowards(connection, pathToTarget);
-        				if (direction >= 0 && getUnit().getMoveType(direction) == Unit.MOVE) {
-        					move(connection, direction);
-        				}
-        			}
-        		}
-        	}
+                } else {
+                    PathNode pathToTarget = getUnit().findPath(tileImprovement.getTarget());
+                    if (pathToTarget != null) {
+                        int direction = moveTowards(connection, pathToTarget);
+                        if (direction >= 0 && getUnit().getMoveType(direction) == Unit.MOVE) {
+                            move(connection, direction);
+                        }
+                    }
+                }
+            }
         }        
     }
 
@@ -181,10 +184,10 @@ public class PioneeringMission extends Mission {
      * @return The destination for this <code>Transportable</code>.
      */    
     public Tile getTransportDestination() {
-    	updateTileImprovement();
-    	if (tileImprovement == null) {
-    		return null;
-    	}
+        updateTileImprovement();
+        if (tileImprovement == null) {
+            return null;
+        }
         if (getUnit().getLocation() instanceof Unit) {
             return tileImprovement.getTarget();
         } else if (getUnit().getTile() == tileImprovement.getTarget()) {
@@ -203,15 +206,7 @@ public class PioneeringMission extends Mission {
      * @return The priority.
      */
     public int getTransportPriority() {
-    	updateTileImprovement();
-    	if (tileImprovement == null) {
-    		return 0;
-    	}    	
-        if (getUnit().getLocation() instanceof Unit) {
-            return NORMAL_TRANSPORT_PRIORITY;
-        } else if (getUnit().getLocation().getTile() == tileImprovement.getTarget()) {
-            return 0;
-        } else if (getUnit().getTile() == null || getUnit().findPath(tileImprovement.getTarget()) == null) {
+        if (getTransportDestination() != null) {
             return NORMAL_TRANSPORT_PRIORITY;
         } else {
             return 0;
@@ -225,10 +220,10 @@ public class PioneeringMission extends Mission {
      *         and <code>false</code> otherwise.
      */
     public boolean isValid() {  
-    	updateTileImprovement();    	
+        updateTileImprovement();        
         //return tileImprovement != null;
-    	// TODO: Remove the second test after code for getting tools has been added:
-    	return (tileImprovement != null) && getUnit().isPioneer();
+        // TODO: Remove the second test after code for getting tools has been added:
+        return (tileImprovement != null) && getUnit().isPioneer();
     }
 
     /**
@@ -239,15 +234,15 @@ public class PioneeringMission extends Mission {
      *         and <code>false</code> otherwise.
      */    
     public static boolean isValid(AIUnit aiUnit) {
-    	AIPlayer aiPlayer = (AIPlayer) aiUnit.getAIMain().getAIObject(aiUnit.getUnit().getOwner().getID());
-    	Iterator tiIterator = aiPlayer.getTileImprovementIterator();        	
-    	while (tiIterator.hasNext()) {
-    		TileImprovement ti = (TileImprovement) tiIterator.next();
-    		if (ti.getPioneer() == null) {
-    			return true;
-    		}
-    	}
-    	return false;
+        AIPlayer aiPlayer = (AIPlayer) aiUnit.getAIMain().getAIObject(aiUnit.getUnit().getOwner().getID());
+        Iterator tiIterator = aiPlayer.getTileImprovementIterator();            
+        while (tiIterator.hasNext()) {
+            TileImprovement ti = (TileImprovement) tiIterator.next();
+            if (ti.getPioneer() == null) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -261,7 +256,7 @@ public class PioneeringMission extends Mission {
 
         element.setAttribute("unit", getUnit().getID());
         if (tileImprovement != null) {
-        	element.setAttribute("tileImprovement", tileImprovement.getID());
+            element.setAttribute("tileImprovement", tileImprovement.getID());
         }
 
         return element;
@@ -277,9 +272,9 @@ public class PioneeringMission extends Mission {
         setAIUnit((AIUnit) getAIMain().getAIObject(element.getAttribute("unit")));
         
         if (element.hasAttribute("tileImprovement")) {
-        	tileImprovement = (TileImprovement) getAIMain().getAIObject(element.getAttribute("tileImprovement"));
+            tileImprovement = (TileImprovement) getAIMain().getAIObject(element.getAttribute("tileImprovement"));
         } else {
-        	tileImprovement = null;
+            tileImprovement = null;
         }
     }
 

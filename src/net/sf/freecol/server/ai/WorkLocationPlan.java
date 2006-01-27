@@ -88,14 +88,14 @@ public class WorkLocationPlan {
      * <code>WorkLocationPlan</code>.
      * 
      * @return The <code>TileImprovement</code> if there is an
-     * 		improvement, plow or build road, which will increase
-     * 		the production of the goods type specified by this 
-     * 		plan. <code>null</code> gets returned if this plan is 
-     * 		for a <code>Building</code> or that the <code>Tile</code> 
-     * 		does not have an improvement.
+     *      improvement, plow or build road, which will increase
+     *      the production of the goods type specified by this 
+     *      plan. <code>null</code> gets returned if this plan is 
+     *      for a <code>Building</code> or that the <code>Tile</code> 
+     *      does not have an improvement.
      */
     public TileImprovement createTileImprovement() {   
-    	return updateTileImprovement(null);
+        return updateTileImprovement(null);
     }
         
     /**
@@ -103,46 +103,46 @@ public class WorkLocationPlan {
      * 
      * @param ti The <code>TileImprovement</code> to update.
      * @return The same <code>TileImprovement</code>-object
-     * 		as provided to the method or <code>null</code> if 
-     * 		there is no more need for the improvement. 
+     *      as provided to the method or <code>null</code> if 
+     *      there is no more need for the improvement. 
      */
     public TileImprovement updateTileImprovement(TileImprovement ti) {
-    	if (workLocation instanceof ColonyTile) {
-    		Tile tile = ((ColonyTile) workLocation).getWorkTile();
-    		
-        	if (ti != null && ti.getTarget() != tile) {
-        		throw new IllegalArgumentException("The given TileImprovement was not created for this Tile.");
-        	}
-    		
-    		int gain = tile.getMaximumPotential(goodsType) - tile.potential(goodsType);
-    		if (gain > 0) {
-    			int value = gain;
-    			if (tile.hasBonus()) {
-    				value += 5;
-    			}
-    			if (!tile.isForested()) {
-    				value += 5;
-    			}
-    			boolean roadIsImprovement = (goodsType == Goods.FURS) 
-    					|| goodsType == Goods.LUMBER 
-    					|| goodsType == Goods.ORE 
-    					|| goodsType == Goods.SILVER;
-    			int type = (roadIsImprovement) ? TileImprovement.BUILD_ROAD : TileImprovement.PLOW;
-    			
-    			if (type == TileImprovement.BUILD_ROAD && tile.canGetRoad()
-    					|| type == TileImprovement.PLOW && tile.canBePlowed()) {
-    				if (ti == null) {
-    					return new TileImprovement(getAIMain(), tile, type, value);
-    				} else {
-    					ti.setType(type);
-    					ti.setValue(value);
-    					return ti;
-    				}
-    			}
-    		}
-    	}
-    	
-    	return null;
+        if (workLocation instanceof ColonyTile) {
+            Tile tile = ((ColonyTile) workLocation).getWorkTile();
+            
+            if (ti != null && ti.getTarget() != tile) {
+                throw new IllegalArgumentException("The given TileImprovement was not created for this Tile.");
+            }
+            
+            int gain = tile.getMaximumPotential(goodsType) - tile.potential(goodsType);
+            if (gain > 0) {
+                int value = gain;
+                if (tile.hasBonus()) {
+                    value += 5;
+                }
+                if (!tile.isForested()) {
+                    value += 5;
+                }
+                boolean roadIsImprovement = (goodsType == Goods.FURS) 
+                        || goodsType == Goods.LUMBER 
+                        || goodsType == Goods.ORE 
+                        || goodsType == Goods.SILVER;
+                int type = (roadIsImprovement) ? TileImprovement.BUILD_ROAD : TileImprovement.PLOW;
+                
+                if (type == TileImprovement.BUILD_ROAD && tile.canGetRoad()
+                        || type == TileImprovement.PLOW && tile.canBePlowed()) {
+                    if (ti == null) {
+                        return new TileImprovement(getAIMain(), tile, type, value);
+                    } else {
+                        ti.setType(type);
+                        ti.setValue(value);
+                        return ti;
+                    }
+                }
+            }
+        }
+        
+        return null;
     }
 
     /**

@@ -5,11 +5,11 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
-import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
@@ -35,7 +35,7 @@ public class UnitSeekAndDestroyMission extends Mission {
      * The object we are trying to destroy. This can be a
      * either <code>Settlement</code> or a <code>Unit</code>.
      */
-    private FreeColGameObject target;
+    private Location target;
 
     /**
     * Creates a mission for the given <code>AIUnit</code>.
@@ -46,9 +46,19 @@ public class UnitSeekAndDestroyMission extends Mission {
     * @param target The object we are trying to destroy. This can be either a
     *        <code>Settlement</code> or a <code>Unit</code>.
     */
-    public UnitSeekAndDestroyMission(AIMain aiMain, AIUnit aiUnit, FreeColGameObject target) {
+    public UnitSeekAndDestroyMission(AIMain aiMain, AIUnit aiUnit, Location target) {
         super(aiMain, aiUnit);
         this.target = target; 
+        
+        if (!(target instanceof Ownable)) {
+            logger.warning("!(target instanceof Ownable)");
+            throw new IllegalArgumentException("!(target instanceof Ownable)");
+        }        
+        if (!(target instanceof Unit || target instanceof Settlement)) {
+            logger.warning("!(target instanceof Unit || target instanceof Settlement)");
+            throw new IllegalArgumentException("!(target instanceof Unit || target instanceof Settlement)");
+            
+        }
     }
 
 
@@ -76,9 +86,13 @@ public class UnitSeekAndDestroyMission extends Mission {
     public void doMission(Connection connection) {
         Unit unit = getUnit();
 
+        if (!isValid()) {
+            return;
+        }
+        
         PathNode pathToTarget = null;
-        if (unit.isOffensiveUnit() && getDestination() != null) {
-            pathToTarget = getUnit().findPath(getDestination());
+        if (unit.isOffensiveUnit() && target.getTile() != null) {
+            pathToTarget = getUnit().findPath(target.getTile());
         }
         
         if (pathToTarget != null) {
@@ -109,7 +123,7 @@ public class UnitSeekAndDestroyMission extends Mission {
                     // Hmmm... if we are an AI player, our Unit will be updated 
                     // immediately. Therefore we don't need to check a server
                     // response.
-                    pathToTarget = getUnit().findPath(getDestination());
+                    pathToTarget = getUnit().findPath(target.getTile());
                     direction = moveTowards(connection, pathToTarget);
                 } else {
                     break;
@@ -126,32 +140,64 @@ public class UnitSeekAndDestroyMission extends Mission {
         Player owner = getUnit().getOwner();
         Player targetPlayer;
 
-        if (target == null) return false;
-        if (!(target instanceof Ownable)) return false;
+        if (((FreeColGameObject) target).isDisposed()) {
+            return false;
+        }
+        if (target == null) {
+            return false;
+        }     
+        if (!getUnit().isOffensiveUnit()) {
+            return false;
+        }
 
-        targetPlayer = ((Ownable)target).getOwner();
+        targetPlayer = ((Ownable) target).getOwner();
         int stance = owner.getStance(targetPlayer);
 
-        return (stance == Player.WAR) &&
-            (owner.getTension(targetPlayer).getLevel() >= Tension.CONTENT) &&
-            (getTarget() != null) &&
-            ((target instanceof Unit) || (target instanceof Settlement));
+        return stance == Player.WAR;
     }
 
     
     /**
-     * Gets the destination of this mission.
-     * @return The <code>Tile</code> containing the target.
-     */
-    public Tile getDestination() {
-        if (target instanceof Unit) {
-            return ((Unit)target).getTile();
-        } else if (target instanceof Settlement) {
-            return ((Settlement)target).getTile();
+     * Returns the destination for this <code>Transportable</code>.
+     * This can either be the target {@link Tile} of the transport
+     * or the target for the entire <code>Transportable</code>'s
+     * mission. The target for the transport is determined by
+     * {@link TransportMission} in the latter case.
+     *
+     * @return The destination for this <code>Transportable</code>.
+     */    
+    public Tile getTransportDestination() {
+        if (target == null) {
+            return null;
+        }
+        
+        if (getUnit().getLocation() instanceof Unit) {
+            return target.getTile();
+        } else if (getUnit().getLocation().getTile() == target) {
+            return null;
+        } else if (getUnit().getTile() == null) {
+            return target.getTile();
+        } else if (getUnit().findPath(target.getTile()) == null) {
+            return target.getTile();
         } else {
             return null;
         }
     }
+    
+    
+    /**
+     * Returns the priority of getting the unit to the
+     * transport destination.
+     *
+     * @return The priority.
+     */
+    public int getTransportPriority() {
+        if (getTransportDestination() != null) {
+            return NORMAL_TRANSPORT_PRIORITY;
+        } else {
+            return 0;
+        }
+    }    
 
     
     /**
@@ -161,7 +207,7 @@ public class UnitSeekAndDestroyMission extends Mission {
      *      This can be either a <code>Settlement</code> 
      *      or a <code>Unit</code>.
      */    
-    public FreeColGameObject getTarget() {
+    public Location getTarget() {
         return target;
     }    
 
@@ -173,7 +219,7 @@ public class UnitSeekAndDestroyMission extends Mission {
      *      This can be either a <code>Settlement</code> 
      *      or a <code>Unit</code>.
      */
-    public void setTarget(FreeColGameObject target) {
+    public void setTarget(Location target) {
         this.target = target;
     }
 
@@ -202,7 +248,7 @@ public class UnitSeekAndDestroyMission extends Mission {
      */    
     public void readFromXMLElement(Element element) {
         setAIUnit((AIUnit) getAIMain().getAIObject(element.getAttribute("unit")));
-        setTarget((FreeColGameObject) getGame().getFreeColGameObject(element.getAttribute("target")));
+        setTarget((Location) getGame().getFreeColGameObject(element.getAttribute("target")));
     }
 
 

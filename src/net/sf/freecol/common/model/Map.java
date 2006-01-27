@@ -457,8 +457,7 @@ public class Map extends FreeColGameObject {
      */
     public PathNode search(Unit unit, GoalDecider gd, int maxTurns) {
         return search(unit, unit.getTile(), gd, defaultCostDecider, maxTurns);
-    } 
-    
+    }     
     
     /**
      * Finds a path to a goal determined by the given 
@@ -469,6 +468,30 @@ public class Map extends FreeColGameObject {
      * A <code>GoalDecider</code> is typically defined
      * inline to serve a specific need.
      * 
+     * @param unit The <code>Unit</code> to find the path for.
+     * @param startTile The <code>Tile</code> to start the search from.
+     * @param gd The object responsible for determining 
+     *      wether a given <code>PathNode</code> is a goal or not.
+     * @param maxTurns The maximum number of turns the given
+     *      <code>Unit</code> is allowed to move. This is the
+     *      maximum search range for a goal.
+     * @return The path to a goal determined by the given 
+     *      <code>GoalDecider</code>.
+     */
+    public PathNode search(Unit unit, Tile startTile, GoalDecider gd, int maxTurns) {
+        return search(unit, startTile, gd, defaultCostDecider, maxTurns);
+    }         
+    
+    /**
+     * Finds a path to a goal determined by the given 
+     * <code>GoalDecider</code>.
+     * 
+     * <br /><br />
+     * 
+     * A <code>GoalDecider</code> is typically defined
+     * inline to serve a specific need.
+     * 
+     * @param startTile The <code>Tile</code> to start the search from.
      * @param gd The object responsible for determining 
      *      wether a given <code>PathNode</code> is a goal or not.
      * @param costDecider The object responsible for determining
@@ -483,7 +506,6 @@ public class Map extends FreeColGameObject {
         return search(null, startTile, gd, costDecider, maxTurns);
     }
     
-    
     /**
      * Finds a path to a goal determined by the given 
      * <code>GoalDecider</code>.
@@ -494,6 +516,7 @@ public class Map extends FreeColGameObject {
      * inline to serve a specific need.
      * 
      * @param unit The <code>Unit</code> to find the path for.
+     * @param startTile The <code>Tile</code> to start the search from.
      * @param gd The object responsible for determining 
      *      wether a given <code>PathNode</code> is a goal or not.
      * @param costDecider The object responsible for determining
@@ -1026,7 +1049,7 @@ public class Map extends FreeColGameObject {
     public boolean isValid(int x, int y) {
         return ((x >= 0) && (x < getWidth()) && (y >= 0) && (y < getHeight()));
     }
-
+    
 
     /**
      * Gets the distance in tiles between two map positions.

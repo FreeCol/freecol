@@ -86,10 +86,10 @@ public class TileImprovement extends AIObject {
      * no longer wanted.
      */
     public void dispose() {
-    	if (pioneer != null && pioneer.getMission() != null) {
-    		((PioneeringMission) pioneer.getMission()).setTileImprovement(null);
-    	}
-    	super.dispose();
+        if (pioneer != null && pioneer.getMission() != null) {
+            ((PioneeringMission) pioneer.getMission()).setTileImprovement(null);
+        }
+        super.dispose();
     }    
 
     /**
@@ -116,7 +116,7 @@ public class TileImprovement extends AIObject {
      * @see #getValue
      */
     public void setValue(int value) {
-    	this.value = value;
+        this.value = value;
     }
     
     /**
@@ -124,12 +124,12 @@ public class TileImprovement extends AIObject {
      * improvement described by this object.
      * 
      * @return The pioneer which should make the improvement, if 
-     * 		such a <code>AIUnit</code> has been assigned, and 
-     * 		<code>null</code> if nobody has been assigned this
-     * 		mission.
+     *      such a <code>AIUnit</code> has been assigned, and 
+     *      <code>null</code> if nobody has been assigned this
+     *      mission.
      */
     public AIUnit getPioneer() {
-    	return pioneer;
+        return pioneer;
     }
     
     /**
@@ -137,22 +137,22 @@ public class TileImprovement extends AIObject {
      * improvement described by this object.
      * 
      * @param pioneer The pioneer which should make the improvement, if 
-     * 		such a <code>Unit</code> has been assigned, and 
-     * 		<code>null</code> if nobody has been assigned this
-     * 		mission.
+     *      such a <code>Unit</code> has been assigned, and 
+     *      <code>null</code> if nobody has been assigned this
+     *      mission.
      */    
     public void setPioneer(AIUnit pioneer) {
-    	this.pioneer = pioneer;    
+        this.pioneer = pioneer;    
     }
     
     /**
      * Returns the type of improvement.
      * 
      * @return The type of the improvement, either 
-     * 		{@link #PLOW} or {@link #BUILD_ROAD}.
+     *      {@link #PLOW} or {@link #BUILD_ROAD}.
      */
     public int getType() {
-    	return type;
+        return type;
     }
     
     /**
@@ -161,7 +161,7 @@ public class TileImprovement extends AIObject {
      * @see #getType
      */
     public void setType(int type) {
-    	this.type = type;
+        this.type = type;
     }
     
     /**
@@ -187,7 +187,7 @@ public class TileImprovement extends AIObject {
         element.setAttribute("type", Integer.toString(type));
         element.setAttribute("value", Integer.toString(value));
         if (pioneer != null) {
-        	element.setAttribute("pioneer", pioneer.getID());
+            element.setAttribute("pioneer", pioneer.getID());
         }
         element.setAttribute("target", target.getID());
 
@@ -205,9 +205,9 @@ public class TileImprovement extends AIObject {
         type = Integer.parseInt(element.getAttribute("type"));
         value = Integer.parseInt(element.getAttribute("value"));
         if (element.hasAttribute("pioneer")) {
-        	pioneer = (AIUnit) getAIMain().getAIObject(element.getAttribute("pioneer"));
+            pioneer = (AIUnit) getAIMain().getAIObject(element.getAttribute("pioneer"));
         } else {
-        	pioneer = null;
+            pioneer = null;
         }
         target = (Tile) getAIMain().getFreeColGameObject(element.getAttribute("target"));        
     }

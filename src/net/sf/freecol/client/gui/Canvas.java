@@ -614,8 +614,8 @@ public final class Canvas extends JLayeredPane {
         File response = (File) loadDialog.getResponse();
         
         while (response != null && !response.isFile()) {
-          	errorMessage("noSuchFile");
-          	response = (File) loadDialog.getResponse();
+            errorMessage("noSuchFile");
+            response = (File) loadDialog.getResponse();
         }        
 
         remove(loadDialog);

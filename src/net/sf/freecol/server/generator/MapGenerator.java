@@ -109,18 +109,18 @@ public class MapGenerator {
         int counter = 0;
 
         for (int i = 0; i < number; i++) {
-        	for (int tries=0; tries<100; tries++) {
-        		Position p = new Position(random.nextInt(width), random.nextInt(height));
+            for (int tries=0; tries<100; tries++) {
+                Position p = new Position(random.nextInt(width), random.nextInt(height));
                 Tile t = map.getTile(p);
-        		if (map.getTile(p).isLand()
-        				&& !t.hasLostCityRumour()
-        				&& t.getSettlement() == null
-        				&& t.getUnitCount() == 0) { 
-        			counter++;
-        			t.setLostCityRumour(true);
-        			break;
-        		}
-        	}
+                if (map.getTile(p).isLand()
+                        && !t.hasLostCityRumour()
+                        && t.getSettlement() == null
+                        && t.getUnitCount() == 0) { 
+                    counter++;
+                    t.setLostCityRumour(true);
+                    break;
+                }
+            }
         }
 
         logger.info("Created " + counter + " lost city rumours of maximum " + number + ".");

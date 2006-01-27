@@ -16,6 +16,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Random;
@@ -130,9 +131,13 @@ public final class GUI {
     private boolean displayGrid = false;
     private GeneralPath gridPath = null;
 
+    /** List of the enemy units which should temporarily be displayed at the top. */
+    private ArrayList enemyUnitsOnTop = new ArrayList();
+    
     // Debug variables:
     boolean displayCoordinates = false;
     boolean displayColonyValue = false;
+    boolean debugShowMission = false;
 
 
     /**
@@ -297,6 +302,14 @@ public final class GUI {
             if (activeUnit != null && activeUnit.getLocation().getTile() == unitTile) {
                 return activeUnit;
             } else {
+                Iterator it = enemyUnitsOnTop.iterator();
+                while (it.hasNext()) {
+                    Unit eu = (Unit) it.next();
+                    if (eu.getTile() == unitTile) {
+                        return eu;
+                    }
+                }
+                
                 Unit movableUnit = unitTile.getMovableUnit();
                 if (movableUnit != null && movableUnit.getLocation() == movableUnit.getTile()) {
                     return movableUnit;
@@ -358,6 +371,8 @@ public final class GUI {
         }*/
 
         if (activeUnit != null && activeUnit.getOwner() != freeColClient.getMyPlayer()) {
+            enemyUnitsOnTop.add(0, activeUnit);
+            freeColClient.getCanvas().repaint(0, 0, getWidth(), getHeight());
             return;
         }
 
@@ -407,6 +422,8 @@ public final class GUI {
     public void setFocus(Position focus) {
         this.focus = focus;
 
+        enemyUnitsOnTop.clear();
+        
         forceReposition();
         freeColClient.getCanvas().repaint(0, 0, getWidth(), getHeight());
     }
@@ -1728,6 +1745,21 @@ public final class GUI {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+        
+        // FOR DEBUGGING:
+        if (debugShowMission && unit.getOwner().isAI() && freeColClient.getFreeColServer() != null) {
+            net.sf.freecol.server.ai.AIUnit au = (net.sf.freecol.server.ai.AIUnit) freeColClient.getFreeColServer().getAIMain().getAIObject(unit);
+            if (au != null) {
+                g.setColor(Color.WHITE);
+                if (au.getMission() != null) {
+                    String missionName = au.getMission().getClass().toString();
+                    missionName = missionName.substring(missionName.lastIndexOf('.') + 1);
+                    g.drawString(missionName, x , y);
+                } else {
+                    g.drawString("No mission", x , y);
+                }
+            }
         }
     }
 

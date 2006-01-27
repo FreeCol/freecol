@@ -190,8 +190,19 @@ public class TransportMission extends Mission {
         }
         Location newSource = newTransportable.getTransportSource();
         Location newDestination = newTransportable.getTransportDestination();
-        if (newDestination == null || (newSource == null && !isCarrying(newTransportable))) {
-            logger.warning("No source/destination for: " + newTransportable.getTransportLocatable().getName());
+        
+        if (newDestination == null) {
+            if (newTransportable instanceof AIGoods) {
+                logger.warning("No destination for goods: " + newTransportable.getTransportLocatable().getName());
+                return;
+            } else {
+                logger.warning("No destination for: " + newTransportable.getTransportLocatable().getName());
+                return;
+            }
+        }
+            
+        if (newSource == null && !isCarrying(newTransportable)) {
+            logger.warning("No source for: " + newTransportable.getTransportLocatable().getName());
             return;
         }
 
@@ -413,6 +424,7 @@ public class TransportMission extends Mission {
             while (space > 0) {
                 AIUnit newUnit = getCheapestUnitInEurope(connection);
                 if (newUnit != null) {
+                    newUnit.setMission(new BuildColonyMission(getAIMain(), newUnit));
                     addToTransportList(newUnit);
                     space--;
                 } else {

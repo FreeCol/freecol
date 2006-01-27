@@ -1,6 +1,7 @@
 
 package net.sf.freecol.server.ai.mission;
 
+import java.io.IOException;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Colony;
@@ -9,6 +10,8 @@ import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIUnit;
 import net.sf.freecol.server.ai.Wish;
@@ -93,8 +96,17 @@ public class WishRealizationMission extends Mission {
             if (wish.getDestination().getTile() == getUnit().getTile()) {
                 if (wish.getDestination() instanceof Colony) {
                     Colony colony = (Colony) wish.getDestination();
-                    // TODO: Do this by sending a message to the server:
-                    getUnit().setLocation(colony);
+
+                    Element workElement = Message.createNewRootElement("work");
+                    workElement.setAttribute("unit", unit.getID());
+                    workElement.setAttribute("workLocation", colony.getVacantWorkLocationFor(getUnit()).getID());
+                    try {
+                        connection.sendAndWait(workElement);
+                    } catch (IOException e) {
+                        logger.warning("Could not send \"work\"-message.");
+                    }
+                    //getUnit().setLocation(colony);
+                    getAIUnit().setMission(new WorkInsideColonyMission(getAIMain(), getAIUnit(), (AIColony) getAIMain().getAIObject(colony)));
                 } else {
                     logger.warning("Unknown type of destination for: " + wish);
                 }

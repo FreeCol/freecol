@@ -14,6 +14,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -374,7 +375,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
 
         Tile newTile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
-        boolean disembark = !unit.getTile().isLand() && newTile.isLand() && newTile.getSettlement() == null;        
+        //boolean disembark = !unit.getTile().isLand() && newTile.isLand() && newTile.getSettlement() == null;        
 
         Iterator enemyPlayerIterator = game.getPlayerIterator();
         while (enemyPlayerIterator.hasNext()) {
@@ -385,12 +386,12 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             }
 
             try {
-                if (unit.isVisibleTo(enemyPlayer) && !disembark) {
+                if (unit.isVisibleTo(enemyPlayer)) { // && !disembark
                     Element opponentMoveElement = Message.createNewRootElement("opponentMove");
                     opponentMoveElement.setAttribute("direction", Integer.toString(direction));
                     opponentMoveElement.setAttribute("unit", unit.getID());
                     enemyPlayer.getConnection().send(opponentMoveElement);
-                } else if (enemyPlayer.canSee(newTile) && newTile.getSettlement() == null) {
+                } else if (enemyPlayer.canSee(newTile) && (newTile.getSettlement() == null || !game.getGameOptions().getBoolean(GameOptions.UNIT_HIDING))) {
                     Element opponentMoveElement = Message.createNewRootElement("opponentMove");
                     opponentMoveElement.setAttribute("direction", Integer.toString(direction));
                     opponentMoveElement.setAttribute("tile", newTile.getID());
@@ -481,8 +482,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
          * outside indian territory:
          */          
         if (tile.getNationOwner() == Player.NO_NATION
-        		|| !tile.getGame().getPlayer(tile.getNationOwner()).isIndian()) {
-        	probability[LostCityRumour.BURIAL_GROUND] = 0;
+                || !tile.getGame().getPlayer(tile.getNationOwner()).isIndian()) {
+            probability[LostCityRumour.BURIAL_GROUND] = 0;
         }
 
         int accumulator = 0;

@@ -119,10 +119,10 @@ public final class InGameController extends Controller {
 
         // Ask the player to choose a founding father if none has been chosen:
         if (nextPlayer.isEuropean()) {
-	    if (nextPlayer.getCurrentFather() == -1) {
-		chooseFoundingFather(nextPlayer);
-	    }
-	    monarchAction(nextPlayer);
+        if (nextPlayer.getCurrentFather() == -1) {
+        chooseFoundingFather(nextPlayer);
+        }
+        monarchAction(nextPlayer);
         }
     }
 
@@ -311,13 +311,13 @@ public final class InGameController extends Controller {
                         return;
                     }
                     monarchActionElement.setAttribute("amount", String.valueOf(newTax));
-		    try {
+            try {
                         Element reply = nextPlayer.getConnection().ask(monarchActionElement);
                         boolean accepted = Boolean.valueOf(reply.getAttribute("accepted")).booleanValue();
 
-			if (accepted) {
-			    nextPlayer.setTax(newTax);
-			} else {
+            if (accepted) {
+                nextPlayer.setTax(newTax);
+            } else {
                             Goods goods = nextPlayer.getMostValuableGoods();
                             Element removeGoodsElement = Message.createNewRootElement("removeGoods");
                             if (goods != null) {

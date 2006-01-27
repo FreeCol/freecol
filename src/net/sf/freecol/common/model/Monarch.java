@@ -116,9 +116,9 @@ public final class Monarch extends FreeColGameObject {
         /** The probabilities of these actions. */
         int probability[] = new int[NUMBER_OF_ACTIONS];
     
-	for (int j = 0; j < NUMBER_OF_ACTIONS; j++ ) {
-	     probability[j] = 0;
-	}
+    for (int j = 0; j < NUMBER_OF_ACTIONS; j++ ) {
+         probability[j] = 0;
+    }
 
         // the more time has passed, the less likely the monarch will
         // do nothing
@@ -324,7 +324,7 @@ public final class Monarch extends FreeColGameObject {
     /**
      * Initialize this object from an XML-representation of this object.
      * @param monarchElement The DOM-element ("Document Object Model") 
-     * 		made to represent this object.
+     *      made to represent this object.
      */
     public void readFromXMLElement(Element monarchElement) {
         setID(monarchElement.getAttribute("ID"));

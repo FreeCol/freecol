@@ -9,7 +9,9 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
+import net.sf.freecol.server.ai.mission.DefendSettlementMission;
 import net.sf.freecol.server.ai.mission.IndianBringGiftMission;
+import net.sf.freecol.server.ai.mission.IndianDemandMission;
 import net.sf.freecol.server.ai.mission.Mission;
 import net.sf.freecol.server.ai.mission.PioneeringMission;
 import net.sf.freecol.server.ai.mission.TransportMission;
@@ -17,6 +19,7 @@ import net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission;
 import net.sf.freecol.server.ai.mission.UnitWanderHostileMission;
 import net.sf.freecol.server.ai.mission.UnitWanderMission;
 import net.sf.freecol.server.ai.mission.WishRealizationMission;
+import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -294,7 +297,9 @@ public class AIUnit extends AIObject implements Transportable {
                 } else if (missionElement.getTagName().equals(IndianBringGiftMission.getXMLElementTagName())) {
                     mission = new IndianBringGiftMission(getAIMain(), missionElement);
                 } else if (missionElement.getTagName().equals(BuildColonyMission.getXMLElementTagName())) {
-                    mission = new BuildColonyMission(getAIMain(), missionElement);
+                    mission = new IndianBringGiftMission(getAIMain(), missionElement);
+                } else if (missionElement.getTagName().equals(IndianDemandMission.getXMLElementTagName())) {                    
+                    mission = new IndianDemandMission(getAIMain(), missionElement);
                 } else if (missionElement.getTagName().equals(TransportMission.getXMLElementTagName())) {
                     mission = new TransportMission(getAIMain(), missionElement);
                 } else if (missionElement.getTagName().equals(WishRealizationMission.getXMLElementTagName())) {
@@ -302,7 +307,11 @@ public class AIUnit extends AIObject implements Transportable {
                 } else if (missionElement.getTagName().equals(UnitSeekAndDestroyMission.getXMLElementTagName())) {
                     mission = new UnitSeekAndDestroyMission(getAIMain(), missionElement);
                 } else if (missionElement.getTagName().equals(PioneeringMission.getXMLElementTagName())) {
-                    mission = new PioneeringMission(getAIMain(), missionElement);                    
+                    mission = new PioneeringMission(getAIMain(), missionElement);
+                } else if (missionElement.getTagName().equals(DefendSettlementMission.getXMLElementTagName())) {
+                    mission = new DefendSettlementMission(getAIMain(), missionElement);
+                } else if (missionElement.getTagName().equals(WorkInsideColonyMission.getXMLElementTagName())) {
+                    mission = new WorkInsideColonyMission(getAIMain(), missionElement);                    
                 } else {
                     logger.warning("Could not find mission-class for: " + missionElement.getTagName());
                     mission = new UnitWanderHostileMission(getAIMain(), this);

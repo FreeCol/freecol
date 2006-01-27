@@ -97,10 +97,10 @@ public final class InGameInputHandler extends InputHandler {
                 reply = reconnect(element);
             } else if (type.equals("setAI")) {
                 reply = setAI(element);
-	    } else if (type.equals("monarchAction")) {
-		reply = monarchAction(element);
-	    } else if (type.equals("removeGoods")) {
-		reply = removeGoods(element);
+        } else if (type.equals("monarchAction")) {
+        reply = monarchAction(element);
+        } else if (type.equals("removeGoods")) {
+        reply = removeGoods(element);
             } else if (type.equals("lostCityRumour")) {
                 reply = lostCityRumour(element);
             } else if (type.equals("diplomaticMessage")) {

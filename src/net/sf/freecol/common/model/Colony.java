@@ -413,6 +413,40 @@ public final class Colony extends Settlement implements Location {
         return null;
     }
 
+    
+    /**
+     * Gets a vacant <code>WorkLocation</code> for the given <code>Unit</code>.
+     * 
+     * @param locatable The <code>Unit</code>
+     * @return A vacant <code>WorkLocation</code> for the given <code>Unit</code>
+     *      or <code>null</code> if there is no such location.
+     */
+    public WorkLocation getVacantWorkLocationFor(Unit locatable) {
+        WorkLocation w = getVacantColonyTileFor(((Unit) locatable), Goods.FOOD);
+        if (w != null && w.canAdd(locatable) &&
+                getVacantColonyTileProductionFor((Unit) locatable, Goods.FOOD) > 0) {
+            return w;
+        }
+
+        Iterator i = getBuildingIterator();
+        while (i.hasNext()) {
+            w = (WorkLocation) i.next();
+            if (w.canAdd(locatable)) {
+                return w;
+            }
+        }
+
+        Iterator it = getWorkLocationIterator();
+        while (it.hasNext()) {
+            w = (WorkLocation) it.next();
+            if (w.canAdd(locatable)) {
+                return w;
+            }
+        }
+        
+        return null;
+    }
+    
 
     /**
     * Adds a <code>Locatable</code> to this Location.
@@ -421,35 +455,13 @@ public final class Colony extends Settlement implements Location {
     public void add(Locatable locatable) {
         if (locatable instanceof Unit) {
             if (((Unit) locatable).isColonist()) {
-                WorkLocation w = getVacantColonyTileFor(((Unit) locatable), Goods.FOOD);
-                if (w != null && w.canAdd(locatable) &&
-                    getVacantColonyTileProductionFor((Unit) locatable, Goods.FOOD) > 0) {
+                WorkLocation w = getVacantWorkLocationFor((Unit) locatable);
+                if (w != null) {
                     locatable.setLocation(w);
                     updatePopulation();
-                    return;
+                } else {
+                    logger.warning("Could not find a 'WorkLocation' for " + locatable + " in " + this);
                 }
-
-                Iterator i = getBuildingIterator();
-                while (i.hasNext()) {
-                    w = (WorkLocation) i.next();
-                    if (w.canAdd(locatable)) {
-                        locatable.setLocation(w);
-                        updatePopulation();
-                        return;
-                    }
-                }
-
-                Iterator it = getWorkLocationIterator();
-                while (it.hasNext()) {
-                    w = (WorkLocation) it.next();
-                    if (w.canAdd(locatable)) {
-                        locatable.setLocation(w);
-                        updatePopulation();
-                        return;
-                    }
-                }
-
-                logger.warning("Could not find a 'WorkLocation' for " + locatable + " in " + this);
             } else {
                 locatable.setLocation(getTile());
             }
@@ -852,8 +864,8 @@ public final class Colony extends Settlement implements Location {
     */
     public int getProductionBonus() {
         int bonus = 0;
-	int tories = (getTory() * getUnitCount()) / 100;
-	int difficulty = getOwner().getDifficulty();
+    int tories = (getTory() * getUnitCount()) / 100;
+    int difficulty = getOwner().getDifficulty();
 
         if (tories > 10 - difficulty) {
             bonus -= 2;

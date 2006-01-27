@@ -199,7 +199,51 @@ public final class Tile extends FreeColGameObject implements Location {
         return null;
     }
 
+    
+    /**
+     * Gets the total value of all treasure trains on this <code>Tile</code>.
+     * 
+     * @return The total value of all treasure trains on this <code>Tile</code>
+     *      or <code>0</code> if there are no treasure trains at all.
+     */
+    public int getUnitTreasureAmount() {
+        int amount = 0;
+        
+        Iterator ui = getUnitIterator();
+        while (ui.hasNext()) {
+            Unit u = (Unit) ui.next();
+            if (u.getType() == Unit.TREASURE_TRAIN) {
+                amount += u.getTreasureAmount();
+            }
+        }
+        
+        return amount;
+    }
+    
+    
+    /**
+     * Returns the treasure train carrying the largest treasure located on 
+     * this <code>Tile</code>.
+     * 
+     * @return The best treasure train or <code>null</code> if no treasure train
+     *      is located on this <code>Tile</code>.
+     */
+    public Unit getBestTreasureTrain() {
+        Unit bestTreasureTrain = null;
+        
+        Iterator ui = getUnitIterator();
+        while (ui.hasNext()) {
+            Unit u = (Unit) ui.next();
+            if (u.getType() == Unit.TREASURE_TRAIN
+                    && (bestTreasureTrain == null || bestTreasureTrain.getTreasureAmount() < u.getTreasureAmount())) {
+                bestTreasureTrain = u;
+            }
+        }
+        
+        return bestTreasureTrain;       
+    }
 
+    
     /**
     * Calculates the value of a future colony at this tile.
     * @return The value of a future colony located on this tile.
@@ -727,8 +771,8 @@ public final class Tile extends FreeColGameObject implements Location {
      * Sets the lost city rumour for this tile.
      *
      * @param rumour If <code>true</code> then this <code>Tile</code>
-     * 		will have a lost city rumour. The type of rumour will be
-     * 		determined by the server.
+     *      will have a lost city rumour. The type of rumour will be
+     *      determined by the server.
      */
     public void setLostCityRumour(boolean rumour) {
         lostCityRumour = rumour;
@@ -1168,7 +1212,9 @@ public final class Tile extends FreeColGameObject implements Location {
         }
 
         // Check if the player can see the tile: Do not show enemy units on a tile out-of-sight.
-        if (showAll || (player.canSee(this) && (settlement == null || settlement.getOwner() == player))) {
+        if (showAll 
+                || (player.canSee(this) && (settlement == null || settlement.getOwner() == player)) 
+                || !getGameOptions().getBoolean(GameOptions.UNIT_HIDING) && player.canSee(this)) {
             tileElement.appendChild(unitContainer.toXMLElement(player, document, showAll, toSavedGame));
         } else {
             UnitContainer emptyUnitContainer = new UnitContainer(getGame(), this);

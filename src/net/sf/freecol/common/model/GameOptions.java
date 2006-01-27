@@ -32,7 +32,10 @@ public class GameOptions extends OptionMap {
     /** Enables/disables fog of war. */
     public static final String FOG_OF_WAR = "fogOfWar";
 
+    /** No units are hidden on carriers or settlements if this option is set to <code>false</code>. */
+    public static final String UNIT_HIDING = "unitHiding";
 
+    
     /**
     * Creates a new <code>GameOptions</code>.
     */
@@ -74,6 +77,7 @@ public class GameOptions extends OptionMap {
         /* Map options: */
         OptionGroup map = new OptionGroup("gameOptions.map.name", "gameOptions.map.shortDescription");
         map.add(new BooleanOption(FOG_OF_WAR, "gameOptions.fogOfWar.name", "gameOptions.fogOfWar.shortDescription", true));
+        map.add(new BooleanOption(UNIT_HIDING, "gameOptions.unitHiding.name", "gameOptions.unitHiding.shortDescription", true));
         add(map);
         
 

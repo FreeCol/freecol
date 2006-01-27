@@ -120,73 +120,73 @@ public class AIColony extends AIObject {
      * @see TileImprovement
      */
     public void createTileImprovements() {
-    	/*
-    	 * TODO: This method has to be implemented properly.
-    	 * 		 For instance, tiles we are currently using
-    	 * 	     should be improved before the ones which
-    	 * 		 will only be used later.
-    	 */
-    	    	    	
-    	List workLocationPlans = colonyPlan.getSortedWorkLocationPlans();
-    	   	    	
-    	Iterator wlpIterator = workLocationPlans.iterator();
-    	while (wlpIterator.hasNext()) {
-    		WorkLocationPlan wlp = (WorkLocationPlan) wlpIterator.next();
-    		if (!(wlp.getWorkLocation() instanceof ColonyTile)) {
-    			continue;
-    		}
-    		Tile target = ((ColonyTile) wlp.getWorkLocation()).getWorkTile();
-    		
-    		// Update the TileImprovement if it already exist:
-    		boolean tileImprovementUpdated = false;
-    		Iterator tiIterator = tileImprovements.iterator();
-    		while (tiIterator.hasNext()) {
-    			TileImprovement ti = (TileImprovement) tiIterator.next();        		
-    			if (ti.getTarget() == target) {
-    				if (wlp.updateTileImprovement(ti) == null) {
-    					ti.dispose();
-    					tiIterator.remove();
-    				}
-    				tileImprovementUpdated = true;
-    				break;
-    			}
-    		}
-    		
-    		// Create a new TileImprovement if it did not exist already:
-    		if (!tileImprovementUpdated) {  		
-    			TileImprovement ti = wlp.createTileImprovement();
-    			if (ti != null) {
-    				tileImprovements.add(ti);
-    			}
-    		}
-    	}
-    	
-    	// Create a TileImprovement for the center tile:
-		Iterator tiIterator = tileImprovements.iterator();
-		boolean centerTileFound = false;
-		while (tiIterator.hasNext()) {
-			TileImprovement ti = (TileImprovement) tiIterator.next();        		
-			if (ti.getTarget() == colony.getTile()) {
-				if (!colony.getTile().canBePlowed()) {
-					ti.dispose();
-					tiIterator.remove();
-				}
-				centerTileFound = true;
-				break;
-			}
-		}
-    	if (!centerTileFound && colony.getTile().canBePlowed()) {
-    		tileImprovements.add(new TileImprovement(getAIMain(), colony.getTile(), TileImprovement.PLOW, 15));
-    	}
-		   	
-    	Collections.sort(tileImprovements, new Comparator() {
-    		public int compare(Object o, Object p) {
-    			Integer i = new Integer(((TileImprovement) o).getValue());
-    			Integer j = new Integer(((TileImprovement) p).getValue());
-    			
-    			return j.compareTo(i);
-    		}
-    	});
+        /*
+         * TODO: This method has to be implemented properly.
+         *       For instance, tiles we are currently using
+         *       should be improved before the ones which
+         *       will only be used later.
+         */
+                        
+        List workLocationPlans = colonyPlan.getSortedWorkLocationPlans();
+                    
+        Iterator wlpIterator = workLocationPlans.iterator();
+        while (wlpIterator.hasNext()) {
+            WorkLocationPlan wlp = (WorkLocationPlan) wlpIterator.next();
+            if (!(wlp.getWorkLocation() instanceof ColonyTile)) {
+                continue;
+            }
+            Tile target = ((ColonyTile) wlp.getWorkLocation()).getWorkTile();
+            
+            // Update the TileImprovement if it already exist:
+            boolean tileImprovementUpdated = false;
+            Iterator tiIterator = tileImprovements.iterator();
+            while (tiIterator.hasNext()) {
+                TileImprovement ti = (TileImprovement) tiIterator.next();               
+                if (ti.getTarget() == target) {
+                    if (wlp.updateTileImprovement(ti) == null) {
+                        ti.dispose();
+                        tiIterator.remove();
+                    }
+                    tileImprovementUpdated = true;
+                    break;
+                }
+            }
+            
+            // Create a new TileImprovement if it did not exist already:
+            if (!tileImprovementUpdated) {          
+                TileImprovement ti = wlp.createTileImprovement();
+                if (ti != null) {
+                    tileImprovements.add(ti);
+                }
+            }
+        }
+        
+        // Create a TileImprovement for the center tile:
+        Iterator tiIterator = tileImprovements.iterator();
+        boolean centerTileFound = false;
+        while (tiIterator.hasNext()) {
+            TileImprovement ti = (TileImprovement) tiIterator.next();               
+            if (ti.getTarget() == colony.getTile()) {
+                if (!colony.getTile().canBePlowed()) {
+                    ti.dispose();
+                    tiIterator.remove();
+                }
+                centerTileFound = true;
+                break;
+            }
+        }
+        if (!centerTileFound && colony.getTile().canBePlowed()) {
+            tileImprovements.add(new TileImprovement(getAIMain(), colony.getTile(), TileImprovement.PLOW, 15));
+        }
+            
+        Collections.sort(tileImprovements, new Comparator() {
+            public int compare(Object o, Object p) {
+                Integer i = new Integer(((TileImprovement) o).getValue());
+                Integer j = new Integer(((TileImprovement) p).getValue());
+                
+                return j.compareTo(i);
+            }
+        });
     }
     
     
@@ -199,9 +199,9 @@ public class AIColony extends AIObject {
      * @see TileImprovement
      */
     public Iterator getTileImprovementIterator() {
-    	return tileImprovements.iterator();
+        return tileImprovements.iterator();
     }
-
+    
     
     /**
     * Creates the wishes for the <code>Colony</code>.
@@ -836,7 +836,7 @@ public class AIColony extends AIObject {
     public void readFromXMLElement(Element element) {
         colony = (Colony) getAIMain().getFreeColGameObject(element.getAttribute("ID"));       
         if (colony == null) {
-        	throw new NullPointerException("Could not find Colony with ID: " + element.getAttribute("ID"));
+            throw new NullPointerException("Could not find Colony with ID: " + element.getAttribute("ID"));
         }
 
         aiGoods.clear();
@@ -862,12 +862,12 @@ public class AIColony extends AIObject {
                     logger.warning("Wish with ID: " + e.getAttribute("ID") + " could not be found.");
                 }
             } else if (e.getTagName().equals(TileImprovement.getXMLElementTagName() + "ListElement")) {
-            	TileImprovement ti = (TileImprovement) getAIMain().getAIObject(e.getAttribute("ID"));
+                TileImprovement ti = (TileImprovement) getAIMain().getAIObject(e.getAttribute("ID"));
                 if (ti != null) {
-                	tileImprovements.add(ti);
+                    tileImprovements.add(ti);
                 } else {
                     logger.warning("TileImprovement with ID: " + e.getAttribute("ID") + " could not be found.");
-                }            	
+                }               
             } else {
                 logger.warning("Unknown tag name: " + e.getTagName());
             }

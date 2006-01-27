@@ -460,6 +460,17 @@ public class FreeColMenuBar extends JMenuBar {
                     canvas.refresh();
                 }
             });
+            
+            JCheckBoxMenuItem dam = new JCheckBoxMenuItem("Display AI-missions");
+            dam.setOpaque(false);
+            dam.setMnemonic(KeyEvent.VK_M);
+            debugMenu.add(dam);
+            dam.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    gui.debugShowMission = ((JCheckBoxMenuItem) e.getSource()).isSelected();
+                    canvas.refresh();
+                }
+            });            
 
             final JMenuItem reveal = new JCheckBoxMenuItem(Messages.message("menuBar.debug.revealEntireMap"));
             reveal.setOpaque(false);
@@ -551,7 +562,7 @@ public class FreeColMenuBar extends JMenuBar {
                                         problemDetected = true;
                                     } else {
                                         Unit clientSideUnit = (Unit) freeColClient.getGame().getFreeColGameObject(u.getID());
-                                        if (!clientSideUnit.getTile().getID().equals(u.getTile().getID())) {
+                                        if (clientSideUnit.getTile() != null && !clientSideUnit.getTile().getID().equals(u.getTile().getID())) {
                                             System.out.println("Unsynchronization detected: Unit located on different tiles");
                                             System.out.println("Server: " + u.getName() + "(" + u.getID() + "). Position: " + u.getTile().getPosition());
                                             System.out.println("Client: " + clientSideUnit.getName() + "(" + clientSideUnit.getID() + "). Position: " + clientSideUnit.getTile().getPosition());

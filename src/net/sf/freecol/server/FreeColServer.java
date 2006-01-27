@@ -558,11 +558,11 @@ public final class FreeColServer {
         // Support for pre-0.1.3 protocols:
         Iterator monarchPlayerIterator = game.getPlayerIterator();
         while (monarchPlayerIterator.hasNext()) {
-        	Player p = (Player) monarchPlayerIterator.next();
-        	if (p.getMonarch() == null) {
-        		p.setMonarch(new Monarch(game, p, ""));
-        	}
-        }  	
+            Player p = (Player) monarchPlayerIterator.next();
+            if (p.getMonarch() == null) {
+                p.setMonarch(new Monarch(game, p, ""));
+            }
+        }   
 
         return savedGameElement.getAttribute("owner");
     }
