@@ -71,8 +71,8 @@ public class Map extends FreeColGameObject {
     */
     private Vector columns = null;
 
-
-
+    private final DefaultCostDecider defaultCostDecider = new DefaultCostDecider();
+    
 
     /**
     * Create a new <code>Map</code> of a specified size.
@@ -159,7 +159,6 @@ public class Map extends FreeColGameObject {
         return findPath(null, start, end, type);
     }
 
-
     /**
     * Finds a shortest path between the given tiles. The <code>Tile</code>
     * at the <code>end</code> will not be checked against the
@@ -186,7 +185,6 @@ public class Map extends FreeColGameObject {
         }
         return findPath(unit, start, end, -1, null);
     }
-
 
     /**
     * Finds a shortest path between the given tiles. The <code>Tile</code>
@@ -217,167 +215,6 @@ public class Map extends FreeColGameObject {
         return findPath(unit, start, end, -1, carrier);
     }
 
-
-    /**
-    * Finds the best path to <code>Europe</code>.
-    *
-    * @param unit The <code>Unit</code> that should be used to determine
-    *             wether or not a path is legal.
-    * @param start The starting <code>Tile</code>.
-    * @return The path to the target or <code>null</code> if no target can
-    *         be found.
-    * @see Europe
-    */
-    public PathNode findPathToEurope(Unit unit, Tile start) {
-        // This is just a temporary implementation; modify at will ;-)
-        
-        if (start == null) {
-            throw new NullPointerException("start == null");
-        }
-
-        PathNode firstNode = new PathNode(start, 0, 0, -1, unit.getMovesLeft(), 0);
-
-        // TODO: Choose a better datastructur:
-        ArrayList openList = new ArrayList();
-        ArrayList closedList = new ArrayList();
-
-        openList.add(firstNode);
-
-        while (openList.size() > 0) {
-            // TODO: Better method for choosing the node with the lowest f:
-            PathNode currentNode = (PathNode) openList.get(0);
-            for (int i=1; i<openList.size(); i++) {
-                if (currentNode.compareTo(openList.get(i)) < 0) {
-                    currentNode = (PathNode) openList.get(i);
-                }
-            }
-
-            // Reached our goal:
-            if (currentNode.getTile().getType() == Tile.HIGH_SEAS) {
-                while (currentNode.previous != null) {
-                    currentNode.previous.next = currentNode;
-                    currentNode = currentNode.previous;
-                }
-                return currentNode.next;
-            }
-
-            // Try every direction:
-            int[] directions = getGame().getMap().getRandomDirectionArray();
-            for (int j=0; j<8; j++) {
-                int direction = directions[j];
-
-                Tile newTile = getGame().getMap().getNeighbourOrNull(direction, currentNode.getTile());
-
-                if (newTile == null) {
-                    while (currentNode.previous != null) {
-                        currentNode.previous.next = currentNode;
-                        currentNode = currentNode.previous;
-                    }
-                    return currentNode.next;
-                } else if (newTile.getType() == Tile.UNEXPLORED) {
-                    continue;
-                }
-
-                int cost = currentNode.getCost();
-                int movesLeft = currentNode.getMovesLeft();
-                int turns = currentNode.getTurns();
-
-                if (newTile.isLand() && unit.isNaval()) {
-                    if ((newTile.getSettlement() == null || newTile.getSettlement().getOwner() != unit.getOwner())) {
-                        // Not allowed to move a naval unit on land:
-                        continue;
-                    } else {
-                        // Entering a settlement costs all of the remaining moves for a naval unit:
-                        cost += movesLeft;
-                        movesLeft = 0;
-                    }
-                } else if ((!newTile.isLand() && !unit.isNaval())) {
-                    // Not allowed to move a land unit on water:
-                    continue;
-                } else {
-                    int mc = newTile.getMoveCost(currentNode.getTile());
-                    if (mc - 2 <= movesLeft) {
-                        // Normal move: Using -2 in order to make 1/3 and 2/3 move count as 3/3.
-                        movesLeft -= mc;
-                        if (movesLeft < 0) {
-                            mc += movesLeft;
-                            movesLeft = 0;
-                        }
-                        cost += mc;
-                    } else if (movesLeft == unit.getInitialMovesLeft()) {
-                        // Entering a terrain with a higher move cost, but no moves have been spent yet.
-                        cost += movesLeft;
-                        movesLeft = 0;
-                    } else {
-                        // This move takes an extra turn to complete:
-                        turns++;
-                        if (mc > unit.getInitialMovesLeft()) {
-                            // Entering a terrain with a higher move cost than the initial moves:
-                            cost += movesLeft + unit.getInitialMovesLeft();
-                            movesLeft = 0;
-                        } else {
-                            // Normal move:
-                            cost += movesLeft + mc;
-                            movesLeft = unit.getInitialMovesLeft() - mc;
-                        }
-                    }
-                }
-
-                int f = cost; // + getDistance(newTile.getPosition(), end.getPosition());
-
-                PathNode successor = null;
-                // TODO: Better method for finding the node on the open list:
-                int i;
-                for (i=0; i<openList.size(); i++) {
-                    if (((PathNode) openList.get(i)).getTile() == newTile) {
-                        successor = (PathNode) openList.get(i);
-                        break;
-                    }
-                }
-
-                if (successor != null) {
-                    if (successor.getF() <= f) {
-                        continue;
-                    } else {
-                        openList.remove(i);
-                    }
-                } else {
-                    // TODO: Better method for finding the node on the closed list:
-                    for (i=0; i<closedList.size(); i++) {
-                        if (((PathNode) closedList.get(i)).getTile() == newTile) {
-                            successor = (PathNode) closedList.get(i);
-                            break;
-                        }
-                    }
-                    if (successor != null) {
-                        if (successor.getF() <= f) {
-                            continue;
-                        } else {
-                            closedList.remove(i);
-                        }
-                    }
-                }
-
-                successor = new PathNode(newTile, cost, f, direction, movesLeft, turns);
-                successor.previous = currentNode;
-                openList.add(successor);
-            }
-
-            closedList.add(currentNode);
-
-            // TODO: Better method for removing the node on the open list:
-            for (int i=0; i<openList.size(); i++) {
-                if (((PathNode) openList.get(i)) == currentNode) {
-                    openList.remove(i);
-                    break;
-                }
-            }
-        }
-
-        return null;
-    }
-
-
     /**
     * Finds a shortest path between the given tiles. The <code>Tile</code>
     * at the <code>end</code> will not be checked against validity
@@ -404,7 +241,6 @@ public class Map extends FreeColGameObject {
     private PathNode findPath(Unit unit, Tile start, Tile end, int type) {
         return findPath(unit, start, end, type, null);
     }
-
 
     /**
     * Finds a shortest path between the given tiles. The <code>Tile</code>
@@ -498,76 +334,24 @@ public class Map extends FreeColGameObject {
 
                 int cost = currentNode.getCost();
                 int movesLeft = currentNode.getMovesLeft();
-                int turns = currentNode.getTurns();
+                int turns = currentNode.getTurns();              
+                
                 if (unit != null) {
-                    if (newTile.getType() == Tile.UNEXPLORED && newTile != end) {
-                        // Not allowed to use an unexplored tile for a path:
+                    int extraCost = defaultCostDecider.getCost(unit, currentNode.getTile(), newTile, movesLeft, turns);
+                    if (extraCost == CostDecider.ILLEGAL_MOVE && newTile != end) {
                         continue;
-                    } else if (newTile.isLand() && unit.isNaval() && (newTile.getSettlement() == null 
-                            || newTile.getSettlement().getOwner() != unit.getOwner()) && newTile != end) {
-                        // Not allowed to move a naval unit on land:
-                        if (carrier == null) {
-                            continue;
-                        }
-                    } else if ((!newTile.isLand() && !unit.isNaval()) && newTile != end) {
-                        // Not allowed to move a land unit on water:
-                        continue;
-                    } else {
-                        int mc = newTile.getMoveCost(currentNode.getTile());
-                        if (newTile != end && newTile.getSettlement() != null
-                            && newTile.getSettlement().getOwner() != unit.getOwner()) {
-                            // A settlement is blocking the path:
-                            cost += COST_INFINITY;
-                        } else if (newTile != end && turns == 0 && newTile.getDefendingUnit(unit) != null
-                                && newTile.getDefendingUnit(unit).getOwner() != unit.getOwner()) {
-                            // A unit is blocking the path:
-                            turns++;
-                            cost += COST_UNIT_BLOCKING;
-                            movesLeft = unit.getInitialMovesLeft();
-                        } else if (newTile != end && turns == 1 && newTile.getDefendingUnit(unit) != null
-                                && newTile.getDefendingUnit(unit).getOwner() != unit.getOwner()) {
-                            // A unit is blocking the path (but can move away before we get there):
-                            cost += COST_MAY_BLOCK;
-                            movesLeft = unit.getInitialMovesLeft();
-                        } else if (mc - 2 <= movesLeft) {
-                            // Normal move: Using -2 in order to make 1/3 and 2/3 move count as 3/3.
-                            movesLeft -= mc;
-                            if (movesLeft < 0) {
-                                mc += movesLeft;
-                                movesLeft = 0;
-                            }
-                            if (carrier != null && unit != carrier && theUnit.getInitialMovesLeft() < carrier.getInitialMovesLeft()) {
-                                mc *= (carrier.getInitialMovesLeft() - theUnit.getInitialMovesLeft());
-                            }
-                            cost += mc;
-                        } else if (movesLeft == unit.getInitialMovesLeft()) {
-                            // Entering a terrain with a higher move cost, but no moves have been spent yet.
-                            if (carrier != null && unit != carrier && theUnit.getInitialMovesLeft() < carrier.getInitialMovesLeft()) {
-                                movesLeft *= (carrier.getInitialMovesLeft() - theUnit.getInitialMovesLeft());
-                            } else {
-                                cost += movesLeft;
-                            }
+                    }
+                    if (extraCost == CostDecider.ILLEGAL_MOVE) {
+                        if (newTile == end) {
+                            cost += unit.getInitialMovesLeft();                        
                             movesLeft = 0;
-                        } else {
-                            // This move takes an extra turn to complete:
                             turns++;
-                            if (mc > unit.getInitialMovesLeft()) {
-                                // Entering a terrain with a higher move cost than the initial moves:
-                                if (carrier != null && unit != carrier && theUnit.getInitialMovesLeft() < carrier.getInitialMovesLeft()) {
-                                    cost += (movesLeft + unit.getInitialMovesLeft()) * (carrier.getInitialMovesLeft() - theUnit.getInitialMovesLeft());
-                                } else {
-                                    cost += movesLeft + unit.getInitialMovesLeft();
-                                }
-                                movesLeft = 0;
-                            } else {
-                                // Normal move:
-                                if (carrier != null && unit != carrier && theUnit.getInitialMovesLeft() < carrier.getInitialMovesLeft()) {
-                                    cost += (movesLeft + mc) * (carrier.getInitialMovesLeft() - theUnit.getInitialMovesLeft());
-                                } else {
-                                    cost += movesLeft + mc;
-                                }
-                                movesLeft = unit.getInitialMovesLeft() - mc;
-                            }
+                        }
+                    } else {
+                        cost += extraCost;
+                        movesLeft = defaultCostDecider.getMovesLeft();
+                        if (defaultCostDecider.isNewTurn()) {
+                            turns++;
                         }
                     }
                 } else {
@@ -652,8 +436,7 @@ public class Map extends FreeColGameObject {
 
         return null;
     }
-
-    
+      
     /**
      * Finds a path to a goal determined by the given 
      * <code>GoalDecider</code>.
@@ -661,7 +444,7 @@ public class Map extends FreeColGameObject {
      * <br /><br />
      * 
      * A <code>GoalDecider</code> is typically defined
-     * inline accoring to a specific need.
+     * inline to serve a specific need.
      * 
      * @param unit The <code>Unit</code> to find the path for.
      * @param gd The object responsible for determining 
@@ -673,9 +456,59 @@ public class Map extends FreeColGameObject {
      *      <code>GoalDecider</code>.
      */
     public PathNode search(Unit unit, GoalDecider gd, int maxTurns) {
+        return search(unit, unit.getTile(), gd, defaultCostDecider, maxTurns);
+    } 
+    
+    
+    /**
+     * Finds a path to a goal determined by the given 
+     * <code>GoalDecider</code>.
+     * 
+     * <br /><br />
+     * 
+     * A <code>GoalDecider</code> is typically defined
+     * inline to serve a specific need.
+     * 
+     * @param gd The object responsible for determining 
+     *      wether a given <code>PathNode</code> is a goal or not.
+     * @param costDecider The object responsible for determining
+     *      the cost.
+     * @param maxTurns The maximum number of turns the given
+     *      <code>Unit</code> is allowed to move. This is the
+     *      maximum search range for a goal.
+     * @return The path to a goal determined by the given 
+     *      <code>GoalDecider</code>.
+     */
+    public PathNode search(Tile startTile, GoalDecider gd, CostDecider costDecider, int maxTurns) {
+        return search(null, startTile, gd, costDecider, maxTurns);
+    }
+    
+    
+    /**
+     * Finds a path to a goal determined by the given 
+     * <code>GoalDecider</code>.
+     * 
+     * <br /><br />
+     * 
+     * A <code>GoalDecider</code> is typically defined
+     * inline to serve a specific need.
+     * 
+     * @param unit The <code>Unit</code> to find the path for.
+     * @param gd The object responsible for determining 
+     *      wether a given <code>PathNode</code> is a goal or not.
+     * @param costDecider The object responsible for determining
+     *      the cost.
+     * @param maxTurns The maximum number of turns the given
+     *      <code>Unit</code> is allowed to move. This is the
+     *      maximum search range for a goal.
+     * @return The path to a goal determined by the given 
+     *      <code>GoalDecider</code>.
+     */
+    public PathNode search(Unit unit, Tile startTile, GoalDecider gd, CostDecider costDecider, int maxTurns) {        
         // This is just a temporary implementation; modify at will ;-)
 
-        PathNode firstNode = new PathNode(unit.getTile(), 0, 0, -1, unit.getMovesLeft(), 0);
+        int ml = (unit != null) ? unit.getMovesLeft() : -1;
+        PathNode firstNode = new PathNode(startTile, 0, 0, -1, ml, 0);
 
         // TODO: Choose a better datastructur:
         ArrayList openList = new ArrayList();
@@ -695,8 +528,22 @@ public class Map extends FreeColGameObject {
             // Reached the end
             if (currentNode.getTurns() > maxTurns) {
                 break;
+            }            
+            
+            if (gd.check(unit, currentNode) && !gd.hasSubGoals()) {
+                PathNode bestTarget = gd.getGoal();
+                if (bestTarget != null) {
+                    while (bestTarget.previous != null) {
+                        bestTarget.previous.next = bestTarget;
+                        bestTarget = bestTarget.previous;
+                    }
+                    return bestTarget.next;
+                } else {
+                    logger.warning("The returned goal is null.");
+                    return null;
+                }                   
             }
-
+            
             // Try every direction:
             int[] directions = getGame().getMap().getRandomDirectionArray();
             for (int j=0; j<8; j++) {
@@ -712,42 +559,16 @@ public class Map extends FreeColGameObject {
                 int movesLeft = currentNode.getMovesLeft();
                 int turns = currentNode.getTurns();
 
-                if (newTile.isLand() && unit.isNaval() && (newTile.getSettlement() == null
-                        || newTile.getSettlement().getOwner() != unit.getOwner())) {
-                    // Not allowed to move a naval unit on land:
+                int extraCost = costDecider.getCost(unit, currentNode.getTile(), newTile, movesLeft, turns);
+                if (extraCost == CostDecider.ILLEGAL_MOVE) {
                     continue;
-                } else if ((!newTile.isLand() && !unit.isNaval())) {
-                    // Not allowed to move a land unit on water:
-                    continue;
-                } else {
-                    int mc = newTile.getMoveCost(currentNode.getTile());
-                    if (mc - 2 <= movesLeft) {
-                        // Normal move: Using -2 in order to make 1/3 and 2/3 move count as 3/3.
-                        movesLeft -= mc;
-                        if (movesLeft < 0) {
-                            mc += movesLeft;
-                            movesLeft = 0;
-                        }
-                        cost += mc;
-                    } else if (movesLeft == unit.getInitialMovesLeft()) {
-                        // Entering a terrain with a higher move cost, but no moves have been spent yet.
-                        cost += movesLeft;
-                        movesLeft = 0;
-                    } else {
-                        // This move takes an extra turn to complete:
-                        turns++;
-                        if (mc > unit.getInitialMovesLeft()) {
-                            // Entering a terrain with a higher move cost than the initial moves:
-                            cost += movesLeft + unit.getInitialMovesLeft();
-                            movesLeft = 0;
-                        } else {
-                            // Normal move:
-                            cost += movesLeft + mc;
-                            movesLeft = unit.getInitialMovesLeft() - mc;
-                        }
-                    }
                 }
-
+                cost += extraCost;
+                movesLeft = costDecider.getMovesLeft();
+                if (costDecider.isNewTurn()) {
+                    turns++;
+                }
+                
                 int f = cost; // + getDistance(newTile.getPosition(), end.getPosition());
 
                 PathNode successor = null;
@@ -786,20 +607,7 @@ public class Map extends FreeColGameObject {
                 successor = new PathNode(newTile, cost, f, direction, movesLeft, turns);
                 successor.previous = currentNode;
 
-                if (!gd.check(unit, successor)) {
-                    openList.add(successor);
-                } else if (!gd.hasSubGoals()) {
-                    PathNode bestTarget = gd.getGoal();
-                    if (bestTarget != null) {
-                        while (bestTarget.previous != null) {
-                            bestTarget.previous.next = bestTarget;
-                            bestTarget = bestTarget.previous;
-                        }
-                        return bestTarget.next;
-                    } else {
-                        return null;
-                    }                   
-                }
+                openList.add(successor);
             }
 
             closedList.add(currentNode);
@@ -824,7 +632,51 @@ public class Map extends FreeColGameObject {
             return null;
         }
     }
-    
+   
+    /**
+     * Finds the best path to <code>Europe</code>.
+     *
+     * @param unit The <code>Unit</code> that should be used to determine
+     *             wether or not a path is legal.
+     * @param start The starting <code>Tile</code>.
+     * @return The path to the target or <code>null</code> if no target can
+     *         be found.
+     * @see Europe
+     */
+    public PathNode findPathToEurope(Unit unit, Tile start) {
+        GoalDecider gd = new GoalDecider() {
+            private PathNode goal = null;
+            
+            public PathNode getGoal() {
+                return goal;
+            }
+            
+            public boolean hasSubGoals() {
+                return false;
+            }
+            
+            public boolean check(Unit u, PathNode pathNode) {
+                Map map = u.getGame().getMap();
+                
+                if (pathNode.getTile().getType() == Tile.HIGH_SEAS) {
+                    goal = pathNode;
+                    return true;
+                }
+                
+                Iterator it = map.getAdjacentIterator(u.getTile().getPosition());
+                while (it.hasNext()) {
+                    Tile t = (Tile) map.getTile((Map.Position) it.next());
+                    if (t == null) {
+                        goal = pathNode;
+                        return true; 
+                    }
+                }
+                
+                return false;
+            }
+        };
+        return search(unit, start, gd, defaultCostDecider, Integer.MAX_VALUE);
+    }        
 
     /**
     * Searches for land within the given radius.
@@ -910,13 +762,13 @@ public class Map extends FreeColGameObject {
      * Returns the Tile at position (x, y). 'x' specifies a column and 'y' specifies a row.
      * (0, 0) is the Tile at the top-left corner of the Map.
      *
-     * @return The Tile at position (x, y).
+     * @return The Tile at position (x, y) or <code>null</code> if the position is invalid.
      */
     public Tile getTile(int x, int y) {
         if ((x >= 0) && (x < getWidth()) && (y >= 0) && (y < getHeight())) {
             return (Tile) ((Vector) columns.get(x)).get(y);
         } else {
-            throw new IllegalArgumentException("Illegal coordinate (" + x + ", " + y + ")");
+            return null;
         }
     }
 

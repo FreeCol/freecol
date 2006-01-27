@@ -111,7 +111,7 @@ public class TileImprovement extends AIObject {
     }
 
     /**
-     * Sets the value of this <code>TileImprovement</code>
+     * Sets the value of this <code>TileImprovement</code>.
      * @param value The value.
      * @see #getValue
      */
@@ -156,7 +156,7 @@ public class TileImprovement extends AIObject {
     }
     
     /**
-     * Sets the type of this <code>TileImprovement</code>
+     * Sets the type of this <code>TileImprovement</code>.
      * @param type The type.
      * @see #getType
      */

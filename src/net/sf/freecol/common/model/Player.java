@@ -165,8 +165,10 @@ public class Player extends FreeColGameObject {
     private boolean[]       fathers = new boolean[FoundingFather.FATHER_COUNT];
     private int             currentFather;
 
-    /** Market data */
+    /** The current tax rate for this player. */
     private int             tax = 0;
+    
+    /** Specifies the cost of removing a boycot for each type of goods. */
     private int[]           arrears = new int[Goods.NUMBER_OF_TYPES];
     private int[]           sales = new int[Goods.NUMBER_OF_TYPES];
     private int[]           incomeBeforeTaxes = new int[Goods.NUMBER_OF_TYPES];
