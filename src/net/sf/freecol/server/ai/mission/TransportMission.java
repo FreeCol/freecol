@@ -311,6 +311,8 @@ public class TransportMission extends Mission {
     public void doMission(Connection connection) {
         Unit carrier = getUnit();
 
+        updateTransportList();
+        
         if (carrier.getLocation() instanceof Europe) {
             if (carrier.getState() == Unit.TO_EUROPE || carrier.getState() == Unit.TO_AMERICA) {
                 return;

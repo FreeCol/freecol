@@ -600,7 +600,7 @@ public final class FreeColServer {
             Element updateElement = Message.createNewRootElement("update");
             updateElement.appendChild(getGame().getMap().toXMLElement(player, updateElement.getOwnerDocument()));
             try {
-                player.getConnection().send(updateElement);
+                player.getConnection().sendAndWait(updateElement);
             } catch (IOException e) {}
         }
     }
