@@ -8,7 +8,6 @@ import java.util.Iterator;
 import java.util.MissingResourceException;
 
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.FreeColException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -64,24 +63,22 @@ public class Player extends FreeColGameObject {
                             REF_SPANISH = 15;
 
     /** An array holding all the European nations in String form. */
-    public static final String[] NATIONS =
-    {
+    public static final String[] NATIONS = {
         Messages.message("model.nation.Dutch"),
-        Messages.message("model.nation.French"),
         Messages.message("model.nation.English"),
+        Messages.message("model.nation.French"),
         Messages.message("model.nation.Spanish"),
     };
 
     /** An array holding all the Native American tribes in String form. */
-    public static final String[] TRIBES =
-    {
-        Messages.message("model.nation.Apache"),
-        Messages.message("model.nation.Arawak"),
-        Messages.message("model.nation.Aztec"),
-        Messages.message("model.nation.Cherokee"),
+    public static final String[] TRIBES = {
         Messages.message("model.nation.Inca"),
+        Messages.message("model.nation.Aztec"),
+        Messages.message("model.nation.Arawak"),
+        Messages.message("model.nation.Cherokee"),    
         Messages.message("model.nation.Iroquois"),
         Messages.message("model.nation.Sioux"),
+        Messages.message("model.nation.Apache"),
         Messages.message("model.nation.Tupi"),
     };
 
@@ -1095,34 +1092,12 @@ public class Player extends FreeColGameObject {
         return "R:" + c.getRed() + ";G:" + c.getGreen() + ";B:" + c.getBlue();
     }
 
-
     /**
     * Sets the nation for this player.
     * @param n The new nation for this player.
     */
     public void setNation(int n) {
         nation = n;
-    }
-
-    /**
-    * Sets the nation for this player.
-    * @param n The new nation for this player.
-    * @throws FreeColException In case the given nation is invalid.
-    */
-    public void setNation(String n) throws FreeColException {
-        final String[] nationNames = {"dutch", "english", "french", "spanish", "apache",
-                "arawak", "aztec", "cherokee", "inca", "iroquois", "sioux", "tupi"};
-        final int[] nations = {DUTCH, ENGLISH, FRENCH, SPANISH, APACHE, ARAWAK, AZTEC,
-                CHEROKEE, INCA, IROQUOIS, SIOUX, TUPI};
-
-        for (int i = 0; i < nationNames.length; i++) {
-            if (n.toLowerCase().equals(nationNames[i])) {
-                setNation(nations[i]);
-                return;
-            }
-        }
-
-        throw new FreeColException("Invalid nation '" + n + "'.");
     }
 
     /**

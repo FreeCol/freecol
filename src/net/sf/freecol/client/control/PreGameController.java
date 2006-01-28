@@ -26,7 +26,6 @@ import net.sf.freecol.client.gui.CanvasMouseListener;
 import net.sf.freecol.client.gui.CanvasMouseMotionListener;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
@@ -87,20 +86,15 @@ public final class PreGameController {
     * Sets this client's player's nation.
     * @param nation Which nation this player wishes to set.
     */
-    public void setNation(String nation) {
+    public void setNation(int nation) {
         // Make the change:
-        try {
-            freeColClient.getMyPlayer().setNation(nation);
-        }
-        catch (FreeColException e) {
-            logger.warning(e.getMessage());
-        }
+        freeColClient.getMyPlayer().setNation(nation);
 
         // Inform the server:
         Element nationElement = Message.createNewRootElement("setNation");
-        nationElement.setAttribute("value", nation);
+        nationElement.setAttribute("value", Integer.toString(nation));
 
-        freeColClient.getClient().send(nationElement);
+        freeColClient.getClient().sendAndWait(nationElement);
     }
 
 
@@ -116,7 +110,7 @@ public final class PreGameController {
         Element colorElement = Message.createNewRootElement("setColor");
         colorElement.setAttribute("value", Player.convertColorToString(color));
 
-        freeColClient.getClient().send(colorElement);
+        freeColClient.getClient().sendAndWait(colorElement);
     }
 
 

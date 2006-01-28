@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.logging.Logger;
 
-import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.FreeColServer;
@@ -134,17 +133,12 @@ public final class PreGameInputHandler extends InputHandler {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
 
         if (player != null) {
-            String nation = element.getAttribute("value");
-            try {
-                player.setNation(nation);
-            }
-            catch (FreeColException e) {
-                logger.warning(e.getMessage());
-            }
+            int nation = Integer.parseInt(element.getAttribute("value"));
+            player.setNation(nation);
 
             Element updateNation = Message.createNewRootElement("updateNation");
             updateNation.setAttribute("player", player.getID());
-            updateNation.setAttribute("value", nation);
+            updateNation.setAttribute("value", Integer.toString(nation));
 
             getFreeColServer().getServer().sendToAll(updateNation, player.getConnection());
         } else {

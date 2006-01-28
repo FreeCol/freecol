@@ -15,10 +15,15 @@ public final class NationCellEditor extends DefaultCellEditor {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
+    
     /**
     * A standard constructor.
     */
     public NationCellEditor() {
         super(new JComboBox(Player.NATIONS));
+    }
+    
+    public Object getCellEditorValue() {
+        return new Integer(((JComboBox) getComponent()).getSelectedIndex());
     }
 }

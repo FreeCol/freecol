@@ -5,7 +5,6 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.Connection;
@@ -166,15 +165,9 @@ public final class PreGameInputHandler extends InputHandler {
         Game game = getFreeColClient().getGame();
 
         Player player = (Player) game.getFreeColGameObject(element.getAttribute("player"));
-        String nation = element.getAttribute("value");
+        int nation = Integer.parseInt(element.getAttribute("value"));
 
-        try {
-            player.setNation(nation);
-        }
-        catch (FreeColException e) {
-            logger.warning(e.getMessage());
-        }
-
+        player.setNation(nation);
         getFreeColClient().getCanvas().getStartGamePanel().refreshPlayersTable();
 
         return null;

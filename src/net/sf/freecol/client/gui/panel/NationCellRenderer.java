@@ -85,7 +85,7 @@ public final class NationCellRenderer implements TableCellRenderer {
         }
         component.setBackground(table.getBackground());
 
-        component.setSelectedItem(value);
+        component.setSelectedIndex(player.getNation());
         return component;
     }
 }
