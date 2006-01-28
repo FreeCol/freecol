@@ -87,6 +87,7 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
         Player player = parent.getClient().getMyPlayer();
         // Display Panel
         reportPanel.removeAll();
+        tradeReportPanel.removeAll();
 
         Iterator colonyIterator = player.getColonyIterator();
         ArrayList colonies = new ArrayList();
@@ -159,3 +160,4 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
         reportPanel.add(tradeReportPanel);
     }
 }
+
