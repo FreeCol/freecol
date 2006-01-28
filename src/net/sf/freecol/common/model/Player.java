@@ -415,6 +415,20 @@ public class Player extends FreeColGameObject {
                 nation == REF_DUTCH || nation == REF_ENGLISH || nation == REF_FRENCH || nation == REF_SPANISH);
     }
     
+
+    /**
+     * Checks whether this player is at war with any other player.
+     *
+     * @return <i>true</i> if this player is at war with any other.
+     */
+    public boolean isAtWar() {
+        for (int nation = 0; nation < NUMBER_OF_NATIONS; nation++) {
+            if (getStance(nation) == WAR) {
+                return true;
+            }
+        }
+        return false;
+    }
     
     /**
     * Returns the price of the given land.
