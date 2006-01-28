@@ -71,7 +71,7 @@ public class AIPlayer extends AIObject {
     private static final int MAX_DISTANCE_TO_MAKE_DEMANDS = 5;
     private static final int MAX_NUMBER_OF_DEMANDS = 1;
     
-    private static final int STRATEGY_NONE = 0,
+    public static final int STRATEGY_NONE = 0,
         STRATEGY_TRADE = 1,
         STRATEGY_IMMIGRATION = 2,
         STRATEGY_COOPERATION = 3,
@@ -1578,6 +1578,14 @@ public class AIPlayer extends AIObject {
         return player;
     }
     
+    /**
+     * Returns the strategy of this <code>AIPlayer</code>.
+     * @return the strategy of this <code>AIPlayer</code>.
+     */
+    public int getStrategy() {
+        return strategy;
+    }
+
     
     /**
      * Gets the connection to the server.

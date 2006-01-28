@@ -15,7 +15,7 @@ import org.w3c.dom.Element;
  */
 public final class Monarch extends FreeColGameObject {
 
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
@@ -32,20 +32,27 @@ public final class Monarch extends FreeColGameObject {
         DECLARE_WAR = 3,
         SUPPORT_SEA = 4,
         SUPPORT_LAND = 5,
-        NUMBER_OF_ACTIONS = 6,
-        WAIVE_TAX = 7;
+        OFFER_MERCENARIES = 6,
+        NUMBER_OF_ACTIONS = 7,
+        WAIVE_TAX = 8,
+        ADD_UNITS = 9;
 
     /** Constants describing the REF. */
     public static final int INFANTRY = 0,
         DRAGOON = 1,
         ARTILLERY = 2,
-        NUMBER_OF_TYPES = 3;
+        MAN_OF_WAR = 3,
+        NUMBER_OF_TYPES = 4;
+
+    /** The minimum price for mercenaries. */
+    public static final int MINIMUM_PRICE = 100;
 
     /** The number of units in the REF. */
     private int[] ref = new int[NUMBER_OF_TYPES];       
 
     /** Whether a frigate has been provided. */
-    private boolean supportSea = false;
+    // Setting this to true here disables the action completely.
+    private boolean supportSea = true;
     
     public static final Random random = new Random();
 
@@ -54,6 +61,8 @@ public final class Monarch extends FreeColGameObject {
         super(game);
         this.player = player;
         this.name = name;
+        int dx = player.getDifficulty();
+        ref[MAN_OF_WAR] = dx + 2;
     }
 
 
@@ -116,9 +125,10 @@ public final class Monarch extends FreeColGameObject {
         /** The probabilities of these actions. */
         int probability[] = new int[NUMBER_OF_ACTIONS];
     
-    for (int j = 0; j < NUMBER_OF_ACTIONS; j++ ) {
-         probability[j] = 0;
-    }
+
+	for (int j = 0; j < NUMBER_OF_ACTIONS; j++ ) {
+            probability[j] = 0;
+	}
 
         // the more time has passed, the less likely the monarch will
         // do nothing
@@ -140,7 +150,11 @@ public final class Monarch extends FreeColGameObject {
         }
         
         if (atWar) {
-            probability[SUPPORT_LAND] = 6 - dx;
+            // disable for the moment
+            //probability[SUPPORT_LAND] = 6 - dx;
+            if (player.getGold() > MINIMUM_PRICE) {
+                probability[OFFER_MERCENARIES] = 6 - dx;
+            }
         }
         
         int accumulator = 0;
@@ -174,18 +188,56 @@ public final class Monarch extends FreeColGameObject {
         return Math.min(newTax, 100);            
     }
 
+
+    /**
+     * Returns units available as mercenaries.
+     * 
+     * @return A troop of mercenaries.    
+     */
+    public int[] getMercenaries() {
+        int[] units = new int[ARTILLERY + 1];
+        int gold = player.getGold();
+        int price = 0;
+        for (int i = 0; i < 6; i++) {
+            int type = random.nextInt(NUMBER_OF_TYPES);
+            if (type > ARTILLERY) {
+                break;
+            }
+            int newPrice = getPrice(type);
+            if (price + newPrice <= gold) {
+                units[type]++;
+                price += newPrice;
+            } else {
+                break;
+            }
+        }
+
+        if (price == 0) {
+            units[INFANTRY] = 1;
+        }
+
+        return units;
+    }        
+    
+
     /**
      * Returns units to be added to the Royal Expeditionary Force.
      *
      * @return An addition to the Royal Expeditionary Force.
      */
-    public Addition addToREF() {
-        int number = random.nextInt(3) + 1;
-        int type = random.nextInt(3);
-
-        ref[type] += number;
-
-        return new Addition(type, number);
+    public int[] addToREF() {
+        int[] units = new int[NUMBER_OF_TYPES];
+        if (ref[INFANTRY] + ref[DRAGOON] + ref[ARTILLERY] >
+            ref[MAN_OF_WAR] * 6) {
+            units[MAN_OF_WAR] = 1;
+        } else {        
+            int number = random.nextInt(3) + 1;
+            int type = random.nextInt(3);
+            
+            units[type] = number;
+            ref[type] += number;
+        }
+        return units;
     }
 
     /**
@@ -193,50 +245,103 @@ public final class Monarch extends FreeColGameObject {
      *
      * @param addition The addition to the Royal Expeditionary Force.
      */
-    public void addToREF(Addition addition) {
-        ref[addition.type] += addition.number;
+     public void addToREF(int[] units) {
+         for (int type = 0; type < units.length; type++) {
+             ref[type] += units[type];
+         }
+     }
+
+    public static String getName(int type) {
+        return getName(type, 1);
     }
 
-    /** An addition to the  Royal Expeditionary Force. */
-    public static final class Addition {
-        public final int type, number;
-
-        public Addition(int type, int number) {
-            this.type = type;
-            this.number = number;
-        }
-
-        public String getName() {
-            String name = "INVALID";
-            switch (type) {
-            case INFANTRY:
-                if (number == 1) {
-                    name = Messages.message("model.monarch.infantry");
-                } else {
-                    name = Messages.message("model.monarch.infantries");
-                }
-                break;
-            case DRAGOON:
-                if (number == 1) {
-                    name = Messages.message("model.monarch.dragoon");
-                } else {
-                    name = Messages.message("model.monarch.dragoons");
-                }
-                break;
-            case ARTILLERY:
-                if (number == 1) {
-                    name = Messages.message("model.monarch.artillery");
-                } else {
-                    name = Messages.message("model.monarch.artilleries");
-                }
-                break;
+    public static String getName(int type, int number) {
+        String name = "INVALID";
+        switch (type) {
+        case INFANTRY:
+            if (number == 1) {
+                name = Messages.message("model.monarch.infantry");
+            } else {
+                name = Messages.message("model.monarch.infantries");
             }
-            return String.valueOf(number) + " " + name;
+            break;
+        case DRAGOON:
+            if (number == 1) {
+                name = Messages.message("model.monarch.dragoon");
+            } else {
+                name = Messages.message("model.monarch.dragoons");
+            }
+            break;
+        case ARTILLERY:
+            if (number == 1) {
+                name = Messages.message("model.monarch.artillery");
+            } else {
+                name = Messages.message("model.monarch.artilleries");
+            }
+            break;
+        case MAN_OF_WAR:
+            if (number == 1) {
+                name = Messages.message("model.monarch.manofwar");
+            } else {
+                name = Messages.message("model.monarch.menofwar");
+            }
+            break;
         }
+        return String.valueOf(number) + " " + name;
+    }
+
+
+    public String getName(int[] units) {
+        String name = null;
+        for (int type = 0; type < units.length; type++) {
+            if (units[type] > 0) {
+                if (name == null) {
+                    name = getName(type, units[type]);
+                } else {
+                    name = name + " " + Messages.message("and") +
+                        " " + getName(type, units[type]);
+                }
+            }
+        }
+        return name;
     }
     
 
+    public int getPrice(int type) {
+        int dx = player.getDifficulty();
+        switch (type) {
+        case INFANTRY:
+            return 300 + dx * 25;
+        case DRAGOON:
+            return 450 + dx * 25;
+        case ARTILLERY:
+            return 600 + dx * 25;
+        case MAN_OF_WAR:
+        default:
+            return 1000000;
+        }
+    }
+
     /**
+     * Returns the price for the given units.
+     *
+     * @param units The units to get a price for.
+     * @param rebate Whether to grant a rebate.
+     * @return The price fo the units.
+     */
+    public int getPrice(int[] units, boolean rebate) {
+        int price = 0;
+        for (int type = 0; type < units.length; type++) {
+            price += units[type] * getPrice(type);
+        }
+        if (price > player.getGold() && rebate) {
+            return player.getGold();
+        } else {
+            return price;
+        }
+    }
+
+     /**
      * Returns the nation of another player to declare war on.
      *
      * @return The enemy nation.
@@ -265,27 +370,29 @@ public final class Monarch extends FreeColGameObject {
      *
      * @return An addition to the colonial forces.
      */     
-    public Addition[] supportLand() {
+    public int[] supportLand() {
+        int[] units = new int[NUMBER_OF_TYPES];
         switch (player.getDifficulty()) {
         case Player.VERY_EASY:
-            return new Addition[] {new Addition(ARTILLERY, 1),
-                                   new Addition(DRAGOON, 1),
-                                   new Addition(DRAGOON, 1)};
+            units[ARTILLERY] = 1;
+            units[DRAGOON] = 2;
+            break;
         case Player.EASY:
-            return new Addition[] {new Addition(DRAGOON, 1),
-                                   new Addition(DRAGOON, 1),
-                                   new Addition(INFANTRY, 1)};
+            units[DRAGOON] = 2;
+            units[INFANTRY] = 1;
+            break;
         case Player.MEDIUM:
-            return new Addition[] {new Addition(DRAGOON, 1),
-                                   new Addition(DRAGOON, 1)};
+            units[DRAGOON] = 2;
+            break;
         case Player.HARD:
-            return new Addition[] {new Addition(DRAGOON, 1),
-                                   new Addition(INFANTRY, 1)};
+            units[DRAGOON] = 1;
+            units[INFANTRY] = 1;
+            break;
         case Player.VERY_HARD:
-            return new Addition[] {new Addition(INFANTRY, 1)};
-        default:
-            return new Addition[0];
+            units[INFANTRY] = 1;
+            break;
         }
+        return units;
     }
             
 

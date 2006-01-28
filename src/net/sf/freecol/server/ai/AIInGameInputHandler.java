@@ -192,7 +192,6 @@ public final class AIInGameInputHandler implements MessageHandler {
         int action = Integer.parseInt(element.getAttribute("action"));
 
         Element reply = null;
-        // at the moment, raising taxes is the only action that requires a reply
         switch (action) {
         case Monarch.RAISE_TAX:
             int tax = Integer.parseInt(element.getAttribute("amount"));
@@ -200,6 +199,14 @@ public final class AIInGameInputHandler implements MessageHandler {
             reply = Message.createNewRootElement("acceptTax");
             reply.setAttribute("accepted", String.valueOf(accept));
             break;
+        case Monarch.OFFER_MERCENARIES:
+            reply = Message.createNewRootElement("hireMercenaries");
+            if (getAIPlayer().getStrategy() == AIPlayer.STRATEGY_CONQUEST ||
+                getAIPlayer().getPlayer().isAtWar()) {
+                reply.setAttribute("accepted", String.valueOf(true));
+            } else {
+                reply.setAttribute("accepted", String.valueOf(false));
+            }
         }
 
         return reply;

@@ -668,14 +668,6 @@ public final class InGameController implements NetworkConstants {
             canvas.showEventDialog(EventPanel.FIRST_LANDING);
         }
 
-        if (unit.getTile().getSettlement() != null && unit.isCarrier()) {
-            canvas.showColonyPanel((Colony) unit.getTile().getSettlement());
-        } else if (unit.getMovesLeft() > 0) {
-            gui.setActiveUnit(unit);
-        } else {
-            nextActiveUnit(unit.getTile());
-        }
-
         // Inform the server:
         Element moveElement = Message.createNewRootElement("move");
         moveElement.setAttribute("unit", unit.getID());
@@ -684,6 +676,14 @@ public final class InGameController implements NetworkConstants {
         //client.send(moveElement);
         Element reply = client.ask(moveElement);
         freeColClient.getInGameInputHandler().handle(client.getConnection(), reply);
+
+        if (unit.getTile().getSettlement() != null && unit.isCarrier()) {
+            canvas.showColonyPanel((Colony) unit.getTile().getSettlement());
+        } else if (unit.getMovesLeft() > 0) {
+            gui.setActiveUnit(unit);
+        } else {
+            nextActiveUnit(unit.getTile());
+        }
 
         nextModelMessage();
     }
@@ -2032,4 +2032,5 @@ public final class InGameController implements NetworkConstants {
         return null;
     }
 }
+
 

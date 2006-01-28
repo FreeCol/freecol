@@ -97,10 +97,10 @@ public final class InGameInputHandler extends InputHandler {
                 reply = reconnect(element);
             } else if (type.equals("setAI")) {
                 reply = setAI(element);
-        } else if (type.equals("monarchAction")) {
-        reply = monarchAction(element);
-        } else if (type.equals("removeGoods")) {
-        reply = removeGoods(element);
+	    } else if (type.equals("monarchAction")) {
+		reply = monarchAction(element);
+	    } else if (type.equals("removeGoods")) {
+		reply = removeGoods(element);
             } else if (type.equals("lostCityRumour")) {
                 reply = lostCityRumour(element);
             } else if (type.equals("diplomaticMessage")) {
@@ -597,11 +597,13 @@ public final class InGameInputHandler extends InputHandler {
         final FreeColClient freeColClient = getFreeColClient();
         Player player = freeColClient.getMyPlayer();
         Canvas canvas = freeColClient.getCanvas();
+        Monarch monarch = player.getMonarch();
         int action = Integer.parseInt(element.getAttribute("action"));
+        Element reply;
 
         switch (action) {
         case Monarch.RAISE_TAX:
-            Element reply = Message.createNewRootElement("acceptTax");
+            reply = Message.createNewRootElement("acceptTax");
             if (freeColClient.getCanvas().
                 showMonarchPanel(action,
                                  new String [][] {{"%replace%", element.getAttribute("amount")}})) {
@@ -615,13 +617,14 @@ public final class InGameInputHandler extends InputHandler {
             }
             return reply;
         case Monarch.ADD_TO_REF:
-            Monarch monarch = player.getMonarch();
-            int type = Integer.parseInt(element.getAttribute("type"));
-            int number = Integer.parseInt(element.getAttribute("number"));
-            Monarch.Addition addition = new Monarch.Addition(type, number);
-            monarch.addToREF(addition);
+            Element arrayElement = Message.getChildElement(element, "addition");
+            int[] units = new int[Integer.parseInt(arrayElement.getAttribute("xLength"))];
+            for (int x = 0; x < units.length; x++) {
+                units[x] = Integer.parseInt(arrayElement.getAttribute("x" + Integer.toString(x)));
+            }
+            monarch.addToREF(units);
             canvas.showMonarchPanel(action,
-                                    new String [][] {{"%addition%", addition.getName()}});
+                                    new String [][] {{"%addition%", monarch.getName(units)}});
             break;
         case Monarch.DECLARE_WAR:
             int nation = Integer.parseInt(element.getAttribute("nation"));
@@ -630,27 +633,37 @@ public final class InGameInputHandler extends InputHandler {
                                     new String [][] {{"%nation%", Player.getNationAsString(nation)}});
             break;
         case Monarch.SUPPORT_LAND:
-            NodeList landList = element.getChildNodes();
-            for (int i = 0; i < landList.getLength(); i++) {
-                Element unitElement = (Element) landList.item(i);
-                Unit newUnit = new Unit(freeColClient.getGame(), unitElement);
-                player.getEurope().add(newUnit);
-            }
-            if (!canvas.showMonarchPanel(action, null)) {
-                canvas.showEuropePanel();
-            }
-            break;
         case Monarch.SUPPORT_SEA:
-            NodeList seaList = element.getChildNodes();
-            for (int i = 0; i < seaList.getLength(); i++) {
-                Element unitElement = (Element) seaList.item(i);
+        case Monarch.ADD_UNITS:
+            NodeList unitList = element.getChildNodes();
+            for (int i = 0; i < unitList.getLength(); i++) {
+                Element unitElement = (Element) unitList.item(i);
                 Unit newUnit = new Unit(freeColClient.getGame(), unitElement);
                 player.getEurope().add(newUnit);
             }
-            if (!canvas.showMonarchPanel(action, null)) {
+            if (action == Monarch.ADD_UNITS || !canvas.showMonarchPanel(action, null)) {
                 canvas.showEuropePanel();
             }
             break;
+        case Monarch.OFFER_MERCENARIES:
+            reply = Message.createNewRootElement("hireMercenaries");
+            Element mercenaryElement = Message.getChildElement(element, "mercenaries");
+            int[] mercenaries = new int[Integer.parseInt(mercenaryElement.getAttribute("xLength"))];
+            for (int x = 0; x < mercenaries.length; x++) {
+                mercenaries[x] = Integer.parseInt(mercenaryElement.getAttribute("x" + Integer.toString(x)));
+            }
+            if (freeColClient.getCanvas().
+                showMonarchPanel(action,
+                                 new String [][] {{"%gold%", element.getAttribute("price")},
+                                                  {"%mercenaries%", monarch.getName(mercenaries)}})) {
+                int price = new Integer(element.getAttribute("price")).intValue();
+                freeColClient.getMyPlayer().modifyGold(-price);
+                freeColClient.getCanvas().updateGoldLabel();
+                reply.setAttribute("accepted", String.valueOf(true));
+            } else {
+                reply.setAttribute("accepted", String.valueOf(false));
+            }
+            return reply;
         }
         return null;
     }
@@ -810,3 +823,4 @@ public final class InGameInputHandler extends InputHandler {
         return null;
     }
 }
+

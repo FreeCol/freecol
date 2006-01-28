@@ -23,8 +23,8 @@ import org.w3c.dom.Element;
 
 
 /**
-*
-*/
+ *
+ */
 public final class InGameController extends Controller {
     private static Logger logger = Logger.getLogger(InGameController.class.getName());
 
@@ -35,9 +35,9 @@ public final class InGameController extends Controller {
     private Random random = new Random();
 
     /**
-    * The constructor to use.
-    * @param freeColServer The main server object.
-    */
+     * The constructor to use.
+     * @param freeColServer The main server object.
+     */
     public InGameController(FreeColServer freeColServer) {
         super(freeColServer);
     }
@@ -45,10 +45,10 @@ public final class InGameController extends Controller {
 
 
     /**
-    * Ends the turn of the given player.
-    *
-    * @param player The player to end the turn of.
-    */
+     * Ends the turn of the given player.
+     *
+     * @param player The player to end the turn of.
+     */
     public void endTurn(ServerPlayer player) {
         FreeColServer freeColServer = getFreeColServer();
         Game game = freeColServer.getGame();
@@ -119,10 +119,10 @@ public final class InGameController extends Controller {
 
         // Ask the player to choose a founding father if none has been chosen:
         if (nextPlayer.isEuropean()) {
-        if (nextPlayer.getCurrentFather() == -1) {
-        chooseFoundingFather(nextPlayer);
-        }
-        monarchAction(nextPlayer);
+            if (nextPlayer.getCurrentFather() == -1) {
+                chooseFoundingFather(nextPlayer);
+            }
+            monarchAction(nextPlayer);
         }
     }
 
@@ -130,55 +130,55 @@ public final class InGameController extends Controller {
     private void chooseFoundingFather(ServerPlayer player) {
         final ServerPlayer nextPlayer = player;
         Thread t = new Thread() {
-            public void run() {
-                int[] randomFoundingFathers = getRandomFoundingFathers(nextPlayer);
+                public void run() {
+                    int[] randomFoundingFathers = getRandomFoundingFathers(nextPlayer);
 
-                boolean atLeastOneChoice = false;
-                Element chooseFoundingFatherElement = Message.createNewRootElement("chooseFoundingFather");
-                for (int i=0; i<randomFoundingFathers.length; i++) {
-                    chooseFoundingFatherElement.setAttribute("foundingFather" + Integer.toString(i), Integer.toString(randomFoundingFathers[i]));
-                    if (randomFoundingFathers[i] != -1) {
-                        atLeastOneChoice = true;
+                    boolean atLeastOneChoice = false;
+                    Element chooseFoundingFatherElement = Message.createNewRootElement("chooseFoundingFather");
+                    for (int i=0; i<randomFoundingFathers.length; i++) {
+                        chooseFoundingFatherElement.setAttribute("foundingFather" + Integer.toString(i), Integer.toString(randomFoundingFathers[i]));
+                        if (randomFoundingFathers[i] != -1) {
+                            atLeastOneChoice = true;
+                        }
                     }
-                }
 
-                if (!atLeastOneChoice) {
-                    nextPlayer.setCurrentFather(-1);
-                } else {
-                    try {
-                        Element reply = nextPlayer.getConnection().ask(chooseFoundingFatherElement);
-                        int foundingFather = Integer.parseInt(reply.getAttribute("foundingFather"));
+                    if (!atLeastOneChoice) {
+                        nextPlayer.setCurrentFather(-1);
+                    } else {
+                        try {
+                            Element reply = nextPlayer.getConnection().ask(chooseFoundingFatherElement);
+                            int foundingFather = Integer.parseInt(reply.getAttribute("foundingFather"));
 
-                        boolean foundIt = false;
-                        for (int i=0; i<randomFoundingFathers.length; i++) {
-                            if (randomFoundingFathers[i] == foundingFather) {
-                                foundIt = true;
-                                break;
+                            boolean foundIt = false;
+                            for (int i=0; i<randomFoundingFathers.length; i++) {
+                                if (randomFoundingFathers[i] == foundingFather) {
+                                    foundIt = true;
+                                    break;
+                                }
                             }
-                        }
 
-                        if (!foundIt) {
-                            throw new IllegalArgumentException();
-                        }
+                            if (!foundIt) {
+                                throw new IllegalArgumentException();
+                            }
 
-                        nextPlayer.setCurrentFather(foundingFather);
-                    } catch (IOException e) {
-                        logger.warning("Could not send message to: " + nextPlayer.getName());
+                            nextPlayer.setCurrentFather(foundingFather);
+                        } catch (IOException e) {
+                            logger.warning("Could not send message to: " + nextPlayer.getName());
+                        }
                     }
                 }
-            }
-        };
+            };
 
         t.start();
     }
 
     /**
-    * Returns an <code>int[]</code> with the size of {@link FoundingFather#TYPE_COUNT},
-    * containing random founding fathers (not including the founding fathers
-    * the player has already) of each type.
-    *
-    * @param player The <code>Player</code> that should pick a founding father from this list.
-    */
+     * Returns an <code>int[]</code> with the size of {@link FoundingFather#TYPE_COUNT},
+     * containing random founding fathers (not including the founding fathers
+     * the player has already) of each type.
+     *
+     * @param player The <code>Player</code> that should pick a founding father from this list.
+     */
     private int[] getRandomFoundingFathers(Player player) {
         Game game = getFreeColServer().getGame();
 
@@ -214,10 +214,10 @@ public final class InGameController extends Controller {
 
 
     /**
-    * Checks if anybody has won the game and returns that player.
-    * @return The <code>Player</code> who have won the game or <i>null</i>
-    *         if the game is not finished.
-    */
+     * Checks if anybody has won the game and returns that player.
+     * @return The <code>Player</code> who have won the game or <i>null</i>
+     *         if the game is not finished.
+     */
     private Player checkForWinner() {
         Game game = getFreeColServer().getGame();
 
@@ -245,9 +245,9 @@ public final class InGameController extends Controller {
 
 
     /**
-    * Checks if this player has died.
-    * @return <i>true</i> if this player should die.
-    */
+     * Checks if this player has died.
+     * @return <i>true</i> if this player should die.
+     */
     private boolean checkForDeath(Player player) {
         // Die if: (No colonies or units on map) && ((After 20 turns) || (Cannot get a unit from Europe))
         Game game = getFreeColServer().getGame();
@@ -258,7 +258,7 @@ public final class InGameController extends Controller {
             Tile t = map.getTile((Map.Position) tileIterator.next());
 
             if (t != null && ((t.getFirstUnit() != null && t.getFirstUnit().getOwner().equals(player))
-                            || t.getSettlement() != null && t.getSettlement().getOwner().equals(player))) {
+                              || t.getSettlement() != null && t.getSettlement().getOwner().equals(player))) {
                 return false;
             }
         }
@@ -267,7 +267,7 @@ public final class InGameController extends Controller {
 
         if (player.getNation() >= 0 && player.getNation() <= 3) {
             /*if (game.getTurn().getNumber() > 20 || player.getEurope().getFirstUnit() == null
-                    && player.getGold() < 600 && player.getGold() < player.getRecruitPrice()) {
+              && player.getGold() < 600 && player.getGold() < player.getRecruitPrice()) {
             */
             if (game.getTurn().getNumber() > 20) {
                 return true;
@@ -297,144 +297,180 @@ public final class InGameController extends Controller {
         final ServerPlayer nextPlayer = player;
         final Game game = getFreeColServer().getGame();
         Thread t = new Thread() {
-            public void run() {
+                public void run() {
 
-                Monarch monarch = nextPlayer.getMonarch();
-                int action = monarch.getAction();
-                Element monarchActionElement = Message.createNewRootElement("monarchAction");
-                monarchActionElement.setAttribute("action", String.valueOf(action));
-                switch (action) {
-                case Monarch.RAISE_TAX:
-                    int newTax = monarch.getNewTax();
-                    if (newTax > 100) {
-                        logger.warning("Tax rate exceeds 100 percent.");
-                        return;
-                    }
-                    monarchActionElement.setAttribute("amount", String.valueOf(newTax));
-            try {
-                        Element reply = nextPlayer.getConnection().ask(monarchActionElement);
-                        boolean accepted = Boolean.valueOf(reply.getAttribute("accepted")).booleanValue();
+                    Monarch monarch = nextPlayer.getMonarch();
+                    int action = monarch.getAction();
+                    Unit newUnit;
+                    Element monarchActionElement = Message.createNewRootElement("monarchAction");
+                    monarchActionElement.setAttribute("action", String.valueOf(action));
+                    switch (action) {
+                    case Monarch.RAISE_TAX:
+                        int newTax = monarch.getNewTax();
+                        if (newTax > 100) {
+                            logger.warning("Tax rate exceeds 100 percent.");
+                            return;
+                        }
+                        monarchActionElement.setAttribute("amount", String.valueOf(newTax));
+                        try {
+                            Element reply = nextPlayer.getConnection().ask(monarchActionElement);
+                            boolean accepted = Boolean.valueOf(reply.getAttribute("accepted")).booleanValue();
 
-            if (accepted) {
-                nextPlayer.setTax(newTax);
-            } else {
-                            Goods goods = nextPlayer.getMostValuableGoods();
-                            Element removeGoodsElement = Message.createNewRootElement("removeGoods");
-                            if (goods != null) {
-                                ((Colony) goods.getLocation()).removeGoods(goods);
-                                nextPlayer.setArrears(goods);
-                                removeGoodsElement.appendChild(goods.toXMLElement(nextPlayer,
-                                                                                  removeGoodsElement.getOwnerDocument()));
+                            if (accepted) {
+                                nextPlayer.setTax(newTax);
+                            } else {
+                                Goods goods = nextPlayer.getMostValuableGoods();
+                                Element removeGoodsElement = Message.createNewRootElement("removeGoods");
+                                if (goods != null) {
+                                    ((Colony) goods.getLocation()).removeGoods(goods);
+                                    nextPlayer.setArrears(goods);
+                                    removeGoodsElement.appendChild(goods.toXMLElement(nextPlayer,
+                                                                                      removeGoodsElement.getOwnerDocument()));
+                                }
+                                nextPlayer.getConnection().send(removeGoodsElement);
                             }
-                            nextPlayer.getConnection().send(removeGoodsElement);
+                        } catch (IOException e) {
+                            logger.warning("Could not send message to: " + nextPlayer.getName());
                         }
-                    } catch (IOException e) {
-                        logger.warning("Could not send message to: " + nextPlayer.getName());
-                    }
-                    break;
-                case Monarch.ADD_TO_REF:
-                    Monarch.Addition addition = monarch.addToREF();
-                    monarchActionElement.setAttribute("type", String.valueOf(addition.type));
-                    monarchActionElement.setAttribute("number", String.valueOf(addition.number));
-                    try {
-                        nextPlayer.getConnection().send(monarchActionElement);
-                    } catch (IOException e) {
-                        logger.warning("Could not send message to: " + nextPlayer.getName());
-                    }
-                    break;
-                case Monarch.DECLARE_WAR:
-                    int nation = monarch.declareWar();
-                    if (nation == Player.NO_NATION) {
-                        // this should not happen
-                        logger.warning( "Declared war on nobody." );
-                        return;
-                    }
-                    game.getPlayer(nation).warDeclaredBy(nextPlayer);
-                    nextPlayer.setStance(nation, Player.WAR);
-                    // inform all relevant players about the declaration of war
-                    Element dowElement = Message.createNewRootElement("diplomaticMessage");
-                    dowElement.setAttribute("type", "declarationOfWar");
-                    dowElement.setAttribute("attacker", nextPlayer.getID());
-                    dowElement.setAttribute("defender", game.getPlayer(nation).getID());
-                    Iterator playerIterator = game.getPlayerIterator();
-                    while (playerIterator.hasNext()) {
-                        ServerPlayer player = (ServerPlayer) playerIterator.next();
-                        if (player.equals(nextPlayer)) {
-                            monarchActionElement.setAttribute("nation", String.valueOf(nation));
-                            try {
-                                player.getConnection().send(monarchActionElement);
-                            } catch (IOException e) {
-                                logger.warning("Could not send message to: " + player.getName());
-                            }
-                        } else if (player.getNation() == nation ||
-                                   player.hasContacted(nation) ||
-                                   player.hasContacted(nextPlayer.getNation())) {
-                            try {
-                                player.getConnection().send(dowElement);
-                            } catch (IOException e) {
-                                logger.warning("Could not send message to: " + player.getName());
+                        break;
+                    case Monarch.ADD_TO_REF:
+                        int[] addition = monarch.addToREF();
+                        Element additionElement = monarchActionElement.getOwnerDocument().createElement("addition");
+                        additionElement.setAttribute("xLength", Integer.toString(addition.length));
+                        for (int x = 0; x < addition.length; x++) {
+                            additionElement.setAttribute("x" + Integer.toString(x), Integer.toString(addition[x]));
+                        }        
+                        monarchActionElement.appendChild(additionElement);
+                        try {
+                            nextPlayer.getConnection().send(monarchActionElement);
+                        } catch (IOException e) {
+                            logger.warning("Could not send message to: " + nextPlayer.getName());
+                        }
+                        break;
+                    case Monarch.DECLARE_WAR:
+                        int nation = monarch.declareWar();
+                        if (nation == Player.NO_NATION) {
+                            // this should not happen
+                            logger.warning( "Declared war on nobody." );
+                            return;
+                        }
+                        game.getPlayer(nation).warDeclaredBy(nextPlayer);
+                        nextPlayer.setStance(nation, Player.WAR);
+                        // inform all relevant players about the declaration of war
+                        Element dowElement = Message.createNewRootElement("diplomaticMessage");
+                        dowElement.setAttribute("type", "declarationOfWar");
+                        dowElement.setAttribute("attacker", nextPlayer.getID());
+                        dowElement.setAttribute("defender", game.getPlayer(nation).getID());
+                        Iterator playerIterator = game.getPlayerIterator();
+                        while (playerIterator.hasNext()) {
+                            ServerPlayer player = (ServerPlayer) playerIterator.next();
+                            if (player.equals(nextPlayer)) {
+                                monarchActionElement.setAttribute("nation", String.valueOf(nation));
+                                try {
+                                    player.getConnection().send(monarchActionElement);
+                                } catch (IOException e) {
+                                    logger.warning("Could not send message to: " + player.getName());
+                                }
+                            } else if (player.getNation() == nation ||
+                                       player.hasContacted(nation) ||
+                                       player.hasContacted(nextPlayer.getNation())) {
+                                try {
+                                    player.getConnection().send(dowElement);
+                                } catch (IOException e) {
+                                    logger.warning("Could not send message to: " + player.getName());
+                                }
                             }
                         }
-                    }
-                    break;
-                case Monarch.SUPPORT_LAND:
-                    Monarch.Addition[] additions = monarch.supportLand();
-                    for (int i = 0; i < additions.length; i++) {
-                        Unit newUnit;
-                        if (additions[i].type == Monarch.ARTILLERY) {
-                            newUnit = new Unit(game,
-                                               nextPlayer.getEurope(),
-                                               nextPlayer,
-                                               Unit.ARTILLERY,
-                                               Unit.ACTIVE);
-                        } else {
-                            boolean mounted = false;
-                            if (additions[i].type == Monarch.DRAGOON) {
-                                mounted = true;
-                            }
-                            newUnit = new Unit(game,
-                                               nextPlayer.getEurope(),
-                                               nextPlayer,
-                                               Unit.VETERAN_SOLDIER,
-                                               Unit.ACTIVE,
-                                               true,
-                                               mounted,
-                                               0,
-                                               false);
+                        break;
+                    case Monarch.SUPPORT_LAND:
+                        int[] additions = monarch.supportLand();
+                        createUnits(additions, monarchActionElement, nextPlayer);
+                        try {
+                            nextPlayer.getConnection().send(monarchActionElement);
+                        } catch (IOException e) {
+                            logger.warning("Could not send message to: " + nextPlayer.getName());
                         }
+                        break;
+                    case Monarch.SUPPORT_SEA:
+                        newUnit = new Unit(game,
+                                           nextPlayer.getEurope(),
+                                           nextPlayer,
+                                           Unit.FRIGATE,
+                                           Unit.ACTIVE);
                         nextPlayer.getEurope().add(newUnit);
                         monarchActionElement.appendChild(newUnit.toXMLElement(nextPlayer,
                                                                               monarchActionElement.getOwnerDocument()));
-                    }
+                        try {
+                            nextPlayer.getConnection().send(monarchActionElement);
+                        } catch (IOException e) {
+                            logger.warning("Could not send message to: " + nextPlayer.getName());
+                        }
+                        break;
+                    case Monarch.OFFER_MERCENARIES:
+                        int[] units = monarch.getMercenaries();
+                        int price = monarch.getPrice(units, true);
+                        Element mercenaryElement = monarchActionElement.getOwnerDocument().createElement("mercenaries");
+                        monarchActionElement.setAttribute("price", String.valueOf(price));
+                        mercenaryElement.setAttribute("xLength", Integer.toString(units.length));
+                        monarchActionElement.appendChild(mercenaryElement);
+                        for (int x = 0; x < units.length; x++) {
+                            mercenaryElement.setAttribute("x" + Integer.toString(x), Integer.toString(units[x]));
+                        }
+                        try {
+                            Element reply = nextPlayer.getConnection().ask(monarchActionElement);
+                            boolean accepted = Boolean.valueOf(reply.getAttribute("accepted")).booleanValue();
 
-                    try {
-                        nextPlayer.getConnection().send(monarchActionElement);
-                    } catch (IOException e) {
-                        logger.warning("Could not send message to: " + nextPlayer.getName());
+                            if (accepted) {
+                                Element updateElement = Message.createNewRootElement("monarchAction");
+                                updateElement.setAttribute("action", String.valueOf(Monarch.ADD_UNITS));
+                                nextPlayer.modifyGold(-price);
+                                createUnits(units, updateElement, nextPlayer);
+                                nextPlayer.getConnection().send(updateElement);
+                            }
+                        
+                        } catch (IOException e) {
+                            logger.warning("Could not send message to: " + nextPlayer.getName());
+                        }
+                        break;
                     }
-                    break;
-                case Monarch.SUPPORT_SEA:
-                    Unit newUnit = new Unit(game,
-                                            nextPlayer.getEurope(),
-                                            nextPlayer,
-                                            Unit.FRIGATE,
-                                            Unit.ACTIVE);
-                    nextPlayer.getEurope().add(newUnit);
-                    monarchActionElement.appendChild(newUnit.toXMLElement(nextPlayer,
-                                                                          monarchActionElement.getOwnerDocument()));
-                    try {
-                        nextPlayer.getConnection().send(monarchActionElement);
-                    } catch (IOException e) {
-                        logger.warning("Could not send message to: " + nextPlayer.getName());
-                    }
-                    break;
-                    
                 }
-            }
-        };
+            };
 
         t.start();
     }
 
 
+    private void createUnits(int[] units, Element element, ServerPlayer nextPlayer) {
+        final Game game = getFreeColServer().getGame();
+        Unit newUnit;
+        for (int type = 0; type < units.length; type++) {
+            for (int i = 0; i < units[type]; i++) {
+                if (type == Monarch.ARTILLERY) {
+                    newUnit = new Unit(game,
+                                       nextPlayer.getEurope(),
+                                       nextPlayer,
+                                       Unit.ARTILLERY,
+                                       Unit.ACTIVE);
+                } else {
+                    boolean mounted = false;
+                    if (type == Monarch.DRAGOON) {
+                        mounted = true;
+                    }
+                    newUnit = new Unit(game,
+                                       nextPlayer.getEurope(),
+                                       nextPlayer,
+                                       Unit.VETERAN_SOLDIER,
+                                       Unit.ACTIVE,
+                                       true,
+                                       mounted,
+                                       0,
+                                       false);
+                }
+                nextPlayer.getEurope().add(newUnit);
+                if (element != null) {
+                    element.appendChild(newUnit.toXMLElement(nextPlayer, element.getOwnerDocument()));
+                }
+            }
+        }
+    }
 }
