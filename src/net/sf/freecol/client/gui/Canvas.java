@@ -1408,7 +1408,13 @@ public final class Canvas extends JLayeredPane {
     *                the message gets replaced by <code>replace[i][1]</code>.
     */
     public void showInformationMessage(String messageId, String[][] replace) {
-        String text = Messages.message(messageId, replace);
+        String text;
+        try {
+            text = Messages.message(messageId, replace);
+        } catch (MissingResourceException e) {
+            text = messageId;
+            logger.warning("Missing i18n resource: " + messageId);
+        }
         FreeColDialog infoDialog = FreeColDialog.createInformationDialog(text);
 
         infoDialog.setLocation(getWidth() / 2 - infoDialog.getWidth() / 2,

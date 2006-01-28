@@ -10,12 +10,15 @@ import java.util.logging.Logger;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.server.ai.AIUnit;
+import net.sf.freecol.server.ai.mission.TransportMission;
 
 
 /**
@@ -70,14 +73,32 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
         if (settlement != null) {
             if (settlement.getOwner() == freeColClient.getMyPlayer()) {
                 addColony(((Colony) settlement));
-            }
-            else if (settlement instanceof IndianSettlement) {
+            } else if (settlement instanceof IndianSettlement) {
                 addIndianSettlement((IndianSettlement) settlement);
             }
         }
 
         addTile(tile);
         
+        // START DEBUG
+        if (FreeCol.isInDebugMode() 
+                && freeColClient.getFreeColServer() != null) {
+            addSeparator();
+            Iterator it = tile.getUnitIterator();
+            while (it.hasNext()) {
+                Unit u = (Unit) it.next();
+                if (u.isCarrier() && u.getOwner().isAI()) {
+                    AIUnit au = (AIUnit) freeColClient.getFreeColServer().getAIMain().getAIObject(u);                
+                    if (au.getMission() != null && au.getMission() instanceof TransportMission) {
+                        JMenuItem menuItem = new JMenuItem("Transport list for: " + u.toString());
+                        menuItem.setActionCommand("TL" + Unit.getXMLElementTagName() + u.getID());
+                        menuItem.addActionListener(this);
+                        add(menuItem);
+                    }
+                }
+            }
+        }
+        // END DEBUG
     }
 
 
@@ -172,6 +193,12 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
             canvas.showIndianSettlementPanel((IndianSettlement) tile.getSettlement());
         } else if (command.equals(Tile.getXMLElementTagName())) {
             canvas.showTilePanel(tile);
+            // START DEBUG
+        } else if (command.startsWith("TL" + Unit.getXMLElementTagName())) {
+            String unitID = command.substring(("TL"+Unit.getXMLElementTagName()).length());
+            AIUnit au = (AIUnit) freeColClient.getFreeColServer().getAIMain().getAIObject(unitID);
+            canvas.showInformationMessage(au.getMission().toString());
+            // END DEBUG
         } else {
             logger.warning("Invalid actioncommand.");
         }

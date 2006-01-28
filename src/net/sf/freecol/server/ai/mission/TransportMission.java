@@ -1074,4 +1074,22 @@ public class TransportMission extends Mission {
     public static String getXMLElementTagName() {
         return "transportMission";
     }
+    
+    
+    /**
+     * Creates a <code>String</code> representation of this mission
+     * to be used for debugging purposes.
+     */
+    public String toString() {
+        StringBuffer sb = new StringBuffer("<html><body><b>Transport list:</b><br><br>");
+        Iterator it = transportList.iterator();
+        while (it.hasNext()) {
+            Transportable t = (Transportable) it.next();
+            Locatable l = t.getTransportLocatable();            
+            sb.append(l.getName());
+            sb.append("<br>");
+        }
+        sb.append("</body></html>");        
+        return sb.toString();
+    }
 }
