@@ -297,7 +297,7 @@ public class AIUnit extends AIObject implements Transportable {
                 } else if (missionElement.getTagName().equals(IndianBringGiftMission.getXMLElementTagName())) {
                     mission = new IndianBringGiftMission(getAIMain(), missionElement);
                 } else if (missionElement.getTagName().equals(BuildColonyMission.getXMLElementTagName())) {
-                    mission = new IndianBringGiftMission(getAIMain(), missionElement);
+                    mission = new BuildColonyMission(getAIMain(), missionElement);
                 } else if (missionElement.getTagName().equals(IndianDemandMission.getXMLElementTagName())) {                    
                     mission = new IndianDemandMission(getAIMain(), missionElement);
                 } else if (missionElement.getTagName().equals(TransportMission.getXMLElementTagName())) {
