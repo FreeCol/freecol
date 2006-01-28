@@ -16,6 +16,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.server.ai.mission.TransportMission;
+import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -710,6 +711,10 @@ public class AIColony extends AIObject {
         while (ui6.hasNext()) {
             Unit u = (Unit) ui6.next();
             u.setLocation(colony.getTile());
+            AIUnit au = (AIUnit) getAIMain().getAIObject(u);
+            if (au.getMission() instanceof WorkInsideColonyMission) {
+                au.setMission(null);
+            }
         }
 
         createWishes();
