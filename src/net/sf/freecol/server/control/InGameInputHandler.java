@@ -1660,9 +1660,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new NullPointerException();
         }
 
-        // No reason to send an update to other players: this is always hidden.
-
         unit.work(workLocation);
+        
+        // For updating the number of colonist:
+        sendUpdatedTileToAll(unit.getTile(), player);
 
         return null;
     }
