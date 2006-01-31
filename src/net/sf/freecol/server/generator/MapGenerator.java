@@ -697,6 +697,13 @@ public class MapGenerator {
                     }
 
                     Unit scout = new Unit(game, colonyTile, player, Unit.SEASONED_SCOUT, Unit.ACTIVE);
+                    Unit unit8 = new Unit(game, colonyTile, player, Unit.VETERAN_SOLDIER, Unit.ACTIVE);
+                    Unit unit9 = new Unit(game, colonyTile, player, Unit.VETERAN_SOLDIER, Unit.ACTIVE);
+                    Unit unit10 = new Unit(game, colonyTile, player, Unit.ARTILLERY, Unit.ACTIVE);
+                    Unit unit11 = new Unit(game, colonyTile, player, Unit.ARTILLERY, Unit.ACTIVE);
+                    Unit unit12 = new Unit(game, colonyTile, player, Unit.ARTILLERY, Unit.ACTIVE);
+                    Unit unit13 = new Unit(game, colonyTile, player, Unit.TREASURE_TRAIN, Unit.ACTIVE);
+                    unit13.setTreasureAmount(10000);
 
                     /* DEBUGGING LINES FOR AI (0.4.1):
                     for (int j=0; j<10; j++) {

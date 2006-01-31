@@ -333,7 +333,37 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             addModelMessage(settlement.getOwner(), "model.unit.gift", new String[][] {{"%player%", getOwner().getNationAsString()}, {"%type%", Goods.getName(type)}, {"%amount%", Integer.toString(amount)}});
         }
     }
-
+ 
+    /**
+     * Checks if the treasure train can be cashed in at it's
+     * current <code>Location</code>.
+     * 
+     * @return <code>true</code> if the treasure train can be
+     *      cashed in.
+     * @exception IllegalStateException if this unit is not a treasure train.
+     */
+    public boolean canCashInTreasureTrain() {
+        return canCashInTreasureTrain(getLocation());
+    }
+    
+    /**
+     * Checks if the treasure train can be cashed in at the
+     * given <code>Location</code>.
+     * 
+     * @param location The <code>Location</code>.
+     * @return <code>true</code> if the treasure train can be
+     *      cashed in.
+     * @exception IllegalStateException if this unit is not a treasure train.
+     */
+    public boolean canCashInTreasureTrain(Location location) {
+        if (getType() != TREASURE_TRAIN) {
+            throw new IllegalStateException("Not a treasure train");
+        }
+        return location instanceof Tile && location.getTile().getColony() != null
+                || location instanceof Europe
+                || (location instanceof Unit && ((Unit) location).getLocation() instanceof Europe);
+    }
+    
 
     /**
      * Transfers the gold carried by this unit to the {@link Player owner}.
@@ -347,8 +377,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             throw new IllegalStateException("Not a treasure train");
         }
 
-        if (location instanceof Tile && getTile().getColony() != null ||
-                (getLocation() instanceof Unit && ((Unit) getLocation()).getLocation() instanceof Europe)) {
+        if (canCashInTreasureTrain()) {
             boolean inEurope = (getLocation() instanceof Unit && ((Unit) getLocation()).getLocation() instanceof Europe);
             int cashInAmount = (getOwner().hasFather(FoundingFather.HERNAN_CORTES) || inEurope) ? getTreasureAmount() : getTreasureAmount() / 2; // TODO: Use tax
             FreeColGameObject o = getOwner();

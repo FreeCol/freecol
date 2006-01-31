@@ -33,6 +33,7 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
+import net.sf.freecol.server.ai.mission.CashInTreasureTrainMission;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
 import net.sf.freecol.server.ai.mission.IndianBringGiftMission;
 import net.sf.freecol.server.ai.mission.IndianDemandMission;
@@ -622,7 +623,9 @@ public class AIPlayer extends AIObject {
             
             Unit unit = aiUnit.getUnit();
             
-            if (unit.isScout() && ScoutingMission.isValid(aiUnit)) {
+            if (unit.getType() == Unit.TREASURE_TRAIN) {
+                aiUnit.setMission(new CashInTreasureTrainMission(getAIMain(), aiUnit));
+            } else if (unit.isScout() && ScoutingMission.isValid(aiUnit)) {
                 aiUnit.setMission(new ScoutingMission(getAIMain(), aiUnit));
             } else if ((unit.isOffensiveUnit() || unit.isDefensiveUnit())
                     && (!unit.isColonist() || unit.getType() == Unit.VETERAN_SOLDIER || getGame().getTurn().getNumber() > 5)) {

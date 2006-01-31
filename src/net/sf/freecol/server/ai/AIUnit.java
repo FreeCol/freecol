@@ -9,6 +9,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
+import net.sf.freecol.server.ai.mission.CashInTreasureTrainMission;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
 import net.sf.freecol.server.ai.mission.IndianBringGiftMission;
 import net.sf.freecol.server.ai.mission.IndianDemandMission;
@@ -317,7 +318,9 @@ public class AIUnit extends AIObject implements Transportable {
                 } else if (missionElement.getTagName().equals(WorkInsideColonyMission.getXMLElementTagName())) {
                     mission = new WorkInsideColonyMission(getAIMain(), missionElement);
                 } else if (missionElement.getTagName().equals(ScoutingMission.getXMLElementTagName())) {
-                    mission = new ScoutingMission(getAIMain(), missionElement);                    
+                    mission = new ScoutingMission(getAIMain(), missionElement);
+                } else if (missionElement.getTagName().equals(CashInTreasureTrainMission.getXMLElementTagName())) {
+                    mission = new CashInTreasureTrainMission(getAIMain(), missionElement);                    
                 } else {
                     logger.warning("Could not find mission-class for: " + missionElement.getTagName());
                     mission = new UnitWanderHostileMission(getAIMain(), this);
