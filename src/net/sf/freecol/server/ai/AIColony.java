@@ -15,6 +15,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
+import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.server.ai.mission.TransportMission;
 import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
 
@@ -79,6 +80,28 @@ public class AIColony extends AIObject {
         return colony;
     }
 
+    
+    /**
+     * Disposes this <code>AIColony</code>.
+     */
+    public void dispose() {
+        Iterator it1 = aiGoods.iterator();
+        while (it1.hasNext()) {
+            AIGoods ag = (AIGoods) it1.next();
+            if (ag.getGoods().getLocation() == colony) {
+                ag.dispose();
+            }
+        }
+        Iterator it2 = wishes.iterator();
+        while (it2.hasNext()) {
+            ((Wish) it2.next()).dispose();
+        }   
+        Iterator it3 = tileImprovements.iterator();
+        while (it3.hasNext()) {
+            ((TileImprovement) it3.next()).dispose();
+        } 
+        super.dispose();
+    }
 
     /**
     * Returns an <code>Iterator</code> of the goods to be
@@ -453,7 +476,7 @@ public class AIColony extends AIObject {
     * This is done according to the {@link ColonyPlan}, although minor
     * adjustments can be done to increase production.
     */
-    public void rearrangeWorkers() {
+    public void rearrangeWorkers(Connection connection) {
         colonyPlan.create();
 
         // TODO: Detect a siege and move the workers temporarily around.
@@ -504,7 +527,7 @@ public class AIColony extends AIObject {
         while (workerAdded) {
             workerAdded = false;
             // Use a food production plan if necessary:
-            int food = colony.getFoodProduction() - colony.getUnitCount() * 2;
+            int food = colony.getFoodProduction() - colony.getFoodConsumption();
             for (int i=0; i<workLocationPlans.size() && food < 2; i++) {
                 WorkLocationPlan wlp = (WorkLocationPlan) workLocationPlans.get(i);
                 WorkLocation wl = wlp.getWorkLocation();
@@ -529,7 +552,7 @@ public class AIColony extends AIObject {
                         units.remove(bestUnit);
                         workLocationPlans.remove(wlp);
                         workerAdded = true;
-                        food = colony.getFoodProduction() - colony.getUnitCount() * 2;
+                        food = colony.getFoodProduction() - colony.getFoodConsumption();
                     }
                 }
             }
@@ -562,7 +585,7 @@ public class AIColony extends AIObject {
                             units.remove(bestUnit);
                             workLocationPlans.remove(wlp);
                             workerAdded = true;
-                            food = colony.getFoodProduction() - colony.getUnitCount() * 2;
+                            food = colony.getFoodProduction() - colony.getFoodConsumption();
                         }
                     }
                 }
@@ -570,7 +593,7 @@ public class AIColony extends AIObject {
         }
 
         // Ensure that we have enough food:
-        int food = colony.getFoodProduction() - colony.getUnitCount() * 2;
+        int food = colony.getFoodProduction() - colony.getFoodConsumption();
         while (food < 0 && colony.getGoodsCount(Goods.FOOD) + food * 3 < 0) {
             Iterator wlIterator = colony.getWorkLocationIterator();
             WorkLocation bestPick = null;
@@ -617,6 +640,10 @@ public class AIColony extends AIObject {
                     u.setWorkType(Goods.FOOD);
                 } else {
                     u.setLocation(colony.getTile());
+                    AIUnit au = (AIUnit) getAIMain().getAIObject(u);
+                    if (au.getMission() instanceof WorkInsideColonyMission) {
+                        au.setMission(null);
+                    }
                 }
             } else { // bestPick instanceof Building
                 Building b = (Building) bestPick;
@@ -630,9 +657,13 @@ public class AIColony extends AIObject {
                     }
                 }
                 bestUnit.setLocation(colony.getTile());
+                AIUnit au = (AIUnit) getAIMain().getAIObject(bestUnit);
+                if (au.getMission() instanceof WorkInsideColonyMission) {
+                    au.setMission(null);
+                }
             }
 
-            food = colony.getFoodProduction() - colony.getUnitCount() * 2;
+            food = colony.getFoodProduction() - colony.getFoodConsumption();
         }
 
         // Move any workers not producing anything to a temporary location.

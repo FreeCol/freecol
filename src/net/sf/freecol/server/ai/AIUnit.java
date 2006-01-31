@@ -14,6 +14,7 @@ import net.sf.freecol.server.ai.mission.IndianBringGiftMission;
 import net.sf.freecol.server.ai.mission.IndianDemandMission;
 import net.sf.freecol.server.ai.mission.Mission;
 import net.sf.freecol.server.ai.mission.PioneeringMission;
+import net.sf.freecol.server.ai.mission.ScoutingMission;
 import net.sf.freecol.server.ai.mission.TransportMission;
 import net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission;
 import net.sf.freecol.server.ai.mission.UnitWanderHostileMission;
@@ -59,7 +60,10 @@ public class AIUnit extends AIObject implements Transportable {
         super(aiMain);
 
         this.unit = unit;
-
+        if (unit == null) {
+            throw new NullPointerException("unit == null");
+        }
+        
         mission = new UnitWanderHostileMission(aiMain, this);
     }
 
@@ -269,7 +273,7 @@ public class AIUnit extends AIObject implements Transportable {
      */
     public void readFromXMLElement(Element element) {
         unit = (Unit) getAIMain().getFreeColGameObject(element.getAttribute("ID"));
-
+        
         if (unit == null) {
             logger.warning("Could not find unit: " + unit);
         }
@@ -311,7 +315,9 @@ public class AIUnit extends AIObject implements Transportable {
                 } else if (missionElement.getTagName().equals(DefendSettlementMission.getXMLElementTagName())) {
                     mission = new DefendSettlementMission(getAIMain(), missionElement);
                 } else if (missionElement.getTagName().equals(WorkInsideColonyMission.getXMLElementTagName())) {
-                    mission = new WorkInsideColonyMission(getAIMain(), missionElement);                    
+                    mission = new WorkInsideColonyMission(getAIMain(), missionElement);
+                } else if (missionElement.getTagName().equals(ScoutingMission.getXMLElementTagName())) {
+                    mission = new ScoutingMission(getAIMain(), missionElement);                    
                 } else {
                     logger.warning("Could not find mission-class for: " + missionElement.getTagName());
                     mission = new UnitWanderHostileMission(getAIMain(), this);

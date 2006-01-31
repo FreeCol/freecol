@@ -133,6 +133,10 @@ public class BuildColonyMission extends Mission {
             return;
         }
         
+        if (getUnit().getTile() == null) {
+            return;
+        }
+        
         if (target == null || doNotGiveUp && colonyValue > target.getColonyValue()) {
             target = findColonyLocation(getUnit());
             if (target == null) {
@@ -215,6 +219,10 @@ public class BuildColonyMission extends Mission {
      */
     public static Tile findColonyLocation(Unit unit) {
         Game game = unit.getGame();
+        
+        if (unit.getTile() == null) {
+            return null;
+        }
         
         Tile bestTile = null;
         int highestColonyValue = 0;

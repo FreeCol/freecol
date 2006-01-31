@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -37,11 +38,13 @@ import net.sf.freecol.server.ai.mission.IndianBringGiftMission;
 import net.sf.freecol.server.ai.mission.IndianDemandMission;
 import net.sf.freecol.server.ai.mission.Mission;
 import net.sf.freecol.server.ai.mission.PioneeringMission;
+import net.sf.freecol.server.ai.mission.ScoutingMission;
 import net.sf.freecol.server.ai.mission.TransportMission;
 import net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission;
 import net.sf.freecol.server.ai.mission.UnitWanderHostileMission;
 import net.sf.freecol.server.ai.mission.UnitWanderMission;
 import net.sf.freecol.server.ai.mission.WishRealizationMission;
+import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.networking.DummyConnection;
 
@@ -146,7 +149,19 @@ public class AIPlayer extends AIObject {
         aiUnits.clear();
         
         determineStances();
-        abortInvalidMissions();        
+        abortInvalidMissions();
+        
+        Iterator it = getAIUnitIterator();
+        while (it.hasNext()) {
+            AIUnit au = (AIUnit) it.next();
+            if (!au.hasMission() &&
+                    (au.getUnit().getLocation() instanceof ColonyTile 
+                    || au.getUnit().getLocation() instanceof Building)) {
+                AIColony ac = (AIColony) getAIMain().getAIObject(au.getUnit().getTile().getColony());
+                au.setMission(new WorkInsideColonyMission(getAIMain(), au, ac));               
+            }
+        }
+        
         giveNavalMissions();
         rearrangeWorkersInColonies();        
         secureSettlements();        
@@ -225,7 +240,7 @@ public class AIPlayer extends AIObject {
         Iterator ci = getAIColonyIterator();
         while (ci.hasNext()) {
             AIColony c = (AIColony) ci.next();
-            c.rearrangeWorkers();
+            c.rearrangeWorkers(getConnection());
         }
     }    
     
@@ -607,10 +622,12 @@ public class AIPlayer extends AIObject {
             
             Unit unit = aiUnit.getUnit();
             
-            if ((unit.isOffensiveUnit() || unit.isDefensiveUnit())
+            if (unit.isScout() && ScoutingMission.isValid(aiUnit)) {
+                aiUnit.setMission(new ScoutingMission(getAIMain(), aiUnit));
+            } else if ((unit.isOffensiveUnit() || unit.isDefensiveUnit())
                     && (!unit.isColonist() || unit.getType() == Unit.VETERAN_SOLDIER || getGame().getTurn().getNumber() > 5)) {
                 giveMilitaryMission(aiUnit);
-            } else if (unit.isPioneer() && !aiUnit.hasMission() && PioneeringMission.isValid(aiUnit)) {
+            } else if (unit.isPioneer() && PioneeringMission.isValid(aiUnit)) {
                 aiUnit.setMission(new PioneeringMission(getAIMain(), aiUnit));
             } else if (unit.isColonist()) {
                 // Check if this unit is needed as an expert (using: "WorkerWish"):

@@ -84,6 +84,13 @@ public final class Colony extends Settlement implements Location {
     public Colony(Game game, Player owner, String name, Tile tile, boolean initializeWorkLocations) {
         super(game, owner, tile);
 
+        Iterator exploreIt = getGame().getMap().getCircleIterator(getTile().getPosition(), true, getLineOfSight());
+        while (exploreIt.hasNext()) {
+            Tile t = getGame().getMap().getTile((Map.Position) exploreIt.next());
+            t.setExploredBy(owner, true);
+            owner.invalidateCanSeeTiles();
+        }
+        
         goodsContainer = new GoodsContainer(game, this);
         exports = new boolean[Goods.NUMBER_OF_TYPES];
         for (int i = 0; i < exports.length; i++) {
@@ -144,6 +151,7 @@ public final class Colony extends Settlement implements Location {
                 getBuilding(Building.STOCKADE).setLevel(Building.HOUSE);
             }
         }
+        getTile().updatePlayerExploredTiles();
     }
     
 
@@ -1078,6 +1086,7 @@ public final class Colony extends Settlement implements Location {
                     hammers = 0;
                     getBuilding(currentlyBuilding).setLevel(getBuilding(currentlyBuilding).getLevel() + 1);
                     addModelMessage(this, "model.colony.buildingReady", new String[][] {{"%colony%", getName()}, {"%building%", getBuilding(currentlyBuilding).getName()}});
+                    getTile().updatePlayerExploredTiles();
                 } else {
                     addModelMessage(this, "model.colony.itemNeedTools", new String[][] {{"%colony%", getName()}, {"%item%", getBuilding(currentlyBuilding).getNextName()}});
                 }

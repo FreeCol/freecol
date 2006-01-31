@@ -605,7 +605,11 @@ public class Player extends FreeColGameObject {
     * @see #hasExplored
     */
     public void setExplored(Unit unit) {
-        if (getGame() == null || getGame().getMap() == null || unit == null || unit.getLocation() == null || unit.getTile() == null) {
+        if (getGame() == null 
+                || getGame().getMap() == null 
+                || unit == null 
+                || unit.getLocation() == null 
+                || unit.getTile() == null) {
             return;
         }
 
@@ -752,6 +756,9 @@ public class Player extends FreeColGameObject {
 
         if (canSeeTiles == null) {
             resetCanSeeTiles();
+            if (canSeeTiles == null) {
+                return false;
+            }
         }
 
         return canSeeTiles[tile.getX()][tile.getY()];

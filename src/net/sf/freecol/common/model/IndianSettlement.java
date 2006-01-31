@@ -372,7 +372,7 @@ public class IndianSettlement extends Settlement {
         }
         this.missionary = missionary;
         missionary.setLocation(null);
-        getTile().updatePlayerExploredTile(missionary.getOwner());
+        getTile().updatePlayerExploredTiles();
     }
 
 

@@ -757,14 +757,13 @@ public class TransportMission extends Mission {
             path = findPathToEurope(start.getTile());
         } else if (locatable instanceof Unit && isCarrying(transportable)) {
             path = getGame().getMap().findPath((Unit) locatable, start.getTile(), destination.getTile(), carrier);
-            if (path.getTransportDropNode().previous == null) {
+            if (path == null || path.getTransportDropNode().previous == null) {
                 path = null;
             } else {
                 path.getTransportDropNode().previous.next = null;
             }
         } else {
             path = getGame().getMap().findPath(carrier, start.getTile(), destination.getTile());
-
         }
 
         return path;
@@ -997,16 +996,33 @@ public class TransportMission extends Mission {
     public boolean isValid() {
         return true;
     }
-
-
+    
     /**
-    * Finds the best path to <code>Europe</code>.
-    *
-    * @param start The starting <code>Tile</code>.
-    * @return The path to the target or <code>null</code> if no target can
-    *         be found.
-    * @see Europe
-    */
+     * Returns the destination of a required transport.
+     * @return <code>null</code>
+     */
+    public Tile getTransportDestination() {
+        return null;
+    }
+    
+    /**
+     * Returns the priority of getting the unit to the
+     * transport destination.
+     *
+     * @return o
+     */
+    public int getTransportPriority() {
+        return 0;
+    }
+    
+    /**
+     * Finds the best path to <code>Europe</code>.
+     *
+     * @param start The starting <code>Tile</code>.
+     * @return The path to the target or <code>null</code> if no target can
+     *         be found.
+     * @see Europe
+     */
     protected PathNode findPathToEurope(Tile start) {
         return getGame().getMap().findPathToEurope(getUnit(), start);
     }

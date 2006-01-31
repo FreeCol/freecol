@@ -58,12 +58,7 @@ public abstract class Mission extends AIObject {
     */
     public Mission(AIMain aiMain, AIUnit aiUnit) {
         super(aiMain);
-        this.aiUnit = aiUnit;
-        
-        if (aiUnit == null) {
-            logger.warning("aiUnit == null");
-            throw new NullPointerException("aiUnit == null");
-        }        
+        this.aiUnit = aiUnit;   
     }
 
     
@@ -125,8 +120,9 @@ public abstract class Mission extends AIObject {
         
         while (pathNode.next != null && pathNode.getTurns() == 0
                 && (getUnit().getMoveType(pathNode.getDirection()) == Unit.MOVE
-                || getUnit().getMoveType(pathNode.getDirection()) == Unit.MOVE_HIGH_SEAS)) {
-            move(connection, pathNode.getDirection());
+                || getUnit().getMoveType(pathNode.getDirection()) == Unit.MOVE_HIGH_SEAS
+                || getUnit().getMoveType(pathNode.getDirection()) == Unit.EXPLORE_LOST_CITY_RUMOUR)) {
+            move(connection, pathNode.getDirection());         
             pathNode = pathNode.next;
         }
         if (pathNode.getTurns() == 0 && getUnit().getMoveType(pathNode.getDirection()) != Unit.ILLEGAL_MOVE) {
@@ -152,6 +148,25 @@ public abstract class Mission extends AIObject {
             connection.sendAndWait(moveElement);
         } catch (IOException e) {
             logger.warning("Could not send \"move\"-message!");
+        }
+    }
+    
+    
+    /**
+     * Makes the unit explore the lost city rumour located on it's current
+     * <code>Tile</code> (if any).
+     *  
+     * @param connection The <code>Connection</code> to make the request on.
+     */
+    protected void exploreLostCityRumour(Connection connection) {
+        if (getUnit().getTile().hasLostCityRumour()) {           
+            Element exploreElement = Message.createNewRootElement("explore");
+            exploreElement.setAttribute("unit", getUnit().getID());       
+            try {
+                connection.ask(exploreElement);
+            } catch (IOException e) {
+                logger.warning("Could not send \"explore\"-message!");
+            }
         }
     }
     

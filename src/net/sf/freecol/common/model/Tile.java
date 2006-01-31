@@ -394,6 +394,7 @@ public final class Tile extends FreeColGameObject implements Location {
     */
     public void disposeAllUnits() {
         unitContainer.disposeAllUnits();
+        updatePlayerExploredTiles();
     }
 
 
@@ -546,6 +547,7 @@ public final class Tile extends FreeColGameObject implements Location {
     */
     public void setNationOwner(int nationOwner) {
         this.nationOwner = nationOwner;
+        updatePlayerExploredTiles();
     }
     
 
@@ -567,6 +569,7 @@ public final class Tile extends FreeColGameObject implements Location {
             }
         }
         setNationOwner(player.getNation());
+        updatePlayerExploredTiles();
     }
 
 
@@ -587,6 +590,7 @@ public final class Tile extends FreeColGameObject implements Location {
     public void setAddition(int addition) {
         if (addition != ADD_NONE) setForested(false);
         addition_type = addition;
+        updatePlayerExploredTiles();
     }
 
 
@@ -606,6 +610,7 @@ public final class Tile extends FreeColGameObject implements Location {
     */
     public void setClaim(int claim) {
         indianClaim = claim;
+        updatePlayerExploredTiles();
     }
 
 
@@ -622,6 +627,8 @@ public final class Tile extends FreeColGameObject implements Location {
     public void setSettlement(Settlement s) {
         settlement = s;
         owner = s;
+        setLostCityRumour(false);
+        updatePlayerExploredTiles();
     }
 
 
@@ -664,6 +671,7 @@ public final class Tile extends FreeColGameObject implements Location {
     */
     public void setOwner(Settlement owner) {
         this.owner = owner;
+        updatePlayerExploredTiles();
     }
 
 
@@ -685,6 +693,7 @@ public final class Tile extends FreeColGameObject implements Location {
     public void setForested(boolean value) {
         forested = value;
         bonus = false;
+        updatePlayerExploredTiles();
     }
 
     /**
@@ -693,6 +702,7 @@ public final class Tile extends FreeColGameObject implements Location {
     */
     public void setPlowed(boolean value) {
         plowed = value;
+        updatePlayerExploredTiles();
     }
 
     /**
@@ -701,6 +711,7 @@ public final class Tile extends FreeColGameObject implements Location {
     */
     public void setRoad(boolean value) {
         road = value;
+        updatePlayerExploredTiles();
     }
 
     /**
@@ -709,6 +720,7 @@ public final class Tile extends FreeColGameObject implements Location {
     */
     public void setBonus(boolean value) {
         bonus = value;
+        updatePlayerExploredTiles();
     }
 
 
@@ -729,6 +741,7 @@ public final class Tile extends FreeColGameObject implements Location {
             forested = false;
             addition_type = ADD_NONE;
         }
+        updatePlayerExploredTiles();
     }
 
 
@@ -776,6 +789,7 @@ public final class Tile extends FreeColGameObject implements Location {
      */
     public void setLostCityRumour(boolean rumour) {
         lostCityRumour = rumour;
+        updatePlayerExploredTiles();
     }
 
     
@@ -901,6 +915,7 @@ public final class Tile extends FreeColGameObject implements Location {
         } else {
             logger.warning("Tried to add an unrecognized 'Locatable' to a tile.");
         }
+        updatePlayerExploredTiles();
     }
 
 
@@ -914,6 +929,7 @@ public final class Tile extends FreeColGameObject implements Location {
         } else {
             logger.warning("Tried to remove an unrecognized 'Locatable' from a tile.");
         }
+        updatePlayerExploredTiles();
     }
 
 
@@ -1389,6 +1405,21 @@ public final class Tile extends FreeColGameObject implements Location {
     public void updatePlayerExploredTile(Player player) {
         updatePlayerExploredTile(player.getNation());
     }
+    
+    /**
+     * Updates the <code>PlayerExploredTile</code> for each player.
+     * This update will only be performed if the player
+     * {@link Player#canSee(Tile) can see} this <code>Tile</code>.
+     */
+    public void updatePlayerExploredTiles() {
+        Iterator it = getGame().getPlayerIterator();
+        while (it.hasNext()) {
+            Player p = (Player) it.next();
+            if (p.canSee(this)) {
+                updatePlayerExploredTile(p);
+            }
+        }
+    }
 
     /**
      * Updates the information about this <code>Tile</code> for the
@@ -1406,7 +1437,7 @@ public final class Tile extends FreeColGameObject implements Location {
         }
         if (playerExploredTiles[nation] == null) {
             logger.warning("'playerExploredTiles' for " + Player.getNationAsString(nation) + " is 'null'.");
-            return;
+            throw new IllegalStateException("'playerExploredTiles' for " + Player.getNationAsString(nation) + " is 'null'. " + isExploredBy(getGame().getPlayer(nation)) + " ::: " + getPosition());
         }
 
         playerExploredTiles[nation].setRoad(road);

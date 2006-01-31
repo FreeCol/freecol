@@ -437,9 +437,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         int dx = player.getDifficulty() + 2;
 
         // seasoned scouts should be more successful
-        if (type == Unit.SEASONED_SCOUT) {
+        if (type == Unit.SEASONED_SCOUT && unit.isScout()) {
             dx--;
-        }
+        }      
 
         // dx is now in range 1-6
         int max = 7; // maximum dx + 1
@@ -454,9 +454,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         probability[LostCityRumour.NOTHING] = dx * 5;
 
         // only these units can be promoted
-        if (type == Unit.FREE_COLONIST ||
-            type == Unit.INDENTURED_SERVANT ||
-            type == Unit.PETTY_CRIMINAL) {
+        if (type == Unit.FREE_COLONIST
+                || type == Unit.INDENTURED_SERVANT
+                || type == Unit.PETTY_CRIMINAL) {
             probability[LostCityRumour.SEASONED_SCOUT] = ( max - dx ) * 3;
         } else {
             probability[LostCityRumour.SEASONED_SCOUT] = 0;
@@ -470,11 +470,12 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         probability[LostCityRumour.TREASURE_TRAIN] = ( max - dx ) * 2;
         probability[LostCityRumour.FOUNTAIN_OF_YOUTH] = ( max - dx );
 
-        int start = 0;
-
+        int start;
         if (player.hasFather(FoundingFather.HERNANDO_DE_SOTO)) {
             // rumours are always positive
-            start = 3;
+            start = dx * 4;
+        } else {
+            start = 0;
         }
         
         /* 
@@ -525,7 +526,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
 
         Tile tile = unit.getTile();
         if (tile.hasLostCityRumour()) {
-            tile.setLostCityRumour(false);
+            tile.setLostCityRumour(false);           
         } else {
             throw new IllegalStateException("No rumour to explore.");
         }
@@ -578,7 +579,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         default:
             throw new IllegalStateException( "No such rumour." );
         }
-
+        
         // tell everyone the rumour has been explored
         Iterator updateIterator = game.getPlayerIterator();
         while (updateIterator.hasNext()) {

@@ -118,7 +118,7 @@ public class AIMain implements FreeColGameObjectListener {
     * @param overwrite Determines wether any old <code>AIObject</code>
     *       should be overwritten or not.
     */
-    private void findNewObjects(boolean overwrite) {
+    public void findNewObjects(boolean overwrite) {
         Iterator i = freeColServer.getGame().getFreeColGameObjectIterator();
         while (i.hasNext()) {
             FreeColGameObject fcgo = (FreeColGameObject) i.next();

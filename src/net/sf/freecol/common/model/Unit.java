@@ -3419,15 +3419,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     * @return The Colony it's in, or null if it is not in a Colony
     */
     public Colony getColony() {
-        if (location == null) {
-            return null;
-        }
-
-        if (!(location instanceof Colony)) {
-            return null;
-        } else {
-            return (Colony) location;
-        }
+        return getTile().getColony();
     }
 
 
