@@ -248,6 +248,10 @@ public abstract class Mission extends AIObject {
         
         Unit carrier = (Unit) getUnit().getLocation();
         
+        if (carrier.getTile().getSettlement() != null) {
+            return carrier.getTile();
+        }
+        
         GoalDecider gd = new GoalDecider() {
             private PathNode bestTarget = null;
             
@@ -269,13 +273,7 @@ public abstract class Mission extends AIObject {
                 return hasOurSettlement;
             }
         };
-        PathNode path;
-        if (carrier.getTile() != null) {
-            path = getGame().getMap().search(carrier, gd, Integer.MAX_VALUE);       
-        } else {
-            path = getGame().getMap().search(carrier, (Tile) carrier.getEntryLocation(), gd, Integer.MAX_VALUE);
-        }
-        
+        PathNode path = getGame().getMap().search(carrier, gd, Integer.MAX_VALUE);               
         if (path == null) {
             return null;
         } else {
