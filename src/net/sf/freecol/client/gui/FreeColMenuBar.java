@@ -613,8 +613,11 @@ public class FreeColMenuBar extends JMenuBar {
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-
-        String displayString =  "Gold: " + freeColClient.getMyPlayer().getGold() + "    |    Year: " + freeColClient.getGame().getTurn().toString();
+        String displayString = Messages.message("menuBar.statusLine", new String[][]{
+            {"%gold%", Integer.toString(freeColClient.getMyPlayer().getGold())},
+            {"%tax%", Integer.toString(freeColClient.getMyPlayer().getTax())},
+            {"%year%", freeColClient.getGame().getTurn().toString()}
+        });
         Rectangle2D displayStringBounds = g.getFontMetrics().getStringBounds(displayString, g);
         g.drawString(displayString, getWidth()-10-(int)displayStringBounds.getWidth(), 15);
     }
