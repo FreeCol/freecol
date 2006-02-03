@@ -4,7 +4,7 @@
   <property environment="env"/>
   <property name="freecol.data.dir" value="${basedir}/data"/>
   <property name="freecol.src.dir" value="${basedir}/src"/>
-  <property name="freecol.build.dir" value="${basedir}/src/classes"/>
+  <property name="freecol.build.dir" value="${basedir}/build"/>
   <property name="freecol.javadoc.dir" value="${basedir}/javadoc"/>
   <property name="freecol.jar.file" value="${basedir}/FreeCol.jar"/>
   <property name="freecol.overview.file" value="${freecol.src.dir}/overview.html"/>
