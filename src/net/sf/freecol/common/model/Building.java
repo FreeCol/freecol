@@ -800,14 +800,16 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             return 0;
         }
 
-        int goodsOutput = getMaximumProduction();
-        int goodsInput = colony.getGoodsCount(getGoodsInputType()) + colony.getProductionOf(getGoodsInputType());
+        int goodsOutput = getMaximumProduction();        
         
-        if (getGoodsInputType() > -1 && goodsInput < goodsOutput) {            
-            if (level < FACTORY) {
-                goodsOutput = goodsInput;
-            } else {
-                goodsOutput = (goodsInput * 3) / 2;
+        if (getGoodsInputType() > -1) {
+            int goodsInput = colony.getGoodsCount(getGoodsInputType()) + colony.getProductionOf(getGoodsInputType());
+            if (goodsInput < goodsOutput) {                
+                if (level < FACTORY) {
+                    goodsOutput = goodsInput;
+                } else {
+                    goodsOutput = (goodsInput * 3) / 2;
+                }
             }
         }
 
