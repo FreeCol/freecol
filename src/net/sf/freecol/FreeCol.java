@@ -74,7 +74,7 @@ public final class FreeCol {
      *
      * @param args The command-line arguments.
      */
-    public static void main(String args[]) {
+    public static void main(String[] args) {
 
         handleArgs(args);
 
@@ -231,7 +231,7 @@ public final class FreeCol {
      *
      * @param args The command-line arguments.
      */
-    private static void handleArgs(String args[]) {
+    private static void handleArgs(String[] args) {
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals("--freecol-data")) {
                 i++;

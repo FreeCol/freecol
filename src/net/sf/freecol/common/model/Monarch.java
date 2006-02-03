@@ -131,7 +131,7 @@ public final class Monarch extends FreeColGameObject {
         }
 
         /** The probabilities of these actions. */
-        int probability[] = new int[NUMBER_OF_ACTIONS];
+        int[] probability = new int[NUMBER_OF_ACTIONS];
     
 
 	for (int j = 0; j < NUMBER_OF_ACTIONS; j++ ) {

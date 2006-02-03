@@ -519,7 +519,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         description.setSize(detailPanel.getWidth(), super.getPreferredSize().height);
         detailPanel.add(description);
         
-        int potentialtable[][][] = {
+        int[][][] potentialtable = {
              // Food    Sugar  Tobac  Cotton Furs   Wood   Ore    Silver Horses Rum    Cigars Cloth  Coats  T.G.   Tools  Musket
                 {{0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Unexp
                 {{5,3}, {0,0}, {0,0}, {2,1}, {0,3}, {0,6}, {1,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Plains

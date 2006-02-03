@@ -101,7 +101,7 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
     */
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
-        Component components[] = getComponents();
+        Component[] components = getComponents();
         for (int i = 0; i < components.length; i++) {
             components[i].setEnabled(enabled);
         }

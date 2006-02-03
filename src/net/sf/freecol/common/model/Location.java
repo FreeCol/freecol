@@ -85,7 +85,7 @@ public interface Location {
 
     
     /**
-     * Gets the ID of this <code>Location</code>
+     * Gets the ID of this <code>Location</code>.
      * @return The ID.
      * @see FreeColGameObject#getID
      */

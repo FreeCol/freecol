@@ -279,7 +279,7 @@ public class IndianSettlement extends Settlement {
     * Adds the given <code>Unit</code> to the list of units that belongs to this
     * <code>IndianSettlement</code>.
     * 
-    * @param u The <codeUnit</code> to be added.
+    * @param u The <code>Unit</code> to be added.
     */
     public void addOwnedUnit(Unit u) {
         if (u == null) {
@@ -1066,7 +1066,7 @@ public class IndianSettlement extends Settlement {
         }
 
         if (getChildElement(indianSettlementElement, "alarm") != null) {
-            int tensionArray[] = readFromArrayElement("alarm", getChildElement(indianSettlementElement, "alarm"), new int[0]);
+            int[] tensionArray = readFromArrayElement("alarm", getChildElement(indianSettlementElement, "alarm"), new int[0]);
             for (int i = 0; i < tensionArray.length; i++) {
                 alarm[i] = new Tension(tensionArray[i]);
             }

@@ -1061,7 +1061,7 @@ public final class Tile extends FreeColGameObject implements Location {
 
         // Please someone tell me they want to put this data into a separate file... -sjm
         // Twelve tile types, sixteen goods types, and forested/unforested.
-        int potentialtable[][][] = {
+        int[][][] potentialtable = {
         // Food    Sugar  Tobac  Cotton Furs   Wood   Ore    Silver Horses Rum    Cigars Cloth  Coats  T.G.   Tools  Musket
             {{0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Unexp
             {{5,3}, {0,0}, {0,0}, {2,1}, {0,3}, {0,6}, {1,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Plains

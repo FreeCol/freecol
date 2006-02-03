@@ -380,8 +380,8 @@ public class FreeColDialog extends FreeColPanel {
             }
         };
 
-        int w1[] = {10, 90, 80, 90, 10};
-        int h1[] = {10, 100, 10, 20, 10};
+        int[] w1 = {10, 90, 80, 90, 10};
+        int[] h1 = {10, 100, 10, 20, 10};
         HIGLayout layout = new HIGLayout(w1, h1);
         higConst.clearCorrection();
         layout.setRowWeight(2,1);
@@ -444,8 +444,8 @@ public class FreeColDialog extends FreeColPanel {
             }
         };
 
-        int w1[] = {10, 30, 200, 30, 10};
-        int h1[] = {10, 100, 10, 100, 10, 20, 10, 20, 10, 20, 10, 20, 10};
+        int[] w1 = {10, 30, 200, 30, 10};
+        int[] h1 = {10, 100, 10, 100, 10, 20, 10, 20, 10, 20, 10, 20, 10};
         HIGLayout layout = new HIGLayout(w1, h1);
         higConst.clearCorrection();
         layout.setRowWeight(2,1);
@@ -519,8 +519,8 @@ public class FreeColDialog extends FreeColPanel {
             }
         };
 
-        int w1[] = {10, 30, 200, 30, 10};
-        int h1[] = {10, 100, 10, 20, 10, 20, 10, 20, 10};
+        int[] w1 = {10, 30, 200, 30, 10};
+        int[] h1 = {10, 100, 10, 20, 10, 20, 10, 20, 10};
         HIGLayout layout = new HIGLayout(w1, h1);
         higConst.clearCorrection();
         layout.setRowWeight(2,1);
@@ -578,8 +578,8 @@ public class FreeColDialog extends FreeColPanel {
         String mainText = Messages.message("missionarySettlement.inciteQuestion");
 
         final JLabel question = new JLabel("<html><body>" + mainText + "</body></html>");
-        final JButton players[] = new JButton[allPlayers.size() - 1],
-                cancel = new JButton(Messages.message("missionarySettlement.cancel"));
+        final JButton[] players = new JButton[allPlayers.size() - 1];
+        final JButton cancel = new JButton(Messages.message("missionarySettlement.cancel"));
 
         int arrayIndex = 0;
         for (int i = 0; i < allPlayers.size(); i++) {
@@ -597,8 +597,8 @@ public class FreeColDialog extends FreeColPanel {
             }
         };
 
-        int w1[] = {10, 30, 200, 30, 10};
-        int h1[] = new int[3 + allPlayers.size() * 2];
+        int[] w1 = {10, 30, 200, 30, 10};
+        int[] h1 = new int[3 + allPlayers.size() * 2];
 
         // h1 = {10, 100, 10, 20, 10, 20, 10, 20, 10, ...};
         h1[0] = 10;

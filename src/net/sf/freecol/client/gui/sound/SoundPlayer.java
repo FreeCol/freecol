@@ -222,7 +222,7 @@ public class SoundPlayer {
         private Synthesizer synthesizer;
 
         /** An array of <i>MidiChannel</i> to use while playing MIDI. */
-        private MidiChannel channels[];
+        private MidiChannel[] channels;
 
 
 

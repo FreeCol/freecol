@@ -38,9 +38,9 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
     /** How wide the margins should be. */
     private final int marginWidth = 12;
     /** The widths of the columns. */
-    private final int widths[] = new int[columns];
+    private final int[] widths = new int[columns];
     /** The heights of the rows. */
-    private final int heights[];
+    private final int[] heights;
 
     private final JLabel[] goodsLabels;
     private final JLabel salesLabel;
@@ -94,7 +94,7 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
         while (colonyIterator.hasNext()) {
             colonies.add(colonyIterator.next());
         }
-        int heights[] = new int[colonies.size() + extraRows];
+        int[] heights = new int[colonies.size() + extraRows];
         for (int h = 0; h < heights.length; h++) {
             heights[h] = 0;
         }

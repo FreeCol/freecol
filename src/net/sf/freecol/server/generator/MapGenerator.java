@@ -433,7 +433,7 @@ public class MapGenerator {
         //logger.info("===============");
         
         // constructs the return array
-        int rv[] = new int[3];
+        int[] rv = new int[3];
         rv[0]=good;
         rv[1]=good1;
         rv[2]=good2;

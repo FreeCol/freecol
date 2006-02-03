@@ -117,7 +117,7 @@ public class Player extends FreeColGameObject {
     private int[] stance = new int[NUMBER_OF_NATIONS];
 
 
-    private static final Color defaultNationColors[] = {
+    private static final Color[] defaultNationColors = {
         Color.ORANGE,
         Color.RED,
         Color.BLUE,
@@ -305,7 +305,7 @@ public class Player extends FreeColGameObject {
 
     /**
     * Checks if this player is a "Royal Expeditionary Force".
-    * @return <code>true> if this <code>Player</code> is controlling
+    * @return <code>true</code> if this <code>Player</code> is controlling
     *       a REF and <code>false</code> otherwise.
     */
     public boolean isREF() {
@@ -1853,7 +1853,7 @@ public class Player extends FreeColGameObject {
         crossesRequired = Integer.parseInt(playerElement.getAttribute("crossesRequired"));
 
         if (getChildElement(playerElement, "tension") != null) {
-            int tensionArray[] = readFromArrayElement("tension", getChildElement(playerElement, "tension"), new int[0]);
+            int[] tensionArray = readFromArrayElement("tension", getChildElement(playerElement, "tension"), new int[0]);
             for (int i = 0; i < tensionArray.length; i++) {
                 tension[i] = new Tension(tensionArray[i]);
             }

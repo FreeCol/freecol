@@ -78,7 +78,7 @@ public final class DefaultTransferHandler extends TransferHandler {
     * @return 'true' if the given component can import a selection of the
     * flavor that is indicated by the second parameter, 'false' otherwise.
     */
-    public boolean canImport(JComponent comp, DataFlavor flavor[]) {
+    public boolean canImport(JComponent comp, DataFlavor[] flavor) {
         if (!(comp instanceof UnitLabel) && !(comp instanceof GoodsLabel) && !(comp instanceof MarketLabel) && !(comp instanceof JPanel) && !(comp instanceof JLabel)) {
             return false;
         }
