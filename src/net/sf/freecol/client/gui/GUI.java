@@ -198,6 +198,8 @@ public final class GUI {
     
     /**
      * Checks if the unit selection cursor is currently being displayed.
+     * @return <code>true</code> if the cursor is currently being displayed
+     *      and <code>false</code> otherwise.
      */
     public boolean hasCursor() {
         return cursor;
@@ -206,6 +208,7 @@ public final class GUI {
     
     /**
     * Sets that the unit selection cursor should be displayed.
+    * @param cursor Use <code>true</code> to enable the cursor.
     */
     public void setCursor(boolean cursor) {
         this.cursor = cursor;
@@ -415,7 +418,7 @@ public final class GUI {
     /**
     * Sets the focus of the map.
     *
-    * param focus The <code>Position</code> of the center tile of the
+    * @param focus The <code>Position</code> of the center tile of the
     *             displayed map.
     * @see #getFocus
     */
@@ -432,9 +435,9 @@ public final class GUI {
     /**
     * Sets the focus of the map.
     *
-    * param x The x-coordinate of the center tile of the
+    * @param x The x-coordinate of the center tile of the
     *         displayed map.
-    * param y The x-coordinate of the center tile of the
+    * @param y The x-coordinate of the center tile of the
     *         displayed map.
     * @see #getFocus
     */
@@ -900,13 +903,19 @@ public final class GUI {
 
 
     /**
-    * Creates an image with a string of a given color and with a black border around the glyphs.
+    * Creates an image with a string of a given color and with 
+    * a black border around the glyphs.
     *
+    * @param g A <code>Graphics</code>-object for getting a
+    *       <code>Font</code>.
     * @param nameString The <code>String</code> to make an image of.
-    * @param color The <code>Color</code> to use when displaying the <code>nameString</code>.
-    * @param maxWidth The maximum width of the image. The size of the <code>Font</code> will be
-    *                 adjusted if the image gets larger than this value.
+    * @param color The <code>Color</code> to use when displaying 
+    *       the <code>nameString</code>.
+    * @param maxWidth The maximum width of the image. The size of 
+    *       the <code>Font</code> will be adjusted if the image gets 
+    *       larger than this value.
     * @param preferredFontSize The preferred font size.
+    * @return The image that was created.
     */
     public BufferedImage createStringImage(Graphics2D g, String nameString, Color color, int maxWidth, int preferredFontSize) {
 
@@ -1132,7 +1141,7 @@ public final class GUI {
                 number = "+"+ number;
             }
             BufferedImage stringImage = createStringImage(
-                    (Graphics2D) g, number, textColor, goodsIcon.getIconWidth()*2, 12);
+                    g, number, textColor, goodsIcon.getIconWidth()*2, 12);
             int textOffset = leftOffset + (coverage-stringImage.getWidth())/2;
             textOffset = (textOffset >= 0) ? textOffset : 0;
             g.drawImage(stringImage, textOffset,
@@ -1236,17 +1245,23 @@ public final class GUI {
 
 
     /**
-     * Displays the given Tile onto the given Graphics2D object at the
-     * location specified by the coordinates. Everything located on the
-     * Tile will also be drawn except for units because their image can
-     * be larger than a Tile.
-     * @param g The Graphics2D object on which to draw the Tile.
-     * @param map The map.
-     * @param tile The Tile to draw.
+     * Displays the given <code>Tile</code> onto the given 
+     * <code>Graphics2D</code> object at the location specified 
+     * by the coordinates. The visualization of the <code>Tile</code>
+     * also includes information from the coresponding
+     * <code>ColonyTile</code> from the given <code>Colony</code>.
+     * 
+     * @param g The <code>Graphics2D</code> object on which to draw 
+     *      the <code>Tile</code>.
+     * @param map The <code>Map</code>.
+     * @param tile The <code>Tile</code> to draw.
      * @param x The x-coordinate of the location where to draw the Tile
-     * (in pixels).
+     *      (in pixels).
      * @param y The y-coordinate of the location where to draw the Tile
-     * (in pixels).
+     *      (in pixels).
+     * @param colony The <code>Colony</code> to create the visualization
+     *      of the <code>Tile</code> for. This object is also used to
+     *      get the <code>ColonyTile</code> for the given <code>Tile</code>.
      */
     public void displayColonyTile(Graphics2D g, Map map, Tile tile, int x, int y, Colony colony) {
         displayTile(g, map, tile, x, y, false, false);
@@ -1455,7 +1470,7 @@ public final class GUI {
                     }
 
                     BufferedImage stringImage = createStringImage(g, populationString, theColor, lib.getTerrainImageWidth(tile.getType()), 12);
-                    g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType()) - stringImage.getWidth())/2 + 1, y + ((lib.getColonyImageHeight(lib.getSettlementGraphicsType(((Colony)settlement)))) / 2) + 1, null);
+                    g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType()) - stringImage.getWidth())/2 + 1, y + ((lib.getColonyImageHeight(lib.getSettlementGraphicsType(settlement))) / 2) + 1, null);
 
                     g.setColor(Color.BLACK);
                 } else if (settlement instanceof IndianSettlement) {
@@ -1596,8 +1611,9 @@ public final class GUI {
 
 
     /**
-    * Checks if there is currently a drag operation on the mapboard.
-    */
+     * Checks if there is currently a drag operation on the mapboard.
+     * @return <code>true</code> if a drag operation is in progress.
+     */
     public boolean isDragStarted() {
         return dragStarted;
     }
@@ -1628,6 +1644,8 @@ public final class GUI {
 
     /**
     * If set to <i>true</i> then tile names are drawn on the map.
+    * @param displayTileNames <code>true</code> if the tile names
+    *       should be displayed and <code>false</code> otherwise.
     */
     public void setDisplayTileNames(boolean displayTileNames) {
         this.displayTileNames = displayTileNames;
@@ -1636,6 +1654,8 @@ public final class GUI {
 
     /**
     * If set to <i>true</i> then a grid is drawn on the map.
+    * @param displayGrid <code>true</code> if the grid should be drawn
+    *       on the map and <code>false</code> otherwise.
     */
     public void setDisplayGrid(boolean displayGrid) {
         this.displayGrid = displayGrid;

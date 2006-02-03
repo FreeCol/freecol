@@ -53,8 +53,10 @@ public final class GoodsLabel extends JLabel implements ActionListener {
     
     /**
     * Initializes this JLabel with the given goods data.
+    * 
     * @param goods The Goods that this JLabel will visually represent.
     * @param parent The parent that knows more than we do.
+    * @param isSmall A smaller picture will be used if <code>true</code>.
     */
     public GoodsLabel(Goods goods, Canvas parent, boolean isSmall) {
         this(goods, parent);
@@ -92,6 +94,7 @@ public final class GoodsLabel extends JLabel implements ActionListener {
 
     /**
     * Sets that this <code>GoodsLabel</code> should be small.
+    * @param isSmall A smaller picture will be used if <code>true</code>.
     */
     public void setSmall(boolean isSmall) {
         if (isSmall) {

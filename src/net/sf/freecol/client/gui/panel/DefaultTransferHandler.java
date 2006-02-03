@@ -53,6 +53,7 @@ public final class DefaultTransferHandler extends TransferHandler {
 
     /**
     * The constructor to use.
+    * @param canvas The <code>Canvas</code>.
     * @param parentPanel The layered pane that holds all kinds of information.
     */
     public DefaultTransferHandler(Canvas canvas, JLayeredPane parentPanel) {
@@ -261,7 +262,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                     comp.revalidate();
 
                     if (oldSelectedUnit != null) {
-                        if (((UnitLabel) oldSelectedUnit).getParent() instanceof EuropePanel.InPortPanel) {
+                        if ((oldSelectedUnit).getParent() instanceof EuropePanel.InPortPanel) {
                             ((EuropePanel) parentPanel).setSelectedUnit(oldSelectedUnit.getUnit());
                         } else {
                             ((ColonyPanel) parentPanel).setSelectedUnit(oldSelectedUnit.getUnit());
@@ -317,7 +318,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                     comp.revalidate();
 
                     if (oldSelectedUnit != null) {
-                        if (((UnitLabel) oldSelectedUnit).getParent() instanceof EuropePanel.InPortPanel) {
+                        if (oldSelectedUnit.getParent() instanceof EuropePanel.InPortPanel) {
                             ((EuropePanel) parentPanel).setSelectedUnit(oldSelectedUnit.getUnit());
                         } else {
                             ((ColonyPanel) parentPanel).setSelectedUnit(oldSelectedUnit.getUnit());

@@ -508,7 +508,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     * Handles an "explore"-message from a client.
     *
     * @param connection The connection the message came from.
-    * @param moveElement The element containing the request.
+    * @param exploreElement The element containing the request.
     * @exception IllegalArgumentException If the data format of the message is invalid.
     * @exception IllegalStateException If the request is not accepted by the model.
     *
@@ -1829,7 +1829,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * Handles a "toggleExports"-request from a client.
      *
      * @param connection The connection the message came from.
-     * @param payArrearsElement The element containing the request.
+     * @param toggleExportsElement The element containing the request.
      */
     private Element toggleExports(Connection connection, Element toggleExportsElement) {
         Game game = getFreeColServer().getGame();

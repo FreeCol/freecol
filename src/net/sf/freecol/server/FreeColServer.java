@@ -386,10 +386,11 @@ public final class FreeColServer {
 
 
     /**
-    * The owner of the game is the player that have loaded the
-    * game.
-    * @see #loadGame
-    */
+     * Gets the owner of the <code>Game</code>.
+     * @return The owner of the game. THis is the player that 
+     *      has loaded the game (if any).
+     * @see #loadGame
+     */
     public String getOwner() {
         return owner;
     }

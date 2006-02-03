@@ -69,6 +69,8 @@ public final class MiniMap extends JPanel implements MouseInputListener {
 
     /**
      * The constructor that will initialize this component.
+     * 
+     * @param freeColClient The main controller object for the client
      * @param imageProvider The ImageProvider that can provide us with images to display
      *        and information about those images (such as the width of a tile image).
      * @param container The component that contains the minimap.
@@ -460,8 +462,8 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         int y = e.getY() - mapY;
         initialX = xOffset;
         initialY = yOffset;
-        int tileX = (int) ((x - adjustX) / tileSize) + xOffset;
-        int tileY = (int) ((y - adjustY) / tileSize * 4) + yOffset;
+        int tileX = ((x - adjustX) / tileSize) + xOffset;
+        int tileY = ((y - adjustY) / tileSize * 4) + yOffset;
         freeColClient.getGUI().setFocus(tileX, tileY);
     }
 
@@ -498,8 +500,8 @@ public final class MiniMap extends JPanel implements MouseInputListener {
 
         int x = e.getX() - mapX;
         int y = e.getY() - mapY;
-        int tileX = (int) ((x - adjustX) / tileSize) + initialX;
-        int tileY = (int) ((y - adjustY) / tileSize * 4) + initialY;
+        int tileX = ((x - adjustX) / tileSize) + initialX;
+        int tileY = ((y - adjustY) / tileSize * 4) + initialY;
         freeColClient.getGUI().setFocus(tileX, tileY);
     }
 

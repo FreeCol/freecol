@@ -75,6 +75,9 @@ public class Game extends FreeColGameObject {
     
     /**
     * Creates a new game model.
+    * @param modelController A controller object the model can
+    *       use to make actions not allowed from the model
+    *       (generate random numbers etc).
     */
     public Game(ModelController modelController) {
         super(null);
@@ -93,6 +96,15 @@ public class Game extends FreeColGameObject {
     /**
     * Initiate a new <code>Game</code> with information from
     * a saved game.
+    * 
+    * @param freeColGameObjectListener A listener that should be 
+    *       monitoring this <code>Game</code>.
+    * @param modelController A controller object the model can
+    *       use to make actions not allowed from the model
+    *       (generate random numbers etc).
+    * @param element An XML representation of a game to be loaded.
+    * @param fcgos A list of <code>FreeColGameObject</code>s to
+    *       be added to this <code>Game</code>.
     */
     public Game(FreeColGameObjectListener freeColGameObjectListener, ModelController modelController, Element element, FreeColGameObject[] fcgos) {
         super(null, element);
@@ -119,6 +131,11 @@ public class Game extends FreeColGameObject {
     /**
     * Initiate a new <code>Game</code> object from a <code>Element</code>
     * in a DOM-parsed XML-tree.
+    * 
+    * @param modelController A controller object the model can
+    *       use to make actions not allowed from the model
+    *       (generate random numbers etc).
+    * @param element An XML representation of a game to be loaded.
     * @param viewOwnerUsername The username of the owner of this view of the game.
     */
     public Game(ModelController modelController, Element element, String viewOwnerUsername) {
@@ -266,6 +283,7 @@ public class Game extends FreeColGameObject {
     * Gets the <code>FreeColGameObject</code> with the specified ID.
     *
     * @param id The identifier of the <code>FreeColGameObject</code>.
+    * @return The <code>FreeColGameObject</code>.
     * @exception NullPointerException If <code>id == null</code>.
     */
     public FreeColGameObject getFreeColGameObject(String id) {
@@ -282,6 +300,7 @@ public class Game extends FreeColGameObject {
     *
     * @param id The identifier of the <code>FreeColGameObject</code> that shall
     *           be removed from this <code>Game</code>.
+    * @return The <code>FreeColGameObject</code> that has been removed.
     * @exception NullPointerException If <code>id == null</code>.
     */
     public FreeColGameObject removeFreeColGameObject(String id) {
@@ -320,6 +339,7 @@ public class Game extends FreeColGameObject {
 
     /**
     * Returns a vacant nation.
+    * @return A vacant nation.
     */
     public int getVacantNation() {
         boolean[] nationTaken = new boolean[4];
@@ -344,6 +364,8 @@ public class Game extends FreeColGameObject {
 
     /**
     * Return a <code>Player</code> identified by it's nation.
+    * @param nation The nation.
+    * @return The <code>Player</code> of the given nation.
     */
     public Player getPlayer(int nation) {
         Iterator playerIterator = getPlayerIterator();
@@ -400,6 +422,12 @@ public class Game extends FreeColGameObject {
 
     /**
     * Gets the player after the given player.
+    * 
+    * @param beforePlayer The <code>Player</code> before the
+    *       <code>Player</code> to be returned.
+    * @return The <code>Player</code> after the 
+    *       <code>beforePlayer</code> in the list which determines
+    *       the order each player becomes the current player. 
     * @see #getNextPlayer
     */
     public Player getPlayerAfter(Player beforePlayer) {
@@ -431,6 +459,10 @@ public class Game extends FreeColGameObject {
 
     /**
     * Checks if the next player is in a new turn.
+    * @return <code>true</code> if changing to the 
+    *       <code>Player</code> given by
+    *       {@link #getNextPlayer()} would increase the
+    *       current number of turns by one.
     */
     public boolean isNextPlayerInNewTurn() {
         return (players.indexOf(currentPlayer) > players.indexOf(getNextPlayer())
@@ -617,6 +649,8 @@ public class Game extends FreeColGameObject {
 
     /**
     * Removes all the model messages for the given player.
+    * @param player The <code>Player</code> to remove the
+    *       messages for.
     */
     public void removeModelMessagesFor(Player player) {
         Iterator i = modelMessages.iterator();
@@ -688,11 +722,20 @@ public class Game extends FreeColGameObject {
 
 
     /**
-    * Returns an amount of gold that should be payed by payingPlayer to attackingPlayer in order for
-    * attackingPlayer to attack targetPlayer. This method should NEVER be randomized: it should always
+    * Gets the amount of gold needed for inciting.
+    * This method should NEVER be randomized: it should always
     * return the same amount if given the same three parameters.
-    * @return An amount of gold that should be payed by payingPlayer to attackingPlayer in order for
-    * attackingPlayer to attack targetPlayer.
+    * 
+    * @param payingPlayer The <code>Player</code> paying for the
+    *       incite.
+    * @param targetPlayer The <code>Player</code> to be attacked by the
+    *       <code>attackingPlayer</code>.
+    * @param attackingPlayer The player that would be receiving the 
+    *       money for incite.
+    * @return The amount of gold that should be payed by 
+    *       <code>payingPlayer</code> to <code>attackingPlayer</code> 
+    *       in order for <code>attackingPlayer</code> to attack 
+    *       <code>targetPlayer</code>. 
     */
     public static int getInciteAmount(Player payingPlayer, Player targetPlayer, Player attackingPlayer) {
         int amount = 0;

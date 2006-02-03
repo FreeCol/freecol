@@ -66,6 +66,12 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
 
     /**
     * Prepares this panel to be displayed.
+    * @param possibleFoundingFathers The founding fathers
+    *       which can be selected. The length of the array
+    *       is the same as the number of <code>FoundingFather</code>
+    *       categories and the values identifies a 
+    *       <code>FoundingFather</code> to be picked in each of
+    *       those categories.
     */
     public void initialize(int[] possibleFoundingFathers) {
         boolean hasSelectedTab = false;
@@ -205,6 +211,8 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
 
         /**
         * Prepares this panel to be displayed.
+        * @param foundingFather The founding father to be displayed or
+        *       <code>-1</code> if there is none.
         */
         public void initialize(int foundingFather) {
             this.foundingFather = foundingFather;

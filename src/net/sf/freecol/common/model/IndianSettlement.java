@@ -110,6 +110,7 @@ public class IndianSettlement extends Settlement {
      * The constructor to use.
      *
      * @param game The <code>Game</code> in which this object belong.
+     * @param player The <code>Player</code> owning this settlement.
      * @param tile The location of the <code>IndianSettlement</code>.
      * @param tribe Tribe of settlement
      * @param kind Kind of settlement
@@ -231,11 +232,18 @@ public class IndianSettlement extends Settlement {
 
     /**
     * Gets the alarm level towards the given player.
+    * @param nation The nation to get the alarm level for.
+    * @return An object representing the alarm level.
     */
     public Tension getAlarm(int nation) {
         return alarm[nation];
     }
 
+    /**
+     * Gets the alarm level towards the given player.
+     * @param player The <code>Player</code> to get the alarm level for.
+     * @return An object representing the alarm level.
+     */    
     public Tension getAlarm(Player player) {
         return getAlarm(player.getNation());
     }
@@ -270,6 +278,8 @@ public class IndianSettlement extends Settlement {
     /**
     * Adds the given <code>Unit</code> to the list of units that belongs to this
     * <code>IndianSettlement</code>.
+    * 
+    * @param u The <codeUnit</code> to be added.
     */
     public void addOwnedUnit(Unit u) {
         if (u == null) {
@@ -283,7 +293,10 @@ public class IndianSettlement extends Settlement {
 
 
     /**
-    * Gets an iterator over all the units this <code>IndianSettlement</code> is owning.
+    * Gets an iterator over all the units this 
+    * <code>IndianSettlement</code> is owning.
+    * 
+    * @return The <code>Iterator</code>.
     */
     public Iterator getOwnedUnitsIterator() {
         return ownedUnits.iterator();
@@ -291,8 +304,12 @@ public class IndianSettlement extends Settlement {
 
 
     /**
-    * Removes the given <code>Unit</code> to the list of units that belongs to this
-    * <code>IndianSettlement</code>.
+    * Removes the given <code>Unit</code> to the list of units 
+    * that belongs to this <code>IndianSettlement</code>.
+    * 
+    * @param u The <code>Unit</code> to be removed from the
+    *       list of the units this <code>IndianSettlement</code>
+    *       owns.
     */
     public void removeOwnedUnit(Unit u) {
         if (u == null) {
@@ -414,6 +431,7 @@ public class IndianSettlement extends Settlement {
 
     /**
     * Gets the kind of Indian settlement.
+    * @return The kind of <code>IndianSettlement</code>.
     */
     public int getKind() {
         return kind;
@@ -422,6 +440,7 @@ public class IndianSettlement extends Settlement {
 
     /**
     * Gets the tribe of the Indian settlement.
+    * @return The tribe.
     */
     public int getTribe() {
         return tribe;
@@ -751,6 +770,8 @@ public class IndianSettlement extends Settlement {
     /**
     * Get general bonus multiplier. This is >1 if this is a <code>VILLAGE</code>,
     * <code>CITY</code> or a capital.
+    * 
+    * @return The bonus multiplier.
     */
     public int getBonusMultiplier() {
         int addition = getKind() + 1;

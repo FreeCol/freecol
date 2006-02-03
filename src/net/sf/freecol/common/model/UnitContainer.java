@@ -51,9 +51,11 @@ public class UnitContainer extends FreeColGameObject {
     /**
     * Initiates a new <code>UnitContainer</code> from an <code>Element</code>.
     *
-    * @param game The <code>Game</code> in which this <code>UnitContainer</code> belong.
-    * @param element The <code>Element</code> (in a DOM-parsed XML-tree) that describes
-    *                this object.
+    * @param game The <code>Game</code> in which this 
+    *       <code>UnitContainer</code> belong.
+    * @param parent The parent panel.
+    * @param element The <code>Element</code> (in a DOM-parsed XML-tree) 
+    *       that describes this object.
     */
     public UnitContainer(Game game, Location parent, Element element) {
         super(game, element);

@@ -39,12 +39,14 @@ public interface Locatable {
     
     /**
     * Gets the amount of space this <code>Locatable</code> take.
+    * @return The space it takes on a carrier.
     */
     public int getTakeSpace();
     
     
     /**
     * Returns the name of this <code>Locatable</code>.
+    * @return The name.
     */
     public String getName();
 }

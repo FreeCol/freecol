@@ -146,6 +146,8 @@ public final class Tile extends FreeColGameObject implements Location {
     /**
     * Initialize this object from an XML-representation of this object.
     *
+    * @param game The <code>Game</code> this <code>Tile</code>
+     *      should be created in.
     * @param element The DOM-element ("Document Object Model") made to represent this "Tile".
     */
     public Tile(Game game, Element element) {
@@ -543,6 +545,8 @@ public final class Tile extends FreeColGameObject implements Location {
 
     /**
     * Sets the nation that should consider this tile to be their property.
+    * @param nationOwner The nation or {@link Player#NO_NATION} is there is
+    *         no nation owning this tile.
     * @see #getNationOwner
     */
     public void setNationOwner(int nationOwner) {
@@ -554,6 +558,8 @@ public final class Tile extends FreeColGameObject implements Location {
     /**
     * Makes the given player take the ownership of this <code>Tile</code>.
     * The tension level is modified accordingly.
+    * 
+    * @param player The <code>Player</code>.
     */
     public void takeOwnership(Player player) {
         if (getNationOwner() != Player.NO_NATION
@@ -1038,6 +1044,12 @@ public final class Tile extends FreeColGameObject implements Location {
     *
     * @param tileType The type of tile
     * @param goods The type of goods to check the potential for.
+    * @param addition_type The type of addition (mountains, hills etc).
+    * @param bonus Should be <code>true</code> to indicate that a bonus
+    *       is present.
+    * @param forested <code>true</code> to indicate a forest.
+    * @param plowed <code>true</code> to indicate that it is plowed.
+    * @param road <code>true</code> to indicate a road
     * @return The amount of goods.
     */
     public static int getTileTypePotential(int tileType, int goods, int addition_type, boolean bonus,
@@ -1583,6 +1595,7 @@ public final class Tile extends FreeColGameObject implements Location {
 
         /**
         * Creates a new <code>PlayerExploredTile</code>.
+        * @param nation The nation.
         */
         public PlayerExploredTile(int nation) {
             this.nation = nation;
@@ -1662,7 +1675,8 @@ public final class Tile extends FreeColGameObject implements Location {
 
 
         /**
-        * Returns <i>true</i> if the tile has been explored.
+        * Checks if this <code>Tile</code> has been explored. 
+        * @return <i>true</i> if the tile has been explored.
         */
         public boolean isExplored() {
             return explored;
@@ -1670,7 +1684,8 @@ public final class Tile extends FreeColGameObject implements Location {
 
 
         /**
-        * Returns the nation of this <code>PlayerExploredTile</code>.
+        * Gets the nation owning this object. 
+        * @return The nation of this <code>PlayerExploredTile</code>.
         */
         public int getNation() {
             return nation;
@@ -1679,6 +1694,10 @@ public final class Tile extends FreeColGameObject implements Location {
 
         /**
         * Hides the invisible features of the given <code>tileElement</code>.
+        * 
+        * @param tileElement The <code>Element</code> to hide information on.
+        * @param player The <code>Player</code>.
+        * @param document The document the given element is a part of.
         */
         public void setAttributes(Element tileElement, Player player, Document document) {
             tileElement.setAttribute("road", Boolean.toString(road));
@@ -1738,7 +1757,14 @@ public final class Tile extends FreeColGameObject implements Location {
         /**
         * Make a XML-representation of this object.
         *
+        * @param player The <code>Player</code> the XML-representation
+        *       should be created for.
         * @param document The document to use when creating new componenets.
+        * @param showAll Should be set to <code>true</code> in order to display all
+        *       information about this <code>Tile</code> and not just the information
+        *       for the given <code>Player</code>.
+        * @param toSavedGame Use <code>true</code> in order to add information which 
+        *       should not be sent across the network, but only be saved.
         * @return The DOM-element ("Document Object Model") made to represent this "PlayerExploredTile".
         */
         public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {

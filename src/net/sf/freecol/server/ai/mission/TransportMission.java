@@ -1074,7 +1074,7 @@ public class TransportMission extends Mission {
                 } else if (!(ao instanceof Transportable)) {
                     logger.warning("AIObject not Transportable, ID: " + e.getAttribute("ID"));
                 } else if (ao != null) {
-                    transportList.add((Transportable) ao);
+                    transportList.add(ao);
                 } else {
                     logger.warning("Could not find unit with ID: " + e.getAttribute("ID"));
                 }

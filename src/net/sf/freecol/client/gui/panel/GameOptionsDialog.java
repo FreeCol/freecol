@@ -52,6 +52,7 @@ public final class GameOptionsDialog extends FreeColDialog implements ActionList
     /**
     * The constructor that will add the items to this panel.
     * @param parent The parent of this panel.
+    * @param freeColClient The main controller object for the client.
     */
     public GameOptionsDialog(Canvas parent, FreeColClient freeColClient) {
         setLayout(new BorderLayout());

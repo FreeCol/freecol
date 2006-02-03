@@ -251,6 +251,8 @@ public final class Canvas extends JLayeredPane {
 
     /**
     * Returns the <code>ClientOptionsDialog</code>.
+    * 
+    * @return The <code>ClientOptionsDialog</code>
     * @see net.sf.freecol.client.ClientOptions
     */
     public ClientOptionsDialog getClientOptionsDialog() {
@@ -395,7 +397,7 @@ public final class Canvas extends JLayeredPane {
     *
     * <ol>
     *   <li>The <code>messageID</code> is used to get the message from
-    *       {@link net.sf.freecol.client.gui.i18n.Messages#message}.
+    *       {@link net.sf.freecol.client.gui.i18n.Messages#message(String)}.
     *   <li>Every occuranse of <code>data[x][0]</code> is replaced with
     *       <code>data[x][1]</code> for every <code>x</code>.
     *   <li>The message is displayed using a modal dialog.
@@ -404,6 +406,7 @@ public final class Canvas extends JLayeredPane {
     * A specialized panel may be used. In this case the <code>messageID</code>
     * of the <code>ModelMessage</code> if used as a key for this panel.
     *
+    * @param m The <code>ModelMessage</code> to be displayed.
     */
     public void showModelMessage(ModelMessage m) {
         String okText = "ok";
@@ -523,9 +526,12 @@ public final class Canvas extends JLayeredPane {
 
 
     /**
-    * Is this <code>Canvas</code> displaying another panel.
-    * {@link net.sf.freecol.client.gui.panel.InfoPanel} and
-    * {@link net.sf.freecol.client.gui.panel.MiniMap} is ignored.
+    * Checks if this <code>Canvas</code> displaying another panel.
+    * 
+    * @return <code>true</code> if the <code>Canvas</code> is 
+    *       displaying a sub panel other than
+    *       {@link net.sf.freecol.client.gui.panel.InfoPanel} and
+    *       {@link net.sf.freecol.client.gui.panel.MiniMap}.
     */
     public boolean isShowingSubPanel() {
         if (getColonyPanel().isShowing() || getEuropePanel().isShowing()) {
@@ -602,6 +608,8 @@ public final class Canvas extends JLayeredPane {
     * Displays a dialog where the user may choose a file.
     *
     * @param directory The directory containing the files.
+    * @param fileFilters The file filters which the user can
+    *       select in the dialog.
     * @return The <code>File</code>.
     * @see FreeColDialog
     */
@@ -645,8 +653,12 @@ public final class Canvas extends JLayeredPane {
     /**
     * Displays a dialog where the user may choose a filename.
     *
-    * @param directory The directory containing the files in which the
-    *                  user may overwrite.
+    * @param directory The directory containing the files 
+    *       in which the user may overwrite.
+    * @param standardName This extension will be added to the
+    *       specified filename (if not added by the user). 
+    * @param fileFilters The available file filters in the
+    *       dialog.
     * @return The <code>File</code>.
     * @see FreeColDialog
     */
@@ -913,6 +925,7 @@ public final class Canvas extends JLayeredPane {
 
     /**
      * Shows a panel displaying Colopedia Information.
+     * @param type The type of colopedia panel to display.
      */
     public void showColopediaPanel(int type) {
         colopediaPanel.initialize(type);
@@ -925,7 +938,9 @@ public final class Canvas extends JLayeredPane {
 
 
     /**
-     * Shows a panel displaying Colopedia Information.
+     * Shows a report panel.
+     * @param classname The class name of the report panel
+     *      to be displayed.
      */
     public void showReportPanel(String classname) {
         ReportPanel reportPanel = null;
@@ -1272,6 +1287,7 @@ public final class Canvas extends JLayeredPane {
 
     /**
     * Gets the <code>ColonyPanel</code>.
+    * @return The <code>ColonyPanel</code>
     */
     public ColonyPanel getColonyPanel() {
         return colonyPanel;
@@ -1280,6 +1296,7 @@ public final class Canvas extends JLayeredPane {
 
     /**
     * Gets the <code>EuropePanel</code>.
+    * @return The <code>EuropePanel</code>.
     */
     public EuropePanel getEuropePanel() {
         return europePanel;
@@ -1746,8 +1763,9 @@ public final class Canvas extends JLayeredPane {
 
 
         /**
-        * Gets the component this thread is trying to take focus for.
-        */
+         * Gets the component this thread is trying to take focus for.
+         * @return The component.
+         */
         public JComponent getComponent() {
             return component;
         }

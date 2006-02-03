@@ -44,6 +44,7 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
     /**
     * The constructor that will add the items to this panel.
     * @param parent The parent of this panel.
+    * @param freeColClient The main controller object for the client
     */
     public MainPanel(Canvas parent, FreeColClient freeColClient) {
         setLayout(new BorderLayout());

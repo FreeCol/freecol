@@ -317,6 +317,10 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
 
     /**
     * Returns the production of food on this tile.
+    * This is the same as calling:
+    * <code>getProductionOf(Goods.FOOD)</code>.
+    * 
+    * @return The production of food in this colony.
     */
     public int getFoodProduction() {
         return getProductionOf(Goods.FOOD);

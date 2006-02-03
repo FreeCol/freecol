@@ -430,7 +430,7 @@ public class ColonyPlan {
     * Determines the best goods to produce on a given <code>Tile</code>
     * within this colony.
     *
-    * @param The <code>Tile</code>.
+    * @param t The <code>Tile</code>.
     * @return The type of goods.
     */
     private int getBestGoodsToProduce(Tile t) {

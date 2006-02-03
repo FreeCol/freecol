@@ -78,6 +78,8 @@ public abstract class OptionMap extends OptionGroup {
 
     /**
     * Gets the object identified by the given <code>id</code>.
+    * @param id The ID.
+    * @return The <code>Object</code> with the given ID.
     */
     public Option getObject(String id) {
         return (Option) values.get(id);
@@ -124,6 +126,8 @@ public abstract class OptionMap extends OptionGroup {
     * Adds the <code>Option</code>s from the given <code>OptionGroup</code>
     * to the <code>Map</code>. This is done recursively if the specified
     * group has any sub-groups.
+    * 
+    * @param og The <code>OptionGroup</code> to be added.
     */
     public void addToMap(OptionGroup og) {
         Iterator it = og.iterator();

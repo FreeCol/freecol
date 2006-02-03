@@ -48,6 +48,8 @@ public class ServerInfo {
     * @param slotsAvailable Number of players that may conncet.
     * @param currentlyPlaying Number of players that are currently connected.
     * @param isGameStarted <i>true</i> if the game has started.
+    * @param version The version of the server.
+    * @param gameState The current state of the game.
     */
     public ServerInfo(String name, String address, int port, int slotsAvailable, int currentlyPlaying, boolean isGameStarted, String version, int gameState) {
         update(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted, version, gameState);
@@ -73,6 +75,8 @@ public class ServerInfo {
     * @param slotsAvailable Number of players that may conncet.
     * @param currentlyPlaying Number of players that are currently connected.
     * @param isGameStarted <i>true</i> if the game has started.
+    * @param version The version of the server.
+    * @param gameState The current state of the game.
     */
     public void update(String name, String address, int port, int slotsAvailable, 
                        int currentlyPlaying, boolean isGameStarted, String version, int gameState) {
@@ -88,7 +92,10 @@ public class ServerInfo {
 
     
     /**
-    * Returns the name of the server that is beeing represented by this object.
+    * Returns the name of the server that is beeing represented 
+    * by this object.
+    * 
+    * @return The name.
     */
     public String getName() {
         return name;
@@ -96,6 +103,7 @@ public class ServerInfo {
 
     /**
     * Returns the IP-address.
+    * @return The IP-address of the server.
     */
     public String getAddress() {
         return address;
@@ -104,6 +112,7 @@ public class ServerInfo {
 
     /**
     * Returns the port in which clients may connect.
+    * @return The port.
     */
     public int getPort() {
         return port;
@@ -112,6 +121,7 @@ public class ServerInfo {
     
     /**
     * Returns the number of currently active (connected and not dead) players.
+    * @return The number of players.
     */
     public int getCurrentlyPlaying() {
         return currentlyPlaying;
@@ -119,7 +129,8 @@ public class ServerInfo {
     
     
     /**
-    * Returns the number of players that may conncet.
+    * Returns the number of players that may connect.
+    * @return The number of slots available on the server.
     */
     public int getSlotsAvailable() {
         return slotsAvailable;
@@ -139,6 +150,8 @@ public class ServerInfo {
 
     /**
     * Gets the current state of the game.
+    * 
+    * @return The current state of the game.
     * @see net.sf.freecol.server.FreeColServer#getGameState
     */
     public int getGameState() {

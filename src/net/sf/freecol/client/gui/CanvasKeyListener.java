@@ -28,7 +28,10 @@ public final class CanvasKeyListener implements KeyListener {
     
     /**
     * The constructor to use.
+    * 
     * @param parent The container of all child panels.
+    * @param inGameController The controller to be used for
+    *       handling the events.
     */
     public CanvasKeyListener(Canvas parent, InGameController inGameController) {
         this.parent = parent;

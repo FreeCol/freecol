@@ -51,6 +51,9 @@ public class ModelMessage {
     /**
     * Sets the <code>beenDisplayed</code> value of this <code>ModelMessage</code>.
     * This is used to avoid showing the same message twice.
+    * 
+    * @param beenDisplayed Should be set to <code>true</code> after the
+    *       message has been displayed.
     */
     public void setBeenDisplayed(boolean beenDisplayed) {
         this.beenDisplayed = beenDisplayed;
@@ -62,6 +65,7 @@ public class ModelMessage {
     * should be associated with. In addition, the owner of the source is the
     * player getting the message.
     *
+    * @return The source of the message.
     * @see #getOwner
     */
     public FreeColGameObject getSource() {
@@ -70,7 +74,8 @@ public class ModelMessage {
     
     
     /**
-    * Gets the ID of the message to display.    
+    * Gets the ID of the message to display.   
+    * @return The ID. 
     */
     public String getMessageID() {
         return messageID;
@@ -90,6 +95,9 @@ public class ModelMessage {
     /**
     * Returns the owner of this message. The owner of this method
     * is the owner of the {@link #getSource source}.
+    * 
+    * @return The owner of the message. This is the <code>Player</code>
+    *       who should receive the message.
     */
     public Player getOwner() {
         if (source instanceof Unit) {

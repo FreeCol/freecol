@@ -46,8 +46,13 @@ public final class FreeColActionUI extends JPanel implements OptionUpdater, Acti
 
 
     /**
-    * Creates a new <code>FreeColActionUI</code> for the given <code>FreeColAction</code>.
-    * @param option The <code>FreeColAction</code> to make a user interface for.
+    * Creates a new <code>FreeColActionUI</code> for the 
+    * given <code>FreeColAction</code>.
+    * 
+    * @param option The <code>FreeColAction</code> to make a user 
+    *       interface for.
+    * @param optionGroupUI The group this <code>FreeColActionUI</code>
+    *       will be a part of.
     */
     public FreeColActionUI(FreeColAction option, OptionGroupUI optionGroupUI) {
         super(new BorderLayout());
@@ -80,6 +85,7 @@ public final class FreeColActionUI extends JPanel implements OptionUpdater, Acti
     
     /**
     * Creates an icon for symbolizing the recording of a <code>KeyStroke</code>.
+    * @return The <code>ImageIcon</code>.
     */
     public static ImageIcon getRecordImage() {
         BufferedImage bi = new BufferedImage(9, 9, BufferedImage.TYPE_INT_ARGB);
@@ -95,6 +101,7 @@ public final class FreeColActionUI extends JPanel implements OptionUpdater, Acti
     
     /**
     * Creates an icon to be used on the button that removes a keyboard accelerator.
+    * @return The <code>ImageIcon</code>.
     */
     public static ImageIcon getRemoveImage() {
         BufferedImage bi = new BufferedImage(9, 9, BufferedImage.TYPE_INT_ARGB);
@@ -140,7 +147,12 @@ public final class FreeColActionUI extends JPanel implements OptionUpdater, Acti
 
     
     /**
-    * Removes the given <code>KeyStroke</code>.
+    * Removes the given <code>KeyStroke</code>. That is:
+    * This action's <code>KeyStroke</code> is set to
+    * <code>null</code> if it is the same as the given 
+    * <code>KeyStroke</code>.
+    * 
+    * @param k The <code>KeyStroke</code> to be removed.
     */
     public void removeKeyStroke(KeyStroke k) {
         if (k != null && keyStroke != null && k.getKeyCode() == keyStroke.getKeyCode() && k.getModifiers() == keyStroke.getModifiers()) {

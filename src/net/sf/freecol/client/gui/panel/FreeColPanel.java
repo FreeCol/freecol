@@ -46,6 +46,7 @@ public class FreeColPanel extends JPanel {
 
     /**
     * Default constructor.
+    * @param layout The <code>LayoutManager</code> to be used.
     */
     public FreeColPanel(LayoutManager layout) {
         super(layout);

@@ -36,6 +36,8 @@ public final class MarketLabel extends JLabel implements ActionListener {
     /**
     * Initializes this JLabel with the given goods type.
     * @param type The Goods type that this JLabel will visually represent.
+    * @param market The <code>Market</code> being used to buy
+    *       and sell <code>Goods</code>.
     * @param parent The parent that knows more than we do.
     */
     public MarketLabel(int type, Market market, Canvas parent) {
@@ -58,7 +60,10 @@ public final class MarketLabel extends JLabel implements ActionListener {
     /**
     * Initializes this JLabel with the given goods type.
     * @param type The Goods type that this JLabel will visually represent.
+    * @param market The <code>Market</code> being used to buy
+    *       and sell <code>Goods</code>.
     * @param parent The parent that knows more than we do.
+    * @param isSmall The image will be smaller if set to <code>true</code>.
     */
     public MarketLabel(int type, Market market, Canvas parent, boolean isSmall) {
         this(type, market, parent);
@@ -94,6 +99,7 @@ public final class MarketLabel extends JLabel implements ActionListener {
 
     /**
     * Sets this MarketLabel's goods amount.
+    * @param amount The amount of goods.
     */
     public void setAmount(int amount) {
         this.amount = amount;
@@ -110,6 +116,7 @@ public final class MarketLabel extends JLabel implements ActionListener {
 
     /**
     * Makes a smaller version.
+    * @param isSmall The image will be smaller if set to <code>true</code>.
     */
     public void setSmall(boolean isSmall) {
         if (isSmall) {

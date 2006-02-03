@@ -54,6 +54,11 @@ public class TileImprovement extends AIObject {
     /**
      * Creates a new <code>TileImprovement</code>.
      * @param aiMain The main AI-object.
+     * @param target The target <code>Tile</code> for the improvement.
+     * @param type The type of improvement.
+     * @param value The value identifying the importance of
+    *         this <code>TileImprovement</code> - a higher value 
+    *         signals a higher importance.
      */
     public TileImprovement(AIMain aiMain, Tile target, int type, int value) {
         super(aiMain);

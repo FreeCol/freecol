@@ -11,11 +11,15 @@ public interface CostDecider {
     /**
      * Determines the cost of a single move.
      * 
+     * @param unit The <code>Unit</code> that will be used when
+     *      determining the cost. This should be the same type
+     *      of unit as the one following the path.
      * @param oldTile The <code>Tile</code> we are moving from.
      * @param newTile The <code>Tile</code> we are moving to.
      * @param movesLeft The remaining moves left. The
      *      <code>CostDecider</code> can use this information
      *      if needed.
+     * @param turns The number of turns spent so far.
      * @return The cost of moving the given unit from the
      *      <code>oldTile</code> to the <code>newTile</code>.
      */

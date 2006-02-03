@@ -122,6 +122,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     /**
      * The constructor for the panel.
      * @param parent The parent of this panel
+     * @param freeColClient The main controller object for the client.
      */
     public ColonyPanel(Canvas parent, FreeColClient freeColClient) {
         final int windowHeight = 630;
@@ -359,6 +360,12 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     
     /**
      * Initialize the data on the window.
+     * This is the same as calling:
+     * <code>initialize(colony, game, null)</code>.
+     * 
+     * @param colony The <code>Colony</code> to be displayed.
+     * @param game The <code>Game</code> in which the given
+     *      <code>Colony</code> is a part of.
      */
     public void initialize(Colony colony, Game game) {
         initialize(colony, game, null);
@@ -367,6 +374,14 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
     /**
      * Initialize the data on the window.
+     * 
+     * @param colony The <code>Colony</code> to be displayed.
+     * @param game The <code>Game</code> in which the given
+     *      <code>Colony</code> is a part of.
+     * @param preSelectedUnit This <code>Unit</code> will be
+     *      selected if it is not <code>null</code> and 
+     *      it is a carrier located in the given
+     *      <code>Colony</code>.
      */
     public void initialize(final Colony colony, Game game, Unit preSelectedUnit) {
         this.colony = colony;
@@ -666,21 +681,24 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
 
     /**
-    * Returns a pointer to the <code>cargoPanel</code>-object in use.
+    * Returns a pointer to the <code>CargoPanel</code>-object in use.
+    * @return The <code>CargoPanel</code>.
     */
     public final CargoPanel getCargoPanel() {
         return cargoPanel;
     }
 
     /**
-    * Returns a pointer to the <code>warehousePanel</code>-object in use.
+    * Returns a pointer to the <code>WarehousePanel</code>-object in use.
+    * @return The <code>WarehousePanel</code>.
     */
     public final WarehousePanel getWarehousePanel() {
         return warehousePanel;
     }
 
     /**
-    * Returns a pointer to the <code>tilePanel</code>-object in use.
+    * Returns a pointer to the <code>TilePanel</code>-object in use.
+    * @return The <code>TilePanel</code>.
     */
     public final TilePanel getTilePanel() {
         return tilePanel;
@@ -688,6 +706,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
     /**
     * Returns a pointer to the <code>FreeColClient</code> which uses this panel.
+    * @return The <code>FreeColClient</code>.
     */
     public final FreeColClient getClient() {
         return freeColClient;
@@ -695,6 +714,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
     /**
     * Returns a pointer to the <code>Colony</code>-pointer in use.
+    * @return The <code>Colony</code>.
     */
     public final Colony getColony() {
         return colony;
@@ -1582,6 +1602,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
         /**
         * Creates a new BuildingBox for this Colony.
+        * @param colonyPanel The <code>ColonyPanel</code> this object is
+        *       created for.
         */
         public BuildingBox(ColonyPanel colonyPanel) {
             super();
@@ -1660,6 +1682,10 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
             /**
             * Sets up the text and the type.
+            * 
+            * @param text The text presented to the user for identifying
+            *       the item.
+            * @param type An <code>int</code> for identifying the item.
             */
             public BuildingBoxItem(String text, int type) {
                 this.text = text;
@@ -1697,6 +1723,10 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
             /**
             * Sets up this BuildingBoxListener's buildingBox and colonyPanel.
+            * 
+            * @param buildingBox The <code>BuildingBox</code> to be listening on.
+            * @param colonyPanel The <code>ColonyPanel</code> this object is
+            *       created for.
             */
             public BuildingBoxListener(BuildingBox buildingBox, ColonyPanel colonyPanel) {
                 super();

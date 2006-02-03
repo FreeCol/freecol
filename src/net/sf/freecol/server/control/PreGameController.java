@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
-import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Map;
@@ -71,87 +70,82 @@ public final class PreGameController extends Controller {
     public void startGame() {
         FreeColServer freeColServer = getFreeColServer();
 
-        try {
-            Game game = freeColServer.getGame();
-            AIMain aiMain = new AIMain(freeColServer);
-            freeColServer.setAIMain(aiMain);
-            game.setFreeColGameObjectListener(aiMain);
-
-            // Add AI players:
-            for (int i = 0; i < Player.NUMBER_OF_NATIONS; i++) {
-                if (game.getPlayer(i) != null) {
-                    continue;
-                }
-
-                DummyConnection theConnection = new DummyConnection(freeColServer.getInGameInputHandler());
-                
-                String name;
-                if (i >= Player.INCA && i<=Player.TUPI) {
-                    name = "Indian_" + Integer.toString(i - 3);
-                } else {
-                    name = "European_" + Integer.toString(i);
-                }
-
-                ServerPlayer aiPlayer = new ServerPlayer(game,
-                                                         name,
-                                                         false,
-                                                         true,
-                                                         null,
-                                                         theConnection,
-                                                         i);
-
-                DummyConnection aiConnection = new DummyConnection(new AIInGameInputHandler(freeColServer, aiPlayer, aiMain));
-                aiConnection.setOutgoingMessageHandler(theConnection);
-                theConnection.setOutgoingMessageHandler(aiConnection);
-
-                freeColServer.getServer().addConnection(theConnection, 3 - i);
-
-                freeColServer.getGame().addPlayer(aiPlayer);
-
-                // Send message to all players except to the new player:
-                Element addNewPlayer = Message.createNewRootElement("addPlayer");
-                addNewPlayer.appendChild(aiPlayer.toXMLElement(null, addNewPlayer.getOwnerDocument()));
-                freeColServer.getServer().sendToAll(addNewPlayer, theConnection);
+        Game game = freeColServer.getGame();
+        AIMain aiMain = new AIMain(freeColServer);
+        freeColServer.setAIMain(aiMain);
+        game.setFreeColGameObjectListener(aiMain);
+        
+        // Add AI players:
+        for (int i = 0; i < Player.NUMBER_OF_NATIONS; i++) {
+            if (game.getPlayer(i) != null) {
+                continue;
             }
-
-            // Make the map:
-            MapGenerator mapGenerator = new MapGenerator(game);
-            mapGenerator.createMap(game.getPlayers(), 30, 64);
-            Map map = game.getMap();
-
-            // Inform the clients:
-            setMap(map);
-
-            // Initialise the crosses required values.
-            Iterator playerIterator = game.getPlayerIterator();
-            while (playerIterator.hasNext()) {
-                Player p = (Player) playerIterator.next();
-                p.updateCrossesRequired();
+            
+            DummyConnection theConnection = new DummyConnection(freeColServer.getInGameInputHandler());
+            
+            String name;
+            if (i >= Player.INCA && i<=Player.TUPI) {
+                name = "Indian_" + Integer.toString(i - 3);
+            } else {
+                name = "European_" + Integer.toString(i);
             }
-
-            // Start the game:
-            freeColServer.setGameState(FreeColServer.IN_GAME);
-            freeColServer.updateMetaServer();
-
-            Element startGameElement = Message.createNewRootElement("startGame");
-            freeColServer.getServer().sendToAll(startGameElement);
-            freeColServer.getServer().setMessageHandlerToAllConnections(freeColServer.getInGameInputHandler());
-        } catch (FreeColException e) {
-            logger.warning("Exception: " + e);
+            
+            ServerPlayer aiPlayer = new ServerPlayer(game,
+                    name,
+                    false,
+                    true,
+                    null,
+                    theConnection,
+                    i);
+            
+            DummyConnection aiConnection = new DummyConnection(new AIInGameInputHandler(freeColServer, aiPlayer, aiMain));
+            aiConnection.setOutgoingMessageHandler(theConnection);
+            theConnection.setOutgoingMessageHandler(aiConnection);
+            
+            freeColServer.getServer().addConnection(theConnection, 3 - i);
+            
+            freeColServer.getGame().addPlayer(aiPlayer);
+            
+            // Send message to all players except to the new player:
+            Element addNewPlayer = Message.createNewRootElement("addPlayer");
+            addNewPlayer.appendChild(aiPlayer.toXMLElement(null, addNewPlayer.getOwnerDocument()));
+            freeColServer.getServer().sendToAll(addNewPlayer, theConnection);
         }
-
+        
+        // Make the map:
+        MapGenerator mapGenerator = new MapGenerator(game);
+        mapGenerator.createMap(game.getPlayers(), 30, 64);
+        Map map = game.getMap();
+        
+        // Inform the clients:
+        setMap(map);
+        
+        // Initialise the crosses required values.
+        Iterator playerIterator = game.getPlayerIterator();
+        while (playerIterator.hasNext()) {
+            Player p = (Player) playerIterator.next();
+            p.updateCrossesRequired();
+        }
+        
+        // Start the game:
+        freeColServer.setGameState(FreeColServer.IN_GAME);
+        freeColServer.updateMetaServer();
+        
+        Element startGameElement = Message.createNewRootElement("startGame");
+        freeColServer.getServer().sendToAll(startGameElement);
+        freeColServer.getServer().setMessageHandlerToAllConnections(freeColServer.getInGameInputHandler());
     }
-
-
+    
+    
     /**
-    * Sets the map and sends an updated <code>Game</code>-object
-    * (that includes the map) to the clients.
-    *
-    * @param map The new <code>Map</code> to be set.
-    */
+     * Sets the map and sends an updated <code>Game</code>-object
+     * (that includes the map) to the clients.
+     *
+     * @param map The new <code>Map</code> to be set.
+     */
     public void setMap(Map map) {
         Game game = getFreeColServer().getGame();
-
+        
         // Already done my the map generator:
         //game.setMap(map);
 

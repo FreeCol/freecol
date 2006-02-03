@@ -216,6 +216,15 @@ public class BuildColonyMission extends Mission {
     
     /**
      * Finds a site for a new colony.
+     * 
+     * @param unit The <code>Unit</code> to find a colony
+     *      site for. This unit will be used for determining
+     *      the path to a colony location and colony sites
+     *      far away from the unit (in turns) will be less
+     *      valuable.
+     * @return A site suitable for a <code>Colony</code> or
+     *      <code>null</code> if no such site could be found
+     *      within a fixed distance from the <code>Unit</code>. 
      */
     public static Tile findColonyLocation(Unit unit) {
         Game game = unit.getGame();
@@ -229,7 +238,7 @@ public class BuildColonyMission extends Mission {
         
         Iterator it = game.getMap().getFloodFillIterator(unit.getTile().getPosition());
         for (int i=0; it.hasNext() && i<500; i++) {
-            Tile tile = (Tile) game.getMap().getTile((Map.Position) it.next());
+            Tile tile = game.getMap().getTile((Map.Position) it.next());
             if (tile.getColonyValue() > 0) {
                 if (tile != unit.getTile()) {
                     PathNode path;

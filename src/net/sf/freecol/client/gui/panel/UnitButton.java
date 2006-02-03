@@ -49,6 +49,8 @@ public final class UnitButton extends JButton {
                             
     /**
     * The basic constructor.
+    * @param freeColClient The main controller object for the client
+    * @param index The index of this <code>UnitButton</code>.
     */
     public UnitButton(FreeColClient freeColClient, int index) {
         this.freeColClient = freeColClient;
@@ -59,6 +61,8 @@ public final class UnitButton extends JButton {
 
     /**
     * The basic constructor.
+    * @param freeColClient The main controller object for the client
+    * @param gui An object that contains useful GUI-related methods.
     */
     public UnitButton(FreeColClient freeColClient, GUI gui) {
         this.gui = gui;
@@ -69,6 +73,8 @@ public final class UnitButton extends JButton {
     /**
     * A constructor which initializes the container.
     * @param container The JComponent that contains this button
+    * @param freeColClient The main controller object for the client
+    * @param gui An object that contains useful GUI-related methods.
     */
     public UnitButton(JComponent container, FreeColClient freeColClient, GUI gui) {
         this.container = container;

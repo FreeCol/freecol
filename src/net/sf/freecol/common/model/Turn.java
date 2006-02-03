@@ -35,6 +35,7 @@ public class Turn {
 
     /**
     * Gets the turn number.
+    * @return The number of turns.
     */
     public int getNumber() {
         return turn;
@@ -43,6 +44,7 @@ public class Turn {
     
     /**
     * Sets the turn number.
+    * @param turn The number of turns.
     */
     public void setNumber(int turn) {
         this.turn = turn;
@@ -51,11 +53,12 @@ public class Turn {
     
     /**
     * Gets the age.
-    *
-    * <br>
-    * <br>1 - if before {@link #SEASON_YEAR}
-    * <br>2 - if between 1600 and 1700.
-    * <br>3 - if after 1700.
+    * 
+    * @return The age:
+    *       <br>
+    *       <br>1 - if before {@link #SEASON_YEAR}
+    *       <br>2 - if between 1600 and 1700.
+    *       <br>3 - if after 1700.
     */
     public int getAge() {
         if (getYear() < SEASON_YEAR) {
@@ -81,6 +84,8 @@ public class Turn {
     
     /**
     * Gets the year this turn is in.
+    * @return The calculated year based on the turn
+    *       number.
     */
     public int getYear() {
         if (STARTING_YEAR + turn - 1 < SEASON_YEAR) {

@@ -35,6 +35,7 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
     /**
      * The constructor that will add the items to this panel.
      * @param parent The parent of this panel.
+     * @param title The title to display on the panel.
      */
     public ReportPanel(Canvas parent, String title) {
         super(new FlowLayout(FlowLayout.CENTER, 1000, 10));

@@ -66,7 +66,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
             }
             if (c != null) {
                 add(c);
-                ou.add((OptionUpdater) c);
+                ou.add(c);
             }
         }
         optionUpdaters = (OptionUpdater[]) ou.toArray(new OptionUpdater[0]);
@@ -89,6 +89,8 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
     /**
     * Removes the given <code>KeyStroke</code> from all of this
     * <code>OptionGroupUI</code>'s children.
+    * 
+    * @param keyStroke The <code>KeyStroke</code> to be removed.
     */
     public void removeKeyStroke(KeyStroke keyStroke) {
         for (int i=0; i<optionUpdaters.length; i++) {

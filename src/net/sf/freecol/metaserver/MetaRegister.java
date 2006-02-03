@@ -86,6 +86,8 @@ public final class MetaRegister {
     * @param slotsAvailable Number of players that may conncet.
     * @param currentlyPlaying Number of players that are currently connected.
     * @param isGameStarted <i>true</i> if the game has started.
+    * @param version The version of the server.
+    * @param gameState The current state of the game.
     */
     public synchronized void addServer(String name, String address, int port, int slotsAvailable,
                 int currentlyPlaying, boolean isGameStarted, String version, int gameState) {
@@ -108,6 +110,8 @@ public final class MetaRegister {
     * @param slotsAvailable Number of players that may conncet.
     * @param currentlyPlaying Number of players that are currently connected.
     * @param isGameStarted <i>true</i> if the game has started.
+    * @param version The version of the server.
+    * @param gameState The current state of the game.
     */
     public synchronized void updateServer(String name, String address, int port, int slotsAvailable,
             int currentlyPlaying, boolean isGameStarted, String version, int gameState) {

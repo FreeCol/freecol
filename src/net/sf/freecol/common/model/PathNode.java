@@ -95,6 +95,8 @@ public class PathNode implements Comparable {
     * Checks if the unit using this path is still onboard
     * it's transport.
     *
+    * @return <code>true</code> if the unit is still onboard
+    *       a carrier when using this path.
     * @see #getTransportDropTurns
     */
     public boolean isOnCarrier() {
@@ -106,6 +108,10 @@ public class PathNode implements Comparable {
     * Sets if the unit using this path is still onboard
     * it's transport.
     *
+    * @param onCarrier Should be set to <code>true</code>
+    *       in order to indicate that the unit using this
+    *       path is still onboard the carrier on this
+    *       path node.
     * @see #getTransportDropTurns
     */
     public void setOnCarrier(boolean onCarrier) {
@@ -116,6 +122,10 @@ public class PathNode implements Comparable {
     /**
     * Returns the number of turns it takes to reach the 
     * {@link #getTransportDropNode transport node}.
+    * 
+    * @return The number of turns in takes to get to the node 
+    *       where the unit using this path should leave it's 
+    *       transport.
     */
     public int getTransportDropTurns() {
         PathNode temp = this;
@@ -129,6 +139,8 @@ public class PathNode implements Comparable {
     /**
     * Returns the node where the unit using this path should
     * leave it's transport.
+    * 
+    * @return The node where the unit leaves it's carrier.
     */
     public PathNode getTransportDropNode() {
         PathNode temp = this;

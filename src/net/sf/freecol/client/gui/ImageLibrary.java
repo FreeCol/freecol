@@ -896,12 +896,12 @@ public final class ImageLibrary extends ImageProvider {
      * @return The alarm chip.
      */
     public Image getAlarmChip(int alarm) {
-        Image alarmChip = (Image)alarmChips[alarm];
+        Image alarmChip = alarmChips[alarm];
 
         if (alarmChip == null) {
             GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
             loadAlarmChip(gc, alarm);
-            alarmChip = (Image)alarmChips[alarm];
+            alarmChip = alarmChips[alarm];
         }
         return alarmChip;
     }

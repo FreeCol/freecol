@@ -76,6 +76,7 @@ public class Tension {
 
     /**
      * Returns the current tension value.
+     * @return The value of this <code>Tension</code>.
      */
     public int getValue() {
         return this.value;
@@ -83,6 +84,7 @@ public class Tension {
 
     /**
      * Sets the current tension value.
+     * @param newValue The new value of the tension.
      */
     public void setValue(int newValue) {
         if (newValue < 0) {
@@ -96,6 +98,7 @@ public class Tension {
 
     /** 
      * Returns the current tension level.
+     * @return The current level.
      */
     public int getLevel() {
     if (value <= TENSION_HAPPY) {
@@ -130,6 +133,8 @@ public class Tension {
 
     /** 
      * Returns the current tension level as a string.
+     * @return A <code>String</code>-representation of the
+     *      current tension level.
      */
     public String getLevelAsString() {
     if (value <= TENSION_HAPPY) {

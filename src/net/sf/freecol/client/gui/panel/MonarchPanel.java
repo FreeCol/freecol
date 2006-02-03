@@ -49,6 +49,7 @@ public final class MonarchPanel extends FreeColDialog implements ActionListener 
     
     /**
     * The constructor that will add the items to this panel.
+    * @param parent The parent panel.
     */
     public MonarchPanel(Canvas parent) {
         canvas = parent;
@@ -99,8 +100,9 @@ public final class MonarchPanel extends FreeColDialog implements ActionListener 
     * The information displayed will be based on the monarch action.
     *
     * @param action The monarch action.
+    * @param replace The data to be used when displaying i18n-strings.
     */
-    public void initialize(int action, String [][] replace) {
+    public void initialize(int action, String[][] replace) {
         buttonPanel.remove(okButton);
         buttonPanel.remove(cancelButton);
         String messageID;

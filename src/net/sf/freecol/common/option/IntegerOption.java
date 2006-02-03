@@ -51,6 +51,7 @@ public class IntegerOption extends AbstractOption {
     
     /**
     * Returns the minimum allowed value.
+    * @return The minimum value allowed by this option.
     */
     public int getMinimumValue() {
         return minimumValue;
@@ -59,6 +60,7 @@ public class IntegerOption extends AbstractOption {
     
     /**
     * Returns the maximum allowed value.
+    * @return The maximum value allowed by this option.
     */
     public int getMaximumValue() {
         return maximumValue;
@@ -67,6 +69,7 @@ public class IntegerOption extends AbstractOption {
 
     /**
     * Gets the current value of this <code>IntegerOption</code>.
+    * @return The value.
     */
     public int getValue() {
         return value;
@@ -75,6 +78,7 @@ public class IntegerOption extends AbstractOption {
     
     /**
     * Sets the value of this <code>IntegerOption</code>.
+    * @param value The value to be set.
     */
     public void setValue(int value) {
         this.value = value;

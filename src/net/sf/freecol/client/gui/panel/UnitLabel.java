@@ -80,6 +80,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
     * Initializes this JLabel with the given unit data.
     * @param unit The Unit that this JLabel will visually represent.
     * @param parent The parent that knows more than we do.
+    * @param isSmall The image will be smaller if set to <code>true</code>.
     */
     public UnitLabel(Unit unit, Canvas parent, boolean isSmall) {
         this(unit, parent);
@@ -107,6 +108,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
 
     /**
     * Makes a smaller version.
+    * @param isSmall The image will be smaller if set to <code>true</code>.
     */
     public void setSmall(boolean isSmall) {
         if (isSmall) {

@@ -49,7 +49,10 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
 
     /**
     * Creates a new <code>Europe</code>.
+    * 
     * @param game The <code>Game</code> in which this object belong.
+    * @param owner The <code>Player</code> that will be using this 
+    *       object of <code>Europe</code>.
     */
     public Europe(Game game, Player owner) {
         super(game);
@@ -308,6 +311,8 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
 
     /**
     * Gets the current price for an artillery.
+    * @return The current price of the artillery in this
+    *       <code>Europe</code>.
     */
     public int getArtilleryPrice() {
         return artilleryPrice;

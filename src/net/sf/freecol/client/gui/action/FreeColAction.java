@@ -18,11 +18,10 @@ import net.sf.freecol.common.option.Option;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-
 /**
-* The super class of all actions in FreeCol. Subclasses of this
-* object is stored in an {@link ActionManager}.
-*/
+ * The super class of all actions in FreeCol. Subclasses of this
+ * object is stored in an {@link ActionManager}.
+ */
 public abstract class FreeColAction extends AbstractAction implements Option {
     private static final Logger logger = Logger.getLogger(FreeColAction.class.getName());
 
@@ -32,11 +31,23 @@ public abstract class FreeColAction extends AbstractAction implements Option {
     
     private final FreeColClient freeColClient;
 
-
     /**
-    * Creates a new <code>FreeColAction</code>.
-    */
-    protected FreeColAction(FreeColClient freeColClient, String name, String shortDescription, int mnemonic, KeyStroke accelerator) {
+     * Creates a new <code>FreeColAction</code>.
+     * 
+     * @param freeColClient The main controller object for the client.
+     * @param name An i18n-key to identify the name of this action.
+     * @param shortDescription An i18n-key to identify a short 
+     *      description of this action. This value can be set to
+     *      <code>null</code> if the action does not have a
+     *      description.
+     * @param mnemonic A mnemonic to be used for selecting this action
+     *      when the action is displaying on a menu etc.
+     * @param accelerator The keyboard accelerator to be used for
+     *      selecting this action or <code>null</code> if this action
+     *      does not have an accelerator.
+     */
+    protected FreeColAction(FreeColClient freeColClient, String name, 
+            String shortDescription, int mnemonic, KeyStroke accelerator) {
         super(Messages.message(name));
 
         this.freeColClient = freeColClient;
@@ -47,81 +58,85 @@ public abstract class FreeColAction extends AbstractAction implements Option {
     }
 
     
-    public FreeColClient getFreeColClient() {
+    /**
+     * Gets the main controller object for the client.
+     * @return The main controller object for the client.
+     */
+    protected FreeColClient getFreeColClient() {
         return freeColClient;
     }
 
-
     /**
-    * Disables this option if the {@link net.sf.freecol.client.gui.panel.ClientOptionsDialog} is visible.
-    */
+     * Disables this option if the 
+     * {@link net.sf.freecol.client.gui.panel.ClientOptionsDialog} 
+     * is visible. This method should be extended by subclasses if
+     * the action should be disabled in other cases.
+     */
     public void update() {
         if (freeColClient.getCanvas() != null) {
             setEnabled(!freeColClient.getCanvas().getClientOptionsDialog().isShowing());
         }
-    }
-    
+    }    
     
     /**
-    * Sets a keyboard accelerator.
-    * @param accelerator The <code>KeyStroke</code>. Using <code>null</code>
-    *        is the same as disabling the keyboard accelerator.
-    */
+     * Sets a keyboard accelerator.
+     * @param accelerator The <code>KeyStroke</code>. Using <code>null</code>
+     *        is the same as disabling the keyboard accelerator.
+     */
     public void setAccelerator(KeyStroke accelerator) {
         //KeyStroke oldValue = (KeyStroke) getValue(ACCELERATOR_KEY);
         putValue(ACCELERATOR_KEY, accelerator);
     }
-
     
     /**
-    * Gets the keyboard accelerator for this option.
-    */
+     * Gets the keyboard accelerator for this option.
+     * @return The <code>KeyStroke</code> or <code>null</code>
+     *        if the keyboard accelerator is disabled.
+     */
     public KeyStroke getAccelerator() {
         return (KeyStroke) getValue(ACCELERATOR_KEY);
     }
-
     
     /**
-    * Gives a short description of this <code>Option</code>.
-    * Can for instance be used as a tooltip text.
-    */
+     * Gives a short description of this <code>Option</code>.
+     * Can for instance be used as a tooltip text.
+     * 
+     * @return A short description of this action.
+     */
     public String getShortDescription() {
         return (String) getValue(SHORT_DESCRIPTION);
     }
 
-
     /**
-    * Returns a textual representation of this object.
-    * @return The name of this <code>Option</code>.
-    * @see #getName
-    */
+     * Returns a textual representation of this object.
+     * 
+     * @return The name of this <code>Option</code>.
+     * @see #getName
+     */
     public String toString() {
         return getName();
     }
 
-
     /**
-    * Returns the id of this <code>Option</code>.
-    * @return An unique identifier for this action.
-    */
+     * Returns the id of this <code>Option</code>.
+     * @return An unique identifier for this action.
+     */
     public abstract String getId();
 
-
     /**
-    * Returns the name of this <code>Option</code>.
-    * @return The name as provided in the constructor.
-    */
+     * Returns the name of this <code>Option</code>.
+     * @return The name as provided in the constructor.
+     */
     public String getName() {
         return (String) getValue(NAME);
-    }
-
-    
+    }    
 
     /**
      * Creates a <code>String</code> that keeps the attributes
      * given <code>KeyStroke</code>. This <code>String</code>
      * can be used to store the key stroke in an XML-file.
      * 
+     * @param keyStroke The <code>KeyStroke</code>.
      * @return A <code>String</code> that produces a key stroke
      *         equal to the given <code>KeyStroke</code> if passed
      *         as a parameter to <code>getAWTKeyStroke(String)</code>.
@@ -188,13 +203,13 @@ public abstract class FreeColAction extends AbstractAction implements Option {
         return buf.toString();
     }
 
-
     /**
-    * Makes an XML-representation of this object.
-    *
-    * @param document The document to use when creating new componenets.
-    * @return The DOM-element ("Document Object Model") made to represent this "Option".
-    */
+     * Makes an XML-representation of this object.
+     *
+     * @param document The document to use when creating new componenets.
+     * @return The DOM-element ("Document Object Model") made to represent 
+     *      this "Option".
+     */
     public Element toXMLElement(Document document) {
         Element optionElement = document.createElement(getId());
 
@@ -203,11 +218,11 @@ public abstract class FreeColAction extends AbstractAction implements Option {
         return optionElement;
     }
 
-
     /**
-    * Initializes this object from an XML-representation of this object.
-    * @param element The DOM-element ("Document Object Model") made to represent this "Option".
-    */
+     * Initializes this object from an XML-representation of this object.
+     * @param element The DOM-element ("Document Object Model") made to 
+     *       represent this "Option".
+     */
     public void readFromXMLElement(Element element) {
         String acc = element.getAttribute("accelerator");
         if (!acc.equals("")) {

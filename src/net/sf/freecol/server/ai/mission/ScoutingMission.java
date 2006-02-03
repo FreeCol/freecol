@@ -258,6 +258,7 @@ public class ScoutingMission extends Mission {
     /**
      * Checks if this mission is valid to perform.
      *
+     * @param au The unit to be tested.
      * @return <code>true</code> if this mission is still valid to perform
      *         and <code>false</code> otherwise.
      */

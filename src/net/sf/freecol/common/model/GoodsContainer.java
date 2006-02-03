@@ -52,9 +52,12 @@ public class GoodsContainer extends FreeColGameObject {
     /**
     * Initiates a new <code>GoodsContainer</code> from an <code>Element</code>.
     *
-    * @param game The <code>Game</code> in which this <code>GoodsContainer</code> belong.
-    * @param element The <code>Element</code> (in a DOM-parsed XML-tree) that describes
-    *                this object.
+    * @param game The <code>Game</code> in which this <code>GoodsContainer</code>
+    *       belong.
+    * @param parent The object using this <code>GoodsContainer</code>
+    *       for storing it's goods.
+    * @param element The <code>Element</code> (in a DOM-parsed XML-tree) 
+    *       that describes this object.
     */
     public GoodsContainer(Game game, Location parent, Element element) {
         super(game, element);
@@ -120,6 +123,8 @@ public class GoodsContainer extends FreeColGameObject {
     /**
     * Removes all goods above given amount, except for
     * <code>Goods.FOOD</code> which is left unchanged.
+    * 
+    * @param amount The treshold.
     */
     public void removeAbove(int amount) {
         for (int i=1; i<storedGoods.length; i++) {
@@ -153,6 +158,7 @@ public class GoodsContainer extends FreeColGameObject {
 
     /**
     * Gets the number of goods-packages. A goods package contain between 1-100.
+    * @return The number of goods packages.
     */
     public int getGoodsCount() {
         int count = 0;

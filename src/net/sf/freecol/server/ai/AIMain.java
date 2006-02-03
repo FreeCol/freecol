@@ -49,6 +49,8 @@ public class AIMain implements FreeColGameObjectListener {
     * Creates a new <code>AIMain</code> and searches the current
     * game for <code>FreeColGameObject</code>s.
     *
+    * @param freeColServer The main controller object for the
+    *       server.
     * @see #findNewObjects()
     */
     public AIMain(FreeColServer freeColServer) {
@@ -59,6 +61,11 @@ public class AIMain implements FreeColGameObjectListener {
     
     /**
     * Creates a new <code>AIMain</code> and reads the given element.
+    * 
+    * @param freeColServer The main controller object for the
+    *       server.
+    * @param element The <code>Element</code> (in a DOM-parsed XML-tree) 
+    *       that describes this object.
     * @see #readFromXMLElement
     */
     public AIMain(FreeColServer freeColServer, Element element) {

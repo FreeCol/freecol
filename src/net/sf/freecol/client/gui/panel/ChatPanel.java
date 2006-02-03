@@ -37,7 +37,10 @@ public final class ChatPanel extends FreeColPanel implements ActionListener {
 
     /**
     * The constructor that will add the items to this panel.
+    * 
     * @param parent The parent of this panel.
+    * @param freeColClient The main controller object for the
+    *       client.
     */
     public ChatPanel(Canvas parent, FreeColClient freeColClient) {
         this.parent = parent;

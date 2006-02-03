@@ -45,7 +45,12 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
 
     /**
     * The constructor that will insert the MenuItems.
-    * @param tile The tile at which the popup must appear.
+    * 
+    * @param tile The <code>Tile</code> to create a popup for.
+    *       The popup menu also appears near this <code>Tile</code>.
+    * @param freeColClient The main controller object for the client.
+    * @param canvas The component containing the map.
+    * @param gui An object with methods used for making the popup.
     */
     public TilePopup(Tile tile, FreeColClient freeColClient, Canvas canvas, GUI gui) {
         super("Tile (" + tile.getX() + ", " + tile.getY() + ")");

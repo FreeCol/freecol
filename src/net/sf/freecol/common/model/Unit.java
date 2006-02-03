@@ -268,6 +268,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     * Sells the given goods from this unit to the given settlement.
     * The owner of this unit gets the gold and the owner of
     * the settlement is charged for the deal.
+    * 
+    * @param settlement The <code>Settlement</code> to trade with.
+    * @param goods The <code>Goods</code> to be traded.
+    * @param gold The money to be given for the goods.
     */
     public void trade(Settlement settlement, Goods goods, int gold) {
         if (getTile().getDistanceTo(settlement.getTile()) > 1) {
@@ -305,6 +309,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
     /**
     * Transfers the given goods from this unit to the given settlement.
+    * @param settlement The <code>Settlement</code> to deliver a gift to.
+    * @param goods The <code>Goods</code> to be delivered as a gift.
     */
     public void deliverGift(Settlement settlement, Goods goods) {
         if (getTile().getDistanceTo(settlement.getTile()) > 1) {
@@ -439,6 +445,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
     /**
     * Gets the skill level.
+    * @return The level of skill for this unit. A higher
+    *       value signals a more advanced type of units.
     */
     public int getSkillLevel() {
         return getSkillLevel(getType());
@@ -446,7 +454,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
 
     /**
-    * Gets the skill level.
+    * Gets the skill level of the given type of <code>Unit</code>.
+    * 
+    * @param unitType The type of <code>Unit</code>.
+    * @return The level of skill for the given unit. A higher
+    *       value signals a more advanced type of units.
     */
     public static int getSkillLevel(int unitType) {
         switch (unitType) {
@@ -491,6 +503,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     /**
     * Gets the number of turns this unit has been training.
     *
+    * @return The number of turns of training this
+    *       <code>Unit</code> has received.
     * @see #setTurnsOfTraining
     * @see #getTrainingType
     * @see #getNeededTurnsOfTraining
@@ -502,6 +516,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
     /**
     * Sets the number of turns this unit has been training.
+    * @param turnsOfTraining The number of turns of training this
+    *       <code>Unit</code> has received.
     * @see #getNeededTurnsOfTraining
     */
     public void setTurnsOfTraining(int turnsOfTraining) {
@@ -513,6 +529,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     /**
     * Gets the unit type this <code>Unit</code> is training for.
     *
+    * @return The type of <code>Unit</code> which this 
+    *       <code>Unit</code> is currently working to become.
     * @see #getTurnsOfTraining
     * @see #setTrainingType
     */
@@ -525,6 +543,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     * Sets the unit type this <code>Unit</code> is training for.
     * Use <code>-1</code> for no type at all.
     *
+    * @param trainingType The type of <code>Unit</code> which this 
+    *       <code>Unit</code> should currently working to become.
     * @see #getTurnsOfTraining
     * @see #getTrainingType
     */
@@ -741,6 +761,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * Returns true if this unit can enter a settlement in order to trade.
      *
      * @param settlement The settlement to enter.
+     * @return <code>true</code> if this <code>Player</code> can trade
+     *       with the given <code>Settlement</code>. The unit will for
+     *       instance need to be a {@link #isCarrier carrier} and have
+     *       goods onboard.
      */
     public boolean canTradeWith(Settlement settlement) {
         return (isCarrier() && 
@@ -949,8 +973,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     }
 
     /**
-    * Sets the <code>movesLeft</code>. If <code>movesLeft < 0</code>
-    * then <code>movesLeft = 0</code>.
+    * Sets the <code>movesLeft</code>. 
+    * 
+    * @param movesLeft The new amount of moves left this
+    *       <code>Unit</code> should have. If <code>movesLeft < 0</code>
+    *       then <code>movesLeft = 0</code>.
     */
     public void setMovesLeft(int movesLeft) {
         if (movesLeft < 0) {
@@ -1014,6 +1041,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     /**
     * Moves this unit in the specified direction.
     *
+    * @param direction The direction
     * @see #getMoveType(int)
     * @exception IllegalStateException If the move is illegal.
     */
@@ -1273,6 +1301,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
     /**
     * Checks if this unit is visible to the given player.
+    * @param player The <code>Player</code>.
+    * @return <code>true</code> if this <code>Unit</code> is
+    *       visible to the given <code>Player</code>.
     */
     public boolean isVisibleTo(Player player) {
         return getTile() != null && player.canSee(getTile()) 
@@ -1409,6 +1440,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
     /**
     * Sets the <code>IndianSettlement</code> that owns this unit.
+    * @param indianSettlement The <code>IndianSettlement</code> that
+    *       should now be owning this <code>Unit</code>.
     */
     public void setIndianSettlement(IndianSettlement indianSettlement) {
         if (this.indianSettlement != null) {
@@ -1425,6 +1458,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     
     /**
     * Gets the <code>IndianSettlement</code> that owns this unit.
+    * @return The <code>IndianSettlement</code>.
     */
     public IndianSettlement getIndianSettlement() {
         return indianSettlement;
@@ -1460,6 +1494,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
     /**
     * Checks if this unit can be armed in the current location.
+    * @return <code>true</code> if it can be armed at the current
+    *       location.
     */
     public boolean canArm() {
         return isArmed() || getGoodsDumpLocation() != null && getGoodsDumpLocation().getGoodsCount(Goods.MUSKETS) >= 50 ||
@@ -1470,6 +1506,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
     /**
     * Checks if this unit can be mounted in the current location.
+    * @return <code>true</code> if it can mount a horse at the current
+    *       location.
     */
     public boolean canMount() {
         return isMounted() || getGoodsDumpLocation() != null && getGoodsDumpLocation().getGoodsCount(Goods.HORSES) >= 50 ||
@@ -1480,6 +1518,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
     /**
     * Checks if this unit can be equiped with tools in the current location.
+    * @return <code>true</code> if it can be equipped with tools at the current
+    *       location.
     */
     public boolean canEquipWithTools() {
         return isPioneer() || getGoodsDumpLocation() != null && getGoodsDumpLocation().getGoodsCount(Goods.TOOLS) >= 20 ||
@@ -1490,6 +1530,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
     /**
     * Checks if this unit can be dressed as a missionary at the current location.
+    * @return <code>true</code> if it can be dressed as a missionary at the current
+    *       location.
     */
     public boolean canDressAsMissionary() {
         return isMissionary() || ((location instanceof Europe || location instanceof Unit && ((Unit) location).getLocation()
@@ -1973,6 +2015,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     * Returns the name of a unit type in a human readable format. The return
     * value can be used when communicating with the user.
     *
+    * @param someType The type of <code>Unit</code>.
     * @return The given unit type as a String
     * @throws IllegalArgumentException
     */
@@ -2138,6 +2181,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
     /**
     * Sets the hitpoints for this unit.
+    * 
+    * @param hitpoints The hitpoints this unit has. This 
+    *       is currently only used for damaged ships, but 
+    *       might get an extended use later.
     * @see #getInitialHitpoints
     */
     public void setHitpoints(int hitpoints) {
@@ -2150,6 +2197,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
     /**
     * Returns the hitpoints.
+    * @return The hitpoints this unit has. This is currently only
+    *       used for damaged ships, but might get an extended use
+    *       later.
     * @see #getInitialHitpoints
     */
     public int getHitpoints() {
@@ -2606,12 +2656,12 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                                     }
                                 }
                                 if (adjacentColonies.size() > 0) {
-                                    int lumberPerCity = (int) (lumberAmount / adjacentColonies.size());
+                                    int lumberPerCity = (lumberAmount / adjacentColonies.size());
                                     for (int i=0; i<adjacentColonies.size(); i++) {
                                         Colony c = (Colony) adjacentColonies.get(i);
                                         // Make sure the lumber lost is being added again to the first adjacent colony:
                                         if (i==0) {
-                                            c.addGoods(Goods.LUMBER, lumberPerCity + ((int) lumberAmount % adjacentColonies.size()));
+                                            c.addGoods(Goods.LUMBER, lumberPerCity + (lumberAmount % adjacentColonies.size()));
                                         } else {
                                             c.addGoods(Goods.LUMBER, lumberPerCity);
                                         }
@@ -2720,8 +2770,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
 
     /**
-    * Returns 'true' if the given type is the type of a recruitable unit, 'false' otherwise.
-    * @return 'true' if the given type is the type of a recruitable unit, 'false' otherwise.
+    * Checks if the given unit can be recruited in <code>Europe</code>.
+    * @param type The type of <code>Unit</code> to be tested.
+    * @return <code>true</code> if the given type is the type of a 
+    *       recruitable unit and <code>false</code> otherwise.
     */
     public static boolean isRecruitable(int type) {
         switch (type) {
@@ -2952,7 +3004,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
     /**
     * Checks if this is an offensive unit.
-    * That is a unit capable of attacking another unit.
+    * 
+    * @return <code>true</code> if this is an offensive unit
+    *       meaning it can attack other units.
     */
     public boolean isOffensiveUnit() {
         // TODO: Make this look prettier ;-)
@@ -2963,6 +3017,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     /**
      * Checks if this is an defensive unit.
      * That is: a unit which can be used to defend a <code>Settlement</code>.
+     * @return <code>true</code> if this is a defensive unit
+     *       meaning it can be used to defend a <code>Colony</code>.
+     *       This would normally mean that a defensive unit also will
+     *       be {@link #isOffensiveUnit offensive}.
      */
      public boolean isDefensiveUnit() {
          return isOffensiveUnit() && !isNaval();
@@ -3316,6 +3374,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     /**
      * Returns true if this unit is a ship that can capture enemy
      * goods. That is, a privateer, frigate or man-o-war.
+     * @return <code>true</code> if this <code>Unit</code> is
+     *      capable of capturing goods.
      */
     public boolean canCaptureGoods() {
         return (type == PRIVATEER ||

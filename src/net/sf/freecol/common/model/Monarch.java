@@ -56,7 +56,15 @@ public final class Monarch extends FreeColGameObject {
     
     public static final Random random = new Random();
 
-    /** Constructor. */
+    /** 
+     * Constructor. 
+     *
+     * @param game The <code>Game</code> this <code>Monarch</code>
+     *      should be created in.
+     * @param player The <code>Player</code> to create the
+     *      <code>Monarch</code> for.
+     * @param name The name of the <code>Monarch</code>.
+     */
     public Monarch(Game game, Player player, String name) {
         super(game);
         this.player = player;
@@ -243,7 +251,7 @@ public final class Monarch extends FreeColGameObject {
     /**
      * Adds units to the Royal Expeditionary Force.
      *
-     * @param addition The addition to the Royal Expeditionary Force.
+     * @param units The addition to the Royal Expeditionary Force.
      */
      public void addToREF(int[] units) {
          for (int type = 0; type < units.length; type++) {

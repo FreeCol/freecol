@@ -61,13 +61,15 @@ public final class Messages {
     }
 
     /**
-     * Convenience method that finds the message with a particular id in the
-     * default locale and performs string replacements.
+     * Convenience method that finds the message with a particular 
+     * ID in the default locale and performs string replacements.
      *
-     * @param  messageId  the id of the message to find
-     * @return  the message with the specified id
+     * @param messageId The key of the message to find
+     * @param data Every occuranse of <code>data[x][0]</code> is replaced with
+     *       <code>data[x][1]</code> for every <code>x</code>.
+     * @return The message with the specified id
      */
-    public static String message(String messageId, String [][] data) {
+    public static String message(String messageId, String[][] data) {
 
         if (null == defaultMessages) {
             defaultMessages = new Messages(Locale.getDefault());

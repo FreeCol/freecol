@@ -73,7 +73,7 @@ public final class ReportForeignAffairPanel extends ReportPanel implements Actio
         Iterator colonies = opponent.getColonyIterator();
         while (colonies.hasNext()) {
             Colony colony = (Colony) colonies.next();
-            int sol = (int) ((float) (colony.getSoL() * colony.getUnitCount()) / 100f);
+            int sol = (int) ((colony.getSoL() * colony.getUnitCount()) / 100f);
             rebels += sol;
             tories += (colony.getUnitCount() - sol);
         }

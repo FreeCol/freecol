@@ -148,6 +148,9 @@ public class FreeColDialog extends FreeColPanel {
 
     /**
     * Convenience method for {@link #getResponse}.
+    * @return The response as a <code>boolean</code>.
+    * @exception ClassCastException if the response-object
+    *       is not of type <code>Boolean</code>.
     */
     public boolean getResponseBoolean() {
         return ((Boolean) getResponse()).booleanValue();
@@ -156,6 +159,9 @@ public class FreeColDialog extends FreeColPanel {
 
     /**
     * Convenience method for {@link #getResponse}.
+    * @return The response as a <code>int</code>.
+    * @exception ClassCastException if the response-object
+    *       is not of type <code>Integer</code>.
     */
     public int getResponseInt() {
         return ((Integer) getResponse()).intValue();
@@ -358,8 +364,12 @@ public class FreeColDialog extends FreeColPanel {
 
 
     /**
-    * Returns an information dialog that shows the given text and an "OK" button.
-    * @return An information dialog that shows the given text and an "OK" button.
+    * Returns an information dialog that shows the given 
+    * text and an "OK" button.
+    * 
+    * @param text The text to be displayed in the dialog.
+    * @return An information dialog that shows the given text 
+    *       and an "OK" button.
     */
     public static FreeColDialog createInformationDialog(String text) {
         final JLabel theText = new JLabel("<html><body>" + text + "</body></html>");
@@ -398,7 +408,7 @@ public class FreeColDialog extends FreeColPanel {
     * The possible responses are integers that are defined in this class as finals.
     *
     * @param settlement The indian settlement that is being scouted.
-    *
+    * @param player The player to create the dialog for.
     * @return The FreeColDialog that asks the question to the user.
     */
     public static FreeColDialog createScoutIndianSettlementDialog(IndianSettlement settlement, Player player) {
@@ -482,7 +492,7 @@ public class FreeColDialog extends FreeColPanel {
     * The possible responses are integers that are defined in this class as finals.
     *
     * @param settlement The indian settlement that is being visited.
-    *
+    * @param player The <code>Player</code> to create the dialog for.
     * @return The FreeColDialog that asks the question to the user.
     */
     public static FreeColDialog createUseMissionaryDialog(IndianSettlement settlement, Player player) {
@@ -717,6 +727,8 @@ public class FreeColDialog extends FreeColPanel {
     * may choose a savegame to load.
     *
     * @param directory The directory to display when choosing the file.
+    * @param fileFilters The available file filters in the
+    *       dialog.
     * @return The <code>FreeColDialog</code>.
     */
     public static FreeColDialog createLoadDialog(File directory, FileFilter[] fileFilters) {
@@ -762,6 +774,10 @@ public class FreeColDialog extends FreeColPanel {
     * may choose the destination of the savegame.
     *
     * @param directory The directory to display when choosing the name.
+    * @param standardName This extension will be added to the
+    *       specified filename (if not added by the user).
+    * @param fileFilters The available file filters in the
+    *       dialog.
     * @return The <code>FreeColDialog</code>.
     */
     public static FreeColDialog createSaveDialog(File directory, final String standardName, FileFilter[] fileFilters) {
@@ -809,6 +825,7 @@ public class FreeColDialog extends FreeColPanel {
 
     /**
     * Returns a filter accepting "*.fsg".
+    * @return The filter.
     */
     public static FileFilter getFSGFileFilter() {
 
@@ -818,6 +835,7 @@ public class FreeColDialog extends FreeColPanel {
 
     /**
     * Returns a filter accepting "*.fgo".
+    * @return The filter.
     */
     public static FileFilter getFGOFileFilter() {
 
@@ -829,6 +847,8 @@ public class FreeColDialog extends FreeColPanel {
     * Returns a filter accepting all files containing a
     * {@link net.sf.freecol.common.model.GameOptions}.
     * That is; both "*.fgo" and "*.fsg".
+    * 
+    * @return The filter.
     */
     public static FileFilter getGameOptionsFileFilter() {
 

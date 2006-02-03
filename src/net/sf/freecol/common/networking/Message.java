@@ -42,6 +42,8 @@ public final class Message {
     * to use if this is an INCOMING message.
     *
     * @param msg The raw message data.
+    * @exception IOException should not be thrown.
+    * @exception SAXException if thrown during parsing. 
     */
     public Message(String msg) throws SAXException, IOException {
         this(new InputSource(new StringReader(msg)));
@@ -51,6 +53,10 @@ public final class Message {
     /**
     * Constructs a new Message with data from the given <code>Reader</code>. The constructor
     * to use if this is an INCOMING message.
+    * 
+    * @param reader The <code>Reader</code> to get the XML-data from.
+    * @exception IOException if thrown by the <code>Reader</code>.
+    * @exception SAXException if thrown during parsing.
     */
     public Message(Reader reader) throws SAXException, IOException {
         this(new InputSource(reader));
@@ -60,6 +66,10 @@ public final class Message {
     /**
     * Constructs a new Message with data from the given InputStream. The constructor
     * to use if this is an INCOMING message.
+    * 
+    * @param inputStream The <code>InputStream</code> to get the XML-data from.
+    * @exception IOException if thrown by the <code>InputStream</code>.
+    * @exception SAXException if thrown during parsing.
     */
     public Message(InputStream inputStream) throws SAXException, IOException {
         this(new InputSource(inputStream));
@@ -69,6 +79,10 @@ public final class Message {
     /**
     * Constructs a new Message with data from the given InputSource. The constructor
     * to use if this is an INCOMING message.
+    * 
+    * @param inputSource The <code>InputSource</code> to get the XML-data from.
+    * @exception IOException if thrown by the <code>InputSource</code>.
+    * @exception SAXException if thrown during parsing.
     */
     public Message(InputSource inputSource) throws SAXException, IOException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -104,6 +118,7 @@ public final class Message {
 
     /**
     * Gets the current version of the FreeCol protocol.
+    * @return The version of the FreeCol protocol.
     */
     public static String getFreeColProtocolVersion() {
         return FREECOL_PROTOCOL_VERSION;
@@ -227,6 +242,8 @@ public final class Message {
     /**
     * Gets an attribute from the root element.
     * @param key The key of the attribute.
+    * @return The value of the attribute with the
+    *       given key.
     */
     public String getAttribute(String key) {
         return document.getDocumentElement().getAttribute(key);
@@ -236,6 +253,8 @@ public final class Message {
     /**
     * Checks if an attribute is set on the root element.
     * @param attribute The attribute in which to verify the existence of.
+    * @return <code>true</code> if the root element has the given
+    *       attribute.
     */
     public boolean hasAttribute(String attribute) {
         return document.getDocumentElement().hasAttribute(attribute);
@@ -245,6 +264,8 @@ public final class Message {
     /**
     * Inserts <code>newRoot</code> as the new root element and appends
     * the old root element.
+    * 
+    * @param newRoot The new root element.
     */
     public void insertAsRoot(Element newRoot) {
         Element oldRoot = document.getDocumentElement();
@@ -259,54 +280,26 @@ public final class Message {
 
 
     /**
-    * Convenience method: returns the first child element with the
-    * specified tagname.
-    *
-    * @param element The <code>Element</code> to search for the child element.
-    * @param tagName The tag name of the child element to be found.
-    */
-    public static Element getChildElement(Element element, String tagName) {
-        NodeList n = element.getChildNodes();
-        for (int i=0; i<n.getLength(); i++) {
-            if (n.item(i) instanceof Element &&
-                    ((Element) n.item(i)).getTagName().equals(tagName)) {
-                return (Element) n.item(i);
-            }
-        }
+     * Convenience method: returns the first child element with the
+     * specified tagname.
+     *
+     * @param element The <code>Element</code> to search for the child element.
+     * @param tagName The tag name of the child element to be found.
+     * @return The first child element with the given name.
+     */
+     public static Element getChildElement(Element element, String tagName) {
+         NodeList n = element.getChildNodes();
+         for (int i=0; i<n.getLength(); i++) {
+             if (n.item(i) instanceof Element &&
+                     ((Element) n.item(i)).getTagName().equals(tagName)) {
+                 return (Element) n.item(i);
+             }
+         }
 
-        return null;
-    }
-    
-    
-    /**
-    * Reads an XML-representation of an array.
-    */
-    public static boolean[][] readFromArrayElement(String tagName, Element arrayElement, boolean[][] arrayType) {
-        boolean[][] array = new boolean[Integer.parseInt(arrayElement.getAttribute("xLength"))][Integer.parseInt(arrayElement.getAttribute("yLength"))];
-
-        String data = null;
-        if (arrayElement.hasAttribute("data")) {
-            data = arrayElement.getAttribute("data");
-        } 
-        
-        for (int x=0; x<array.length; x++) {
-            for (int y=0; y<array[0].length; y++) {
-                if (data != null) {
-                    if (data.charAt(x*array[0].length+y) == '1') {
-                        array[x][y] = true;
-                    } else {
-                        array[x][y] = false;
-                    }
-                } else { // Old type of storing booleans:
-                    array[x][y] = Boolean.valueOf(arrayElement.getAttribute("x" + Integer.toString(x) + "y" + Integer.toString(y))).booleanValue();
-                }
-            }
-        }
-
-        return array;
-    }
-
-
+         return null;
+     }
+         
+     
     /**
     * Returns the <code>String</code> representation of the message.
     * This is what actually gets transmitted to the other peer.

@@ -58,6 +58,7 @@ public class OptionGroup extends AbstractOption {
 
     /**
     * Returns an <code>Iterator</code> for the <code>Option</code>s.
+    * @return The <code>Iterator</code>.
     */
     public Iterator iterator() {
         return options.iterator();

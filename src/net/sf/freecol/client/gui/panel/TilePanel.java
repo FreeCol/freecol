@@ -50,6 +50,7 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
     
     /**
     * The constructor that will add the items to this panel.
+    * @param parent The parent panel.
     */
     public TilePanel(Canvas parent) {
         canvas = parent;

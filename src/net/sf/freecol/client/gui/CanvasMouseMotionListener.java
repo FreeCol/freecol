@@ -29,6 +29,8 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
 
     /**
      * The constructor to use.
+     * 
+     * @param canvas The component this object gets created for.
      * @param g The GUI that holds information such as screen resolution.
      * @param m The Map that is currently being drawn on the
      * Canvas (by the GUI).

@@ -45,6 +45,7 @@ public final class EventPanel extends FreeColDialog implements ActionListener {
     /**
     * The constructor that will add the items to this panel.
     * @param parent The parent of this panel.
+    * @param freeColClient The main controller object for the client.
     */
     public EventPanel(Canvas parent, FreeColClient freeColClient) {
         this.parent = parent;

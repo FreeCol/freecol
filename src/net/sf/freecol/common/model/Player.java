@@ -219,6 +219,7 @@ public class Player extends FreeColGameObject {
     * @param name The name that this player will use.
     * @param admin Whether or not this AI player shall be considered an Admin.
     * @param ai Whether or not this AI player shall be considered an AI player (usually true here).
+    * @param nation The nation of the <code>Player</code>.
     */
     public Player(Game game, String name, boolean admin, boolean ai, int nation) {
         this(game, name, admin, nation);
@@ -246,6 +247,7 @@ public class Player extends FreeColGameObject {
     * @param name The name that this player will use.
     * @param admin 'true' if this Player is an admin,
     * 'false' otherwise.
+    * @param nation The nation of the <code>Player</code>.
     */
     public Player(Game game, String name, boolean admin, int nation) {
         super(game);
@@ -302,7 +304,9 @@ public class Player extends FreeColGameObject {
    
 
     /**
-    * Checks if this player is a "royal expeditionary force.
+    * Checks if this player is a "Royal Expeditionary Force".
+    * @return <code>true> if this <code>Player</code> is controlling
+    *       a REF and <code>false</code> otherwise.
     */
     public boolean isREF() {
         return nation == REF_DUTCH || nation == REF_ENGLISH || nation == REF_FRENCH || nation == REF_SPANISH;
@@ -311,6 +315,8 @@ public class Player extends FreeColGameObject {
 
     /**
     * Gets the name this player has choosen for the new land.
+    * @return The name of the new world as chosen by the
+    *       <code>Player</code>.
     */
     public String getNewLandName() {
         return newLandName;
@@ -319,6 +325,7 @@ public class Player extends FreeColGameObject {
 
     /**
     * Gets the default name this player has choosen for the new land.
+    * @return The default name for the new world.
     */
     public String getDefaultNewLandName() {
         return Messages.message("newLandName." + Integer.toString(getNation()));
@@ -378,6 +385,8 @@ public class Player extends FreeColGameObject {
 
     /**
     * Sets the name this player uses for the new land.
+    * @param newLandName This <code>Player</code>'s name
+    *       for the new world.
     */
     public void setNewLandName(String newLandName) {
         this.newLandName = newLandName;
@@ -396,7 +405,7 @@ public class Player extends FreeColGameObject {
 
     /**
      * Checks if this player is indian. This method returns
-     * the opposite of {@link #isEuropean}.
+     * the opposite of {@link #isEuropean()}.
      *
      * @return <i>true</i> if this player is indian and <i>false</i> otherwise.
      */
@@ -408,6 +417,7 @@ public class Player extends FreeColGameObject {
     * Checks if this player is european. This includes the
     * "Royal Expeditionay Force".
     *
+    * @param nation The nation of the <code>Player</code>.
     * @return <i>true</i> if this player is european and <i>false</i> otherwise.
     */
     public static boolean isEuropean(int nation) {
@@ -432,6 +442,8 @@ public class Player extends FreeColGameObject {
     
     /**
     * Returns the price of the given land.
+    * @param tile The <code>Tile</code> to get the price for.
+    * @return The price of the land.
     */
     public int getLandPrice(Tile tile)  {
         int price = 0;
@@ -444,6 +456,7 @@ public class Player extends FreeColGameObject {
 
     /**
     * Buys the given land.
+    * @param tile The <code>Tile</code> to buy.
     */
     public void buyLand(Tile tile) {
         int nation = tile.getNationOwner();
@@ -467,19 +480,30 @@ public class Player extends FreeColGameObject {
 
     /**
     * Returns the default color for the given <code>nation</code>.
+    * @param nation The nation of the <code>Player</code>.
+    * @return The defult color for the given nation.
     */
     public static Color getDefaultNationColor(int nation) {
         return defaultNationColors[nation];
     }
 
     /**
-     * Returns whether this player has met with <code>type</code>.
+     * Returns whether this player has met with the <code>Player</code>
+     * if the given <code>nation</code>.
+     * 
+     * @param nation The nation.
+     * @return <code>true</code> if this <code>Player</code> has
+     *      contacted the given nation.
      */
-    public boolean hasContacted(int type) {
-        return contacted[type];
+    public boolean hasContacted(int nation) {
+        return contacted[nation];
     }
 
-    /** Returns whether this player has been attacked by privateers. */
+    /** 
+     * Returns whether this player has been attacked by privateers.
+     * @return <code>true</code> if this <code>Player</code> has
+     *      been attacked by privateers.
+     */
     public boolean hasBeenAttackedByPrivateers() {
         return attackedByPrivateers;
     }
@@ -491,7 +515,11 @@ public class Player extends FreeColGameObject {
     
 
     /**
-     * Sets whether this player has contacted <code>type</code>.
+     * Sets whether this player has contacted the given player.
+     * 
+     * @param player The <code>Player</code>.
+     * @param b <code>true</code> if this <code>Player</code> has
+     *      contacted the given <code>Player</code>.
      */
     public void setContacted(Player player, boolean b) {
         int type = player.getNation();
@@ -539,14 +567,19 @@ public class Player extends FreeColGameObject {
 
 
     /**
-     * Sets whether this player has contacted <code>type</code>.
+     * Sets whether this player has contacted <code>Player</code>
+     * of the given nation.
+     * 
+     * @param nation The nation.
+     * @param b <code>true</code> if this <code>Player</code> has
+     *      contacted the given <code>Player</code>.
      */
-    public void setContacted(int type, boolean b) {
-        if (type == getNation()) {
+    public void setContacted(int nation, boolean b) {
+        if (nation == getNation()) {
             return;
         }
 
-        contacted[type] = b;
+        contacted[nation] = b;
     }
 
 
@@ -589,6 +622,7 @@ public class Player extends FreeColGameObject {
     * Sets the given tile to be explored by this player and updates the player's
     * information about the tile.
     *
+    * @param tile The <code>Tile</code> to set explored.
     * @see Tile#updatePlayerExploredTile(Player)
     */
     public void setExplored(Tile tile) {
@@ -810,6 +844,8 @@ public class Player extends FreeColGameObject {
 
     /**
     * Determines whether this player has a certain Founding father.
+    * 
+    * @param type The ID of the founding father.
     * @return Whether this player has a Founding father of <code>type</code>
     * @see FoundingFather
     */
@@ -857,6 +893,7 @@ public class Player extends FreeColGameObject {
 
     /**
      * Returns the bell production bonus.
+     * @return The bell production bonus.
      */
     public int getBellsBonus() {
         return bellsBonus;
@@ -934,6 +971,8 @@ public class Player extends FreeColGameObject {
 
     /**
     * Sets whether this player is an AI player.
+    * @param ai <code>true</code> if this <code>Player</code>
+    *       is controlled by the computer.
     */
     public void setAI(boolean ai) {
         this.ai = ai;
@@ -1008,6 +1047,9 @@ public class Player extends FreeColGameObject {
     /**
     * Checks if this player is dead.
     * A <code>Player</code> dies when it looses the game.
+    * 
+    * @return <code>true</code> if this <code>Player</code>
+    *       is dead.
     */
     public boolean isDead() {
         return dead;
@@ -1016,6 +1058,8 @@ public class Player extends FreeColGameObject {
 
     /**
     * Sets this player to be dead or not.
+    * @param dead Should be set to <code>true</code> when this
+    *       <code>Player</code> dies.
     * @see #isDead
     */
     public void setDead(boolean dead) {
@@ -1061,6 +1105,8 @@ public class Player extends FreeColGameObject {
 
     /**
     * Returns the given nation as a String.
+    * 
+    * @param nation The nation of the <code>Player</code>.
     * @return The given nation as a String.
     */
     public static String getNationAsString(int nation) {
@@ -1107,6 +1153,8 @@ public class Player extends FreeColGameObject {
     /**
     * Returns the String representation of the given Color.
     * The result is something that looks like this example: "R:23;G:230;B:89".
+    * 
+    * @param c The <code>Color</code>.
     * @return The String representation of the given Color.
     */
     public static String convertColorToString(Color c) {
@@ -1152,6 +1200,8 @@ public class Player extends FreeColGameObject {
 
     /**
     * Checks if this <code>Player</code> is ready to start the game.
+    * @return <code>true</code> if this <code>Player</code> is ready
+    *       to start the game.
     */
     public boolean isReady() {
         return ready;
@@ -1161,6 +1211,9 @@ public class Player extends FreeColGameObject {
     /**
     * Sets this <code>Player</code> to be ready/not ready for
     * starting the game.
+    * 
+    * @param ready This indicates if the player is ready to start
+    *       the game.
     */
     public void setReady(boolean ready) {
         this.ready = ready;
@@ -1301,31 +1354,6 @@ public class Player extends FreeColGameObject {
     
     
     /**
-    * Returns a random settlement, or <i>null</i> if this
-    * player does not own a single settlement.
-    */
-    public Settlement getRandomSettlement() {
-        ArrayList settlements = new ArrayList();
-        Map map = getGame().getMap();
-
-        Iterator tileIterator = map.getWholeMapIterator();
-        while (tileIterator.hasNext()) {
-            Tile t = map.getTile((Map.Position) tileIterator.next());
-
-            if (t != null && t.getSettlement() != null && t.getSettlement().getOwner() == this) {
-                settlements.add(t.getSettlement());
-            }
-        }
-        
-        if (settlements.size() == 0) {
-            return null;
-        }
-        
-        return (Settlement) settlements.get((int) (Math.random() * settlements.size()));
-    }
-
-
-    /**
     * Increments the player's cross count, with benefits thereof.
     * @param num The number of crosses to add.
     * @see #setCrosses
@@ -1450,7 +1478,7 @@ public class Player extends FreeColGameObject {
     * Sets the hostiliy against the given player.
     *
     * @param player The <code>Player</code>.
-    * @param tension The <code>Tension</code>.
+    * @param newTension The <code>Tension</code>.
     */
     public void setTension(Player player, Tension newTension) {
         tension[player.getNation()] = newTension;
@@ -1459,6 +1487,8 @@ public class Player extends FreeColGameObject {
 
     /**
     * Gets the hostility this player has against the given player.
+    * @param player The <code>Player</code>.
+    * @return An object representing the tension level.
     */
     public Tension getTension(Player player) {
         return tension[player.getNation()];
@@ -1471,6 +1501,9 @@ public class Player extends FreeColGameObject {
     * <BR><BR>
     *
     * One of: WAR, CEASE_FIRE, PEACE and ALLIANCE.
+    * 
+    * @param player The <code>Player</code>.
+    * @return The stance.
     */
     public int getStance(Player player) {
         return stance[player.getNation()];
@@ -1503,6 +1536,9 @@ public class Player extends FreeColGameObject {
     * <BR><BR>
     *
     * One of: WAR, CEASE_FIRE, PEACE and ALLIANCE.
+    * 
+    * @param player The <code>Player</code>.
+    * @param theStance The stance.
     */
     public void setStance(Player player, int theStance) {
         stance[player.getNation()] = theStance;
@@ -1540,6 +1576,8 @@ public class Player extends FreeColGameObject {
 
     /**
     * Gets the price for a recruit in europe.
+    * @return The price of a single recruit in
+    *       {@link Europe}.
     */
     public int getRecruitPrice() {
         return (getCrossesRequired() - crosses) * 10;
@@ -2319,6 +2357,8 @@ public class Player extends FreeColGameObject {
         /**
         * Creates a new <code>NextActiveUnitIterator</code>.
         * @param owner The <code>Player</code> that needs an iterator of it's units.
+        * @param predicate An object for deciding wether a <code>Unit</code> should
+        *       be included in the <code>Iterator</code> or not.
         */
         public UnitIterator(Player owner, UnitPredicate predicate) {
             this.owner = owner;

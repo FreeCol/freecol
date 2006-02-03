@@ -59,7 +59,10 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
 
     /**
     * The constructor that will add the items to this panel.
+    * 
     * @param parent The parent of this panel.
+    * @param connectController The controller responsible for
+    *       creating new connections.
     */
     public NewPanel(Canvas parent, ConnectController connectController) {
         this.parent = parent;

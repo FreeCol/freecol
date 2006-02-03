@@ -47,10 +47,12 @@ public final class InfoPanel extends FreeColPanel {
 
     /**
     * The constructor that will add the items to this panel.
+    * 
+    * @param freeColClient The main controller object for the client.
     * @param game The Game object that has all kinds of useful information
-    * that we want to display here.
-    * @param imageProvider The ImageProvider that can provide us with images to
-    * display on this panel.
+    *       that we want to display here.
+    * @param imageProvider The ImageProvider that can provide us with images
+    *       to display on this panel.
     */
     public InfoPanel(FreeColClient freeColClient, Game game, ImageProvider imageProvider) {
         this.freeColClient = freeColClient;

@@ -53,6 +53,9 @@ public final class ServerListPanel extends FreeColPanel implements ActionListene
     /**
     * The constructor that will add the items to this panel.
     * @param parent The parent of this panel.
+    * @param freeColClient The main controller object for the client
+    * @param connectController The controller responsible for
+    *       creating new connections.
     */
     public ServerListPanel(Canvas parent, FreeColClient freeColClient, ConnectController connectController) {
         this.parent = parent;
@@ -123,6 +126,10 @@ public final class ServerListPanel extends FreeColPanel implements ActionListene
 
     /**
     * Initializes the data that is displayed in this panel.
+    * @param username The username to be used when connecting
+    *       to a server.
+    * @param arrayList A list of <code>ServerInfo</code>-objects
+    *       to be displayed.
     */
     public void initialize(String username, ArrayList arrayList) {
         this.username = username;
@@ -232,6 +239,9 @@ class ServerListTableModel extends AbstractTableModel {
     
     /**
     * Gets the given item.
+    * @param row The row-number identifying a 
+    *       <code>ServerInfo</code>-line.
+    * @return The <code>ServerInfo</code>.
     */
     public ServerInfo getItem(int row) {
         return (ServerInfo) items.get(row);

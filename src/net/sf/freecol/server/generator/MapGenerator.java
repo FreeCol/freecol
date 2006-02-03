@@ -5,7 +5,6 @@ import java.util.Random;
 import java.util.Vector;
 import java.util.logging.Logger;
 
-import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
@@ -80,7 +79,7 @@ public class MapGenerator {
     * @see LandGenerator
     * @see TerrainGenerator
     */
-    public void createMap(Vector players, int width, int height) throws FreeColException {
+    public void createMap(Vector players, int width, int height) {
         this.width = width;
         this.height = height;
 
@@ -133,11 +132,10 @@ public class MapGenerator {
      * 
      * @param map The <code>Map</code> to place the indian settlments on.
      * @param players The players to create <code>Settlement</code>s
-    *       and starting locations for. That is; both indian and 
-    *       european players.
-     * @throws FreeColException if thrown by a called method
+     *       and starting locations for. That is; both indian and 
+     *       european players.
      */
-    protected void createIndianSettlements(Map map, Vector players) throws FreeColException {
+    protected void createIndianSettlements(Map map, Vector players) {
         Iterator incaIterator = map.getFloodFillIterator
                                                 (getRandomLandPosition(map));
         Iterator aztecIterator = map.getFloodFillIterator
@@ -242,12 +240,10 @@ public class MapGenerator {
      * be discarded.
      *
      * @param iterator The nation's iterator to use
-     * @throws FreeColException if thrown by a called method
      */
     private void placeIndianSettlement(int owner, int type,
                                        boolean capital,
-                                       Iterator iterator, Map map, Vector players)
-                                throws FreeColException {
+                                       Iterator iterator, Map map, Vector players) {
         while (iterator.hasNext()) {
             Position position = (Position)iterator.next();
             int radius = (type == IndianSettlement.CITY) ? 2 : 1;
@@ -557,10 +553,8 @@ public class MapGenerator {
      * @param position Candidate position
      * @param radius necessary radius
      * @return True if position suitable for settlement
-     * @throws FreeColException if thrown by a called method
      */
-    private boolean isIndianSettlementCandidate(Position position, int radius, Map map)
-                        throws FreeColException {
+    private boolean isIndianSettlementCandidate(Position position, int radius, Map map) {
         if (map.getTile(position).getClaim() == Tile.CLAIM_NONE) {
             map.getTile(position).setClaim(Tile.CLAIM_VISITED);
             if (map.getTile(position).isSettleable()) {
@@ -610,9 +604,8 @@ public class MapGenerator {
      * @param players The players to create <code>Settlement</code>s
      *      and starting locations for. That is; both indian and 
      *      european players.
-     * @throws FreeColException if thrown by a called method
      */
-    protected void createEuropeanUnits(Map map, int width, int height, Vector players) throws FreeColException {
+    protected void createEuropeanUnits(Map map, int width, int height, Vector players) {
         int[] shipYPos = new int[4];
         for (int i = 0; i < 4; i++) {
             shipYPos[i] = 0;

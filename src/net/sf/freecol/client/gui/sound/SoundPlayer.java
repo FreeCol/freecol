@@ -113,6 +113,7 @@ public class SoundPlayer {
 
     /**
     * Plays a playlist using the default play-continues, repeat-mode and pick-mode for this <i>SoundPlayer</i>.
+    * @param playlist The <code>Playlist</code> to be played.
     */
     public void play(Playlist playlist) {
         play(playlist, defaultPlayContinues, defaultRepeatMode, defaultPickMode);
@@ -122,6 +123,14 @@ public class SoundPlayer {
 
     /**
     * Plays a playlist.
+    * @param playlist The <code>Playlist</code> to be played.
+    * @param playContinues <code>true</code> if the
+    *       <code>SoundPlayer</code> should continue playing
+    *       after playing the first entry on the playlist.
+    * @param repeatMode The method this <code>PlayList</code>
+    *      should be repeated.
+    * @param pickMode The method to be used for picking
+    *      the songs.
     */
     public void play(Playlist playlist, boolean playContinues, int repeatMode, int pickMode) {
         if (playlist != null) {
@@ -144,6 +153,7 @@ public class SoundPlayer {
 
     /**
     * Are the sounds stopped?
+    * @return <code>true</code> is the sounds are stopped.
     */
     public boolean isStopped() {
         return soundStopped;
@@ -162,6 +172,7 @@ public class SoundPlayer {
 
     /**
     * Are the sounds paused?
+    * @return <code>true</code> is the sounds are paused.
     */
     public boolean isPaused() {
         return soundPaused;

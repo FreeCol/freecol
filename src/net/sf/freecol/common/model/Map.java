@@ -79,6 +79,8 @@ public class Map extends FreeColGameObject {
     *
     * @param game The <code>Game</code> this map belongs to.
     * @param size The size of the map to construct, should be one of {SMALL, MEDIUM, LARGE, HUGE}.
+    * @exception FreeColException If thrown during the creation
+    *       of the map.
     */
     public Map(Game game, int size) throws FreeColException {
         super(game);
@@ -119,6 +121,8 @@ public class Map extends FreeColGameObject {
 
     /**
     * Returns the opposite direction of the given direction.
+    * @param direction The direction
+    * @return The oppositre direction of the given one.
     */
     public int getOppositeDirection(int direction) {
         return (direction+4<8) ? direction+4 : direction-4;
@@ -688,7 +692,7 @@ public class Map extends FreeColGameObject {
                 
                 Iterator it = map.getAdjacentIterator(u.getTile().getPosition());
                 while (it.hasNext()) {
-                    Tile t = (Tile) map.getTile((Map.Position) it.next());
+                    Tile t = map.getTile((Map.Position) it.next());
                     if (t == null) {
                         goal = pathNode;
                         return true; 
@@ -782,9 +786,12 @@ public class Map extends FreeColGameObject {
 
 
     /**
-     * Returns the Tile at position (x, y). 'x' specifies a column and 'y' specifies a row.
-     * (0, 0) is the Tile at the top-left corner of the Map.
+     * Returns the Tile at position (x, y). 'x' specifies a 
+     * column and 'y' specifies a row. (0, 0) is the Tile at 
+     * the top-left corner of the Map.
      *
+     * @param x The x-coordinate of the <code>Tile</code>.
+     * @param y The y-coordinate of the <code>Tile</code>.
      * @return The Tile at position (x, y) or <code>null</code> if the position is invalid.
      */
     public Tile getTile(int x, int y) {
@@ -799,6 +806,8 @@ public class Map extends FreeColGameObject {
     /**
     * Sets the given tile the the given coordinates.
     *
+    * @param x The x-coordinate of the <code>Tile</code>.
+    * @param y The y-coordinate of the <code>Tile</code>.
     * @param tile The <code>Tile</code>.
     */
     public void setTile(Tile tile, int x, int y) {

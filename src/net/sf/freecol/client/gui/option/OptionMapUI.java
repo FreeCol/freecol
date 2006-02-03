@@ -62,15 +62,15 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
                 c.setBorder(BorderFactory.createEmptyBorder(OptionGroupUI.H_GAP-5,0,0,0));
                 c.setOpaque(true);
                 tb.addTab(o.getName(), null, c, o.getShortDescription());
-                ou.add((OptionUpdater) c);
+                ou.add(c);
             } else if (o instanceof BooleanOption) {
                 JComponent c = new BooleanOptionUI((BooleanOption) o);
                 northPanel.add(c);
-                ou.add((OptionUpdater) c);
+                ou.add(c);
             } else if (o instanceof IntegerOption) {
                 JComponent c = new IntegerOptionUI((IntegerOption) o);
                 northPanel.add(c);
-                ou.add((OptionUpdater) c);
+                ou.add(c);
             } else {
                 logger.warning("Unknown option.");
             }

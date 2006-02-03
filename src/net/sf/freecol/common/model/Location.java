@@ -85,9 +85,18 @@ public interface Location {
 
     
     /**
-    * @see FreeColGameObject#getID
-    */
+     * Gets the ID of this <code>Location</code>
+     * @return The ID.
+     * @see FreeColGameObject#getID
+     */
     public String getID();
 
+    /**
+     * Gets the <code>GoodsContainer</code> this <code>Location</code>
+     * use for storing it's goods.
+     * 
+     * @return The <code>GoodsContainer</code> or <code>null</code>
+     *      if the <code>Location</code> cannot store any goods.
+     */
     public GoodsContainer getGoodsContainer();
 }

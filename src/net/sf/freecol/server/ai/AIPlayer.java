@@ -231,7 +231,7 @@ public class AIPlayer extends AIObject {
     }
     
     /**
-     * Calls {@link Colony#rearrangeWorkersInColonies} for every colony
+     * Calls {@link AIColony#rearrangeWorkers} for every colony
      * this player owns.
      */
     private void rearrangeWorkersInColonies() {
@@ -839,7 +839,7 @@ public class AIPlayer extends AIObject {
     }
     
     /**
-     * Calls {@link Colony#createAIGoodsInColonies} for every colony
+     * Calls {@link AIColony#createAIGoods} for every colony
      * this player owns.
      */
     private void createAIGoodsInColonies() {
@@ -1482,7 +1482,8 @@ public class AIPlayer extends AIObject {
     /**
      * Decides whether to accept the monarch's tax raise or not.
      *
-     * @return true if the tax raise should be accepted.
+     * @param tax The new tax rate to be considered.
+     * @return <code>true</code> if the tax raise should be accepted.
      */
     public boolean acceptTax(int tax) {
         Goods toBeDestroyed = player.getMostValuableGoods();
@@ -1507,16 +1508,16 @@ public class AIPlayer extends AIObject {
             }
         default:
             int averageIncome = 0;
-        for (int i = 0; i < Goods.NUMBER_OF_TYPES; i++) {
-            averageIncome += player.getIncomeAfterTaxes(i);
-        }
-        averageIncome = averageIncome / Goods.NUMBER_OF_TYPES;
-        if (player.getIncomeAfterTaxes(toBeDestroyed.getType()) > averageIncome) {
-            // this is a more valuable type of goods
-            return false;
-        } else {
-            return true;
-        }
+            for (int i = 0; i < Goods.NUMBER_OF_TYPES; i++) {
+                averageIncome += player.getIncomeAfterTaxes(i);
+            }
+            averageIncome = averageIncome / Goods.NUMBER_OF_TYPES;
+            if (player.getIncomeAfterTaxes(toBeDestroyed.getType()) > averageIncome) {
+                // this is a more valuable type of goods
+                return false;
+            } else {
+                return true;
+            }
         }
     }
     
@@ -1527,6 +1528,9 @@ public class AIPlayer extends AIObject {
      * @param colony The colony where demands are being made.
      * @param goods The goods demanded.
      * @param gold The amount of gold demanded.
+     * @return <code>true</code> if this <code>AIPlayer</code>
+     *      accepts the indian demand and <code>false</code>
+     *      otherwise.
      */
     public boolean acceptIndianDemand(Unit unit, Colony colony, Goods goods, int gold) {
         // TODO: make a better choice

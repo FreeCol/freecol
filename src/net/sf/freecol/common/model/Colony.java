@@ -80,6 +80,8 @@ public final class Colony extends Settlement implements Location {
     * @param owner The <code>Player</code> owning this <code>Colony</code>.
     * @param name The name of the new <code>Colony</code>.
     * @param tile The location of the <code>Colony</code>.
+    * @param initializeWorkLocations If <code>true</code> then all standard
+    *       {@link WorkLocation work locations} will be added.
     */
     public Colony(Game game, Player owner, String name, Tile tile, boolean initializeWorkLocations) {
         super(game, owner, tile);
@@ -171,6 +173,9 @@ public final class Colony extends Settlement implements Location {
 
     /**
     * Gets this colony's line of sight.
+    * @return The line of sight offered by this
+    *       <code>Colony</code>.
+    * @see Player#canSee(Tile)
     */
     public int getLineOfSight() {
         return 2;
@@ -179,6 +184,10 @@ public final class Colony extends Settlement implements Location {
     /**
      * Returns whether this colony is landlocked, or has access to the
      * ocean.
+     * 
+     * @return <code>true</code> if there are no adjacent tiles
+     *      to this <code>Colony</code>'s tile being ocean
+     *      tiles.
      */
     public boolean isLandLocked() {
         return landLocked;
@@ -208,6 +217,8 @@ public final class Colony extends Settlement implements Location {
 
     /**
     * Returns the building for producing the given type of goods.
+    * 
+    * @param goodsType The type of goods.
     * @return The <code>Building</code> which produces the given type
     *         of goods, or <code>null</code> if such a building cannot
     *         be found.
@@ -375,7 +386,11 @@ public final class Colony extends Settlement implements Location {
     }
     
     /**
-    * Gets a <code>Tile</code> from the neighbourhood of this <code>Colony</code>.
+    * Gets a <code>Tile</code> from the neighbourhood of this 
+    * <code>Colony</code>.
+    * 
+    * @param x The x-coordinate of the <code>Tile</code>.
+    * @param y The y-coordinate of the <code>Tile</code>. 
     * @return The <code>Tile</code>.
     */
     public Tile getTile(int x, int y) {
@@ -405,6 +420,12 @@ public final class Colony extends Settlement implements Location {
 
     /**
     * Gets the specified <code>ColonyTile</code>.
+    * 
+    * @param x The x-coordinate of the <code>Tile</code>.
+    * @param y The y-coordinate of the <code>Tile</code>.
+    * @return The <code>ColonyTile</code> for the
+    *       <code>Tile</code> returned by
+    *       {@link #getTile(int, int)}.
     */
     public ColonyTile getColonyTile(int x, int y) {
         Tile t = getTile(x, y);
@@ -430,9 +451,9 @@ public final class Colony extends Settlement implements Location {
      *      or <code>null</code> if there is no such location.
      */
     public WorkLocation getVacantWorkLocationFor(Unit locatable) {
-        WorkLocation w = getVacantColonyTileFor(((Unit) locatable), Goods.FOOD);
+        WorkLocation w = getVacantColonyTileFor(locatable, Goods.FOOD);
         if (w != null && w.canAdd(locatable) &&
-                getVacantColonyTileProductionFor((Unit) locatable, Goods.FOOD) > 0) {
+                getVacantColonyTileProductionFor(locatable, Goods.FOOD) > 0) {
             return w;
         }
 
@@ -715,7 +736,11 @@ public final class Colony extends Settlement implements Location {
 
 
     /**
-    * Returns an <code>Iterator</code> of every unit type this colony may build.
+    * Returns an <code>Iterator</code> of every unit type 
+    * this colony may build.
+    * 
+    * @return An <code>Iterator</code> on <code>Integer</code>
+    *       -objects where the values are the unit type values. 
     */
     public Iterator getBuildableUnitIterator() {
         ArrayList buildableUnits = new ArrayList();
@@ -920,6 +945,7 @@ public final class Colony extends Settlement implements Location {
 
     /**
     * Gets the production of food.
+    * @return The same as <code>getProductionOf(Goods.FOOD)</code>.
     */
     public int getFoodProduction() {
         return getProductionOf(Goods.FOOD);
@@ -928,6 +954,11 @@ public final class Colony extends Settlement implements Location {
 
     /**
     * Returns the production of the given type of goods.
+    * @param goodsType The type of goods to get the production
+    *       for.
+    * @return The production of the given type of goods the
+    *       current turn by all of the <code>Colony</code>'s
+    *       {@link Building buildings} and {@link ColonyTile tiles}.
     */
     public int getProductionOf(int goodsType) {
         int amount = 0;
@@ -949,6 +980,14 @@ public final class Colony extends Settlement implements Location {
     * Returns a vacant <code>ColonyTile</code> where the
     * given <code>unit</code> produces the maximum output of
     * the given <code>goodsType</code>.
+    * 
+    * @param unit The <code>Unit</code> to find a vacant
+    *       <code>ColonyTile</code> for.
+    * @param goodsType The type of goods that should be produced.
+    * @return The <code>ColonyTile</code> giving the highest
+    *       production of the given goods for the given unit or
+    *       <code>null</code> if there is no available
+    *       <code>ColonyTile</code> for producing that goods.
     */
     public ColonyTile getVacantColonyTileFor(Unit unit, int goodsType) {
         ColonyTile bestPick = null;
@@ -977,6 +1016,13 @@ public final class Colony extends Settlement implements Location {
     * Returns the production of a vacant <code>ColonyTile</code>
     * where the given <code>unit</code> produces the maximum output
     * of the given <code>goodsType</code>.
+    * 
+    * @param unit The <code>Unit</code> to find the highest possible
+    *       <code>ColonyTile</code>-production for.
+    * @param goodsType The type of goods that should be produced.
+    * @return The highest possible production on a vacant 
+    *       <code>ColonyTile</code> for the given goods and the 
+    *       given unit.
     */
     public int getVacantColonyTileProductionFor(Unit unit, int goodsType) {
         ColonyTile bestPick = getVacantColonyTileFor(unit, goodsType);
@@ -1003,6 +1049,8 @@ public final class Colony extends Settlement implements Location {
 
     /**
     * Gets the production of horses in this <code>Colony</code>.
+    * @return The total production of horses in this
+    *       <code>Colony</code>.
     */
     public int getHorseProduction() {
         int surplus = getFoodProduction() - getFoodConsumption();
@@ -1166,6 +1214,10 @@ public final class Colony extends Settlement implements Location {
     *
     * At this moment, this method always returns the first unit
     * in the colony.
+    * 
+    * @return A random unit from this <code>Colony</code>.
+    *       This <code>Unit</code> will either be working in a
+    *       {@link Building} or a {@link ColonyTile}.
     */
     public Unit getRandomUnit() {
         if (getUnitIterator().hasNext()) {
@@ -1257,14 +1309,22 @@ public final class Colony extends Settlement implements Location {
 
 
     /**
-    * Returns the capacity of this colony's warehouse. All goods above this limit,
-    * except {@link Goods#FOOD}, will be removed when calling {@link #newTurn}.
+    * Returns the capacity of this colony's warehouse. All goods 
+    * above this limit, except {@link Goods#FOOD}, will be removed 
+    * when calling {@link #newTurn}.
+    * 
+    * @return The capacity of this <code>Colony</code>'s warehouse.
     */
     public int getWarehouseCapacity() {
         return 100 + getBuilding(Building.WAREHOUSE).getLevel() * 100;
     }
 
-
+    
+    /**
+     * Disposes this <code>Colony</code>. All <code>WorkLocation</code>s
+     * owned by this <code>Colony</code> will also be destroyed, and
+     * <code>getTile().setSettlement(null)</code> will get called.
+     */
     public void dispose() {
         Iterator i = getWorkLocationIterator();
         while (i.hasNext()) {

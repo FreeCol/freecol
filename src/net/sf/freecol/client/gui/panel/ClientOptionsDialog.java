@@ -46,6 +46,8 @@ public final class ClientOptionsDialog extends FreeColDialog implements ActionLi
     /**
     * The constructor that will add the items to this panel.
     * @param parent The parent of this panel.
+    * @param freeColClient The main controller object for the
+    *       client.
     */
     public ClientOptionsDialog(Canvas parent, FreeColClient freeColClient) {
         setLayout(new BorderLayout());

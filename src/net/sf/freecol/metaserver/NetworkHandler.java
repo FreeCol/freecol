@@ -30,6 +30,12 @@ public final class NetworkHandler implements MessageHandler {
 
     /**
     * The constructor to use.
+    * 
+    * @param metaServer The <code>MetaServer</code> this
+    *       <code>NetworkHandler</code> has been created
+    *       for.
+    * @param metaRegister An object containing a list
+    *       of all the servers.
     */
     public NetworkHandler(MetaServer metaServer, MetaRegister metaRegister) {
         this.metaServer = metaServer;

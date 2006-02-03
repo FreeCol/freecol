@@ -344,6 +344,8 @@ public class Goods implements Locatable, Ownable {
     /**
     * Makes an XML-representation of this object.
     *
+    * @param player The <code>Player</code> to created this representation
+    *       for.
     * @param document The document to use when creating new componenets.
     * @return The DOM-element ("Document Object Model") made to represent this "Goods".
     */

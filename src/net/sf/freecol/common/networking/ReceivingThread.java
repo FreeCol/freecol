@@ -16,8 +16,8 @@ import org.xml.sax.SAXException;
 
 
 /**
-* The thread that checks for incoming messages.
-*/
+ * The thread that checks for incoming messages.
+ */
 final class ReceivingThread extends Thread {
     private static final Logger logger = Logger.getLogger(ReceivingThread.class.getName());
 
@@ -25,6 +25,9 @@ final class ReceivingThread extends Thread {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
+    /** Maximum number og retries before closing the connection. */
+    private static final int MAXIMUM_RETRIES = 5;
+    
     private final FreeColNetworkInputStream in;
     private boolean shouldRun;
 
@@ -35,12 +38,12 @@ final class ReceivingThread extends Thread {
 
 
     /**
-    * The constructor to use.
-    *
-    * @param connection The <code>Connection</code> this <code>ReceivingThread</code>
-    *                   belongs to.
-    * @param in The stream to read from.
-    */
+     * The constructor to use.
+     *
+     * @param connection The <code>Connection</code> this <code>ReceivingThread</code>
+     *                   belongs to.
+     * @param in The stream to read from.
+     */
     ReceivingThread(Connection connection, InputStream in) {
         super("ReceivingThread");
 
@@ -51,22 +54,24 @@ final class ReceivingThread extends Thread {
 
 
     /**
-    * Gets the next <code>networkReplyId</code> that will be used when identifing a network message.
+    * Gets the next <code>networkReplyId</code> that will be used 
+    * when identifing a network message.
+    * 
     * @return The next available <code>networkReplyId</code>.
     */
     public int getNextNetworkReplyId() {
         nextNetworkReplyId++;
-
         return nextNetworkReplyId - 1;
     }
 
-
     /**
-    * Creates and registers a new <code>NetworkReplyObject</code> with the
-    * specified ID.
+    * Creates and registers a new <code>NetworkReplyObject</code> 
+    * with the specified ID.
     *
-    * @param networkReplyId The id of the message the calling thread should wait for.
-    * @return The <code>NetworkReplyObject</code> containing the network message.
+    * @param networkReplyId The id of the message the calling 
+    *       thread should wait for.
+    * @return The <code>NetworkReplyObject</code> containing 
+    *       the network message.
     */
     public NetworkReplyObject waitForNetworkReply(int networkReplyId) {
         NetworkReplyObject nro = new NetworkReplyObject(networkReplyId);
@@ -76,72 +81,47 @@ final class ReceivingThread extends Thread {
         return nro;
     }
 
-
     /**
-     * This method is invoked When the thread starts and the thread will stop
-     * when this method returns.
+     * Receives messages from the network in a loop.
+     * This method is invoked when the thread starts and the 
+     * thread will stop when this method returns.
      */
     public void run() {
-
         int  timesFailed = 0;
 
-        // while this thread should run..
-        while ( shouldRun() ) {
-
-            // this core means that no exception will stop this thread unless it
-            // is intended to do so
+        while (shouldRun()) {
             try {
                 listen();
                 timesFailed = 0;
-            }
-            catch ( Exception e ) {
-
-                if ( shouldRun() ) {
-
-                    timesFailed ++;
-
-                    // determine if the message reception should be re-tried and
-                    // unpack the exception if necessary
-                    boolean    shouldRetry;
-                    Exception  exception;
-                    if ( e instanceof SAXException ) {
-
-                        exception = ((SAXException) e).getException();
-                        if ( null == exception ) { exception = e; }
-                        shouldRetry = true;
-                    }
-                    else {
-                        exception = e;
-                        shouldRetry = false;
-                    }
-
-                    // warn of the exception
-                    warnOf( exception );
-
-                    // if the client should be disconnected..
-                    if ( ! shouldRetry  ||  10 < timesFailed ) {
-
-                        disconnect();
-                    }
-                }
+            } catch (SAXException e) {
+                timesFailed++;
+                //warnOf(exception);
+                if (timesFailed > MAXIMUM_RETRIES) {
+                    disconnect();
+                }                
+            } catch (IOException e) {
+                //warnOf(exception);
+                disconnect();
             }
         }
     }
 
-
     /**
-    * The method that does it all. Listens to the inputstream and then tries to
-    * recognize messages. Calls the messagehandler for each message received.
-    */
-    public void listen() throws Exception {
-
+     * Listens to the inputstream and calls the messagehandler 
+     * for each message received.
+     * 
+     * @exception IOException If thrown by the
+     *      {@link FreeColNetworkInputStream}.
+     * @exception SAXException If thrown by
+     *      {@link Message}.      
+     */
+    public void listen() throws IOException, SAXException {
         Message  msg = null;
 
         in.enable();
-
         msg = new Message(in);
 
-        if ( ! shouldRun() ) {
+        if (!shouldRun()) {
             return;
         }
 
@@ -157,7 +137,7 @@ final class ReceivingThread extends Thread {
         }
         // END DEBUB
 
-        if (msg.isType("reply")) { // == this is a reply-message:
+        if (msg.isType("reply")) {
             boolean foundNetworkReplyObject = false;
 
             for (int i=0; i<threadsWaitingForNetworkReply.size(); i++) {
@@ -174,14 +154,13 @@ final class ReceivingThread extends Thread {
             if (!foundNetworkReplyObject) {
                 logger.warning("Could not find networkReplyId=" + msg.getAttribute("networkReplyId"));
             }
-
-        } else { // == this is not a reply-message:
+        } else {
             final Message theMsg  = msg;
 
             /*
-            TODO: The tag "urgent" should be used to mark messages
-                    that should be processed in a separate thread:
-            */
+             * TODO: The tag "urgent" should be used to mark messages
+             *       that should be processed in a separate thread:
+             */
             Thread t = new Thread() {
                 public void run() {
                     connection.handleAndSendReply(theMsg);
@@ -191,69 +170,55 @@ final class ReceivingThread extends Thread {
             t.start();
         }
 
-        if ( msg.isType("disconnect") ) {
-
+        if (msg.isType("disconnect")) {
             askToStop();
         }
     }
 
-
     /**
-    * Checks if this thread has been halted.
-    */
+     * Checks if this thread has been halted.
+     */
     private synchronized boolean shouldRun() {
-
         return shouldRun;
     }
 
-
     /**
-    * Tells this thread that it doesn't need to do any more work.
-    */
+     * Tells this thread that it doesn't need to do any more work.
+     */
     synchronized void askToStop() {
-
         shouldRun = false;
     }
 
-
-    private void disconnect()
-    {
+    private void disconnect() {
         try {
-            Element  disconnectElement = Message.createNewRootElement( "disconnect" );
-            disconnectElement.setAttribute( "reason", "reception exception" );
-            connection.getMessageHandler().handle( connection, disconnectElement );
-        }
-        catch ( FreeColException e ) {
-
+            Element disconnectElement = Message.createNewRootElement("disconnect");
+            disconnectElement.setAttribute("reason", "reception exception");
+            connection.getMessageHandler().handle(connection, disconnectElement);
+        } catch (FreeColException e) {
             e.printStackTrace();
         }
     }
 
-
-    private void warnOf( Exception e )
-    {
-        StringWriter  stringWriter = new StringWriter();
-        PrintWriter  printWriter = new PrintWriter( stringWriter );
-        e.printStackTrace( printWriter );
+    private void warnOf(Exception e) {
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        e.printStackTrace(printWriter);
         printWriter.close();
-        logger.warning( stringWriter.toString() );
+        logger.warning(stringWriter.toString());
     }
 
 
-    // ----------------------------------------------------------- nested types
-
     /**
-    * Input stream for buffering the data from the network.
-    *
-    * <br><br>
-    *
-    * This is just a buffered input stream that signals end-of-stream when a
-    * given token {@link #END_OF_STREAM} is encountered. In order to continue receiving data,
-    * the method {@link #enable} has to be called. Calls to {@link #close} has no
-    * effect, the underlying input stream has to be closed directly.
-    */
+     * Input stream for buffering the data from the network.
+     *
+     * <br><br>
+     *
+     * This is just a buffered input stream that signals end-of-stream when a
+     * given token {@link #END_OF_STREAM} is encountered. In order to continue receiving data,
+     * the method {@link #enable} has to be called. Calls to <code>close()</code> has no
+     * effect, the underlying input stream has to be closed directly.
+     */
     class FreeColNetworkInputStream extends InputStream {
-
         private static final int BUFFER_SIZE = 8192;
         private static final char END_OF_STREAM = '\n';
 
@@ -264,13 +229,12 @@ final class ReceivingThread extends Thread {
         private boolean empty = true;
         private boolean wait = false;
 
-
-
         /**
-        * Creates a new <code>FreeColNetworkInputStream</code>.
-        * @param in The input stream in which this object should get
-        *           the data from.
-        */
+         * Creates a new <code>FreeColNetworkInputStream</code>.
+         * 
+         * @param in The input stream in which this object should get
+         *           the data from.
+         */
         FreeColNetworkInputStream(InputStream in) {
             this.in = in;
         }
@@ -278,10 +242,11 @@ final class ReceivingThread extends Thread {
 
 
         /**
-        * Fills the buffer with data.
-        * @return <i>true</i> if the buffer has been filled with
-        *         data, and <i>false</i> if an error occured.
-        */
+         * Fills the buffer with data.
+         * 
+         * @return <i>true</i> if the buffer has been filled with
+         *         data, and <i>false</i> if an error occured.
+         */
         private boolean fill() throws IOException {
             int r;
             if (bStart < bEnd || empty && bStart == bEnd) {
@@ -310,22 +275,20 @@ final class ReceivingThread extends Thread {
             return true;
         }
 
-
         /**
-        * Prepares the input stream for a new message.
-        * <br><br>
-        * Makes the subsequent calls to <code>read</code> return
-        * the data instead of <code>-1</code>.
-        */
+         * Prepares the input stream for a new message.
+         * <br><br>
+         * Makes the subsequent calls to <code>read</code> return
+         * the data instead of <code>-1</code>.
+         */
         void enable() {
             wait = false;
         }
 
-
         /**
-        * Reads a single byte.
-        * @see #read(byte[], int, int)
-        */
+         * Reads a single byte.
+         * @see #read(byte[], int, int)
+         */
         public int read() throws IOException {
             if (wait) {
                 return -1;
@@ -362,18 +325,17 @@ final class ReceivingThread extends Thread {
             }
         }
 
-
         /**
-        * Reads from the buffer and returns the data.
-        *
-        * @param b The place where the data will be put.
-        * @param off The offset to use when writing the data to <code>b</code>.
-        * @param len Number of bytes to read.
-        * @return The actual number of bytes read and <code>-1</code> if the
-        *         message has ended, that is; if the token {@link #END_OF_STREAM}
-        *         is encountered.
-        *
-        */
+         * Reads from the buffer and returns the data.
+         *
+         * @param b The place where the data will be put.
+         * @param off The offset to use when writing the data to <code>b</code>.
+         * @param len Number of bytes to read.
+         * @return The actual number of bytes read and <code>-1</code> if the
+         *         message has ended, that is; if the token {@link #END_OF_STREAM}
+         *         is encountered.
+         *
+         */
         public int read(byte[] b, int off, int len) throws IOException {
             if (wait) {
                 return -1;
@@ -418,5 +380,4 @@ final class ReceivingThread extends Thread {
             return len;
         }
     }
-
 }

@@ -16,6 +16,7 @@ public final class WindowedFrameListener implements WindowListener {
     
     /**
     * Constructs this WindowListener.
+    * @param canvas The <code>Canvas</code>.
     */
     public WindowedFrameListener(Canvas canvas) {
         parent = canvas;

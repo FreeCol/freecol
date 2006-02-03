@@ -66,8 +66,9 @@ public class FileList extends JList {
 
     
     /**
-    * This filter accepts any file ending with ".fsg".
-    */
+     * Gets the default file filter.
+     * @return A filter that accepts any file ending with ".fsg".
+     */
     public FileFilter getDefaultFileFilter() {
         FileFilter ff = new FileFilter() {
             public boolean accept(File file) {
@@ -101,8 +102,9 @@ public class FileList extends JList {
         
         
         /**
-        * Gets the file.
-        */
+         * Gets the file.
+         * @return The <code>File</code>
+         */
         public File getFile() {
             return file;
         }

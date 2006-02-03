@@ -82,14 +82,22 @@ public final class Playlist {
 
 
 
-    /** Sets the repeat-mode for this playlist. */
+    /** 
+     * Sets the repeat-mode for this playlist.
+     * @param repeatMode The method this <code>PlayList</code>
+     *      should be repeated.
+     */
     public void setRepeatMode(int repeatMode) {
         this.repeatMode = repeatMode;
     }
 
 
 
-    /** Sets the pick-mode for this playlist. */
+    /** 
+     * Sets the pick-mode for this playlist. 
+     * @param pickMode The method to be used for picking
+     *      the songs. 
+     */
     public void setPickMode(int pickMode) {
         this.pickMode = pickMode;
     }
@@ -113,7 +121,7 @@ public final class Playlist {
                 num = soundFiles.length - 1;
             }
             else { // SHUFFLE mode
-                num = (int)(Math.random() * (double)soundFiles.length);
+                num = (int)(Math.random() * soundFiles.length);
                 playedSounds[0] = num;
             }
         }
@@ -132,7 +140,7 @@ public final class Playlist {
                     for (int i = 1; i < playedSounds.length; i++) {
                         playedSounds[i] = Integer.MAX_VALUE;
                     }
-                    num = (int)(Math.random() * (double)soundFiles.length);
+                    num = (int)(Math.random() * soundFiles.length);
                     playedSounds[0] = num;
                 }
             }
@@ -144,7 +152,7 @@ public final class Playlist {
                     }
                 }
 
-                int tmp = (int)(Math.random() * (double)(soundFiles.length - i));
+                int tmp = (int)(Math.random() * (soundFiles.length - i));
                 for (int j = 0; j < i; j++) {
                     if (tmp < playedSounds[j]) {
                         num = tmp;

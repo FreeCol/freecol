@@ -3,9 +3,10 @@ package net.sf.freecol.common.model;
 
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.networking.Message;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 
 
@@ -87,8 +88,11 @@ abstract public class FreeColGameObject {
 
 
     /**
-    * Gets the <code>GameOptions</code> that is associated with the {@link Game}
-    * owning this <code>FreeColGameObject</code>.
+    * Gets the <code>GameOptions</code> that is associated with the 
+    * {@link Game} owning this <code>FreeColGameObject</code>.
+    * 
+    * @return The same <code>GameOptions</code>-object as returned
+    *       by <code>getGame().getGameOptions()</code>.
     */
     public GameOptions getGameOptions() {
         return game.getGameOptions();
@@ -121,6 +125,7 @@ abstract public class FreeColGameObject {
 
     /**
     * Checks if this object has been disposed.
+    * @return <code>true</code> if this object has been disposed.
     * @see #dispose
     */
     public boolean isDisposed() {
@@ -333,22 +338,23 @@ abstract public class FreeColGameObject {
     *
     * @param element The <code>Element</code> to search for the child element.
     * @param tagName The tag name of the child element to be found.
+    * @return The first child element with the given name.
     */
     protected Element getChildElement(Element element, String tagName) {
-        NodeList n = element.getChildNodes();
-        for (int i=0; i<n.getLength(); i++) {
-            if (n.item(i) instanceof Element &&
-                    ((Element) n.item(i)).getTagName().equals(tagName)) {
-                return (Element) n.item(i);
-            }
-        }
-
-        return null;
+        return Message.getChildElement(element, tagName);
     }
 
     
     /**
     * Creates an XML-representation of an array.
+    * 
+    * @param tagName The tagname for the <code>Element</code>
+    *       representing the array.
+    * @param array The array to represent.
+    * @param document The document context in which the
+    *       elemt should be created.
+    * @return An XML DOM <code>Element</code> representing
+    *       the given array.
     */
     protected Element toArrayElement(String tagName, int[][] array, Document document) {
         Element arrayElement = document.createElement(tagName);
@@ -367,6 +373,13 @@ abstract public class FreeColGameObject {
 
     /**
     * Reads an XML-representation of an array.
+    * 
+    * @param tagName The tagname for the <code>Element</code>
+    *       representing the array.
+    * @param arrayElement An XML DOM <code>Element</code> 
+    *       representing an array.
+    * @param arrayType The type of array to be read.
+    * @return The array.
     */                
     protected int[][] readFromArrayElement(String tagName, Element arrayElement, int[][] arrayType) {
         int[][] array = new int[Integer.parseInt(arrayElement.getAttribute("xLength"))][Integer.parseInt(arrayElement.getAttribute("yLength"))];
@@ -382,8 +395,16 @@ abstract public class FreeColGameObject {
 
     
     /**
-    * Creates an XML-representation of an array.
-    */
+     * Creates an XML-representation of an array.
+     * 
+     * @param tagName The tagname for the <code>Element</code>
+     *       representing the array.
+     * @param array The array to represent.
+     * @param document The document context in which the
+     *       elemt should be created.
+     * @return An XML DOM <code>Element</code> representing
+     *       the given array.
+     */
     protected Element toArrayElement(String tagName, int[] array, Document document) {
         Element arrayElement = document.createElement(tagName);
         arrayElement.setAttribute("xLength", Integer.toString(array.length));
@@ -397,8 +418,15 @@ abstract public class FreeColGameObject {
     
 
     /**
-    * Reads an XML-representation of an array.
-    */                
+     * Reads an XML-representation of an array.
+     * 
+     * @param tagName The tagname for the <code>Element</code>
+     *       representing the array.
+     * @param arrayElement An XML DOM <code>Element</code> 
+     *       representing an array.
+     * @param arrayType The type of array to be read.
+     * @return The array.
+     */               
     protected int[] readFromArrayElement(String tagName, Element arrayElement, int[] arrayType) {
         int[] array = new int[Integer.parseInt(arrayElement.getAttribute("xLength"))];
         
@@ -411,8 +439,16 @@ abstract public class FreeColGameObject {
 
 
     /**
-    * Creates an XML-representation of an array.
-    */        
+     * Creates an XML-representation of an array.
+     * 
+     * @param tagName The tagname for the <code>Element</code>
+     *       representing the array.
+     * @param array The array to represent.
+     * @param document The document context in which the
+     *       elemt should be created.
+     * @return An XML DOM <code>Element</code> representing
+     *       the given array.
+     */    
     protected Element toArrayElement(String tagName, boolean[][] array, Document document) {
         Element arrayElement = document.createElement(tagName);
         arrayElement.setAttribute("xLength", Integer.toString(array.length));
@@ -437,8 +473,15 @@ abstract public class FreeColGameObject {
 
 
     /**
-    * Reads an XML-representation of an array.
-    */
+     * Reads an XML-representation of an array.
+     * 
+     * @param tagName The tagname for the <code>Element</code>
+     *       representing the array.
+     * @param arrayElement An XML DOM <code>Element</code> 
+     *       representing an array.
+     * @param arrayType The type of array to be read.
+     * @return The array.
+     */ 
     protected boolean[][] readFromArrayElement(String tagName, Element arrayElement, boolean[][] arrayType) {
         boolean[][] array = new boolean[Integer.parseInt(arrayElement.getAttribute("xLength"))][Integer.parseInt(arrayElement.getAttribute("yLength"))];
 

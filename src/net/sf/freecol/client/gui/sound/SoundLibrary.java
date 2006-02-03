@@ -148,6 +148,9 @@ public class SoundLibrary {
 
     /**
     * Returns a playlist identified by id.
+    * @param id The ID.
+    * @return The <code>PlayList</code> specified by the
+    *       ID.
     */
     public Playlist get(int id) {
         if (id >= 0 && id < playlists.length)

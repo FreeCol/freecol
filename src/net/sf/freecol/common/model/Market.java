@@ -70,8 +70,9 @@ public final class Market extends FreeColGameObject {
     /**
      * Determines the cost to buy a single unit of a particular type of good.
      *
-     * @param  typeOfGood  the type of good for which to obtain a price
-     * @throws  NullPointerException  if the argument is <TT>null</TT>
+     * @param typeOfGood  the type of good for which to obtain a price
+     * @return The cost to buy a single unit of the given type of goods.
+     * @throws NullPointerException  if the argument is <TT>null</TT>
      */
     public int costToBuy(int typeOfGood) {
 
@@ -83,8 +84,10 @@ public final class Market extends FreeColGameObject {
      * Determines the price paid for the sale of a single unit of a particular
      * type of good.
      *
-     * @param  typeOfGood  The Goods for which to obtain a price.
-     * @throws  NullPointerException  if the argument is <TT>null</TT>
+     * @param typeOfGood  The Goods for which to obtain a price.
+     * @return The price for a single unit of the given type of goods
+     *      if being sold. 
+     * @throws NullPointerException  if the argument is <TT>null</TT>
      */
     public int paidForSale(int typeOfGood) {
         return dataForGoodType[typeOfGood].paidForSale;
@@ -160,6 +163,8 @@ public final class Market extends FreeColGameObject {
 
     /**
     * Add the given <code>Goods</code> to this <code>Market</code>.
+    * @param type The type of goods.
+    * @param amount The amount of goods.
     */
     public void add(int type, int amount) {
         Data  data = dataForGoodType[type];
@@ -189,6 +194,8 @@ public final class Market extends FreeColGameObject {
 
     /**
     * Remove the given <code>Goods</code> from this <code>Market</code>.
+    * @param type The type of goods.
+    * @param amount The amount of goods.
     */
     public void remove(int type, int amount) {
         Data data = dataForGoodType[type];
@@ -206,6 +213,8 @@ public final class Market extends FreeColGameObject {
     /**
     * Gets the price of a given goods when the <code>Player</code> buys.
     *
+    * @param type The type of goods.
+    * @param amount The amount of goods.
     * @return The bid price of the given goods.
     */
     public int getBidPrice(int type, int amount) {
@@ -217,6 +226,8 @@ public final class Market extends FreeColGameObject {
     /**
     * Gets the price of a given goods when the <code>Player</code> sales.
     *
+    * @param type The type of goods.
+    * @param amount The amount of goods.
     * @return The sale price of the given goods.
     */
     public int getSalePrice(int type, int amount) {

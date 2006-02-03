@@ -19,6 +19,8 @@ public interface Option {
     /**
     * Gives a short description of this <code>Option</code>.
     * Can for instance be used as a tooltip text.
+    * 
+    * @return A short description of this action.
     */
     public String getShortDescription();
 

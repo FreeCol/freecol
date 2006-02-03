@@ -91,6 +91,9 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
     /**
      * The constructor for the panel.
      * @param parent The parent of this panel
+     * @param freeColClient The main controller object for the client.
+     * @param inGameController The controller object to be used when
+     *      ingame.
      */
     public EuropePanel(Canvas parent, FreeColClient freeColClient, InGameController inGameController) {
         this.parent = parent;
@@ -344,6 +347,11 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
 
     /**
      * Initialize the data on the window.
+     * 
+     * @param europe The object of type <code>Europe</code> this panel
+     *      should display.
+     * @param game The <code>Game</code>-object the
+     *      <code>Europe</code>-object is a part of.
      */
     public void initialize(Europe europe, Game game) {
         this.europe = europe;
@@ -958,14 +966,16 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
 
 
     /**
-    * Returns a pointer to the <code>cargoPanel</code>-object in use.
+    * Returns a pointer to the <code>CargoPanel</code>-object in use.
+    * @return The <code>CargoPanel</code>.
     */
     public final CargoPanel getCargoPanel() {
         return cargoPanel;
     }
 
     /**
-    * Returns a pointer to the <code>marketPanel</code>-object in use.
+    * Returns a pointer to the <code>MarketPanel</code>-object in use.
+    * @return The <code>MarketPanel</code>.
     */
     public final MarketPanel getMarketPanel() {
         return marketPanel;

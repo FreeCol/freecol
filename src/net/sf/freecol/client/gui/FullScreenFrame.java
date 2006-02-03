@@ -28,6 +28,7 @@ public final class FullScreenFrame extends JFrame {
 
     /**
     * The constructor to use.
+    * @param gd The context of this <code>FullScreenFrame</code>.
     */
     public FullScreenFrame(GraphicsDevice gd) {
         super(gd.getDefaultConfiguration());

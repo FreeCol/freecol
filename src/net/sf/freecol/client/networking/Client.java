@@ -96,8 +96,10 @@ public final class Client {
     /**
     * Sends the specified message to the server and returns the reply.
     *
-    * @param element The element (root element in a DOM-parsed XML tree) that
-    *                holds all the information
+    * @param element The element (root element in a DOM-parsed XML tree) 
+    *       that holds all the information
+    * @return The answer from the server or <code>null</code> if either
+    *       an error occured or the server did not send a reply.
     * @see #sendAndWait
     * @see #send
     */

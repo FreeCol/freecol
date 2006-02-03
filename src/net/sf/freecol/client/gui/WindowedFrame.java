@@ -33,6 +33,7 @@ public final class WindowedFrame extends JFrame {
 
     /**
     * The constructor to use.
+    * @param windowSize The size of the frame to be created.
     */
     public WindowedFrame(Rectangle windowSize) {
         super("FreeCol " + FreeCol.getVersion());

@@ -58,6 +58,7 @@ public final class MetaServer extends Thread {
 
     /**
     * Creates and starts a new <code>MetaServer</code>.
+    * @param args The command-line options.
     */
     public static void main(String[] args) {
         int port = -1;
@@ -138,6 +139,7 @@ public final class MetaServer extends Thread {
 
      /**
      * Gets the control object that handles the network requests.
+     * @return The <code>NetworkHandler</code>.
      */
      public NetworkHandler getNetworkHandler() {
         return networkHandler;

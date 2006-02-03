@@ -475,6 +475,9 @@ public class AIColony extends AIObject {
     * Rearranges the workers within this colony.
     * This is done according to the {@link ColonyPlan}, although minor
     * adjustments can be done to increase production.
+    * 
+    * @param connection The <code>Connection</code> to be used when
+    *       communicating with the server.
     */
     public void rearrangeWorkers(Connection connection) {
         colonyPlan.create();
@@ -757,7 +760,7 @@ public class AIColony extends AIObject {
     * Determines the best goods to produce on a given <code>Tile</code>
     * within this colony.
     *
-    * @param The <code>Tile</code>.
+    * @param t The <code>Tile</code>.
     * @return The type of goods.
     */
     private int getBestGoodsToProduce(Tile t) {

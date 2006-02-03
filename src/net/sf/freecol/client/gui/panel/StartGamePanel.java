@@ -90,6 +90,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
     /**
     * The constructor that will add the items to this panel.
     * @param parent The parent of this panel.
+    * @param freeColClient The main controller object for the client
     */
     public StartGamePanel(Canvas parent, FreeColClient freeColClient) {
         this.parent = parent;
@@ -391,6 +392,7 @@ class PlayersTableModel extends AbstractTableModel {
     /**
     * A standard constructor.
     *
+    * @param freeColClient The main controller object for the client
     * @param pgc The PreGameController to use when updates need to be notified across the
     * network.
     */

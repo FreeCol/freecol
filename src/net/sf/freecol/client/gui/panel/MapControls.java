@@ -39,6 +39,8 @@ public final class MapControls {
 
     /**
     * The basic constructor.
+    * @param freeColClient The main controller object for the client
+    * @param gui An object that contains useful GUI-related methods.
     */
     public MapControls(FreeColClient freeColClient, GUI gui) {
         this.freeColClient = freeColClient;
