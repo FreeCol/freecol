@@ -1988,9 +1988,11 @@ public final class InGameController implements NetworkConstants {
         }
 
         if (messages.size() > 0) {
+            ModelMessage[] modelMessages = new ModelMessage[messages.size()];
             for (int j=0; j<messages.size(); j++) {
-                canvas.showModelMessage((ModelMessage) messages.get(j));
+                modelMessages[j] = (ModelMessage) messages.get(j);
             }
+            canvas.showModelMessages(modelMessages);
         }
     }
 

@@ -278,6 +278,10 @@ public class FreeColDialog extends FreeColPanel {
     * @return The <code>FreeColDialog</code>.
     */
     public static FreeColDialog createConfirmDialog(String text, String okText, String cancelText) {
+        return createConfirmDialog(new String[] {text}, okText, cancelText);
+    }
+
+    public static FreeColDialog createConfirmDialog(String[] texts, String okText, String cancelText) {
 
         // create the OK button early so that the dialog may refer to it
         final JButton  okButton = new JButton();
@@ -290,6 +294,12 @@ public class FreeColDialog extends FreeColPanel {
                 okButton.requestFocus();
             }
         };
+
+        String text = "<html><body>";
+        for (int i = 0; i < texts.length; i++) {
+            text += "<p>" + texts[i];
+        }
+        text += "</body></html>";
 
         // build the label panel
         JPanel  labelPanel = new JPanel( new FlowLayout() );
@@ -372,7 +382,16 @@ public class FreeColDialog extends FreeColPanel {
     *       and an "OK" button.
     */
     public static FreeColDialog createInformationDialog(String text) {
-        final JLabel theText = new JLabel("<html><body>" + text + "</body></html>");
+        return createInformationDialog(new String[] {text});
+    }
+
+    public static FreeColDialog createInformationDialog(String[] texts) {
+        String text = "<html><body>";
+        for (int i = 0; i < texts.length; i++) {
+            text += "<p>" + texts[i];
+        }
+        text += "</body></html>";
+        final JLabel theText = new JLabel(text);
         final JButton theButton = new JButton(Messages.message("ok"));
         final FreeColDialog informationDialog = new FreeColDialog() {
             public void requestFocus() {

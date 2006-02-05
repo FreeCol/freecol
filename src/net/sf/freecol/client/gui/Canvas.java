@@ -26,39 +26,6 @@ import javax.swing.filechooser.FileFilter;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.*;
-/**
-import net.sf.freecol.client.gui.panel.ChatPanel;
-import net.sf.freecol.client.gui.panel.ChooseFoundingFatherDialog;
-import net.sf.freecol.client.gui.panel.ClientOptionsDialog;
-import net.sf.freecol.client.gui.panel.ColonyPanel;
-import net.sf.freecol.client.gui.panel.ColopediaPanel;
-import net.sf.freecol.client.gui.panel.EmigrationPanel;
-import net.sf.freecol.client.gui.panel.ErrorPanel;
-import net.sf.freecol.client.gui.panel.EuropePanel;
-import net.sf.freecol.client.gui.panel.EventPanel;
-import net.sf.freecol.client.gui.panel.FreeColDialog;
-import net.sf.freecol.client.gui.panel.FreeColPanel;
-import net.sf.freecol.client.gui.panel.GameOptionsDialog;
-import net.sf.freecol.client.gui.panel.ImageProvider;
-import net.sf.freecol.client.gui.panel.IndianSettlementPanel;
-import net.sf.freecol.client.gui.panel.InfoPanel;
-import net.sf.freecol.client.gui.panel.MainPanel;
-import net.sf.freecol.client.gui.panel.MonarchPanel;
-import net.sf.freecol.client.gui.panel.NewPanel;
-import net.sf.freecol.client.gui.panel.QuitDialog;
-import net.sf.freecol.client.gui.panel.ReportForeignAffairPanel;
-import net.sf.freecol.client.gui.panel.ReportContinentalCongressPanel;
-import net.sf.freecol.client.gui.panel.ReportIndianPanel;
-import net.sf.freecol.client.gui.panel.ReportLabourPanel;
-import net.sf.freecol.client.gui.panel.ReportPanel;
-import net.sf.freecol.client.gui.panel.ReportReligiousPanel;
-import net.sf.freecol.client.gui.panel.ReportTradePanel;
-import net.sf.freecol.client.gui.panel.ServerListPanel;
-import net.sf.freecol.client.gui.panel.StartGamePanel;
-import net.sf.freecol.client.gui.panel.StatusPanel;
-import net.sf.freecol.client.gui.panel.TilePanel;
-import net.sf.freecol.client.gui.panel.VictoryPanel;
-*/
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -472,6 +439,69 @@ public final class Canvas extends JLayeredPane {
 
                 freeColClient.getInGameController().nextModelMessage();
             }
+        }
+    }
+
+    public void showModelMessages(ModelMessage[] modelMessages) {
+        String okText = "ok";
+        String cancelText = "display";
+        //String message = m.getMessageID();
+        String[] messageText = new String[modelMessages.length];
+        try {
+            okText = Messages.message(okText);
+        } catch (MissingResourceException e) {
+            logger.warning("could not find message with id: " + okText + ".");
+        }
+        try {
+            cancelText = Messages.message(cancelText);
+        } catch (MissingResourceException e) {
+            logger.warning("could not find message with id: " + cancelText + ".");
+        }
+        for (int i = 0; i < modelMessages.length; i++) {
+            try {
+                messageText[i] = Messages.message(modelMessages[i].getMessageID(),
+                                                  modelMessages[i].getData());
+            } catch (MissingResourceException e) {
+                logger.warning("could not find message with id: " + modelMessages[i].getMessageID() + ".");
+            }
+        }
+
+        // source should be the same for all messages
+        FreeColGameObject source = modelMessages[0].getSource();
+        if ((source instanceof Europe && !europePanel.isShowing()) ||
+            (source instanceof Colony || source instanceof WorkLocation) && 
+            !colonyPanel.isShowing()) {
+
+            FreeColDialog confirmDialog = FreeColDialog.createConfirmDialog(messageText, okText, cancelText);
+            confirmDialog.setLocation(getWidth() / 2 - confirmDialog.getWidth() / 2,
+                                      getHeight() / 2 - confirmDialog.getHeight() / 2);
+            add(confirmDialog, MODEL_MESSAGE_LAYER);
+            confirmDialog.requestFocus();
+
+            if (!confirmDialog.getResponseBoolean()) {
+                remove(confirmDialog);
+                if (source instanceof Europe) {
+                    showEuropePanel();
+                } else if (source instanceof Colony) {
+                    showColonyPanel((Colony) source);
+                } else if (source instanceof WorkLocation) {
+                    showColonyPanel(((WorkLocation) source).getColony());
+                }
+            } else {
+                remove(confirmDialog);
+                freeColClient.getInGameController().nextModelMessage();
+            }
+        } else {
+            FreeColDialog informationDialog = FreeColDialog.createInformationDialog(messageText);
+            informationDialog.setLocation(getWidth() / 2 - informationDialog.getWidth() / 2,
+                                          getHeight() / 2 - informationDialog.getHeight() / 2);
+            add(informationDialog, MODEL_MESSAGE_LAYER);
+            informationDialog.requestFocus();
+
+            informationDialog.getResponse();
+            remove(informationDialog);
+
+            freeColClient.getInGameController().nextModelMessage();
         }
     }
 
