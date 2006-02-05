@@ -64,12 +64,12 @@ public final class ErrorPanel extends FreeColDialog implements ActionListener {
     */
     public void initialize(String message) {
         LinkedList lines = new LinkedList();
-        while (getFontMetrics(getFont()).getStringBounds(message, getGraphics()).getWidth()
+        while (getFontMetrics(getFont()).getStringBounds(message, getGraphics()).getWidth() + 40
                 > lineWidth) {
             int spaceIndex = message.indexOf(' ');
             int previousIndex = -1;
             while (getFontMetrics(getFont()).getStringBounds(message.substring(0, spaceIndex),
-                    getGraphics()).getWidth() <= lineWidth) {
+                    getGraphics()).getWidth() + 40 <= lineWidth) {
                 previousIndex = spaceIndex;
                 if ((spaceIndex + 1) >= message.length()) {
                     spaceIndex = 0;

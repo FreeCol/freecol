@@ -27,6 +27,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -119,16 +120,16 @@ public final class FreeColServer {
     *
     * @param publicServer This value should be set to <code>true</code>
     *                     in order to appear on the meta server's listing.
-    *                     
+    *
     * @param singleplayer Sets the game as singleplayer (if <i>true</i>)
     *                     or multiplayer (if <i>false</i>).
 
     * @param port         The TCP port to use for the public socket.
     *                     That is the port the clients will connect to.
     *
-    * @param name         The name of the server, or <code>null</code> if the 
+    * @param name         The name of the server, or <code>null</code> if the
     *                     default name should be used.
-    * 
+    *
     * @throws IOException if the public socket cannot be created (the exception
     *                     will be logged by this class).
     *
@@ -175,7 +176,7 @@ public final class FreeColServer {
     *                     will be logged by this class).
     *
     */
-    public FreeColServer(File file, int port) throws IOException {
+    public FreeColServer(File file, int port) throws IOException, FreeColException {
         this.port = port;
 
         modelController = new ServerModelController(this);
@@ -191,10 +192,22 @@ public final class FreeColServer {
             server.start();
         } catch (IOException e) {
             logger.warning("Exception while starting server: " + e);
+            server.shutdown();
             throw e;
         }
 
-        owner = loadGame(file);
+        try {
+            owner = loadGame(file);
+        }
+        catch (FreeColException e) {
+            server.shutdown();
+            throw e;
+        }
+        catch (Exception e) {
+            server.shutdown();
+            throw new FreeColException("couldNotLoadGame");
+        }
+
         updateMetaServer(true);
         startMetaServerUpdateThread();
     }
@@ -346,7 +359,7 @@ public final class FreeColServer {
     /**
     * Gets the number of player that may connect.
     * @return The number of available slots for human
-    *       players. This number also includes 
+    *       players. This number also includes
     *       european players currently controlled by the AI.
     */
     public int getSlotsAvailable() {
@@ -387,7 +400,7 @@ public final class FreeColServer {
 
     /**
      * Gets the owner of the <code>Game</code>.
-     * @return The owner of the game. THis is the player that 
+     * @return The owner of the game. THis is the player that
      *      has loaded the game (if any).
      * @see #loadGame
      */
@@ -398,7 +411,7 @@ public final class FreeColServer {
 
     /**
     * Saves a game.
-    * 
+    *
     * @param file The file where the data will be written.
     * @param username The username of the player saving the game.
     * @throws IOException If a problem was encountered while trying
@@ -465,7 +478,7 @@ public final class FreeColServer {
     * @throws IOException If a problem was encountered while trying
     *        to open, read or close the file.
     */
-    public String loadGame(File file) throws IOException {
+    public String loadGame(File file) throws IOException, FreeColException {
         InputStream in;
         if (DISABLE_SAVEGAME_COMPRESSION) {
             // No compression
@@ -492,80 +505,91 @@ public final class FreeColServer {
 
         Element savedGameElement = message.getDocument().getDocumentElement();
         String version = savedGameElement.getAttribute("version");
-        Element serverObjectsElement = (Element) savedGameElement.getElementsByTagName("serverObjects").item(0);
 
-        singleplayer = Boolean.valueOf(savedGameElement.getAttribute("singleplayer")).booleanValue();
+        if (Message.getFreeColProtocolVersion().equals(version)) {
+            Element serverObjectsElement = (Element) savedGameElement.getElementsByTagName("serverObjects").item(0);
 
-        if (savedGameElement.hasAttribute("publicServer")) {
-            publicServer = Boolean.valueOf(savedGameElement.getAttribute("publicServer")).booleanValue();
-        }
+            singleplayer = Boolean.valueOf(savedGameElement.getAttribute("singleplayer")).booleanValue();
 
-        // Read the ServerAdditionObjects:
-        ArrayList serverObjects = new ArrayList();
-        ArrayList serverPlayerElements = new ArrayList();
-        NodeList serverObjectsNodeList = serverObjectsElement.getChildNodes();
-        for (int i=0; i<serverObjectsNodeList.getLength(); i++) {
-            Node node = serverObjectsNodeList.item(i);
-            if (!(node instanceof Element)) {
-                continue;
+            if (savedGameElement.hasAttribute("publicServer")) {
+                publicServer = Boolean.valueOf(savedGameElement.getAttribute("publicServer")).booleanValue();
             }
-            Element element = (Element) node;
-            if (element.getTagName().equals(ServerPlayer.getServerAdditionXMLElementTagName())) {
-                serverObjects.add(new ServerPlayer(element));
-                serverPlayerElements.add(element);
+
+            try {
+                // Read the ServerAdditionObjects:
+                ArrayList serverObjects = new ArrayList();
+                ArrayList serverPlayerElements = new ArrayList();
+                NodeList serverObjectsNodeList = serverObjectsElement.getChildNodes();
+                for (int i=0; i<serverObjectsNodeList.getLength(); i++) {
+                    Node node = serverObjectsNodeList.item(i);
+                    if (!(node instanceof Element)) {
+                        continue;
+                    }
+                    Element element = (Element) node;
+                    if (element.getTagName().equals(ServerPlayer.getServerAdditionXMLElementTagName())) {
+                        serverObjects.add(new ServerPlayer(element));
+                        serverPlayerElements.add(element);
+                    }
+                }
+
+                // Read the game model:
+                Element gameElement = (Element) savedGameElement.getElementsByTagName(Game.getXMLElementTagName()).item(0);
+                game = new Game(aiMain, getModelController(), gameElement, (FreeColGameObject[]) serverObjects.toArray(new FreeColGameObject[0]));
+                game.setCurrentPlayer(null);
+
+                gameState = IN_GAME;
+
+                // Read the AIObjects:
+                if (savedGameElement.getElementsByTagName(AIMain.getXMLElementTagName()).getLength() > 0) {
+                    Element aiMainElement = (Element) savedGameElement.getElementsByTagName(AIMain.getXMLElementTagName()).item(0);
+                    aiMain = new AIMain(this, aiMainElement);
+                } else {
+                    aiMain = new AIMain(this);
+                }
+
+                // Connect the AI-players:
+                Iterator playerIterator = game.getPlayerIterator();
+                while (playerIterator.hasNext()) {
+                    ServerPlayer player = (ServerPlayer) playerIterator.next();
+                    if (player.isAI()) {
+                        DummyConnection theConnection = new DummyConnection(getInGameInputHandler());
+                        DummyConnection aiConnection = new DummyConnection(new AIInGameInputHandler(this, player, aiMain));
+                        aiConnection.setOutgoingMessageHandler(theConnection);
+                        theConnection.setOutgoingMessageHandler(aiConnection);
+
+                        getServer().addConnection(theConnection, -1);
+                        player.setConnection(theConnection);
+                        player.setConnected(true);
+                    }
+                }
+
+                // Support for pre-0.0.3 protocols:
+                Iterator pi = game.getMap().getWholeMapIterator();
+                while (pi.hasNext()) {
+                    Tile t = game.getMap().getTile((Map.Position) pi.next());
+                    if (t.getSettlement() != null && t.getSettlement() instanceof IndianSettlement) {
+                        ((IndianSettlement) t.getSettlement()).createGoodsContainer();
+                    }
+                }
+
+                // Support for pre-0.1.3 protocols:
+                Iterator monarchPlayerIterator = game.getPlayerIterator();
+                while (monarchPlayerIterator.hasNext()) {
+                    Player p = (Player) monarchPlayerIterator.next();
+                    if (p.getMonarch() == null) {
+                        p.setMonarch(new Monarch(game, p, ""));
+                    }
+                }
+
+                return savedGameElement.getAttribute("owner");
+            }
+            catch (Exception e) {
+                throw new IOException(e.getMessage());
             }
         }
-
-        // Read the game model:
-        Element gameElement = (Element) savedGameElement.getElementsByTagName(Game.getXMLElementTagName()).item(0);
-        game = new Game(aiMain, getModelController(), gameElement, (FreeColGameObject[]) serverObjects.toArray(new FreeColGameObject[0]));
-        game.setCurrentPlayer(null);
-
-        gameState = IN_GAME;
-
-        // Read the AIObjects:
-        if (savedGameElement.getElementsByTagName(AIMain.getXMLElementTagName()).getLength() > 0) {
-            Element aiMainElement = (Element) savedGameElement.getElementsByTagName(AIMain.getXMLElementTagName()).item(0);
-            aiMain = new AIMain(this, aiMainElement);
-        } else {
-            aiMain = new AIMain(this);
+        else {
+            throw new FreeColException("incompatibleVersions");
         }
-
-        // Connect the AI-players:
-        Iterator playerIterator = game.getPlayerIterator();
-        while (playerIterator.hasNext()) {
-            ServerPlayer player = (ServerPlayer) playerIterator.next();
-            if (player.isAI()) {
-                DummyConnection theConnection = new DummyConnection(getInGameInputHandler());
-                DummyConnection aiConnection = new DummyConnection(new AIInGameInputHandler(this, player, aiMain));
-                aiConnection.setOutgoingMessageHandler(theConnection);
-                theConnection.setOutgoingMessageHandler(aiConnection);
-
-                getServer().addConnection(theConnection, -1);
-                player.setConnection(theConnection);
-                player.setConnected(true);
-            }
-        }
-
-        // Support for pre-0.0.3 protocols:
-        Iterator pi = game.getMap().getWholeMapIterator();
-        while (pi.hasNext()) {
-            Tile t = game.getMap().getTile((Map.Position) pi.next());
-            if (t.getSettlement() != null && t.getSettlement() instanceof IndianSettlement) {
-                ((IndianSettlement) t.getSettlement()).createGoodsContainer();
-            }
-        }
-        
-        // Support for pre-0.1.3 protocols:
-        Iterator monarchPlayerIterator = game.getPlayerIterator();
-        while (monarchPlayerIterator.hasNext()) {
-            Player p = (Player) monarchPlayerIterator.next();
-            if (p.getMonarch() == null) {
-                p.setMonarch(new Monarch(game, p, ""));
-            }
-        }   
-
-        return savedGameElement.getAttribute("owner");
     }
 
 
@@ -698,7 +722,7 @@ public final class FreeColServer {
 
     /**
      * Sets the main AI-object.
-     * @param aiMain The main AI-object which is responsible for 
+     * @param aiMain The main AI-object which is responsible for
      *      controlling, updating and saving the AI objects.
      */
     public void setAIMain(AIMain aiMain) {
@@ -708,9 +732,9 @@ public final class FreeColServer {
 
     /**
      * Gets the main AI-object.
-     * @return The main AI-object which is responsible for 
+     * @return The main AI-object which is responsible for
      *      controlling, updating and saving the AI objects.
-     */    
+     */
     public AIMain getAIMain() {
         return aiMain;
     }

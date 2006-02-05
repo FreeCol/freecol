@@ -116,7 +116,7 @@ public final class FreeColClient {
     /**
     * Creates a new <code>FreeColClient</code>. Creates the control
     * objects and starts the GUI.
-    * 
+    *
     * @param windowed Determines if the <code>Canvas</code> should be displayed
     *       within a <code>JFrame</code> (when <code>true</code>) or in fullscreen
     *       mode (when <code>false</code>).
@@ -160,7 +160,7 @@ public final class FreeColClient {
         loadClientOptions();
     }
 
-    
+
 
 
     /**
@@ -249,7 +249,7 @@ public final class FreeColClient {
 
         frame.getContentPane().add(canvas);
         frame.setVisible(true);
-        canvas.showMainPanel();        
+        canvas.showMainPanel();
         gui.startCursorBlinking();
     }
 
@@ -298,8 +298,8 @@ public final class FreeColClient {
     public ImageLibrary getImageLibrary() {
         return imageLibrary;
     }
-    
-    
+
+
     /**
     * Reads the {@link ClientOptions} from the given file.
     */
@@ -347,7 +347,7 @@ public final class FreeColClient {
         return actionManager;
     }
 
-    
+
     /**
     * Returns the object keeping the current client options.
     * @return The <code>ClientOptions</code>.
@@ -355,7 +355,7 @@ public final class FreeColClient {
     public ClientOptions getClientOptions() {
         return clientOptions;
     }
-    
+
 
     /**
     * Gets the <code>Player</code> that uses this client.
@@ -380,22 +380,22 @@ public final class FreeColClient {
 
 
     /**
-     * Sets the <code>FreeColServer</code> which has been started
-     * by the client gui.
-     * 
-     * @param freeColServer The <code>FreeColServer</code>.
-     * @see #getFreeColServer
-     */
+    * Sets the <code>FreeColServer</code> which has been started
+    * by the client gui.
+    *
+    * @param freeColServer The <code>FreeColServer</code>.
+    * @see #getFreeColServer
+    */
     public void setFreeColServer(FreeColServer freeColServer) {
         this.freeColServer = freeColServer;
     }
 
 
     /**
-     * Gets the <code>FreeColServer</code> started by the client.
-     * @return The <code>FreeColServer</code> or <code>null</code>
-     *      if no server has been started.
-     */
+    * Gets the <code>FreeColServer</code> started by the client.
+    * @return The <code>FreeColServer</code> or <code>null</code>
+    *      if no server has been started.
+    */
     public FreeColServer getFreeColServer() {
         return freeColServer;
     }
@@ -510,7 +510,7 @@ public final class FreeColClient {
     /**
     * Gets the controller responsible for starting a server and
     * connecting to it.
-    * 
+    *
     * @return The <code>ConnectController</code>.
     */
     public ConnectController getConnectController() {
@@ -521,7 +521,7 @@ public final class FreeColClient {
     /**
     * Gets the controller that will be used before the game
     * has been started.
-    * 
+    *
     * @return The <code>PreGameController</code>.
     */
     public PreGameController getPreGameController() {
@@ -532,7 +532,7 @@ public final class FreeColClient {
     /**
     * Gets the input handler that will be used before the game
     * has been started.
-    * 
+    *
     * @return The <code>PreGameInputHandler</code>.
     */
     public PreGameInputHandler getPreGameInputHandler() {
@@ -543,7 +543,7 @@ public final class FreeColClient {
     /**
     * Gets the controller that will be used when the game
     * has been started.
-    * 
+    *
     * @return The <code>InGameController</code>.
     */
     public InGameController getInGameController() {
@@ -554,7 +554,7 @@ public final class FreeColClient {
     /**
     * Gets the input handler that will be used when the game
     * has been started.
-    * 
+    *
     * @return The <code>InGameInputHandler</code>.
     */
     public InGameInputHandler getInGameInputHandler() {
@@ -595,7 +595,7 @@ public final class FreeColClient {
 
 
     /**
-     * Plays the given sound effect. 
+     * Plays the given sound effect.
      * @param sound The key sound effect given by {@link SfxLibrary}.
      */
     public void playSound(int sound) {

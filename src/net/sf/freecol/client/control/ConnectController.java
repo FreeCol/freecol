@@ -17,6 +17,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.networking.Client;
+import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
@@ -77,7 +78,8 @@ public final class ConnectController {
         try {
             FreeColServer freeColServer = new FreeColServer(publicServer, false, port, null);
             freeColClient.setFreeColServer(freeColServer);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             freeColClient.getCanvas().errorMessage("server.couldNotStart");
             return;
         }
@@ -110,7 +112,8 @@ public final class ConnectController {
         try {
             FreeColServer freeColServer = new FreeColServer(false, true, port, null);
             freeColClient.setFreeColServer(freeColServer);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             freeColClient.getCanvas().errorMessage("server.couldNotStart");
             return;
         }
@@ -288,13 +291,13 @@ public final class ConnectController {
 
                     public void run() {
                         canvas.closeMenus();
-                        canvas.showMainPanel();
                         canvas.errorMessage( message );
                     }
                 };
 
+                FreeColServer freeColServer = null;
                 try {
-                    FreeColServer  freeColServer = new FreeColServer( theFile, port );
+                    freeColServer = new FreeColServer( theFile, port );
                     freeColClient.setFreeColServer( freeColServer );
 
                     final String username = freeColServer.getOwner();
@@ -310,9 +313,21 @@ public final class ConnectController {
                 }
                 catch ( FileNotFoundException e ) {
                     SwingUtilities.invokeLater( new ErrorJob("fileNotFound") );
+                    if (freeColServer != null) {
+                        freeColServer.getServer().shutdown();
+                    }
                 }
                 catch ( IOException e ) {
                     SwingUtilities.invokeLater( new ErrorJob("server.couldNotStart") );
+                    if (freeColServer != null) {
+                        freeColServer.getServer().shutdown();
+                    }
+                }
+                catch ( FreeColException e ) {
+                    SwingUtilities.invokeLater( new ErrorJob(e.getMessage()) );
+                    if (freeColServer != null) {
+                        freeColServer.getServer().shutdown();
+                    }
                 }
             }
         };
