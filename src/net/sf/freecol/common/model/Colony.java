@@ -38,7 +38,21 @@ public final class Colony extends Settlement implements Location {
     
     private int hammers;
     private int bells;
-    private int sonsOfLiberty, oldSonsOfLiberty;
+
+    /** The SoL membership this turn. */
+    private int sonsOfLiberty;
+
+    /** The SoL membership last turn. */
+    private int oldSonsOfLiberty;
+
+    /** The number of tories this turn. */
+    private int tories;
+
+    /** The number of tories last turn. */
+    private int oldTories;
+
+    /** The current production bonus. */
+    private int productionBonus;
     
     /**
     * Identifies what this colony is currently building.
@@ -860,7 +874,8 @@ public final class Colony extends Settlement implements Location {
     }
 
     /**
-     * Calculates the current SoL membership of the colony.
+     * Calculates the current SoL membership of the colony. This
+     * method should be called exactly once per turn.
      */
     public void updateSoL() {
         int membership = (bells * 2) / (getUnitCount() + 1);
@@ -868,6 +883,12 @@ public final class Colony extends Settlement implements Location {
         if (membership > 100) membership = 100;
         oldSonsOfLiberty = sonsOfLiberty;
         sonsOfLiberty = membership;
+        oldTories = tories;
+        tories = ((100 - sonsOfLiberty) * getUnitCount()) / 100;
+        int difficulty = getOwner().getDifficulty();
+        int veryBadGovernment = 10 - difficulty;
+        int badGovernment = 6 - difficulty;
+
         if (sonsOfLiberty/10 != oldSonsOfLiberty/10) {
             if (sonsOfLiberty > oldSonsOfLiberty) {
                 addModelMessage(this, "model.colony.SoLIncrease",
@@ -881,7 +902,59 @@ public final class Colony extends Settlement implements Location {
                                                  {"%colony%", getName()}});
             }
         }
+
+        int bonus = 0;
+        if (sonsOfLiberty == 100) {
+            // there are no tories left
+            bonus = 2;
+            if (oldSonsOfLiberty < 100) {
+                addModelMessage(this, "model.colony.SoL100",
+                                new String[][] {{"%colony%", getName()}});
+            }
+        } else {
+
+            if (sonsOfLiberty >= 50) {
+                bonus += 1;
+                if (oldSonsOfLiberty < 50) {
+                    addModelMessage(this, "model.colony.SoL50",
+                                    new String[][] {{"%colony%", getName()}});
+                }
+            }
+
+            if (tories > veryBadGovernment) {
+                bonus -= 2;
+                if (oldTories <= veryBadGovernment) {
+                    // government has become very bad
+                    addModelMessage(this, "model.colony.veryBadGovernment",
+                                    new String[][] {{"%colony%", getName()}});
+                }
+            } else if (tories > badGovernment) {
+                bonus -= 1;
+                if (oldTories <= badGovernment) {
+                    // government has become bad
+                    addModelMessage(this, "model.colony.badGovernment",
+                                    new String[][] {{"%colony%", getName()}});
+                } else if (oldTories > veryBadGovernment) {
+                    // government has improved, but is still bad
+                    addModelMessage(this, "model.colony.governmentImproved1",
+                                    new String[][] {{"%colony%", getName()}});
+                }
+            } else if (oldTories > badGovernment) {
+                // government was bad, but has improved
+                addModelMessage(this, "model.colony.governmentImproved2",
+                                new String[][] {{"%colony%", getName()}});
+            }
+
+        }
+
+        // TODO-LATER: REMOVE THIS WHEN THE AI CAN HANDLE PRODUCTION PENALTIES:
+        if (getOwner().isAI()) {
+            productionBonus = Math.max(0, bonus);
+        } else {
+            productionBonus = bonus;
+        }
     }
+
     
     /**
     * Returns the Tory membership of the colony.
@@ -896,30 +969,8 @@ public final class Colony extends Settlement implements Location {
     * @return The current production bonus of the colony.
     */
     public int getProductionBonus() {
-        int bonus = 0;
-    int tories = (getTory() * getUnitCount()) / 100;
-    int difficulty = getOwner().getDifficulty();
-
-        if (tories > 10 - difficulty) {
-            bonus -= 2;
-        } else if (tories > 6 - difficulty) {
-            bonus -= 1;
-        }
-
-        if (getSoL() == 100) {
-            bonus += 2;
-        } else if (getSoL() >= 50) {
-            bonus += 1;
-        }
-        
-        // TODO-LATER: REMOVE THIS WHEN THE AI CAN HANDLE PRODUCTION PENALTIES:
-        if (getOwner().isAI()) {
-            bonus = Math.max(0, bonus);
-        }
-        
-        return bonus;
+        return productionBonus;
     }
-
     
     /**
     * Gets a string representation of the Colony. Currently this method
@@ -1229,7 +1280,7 @@ public final class Colony extends Settlement implements Location {
 
 
     /**
-    * Prepares this <code>Colony</code> for a new turn.
+    * Prepares this <code>Colony</code> for a new turn. 
     */
     public void newTurn() {
         // Skip doing work in enemy colonies.
