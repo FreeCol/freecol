@@ -1838,7 +1838,7 @@ public final class InGameController implements NetworkConstants {
                 player.setArrears(type, 0);
                 // send to server
                 Element payArrearsElement = Message.createNewRootElement("payArrears");
-                payArrearsElement.setAttribute("type", String.valueOf(type));
+                payArrearsElement.setAttribute("goodsType", String.valueOf(type));
                 client.send(payArrearsElement);        
             }
         } else {

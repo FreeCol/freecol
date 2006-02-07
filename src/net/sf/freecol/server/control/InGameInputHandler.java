@@ -1812,7 +1812,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
 
-        int goods = new Integer(payArrearsElement.getAttribute("goods")).intValue();
+        int goods = new Integer(payArrearsElement.getAttribute("goodsType")).intValue();
         int arrears = player.getArrears(goods);
         
         if (player.getGold() < arrears) {
