@@ -1,26 +1,45 @@
 
 package net.sf.freecol.client.control;
 
-import java.util.logging.Logger;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ArrayList;
-import java.io.*;
+import java.util.logging.Logger;
+
 import javax.swing.SwingUtilities;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.FreeColMenuBar;
-import net.sf.freecol.client.gui.sound.*;
-import net.sf.freecol.client.gui.panel.EventPanel;
-import net.sf.freecol.client.gui.panel.ChoiceItem;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.ChoiceItem;
+import net.sf.freecol.client.gui.panel.EventPanel;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
-
-import net.sf.freecol.common.model.*;
+import net.sf.freecol.client.gui.sound.SfxLibrary;
+import net.sf.freecol.client.networking.Client;
+import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.ColonyTile;
+import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.ModelMessage;
+import net.sf.freecol.common.model.PathNode;
+import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
@@ -357,19 +376,19 @@ public final class InGameController implements NetworkConstants {
                 unit.setMovesLeft(0);
                 logger.info("Setting moves to zero.");
                 break;
+            }
+
+            int moveType = unit.getMoveType(target);
+            if (moveType == Unit.MOVE ||
+                moveType == Unit.MOVE_HIGH_SEAS) {
+                reallyMove(unit, direction);
+                path = path.next;
+                freeColClient.getCanvas().refresh();
             } else {
-                int moveType = unit.getMoveType(target);
-                if (moveType == Unit.MOVE ||
-                    moveType == Unit.MOVE_HIGH_SEAS) {
-                    reallyMove(unit, direction);
-                    path = path.next;
-                    freeColClient.getCanvas().refresh();
-                } else {
-                    // something has got in our way
-                    logger.info("Aborting goto: move type was " + moveType);
-                    active = true;
-                    break;
-                }
+                // something has got in our way
+                logger.info("Aborting goto: move type was " + moveType);
+                active = true;
+                break;
             }
         }
         unit.setPath(path);
@@ -959,9 +978,9 @@ public final class InGameController implements NetworkConstants {
             client.send(boardShipElement);
 
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
 
@@ -1246,9 +1265,9 @@ public final class InGameController implements NetworkConstants {
             client.send(putOutsideColonyElement);
 
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
@@ -1322,9 +1341,9 @@ public final class InGameController implements NetworkConstants {
                     if (price > freeColClient.getMyPlayer().getGold()) {
                         canvas.errorMessage("notEnoughGold");
                         return;
-                    } else {
-                        buyLand(unit.getTile());
                     }
+
+                    buyLand(unit.getTile());
                 }
             }
         }
@@ -1823,7 +1842,6 @@ public final class InGameController implements NetworkConstants {
      */
     public void payArrears(int type) {
         Client client = freeColClient.getClient();
-        Game game = freeColClient.getGame();
         Player player = freeColClient.getMyPlayer();
 
         int arrears = player.getArrears(type);
@@ -1958,42 +1976,67 @@ public final class InGameController implements NetworkConstants {
     * @see net.sf.freecol.common.model.ModelMessage ModelMessage
     */
     public void nextModelMessage() {
-        Canvas canvas = freeColClient.getCanvas();
 
-        ArrayList messages = new ArrayList();
+        Canvas  canvas = freeColClient.getCanvas();
 
-        Iterator i = freeColClient.getGame().getModelMessageIterator(freeColClient.getMyPlayer());
-        if (i.hasNext()) {
-            ModelMessage first = (ModelMessage) i.next();
-            first.setBeenDisplayed(true);
-            messages.add(first);
-            while (i.hasNext()) {
-                ModelMessage m = (ModelMessage) i.next();
-                if (m.getSource() == first.getSource()) {
-                    m.setBeenDisplayed(true);
-                    boolean unique = true;
-                    for (int j=0; j<messages.size(); j++) {
-                        if (messages.get(j).equals(m)) {
-                            unique = false;
-                            break;
-                        }
-                    }
+        List  messageList = new ArrayList();
 
-                    if (unique) {
-                        messages.add(m);
+        /* look through all available messages and deliver to the canvas all
+         * messages with a source the same as the first message.  flag all
+         * messages delivered as "beenDisplayed".  ignore duplicate messages */
+        Object  deliveringFromSource = null;
+        for ( Iterator i = freeColClient.getGame().getModelMessageIterator(freeColClient.getMyPlayer());
+              i.hasNext(); ) {
+
+            ModelMessage  message = (ModelMessage) i.next();
+
+            // if this is the first message..
+            if ( null == deliveringFromSource ) {
+                deliveringFromSource = message.getSource();
+            }
+
+            // if this message is from the same source as the first message..
+            if ( deliveringFromSource == message.getSource() ) {
+
+                message.setBeenDisplayed( true );
+
+                // if this message is NOT a duplicate
+                if ( -1 == messageList.indexOf(message) ) {
+
+                    if ( shouldAllowMessage(message) ) {
+
+                        messageList.add( message );
                     }
                 }
             }
-
         }
 
-        if (messages.size() > 0) {
-            ModelMessage[] modelMessages = new ModelMessage[messages.size()];
-            for (int j=0; j<messages.size(); j++) {
-                modelMessages[j] = (ModelMessage) messages.get(j);
-            }
-            canvas.showModelMessages(modelMessages);
+        if ( ! messageList.isEmpty() ) {
+
+            ModelMessage[]  store = new ModelMessage[ messageList.size() ];
+            canvas.showModelMessages( (ModelMessage[]) messageList.toArray(store) );
         }
+    }
+
+
+    /**
+     * Provides an opportunity to filter the messages delivered to the canvas.
+     *
+     * @param  message  the message that is candidate for delivery to the canvas
+     * @return  true if the message should be delivered
+     */
+    private boolean shouldAllowMessage( ModelMessage message ) {
+
+        boolean  shouldAllowMessage = true;
+
+        boolean  independenceMessage =
+            "model.colony.SoLIncrease".equals(message.getMessageID())
+        ||  "model.colony.SoLDecrease".equals(message.getMessageID());
+
+        shouldAllowMessage &= ! independenceMessage
+            ||  freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_SONS_OF_LIBERTY);
+
+        return shouldAllowMessage;
     }
 
 

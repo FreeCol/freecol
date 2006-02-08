@@ -1,8 +1,8 @@
 
 package net.sf.freecol.client;
 
-import java.util.logging.Logger;
 
+import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.OptionMap;
@@ -20,7 +20,6 @@ import org.w3c.dom.Element;
 * identifier (defined as a constant in this class).
 */
 public class ClientOptions extends OptionMap {
-    private static Logger logger = Logger.getLogger(ClientOptions.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
@@ -42,6 +41,8 @@ public class ClientOptions extends OptionMap {
      * @see net.sf.freecol.client.gui.GUI
      */
     public static final String MAX_NUMBER_OF_GOODS_IMAGES = "guiMaxNumberOfGoodsImages";
+
+    public static final  String  SHOW_SONS_OF_LIBERTY = "guiShowSonsOfLiberty";
 
 
 
@@ -77,8 +78,8 @@ public class ClientOptions extends OptionMap {
         OptionGroup guiGroup = new OptionGroup("clientOptions.gui.name", "clientOptions.gui.shortDescription");
         guiGroup.add(new IntegerOption(MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT, "clientOptions.gui."+ MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT +".name", "clientOptions.gui."+ MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT +".shortDescription", 0, 10, 7));
         guiGroup.add(new IntegerOption(MAX_NUMBER_OF_GOODS_IMAGES, "clientOptions.gui."+ MAX_NUMBER_OF_GOODS_IMAGES +".name", "clientOptions.gui."+ MAX_NUMBER_OF_GOODS_IMAGES +".shortDescription", 1, 10, 7));
+        guiGroup.add(new BooleanOption(SHOW_SONS_OF_LIBERTY, "clientOptions.gui."+ SHOW_SONS_OF_LIBERTY +".name", "clientOptions.gui."+ SHOW_SONS_OF_LIBERTY +".shortDescription", true));
         add(guiGroup);
-
     }
 
 

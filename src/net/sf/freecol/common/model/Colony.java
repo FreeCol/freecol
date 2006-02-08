@@ -1271,11 +1271,7 @@ public final class Colony extends Settlement implements Location {
     *       {@link Building} or a {@link ColonyTile}.
     */
     public Unit getRandomUnit() {
-        if (getUnitIterator().hasNext()) {
-            return ((Unit) getUnitIterator().next());
-        } else {
-            return null;
-        }
+        return getUnitIterator().hasNext() ? ((Unit) getUnitIterator().next()) : null;
     }
 
 
