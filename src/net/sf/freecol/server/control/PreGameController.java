@@ -74,38 +74,40 @@ public final class PreGameController extends Controller {
         AIMain aiMain = new AIMain(freeColServer);
         freeColServer.setAIMain(aiMain);
         game.setFreeColGameObjectListener(aiMain);
-        
+
         // Add AI players:
         for (int i = 0; i < Player.NUMBER_OF_NATIONS; i++) {
             if (game.getPlayer(i) != null) {
                 continue;
             }
-            
+
             DummyConnection theConnection = new DummyConnection(freeColServer.getInGameInputHandler());
-            
+
             String name;
-            if (i >= Player.INCA && i<=Player.TUPI) {
+            if (!Player.isEuropean(i)) {
                 name = "Indian_" + Integer.toString(i - 3);
-            } else {
+            } else if (!Player.isREF(i)) {
                 name = "European_" + Integer.toString(i);
+            } else {
+                name = "REF_" + Integer.toString(i - 12);
             }
-            
+
             ServerPlayer aiPlayer = new ServerPlayer(game,
-                    name,
-                    false,
-                    true,
-                    null,
-                    theConnection,
-                    i);
-            
+                                                    name,
+                                                    false,
+                                                    true,
+                                                    null,
+                                                    theConnection,
+                                                    i);
+
             DummyConnection aiConnection = new DummyConnection(new AIInGameInputHandler(freeColServer, aiPlayer, aiMain));
             aiConnection.setOutgoingMessageHandler(theConnection);
             theConnection.setOutgoingMessageHandler(aiConnection);
-            
+
             freeColServer.getServer().addConnection(theConnection, 3 - i);
-            
+
             freeColServer.getGame().addPlayer(aiPlayer);
-            
+
             // Send message to all players except to the new player:
             Element addNewPlayer = Message.createNewRootElement("addPlayer");
             addNewPlayer.appendChild(aiPlayer.toXMLElement(null, addNewPlayer.getOwnerDocument()));

@@ -271,7 +271,7 @@ public class Map extends FreeColGameObject {
     *             are <code>null</code>.
     * @exception IllegalArgumentException if <code>start == end</code>.
     */
-    private PathNode findPath(Unit unit, Tile start, Tile end, int type, Unit carrier) {
+    private PathNode findPath(Unit unit, Tile start, final Tile end, int type, Unit carrier) {
         if (start == end) {
             throw new IllegalArgumentException("start == end");
         }
@@ -531,18 +531,52 @@ public class Map extends FreeColGameObject {
      * @return The path to a goal determined by the given 
      *      <code>GoalDecider</code>.
      */
-    public PathNode search(Unit unit, Tile startTile, GoalDecider gd, CostDecider costDecider, int maxTurns) {        
+    public PathNode search(Unit unit, Tile startTile, GoalDecider gd, CostDecider costDecider, int maxTurns) {
+        return search(unit, startTile, gd, costDecider, maxTurns, null);
+    }
+    
+    /**
+     * Finds a path to a goal determined by the given 
+     * <code>GoalDecider</code>.
+     * 
+     * <br /><br />
+     * 
+     * A <code>GoalDecider</code> is typically defined
+     * inline to serve a specific need.
+     * 
+     * @param unit The <code>Unit</code> to find the path for.
+     * @param startTile The <code>Tile</code> to start the search from.
+     * @param gd The object responsible for determining 
+     *      wether a given <code>PathNode</code> is a goal or not.
+     * @param costDecider The object responsible for determining
+     *      the cost.
+     * @param maxTurns The maximum number of turns the given
+     *      <code>Unit</code> is allowed to move. This is the
+     *      maximum search range for a goal.
+     * @param carrier The carrier the <code>unit</code> is currently
+     *      onboard or <code>null</code> if the <code>unit</code> is
+     *      either not onboard a carrier or should not use the
+     *      carrier while finding the path.
+     * @return The path to a goal determined by the given 
+     *      <code>GoalDecider</code>.
+     */
+    public PathNode search(Unit unit, Tile startTile, GoalDecider gd, CostDecider costDecider, int maxTurns, Unit carrier) {         
         // This is just a temporary implementation; modify at will ;-)
-
+        
+        Unit theUnit = unit;        
+        if (carrier != null) {
+            unit = carrier;
+        }
         int ml = (unit != null) ? unit.getMovesLeft() : -1;
         PathNode firstNode = new PathNode(startTile, 0, 0, -1, ml, 0);
-
+        firstNode.setOnCarrier(carrier != null);
+        
         // TODO: Choose a better datastructur:
         ArrayList openList = new ArrayList();
         ArrayList closedList = new ArrayList();
-
+        
         openList.add(firstNode);
-
+        
         while (openList.size() > 0) {
             // TODO: Better method for choosing the node with the lowest f:
             PathNode currentNode = (PathNode) openList.get(0);
@@ -555,7 +589,13 @@ public class Map extends FreeColGameObject {
             // Reached the end
             if (currentNode.getTurns() > maxTurns) {
                 break;
-            }            
+            }
+            
+            if (currentNode.isOnCarrier()) {
+                unit = carrier;
+            } else {
+                unit = theUnit;
+            }
             
             if (gd.check(unit, currentNode) && !gd.hasSubGoals()) {
                 PathNode bestTarget = gd.getGoal();
@@ -580,17 +620,26 @@ public class Map extends FreeColGameObject {
 
                 if (newTile == null) {
                     continue;
-                }
+                }                
 
                 int cost = currentNode.getCost();
                 int movesLeft = currentNode.getMovesLeft();
                 int turns = currentNode.getTurns();
 
+                if (currentNode.isOnCarrier() && newTile.isLand()) {
+                    unit = theUnit;
+                    movesLeft = unit.getInitialMovesLeft();
+                }
+                
                 int extraCost = costDecider.getCost(unit, currentNode.getTile(), newTile, movesLeft, turns);
                 if (extraCost == CostDecider.ILLEGAL_MOVE) {
                     continue;
                 }
-                cost += extraCost;
+                if (carrier != null && unit == theUnit) {
+                    cost += extraCost * (1 + (carrier.getInitialMovesLeft() / ((double) theUnit.getInitialMovesLeft())));
+                } else {
+                    cost += extraCost;
+                }
                 movesLeft = costDecider.getMovesLeft();
                 if (costDecider.isNewTurn()) {
                     turns++;
@@ -633,7 +682,8 @@ public class Map extends FreeColGameObject {
 
                 successor = new PathNode(newTile, cost, f, direction, movesLeft, turns);
                 successor.previous = currentNode;
-
+                successor.setOnCarrier(currentNode.isOnCarrier() && unit != theUnit);
+                
                 openList.add(successor);
             }
 
@@ -660,6 +710,15 @@ public class Map extends FreeColGameObject {
         }
     }
    
+    /**
+     * Gets the default <code>CostDecider</code>.
+     * @return The default <code>CostDecider</code>. This is currently
+     *      a singleton instance of {@link DefaultCostDecider}.
+     */
+    public CostDecider getDefaultCostDecider() {
+        return defaultCostDecider;
+    }
+    
     /**
      * Finds the best path to <code>Europe</code>.
      *

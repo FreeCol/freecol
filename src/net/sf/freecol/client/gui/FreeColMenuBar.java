@@ -23,15 +23,16 @@ import net.sf.freecol.client.gui.action.BuildRoadAction;
 import net.sf.freecol.client.gui.action.ChangeAction;
 import net.sf.freecol.client.gui.action.ChatAction;
 import net.sf.freecol.client.gui.action.ClearOrdersAction;
+import net.sf.freecol.client.gui.action.DeclareIndependenceAction;
 import net.sf.freecol.client.gui.action.DisbandUnitAction;
 import net.sf.freecol.client.gui.action.EndTurnAction;
 import net.sf.freecol.client.gui.action.EuropeAction;
 import net.sf.freecol.client.gui.action.FortifyAction;
+import net.sf.freecol.client.gui.action.GotoAction;
 import net.sf.freecol.client.gui.action.MapControlsAction;
 import net.sf.freecol.client.gui.action.PlowAction;
 import net.sf.freecol.client.gui.action.SkipUnitAction;
 import net.sf.freecol.client.gui.action.WaitAction;
-import net.sf.freecol.client.gui.action.GotoAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ColopediaPanel;
 import net.sf.freecol.client.gui.panel.ReportContinentalCongressPanel;
@@ -158,9 +159,14 @@ public class FreeColMenuBar extends JMenuBar {
         chatMenuItem.setOpaque(false);
         gameMenu.add(chatMenuItem);
 
+        final JMenuItem declareIndependenceMenuItem = new JMenuItem(am.getFreeColAction(DeclareIndependenceAction.ID));
+        declareIndependenceMenuItem.setOpaque(false);
+        gameMenu.add(declareIndependenceMenuItem);       
+        
         final JMenuItem endTurnMenuItem = new JMenuItem(am.getFreeColAction(EndTurnAction.ID));
         endTurnMenuItem.setOpaque(false);
         gameMenu.add(endTurnMenuItem);
+                
         
         gameMenu.addSeparator();
 

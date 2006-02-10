@@ -81,8 +81,16 @@ public class Player extends FreeColGameObject {
         Messages.message("model.nation.Apache"),
         Messages.message("model.nation.Tupi"),
     };
+    
+    /** An array holding all the REF-forces in String form. */
+    public static final String[] REF_NATIONS = {
+        Messages.message("model.nation.refDutch"),
+        Messages.message("model.nation.refEnglish"),
+        Messages.message("model.nation.refFrench"),
+        Messages.message("model.nation.refSpanish"),
+    };    
 
-    public static final int NUMBER_OF_NATIONS = TRIBES.length + NATIONS.length;
+    public static final int NUMBER_OF_NATIONS = TRIBES.length + NATIONS.length + REF_NATIONS.length;
 
     /** The maximum line of sight a unit can have in the game. */
     public static final int MAX_LINE_OF_SIGHT = 2;
@@ -129,7 +137,11 @@ public class Player extends FreeColGameObject {
         new Color(116, 164,  76),
         new Color(192, 172, 132),
         new Color(144,   0,   0),
-        new Color(  4,  92,   4)
+        new Color(  4,  92,   4),
+        Color.WHITE,
+        Color.WHITE,
+        Color.WHITE,
+        Color.WHITE
     };
 
 
@@ -301,17 +313,89 @@ public class Player extends FreeColGameObject {
 
         readFromXMLElement(element);
     }
-   
 
+    
     /**
-    * Checks if this player is a "Royal Expeditionary Force".
-    * @return <code>true</code> if this <code>Player</code> is controlling
-    *       a REF and <code>false</code> otherwise.
+     * Checks if this player is a "royal expeditionary force.
+     * @return <code>true</code> is the given nation is a royal expeditionary force
+     *       and <code>false</code> otherwise.     
+     */
+    public boolean isREF() {    
+        return isREF(getNation());
+    }
+
+         
+    /**
+    * Checks if the given nation is a "royal expeditionary force.
+    * 
+    * @param nation The nation.
+    * @return <code>true</code> is the given nation is a royal expeditionary force
+    *       and <code>false</code> otherwise.
     */
-    public boolean isREF() {
+    public static boolean isREF(int nation) {
         return nation == REF_DUTCH || nation == REF_ENGLISH || nation == REF_FRENCH || nation == REF_SPANISH;
     }
 
+    
+    /**
+     * Gets the total percentage of rebels in all this player's colonies.
+     * @return The total percentage of rebels in all this player's colonies.
+     */
+    public int getSoL() {       
+        int sum = 0;
+        int number = 0;
+        
+        Iterator it = getColonyIterator();
+        while (it.hasNext()) {
+            Colony c = (Colony) it.next();
+            sum += c.getSoL();
+            number++;
+        }
+        
+        if (number > 0) {
+            return sum / number;
+        } else {
+            return 0;
+        }
+    }
+    
+    
+    /**
+     * Declares independece.
+     */
+    public void declareIndependence() {
+        if (getSoL() < 50) {
+            throw new IllegalStateException("Cannot declare independence. SoL is only: " + getSoL());
+        }
+        if (getRebellionState() != REBELLION_PRE_WAR) {
+            throw new IllegalStateException("Independence has already been declared.");
+        }
+        
+        setRebellionState(REBELLION_IN_WAR);
+        setStance(getREFPlayer(), WAR);
+    }
+    
+    
+    /**
+     * Gets the <code>Player</code> controlling the 
+     * "Royal Expeditionary Force" for this player.
+
+     * @return The player, or <code>null</code> if this player
+     *      does not have a royal expeditionary force.
+     */
+    public Player getREFPlayer() {
+        if (getRebellionState() == REBELLION_POST_WAR) {
+            return null;
+        }
+        
+        switch (getNation()) {
+        case DUTCH:   return getGame().getPlayer(REF_DUTCH);
+        case ENGLISH: return getGame().getPlayer(REF_ENGLISH);
+        case FRENCH:  return getGame().getPlayer(REF_FRENCH);
+        case SPANISH: return getGame().getPlayer(REF_SPANISH);
+        default:      return null;
+        }
+    }
 
     /**
     * Gets the name this player has choosen for the new land.
@@ -820,6 +904,17 @@ public class Player extends FreeColGameObject {
     public boolean canBuildColonies() {
         return isEuropean() && getRebellionState() != REBELLION_IN_WAR && !isREF();
     }
+    
+    
+    /**
+     * Checks if this <code>Player</code> can get founding fathers.
+     * @return <code>true</code> if this player is european, not the
+     *         royal expeditionary force and not currently fighting
+     *         the war of independence.
+     */    
+    public boolean canHaveFoundingFathers() {
+        return isEuropean() && getRebellionState() != REBELLION_IN_WAR && !isREF();
+    }
 
 
     /**
@@ -1135,6 +1230,14 @@ public class Player extends FreeColGameObject {
                 return Messages.message("model.nation.Apache");
             case TUPI:
                 return Messages.message("model.nation.Tupi");
+            case REF_DUTCH:
+                return Messages.message("model.nation.refDutch");
+            case REF_ENGLISH:
+                return Messages.message("model.nation.refEnglish");
+            case REF_FRENCH:
+                return Messages.message("model.nation.refFrench");
+            case REF_SPANISH:
+                return Messages.message("model.nation.refSpanish");                
             default:
                 return "INVALID";
         }
@@ -1589,6 +1692,9 @@ public class Player extends FreeColGameObject {
     * @param num The number of bells to add.
     */
     public void incrementBells(int num) {
+        if (!canHaveFoundingFathers()) {
+            return;
+        }
         bells += num;
     }
     
@@ -1600,6 +1706,9 @@ public class Player extends FreeColGameObject {
     * @see #incrementBells
     */
     public int getBells() {
+        if (!canHaveFoundingFathers()) {
+            return 0;
+        }        
         return bells;
     }
 
@@ -1859,6 +1968,9 @@ public class Player extends FreeColGameObject {
             }
         } else {
             tension = new Tension[TRIBES.length + NATIONS.length];
+            for (int i = 0; i < tension.length; i++) {
+                tension[i] = new Tension(0);
+            }            
         }
         
         if (getChildElement(playerElement, "stance") != null) {

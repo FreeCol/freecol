@@ -710,16 +710,30 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     *        or <code>Integer.MAX_VALUE</code> if no path can be found.
     */
     public int getTurnsToReach(Tile end) {
-        if (getTile() == end) {
+        return getTurnsToReach(getTile(), end);
+    }
+    
+    
+    /**
+     * Returns the number of turns this <code>Unit</code> will have to use
+     * in order to reach the given <code>Tile</code>.
+     *
+     * @param start The <code>Tile</code> to start the search from.
+     * @param end The <code>Tile</code> to be reached by this <code>Unit</code>.
+     * @return The number of turns it will take to reach the <code>end</code>,
+     *        or <code>Integer.MAX_VALUE</code> if no path can be found.
+     */
+     public int getTurnsToReach(Tile start, Tile end) {    
+        if (start == end) {
             return 0;
         } else {
             if (getLocation() instanceof Unit) {
-                PathNode p = getGame().getMap().findPath(this, getTile(), end, (Unit) getLocation());
+                PathNode p = getGame().getMap().findPath(this, start, end, (Unit) getLocation());
                 if (p != null) {
                     return p.getTotalTurns();
                 }
             }
-            PathNode p = findPath(end);
+            PathNode p = getGame().getMap().findPath(this, start, end);
             if (p != null) {
                 return p.getTotalTurns();
             } else {
@@ -2490,11 +2504,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     *         it is located and <code>false</code> otherwise.
     */
     public boolean canBuildColony() {
-        if (getTile() == null || !getTile().isColonizeable() || !isColonist() || getMovesLeft() <= 0) {
-            return false;
-        } else {
-            return true;
-        }
+        return getOwner().canBuildColonies() 
+                && isColonist() 
+                && getMovesLeft() > 0
+                && getTile() != null 
+                && getTile().isColonizeable();                
     }
 
 

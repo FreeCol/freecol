@@ -253,6 +253,10 @@ public final class InGameController extends Controller {
         Game game = getFreeColServer().getGame();
         Map map = game.getMap();
 
+        if (player.isREF()) {
+            return false;
+        }
+        
         Iterator tileIterator = map.getWholeMapIterator();
         while (tileIterator.hasNext()) {
             Tile t = map.getTile((Map.Position) tileIterator.next());

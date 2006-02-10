@@ -70,7 +70,10 @@ public final class Monarch extends FreeColGameObject {
         this.player = player;
         this.name = name;
         int dx = player.getDifficulty();
-        ref[MAN_OF_WAR] = dx + 2;
+        ref[INFANTRY] = dx * 3 + 5;
+        ref[DRAGOON] = dx * 2 + 3;
+        ref[ARTILLERY] = dx + 3;
+        ref[MAN_OF_WAR] = dx + 1;
     }
 
 
@@ -116,6 +119,9 @@ public final class Monarch extends FreeColGameObject {
         // Benjamin Franklin puts an end to the monarch's interference
         if (!player.hasFather(FoundingFather.BENJAMIN_FRANKLIN)) {
             for (int i = 0; i < Player.NUMBER_OF_NATIONS; i++) {
+                if (!getGame().getPlayer(i).isEuropean() || getGame().getPlayer(i).isREF()) {
+                    continue;
+                }
                 if (player.hasContacted(i)) {
                     switch (player.getStance(i)) {
                     case Player.WAR:
@@ -182,6 +188,16 @@ public final class Monarch extends FreeColGameObject {
         return NO_ACTION;
     }
 
+    public int[] getREF() {
+        return ref;        
+    }
+    
+    public void clearREF() {
+        for (int i=0; i<ref.length; i++) {
+            ref[i] = 0;
+        }
+    }
+    
     /**
      * Returns the new increased tax, but never more than 100 percent.
      *
@@ -361,6 +377,8 @@ public final class Monarch extends FreeColGameObject {
             if (nation == player.getNation()) {
                 continue;
             } else if (!player.hasContacted(nation)) {
+                continue;
+            } else if (!getGame().getPlayer(i).isEuropean() || getGame().getPlayer(i).isREF()) {
                 continue;
             }
             int stance = player.getStance(nation);

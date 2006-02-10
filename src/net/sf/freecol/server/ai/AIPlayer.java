@@ -23,6 +23,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
@@ -110,8 +111,7 @@ public class AIPlayer extends AIObject {
     public AIPlayer(AIMain aiMain, ServerPlayer player) {
         super(aiMain);
         
-        this.player = player;
-        
+        this.player = player;        
         switch (player.getNation()) {
         case Player.DUTCH:
             this.strategy = STRATEGY_TRADE; break;
@@ -144,12 +144,19 @@ public class AIPlayer extends AIObject {
      * when this method returns.
      */
     public void startWorking() {
-        // logger.info("Entering AI code for: " + player.getNationAsString());
+        //logger.info("Entering AI code for: " + player.getNationAsString());
         
         sessionRegister.clear();
         aiUnits.clear();
         
+        if (getPlayer().isREF()) {
+            if (!isWorkForREF()) {
+                return;
+            }
+        }        
+        
         determineStances();
+        moveREFToDocks();
         abortInvalidMissions();
         
         Iterator it = getAIUnitIterator();
@@ -178,6 +185,32 @@ public class AIPlayer extends AIObject {
     }
     
     /**
+     * Checks if this player has work to do (provided it is an REF-player).
+     * @return <code>true</code> if any of our units are located in the new world
+     *      or if a puppet-nation has declared independence.
+     */
+    private boolean isWorkForREF() {
+        Iterator it = getPlayer().getUnitIterator();
+        while (it.hasNext()) {
+            if (((Unit) it.next()).getTile() != null) {
+                return true;
+            }
+        }
+        
+        Iterator it2 = getGame().getPlayerIterator();
+        while (it2.hasNext()) {
+            Player p = (Player) it2.next();
+            if (p.getREFPlayer() == getPlayer() 
+                    && p.getRebellionState() == Player.REBELLION_IN_WAR) {
+                return true;
+            }
+                
+        }
+        
+        return false;
+    }
+    
+    /**
      * Determines the stances towards each player.
      * That is: should we declare war? 
      */
@@ -185,6 +218,10 @@ public class AIPlayer extends AIObject {
         Iterator playerIterator = getGame().getPlayerIterator();
         while (playerIterator.hasNext()) {
             Player p = (Player) playerIterator.next();
+            if (p.getREFPlayer() == getPlayer() 
+                    && p.getRebellionState() == Player.REBELLION_IN_WAR) {
+                getPlayer().getTension(p).modify(1000);
+            }            
             if (strategy == STRATEGY_CONQUEST && p.isEuropean()) {
                 getPlayer().getTension(p).modify(10);
             }
@@ -194,6 +231,62 @@ public class AIPlayer extends AIObject {
                 getPlayer().setStance(p, Player.PEACE);
             }
         }
+    }
+    
+    /**
+     * Moves the "Royal Expeditionary Force" to the docks.
+     * This method will just return if this player is
+     * not a REF-player.
+     */
+    private void moveREFToDocks() {
+        Iterator it = getGame().getPlayerIterator();
+        while (it.hasNext()) {
+            Player p = (Player) it.next();
+            if (p.getREFPlayer() == getPlayer() 
+                    && p.getRebellionState() == Player.REBELLION_IN_WAR) {
+                Monarch m = p.getMonarch();
+                int[] ref = m.getREF();
+                int totalNumber = 0;
+                for (int i=0; i<ref.length; i++) {
+                    totalNumber += ref[i];
+                }
+                while (totalNumber > 0) {
+                    int i = getRandom().nextInt(ref.length);
+                    if (ref[i] <= 0) {
+                        continue;
+                    }
+                    int unitType;
+                    boolean armed = false;
+                    boolean mounted = false;
+                    if (i == Monarch.INFANTRY) {
+                        unitType = Unit.KINGS_REGULAR;
+                        armed = true;
+                    } else if (i == Monarch.DRAGOON) {
+                        unitType = Unit.KINGS_REGULAR;                        
+                        armed = true;
+                        mounted = true;
+                    } else if (i == Monarch.ARTILLERY) {
+                        unitType = Unit.ARTILLERY;
+                    } else if (i == Monarch.MAN_OF_WAR) {
+                        unitType = Unit.MAN_O_WAR;
+                    } else {
+                        logger.warning("Unsupported REF-unit.");
+                        continue;
+                    }
+                    Unit newUnit = new Unit(getGame(), 
+                            getPlayer().getEurope(), 
+                            getPlayer(), 
+                            unitType,
+                            Unit.ACTIVE,
+                            armed,
+                            mounted,
+                            0,
+                            false);
+                    ref[i]--;
+                    totalNumber--;
+                }       
+            }
+        }        
     }
     
     /**
@@ -627,8 +720,10 @@ public class AIPlayer extends AIObject {
                 aiUnit.setMission(new CashInTreasureTrainMission(getAIMain(), aiUnit));
             } else if (unit.isScout() && ScoutingMission.isValid(aiUnit)) {
                 aiUnit.setMission(new ScoutingMission(getAIMain(), aiUnit));
-            } else if ((unit.isOffensiveUnit() || unit.isDefensiveUnit())
-                    && (!unit.isColonist() || unit.getType() == Unit.VETERAN_SOLDIER || getGame().getTurn().getNumber() > 5)) {
+            } else if ((unit.isOffensiveUnit() || unit.isDefensiveUnit()) && 
+                    (!unit.isColonist() 
+                            || unit.getType() == Unit.VETERAN_SOLDIER
+                            || getGame().getTurn().getNumber() > 5)) {
                 giveMilitaryMission(aiUnit);
             } else if (unit.isPioneer() && PioneeringMission.isValid(aiUnit)) {
                 aiUnit.setMission(new PioneeringMission(getAIMain(), aiUnit));
@@ -662,7 +757,10 @@ public class AIPlayer extends AIObject {
                 }
                 
                 // Find a site for a new colony:
-                Tile colonyTile = BuildColonyMission.findColonyLocation(aiUnit.getUnit());
+                Tile colonyTile = null;
+                if (getPlayer().canBuildColonies()) {
+                    colonyTile = BuildColonyMission.findColonyLocation(aiUnit.getUnit());
+                }
                 if (colonyTile != null) {
                     bestTurns = unit.getTurnsToReach(colonyTile);
                 }
@@ -895,14 +993,21 @@ public class AIPlayer extends AIObject {
          *  the "Tactic"-classes has been implemented.
          */
         
-        Unit unit = aiUnit.getUnit();       
-        
-        if (unit.getTile() == null) {
-            return;
-        }
-        
+        Unit unit = aiUnit.getUnit();
+        Unit carrier = (unit.getLocation() instanceof Unit) ? (Unit) unit.getLocation() : null;
+        Map map = unit.getGame().getMap();
+        Tile startTile = unit.getTile();
+        if (startTile == null) {
+            if (unit.getLocation() instanceof Unit) {
+                startTile = (Tile) ((Unit) unit.getLocation()).getEntryLocation();
+            } else {
+                startTile = (Tile) unit.getOwner().getEntryLocation();
+            }
+        }        
+
         int tempValue = Integer.MIN_VALUE;
-        if (unit.getTile().getSettlement() != null) {
+        if (unit.getTile() != null
+                && unit.getTile().getSettlement() != null) {
             tempValue = 10000;
             Iterator ui = unit.getTile().getUnitIterator();
             while (ui.hasNext()) {
@@ -912,8 +1017,7 @@ public class AIPlayer extends AIObject {
                 }
             }
         }
-        final int currentTileSettlementValue = tempValue;
-        
+        final int currentTileSettlementValue = tempValue;        
         // Checks if a nearby colony requires additional defence:
         GoalDecider gd = new GoalDecider() {
             private PathNode best = null;
@@ -932,6 +1036,10 @@ public class AIPlayer extends AIObject {
                 if (t.getSettlement() != null
                         && t.getSettlement().getOwner() == u.getOwner()) {
                     int value = 20 - pathNode.getTurns();
+                    
+                    if (u.getOwner().isREF()) {
+                        value -= 19;
+                    }
                     
                     Iterator ui = t.getUnitIterator();
                     while (ui.hasNext()) {
@@ -952,7 +1060,7 @@ public class AIPlayer extends AIObject {
             }
         };
         final int MAXIMUM_DISTANCE_TO_SETTLEMENT = 10; // Given in number of turns.
-        PathNode bestPath = unit.getGame().getMap().search(unit, gd, MAXIMUM_DISTANCE_TO_SETTLEMENT);
+        PathNode bestPath = map.search(unit, startTile, gd, map.getDefaultCostDecider(), MAXIMUM_DISTANCE_TO_SETTLEMENT, carrier);
         if (bestPath != null || currentTileSettlementValue > Integer.MIN_VALUE) {           
             Settlement settlement;
             if (bestPath != null) {
@@ -982,7 +1090,7 @@ public class AIPlayer extends AIObject {
             Unit coUnit = coAIUnit.getUnit();
             if (coAIUnit.getMission() instanceof UnitSeekAndDestroyMission) {
                 Location target = ((UnitSeekAndDestroyMission) coAIUnit.getMission()).getTarget();
-                int ourDistance = unit.getTurnsToReach(target.getTile());
+                int ourDistance = unit.getTurnsToReach(startTile, target.getTile());
                 int coUnitDistance = coUnit.getTurnsToReach(target.getTile());
                 if (ourDistance != Integer.MAX_VALUE) {
                     int difference = Math.abs(ourDistance - coUnitDistance);
@@ -997,7 +1105,7 @@ public class AIPlayer extends AIObject {
         final int bestExistingTargetValue = Math.max(100 - smallestDifference, 0);
         GoalDecider targetDecider = new GoalDecider() {
             private PathNode bestTarget = null;
-            private int bestNewTargetValue = 0;
+            private int bestNewTargetValue = Integer.MIN_VALUE;
             
             public PathNode getGoal() {
                 return bestTarget;              
@@ -1009,15 +1117,15 @@ public class AIPlayer extends AIObject {
             
             public boolean check(Unit unit, PathNode pathNode) {
                 Tile newTile = pathNode.getTile();
-                if ((newTile.isLand() && !unit.isNaval() || !newTile.isLand() && unit.isNaval()) 
-                        && newTile.getDefendingUnit(unit) != null && newTile.getDefendingUnit(unit).getOwner() != unit.getOwner()
+                Map map = newTile.getMap();
+                
+                if (newTile.isLand() 
+                        && !unit.isNaval() 
+                        && newTile.getDefendingUnit(unit) != null 
+                        && newTile.getDefendingUnit(unit).getOwner() != unit.getOwner()
                         && unit.getOwner().getStance(newTile.getDefendingUnit(unit).getOwner()) == Player.WAR) {
                     
-                    int value = 0;
-                    if (newTile.getSettlement() != null && newTile.getSettlement() instanceof IndianSettlement) {
-                        IndianSettlement is = (IndianSettlement) newTile.getSettlement();
-                        value += is.getAlarm(unit.getOwner()).getValue() / 10;
-                    }
+                    int value = 10020;                    
                     if (newTile.getBestTreasureTrain() != null) {
                         value += Math.min(newTile.getBestTreasureTrain().getTreasureAmount() / 10, 50);
                     }
@@ -1026,21 +1134,52 @@ public class AIPlayer extends AIObject {
                     }
                     if (newTile.getDefendingUnit(unit).getType() == Unit.VETERAN_SOLDIER && !newTile.getDefendingUnit(unit).isArmed()) {
                         value += 50 - newTile.getDefendingUnit(unit).getDefensePower(unit) * 2 - pathNode.getTurns() * 25;
-                    }
+                    } 
+                    value += newTile.getDefendingUnit(unit).getOffensePower(unit) - newTile.getDefendingUnit(unit).getDefensePower(unit);
+                     
                     value -= pathNode.getTurns() * 10;
-                    if (value > bestExistingTargetValue && value > bestNewTargetValue) {
+                    if (value - 10000 > bestExistingTargetValue && value > bestNewTargetValue) {
                         bestTarget = pathNode;                           
                         bestNewTargetValue = value;
+                    }                                    
+                }            
+                if (newTile.isLand() 
+                        && !unit.isNaval() 
+                        && newTile.getSettlement() == null) {                 
+                    for (int direction=0; direction < Map.NUMBER_OF_DIRECTIONS; direction++) {
+                        Tile attackTile = map.getNeighbourOrNull(direction, newTile);
+                        if (attackTile == null) {
+                            continue;
+                        }
+                        int value = 10000;                        
+                        if (attackTile.getSettlement() != null
+                                && unit.getOwner().getStance(attackTile.getSettlement().getOwner()) == Player.WAR) {                            
+                            if (attackTile.getColony() != null) {
+                                value += unit.getOwner().getTension(attackTile.getColony().getOwner()).getValue() / 10;
+                            } else {
+                                IndianSettlement is = (IndianSettlement) attackTile.getSettlement();
+                                value += is.getAlarm(unit.getOwner()).getValue() / 10;
+                            }
+                        }
+                        boolean hasTarget = value > 10000; 
+                        value -= pathNode.getTurns() * 10;
+                        if (hasTarget && value - 10000 > bestExistingTargetValue && value > bestNewTargetValue) {
+                            int cost = pathNode.getCost();
+                            int movesLeft = pathNode.getMovesLeft();
+                            int turns = pathNode.getTurns();
+                            bestTarget = new PathNode(attackTile, cost, cost, direction, movesLeft, turns);
+                            bestTarget.previous = pathNode;
+                            bestNewTargetValue = value;
+                            return true;
+                        }
                     }
-                    return true;
-                } else {
-                    return false;
                 }
+                return false;
             }
-        };
-        PathNode newTarget = getGame().getMap().search(unit, gd, 20);
+        };        
+        PathNode newTarget = map.search(unit, startTile, targetDecider, map.getDefaultCostDecider(), Integer.MAX_VALUE, carrier);        
         // Use the target:        
-        if (newTarget != null) {
+        if (newTarget != null) {            
             Tile targetTile = newTarget.getLastNode().getTile();
             if (targetTile.getSettlement() != null) {
                 aiUnit.setMission(new UnitSeekAndDestroyMission(getAIMain(), aiUnit, targetTile.getSettlement()));
@@ -1094,6 +1233,9 @@ public class AIPlayer extends AIObject {
      *         more colonies.
      */
     public boolean hasFewColonies() {
+        if (!getPlayer().canBuildColonies()) {
+            return false;
+        }
         Iterator it = getPlayer().getColonyIterator();
         int numberOfColonies = 0;
         int numberOfWorkers = 0;
@@ -1162,7 +1304,7 @@ public class AIPlayer extends AIObject {
             if (t.getTransportLocatable().getLocation() instanceof Unit) {
                 Mission m = ((AIUnit) getAIMain().getAIObject((FreeColGameObject) t.getTransportLocatable().getLocation())).getMission();
                 if (m instanceof TransportMission) {
-                    ((TransportMission) m).addToTransportList(t);
+                    ((TransportMission) m).addToTransportList(t);                    
                 }
                 ti.remove();
             }
@@ -1203,14 +1345,14 @@ public class AIPlayer extends AIObject {
             }
             bestTransport.addToTransportList(t);
             transportables.remove(t);
-            vacantTransports.remove(bestTransport);
+            vacantTransports.remove(bestTransport);            
             bestTransportSpace--;
             
             for (int i=0; i<transportables.size() && bestTransportSpace > 0; i++) {
                 Transportable t2 = (Transportable) transportables.get(0);
-                if (t2.getTransportLocatable().getLocation().getTile() == t.getTransportLocatable().getLocation().getTile()) {
+                if (t2.getTransportLocatable().getLocation() == t.getTransportLocatable().getLocation()) {
                     bestTransport.addToTransportList(t2);
-                    transportables.remove(t2);
+                    transportables.remove(t2);                    
                     bestTransportSpace--;
                 }
             }

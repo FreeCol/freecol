@@ -299,20 +299,22 @@ public final class GUI {
     * @return The <code>Unit</code> or <i>null</i> if no unit applies.
     */
     public Unit getUnitInFront(Tile unitTile) {
-        if (unitTile != null && unitTile.getUnitCount() > 0 && (unitTile.getSettlement() == null
-                || (activeUnit != null && unitTile.contains(activeUnit)))) {
+        if (unitTile == null || unitTile.getUnitCount() <= 0) {
+            return null;
+        }
 
-            if (activeUnit != null && activeUnit.getLocation().getTile() == unitTile) {
-                return activeUnit;
-            } else {
-                Iterator it = enemyUnitsOnTop.iterator();
-                while (it.hasNext()) {
-                    Unit eu = (Unit) it.next();
-                    if (eu.getTile() == unitTile) {
-                        return eu;
-                    }
+        if (activeUnit != null && activeUnit.getLocation().getTile() == unitTile) {
+            return activeUnit;
+        } else {
+            Iterator it = enemyUnitsOnTop.iterator();
+            while (it.hasNext()) {
+                Unit eu = (Unit) it.next();
+                if (eu.getTile() == unitTile) {
+                    return eu;
                 }
-                
+            }
+            
+            if (unitTile.getSettlement() == null) {
                 Unit movableUnit = unitTile.getMovableUnit();
                 if (movableUnit != null && movableUnit.getLocation() == movableUnit.getTile()) {
                     return movableUnit;
@@ -325,12 +327,12 @@ public final class GUI {
                             bestPick = u;
                         }
                     }
-
+                    
                     return bestPick;
                 }
+            } else {
+                return null;
             }
-        } else {
-            return null;
         }
     }
 

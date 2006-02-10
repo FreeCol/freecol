@@ -149,6 +149,26 @@ public final class InGameController implements NetworkConstants {
         freeColClient.getCanvas().updateJMenuBar();
     }
 
+    
+    /**
+     * Declares independence for the home country.
+     */
+    public void declareIndependence() {
+        Canvas canvas = freeColClient.getCanvas();
+        
+        if (freeColClient.getMyPlayer().getSoL() < 50) {
+            canvas.showInformationMessage("declareIndependence.notMajority", new String[][] {{"%percentage%", Integer.toString(freeColClient.getMyPlayer().getSoL())}});
+            return;
+        }
+        if (!canvas.showConfirmDialog("declareIndependence.areYouSure.text", "declareIndependence.areYouSure.yes", "declareIndependence.areYouSure.no")) {
+            return;
+        }
+            
+        Element declareIndependenceElement = Message.createNewRootElement("declareIndependence");
+        freeColClient.getMyPlayer().declareIndependence();    
+        freeColClient.getClient().sendAndWait(declareIndependenceElement);        
+    }
+    
 
     /**
     * Sends a public chat message.

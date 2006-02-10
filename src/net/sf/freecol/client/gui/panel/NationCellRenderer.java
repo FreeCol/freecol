@@ -23,6 +23,7 @@ public final class NationCellRenderer implements TableCellRenderer {
 
     private static final JComboBox standardNationsComboBox = new JComboBox(Player.NATIONS);
     private static final JComboBox indianTribesComboBox = new JComboBox(Player.TRIBES);
+    private static final JComboBox refNationsComboBox = new JComboBox(Player.REF_NATIONS);
 
     private Vector players;
 
@@ -57,7 +58,9 @@ public final class NationCellRenderer implements TableCellRenderer {
         Player player = (Player) players.get(row);
 
         JComboBox component;
-        if (player.isEuropean()) {
+        if (player.isREF()) {
+            component = refNationsComboBox;
+        } else if (player.isEuropean()) {
             component = standardNationsComboBox;
         } else {
             component = indianTribesComboBox;
@@ -85,7 +88,14 @@ public final class NationCellRenderer implements TableCellRenderer {
         }
         component.setBackground(table.getBackground());
 
-        component.setSelectedIndex(player.getNation());
+        int index = player.getNation();
+        if (player.isIndian() || player.isREF()) {
+            index -= Player.NATIONS.length;
+        }
+        if (player.isREF()) {
+            index -= Player.TRIBES.length;
+        }        
+        component.setSelectedIndex(index);
         return component;
     }
 }

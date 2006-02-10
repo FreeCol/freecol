@@ -174,7 +174,8 @@ public final class FreeColServer {
     *
     * @throws IOException if the public socket cannot be created (the exception
     *                     will be logged by this class).
-    *
+    *                     
+    * @throws FreeColException if the savegame could not be loaded.
     */
     public FreeColServer(File file, int port) throws IOException, FreeColException {
         this.port = port;
@@ -198,14 +199,14 @@ public final class FreeColServer {
 
         try {
             owner = loadGame(file);
-        }
-        catch (FreeColException e) {
+        } catch (FreeColException e) {
             server.shutdown();
             throw e;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             server.shutdown();
-            throw new FreeColException("couldNotLoadGame");
+            FreeColException fe = new FreeColException("couldNotLoadGame");
+            fe.initCause(e);
+            throw fe;
         }
 
         updateMetaServer(true);
@@ -473,10 +474,16 @@ public final class FreeColServer {
 
     /**
     * Loads a game.
+    * 
     * @param file The file where the game data is located.
     * @return The username of the player saving the game.
     * @throws IOException If a problem was encountered while trying
     *        to open, read or close the file.
+    * @exception IOException if thrown while loading the game, or if
+    *        a <code>SAXException</code> is thrown while parsing the
+    *        text.
+    * @exception FreeColException if the savegame contains incompatible
+    *        data.
     */
     public String loadGame(File file) throws IOException, FreeColException {
         InputStream in;
@@ -582,12 +589,10 @@ public final class FreeColServer {
                 }
 
                 return savedGameElement.getAttribute("owner");
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 throw new IOException(e.getMessage());
             }
-        }
-        else {
+        } else {
             throw new FreeColException("incompatibleVersions");
         }
     }

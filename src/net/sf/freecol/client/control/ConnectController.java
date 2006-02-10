@@ -379,7 +379,7 @@ public final class ConnectController {
     * For example: if the server kicked us out then we don't need to confirm with a logout
     * message.
     */
-    public void quitGame(boolean bStopServer, boolean notifyServer) {
+    public void quitGame(boolean bStopServer, boolean notifyServer) {      
         if (bStopServer) {
             final FreeColServer server = freeColClient.getFreeColServer();
             if (server != null) {
@@ -387,10 +387,9 @@ public final class ConnectController {
                 freeColClient.setFreeColServer(null);
                 freeColClient.setLoggedIn(false);
             }
-        }
-        if (freeColClient.isLoggedIn()) {
+        } else if (freeColClient.isLoggedIn()) {
             logout(notifyServer);
-        }
+        }          
     }
 
 

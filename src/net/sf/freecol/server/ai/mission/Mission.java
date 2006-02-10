@@ -250,8 +250,8 @@ public abstract class Mission extends AIObject {
         
         if (carrier.getTile().getSettlement() != null) {
             return carrier.getTile();
-        }
-        
+        }        
+        // Find the closest friendly Settlement:
         GoalDecider gd = new GoalDecider() {
             private PathNode bestTarget = null;
             
@@ -273,11 +273,11 @@ public abstract class Mission extends AIObject {
                 return hasOurSettlement;
             }
         };
-        PathNode path = getGame().getMap().search(carrier, gd, Integer.MAX_VALUE);               
-        if (path == null) {
-            return null;
-        } else {
+        PathNode path = getGame().getMap().search(carrier, gd, Integer.MAX_VALUE);                             
+        if (path != null) {
             return path.getLastNode().getTile();
+        } else {
+            return null;
         }
     }
     

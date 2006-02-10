@@ -443,8 +443,8 @@ public class Game extends FreeColGameObject {
 
         // Find first non-dead player:
         while (true) {
-            Player player = (Player) players.get(index);
-            if (!player.isDead()) {
+            Player player = (Player) players.get(index);            
+            if (!player.isDead()) {                
                 return player;
             }
 
@@ -453,7 +453,7 @@ public class Game extends FreeColGameObject {
             if (index >= players.size()) {
                 index = 0;
             }
-        }
+        }        
     }
 
 

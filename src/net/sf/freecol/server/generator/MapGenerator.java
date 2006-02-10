@@ -613,6 +613,10 @@ public class MapGenerator {
 
         for (int i = 0; i < players.size(); i++) {
             ServerPlayer player = (ServerPlayer)players.elementAt(i);
+            if (player.isREF()) {
+                player.setEntryLocation(map.getTile(width - 2, random.nextInt(height - 20) + 10));
+                continue;
+            }
             if (!player.isEuropean()) {
                 continue;
             }

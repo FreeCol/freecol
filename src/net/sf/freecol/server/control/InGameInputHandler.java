@@ -174,6 +174,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                         reply = payArrears(connection, element);
                     } else if (type.equals("toggleExports")) {
                         reply = toggleExports(connection, element);
+                    } else if (type.equals("declareIndependence")) {
+                        reply = declareIndependence(connection, element);                                                
                     } else {
                         logger.warning("Unknown request from client " + element.getTagName());
                     }
@@ -1947,6 +1949,22 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         return null;
     }
 
+    
+    /**
+     * Handles a "declareIndependence"-message.
+     *
+     * @param connection The <code>Connection</code> the message was received on.
+     * @param element The element containing the request.
+     */
+    private Element declareIndependence(Connection connection, Element element) {
+        Game game = getFreeColServer().getGame();
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
+        
+        player.declareIndependence();
+
+        return null;
+    }
+    
 
     /**
      * Handles a "tradeProposition"-message.

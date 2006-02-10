@@ -49,7 +49,7 @@ public class TransportMission extends Mission {
     private static final String ELEMENT_TRANSPORTABLE = "transportable";
     private static final int MINIMUM_GOLD_TO_STAY_IN_EUROPE = 600;
 
-    List transportList = new ArrayList();
+    private List transportList = new ArrayList();
 
 
     /**
@@ -182,7 +182,7 @@ public class TransportMission extends Mission {
     *
     * @param newTransportable The <code>Transportable</code>.
     */
-    public void addToTransportList(Transportable newTransportable) {
+    public void addToTransportList(Transportable newTransportable) {        
         Unit carrier = getUnit();
         if (newTransportable.getTransportLocatable() instanceof Unit
                 && ((Unit) newTransportable.getTransportLocatable()).isCarrier()) {
@@ -513,7 +513,7 @@ public class TransportMission extends Mission {
         int space = getAvailableSpace();
         while (space > 0) {
             AIUnit newUnit = getCheapestUnitInEurope(connection);
-            if (newUnit != null) {
+            if (newUnit != null) {             
                 addToTransportList(newUnit);
                 space--;
             } else {
@@ -665,7 +665,8 @@ public class TransportMission extends Mission {
         Iterator ui = europe.getUnitIterator();
         while (ui.hasNext()) {
             Unit u = (Unit) ui.next();
-            if (!u.isCarrier()) {
+            if (!u.isCarrier() 
+                    && ((AIUnit) getAIMain().getAIObject(u)).getTransport() == null) {
                 return (AIUnit) getAIMain().getAIObject(u.getID());
             }
         }
@@ -931,7 +932,7 @@ public class TransportMission extends Mission {
         Iterator tli = transportList.iterator();
         while (tli.hasNext()) {
             Transportable t = (Transportable) tli.next();
-            if (isCarrying(t)) {
+            if (isCarrying(t)) {          
                 continue;
             }
             if (t instanceof AIUnit) {
