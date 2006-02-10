@@ -122,7 +122,9 @@ public final class InGameController extends Controller {
             if (nextPlayer.getCurrentFather() == -1) {
                 chooseFoundingFather(nextPlayer);
             }
-            monarchAction(nextPlayer);
+            if (nextPlayer.getMonarch() != null) {
+                monarchAction(nextPlayer);
+            }
         }
     }
 

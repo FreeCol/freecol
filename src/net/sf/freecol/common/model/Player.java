@@ -269,8 +269,6 @@ public class Player extends FreeColGameObject {
         this.nation = nation;
 
         color = getDefaultNationColor(nation);
-        europe = new Europe(game, this);
-        monarch = new Monarch(game, this, "");
         /** No initial arrears. */
         for (int i = 0; i < arrears.length; i++) {
             arrears[i] = 0;
@@ -297,6 +295,13 @@ public class Player extends FreeColGameObject {
 
         currentFather = FoundingFather.NONE;
         rebellionState = 0;
+
+        if (isEuropean(nation)) {
+            europe = new Europe(game, this);
+            if (!isREF(nation)) {
+                monarch = new Monarch(game, this, "");
+            }
+        }
     }
 
 
@@ -373,6 +378,11 @@ public class Player extends FreeColGameObject {
         
         setRebellionState(REBELLION_IN_WAR);
         setStance(getREFPlayer(), WAR);
+        setMonarch(null);
+        setTax(0);
+        
+        europe.dispose();
+        europe = null;
     }
     
     
@@ -1003,11 +1013,24 @@ public class Player extends FreeColGameObject {
         resetCanSeeTiles();
     }
 
+    /**
+     * Checks if this <code>Player</code> can move units to
+     * <code>Europe</code>.
+     * 
+     * @return <code>true</code> if this <code>Player</code> has
+     *      an instance of <code>Europe</code>.
+     */
+    public boolean canMoveToEurope() {
+        return getEurope() != null;
+    }
 
     /**
-    * Returns the europe object that this player has.
-    * @return The europe object that this player has.
-    */
+     * Returns the europe object that this player has.
+     * 
+     * @return The europe object that this player has or
+     *       <code>null</code> if this <code>Player</code>
+     *       does not have an instance <code>Europe</code>.
+     */
     public Europe getEurope() {
         return europe;
     }
@@ -1015,7 +1038,9 @@ public class Player extends FreeColGameObject {
     /**
      * Returns the monarch object this player has.
      *
-     * @return The monarch object this player has.
+     * @return The monarch object this player has or
+     *       <code>null</code> if this <code>Player</code>
+     *       does not have an instance <code>Monarch</code>.
      */
     public Monarch getMonarch() {
         return monarch;
@@ -1462,6 +1487,10 @@ public class Player extends FreeColGameObject {
     * @see #setCrosses
     */
     public void incrementCrosses(int num) {
+        if (!canRecruitUnits()) {
+            return;
+        }
+        
         crosses += num;
     }
 
@@ -1472,6 +1501,10 @@ public class Player extends FreeColGameObject {
     * @see #incrementCrosses
     */
     public void setCrosses(int crosses) {
+        if (!canRecruitUnits()) {
+            return;
+        }
+        
         this.crosses = crosses;
     }
 
@@ -1482,6 +1515,10 @@ public class Player extends FreeColGameObject {
     * @see #setCrosses
     */
     public int getCrosses() {
+        if (!canRecruitUnits()) {
+            return 0;
+        }
+        
         return crosses;
     }
 
@@ -1491,6 +1528,10 @@ public class Player extends FreeColGameObject {
     * @return Whether a new colonist should immigrate.
     */
     public boolean checkEmigrate() {
+        if (!canRecruitUnits()) {
+            return false;
+        }
+        
         return getCrossesRequired() <= crosses;
     }
 
@@ -1500,6 +1541,9 @@ public class Player extends FreeColGameObject {
     * @return The number of crosses required to cause a new colonist to emigrate.
     */
     public int getCrossesRequired() {
+        if (!canRecruitUnits()) {
+            return 0;
+        }
         return crossesRequired;
     }
 
@@ -1509,15 +1553,33 @@ public class Player extends FreeColGameObject {
     * @param crossesRequired The number of crosses required to cause a new colonist to emigrate.
     */
     public void setCrossesRequired(int crossesRequired) {
+        if (!canRecruitUnits()) {
+            return;
+        }
+        
         this.crossesRequired = crossesRequired;
     }
 
+    /**
+     * Checks if this <code>Player</code> can recruit units by producing
+     * crosses.
+     * 
+     * @return <code>true</code> if units can be recruited by this
+     *      <code>Player</code>.
+     */
+    public boolean canRecruitUnits() {        
+        return isEuropean() && getRebellionState() < REBELLION_IN_WAR;
+    }
 
     /**
     * Updates the amount of crosses needed to emigrate a <code>Unit</code>
     * from <code>Europe</code>.
     */
     public void updateCrossesRequired() {
+        if (!canRecruitUnits()) {
+            return;
+        }
+        
         // The book I have tells me the crosses needed is:
         // [(colonist count in colonies + total colonist count) * 2] + 8.
         // So every unit counts as 2 unless they're in a colony,
@@ -1925,8 +1987,12 @@ public class Player extends FreeColGameObject {
         }
 
         if (showAll || equals(player)) {
-            playerElement.appendChild(europe.toXMLElement(player, document, showAll, toSavedGame));
-            playerElement.appendChild(monarch.toXMLElement(player, document, showAll, toSavedGame));
+            if (europe != null) {
+                playerElement.appendChild(europe.toXMLElement(player, document, showAll, toSavedGame));
+            }
+            if (monarch != null) {
+                playerElement.appendChild(monarch.toXMLElement(player, document, showAll, toSavedGame));
+            }
         }
 
         return playerElement;

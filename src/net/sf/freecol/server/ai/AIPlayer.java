@@ -238,13 +238,16 @@ public class AIPlayer extends AIObject {
      * This method will just return if this player is
      * not a REF-player.
      */
-    private void moveREFToDocks() {
+    private void moveREFToDocks() {        
         Iterator it = getGame().getPlayerIterator();
         while (it.hasNext()) {
             Player p = (Player) it.next();
             if (p.getREFPlayer() == getPlayer() 
                     && p.getRebellionState() == Player.REBELLION_IN_WAR) {
                 Monarch m = p.getMonarch();
+                if (m == null) {
+                    continue;
+                }
                 int[] ref = m.getREF();
                 int totalNumber = 0;
                 for (int i=0; i<ref.length; i++) {

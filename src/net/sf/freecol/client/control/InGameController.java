@@ -166,6 +166,7 @@ public final class InGameController implements NetworkConstants {
             
         Element declareIndependenceElement = Message.createNewRootElement("declareIndependence");
         freeColClient.getMyPlayer().declareIndependence();    
+        freeColClient.getActionManager().update();
         freeColClient.getClient().sendAndWait(declareIndependenceElement);        
     }
     

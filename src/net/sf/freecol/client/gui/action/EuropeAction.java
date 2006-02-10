@@ -40,6 +40,14 @@ public class EuropeAction extends MapboardAction {
         return ID;
     }
 
+    /**
+     * Disables this action if our <code>Player</code> does
+     * not have an instance of <code>Europe</code>.
+     */
+    public void update() {
+        super.update();
+        setEnabled(getFreeColClient().getMyPlayer() != null && getFreeColClient().getMyPlayer().getEurope() != null);
+    }
     
     /**
      * Applies this action.

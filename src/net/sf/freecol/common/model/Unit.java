@@ -839,9 +839,17 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      */
     private int getNavalMoveType(Tile target) {
         if (target == null) { // TODO: do not allow "MOVE_HIGH_SEAS" north and south.
-            return MOVE_HIGH_SEAS;
+            if (getOwner().canMoveToEurope()) {
+                return MOVE_HIGH_SEAS;
+            } else {
+                return ILLEGAL_MOVE;
+            }
         } else if (target.getType() == Tile.HIGH_SEAS) {
-            return MOVE_HIGH_SEAS;
+            if (getOwner().canMoveToEurope()) {
+                return MOVE_HIGH_SEAS;
+            } else {
+                return MOVE;
+            }
         } else if (target.isLand()) {
             Settlement settlement = target.getSettlement();
             if (settlement != null) {
