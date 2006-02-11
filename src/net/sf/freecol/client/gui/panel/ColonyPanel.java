@@ -460,7 +460,9 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
         updateSoLLabel();
         updateProgressLabel();
-        this.colonyNameLabel.setText( colony.getName() );
+
+        ImageIcon imageIcon = new ImageIcon(freeColClient.getGUI().createStringImage(colonyNameLabel, colony.getName(), colony.getOwner().getColor(), 200, 24));
+        this.colonyNameLabel.setIcon(imageIcon);
     }
 
 

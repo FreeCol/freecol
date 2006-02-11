@@ -7,6 +7,7 @@ import java.awt.Composite;
 import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.MediaTracker;
@@ -24,6 +25,7 @@ import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.Timer;
 import javax.swing.UIManager;
 
@@ -920,21 +922,57 @@ public final class GUI {
     * @return The image that was created.
     */
     public BufferedImage createStringImage(Graphics2D g, String nameString, Color color, int maxWidth, int preferredFontSize) {
-
-        Font nameFont = null;
-        FontMetrics nameFontMetrics = null;
+        return createStringImage(null, g, nameString, color, maxWidth, preferredFontSize);
+    }
+    
+    /**
+     * Creates an image with a string of a given color and with 
+     * a black border around the glyphs.
+     *
+     * @param c A <code>JComponent</code>-object for getting a
+     *       <code>Font</code>.
+     * @param nameString The <code>String</code> to make an image of.
+     * @param color The <code>Color</code> to use when displaying 
+     *       the <code>nameString</code>.
+     * @param maxWidth The maximum width of the image. The size of 
+     *       the <code>Font</code> will be adjusted if the image gets 
+     *       larger than this value.
+     * @param preferredFontSize The preferred font size.
+     * @return The image that was created.
+     */
+    public BufferedImage createStringImage(JComponent c, String nameString, Color color, int maxWidth, int preferredFontSize) {
+        return createStringImage(c, null, nameString, color, maxWidth, preferredFontSize);
+    }    
+    
+    /**
+     * Creates an image with a string of a given color and with 
+     * a black border around the glyphs.
+     *
+     * @param c A <code>JComponent</code>-object for getting a
+     *       <code>Font</code>.
+     * @param g A <code>Graphics</code>-object for getting a
+     *       <code>Font</code>.
+     * @param nameString The <code>String</code> to make an image of.
+     * @param color The <code>Color</code> to use when displaying 
+     *       the <code>nameString</code>.
+     * @param maxWidth The maximum width of the image. The size of 
+     *       the <code>Font</code> will be adjusted if the image gets 
+     *       larger than this value.
+     * @param preferredFontSize The preferred font size.
+     * @return The image that was created.
+     */
+    private BufferedImage createStringImage(JComponent c, Graphics g, String nameString, Color color, int maxWidth, int preferredFontSize) {        
+        Font nameFont = (c != null) ? c.getFont() : g.getFont();
+        FontMetrics nameFontMetrics = (c != null) ? c.getFontMetrics(nameFont) : g.getFontMetrics(nameFont);
         BufferedImage bi = null;
 
-        Font origFont = g.getFont();
         int fontSize = preferredFontSize;
         do {
-            nameFont = origFont.deriveFont(Font.BOLD, fontSize);
-            g.setFont(nameFont);
-            nameFontMetrics = g.getFontMetrics();
+            nameFont = nameFont.deriveFont(Font.BOLD, fontSize);            
+            nameFontMetrics = (c != null) ? c.getFontMetrics(nameFont) : g.getFontMetrics(nameFont);
             bi = new BufferedImage(nameFontMetrics.stringWidth(nameString) + 4, nameFontMetrics.getMaxAscent() + nameFontMetrics.getMaxDescent(), BufferedImage.TYPE_INT_ARGB);
             fontSize -= 2;
         } while (bi.getWidth() > maxWidth);
-        g.setFont(origFont);
 
         Graphics2D big = bi.createGraphics();
 
