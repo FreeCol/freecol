@@ -145,11 +145,38 @@ public class AIPlayer extends AIObject {
      */
     public void startWorking() {
         //logger.info("Entering AI code for: " + player.getNationAsString());
-        
+
         sessionRegister.clear();
         aiUnits.clear();
         
         if (getPlayer().isREF()) {
+            boolean defeated = true;
+            Iterator it = getPlayer().getUnitIterator();
+            while (it.hasNext()) {
+                Unit u = (Unit) it.next();             
+                if (u.getType() != Unit.MAN_O_WAR) {
+                    defeated = false;
+                    break;
+                }
+            }          
+            if (defeated) {
+                Iterator it2 = getGame().getPlayerIterator();
+                while (it2.hasNext()) {
+                    Player p = (Player) it2.next();
+                    if (p.getREFPlayer() == getPlayer() 
+                            && p.getRebellionState() == Player.REBELLION_IN_WAR
+                            && p.getMonarch() == null) {           
+                        Element giveIndependenceElement = Message.createNewRootElement("giveIndependence");
+                        giveIndependenceElement.setAttribute("player", p.getID());
+                        try {
+                            getConnection().sendAndWait(giveIndependenceElement);
+                        } catch (IOException e) {
+                            logger.warning("Could not send \"giveIndependence\"-message.");                            
+                        }
+                    }                    
+                }
+            }
+            
             if (!isWorkForREF()) {
                 return;
             }
@@ -287,7 +314,8 @@ public class AIPlayer extends AIObject {
                             false);
                     ref[i]--;
                     totalNumber--;
-                }       
+                }
+                p.setMonarch(null);
             }
         }        
     }
@@ -773,7 +801,15 @@ public class AIPlayer extends AIObject {
                         wishList = workerWishes[i];
                         for (int j=0; j<wishList.size(); j++) {
                             WorkerWish ww = (WorkerWish) wishList.get(j);
-                            int turns = unit.getTurnsToReach(ww.getDestination().getTile());
+                            Tile source = unit.getTile();
+                            if (source == null) {
+                                if (unit.getLocation() instanceof Unit) {
+                                    source = (Tile) ((Unit) unit.getLocation()).getEntryLocation();
+                                } else {
+                                    source = (Tile) unit.getOwner().getEntryLocation();
+                                }
+                            }
+                            int turns = unit.getTurnsToReach(source, ww.getDestination().getTile());
                             // TODO: Choose to build colony if the value of the wish is low.
                             if (bestWish == null && turns < bestTurns
                                     || bestWish != null && (turns < bestTurns || 

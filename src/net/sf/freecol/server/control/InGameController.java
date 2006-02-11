@@ -6,9 +6,10 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.logging.Logger;
 
-import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Monarch;
@@ -222,27 +223,60 @@ public final class InGameController extends Controller {
      */
     private Player checkForWinner() {
         Game game = getFreeColServer().getGame();
-
-        Iterator playerIterator = game.getPlayerIterator();
-        Player winner = null;
-
-        if (getFreeColServer().isSingleplayer()) {
-            // TODO
-        } else {
+        GameOptions go = game.getGameOptions();
+        
+        if (go.getBoolean(GameOptions.VICTORY_DEFEAT_REF)) {
+            Iterator playerIterator = game.getPlayerIterator();
             while (playerIterator.hasNext()) {
                 Player p = (Player) playerIterator.next();
-
-                if (!p.isDead() && !p.isAI()) {
+                
+                if (!p.isAI() && p.getRebellionState() == Player.REBELLION_POST_WAR) {                  
+                    return p;
+                }
+            }
+        }
+        if (go.getBoolean(GameOptions.VICTORY_DEFEAT_EUROPEANS)) {
+            Player winner = null;
+            Iterator playerIterator = game.getPlayerIterator();
+            while (playerIterator.hasNext()) {
+                Player p = (Player) playerIterator.next();
+                
+                if (!p.isDead() && p.isEuropean() && !p.isREF()) {                    
                     if (winner != null) {
-                        return null;
+                        // There is more than one european player alive:
+                        winner = null;
+                        break;
                     } else {
                         winner = p;
                     }
                 }
             }
+            if (winner != null) {                
+                return winner;
+            }
+        }   
+        if (go.getBoolean(GameOptions.VICTORY_DEFEAT_HUMANS)) {
+            Player winner = null;
+            Iterator playerIterator = game.getPlayerIterator();
+            while (playerIterator.hasNext()) {
+                Player p = (Player) playerIterator.next();
+                
+                if (!p.isDead() && !p.isAI()) {
+                    if (winner != null) {                        
+                        // There is more than one human player alive:
+                        winner = null;
+                        break;
+                    } else {
+                        winner = p;
+                    }
+                }
+            }
+            if (winner != null) {
+                return winner;
+            }
         }
 
-        return winner;
+        return null;
     }
 
 

@@ -175,7 +175,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     } else if (type.equals("toggleExports")) {
                         reply = toggleExports(connection, element);
                     } else if (type.equals("declareIndependence")) {
-                        reply = declareIndependence(connection, element);                                                
+                        reply = declareIndependence(connection, element);
+                    } else if (type.equals("giveIndependence")) {
+                        reply = giveIndependence(connection, element);                                                
                     } else {
                         logger.warning("Unknown request from client " + element.getTagName());
                     }
@@ -439,7 +441,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         int dx = player.getDifficulty() + 2;
 
         // seasoned scouts should be more successful
+        int bonus = 0;
         if (type == Unit.SEASONED_SCOUT && unit.isScout()) {
+            bonus += 3;
             dx--;
         }      
 
@@ -469,13 +473,13 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
          */
         probability[LostCityRumour.TRIBAL_CHIEF] = ( max - dx ) * 3;
         probability[LostCityRumour.COLONIST] = ( max - dx ) * 2;
-        probability[LostCityRumour.TREASURE_TRAIN] = ( max - dx ) * 2;
-        probability[LostCityRumour.FOUNTAIN_OF_YOUTH] = ( max - dx );
+        probability[LostCityRumour.TREASURE_TRAIN] = ( max - dx ) * 2 + bonus;
+        probability[LostCityRumour.FOUNTAIN_OF_YOUTH] = ( max - dx ) + bonus / 2;
 
         int start;
         if (player.hasFather(FoundingFather.HERNANDO_DE_SOTO)) {
             // rumours are always positive
-            start = dx * 4;
+            start = 3;
         } else {
             start = 0;
         }
@@ -1964,6 +1968,31 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
 
         return null;
     }
+    
+    
+    /**
+     * Handles a "giveIndependence"-message.
+     *
+     * @param connection The <code>Connection</code> the message was received on.
+     * @param element The element containing the request.
+     */
+    private Element giveIndependence(Connection connection, Element element) {
+        Game game = getFreeColServer().getGame();
+        ServerPlayer player = getFreeColServer().getPlayer(connection);        
+        Player independent = (Player) game.getFreeColGameObject(element.getAttribute("player"));
+        
+        if (independent.getREFPlayer() != player) {
+            throw new IllegalStateException("Cannot give independence to a country we do not own.");
+        }
+        
+        independent.giveIndependence();
+        
+        Element giveIndependenceElement = Message.createNewRootElement("giveIndependence");
+        giveIndependenceElement.setAttribute("player", independent.getID());
+        getFreeColServer().getServer().sendToAll(giveIndependenceElement, connection);
+
+        return null;
+    }    
     
 
     /**

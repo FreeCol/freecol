@@ -159,7 +159,7 @@ public final class PreGameController extends Controller {
 
             player.resetExploredTiles(map);
             
-            if (player.isEuropean()) {
+            if (player.isEuropean() && !player.isREF()) {
                 player.setGold(game.getGameOptions().getInteger(GameOptions.STARTING_MONEY));
             }
 

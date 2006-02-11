@@ -378,11 +378,28 @@ public class Player extends FreeColGameObject {
         
         setRebellionState(REBELLION_IN_WAR);
         setStance(getREFPlayer(), WAR);
-        setMonarch(null);
         setTax(0);
         
         europe.dispose();
         europe = null;
+    }
+    
+    
+    /**
+     * Gives independece to this <code>Player</code>.
+     */
+    public void giveIndependence() {
+        if (!isEuropean()) {
+            throw new IllegalStateException("The player \"" + getName() + "\" is not european");
+        }        
+        if (getRebellionState() == Player.REBELLION_POST_WAR) {
+            throw new IllegalStateException("The player \"" + getName() + "\" is already independent");
+        }
+        setRebellionState(Player.REBELLION_POST_WAR);
+        getREFPlayer().setStance(this, Player.PEACE);
+        setStance(getREFPlayer(), Player.PEACE);
+        
+        addModelMessage(this, "model.player.independence", null);
     }
     
     
@@ -394,10 +411,6 @@ public class Player extends FreeColGameObject {
      *      does not have a royal expeditionary force.
      */
     public Player getREFPlayer() {
-        if (getRebellionState() == REBELLION_POST_WAR) {
-            return null;
-        }
-        
         switch (getNation()) {
         case DUTCH:   return getGame().getPlayer(REF_DUTCH);
         case ENGLISH: return getGame().getPlayer(REF_ENGLISH);
@@ -1389,6 +1402,11 @@ public class Player extends FreeColGameObject {
             Iterator unitIterator = getEurope().getUnitIterator();
             while (unitIterator.hasNext()) {
                 Unit u = (Unit) unitIterator.next();
+                Iterator childUnitIterator = u.getUnitIterator();
+                while (childUnitIterator.hasNext()) {
+                    Unit childUnit = (Unit) childUnitIterator.next();
+                    units.add(childUnit);
+                }                
                 units.add(u);
             }
         }
@@ -1778,7 +1796,7 @@ public class Player extends FreeColGameObject {
     /**
     * Prepares this <code>Player</code> for a new turn.
     */
-    public void newTurn() {
+    public void newTurn() {        
         if (isEuropean() && getBells() >= getTotalFoundingFatherCost()
                 && currentFather != FoundingFather.NONE) {
             fathers[currentFather] = true;

@@ -35,7 +35,25 @@ public class GameOptions extends OptionMap {
     /** No units are hidden on carriers or settlements if this option is set to <code>false</code>. */
     public static final String UNIT_HIDING = "unitHiding";
 
+    /** 
+     * Victory condition: Should the <code>Player</code> who first defeats the
+     * Royal Expeditionary Force win the game?
+     */
+    public static final String VICTORY_DEFEAT_REF = "victoryDefeatREF";
     
+    /** 
+     * Victory condition: Should a <code>Player</code> who first defeats all
+     * other european players win the game?
+     */
+    public static final String VICTORY_DEFEAT_EUROPEANS = "victoryDefeatEuropeans";    
+
+    /** 
+     * Victory condition: Should a <code>Player</code> who first defeats all
+     * other human players win the game?
+     */
+    public static final String VICTORY_DEFEAT_HUMANS = "victoryDefeatHumans";
+    
+     
     /**
     * Creates a new <code>GameOptions</code>.
     */
@@ -85,6 +103,13 @@ public class GameOptions extends OptionMap {
         OptionGroup colony = new OptionGroup("gameOptions.colony.name", "gameOptions.colony.shortDescription");
         colony.add(new IntegerOption(HAMMER_PRICE, "gameOptions.hammerPrice.name", "gameOptions.hammerPrice.shortDescription", 0, 50, 20));
         add(colony);
+
+        /* Victory Conditions */
+        OptionGroup victoryConditions = new OptionGroup("gameOptions.victoryConditions.name", "gameOptions.victoryConditions.shortDescription");
+        victoryConditions.add(new BooleanOption(VICTORY_DEFEAT_REF, "gameOptions.victoryDefeatREF.name", "gameOptions.victoryDefeatREF.shortDescription", true));
+        victoryConditions.add(new BooleanOption(VICTORY_DEFEAT_EUROPEANS, "gameOptions.victoryDefeatEuropeans.name", "gameOptions.victoryDefeatEuropeans.shortDescription", true));
+        victoryConditions.add(new BooleanOption(VICTORY_DEFEAT_HUMANS, "gameOptions.victoryDefeatHumans.name", "gameOptions.victoryDefeatHumans.shortDescription", false));
+        add(victoryConditions);        
     }
 
 

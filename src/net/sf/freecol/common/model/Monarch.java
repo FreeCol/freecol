@@ -70,6 +70,7 @@ public final class Monarch extends FreeColGameObject {
         this.player = player;
         this.name = name;
         int dx = player.getDifficulty();
+
         ref[INFANTRY] = dx * 3 + 5;
         ref[DRAGOON] = dx * 2 + 3;
         ref[ARTILLERY] = dx + 3;

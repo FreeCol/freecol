@@ -97,14 +97,16 @@ public final class InGameInputHandler extends InputHandler {
                 reply = reconnect(element);
             } else if (type.equals("setAI")) {
                 reply = setAI(element);
-	    } else if (type.equals("monarchAction")) {
-		reply = monarchAction(element);
-	    } else if (type.equals("removeGoods")) {
-		reply = removeGoods(element);
+            } else if (type.equals("monarchAction")) {
+                reply = monarchAction(element);
+            } else if (type.equals("removeGoods")) {
+                reply = removeGoods(element);
             } else if (type.equals("lostCityRumour")) {
                 reply = lostCityRumour(element);
             } else if (type.equals("diplomaticMessage")) {
                 reply = diplomaticMessage(element);
+            } else if (type.equals("giveIndependence")) {
+                reply = giveIndependence(element);                                
             } else {
                 logger.warning("Message is of unsupported type \"" + type + "\".");
             }
@@ -702,8 +704,18 @@ public final class InGameInputHandler extends InputHandler {
         return null;
     }
 
-
-
+    /**
+     * Handles a "giveIndependence"-request.
+     *
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *                holds all the information.
+     */
+    private Element giveIndependence(Element element) {  
+        Player player = (Player) getFreeColClient().getGame().getFreeColGameObject(element.getAttribute("player"));
+        player.giveIndependence();
+        return null;
+    }
+    
     /**
      * Handles a "removeGoods"-request.
      *
