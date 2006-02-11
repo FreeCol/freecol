@@ -262,7 +262,10 @@ public class ScoutingMission extends Mission {
      * @return <code>true</code> if this mission is still valid to perform
      *         and <code>false</code> otherwise.
      */
-    public static boolean isValid(AIUnit au) {  
+    public static boolean isValid(AIUnit au) { 
+        if (au.getUnit().getTile() == null) {
+            return true;
+        }
         Iterator it = au.getGame().getMap().getFloodFillIterator(au.getUnit().getTile().getPosition());
         while (it.hasNext()) {
             Tile t = au.getGame().getMap().getTile((Map.Position) it.next());
