@@ -5,18 +5,18 @@ package net.sf.freecol.common.model;
 import net.sf.freecol.client.gui.i18n.Messages;
 
 
-public final class Good
+public final class GoodsType
 {
-    public final  int      index;
-    public final  String   name;
-    public final  boolean  isFarmed;
-    public        Good     madeFrom;
-    public        Good     makes;
+    public final  int        index;
+    public final  String     name;
+    public final  boolean    isFarmed;
+    public        GoodsType  madeFrom;
+    public        GoodsType  makes;
 
     private static  int  nextIndex;
 
 
-    public Good( String name, boolean isFarmed ) {
+    public GoodsType( String name, boolean isFarmed ) {
 
         index = nextIndex ++;
         this.name = Messages.message( name );

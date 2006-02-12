@@ -15,7 +15,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.BuildingType;
-import net.sf.freecol.common.model.Good;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.TileType;
 
 import org.xml.sax.Attributes;
@@ -37,7 +37,7 @@ public final class Specification {
 
     private final  List  buildingTypeList;
     private final  List  tileTypeList;
-    private final  List  goodList;
+    private final  List  goodsTypeList;
 
 
     // ----------------------------------------------------------- constructors
@@ -47,7 +47,7 @@ public final class Specification {
         try {
             buildingTypeList = new ArrayList();
             tileTypeList = new ArrayList();
-            goodList = new ArrayList();
+            goodsTypeList = new ArrayList();
 
             SAXParser  parser = SAXParserFactory.newInstance().newSAXParser();
             InputStream  in = Specification.class.getResourceAsStream("specification.xml");
@@ -91,15 +91,15 @@ public final class Specification {
     }
 
 
-    public int numberOfGoods() {
+    public int numberOfGoodTypes() {
 
-        return goodList.size();
+        return goodsTypeList.size();
     }
 
 
-    public Good good( int goodIndex ) {
+    public GoodsType goodType( int goodIndex ) {
 
-        return (Good) goodList.get( goodIndex );
+        return (GoodsType) goodsTypeList.get( goodIndex );
     }
 
 
@@ -165,18 +165,18 @@ public final class Specification {
             }
             else if ( "good".equals(elementName) ) {
 
-                Good  good = new Good( attributes.getValue("name"),
+                GoodsType  good = new GoodsType( attributes.getValue("name"),
                                        parseTruth(attributes.getValue("is-farmed")) );
 
                 String  madeFrom = attributes.getValue( "made-from" );
                 if ( madeFrom != null ) {
-                    Good  rawMaterial = (Good) goodByRef.get( madeFrom );
+                    GoodsType  rawMaterial = (GoodsType) goodByRef.get( madeFrom );
                     good.madeFrom = rawMaterial;
                     rawMaterial.makes = good;
                 }
 
                 goodByRef.put( attributes.getValue("ref"), good );
-                goodList.add( good );
+                goodsTypeList.add( good );
             }
             else {
                 throw new RuntimeException( elementName );
