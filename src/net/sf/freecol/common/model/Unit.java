@@ -3276,8 +3276,19 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         String oldName = getName();
         String messageID = "model.unit.unitDemoted";
         String nation = owner.getNationAsString();
-        if (isMounted()) {
-            if (isArmed() && getType() != BRAVE) {
+        
+        if (getType() == ARTILLERY) {
+            messageID = "model.unit.artilleryDamaged";
+            setType(DAMAGED_ARTILLERY);
+        } else if (getType() == DAMAGED_ARTILLERY 
+                || getType() == KINGS_REGULAR) {
+            messageID = "model.unit.unitDestroyed";
+            dispose();
+        } else if (getType() == BRAVE) {
+            messageID = "model.unit.unitSlaughtered";
+            dispose();
+        } else if (isMounted()) {
+            if (isArmed()) {
                 // dragoon
                 setMounted(false, true);
                 if (enemyUnit.getType() == BRAVE && greatDemote) {
@@ -3286,7 +3297,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                     enemyUnit.setMounted(true, true);
                 }
             } else {
-                // scout, brave?
+                // scout
                 messageID = "model.unit.unitSlaughtered";
                 dispose();
             }
@@ -3298,16 +3309,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                                 new String [][] {{"%nation%", enemyUnit.getOwner().getNationAsString()}});
                 enemyUnit.setArmed(true, true);
             }
-        } else if (getType() == ARTILLERY) {
-            messageID = "model.unit.artilleryDamaged";
-            setType(DAMAGED_ARTILLERY);
-        } else if (getType() == DAMAGED_ARTILLERY ||
-                   getType() == KINGS_REGULAR) {
-            messageID = "model.unit.unitDestroyed";
-            dispose();
-        } else if (getType() == BRAVE) {
-            messageID = "model.unit.unitSlaughtered";
-            dispose();
         } else {
             // civilians
             if (enemyUnit.getOwner().isEuropean()) {
@@ -3340,7 +3341,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             setType(FREE_COLONIST);
         } else if (getType() == FREE_COLONIST) {
             setType(VETERAN_SOLDIER);
-        } else if (getType() == VETERAN_SOLDIER && getOwner().getRebellionState() > 1) {
+        } else if (getType() == VETERAN_SOLDIER && getOwner().getRebellionState() >= Player.REBELLION_IN_WAR) {
             setType(COLONIAL_REGULAR);
         }
 
