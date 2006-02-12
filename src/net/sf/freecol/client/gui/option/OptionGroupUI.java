@@ -17,6 +17,7 @@ import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.common.option.SelectOption;
 
 
 
@@ -59,6 +60,8 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
                 c = new BooleanOptionUI((BooleanOption) o);
             } else if (o instanceof IntegerOption) {
                 c = new IntegerOptionUI((IntegerOption) o);
+            } else if (o instanceof SelectOption) {
+                c = new SelectOptionUI((SelectOption) o);
             } else if (o instanceof FreeColAction) {
                 c = new FreeColActionUI((FreeColAction) o, this);
             } else {

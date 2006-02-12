@@ -18,6 +18,7 @@ import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.OptionMap;
+import net.sf.freecol.common.option.SelectOption;
 
 
 
@@ -69,6 +70,10 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
                 ou.add(c);
             } else if (o instanceof IntegerOption) {
                 JComponent c = new IntegerOptionUI((IntegerOption) o);
+                northPanel.add(c);
+                ou.add(c);
+            } else if (o instanceof SelectOption) {
+                JComponent c = new SelectOptionUI((SelectOption) o);
                 northPanel.add(c);
                 ou.add(c);
             } else {

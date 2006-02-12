@@ -2049,16 +2049,30 @@ public final class InGameController implements NetworkConstants {
      */
     private boolean shouldAllowMessage( ModelMessage message ) {
 
-        boolean  shouldAllowMessage = true;
-
-        boolean  independenceMessage =
-            "model.colony.SoLIncrease".equals(message.getMessageID())
-        ||  "model.colony.SoLDecrease".equals(message.getMessageID());
-
-        shouldAllowMessage &= ! independenceMessage
-            ||  freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_SONS_OF_LIBERTY);
-
-        return shouldAllowMessage;
+        switch (message.getType()) {
+        case ModelMessage.DEFAULT:
+            return true;
+        case ModelMessage.SONS_OF_LIBERTY:
+            return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_SONS_OF_LIBERTY);
+        case ModelMessage.GOVERNMENT_EFFICIENCY:
+            return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_GOVERNMENT_EFFICIENCY);
+        case ModelMessage.WAREHOUSE_CAPACITY:
+            return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_WAREHOUSE_CAPACITY);
+        case ModelMessage.UNIT_IMPROVEMENT:
+            return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_UNIT_IMPROVEMENT);
+        case ModelMessage.UNIT_PROMOTION:
+            return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_UNIT_PROMOTION);
+        case ModelMessage.UNIT_DEMOTION:
+            return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_UNIT_DEMOTION);
+        case ModelMessage.BUILDING_COMPLETION:
+            return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_BUILDING_COMPLETION);
+        case ModelMessage.NEW_COLONIST:
+            return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_NEW_COLONIST);
+        case ModelMessage.FOREIGN_DIPLOMACY:
+            return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_FOREIGN_DIPLOMACY);
+        default:
+            return true;
+        }
     }
 
 

@@ -19,7 +19,7 @@ import net.sf.freecol.common.option.Option;
 * enable values to be both seen and changed.
 */
 public final class IntegerOptionUI extends JPanel implements OptionUpdater {
-    private static final Logger logger = Logger.getLogger(BooleanOptionUI.class.getName());
+    private static final Logger logger = Logger.getLogger(IntegerOptionUI.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";

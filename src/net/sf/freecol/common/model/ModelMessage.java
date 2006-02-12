@@ -10,15 +10,47 @@ import java.util.Arrays;
 */
 public class ModelMessage {
 
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
-    
+
+    /** Constants describing the type of message. */
+    public static final int DEFAULT = 0;
+    public static final int SONS_OF_LIBERTY = 1;
+    public static final int GOVERNMENT_EFFICIENCY = 2;
+    public static final int WAREHOUSE_CAPACITY = 3;
+    public static final int UNIT_IMPROVEMENT = 4;
+    public static final int UNIT_PROMOTION = 5;
+    public static final int UNIT_DEMOTION = 6;
+    public static final int BUILDING_COMPLETION = 7;
+    public static final int NEW_COLONIST = 8;
+    public static final int FOREIGN_DIPLOMACY = 9;
+
     private final FreeColGameObject source;
+    private final int type;
     private final String messageID;
     private final String[][] data;
     private boolean beenDisplayed = false;
 
+
+    /**
+    * Creates a new <code>ModelMessage</code>.
+    *
+    * @param source The source of the message. This is what the message should be
+    *               associated with. In addition, the owner of the source is the
+    *               player getting the message.
+    * @param messageID The ID of the message to display.
+    * @param data Contains data to be displayed in the message or <i>null</i>.
+    * @param type The type of this model message.
+    * @see Game#addModelMessage
+    * @see FreeColGameObject#addModelMessage
+    */
+    public ModelMessage(FreeColGameObject source, String messageID, String[][] data, int type) {
+        this.source = source;
+        this.messageID = messageID;
+        this.data = data;
+        this.type = type;
+    }
 
     /**
     * Creates a new <code>ModelMessage</code>.
@@ -35,8 +67,8 @@ public class ModelMessage {
         this.source = source;
         this.messageID = messageID;
         this.data = data;
+        this.type = DEFAULT;
     }
-
 
     /**
     * Checks if this <code>ModelMessage</code> has been displayed.
@@ -91,6 +123,14 @@ public class ModelMessage {
         return data;
     }
 
+    /**
+     * Gets the type of the message to display.   
+     * @return The type. 
+     */
+    public int getType() {
+        return type;
+    }
+    
 
     /**
     * Returns the owner of this message. The owner of this method
@@ -126,7 +166,8 @@ public class ModelMessage {
 
         ModelMessage m = (ModelMessage) o;
         return ( getSource() == m.getSource()
-                &&  getMessageID().equals(m.getMessageID())
-                &&  Arrays.equals(getData(), m.getData()) );
+                 && getMessageID().equals(m.getMessageID())
+                 && Arrays.equals(getData(), m.getData())
+                 && getType() == m.getType() );
     }
 }

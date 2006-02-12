@@ -141,6 +141,7 @@ public final class Colony extends Settlement implements Location {
         if (initializeWorkLocations) {
             workLocations.add(new ColonyTile(game, this, tile));
 
+            
             workLocations.add(new Building(game, this, Building.TOWN_HALL, Building.HOUSE));
             workLocations.add(new Building(game, this, Building.CARPENTER, Building.HOUSE));
             workLocations.add(new Building(game, this, Building.BLACKSMITH, Building.HOUSE));
@@ -157,6 +158,7 @@ public final class Colony extends Settlement implements Location {
             workLocations.add(new Building(game, this, Building.CHURCH, Building.NOT_BUILT));
             workLocations.add(new Building(game, this, Building.PRINTING_PRESS, Building.NOT_BUILT));
             workLocations.add(new Building(game, this, Building.CUSTOM_HOUSE, Building.NOT_BUILT));
+            
         }
     }
 
@@ -879,28 +881,41 @@ public final class Colony extends Settlement implements Location {
      * method should be called exactly once per turn.
      */
     public void updateSoL() {
+        int units = getUnitCount();
+        if (units == -1) {
+            return;
+        }
+
         int membership = (bells * 2) / (getUnitCount() + 1);
         if (membership < 0) membership = 0;
         if (membership > 100) membership = 100;
         oldSonsOfLiberty = sonsOfLiberty;
         sonsOfLiberty = membership;
         oldTories = tories;
-        tories = ((100 - sonsOfLiberty) * getUnitCount()) / 100;
+        tories = (units - ((units * sonsOfLiberty) / 100));
         int difficulty = getOwner().getDifficulty();
         int veryBadGovernment = 10 - difficulty;
         int badGovernment = 6 - difficulty;
+
+        logger.info(getName() +
+                    ": Tories: " + tories +
+                    "; OldTories: " + oldTories +
+                    "; SonsOfLiberty: " + sonsOfLiberty +
+                    "; OldSonsOfLiberty: " + oldSonsOfLiberty);
 
         if (sonsOfLiberty/10 != oldSonsOfLiberty/10) {
             if (sonsOfLiberty > oldSonsOfLiberty) {
                 addModelMessage(this, "model.colony.SoLIncrease",
                                 new String [][] {{"%oldSoL%", String.valueOf(oldSonsOfLiberty)},
                                                  {"%newSoL%", String.valueOf(sonsOfLiberty)},
-                                                 {"%colony%", getName()}});
+                                                 {"%colony%", getName()}},
+                                ModelMessage.SONS_OF_LIBERTY);
             } else {
                 addModelMessage(this, "model.colony.SoLDecrease",
                                 new String [][] {{"%oldSoL%", String.valueOf(oldSonsOfLiberty)},
                                                  {"%newSoL%", String.valueOf(sonsOfLiberty)},
-                                                 {"%colony%", getName()}});
+                                                 {"%colony%", getName()}},
+                                ModelMessage.SONS_OF_LIBERTY);
             }
         }
 
@@ -910,7 +925,8 @@ public final class Colony extends Settlement implements Location {
             bonus = 2;
             if (oldSonsOfLiberty < 100) {
                 addModelMessage(this, "model.colony.SoL100",
-                                new String[][] {{"%colony%", getName()}});
+                                new String[][] {{"%colony%", getName()}},
+                                ModelMessage.SONS_OF_LIBERTY);
             }
         } else {
 
@@ -918,7 +934,8 @@ public final class Colony extends Settlement implements Location {
                 bonus += 1;
                 if (oldSonsOfLiberty < 50) {
                     addModelMessage(this, "model.colony.SoL50",
-                                    new String[][] {{"%colony%", getName()}});
+                                    new String[][] {{"%colony%", getName()}},
+                                    ModelMessage.SONS_OF_LIBERTY);
                 }
             }
 
@@ -927,23 +944,27 @@ public final class Colony extends Settlement implements Location {
                 if (oldTories <= veryBadGovernment) {
                     // government has become very bad
                     addModelMessage(this, "model.colony.veryBadGovernment",
-                                    new String[][] {{"%colony%", getName()}});
+                                    new String[][] {{"%colony%", getName()}},
+                                    ModelMessage.GOVERNMENT_EFFICIENCY);
                 }
             } else if (tories > badGovernment) {
                 bonus -= 1;
                 if (oldTories <= badGovernment) {
                     // government has become bad
                     addModelMessage(this, "model.colony.badGovernment",
-                                    new String[][] {{"%colony%", getName()}});
+                                    new String[][] {{"%colony%", getName()}},
+                                    ModelMessage.GOVERNMENT_EFFICIENCY);
                 } else if (oldTories > veryBadGovernment) {
                     // government has improved, but is still bad
                     addModelMessage(this, "model.colony.governmentImproved1",
-                                    new String[][] {{"%colony%", getName()}});
+                                    new String[][] {{"%colony%", getName()}},
+                                    ModelMessage.GOVERNMENT_EFFICIENCY);
                 }
             } else if (oldTories > badGovernment) {
                 // government was bad, but has improved
                 addModelMessage(this, "model.colony.governmentImproved2",
-                                new String[][] {{"%colony%", getName()}});
+                                new String[][] {{"%colony%", getName()}},
+                                ModelMessage.GOVERNMENT_EFFICIENCY);
             }
 
         }
@@ -1185,7 +1206,10 @@ public final class Colony extends Settlement implements Location {
                     }
                     hammers = 0;
                     getBuilding(currentlyBuilding).setLevel(getBuilding(currentlyBuilding).getLevel() + 1);
-                    addModelMessage(this, "model.colony.buildingReady", new String[][] {{"%colony%", getName()}, {"%building%", getBuilding(currentlyBuilding).getName()}});
+                    addModelMessage(this, "model.colony.buildingReady", 
+                                    new String[][] {{"%colony%", getName()},
+                                                    {"%building%", getBuilding(currentlyBuilding).getName()}},
+                                    ModelMessage.BUILDING_COMPLETION);
                     getTile().updatePlayerExploredTiles();
                 } else {
                     addModelMessage(this, "model.colony.itemNeedTools", new String[][] {{"%colony%", getName()}, {"%item%", getBuilding(currentlyBuilding).getNextName()}});
@@ -1327,7 +1351,9 @@ public final class Colony extends Settlement implements Location {
         if (getGoodsCount(Goods.FOOD) >= 200) {
             Unit u = getGame().getModelController().createUnit(getID() + "newTurn200food", getTile(), getOwner(), Unit.FREE_COLONIST);
             removeGoods(Goods.FOOD, 200);
-            addModelMessage(this, "model.colony.newColonist", new String[][] {{"%colony%", getName()}});
+            addModelMessage(this, "model.colony.newColonist",
+                            new String[][] {{"%colony%", getName()}},
+                            ModelMessage.NEW_COLONIST);
             logger.info("New colonist created in " + getName() + " with ID=" + u.getID());
         }
 
@@ -1404,6 +1430,9 @@ public final class Colony extends Settlement implements Location {
             colonyElement.setAttribute("bells", Integer.toString(bells));
             colonyElement.setAttribute("sonsOfLiberty", Integer.toString(sonsOfLiberty));
             colonyElement.setAttribute("oldSonsOfLiberty", Integer.toString(oldSonsOfLiberty));
+            colonyElement.setAttribute("tories", Integer.toString(tories));
+            colonyElement.setAttribute("oldTories", Integer.toString(oldTories));
+            colonyElement.setAttribute("productionBonus", Integer.toString(productionBonus));
             colonyElement.setAttribute("currentlyBuilding", Integer.toString(currentlyBuilding));
             colonyElement.setAttribute("landLocked", Boolean.toString(landLocked));
 
@@ -1461,6 +1490,24 @@ public final class Colony extends Settlement implements Location {
             oldSonsOfLiberty = Integer.parseInt(colonyElement.getAttribute("oldSonsOfLiberty"));
         } else {
             oldSonsOfLiberty = 0;
+        }
+
+        if (colonyElement.hasAttribute("tories")) {
+            tories = Integer.parseInt(colonyElement.getAttribute("tories"));
+        } else {
+            tories = 0;
+        }
+
+        if (colonyElement.hasAttribute("oldTories")) {
+            oldTories = Integer.parseInt(colonyElement.getAttribute("oldTories"));
+        } else {
+            oldTories = 0;
+        }
+
+        if (colonyElement.hasAttribute("productionBonus")) {
+            productionBonus = Integer.parseInt(colonyElement.getAttribute("productionBonus"));
+        } else {
+            productionBonus = 0;
         }
 
         if (colonyElement.hasAttribute("currentlyBuilding")) {

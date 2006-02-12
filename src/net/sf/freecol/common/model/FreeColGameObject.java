@@ -290,6 +290,10 @@ abstract public class FreeColGameObject {
         getGame().addModelMessage(new ModelMessage(source, messageID, data));
     }
 
+    protected void addModelMessage(FreeColGameObject source, String messageID, String[][] data, int type) {
+        getGame().addModelMessage(new ModelMessage(source, messageID, data, type));
+    }
+
 
     /**
     * Checks if this object has the specified ID.
