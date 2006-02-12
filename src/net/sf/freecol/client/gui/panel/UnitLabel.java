@@ -238,9 +238,6 @@ public final class UnitLabel extends JLabel implements ActionListener {
 
                         break;
                     } else if (uc instanceof EuropePanel) {
-                        //((EuropePanel) uc).reinitialize();
-                        EuropePanel ep = (EuropePanel) uc;
-                        ep.updateGoldLabel();
                         break;
                     }
 

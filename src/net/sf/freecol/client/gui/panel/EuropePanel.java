@@ -8,6 +8,7 @@ import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.MediaTracker;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -17,6 +18,7 @@ import java.util.Iterator;
 import java.util.logging.Logger;
 
 import javax.swing.ComponentInputMap;
+import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -58,14 +60,13 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                                 PURCHASE = 2,
                                 TRAIN = 3;
 
-
+    private static final int TITLE_FONT_SIZE = 12;
+    
     private final Canvas  parent;
     private final FreeColClient freeColClient;
     private InGameController inGameController;
 
     private final JLabel                    cargoLabel;
-    private final JLabel                    goldLabel;
-    private final JLabel                    taxLabel;
     private final JLabel                    toAmericaLabel;
     private final ToAmericaPanel            toAmericaPanel;
     private final ToEuropePanel             toEuropePanel;
@@ -83,7 +84,8 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
     private Game        game;
     private UnitLabel   selectedUnit;
 
-    private JButton exitButton = new JButton("Close");
+    private JButton exitButton;
+    
 
 
 
@@ -101,7 +103,10 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         this.inGameController = inGameController;
 
         setFocusCycleRoot(true);
+        setSize(parent.getSize());
 
+        exitButton = new JButton("Close");
+        
         // Use ESCAPE for closing the ColonyPanel:
         InputMap inputMap = new ComponentInputMap(exitButton);
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false), "pressed");
@@ -117,7 +122,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         recruitDialog = new RecruitDialog();
         purchaseDialog = new PurchaseDialog();
         trainDialog = new TrainDialog();
-
+        
         toAmericaPanel.setBackground(Color.WHITE);
         toEuropePanel.setBackground(Color.WHITE);
         inPortPanel.setBackground(Color.WHITE);
@@ -147,10 +152,6 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         docksPanel.setLayout(new GridLayout(0 , 2));
         cargoPanel.setLayout(new GridLayout(1 , 0));
 
-        cargoLabel = new JLabel("<html><strike>Cargo</strike></html>");
-        goldLabel = new JLabel("Gold: 0");
-    taxLabel = new JLabel("Tax: 0");
-
         JButton recruitButton = new JButton( Messages.message("recruit") ),
                 purchaseButton = new JButton( Messages.message("purchase") ),
                 trainButton = new JButton( Messages.message("train") );
@@ -159,47 +160,85 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     inPortScroll = new JScrollPane(inPortPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER),
                     docksScroll = new JScrollPane(docksPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER),
                     cargoScroll = new JScrollPane(cargoPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED),
-                    marketScroll = new JScrollPane(marketPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-                toAmericaLabel = new JLabel( Messages.message("goingToAmerica") );
-        JLabel  toEuropeLabel = new JLabel( Messages.message("goingToEurope") ),
-                inPortLabel = new JLabel( Messages.message("inPort") ),
-                docksLabel = new JLabel( Messages.message("docks") );
-
+                    marketScroll = new JScrollPane(marketPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);                
+                
+        JLabel  toEuropeLabel = new JLabel(),
+                inPortLabel = new JLabel(),
+                docksLabel = new JLabel();
+        toAmericaLabel = new JLabel();
+        cargoLabel = new JLabel(); //"<html><strike>Cargo</strike></html>");
+        
+        ImageIcon toEuropeImage = new ImageIcon(freeColClient.getGUI().createStringImage(toEuropeLabel, Messages.message("goingToEurope"), Color.WHITE, 200, TITLE_FONT_SIZE));
+        toEuropeLabel.setIcon(toEuropeImage);
+        ImageIcon inPortImage = new ImageIcon(freeColClient.getGUI().createStringImage(inPortLabel, Messages.message("inPort"), Color.WHITE, 200, TITLE_FONT_SIZE));
+        inPortLabel.setIcon(inPortImage);
+        ImageIcon docksImage = new ImageIcon(freeColClient.getGUI().createStringImage(docksLabel, Messages.message("docks"), Color.WHITE, 200, TITLE_FONT_SIZE));
+        docksLabel.setIcon(docksImage);
+        ImageIcon toAmericaImage = new ImageIcon(freeColClient.getGUI().createStringImage(toAmericaLabel, Messages.message("goingToAmerica"), Color.WHITE, 200, TITLE_FONT_SIZE));
+        toAmericaLabel.setIcon(toAmericaImage);
+        ImageIcon cargoImage = new ImageIcon(freeColClient.getGUI().createStringImage(cargoLabel, Messages.message("cargo"), Color.WHITE, 400, TITLE_FONT_SIZE));
+        cargoLabel.setIcon(cargoImage);        
+        
+        marketScroll.getViewport().setOpaque(false);
+        marketPanel.setOpaque(false);
+        cargoScroll.getViewport().setOpaque(false);
+        cargoPanel.setOpaque(false);
+        toAmericaScroll.getViewport().setOpaque(false);
+        toAmericaPanel.setOpaque(false);
+        toEuropeScroll.getViewport().setOpaque(false);
+        toEuropePanel.setOpaque(false);
+        docksScroll.getViewport().setOpaque(false);
+        docksPanel.setOpaque(false);
+        inPortScroll.getViewport().setOpaque(false);
+        inPortPanel.setOpaque(false);        
+        recruitButton.setOpaque(true);
+        purchaseButton.setOpaque(true);
+        trainButton.setOpaque(true);
+        exitButton.setOpaque(true);
+        
+        final int SPACE = 30;
+        final int SPACE_BUTTON = 10;
+        
+        marketScroll.setSize(640, 114);
+        toAmericaScroll.setSize(315, 192);
+        toEuropeScroll.setSize(toAmericaScroll.getSize());        
+        inPortScroll.setSize(430, 96);
+        cargoScroll.setSize(inPortScroll.getSize());
+        docksScroll.setSize(marketScroll.getWidth() - inPortScroll.getWidth() - SPACE, cargoScroll.getHeight() + inPortScroll.getHeight() + SPACE);        
         exitButton.setSize(80, 20);
         recruitButton.setSize(100, 20);
         purchaseButton.setSize(100, 20);
-        trainButton.setSize(100, 20);
-        toAmericaScroll.setSize(200, 300);
-        toEuropeScroll.setSize(200, 300);
-        inPortScroll.setSize(200, 300);
-        docksScroll.setSize(200, 300);
-        cargoScroll.setSize(410, 96);
-        marketScroll.setSize(620, 114);
+        trainButton.setSize(100, 20);                        
         toAmericaLabel.setSize(200, 20);
         toEuropeLabel.setSize(200, 20);
         inPortLabel.setSize(200, 20);
         docksLabel.setSize(200, 20);
         cargoLabel.setSize(410, 20);
-        goldLabel.setSize(100, 20);
-    taxLabel.setSize(100, 20);
 
-        exitButton.setLocation(760, 570);
-        recruitButton.setLocation(690, 90);
-        purchaseButton.setLocation(690, 120);
-        trainButton.setLocation(690, 150);
-        toAmericaScroll.setLocation(10, 35);
-        toEuropeScroll.setLocation(220, 35);
-        inPortScroll.setLocation(430, 35);
-        docksScroll.setLocation(640, 250);
-        cargoScroll.setLocation(220, 370);
-        marketScroll.setLocation(10, 476);
-        toAmericaLabel.setLocation(10, 10);
-        toEuropeLabel.setLocation(220, 10);
-        inPortLabel.setLocation(430, 10);
-        docksLabel.setLocation(640, 225);
-        cargoLabel.setLocation(220, 345);
-        goldLabel.setLocation(15, 345);
-    taxLabel.setLocation(15, 365);
+        int totalHeight = toAmericaScroll.getHeight() + docksScroll.getHeight() + marketScroll.getHeight() + 2 * SPACE;
+        int spaceTop = (getHeight() - totalHeight) / 2;
+        int spaceLeft = (getWidth() - marketScroll.getWidth()) / 2;
+        int spaceRight = spaceLeft;
+        int spaceBottom = spaceTop;
+        
+        toAmericaScroll.setLocation(spaceLeft, spaceTop);
+        toAmericaLabel.setLocation(spaceLeft, spaceTop - 20);
+        toEuropeScroll.setLocation(getWidth() - spaceRight - toEuropeScroll.getWidth(), spaceTop);
+        toEuropeLabel.setLocation(getWidth() - spaceRight - toEuropeScroll.getWidth(), spaceTop - 20);
+        inPortScroll.setLocation(spaceLeft, spaceTop + toAmericaScroll.getHeight() + SPACE);
+        inPortLabel.setLocation(spaceLeft, inPortScroll.getY() - 20);   
+        docksScroll.setLocation(getWidth() - spaceRight - docksScroll.getWidth(), spaceTop + toEuropeScroll.getHeight() + SPACE);
+        docksLabel.setLocation(getWidth() - spaceRight - docksScroll.getWidth(), docksScroll.getY() - 20);
+        marketScroll.setLocation(spaceLeft, getHeight() - spaceBottom - marketScroll.getHeight());
+        cargoScroll.setLocation(spaceLeft, spaceTop + toAmericaScroll.getHeight() + inPortScroll.getHeight() + 2 * SPACE);
+        cargoLabel.setLocation(spaceLeft, cargoScroll.getY() - 20);
+        
+        int spaceTopButtons = spaceTop + (toAmericaScroll.getHeight() - (recruitButton.getHeight() + purchaseButton.getHeight() + trainButton.getHeight() + 2 * SPACE_BUTTON)) / 2;
+        recruitButton.setLocation((spaceLeft - recruitButton.getWidth()) / 2, spaceTopButtons);
+        purchaseButton.setLocation((spaceLeft - purchaseButton.getWidth()) / 2, spaceTopButtons + recruitButton.getHeight() + SPACE_BUTTON);
+        trainButton.setLocation((spaceLeft - trainButton.getWidth()) / 2, purchaseButton.getY() + purchaseButton.getHeight() + SPACE_BUTTON);
+                                
+        exitButton.setLocation((marketScroll.getWidth() + marketScroll.getX() + getWidth() - exitButton.getWidth()) / 2, marketScroll.getY() + (marketScroll.getHeight() - exitButton.getHeight()) / 2);                
     
         setLayout(null);
 
@@ -228,15 +267,11 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         add(inPortLabel);
         add(docksLabel);
         add(cargoLabel);
-        add(goldLabel);
-    add(taxLabel);
 
         try {
             BevelBorder border = new BevelBorder(BevelBorder.RAISED);
             setBorder(border);
-        } catch(Exception e) {}
-
-        setSize(850, 600);
+        } catch(Exception e) {}        
 
         selectedUnit = null;
         
@@ -267,18 +302,44 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         int width = getWidth();
         int height = getHeight();
 
-        Image tempImage = (Image) UIManager.get("BackgroundImage");
+        Image bgImage = (Image) UIManager.get("EuropeBackgroundImage");
+        if (bgImage != null) {
+            if (bgImage.getWidth(null) != getWidth() || bgImage.getHeight(null) != getHeight()) {
+                bgImage = bgImage.getScaledInstance(getWidth(), getHeight(), Image.SCALE_SMOOTH);
+                UIManager.put("EuropeBackgroundImage", bgImage);
 
-        if (tempImage != null) {
-            for (int x=0; x<width; x+=tempImage.getWidth(null)) {
-                for (int y=0; y<height; y+=tempImage.getHeight(null)) {
-                    g.drawImage(tempImage, x, y, null);
+                /*
+                  We have to use a MediaTracker to ensure that the
+                  image has been scaled before we paint it.
+                */
+                MediaTracker mt = new MediaTracker(freeColClient.getCanvas());
+                mt.addImage(bgImage, 0, getWidth(), getHeight());
+
+                try {
+                    mt.waitForID(0);
+                } catch (InterruptedException e) {
+                    g.setColor(Color.black);
+                    g.fillRect(0, 0, getWidth(), getHeight());
+                    return;
                 }
+
             }
+
+            g.drawImage(bgImage, 0, 0, null);
         } else {
-            g.setColor(getBackground());
-            g.fillRect(0, 0, width, height);
-        }
+            Image tempImage = (Image) UIManager.get("BackgroundImage");
+
+            if (tempImage != null) {
+                for (int x=0; x<width; x+=tempImage.getWidth(null)) {
+                    for (int y=0; y<height; y+=tempImage.getHeight(null)) {
+                        g.drawImage(tempImage, x, y, null);
+                    }
+                }
+            } else {
+                g.setColor(getBackground());
+                g.fillRect(0, 0, width, height);
+            }
+        }        
     }
 
 
@@ -302,10 +363,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             }
         }
 
-        goldLabel.setText("Gold: " + freeColClient.getMyPlayer().getGold());
-
-        // Only two components will be repainted!
-        goldLabel.repaint(0, 0, goldLabel.getWidth(), goldLabel.getHeight());
+        // Only one component will be repainted!
         docksPanel.repaint(0, 0, docksPanel.getWidth(), docksPanel.getHeight());
     }
 
@@ -336,10 +394,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                 }
             }
 
-            goldLabel.setText("Gold: " + freeColClient.getMyPlayer().getGold());
-
-            // Only two components will be repainted!
-            goldLabel.repaint(0, 0, goldLabel.getWidth(), goldLabel.getHeight());
+            // Only one component will be repainted!
             inPortPanel.repaint(0, 0, inPortPanel.getWidth(), inPortPanel.getHeight());
         }
     }
@@ -401,32 +456,15 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         }
 
         setSelectedUnitLabel(carrier);
-        updateGoldLabel();
 
         if (freeColClient.getMyPlayer() != null) {
             String newLandName = freeColClient.getMyPlayer().getNewLandName();
             if (newLandName == null) {
                 newLandName = freeColClient.getMyPlayer().getDefaultNewLandName();
             }
-            toAmericaLabel.setText( Messages.message("goingTo") + " " + newLandName );
-        taxLabel.setText( Messages.message("tax") + ": " + freeColClient.getMyPlayer().getTax() + "%" );
-
-    }
-    }
-
-
-    /**
-    * Updates the gold label.
-    */
-    public void updateGoldLabel() {
-        goldLabel.setText( Messages.message("goldTitle") + ": " + freeColClient.getMyPlayer().getGold() );
-    }
-
-    /**
-    * Updates the tax label.
-    */
-    public void updateTaxLabel() {
-        taxLabel.setText( Messages.message("tax") + ": " + freeColClient.getMyPlayer().getTax() + "%" );
+            ImageIcon toAmericaImage = new ImageIcon(freeColClient.getGUI().createStringImage(toAmericaLabel, Messages.message("goingTo") + " " + newLandName, Color.WHITE, 200, TITLE_FONT_SIZE));
+            toAmericaLabel.setIcon(toAmericaImage);
+        }
     }
 
     /**
@@ -507,9 +545,11 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
     */
     private void updateCargoLabel() {
         if (selectedUnit != null) {
-            cargoLabel.setText("Cargo (" + selectedUnit.getUnit().getName() + ") space left: " + selectedUnit.getUnit().getSpaceLeft());
+            ImageIcon cargoImage = new ImageIcon(freeColClient.getGUI().createStringImage(cargoLabel, Messages.message("cargo") + " (" + selectedUnit.getUnit().getName() + ") " + Messages.message("spaceLeft") + ": " + selectedUnit.getUnit().getSpaceLeft(), Color.WHITE, 200, TITLE_FONT_SIZE));
+            cargoLabel.setIcon(cargoImage);  
         } else {
-            cargoLabel.setText("<html><strike>Cargo</strike></html>");
+            ImageIcon cargoImage = new ImageIcon(freeColClient.getGUI().createStringImage(cargoLabel, Messages.message("cargo"), Color.WHITE, 200, TITLE_FONT_SIZE));
+            cargoLabel.setIcon(cargoImage); 
         }
     }
 
@@ -696,7 +736,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
 
 
         public String getUIClassID() {
-            return "InPortPanelUI";
+            return "EuropeInPortPanelUI";
         }
     }
 
@@ -855,9 +895,6 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                                                   selectedUnit.getUnit());
 
                         updateCargoLabel();
-                        goldLabel.setText( Messages.message("goldTitle") + ": " +
-                                           freeColClient.getMyPlayer().getGold() );
-                        goldLabel.repaint(0, 0, goldLabel.getWidth(), goldLabel.getHeight());
 
                         // TODO: Make this look prettier :-)
                         UnitLabel t = selectedUnit;
@@ -890,7 +927,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
 
 
         public String getUIClassID() {
-            return "CargoPanelUI";
+            return "EuropeCargoPanelUI";
         }
     }
 
@@ -929,8 +966,6 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     if (freeColClient.getMyPlayer().canTrade(goods)) {
                         inGameController.sellGoods(goods);
                         updateCargoLabel();
-                        goldLabel.setText("Gold: " + player.getGold());
-                        goldLabel.repaint(0, 0, goldLabel.getWidth(), goldLabel.getHeight());
                     } else {
                         inGameController.payArrears(goods);
                     }

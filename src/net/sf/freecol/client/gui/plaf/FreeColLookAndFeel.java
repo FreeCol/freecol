@@ -150,28 +150,35 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
             u.put("ScrollPaneUI", "net.sf.freecol.client.gui.plaf.FreeColScrollPaneUI");
             u.put("net.sf.freecol.client.gui.plaf.FreeColScrollPaneUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColScrollPaneUI"));
             u.put("ToolTipUI", "net.sf.freecol.client.gui.plaf.FreeColToolTipUI");
-            u.put("net.sf.freecol.client.gui.plaf.FreeColToolTipUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColToolTipUI"));
+            u.put("net.sf.freecol.client.gui.plaf.FreeColToolTipUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColToolTipUI"));            
+            
             //u.put("CargoPanelUI", "net.sf.freecol.client.gui.plaf.FreeColCargoPanelUI");
             //u.put("net.sf.freecol.client.gui.plaf.FreeColCargoPanelUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColCargoPanelUI"));
 
             // Sharing FreeColBrightPanelUI:
             u.put("net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI"));
-            u.put("ToAmericaPanelUI", "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI");            
-            u.put("ToEuropePanelUI", "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI");            
-            u.put("DocksPanelUI", "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI");
-            u.put("InPortPanelUI", "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI");
-            u.put("MarketPanelUI", "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI");
+            u.put("InPortPanelUI", "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI");            
             u.put("CargoPanelUI", "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI");
             u.put("BuildingsPanelUI", "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI");
             u.put("OutsideColonyPanelUI", "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI");
             u.put("InPortPanelUI", "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI");
             u.put("WarehousePanelUI", "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI");
 
+            // Sharing FreeColTransparentPanelUI:
+            u.put("net.sf.freecol.client.gui.plaf.FreeColTransparentPanelUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColTransparentPanelUI"));
+            u.put("MarketPanelUI", "net.sf.freecol.client.gui.plaf.FreeColTransparentPanelUI");
+            u.put("EuropeCargoPanelUI", "net.sf.freecol.client.gui.plaf.FreeColTransparentPanelUI");
+            u.put("ToAmericaPanelUI", "net.sf.freecol.client.gui.plaf.FreeColTransparentPanelUI");
+            u.put("ToEuropePanelUI", "net.sf.freecol.client.gui.plaf.FreeColTransparentPanelUI");
+            u.put("EuropeInPortPanelUI", "net.sf.freecol.client.gui.plaf.FreeColTransparentPanelUI");
+            u.put("DocksPanelUI", "net.sf.freecol.client.gui.plaf.FreeColTransparentPanelUI");
+            
             // Add image UI resources:
             String [][] resources = {                
                 {"BackgroundImage", "bg.png"},
                 {"BackgroundImage2", "bg2.png"},
                 {"CanvasBackgroundImage", "bg_map1.jpg"},
+                {"EuropeBackgroundImage", "bg_europe.jpg"},
                 {"TitleImage", "freecol2.png"},
                 {"MonarchImage", "monarch.png"},
                 {"EventImage.firstLanding", "landing.png"},

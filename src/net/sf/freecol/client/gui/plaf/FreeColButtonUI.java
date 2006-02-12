@@ -6,9 +6,11 @@ import java.awt.Composite;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 
 import javax.swing.AbstractButton;
 import javax.swing.JComponent;
+import javax.swing.UIManager;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.metal.MetalButtonUI;
 
@@ -33,6 +35,27 @@ public class FreeColButtonUI extends MetalButtonUI {
         c.setOpaque(false);
     }
     
+    
+    public void paint(Graphics g, JComponent b) {
+        if (b.isOpaque()) {
+            int width = b.getWidth();
+            int height = b.getHeight();
+            
+            Image tempImage = (Image) UIManager.get("BackgroundImage");
+            
+            if (tempImage != null) {
+                for (int x=0; x<width; x+=tempImage.getWidth(null)) {
+                    for (int y=0; y<height; y+=tempImage.getHeight(null)) {
+                        g.drawImage(tempImage, x, y, null);
+                    }
+                }
+            } else {
+                g.setColor(b.getBackground());
+                g.fillRect(0, 0, width, height);
+            }
+        }
+        super.paint(g, b);
+    }
     
     protected void paintButtonPressed(Graphics g, AbstractButton b) {
         if (b.isContentAreaFilled()) {

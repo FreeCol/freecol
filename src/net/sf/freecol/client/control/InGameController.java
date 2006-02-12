@@ -1874,7 +1874,6 @@ public final class InGameController implements NetworkConstants {
                                   new String [][] {{"%replace%", String.valueOf(arrears)}})) {
                 player.modifyGold(-arrears);
                 freeColClient.getCanvas().updateGoldLabel();
-                freeColClient.getCanvas().getEuropePanel().updateGoldLabel();
                 player.setArrears(type, 0);
                 // send to server
                 Element payArrearsElement = Message.createNewRootElement("payArrears");
