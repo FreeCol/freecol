@@ -201,7 +201,7 @@ public final class Server extends Thread {
             // For more info see the run() method
         }
 
-        Iterator connectionsIterator = connections.values().iterator();
+        Iterator connectionsIterator = ((HashMap) connections.clone()).values().iterator();
         while (connectionsIterator.hasNext()) {
             Connection c = (Connection) connectionsIterator.next();
 
