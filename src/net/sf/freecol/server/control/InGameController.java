@@ -12,6 +12,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
@@ -104,6 +105,10 @@ public final class InGameController extends Controller {
 
         if (nextPlayer.isEuropean()) {
             try {
+                Market market = game.getMarket();
+                // make random change to the market
+                market.add(random.nextInt(Goods.NUMBER_OF_TYPES), (50 - random.nextInt(71)));
+
                 Element updateElement = Message.createNewRootElement("update");
                 updateElement.appendChild(game.getMarket().toXMLElement(nextPlayer, updateElement.getOwnerDocument()));
                 nextPlayer.getConnection().send(updateElement);

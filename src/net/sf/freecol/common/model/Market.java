@@ -308,6 +308,14 @@ public final class Market extends FreeColGameObject {
     * @param marketElement The DOM-element ("Document Object Model") made to represent this "Map".
     */
     public void readFromXMLElement(Element marketElement) {
+
+        int[] oldPrices = new int[dataForGoodType.length];
+        for(int i = 0; i < dataForGoodType.length; i++) {
+            if (dataForGoodType[i] != null) {
+                oldPrices[i] = dataForGoodType[i].costToBuy;
+            }
+        }
+
         setID(marketElement.getAttribute("ID"));
 
         NodeList dataList = marketElement.getElementsByTagName(Data.getXMLElementTagName());
@@ -323,6 +331,22 @@ public final class Market extends FreeColGameObject {
         }
 
         priceGoods();
+        
+        for(int k = 0; k < dataForGoodType.length; k++) {
+            if (oldPrices[k] > dataForGoodType[k].costToBuy) {
+                addModelMessage(this, "model.market.priceDecrease",
+                                new String[][] {{"%goods%", Goods.getName(k)},
+                                                {"%buy%", String.valueOf(dataForGoodType[k].costToBuy)},
+                                                {"%sell%", String.valueOf(dataForGoodType[k].paidForSale)}},
+                                ModelMessage.MARKET_PRICES);
+            } else if (oldPrices[k] < dataForGoodType[k].costToBuy) {
+                addModelMessage(this, "model.market.priceIncrease",
+                                new String[][] {{"%goods%", Goods.getName(k)},
+                                                {"%buy%", String.valueOf(dataForGoodType[k].costToBuy)},
+                                                {"%sell%", String.valueOf(dataForGoodType[k].paidForSale)}},
+                                ModelMessage.MARKET_PRICES);
+            }
+        }
     }
 
 
