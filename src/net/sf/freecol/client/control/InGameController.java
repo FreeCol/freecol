@@ -2070,6 +2070,8 @@ public final class InGameController implements NetworkConstants {
             return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_NEW_COLONIST);
         case ModelMessage.FOREIGN_DIPLOMACY:
             return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_FOREIGN_DIPLOMACY);
+        case ModelMessage.MARKET_PRICES:
+            return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_MARKET_PRICES);
         default:
             return true;
         }

@@ -638,7 +638,8 @@ public class Game extends FreeColGameObject {
         Iterator i = modelMessages.iterator();
         while (i.hasNext()) {
             ModelMessage m = (ModelMessage) i.next();
-            if (m.getOwner() == player && !m.hasBeenDisplayed()) {
+            if ((m.getOwner() == null || m.getOwner() == player) &&
+                !m.hasBeenDisplayed()) {
                 out.add(m);
             }
         }

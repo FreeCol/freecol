@@ -1920,11 +1920,13 @@ public class Player extends FreeColGameObject {
                 if (newSoL > oldSoL) {
                     addModelMessage(this, "model.player.SoLIncrease",
                                     new String [][] {{"%oldSoL%", String.valueOf(oldSoL)},
-                                                     {"%newSoL%", String.valueOf(newSoL)}});
+                                                     {"%newSoL%", String.valueOf(newSoL)}},
+                                    ModelMessage.SONS_OF_LIBERTY);
                 } else {
                     addModelMessage(this, "model.player.SoLDecrease",
                                     new String [][] {{"%oldSoL%", String.valueOf(oldSoL)},
-                                                     {"%newSoL%", String.valueOf(newSoL)}});
+                                                     {"%newSoL%", String.valueOf(newSoL)}},
+                                    ModelMessage.SONS_OF_LIBERTY);
                 }
             }
         }

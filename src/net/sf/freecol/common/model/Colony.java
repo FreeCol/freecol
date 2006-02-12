@@ -897,7 +897,7 @@ public final class Colony extends Settlement implements Location {
         int veryBadGovernment = 10 - difficulty;
         int badGovernment = 6 - difficulty;
 
-        logger.info(getName() +
+        logger.fine(getName() +
                     ": Tories: " + tories +
                     "; OldTories: " + oldTories +
                     "; SonsOfLiberty: " + sonsOfLiberty +

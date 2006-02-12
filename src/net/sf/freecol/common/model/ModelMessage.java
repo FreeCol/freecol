@@ -25,6 +25,7 @@ public class ModelMessage {
     public static final int BUILDING_COMPLETION = 7;
     public static final int NEW_COLONIST = 8;
     public static final int FOREIGN_DIPLOMACY = 9;
+    public static final int MARKET_PRICES = 10;
 
     private final FreeColGameObject source;
     private final int type;
