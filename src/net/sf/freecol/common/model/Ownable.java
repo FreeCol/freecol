@@ -8,6 +8,11 @@ package net.sf.freecol.common.model;
 */
 public interface Ownable {
 
+    public static final  String  COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
+    public static final  String  LICENSE   = "http://www.gnu.org/licenses/gpl.html";
+    public static final  String  REVISION  = "$Revision$";
+
+
     /**
     * Gets the owner of this <code>Ownable</code>.
     *
@@ -15,4 +20,5 @@ public interface Ownable {
     *         {@link Ownable}.
     */
     public Player getOwner();
+
 }

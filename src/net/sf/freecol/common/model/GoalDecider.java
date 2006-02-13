@@ -1,4 +1,6 @@
+
 package net.sf.freecol.common.model;
+
 
 /**
  * Used by {@link Map#search} in order to determine a goal.
@@ -17,6 +19,11 @@ package net.sf.freecol.common.model;
  * The method {@link #getGoal()} will get called after this.
  */
 public interface GoalDecider {
+
+    public static final  String  COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
+    public static final  String  LICENSE   = "http://www.gnu.org/licenses/gpl.html";
+    public static final  String  REVISION  = "$Revision$";
+
 
     /**
      * Gets the <code>PathNode</code> containing the goal.

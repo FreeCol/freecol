@@ -1,6 +1,7 @@
 
 package net.sf.freecol.server.ai;
 
+
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Locatable;
 import net.sf.freecol.common.model.Location;
@@ -17,6 +18,10 @@ import net.sf.freecol.server.ai.mission.TransportMission;
 * @see TransportMission
 */
 public interface Transportable {
+
+    public static final  String  COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
+    public static final  String  LICENSE   = "http://www.gnu.org/licenses/gpl.html";
+    public static final  String  REVISION  = "$Revision$";
 
     /**
     * Returns the source for this <code>Transportable</code>.

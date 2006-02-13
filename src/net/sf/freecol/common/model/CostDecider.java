@@ -1,4 +1,6 @@
+
 package net.sf.freecol.common.model;
+
 
 /**
  * Determines the cost of a single move. Used by {@link Map#findPath} 
@@ -6,6 +8,10 @@ package net.sf.freecol.common.model;
  */
 public interface CostDecider {
     
+    public static final  String  COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
+    public static final  String  LICENSE   = "http://www.gnu.org/licenses/gpl.html";
+    public static final  String  REVISION  = "$Revision$";
+
     public static final int ILLEGAL_MOVE = -1;
     
     /**

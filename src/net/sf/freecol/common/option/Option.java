@@ -1,6 +1,7 @@
 
 package net.sf.freecol.common.option;
 
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -11,6 +12,10 @@ import org.w3c.dom.Element;
  * @see net.sf.freecol.common.model.GameOptions
  */
 public interface Option {
+
+    public static final  String  COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
+    public static final  String  LICENSE   = "http://www.gnu.org/licenses/gpl.html";
+    public static final  String  REVISION  = "$Revision$";
 
     public static final String NO_ID = "NO_ID";
 

@@ -2,7 +2,6 @@
 package net.sf.freecol.common.model;
 
 
-
 /**
 * Represents a single <code>Tile</code> in a path.
 *
@@ -12,6 +11,10 @@ package net.sf.freecol.common.model;
 * {@link #getTile} and {@link #getTotalTurns}, when evaluating/following a path.
 */
 public class PathNode implements Comparable {
+
+    public static final  String  COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
+    public static final  String  LICENSE   = "http://www.gnu.org/licenses/gpl.html";
+    public static final  String  REVISION  = "$Revision$";
 
     private Tile tile;
     private int cost;
