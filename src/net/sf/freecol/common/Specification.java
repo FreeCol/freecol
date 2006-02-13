@@ -11,6 +11,7 @@ import java.util.Map;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.TileType;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.util.Xml;
 
 import org.w3c.dom.Document;
@@ -31,6 +32,7 @@ public final class Specification {
     private final  List  buildingTypeList;
     private final  List  tileTypeList;
     private final  List  goodsTypeList;
+    private final  List  unitTypeList;
 
 
     // ----------------------------------------------------------- constructors
@@ -40,6 +42,7 @@ public final class Specification {
         buildingTypeList = new ArrayList();
         tileTypeList = new ArrayList();
         goodsTypeList = new ArrayList();
+        unitTypeList = new ArrayList();
 
         InputStream  in = Specification.class.getResourceAsStream( "specification.xml" );
         Document  specificationDocument = Xml.documentFrom( in );
@@ -92,6 +95,19 @@ public final class Specification {
 
                     makeListFromXml( goodsTypeList, xml, factory );
                 }
+                else if ( "unit-types".equals(childName) ) {
+
+                    ObjectFactory  factory = new ObjectFactory() {
+                        public Object objectFrom( Node xml ) {
+
+                            UnitType  unitType = new UnitType();
+                            unitType.readFromXmlElement( xml, goodsTypeByRef );
+                            return unitType;
+                        }
+                    };
+
+                    makeListFromXml( unitTypeList, xml, factory );
+                }
                 else {
                     throw new RuntimeException( "unexpected: " + xml );
                 }
@@ -141,15 +157,27 @@ public final class Specification {
     }
 
 
-    public int numberOfGoodTypes() {
+    public int numberOfGoodsTypes() {
 
         return goodsTypeList.size();
     }
 
 
-    public GoodsType goodType( int goodIndex ) {
+    public GoodsType goodsType( int goodsTypeIndex ) {
 
-        return (GoodsType) goodsTypeList.get( goodIndex );
+        return (GoodsType) goodsTypeList.get( goodsTypeIndex );
+    }
+
+
+    public int numberOfUnitTypes() {
+
+        return unitTypeList.size();
+    }
+
+
+    public UnitType unitType( int unitTypeIndex ) {
+
+        return (UnitType) unitTypeList.get( unitTypeIndex );
     }
 
 
