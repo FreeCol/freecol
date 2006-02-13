@@ -1,10 +1,10 @@
 
 package net.sf.freecol.common.networking;
 
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.logging.Logger;
@@ -49,19 +49,6 @@ public final class Message {
         this(new InputSource(new StringReader(msg)));
     }
 
-
-    /**
-    * Constructs a new Message with data from the given <code>Reader</code>. The constructor
-    * to use if this is an INCOMING message.
-    * 
-    * @param reader The <code>Reader</code> to get the XML-data from.
-    * @exception IOException if thrown by the <code>Reader</code>.
-    * @exception SAXException if thrown during parsing.
-    */
-    public Message(Reader reader) throws SAXException, IOException {
-        this(new InputSource(reader));
-    }
-    
     
     /**
     * Constructs a new Message with data from the given InputStream. The constructor
@@ -84,7 +71,7 @@ public final class Message {
     * @exception IOException if thrown by the <code>InputSource</code>.
     * @exception SAXException if thrown during parsing.
     */
-    public Message(InputSource inputSource) throws SAXException, IOException {
+    private Message(InputSource inputSource) throws SAXException, IOException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         Document tempDocument = null;
 
@@ -193,11 +180,13 @@ public final class Message {
     * @return The type of this Message.
     */
     public String getType() {
-        if (document != null && document.getDocumentElement() != null) {
+
+        if ( document != null  &&  document.getDocumentElement() != null ) {
+
             return document.getDocumentElement().getTagName();
-        } else {
-            return INVALID_MESSAGE;
         }
+
+        return INVALID_MESSAGE;
     }
 
 
@@ -209,11 +198,8 @@ public final class Message {
     *         and <code>false</code> otherwise.
     */
     public boolean isType(String type) {
-        if (getType().equals(type)) {
-            return true;
-        } else {
-            return false;
-        }
+
+        return getType().equals( type );
     }
 
 

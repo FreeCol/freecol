@@ -2,26 +2,19 @@
 package net.sf.freecol.common;
 
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.TileType;
+import net.sf.freecol.common.util.Xml;
 
-import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 
 /**
@@ -44,24 +37,81 @@ public final class Specification {
 
     public Specification() {
 
-        try {
-            buildingTypeList = new ArrayList();
-            tileTypeList = new ArrayList();
-            goodsTypeList = new ArrayList();
+        buildingTypeList = new ArrayList();
+        tileTypeList = new ArrayList();
+        goodsTypeList = new ArrayList();
 
-            SAXParser  parser = SAXParserFactory.newInstance().newSAXParser();
-            InputStream  in = Specification.class.getResourceAsStream("specification.xml");
-            parser.parse(new InputSource(in), new XmlHandler());
-        }
-        catch ( SAXException e ) {
-            throw new RuntimeException( e );
-        }
-        catch ( IOException e ) {
-            throw new RuntimeException( e );
-        }
-        catch ( ParserConfigurationException e ) {
-            throw new RuntimeException( e );
-        }
+        InputStream  in = Specification.class.getResourceAsStream( "specification.xml" );
+        Document  specificationDocument = Xml.documentFrom( in );
+
+        final  Map  goodsTypeByRef = new HashMap();
+
+        /* this method is invoked for each child element of the root element */
+        final Xml.Method  method = new Xml.Method() {
+            public void invokeOn( Node xml ) {
+
+                String  childName = xml.getNodeName();
+
+                if ( "building-types".equals(childName) ) {
+
+                    ObjectFactory  factory = new ObjectFactory() {
+                        public Object objectFrom( Node xml ) {
+
+                            BuildingType  buildingType = new BuildingType();
+                            buildingType.readFromXmlElement( xml );
+                            return buildingType;
+                        }
+                    };
+
+                    makeListFromXml( buildingTypeList, xml, factory );
+                }
+                else if ( "tile-types".equals(childName) ) {
+
+                    ObjectFactory  factory = new ObjectFactory() {
+                        public Object objectFrom( Node xml ) {
+
+                            TileType  tileType = new TileType();
+                            tileType.readFromXmlElement( xml );
+                            return tileType;
+                        }
+                    };
+
+                    makeListFromXml( tileTypeList, xml, factory );
+                }
+                else if ( "goods-types".equals(childName) ) {
+
+                    ObjectFactory  factory = new ObjectFactory() {
+                        public Object objectFrom( Node xml ) {
+
+                            GoodsType  goodsType = new GoodsType();
+                            goodsType.readFromXmlElement( xml, goodsTypeByRef );
+                            goodsTypeByRef.put( Xml.attribute(xml, "ref"), goodsType );
+                            return goodsType;
+                        }
+                    };
+
+                    makeListFromXml( goodsTypeList, xml, factory );
+                }
+                else {
+                    throw new RuntimeException( "unexpected: " + xml );
+                }
+            }
+        };
+
+        /* this method is invoked for each child element of the document, which
+         * includes the "revision" comment and the root element at the moment */
+        Xml.Method  documentMethod = new Xml.Method() {
+            public void invokeOn( Node xml ) {
+
+                if ( "freecol-specification".equals(xml.getNodeName()) ) {
+
+                    // for each child element of the document root element..
+                    Xml.forEachChild( xml, method );
+                }
+            }
+        };
+
+        Xml.forEachChild( specificationDocument, documentMethod );
     }
 
 
@@ -103,144 +153,28 @@ public final class Specification {
     }
 
 
-    // ----------------------------------------------------------- nested types
+    // -------------------------------------------------------- support methods
 
-    private final class XmlHandler extends DefaultHandler {
+    private void makeListFromXml( final List list, Node xml, final ObjectFactory factory ) {
 
-        private  BuildingType  contextBuildingType;
-        private  TileType      contextTileType;
-        private  Map           goodByRef;
+        Xml.Method  method = new Xml.Method() {
+            public void invokeOn( Node xml ) {
 
-        public void startElement( String      namespaceUuri,
-                                  String      localName,
-                                  String      elementName,
-                                  Attributes  attributes ) throws SAXException {
-
-            if ( "freecol-specification".equals(elementName) ) {
-
-                // do nothing
+                // construct an object from "xml" and add it to the list
+                list.add( factory.objectFrom(xml) );
             }
-            else if ( "building-types".equals(elementName) ) {
+        };
 
-                // do nothing
-            }
-            else if ( "building-type".equals(elementName) ) {
-
-                contextBuildingType = new BuildingType();
-            }
-            else if ( "building-level".equals(elementName) ) {
-
-                BuildingType.Level  level =
-                    new BuildingType.Level( Messages.message(attributes.getValue("name")),
-                            Integer.parseInt(attributes.getValue("hammers-required")),
-                            Integer.parseInt(attributes.getValue("tools-required")),
-                            Integer.parseInt(attributes.getValue("population-required"))
-                    );
-                contextBuildingType.add( level );
-            }
-            else if ( "tile-types".equals(elementName) ) {
-
-                // do nothing
-            }
-            else if ( "tile-type".equals(elementName) ) {
-
-                contextTileType =
-                    new TileType( Messages.message(attributes.getValue("name")),
-                                  Integer.parseInt(attributes.getValue("basic-move-cost")),
-                                  Integer.parseInt(attributes.getValue("defence-bonus")) );
-
-            }
-            else if ( "when-forested".equals(elementName) ) {
-
-                TileType  tileType =
-                    new TileType( Messages.message(attributes.getValue("name")),
-                                  Integer.parseInt(attributes.getValue("basic-move-cost")),
-                                  Integer.parseInt(attributes.getValue("defence-bonus")) );
-
-                contextTileType.whenForested = tileType;
-            }
-            else if ( "goods".equals(elementName) ) {
-
-                goodByRef = new HashMap();
-            }
-            else if ( "good".equals(elementName) ) {
-
-                GoodsType  good = new GoodsType( attributes.getValue("name"),
-                                       parseTruth(attributes.getValue("is-farmed")) );
-
-                String  madeFrom = attributes.getValue( "made-from" );
-                if ( madeFrom != null ) {
-                    GoodsType  rawMaterial = (GoodsType) goodByRef.get( madeFrom );
-                    good.madeFrom = rawMaterial;
-                    rawMaterial.makes = good;
-                }
-
-                goodByRef.put( attributes.getValue("ref"), good );
-                goodsTypeList.add( good );
-            }
-            else {
-                throw new RuntimeException( elementName );
-            }
-        }
-
-        public void endElement( String  namespaceUri,
-                                String  localName,
-                                String  elementName ) throws SAXException {
-
-            if ( "freecol-specification".equals(elementName) ) {
-
-                // do nothing
-            }
-            else if ( "building-types".equals(elementName) ) {
-
-                // do nothing
-            }
-            else if ( "building-type".equals(elementName) ) {
-
-                buildingTypeList.add( contextBuildingType );
-                contextBuildingType = null;
-            }
-            else if ( "building-level".equals(elementName) ) {
-
-                // do nothing
-            }
-            else if ( "tile-types".equals(elementName) ) {
-
-                // do nothing
-            }
-            else if ( "tile-type".equals(elementName) ) {
-
-                tileTypeList.add( contextTileType );
-                contextTileType = null;
-            }
-            else if ( "when-forested".equals(elementName) ) {
-
-                // do nothing
-            }
-            else if ( "goods".equals(elementName) ) {
-
-                goodByRef = null;
-            }
-            else if ( "good".equals(elementName) ) {
-
-                // do nothing
-            }
-            else {
-                throw new RuntimeException( elementName );
-            }
-        }
+        // for each child element of "xml"..
+        Xml.forEachChild( xml, method );
     }
 
 
-    public static boolean parseTruth( String truthAsString )
-    {
-        if ( "yes".equals(truthAsString) ) {
-            return true;
-        }
-        else if ( "no".equals(truthAsString) ) {
-            return false;
-        }
-        throw new RuntimeException( "mus be 'yes' or 'no': " + truthAsString );
+    // ----------------------------------------------------------- nested types
+
+    interface ObjectFactory {
+
+        public Object objectFrom( Node xml );
     }
 
 }

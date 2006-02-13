@@ -2,7 +2,11 @@
 package net.sf.freecol.common.model;
 
 
-import net.sf.freecol.client.gui.i18n.Messages;
+import java.util.Map;
+
+import net.sf.freecol.common.util.Xml;
+
+import org.w3c.dom.Node;
 
 
 public final class GoodsType
@@ -14,17 +18,34 @@ public final class GoodsType
     private static  int  nextIndex;
 
     public final  int        index;
-    public final  String     name;
-    public final  boolean    isFarmed;
+    public        String     name;
+    public        boolean    isFarmed;
     public        GoodsType  madeFrom;
     public        GoodsType  makes;
 
 
-    public GoodsType( String name, boolean isFarmed ) {
+    // ----------------------------------------------------------- constructors
+
+    public GoodsType() {
 
         index = nextIndex ++;
-        this.name = Messages.message( name );
-        this.isFarmed = isFarmed;
+    }
+
+
+    // ------------------------------------------------------------ API methods
+
+    public void readFromXmlElement( Node xml, Map goodsTypeByRef ) {
+
+        name = Xml.messageAttribute( xml, "name" );
+        isFarmed = Xml.booleanAttribute( xml, "is-farmed" );
+
+        if ( Xml.hasAttribute(xml, "made-from") ) {
+
+            String  madeFromRef = Xml.attribute( xml, "made-from" );
+            GoodsType  rawMaterial = (GoodsType) goodsTypeByRef.get( madeFromRef );
+            madeFrom = rawMaterial;
+            rawMaterial.makes = this;
+        }
     }
 
 

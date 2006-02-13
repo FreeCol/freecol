@@ -5,6 +5,10 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.freecol.common.util.Xml;
+
+import org.w3c.dom.Node;
+
 
 public final class BuildingType
 {
@@ -25,9 +29,18 @@ public final class BuildingType
 
     // ------------------------------------------------------------ API methods
 
-    public void add( Level level ) {
+    public void readFromXmlElement( Node xml )
+    {
+        Xml.Method  method = new Xml.Method() {
+            public void invokeOn( Node xml ) {
 
-        levelList.add( level );
+                BuildingType.Level  level = new BuildingType.Level();
+                level.readFromXmlElement( xml );
+                levelList.add( level );
+            }
+        };
+
+        Xml.forEachChild( xml, method );
     }
 
 
@@ -47,20 +60,17 @@ public final class BuildingType
 
     public static final class Level {
 
-        public final  String  name;
-        public final  int     hammersRequired;
-        public final  int     toolsRequired;
-        public final  int     populationRequired;
+        public  String  name;
+        public  int     hammersRequired;
+        public  int     toolsRequired;
+        public  int     populationRequired;
 
-        public Level( String  name,
-                      int     hammersRequired,
-                      int     toolsRequired,
-                      int     populationRequired ) {
+        void readFromXmlElement( Node xml ) {
 
-            this.name = name;
-            this.hammersRequired = hammersRequired;
-            this.toolsRequired = toolsRequired;
-            this.populationRequired = populationRequired;
+            name = Xml.messageAttribute(xml, "name");
+            hammersRequired = Xml.intAttribute(xml, "hammers-required");
+            toolsRequired = Xml.intAttribute(xml, "tools-required");
+            populationRequired = Xml.intAttribute(xml, "population-required");
         }
     }
 
