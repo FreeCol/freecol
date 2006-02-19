@@ -58,16 +58,17 @@ public class ClientOptions extends OptionMap {
      * @see net.sf.freecol.client.gui.GUI
      */
     public static final String SHOW_SONS_OF_LIBERTY = "guiShowSonsOfLiberty";
-
+    public static final String SHOW_WARNING = "guiShowWarning";
     public static final String SHOW_GOVERNMENT_EFFICIENCY = "guiShowGovernmentEfficiency";
     public static final String SHOW_WAREHOUSE_CAPACITY = "guiShowWarehouseCapacity";
-    public static final String SHOW_UNIT_IMPROVEMENT = "guiShowUnitImprovement";
-    public static final String SHOW_UNIT_PROMOTION = "guiShowUnitPromotion";
-    public static final String SHOW_UNIT_DEMOTION = "guiShowUnitDemotion";
-    public static final String SHOW_BUILDING_COMPLETION = "guiShowBuildingCompletion";
-    public static final String SHOW_NEW_COLONIST = "guiShowNewColonist";
+    public static final String SHOW_UNIT_IMPROVED = "guiShowUnitImproved";
+    public static final String SHOW_UNIT_DEMOTED = "guiShowUnitDemoted";
+    public static final String SHOW_UNIT_ADDED = "guiShowUnitAdded";
+    public static final String SHOW_UNIT_LOST = "guiShowUnitLost";
+    public static final String SHOW_BUILDING_COMPLETED = "guiShowBuildingCompleted";
     public static final String SHOW_FOREIGN_DIPLOMACY = "guiShowForeignDiplomacy";
     public static final String SHOW_MARKET_PRICES = "guiShowMarketPrices";
+    public static final String SHOW_LOST_CITY_RUMOURS = "guiShowLostCityRumours";
 
     /**
     * Creates a new <code>ClientOptions</code>.
@@ -113,6 +114,10 @@ public class ClientOptions extends OptionMap {
                                       0));
 
         /** Boolean message display options. */
+        guiGroup.add(new BooleanOption(SHOW_WARNING,
+                                       "clientOptions.gui."+ SHOW_WARNING +".name",
+                                       "clientOptions.gui."+ SHOW_WARNING +".shortDescription", 
+                                       true));
         guiGroup.add(new BooleanOption(SHOW_SONS_OF_LIBERTY,
                                        "clientOptions.gui."+ SHOW_SONS_OF_LIBERTY +".name",
                                        "clientOptions.gui."+ SHOW_SONS_OF_LIBERTY +".shortDescription", 
@@ -125,25 +130,25 @@ public class ClientOptions extends OptionMap {
                                        "clientOptions.gui."+ SHOW_WAREHOUSE_CAPACITY +".name",
                                        "clientOptions.gui."+ SHOW_WAREHOUSE_CAPACITY +".shortDescription", 
                                        true));
-        guiGroup.add(new BooleanOption(SHOW_UNIT_IMPROVEMENT,
-                                       "clientOptions.gui."+ SHOW_UNIT_IMPROVEMENT +".name",
-                                       "clientOptions.gui."+ SHOW_UNIT_IMPROVEMENT +".shortDescription", 
+        guiGroup.add(new BooleanOption(SHOW_UNIT_IMPROVED,
+                                       "clientOptions.gui."+ SHOW_UNIT_IMPROVED +".name",
+                                       "clientOptions.gui."+ SHOW_UNIT_IMPROVED +".shortDescription", 
                                        true));
-        guiGroup.add(new BooleanOption(SHOW_UNIT_PROMOTION,
-                                       "clientOptions.gui."+ SHOW_UNIT_PROMOTION +".name",
-                                       "clientOptions.gui."+ SHOW_UNIT_PROMOTION +".shortDescription", 
+        guiGroup.add(new BooleanOption(SHOW_UNIT_DEMOTED,
+                                       "clientOptions.gui."+ SHOW_UNIT_DEMOTED +".name",
+                                       "clientOptions.gui."+ SHOW_UNIT_DEMOTED +".shortDescription", 
                                        true));
-        guiGroup.add(new BooleanOption(SHOW_UNIT_DEMOTION,
-                                       "clientOptions.gui."+ SHOW_UNIT_DEMOTION +".name",
-                                       "clientOptions.gui."+ SHOW_UNIT_DEMOTION +".shortDescription", 
+        guiGroup.add(new BooleanOption(SHOW_UNIT_ADDED,
+                                       "clientOptions.gui."+ SHOW_UNIT_ADDED +".name",
+                                       "clientOptions.gui."+ SHOW_UNIT_ADDED +".shortDescription", 
                                        true));
-        guiGroup.add(new BooleanOption(SHOW_BUILDING_COMPLETION,
-                                       "clientOptions.gui."+ SHOW_BUILDING_COMPLETION +".name",
-                                       "clientOptions.gui."+ SHOW_BUILDING_COMPLETION +".shortDescription", 
+        guiGroup.add(new BooleanOption(SHOW_UNIT_LOST,
+                                       "clientOptions.gui."+ SHOW_UNIT_LOST +".name",
+                                       "clientOptions.gui."+ SHOW_UNIT_LOST +".shortDescription", 
                                        true));
-        guiGroup.add(new BooleanOption(SHOW_NEW_COLONIST,
-                                       "clientOptions.gui."+ SHOW_NEW_COLONIST +".name",
-                                       "clientOptions.gui."+ SHOW_NEW_COLONIST +".shortDescription", 
+        guiGroup.add(new BooleanOption(SHOW_BUILDING_COMPLETED,
+                                       "clientOptions.gui."+ SHOW_BUILDING_COMPLETED +".name",
+                                       "clientOptions.gui."+ SHOW_BUILDING_COMPLETED +".shortDescription", 
                                        true));
         guiGroup.add(new BooleanOption(SHOW_FOREIGN_DIPLOMACY,
                                        "clientOptions.gui."+ SHOW_FOREIGN_DIPLOMACY +".name",

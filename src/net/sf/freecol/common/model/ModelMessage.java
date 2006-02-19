@@ -16,16 +16,18 @@ public class ModelMessage {
 
     /** Constants describing the type of message. */
     public static final int DEFAULT = 0;
-    public static final int SONS_OF_LIBERTY = 1;
-    public static final int GOVERNMENT_EFFICIENCY = 2;
-    public static final int WAREHOUSE_CAPACITY = 3;
-    public static final int UNIT_IMPROVEMENT = 4;
-    public static final int UNIT_PROMOTION = 5;
-    public static final int UNIT_DEMOTION = 6;
-    public static final int BUILDING_COMPLETION = 7;
-    public static final int NEW_COLONIST = 8;
-    public static final int FOREIGN_DIPLOMACY = 9;
-    public static final int MARKET_PRICES = 10;
+    public static final int WARNING = 1;
+    public static final int SONS_OF_LIBERTY = 2;
+    public static final int GOVERNMENT_EFFICIENCY = 3;
+    public static final int WAREHOUSE_CAPACITY = 4;
+    public static final int UNIT_IMPROVED = 5;
+    public static final int UNIT_DEMOTED = 6;
+    public static final int UNIT_LOST = 7;
+    public static final int UNIT_ADDED = 8;
+    public static final int BUILDING_COMPLETED = 9;
+    public static final int FOREIGN_DIPLOMACY = 10;
+    public static final int MARKET_PRICES = 11;
+    public static final int LOST_CITY_RUMOUR = 12;
 
     private final FreeColGameObject source;
     private final int type;
@@ -64,12 +66,14 @@ public class ModelMessage {
     * @see Game#addModelMessage
     * @see FreeColGameObject#addModelMessage
     */
+    /*
     public ModelMessage(FreeColGameObject source, String messageID, String[][] data) {
         this.source = source;
         this.messageID = messageID;
         this.data = data;
         this.type = DEFAULT;
     }
+    */
 
     /**
     * Checks if this <code>ModelMessage</code> has been displayed.

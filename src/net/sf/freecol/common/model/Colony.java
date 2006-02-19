@@ -730,19 +730,27 @@ public final class Colony extends Settlement implements Location {
     */
     public void addHammers(int amount) {
         if (currentlyBuilding == -1) {
-            addModelMessage(this, "model.colony.cannotBuild", new String[][] {{"%colony%", getName()}});
+            addModelMessage(this, "model.colony.cannotBuild",
+                            new String[][] {{"%colony%", getName()}},
+                            ModelMessage.WARNING);
             return;
         }
 
         // Building only:
         if (currentlyBuilding < BUILDING_UNIT_ADDITION) {
             if (getBuilding(currentlyBuilding).getNextPop() > getUnitCount()) {
-                addModelMessage(this, "model.colony.buildNeedPop", new String[][] {{"%colony%", getName()}, {"%building%", getBuilding(currentlyBuilding).getNextName()}});
+                addModelMessage(this, "model.colony.buildNeedPop",
+                                new String[][] {{"%colony%", getName()},
+                                                {"%building%", getBuilding(currentlyBuilding).getNextName()}},
+                                ModelMessage.WARNING);
                 return;
             }
 
             if (getBuilding(currentlyBuilding).getNextHammers() == -1) {
-                addModelMessage(this, "model.colony.alreadyBuilt", new String[][] {{"%colony%", getName()}, {"%building%", getBuilding(currentlyBuilding).getName()}});
+                addModelMessage(this, "model.colony.alreadyBuilt",
+                                new String[][] {{"%colony%", getName()},
+                                                {"%building%", getBuilding(currentlyBuilding).getName()}},
+                                ModelMessage.WARNING);
             }
         }
         
@@ -1185,9 +1193,15 @@ public final class Colony extends Settlement implements Location {
                     Unit unit = getGame().getModelController().createUnit(getID() + "buildUnit", getTile(), getOwner(), unitType);
                     hammers = 0;
                     removeGoods(Goods.TOOLS, Unit.getNextTools(unit.getType()));
-                    addModelMessage(this, "model.colony.unitReady", new String[][] {{"%colony%", getName()}, {"%unit%", unit.getName()}});
+                    addModelMessage(this, "model.colony.unitReady",
+                                    new String[][] {{"%colony%", getName()},
+                                                    {"%unit%", unit.getName()}},
+                                    ModelMessage.UNIT_ADDED);
                 } else {
-                    addModelMessage(this, "model.colony.itemNeedTools", new String[][] {{"%colony%", getName()}, {"%item%", Unit.getName(unitType)}});
+                    addModelMessage(this, "model.colony.itemNeedTools",
+                                    new String[][] {{"%colony%", getName()},
+                                                    {"%item%", Unit.getName(unitType)}},
+                                    ModelMessage.WARNING);
                 }
             }
         } else if (currentlyBuilding != -1) {
@@ -1209,10 +1223,13 @@ public final class Colony extends Settlement implements Location {
                     addModelMessage(this, "model.colony.buildingReady", 
                                     new String[][] {{"%colony%", getName()},
                                                     {"%building%", getBuilding(currentlyBuilding).getName()}},
-                                    ModelMessage.BUILDING_COMPLETION);
+                                    ModelMessage.BUILDING_COMPLETED);
                     getTile().updatePlayerExploredTiles();
                 } else {
-                    addModelMessage(this, "model.colony.itemNeedTools", new String[][] {{"%colony%", getName()}, {"%item%", getBuilding(currentlyBuilding).getNextName()}});
+                    addModelMessage(this, "model.colony.itemNeedTools",
+                                    new String[][] {{"%colony%", getName()},
+                                                    {"%item%", getBuilding(currentlyBuilding).getNextName()}},
+                                    ModelMessage.WARNING);
                 }
             }
         }
@@ -1326,12 +1343,17 @@ public final class Colony extends Settlement implements Location {
             // Kill a colonist:
             getRandomUnit().dispose();
             removeGoods(Goods.FOOD, food);
-            addModelMessage(this, "model.colony.colonistStarved", new String[][] {{"%colony%", getName()}});
+            addModelMessage(this, "model.colony.colonistStarved", 
+                            new String[][] {{"%colony%", getName()}},
+                            ModelMessage.UNIT_LOST);
         } else {
             removeGoods(Goods.FOOD, eat);
 
             if (eat > getFoodProduction() && (food-eat) / (eat - getFoodProduction()) <= 3) {
-                addModelMessage(this, "model.colony.famineFeared", new String[][] {{"%colony%", getName()}, {"%number%", Integer.toString((food-eat) / (eat - getFoodProduction()))}});
+                addModelMessage(this, "model.colony.famineFeared",
+                                new String[][] {{"%colony%", getName()},
+                                                {"%number%", Integer.toString((food-eat) / (eat - getFoodProduction()))}},
+                                ModelMessage.WARNING);
             }
         }
 
@@ -1353,7 +1375,7 @@ public final class Colony extends Settlement implements Location {
             removeGoods(Goods.FOOD, 200);
             addModelMessage(this, "model.colony.newColonist",
                             new String[][] {{"%colony%", getName()}},
-                            ModelMessage.NEW_COLONIST);
+                            ModelMessage.UNIT_ADDED);
             logger.info("New colonist created in " + getName() + " with ID=" + u.getID());
         }
 

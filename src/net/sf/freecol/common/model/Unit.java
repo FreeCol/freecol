@@ -342,7 +342,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             int value = ((IndianSettlement) settlement).getPrice(goods) / 100;
             settlement.getOwner().modifyTension(getOwner(), -value);
         } else {
-            addModelMessage(settlement.getOwner(), "model.unit.gift", new String[][] {{"%player%", getOwner().getNationAsString()}, {"%type%", Goods.getName(type)}, {"%amount%", Integer.toString(amount)}});
+            addModelMessage(settlement.getOwner(), "model.unit.gift",
+                            new String[][] {{"%player%", getOwner().getNationAsString()},
+                                            {"%type%", Goods.getName(type)},
+                                            {"%amount%", Integer.toString(amount)}},
+                            ModelMessage.DEFAULT);
         }
     }
  
@@ -397,7 +401,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 o = getOwner().getEurope();
             }
             getOwner().modifyGold(cashInAmount);
-            addModelMessage(o, "model.unit.cashInTreasureTrain", new String[][] {{"%amount%", Integer.toString(getTreasureAmount())}, {"%cashInAmount%", Integer.toString(cashInAmount)}});
+            addModelMessage(o, "model.unit.cashInTreasureTrain",
+                            new String[][] {{"%amount%", Integer.toString(getTreasureAmount())},
+                                            {"%cashInAmount%", Integer.toString(cashInAmount)}},
+                            ModelMessage.DEFAULT);
             dispose();
         } else {
             throw new IllegalStateException("Cannot cash in treasure train at the current location.");
@@ -1683,7 +1690,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             getGame().getMarket().buy(type, amount, getOwner());
             goodsContainer.addGoods(type, amount);
         } catch(IllegalStateException ise) {
-            this.addModelMessage(this, "notEnoughGold", null);
+            this.addModelMessage(this, "notEnoughGold", null,
+                                 ModelMessage.DEFAULT);
         }
     }
 
@@ -2460,7 +2468,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
                 switch (state) {
                     case TO_EUROPE:
-                        addModelMessage(getOwner().getEurope(), "model.unit.arriveInEurope", null);
+                        addModelMessage(getOwner().getEurope(), "model.unit.arriveInEurope", null,
+                                        ModelMessage.DEFAULT);
                         if (getType() == GALLEON) {
                             Iterator iter = getUnitIterator();
                             Unit u = null;
@@ -2532,9 +2541,12 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         numberOfTools -= amount;
         if (numberOfTools == 0) {
             if (getType() == HARDY_PIONEER) {
-                addModelMessage(this, "model.unit.noMoreToolsPioneer", null);
+                addModelMessage(this, "model.unit.noMoreToolsPioneer", null,
+                                ModelMessage.WARNING);
             } else {
-                addModelMessage(this, "model.unit.noMoreTools", new String [][] {{"%name%", getName()}});
+                addModelMessage(this, "model.unit.noMoreTools",
+                                new String [][] {{"%name%", getName()}},
+                                ModelMessage.WARNING);
             }
         }
     }
@@ -2853,7 +2865,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         case ATTACK_EVADES:
             if (isNaval()) {
                 addModelMessage(this, "model.unit.shipEvaded",
-                                new String [][] {{"%ship%", getName()}});
+                                new String [][] {{"%ship%", getName()}},
+                                ModelMessage.DEFAULT);
             } else {
                 logger.warning("Non-naval unit evades!");
             }
@@ -2927,7 +2940,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         addModelMessage(this, "model.unit.shipDamaged",
                         new String [][] {{"%ship%", getName()},
                                          {"%repairLocation%", repairLocationName},
-                                         {"%nation%", nation}});
+                                         {"%nation%", nation}},
+                        ModelMessage.UNIT_DEMOTED);
         setHitpoints(1);
         getUnitContainer().disposeAllUnits();
         goodsContainer.removeAbove(0);
@@ -2941,7 +2955,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         String nation = owner.getNationAsString();
         addModelMessage(this, "model.unit.shipSunk",
                         new String [][] {{"%ship%", getName()},
-                                         {"%nation%", nation}});
+                                         {"%nation%", nation}},
+                        ModelMessage.UNIT_DEMOTED);
         dispose();
     }
 
@@ -2957,6 +2972,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         String oldName = getName();
         String messageID = "model.unit.unitDemoted";
         String nation = owner.getNationAsString();
+        int type = ModelMessage.UNIT_DEMOTED;
         
         if (getType() == ARTILLERY) {
             messageID = "model.unit.artilleryDamaged";
@@ -2964,9 +2980,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         } else if (getType() == DAMAGED_ARTILLERY 
                 || getType() == KINGS_REGULAR) {
             messageID = "model.unit.unitDestroyed";
+            type = ModelMessage.UNIT_LOST;
             dispose();
         } else if (getType() == BRAVE) {
             messageID = "model.unit.unitSlaughtered";
+            type = ModelMessage.UNIT_LOST;
             dispose();
         } else if (isMounted()) {
             if (isArmed()) {
@@ -2974,12 +2992,14 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 setMounted(false, true);
                 if (enemyUnit.getType() == BRAVE && greatDemote) {
                     addModelMessage(this, "model.unit.braveMounted",
-                                    new String [][] {{"%nation%", enemyUnit.getOwner().getNationAsString()}});
+                                    new String [][] {{"%nation%", enemyUnit.getOwner().getNationAsString()}},
+                                    ModelMessage.FOREIGN_DIPLOMACY);
                     enemyUnit.setMounted(true, true);
                 }
             } else {
                 // scout
                 messageID = "model.unit.unitSlaughtered";
+                type = ModelMessage.UNIT_LOST;
                 dispose();
             }
         } else if (isArmed()) {
@@ -2987,18 +3007,21 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             setArmed(false, true);
             if (enemyUnit.getType() == BRAVE && greatDemote) {
                 addModelMessage(this, "model.unit.braveArmed",
-                                new String [][] {{"%nation%", enemyUnit.getOwner().getNationAsString()}});
+                                new String [][] {{"%nation%", enemyUnit.getOwner().getNationAsString()}},
+                                ModelMessage.FOREIGN_DIPLOMACY);
                 enemyUnit.setArmed(true, true);
             }
         } else {
             // civilians
             if (enemyUnit.getOwner().isEuropean()) {
                 messageID = "model.unit.unitCaptured";
+                type = ModelMessage.UNIT_LOST;
                 setHitpoints(getInitialHitpoints(enemyUnit.getType()));
                 setLocation(enemyUnit.getTile());
                 setOwner(enemyUnit.getOwner());
             } else {
                 messageID = "model.unit.unitSlaughtered";
+                type = ModelMessage.UNIT_LOST;
                 dispose();
             }
         }
@@ -3006,7 +3029,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         addModelMessage(this, messageID,
                         new String [][] {{"%oldName%", oldName},
                                          {"%newName%", newName},
-                                         {"%nation%", nation}});
+                                         {"%nation%", nation}},
+                        type);
     }
 
     /**
@@ -3031,7 +3055,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             addModelMessage(this, "model.unit.unitImproved",
                             new String[][] {{"%oldName%", oldName},
                                             {"%newName%", getName()},
-                                            {"%nation%", nation}});
+                                            {"%nation%", nation}},
+                            ModelMessage.UNIT_IMPROVED);
         }
     }
 
@@ -3159,7 +3184,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
         addModelMessage(this, "model.unit.indianTreasure",
                         new String[][] {{"%indian%", enemy.getNationAsString()},
-                                        {"%amount%", Integer.toString(tTrain.getTreasureAmount())}});
+                                        {"%amount%", Integer.toString(tTrain.getTreasureAmount())}},
+                        ModelMessage.DEFAULT);
         setLocation(newTile);
     }
 
@@ -3182,14 +3208,16 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             setLocation(colony.getTile());
             addModelMessage(this, "model.unit.colonyCaptured",
                             new String[][] {{"%colony%", colony.getName()},
-                                            {"%amount%", Integer.toString(plunderGold)}});
+                                            {"%amount%", Integer.toString(plunderGold)}},
+                            ModelMessage.DEFAULT);
         } else { // Indian:
             if (colony.getUnitCount() <= 1) {
                 myPlayer.modifyGold(plunderGold);
                 enemy.modifyGold(-plunderGold);
                 addModelMessage(colony, "model.unit.colonyBurning",
                                 new String[][] {{"%colony%", colony.getName()},
-                                                {"%amount%", Integer.toString(plunderGold)}});
+                                                {"%amount%", Integer.toString(plunderGold)}},
+                                ModelMessage.DEFAULT);
                 colony.dispose();
             } else {
                 Unit victim = colony.getRandomUnit();
@@ -3198,7 +3226,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 }
                 addModelMessage(colony, "model.unit.colonistSlaughtered",
                                 new String[][] {{"%colony%", colony.getName()},
-                                                {"%unit%", victim.getName()}});
+                                                {"%unit%", victim.getName()}},
+                                ModelMessage.UNIT_LOST);
                 victim.dispose();
             }
         }

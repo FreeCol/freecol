@@ -630,10 +630,16 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
                         student.setTrainingType(-1);
                         student.setTurnsOfTraining(0);
-                        addModelMessage(this, "model.unit.unitImproved", new String[][] {{"%oldName%", oldName}, {"%newName%", student.getName()}});
+                        addModelMessage(this, "model.unit.unitImproved",
+                                        new String[][] {{"%oldName%", oldName},
+                                                        {"%newName%", student.getName()}},
+                                        ModelMessage.UNIT_IMPROVED);
                     }
                 } else {
-                    addModelMessage(this, "model.building.noStudent", new String[][] {{"%teacher%", teacher.getName()}, {"%colony%", colony.getName()}});
+                    addModelMessage(this, "model.building.noStudent",
+                                    new String[][] {{"%teacher%", teacher.getName()},
+                                                    {"%colony%", colony.getName()}},
+                                    ModelMessage.WARNING);
                 }
             }
         } else if (getGoodsOutputType() != -1) {
@@ -643,7 +649,11 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             int goodsOutputType = getGoodsOutputType();
 
             if (getGoodsInput() == 0 && getMaximumGoodsInput() > 0) {
-                addModelMessage(this, "model.building.notEnoughInput", new String[][] {{"%inputGoods%", Goods.getName(goodsInputType)}, {"%building%", getName()}, {"%colony%", colony.getName()}});
+                addModelMessage(this, "model.building.notEnoughInput", 
+                                new String[][] {{"%inputGoods%", Goods.getName(goodsInputType)},
+                                                {"%building%", getName()},
+                                                {"%colony%", colony.getName()}},
+                                ModelMessage.WARNING);
             }
 
             if (goodsOutput <= 0) return;

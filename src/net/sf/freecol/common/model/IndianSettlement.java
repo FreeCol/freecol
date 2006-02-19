@@ -934,7 +934,8 @@ public class IndianSettlement extends Settlement {
 
                     Unit u = getGame().getModelController().createUnit(getID() + "newTurn100missionary", targetTile, missionary.getOwner(), Unit.INDIAN_CONVERT);
                     addModelMessage(this, "model.colony.newConvert",
-                                    new String[][] {{"%nation%", getOwner().getNationAsString()}});
+                                    new String[][] {{"%nation%", getOwner().getNationAsString()}},
+                                    ModelMessage.UNIT_ADDED);
                     logger.info("New convert created for " + missionary.getOwner().getName() + " with ID=" + u.getID());
                 }
             }

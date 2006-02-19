@@ -295,12 +295,14 @@ public class GoodsContainer extends FreeColGameObject {
                 storedGoods[i] = limit;
                 addModelMessage(source, "model.building.warehouseOverfull",
                                 new String [][] {{"%goods%", Goods.getName(i)},
-                                                 {"%colony%", ((Colony) parent).getName()}});
+                                                 {"%colony%", ((Colony) parent).getName()}},
+                                ModelMessage.WAREHOUSE_CAPACITY);
             } else if (storedGoods[i] == limit && oldStoredGoods[i] < limit) {
                 // limit has been reached during this turn
                 addModelMessage(source, "model.building.warehouseOverfull",
                                 new String [][] {{"%goods%", Goods.getName(i)},
-                                                 {"%colony%", ((Colony) parent).getName()}}) ;
+                                                 {"%colony%", ((Colony) parent).getName()}},
+                                ModelMessage.WAREHOUSE_CAPACITY) ;
             } else {
                 // check whether certain levels have been exceeded
                 for (int k = 0; k < levels.length; k++) {
@@ -308,7 +310,8 @@ public class GoodsContainer extends FreeColGameObject {
                         addModelMessage(source, "model.building.warehouseFull",
                                         new String [][] {{"%goods%", Goods.getName(i)},
                                                          {"%level%", String.valueOf(levels[k])},
-                                                         {"%colony%", ((Colony) parent).getName()}}) ;
+                                                         {"%colony%", ((Colony) parent).getName()}},
+                                        ModelMessage.WAREHOUSE_CAPACITY) ;
                         // don't report on more than one level
                         break;
                     }

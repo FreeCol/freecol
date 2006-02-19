@@ -744,7 +744,8 @@ public final class InGameInputHandler extends InputHandler {
                                                   "model.monarch.bostonTeaParty",
                                                   new String [][] {{"%colony%", colony.getName()},
                                                                    {"%amount%", String.valueOf(goods.getAmount())},
-                                                                   {"%goods%", goods.getName()}})); 
+                                                                   {"%goods%", goods.getName()}},
+                                                  ModelMessage.WARNING)); 
         }
                          
         return null;
@@ -779,27 +780,33 @@ public final class InGameInputHandler extends InputHandler {
             Player indianPlayer = game.getPlayer(tile.getNationOwner());
             indianPlayer.modifyTension(player, Tension.TENSION_HATEFUL);
             m = new ModelMessage(tile, "lostCityRumour.BurialGround", 
-                                 new String [][] {{"%nation%", indianPlayer.getNationAsString()}});
+                                 new String [][] {{"%nation%", indianPlayer.getNationAsString()}},
+                                 ModelMessage.LOST_CITY_RUMOUR);
         case LostCityRumour.EXPEDITION_VANISHES: 
-            m = new ModelMessage(tile, "lostCityRumour.ExpeditionVanishes", null);
+            m = new ModelMessage(tile, "lostCityRumour.ExpeditionVanishes", null,
+                                 ModelMessage.LOST_CITY_RUMOUR);
             unit.dispose();
             break;
         case LostCityRumour.NOTHING:
-            m = new ModelMessage(tile, "lostCityRumour.Nothing", null);
+            m = new ModelMessage(tile, "lostCityRumour.Nothing", null,
+                                 ModelMessage.LOST_CITY_RUMOUR);
             break;
         case LostCityRumour.SEASONED_SCOUT:
             m = new ModelMessage(tile, "lostCityRumour.SeasonedScout",
-                                 new String [][] {{"%unit%", unit.getName()}});
+                                 new String [][] {{"%unit%", unit.getName()}},
+                                 ModelMessage.LOST_CITY_RUMOUR);
             unit.setType(Unit.SEASONED_SCOUT);
             break;
         case LostCityRumour.TRIBAL_CHIEF:
             String amount = element.getAttribute("amount");
             m = new ModelMessage(tile, "lostCityRumour.TribalChief", 
-                                 new String [][] {{"%money%", amount}});
+                                 new String [][] {{"%money%", amount}},
+                                 ModelMessage.LOST_CITY_RUMOUR);
             player.modifyGold(Integer.parseInt(amount));
             break;
         case LostCityRumour.COLONIST:
-            m = new ModelMessage(tile, "lostCityRumour.Colonist", null);
+            m = new ModelMessage(tile, "lostCityRumour.Colonist", null,
+                                 ModelMessage.LOST_CITY_RUMOUR);
             unitList = element.getChildNodes();
             for (int i = 0; i < unitList.getLength(); i++) {
                 Element unitElement = (Element) unitList.item(i);
@@ -810,7 +817,8 @@ public final class InGameInputHandler extends InputHandler {
         case LostCityRumour.TREASURE_TRAIN:
             String treasure = element.getAttribute("amount");
             m = new ModelMessage(tile, "lostCityRumour.TreasureTrain",
-                                 new String [][] {{"%money%", treasure}});
+                                 new String [][] {{"%money%", treasure}},
+                                 ModelMessage.LOST_CITY_RUMOUR);
             unitList = element.getChildNodes();
             for (int i = 0; i < unitList.getLength(); i++) {
                 Element unitElement = (Element) unitList.item(i);
@@ -819,7 +827,8 @@ public final class InGameInputHandler extends InputHandler {
             }
             break;
         case LostCityRumour.FOUNTAIN_OF_YOUTH:
-            m = new ModelMessage(player.getEurope(), "lostCityRumour.FountainOfYouth", null);
+            m = new ModelMessage(player.getEurope(), "lostCityRumour.FountainOfYouth", null,
+                                 ModelMessage.LOST_CITY_RUMOUR);
             unitList = element.getChildNodes();
             for (int i = 0; i < unitList.getLength(); i++) {
                 Element unitElement = (Element) unitList.item(i);

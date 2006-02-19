@@ -2051,22 +2051,24 @@ public final class InGameController implements NetworkConstants {
         switch (message.getType()) {
         case ModelMessage.DEFAULT:
             return true;
+        case ModelMessage.WARNING:
+            return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_WARNING);
         case ModelMessage.SONS_OF_LIBERTY:
             return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_SONS_OF_LIBERTY);
         case ModelMessage.GOVERNMENT_EFFICIENCY:
             return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_GOVERNMENT_EFFICIENCY);
         case ModelMessage.WAREHOUSE_CAPACITY:
             return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_WAREHOUSE_CAPACITY);
-        case ModelMessage.UNIT_IMPROVEMENT:
-            return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_UNIT_IMPROVEMENT);
-        case ModelMessage.UNIT_PROMOTION:
-            return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_UNIT_PROMOTION);
-        case ModelMessage.UNIT_DEMOTION:
-            return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_UNIT_DEMOTION);
-        case ModelMessage.BUILDING_COMPLETION:
-            return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_BUILDING_COMPLETION);
-        case ModelMessage.NEW_COLONIST:
-            return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_NEW_COLONIST);
+        case ModelMessage.UNIT_IMPROVED:
+            return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_UNIT_IMPROVED);
+        case ModelMessage.UNIT_DEMOTED:
+            return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_UNIT_DEMOTED);
+        case ModelMessage.UNIT_LOST:
+            return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_UNIT_LOST);
+        case ModelMessage.UNIT_ADDED:
+            return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_UNIT_ADDED);
+        case ModelMessage.BUILDING_COMPLETED:
+            return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_BUILDING_COMPLETED);
         case ModelMessage.FOREIGN_DIPLOMACY:
             return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_FOREIGN_DIPLOMACY);
         case ModelMessage.MARKET_PRICES:

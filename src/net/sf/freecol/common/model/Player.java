@@ -399,7 +399,7 @@ public class Player extends FreeColGameObject {
         getREFPlayer().setStance(this, Player.PEACE);
         setStance(getREFPlayer(), Player.PEACE);
         
-        addModelMessage(this, "model.player.independence", null);
+        addModelMessage(this, "model.player.independence", null, ModelMessage.DEFAULT);
     }
     
     
@@ -653,18 +653,22 @@ public class Player extends FreeColGameObject {
             // these dialogs should only appear on the first event
             if (player.isEuropean()) {
                 if(!contactedEuro) {
-                    addModelMessage(this, "EventPanel.MEETING_EUROPEANS", null);
+                    addModelMessage(this, "EventPanel.MEETING_EUROPEANS", null,
+                                    ModelMessage.FOREIGN_DIPLOMACY);
                 }
             } else {
                 if(!contactedIndians) {
-                    addModelMessage(this, "EventPanel.MEETING_NATIVES", null);
+                    addModelMessage(this, "EventPanel.MEETING_NATIVES", null,
+                                    ModelMessage.FOREIGN_DIPLOMACY);
                 }
 
                 // special cases for Aztec/Inca
                 if(player.getNation() == Player.AZTEC) {
-                    addModelMessage(this, "EventPanel.MEETING_AZTEC", null);
+                    addModelMessage(this, "EventPanel.MEETING_AZTEC", null,
+                                    ModelMessage.FOREIGN_DIPLOMACY);
                 } else if(player.getNation() == Player.INCA) {
-                    addModelMessage(this, "EventPanel.MEETING_INCA", null);
+                    addModelMessage(this, "EventPanel.MEETING_INCA", null,
+                                    ModelMessage.FOREIGN_DIPLOMACY);
                 }
             }
         }
@@ -1892,7 +1896,8 @@ public class Player extends FreeColGameObject {
 
             addModelMessage(this, "model.player.foundingFatherJoinedCongress",
                             new String[][] {{"%foundingFather%",
-                            Messages.message(FoundingFather.getName(currentFather))}});
+                            Messages.message(FoundingFather.getName(currentFather))}},
+                            ModelMessage.DEFAULT);
 
             currentFather = FoundingFather.NONE;
             bells = 0;
