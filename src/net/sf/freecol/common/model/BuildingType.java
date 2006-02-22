@@ -64,6 +64,7 @@ public final class BuildingType
         public  int     hammersRequired;
         public  int     toolsRequired;
         public  int     populationRequired;
+        public  int     workPlaces;
 
         void readFromXmlElement( Node xml ) {
 
@@ -71,6 +72,7 @@ public final class BuildingType
             hammersRequired = Xml.intAttribute(xml, "hammers-required");
             toolsRequired = Xml.intAttribute(xml, "tools-required");
             populationRequired = Xml.intAttribute(xml, "population-required");
+            workPlaces = Xml.intAttribute(xml, "workplaces");
         }
     }
 
