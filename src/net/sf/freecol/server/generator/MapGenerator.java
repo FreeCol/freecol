@@ -1,6 +1,9 @@
 package net.sf.freecol.server.generator;
 
+import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -90,7 +93,7 @@ public class MapGenerator {
         Map map = terrainGenerator.createMap();
 
         game.setMap(map);
-
+        createRivers(map);
         createIndianSettlements(map, players);
         createEuropeanUnits(map, width, height, players);
         createLostCityRumours(map);        
@@ -125,6 +128,38 @@ public class MapGenerator {
         logger.info("Created " + counter + " lost city rumours of maximum " + number + ".");
     }
         
+
+    /**
+     * Creates rivers on the given map. The number of rivers depends
+     * on the map size.
+     *
+     * @param map The map to create rivers on.
+     */
+    public void createRivers(Map map) {
+        int number = (width * height) / 100;
+        int counter = 0;
+        Hashtable riverMap = new Hashtable();
+
+        for (int i = 0; i < number; i++) {
+            River river = new River(map, riverMap);
+            for (int tries = 0; tries < 100; tries++) {
+                Position position = new Position(random.nextInt(width), random.nextInt(height));
+
+                if (riverMap.get(position) == null) {
+                    if (river.flowFromSource(position)) {
+                        logger.info("Created new river with length " + river.getLength());
+                        counter++;
+                        break;
+                    } else {
+                        logger.info("Failed to generate river.");
+                    }
+                }
+            }
+        }
+
+        logger.info("Created " + counter + " rivers of maximum " + number + ".");
+    }
+
 
     /**
      * Create the Indian settlements, at least a capital for every nation and

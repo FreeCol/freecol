@@ -1361,6 +1361,7 @@ public final class GUI {
 
         Map.Position pos = new Map.Position(tile.getX(), tile.getY());
 
+
         for (int i = 0; i < 8; i++) {
             Map.Position p = map.getAdjacent(pos, i);
             if (map.isValid(p)) {
@@ -1392,6 +1393,7 @@ public final class GUI {
                                                     tile.getX(), tile.getY()),
                                 x, y, null);
                 }
+
             }
         }
 
@@ -1422,6 +1424,10 @@ public final class GUI {
 
             if (tile.isPlowed()) {
                 g.drawImage(lib.getMiscImage(ImageLibrary.PLOWED), x, y, null);
+            }
+
+            if (tile.getRiver() != 0) {
+                g.drawImage(lib.getRiverImage(tile.getRiver()), x, y, null);
             }
 
             if (tile.hasBonus()) {

@@ -63,6 +63,11 @@ public final class Tile extends FreeColGameObject implements Location {
 
     private int     type;
 
+    /**
+     * The type of river on this tile.
+     */
+    private int     river = 0;
+
     private int     addition_type;
 
     private int     x,
@@ -594,9 +599,20 @@ public final class Tile extends FreeColGameObject implements Location {
     * @param addition The addition on this Tile.
     */
     public void setAddition(int addition) {
-        if (addition != ADD_NONE) setForested(false);
+        if (addition == ADD_HILLS || addition == ADD_MOUNTAINS) {
+            setForested(false);
+        }
         addition_type = addition;
         updatePlayerExploredTiles();
+    }
+
+    public int getRiver() {
+        return this.river;
+    }
+
+    public void addRiver(int addition, int river) {
+        setAddition(addition);
+        this.river = river;
     }
 
 
@@ -1206,6 +1222,7 @@ public final class Tile extends FreeColGameObject implements Location {
         tileElement.setAttribute("x", Integer.toString(x));
         tileElement.setAttribute("y", Integer.toString(y));
         tileElement.setAttribute("type", Integer.toString(type));
+        tileElement.setAttribute("river", Integer.toString(river));
         if (addition_type != ADD_NONE) {
             tileElement.setAttribute("addition", Integer.toString(addition_type));
         }
@@ -1283,6 +1300,7 @@ public final class Tile extends FreeColGameObject implements Location {
         x = Integer.parseInt(tileElement.getAttribute("x"));
         y = Integer.parseInt(tileElement.getAttribute("y"));
         type = Integer.parseInt(tileElement.getAttribute("type"));
+        river = Integer.parseInt(tileElement.getAttribute("river"));
         if (tileElement.hasAttribute("addition")) {
             addition_type = Integer.parseInt(tileElement.getAttribute("addition"));
         } else {

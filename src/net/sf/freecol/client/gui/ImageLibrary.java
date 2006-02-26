@@ -226,6 +226,8 @@ public final class ImageLibrary extends ImageProvider {
                                 unitsName = new String("Unit"),
                                 terrainDirectory = new String("terrain/"),
                                 terrainName = new String("terrain"),
+                                riverDirectory = new String("river/"),
+                                riverName = new String("river"),
                                 miscDirectory = new String("misc/"),
                                 miscName = new String("Misc"),
                                 unitButtonDirectory = new String("order-buttons/"),
@@ -247,6 +249,7 @@ public final class ImageLibrary extends ImageProvider {
     private Vector units, // Holds ImageIcon objects
                    terrain1, // Holds Vectors that hold ImageIcon objects
                    terrain2, // Holds Vectors that hold ImageIcon objects
+                   rivers, // Holds ImageIcon objects
                    misc, // Holds ImageIcon objects
                    colonies, //Holds ImageIcon objects
                    indians, //Holds ImageIcon objects
@@ -304,6 +307,7 @@ public final class ImageLibrary extends ImageProvider {
 
         loadUnits(gc, resourceLocator, doLookup);
         loadTerrain(gc, resourceLocator, doLookup);
+        loadRivers(gc, resourceLocator, doLookup);
         loadMisc(gc, resourceLocator, doLookup);
         loadUnitButtons(gc, resourceLocator, doLookup);
         loadColonies(gc, resourceLocator, doLookup);
@@ -418,6 +422,27 @@ public final class ImageLibrary extends ImageProvider {
             terrain2.add(tempVector2);
         }
     }
+
+    /**
+     * Loads the river images from file into memory.
+     * @param gc The GraphicsConfiguration is needed to create images that are compatible with the
+     * local environment.
+     * @param resourceLocator The class that is used to locate data files.
+     * @param doLookup Must be set to 'false' if the path to the image files
+     * has been manually provided by the user. If set to 'true' then a
+     * lookup will be done to search for image files from net.sf.freecol,
+     * in this case the images need to be placed in net.sf.freecol/images.
+     * @throws FreeColException If one of the data files could not be found.
+     */
+    private void loadRivers(GraphicsConfiguration gc, Class resourceLocator, boolean doLookup) throws FreeColException {
+        int combinations = 16;
+        rivers = new Vector(combinations);
+        for (int i = 0; i < combinations; i++) {
+            String filePath = dataDirectory + path + riverDirectory + riverName + i + extension;
+            rivers.add(findImage(filePath, resourceLocator, doLookup));
+        }
+    }
+                
 
     /**
      * Loads miscellaneous images from file into memory.
@@ -779,6 +804,15 @@ public final class ImageLibrary extends ImageProvider {
         } else {
             return ((ImageIcon) ((Vector) terrain2.get(index)).get(borderType)).getImage();
         }
+    }
+
+    /**
+     * Returns the river image at the given index.
+     * @param index The index of the image to return.
+     * @return The image at the given index.
+     */
+    public Image getRiverImage(int index) {
+        return ((ImageIcon) rivers.get(index)).getImage();
     }
 
     /**
