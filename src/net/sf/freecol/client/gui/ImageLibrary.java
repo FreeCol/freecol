@@ -435,7 +435,7 @@ public final class ImageLibrary extends ImageProvider {
      * @throws FreeColException If one of the data files could not be found.
      */
     private void loadRivers(GraphicsConfiguration gc, Class resourceLocator, boolean doLookup) throws FreeColException {
-        int combinations = 16;
+        int combinations = 81;
         rivers = new Vector(combinations);
         for (int i = 0; i < combinations; i++) {
             String filePath = dataDirectory + path + riverDirectory + riverName + i + extension;

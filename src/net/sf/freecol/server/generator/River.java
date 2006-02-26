@@ -86,6 +86,10 @@ public class River {
         return this.sections.size();
     }
 
+    public Section getLastSection() {
+        return (Section) this.sections.get(sections.size() - 1);
+    }
+
     /**
      * Adds a new section to this river.
      *
@@ -105,6 +109,7 @@ public class River {
 
 	boolean found = false;
         Section section = null;
+        int lastDirection = -1;
 
         Iterator sectionIterator = sections.iterator();
         while (sectionIterator.hasNext()) {
@@ -112,10 +117,12 @@ public class River {
             if (found) {
                 section.grow();
             } else if (section.position.equals(position)) {
-                section.addBranch(oppositeDirection(lastSection.direction));
+                section.addBranch(oppositeDirection(lastSection.direction),
+                                  lastSection.size);
                 section.grow();
                 found = true;
             }
+            lastDirection = section.direction;
         }
         drawToMap();
         if (nextRiver != null) {
@@ -222,7 +229,6 @@ public class River {
 	}
 
 	for (int i = 0; i < 3; i++) {
-	    // add Map.NUMBER_OF_DIRECTIONS to ensure direction > 0
 	    int dir = newDirection(i);
 	    Map.Position newPosition = map.getAdjacent(source, dir);
 	    Tile nextTile = map.getTile(newPosition);
@@ -259,7 +265,13 @@ public class River {
                         } else {
                             // flow into the sea (or a lake)
                             logger.info("Point " + newPosition + " is next to water.");
-                            sections.add(new Section(px, oppositeDirection(lastDir)));
+                            River someRiver = (River) riverMap.get(px);
+                            if (someRiver == null) {
+                                sections.add(new Section(px, oppositeDirection(lastDir)));
+                            } else {
+                                Section waterSection = someRiver.getLastSection();
+                                waterSection.addBranch(oppositeDirection(lastDir), 1);
+                            }
                             drawToMap();
                         }
                         return true;
@@ -321,14 +333,15 @@ public class River {
      */
     private void drawToMap() {
 
-        int oldDirection = -1;
+        Section oldSection = null;
 
         Iterator sectionIterator = sections.iterator();
         while (sectionIterator.hasNext()) {
             Section section = (Section) sectionIterator.next();
             riverMap.put(section.position, this);
-            if (oldDirection != -1) {
-                section.addBranch(oldDirection);
+            if (oldSection != null) {
+                section.addBranch(oppositeDirection(oldSection.direction),
+                                  oldSection.size);
             }
             Tile tile = map.getTile(section.position);
             switch (section.size) {
@@ -344,7 +357,7 @@ public class River {
                 tile.setType(Tile.OCEAN);
                 logger.info("Created fjord at " + section.position);
             }
-            oldDirection = oppositeDirection(section.direction);
+            oldSection = section;
 	}
     }
 
@@ -352,7 +365,7 @@ public class River {
      * A river section.
      */
     private class Section {
-        private int[] base = {1, 2, 4, 8};
+        private int[] base = {1, 3, 9, 27};
 
         public Map.Position position;
         public int size = 1;
@@ -365,8 +378,11 @@ public class River {
             this.branch[direction/2] = 1;
         }
 
-        public void addBranch(int direction) {
-            this.branch[direction/2] = 1;
+        public void addBranch(int direction, int size) {
+            if (size != 1) {
+                size = 2;
+            }
+            this.branch[direction/2] = size;
         }
 
         /**
@@ -385,6 +401,7 @@ public class River {
          */
         public void grow() {
             this.size++;
+            this.branch[direction/2] = 2;
         }
 
     }
