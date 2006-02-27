@@ -108,15 +108,16 @@
   </tile-types>
 
   <!-- types of goods.  an element must be defined before it is referenced -->
+  <!-- transport is by road or river -->
   <goods-types>
-    <goods-type ref="food"        name="model.goods.Food"       is-farmed="yes" />
-    <goods-type ref="sugar"       name="model.goods.Sugar"      is-farmed="yes" />
-    <goods-type ref="tobacco"     name="model.goods.Tobacco"    is-farmed="yes" />
-    <goods-type ref="cotton"      name="model.goods.Cotton"     is-farmed="yes" />
-    <goods-type ref="furs"        name="model.goods.Furs"       is-farmed="yes" />
-    <goods-type ref="lumber"      name="model.goods.Lumber"     is-farmed="yes" />
-    <goods-type ref="ore"         name="model.goods.Ore"        is-farmed="yes" />
-    <goods-type ref="silver"      name="model.goods.Silver"     is-farmed="yes" />
+    <goods-type ref="food"        name="model.goods.Food"       is-farmed="yes" improved-by="plowing" />
+    <goods-type ref="sugar"       name="model.goods.Sugar"      is-farmed="yes" improved-by="plowing" />
+    <goods-type ref="tobacco"     name="model.goods.Tobacco"    is-farmed="yes" improved-by="plowing" />
+    <goods-type ref="cotton"      name="model.goods.Cotton"     is-farmed="yes" improved-by="plowing" />
+    <goods-type ref="furs"        name="model.goods.Furs"       is-farmed="yes" improved-by="transport" />
+    <goods-type ref="lumber"      name="model.goods.Lumber"     is-farmed="yes" improved-by="transport" />
+    <goods-type ref="ore"         name="model.goods.Ore"        is-farmed="yes" improved-by="transport" />
+    <goods-type ref="silver"      name="model.goods.Silver"     is-farmed="yes" improved-by="transport" />
     <goods-type ref="horses"      name="model.goods.Horses"     is-farmed="no" made-from="food" />
     <goods-type ref="rum"         name="model.goods.Rum"        is-farmed="no" made-from="sugar" />
     <goods-type ref="cigars"      name="model.goods.Cigars"     is-farmed="no" made-from="tobacco" />
@@ -132,32 +133,72 @@
   </goods-types>
 
   <unit-types>
-    <unit-type name="model.unit.freeColonist"         offence="0"  defence="1"               skill="0"                                           abilities="found-colony,recruitable" />
-    <unit-type name="model.unit.expertFarmer"         offence="0"  defence="1"  price="1100" skill="1"  expert-production="food"                 abilities="found-colony,recruitable" />
-    <unit-type name="model.unit.expertFisherman"      offence="0"  defence="1"  price="1000" skill="1"  expert-production="food"                 abilities="found-colony,recruitable" />
-    <unit-type name="model.unit.expertFurTrapper"     offence="0"  defence="1"               skill="1"               expert-production="furs"    abilities="found-colony" />
-    <unit-type name="model.unit.expertSilverMiner"    offence="0"  defence="1"  price="900"  skill="1"  expert-production="silver"               abilities="found-colony,recruitable" />
-    <unit-type name="model.unit.expertLumberJack"     offence="0"  defence="1"  price="700"  skill="1"  expert-production="lumber"               abilities="found-colony,recruitable" />
-    <unit-type name="model.unit.expertOreMiner"       offence="0"  defence="1"  price="600"  skill="1"  expert-production="ore"                  abilities="found-colony,recruitable" />
-    <unit-type name="model.unit.masterSugarPlanter"   offence="0"  defence="1"               skill="2"               expert-production="sugar"   abilities="found-colony" />
-    <unit-type name="model.unit.masterCottonPlanter"  offence="0"  defence="1"               skill="2"               expert-production="cotton"  abilities="found-colony" />
-    <unit-type name="model.unit.masterTobaccoPlanter" offence="0"  defence="1"               skill="2"               expert-production="tobacco" abilities="found-colony" />
-    <unit-type name="model.unit.firebrandPreacher"    offence="0"  defence="1"  price="1500" skill="3"  expert-production="crosses"              abilities="found-colony,recruitable" />
-    <unit-type name="model.unit.elderStatesman"       offence="0"  defence="1"  price="1900" skill="3"  expert-production="bells"                abilities="found-colony,recruitable" />
-    <unit-type name="model.unit.masterCarpenter"      offence="0"  defence="1"  price="1000" skill="1"  expert-production="hammers"              abilities="found-colony,recruitable" />
-    <unit-type name="model.unit.masterDistiller"      offence="0"  defence="1"  price="1100" skill="2"  expert-production="rum"                  abilities="found-colony,recruitable" />
-    <unit-type name="model.unit.masterWeaver"         offence="0"  defence="1"  price="1300" skill="2"  expert-production="cloth"                abilities="found-colony,recruitable" />
-    <unit-type name="model.unit.masterTobacconist"    offence="0"  defence="1"  price="1200" skill="2"  expert-production="cigars"               abilities="found-colony,recruitable" />
-    <unit-type name="model.unit.masterFurTrader"      offence="0"  defence="1"  price="950"  skill="2"  expert-production="coats"                abilities="found-colony,recruitable" />
-    <unit-type name="model.unit.masterBlacksmith"     offence="0"  defence="1"  price="1050" skill="2"  expert-production="tools"                abilities="found-colony,recruitable" />
-    <unit-type name="model.unit.masterGunsmith"       offence="0"  defence="1"  price="850"  skill="2"  expert-production="muskets"              abilities="found-colony,recruitable" />
-    <unit-type name="model.unit.seasonedScout"        offence="0"  defence="1"               skill="1"                                           abilities="" />
-    <unit-type name="model.unit.hardyPioneer"         offence="0"  defence="1"  price="1100" skill="1"                                           abilities="recruitable" />
-    <unit-type name="model.unit.veteranSoldier"       offence="0"  defence="2"  price="2000" skill="2"                                           abilities="recruitable" />
-    <unit-type name="model.unit.jesuitMissionary"     offence="0"  defence="1"  price="1400" skill="3"                                           abilities="recruitable" />
-    <unit-type name="model.unit.indenturedServant"    offence="0"  defence="1"               skill="-1"                                          abilities="recruitable" />
-    <unit-type name="model.unit.pettyCriminal"        offence="0"  defence="1"               skill="-2"                                          abilities="recruitable" />
-    <unit-type name="model.unit.indianConvert"        offence="0"  defence="1"               skill="0"               expert-production="food"    abilities="found-colony" />
+    <unit-type name="model.unit.freeColonist"         offence="0"  defence="1"               
+               skill="0"                                           abilities="found-colony,recruitable" />
+    <unit-type name="model.unit.expertFarmer"         offence="0"  defence="1"  price="1100" 
+               skill="1"  expert-production="food"                 abilities="found-colony,recruitable" />
+        <!-- should be something like this: 
+        <production-bonus goods-type="food" bonus="+3" />
+        -->
+    <unit-type name="model.unit.expertFisherman"      offence="0"  defence="1"  price="1000" 
+               skill="1"  expert-production="food"                 abilities="found-colony,recruitable" />
+    <unit-type name="model.unit.expertFurTrapper"     offence="0"  defence="1"               
+               skill="1"               expert-production="furs"    abilities="found-colony" />
+    <unit-type name="model.unit.expertSilverMiner"    offence="0"  defence="1"  price="900"  
+               skill="1"  expert-production="silver"               abilities="found-colony,recruitable" />
+    <unit-type name="model.unit.expertLumberJack"     offence="0"  defence="1"  price="700"  
+               skill="1"  expert-production="lumber"               abilities="found-colony,recruitable" />
+    <unit-type name="model.unit.expertOreMiner"       offence="0"  defence="1"  price="600"  
+               skill="1"  expert-production="ore"                  abilities="found-colony,recruitable" />
+    <unit-type name="model.unit.masterSugarPlanter"   offence="0"  defence="1"               
+               skill="2"               expert-production="sugar"   abilities="found-colony" />
+    <unit-type name="model.unit.masterCottonPlanter"  offence="0"  defence="1"               
+               skill="2"               expert-production="cotton"  abilities="found-colony" />
+    <unit-type name="model.unit.masterTobaccoPlanter" offence="0"  defence="1"               
+               skill="2"               expert-production="tobacco" abilities="found-colony" />
+    <unit-type name="model.unit.firebrandPreacher"    offence="0"  defence="1"  price="1500" 
+               skill="3"  expert-production="crosses"              abilities="found-colony,recruitable" />
+    <unit-type name="model.unit.elderStatesman"       offence="0"  defence="1"  price="1900" 
+               skill="3"  expert-production="bells"                abilities="found-colony,recruitable" />
+    <unit-type name="model.unit.masterCarpenter"      offence="0"  defence="1"  price="1000" 
+               skill="1"  expert-production="hammers"              abilities="found-colony,recruitable" />
+    <unit-type name="model.unit.masterDistiller"      offence="0"  defence="1"  price="1100" 
+               skill="2"  expert-production="rum"                  abilities="found-colony,recruitable" />
+    <unit-type name="model.unit.masterWeaver"         offence="0"  defence="1"  price="1300" 
+               skill="2"  expert-production="cloth"                abilities="found-colony,recruitable" />
+    <unit-type name="model.unit.masterTobacconist"    offence="0"  defence="1"  price="1200" 
+               skill="2"  expert-production="cigars"               abilities="found-colony,recruitable" />
+    <unit-type name="model.unit.masterFurTrader"      offence="0"  defence="1"  price="950"  
+               skill="2"  expert-production="coats"                abilities="found-colony,recruitable" />
+    <unit-type name="model.unit.masterBlacksmith"     offence="0"  defence="1"  price="1050" 
+               skill="2"  expert-production="tools"                abilities="found-colony,recruitable" />
+    <unit-type name="model.unit.masterGunsmith"       offence="0"  defence="1"  price="850"  
+               skill="2"  expert-production="muskets"              abilities="found-colony,recruitable" />
+    <unit-type name="model.unit.seasonedScout"        offence="0"  defence="1"               
+               skill="1"                                           abilities="" />
+    <unit-type name="model.unit.hardyPioneer"         offence="0"  defence="1"  price="1100" 
+               skill="1"                                           abilities="recruitable" />
+    <unit-type name="model.unit.veteranSoldier"       offence="0"  defence="2"  price="2000" 
+               skill="2"                                           abilities="recruitable" />
+    <unit-type name="model.unit.jesuitMissionary"     offence="0"  defence="1"  price="1400" 
+               skill="3"                                           abilities="recruitable" />
+    <unit-type name="model.unit.indenturedServant"    offence="0"  defence="1"               
+               skill="-1" abilities="recruitable" />
+        <!-- should be something like this: 
+        <production-bonus goods-type="rum" bonus="-1" />
+        <production-bonus goods-type="cigars" bonus="-1" />
+        <production-bonus goods-type="cloth" bonus="-1" />
+        <production-bonus goods-type="coats" bonus="-1" />
+        <production-bonus goods-type="muskets" bonus="-1" />
+        <production-bonus goods-type="bells" bonus="-1" />
+        <production-bonus goods-type="crosses" bonus="-1" />
+        <production-bonus goods-type="hammers" bonus="-1" />
+        <production-bonus goods-type="tools" bonus="-1" />
+        -->
+    <unit-type name="model.unit.pettyCriminal"        offence="0"  defence="1"               
+               skill="-2" abilities="recruitable" />
+    <unit-type name="model.unit.indianConvert"        offence="0"  defence="1"               
+               skill="0" abilities="" />
     <unit-type name="model.unit.brave"                offence="1"  defence="1"                                                                   abilities="carry-goods" />
     <unit-type name="model.unit.colonialRegular"      offence="3"  defence="3"                                                                   abilities="found-colony" />
     <unit-type name="model.unit.kingsRegular"         offence="4"  defence="4"                                                                   abilities="found-colony" />
