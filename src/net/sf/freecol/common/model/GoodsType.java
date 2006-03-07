@@ -15,18 +15,17 @@ public final class GoodsType
     public static final  String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final  String  REVISION = "$Revision$";
 
-    public static final  int IMPROVED_BY_NOTHING = 0;
-    public static final  int IMPROVED_BY_PLOWING = 1;
-    public static final  int IMPROVED_BY_TRANSPORT = 2;
-
     private static  int  nextIndex;
 
     public final  int        index;
     public        String     name;
     public        boolean    isFarmed;
+    public boolean improvedByPlowing = false;
+    public boolean improvedByRiver = false;
+    public boolean improvedByRoad = false;
     public        GoodsType  madeFrom;
     public        GoodsType  makes;
-    public        int        improvedBy = IMPROVED_BY_NOTHING;
+
 
 
     // ----------------------------------------------------------- constructors
@@ -52,15 +51,18 @@ public final class GoodsType
             rawMaterial.makes = this;
         }
 
-        if ( Xml.hasAttribute(xml, "improved-by") ) {
-            String improved = Xml.attribute(xml, "improved-by");
-            if (improved.equals("plowing")) {
-                improvedBy = IMPROVED_BY_PLOWING;
-            } else if (improved.equals("transport")) {
-                improvedBy = IMPROVED_BY_TRANSPORT;
-            }
+        if (Xml.hasAttribute(xml, "improved-by-plowing") &&
+            Xml.booleanAttribute(xml, "improved-by-plowing")) {
+            improvedByPlowing = true;
         }
-
+        if (Xml.hasAttribute(xml, "improved-by-river") &&
+            Xml.booleanAttribute(xml, "improved-by-river")) {
+            improvedByRiver = true;
+        }
+        if (Xml.hasAttribute(xml, "improved-by-road") &&
+            Xml.booleanAttribute(xml, "improved-by-road")) {
+            improvedByRoad = true;
+        }
     }
 
 
