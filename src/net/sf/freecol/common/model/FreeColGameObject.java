@@ -286,9 +286,11 @@ abstract public class FreeColGameObject {
     * @see Game#addModelMessage
     * @see ModelMessage
     */
+    /*
     protected void addModelMessage(FreeColGameObject source, String messageID, String[][] data) {
         getGame().addModelMessage(new ModelMessage(source, messageID, data));
     }
+    */
 
     protected void addModelMessage(FreeColGameObject source, String messageID, String[][] data, int type) {
         getGame().addModelMessage(new ModelMessage(source, messageID, data, type));

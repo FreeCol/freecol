@@ -113,7 +113,8 @@ public final class Market extends FreeColGameObject {
             add(type, (player.getNation() == Player.DUTCH) ? (amount/2) : amount);
         } else {
             addModelMessage(this, "model.europe.market",
-                            new String [][] {{"%goods%", Goods.getName(type)}});
+                            new String [][] {{"%goods%", Goods.getName(type)}},
+                            ModelMessage.WARNING);
         }
     }
 

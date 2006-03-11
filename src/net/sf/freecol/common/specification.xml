@@ -110,21 +110,21 @@
   <!-- types of goods.  an element must be defined before it is referenced -->
   <goods-types>
     <goods-type ref="food"        name="model.goods.Food"       is-farmed="yes"
-                improved-by-plowing="true" improved-by-river="true" />
+                improved-by-plowing="yes" improved-by-river="yes" />
     <goods-type ref="sugar"       name="model.goods.Sugar"      is-farmed="yes"
-                improved-by-plowing="true" improved-by-river="true" />
+                improved-by-plowing="yes" improved-by-river="yes" />
     <goods-type ref="tobacco"     name="model.goods.Tobacco"    is-farmed="yes"
-                improved-by-plowing="true" improved-by-river="true" />
+                improved-by-plowing="yes" improved-by-river="yes" />
     <goods-type ref="cotton"      name="model.goods.Cotton"     is-farmed="yes"
-                improved-by-plowing="true" improved-by-river="true" />
+                improved-by-plowing="yes" improved-by-river="yes" />
     <goods-type ref="furs"        name="model.goods.Furs"       is-farmed="yes"
-                improved-by-road="true" improved-by-river="true" />
+                improved-by-road="yes" improved-by-river="yes" />
     <goods-type ref="lumber"      name="model.goods.Lumber"     is-farmed="yes"
-                improved-by-road="true" improved-by-river="true" />
+                improved-by-road="yes" improved-by-river="yes" />
     <goods-type ref="ore"         name="model.goods.Ore"        is-farmed="yes"
-                improved-by-road="true" improved-by-river="true" />
+                improved-by-road="yes" improved-by-river="yes" />
     <goods-type ref="silver"      name="model.goods.Silver"     is-farmed="yes"
-                improved-by-road="true" improved-by-river="true" />
+                improved-by-road="yes" improved-by-river="yes" />
     <goods-type ref="horses"      name="model.goods.Horses"     is-farmed="no" made-from="food" />
     <goods-type ref="rum"         name="model.goods.Rum"        is-farmed="no" made-from="sugar" />
     <goods-type ref="cigars"      name="model.goods.Cigars"     is-farmed="no" made-from="tobacco" />
