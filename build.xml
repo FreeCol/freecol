@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 
 <project name="FreeCol" default="package">
+    
   <property environment="env"/>
   <property name="freecol.data.dir" value="${basedir}/data"/>
   <property name="freecol.src.dir" value="${basedir}/src"/>
@@ -8,6 +9,11 @@
   <property name="freecol.javadoc.dir" value="${basedir}/javadoc"/>
   <property name="freecol.jar.file" value="${basedir}/FreeCol.jar"/>
   <property name="freecol.overview.file" value="${freecol.src.dir}/overview.html"/>
+
+  <path id="test.class.path">
+    <fileset dir="test/lib" includes="*.jar" />
+  </path>
+
 
   <target name="init" unless="TSTAMP">
     <tstamp/>
@@ -135,4 +141,72 @@
              Windowtitle="FreeCol Code Documentation"
     />
   </target>
+
+
+  <!-- example:
+       ant -lib test/lib/junit.jar -Dtest=common.model.Building test
+       -->
+  <target name="test" depends="build, build-unit-tests"
+          description="runs a particular unit test"
+  >
+    <echo message="if the next task fails then please read the build script" />
+    <!-- if the next fails then here is the long answer:
+           http://ant.apache.org/faq.html#delegating-classloader
+         the short answer depends.
+         if you have Ant 1.6:
+           ant -lib test/lib/junit.jar testall
+         if you have a version of Ant prior to 1.6 on Windows:
+           set CLASSPATH=%CLASSPATH%;test\lib\junit.jar
+           ant testall
+         if you have a version of Ant prior to 1.6 on UNIX:
+           export CLASSPATH=${CLASSPATH}:test/lib/junit.jar; ant testall
+         -->
+    <junit printsummary="yes">
+      <classpath>
+        <pathelement location="${freecol.build.dir}" />
+      </classpath>
+      <formatter type="plain" />
+      <test todir="${freecol.build.dir}" name="net.sf.freecol.${test}Test" />
+    </junit>
+  </target>
+
+
+  <target name="testall" depends="build-unit-tests"
+          description="runs all unit tests"
+  >
+    <echo message="if the next task fails then please read the build script" />
+    <!-- if the next fails then here is the long answer:
+           http://ant.apache.org/faq.html#delegating-classloader
+         the short answer depends.
+         if you have Ant 1.6:
+           ant -lib test/lib/junit.jar testall
+         if you have a version of Ant prior to 1.6 on Windows:
+           set CLASSPATH=%CLASSPATH%;test\lib\junit.jar
+           ant testall
+         if you have a version of Ant prior to 1.6 on UNIX:
+           export CLASSPATH=${CLASSPATH}:test/lib/junit.jar; ant testall
+         -->
+    <junit printsummary="yes">
+      <classpath>
+        <pathelement location="${freecol.build.dir}" />
+      </classpath>
+      <formatter type="plain" />
+      <batchtest fork="yes" todir="${freecol.build.dir}">
+        <fileset dir="test/src" includes="**/*Test.java" />
+      </batchtest>
+    </junit>
+  </target>
+
+
+  <target name="build-unit-tests" depends="build">
+
+    <depend srcDir="test/src" destDir="${freecol.build.dir}"
+            cache="${freecol.build.dir}" />
+
+    <javac srcdir="test/src" destdir="${freecol.build.dir}"
+           classpathref="test.class.path" debug="on" deprecation="off"
+           source="1.4" />
+
+  </target>
+
 </project>
