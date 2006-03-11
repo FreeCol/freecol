@@ -1414,9 +1414,12 @@ public final class GUI {
             } */
 
             // Do this after the basic terrain is done or it looks funny. -sjm
+            /*
             if (tile.isForested()) {
-                g.drawImage(lib.getTerrainImage(ImageLibrary.FOREST, tile.getX(), tile.getY()), x, y - 32, null);
-            } else if (tile.getAddition() == Tile.ADD_HILLS) {
+                //g.drawImage(lib.getTerrainImage(ImageLibrary.FOREST, tile.getX(), tile.getY()), x, y - 32, null);
+            } else
+            */
+            if (tile.getAddition() == Tile.ADD_HILLS) {
                 g.drawImage(lib.getTerrainImage(ImageLibrary.HILLS, tile.getX(), tile.getY()), x, y - 32, null);
             } else if (tile.getAddition() == Tile.ADD_MOUNTAINS) {
                 g.drawImage(lib.getTerrainImage(ImageLibrary.MOUNTAINS, tile.getX(), tile.getY()), x, y - 32, null);
@@ -1428,6 +1431,9 @@ public final class GUI {
 
             if (tile.getRiver() != 0) {
                 g.drawImage(lib.getRiverImage(tile.getRiver()), x, y, null);
+            }
+            if (tile.isForested()) {
+                g.drawImage(lib.getForestImage(tile.getType()), x, y, null);
             }
 
             if (tile.hasBonus()) {

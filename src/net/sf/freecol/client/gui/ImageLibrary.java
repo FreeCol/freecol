@@ -226,6 +226,8 @@ public final class ImageLibrary extends ImageProvider {
                                 unitsName = new String("Unit"),
                                 terrainDirectory = new String("terrain/"),
                                 terrainName = new String("terrain"),
+                                forestDirectory = new String("forest/"),
+                                forestName = new String("forest"),
                                 riverDirectory = new String("river/"),
                                 riverName = new String("river"),
                                 miscDirectory = new String("misc/"),
@@ -249,6 +251,7 @@ public final class ImageLibrary extends ImageProvider {
     private Vector units, // Holds ImageIcon objects
                    terrain1, // Holds Vectors that hold ImageIcon objects
                    terrain2, // Holds Vectors that hold ImageIcon objects
+                   forests, // Holds ImageIcon objects
                    rivers, // Holds ImageIcon objects
                    misc, // Holds ImageIcon objects
                    colonies, //Holds ImageIcon objects
@@ -307,6 +310,7 @@ public final class ImageLibrary extends ImageProvider {
 
         loadUnits(gc, resourceLocator, doLookup);
         loadTerrain(gc, resourceLocator, doLookup);
+        loadForests(gc, resourceLocator, doLookup);
         loadRivers(gc, resourceLocator, doLookup);
         loadMisc(gc, resourceLocator, doLookup);
         loadUnitButtons(gc, resourceLocator, doLookup);
@@ -440,6 +444,27 @@ public final class ImageLibrary extends ImageProvider {
         for (int i = 0; i < combinations; i++) {
             String filePath = dataDirectory + path + riverDirectory + riverName + i + extension;
             rivers.add(findImage(filePath, resourceLocator, doLookup));
+        }
+    }
+                
+    /**
+     * Loads the forest images from file into memory.
+     * @param gc The GraphicsConfiguration is needed to create images that are compatible with the
+     * local environment.
+     * @param resourceLocator The class that is used to locate data files.
+     * @param doLookup Must be set to 'false' if the path to the image files
+     * has been manually provided by the user. If set to 'true' then a
+     * lookup will be done to search for image files from net.sf.freecol,
+     * in this case the images need to be placed in net.sf.freecol/images.
+     * @throws FreeColException If one of the data files could not be found.
+     */
+    private void loadForests(GraphicsConfiguration gc, Class resourceLocator, boolean doLookup) throws FreeColException {
+
+        forests = new Vector(Tile.ARCTIC);
+        forests.add(null);
+        for (int i = Tile.PLAINS; i < Tile.ARCTIC; i++) {
+            String filePath = dataDirectory + path + forestDirectory + forestName + i + extension;
+            forests.add(findImage(filePath, resourceLocator, doLookup));
         }
     }
                 
@@ -813,6 +838,15 @@ public final class ImageLibrary extends ImageProvider {
      */
     public Image getRiverImage(int index) {
         return ((ImageIcon) rivers.get(index)).getImage();
+    }
+
+    /**
+     * Returns the forest image at the given index.
+     * @param index The index of the image to return.
+     * @return The image at the given index.
+     */
+    public Image getForestImage(int index) {
+        return ((ImageIcon) forests.get(index)).getImage();
     }
 
     /**
