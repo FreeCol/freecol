@@ -17,7 +17,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 
-public final class WorkerTest
+public final class WorkerCheck
 {
     private final  JTextArea  textArea;
     private final  Action     workAction;
@@ -25,11 +25,11 @@ public final class WorkerTest
 
     public static void main( String[] args ) {
 
-        new WorkerTest();
+        new WorkerCheck();
     }
 
 
-    private WorkerTest() {
+    private WorkerCheck() {
 
         final Worker  worker = new Worker();
 
