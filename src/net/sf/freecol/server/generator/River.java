@@ -9,7 +9,6 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.Map.Position;
 
 
 /**
