@@ -102,7 +102,11 @@ public final class MetaServer extends Thread {
         
         ActionListener deadServerRemover = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                mr.removeDeadServers();
+                try {
+                    mr.removeDeadServers();
+                } catch (Exception ex) {
+                    logger.warning("Exception: " + ex.getMessage());
+                }
             }
         };
         Timer timer = new Timer(REMOVE_DEAD_SERVERS_INTERVAL, deadServerRemover);

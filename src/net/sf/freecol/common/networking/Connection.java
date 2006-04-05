@@ -49,7 +49,7 @@ public class Connection {
     /**
     * Dead constructor, for DummyConnection purposes.
     */
-    public Connection() {
+    protected Connection() {
         out = null;
         in = null;
         socket = null;

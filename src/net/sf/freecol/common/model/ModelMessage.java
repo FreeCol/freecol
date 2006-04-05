@@ -66,14 +66,12 @@ public class ModelMessage {
     * @see Game#addModelMessage
     * @see FreeColGameObject#addModelMessage
     */
-    /*
     public ModelMessage(FreeColGameObject source, String messageID, String[][] data) {
         this.source = source;
         this.messageID = messageID;
         this.data = data;
         this.type = DEFAULT;
     }
-    */
 
     /**
     * Checks if this <code>ModelMessage</code> has been displayed.

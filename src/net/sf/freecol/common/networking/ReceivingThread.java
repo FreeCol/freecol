@@ -87,7 +87,7 @@ final class ReceivingThread extends Thread {
      * thread will stop when this method returns.
      */
     public void run() {
-        int  timesFailed = 0;
+        int timesFailed = 0;
 
         while (shouldRun()) {
             try {
@@ -262,7 +262,7 @@ final class ReceivingThread extends Thread {
             }
 
             if (r <= 0) {
-                logger.info("Could not read data from stream.");
+                logger.fine("Could not read data from stream.");
                 return false;
             }
 
