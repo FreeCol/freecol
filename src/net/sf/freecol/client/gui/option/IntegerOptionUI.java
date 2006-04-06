@@ -1,6 +1,7 @@
 
 package net.sf.freecol.client.gui.option;
 
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.util.logging.Logger;
 
@@ -51,6 +52,19 @@ public final class IntegerOptionUI extends JPanel implements OptionUpdater {
         setOpaque(false);
     }
 
+    /**
+     * @inheritDoc
+     */
+    public Dimension getPreferredSize() {
+        return new Dimension(getParent().getWidth()/2 - getParent().getInsets().left - getParent().getInsets().right - (OptionGroupUI.H_GAP*3)/2, super.getPreferredSize().height);
+    }
+    
+    /**
+     * @inheritDoc
+     */
+    public Dimension getMinimumSize() {
+        return getPreferredSize();
+    }
 
     /**
     * Updates the value of the {@link Option} this object keeps.

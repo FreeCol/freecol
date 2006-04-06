@@ -100,12 +100,12 @@ public class ClientOptions extends OptionMap {
         /* Add options here: */
 
         OptionGroup guiGroup = new OptionGroup("clientOptions.gui.name", "clientOptions.gui.shortDescription");
-
         guiGroup.add(new IntegerOption(MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT, "clientOptions.gui."+ MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT +".name", "clientOptions.gui."+ MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT +".shortDescription", 0, 10, 7));
-
         guiGroup.add(new IntegerOption(MAX_NUMBER_OF_GOODS_IMAGES, "clientOptions.gui."+ MAX_NUMBER_OF_GOODS_IMAGES +".name", "clientOptions.gui."+ MAX_NUMBER_OF_GOODS_IMAGES +".shortDescription", 1, 10, 7));
+        add(guiGroup);
 
-        guiGroup.add(new SelectOption(MESSAGES_GROUP_BY,
+        OptionGroup messagesGroup = new OptionGroup("clientOptions.messages.name", "clientOptions.messages.shortDescription");
+        messagesGroup.add(new SelectOption(MESSAGES_GROUP_BY,
                                       "clientOptions.gui." + MESSAGES_GROUP_BY + ".name", 
                                       "clientOptions.gui." + MESSAGES_GROUP_BY + ".shortDescription", 
                                       new String[] {"clientOptions.gui." + MESSAGES_GROUP_BY + ".nothing",
@@ -114,51 +114,51 @@ public class ClientOptions extends OptionMap {
                                       0));
 
         /** Boolean message display options. */
-        guiGroup.add(new BooleanOption(SHOW_WARNING,
+        messagesGroup.add(new BooleanOption(SHOW_WARNING,
                                        "clientOptions.gui."+ SHOW_WARNING +".name",
                                        "clientOptions.gui."+ SHOW_WARNING +".shortDescription", 
                                        true));
-        guiGroup.add(new BooleanOption(SHOW_SONS_OF_LIBERTY,
+        messagesGroup.add(new BooleanOption(SHOW_SONS_OF_LIBERTY,
                                        "clientOptions.gui."+ SHOW_SONS_OF_LIBERTY +".name",
                                        "clientOptions.gui."+ SHOW_SONS_OF_LIBERTY +".shortDescription", 
                                        true));
-        guiGroup.add(new BooleanOption(SHOW_GOVERNMENT_EFFICIENCY,
+        messagesGroup.add(new BooleanOption(SHOW_GOVERNMENT_EFFICIENCY,
                                        "clientOptions.gui."+ SHOW_GOVERNMENT_EFFICIENCY +".name",
                                        "clientOptions.gui."+ SHOW_GOVERNMENT_EFFICIENCY +".shortDescription", 
                                        true));
-        guiGroup.add(new BooleanOption(SHOW_WAREHOUSE_CAPACITY,
+        messagesGroup.add(new BooleanOption(SHOW_WAREHOUSE_CAPACITY,
                                        "clientOptions.gui."+ SHOW_WAREHOUSE_CAPACITY +".name",
                                        "clientOptions.gui."+ SHOW_WAREHOUSE_CAPACITY +".shortDescription", 
                                        true));
-        guiGroup.add(new BooleanOption(SHOW_UNIT_IMPROVED,
+        messagesGroup.add(new BooleanOption(SHOW_UNIT_IMPROVED,
                                        "clientOptions.gui."+ SHOW_UNIT_IMPROVED +".name",
                                        "clientOptions.gui."+ SHOW_UNIT_IMPROVED +".shortDescription", 
                                        true));
-        guiGroup.add(new BooleanOption(SHOW_UNIT_DEMOTED,
+        messagesGroup.add(new BooleanOption(SHOW_UNIT_DEMOTED,
                                        "clientOptions.gui."+ SHOW_UNIT_DEMOTED +".name",
                                        "clientOptions.gui."+ SHOW_UNIT_DEMOTED +".shortDescription", 
                                        true));
-        guiGroup.add(new BooleanOption(SHOW_UNIT_ADDED,
+        messagesGroup.add(new BooleanOption(SHOW_UNIT_ADDED,
                                        "clientOptions.gui."+ SHOW_UNIT_ADDED +".name",
                                        "clientOptions.gui."+ SHOW_UNIT_ADDED +".shortDescription", 
                                        true));
-        guiGroup.add(new BooleanOption(SHOW_UNIT_LOST,
+        messagesGroup.add(new BooleanOption(SHOW_UNIT_LOST,
                                        "clientOptions.gui."+ SHOW_UNIT_LOST +".name",
                                        "clientOptions.gui."+ SHOW_UNIT_LOST +".shortDescription", 
                                        true));
-        guiGroup.add(new BooleanOption(SHOW_BUILDING_COMPLETED,
+        messagesGroup.add(new BooleanOption(SHOW_BUILDING_COMPLETED,
                                        "clientOptions.gui."+ SHOW_BUILDING_COMPLETED +".name",
                                        "clientOptions.gui."+ SHOW_BUILDING_COMPLETED +".shortDescription", 
                                        true));
-        guiGroup.add(new BooleanOption(SHOW_FOREIGN_DIPLOMACY,
+        messagesGroup.add(new BooleanOption(SHOW_FOREIGN_DIPLOMACY,
                                        "clientOptions.gui."+ SHOW_FOREIGN_DIPLOMACY +".name",
                                        "clientOptions.gui."+ SHOW_FOREIGN_DIPLOMACY +".shortDescription", 
                                        true));
-        guiGroup.add(new BooleanOption(SHOW_MARKET_PRICES,
+        messagesGroup.add(new BooleanOption(SHOW_MARKET_PRICES,
                                        "clientOptions.gui."+ SHOW_MARKET_PRICES +".name",
                                        "clientOptions.gui."+ SHOW_MARKET_PRICES +".shortDescription", 
-                                       true));
-        add(guiGroup);
+                                       false));
+        add(messagesGroup);
     }
 
 
