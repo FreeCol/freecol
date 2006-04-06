@@ -46,7 +46,10 @@ public class EuropeAction extends MapboardAction {
      */
     public void update() {
         super.update();
-        setEnabled(getFreeColClient().getMyPlayer() != null && getFreeColClient().getMyPlayer().getEurope() != null);
+        
+        if (isEnabled()) {
+            setEnabled(getFreeColClient().getMyPlayer() != null && getFreeColClient().getMyPlayer().getEurope() != null);
+        }
     }
     
     /**
