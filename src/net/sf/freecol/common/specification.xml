@@ -182,15 +182,15 @@
     <unit-type name="model.unit.masterGunsmith"       offence="0"  defence="1"  price="850"  
                skill="2"  expert-production="muskets"              abilities="found-colony,recruitable" />
     <unit-type name="model.unit.seasonedScout"        offence="0"  defence="1"               
-               skill="1"                                           abilities="" />
+               skill="1"                                           abilities="found-colony,recruitable" />
     <unit-type name="model.unit.hardyPioneer"         offence="0"  defence="1"  price="1100" 
-               skill="1"                                           abilities="recruitable" />
+               skill="1"                                           abilities="found-colony,recruitable" />
     <unit-type name="model.unit.veteranSoldier"       offence="0"  defence="2"  price="2000" 
-               skill="2"                                           abilities="recruitable" />
+               skill="2"                                           abilities="found-colony,recruitable" />
     <unit-type name="model.unit.jesuitMissionary"     offence="0"  defence="1"  price="1400" 
-               skill="3"                                           abilities="recruitable" />
+               skill="3"                                           abilities="found-colony,recruitable" />
     <unit-type name="model.unit.indenturedServant"    offence="0"  defence="1"               
-               skill="-1" abilities="recruitable" />
+               skill="-1" abilities="found-colony,recruitable" />
         <!-- should be something like this: 
         <production-bonus goods-type="rum" bonus="-1" />
         <production-bonus goods-type="cigars" bonus="-1" />
@@ -203,7 +203,7 @@
         <production-bonus goods-type="tools" bonus="-1" />
         -->
     <unit-type name="model.unit.pettyCriminal"        offence="0"  defence="1"               
-               skill="-2" abilities="recruitable" />
+               skill="-2" abilities="found-colony,recruitable" />
     <unit-type name="model.unit.indianConvert"        offence="0"  defence="1"               
                skill="0" abilities="" />
     <unit-type name="model.unit.brave"                offence="1"  defence="1"                                                                   abilities="carry-goods" />

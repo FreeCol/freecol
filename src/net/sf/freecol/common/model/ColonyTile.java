@@ -161,6 +161,10 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         if (!(workTile.isLand() || getColony().getBuilding(Building.DOCK).isBuilt())) {
             return false;
         }
+        
+        if (!((Unit) locatable).isColonist() && ((Unit) locatable).getType() != Unit.INDIAN_CONVERT) {
+            return false;
+        }
 
         return ( ! isColonyCenterTile()  &&  locatable instanceof Unit
                 &&  ( getUnit() == null || locatable == getUnit()) );

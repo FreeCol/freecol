@@ -118,7 +118,7 @@ public final class DragListener extends MouseAdapter {
 
 
                 if (tempUnit.isColonist()) {
-                    if (!tempUnit.isPioneer() && !tempUnit.isMissionary() && tempUnit.canArm()) {
+                    if (!tempUnit.isPioneer() && !tempUnit.isMissionary() && tempUnit.canBeArmed()) {
                         if (tempUnit.isArmed()) {
                             menuItem = new JMenuItem( Messages.message("disarm") );
                         } else {
@@ -133,7 +133,7 @@ public final class DragListener extends MouseAdapter {
                         menu.add(menuItem);
                     }
 
-                    if (!tempUnit.isPioneer() && !tempUnit.isMissionary() && tempUnit.canMount()) {
+                    if (!tempUnit.isPioneer() && !tempUnit.isMissionary() && tempUnit.canBeMounted()) {
                         if (tempUnit.isMounted()) {
                             menuItem = new JMenuItem( Messages.message("removeHorses") );
                         } else {
@@ -148,7 +148,7 @@ public final class DragListener extends MouseAdapter {
                         menu.add(menuItem);
                     }
 
-                    if (!tempUnit.isArmed() && !tempUnit.isMounted() && !tempUnit.isMissionary() && tempUnit.canEquipWithTools()) {
+                    if (!tempUnit.isArmed() && !tempUnit.isMounted() && !tempUnit.isMissionary() && tempUnit.canBeEquippedWithTools()) {
                         if (tempUnit.isPioneer()) {
                             menuItem = new JMenuItem( Messages.message("removeTools") );
                         } else {
@@ -174,7 +174,7 @@ public final class DragListener extends MouseAdapter {
                         menu.add(menuItem);
                     }
 
-                    if (!tempUnit.isArmed() && !tempUnit.isMounted() && !tempUnit.isPioneer() && tempUnit.canDressAsMissionary()) {
+                    if (!tempUnit.isArmed() && !tempUnit.isMounted() && !tempUnit.isPioneer() && tempUnit.canBeDressedAsMissionary()) {
 
                         if (tempUnit.isMissionary()) {
                             menuItem = new JMenuItem( Messages.message("cancelMissionaryStatus") );

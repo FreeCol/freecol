@@ -1447,7 +1447,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     * @return <code>true</code> if it can be armed at the current
     *       location.
     */
-    public boolean canArm() {
+    public boolean canBeArmed() {
         return isArmed() || getGoodsDumpLocation() != null && getGoodsDumpLocation().getGoodsCount(Goods.MUSKETS) >= 50 ||
                (location instanceof Europe || location instanceof Unit && ((Unit) location).getLocation() instanceof Europe) &&
                getOwner().getGold() >= getGame().getMarket().getBidPrice(Goods.MUSKETS, 50);
@@ -1459,7 +1459,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     * @return <code>true</code> if it can mount a horse at the current
     *       location.
     */
-    public boolean canMount() {
+    public boolean canBeMounted() {
         return isMounted() || getGoodsDumpLocation() != null && getGoodsDumpLocation().getGoodsCount(Goods.HORSES) >= 50 ||
                (location instanceof Europe || location instanceof Unit && ((Unit) location).getLocation() instanceof Europe)
                && getOwner().getGold() >= getGame().getMarket().getBidPrice(Goods.HORSES, 50);
@@ -1471,7 +1471,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     * @return <code>true</code> if it can be equipped with tools at the current
     *       location.
     */
-    public boolean canEquipWithTools() {
+    public boolean canBeEquippedWithTools() {
         return isPioneer() || getGoodsDumpLocation() != null && getGoodsDumpLocation().getGoodsCount(Goods.TOOLS) >= 20 ||
                (location instanceof Europe || location instanceof Unit && ((Unit) location).getLocation() instanceof Europe)
                && getOwner().getGold() >= getGame().getMarket().getBidPrice(Goods.TOOLS, 20);
@@ -1483,7 +1483,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     * @return <code>true</code> if it can be dressed as a missionary at the current
     *       location.
     */
-    public boolean canDressAsMissionary() {
+    public boolean canBeDressedAsMissionary() {
         return isMissionary() || ((location instanceof Europe || location instanceof Unit && ((Unit) location).getLocation()
                instanceof Europe) || getTile() != null && getTile().getColony().getBuilding(Building.CHURCH).isBuilt());
     }

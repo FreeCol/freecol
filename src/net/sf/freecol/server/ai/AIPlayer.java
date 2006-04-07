@@ -311,7 +311,7 @@ public class AIPlayer extends AIObject {
                             armed,
                             mounted,
                             0,
-                            false);
+                            false);                    
                     ref[i]--;
                     totalNumber--;
                 }
@@ -567,7 +567,7 @@ public class AIPlayer extends AIObject {
                 while (ui.hasNext() && recruitCount > 0) {
                     
                     Unit u = (Unit)(ui.next());
-                    if (u.canArm()) {
+                    if (!u.isArmed() && u.canBeArmed()) {
                         recruitCount--;
                         Element equipUnitElement = Message.createNewRootElement("equipunit");
                         equipUnitElement.setAttribute("unit", u.getID());
@@ -603,13 +603,11 @@ public class AIPlayer extends AIObject {
                         
                         olddefenders++;
                         
-                        if (u.canMount()) {
+                        if (!u.isMounted() && u.canBeMounted()) {
                             equipUnitElement = Message.createNewRootElement("equipunit");
                             equipUnitElement.setAttribute("unit", u.getID());
                             equipUnitElement.setAttribute("type", Integer.toString(Goods.HORSES));
                             equipUnitElement.setAttribute("amount", "50");
-                            // I don't think we need to do this if we are the server...
-                            //unit.setArmed(true);
                             try {
                                 getConnection().sendAndWait(equipUnitElement);
                             } catch (IOException e) {
