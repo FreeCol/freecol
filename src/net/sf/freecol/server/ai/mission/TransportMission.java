@@ -851,8 +851,12 @@ public class TransportMission extends Mission {
                 Unit u = au.getUnit();
                 Mission mission = au.getMission();
                 if (mission != null && mission.isValid()) {
-                    if (au.getTransportDestination() != null && au.getTransportDestination().getTile() == carrier.getTile()) {
-                        if (u.getLocation() instanceof Europe || u.getTile() != null && u.getTile().getColony() != null) {
+                    if (au.getTransportDestination() != null 
+                            && au.getTransportDestination().getTile() == carrier.getTile()
+                            && carrier.getState() != Unit.TO_EUROPE 
+                            && carrier.getState() != Unit.TO_AMERICA) {
+                        if (u.getLocation() instanceof Europe
+                                || u.getTile() != null && u.getTile().getColony() != null) {
                             Element leaveShipElement = Message.createNewRootElement("leaveShip");
                             leaveShipElement.setAttribute("unit", u.getID());
                             try {
@@ -880,7 +884,10 @@ public class TransportMission extends Mission {
                 }
             } else if (t instanceof AIGoods) {
                 AIGoods ag = (AIGoods) t;
-                if (ag.getTransportDestination() != null && ag.getTransportDestination().getTile() == carrier.getLocation().getTile()) {
+                if (ag.getTransportDestination() != null 
+                        && ag.getTransportDestination().getTile() == carrier.getLocation().getTile()
+                        && carrier.getState() != Unit.TO_EUROPE
+                        && carrier.getState() != Unit.TO_AMERICA) {
                     if (carrier.getLocation() instanceof Europe) {
                         Element sellGoodsElement = Message.createNewRootElement("sellGoods");
                         sellGoodsElement.appendChild(ag.getGoods().toXMLElement(carrier.getOwner(), sellGoodsElement.getOwnerDocument()));
@@ -938,7 +945,9 @@ public class TransportMission extends Mission {
             if (t instanceof AIUnit) {
                 AIUnit au = (AIUnit) t;
                 Unit u = au.getUnit();
-                if (u.getTile() == carrier.getTile()) {
+                if (u.getTile() == carrier.getTile() 
+                        && carrier.getState() != Unit.TO_EUROPE 
+                        && carrier.getState() != Unit.TO_AMERICA) {
                     Element boardShipElement = Message.createNewRootElement("boardShip");
                     boardShipElement.setAttribute("unit", u.getID());
                     boardShipElement.setAttribute("carrier", carrier.getID());
@@ -952,7 +961,9 @@ public class TransportMission extends Mission {
                 }
             } else if (t instanceof AIGoods) {
                 AIGoods ag = (AIGoods) t;
-                if (ag.getGoods().getTile() == carrier.getTile()) {
+                if (ag.getGoods().getTile() == carrier.getTile()
+                        && carrier.getState() != Unit.TO_EUROPE 
+                        && carrier.getState() != Unit.TO_AMERICA) {
                     if (carrier.getLocation() instanceof Europe) {
                         Element buyGoodsElement = Message.createNewRootElement("buyGoods");
                         buyGoodsElement.setAttribute("carrier", carrier.getID());
