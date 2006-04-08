@@ -292,6 +292,29 @@ abstract public class FreeColGameObject {
     }
     */
 
+    /**
+     * Creates a <code>ModelMessage</code> and uses <code>
+     * getGame().addModelMessage(modelMessage)</code>
+     * to register it.
+     *
+     * <br><br><br>
+     *
+     * Example:<br><br>
+     *
+     * Using <code>addModelMessage(this, "messageID", new String[][] {{"%test1%", "ok1"}, {"%test2%", "ok2"})</code>
+     * with the entry "messageID=This is %test1% and %test2%" in {@link net.sf.freecol.client.gui.i18n.Messages Messages},
+     * would give the following message: "This is ok1 and ok2".
+     *
+     * @param source The source of the message. This is what the message should be 
+     *               associated with. In addition, the owner of the source is the
+     *               player getting the message.
+     * @param messageID The ID of the message to display. See: {@link net.sf.freecol.client.gui.i18n.Messages Messages}.
+     * @param data Contains the data to be displayed in the message or <i>null</i>.
+     * @param type The type of message.
+     * @see net.sf.freecol.client.gui.Canvas Canvas
+     * @see Game#addModelMessage
+     * @see ModelMessage
+     */    
     protected void addModelMessage(FreeColGameObject source, String messageID, String[][] data, int type) {
         getGame().addModelMessage(new ModelMessage(source, messageID, data, type));
     }
