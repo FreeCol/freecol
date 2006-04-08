@@ -87,7 +87,7 @@ public class AIPlayer extends AIObject {
     
     /* Stores temporary information for sessions (trading with another player etc). */
     private HashMap sessionRegister = new HashMap();
-    
+        
     
     /**
      * The FreeColGameObject this AIObject contains AI-information for.
@@ -110,7 +110,7 @@ public class AIPlayer extends AIObject {
      */
     public AIPlayer(AIMain aiMain, ServerPlayer player) {
         super(aiMain);
-        
+         
         this.player = player;        
         switch (player.getNation()) {
         case Player.DUTCH:

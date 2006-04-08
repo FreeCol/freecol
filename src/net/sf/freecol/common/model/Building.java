@@ -268,8 +268,11 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     * Checks if this building can have a higher level.
     * 
     * @return If this <code>Building</code> can have a
-    *       higher level and that {@link FoundingFather Adam Smith}
-    *       is present for manufactoring factory level buildings.
+    *       higher level, that {@link FoundingFather Adam Smith}
+    *       is present for manufactoring factory level buildings
+    *       and that the <code>Colony</code> containing this
+    *       <code>Building</code> has a sufficiently high
+    *       population.
     */
     public boolean canBuildNext() {
         if (level >= MAX_LEVEL) {
@@ -295,6 +298,11 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         if (getType() == DOCK && getColony().isLandLocked()) {
             return false;
         }
+        
+        if (buildingType.level(level).populationRequired > colony.getUnitCount()) {
+            return false;
+        }
+        
         return true;
     }
 

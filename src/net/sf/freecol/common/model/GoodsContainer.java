@@ -134,6 +134,26 @@ public class GoodsContainer extends FreeColGameObject {
         }
     }
 
+    
+    /**
+     * Checks if any type of goods, except for
+     * <code>Goods.FOOD</code>, has reached the given
+     * amount.
+     * 
+     * @param amount The amount.
+     * @return <code>true</code> if any type of goods, 
+     * except for <code>Goods.FOOD</code>, has reached 
+     * the given amount.
+     */
+     public boolean hasReachedCapacity(int amount) {
+         for (int i=1; i<storedGoods.length; i++) {
+             if (storedGoods[i] >= amount) {
+                 return true;
+             }
+         }
+         return false;
+     }
+     
 
     /**
     * Checks if the specified <code>Goods</code> is in this container.

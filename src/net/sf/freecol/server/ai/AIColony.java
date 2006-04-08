@@ -1,6 +1,7 @@
 
 package net.sf.freecol.server.ai;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -16,6 +17,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.mission.TransportMission;
 import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
 
@@ -751,11 +753,55 @@ public class AIColony extends AIObject {
             }
         }
 
+        decideBuildable(connection);
         createWishes();
         createTileImprovements();
     }
 
 
+    /**
+     * Decides what to build in the <code>Colony</code>.
+     */
+    private void decideBuildable(Connection connection) {
+        // TODO: Request tools if needed.
+        Iterator bi = colonyPlan.getBuildable();
+        while (bi.hasNext()) {
+            int buildable = ((Integer) bi.next()).intValue();
+            
+            if (buildable == colony.getCurrentlyBuilding()) {                
+                // We are building the right item already:
+                break;
+            }
+            
+            int hammersNew = (buildable >= Colony.BUILDING_UNIT_ADDITION) 
+                    ? Unit.getNextHammers(buildable-Colony.BUILDING_UNIT_ADDITION) 
+                    : colony.getBuilding(buildable).getNextHammers();
+            int hammersOld = (colony.getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) 
+                    ? Unit.getNextHammers(colony.getCurrentlyBuilding()-Colony.BUILDING_UNIT_ADDITION) 
+                    : colony.getBuilding(colony.getCurrentlyBuilding()).getNextHammers();    
+            boolean isOldValid = (colony.getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) 
+                    ? true
+                    : colony.getBuilding(colony.getCurrentlyBuilding()).canBuildNext();               
+            if (hammersNew > colony.getHammers()
+                    || hammersNew > hammersOld
+                    || !isOldValid) {
+                Element setCurrentlyBuildingElement = Message.createNewRootElement("setCurrentlyBuilding");
+                setCurrentlyBuildingElement.setAttribute("colony", colony.getID());
+                setCurrentlyBuildingElement.setAttribute("type", Integer.toString(buildable));
+                
+                try {
+                    connection.sendAndWait(setCurrentlyBuildingElement);
+                } catch (IOException e) {
+                    logger.warning("Could not send \"setCurrentlyBuilding\"-message.");
+                }
+               
+                // We have found something to build:
+                break;
+            }
+        }
+    }    
+    
+    
     /**
     * Determines the best goods to produce on a given <code>Tile</code>
     * within this colony.

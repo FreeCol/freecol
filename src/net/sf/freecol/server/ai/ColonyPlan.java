@@ -14,6 +14,7 @@ import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -90,7 +91,7 @@ public class ColonyPlan {
     /**
      * Returns the <code>WorkLocationPlan</code>s 
      * associated with this <code>ColonyPlan</code>
-     * sorted by production in an increasing order.
+     * sorted by production in a decreasing order.
      * 
      * @return The list of <code>WorkLocationPlan</code>s .
      */   
@@ -106,6 +107,82 @@ public class ColonyPlan {
         });
         
         return workLocationPlans;
+    }
+    
+
+    /**
+     * Gets an <code>Iterator</code> for everything to
+     * be built in the <code>Colony</code>.
+     * 
+     * @return An iterator containing all the <code>Buildable</code>
+     *      sorted by priority (highest priority first).
+     */      
+    public Iterator getBuildable() {
+        List buildList = new ArrayList();
+        
+        if (!colony.getBuilding(Building.DOCK).isBuilt()
+                && !colony.isLandLocked()) {
+            buildList.add(new Integer(Building.DOCK));
+        }
+        
+        Iterator wlpIt = getSortedWorkLocationPlans().iterator();
+        while (wlpIt.hasNext()) {
+            WorkLocationPlan wlp = (WorkLocationPlan) wlpIt.next();
+            if (wlp.getWorkLocation() instanceof Building) {
+                Building b = (Building) wlp.getWorkLocation();
+                if (b.getType() == Building.TOWN_HALL) {
+                    if (colony.getBuilding(Building.PRINTING_PRESS).canBuildNext()) {
+                        buildList.add(new Integer(Building.PRINTING_PRESS));
+                    }
+                } else {
+                    if (b.canBuildNext()) {
+                        buildList.add(new Integer(b.getType()));
+                    }
+                }
+            }
+        }
+        
+        if (colony.getBuilding(Building.CUSTOM_HOUSE).canBuildNext()) {
+            if (colony.getGoodsContainer().hasReachedCapacity(colony.getWarehouseCapacity())) {
+                buildList.add(0, new Integer(Building.CUSTOM_HOUSE));
+            }   
+        }
+        
+        // Check if we should improve the warehouse:
+        if (colony.getBuilding(Building.WAREHOUSE).canBuildNext()) {
+            if (colony.getGoodsContainer().hasReachedCapacity(colony.getWarehouseCapacity())) {
+                buildList.add(0, new Integer(Building.WAREHOUSE));
+            } else {
+                buildList.add(new Integer(Building.WAREHOUSE));
+            }
+        }                
+        
+        if (buildList.size() > 3) {
+            buildList.add(0, new Integer(Building.CARPENTER));
+        }
+        
+        if (colony.getBuilding(Building.STABLES).canBuildNext()
+                && colony.getHorseProduction() > 2) {
+            buildList.add(new Integer(Building.STABLES));
+        }
+        
+        buildList.add(new Integer(Building.STOCKADE));
+        
+        if (colony.getBuilding(Building.ARMORY).canBuildNext()
+                && !colony.getBuilding(Building.ARMORY).isBuilt()) {
+            buildList.add(new Integer(Building.ARMORY));
+        }
+        buildList.add(new Integer(colony.BUILDING_UNIT_ADDITION + Unit.ARTILLERY)); 
+
+        //buildList.add(new Integer(Building.SCHOOLHOUSE));
+        
+        if (colony.getBuilding(Building.CUSTOM_HOUSE).canBuildNext()) {
+            buildList.add(new Integer(Building.CUSTOM_HOUSE));
+        }
+        
+        buildList.add(new Integer(-1));
+        
+        return buildList.iterator();
     }
     
     
