@@ -74,6 +74,13 @@ public class AIMain implements FreeColGameObjectListener {
     }
 
 
+    /**
+     * Gets the main controller object for the server.
+     * @return The <code>FreeColServer</code>-object.
+     */
+    public FreeColServer getFreeColServer() {
+        return freeColServer;
+    }
 
     /**
     * Gets a unique ID for identifying an <code>AIObject</code>.

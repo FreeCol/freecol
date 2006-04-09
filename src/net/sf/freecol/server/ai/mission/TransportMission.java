@@ -363,7 +363,9 @@ public class TransportMission extends Mission {
             } else {
                 Transportable transportable = (Transportable) transportList.get(i);
                 path = getPath(transportable);
-                moveToEurope = (transportable.getTransportDestination() instanceof Europe);
+                moveToEurope = isCarrying(transportable)
+                        ? (transportable.getTransportDestination() instanceof Europe)
+                        : (transportable.getTransportLocatable().getLocation() instanceof Europe);
             }
 
             // Move towards the next target:
@@ -391,9 +393,14 @@ public class TransportMission extends Mission {
                 }
 
                 transportListChanged = restockCargoAtDestination(connection);
-            } else {
-                //moreWork = true;
-                //continue;
+            } else if (moveToEurope && carrier.canMoveToEurope()){
+                Element moveToEuropeElement = Message.createNewRootElement("moveToEurope");
+                moveToEuropeElement.setAttribute("unit", carrier.getID());
+                try {
+                    connection.sendAndWait(moveToEuropeElement);
+                } catch (IOException e) {
+                    logger.warning("Could not send \"moveToEuropeElement\"-message (2)!");
+                }
             }
         }
     }
@@ -426,7 +433,9 @@ public class TransportMission extends Mission {
             while (space > 0) {
                 AIUnit newUnit = getCheapestUnitInEurope(connection);
                 if (newUnit != null) {
-                    newUnit.setMission(new BuildColonyMission(getAIMain(), newUnit));
+                    if (newUnit.getUnit().isColonist() && !newUnit.getUnit().isArmed()) {
+                        newUnit.setMission(new BuildColonyMission(getAIMain(), newUnit));
+                    }
                     addToTransportList(newUnit);
                     space--;
                 } else {

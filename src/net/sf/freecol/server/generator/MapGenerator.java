@@ -145,11 +145,11 @@ public class MapGenerator {
 
                 if (riverMap.get(position) == null) {
                     if (river.flowFromSource(position)) {
-                        logger.info("Created new river with length " + river.getLength());
+                        logger.fine("Created new river with length " + river.getLength());
                         counter++;
                         break;
                     } else {
-                        logger.info("Failed to generate river.");
+                        logger.fine("Failed to generate river.");
                     }
                 }
             }

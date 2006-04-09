@@ -75,7 +75,7 @@ public class River {
 
         this.map = map;
         this.riverMap = riverMap;
-        logger.info("Starting new river");
+        logger.fine("Starting new river");
     }
 
     /**
@@ -189,22 +189,22 @@ public class River {
     public boolean flowFromSource(Map.Position position) {
         Tile tile = map.getTile(position);
         if (!tile.isLand()) {
-            logger.info("Tile at " + position + " is water.");
+            logger.fine("Tile at " + position + " is water.");
             return false;
         } else if (tile.getAddition() != Tile.ADD_NONE) {
-            logger.info("Tile at " + position + " has additions.");
+            logger.fine("Tile at " + position + " has additions.");
             return false;
         } else if (tile.getType() == Tile.DESERT) {
-            logger.info("Tile at " + position + " is desert.");
+            logger.fine("Tile at " + position + " is desert.");
             return false;
         } else if (tile.getType() == Tile.ARCTIC) {
-            logger.info("Tile at " + position + " is arctic.");
+            logger.fine("Tile at " + position + " is arctic.");
             return false;
         } else if (isNextToWater(position)) {
-            logger.info("Tile at " + position + " is next to water.");
+            logger.fine("Tile at " + position + " is next to water.");
             return false;
         } else {
-            logger.info("Tile at " + position + " is suitable source.");
+            logger.fine("Tile at " + position + " is suitable source.");
             return flow(position);
         }
     }
@@ -342,15 +342,15 @@ public class River {
             switch (section.size) {
             case 1:
                 tile.addRiver(Tile.ADD_RIVER_MINOR, section.getBranches());
-                logger.info("Added minor river to tile at " + section.position);
+                logger.fine("Added minor river to tile at " + section.position);
                 break;
             case 2:
                 tile.addRiver(Tile.ADD_RIVER_MAJOR, section.getBranches());
-                logger.info("Added major river to tile at " + section.position);
+                logger.fine("Added major river to tile at " + section.position);
                 break;
             default:
                 tile.setType(Tile.OCEAN);
-            logger.info("Created fjord at " + section.position);
+            logger.fine("Created fjord at " + section.position);
             }
             oldSection = section;
         }

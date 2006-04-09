@@ -182,6 +182,78 @@ public class AIPlayer extends AIObject {
             }
         }        
         
+        // TODO-AI-CHEATING: REMOVE WHEN THE AI IS GOOD ENOUGH:
+        if (getAIMain().getFreeColServer().isSingleplayer()
+                &&player.isEuropean() 
+                && !player.isREF() 
+                && player.isAI()
+                && player.getRebellionState() == Player.REBELLION_PRE_WAR) {
+            if (getRandom().nextInt(40) == 21) {
+                player.modifyGold(Unit.getPrice(Unit.EXPERT_ORE_MINER));
+                player.modifyGold(getGame().getMarket().getBidPrice(Goods.MUSKETS, 50));
+                player.modifyGold(getGame().getMarket().getBidPrice(Goods.HORSES, 50));
+
+                try {
+                    Element trainUnitInEuropeElement = Message.createNewRootElement("trainUnitInEurope");
+                    trainUnitInEuropeElement.setAttribute("unitType", Integer.toString(Unit.EXPERT_ORE_MINER));                    
+                    Element reply = getConnection().ask(trainUnitInEuropeElement);
+                    Unit unit = (Unit) getGame().getFreeColGameObject(((Element) reply.getChildNodes().item(0)).getAttribute("ID"));
+                    
+                    Element clearSpecialityElement = Message.createNewRootElement("clearSpeciality");
+                    clearSpecialityElement.setAttribute("unit", unit.getID());
+                    getConnection().sendAndWait(clearSpecialityElement);
+                    
+                    Element equipMusketsElement = Message.createNewRootElement("equipunit");
+                    equipMusketsElement.setAttribute("unit", unit.getID());
+                    equipMusketsElement.setAttribute("type", Integer.toString(Goods.MUSKETS));
+                    equipMusketsElement.setAttribute("amount", Integer.toString(50));  
+                    getConnection().sendAndWait(equipMusketsElement);
+                    
+                    Element equipHorsesElement = Message.createNewRootElement("equipunit");
+                    equipHorsesElement.setAttribute("unit", unit.getID());
+                    equipHorsesElement.setAttribute("type", Integer.toString(Goods.HORSES));
+                    equipHorsesElement.setAttribute("amount", Integer.toString(50));  
+                    getConnection().sendAndWait(equipHorsesElement);                    
+                } catch (IOException e) {
+                    logger.warning("Could not create dragoon.");
+                }                
+            }
+            if (getRandom().nextInt(100) == 42) {                
+                int unitType = Unit.CARAVEL;
+                switch (getRandom().nextInt(10)) {
+                case 1:
+                case 2: 
+                case 3: 
+                case 4: 
+                    unitType = Unit.CARAVEL;
+                    break;
+                case 5:
+                case 6:
+                case 7:
+                    unitType = Unit.MERCHANTMAN;
+                    break;
+                case 8: 
+                    unitType = Unit.GALLEON;
+                    break;
+                case 9: 
+                    unitType = Unit.PRIVATEER;
+                    break;
+                case 10: 
+                    unitType = Unit.FRIGATE;
+                    break;
+                }
+                player.modifyGold(Unit.getPrice(unitType));
+                Element trainUnitInEuropeElement = Message.createNewRootElement("trainUnitInEurope");
+                trainUnitInEuropeElement.setAttribute("unitType", Integer.toString(unitType));
+
+                try {
+                    getConnection().ask(trainUnitInEuropeElement);
+                } catch (IOException e) {
+                    logger.warning("Could not buy the ship.");
+                }
+            }
+        }
+        
         determineStances();
         moveREFToDocks();
         abortInvalidMissions();

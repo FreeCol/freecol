@@ -2230,34 +2230,42 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         state = s;
     }
 
+    /**
+     * Checks if this <code>Unit</code> can be moved to Europe.
+     * @return <code>true</code> if this unit is adjacent to
+     *      a <code>Tile</code> of type {@link Tile#HIGH_SEAS}.
+     */
+    public boolean canMoveToEurope() {
+        if (getLocation() instanceof Europe) {
+            return true;
+        }
+        if (!getOwner().canMoveToEurope()) {
+            return false;
+        }        
+        
+        Vector surroundingTiles = getGame().getMap().getSurroundingTiles(getTile(), 1);
+        if (surroundingTiles.size() != 8) {
+            return true;
+        } else {
+            for (int i=0; i<surroundingTiles.size(); i++) {
+                Tile tile = (Tile) surroundingTiles.get(i);
+                if (tile == null || tile.getType() == Tile.HIGH_SEAS) {
+                    return true;
+                }
+            }
+        }        
+        return false;
+    }
 
     /**
     * Moves this unit to europe.
     * @exception IllegalStateException If the move is illegal.
     */
     public void moveToEurope() {
-
         // Check if this move is illegal or not:
-        if (!(getLocation() instanceof Europe)) {
-            boolean ok = false;
-
-            Vector surroundingTiles = getGame().getMap().getSurroundingTiles(getTile(), 1);
-            if (surroundingTiles.size() != 8) {
-                ok = true;
-            } else {
-                for (int i=0; i<surroundingTiles.size(); i++) {
-                    Tile tile = (Tile) surroundingTiles.get(i);
-                    if (tile == null || tile.getType() == Tile.HIGH_SEAS) {
-                        ok = true;
-                        break;
-                    }
-                }
-            }
-
-            if (!ok) {
-                throw new IllegalStateException("It is not allowed to move units to europe from the tile where this unit is located.");
-            }
-
+        if (!canMoveToEurope()) {
+            throw new IllegalStateException("It is not allowed to move units to europe from the tile where this unit is located.");
+        } else {        
             setEntryLocation(getLocation());
         }
 
