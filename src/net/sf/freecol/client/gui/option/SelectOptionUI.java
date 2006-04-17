@@ -58,15 +58,15 @@ public final class SelectOptionUI extends JPanel implements OptionUpdater {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public Dimension getPreferredSize() {
         return new Dimension(getParent().getWidth() - getParent().getInsets().left - getParent().getInsets().right - (OptionGroupUI.H_GAP*2), super.getPreferredSize().height);
     }
     
     /**
-     * @inheritDoc
-     */    
+     * {@inheritDoc}
+     */  
     public Dimension getMinimumSize() {
         return getPreferredSize();
     }    

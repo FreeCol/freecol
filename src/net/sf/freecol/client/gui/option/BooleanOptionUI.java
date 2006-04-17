@@ -46,14 +46,14 @@ public final class BooleanOptionUI extends JPanel implements OptionUpdater {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public Dimension getPreferredSize() {
         return new Dimension(getParent().getWidth()/2 - getParent().getInsets().left - getParent().getInsets().right - (OptionGroupUI.H_GAP*3)/2, super.getPreferredSize().height);
     }
     
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public Dimension getMinimumSize() {
         return getPreferredSize();
