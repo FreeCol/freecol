@@ -146,6 +146,7 @@ public final class Canvas extends JLayeredPane {
     private final ServerListPanel   serverListPanel;
     private final GameOptionsDialog gameOptionsDialog;
     private final ClientOptionsDialog clientOptionsDialog;
+    private final DeclarationDialog declarationDialog;
     private TakeFocusThread         takeFocusThread;
     private JMenuBar                jMenuBar;
 
@@ -178,6 +179,7 @@ public final class Canvas extends JLayeredPane {
         indianSettlementPanel = new IndianSettlementPanel();
         tilePanel = new TilePanel(this);
         monarchPanel = new MonarchPanel(this);
+        declarationDialog = new DeclarationDialog(this, freeColClient);
 
         europePanel = new EuropePanel(this, freeColClient, freeColClient.getInGameController());
         statusPanel = new StatusPanel(this);
@@ -505,6 +507,20 @@ public final class Canvas extends JLayeredPane {
         }
     }
 
+    /**
+     * Shows the <code>DeclarationDialog</code>.
+     * @see DeclarationDialog
+     */
+     public void showDeclarationDialog() {
+         declarationDialog.setLocation(getWidth() / 2 - declarationDialog.getWidth() / 2,
+                                   getHeight() / 2 - declarationDialog.getHeight() / 2);
+         add(declarationDialog, CONFIRM_LAYER);
+         declarationDialog.requestFocus();
+
+         declarationDialog.initialize();
+         boolean response = declarationDialog.getResponseBoolean();
+         remove(declarationDialog);
+     }
 
     /**
     * Displays a dialog with a text and a ok/cancel option.

@@ -154,8 +154,7 @@ public final class InGameController implements NetworkConstants {
      * Declares independence for the home country.
      */
     public void declareIndependence() {
-        Canvas canvas = freeColClient.getCanvas();
-        
+        Canvas canvas = freeColClient.getCanvas();        
         if (freeColClient.getMyPlayer().getSoL() < 50) {
             canvas.showInformationMessage("declareIndependence.notMajority", new String[][] {{"%percentage%", Integer.toString(freeColClient.getMyPlayer().getSoL())}});
             return;
@@ -169,6 +168,8 @@ public final class InGameController implements NetworkConstants {
         freeColClient.getActionManager().update();
         freeColClient.getClient().sendAndWait(declareIndependenceElement);
         freeColClient.getMyPlayer().setMonarch(null);
+        
+        canvas.showDeclarationDialog();
     }
     
 
