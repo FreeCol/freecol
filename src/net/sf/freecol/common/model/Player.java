@@ -126,7 +126,7 @@ public class Player extends FreeColGameObject {
 
 
     private static final Color[] defaultNationColors = {
-        Color.ORANGE,
+        new Color(255, 157, 60),
         Color.RED,
         Color.BLUE,
         Color.YELLOW,
