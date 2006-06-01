@@ -44,6 +44,9 @@ public final class ReportForeignAffairPanel extends ReportPanel implements Actio
         }
         while (opponents.hasNext()) {
             Player enemy = (Player) opponents.next();
+            if (enemy.isREF()) {
+                continue;
+            }
             buildForeignAffairLabel(player, enemy);
             for (nation = 0; nation < 4; nation++) {
                 if (nation == enemy.getNation()) {
