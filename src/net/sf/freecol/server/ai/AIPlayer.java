@@ -1197,7 +1197,8 @@ public class AIPlayer extends AIObject {
         while (aui.hasNext()) {
             AIUnit coAIUnit = (AIUnit) aui.next();
             Unit coUnit = coAIUnit.getUnit();
-            if (coAIUnit.getMission() instanceof UnitSeekAndDestroyMission) {
+            if (coUnit.getTile() != null
+                    && coAIUnit.getMission() instanceof UnitSeekAndDestroyMission) {
                 Location target = ((UnitSeekAndDestroyMission) coAIUnit.getMission()).getTarget();
                 int ourDistance = unit.getTurnsToReach(startTile, target.getTile());
                 int coUnitDistance = coUnit.getTurnsToReach(target.getTile());

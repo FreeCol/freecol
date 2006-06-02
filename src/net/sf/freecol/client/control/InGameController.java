@@ -488,6 +488,8 @@ public final class InGameController implements NetworkConstants {
 
         freeColClient.getActionManager().update();
         freeColClient.getCanvas().updateJMenuBar();
+        
+        nextModelMessage();
     }
 
 

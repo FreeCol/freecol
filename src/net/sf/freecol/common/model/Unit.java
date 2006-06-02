@@ -2469,6 +2469,12 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     public void doAssignedWork() {
         if (workLeft > 0) {
             workLeft--;
+            
+            // Shorter travel time to America for the REF:
+            if (state == TO_AMERICA && getOwner().isREF()) {
+                workLeft = 0;
+            }
+            
             if (workLeft == 0) {
                 workLeft = -1;
 
@@ -3214,6 +3220,19 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
             colony.setOwner(myPlayer); // This also changes over all of the units...
             setLocation(colony.getTile());
+            
+            // Demote all soldiers and clear all orders:
+            Iterator it = colony.getTile().getUnitIterator();
+            while (it.hasNext()) {
+                Unit u = (Unit) it.next();
+                if (u.getType() == Unit.VETERAN_SOLDIER
+                        || u.getType() == Unit.KINGS_REGULAR
+                        || u.getType() == Unit.COLONIAL_REGULAR) {
+                    u.setType(Unit.FREE_COLONIST);
+                }
+                u.setState(Unit.ACTIVE);
+            }
+            
             addModelMessage(this, "model.unit.colonyCaptured",
                             new String[][] {{"%colony%", colony.getName()},
                                             {"%amount%", Integer.toString(plunderGold)}},

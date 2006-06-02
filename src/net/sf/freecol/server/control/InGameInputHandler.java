@@ -800,7 +800,21 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
 
         unit.attack(defender, result, plunderGold);
-
+        
+        // TODO: REMOVE MAGIC: This should not really be necessary:
+        if (result == Unit.ATTACK_DONE_SETTLEMENT) {
+            Element updateElement = Message.createNewRootElement("update");
+            updateElement.appendChild(newTile.toXMLElement(newTile.getColony().getOwner(), reply.getOwnerDocument()));
+            ServerPlayer enemyPlayer = (ServerPlayer) defender.getOwner();
+            try {
+                enemyPlayer.getConnection().send(updateElement);
+            } catch (IOException e) {
+                logger.warning("Could not send message (2) to: " +
+                               enemyPlayer.getName() + " with connection " +
+                               enemyPlayer.getConnection());
+            }            
+        }
+        
         if (result >= Unit.ATTACK_EVADES && unit.getTile().equals(newTile)) { // In other words, we moved...
             Element update = reply.getOwnerDocument().createElement("update");
             Vector surroundingTiles = game.getMap().getSurroundingTiles(unit.getTile(), unit.getLineOfSight());

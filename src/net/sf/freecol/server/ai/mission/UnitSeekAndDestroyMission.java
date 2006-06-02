@@ -229,7 +229,9 @@ public class UnitSeekAndDestroyMission extends Mission {
                     getUnit().getTile(), 
                     target.getTile(), 
                     (Unit) getUnit().getLocation());
-            dropTarget = p.getTransportDropNode().getTile();
+            if (p != null) {
+                dropTarget = p.getTransportDropNode().getTile();
+            }
         }
         
         if (getUnit().getLocation() instanceof Unit) {

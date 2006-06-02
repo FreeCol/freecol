@@ -41,6 +41,7 @@ import net.sf.freecol.client.gui.panel.ReportIndianPanel;
 import net.sf.freecol.client.gui.panel.ReportLabourPanel;
 import net.sf.freecol.client.gui.panel.ReportReligiousPanel;
 import net.sf.freecol.client.gui.panel.ReportTradePanel;
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
@@ -478,6 +479,25 @@ public class FreeColMenuBar extends JMenuBar {
                 }
             });            
 
+            if (freeColClient.getFreeColServer() != null) {
+                final JMenuItem giveBells = new JMenuItem("Adds 100 bells to each Colony");
+                giveBells.setOpaque(false);
+                giveBells.setMnemonic(KeyEvent.VK_B);
+                debugMenu.add(giveBells);
+                giveBells.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        Iterator ci = freeColClient.getMyPlayer().getColonyIterator();
+                        while (ci.hasNext()) {
+                            Colony c = (Colony) ci.next();
+                            c.addBells(100);
+                            
+                            Colony sc = (Colony) freeColClient.getFreeColServer().getGame().getFreeColGameObject(c.getID());
+                            sc.addBells(100);
+                        }
+                    }
+                });
+            }
+            
             final JMenuItem reveal = new JCheckBoxMenuItem(Messages.message("menuBar.debug.revealEntireMap"));
             reveal.setOpaque(false);
             reveal.setMnemonic(KeyEvent.VK_R);

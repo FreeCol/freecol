@@ -316,6 +316,8 @@ public final class InGameController extends Controller {
             */
             if (game.getTurn().getNumber() > 20) {
                 return true;
+            } else if (player.getEurope() == null) {
+                return true;
             } else if (player.getGold() < 1000) {
                 Iterator unitIterator = player.getEurope().getUnitIterator();
                 while (unitIterator.hasNext()) {
