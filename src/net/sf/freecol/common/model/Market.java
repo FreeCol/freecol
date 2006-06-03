@@ -332,20 +332,22 @@ public final class Market extends FreeColGameObject {
         }
 
         priceGoods();
-        
-        for(int k = 0; k < dataForGoodType.length; k++) {
-            if (oldPrices[k] > dataForGoodType[k].costToBuy) {
-                addModelMessage(this, "model.market.priceDecrease",
-                                new String[][] {{"%goods%", Goods.getName(k)},
-                                                {"%buy%", String.valueOf(dataForGoodType[k].costToBuy)},
-                                                {"%sell%", String.valueOf(dataForGoodType[k].paidForSale)}},
-                                ModelMessage.MARKET_PRICES);
-            } else if (oldPrices[k] < dataForGoodType[k].costToBuy) {
-                addModelMessage(this, "model.market.priceIncrease",
-                                new String[][] {{"%goods%", Goods.getName(k)},
-                                                {"%buy%", String.valueOf(dataForGoodType[k].costToBuy)},
-                                                {"%sell%", String.valueOf(dataForGoodType[k].paidForSale)}},
-                                ModelMessage.MARKET_PRICES);
+
+        if (getGame().getTurn().getNumber() > 1) {
+            for(int k = 0; k < dataForGoodType.length; k++) {
+                if (oldPrices[k] > dataForGoodType[k].costToBuy) {
+                    addModelMessage(this, "model.market.priceDecrease",
+                                    new String[][] {{"%goods%", Goods.getName(k)},
+                                                    {"%buy%", String.valueOf(dataForGoodType[k].costToBuy)},
+                                                    {"%sell%", String.valueOf(dataForGoodType[k].paidForSale)}},
+                                    ModelMessage.MARKET_PRICES);
+                } else if (oldPrices[k] < dataForGoodType[k].costToBuy) {
+                    addModelMessage(this, "model.market.priceIncrease",
+                                    new String[][] {{"%goods%", Goods.getName(k)},
+                                                    {"%buy%", String.valueOf(dataForGoodType[k].costToBuy)},
+                                                    {"%sell%", String.valueOf(dataForGoodType[k].paidForSale)}},
+                                    ModelMessage.MARKET_PRICES);
+                }
             }
         }
     }
