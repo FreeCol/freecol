@@ -535,4 +535,50 @@ abstract public class FreeColGameObject {
 
         return array;
     }
+
+
+    
+    /**
+     * Creates an XML-representation of an array.
+     * 
+     * @param tagName The tagname for the <code>Element</code>
+     *       representing the array.
+     * @param array The array to represent.
+     * @param document The document context in which the
+     *       elemt should be created.
+     * @return An XML DOM <code>Element</code> representing
+     *       the given array.
+     */
+    protected Element toArrayElement(String tagName, String[] array, Document document) {
+        Element arrayElement = document.createElement(tagName);
+        arrayElement.setAttribute("xLength", Integer.toString(array.length));
+
+        for (int x=0; x < array.length; x++) {
+            arrayElement.setAttribute("x" + Integer.toString(x), array[x]);
+        }
+        
+        return arrayElement;
+    }
+    
+
+    /**
+     * Reads an XML-representation of an array.
+     * 
+     * @param tagName The tagname for the <code>Element</code>
+     *       representing the array.
+     * @param arrayElement An XML DOM <code>Element</code> 
+     *       representing an array.
+     * @param arrayType The type of array to be read.
+     * @return The array.
+     */               
+    protected String[] readFromArrayElement(String tagName, Element arrayElement, String[] arrayType) {
+        String[] array = new String[Integer.parseInt(arrayElement.getAttribute("xLength"))];
+        
+        for (int x=0; x<array.length; x++) {
+            array[x] = arrayElement.getAttribute("x" + Integer.toString(x));
+        }
+        
+        return array;
+    }
+
 }

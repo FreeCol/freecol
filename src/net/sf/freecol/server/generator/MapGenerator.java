@@ -289,18 +289,20 @@ public class MapGenerator {
 
                 int[] wantedGoods = generateWantedGoodsForLocation(map,map.getTile(position));
 
-                map.getTile(position).setSettlement(
+                IndianSettlement settlement = 
                     new IndianSettlement(game, player,
                                          map.getTile(position), owner, type, capital,
                                          generateSkillForLocation(map, map.getTile(position)),
                                          wantedGoods[0],
                                          wantedGoods[1],
                                          wantedGoods[2],
-                                         false, null)
-                );
+                                         false, null);
+
+                player.getSettlements().add(settlement);
+                map.getTile(position).setSettlement(settlement);
 
                 map.getTile(position).setClaim(Tile.CLAIM_CLAIMED);
-                map.getTile(position).setOwner(map.getTile(position).getSettlement());
+                map.getTile(position).setOwner(settlement);
                 Iterator circleIterator = map.getCircleIterator
                                                 (position, true, radius);
                 while (circleIterator.hasNext()) {
@@ -311,11 +313,11 @@ public class MapGenerator {
 
                 for (int i = 0; i < (type * 2) + 4; i++) {
                     Unit unit = new Unit(game, player, Unit.BRAVE);
-                    unit.setIndianSettlement((IndianSettlement) map.getTile(position).getSettlement());
+                    unit.setIndianSettlement(settlement);
                     if (i == 0) {
                         unit.setLocation(map.getTile(position));
                     } else {
-                        unit.setLocation(map.getTile(position).getSettlement());
+                        unit.setLocation(settlement);
                     }
 
                 }

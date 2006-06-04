@@ -201,6 +201,8 @@ public class Player extends FreeColGameObject {
     private Iterator nextActiveUnitIterator = new UnitIterator(this, new ActivePredicate());
     private Iterator nextGoingToUnitIterator = new UnitIterator(this, new GoingToPredicate());
 
+    // Settlements this player owns
+    private ArrayList settlements = new ArrayList();
 
     // Temporary variables:
     protected boolean[][] canSeeTiles = null;
@@ -327,6 +329,13 @@ public class Player extends FreeColGameObject {
      */
     public boolean isREF() {    
         return isREF(getNation());
+    }
+
+    /**
+     * @return the settlements this player owns
+     */
+    public ArrayList getSettlements() {
+        return settlements;
     }
 
          
@@ -819,8 +828,7 @@ public class Player extends FreeColGameObject {
 
                 Iterator colonyIterator = getColonyIterator();
                 while (colonyIterator.hasNext()) {
-                    Colony colony = (Colony) colonyIterator.next();
-
+                    Settlement colony = (Settlement) colonyIterator.next();
                     Map.Position position = colony.getTile().getPosition();
                     canSeeTiles[position.getX()][position.getY()] = true;
 
@@ -1426,19 +1434,7 @@ public class Player extends FreeColGameObject {
     * @see Colony
     */
     public Iterator getColonyIterator() {
-        ArrayList colonies = new ArrayList();
-        Map map = getGame().getMap();
-
-        Iterator tileIterator = map.getWholeMapIterator();
-        while (tileIterator.hasNext()) {
-            Tile t = map.getTile((Map.Position) tileIterator.next());
-
-            if (t != null && t.getColony() != null && t.getColony().getOwner() == this) {
-                colonies.add(t.getColony());
-            }
-        }
-
-        return colonies.iterator();
+        return settlements.iterator();
     }
 
 
@@ -1487,6 +1483,7 @@ public class Player extends FreeColGameObject {
     * @see IndianSettlement
     */
     public Iterator getIndianSettlementIterator() {
+        /**
         ArrayList indianSettlements = new ArrayList();
         Map map = getGame().getMap();
 
@@ -1500,6 +1497,8 @@ public class Player extends FreeColGameObject {
         }
 
         return indianSettlements.iterator();
+        **/
+        return settlements.iterator();
     }
     
     
@@ -1801,141 +1800,141 @@ public class Player extends FreeColGameObject {
     * Prepares this <code>Player</code> for a new turn.
     */
     public void newTurn() {        
-        if (isEuropean() && getBells() >= getTotalFoundingFatherCost()
+        if (isEuropean()) {
+            if (getBells() >= getTotalFoundingFatherCost()
                 && currentFather != FoundingFather.NONE) {
-            fathers[currentFather] = true;
+                fathers[currentFather] = true;
 
-            switch (currentFather) {
-            case FoundingFather.JOHN_PAUL_JONES:
-                // get new frigate
-                getGame().getModelController().createUnit(getID() + "newTurnJohnPaulJones",
-                                                          getEurope(), this, Unit.FRIGATE);
-                break;
-            case FoundingFather.BARTOLOME_DE_LAS_CASAS:
-                // make all converts free colonists
-                for(Iterator iter = getUnitIterator(); iter.hasNext(); ) {
-                    Unit u = (Unit)iter.next();
-                    if (u.getType() == Unit.INDIAN_CONVERT) {
-                        u.setType(Unit.FREE_COLONIST);
+                switch (currentFather) {
+                case FoundingFather.JOHN_PAUL_JONES:
+                    // get new frigate
+                    getGame().getModelController().createUnit(getID() + "newTurnJohnPaulJones",
+                                                              getEurope(), this, Unit.FRIGATE);
+                    break;
+                case FoundingFather.BARTOLOME_DE_LAS_CASAS:
+                    // make all converts free colonists
+                    for(Iterator iter = getUnitIterator(); iter.hasNext(); ) {
+                        Unit u = (Unit)iter.next();
+                        if (u.getType() == Unit.INDIAN_CONVERT) {
+                            u.setType(Unit.FREE_COLONIST);
+                        }
                     }
-                }
-                break;
-            case FoundingFather.FRANSISCO_DE_CORONADO:
-                // explore all tiles surrounding colonies
-                ArrayList tiles = new ArrayList();
+                    break;
+                case FoundingFather.FRANSISCO_DE_CORONADO:
+                    // explore all tiles surrounding colonies
+                    ArrayList tiles = new ArrayList();
 
-                Iterator tileIterator = getGame().getMap().getWholeMapIterator();
-                while (tileIterator.hasNext()) {
-                    Tile tile = getGame().getMap().getTile(((Map.Position) tileIterator.next()));
-                    if (tile.getColony() != null) {
-                        tiles.add(tile);
-                        for (int i=0; i<8; i++) {
-                            Tile addTile = getGame().getMap().getNeighbourOrNull(i, tile);
-                            if (addTile != null) {
-                                tiles.add(addTile);
+                    Iterator tileIterator = getGame().getMap().getWholeMapIterator();
+                    while (tileIterator.hasNext()) {
+                        Tile tile = getGame().getMap().getTile(((Map.Position) tileIterator.next()));
+                        if (tile.getColony() != null) {
+                            tiles.add(tile);
+                            for (int i=0; i<8; i++) {
+                                Tile addTile = getGame().getMap().getNeighbourOrNull(i, tile);
+                                if (addTile != null) {
+                                    tiles.add(addTile);
+                                }
                             }
                         }
                     }
-                }
 
-                getGame().getModelController().exploreTiles(this, tiles);
-                break;
-            case FoundingFather.LA_SALLE:
-                // all colonies get a stockade for free
-                Iterator colonyIterator = getColonyIterator();
-                while (colonyIterator.hasNext()) {
-                    ((Colony) colonyIterator.next()).updatePopulation();
-                }
-                break;
-            case FoundingFather.SIMON_BOLIVAR:
-                // SoL increase by 20 %
-                Iterator colonyIterator2 = getColonyIterator();
-                while (colonyIterator2.hasNext()) {
-                    ((Colony) colonyIterator2.next()).addSoL(20);
-                }
-                break;
-            case FoundingFather.POCAHONTAS:
-                // reduce indian tension and alarm
-                Iterator pi = getGame().getPlayerIterator();
-                while (pi.hasNext()) {
-                    Player p = (Player) pi.next();
-                    if (!p.isEuropean()) {
-                        p.getTension(this).setValue(0);
-                        Iterator isi = p.getIndianSettlementIterator();
-                        while (isi.hasNext()) {
-                            IndianSettlement is = (IndianSettlement) isi.next();
-                            is.getAlarm(this).setValue(0);
+                    getGame().getModelController().exploreTiles(this, tiles);
+                    break;
+                case FoundingFather.LA_SALLE:
+                    // all colonies get a stockade for free
+                    Iterator colonyIterator = getColonyIterator();
+                    while (colonyIterator.hasNext()) {
+                        ((Colony) colonyIterator.next()).updatePopulation();
+                    }
+                    break;
+                case FoundingFather.SIMON_BOLIVAR:
+                    // SoL increase by 20 %
+                    Iterator colonyIterator2 = getColonyIterator();
+                    while (colonyIterator2.hasNext()) {
+                        ((Colony) colonyIterator2.next()).addSoL(20);
+                    }
+                    break;
+                case FoundingFather.POCAHONTAS:
+                    // reduce indian tension and alarm
+                    Iterator pi = getGame().getPlayerIterator();
+                    while (pi.hasNext()) {
+                        Player p = (Player) pi.next();
+                        if (!p.isEuropean()) {
+                            p.getTension(this).setValue(0);
+                            Iterator isi = p.getIndianSettlementIterator();
+                            while (isi.hasNext()) {
+                                IndianSettlement is = (IndianSettlement) isi.next();
+                                is.getAlarm(this).setValue(0);
+                            }
                         }
                     }
-                }
-                break;
-            case FoundingFather.WILLIAM_BREWSTER:
-                // don't recruit any more criminals or servants
-                for (int i=1; i<=3; i++) {
-                    if (getEurope().getRecruitable(i) == Unit.PETTY_CRIMINAL
+                    break;
+                case FoundingFather.WILLIAM_BREWSTER:
+                    // don't recruit any more criminals or servants
+                    for (int i=1; i<=3; i++) {
+                        if (getEurope().getRecruitable(i) == Unit.PETTY_CRIMINAL
                             || getEurope().getRecruitable(i) == Unit.INDENTURED_SERVANT) {
-                        getEurope().setRecruitable(i, Unit.FREE_COLONIST);
+                            getEurope().setRecruitable(i, Unit.FREE_COLONIST);
+                        }
+                    }
+                    break;
+                case FoundingFather.THOMAS_JEFFERSON:
+                    // increase bells production by 50 %
+                    bellsBonus += 50;
+                    break;
+                case FoundingFather.THOMAS_PAINE:
+                    // increase bell production by current tax rate
+                    bellsBonus += tax;
+                    break;
+                case FoundingFather.JACOB_FUGGER:
+                    // lift all current boycotts
+                    for (int goods = 0; goods < Goods.NUMBER_OF_TYPES; goods++) {
+                        setArrears(goods, 0);
+                    }
+                    break;
+                }
+
+                addModelMessage(this, "model.player.foundingFatherJoinedCongress",
+                                new String[][] {{"%foundingFather%",
+                                                 Messages.message(FoundingFather.getName(currentFather))}},
+                                ModelMessage.DEFAULT);
+
+                currentFather = FoundingFather.NONE;
+                bells = 0;
+            }
+
+            if (crossesRequired != -1) {
+                updateCrossesRequired();
+            }
+
+            int oldSoL = 0;
+            int newSoL = 0;
+            int numberOfColonies = settlements.size();
+            if (numberOfColonies > 0) {
+                Iterator iterator = getColonyIterator();
+                while (iterator.hasNext()) {
+                    Colony colony = (Colony) iterator.next();
+                    colony.updateSoL();
+                    oldSoL += colony.getOldSoL();
+                    newSoL += colony.getSoL();
+                }
+                oldSoL = oldSoL / numberOfColonies;
+                newSoL = newSoL / numberOfColonies;
+                if (oldSoL/10 != newSoL/10) {
+                    if (newSoL > oldSoL) {
+                        addModelMessage(this, "model.player.SoLIncrease",
+                                        new String [][] {{"%oldSoL%", String.valueOf(oldSoL)},
+                                                         {"%newSoL%", String.valueOf(newSoL)}},
+                                        ModelMessage.SONS_OF_LIBERTY);
+                    } else {
+                        addModelMessage(this, "model.player.SoLDecrease",
+                                        new String [][] {{"%oldSoL%", String.valueOf(oldSoL)},
+                                                         {"%newSoL%", String.valueOf(newSoL)}},
+                                        ModelMessage.SONS_OF_LIBERTY);
                     }
                 }
-                break;
-            case FoundingFather.THOMAS_JEFFERSON:
-                // increase bells production by 50 %
-                bellsBonus += 50;
-                break;
-            case FoundingFather.THOMAS_PAINE:
-                // increase bell production by current tax rate
-                bellsBonus += tax;
-                break;
-            case FoundingFather.JACOB_FUGGER:
-                // lift all current boycotts
-                for (int goods = 0; goods < Goods.NUMBER_OF_TYPES; goods++) {
-                    setArrears(goods, 0);
-                }
-                break;
-            }
-
-            addModelMessage(this, "model.player.foundingFatherJoinedCongress",
-                            new String[][] {{"%foundingFather%",
-                            Messages.message(FoundingFather.getName(currentFather))}},
-                            ModelMessage.DEFAULT);
-
-            currentFather = FoundingFather.NONE;
-            bells = 0;
-        }
-
-        if (crossesRequired != -1) {
-            updateCrossesRequired();
-        }
-
-        int oldSoL = 0;
-        int newSoL = 0;
-        int numberOfColonies = 0;
-        Iterator iterator = getColonyIterator();
-        while (iterator.hasNext()) {
-            Colony colony = (Colony) iterator.next();
-            colony.updateSoL();
-            numberOfColonies++;
-            oldSoL += colony.getOldSoL();
-            newSoL += colony.getSoL();
-        }
-        if (numberOfColonies > 0) {
-            oldSoL = oldSoL / numberOfColonies;
-            newSoL = newSoL / numberOfColonies;
-            if (oldSoL/10 != newSoL/10) {
-                if (newSoL > oldSoL) {
-                    addModelMessage(this, "model.player.SoLIncrease",
-                                    new String [][] {{"%oldSoL%", String.valueOf(oldSoL)},
-                                                     {"%newSoL%", String.valueOf(newSoL)}},
-                                    ModelMessage.SONS_OF_LIBERTY);
-                } else {
-                    addModelMessage(this, "model.player.SoLDecrease",
-                                    new String [][] {{"%oldSoL%", String.valueOf(oldSoL)},
-                                                     {"%newSoL%", String.valueOf(newSoL)}},
-                                    ModelMessage.SONS_OF_LIBERTY);
-                }
             }
         }
-
     }
 
 
@@ -1995,6 +1994,14 @@ public class Player extends FreeColGameObject {
                 }
             }
             playerElement.setAttribute("contacted", sb.toString());
+            if (settlements.size() > 0) {
+                String[] colonyArray = new String[settlements.size()];
+                for (int i = 0; i < settlements.size(); i++) {
+                    colonyArray[i] = ((Settlement) settlements.get(i)).getID();
+                }
+                playerElement.appendChild(toArrayElement("colonies", colonyArray, document));
+            }
+
         } else {
             playerElement.setAttribute("gold", Integer.toString(-1));
             playerElement.setAttribute("crosses", Integer.toString(-1));
@@ -2096,6 +2103,15 @@ public class Player extends FreeColGameObject {
                                                                     "incomeAfterTaxes"), new int[0]);
         } else {
             incomeAfterTaxes = new int[Goods.NUMBER_OF_TYPES];
+        }
+
+        if (getChildElement(playerElement, "colonies") != null) {
+            settlements = new ArrayList();
+            String[] colonyArray = readFromArrayElement("colonies", getChildElement(playerElement, "colonies"),
+                                                        new String[0]);
+            for (int i = 0; i < colonyArray.length; i++) {
+                settlements.add(getGame().getFreeColGameObject(colonyArray[i]));
+            }
         }
 
         if (playerElement.hasAttribute("contacted")) {
