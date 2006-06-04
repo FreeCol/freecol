@@ -204,7 +204,7 @@ public final class InGameController implements NetworkConstants {
                         ? freeColClient.getCanvas().showEmigrationPanel() : 0
                     );
             }
-
+            nextModelMessage();
             nextActiveUnit();
         }
     }
@@ -257,6 +257,11 @@ public final class InGameController implements NetworkConstants {
 
         if (name == null) { // The user cancelled the action.
             return;
+        } else if (freeColClient.getMyPlayer().getColony(name) != null) {
+            // colony name must be unique (per Player)
+            freeColClient.getCanvas().showInformationMessage("nameColony.notUnique",
+                                                             new String[][] {{"%name%", name}});
+            return;
         }
 
         Element buildColonyElement = Message.createNewRootElement("buildColony");
@@ -272,6 +277,7 @@ public final class InGameController implements NetworkConstants {
             }
 
             Colony colony = new Colony(game, (Element) reply.getChildNodes().item(0));
+            freeColClient.getMyPlayer().getSettlements().add(colony);
             changeWorkType(unit, Goods.FOOD);
             unit.buildColony(colony);
             gui.setActiveUnit(null);
