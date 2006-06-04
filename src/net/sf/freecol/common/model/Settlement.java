@@ -17,6 +17,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     /** The <code>Tile</code> where this <code>Settlement</code> is located. */
     protected Tile tile;
     
+    protected GoodsContainer goodsContainer;
     
 
     /**
@@ -28,9 +29,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     */
     public Settlement(Game game, Player owner, Tile tile) {
         super(game);
-        
         this.tile = tile;
-
         this.owner = owner;
     }
 
@@ -48,6 +47,16 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     }
     
     
+
+    /**
+    * Gets this colony's line of sight.
+    * @return The line of sight offered by this
+    *       <code>Colony</code>.
+    * @see Player#canSee(Tile)
+    */
+    public int getLineOfSight() {
+        return 2;
+    }
     
 
     /**
@@ -66,6 +75,39 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         return tile;
     }
     
+    /**
+    * Gets a <code>Tile</code> from the neighbourhood of this 
+    * <code>Colony</code>.
+    * 
+    * @param x The x-coordinate of the <code>Tile</code>.
+    * @param y The y-coordinate of the <code>Tile</code>. 
+    * @return The <code>Tile</code>.
+    */
+    public Tile getTile(int x, int y) {
+        if (x==0 && y==0) {
+            return getGame().getMap().getNeighbourOrNull(Map.N, tile);
+        } else if (x==0 && y== 1) {
+            return getGame().getMap().getNeighbourOrNull(Map.NE, tile);
+        } else if (x==0 && y== 2) {
+            return getGame().getMap().getNeighbourOrNull(Map.E, tile);
+        } else if (x==1 && y== 0) {
+            return getGame().getMap().getNeighbourOrNull(Map.NW, tile);
+        } else if (x==1 && y== 1) {
+            return tile;
+        } else if (x==1 && y== 2) {
+            return getGame().getMap().getNeighbourOrNull(Map.SE, tile);
+        } else if (x==2 && y== 0) {
+            return getGame().getMap().getNeighbourOrNull(Map.W, tile);
+        } else if (x==2 && y== 1) {
+            return getGame().getMap().getNeighbourOrNull(Map.SW, tile);
+        } else if (x==2 && y== 2) {
+            return getGame().getMap().getNeighbourOrNull(Map.S, tile);
+        } else {
+            return null;
+        }
+    }
+
+
 
     /**
     * Gets the owner of this <code>Settlement</code>.
@@ -88,8 +130,43 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         this.owner = owner;
     }
 
-    
     public GoodsContainer getGoodsContainer() {
-        return null;
+        return goodsContainer;
     }
+
+
+    /**
+    * Adds a <code>Locatable</code> to this Location.
+    *
+    * @param locatable The <code>Locatable</code> to add to this Location.
+    */
+    public abstract void add(Locatable locatable);
+
+    /**
+    * Removes a <code>Locatable</code> from this Location.
+    *
+    * @param locatable The <code>Locatable</code> to remove from this Location.
+    */
+    public abstract void remove(Locatable locatable);
+
+    public abstract boolean canAdd(Locatable locatable);
+
+    /**
+    * Returns the number of units in this settlement.
+    *
+    * @return The number of units in this settlement.
+    */
+    public abstract int getUnitCount();
+
+    public abstract boolean contains(Locatable locatable);
+
+
+
+    public void dispose() {
+        getTile().setSettlement(null);
+        owner.getSettlements().remove(this);
+        goodsContainer.dispose();
+        super.dispose();
+    }
+
 }

@@ -88,7 +88,6 @@ public class IndianSettlement extends Settlement {
                     isVisited; /* true if a European player has asked to speak with the chief. */
 
     private UnitContainer unitContainer;
-    private GoodsContainer goodsContainer;
 
     private ArrayList ownedUnits = new ArrayList();
 
@@ -517,12 +516,6 @@ public class IndianSettlement extends Settlement {
     public Iterator getUnitIterator() {
         return unitContainer.getUnitIterator();
     }
-
-
-    public GoodsContainer getGoodsContainer() {
-        return goodsContainer;
-    }
-
 
     public Unit getFirstUnit() {
         return unitContainer.getFirstUnit();
@@ -954,8 +947,6 @@ public class IndianSettlement extends Settlement {
 
     public void dispose() {
         unitContainer.dispose();
-        goodsContainer.dispose();
-        getTile().setSettlement(null);
         super.dispose();
     }
 

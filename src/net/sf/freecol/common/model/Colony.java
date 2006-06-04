@@ -33,7 +33,6 @@ public final class Colony extends Settlement implements Location {
     /** Places a unit may work. Either a <code>Building</code> or a <code>ColonyTile</code>. */
     private ArrayList workLocations = new ArrayList();
 
-    private GoodsContainer goodsContainer;
     private boolean[] exports;
     
     private int hammers;
@@ -186,16 +185,6 @@ public final class Colony extends Settlement implements Location {
         readFromXMLElement(element);
     }
 
-
-    /**
-    * Gets this colony's line of sight.
-    * @return The line of sight offered by this
-    *       <code>Colony</code>.
-    * @see Player#canSee(Tile)
-    */
-    public int getLineOfSight() {
-        return 2;
-    }
 
     /**
      * Returns whether this colony is landlocked, or has access to the
@@ -394,47 +383,6 @@ public final class Colony extends Settlement implements Location {
     }
 
     /**
-    * Gets a <code>Tile</code> of this<code>Colony</code>.
-    * @return The <code>Tile</code>.
-    */
-    public Tile getTile() {
-            return tile;
-    }
-    
-    /**
-    * Gets a <code>Tile</code> from the neighbourhood of this 
-    * <code>Colony</code>.
-    * 
-    * @param x The x-coordinate of the <code>Tile</code>.
-    * @param y The y-coordinate of the <code>Tile</code>. 
-    * @return The <code>Tile</code>.
-    */
-    public Tile getTile(int x, int y) {
-        if (x==0 && y==0) {
-            return getGame().getMap().getNeighbourOrNull(Map.N, tile);
-        } else if (x==0 && y== 1) {
-            return getGame().getMap().getNeighbourOrNull(Map.NE, tile);
-        } else if (x==0 && y== 2) {
-            return getGame().getMap().getNeighbourOrNull(Map.E, tile);
-        } else if (x==1 && y== 0) {
-            return getGame().getMap().getNeighbourOrNull(Map.NW, tile);
-        } else if (x==1 && y== 1) {
-            return tile;
-        } else if (x==1 && y== 2) {
-            return getGame().getMap().getNeighbourOrNull(Map.SE, tile);
-        } else if (x==2 && y== 0) {
-            return getGame().getMap().getNeighbourOrNull(Map.W, tile);
-        } else if (x==2 && y== 1) {
-            return getGame().getMap().getNeighbourOrNull(Map.SW, tile);
-        } else if (x==2 && y== 2) {
-            return getGame().getMap().getNeighbourOrNull(Map.S, tile);
-        } else {
-            return null;
-        }
-    }
-
-
-    /**
     * Gets the specified <code>ColonyTile</code>.
     * 
     * @param x The x-coordinate of the <code>Tile</code>.
@@ -583,9 +531,6 @@ public final class Colony extends Settlement implements Location {
         return goodsContainer.getGoodsCount(type);
     }
 
-    public GoodsContainer getGoodsContainer() {
-        return goodsContainer;
-    }
        
     /**
     * Removes a specified amount of a type of Goods from this containter.
@@ -1428,7 +1373,6 @@ public final class Colony extends Settlement implements Location {
             ((FreeColGameObject) w).dispose();
         }
 
-        getTile().setSettlement(null);
         super.dispose();
     }
 
