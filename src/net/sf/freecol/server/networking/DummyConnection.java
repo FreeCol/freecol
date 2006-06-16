@@ -75,9 +75,7 @@ public final class DummyConnection extends Connection {
     public void send(Element element) throws IOException {
         try {
             outgoingMessageHandler.handle(getOtherConnection(), element);
-        } catch (FreeColException e) {
-            //logger.warning("Can't ask AI player");
-        }
+        } catch (FreeColException e) {}
     }
 
 
@@ -94,9 +92,8 @@ public final class DummyConnection extends Connection {
         Element theResult = null;
         try {
             theResult = outgoingMessageHandler.handle(getOtherConnection(), element);
-        } catch (FreeColException e) {
-            //logger.warning("Can't ask AI player");
-        }
+        } catch (FreeColException e) {}
+        
         return theResult;
     }
 

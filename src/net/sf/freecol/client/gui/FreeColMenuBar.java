@@ -445,6 +445,29 @@ public class FreeColMenuBar extends JMenuBar {
             debugMenu.setOpaque(false);
             debugMenu.setMnemonic(KeyEvent.VK_D);
             add(debugMenu);
+            
+            JMenu debugFixMenu = new JMenu("Fixes");
+            debugFixMenu.setOpaque(false);
+            debugFixMenu.setMnemonic(KeyEvent.VK_F);
+            debugMenu.add(debugFixMenu);
+            
+            final JMenuItem crossBug = new JCheckBoxMenuItem("Fix \"not enough crosses\"-bug");
+            crossBug.setOpaque(false);
+            crossBug.setMnemonic(KeyEvent.VK_B);
+            debugFixMenu.add(crossBug);
+            crossBug.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    freeColClient.getMyPlayer().updateCrossesRequired();
+                    if (freeColClient.getFreeColServer() != null) {
+                        Iterator pi = freeColClient.getFreeColServer().getGame().getPlayerIterator();
+                        while (pi.hasNext()) {
+                            ((Player) pi.next()).updateCrossesRequired();
+                        }
+                    }
+                }
+            });            
+            
+            debugMenu.addSeparator();
 
             JCheckBoxMenuItem sc = new JCheckBoxMenuItem(Messages.message("menuBar.debug.showCoordinates"));
             sc.setOpaque(false);
@@ -477,8 +500,38 @@ public class FreeColMenuBar extends JMenuBar {
                     gui.debugShowMission = ((JCheckBoxMenuItem) e.getSource()).isSelected();
                     canvas.refresh();
                 }
-            });            
+            });    
+            
+            final JMenuItem reveal = new JCheckBoxMenuItem(Messages.message("menuBar.debug.revealEntireMap"));
+            reveal.setOpaque(false);
+            reveal.setMnemonic(KeyEvent.VK_R);
+            debugMenu.add(reveal);
+            reveal.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    if (freeColClient.getFreeColServer() != null) {
+                        freeColClient.getFreeColServer().revealMapForAllPlayers();
+                    }
 
+                    reveal.setEnabled(false);
+                }
+            });
+
+            debugMenu.addSeparator();
+            
+            final JMenuItem skipTurns = new JMenuItem("Skip turns");
+            skipTurns.setOpaque(false);
+            skipTurns.setMnemonic(KeyEvent.VK_S);
+            debugMenu.add(skipTurns);
+            skipTurns.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    if (freeColClient.getFreeColServer() != null) {
+                        int skipTurns = Integer.parseInt(freeColClient.getCanvas().showInputDialog("How many turns should be skipped:", Integer.toString(10), "ok", "cancel"));
+                        freeColClient.getFreeColServer().getInGameController().debugOnlyAITurns = skipTurns;
+                        freeColClient.getInGameController().endTurn();
+                    }
+                }
+            });
+            
             if (freeColClient.getFreeColServer() != null) {
                 final JMenuItem giveBells = new JMenuItem("Adds 100 bells to each Colony");
                 giveBells.setOpaque(false);
@@ -496,48 +549,8 @@ public class FreeColMenuBar extends JMenuBar {
                         }
                     }
                 });
-            }
+            }            
             
-            final JMenuItem reveal = new JCheckBoxMenuItem(Messages.message("menuBar.debug.revealEntireMap"));
-            reveal.setOpaque(false);
-            reveal.setMnemonic(KeyEvent.VK_R);
-            debugMenu.add(reveal);
-            reveal.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    if (freeColClient.getFreeColServer() != null) {
-                        freeColClient.getFreeColServer().revealMapForAllPlayers();
-                    }
-
-                    reveal.setEnabled(false);
-                }
-            });
-
-            final JMenuItem gc = new JMenuItem("Run the garbage collector");
-            gc.setOpaque(false);
-            gc.setMnemonic(KeyEvent.VK_G);
-            debugMenu.add(gc);
-            gc.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    System.gc();
-                }
-            });
-            
-            final JMenuItem crossBug = new JCheckBoxMenuItem("Fix \"not enough crosses\"-bug");
-            crossBug.setOpaque(false);
-            crossBug.setMnemonic(KeyEvent.VK_B);
-            debugMenu.add(crossBug);
-            crossBug.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    freeColClient.getMyPlayer().updateCrossesRequired();
-                    if (freeColClient.getFreeColServer() != null) {
-                        Iterator pi = freeColClient.getFreeColServer().getGame().getPlayerIterator();
-                        while (pi.hasNext()) {
-                            ((Player) pi.next()).updateCrossesRequired();
-                        }
-                    }
-                }
-            });
-
             debugMenu.addSeparator();
 
             final JMenuItem useAI = new JMenuItem("Use AI");
@@ -555,7 +568,7 @@ public class FreeColMenuBar extends JMenuBar {
                         //freeColClient.getConnectController().reconnect();
                     }
                 }
-            });
+            });            
 
             debugMenu.addSeparator();
 
@@ -608,6 +621,16 @@ public class FreeColMenuBar extends JMenuBar {
                     }
                 }
             });
+            
+            final JMenuItem gc = new JMenuItem("Run the garbage collector");
+            gc.setOpaque(false);
+            gc.setMnemonic(KeyEvent.VK_G);
+            debugMenu.add(gc);
+            gc.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    System.gc();
+                }
+            });
         }
         
         update();
@@ -623,6 +646,7 @@ public class FreeColMenuBar extends JMenuBar {
         }
 
         saveMenuItem.setEnabled(freeColClient.getMyPlayer().isAdmin() && freeColClient.getFreeColServer() != null);
+        repaint();
     }
 
 

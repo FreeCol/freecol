@@ -81,6 +81,10 @@ public class BuildColonyMission extends Mission {
         this.target = target;
         this.colonyValue = colonyValue;
         
+        if (target == null) {
+            throw new NullPointerException("target == null");
+        }
+        
         if (!getUnit().isColonist()) {
             logger.warning("Only colonists can build a new Colony.");
             throw new IllegalArgumentException("Only colonists can build a new Colony.");
@@ -327,7 +331,9 @@ public class BuildColonyMission extends Mission {
      *         and <code>false</code> otherwise.
      */
     public boolean isValid() {
-        return (!colonyBuilt && (doNotGiveUp || colonyValue <= target.getColonyValue() + getNearbyColonyBonus(getUnit().getOwner(), target)));
+        return (!colonyBuilt && (doNotGiveUp 
+                || target != null 
+                && colonyValue <= target.getColonyValue() + getNearbyColonyBonus(getUnit().getOwner(), target)));
     }
     
     /**

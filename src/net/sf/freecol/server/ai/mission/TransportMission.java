@@ -362,10 +362,15 @@ public class TransportMission extends Mission {
                 moveToEurope = true;
             } else {
                 Transportable transportable = (Transportable) transportList.get(i);
-                path = getPath(transportable);
-                moveToEurope = isCarrying(transportable)
-                        ? (transportable.getTransportDestination() instanceof Europe)
-                        : (transportable.getTransportLocatable().getLocation() instanceof Europe);
+                try {
+                    path = getPath(transportable);
+                    moveToEurope = isCarrying(transportable)
+                            ? (transportable.getTransportDestination() instanceof Europe)
+                            : (transportable.getTransportLocatable().getLocation() instanceof Europe);                    
+                } catch (IllegalArgumentException e) {
+                    transportListChanged = restockCargoAtDestination(connection);
+                    continue;
+                }
             }
 
             // Move towards the next target:

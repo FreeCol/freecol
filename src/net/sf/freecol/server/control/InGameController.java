@@ -35,6 +35,9 @@ public final class InGameController extends Controller {
     public static final String  REVISION = "$Revision$";
 
     private Random random = new Random();
+    
+    public int debugOnlyAITurns = 0;
+    
 
     /**
      * The constructor to use.
@@ -79,6 +82,10 @@ public final class InGameController extends Controller {
             game.setCurrentPlayer(nextPlayer);
             nextPlayer = (ServerPlayer) game.getPlayerAfter(nextPlayer);
         }
+        
+        while (nextPlayer != null && !nextPlayer.isAI() && debugOnlyAITurns > 0) {
+            nextPlayer = (ServerPlayer) game.getPlayerAfter(nextPlayer);
+        }
 
         if (nextPlayer == null) {
             game.setCurrentPlayer(null);
@@ -98,7 +105,10 @@ public final class InGameController extends Controller {
 
         if (game.isNextPlayerInNewTurn()) {
             game.newTurn();
-
+            if (debugOnlyAITurns > 0) {
+                debugOnlyAITurns--;
+            }
+            
             Element newTurnElement = Message.createNewRootElement("newTurn");
             freeColServer.getServer().sendToAll(newTurnElement, null);
         }

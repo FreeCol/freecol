@@ -132,26 +132,31 @@ public final class AIInGameInputHandler implements MessageHandler {
     * @param setCurrentPlayerElement The element (root element in a DOM-parsed XML tree) that
     *                holds all the information.
     */
-    private Element setCurrentPlayer(DummyConnection connection, Element setCurrentPlayerElement) {
-        Game game = freeColServer.getGame();
-        Player currentPlayer = (Player) game.getFreeColGameObject(setCurrentPlayerElement.getAttribute("player"));
+    private Element setCurrentPlayer(final DummyConnection connection, final Element setCurrentPlayerElement) {
+        final Game game = freeColServer.getGame();
+        final Player currentPlayer = (Player) game.getFreeColGameObject(setCurrentPlayerElement.getAttribute("player"));
 
         if (me.getID() == currentPlayer.getID()) {
-            try {
-                getAIPlayer().startWorking();
-            } catch (Exception e) {
-                StringWriter sw = new StringWriter();
-                e.printStackTrace(new PrintWriter(sw));
-                logger.warning(sw.toString());
-            }
-
-            Element replyElement = Message.createNewRootElement("endTurn");
-
-            try {
-                connection.send(replyElement);
-            } catch (IOException e) {
-                logger.warning("Could not send \"endTurn\"-message!");
-            }
+            Thread t = new Thread() {
+                public void run() {
+                    try {
+                        getAIPlayer().startWorking();
+                    } catch (Exception e) {
+                        StringWriter sw = new StringWriter();
+                        e.printStackTrace(new PrintWriter(sw));
+                        logger.warning(sw.toString());
+                    }
+                    
+                    Element replyElement = Message.createNewRootElement("endTurn");                    
+                    try {
+                        connection.send(replyElement);
+                    } catch (IOException e) {
+                        logger.warning("Could not send \"endTurn\"-message!");
+                    }
+                    
+                }
+            };
+            t.start();
         }
 
         return null;

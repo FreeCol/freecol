@@ -385,7 +385,7 @@ public final class InGameInputHandler extends InputHandler {
     */
     private Element newTurn(Element newTurnElement) {
         getFreeColClient().getGame().newTurn();
-
+        getFreeColClient().getCanvas().updateJMenuBar();
         return null;
     }
 
