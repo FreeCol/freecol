@@ -278,7 +278,6 @@ public final class InGameController implements NetworkConstants {
             }
 
             Colony colony = new Colony(game, (Element) reply.getChildNodes().item(0));
-            freeColClient.getMyPlayer().getSettlements().add(colony);
             changeWorkType(unit, Goods.FOOD);
             unit.buildColony(colony);
             gui.setActiveUnit(null);

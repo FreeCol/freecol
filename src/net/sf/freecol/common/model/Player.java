@@ -5,6 +5,7 @@ package net.sf.freecol.common.model;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.MissingResourceException;
 
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -202,7 +203,7 @@ public class Player extends FreeColGameObject {
     private Iterator nextGoingToUnitIterator = new UnitIterator(this, new GoingToPredicate());
 
     // Settlements this player owns
-    private ArrayList settlements = new ArrayList();
+    private List settlements = new ArrayList();
 
     // Temporary variables:
     protected boolean[][] canSeeTiles = null;
@@ -323,6 +324,48 @@ public class Player extends FreeColGameObject {
 
     
     /**
+     * Checks if this player owns the given 
+     * <code>Settlement</code>.
+     * 
+     * @param s The <code>Settlement</code>.
+     * @return <code>true</code> if this <code>Player</code>
+     *      owns the given <code>Settlement</code>.
+     */
+    public boolean hasSettlement(Settlement s) {
+        return settlements.contains(s);
+    }
+    
+    /**
+     * Adds the given <code>Settlement</code> to this
+     * <code>Player</code>'s list of settlements.
+     * 
+     * @param s
+     */
+    public void addSettlement(Settlement s) {
+        if (!settlements.contains(s)) {
+            settlements.add(s);
+            if (s.getOwner() != this) {
+                s.setOwner(this);
+            }
+        }
+    }
+    
+    /**
+     * Removes the given <code>Settlement</code> from this
+     * <code>Player</code>'s list of settlements.
+     * 
+     * @param s The <code>Settlement</code> to remove.
+     */
+    public void removeSettlement(Settlement s) {
+        if (settlements.contains(s)) {
+            if (s.getOwner() == this) {
+                throw new IllegalStateException("Cannot remove the ownership of the given settlement before it has been given to another player.");
+            }
+            settlements.remove(s);            
+        }
+    }    
+    
+    /**
      * Checks if this player is a "royal expeditionary force.
      * @return <code>true</code> is the given nation is a royal expeditionary force
      *       and <code>false</code> otherwise.     
@@ -330,14 +373,6 @@ public class Player extends FreeColGameObject {
     public boolean isREF() {    
         return isREF(getNation());
     }
-
-    /**
-     * @return the settlements this player owns
-     */
-    public ArrayList getSettlements() {
-        return settlements;
-    }
-
          
     /**
     * Checks if the given nation is a "royal expeditionary force.
@@ -1994,14 +2029,6 @@ public class Player extends FreeColGameObject {
                 }
             }
             playerElement.setAttribute("contacted", sb.toString());
-            if (settlements.size() > 0) {
-                String[] colonyArray = new String[settlements.size()];
-                for (int i = 0; i < settlements.size(); i++) {
-                    colonyArray[i] = ((Settlement) settlements.get(i)).getID();
-                }
-                playerElement.appendChild(toArrayElement("colonies", colonyArray, document));
-            }
-
         } else {
             playerElement.setAttribute("gold", Integer.toString(-1));
             playerElement.setAttribute("crosses", Integer.toString(-1));
@@ -2103,15 +2130,6 @@ public class Player extends FreeColGameObject {
                                                                     "incomeAfterTaxes"), new int[0]);
         } else {
             incomeAfterTaxes = new int[Goods.NUMBER_OF_TYPES];
-        }
-
-        if (getChildElement(playerElement, "colonies") != null) {
-            settlements = new ArrayList();
-            String[] colonyArray = readFromArrayElement("colonies", getChildElement(playerElement, "colonies"),
-                                                        new String[0]);
-            for (int i = 0; i < colonyArray.length; i++) {
-                settlements.add(getGame().getFreeColGameObject(colonyArray[i]));
-            }
         }
 
         if (playerElement.hasAttribute("contacted")) {

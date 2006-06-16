@@ -298,7 +298,6 @@ public class MapGenerator {
                                          wantedGoods[2],
                                          false, null);
 
-                player.getSettlements().add(settlement);
                 map.getTile(position).setSettlement(settlement);
 
                 map.getTile(position).setClaim(Tile.CLAIM_CLAIMED);

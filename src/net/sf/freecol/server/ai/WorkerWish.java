@@ -126,4 +126,8 @@ public class WorkerWish extends Wish {
     public static String getXMLElementTagName() {
         return "workerWish";
     }
+    
+    public String toString() {
+        return "WorkerWish: " + Unit.getName(unitType) + " (" + expertNeeded + ")";
+    }
 }

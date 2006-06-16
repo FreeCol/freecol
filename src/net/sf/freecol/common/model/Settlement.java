@@ -31,6 +31,8 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         super(game);
         this.tile = tile;
         this.owner = owner;
+        
+        owner.addSettlement(this);
     }
 
     
@@ -127,7 +129,14 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     * @see #getOwner
     */
     public void setOwner(Player owner) {
+        Player oldOwner = this.owner;
         this.owner = owner;
+        if (oldOwner.hasSettlement(this)) {
+            oldOwner.removeSettlement(this);
+        }
+        if (!owner.hasSettlement(this)) {
+            owner.addSettlement(this);
+        }
     }
 
     public GoodsContainer getGoodsContainer() {
@@ -164,7 +173,11 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
 
     public void dispose() {
         getTile().setSettlement(null);
-        owner.getSettlements().remove(this);
+        
+        Player temp = owner;
+        owner = null;
+        temp.removeSettlement(this);
+        
         goodsContainer.dispose();
         super.dispose();
     }

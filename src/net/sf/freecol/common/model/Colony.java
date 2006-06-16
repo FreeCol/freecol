@@ -205,7 +205,7 @@ public final class Colony extends Settlement implements Location {
     * @see Settlement#getOwner
     */
     public void setOwner(Player owner) {
-        this.owner = owner;
+        super.setOwner(owner);
 
         Iterator unitIterator = getUnitIterator();
         while (unitIterator.hasNext()) {
@@ -1433,6 +1433,8 @@ public final class Colony extends Settlement implements Location {
         name = colonyElement.getAttribute("name");
         owner = (Player) getGame().getFreeColGameObject(colonyElement.getAttribute("owner"));
         tile = (Tile) getGame().getFreeColGameObject(colonyElement.getAttribute("tile"));
+        
+        owner.addSettlement(this);
 
         if (colonyElement.hasAttribute("hammers")) {
             hammers = Integer.parseInt(colonyElement.getAttribute("hammers"));

@@ -1046,6 +1046,8 @@ public class IndianSettlement extends Settlement {
         kind = Integer.parseInt(indianSettlementElement.getAttribute("kind"));
         isCapital = (new Boolean(indianSettlementElement.getAttribute("isCapital"))).booleanValue();
 
+        owner.addSettlement(this);
+        
         ownedUnits.clear();
         if (indianSettlementElement.hasAttribute("ownedUnits")) {
             StringTokenizer st = new StringTokenizer(indianSettlementElement.getAttribute("ownedUnits"), ", ", false);

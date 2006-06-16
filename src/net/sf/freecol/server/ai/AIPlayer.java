@@ -800,7 +800,7 @@ public class AIPlayer extends AIObject {
                 Iterator wIterator = ((AIColony) aIterator.next()).getWishIterator();
                 while (wIterator.hasNext()) {
                     Wish w = (Wish) wIterator.next();
-                    if (w instanceof WorkerWish && w.getTransportable() == null) {
+                    if (w instanceof WorkerWish && w.getTransportable() == null) {                        
                         workerWishes[((WorkerWish) w).getUnitType()].add(w);
                     }
                 }
@@ -1342,7 +1342,7 @@ public class AIPlayer extends AIObject {
      * @return <code>true</code> if the AI should build
      *         more colonies.
      */
-    public boolean hasFewColonies() {
+    public boolean hasFewColonies() {        
         if (!getPlayer().canBuildColonies()) {
             return false;
         }
@@ -1833,7 +1833,7 @@ public class AIPlayer extends AIObject {
         
         Iterator colonyIterator = player.getColonyIterator();
         while (colonyIterator.hasNext()) {
-            Colony colony = (Colony) colonyIterator.next();
+            Colony colony = (Colony) colonyIterator.next();            
             AIObject a = getAIMain().getAIObject(colony.getID());
             if (a != null) {
                 ac.add(a);

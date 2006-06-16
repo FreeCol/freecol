@@ -447,7 +447,7 @@ public class TransportMission extends Mission {
                     return;
                 }
             }
-        }        
+        }       
         
         /* Add colonies containing wishes with the same destination as
            an item in the transport list to the "aiColonies"-list: */
