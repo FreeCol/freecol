@@ -181,7 +181,7 @@ public final class InGameController implements NetworkConstants {
         Element chatElement = Message.createNewRootElement("chat");
         chatElement.setAttribute("message", message);
         chatElement.setAttribute("privateChat", "false");
-        freeColClient.getClient().send(chatElement);
+        freeColClient.getClient().sendAndWait(chatElement);
     }
 
 
@@ -622,7 +622,7 @@ public final class InGameController implements NetworkConstants {
         tradeElement.setAttribute("gold", Integer.toString(gold));
         tradeElement.appendChild(goods.toXMLElement(null, tradeElement.getOwnerDocument()));
 
-        client.send(tradeElement);
+        client.sendAndWait(tradeElement);
 
         unit.trade(settlement, goods, gold);
         
@@ -642,7 +642,7 @@ public final class InGameController implements NetworkConstants {
         deliverGiftElement.setAttribute("settlement", settlement.getID());
         deliverGiftElement.appendChild(goods.toXMLElement(null, deliverGiftElement.getOwnerDocument()));
 
-        client.send(deliverGiftElement);
+        client.sendAndWait(deliverGiftElement);
 
         unit.deliverGift(settlement, goods);
     }
@@ -686,7 +686,7 @@ public final class InGameController implements NetworkConstants {
         Element cashInTreasureTrainElement = Message.createNewRootElement("cashInTreasureTrain");
         cashInTreasureTrainElement.setAttribute("unit", unit.getID());
 
-        client.send(cashInTreasureTrainElement);
+        client.sendAndWait(cashInTreasureTrainElement);
 
         unit.cashInTreasureTrain();
         
@@ -714,7 +714,7 @@ public final class InGameController implements NetworkConstants {
             unit.getOwner().setNewLandName(newLandName);
             Element setNewLandNameElement = Message.createNewRootElement("setNewLandName");
             setNewLandNameElement.setAttribute("newLandName", newLandName);
-            client.send(setNewLandNameElement);
+            client.sendAndWait(setNewLandNameElement);
             canvas.showEventDialog(EventPanel.FIRST_LANDING);
         }
 
@@ -961,7 +961,7 @@ public final class InGameController implements NetworkConstants {
         embarkElement.setAttribute("direction", Integer.toString(direction));
         embarkElement.setAttribute("embarkOnto", destinationUnit.getID());
 
-        client.send(embarkElement);
+        client.sendAndWait(embarkElement);
     }
 
 
@@ -1006,7 +1006,7 @@ public final class InGameController implements NetworkConstants {
 
             unit.boardShip(carrier);
 
-            client.send(boardShipElement);
+            client.sendAndWait(boardShipElement);
 
             return true;
         }
@@ -1029,7 +1029,7 @@ public final class InGameController implements NetworkConstants {
 
         unit.clearSpeciality();
 
-        client.send(clearSpecialityElement);
+        client.sendAndWait(clearSpecialityElement);
     }
 
 
@@ -1046,7 +1046,7 @@ public final class InGameController implements NetworkConstants {
         Element leaveShipElement = Message.createNewRootElement("leaveShip");
         leaveShipElement.setAttribute("unit", unit.getID());
 
-        client.send(leaveShipElement);
+        client.sendAndWait(leaveShipElement);
     }
 
     /**
@@ -1071,7 +1071,7 @@ public final class InGameController implements NetworkConstants {
 
         goods.loadOnto(carrier);
 
-        client.send(loadCargoElement);
+        client.sendAndWait(loadCargoElement);
     }
 
 
@@ -1091,7 +1091,7 @@ public final class InGameController implements NetworkConstants {
 
         goods.unload();
 
-        client.send(unloadCargoElement);
+        client.sendAndWait(unloadCargoElement);
     }
 
 
@@ -1137,7 +1137,7 @@ public final class InGameController implements NetworkConstants {
         carrier.buyGoods(type, amount);
         freeColClient.getCanvas().updateGoldLabel();
 
-        client.send(buyGoodsElement);
+        client.sendAndWait(buyGoodsElement);
     }
 
 
@@ -1160,7 +1160,7 @@ public final class InGameController implements NetworkConstants {
         player.getGame().getMarket().sell(goods, player);
         freeColClient.getCanvas().updateGoldLabel();
 
-        client.send(sellGoodsElement);
+        client.sendAndWait(sellGoodsElement);
     }
 
     /**
@@ -1177,7 +1177,7 @@ public final class InGameController implements NetworkConstants {
         toggleExportsElement.setAttribute("goods", String.valueOf(goods.getType()));
 
         colony.toggleExports(goods);
-        client.send(toggleExportsElement);
+        client.sendAndWait(toggleExportsElement);
     }
         
     
@@ -1236,7 +1236,7 @@ public final class InGameController implements NetworkConstants {
 
         freeColClient.getCanvas().updateGoldLabel();
 
-        client.send(equipUnitElement);
+        client.sendAndWait(equipUnitElement);
 
         if (unit.getLocation() instanceof Colony || unit.getLocation() instanceof Building || unit.getLocation() instanceof ColonyTile) {
             putOutsideColony(unit, true);
@@ -1261,7 +1261,7 @@ public final class InGameController implements NetworkConstants {
 
         unit.work(workLocation);
 
-        client.send(workElement);
+        client.sendAndWait(workElement);
     }
 
 
@@ -1293,7 +1293,7 @@ public final class InGameController implements NetworkConstants {
             Element putOutsideColonyElement = Message.createNewRootElement("putOutsideColony");
             putOutsideColonyElement.setAttribute("unit", unit.getID());
             unit.putOutsideColony();
-            client.send(putOutsideColonyElement);
+            client.sendAndWait(putOutsideColonyElement);
 
             return true;
         }
@@ -1315,7 +1315,7 @@ public final class InGameController implements NetworkConstants {
 
         unit.setWorkType(workType);
 
-        client.send(changeWorkTypeElement);
+        client.sendAndWait(changeWorkTypeElement);
     }
 
     /**
@@ -1332,7 +1332,7 @@ public final class InGameController implements NetworkConstants {
         setCurrentlyBuildingElement.setAttribute("colony", colony.getID());
         setCurrentlyBuildingElement.setAttribute("type", Integer.toString(type));
 
-        client.send(setCurrentlyBuildingElement);
+        client.sendAndWait(setCurrentlyBuildingElement);
     }
 
 
@@ -1391,7 +1391,7 @@ public final class InGameController implements NetworkConstants {
             freeColClient.getCanvas().refresh();
         }
 
-        client.send(changeStateElement);
+        client.sendAndWait(changeStateElement);
     }
 
 
@@ -1493,7 +1493,7 @@ public final class InGameController implements NetworkConstants {
                     learnSkill.setAttribute("action", "cancel");
                 }
 
-                client.send(learnSkill);
+                client.sendAndWait(learnSkill);
             }
         }
         else {
@@ -1544,11 +1544,11 @@ public final class InGameController implements NetworkConstants {
         switch (userAction) {
             case FreeColDialog.SCOUT_INDIAN_SETTLEMENT_ATTACK:
                 scoutMessage.setAttribute("action", "attack");
-                client.send(scoutMessage);
+                client.sendAndWait(scoutMessage);
                 attack(unit, direction);
             case FreeColDialog.SCOUT_INDIAN_SETTLEMENT_CANCEL:
                 scoutMessage.setAttribute("action", "cancel");
-                client.send(scoutMessage);
+                client.sendAndWait(scoutMessage);
                 return;
             case FreeColDialog.SCOUT_INDIAN_SETTLEMENT_SPEAK:
                 scoutMessage.setAttribute("action", "speak");
@@ -1631,12 +1631,12 @@ public final class InGameController implements NetworkConstants {
         switch (action) {
             case FreeColDialog.MISSIONARY_CANCEL:
                 missionaryMessage.setAttribute("action", "cancel");
-                client.send(missionaryMessage);
+                client.sendAndWait(missionaryMessage);
                 break;
             case FreeColDialog.MISSIONARY_ESTABLISH:
                 missionaryMessage.setAttribute("action", "establish");
                 settlement.setMissionary(unit);
-                client.send(missionaryMessage);
+                client.sendAndWait(missionaryMessage);
                 nextActiveUnit(); // At this point: unit.getTile() == null
                 return;
             case FreeColDialog.MISSIONARY_DENOUNCE_AS_HERESY:
@@ -1684,7 +1684,7 @@ public final class InGameController implements NetworkConstants {
                         ((Player)response.get(1)).setStance(settlement.getOwner(), Player.WAR);
                     }
 
-                    client.send(inciteMessage);
+                    client.sendAndWait(inciteMessage);
                 }
                 else {
                     logger.warning("Server gave an invalid reply to a missionaryAtSettlement message");
@@ -1708,7 +1708,7 @@ public final class InGameController implements NetworkConstants {
         Element moveToEuropeElement = Message.createNewRootElement("moveToEurope");
         moveToEuropeElement.setAttribute("unit", unit.getID());
 
-        client.send(moveToEuropeElement);
+        client.sendAndWait(moveToEuropeElement);
     }
 
 
@@ -1724,7 +1724,7 @@ public final class InGameController implements NetworkConstants {
         Element moveToAmericaElement = Message.createNewRootElement("moveToAmerica");
         moveToAmericaElement.setAttribute("unit", unit.getID());
 
-        client.send(moveToAmericaElement);
+        client.sendAndWait(moveToAmericaElement);
     }
 
 
@@ -1786,7 +1786,7 @@ public final class InGameController implements NetworkConstants {
 
         colony.payForBuilding();
 
-        freeColClient.getClient().send(payForBuildingElement);
+        freeColClient.getClient().sendAndWait(payForBuildingElement);
     }
 
     /**
@@ -1887,7 +1887,7 @@ public final class InGameController implements NetworkConstants {
                 // send to server
                 Element payArrearsElement = Message.createNewRootElement("payArrears");
                 payArrearsElement.setAttribute("goodsType", String.valueOf(type));
-                client.send(payArrearsElement);        
+                client.sendAndWait(payArrearsElement);        
             }
         } else {
             freeColClient.getCanvas().
@@ -1943,7 +1943,7 @@ public final class InGameController implements NetworkConstants {
 
         nextActiveUnit();
 
-        client.send(disbandUnit);
+        client.sendAndWait(disbandUnit);
     }
 
 
@@ -2100,7 +2100,7 @@ public final class InGameController implements NetworkConstants {
         canvas.showStatusPanel(Messages.message("waitingForOtherPlayers"));
 
         Element endTurnElement = Message.createNewRootElement("endTurn");
-        client.send(endTurnElement);
+        client.sendAndWait(endTurnElement);
     }
 
 
