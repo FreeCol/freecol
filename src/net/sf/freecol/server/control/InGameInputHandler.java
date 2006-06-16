@@ -804,7 +804,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         // TODO: REMOVE MAGIC: This should not really be necessary:
         if (result == Unit.ATTACK_DONE_SETTLEMENT) {
             Element updateElement = Message.createNewRootElement("update");
-            updateElement.appendChild(newTile.toXMLElement(newTile.getColony().getOwner(), reply.getOwnerDocument()));
+            updateElement.appendChild(newTile.toXMLElement(newTile.getColony().getOwner(), updateElement.getOwnerDocument()));
             ServerPlayer enemyPlayer = (ServerPlayer) defender.getOwner();
             try {
                 enemyPlayer.getConnection().send(updateElement);

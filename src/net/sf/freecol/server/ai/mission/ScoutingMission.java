@@ -76,6 +76,10 @@ public class ScoutingMission extends Mission {
     public void doMission(Connection connection) {     
         Map map = getUnit().getGame().getMap();
                 
+        if (getUnit().getTile() == null) {
+            return;
+        }
+        
         if (!isValid()) {
             return;
         }
