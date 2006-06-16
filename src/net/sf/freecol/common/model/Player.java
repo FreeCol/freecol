@@ -1801,7 +1801,7 @@ public class Player extends FreeColGameObject {
     *       {@link Europe}.
     */
     public int getRecruitPrice() {
-        return (getCrossesRequired() - crosses) * 10;
+        return Math.max(0, (getCrossesRequired() - crosses) * 10);
     }
 
 
