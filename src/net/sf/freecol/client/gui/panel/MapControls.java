@@ -1,12 +1,19 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import javax.swing.Action;
 import javax.swing.JComponent;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.client.gui.action.ActionManager;
+import net.sf.freecol.client.gui.action.BuildColonyAction;
+import net.sf.freecol.client.gui.action.BuildRoadAction;
+import net.sf.freecol.client.gui.action.DisbandUnitAction;
+import net.sf.freecol.client.gui.action.FortifyAction;
+import net.sf.freecol.client.gui.action.PlowAction;
+import net.sf.freecol.client.gui.action.SkipUnitAction;
+import net.sf.freecol.client.gui.action.WaitAction;
 
 
 /**
@@ -24,14 +31,13 @@ public final class MapControls {
     public static final String  REVISION = "$Revision$";
     public static final int EUROPE = 2;
     public static final int UNITBUTTON = 3;
-
+    
     private JComponent  container;
     private FreeColClient freeColClient;
 
     private final InfoPanel        infoPanel;
     private final MiniMap          miniMap;
-    private final UnitButton[]     unitButton;
-    private final int              NUMBER_OF_BUTTONS = 8;
+    private final UnitButton[]     unitButton;   
     private GUI                    gui;
 
 
@@ -53,31 +59,26 @@ public final class MapControls {
 
         infoPanel = new InfoPanel(freeColClient, freeColClient.getGame(), freeColClient.getGUI().getImageLibrary());
         miniMap = new MiniMap(freeColClient, freeColClient.getGUI().getImageLibrary(), container);
-        unitButton = new UnitButton[NUMBER_OF_BUTTONS];
-        for(int i=0; i<NUMBER_OF_BUTTONS; i++) {
-            unitButton[i] = new UnitButton(freeColClient, gui);
-        }
-
-
+        
+        final ActionManager am = freeColClient.getActionManager();
+        unitButton = new UnitButton[] {
+            new UnitButton(am.getFreeColAction(WaitAction.ID)),
+            new UnitButton(am.getFreeColAction(SkipUnitAction.ID)),
+            new UnitButton(am.getFreeColAction(FortifyAction.ID)),
+            new UnitButton(am.getFreeColAction(PlowAction.ID)),
+            new UnitButton(am.getFreeColAction(BuildRoadAction.ID)),
+            new UnitButton(am.getFreeColAction(BuildColonyAction.ID)),
+            new UnitButton(am.getFreeColAction(DisbandUnitAction.ID))
+        };
+        
         //
         // Don't allow them to gain focus
         //
 
         infoPanel.setFocusable(false);
         miniMap.setFocusable(false);
-        for(int i=0; i<NUMBER_OF_BUTTONS; i++) {
+        for(int i=0; i<unitButton.length; i++) {
             unitButton[i].setFocusable(false);
-        }
-
-
-        //
-        // Set ActionCommands
-        //
-
-        /*miniMapZoomOutButton.setActionCommand(String.valueOf(MINIMAP_ZOOMOUT));
-        miniMapZoomInButton.setActionCommand(String.valueOf(MINIMAP_ZOOMIN));*/
-        for(int i=0; i<NUMBER_OF_BUTTONS; i++) {
-            unitButton[i].setActionCommand(String.valueOf(UNITBUTTON + i));
         }
     }
 
@@ -88,31 +89,19 @@ public final class MapControls {
     */
     public void addToComponent(JComponent component) {
         container = component;
+        
         miniMap.setContainer(container);
-        for(int i=0; i<NUMBER_OF_BUTTONS; i++) {
-            unitButton[i].setContainer(container);
-        }
-
-        // Initialize Unit-Buttons
-        ImageProvider imageProvider = freeColClient.getGUI().getImageLibrary();
-        unitButton[0].initialize(UnitButton.UNIT_BUTTON_WAIT, imageProvider);
-        unitButton[1].initialize(UnitButton.UNIT_BUTTON_DONE, imageProvider);
-        unitButton[2].initialize(UnitButton.UNIT_BUTTON_FORTIFY, imageProvider);
-        unitButton[3].initialize(UnitButton.UNIT_BUTTON_SENTRY, imageProvider);
-        unitButton[4].initialize(UnitButton.UNIT_BUTTON_CLEAR, imageProvider);
-        unitButton[5].initialize(UnitButton.UNIT_BUTTON_ROAD, imageProvider);
-        unitButton[6].initialize(UnitButton.UNIT_BUTTON_BUILD, imageProvider);
-        unitButton[7].initialize(UnitButton.UNIT_BUTTON_DISBAND, imageProvider);
-
+        
         //
         // Relocate GUI Objects
         //
 
         infoPanel.setLocation(container.getWidth() - infoPanel.getWidth(), container.getHeight() - infoPanel.getHeight());
         miniMap.setLocation(0, container.getHeight() - miniMap.getHeight());
-        for(int i=0; i<NUMBER_OF_BUTTONS; i++) {
-            int SPACE = unitButton[0].getWidth() + 5;
-            unitButton[i].setLocation(miniMap.getWidth() + (infoPanel.getX() - miniMap.getWidth() - NUMBER_OF_BUTTONS*SPACE)/2 + i*SPACE, container.getHeight() - 40);
+        
+        final int SPACE = unitButton[0].getWidth() + 5;
+        for(int i=0; i<unitButton.length; i++) {            
+            unitButton[i].setLocation(miniMap.getWidth() + (infoPanel.getX() - miniMap.getWidth() - unitButton.length*SPACE)/2 + i*SPACE, container.getHeight() - 40);
         }
 
         //
@@ -122,11 +111,12 @@ public final class MapControls {
         container.add(infoPanel);
         container.add(miniMap);
 
-        for(int i=0; i<NUMBER_OF_BUTTONS; i++) {
+        for(int i=0; i<unitButton.length; i++) {
             container.add(unitButton[i]);
+            Action a = unitButton[i].getAction();
+            unitButton[i].setAction(null);
+            unitButton[i].setAction(a);
         }
-
-        updateButtons();
     }
 
 
@@ -146,7 +136,7 @@ public final class MapControls {
             temp.remove(infoPanel);
             temp.remove(miniMap);
 
-            for(int i=0; i<NUMBER_OF_BUTTONS; i++) {
+            for(int i=0; i<unitButton.length; i++) {
                 temp.remove(unitButton[i]);
             }
         }
@@ -172,7 +162,14 @@ public final class MapControls {
     public void zoomOut() {
         miniMap.zoomOut();
     }
+    
+    public boolean canZoomIn() {
+        return miniMap.canZoomIn();
+    }
 
+    public boolean canZoomOut() {
+        return miniMap.canZoomOut();
+    }
 
     /**
     * Updates this <code>MapControls</code>.
@@ -180,109 +177,6 @@ public final class MapControls {
     public void update() {
         if (infoPanel.getUnit() != freeColClient.getGUI().getActiveUnit()) {
             infoPanel.update(freeColClient.getGUI().getActiveUnit());
-        }
-
-        updateButtons();
-    }
-
-
-    /**
-    * Updates the buttons depending on the currently selected unit. Buttons may
-    * disappear or become enabled or disabled.
-    */
-    private void updateButtons() {
-        ImageProvider imageProvider = freeColClient.getGUI().getImageLibrary();
-        Unit selectedOne = freeColClient.getGUI().getActiveUnit();
-        if(selectedOne == null) {
-            for (int t=0; t<NUMBER_OF_BUTTONS; t++) {
-                unitButton[t].setEnabled(false);
-            }
-            return;
-        }
-
-        //int unitType = selectedOne.getType();
-
-        /* Wait
-        *  All units can wait
-        */
-        if (true) {
-            unitButton[0].setEnabled(true);
-        }
-
-        /* Done
-        *  All units can be skipped
-        */
-        if (true) {
-            unitButton[1].setEnabled(true);
-        }
-
-        /* Fortify
-        *  All units can fortify
-        */
-        if (true) {
-            unitButton[2].setEnabled(true);
-        }
-
-        /* Sentry
-        *  Disabled for now.
-        */
-        if (true) {
-            unitButton[3].setEnabled(false);
-        }
-
-        /* Clear Forest / Plow Fields
-        *  Only colonists can do this, only if they have at least 20 tools, and only if they are
-        *  in a square that can be improved
-        */
-        if (selectedOne.getTile() != null) {
-            Tile tile = selectedOne.getTile();
-            if(tile.isLand() && tile.isForested()) {
-                unitButton[4].initialize(UnitButton.UNIT_BUTTON_CLEAR, imageProvider);
-                unitButton[4].setEnabled(selectedOne.isPioneer());
-            } else if (tile.isLand() && !tile.isForested() && !tile.isPlowed()) {
-                unitButton[4].initialize(UnitButton.UNIT_BUTTON_PLOW, imageProvider);
-                unitButton[4].setEnabled(selectedOne.isPioneer());
-            } else if (tile.isLand() && !tile.isForested() && tile.isPlowed()) {
-                unitButton[4].initialize(UnitButton.UNIT_BUTTON_PLOW, imageProvider);
-                unitButton[4].setEnabled(false);
-            } else {
-                unitButton[4].initialize(UnitButton.UNIT_BUTTON_CLEAR, imageProvider);
-                unitButton[4].setEnabled(false);
-            }
-        } else {
-            unitButton[4].initialize(UnitButton.UNIT_BUTTON_CLEAR, imageProvider);
-            unitButton[4].setEnabled(false);
-        }
-
-        /* Build roads
-        *  Only colonists can do this, only if they have at least 20 tools, and only if they are
-        *  in a land square that does not already have roads
-        */
-        if (selectedOne.getTile() != null && selectedOne.isPioneer()) {
-            Tile tile = selectedOne.getTile();
-            if(tile.isLand() && !tile.hasRoad()) {
-                unitButton[5].setEnabled(true);
-            } else {
-                unitButton[5].setEnabled(false);
-            }
-        } else {
-            unitButton[5].setEnabled(false);
-        }
-
-        /* Build a new colony
-        *  Only colonists can do this, and only if they are on a 'colonizeable' tile
-        */
-        if (selectedOne.getTile() != null && selectedOne.canBuildColony()) {
-            unitButton[6].setEnabled(true);
-        } else {
-            unitButton[6].setEnabled(false);
-        }
-
-        /* Disband
-        *  Any unit can do this
-        */
-        if (true) {
-            unitButton[7].setEnabled(true);
         }
     }
 }

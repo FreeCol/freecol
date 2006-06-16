@@ -42,23 +42,19 @@ public class ChangeAction extends MapboardAction {
     }
     
     
-    
     /**
-    * Updates this action. If there is no active unit,
-    * then <code>setEnabled(false)</code> gets called.
-    */
+     * Updates the "enabled"-status with the value
+     * returned by {@link #shouldBeEnabled} and
+     * updates the name of the action.
+     */
     public void update() {
         super.update();
-
-        if (enabled) {
+        
+        if (getFreeColClient().getGUI().getActiveUnit() != null) {
             Unit unit = getFreeColClient().getGUI().getActiveUnit();
-            if (unit == null) {
-                setEnabled(false);
-            } else {
+            if (unit.getTile() != null) {
                 Tile tile = unit.getTile();
-                if (tile == null) {
-                    setEnabled(false);
-                } else if (tile.getColony() != null) {
+                if (tile.getColony() != null) {
                     putValue(NAME, Messages.message("menuBar.orders.enterColony"));
                 } else if (unit.getLocation() instanceof Unit) {
                     putValue(NAME, Messages.message("menuBar.orders.selectCarrier"));
@@ -68,7 +64,23 @@ public class ChangeAction extends MapboardAction {
             }
         }
     }
-
+    
+    /**
+     * Checks if this action should be enabled.
+     * 
+     * @return <code>false</code> if there is no active unit.
+     */
+    protected boolean shouldBeEnabled() {    
+        if (!super.shouldBeEnabled()) {
+            return false;
+        }        
+        Unit unit = getFreeColClient().getGUI().getActiveUnit();
+        if (unit == null) {
+            return false;
+        } else {
+            return unit.getTile() != null;
+        }
+    }
     
     /**
     * Returns the id of this <code>Option</code>.

@@ -11,7 +11,10 @@ import javax.swing.AbstractButton;
 import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.MapControls;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
 
 
 /**
@@ -39,16 +42,15 @@ public class MapControlsAction extends MapboardAction {
         super(freeColClient, "menuBar.view.mapControls", null, KeyEvent.VK_M, KeyStroke.getKeyStroke('M', InputEvent.CTRL_MASK));
     }
 
-
     /**
-    * Displays the map controls if the mapboard is selected.
-    * @see MapControls
-    */
+     * Updates the "enabled"-status with the value
+     * returned by {@link #shouldBeEnabled} and
+     * calls {@link #showMapControls(boolean)}.
+     */
     public void update() {
-        super.update();
+        super.update();        
         showMapControls(enabled && selected);
     }
-
 
     /**
     * Returns the id of this <code>Option</code>.
@@ -96,7 +98,7 @@ public class MapControlsAction extends MapboardAction {
         }
         if (mapControls != null) {
             if (value && !mapControls.isShowing()) {
-                mapControls.addToComponent(getFreeColClient().getCanvas());
+                mapControls.addToComponent(getFreeColClient().getCanvas());                
             } else if (!value && mapControls.isShowing()) {
                 mapControls.removeFromComponent(getFreeColClient().getCanvas());
             }

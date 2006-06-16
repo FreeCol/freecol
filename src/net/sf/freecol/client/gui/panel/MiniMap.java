@@ -5,11 +5,10 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.util.logging.Logger;
 
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -18,6 +17,8 @@ import javax.swing.border.BevelBorder;
 import javax.swing.event.MouseInputListener;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.action.MiniMapZoomInAction;
+import net.sf.freecol.client.gui.action.MiniMapZoomOutAction;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
@@ -109,25 +110,11 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         }
 
         // Add buttons:
-        miniMapZoomOutButton = new UnitButton(freeColClient, UnitButton.UNIT_BUTTON_ZOOM_OUT);
-        miniMapZoomOutButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                zoomOut();
-            }
-        });
-
-        miniMapZoomInButton = new UnitButton(freeColClient, UnitButton.UNIT_BUTTON_ZOOM_IN);
-        miniMapZoomInButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                zoomIn();
-            }
-        });
+        miniMapZoomOutButton = new UnitButton(freeColClient.getActionManager().getFreeColAction(MiniMapZoomOutAction.ID));
+        miniMapZoomInButton = new UnitButton(freeColClient.getActionManager().getFreeColAction(MiniMapZoomInAction.ID));
 
         miniMapZoomOutButton.setFocusable(false);
         miniMapZoomInButton.setFocusable(false);
-
-        miniMapZoomOutButton.setActionCommand(String.valueOf(MINIMAP_ZOOMOUT));
-        miniMapZoomInButton.setActionCommand(String.valueOf(MINIMAP_ZOOMIN));
 
         int bh = mapY + MAP_HEIGHT - Math.max(miniMapZoomOutButton.getHeight(), miniMapZoomInButton.getHeight());;
         int bw = mapX;
@@ -142,7 +129,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         miniMapZoomOutButton.setLocation(300, 174);
 
         add(miniMapZoomInButton);
-        add(miniMapZoomOutButton);
+        add(miniMapZoomOutButton);        
     }
 
 
@@ -161,10 +148,8 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         tileSize += 4;
         if (tileSize >= 24) {
             tileSize = 24;
-            miniMapZoomInButton.setEnabled(false);
         }
 
-        miniMapZoomOutButton.setEnabled(true);
         repaint();
     }
 
@@ -177,11 +162,17 @@ public final class MiniMap extends JPanel implements MouseInputListener {
             tileSize -= 4;
         } else {
             tileSize = 4;
-            miniMapZoomOutButton.setEnabled(false);
         }
 
-        miniMapZoomInButton.setEnabled(true);
         repaint();
+    }
+    
+    public boolean canZoomIn() {
+        return tileSize < 24;
+    }
+    
+    public boolean canZoomOut() {
+        return tileSize > 4;
     }
 
 

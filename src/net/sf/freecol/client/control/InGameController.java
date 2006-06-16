@@ -191,22 +191,23 @@ public final class InGameController implements NetworkConstants {
     */
     public void setCurrentPlayer(Player currentPlayer) {
         Game game = freeColClient.getGame();
-
         game.setCurrentPlayer(currentPlayer);
 
         if (freeColClient.getMyPlayer().equals(currentPlayer)) {
             removeUnitsOutsideLOS();
-            freeColClient.getCanvas().setEnabled(true);
             freeColClient.getCanvas().closeMenus();
+            freeColClient.getCanvas().setEnabled(true);
             if (currentPlayer.checkEmigrate()) {
                 emigrateUnitInEurope(
                         currentPlayer.hasFather(FoundingFather.WILLIAM_BREWSTER)
                         ? freeColClient.getCanvas().showEmigrationPanel() : 0
                     );
             }
+
+            freeColClient.getGUI().setActiveUnit(null);
             nextModelMessage();
             nextActiveUnit();
-        }
+        }        
     }
 
 
@@ -2095,6 +2096,7 @@ public final class InGameController implements NetworkConstants {
         Client client = freeColClient.getClient();
         Canvas canvas = freeColClient.getCanvas();
 
+        canvas.getGUI().setActiveUnit(null);
         canvas.setEnabled(false);
         canvas.showStatusPanel(Messages.message("waitingForOtherPlayers"));
 

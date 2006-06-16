@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.model.Unit;
 
 
 /**
@@ -38,16 +39,15 @@ public abstract class MapboardAction extends FreeColAction {
         super(freeColClient, name, shortDescription, mnemonic, accelerator);
     }
     
-
     
     /**
-    * Disables this option if the mapboard is not selected and otherwise enables this option.
-    */
-    public void update() {
-        super.update();
-
-        if (enabled) {
-            setEnabled(getFreeColClient().getCanvas() != null && !getFreeColClient().getCanvas().isShowingSubPanel());
-        }
+     * Checks if this action should be enabled.
+     * 
+     * @return <code>true</code> if the mapboard is selected.
+     */
+    protected boolean shouldBeEnabled() { 
+        return super.shouldBeEnabled()  
+                && getFreeColClient().getCanvas() != null
+                && !getFreeColClient().getCanvas().isShowingSubPanel();
     }
 }

@@ -45,6 +45,8 @@ public class ActionManager extends OptionGroup {
         add(new ChangeAction(freeColClient));
         add(new GotoAction(freeColClient));
         add(new DeclareIndependenceAction(freeColClient));
+        add(new MiniMapZoomOutAction(freeColClient));
+        add(new MiniMapZoomInAction(freeColClient));
         
         freeColClient.getClientOptions().add(this);
         freeColClient.getClientOptions().addToMap(this);
@@ -84,7 +86,7 @@ public class ActionManager extends OptionGroup {
     * Updates every <code>FreeColAction</code> this object keeps.
     * @see FreeColAction
     */
-    public void update() {
+    public void update() {      
         Iterator it = iterator();
         while (it.hasNext()) {
             FreeColAction fa = (FreeColAction) it.next();

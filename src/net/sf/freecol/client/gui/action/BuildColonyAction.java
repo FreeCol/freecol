@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.model.Unit;
 
 
@@ -30,21 +31,27 @@ public class BuildColonyAction extends MapboardAction {
     */
     BuildColonyAction(FreeColClient freeColClient) {
         super(freeColClient, "unit.state.7", null, KeyEvent.VK_B, KeyStroke.getKeyStroke('B', 0));
+        putValue(BUTTON_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_BUILD, 0));
+        putValue(BUTTON_ROLLOVER_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_BUILD, 1));
+        putValue(BUTTON_PRESSED_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_BUILD, 2));
+        putValue(BUTTON_DISABLED_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_BUILD, 3));
     }
     
     
     
     /**
-    * Updates this action. If there is no active unit or the active unit cannot build a colony,
-    * then <code>setEnabled(false)</code> gets called.
-    */
-    public void update() {
-        super.update();
-        
-        Unit selectedOne = getFreeColClient().getGUI().getActiveUnit();
-        if (selectedOne == null || selectedOne.getTile() == null || !selectedOne.canBuildColony()) {
-            setEnabled(false);
+     * Checks if this action should be enabled.
+     * 
+     * @return <code>false</code> if there is no active unit or 
+     *      the active unit cannot build a colony, and <code>true</code>
+     *      otherwise.
+     */
+    protected boolean shouldBeEnabled() {
+        if (!super.shouldBeEnabled()) {
+            return false;
         }
+        Unit selectedOne = getFreeColClient().getGUI().getActiveUnit();
+        return selectedOne != null && selectedOne.getTile() != null && selectedOne.canBuildColony();
     }
 
     

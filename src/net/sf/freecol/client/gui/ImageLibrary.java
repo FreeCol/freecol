@@ -164,7 +164,7 @@ public final class ImageLibrary extends ImageProvider {
 
                             UNIT_GRAPHICS_COUNT = 60;
 
-    private static final int UNIT_BUTTON_WAIT = 0,
+    public static final int UNIT_BUTTON_WAIT = 0,
                             UNIT_BUTTON_DONE = 1,
                             UNIT_BUTTON_FORTIFY = 2,
                             UNIT_BUTTON_SENTRY = 3,

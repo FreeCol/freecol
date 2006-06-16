@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.ImageLibrary;
 
 
 /**
@@ -30,21 +31,22 @@ public class SkipUnitAction extends MapboardAction {
     */
     SkipUnitAction(FreeColClient freeColClient) {
         super(freeColClient, "unit.state.1", null, KeyEvent.VK_S, KeyStroke.getKeyStroke(' ', 0));
+        putValue(BUTTON_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_DONE, 0));
+        putValue(BUTTON_ROLLOVER_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_DONE, 1));
+        putValue(BUTTON_PRESSED_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_DONE, 2));
+        putValue(BUTTON_DISABLED_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_DONE, 3));
     }
     
     
     /**
-    * Updates this action. If there is no active unit,
-    * then <code>setEnabled(false)</code> gets called.
-    */
-    public void update() {
-        super.update();
-        
-        if (getFreeColClient().getGUI().getActiveUnit() == null) {
-            setEnabled(false);
-        }
-    }
-
+     * Checks if this action should be enabled.
+     * 
+     * @return <code>false</code> if there is no active unit.
+     */
+    protected boolean shouldBeEnabled() {    
+        return super.shouldBeEnabled()
+                && getFreeColClient().getGUI().getActiveUnit() != null;
+    }            
     
     /**
     * Returns the id of this <code>Option</code>.

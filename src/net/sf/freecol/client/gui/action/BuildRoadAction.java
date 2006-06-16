@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 
@@ -30,22 +31,30 @@ public class BuildRoadAction extends MapboardAction {
     */
     BuildRoadAction(FreeColClient freeColClient) {
         super(freeColClient, "unit.state.6", null, KeyEvent.VK_R, KeyStroke.getKeyStroke('R', 0));
+        putValue(BUTTON_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_ROAD, 0));
+        putValue(BUTTON_ROLLOVER_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_ROAD, 1));
+        putValue(BUTTON_PRESSED_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_ROAD, 2));
+        putValue(BUTTON_DISABLED_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_ROAD, 3));
     }
     
     
     /**
-    * Updates this action. If there is no active unit or the active unit cannot build a road,
-    * then <code>setEnabled(false)</code> gets called.
-    */
-    public void update() {
-        super.update();
+     * Checks if this action should be enabled.
+     * 
+     * @return <code>false</code> if there is no active unit or the 
+     *  active unit cannot build a road.
+     */
+    protected boolean shouldBeEnabled() {    
+        if (!super.shouldBeEnabled()) {
+            return false;
+        }
 
         Unit selectedOne = getFreeColClient().getGUI().getActiveUnit();
-        if (enabled && selectedOne != null && selectedOne.getTile() != null && selectedOne.isPioneer()) {
+        if (selectedOne != null && selectedOne.getTile() != null && selectedOne.isPioneer()) {
             Tile tile = selectedOne.getTile();
-            setEnabled(tile.canGetRoad() && selectedOne.checkSetState(Unit.BUILD_ROAD));
+            return tile.canGetRoad() && selectedOne.checkSetState(Unit.BUILD_ROAD);
         } else {
-            setEnabled(false);
+            return false;
         }
     }
     

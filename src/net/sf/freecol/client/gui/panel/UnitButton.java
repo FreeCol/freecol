@@ -2,16 +2,15 @@
 package net.sf.freecol.client.gui.panel;
 
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
+import javax.swing.AbstractButton;
+import javax.swing.Action;
+import javax.swing.Icon;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 
-import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.client.gui.action.FreeColAction;
 
 /**
 * A button with a set of images which is used to give commands
@@ -25,178 +24,86 @@ public final class UnitButton extends JButton {
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
-    public static final int EUROPE = 2;
     
-    private JComponent             container;
-    private int                    buttonType;
-    private GUI                    gui;
-    private FreeColClient freeColClient;
-
-
-    public static final int UNIT_BUTTON_WAIT = 0,
-                            UNIT_BUTTON_DONE = 1,
-                            UNIT_BUTTON_FORTIFY = 2,
-                            UNIT_BUTTON_SENTRY = 3,
-                            UNIT_BUTTON_CLEAR = 4,
-                            UNIT_BUTTON_PLOW = 5,
-                            UNIT_BUTTON_ROAD = 6,
-                            UNIT_BUTTON_BUILD = 7,
-                            UNIT_BUTTON_DISBAND = 8,
-                            UNIT_BUTTON_ZOOM_IN = 9,
-                            UNIT_BUTTON_ZOOM_OUT = 10,
-                            UNIT_BUTTON_COUNT = 11;
-
-                            
     /**
     * The basic constructor.
-    * @param freeColClient The main controller object for the client
-    * @param index The index of this <code>UnitButton</code>.
+    * @param a The action to be used with this button. 
     */
-    public UnitButton(FreeColClient freeColClient, int index) {
-        this.freeColClient = freeColClient;
-        this.gui = freeColClient.getGUI();
-        initialize(index, freeColClient.getImageLibrary());
+    public UnitButton(FreeColAction a) {
+        super(a);
     }
-    
 
-    /**
-    * The basic constructor.
-    * @param freeColClient The main controller object for the client
-    * @param gui An object that contains useful GUI-related methods.
-    */
-    public UnitButton(FreeColClient freeColClient, GUI gui) {
-        this.gui = gui;
-        this.freeColClient = freeColClient;
-    }
+    protected void configurePropertiesFromAction(Action a) {
+        super.configurePropertiesFromAction(a);
         
-
-    /**
-    * A constructor which initializes the container.
-    * @param container The JComponent that contains this button
-    * @param freeColClient The main controller object for the client
-    * @param gui An object that contains useful GUI-related methods.
-    */
-    public UnitButton(JComponent container, FreeColClient freeColClient, GUI gui) {
-        this.container = container;
-        this.gui = gui;
-        this.freeColClient = freeColClient;
-    }
-
-
-
-
-
-    /**
-    * Sets various attributes about the button, as well as the picture set.
-    * @param index The picture set to use (see definitions in ImageLibrary.java)
-    * @param imageProvider The ImageProvider used to retrive the Images
-    */
-    public void initialize(int index, ImageProvider imageProvider) {
-        buttonType = index;
-        //setSize(30, 30);
-        setRolloverEnabled(true);
-        setIcon(imageProvider.getUnitButtonImageIcon(index, 0));
-        setRolloverIcon(imageProvider.getUnitButtonImageIcon(index, 1));
-        setPressedIcon(imageProvider.getUnitButtonImageIcon(index, 2));
-        setDisabledIcon(imageProvider.getUnitButtonImageIcon(index, 3));
-        setToolTipText(Messages.message("unit.state." + index));
-        setFocusPainted(false);
-        setContentAreaFilled(false);
-        setBorderPainted(false);
-
-        setSize(imageProvider.getUnitButtonImageIcon(index, 0).getIconWidth(), 
-                imageProvider.getUnitButtonImageIcon(index, 0).getIconHeight());
-
-        ActionListener[] actionListeners = getActionListeners();
-        for (int i=0; i<actionListeners.length; i++) {
-            removeActionListener(actionListeners[i]);
+        if (a != null) {
+            setRolloverEnabled(true);
+            Icon bi = (Icon) a.getValue(FreeColAction.BUTTON_IMAGE);
+            setIcon(bi);
+            setRolloverIcon((Icon) a.getValue(FreeColAction.BUTTON_ROLLOVER_IMAGE));
+            setPressedIcon((Icon) a.getValue(FreeColAction.BUTTON_PRESSED_IMAGE));
+            setDisabledIcon((Icon) a.getValue(FreeColAction.BUTTON_DISABLED_IMAGE));
+            setToolTipText((String) a.getValue(FreeColAction.NAME));
+            setText(null);
+            setFocusPainted(false);
+            setContentAreaFilled(false);
+            setBorderPainted(false);
+            
+            if (bi == null) {
+                throw new IllegalArgumentException("The given action is missing \"BUTTON_IMAGE\".");
+            } 
+            setSize(bi.getIconWidth(), bi.getIconHeight());
         }
-        addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                push();
-            }
-        });
     }
-
-
-    /**
-    * Sets the container.
-    * @param container The JComponent to set as the container
-    */
-    public void setContainer(JComponent container) {
-        this.container = container;
-    }
-
-
-    /**
-    * A function that removes this button from its container.
-    */
-    public void removeFromContainer() {
-        container.remove(this);
+   
+    protected PropertyChangeListener createActionPropertyChangeListener(Action a) {
+        return new UnitButtonActionPropertyChangeListener(this);
     }
     
-
-    /**
-    * Gets called when this button becomes pressed.
-    * The button will determine what it is supposed to do
-    */
-    public void push() {
-        switch(buttonType) {
-            case UNIT_BUTTON_WAIT:
-                if (gui.getActiveUnit() != null) {
-                    freeColClient.getInGameController().nextActiveUnit();
-                }
-                break;
-            
-            case UNIT_BUTTON_DONE:
-                if (gui.getActiveUnit() != null) {
-                    freeColClient.getInGameController().skipActiveUnit();
-                }
-                break;
-                
-            case UNIT_BUTTON_FORTIFY:
-                if (gui.getActiveUnit() != null) {
-                    freeColClient.getInGameController().changeState(gui.getActiveUnit(), Unit.FORTIFY);
-                }
-                break;
-                
-            case UNIT_BUTTON_SENTRY:
-                if (gui.getActiveUnit() != null) {
-                    freeColClient.getInGameController().changeState(gui.getActiveUnit(), Unit.SENTRY);
-                }
-                break;
-            
-            case UNIT_BUTTON_CLEAR:
-                if (gui.getActiveUnit() != null) {
-                    freeColClient.getInGameController().changeState(gui.getActiveUnit(), Unit.PLOW);
-                }
-                break;
-            
-            case UNIT_BUTTON_PLOW:
-                if (gui.getActiveUnit() != null) {
-                    freeColClient.getInGameController().changeState(gui.getActiveUnit(), Unit.PLOW);
-                }
-                break;
-            
-            case UNIT_BUTTON_ROAD:
-                if (gui.getActiveUnit() != null) {
-                    freeColClient.getInGameController().changeState(gui.getActiveUnit(), Unit.BUILD_ROAD);
-                }
-                break;
-            
-            case UNIT_BUTTON_BUILD:
-                if (gui.getActiveUnit() != null) {
-                    freeColClient.getInGameController().buildColony();
-                }
-                break;
-            
-            case UNIT_BUTTON_DISBAND:
-                if(gui.getActiveUnit() != null) {
-                    freeColClient.getInGameController().disbandActiveUnit();
-                }
-                break;
-            default:
-                break;
+    private static class UnitButtonActionPropertyChangeListener implements PropertyChangeListener {
+        private AbstractButton button;
+        
+        UnitButtonActionPropertyChangeListener(AbstractButton button) {
+            this.button = button;
+        }
+        
+        public void propertyChange(PropertyChangeEvent e) {     
+            String propertyName = e.getPropertyName();
+            if (e.getPropertyName().equals(Action.NAME)
+                    || e.getPropertyName().equals(Action.SHORT_DESCRIPTION)) {
+                String text = (String) e.getNewValue();
+                button.setToolTipText(text);
+            } else if (propertyName.equals("enabled")) {
+                Boolean enabledState = (Boolean) e.getNewValue();
+                button.setEnabled(enabledState.booleanValue());
+                button.repaint();
+            } else if (e.getPropertyName().equals(Action.SMALL_ICON)) {
+                Icon icon = (Icon) e.getNewValue();
+                button.setIcon(icon);
+                button.repaint();
+            } else if (e.getPropertyName().equals(FreeColAction.BUTTON_IMAGE)) {
+                Icon icon = (Icon) e.getNewValue();
+                button.setIcon(icon);
+                button.repaint();
+            } else if (e.getPropertyName().equals(FreeColAction.BUTTON_ROLLOVER_IMAGE)) {
+                Icon icon = (Icon) e.getNewValue();
+                button.setRolloverIcon(icon);
+                button.repaint();
+            } else if (e.getPropertyName().equals(FreeColAction.BUTTON_PRESSED_IMAGE)) {
+                Icon icon = (Icon) e.getNewValue();
+                button.setPressedIcon(icon);
+                button.repaint();                
+            } else if (e.getPropertyName().equals(FreeColAction.BUTTON_DISABLED_IMAGE)) {
+                Icon icon = (Icon) e.getNewValue();
+                button.setDisabledIcon(icon);
+                button.repaint();                  
+            } else if (e.getPropertyName().equals(Action.MNEMONIC_KEY)) {
+                Integer mn = (Integer) e.getNewValue();
+                button.setMnemonic(mn.intValue());
+                button.repaint();
+            } else if (e.getPropertyName().equals(Action.ACTION_COMMAND_KEY)) {
+                button.setActionCommand((String)e.getNewValue());
+            }
         }
     }
 }

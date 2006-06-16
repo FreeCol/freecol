@@ -1229,12 +1229,23 @@ public final class Canvas extends JLayeredPane {
         setJMenuBar(freeColMenuBar);
     }
 
+    /**
+     * Removes the given component from this Container.
+     * @param comp The component to remove from this Container.
+     */
+    public void remove(Component comp) {
+       remove(comp, true); 
+    }
 
     /**
-    * Removes the given component from this Container.
-    * @param comp The component to remove from this Container.
-    */
-    public void remove(Component comp) {
+     * Removes the given component from this Container.
+     * @param comp The component to remove from this Container.
+     * @param update The <code>Canvas</code> will be enabled,
+     *      the graphics repainted and both the menubar and 
+     *      the actions will be updated if this parameter is 
+     *      <code>true</code>.
+     */
+    public void remove(Component comp, boolean update) {
         if (comp != null) {
             boolean takeFocus = true;
             if (comp == statusPanel) {
@@ -1243,15 +1254,18 @@ public final class Canvas extends JLayeredPane {
 
             Rectangle bounds = comp.getBounds();
             super.remove(comp);
-            setEnabled(true);
-            updateJMenuBar();
-            freeColClient.getActionManager().update();
+            
+            if (update) {
+                setEnabled(true);
+                updateJMenuBar();
+                freeColClient.getActionManager().update();
+                
+                if (takeFocus && !isShowingSubPanel()) {
+                    takeFocus();
+                }
 
-            if (takeFocus && !isShowingSubPanel()) {
-                takeFocus();
+                repaint(bounds.x, bounds.y, bounds.width, bounds.height);
             }
-
-            repaint(bounds.x, bounds.y, bounds.width, bounds.height);
         }
     }
 
@@ -1267,7 +1281,7 @@ public final class Canvas extends JLayeredPane {
         }
 
         if (comp != statusPanel && !(comp instanceof JMenuItem) && !(comp instanceof FreeColDialog)) {
-            remove(statusPanel);
+            remove(statusPanel, false);
         }
 
         Component c = super.add(comp);
@@ -1290,7 +1304,7 @@ public final class Canvas extends JLayeredPane {
         }
 
         if (comp != statusPanel && !(comp instanceof JMenuItem) && !(comp instanceof FreeColDialog)) {
-            remove(statusPanel);
+            remove(statusPanel, false);
         }
 
         super.add(comp, i);
@@ -1355,18 +1369,20 @@ public final class Canvas extends JLayeredPane {
     * or to 'false' otherwise.
     */
     public void setEnabled(boolean b) {
-        for (int i = 0; i < getComponentCount(); i++) {
-            getComponent(i).setEnabled(b);
+        if (isEnabled() != b) {
+            for (int i = 0; i < getComponentCount(); i++) {
+                getComponent(i).setEnabled(b);              
+            }
+            
+            /*
+             if (jMenuBar != null) {
+             jMenuBar.setEnabled(b);
+             }
+             */
+            freeColClient.getActionManager().update();
+            
+            super.setEnabled(b);
         }
-
-        /*
-        if (jMenuBar != null) {
-            jMenuBar.setEnabled(b);
-        }
-        */
-        freeColClient.getActionManager().update();
-
-        super.setEnabled(b);
     }
 
 
@@ -1552,11 +1568,11 @@ public final class Canvas extends JLayeredPane {
     * Closes all the menus that are currently open.
     */
     public void closeMenus() {
-        remove(newPanel);
-        remove(startGamePanel);
-        remove(serverListPanel);
-        remove(colonyPanel);
-        remove(europePanel);
+        remove(newPanel, false);
+        remove(startGamePanel, false);
+        remove(serverListPanel, false);
+        remove(colonyPanel, false);
+        remove(europePanel, false);
         remove(statusPanel);
     }
 

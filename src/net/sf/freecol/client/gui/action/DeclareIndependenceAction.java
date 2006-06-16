@@ -32,17 +32,14 @@ public class DeclareIndependenceAction extends MapboardAction {
     
     
     /**
-     * Updates this action.
+     * Checks if this action should be enabled.
+     * 
+     * @return <code>true</code> if the player can declare independence.
      */
-    public void update() {
-        super.update();
-
+    protected boolean shouldBeEnabled() { 
         Player p = getFreeColClient().getMyPlayer();
-        if (p == null) {
-            setEnabled(false);
-        } else if (p.getRebellionState() != Player.REBELLION_PRE_WAR) {
-            setEnabled(false);
-        }        
+        return super.shouldBeEnabled() && p != null 
+                && p.getRebellionState() == Player.REBELLION_PRE_WAR;
     }    
     
     /**

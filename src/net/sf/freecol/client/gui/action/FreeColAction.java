@@ -29,6 +29,11 @@ public abstract class FreeColAction extends AbstractAction implements Option {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
     
+    public static final String BUTTON_IMAGE = "BUTTON_IMAGE";
+    public static final String BUTTON_ROLLOVER_IMAGE = "BUTTON_ROLLOVER_IMAGE";
+    public static final String BUTTON_PRESSED_IMAGE = "BUTTON_PRESSED_IMAGE";
+    public static final String BUTTON_DISABLED_IMAGE = "BUTTON_DISABLED_IMAGE";    
+    
     private final FreeColClient freeColClient;
 
     /**
@@ -67,16 +72,29 @@ public abstract class FreeColAction extends AbstractAction implements Option {
     }
 
     /**
-     * Disables this option if the 
-     * {@link net.sf.freecol.client.gui.panel.ClientOptionsDialog} 
-     * is visible. This method should be extended by subclasses if
-     * the action should be disabled in other cases.
+     * Updates the "enabled"-status with the value
+     * returned by {@link #shouldBeEnabled}.
      */
     public void update() {
-        if (freeColClient.getCanvas() != null) {
-            setEnabled(!freeColClient.getCanvas().getClientOptionsDialog().isShowing());
+        boolean b = shouldBeEnabled();
+        if (isEnabled() != b) {
+            setEnabled(b);
         }
-    }    
+    }
+    
+    /**
+     * Checks if this action should be enabled.
+     * 
+     * @return <code>false</code> if the 
+     * {@link net.sf.freecol.client.gui.panel.ClientOptionsDialog} 
+     * is visible and <code>true</code> otherwise.
+     * This method should be extended by subclasses if
+     * the action should be disabled in other cases.
+     */
+    protected boolean shouldBeEnabled() {
+        return freeColClient.getCanvas() != null
+                && !freeColClient.getCanvas().getClientOptionsDialog().isShowing();        
+    }
     
     /**
      * Sets a keyboard accelerator.

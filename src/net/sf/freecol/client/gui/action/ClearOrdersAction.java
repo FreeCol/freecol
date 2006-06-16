@@ -32,19 +32,15 @@ public class ClearOrdersAction extends MapboardAction {
     }
     
 
-    
     /**
-    * Updates this action. If there is no active unit,
-    * then <code>setEnabled(false)</code> gets called.
-    */
-    public void update() {
-        super.update();
-        
-        if (getFreeColClient().getGUI().getActiveUnit() == null) {
-            setEnabled(false);
-        }
+     * Checks if this action should be enabled.
+     * 
+     * @return <code>false</code> if there is no active unit.
+     */
+    protected boolean shouldBeEnabled() { 
+        return super.shouldBeEnabled() 
+                && getFreeColClient().getGUI().getActiveUnit() != null;
     }
-
     
     /**
     * Returns the id of this <code>Option</code>.

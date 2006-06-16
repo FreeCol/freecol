@@ -34,14 +34,6 @@ public class EndTurnAction extends MapboardAction {
 
 
     /**
-     * Disables this option if the mapboard is not selected and otherwise enables this option.
-     */    
-    public void update() {
-        super.update();
-    }
-
-
-    /**
     * Returns the id of this <code>Option</code>.
     * @return "endTurnAction"
     */

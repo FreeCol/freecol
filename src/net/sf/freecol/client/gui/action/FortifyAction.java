@@ -9,6 +9,8 @@ import java.util.logging.Logger;
 import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 
 
@@ -30,24 +32,23 @@ public class FortifyAction extends MapboardAction {
     */
     FortifyAction(FreeColClient freeColClient) {
         super(freeColClient, "unit.state.2", null, KeyEvent.VK_F, KeyStroke.getKeyStroke('F', 0));
+        putValue(BUTTON_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_FORTIFY, 0));
+        putValue(BUTTON_ROLLOVER_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_FORTIFY, 1));
+        putValue(BUTTON_PRESSED_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_FORTIFY, 2));
+        putValue(BUTTON_DISABLED_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_FORTIFY, 3));        
     }
-    
     
     
     /**
-    * Updates this action. If there is no active unit,
-    * then <code>setEnabled(false)</code> gets called.
-    */
-    public void update() {
-        super.update();
-        
-        if (getFreeColClient().getGUI().getActiveUnit() == null) {
-            setEnabled(false);
-        } else if (isEnabled()) {
-            setEnabled(getFreeColClient().getGUI().getActiveUnit().checkSetState(Unit.FORTIFY));
-        }
+     * Checks if this action should be enabled.
+     * 
+     * @return <code>true</code> if there is an active unit.
+     */
+    protected boolean shouldBeEnabled() { 
+        return super.shouldBeEnabled()  
+                && getFreeColClient().getGUI().getActiveUnit() != null
+                && getFreeColClient().getGUI().getActiveUnit().checkSetState(Unit.FORTIFY);
     }
-
     
     /**
     * Returns the id of this <code>Option</code>.

@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.model.Player;
 
 
 /**
@@ -41,16 +42,15 @@ public class EuropeAction extends MapboardAction {
     }
 
     /**
-     * Disables this action if our <code>Player</code> does
-     * not have an instance of <code>Europe</code>.
+     * Checks if this action should be enabled.
+     * 
+     * @return <code>true</code> if the player has access to Europe.
      */
-    public void update() {
-        super.update();
-        
-        if (isEnabled()) {
-            setEnabled(getFreeColClient().getMyPlayer() != null && getFreeColClient().getMyPlayer().getEurope() != null);
-        }
-    }
+    protected boolean shouldBeEnabled() { 
+        return super.shouldBeEnabled() 
+                && getFreeColClient().getMyPlayer() != null 
+                && getFreeColClient().getMyPlayer().getEurope() != null;
+    }    
     
     /**
      * Applies this action.
