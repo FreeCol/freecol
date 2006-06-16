@@ -17,6 +17,7 @@ public final class Market extends FreeColGameObject {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
+    private static final int GOODS_STABILIZER = 750;
 
     private final Data[]  dataForGoodType = new Data[Goods.NUMBER_OF_TYPES];
 
@@ -33,7 +34,7 @@ public final class Market extends FreeColGameObject {
 
         /* seed these objects with the initial amount of each type of good */
         int[]  initialAmounts = {
-          10000, // FOOD
+           10000, // FOOD
            2000, // SUGAR
            2000, // TOBACCO
            2000, // COTTON
@@ -49,6 +50,7 @@ public final class Market extends FreeColGameObject {
           10000, // TRADE_GOODS
            4000, // TOOLS
            3000  // MUSKETS
+           
         };
         for (int i = 0; i < initialAmounts.length; i++) {
             dataForGoodType[i].amountInMarket = initialAmounts[i];
@@ -75,10 +77,8 @@ public final class Market extends FreeColGameObject {
      * @throws NullPointerException  if the argument is <TT>null</TT>
      */
     public int costToBuy(int typeOfGood) {
-
         return dataForGoodType[typeOfGood].costToBuy;
     }
-
 
     /**
      * Determines the price paid for the sale of a single unit of a particular
@@ -92,7 +92,6 @@ public final class Market extends FreeColGameObject {
     public int paidForSale(int typeOfGood) {
         return dataForGoodType[typeOfGood].paidForSale;
     }
-
 
     /**
      * Sells a particular amount of a particular type of good with the proceeds
@@ -118,7 +117,6 @@ public final class Market extends FreeColGameObject {
         }
     }
 
-
     /**
      * Sells a particular amount of a particular type of good with the proceeds
      * of the sale being paid to a particular player.
@@ -136,7 +134,6 @@ public final class Market extends FreeColGameObject {
 
         sell(type, amount, player);
     }
-
 
     /**
      * Buys a particular amount of a particular type of good with the cost
@@ -163,10 +160,11 @@ public final class Market extends FreeColGameObject {
 
 
     /**
-    * Add the given <code>Goods</code> to this <code>Market</code>.
-    * @param type The type of goods.
-    * @param amount The amount of goods.
-    */
+     * Add the given <code>Goods</code> to this <code>Market</code>.
+     * 
+     * @param type The type of goods.
+     * @param amount The amount of goods.
+     */
     public void add(int type, int amount) {
         Data  data = dataForGoodType[type];
 
@@ -192,12 +190,11 @@ public final class Market extends FreeColGameObject {
         priceGoods();
     }
 
-
     /**
-    * Remove the given <code>Goods</code> from this <code>Market</code>.
-    * @param type The type of goods.
-    * @param amount The amount of goods.
-    */
+     * Remove the given <code>Goods</code> from this <code>Market</code>.
+     * @param type The type of goods.
+     * @param amount The amount of goods.
+     */
     public void remove(int type, int amount) {
         Data data = dataForGoodType[type];
         data.amountInMarket -= amount;
@@ -210,27 +207,25 @@ public final class Market extends FreeColGameObject {
         priceGoods();
     }
 
-
     /**
-    * Gets the price of a given goods when the <code>Player</code> buys.
-    *
-    * @param type The type of goods.
-    * @param amount The amount of goods.
-    * @return The bid price of the given goods.
-    */
+     * Gets the price of a given goods when the <code>Player</code> buys.
+     *
+     * @param type The type of goods.
+     * @param amount The amount of goods.
+     * @return The bid price of the given goods.
+     */
     public int getBidPrice(int type, int amount) {
         Data data = dataForGoodType[type];
         return (amount * data.costToBuy);
     }
 
-
     /**
-    * Gets the price of a given goods when the <code>Player</code> sales.
-    *
-    * @param type The type of goods.
-    * @param amount The amount of goods.
-    * @return The sale price of the given goods.
-    */
+     * Gets the price of a given goods when the <code>Player</code> sales.
+     *
+     * @param type The type of goods.
+     * @param amount The amount of goods.
+     * @return The sale price of the given goods.
+     */
     public int getSalePrice(int type, int amount) {
         Data data = dataForGoodType[type];
         return (amount * data.paidForSale);
@@ -240,26 +235,31 @@ public final class Market extends FreeColGameObject {
         return getSalePrice(goods.getType(), goods.getAmount());
     }
 
-
     // -------------------------------------------------------- support methods
 
-    private void priceGoods() {
-
-        /* first, count the total units of all goods in the market */
-        int  totalGoods = 0;
-
+    /**
+     * Adjusts the prices for all goods.
+     */
+    private void priceGoods() {        
+        int[] adjustedGoods = new int[Goods.NUMBER_OF_TYPES];
         for (int i = 0; i < dataForGoodType.length; i++) {
-            totalGoods += dataForGoodType[i].amountInMarket;
+            adjustedGoods[i] += GOODS_STABILIZER;
+            adjustedGoods[i] += dataForGoodType[i].amountInMarket;
+        }
+        
+        /* count the total units of all goods in the market */        
+        int  totalGoods = 0;
+        for (int i = 0; i < dataForGoodType.length; i++) {
+            totalGoods += adjustedGoods[i];
         }
 
         /* next, choose a price for each type of good in the market based on
          * the relative availability of that type of good */
         for (int i = 0; i < dataForGoodType.length; i++) {
-
             Data  data = dataForGoodType[i];
 
             /* scale sale prices from 1 to 19 and place buy prices one above */
-            data.paidForSale = (10 * ((totalGoods / 30) + 1)) / (data.amountInMarket + 1);
+            data.paidForSale = (10 * ((totalGoods / 30) + 1)) / (adjustedGoods[i] + 1);
 
             //data.paidForSale = 19 - 18 * (data.amountInMarket / (totalGoods + 1));
 
@@ -277,11 +277,11 @@ public final class Market extends FreeColGameObject {
     }
 
     /**
-    * Make a XML-representation of this object.
-    *
-    * @param document The document to use when creating new componenets.
-    * @return The DOM-element ("Document Object Model") made to represent this "Map".
-    */
+     * Make a XML-representation of this object.
+     *
+     * @param document The document to use when creating new componenets.
+     * @return The DOM-element ("Document Object Model") made to represent this "Map".
+     */
     public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
         Element marketElement = document.createElement(getXMLElementTagName());
 
@@ -294,20 +294,56 @@ public final class Market extends FreeColGameObject {
         return marketElement;
     }
 
+    /**
+     * Changes the prices in the market.
+     */
     public void newTurn() {
-        for(int i = 0; i < dataForGoodType.length; i++) {
-            int subtract = (int) (dataForGoodType[i].amountInMarket*0.015);
-            dataForGoodType[i].amountInMarket -= subtract;
+        int totalNormalGoods = 0;
+        for (int i = 0; i < dataForGoodType.length; i++) {            
+            int rawType = Goods.getRawMaterial(i);
+            int manufactoredType = Goods.getManufactoredGoods(i);
+            
+            dataForGoodType[i].amountInMarket += 10;
+            
+            // Manage dependencies:
+            if (manufactoredType >= 0
+                    && manufactoredType < Goods.NUMBER_OF_TYPES) {
+                final int rawGoodsAmount = dataForGoodType[i].amountInMarket;
+                final int manufactoredGoodsAmount = dataForGoodType[manufactoredType].amountInMarket;
+                if (rawGoodsAmount < manufactoredGoodsAmount * 2 + GOODS_STABILIZER) {
+                    int diff = manufactoredGoodsAmount * 2 + GOODS_STABILIZER - rawGoodsAmount;
+                    dataForGoodType[i].amountInMarket += Math.min(diff / 20, dataForGoodType[manufactoredType].amountInMarket);
+                    dataForGoodType[manufactoredType].amountInMarket -= Math.min(diff / 20, dataForGoodType[manufactoredType].amountInMarket);
+                } else if (rawGoodsAmount > manufactoredGoodsAmount * 2 + GOODS_STABILIZER) {
+                    int diff = rawGoodsAmount - manufactoredGoodsAmount * 2 - GOODS_STABILIZER;
+                    dataForGoodType[manufactoredType].amountInMarket += Math.min(diff / 20, dataForGoodType[i].amountInMarket);
+                    dataForGoodType[i].amountInMarket -= Math.min(diff / 20, dataForGoodType[i].amountInMarket);                    
+                }
+            }
+            if (i != Goods.FOOD && i != Goods.LUMBER) {
+                totalNormalGoods += dataForGoodType[i].amountInMarket;
+            }
         }
+        
+        int averageGoods = totalNormalGoods / (dataForGoodType.length - 2) + GOODS_STABILIZER;
+        if (dataForGoodType[Goods.FOOD].amountInMarket < averageGoods * 2) {
+            int diff = averageGoods * 2 - dataForGoodType[Goods.FOOD].amountInMarket;
+            dataForGoodType[Goods.FOOD].amountInMarket += diff / 20;
+        }
+        if (dataForGoodType[Goods.LUMBER].amountInMarket < averageGoods * 1.5) {
+            int diff = (int) (averageGoods * 1.5 - dataForGoodType[Goods.LUMBER].amountInMarket);
+            dataForGoodType[Goods.LUMBER].amountInMarket += diff / 20;
+        }
+        
         priceGoods();
     }
 
-
     /**
-    * Initialize this object from an XML-representation of this object.
-    *
-    * @param marketElement The DOM-element ("Document Object Model") made to represent this "Map".
-    */
+     * Initialize this object from an XML-representation of this object.
+     *
+     * @param marketElement The DOM-element ("Document Object Model")
+     *      made to represent this "Map".
+     */
     public void readFromXMLElement(Element marketElement) {
 
         int[] oldPrices = new int[dataForGoodType.length];
@@ -352,16 +388,16 @@ public final class Market extends FreeColGameObject {
         }
     }
 
-
     /**
-    * Returns the tag name of the root element representing this object.
-    *
-    * @return the tag name.
-    */
+     * Returns the tag name of the root element representing this object.
+     *
+     * @return the tag name.
+     */
     public static String getXMLElementTagName() {
         return "market";
     }
 
+    
     // ---------------------------------------------------------- inner classes
 
     /**
@@ -389,11 +425,11 @@ public final class Market extends FreeColGameObject {
         }
 
         /**
-        * Make a XML-representation of this object.
-        *
-        * @param document The document to use when creating new componenets.
-        * @return The DOM-element ("Document Object Model") made to represent this "Data".
-        */
+         * Make a XML-representation of this object.
+         *
+         * @param document The document to use when creating new componenets.
+         * @return The DOM-element ("Document Object Model") made to represent this "Data".
+         */
         public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
             Element dataElement = document.createElement(getXMLElementTagName());
 
@@ -404,12 +440,11 @@ public final class Market extends FreeColGameObject {
             return dataElement;
         }
 
-
         /**
-        * Initialize this object from an XML-representation of this object.
-        *
-        * @param dataElement The DOM-element ("Document Object Model") made to represent this "Data".
-        */
+         * Initialize this object from an XML-representation of this object.
+         *
+         * @param dataElement The DOM-element ("Document Object Model") made to represent this "Data".
+         */
         public void readFromXMLElement(Element dataElement) {
             setID(dataElement.getAttribute("ID"));
 
@@ -417,10 +452,10 @@ public final class Market extends FreeColGameObject {
         }
 
         /**
-        * Returns the tag name of the root element representing this object.
-        *
-        * @return the tag name.
-        */
+         * Returns the tag name of the root element representing this object.
+         *
+         * @return the tag name.
+         */
         public static String getXMLElementTagName() {
             return "marketdata";
         }
@@ -429,5 +464,4 @@ public final class Market extends FreeColGameObject {
             // Shift market goods around a bit?
         }
     } // class Data
-
 }
