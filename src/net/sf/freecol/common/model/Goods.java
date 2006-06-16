@@ -147,9 +147,8 @@ public class Goods implements Locatable, Ownable {
     *         of goods does not have a raw material.
     */
     public static int getRawMaterial(int goodsType) {
-
         GoodsType  good = FreeCol.specification.goodsType( goodsType );
-        return good.isRawMaterial() ? good.makes.index : -1;
+        return good.isRefined() ? good.madeFrom.index : -1;        
     }
 
 
@@ -162,9 +161,8 @@ public class Goods implements Locatable, Ownable {
     *         of goods does not have a manufactured goods.
     */
     public static int getManufactoredGoods(int rawMaterialGoodsType) {
-
         GoodsType  good = FreeCol.specification.goodsType( rawMaterialGoodsType );
-        return good.isRefined() ? good.madeFrom.index : -1;
+        return good.isRawMaterial() ? good.makes.index : -1;
     }
 
 
