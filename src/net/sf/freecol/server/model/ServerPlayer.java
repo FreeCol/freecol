@@ -5,11 +5,13 @@ import java.net.Socket;
 import java.util.Iterator;
 
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.option.BooleanOption;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -207,6 +209,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
             Map.Position p = (Map.Position) positionIterator.next();
             setExplored(getGame().getMap().getTile(p));
         }
+        
+        ((BooleanOption) getGame().getGameOptions().getObject(GameOptions.UNIT_HIDING)).setValue(false);
+        ((BooleanOption) getGame().getGameOptions().getObject(GameOptions.FOG_OF_WAR)).setValue(false);
         
         resetCanSeeTiles();
     }

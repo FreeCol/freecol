@@ -1453,9 +1453,15 @@ public final class Tile extends FreeColGameObject implements Location {
      * {@link Player#canSee(Tile) can see} this <code>Tile</code>.
      */
     public void updatePlayerExploredTiles() {
+        if (playerExploredTiles == null || getGame().getViewOwner() != null) {
+            return;
+        }
         Iterator it = getGame().getPlayerIterator();
         while (it.hasNext()) {
             Player p = (Player) it.next();
+            if (playerExploredTiles[p.getNation()] == null && !p.isEuropean()) {
+                continue;
+            }            
             if (p.canSee(this)) {
                 updatePlayerExploredTile(p);
             }
@@ -1478,7 +1484,7 @@ public final class Tile extends FreeColGameObject implements Location {
         }
         if (playerExploredTiles[nation] == null) {
             logger.warning("'playerExploredTiles' for " + Player.getNationAsString(nation) + " is 'null'.");
-            throw new IllegalStateException("'playerExploredTiles' for " + Player.getNationAsString(nation) + " is 'null'. " + isExploredBy(getGame().getPlayer(nation)) + " ::: " + getPosition());
+            throw new IllegalStateException("'playerExploredTiles' for " + Player.getNationAsString(nation) + " is 'null'. " + getGame().getPlayer(nation).canSee(this) + ", " + isExploredBy(getGame().getPlayer(nation)) + " ::: " + getPosition());
         }
 
         playerExploredTiles[nation].setRoad(road);

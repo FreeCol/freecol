@@ -121,7 +121,8 @@ public class ColonyPlan {
         List buildList = new ArrayList();
         
         if (!colony.getBuilding(Building.DOCK).isBuilt()
-                && !colony.isLandLocked()) {
+                && !colony.isLandLocked()
+                && colony.getBuilding(Building.DOCK).canBuildNext()) {
             buildList.add(new Integer(Building.DOCK));
         }
         
@@ -157,16 +158,19 @@ public class ColonyPlan {
             }
         }                
         
-        if (buildList.size() > 3) {
+        if (buildList.size() > 3
+                && colony.getBuilding(Building.CARPENTER).canBuildNext()) {
             buildList.add(0, new Integer(Building.CARPENTER));
         }
         
-        if (colony.getBuilding(Building.STABLES).canBuildNext()
-                && colony.getHorseProduction() > 2) {
+        if (colony.getHorseProduction() > 2
+                && colony.getBuilding(Building.STABLES).canBuildNext()) {
             buildList.add(new Integer(Building.STABLES));
         }
         
-        buildList.add(new Integer(Building.STOCKADE));
+        if (colony.getBuilding(Building.STOCKADE).canBuildNext()) {
+            buildList.add(new Integer(Building.STOCKADE));
+        }
         
         if (colony.getBuilding(Building.ARMORY).canBuildNext()
                 && !colony.getBuilding(Building.ARMORY).isBuilt()) {

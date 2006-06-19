@@ -1,5 +1,8 @@
 package net.sf.freecol.common.model;
 
+import java.util.Iterator;
+import java.util.logging.Logger;
+
 import org.w3c.dom.Element;
 
 
@@ -7,6 +10,8 @@ import org.w3c.dom.Element;
 * The super class of all settlements on the map (that is colonies and indian settlements).
 */
 abstract public class Settlement extends FreeColGameObject implements Location, Ownable {
+    private static final Logger logger = Logger.getLogger(Settlement.class.getName()); 
+    
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
@@ -31,6 +36,17 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         super(game);
         this.tile = tile;
         this.owner = owner;
+        
+        // Relocate any worker already on the Tile (from another Settlement):
+        if (tile.getOwner() != null) {
+            if (tile.getOwner() instanceof Colony) {
+                Colony oc = (Colony) tile.getOwner();
+                ColonyTile ct = oc.getColonyTile(tile);
+                ct.relocateWorkers();
+            } else {
+                logger.warning("An unknown type of settlement is already owning the tile.");
+            }
+        }
         
         owner.addSettlement(this);
     }
@@ -129,13 +145,23 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     * @see #getOwner
     */
     public void setOwner(Player owner) {
-        Player oldOwner = this.owner;
+        Player oldOwner = this.owner;        
         this.owner = owner;
+        
         if (oldOwner.hasSettlement(this)) {
             oldOwner.removeSettlement(this);
         }
         if (!owner.hasSettlement(this)) {
             owner.addSettlement(this);
+        }
+        
+        oldOwner.invalidateCanSeeTiles();
+        
+        owner.setExplored(getTile());
+        Iterator positionIterator = getGame().getMap().getCircleIterator(getTile().getPosition(), true, getLineOfSight());
+        while (positionIterator.hasNext()) {
+            Map.Position p = (Map.Position) positionIterator.next();
+            owner.setExplored(getGame().getMap().getTile(p));
         }
     }
 
@@ -177,6 +203,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         Player temp = owner;
         owner = null;
         temp.removeSettlement(this);
+        temp.invalidateCanSeeTiles();
         
         goodsContainer.dispose();
         super.dispose();

@@ -346,7 +346,16 @@ abstract public class FreeColGameObject {
         }
     }
     
-    
+    /**
+     * Checks if the given <code>FreeColGameObject</code> equals this object.
+     *
+     * @param o The <code>FreeColGameObject</code> to compare against this object.
+     * @return <i>true</i> if the two <code>FreeColGameObject</code> are equal and <i>false</i> otherwise.
+     */
+    public boolean equals(Object o) {
+        return (o instanceof FreeColGameObject) ? equals((FreeColGameObject) o) : false;
+    }
+        
     public int hashCode() {
         return getID().hashCode();
     }

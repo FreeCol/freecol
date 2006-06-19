@@ -892,6 +892,8 @@ public class AIColony extends AIObject {
             Element wElement;
             if (w instanceof WorkerWish) {
                 wElement = document.createElement(WorkerWish.getXMLElementTagName() + "WishListElement");
+            } else if (w instanceof GoodsWish) {
+                wElement = document.createElement(GoodsWish.getXMLElementTagName() + "WishListElement");
             } else {
                 logger.warning("Unknown type of wish.");
                 continue;
@@ -940,6 +942,13 @@ public class AIColony extends AIObject {
                 AIGoods ag = (AIGoods) getAIMain().getAIObject(e.getAttribute("ID"));
                 aiGoods.add(ag);
             } else if (e.getTagName().equals(WorkerWish.getXMLElementTagName() + "WishListElement")) {
+                Wish w = (Wish) getAIMain().getAIObject(e.getAttribute("ID"));
+                if (w != null) {
+                    wishes.add(w);
+                } else {
+                    logger.warning("Wish with ID: " + e.getAttribute("ID") + " could not be found.");
+                }                
+            } else if (e.getTagName().equals(GoodsWish.getXMLElementTagName() + "WishListElement")) {
                 Wish w = (Wish) getAIMain().getAIObject(e.getAttribute("ID"));
                 if (w != null) {
                     wishes.add(w);

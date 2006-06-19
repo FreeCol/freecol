@@ -707,6 +707,11 @@ public final class InGameController implements NetworkConstants {
         Canvas canvas = freeColClient.getCanvas();
         Client client = freeColClient.getClient();
 
+        // Inform the server:
+        Element moveElement = Message.createNewRootElement("move");
+        moveElement.setAttribute("unit", unit.getID());
+        moveElement.setAttribute("direction", Integer.toString(direction));
+        
         unit.move(direction);
 
         if (unit.getTile().isLand() && unit.getOwner().getNewLandName() == null) {
@@ -717,11 +722,6 @@ public final class InGameController implements NetworkConstants {
             client.sendAndWait(setNewLandNameElement);
             canvas.showEventDialog(EventPanel.FIRST_LANDING);
         }
-
-        // Inform the server:
-        Element moveElement = Message.createNewRootElement("move");
-        moveElement.setAttribute("unit", unit.getID());
-        moveElement.setAttribute("direction", Integer.toString(direction));
 
         //client.send(moveElement);
         Element reply = client.ask(moveElement);

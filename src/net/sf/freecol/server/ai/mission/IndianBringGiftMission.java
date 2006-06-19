@@ -150,9 +150,11 @@ public class IndianBringGiftMission extends Mission {
     * @return <code>true</code> if this mission is still valid.
     */
     public boolean isValid() {
-        // The last check is to ensure that the colony have not been burned to the ground.
-        return (!giftDelivered && isValidMission(getUnit().getOwner(), target.getOwner()) 
-                && target != null && target.getTile().getColony() == target);
+        return target != null 
+                && !target.isDisposed()
+                && target.getTile().getColony() == target
+                && !giftDelivered
+                && isValidMission(getUnit().getOwner(), target.getOwner());
     }
 
 

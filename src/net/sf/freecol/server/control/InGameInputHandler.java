@@ -795,7 +795,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
 
         if (result == Unit.ATTACK_DONE_SETTLEMENT && newTile.getColony() != null) { // If a colony will been won, send an updated tile:
             reply.appendChild(newTile.toXMLElement(newTile.getColony().getOwner(), reply.getOwnerDocument()));
-        } else if (!defender.isVisibleTo(player)) {
+        }
+        if (!defender.isVisibleTo(player)) {
             reply.appendChild(defender.toXMLElement(player, reply.getOwnerDocument()));
         }
 
@@ -817,7 +818,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         
         if (result >= Unit.ATTACK_EVADES && unit.getTile().equals(newTile)) { // In other words, we moved...
             Element update = reply.getOwnerDocument().createElement("update");
-            Vector surroundingTiles = game.getMap().getSurroundingTiles(unit.getTile(), unit.getLineOfSight());
+            int lineOfSight = unit.getLineOfSight();
+            if (result == Unit.ATTACK_DONE_SETTLEMENT) {
+                lineOfSight = Math.max(lineOfSight, newTile.getSettlement().getLineOfSight());
+            }
+            Vector surroundingTiles = game.getMap().getSurroundingTiles(unit.getTile(), lineOfSight);
 
             for (int i=0; i<surroundingTiles.size(); i++) {
                 Tile t = (Tile) surroundingTiles.get(i);

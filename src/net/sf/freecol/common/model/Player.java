@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.MissingResourceException;
+import java.util.logging.Logger;
 
 import net.sf.freecol.client.gui.i18n.Messages;
 
@@ -24,6 +25,8 @@ import org.w3c.dom.Element;
 * {@link #getEntryLocation entry location}.
 */
 public class Player extends FreeColGameObject {
+    private static final Logger logger = Logger.getLogger(Player.class.getName());
+    
     public static final String  COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
@@ -853,11 +856,19 @@ public class Player extends FreeColGameObject {
 
                     Map.Position position = unit.getTile().getPosition();
                     canSeeTiles[position.getX()][position.getY()] = true;
+                    if (getGame().getViewOwner() == null && !hasExplored(map.getTile(position))) {
+                        logger.warning("Trying to set a non-explored Tile to be visible (1). Unit: " + unit.getName() + ", Tile: " + position);
+                        throw new IllegalStateException("Trying to set a non-explored Tile to be visible. Unit: " + unit.getName() + ", Tile: " + position);
+                    }                    
 
                     Iterator positionIterator = map.getCircleIterator(position, true, unit.getLineOfSight());
                     while (positionIterator.hasNext()) {
                         Map.Position p = (Map.Position) positionIterator.next();
-                        canSeeTiles[p.getX()][p.getY()] = true;
+                        canSeeTiles[p.getX()][p.getY()] = true;                 
+                        if (getGame().getViewOwner() == null && !hasExplored(map.getTile(p))) {
+                            logger.warning("Trying to set a non-explored Tile to be visible (2). Unit: " + unit.getName() + ", Tile: " + p);
+                            throw new IllegalStateException("Trying to set a non-explored Tile to be visible. Unit: " + unit.getName() + ", Tile: " + p);
+                        }
                     }
                 }
 
@@ -866,11 +877,19 @@ public class Player extends FreeColGameObject {
                     Settlement colony = (Settlement) colonyIterator.next();
                     Map.Position position = colony.getTile().getPosition();
                     canSeeTiles[position.getX()][position.getY()] = true;
-
+                    if (getGame().getViewOwner() == null && !hasExplored(map.getTile(position))) {
+                        logger.warning("Trying to set a non-explored Tile to be visible (3). Colony: " + colony + "(" + colony.getTile().getPosition() + "), Tile: " + position);
+                        throw new IllegalStateException("Trying to set a non-explored Tile to be visible. Colony: " + colony + "(" + colony.getTile().getPosition() + "), Tile: " + position);
+                    }
+                    
                     Iterator positionIterator = map.getCircleIterator(position, true, colony.getLineOfSight());
                     while (positionIterator.hasNext()) {
                         Map.Position p = (Map.Position) positionIterator.next();
                         canSeeTiles[p.getX()][p.getY()] = true;
+                        if (getGame().getViewOwner() == null && !hasExplored(map.getTile(p))) {
+                            logger.warning("Trying to set a non-explored Tile to be visible (4). Colony: " + colony + "(" + colony.getTile().getPosition() + "), Tile: " + p);
+                            throw new IllegalStateException("Trying to set a non-explored Tile to be visible. Colony: " + colony + "(" + colony.getTile().getPosition() + "), Tile: " + p);
+                        }                        
                     }
                 }
             }
@@ -1841,6 +1860,12 @@ public class Player extends FreeColGameObject {
                 fathers[currentFather] = true;
 
                 switch (currentFather) {
+                case FoundingFather.HERNANDO_DE_SOTO:
+                    Iterator ui = getUnitIterator();
+                    while (ui.hasNext()) {
+                        setExplored((Unit) ui.next());
+                    }
+                    break;
                 case FoundingFather.JOHN_PAUL_JONES:
                     // get new frigate
                     getGame().getModelController().createUnit(getID() + "newTurnJohnPaulJones",

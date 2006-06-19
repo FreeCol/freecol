@@ -146,6 +146,23 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         return (getUnit() != null) ? 1 : 0;
     }
 
+    /**
+     * Relocates any worker on this <code>ColonyTile</code>.
+     * The workers are added to another {@link WorkLocation}
+     * within the {@link Colony}.
+     */
+    public void relocateWorkers() {
+        if (getUnit() != null) {
+            Iterator wli = getColony().getWorkLocationIterator();
+            while (wli.hasNext()) {
+                WorkLocation wl = (WorkLocation) wli.next();
+                if (wl != this && wl.canAdd(getUnit())) {
+                    getUnit().setLocation(wl);
+                    break;
+                }
+            }
+        }
+    }
 
     /**
     * Checks if the specified <code>Locatable</code> may be added to this <code>WorkLocation</code>.

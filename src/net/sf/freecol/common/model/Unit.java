@@ -1368,6 +1368,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 }
 
                 if (getOwner() == null) {
+                    logger.warning("owner == null");
                     throw new NullPointerException();
                 }
 
@@ -1822,9 +1823,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         Player oldOwner = this.owner;
 
         this.owner = owner;
-
-        getOwner().invalidateCanSeeTiles();
+        
         oldOwner.invalidateCanSeeTiles();
+        getOwner().setExplored(this);
     }
 
     /**

@@ -102,9 +102,9 @@ public final class Colony extends Settlement implements Location {
         Iterator exploreIt = getGame().getMap().getCircleIterator(getTile().getPosition(), true, getLineOfSight());
         while (exploreIt.hasNext()) {
             Tile t = getGame().getMap().getTile((Map.Position) exploreIt.next());
-            t.setExploredBy(owner, true);
-            owner.invalidateCanSeeTiles();
+            t.setExploredBy(owner, true);            
         }
+        owner.invalidateCanSeeTiles();
         
         goodsContainer = new GoodsContainer(game, this);
         exports = new boolean[Goods.NUMBER_OF_TYPES];
@@ -404,6 +404,25 @@ public final class Colony extends Settlement implements Location {
         }
 
         return null;
+    }
+    
+    /**
+     * Returns the <code>ColonyTile</code> matching the given
+     * <code>Tile</code>.
+     * 
+     * @param t The <code>Tile</code> to get the
+     *      <code>ColonyTile</code> for.
+     * @return The <code>ColonyTile</code>
+     */
+    public ColonyTile getColonyTile(Tile t) {
+        Iterator i = getColonyTileIterator();
+        while (i.hasNext()) {
+            ColonyTile c = (ColonyTile) i.next();
+            if (c.getWorkTile() == t) {
+                return c;
+            }
+        }
+        return null;        
     }
 
     
