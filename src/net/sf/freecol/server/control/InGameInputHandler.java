@@ -717,18 +717,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalStateException("Nothing to attack in direction " +
                                             direction + " from unit with ID " +
                                             attackElement.getAttribute("unit"));
-        } else if (unit.getType() == Unit.PRIVATEER) {
-            defender.getOwner().setAttackedByPrivateers();
-        } else if (player.getStance(defender.getOwner()) == Player.ALLIANCE) {
-            throw new IllegalArgumentException("Can not attack allied player.");
-        } else if (player.getStance(defender.getOwner()) != Player.WAR) {
-            player.setStance(defender.getOwner(), Player.WAR);
-            defender.getOwner().warDeclaredBy(player);
-            // create diplomatic message
-            dowElement = Message.createNewRootElement("diplomaticMessage");
-            dowElement.setAttribute("type", "declarationOfWar");
-            dowElement.setAttribute("attacker", player.getID());
-            dowElement.setAttribute("defender", defender.getOwner().getID());
         }
 
         int result = generateAttackResult(unit, defender);
@@ -1288,7 +1276,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
 
             // Set the indian player at war with the european player (and vice versa).
             settlement.getOwner().setStance(enemy, Player.WAR);
-            enemy.setStance(settlement.getOwner(), Player.WAR);
             
             // Increase tension levels:
             settlement.getOwner().modifyTension(enemy, 500);

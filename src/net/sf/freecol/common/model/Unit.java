@@ -1922,7 +1922,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
         if (getType() == BRAVE) {
             if (isArmed() && !isMounted()) {
-                name = Messages.message("model.unit.unarmed") + " ";
+                name = Messages.message("model.unit.armed") + " ";
             } else if (isMounted()) {
                 name = Messages.message("model.unit.mounted") + " ";
             }
@@ -2865,6 +2865,17 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     public void attack(Unit defender, int result, int plunderGold) {
         if (defender == null) {
             throw new NullPointerException();
+        }
+        if (getOwner().getStance(defender.getOwner()) == Player.ALLIANCE) {
+            throw new IllegalStateException("Cannot attack allied players.");
+        }
+
+        // make sure we are at war
+        if (getOwner().isEuropean() && defender.getOwner().isEuropean()) {
+            getOwner().setStance(defender.getOwner(), Player.WAR);
+        }
+        if (getType() == PRIVATEER) {
+            defender.getOwner().setAttackedByPrivateers();
         }
 
         // Wake up if you're attacking something.

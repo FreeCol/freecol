@@ -383,9 +383,8 @@ public final class Monarch extends FreeColGameObject {
                 continue;
             }
             int stance = player.getStance(nation);
-            if (stance == Player.PEACE ||
-                stance == Player.CEASE_FIRE) {
-                player.setStance(nation, Player.WAR);
+            if (stance == Player.PEACE || stance == Player.CEASE_FIRE) {
+                player.setStance(getGame().getPlayer(nation), Player.WAR);
                 return nation;
             }
         }

@@ -103,8 +103,8 @@ public final class InGameInputHandler extends InputHandler {
                 reply = removeGoods(element);
             } else if (type.equals("lostCityRumour")) {
                 reply = lostCityRumour(element);
-            } else if (type.equals("diplomaticMessage")) {
-                reply = diplomaticMessage(element);
+            } else if (type.equals("setStance")) {
+                reply = setStance(element);
             } else if (type.equals("giveIndependence")) {
                 reply = giveIndependence(element);                                
             } else {
@@ -597,6 +597,7 @@ public final class InGameInputHandler extends InputHandler {
      */
     private Element monarchAction(Element element) {
         final FreeColClient freeColClient = getFreeColClient();
+        Game game = freeColClient.getGame();
         Player player = freeColClient.getMyPlayer();
         Canvas canvas = freeColClient.getCanvas();
         Monarch monarch = player.getMonarch();
@@ -629,7 +630,7 @@ public final class InGameInputHandler extends InputHandler {
             break;
         case Monarch.DECLARE_WAR:
             int nation = Integer.parseInt(element.getAttribute("nation"));
-            player.setStance(nation, Player.WAR);
+            player.setStance(game.getPlayer(nation), Player.WAR);
             canvas.showMonarchPanel(action,
                                     new String [][] {{"%nation%", Player.getNationAsString(nation)}});
             break;
@@ -670,33 +671,38 @@ public final class InGameInputHandler extends InputHandler {
     }
 
     /**
-     * Handles a "diplomaticMessage"-request.
+     * Handles a "setStance"-request.
      *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *                holds all the information.
      */
-    private Element diplomaticMessage(Element element) {
+    private Element setStance(Element element) {
         final FreeColClient freeColClient = getFreeColClient();
         Game game = freeColClient.getGame();
         Player player = freeColClient.getMyPlayer();
         Canvas canvas = freeColClient.getCanvas();
 
-        String type = element.getAttribute("type");
-        if (type.equals("declarationOfWar")) {
-            Player attacker = (Player) game.getFreeColGameObject(element.getAttribute("attacker"));
-            Player defender = (Player) game.getFreeColGameObject(element.getAttribute("defender"));
-            defender.warDeclaredBy(attacker);
+        int stance = Integer.parseInt(element.getAttribute("stance"));
+        Player first = (Player) game.getFreeColGameObject(element.getAttribute("first"));
+        Player second = (Player) game.getFreeColGameObject(element.getAttribute("second"));
         
-            if (player.equals(defender)) {
+        if (first.getStance(second) == stance) {
+            return null;
+        }
+        
+        first.setStance(second, stance);
+
+        if (stance == Player.WAR) {
+            if (player.equals(second)) {
                 canvas.showInformationMessage("model.diplomacy.war.declared",
                                               new String [][] {{"%nation%",
-                                                                attacker.getNationAsString()}});
+                                                                first.getNationAsString()}});
             } else {
                 canvas.showInformationMessage("model.diplomacy.war.others",
                                               new String [][] {{"%attacker%",
-                                                                attacker.getNationAsString()},
+                                                                first.getNationAsString()},
                                                                {"%defender%",
-                                                                defender.getNationAsString()}});
+                                                                second.getNationAsString()}});
             }
         }
             

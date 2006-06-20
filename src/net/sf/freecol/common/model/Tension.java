@@ -38,13 +38,19 @@ public class Tension {
     // Unit destroyed in a capital, etc
     public static final int TENSION_ADD_MAJOR = 300;
     // Grab land without paying
-    public static final int TENSION_ADD_LAND_TAKEN = 350;
+    public static final int TENSION_ADD_LAND_TAKEN = 200;
     // Unit destroyed
     public static final int TENSION_ADD_UNIT_DESTROYED = 400;
     // Settlement attacked
     public static final int TENSION_ADD_SETTLEMENT_ATTACKED = 500;
     // Capital attacked
     public static final int TENSION_ADD_CAPITAL_ATTACKED = 600;
+
+    /** Tension modification to be used when war is declared from a peaceful state. */
+    public static final int TENSION_ADD_DECLARE_WAR_FROM_PEACE = 1000;
+
+    /** Tension modification to be used when war is declared from a cease fire. */
+    public static final int TENSION_ADD_DECLARE_WAR_FROM_CEASE_FIRE = 750;
     
     /** The AI player is happy if <code>tension <= TENSION_HAPPY</code>. */
     public static final int TENSION_HAPPY = 100;
@@ -101,17 +107,17 @@ public class Tension {
      * @return The current level.
      */
     public int getLevel() {
-    if (value <= TENSION_HAPPY) {
-        return HAPPY;
-    } else if (value <= TENSION_CONTENT) {
-        return CONTENT;
-    } else if (value <= TENSION_DISPLEASED) {
-        return DISPLEASED;
-    } else if (value <= TENSION_ANGRY) {
-        return ANGRY;
-    } else {
-        return HATEFUL;
-    }
+        if (value <= TENSION_HAPPY) {
+            return HAPPY;
+        } else if (value <= TENSION_CONTENT) {
+            return CONTENT;
+        } else if (value <= TENSION_DISPLEASED) {
+            return DISPLEASED;
+        } else if (value <= TENSION_ANGRY) {
+            return ANGRY;
+        } else {
+            return HATEFUL;
+        }
     }
 
     public void setLevel(int level) {
@@ -131,25 +137,6 @@ public class Tension {
         }
     }
 
-    /** 
-     * Returns the current tension level as a string.
-     * @return A <code>String</code>-representation of the
-     *      current tension level.
-     */
-    public String getLevelAsString() {
-    if (value <= TENSION_HAPPY) {
-        return Messages.message(level[HAPPY]);
-    } else if (value <= TENSION_CONTENT) {
-        return Messages.message(level[CONTENT]);
-    } else if (value <= TENSION_DISPLEASED) {
-            return Messages.message(level[DISPLEASED]);
-    } else if (value <= TENSION_ANGRY) {
-            return Messages.message(level[ANGRY]);
-    } else {
-        return Messages.message(level[HATEFUL]);
-    }
-    }
-
     /**
      * Modifies the tension by the given amount.
      *
@@ -159,6 +146,24 @@ public class Tension {
         setValue(value + newTension);
     }
 
+    /** 
+     * Returns the current tension level as a string.
+     * @return A <code>String</code>-representation of the
+     *      current tension level.
+     */
+    public String toString() {
+        if (value <= TENSION_HAPPY) {
+            return Messages.message(level[HAPPY]);
+        } else if (value <= TENSION_CONTENT) {
+            return Messages.message(level[CONTENT]);
+        } else if (value <= TENSION_DISPLEASED) {
+            return Messages.message(level[DISPLEASED]);
+        } else if (value <= TENSION_ANGRY) {
+            return Messages.message(level[ANGRY]);
+        } else {
+            return Messages.message(level[HATEFUL]);
+        }
+    }    
 }
 
 

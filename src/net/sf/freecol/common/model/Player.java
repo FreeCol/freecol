@@ -443,7 +443,6 @@ public class Player extends FreeColGameObject {
             throw new IllegalStateException("The player \"" + getName() + "\" is already independent");
         }
         setRebellionState(Player.REBELLION_POST_WAR);
-        getREFPlayer().setStance(this, Player.PEACE);
         setStance(getREFPlayer(), Player.PEACE);
         
         addModelMessage(this, "model.player.independence", null, ModelMessage.DEFAULT);
@@ -856,19 +855,19 @@ public class Player extends FreeColGameObject {
 
                     Map.Position position = unit.getTile().getPosition();
                     canSeeTiles[position.getX()][position.getY()] = true;
-                    if (getGame().getViewOwner() == null && !hasExplored(map.getTile(position))) {
+                    /*if (getGame().getViewOwner() == null && !hasExplored(map.getTile(position))) {
                         logger.warning("Trying to set a non-explored Tile to be visible (1). Unit: " + unit.getName() + ", Tile: " + position);
                         throw new IllegalStateException("Trying to set a non-explored Tile to be visible. Unit: " + unit.getName() + ", Tile: " + position);
-                    }                    
+                    }*/                   
 
                     Iterator positionIterator = map.getCircleIterator(position, true, unit.getLineOfSight());
                     while (positionIterator.hasNext()) {
                         Map.Position p = (Map.Position) positionIterator.next();
                         canSeeTiles[p.getX()][p.getY()] = true;                 
-                        if (getGame().getViewOwner() == null && !hasExplored(map.getTile(p))) {
+                        /*if (getGame().getViewOwner() == null && !hasExplored(map.getTile(p))) {
                             logger.warning("Trying to set a non-explored Tile to be visible (2). Unit: " + unit.getName() + ", Tile: " + p);
                             throw new IllegalStateException("Trying to set a non-explored Tile to be visible. Unit: " + unit.getName() + ", Tile: " + p);
-                        }
+                        }*/
                     }
                 }
 
@@ -877,19 +876,19 @@ public class Player extends FreeColGameObject {
                     Settlement colony = (Settlement) colonyIterator.next();
                     Map.Position position = colony.getTile().getPosition();
                     canSeeTiles[position.getX()][position.getY()] = true;
-                    if (getGame().getViewOwner() == null && !hasExplored(map.getTile(position))) {
+                    /*if (getGame().getViewOwner() == null && !hasExplored(map.getTile(position))) {
                         logger.warning("Trying to set a non-explored Tile to be visible (3). Colony: " + colony + "(" + colony.getTile().getPosition() + "), Tile: " + position);
                         throw new IllegalStateException("Trying to set a non-explored Tile to be visible. Colony: " + colony + "(" + colony.getTile().getPosition() + "), Tile: " + position);
-                    }
+                    }*/
                     
                     Iterator positionIterator = map.getCircleIterator(position, true, colony.getLineOfSight());
                     while (positionIterator.hasNext()) {
                         Map.Position p = (Map.Position) positionIterator.next();
                         canSeeTiles[p.getX()][p.getY()] = true;
-                        if (getGame().getViewOwner() == null && !hasExplored(map.getTile(p))) {
+                        /*if (getGame().getViewOwner() == null && !hasExplored(map.getTile(p))) {
                             logger.warning("Trying to set a non-explored Tile to be visible (4). Colony: " + colony + "(" + colony.getTile().getPosition() + "), Tile: " + p);
                             throw new IllegalStateException("Trying to set a non-explored Tile to be visible. Colony: " + colony + "(" + colony.getTile().getPosition() + "), Tile: " + p);
-                        }                        
+                        }*/                        
                     }
                 }
             }
@@ -1709,7 +1708,10 @@ public class Player extends FreeColGameObject {
         modifyTension(player.getNation(), addToTension);
     }
 
-    public void modifyTension(int nation, int addToTension) {        
+    public void modifyTension(int nation, int addToTension) {   
+        if (getNation() == nation) {
+            return;
+        }
         tension[nation].modify(addToTension);
     }
 
@@ -1721,6 +1723,9 @@ public class Player extends FreeColGameObject {
     * @param newTension The <code>Tension</code>.
     */
     public void setTension(Player player, Tension newTension) {
+        if (player == this) {
+            return;
+        }
         tension[player.getNation()] = newTension;
     }
 
@@ -1778,42 +1783,43 @@ public class Player extends FreeColGameObject {
     * One of: WAR, CEASE_FIRE, PEACE and ALLIANCE.
     * 
     * @param player The <code>Player</code>.
-    * @param theStance The stance.
+    * @param newStance The stance.
     */
-    public void setStance(Player player, int theStance) {
-        stance[player.getNation()] = theStance;
-    }
-
-    public void setStance(int nation, int theStance) {
-        stance[nation] = theStance;
+    public void setStance(Player player, int newStance) {
+        int oldStance = stance[player.getNation()];
+        
+        // Ignore requests to change the stance when indian players are involved:
+        if (isIndian() || player.isIndian()) {
+            return;
+        }        
+        
+        if (player == this) {
+            throw new IllegalStateException("Cannot set the stance towards ourselves.");
+        }
+        if (newStance == oldStance) {
+            return;
+        }        
+        if (newStance == CEASE_FIRE && oldStance != WAR) {
+            throw new IllegalStateException("Cease fire can only be declared when at war.");
+        }        
+        
+        stance[player.getNation()] = newStance;
+        
+        if (player.getStance(this) != newStance) {
+            getGame().getModelController().setStance(this, player, newStance);
+        }
+        
+        if (player.getStance(this) != newStance) {
+            player.setStance(this, newStance);
+        }
+        
+        if (oldStance == PEACE && newStance == WAR) {
+            modifyTension(nation, Tension.TENSION_ADD_DECLARE_WAR_FROM_PEACE);
+        } else if (oldStance == CEASE_FIRE && newStance == WAR) {
+            modifyTension(nation, Tension.TENSION_ADD_DECLARE_WAR_FROM_CEASE_FIRE);
+        }        
     }
     
-    /**
-     * Declares war on this player.
-     *
-     * @param enemy The player who declares war on this one.
-     */
-    public void warDeclaredBy(Player enemy) {
-        warDeclaredBy(enemy.getNation());
-    }
-
-    /**
-     * Declares war on this player.
-     *
-     * @param nation The nation which declares war on the player.
-     */
-    public void warDeclaredBy(int nation) {
-        setStance(nation, WAR);
-        modifyTension(nation, Tension.ANGRY);
-        if (!isEuropean()) {
-            Iterator settlementIterator = getIndianSettlementIterator();
-            while (settlementIterator.hasNext()) {
-                IndianSettlement settlement = (IndianSettlement) settlementIterator.next();
-                settlement.modifyAlarm(nation, Tension.TENSION_ANGRY);
-            }
-        }
-    }    
-
     /**
     * Gets the price for a recruit in europe.
     * @return The price of a single recruit in
@@ -2204,7 +2210,7 @@ public class Player extends FreeColGameObject {
                 monarch = new Monarch(getGame(), monarchElement);
             }
         }
-        resetCanSeeTiles();        
+        invalidateCanSeeTiles();        
     }
 
 

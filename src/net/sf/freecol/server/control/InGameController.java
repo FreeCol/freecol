@@ -411,32 +411,12 @@ public final class InGameController extends Controller {
                             logger.warning( "Declared war on nobody." );
                             return;
                         }
-                        game.getPlayer(nation).warDeclaredBy(nextPlayer);
-                        nextPlayer.setStance(nation, Player.WAR);
-                        // inform all relevant players about the declaration of war
-                        Element dowElement = Message.createNewRootElement("diplomaticMessage");
-                        dowElement.setAttribute("type", "declarationOfWar");
-                        dowElement.setAttribute("attacker", nextPlayer.getID());
-                        dowElement.setAttribute("defender", game.getPlayer(nation).getID());
-                        Iterator playerIterator = game.getPlayerIterator();
-                        while (playerIterator.hasNext()) {
-                            ServerPlayer player = (ServerPlayer) playerIterator.next();
-                            if (player.equals(nextPlayer)) {
-                                monarchActionElement.setAttribute("nation", String.valueOf(nation));
-                                try {
-                                    player.getConnection().send(monarchActionElement);
-                                } catch (IOException e) {
-                                    logger.warning("Could not send message to: " + player.getName());
-                                }
-                            } else if (player.getNation() == nation ||
-                                       player.hasContacted(nation) ||
-                                       player.hasContacted(nextPlayer.getNation())) {
-                                try {
-                                    player.getConnection().send(dowElement);
-                                } catch (IOException e) {
-                                    logger.warning("Could not send message to: " + player.getName());
-                                }
-                            }
+                        nextPlayer.setStance(game.getPlayer(nation), Player.WAR);
+                        monarchActionElement.setAttribute("nation", String.valueOf(nation));
+                        try {
+                            nextPlayer.getConnection().send(monarchActionElement);
+                        } catch (IOException e) {
+                            logger.warning("Could not send message to: " + nextPlayer.getName());
                         }
                         break;
                     case Monarch.SUPPORT_LAND:

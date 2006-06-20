@@ -65,6 +65,15 @@ public interface ModelController {
     
     
     /**
+     * Updates stances.
+     * @param first The first <code>Player</code>.
+     * @param second The second <code>Player</code>.
+     * @param stance The new stance.
+     */
+    public void setStance(Player first, Player second, int stance);
+    
+    
+    /**
     * Returns a pseudorandom int, uniformly distributed between 0
     * (inclusive) and the specified value (exclusive).
     * 

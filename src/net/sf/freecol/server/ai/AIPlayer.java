@@ -324,9 +324,14 @@ public class AIPlayer extends AIObject {
             if (strategy == STRATEGY_CONQUEST && p.isEuropean()) {
                 getPlayer().getTension(p).modify(10);
             }
-            if (getPlayer().getTension(p).getValue() >= Tension.TENSION_ADD_NORMAL) {
+            if (getPlayer().getStance(p) != Player.WAR
+                    && getPlayer().getTension(p).getLevel() >= Tension.ANGRY) {
                 getPlayer().setStance(p, Player.WAR);
-            } else {
+            } else if (getPlayer().getStance(p) == Player.WAR
+                    && getPlayer().getTension(p).getLevel() <= Tension.CONTENT) {
+                getPlayer().setStance(p, Player.CEASE_FIRE);
+            } else if (getPlayer().getStance(p) == Player.CEASE_FIRE
+                    && getPlayer().getTension(p).getLevel() <= Tension.HAPPY) {
                 getPlayer().setStance(p, Player.PEACE);
             }
         }
@@ -978,11 +983,6 @@ public class AIPlayer extends AIObject {
      * Demands goods from players with nearby colonies.
      */
     private void demandTribute() {
-        /* 
-         * TODO: The european players should also demand goods if they have a high tension
-         *       towards a player.
-         */
-        
         if (!player.isIndian()) {
             return;
         }
@@ -1020,7 +1020,18 @@ public class AIPlayer extends AIObject {
                 }
             }
             if (nearbyColonies.size() > 0) {
-                Colony target = (Colony) nearbyColonies.get(getRandom().nextInt(nearbyColonies.size()));
+                int targetTension = Integer.MIN_VALUE;
+                Colony target = null;
+                for (int i=0; i<nearbyColonies.size(); i++) {
+                    Colony t = (Colony) nearbyColonies.get(i);
+                    Player to = t.getOwner();
+                    int tension = 1 + getPlayer().getTension(to).getValue() + indianSettlement.getAlarm(to).getValue();
+                    tension = getRandom().nextInt(tension);
+                    if (tension > targetTension) {
+                        targetTension = tension;
+                        target = t;
+                    }
+                }                
                 Iterator it2 = indianSettlement.getOwnedUnitsIterator();
                 AIUnit chosenOne = null;
                 while (it2.hasNext()) {
@@ -1037,7 +1048,12 @@ public class AIPlayer extends AIObject {
                             indianSettlement.getTile(),
                             target.getTile());
                     if (pn != null && pn.getTotalTurns() <= MAX_DISTANCE_TO_MAKE_DEMANDS) {
-                        chosenOne.setMission(new IndianDemandMission(getAIMain(), chosenOne, target));
+                        // Make it less probable that nice players get targeted for a demand misson:
+                        Player tp = target.getOwner();                        
+                        int tension = 1 + getPlayer().getTension(tp).getValue() + indianSettlement.getAlarm(tp).getValue();
+                        if (getRandom().nextInt(tension) > Tension.HAPPY) {
+                            chosenOne.setMission(new IndianDemandMission(getAIMain(), chosenOne, target));
+                        }
                     }
                 }
                 

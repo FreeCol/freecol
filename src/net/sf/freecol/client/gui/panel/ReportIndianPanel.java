@@ -68,7 +68,7 @@ public final class ReportIndianPanel extends ReportPanel implements ActionListen
             colonies.next();
         }
         report += "<p>" + settlementCount + " camps";
-        String tensionString = opponent.getTension(player).getLevelAsString();
+        String tensionString = opponent.getTension(player).toString();
         report += "<p>" + Messages.message("tension") + ": " + tensionString;
         report += "</html>";
         JLabel label;

@@ -102,8 +102,7 @@ public final class AIInGameInputHandler implements MessageHandler {
                     reply = chooseFoundingFather((DummyConnection) connection, element);
                 } else if (type.equals("reconnect")) {            
                     logger.warning("The server requests a reconnect. This means an illegal operation has been performed. Please refer to any previous error message.");
-                } else if (type.equals("diplomaticMessage")) {
-                    reply = diplomaticMessage((DummyConnection) connection, element);
+                } else if (type.equals("setStance")) {
                 } else if (type.equals("monarchAction")) {
                     reply = monarchAction((DummyConnection) connection, element);
                 } else if (type.equals("removeGoods")) {
@@ -242,25 +241,6 @@ public final class AIInGameInputHandler implements MessageHandler {
 
         return element;
     }   
-
-    /**
-     * Handles a "diplomaticMessage"-request.
-     *
-     * @param connection The connection the message was received on.
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *                holds all the information.
-     */
-    private Element diplomaticMessage(DummyConnection connection, Element element) {
-        Game game = freeColServer.getGame();
-        String type = element.getAttribute("type");
-        if (type.equals("declarationOfWar")) {
-            Player attacker = (Player) game.getFreeColGameObject(element.getAttribute("attacker"));
-            Player defender = (Player) game.getFreeColGameObject(element.getAttribute("defender"));
-            defender.warDeclaredBy(attacker);
-        }
-        return null;
-    }
-
             
     /**
      * Gets the <code>AIPlayer</code> using this
