@@ -1150,12 +1150,18 @@ public class AIPlayer extends AIObject {
                         value -= 19;
                     }
                     
+                    int numberOfDefendingUnits = 0;
                     Iterator ui = t.getUnitIterator();
                     while (ui.hasNext()) {
                         Unit tu = (Unit) ui.next();
                         if (tu.isDefensiveUnit()) {
                             value -= 6;
+                            numberOfDefendingUnits++;
                         }                       
+                    }
+                    if (t.getColony() != null && numberOfDefendingUnits
+                            > t.getColony().getBuilding(Building.STOCKADE).getLevel() + 1) {
+                        value = 0;
                     }
                     
                     if (value > 0 && value > bestValue && value > currentTileSettlementValue) {

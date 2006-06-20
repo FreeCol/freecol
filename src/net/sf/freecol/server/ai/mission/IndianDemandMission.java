@@ -14,6 +14,7 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tension;
+import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
@@ -78,6 +79,10 @@ public class IndianDemandMission extends Mission {
     * @param connection The <code>Connection</code> to the server.
     */
     public void doMission(Connection connection) {
+        if (!isValid()) {
+            return;
+        }
+        
         if (!hasGift()) {
             if (getUnit().getTile() != getUnit().getIndianSettlement().getTile()) {
                 // Move to the owning settlement:
@@ -104,9 +109,10 @@ public class IndianDemandMission extends Mission {
         } else {
             // Move to the target's colony and deliver
             Unit unit = getUnit();
-            int r = moveTowards(connection, target.getTile());
-            if (r >= 0 && getGame().getMap().getNeighbourOrNull(r, unit.getTile()) == target.getTile() &&
-                unit.getMovesLeft() > 0) {
+            int r = moveTowards(connection, target.getTile());            
+            if (r >= 0 
+                    && getGame().getMap().getNeighbourOrNull(r, unit.getTile()) == target.getTile()
+                    && unit.getMovesLeft() > 0) {
                 // We have arrived.
                 Element demandElement = Message.createNewRootElement("indianDemand");
                 demandElement.setAttribute("unit", unit.getID());
@@ -135,8 +141,8 @@ public class IndianDemandMission extends Mission {
                     // TODO: if very happy, the brave should convert
                     tension = -(5 - enemy.getDifficulty()) * 50;
                     unit.getOwner().modifyTension(enemy, tension);
-                    if (unit.getOwner().getTension(enemy).getLevel() <= Tension.DISPLEASED &&
-                        (goods == null || goods.getType() == Goods.FOOD)) {
+                    if (unit.getOwner().getTension(enemy).getLevel() <= Tension.DISPLEASED
+                            && (goods == null || goods.getType() == Goods.FOOD)) {
                         Element deliverGiftElement = Message.createNewRootElement("deliverGift");
                         deliverGiftElement.setAttribute("unit", getUnit().getID());
                         deliverGiftElement.setAttribute("settlement", target.getID());
@@ -150,8 +156,7 @@ public class IndianDemandMission extends Mission {
                     } else {
                         tension = (enemy.getDifficulty() + 1) * 50;
                         unit.getOwner().modifyTension(enemy, tension);
-                        if (unit.getOwner().getTension(enemy).getLevel() >=
-                            Tension.ANGRY) {
+                        if (unit.getOwner().getTension(enemy).getLevel() >= Tension.ANGRY) {
                             // if we didn't get what we wanted, attack
                             Element element = Message.createNewRootElement("attack");
                             element.setAttribute("unit", unit.getID());
@@ -170,6 +175,30 @@ public class IndianDemandMission extends Mission {
             }
         }
 
+        // Walk in a random direction if we have any moves left:
+        Tile thisTile = getUnit().getTile();
+        Unit unit = getUnit();
+        while(unit.getMovesLeft() > 0) {
+            int direction = (int) (Math.random() * 8);
+            int j;
+            for (j = 8; j > 0 && 
+                    ((unit.getGame().getMap().getNeighbourOrNull(direction, thisTile) == null)
+                            || (unit.getMoveType(direction) != Unit.MOVE)); j--) {
+                direction = (int) (Math.random() * 8);
+            }
+            if (j == 0) break;
+            thisTile = unit.getGame().getMap().getNeighbourOrNull(direction, thisTile);
+
+            Element moveElement = Message.createNewRootElement("move");
+            moveElement.setAttribute("unit", unit.getID());
+            moveElement.setAttribute("direction", Integer.toString(direction));
+            
+            try {
+                connection.sendAndWait(moveElement);
+            } catch (IOException e) {
+                logger.warning("Could not send \"move\"-message!");
+            }
+        }
     }
 
     /**

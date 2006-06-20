@@ -803,7 +803,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         unit.attack(defender, result, plunderGold);
         
         // TODO: REMOVE MAGIC: This should not really be necessary:
-        if (result == Unit.ATTACK_DONE_SETTLEMENT) {
+        /*if (result == Unit.ATTACK_DONE_SETTLEMENT) {
             Element updateElement = Message.createNewRootElement("update");
             updateElement.appendChild(newTile.toXMLElement(newTile.getColony().getOwner(), updateElement.getOwnerDocument()));
             ServerPlayer enemyPlayer = (ServerPlayer) defender.getOwner();
@@ -814,12 +814,13 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                                enemyPlayer.getName() + " with connection " +
                                enemyPlayer.getConnection());
             }            
-        }
+        }*/
         
         if (result >= Unit.ATTACK_EVADES && unit.getTile().equals(newTile)) { // In other words, we moved...
             Element update = reply.getOwnerDocument().createElement("update");
             int lineOfSight = unit.getLineOfSight();
-            if (result == Unit.ATTACK_DONE_SETTLEMENT) {
+            if (result == Unit.ATTACK_DONE_SETTLEMENT
+                    && newTile.getSettlement() != null) {
                 lineOfSight = Math.max(lineOfSight, newTile.getSettlement().getLineOfSight());
             }
             Vector surroundingTiles = game.getMap().getSurroundingTiles(unit.getTile(), lineOfSight);

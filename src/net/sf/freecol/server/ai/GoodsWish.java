@@ -39,6 +39,10 @@ public class GoodsWish extends Wish {
     public GoodsWish(AIMain aiMain, Location destination, int value, int goodsType) {
         super(aiMain);
 
+        if (destination == null) {
+            throw new NullPointerException("destination == null");
+        }
+        
         id = aiMain.getNextID();
         aiMain.addAIObject(id, this);
 

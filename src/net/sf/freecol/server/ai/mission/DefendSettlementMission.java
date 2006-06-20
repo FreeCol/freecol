@@ -90,7 +90,7 @@ public class DefendSettlementMission extends Mission {
         
         if (unit.isOffensiveUnit()) {
             Unit bestTarget = null;
-            int bestDifference = 0;
+            int bestDifference = Integer.MIN_VALUE;
             int bestDirection = -1;
             
             int[] directions = map.getRandomDirectionArray();
@@ -109,9 +109,11 @@ public class DefendSettlementMission extends Mission {
 
                     int difference = weAttack / (weAttack + enemyDefend) - enemyAttack / (enemyAttack + weDefend);                  
                     if (difference > bestDifference) {
-                        bestDifference = difference;
-                        bestTarget = enemyUnit;
-                        bestDirection = direction;
+                        if (difference > 0 || weAttack > enemyDefend) {
+                            bestDifference = difference;
+                            bestTarget = enemyUnit;
+                            bestDirection = direction;
+                        }
                     }
                 }
             }

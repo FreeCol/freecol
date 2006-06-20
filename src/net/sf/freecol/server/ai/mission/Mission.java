@@ -114,7 +114,7 @@ public abstract class Mission extends AIObject {
     *         {@link Unit#MOVE_HIGH_SEAS}.
     */
     protected int moveTowards(Connection connection, PathNode pathNode) {
-        if (getUnit().getMovesLeft() <= 0) {
+        if (getUnit().getMovesLeft() <= 0) {            
             return NO_MORE_MOVES_LEFT;
         }
         
@@ -124,10 +124,10 @@ public abstract class Mission extends AIObject {
                 || getUnit().getMoveType(pathNode.getDirection()) == Unit.EXPLORE_LOST_CITY_RUMOUR)) {
             move(connection, pathNode.getDirection());         
             pathNode = pathNode.next;
-        }
-        if (pathNode.getTurns() == 0 && getUnit().getMoveType(pathNode.getDirection()) != Unit.ILLEGAL_MOVE) {
+        }        
+        if (pathNode.getTurns() == 0 && getUnit().getMoveType(pathNode.getDirection()) != Unit.ILLEGAL_MOVE) {            
             return pathNode.getDirection();
-        }
+        }        
         return NO_MORE_MOVES_LEFT;
     }
 

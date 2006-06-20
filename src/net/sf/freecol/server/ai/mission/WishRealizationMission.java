@@ -46,6 +46,10 @@ public class WishRealizationMission extends Mission {
     public WishRealizationMission(AIMain aiMain, AIUnit aiUnit, Wish wish) {
         super(aiMain, aiUnit);
         this.wish = wish;
+        
+        if (wish == null) {
+            throw new NullPointerException("wish == null");
+        }
     }
 
 

@@ -146,7 +146,7 @@ public class ColonyPlan {
         if (colony.getBuilding(Building.CUSTOM_HOUSE).canBuildNext()) {
             if (colony.getGoodsContainer().hasReachedCapacity(colony.getWarehouseCapacity())) {
                 buildList.add(0, new Integer(Building.CUSTOM_HOUSE));
-            }   
+            }
         }
         
         // Check if we should improve the warehouse:

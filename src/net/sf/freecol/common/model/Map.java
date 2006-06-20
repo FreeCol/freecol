@@ -349,7 +349,6 @@ public class Map extends FreeColGameObject {
                         if (newTile == end) {
                             cost += unit.getInitialMovesLeft();                        
                             movesLeft = 0;
-                            turns++;
                         }
                     } else {
                         cost += extraCost;
@@ -562,6 +561,10 @@ public class Map extends FreeColGameObject {
      */
     public PathNode search(Unit unit, Tile startTile, GoalDecider gd, CostDecider costDecider, int maxTurns, Unit carrier) {         
         // This is just a temporary implementation; modify at will ;-)
+        
+        if (startTile == null) {
+            throw new NullPointerException("startTile == null");
+        }
         
         Unit theUnit = unit;        
         if (carrier != null) {

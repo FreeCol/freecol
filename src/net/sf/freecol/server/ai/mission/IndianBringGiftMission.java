@@ -12,6 +12,7 @@ import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tension;
+import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
@@ -110,7 +111,9 @@ public class IndianBringGiftMission extends Mission {
         } else {
             // Move to the target's colony and deliver
             int r = moveTowards(connection, target.getTile());
-            if (r >= 0 && getGame().getMap().getNeighbourOrNull(r, getUnit().getTile()) == target.getTile()) { // We have arrived.
+            if (r >= 0
+                    && getGame().getMap().getNeighbourOrNull(r, getUnit().getTile()) == target.getTile()) { 
+                // We have arrived.
                 Element deliverGiftElement = Message.createNewRootElement("deliverGift");
                 deliverGiftElement.setAttribute("unit", getUnit().getID());
                 deliverGiftElement.setAttribute("settlement", target.getID());
@@ -126,6 +129,31 @@ public class IndianBringGiftMission extends Mission {
                 getUnit().getOwner().modifyTension(target.getOwner(), 1);
             }
         }
+        
+        // Walk in a random direction if we have any moves left:
+        Tile thisTile = getUnit().getTile();
+        Unit unit = getUnit();
+        while(unit.getMovesLeft() > 0) {
+            int direction = (int) (Math.random() * 8);
+            int j;
+            for (j = 8; j > 0 && 
+                    ((unit.getGame().getMap().getNeighbourOrNull(direction, thisTile) == null)
+                            || (unit.getMoveType(direction) != Unit.MOVE)); j--) {
+                direction = (int) (Math.random() * 8);
+            }
+            if (j == 0) break;
+            thisTile = unit.getGame().getMap().getNeighbourOrNull(direction, thisTile);
+
+            Element moveElement = Message.createNewRootElement("move");
+            moveElement.setAttribute("unit", unit.getID());
+            moveElement.setAttribute("direction", Integer.toString(direction));
+            
+            try {
+                connection.sendAndWait(moveElement);
+            } catch (IOException e) {
+                logger.warning("Could not send \"move\"-message!");
+            }
+        }        
     }
 
 

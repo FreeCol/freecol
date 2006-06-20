@@ -179,7 +179,8 @@ public class AIUnit extends AIObject implements Transportable {
     public void setTransport(AIUnit transport) {
         this.transport = transport;
 
-        if (transport.getMission() instanceof TransportMission
+        if (transport != null
+            && transport.getMission() instanceof TransportMission
             && !((TransportMission) transport.getMission()).isOnTransportList(this)) {
             ((TransportMission) transport.getMission()).addToTransportList(this);
         }

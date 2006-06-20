@@ -108,12 +108,25 @@ public class PioneeringMission extends Mission {
                     path = getUnit().findPath(ti.getTarget());
                     if (path != null) {
                         value = ti.getValue() + 10000 - (path.getTotalTurns()*5);
+                        
+                        /*
+                         * Avoid picking a TileImprovement with a path being blocked 
+                         * by an enemy unit (apply a penalty to the value):
+                         */
+                        PathNode pn = path;
+                        while (pn != null) {
+                            if (pn.getTile().getFirstUnit() != null
+                                    && pn.getTile().getFirstUnit().getOwner() != getUnit().getOwner()) {
+                                value -= 1000;
+                            }
+                            pn = pn.next;
+                        }
                     } else {
                         value = ti.getValue();
                     }
                 } else {
                     value = ti.getValue() + 10000;
-                }
+                }                
                 if (value > bestValue) {
                     bestChoice = ti;
                     bestValue = value;

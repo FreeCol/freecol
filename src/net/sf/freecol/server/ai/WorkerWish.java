@@ -41,6 +41,10 @@ public class WorkerWish extends Wish {
     public WorkerWish(AIMain aiMain, Location destination, int value, int unitType, boolean expertNeeded) {
         super(aiMain);
 
+        if (destination == null) {
+            throw new NullPointerException("destination == null");
+        }
+        
         id = aiMain.getNextID();
         aiMain.addAIObject(id, this);
 

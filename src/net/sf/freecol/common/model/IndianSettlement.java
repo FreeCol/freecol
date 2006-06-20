@@ -946,6 +946,9 @@ public class IndianSettlement extends Settlement {
 
 
     public void dispose() {
+        while (ownedUnits.size() > 0) {
+            ((Unit) ownedUnits.remove(0)).setIndianSettlement(null);
+        }
         unitContainer.dispose();
         super.dispose();
     }
