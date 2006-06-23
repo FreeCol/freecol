@@ -2,6 +2,7 @@
 
 package net.sf.freecol.client.gui;
 
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Iterator;
@@ -13,6 +14,7 @@ import javax.swing.JPopupMenu;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
@@ -64,14 +66,22 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
         Iterator unitIterator = tile.getUnitIterator();
         while (unitIterator.hasNext()) {
             Unit u = (Unit) unitIterator.next();
-            if (!u.isUnderRepair()) {
-                addUnit(u);
-            }
+
+            addUnit(u, !u.isUnderRepair(), false);
 
             Iterator childUnitIterator = u.getUnitIterator();
             while (childUnitIterator.hasNext()) {
-                addUnit((Unit) childUnitIterator.next());
+                addUnit((Unit) childUnitIterator.next(), true, true);
             }
+            
+            Iterator goodsIterator = u.getGoodsIterator();
+            while (goodsIterator.hasNext()) {
+                addGoods((Goods) goodsIterator.next(), false, true);
+            }
+        }
+        
+        if (hasItem()) {
+            addSeparator();
         }
 
         Settlement settlement = tile.getSettlement();
@@ -81,7 +91,10 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
             } else if (settlement instanceof IndianSettlement) {
                 addIndianSettlement((IndianSettlement) settlement);
             }
-        }
+            if (hasItem()) {
+                addSeparator();
+            }          
+        }        
 
         addTile(tile);
         
@@ -115,13 +128,52 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
     * @param unit The unit that will be represented on the popup.
     */
     private void addUnit(Unit unit) {
-        JMenuItem menuItem = new JMenuItem(unit.toString());
+        addUnit(unit, true, false);
+    }
+    
+    /**
+     * Adds a unit entry to this popup.
+     * @param unit The unit that will be represented on the popup.
+     * @param enabled The initial state for the menu item.
+     * @param indent Should be <code>true</code> if the text should be
+     *      indented on the menu.
+     */
+    private void addUnit(Unit unit, boolean enabled, boolean indent) {
+        String text = (indent ? "    " : "") + unit.toString();
+        JMenuItem menuItem = new JMenuItem(text);
         menuItem.setActionCommand(Unit.getXMLElementTagName() + unit.getID());
         menuItem.addActionListener(this);
+        if (indent) {
+            menuItem.setFont(menuItem.getFont().deriveFont(Font.ITALIC));
+        }
+        if (!enabled) {
+            menuItem.setEnabled(false);
+        }
         add(menuItem);
         hasAnItem = true;
     }
 
+    /**
+     * Adds a goods entry to this popup.
+     * @param goods The goods that will be represented on the popup.
+     * @param enabled The initial state for the menu item.
+     * @param indent Should be <code>true</code> if the text should be
+     *      indented on the menu.
+     */
+    private void addGoods(Goods goods, boolean enabled, boolean indent) {
+        String text = (indent ? "    " : "") + goods.toString();
+        JMenuItem menuItem = new JMenuItem(text);
+        menuItem.setActionCommand(Goods.getXMLElementTagName());
+        menuItem.addActionListener(this);
+        if (indent) {
+            menuItem.setFont(menuItem.getFont().deriveFont(Font.ITALIC));
+        }
+        if (!enabled) {
+            menuItem.setEnabled(false);
+        }
+        add(menuItem);
+        hasAnItem = true;
+    }
 
     /**
     * Adds a colony entry to this popup.
