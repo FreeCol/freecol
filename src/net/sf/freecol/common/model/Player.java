@@ -1511,7 +1511,9 @@ public class Player extends FreeColGameObject {
         Iterator colonyIterator = getColonyIterator();
         while (colonyIterator.hasNext()) {
             Colony colony = (Colony) colonyIterator.next();
-            if (colony == null || colony.getBuilding(Building.DOCK) == null) {
+            if (colony == null 
+                    || colony.getBuilding(Building.DOCK) == null
+                    || colony.getTile() == unit.getTile()) {
                 continue; // This has happened before, oddly ~ smelenchuk
             } 
             int distance;
@@ -1814,9 +1816,9 @@ public class Player extends FreeColGameObject {
         }
         
         if (oldStance == PEACE && newStance == WAR) {
-            modifyTension(nation, Tension.TENSION_ADD_DECLARE_WAR_FROM_PEACE);
+            modifyTension(player.getNation(), Tension.TENSION_ADD_DECLARE_WAR_FROM_PEACE);
         } else if (oldStance == CEASE_FIRE && newStance == WAR) {
-            modifyTension(nation, Tension.TENSION_ADD_DECLARE_WAR_FROM_CEASE_FIRE);
+            modifyTension(player.getNation(), Tension.TENSION_ADD_DECLARE_WAR_FROM_CEASE_FIRE);
         }        
     }
     

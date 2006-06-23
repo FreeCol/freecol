@@ -2,9 +2,14 @@
 package net.sf.freecol.server.ai.mission;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.GoalDecider;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;

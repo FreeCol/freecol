@@ -219,6 +219,22 @@ public final class Colony extends Settlement implements Location {
         }
     }
 
+    /**
+     * Damages all ship located on this <code>Colony</code>'s
+     * <code>Tile</code>. That is: they are sent to the closest
+     * location for repair.
+     *
+     * @see Unit#damageShip
+     */
+    public void damageAllShips() {
+        Iterator iter = getTile().getUnitIterator();
+        while (iter.hasNext()) {
+            Unit u = (Unit) iter.next();
+            if (u.isNaval()) {
+                u.shipDamaged();                    
+            }
+        }
+    }
 
     /**
     * Returns the building for producing the given type of goods.
@@ -616,7 +632,7 @@ public final class Colony extends Settlement implements Location {
     public boolean getExports(int type) {
         return exports[type];
     }
-
+    
     /**
      * Returns true if the custom house should export these goods.
      *

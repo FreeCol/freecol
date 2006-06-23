@@ -56,7 +56,9 @@ public class DefaultCostDecider implements CostDecider {
             if (newTile.getSettlement() != null
                     && newTile.getSettlement().getOwner() != unit.getOwner()) {
                 // A settlement is blocking the path:
-                return ILLEGAL_MOVE;
+                //return ILLEGAL_MOVE;
+                movesLeft = 0;
+                return ml;
             } else if (mc - 2 <= movesLeft) {
                 // Normal move: Using -2 in order to make 1/3 and 2/3 move count as 3/3.
                 if (mc <= movesLeft) {

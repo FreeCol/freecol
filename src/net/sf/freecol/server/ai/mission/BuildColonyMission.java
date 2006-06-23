@@ -334,7 +334,7 @@ public class BuildColonyMission extends Mission {
         return (!colonyBuilt && (doNotGiveUp 
                 || target != null 
                 && colonyValue <= target.getColonyValue() + getNearbyColonyBonus(getUnit().getOwner(), target)));
-    }
+    }     
     
     /**
      * Creates an XML-representation of this object.

@@ -1256,6 +1256,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     *       visible to the given <code>Player</code>.
     */
     public boolean isVisibleTo(Player player) {
+        if (player == getOwner()) {
+            return true;
+        }
         return getTile() != null && player.canSee(getTile()) 
                     && (getTile().getSettlement() == null 
                             || getTile().getSettlement().getOwner() == player
@@ -2956,7 +2959,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * Sets the damage to this ship and sends it to its repair
      * location.
      */
-    private void shipDamaged() {
+    public void shipDamaged() {
         String nation = owner.getNationAsString();
         Location repairLocation = getOwner().getRepairLocation(this);
         String repairLocationName = Messages.message("menuBar.view.europe");
@@ -3227,12 +3230,24 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         enemy.modifyTension(getOwner(), Tension.TENSION_ADD_MAJOR);
 
         if (myPlayer.isEuropean()) {
+            addModelMessage(enemy, "model.unit.colonyCapturedBy",
+                    new String[][] {{"%colony%", colony.getName()},
+                                    {"%amount%", Integer.toString(plunderGold)},
+                                    {"%player%", myPlayer.getNationAsString()}},
+                    ModelMessage.DEFAULT);
+            colony.damageAllShips();
+            
             myPlayer.modifyGold(plunderGold);
             enemy.modifyGold(-plunderGold);
 
             colony.setOwner(myPlayer); // This also changes over all of the units...
-            setLocation(colony.getTile());
+            addModelMessage(colony, "model.unit.colonyCaptured",
+                    new String[][] {{"%colony%", colony.getName()},
+                                    {"%amount%", Integer.toString(plunderGold)}},
+                    ModelMessage.DEFAULT);            
             
+            setLocation(colony.getTile());
+                        
             // Demote all soldiers and clear all orders:
             Iterator it = colony.getTile().getUnitIterator();
             while (it.hasNext()) {
@@ -3244,26 +3259,22 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 }
                 u.setState(Unit.ACTIVE);
             }
-            
-            addModelMessage(this, "model.unit.colonyCaptured",
-                            new String[][] {{"%colony%", colony.getName()},
-                                            {"%amount%", Integer.toString(plunderGold)}},
-                            ModelMessage.DEFAULT);
         } else { // Indian:
             if (colony.getUnitCount() <= 1) {
                 myPlayer.modifyGold(plunderGold);
                 enemy.modifyGold(-plunderGold);
-                addModelMessage(colony, "model.unit.colonyBurning",
+                addModelMessage(enemy, "model.unit.colonyBurning",
                                 new String[][] {{"%colony%", colony.getName()},
                                                 {"%amount%", Integer.toString(plunderGold)}},
                                 ModelMessage.DEFAULT);
+                colony.damageAllShips();
                 colony.dispose();
             } else {
                 Unit victim = colony.getRandomUnit();
                 if (victim == null) {
                     return;
                 }
-                addModelMessage(colony, "model.unit.colonistSlaughtered",
+                addModelMessage(enemy, "model.unit.colonistSlaughtered",
                                 new String[][] {{"%colony%", colony.getName()},
                                                 {"%unit%", victim.getName()}},
                                 ModelMessage.UNIT_LOST);

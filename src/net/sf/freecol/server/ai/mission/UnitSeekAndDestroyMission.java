@@ -12,6 +12,7 @@ import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
@@ -104,7 +105,8 @@ public class UnitSeekAndDestroyMission extends Mission {
             while (direction >= 0) {
                 Tile newTile = getGame().getMap().getNeighbourOrNull(direction, unit.getTile());
                 if (unit.getMoveType(direction) == Unit.ATTACK
-                        && unit.getOwner().getStance(newTile.getDefendingUnit(unit).getOwner()) == Player.WAR) {
+                        && (unit.getOwner().getStance(newTile.getDefendingUnit(unit).getOwner()) == Player.WAR
+                                || ((Ownable) target).getOwner() == newTile.getDefendingUnit(unit).getOwner())) {
                     Element element = Message.createNewRootElement("attack");
                     element.setAttribute("unit", unit.getID());
                     element.setAttribute("direction", Integer.toString(direction));
@@ -205,7 +207,8 @@ public class UnitSeekAndDestroyMission extends Mission {
         targetPlayer = ((Ownable) target).getOwner();
         int stance = owner.getStance(targetPlayer);
 
-        return targetPlayer != getUnit().getOwner() && stance == Player.WAR;
+        return targetPlayer != owner && (stance == Player.WAR 
+                || owner.isIndian() && owner.getTension(targetPlayer).getLevel() >= Tension.CONTENT);
     }
 
     

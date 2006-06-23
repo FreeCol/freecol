@@ -137,11 +137,15 @@ public class IndianDemandMission extends Mission {
                 
                 boolean accepted = Boolean.valueOf(reply.getAttribute("accepted")).booleanValue();
                 int tension = 0;
+                int unitTension = unit.getOwner().getTension(enemy).getValue();
+                if (unit.getIndianSettlement() != null) {
+                    unitTension += unit.getIndianSettlement().getOwner().getTension(enemy).getValue();
+                }
                 if (accepted) {
                     // TODO: if very happy, the brave should convert
                     tension = -(5 - enemy.getDifficulty()) * 50;
                     unit.getOwner().modifyTension(enemy, tension);
-                    if (unit.getOwner().getTension(enemy).getLevel() <= Tension.DISPLEASED
+                    if (unitTension <= Tension.TENSION_HAPPY
                             && (goods == null || goods.getType() == Goods.FOOD)) {
                         Element deliverGiftElement = Message.createNewRootElement("deliverGift");
                         deliverGiftElement.setAttribute("unit", getUnit().getID());
@@ -153,23 +157,22 @@ public class IndianDemandMission extends Mission {
                         } catch (IOException e) {
                             logger.warning("Could not send \"deliverGift\"-message!");
                         }
-                    } else {
-                        tension = (enemy.getDifficulty() + 1) * 50;
-                        unit.getOwner().modifyTension(enemy, tension);
-                        if (unit.getOwner().getTension(enemy).getLevel() >= Tension.ANGRY) {
-                            // if we didn't get what we wanted, attack
-                            Element element = Message.createNewRootElement("attack");
-                            element.setAttribute("unit", unit.getID());
-                            element.setAttribute("direction", Integer.toString(r));
-
-                            try {
-                                connection.ask(element);
-                            } catch (IOException e) {
-                                logger.warning("Could not send message!");
-                            }
+                    }
+                } else {
+                    tension = (enemy.getDifficulty() + 1) * 50;
+                    unit.getOwner().modifyTension(enemy, tension);
+                    if (unitTension >= Tension.TENSION_CONTENT) {
+                        // if we didn't get what we wanted, attack
+                        Element element = Message.createNewRootElement("attack");
+                        element.setAttribute("unit", unit.getID());
+                        element.setAttribute("direction", Integer.toString(r));
+                        
+                        try {
+                            connection.ask(element);
+                        } catch (IOException e) {
+                            logger.warning("Could not send message!");
                         }
                     }
-                
                 }
                 completed = true;
             }
@@ -275,7 +278,7 @@ public class IndianDemandMission extends Mission {
     */
     public boolean isValid() {
         // The last check is to ensure that the colony have not been burned to the ground.
-        return (!completed && target != null && target.getTile().getColony() == target);
+        return (!completed && target != null && !target.isDisposed() && target.getTile().getColony() == target);
     }
 
     /**

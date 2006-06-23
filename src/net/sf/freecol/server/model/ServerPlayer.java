@@ -193,6 +193,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
         Iterator positionIterator = getGame().getMap().getCircleIterator(unit.getTile().getPosition(), true, unit.getLineOfSight());
         while (positionIterator.hasNext()) {
             Map.Position p = (Map.Position) positionIterator.next();
+            if (p == null) {
+                continue;
+            }
             setExplored(getGame().getMap().getTile(p));
             canSeeTiles[p.getX()][p.getY()] = true;
         }
