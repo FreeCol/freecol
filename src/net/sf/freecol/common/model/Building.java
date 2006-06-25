@@ -640,7 +640,8 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
                         student.setTurnsOfTraining(0);
                         addModelMessage(this, "model.unit.unitImproved",
                                         new String[][] {{"%oldName%", oldName},
-                                                        {"%newName%", student.getName()}},
+                                                        {"%newName%", student.getName()},
+                                                        {"%nation%", getOwner().getName()}},
                                         ModelMessage.UNIT_IMPROVED);
                     }
                 } else {
