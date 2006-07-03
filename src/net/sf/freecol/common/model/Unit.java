@@ -146,6 +146,15 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     private int             turnsOfTraining = 0;
     private int             trainingType = -1;
 
+    /**
+     * The amount of goods carried by this unit.
+     * This variable is only used by the clients.
+     * A negative value signals that the variable
+     * is not in use.
+     * 
+     * @see #getVisibleGoodsCount()
+     */
+    private int             visibleGoodsCount;
 
 
     /**
@@ -205,6 +214,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 boolean armed, boolean mounted, int numberOfTools, boolean missionary) {
         super(game);
 
+        visibleGoodsCount = -1;
         unitContainer = new UnitContainer(game, this);
         goodsContainer = new GoodsContainer(game, this);
 
@@ -2407,6 +2417,22 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         return space;
     }
 
+    /**
+     * Returns the amount of goods that is carried by this unit.
+     *  
+     * @return The amount of goods carried by this <code>Unit</code>.
+     *      This value might different from the one returned by
+     *      {@link #getGoodsCount()} when the model is
+     *      {@link Game#getViewOwner() owned by a client} and cargo
+     *      hiding has been enabled.
+     */
+    public int getVisibleGoodsCount() {
+        if (visibleGoodsCount >= 0) {
+            return visibleGoodsCount;
+        } else {
+            return getGoodsCount();
+        }
+    }
 
     public int getGoodsCount() {
         return goodsContainer.getGoodsCount();
@@ -3664,7 +3690,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             if (showAll || getOwner().equals(player) || !getGameOptions().getBoolean(GameOptions.UNIT_HIDING) && player.canSee(getTile())) {
                 unitElement.appendChild(unitContainer.toXMLElement(player, document, showAll, toSavedGame));
                 unitElement.appendChild(goodsContainer.toXMLElement(player, document, showAll, toSavedGame));
-            } else {
+            } else {                
+                unitElement.setAttribute("visibleGoodsCount", Integer.toString(getGoodsCount()));
                 UnitContainer emptyUnitContainer = new UnitContainer(getGame(), this);
                 emptyUnitContainer.setID(unitContainer.getID());
                 unitElement.appendChild(emptyUnitContainer.toXMLElement(player, document, showAll, toSavedGame));
@@ -3719,6 +3746,12 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
         if (unitElement.hasAttribute("workType")) {
             workType = Integer.parseInt(unitElement.getAttribute("workType"));
+        }
+        
+        if (unitElement.hasAttribute("visibleGoodsCount")) {
+            visibleGoodsCount = Integer.parseInt(unitElement.getAttribute("visibleGoodsCount"));
+        } else {
+            visibleGoodsCount = -1;
         }
 
         if (owner == null) {

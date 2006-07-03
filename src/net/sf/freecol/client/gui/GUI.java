@@ -1771,7 +1771,11 @@ public final class GUI {
             // Draw an occupation and nation indicator.
             g.drawImage(lib.getColorChip(unit.getOwner().getColor()), x + STATE_OFFSET_X, y, null);
             String occupationString;
-            switch (unit.getState()) {
+            if (unit.getOwner() != freeColClient.getMyPlayer()
+                    && unit.isNaval()) {
+                occupationString = Integer.toString(unit.getVisibleGoodsCount());
+            } else {
+                switch (unit.getState()) {
                 case Unit.ACTIVE:
                     occupationString = "-";
                     break;
@@ -1796,7 +1800,8 @@ public final class GUI {
                     break;
                 default:
                     occupationString = "?";
-                    logger.warning("Unit has an invalid occpuation: " + unit.getState());
+                logger.warning("Unit has an invalid occpuation: " + unit.getState());
+                }
             }
             if (unit.getOwner().getColor() == Color.BLACK) {
                 g.setColor(Color.WHITE);
