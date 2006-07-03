@@ -1124,18 +1124,28 @@ public class AIPlayer extends AIObject {
         }       
     }
     
-    private int getBuildColonyMissionValue(Unit u, Colony colony, int turns) {
+    private int getDefendColonyMissionValue(Unit u, Colony colony, int turns) {
         // Temporary helper method for: giveMilitaryMission
         int value = 10025 - turns;            
         
         int numberOfDefendingUnits = 0;
-        Iterator ui = colony.getTile().getUnitIterator();
+        /*Iterator ui = colony.getTile().getUnitIterator();
         while (ui.hasNext()) {
             Unit tu = (Unit) ui.next();
             if (tu.isDefensiveUnit()) {
                 value -= 6;
                 numberOfDefendingUnits++;
             }                       
+        }*/
+        Iterator aui = getAIUnitIterator();
+        while (aui.hasNext()) {
+            Mission m = ((AIUnit) aui.next()).getMission();
+            if (m != null && m instanceof DefendSettlementMission) {
+                if (((DefendSettlementMission) m).getSettlement() == colony) {
+                    value -= 6;
+                    numberOfDefendingUnits++;
+                }
+            }
         }
         
         if (u.getOwner().isREF()) {
@@ -1242,7 +1252,7 @@ public class AIPlayer extends AIObject {
         if (unit.getTile() != null
                 && unit.getTile().getColony() != null) {
             bestTarget = unit.getTile().getColony();            
-            bestValue = getBuildColonyMissionValue(unit, (Colony) bestTarget, 0);
+            bestValue = getDefendColonyMissionValue(unit, (Colony) bestTarget, 0);
         }        
         
         // Checks if a nearby colony requires additional defence:
@@ -1263,7 +1273,7 @@ public class AIPlayer extends AIObject {
                 Tile t = pathNode.getTile();
                 if (t.getColony() != null
                         && t.getColony().getOwner() == u.getOwner()) {
-                    int value = getBuildColonyMissionValue(u, t.getColony(), pathNode.getTurns());
+                    int value = getDefendColonyMissionValue(u, t.getColony(), pathNode.getTurns());
                     if (value > 0 && value > bestValue) {
                         bestValue = value;
                         best = pathNode;
@@ -1278,7 +1288,7 @@ public class AIPlayer extends AIObject {
         PathNode bestPath = map.search(unit, startTile, gd, map.getDefaultCostDecider(), MAXIMUM_DISTANCE_TO_SETTLEMENT, carrier);
         if (bestPath != null) {      
             PathNode ln = bestPath.getLastNode();
-            int value = getBuildColonyMissionValue(unit, ln.getTile().getColony(), ln.getTurns());
+            int value = getDefendColonyMissionValue(unit, ln.getTile().getColony(), ln.getTurns());
             if (value > bestValue) {
                 bestTarget = ln.getTile().getColony();
                 bestValue = value;

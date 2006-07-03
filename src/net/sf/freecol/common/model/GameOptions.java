@@ -34,7 +34,7 @@ public class GameOptions extends OptionMap {
 
     /** No units are hidden on carriers or settlements if this option is set to <code>false</code>. */
     public static final String UNIT_HIDING = "unitHiding";
-
+    
     /** 
      * Victory condition: Should the <code>Player</code> who first defeats the
      * Royal Expeditionary Force win the game?
@@ -96,8 +96,7 @@ public class GameOptions extends OptionMap {
         OptionGroup map = new OptionGroup("gameOptions.map.name", "gameOptions.map.shortDescription");
         map.add(new BooleanOption(FOG_OF_WAR, "gameOptions.fogOfWar.name", "gameOptions.fogOfWar.shortDescription", true));
         map.add(new BooleanOption(UNIT_HIDING, "gameOptions.unitHiding.name", "gameOptions.unitHiding.shortDescription", true));
-        add(map);
-        
+        add(map);        
 
         /* Colony options: */
         OptionGroup colony = new OptionGroup("gameOptions.colony.name", "gameOptions.colony.shortDescription");

@@ -193,6 +193,15 @@ public class DefendSettlementMission extends Mission {
         }
      }
      
+     /**
+      * Gets the settlement.
+      * @return The <code>Settlement</code> to be defended by
+      *         this <code>Mission</code>.
+      */
+     public Settlement getSettlement() {
+         return settlement;
+     }
+     
     /**
      * Checks if this mission is still valid to perform.
      *
