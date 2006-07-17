@@ -1,8 +1,6 @@
 
 package net.sf.freecol.server;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -13,12 +11,13 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 import java.util.logging.Logger;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
-import javax.swing.Timer;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -226,12 +225,12 @@ public final class FreeColServer {
             return;
         }
 
-        ActionListener updater = new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+        Timer t = new Timer(true);
+        t.scheduleAtFixedRate(new TimerTask() {
+            public void run() {
                 updateMetaServer();
             }
-        };
-        new Timer(META_SERVER_UPDATE_INTERVAL, updater).start();
+        }, META_SERVER_UPDATE_INTERVAL, META_SERVER_UPDATE_INTERVAL);        
     }
 
 

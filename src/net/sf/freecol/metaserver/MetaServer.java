@@ -1,9 +1,6 @@
 
 package net.sf.freecol.metaserver;
 
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -11,9 +8,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Logger;
-
-import javax.swing.Timer;
 
 import net.sf.freecol.common.networking.Connection;
 
@@ -99,19 +96,17 @@ public final class MetaServer extends Thread {
         final MetaRegister mr = new MetaRegister();
         networkHandler = new NetworkHandler(this, mr);
         serverSocket = new ServerSocket(port);
-        
-        ActionListener deadServerRemover = new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+
+        Timer t = new Timer(true);
+        t.scheduleAtFixedRate(new TimerTask() {
+            public void run() {
                 try {
                     mr.removeDeadServers();
                 } catch (Exception ex) {
                     logger.warning("Exception: " + ex.getMessage());
                 }
             }
-        };
-        Timer timer = new Timer(REMOVE_DEAD_SERVERS_INTERVAL, deadServerRemover);
-        timer.setRepeats(true);
-        timer.start();
+        }, REMOVE_DEAD_SERVERS_INTERVAL, REMOVE_DEAD_SERVERS_INTERVAL);
     }
 
 

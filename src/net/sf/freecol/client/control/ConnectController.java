@@ -370,7 +370,7 @@ public final class ConnectController {
     * <i>true</i>.
     * If a server is running through this client and bStopServer is true then the clients
     * connected to that server will be notified. If a local client is connected to a server
-    * then the server will be notified with a logout in casgetVacantPlayerse <i>notifyServer</i> is true.
+    * then the server will be notified with a logout in case <i>notifyServer</i> is true.
     *
     * @param bStopServer Indicates whether or not a server that was started through this
     * client should be stopped.
@@ -385,8 +385,12 @@ public final class ConnectController {
             if (server != null) {
                 server.getController().shutdown();
                 freeColClient.setFreeColServer(null);
-                freeColClient.setLoggedIn(false);
             }
+            freeColClient.getGUI().setInGame(false);
+            freeColClient.setGame(null);
+            freeColClient.setMyPlayer(null);
+            freeColClient.setClient(null);                
+            freeColClient.setLoggedIn(false);            
         } else if (freeColClient.isLoggedIn()) {
             logout(notifyServer);
         }          

@@ -118,7 +118,7 @@ public final class FreeCol {
             saveDirectory.mkdirs();
         }
 
-        if (standAloneServer) {
+        if (standAloneServer) {            
             logger.info("Starting stand-alone server.");
             try {
                 final FreeColServer freeColServer = new FreeColServer(true, false, serverPort, serverName);

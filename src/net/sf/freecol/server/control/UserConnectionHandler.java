@@ -1,6 +1,7 @@
 
 package net.sf.freecol.server.control;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
@@ -62,6 +63,8 @@ public final class UserConnectionHandler implements MessageHandler {
                 reply = login(connection, element);
             } else if (type.equals("getVacantPlayers")) {
                 reply = getVacantPlayers(connection, element);
+            } else if (type.equals("disconnect")) {
+                reply = disconnect(connection, element);                                
             } else {
                 logger.warning("Unkown request: " + type);
             }
@@ -213,4 +216,22 @@ public final class UserConnectionHandler implements MessageHandler {
 
         return reply;
     }
+    
+    /**
+     * Handles a "disconnect"-message.
+     *
+     * @param connection The <code>Connection</code> the message was received on.
+     * @param disconnectElement The element (root element in a DOM-parsed XML tree) that
+     *                holds all the information.
+     * @return The reply.
+     */
+    private Element disconnect(Connection connection, Element disconnectElement) {
+        try {
+            connection.reallyClose();
+        } catch (IOException e) {
+            logger.warning("Could not close the connection.");
+        }
+        
+        return null;
+    }    
 }

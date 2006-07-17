@@ -190,12 +190,14 @@ final class ReceivingThread extends Thread {
     }
 
     private void disconnect() {
-        try {
-            Element disconnectElement = Message.createNewRootElement("disconnect");
-            disconnectElement.setAttribute("reason", "reception exception");
-            connection.getMessageHandler().handle(connection, disconnectElement);
-        } catch (FreeColException e) {
-            e.printStackTrace();
+        if (connection.getMessageHandler() != null) {
+            try {
+                Element disconnectElement = Message.createNewRootElement("disconnect");
+                disconnectElement.setAttribute("reason", "reception exception");
+                connection.getMessageHandler().handle(connection, disconnectElement);
+            } catch (FreeColException e) {
+                e.printStackTrace();
+            }
         }
     }
 
