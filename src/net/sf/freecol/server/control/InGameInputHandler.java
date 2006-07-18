@@ -177,7 +177,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     } else if (type.equals("declareIndependence")) {
                         reply = declareIndependence(connection, element);
                     } else if (type.equals("giveIndependence")) {
-                        reply = giveIndependence(connection, element);                                                
+                        reply = giveIndependence(connection, element);
+                    } else if (type.equals("setDestination")) {
+                        reply = setDestination(connection, element);                                                
                     } else {
                         logger.warning("Unknown request from client " + element.getTagName());
                     }
@@ -2001,7 +2003,31 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         return null;
     }    
     
+    /**
+     * Handles a "setDestination"-message.
+     *
+     * @param connection The <code>Connection</code> the message was received on.
+     * @param element The element containing the request.
+     */
+    private Element setDestination(Connection connection, Element element) {
+        Game game = getFreeColServer().getGame();
+        ServerPlayer player = getFreeColServer().getPlayer(connection);                
+        Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
+        
+        if (unit.getOwner() != player) {
+            throw new IllegalStateException("Not the owner of the unit.");
+        }
+        
+        Location destination = null;
+        if (element.hasAttribute("destination")) {
+            destination = (Location) game.getFreeColGameObject(element.getAttribute("destination"));
+        }
+        
+        unit.setDestination(destination);
 
+        return null;
+    } 
+    
     /**
      * Handles a "tradeProposition"-message.
      *

@@ -87,8 +87,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                             TO_EUROPE = 6,
                             IN_EUROPE = 7,
                             TO_AMERICA = 8,
-                            GOING_TO = 9,
-                            NUMBER_OF_STATES = 10;
+                            NUMBER_OF_STATES = 9;
 
 
     /**
@@ -135,7 +134,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     private Location        entryLocation;
     private Location        location;
     private IndianSettlement indianSettlement = null; // only used by BRAVE.
-    private PathNode        path = null;
     private Location        destination = null;
     
     // to be used only for type == TREASURE_TRAIN
@@ -580,25 +578,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         GoodsType  expertProduction = unitType.expertProduction;
         return (expertProduction != null) ? expertProduction.index : -1;
     }
-
-
-    /**
-     * Returns the path this unit is following.
-     *
-     * @return The path this unit is following.
-     */
-    public PathNode getPath() {
-        return path;
-    }
-
-    /**
-     * Sets the path this unit is following.
-     *
-     * @param newPath The path this unit should be following.
-     */
-    public void setPath(PathNode newPath) {
-        this.path = newPath;
-    }
     
     /**
      * Returns the destination of this unit.
@@ -1003,7 +982,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         return isMounted()  &&  ! isArmed();
     }
 
-
     /**
     * Moves this unit in the specified direction.
     *
@@ -1014,10 +992,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     public void move(int direction) {
         int type = getMoveType(direction);
 
+        // For debugging:
         switch (type) {
         case MOVE:
         case MOVE_HIGH_SEAS:
-        case DISEMBARK:
         case EXPLORE_LOST_CITY_RUMOUR:
             break;    
         case ATTACK:
@@ -1035,10 +1013,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                                             + direction + " Moves Left: " + getMovesLeft());
         }
 
-        if (getState() != GOING_TO) {
-            setState(ACTIVE);
-            setStateToAllChildren(SENTRY);
-        }
+        setState(ACTIVE);
+        setStateToAllChildren(SENTRY);
 
         Tile newTile = getGame().getMap().getNeighbourOrNull(direction, getTile());
 
@@ -2212,9 +2188,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 if (s == BUILD_ROAD) workLeft /= 2;
                 movesLeft = 0;
             case TO_EUROPE:
-                if ((state == ACTIVE ||
-                     state == GOING_TO) &&
-                    (!(location instanceof Europe))) {
+                if (state == ACTIVE && !(location instanceof Europe)) {
                     workLeft = 3;
                 } else if ((state == TO_AMERICA) && (location instanceof Europe)) {
                     // I think '4' was also used in the original game.
@@ -2234,9 +2208,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 if (getOwner().hasFather(FoundingFather.FERDINAND_MAGELLAN)) {
                     workLeft = workLeft/2;
                 }
-                break;
-            case GOING_TO:
-                setStateToAllChildren(SENTRY);
                 break;
             default:
                 workLeft = -1;
@@ -2346,8 +2317,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                         || (getEntryLocation() == getLocation());
             case TO_AMERICA:
                 return (location instanceof Europe && isNaval());
-            case GOING_TO:
-                return true;
             default:
                 logger.warning("Invalid unit state: " + s);
                 return false;
@@ -3684,6 +3653,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 unitElement.setAttribute("location", getTile().getColony().getID());
             }
         }
+        
+        if (destination != null) {
+            unitElement.setAttribute("destination", destination.getID());
+        }
 
         // Do not show enemy units hidden in a carrier:
         if (isCarrier()) {
@@ -3744,6 +3717,12 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             treasureAmount = 0;
         }
 
+        if (unitElement.hasAttribute("destination")) {
+            destination = (Location) getGame().getFreeColGameObject(unitElement.getAttribute("destination"));
+        } else {
+            destination = null;
+        }
+        
         if (unitElement.hasAttribute("workType")) {
             workType = Integer.parseInt(unitElement.getAttribute("workType"));
         }

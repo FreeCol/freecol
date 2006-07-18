@@ -239,7 +239,7 @@ public class FreeColMenuBar extends JMenuBar {
         ordersMenu.add(fortifyMenuItem);
 
         final JMenuItem gotoMenuItem = new JMenuItem(am.getFreeColAction(GotoAction.ID));
-        fortifyMenuItem.setOpaque(false);
+        gotoMenuItem.setOpaque(false);
         ordersMenu.add(gotoMenuItem);
 
         /*

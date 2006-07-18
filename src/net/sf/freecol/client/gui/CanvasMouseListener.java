@@ -5,6 +5,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import net.sf.freecol.common.model.PathNode;
+import net.sf.freecol.common.model.Unit;
 
 
 
@@ -84,8 +85,10 @@ public final class CanvasMouseListener implements MouseListener {
 
             gui.stopDrag();
             
-            // Move the unit:
-            canvas.getClient().getInGameController().moveAlongPath(temp);
+            // Move the unit:            
+            Unit unit = gui.getActiveUnit();
+            canvas.getClient().getInGameController().setDestination(unit, temp.getLastNode().getTile());
+            canvas.getClient().getInGameController().moveToDestination(unit);
         } else if (gui.isDragStarted()) {
             gui.stopDrag();
         }

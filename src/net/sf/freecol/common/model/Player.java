@@ -2588,7 +2588,7 @@ public class Player extends FreeColGameObject {
             return (!unit.isDisposed() &&
                     (unit.getMovesLeft() > 0) &&
                     (unit.getState() == Unit.ACTIVE) &&
-                    (unit.getPath() == null) &&
+                    (unit.getDestination() == null) &&
                     !(unit.getLocation() instanceof WorkLocation) &&
                     unit.getTile() != null);
         }
@@ -2606,7 +2606,7 @@ public class Player extends FreeColGameObject {
         public boolean obtains(Unit unit) {
             return (!unit.isDisposed() &&
                     (unit.getMovesLeft() > 0) &&
-                    (unit.getPath() != null) &&
+                    (unit.getDestination() != null) &&
                     !(unit.getLocation() instanceof WorkLocation) &&
                     unit.getTile() != null);
         }

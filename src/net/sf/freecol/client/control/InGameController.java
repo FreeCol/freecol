@@ -29,6 +29,7 @@ import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.GoalDecider;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
@@ -307,135 +308,148 @@ public final class InGameController implements NetworkConstants {
      * @param unit The unit for which to select a destination.
      */
     public void selectDestination(Unit unit) {
-        Player player = freeColClient.getMyPlayer();
+        final Player player = freeColClient.getMyPlayer();
         Map map = freeColClient.getGame().getMap();
-        boolean naval = unit.isNaval();
-        Iterator colonyIterator = player.getColonyIterator();
-        ArrayList destinations = new ArrayList();
-        if (naval) {
-            destinations.add(player.getEurope());
-        }
-        while (colonyIterator.hasNext()) {
-            Colony colony = (Colony) colonyIterator.next();
-            if (naval && colony.isLandLocked()) {
-                continue;
-            } else if (unit.getTile() == colony.getTile()) {
-                continue;
+        
+        final ArrayList destinations = new ArrayList();        
+        if (unit.isNaval() && unit.getOwner().canMoveToEurope()) {
+            PathNode path = map.findPathToEurope(unit, unit.getTile());
+            if (path != null) {
+                int turns = path.getTotalTurns();
+                destinations.add(new ChoiceItem(player.getEurope() + " (" + turns + ")", player.getEurope()));
             }
-            // TODO: check if unit can really reach colony
-            destinations.add(colony);
         }
+        
+        // Search for destinations we can reach:
+        map.search(unit, new GoalDecider() {
+            public PathNode getGoal() {
+                return null;
+            }            
+            public boolean check(Unit u, PathNode p) {
+               if (p.getTile().getSettlement() != null
+                       && p.getTile().getSettlement().getOwner() == player) {
+                   Settlement s = p.getTile().getSettlement();
+                   int turns = p.getTurns();
+                   destinations.add(new ChoiceItem(s.toString() + " (" + turns + ")", s));
+               }
+               return false;
+            }
+            public boolean hasSubGoals() {
+                return false;
+            }
+        }, Integer.MAX_VALUE);
 
         Canvas canvas = freeColClient.getCanvas();
-        Object destination = canvas.showChoiceDialog(Messages.message("selectDestination.text"),
+        ChoiceItem choice = (ChoiceItem) canvas.showChoiceDialog(Messages.message("selectDestination.text"),
                                                      Messages.message("selectDestination.cancel"),
                                                      destinations.toArray());
-
-        unit.setDestination((Location) destination);
-        if (destination == null) {
+        if (choice == null) {
             // user aborted
             return;
-        } else if (destination instanceof Europe) {
-            PathNode path = map.findPathToEurope(unit, unit.getTile());
-            if (path == null) {
-                canvas.showInformationMessage("selectDestination.failed",
-                                              new String [][] {{"%destination%",
-                                                                ((Europe) destination).toString()}});
-            } else {
-                moveAlongPath(path);
-            }
-        } else if (destination instanceof Colony) {
-            PathNode path = map.findPath(unit, unit.getTile(), ((Colony) destination).getTile());
-            if (path == null) {
-                canvas.showInformationMessage("selectDestination.failed",
-                                              new String [][] {{"%destination%",
-                                                                ((Colony) destination).getName()}});
-            } else {
-                moveAlongPath(path);
-            }
-        } else {
-            throw new IllegalArgumentException("Unknown type of destination");
         }
-    }
-
-    /**
-     * Moves the active unit along a given path. The path may be the
-     * result of a unit drag or of selecting a destination.
-     *
-     * @param path The path to follow.
-     */
-    public void moveAlongPath(PathNode path) {
-        Unit unit = freeColClient.getGUI().getActiveUnit();
-
-        if (unit != null && path != null) {
-            unit.setPath(path);
-            // only for the client
-            unit.setState(Unit.GOING_TO);
-            unit.setStateToAllChildren(Unit.SENTRY);
-            moveAlongPath(unit);
-        } // else: nothing: There is no active unit that can be moved.
-    }
         
+        Location destination = (Location) choice.getObject();
+        setDestination(unit, destination);
+        
+        moveToDestination(unit);
+    }
 
     /**
-     * Moves the given unit along the unit's path.
+     * Sets the destination of the given unit
+     * 
+     * @param unit The <code>Unit</code>.
+     * @param destination The <code>Location</code>.
+     * @see Unit#setDestination(Location)
+     */
+    public void setDestination(Unit unit, Location destination) {
+        Element setDestinationElement = Message.createNewRootElement("setDestination");        
+        setDestinationElement.setAttribute("unit", unit.getID());
+        if (destination != null) {
+            setDestinationElement.setAttribute("destination", destination.getID());    
+        }
+        
+        unit.setDestination(destination);        
+
+        freeColClient.getClient().sendAndWait(setDestinationElement);
+    }
+    
+    /**
+     * Moves the given unit towards the destination given by
+     * {@link Unit#getDestination()}.
      *
      * @param unit The unit to move.
      */
-    public void moveAlongPath(Unit unit) {
-        Map map = freeColClient.getGame().getMap();
-        PathNode path = unit.getPath();
-        boolean active = false;
-        while (unit.getMovesLeft() >= 0) {
-            if (path == null) {
-                if (unit.getDestination() instanceof Europe) {
-                    unit.setDestination(null);
-                    unit.setPath(null);
+    public void moveToDestination(Unit unit) {
+        final Canvas canvas = freeColClient.getCanvas();
+        final Map map = freeColClient.getGame().getMap();
+        final Location destination = unit.getDestination();
+
+        PathNode path;
+        if (destination instanceof Europe) {
+            path = map.findPathToEurope(unit, unit.getTile());
+        } else {
+            path = map.findPath(unit, unit.getTile(), destination.getTile());
+        }
+        
+        if (path == null) {
+            canvas.showInformationMessage("selectDestination.failed",
+                                          new String [][] {{"%destination%",
+                                                            ((Location) destination).toString()}});
+            setDestination(unit, null);
+            return;
+        }   
+        
+        while (path != null) {
+            int mt = unit.getMoveType(path.getDirection());
+            switch (mt) {
+            case Unit.MOVE:                    
+                reallyMove(unit, path.getDirection());
+                break;
+            case Unit.EXPLORE_LOST_CITY_RUMOUR:
+                exploreLostCityRumour(unit, path.getDirection());
+                break;
+            case Unit.MOVE_HIGH_SEAS:
+                if (destination instanceof Europe) {
                     moveToEurope(unit);
+                    path = null;
+                } else if (path == path.getLastNode()){
+                    move(unit, path.getDirection());
+                    path = null;
                 } else {
-                    active = true;
+                    reallyMove(unit, path.getDirection());    
                 }
                 break;
-            }                
-            int direction = path.getDirection();
-            Tile target = map.getNeighbourOrNull(direction, unit.getTile());
-            int moveCost = unit.getMoveCost(target);
-            if (moveCost > unit.getMovesLeft()) {
-                // we can't go there now, but we don't want to wake up
-                unit.setMovesLeft(0);
-                logger.info("Setting moves to zero.");
+            case Unit.DISEMBARK:
+                disembark(unit, path.getDirection());
+                path = null;
                 break;
+            default:
+                Tile target = map.getNeighbourOrNull(path.getDirection(), unit.getTile());
+                int moveCost = unit.getMoveCost(target);                
+                if (moveCost > unit.getMovesLeft()
+                        && (target.getFirstUnit() == null
+                                || target.getFirstUnit().getOwner() == unit.getOwner())
+                        && (target.getSettlement() == null
+                                || target.getSettlement().getOwner() == unit.getOwner())) {
+                    // we can't go there now, but we don't want to wake up        
+                    unit.setMovesLeft(0);
+                    nextActiveUnit();
+                    return;
+                } else {           
+                    setDestination(unit, null);
+                    freeColClient.getGUI().setActiveUnit(unit);
+                    return;
+                }
             }
-
-            int moveType = unit.getMoveType(target);
-            if (moveType == Unit.MOVE ||
-                moveType == Unit.MOVE_HIGH_SEAS) {
-                reallyMove(unit, direction);
+            if (path != null) {
                 path = path.next;
-                freeColClient.getCanvas().refresh();
-            } else {
-                // something has got in our way
-                logger.info("Aborting goto: move type was " + moveType);
-                active = true;
-                break;
             }
         }
-        unit.setPath(path);
-        freeColClient.getActionManager().update();
-        freeColClient.getCanvas().updateJMenuBar();
-
-        if (active) {
-            // only for the client
-            unit.setState(Unit.ACTIVE);
-            unit.setPath(null);
-            unit.setDestination(null);
+        
+        setDestination(unit, null);
+        
+        if (unit.getMovesLeft() > 0) {
             freeColClient.getGUI().setActiveUnit(unit);
-        } else {
-            // only for the client
-            if (path != null) {
-                unit.setState(Unit.GOING_TO);
-            }
-            nextActiveUnit();
         }
     }
 
@@ -1404,7 +1418,6 @@ public final class InGameController implements NetworkConstants {
         }
         // affect client only
         unit.setDestination(null);
-        unit.setPath(null);
         changeState(unit, Unit.ACTIVE);
     }
 
@@ -1983,7 +1996,7 @@ public final class InGameController implements NetworkConstants {
             // no more active units, so we can move the others
             nextActiveUnit = myPlayer.getNextGoingToUnit();
             if (nextActiveUnit != null) {
-                moveAlongPath(nextActiveUnit);
+                moveToDestination(nextActiveUnit);
             } else if (tile != null) {
                 Position p = tile.getPosition();
                 if (p != null) {
