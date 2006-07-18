@@ -33,7 +33,7 @@ public final class ReportForeignAffairPanel extends ReportPanel implements Actio
      */
     public void initialize() {
         Player player = parent.getClient().getMyPlayer();
-        Iterator opponents = parent.getClient().getFreeColServer().getGame().getEuropeanPlayers().iterator();
+        Iterator opponents = parent.getClient().getGame().getEuropeanPlayers().iterator();
         // Display Panel
         reportPanel.removeAll();
         reportPanel.setLayout(new GridLayout(5, 5));
@@ -71,6 +71,7 @@ public final class ReportForeignAffairPanel extends ReportPanel implements Actio
         String report = "<html><p align=center><b>" +
                         opponent.getName() + "'s " +
                         opponent.getNationAsString() + "</b>";
+        /** We need to get this information from the server:
         int rebels = 0;
         int tories = 0;
         Iterator colonies = opponent.getColonyIterator();
@@ -85,6 +86,7 @@ public final class ReportForeignAffairPanel extends ReportPanel implements Actio
         if (player.hasFather(FoundingFather.JAN_DE_WITT)) {
           // Foreign Affair Reports become more revealing
         }
+        */
         report += "</html>";
         JLabel label;
         label = new JLabel(report);

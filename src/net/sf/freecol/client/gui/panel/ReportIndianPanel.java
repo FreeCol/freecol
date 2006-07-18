@@ -36,7 +36,7 @@ public final class ReportIndianPanel extends ReportPanel implements ActionListen
      */
     public void initialize() {
         Player player = parent.getClient().getMyPlayer();
-        Iterator opponents = parent.getClient().getFreeColServer().getGame().getPlayers().iterator();
+        Iterator opponents = parent.getClient().getGame().getPlayers().iterator();
         // Display Panel
         reportPanel.removeAll();
         reportPanel.setLayout(new GridLayout(8, 1));
@@ -67,7 +67,7 @@ public final class ReportIndianPanel extends ReportPanel implements ActionListen
             settlementCount++;
             colonies.next();
         }
-        report += "<p>" + settlementCount + " camps";
+        report += "<p>" + settlementCount + " known camps";
         String tensionString = opponent.getTension(player).toString();
         report += "<p>" + Messages.message("tension") + ": " + tensionString;
         report += "</html>";
