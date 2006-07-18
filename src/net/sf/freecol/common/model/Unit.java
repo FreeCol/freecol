@@ -1917,7 +1917,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             }
         }
 
-        name += getName(getType());
+        name += getOwner().getNationAsString() + " " + getName(getType());
 
         if (isArmed() && isMounted()) {
             if (getType() == KINGS_REGULAR) {
@@ -1930,7 +1930,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 name = Messages.message("model.unit.veteranDragoon");
                 addP = false;
             } else if (getType() == BRAVE) {
-                name = Messages.message("model.unit.indianDragoon");
+                name = getOwner().getNationAsString() + " " + Messages.message("model.unit.indianDragoon");
                 addP = false;
             }
         }
