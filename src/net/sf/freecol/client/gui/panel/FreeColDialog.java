@@ -751,15 +751,8 @@ public class FreeColDialog extends FreeColPanel {
     * @return The <code>FreeColDialog</code>.
     */
     public static FreeColDialog createLoadDialog(File directory, FileFilter[] fileFilters) {
-        String dir = System.getProperty("user.home");
-        String fileSeparator = System.getProperty("file.separator");
-        if (!dir.endsWith(fileSeparator)) {
-            dir += fileSeparator;
-        }
-        dir += ".freecol" + fileSeparator + "save";
-
         final FreeColDialog loadDialog = new FreeColDialog();
-        final JFileChooser fileChooser = new JFileChooser(dir);
+        final JFileChooser fileChooser = new JFileChooser(directory);
 
         fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
         if (fileFilters.length > 0) {
@@ -800,15 +793,8 @@ public class FreeColDialog extends FreeColPanel {
     * @return The <code>FreeColDialog</code>.
     */
     public static FreeColDialog createSaveDialog(File directory, final String standardName, FileFilter[] fileFilters) {
-        String dir = System.getProperty("user.home");
-        String fileSeparator = System.getProperty("file.separator");
-        if (!dir.endsWith(fileSeparator)) {
-            dir += fileSeparator;
-        }
-        dir += ".freecol" + fileSeparator + "save";
-
         final FreeColDialog saveDialog = new FreeColDialog();
-        final JFileChooser fileChooser = new JFileChooser(dir);
+        final JFileChooser fileChooser = new JFileChooser(directory);
 
         fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
         if (fileFilters.length > 0) {
