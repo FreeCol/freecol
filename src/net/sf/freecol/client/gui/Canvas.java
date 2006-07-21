@@ -1655,6 +1655,7 @@ public final class Canvas extends JLayeredPane {
         //       of GUI::inGame.)
         //       If GUI thinks we're still in the game then log an error because at this
         //       point the GUI should have been informed.
+        setEnabled(false);
         closeMenus();
         removeInGameComponents();
         showMainPanel();

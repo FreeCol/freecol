@@ -80,7 +80,7 @@ public abstract class InputHandler implements MessageHandler {
 
         logger.info("Disconnection by: " + connection + ((player != null) ? " (" + player.getName() + ") " : ""));
 
-        if (player == null || player.isConnected()) {
+        if (player != null && player.isConnected()) {
             logout(connection, null);
         }
 

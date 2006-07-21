@@ -239,8 +239,8 @@ public final class ConnectController {
         String host = freeColClient.getClient().getHost();
         int port = freeColClient.getClient().getPort();
 
-        freeColClient.getCanvas().removeInGameComponents();
         logout(true);
+        freeColClient.getCanvas().removeInGameComponents();
 
         login(username, host, port);
     }
@@ -347,7 +347,7 @@ public final class ConnectController {
             Element logoutMessage = Message.createNewRootElement("logout");
             logoutMessage.setAttribute("reason", "User has quit the client.");
 
-            freeColClient.getClient().send(logoutMessage);
+            freeColClient.getClient().sendAndWait(logoutMessage);
         }
 
         try {
@@ -379,13 +379,12 @@ public final class ConnectController {
     * For example: if the server kicked us out then we don't need to confirm with a logout
     * message.
     */
-    public void quitGame(boolean bStopServer, boolean notifyServer) {      
-        if (bStopServer) {
-            final FreeColServer server = freeColClient.getFreeColServer();
-            if (server != null) {
-                server.getController().shutdown();
-                freeColClient.setFreeColServer(null);
-            }
+    public void quitGame(boolean bStopServer, boolean notifyServer) {
+        final FreeColServer server = freeColClient.getFreeColServer();
+        if (bStopServer && server != null) {            
+            server.getController().shutdown();
+            freeColClient.setFreeColServer(null);
+
             freeColClient.getGUI().setInGame(false);
             freeColClient.setGame(null);
             freeColClient.setMyPlayer(null);
@@ -419,42 +418,43 @@ public final class ConnectController {
     * @return A list of available {@link Player#getUsername usernames}.
     */
     private List getVacantPlayers(String host, int port) {
-        Client client = freeColClient.getClient();
         Canvas canvas = freeColClient.getCanvas();
 
-        if (client != null) {
-            client.disconnect();
-        }
-
+        Connection mc;
         try {
-            client = new Client(host, port, freeColClient.getPreGameInputHandler());
-        } catch (ConnectException e) {
-            canvas.errorMessage("server.couldNotConnect");
-            return null;
+            mc = new Connection(host, port, null);
         } catch (IOException e) {
-            canvas.errorMessage("server.couldNotConnect");
-            return null;
-        }
-
-        freeColClient.setClient(client);
-
-        Element element = Message.createNewRootElement("getVacantPlayers");
-
-        Element reply = client.ask(element);
-        if (reply == null) {
-            logger.warning("The server did not return a list.");
-            return null;
-        }
-        if (!reply.getTagName().equals("vacantPlayers")) {
-            logger.warning("The reply has an unknown type: " + reply.getTagName());
+            logger.warning("Could not connect to server.");
             return null;
         }
 
         List items = new ArrayList();
-        NodeList nl = reply.getChildNodes();
-        for (int i=0; i<nl.getLength(); i++) {
-            items.add(((Element) nl.item(i)).getAttribute("username"));
+        Element element = Message.createNewRootElement("getVacantPlayers");
+        try {
+            Element reply = mc.ask(element);
+            if (reply == null) {
+                logger.warning("The server did not return a list.");
+                return null;
+            }
+            if (!reply.getTagName().equals("vacantPlayers")) {
+                logger.warning("The reply has an unknown type: " + reply.getTagName());
+                return null;
+            }
+                        
+            NodeList nl = reply.getChildNodes();
+            for (int i=0; i<nl.getLength(); i++) {
+                items.add(((Element) nl.item(i)).getAttribute("username"));
+            }
+        } catch (IOException e) {
+            logger.warning("Could not send message to server.");
+        } finally {
+            try {
+                mc.close();
+            } catch (IOException e) {
+                logger.warning("Could not close connection.");
+            }
         }
+                        
         return items;
     }
 
