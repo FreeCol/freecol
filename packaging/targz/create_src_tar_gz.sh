@@ -20,7 +20,7 @@
 # Location of the freecol CVS directory.
 FREECOL_CVS_DIR=/home/`whoami`/freecol
 # The current FreeCol version
-VERSION="0.4.0"
+VERSION="0.5.0"
 
 
 

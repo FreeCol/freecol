@@ -39,7 +39,7 @@ public final class FreeCol {
 
     public static final  Specification  specification = new Specification();
 
-    private  static final String FREECOL_VERSION = "0.4.1";
+    private  static final String FREECOL_VERSION = "0.5.0";
 
     public static final String  META_SERVER_ADDRESS = "meta.freecol.org";
     public static final int     META_SERVER_PORT = 3540;
@@ -75,16 +75,6 @@ public final class FreeCol {
      * @param args The command-line arguments.
      */
     public static void main(String[] args) {
-        // TODO: The location of the save directory should be determined by the installer.
-        saveDirectory = new File(System.getProperty("user.home"));
-        if (!saveDirectory.exists()) {
-            saveDirectory = new File("save");
-        } else {        
-            saveDirectory = new File(saveDirectory, ".freecol" + FILE_SEP + "save");
-        }        
-        if (!saveDirectory.exists()) {
-            saveDirectory.mkdirs();
-        }
 
         handleArgs(args);
 
@@ -113,8 +103,22 @@ public final class FreeCol {
         } catch (FreeColException e) {
             e.printStackTrace();
         }
+
+
         
-        if (standAloneServer) {            
+        // TODO: The location of the save directory should be determined by the installer.
+        saveDirectory = new File(System.getProperty("user.home"));
+        if (!saveDirectory.exists()) {
+            saveDirectory = new File("save");
+        } else {        
+            saveDirectory = new File(saveDirectory, "freecol" + FILE_SEP + "save");
+        }
+        
+        if (!saveDirectory.exists()) {
+            saveDirectory.mkdirs();
+        }
+
+        if (standAloneServer) {
             logger.info("Starting stand-alone server.");
             try {
                 final FreeColServer freeColServer = new FreeColServer(true, false, serverPort, serverName);
@@ -307,14 +311,8 @@ public final class FreeCol {
                 if (i < args.length) {
                     savegameFile = new File(args[i]);
                     if (!savegameFile.exists() || !savegameFile.isFile()) {
-                        /* The savegame file could not be found. Trying to
-                         * locate the file in the savegame directory:
-                         */
-                        savegameFile = new File(saveDirectory, args[i]);
-                        if (!savegameFile.exists() || !savegameFile.isFile()) {
-                            System.out.println("The given savegame file could not be found: " + args[i]);
-                            System.exit(1);
-                        }
+                        System.out.println("The given savegame file could not be found: " + args[i]);
+                        System.exit(1);
                     }
                 } else {
                     printUsage();
