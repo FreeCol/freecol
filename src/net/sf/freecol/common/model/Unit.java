@@ -1910,14 +1910,15 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         }
 
         if (getType() == BRAVE) {
+            name = getOwner().getNationAsString() + " ";
             if (isArmed() && !isMounted()) {
-                name = Messages.message("model.unit.armed") + " ";
+                name += Messages.message("model.unit.armed") + " ";
             } else if (isMounted()) {
-                name = Messages.message("model.unit.mounted") + " ";
-            }
+                name += Messages.message("model.unit.mounted") + " ";
+            }            
         }
 
-        name += getOwner().getNationAsString() + " " + getName(getType());
+        name += getName(getType());
 
         if (isArmed() && isMounted()) {
             if (getType() == KINGS_REGULAR) {
