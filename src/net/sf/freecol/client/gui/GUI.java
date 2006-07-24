@@ -653,6 +653,10 @@ public final class GUI {
     private void positionMap() {
         Game gameData = freeColClient.getGame();
 
+        if (focus == null) {
+            return;
+        }
+        
         int x = focus.getX(),
             y = focus.getY();
         int leftColumns = getLeftColumns(),
@@ -1872,7 +1876,8 @@ public final class GUI {
      */
     public boolean onScreen(int x, int y) {
         if (bottomRow < 0) {
-            return true; // complete repaint about to happen
+            positionMap();
+            return y - 2 > topRow && y + 4 < bottomRow && x - 1 > leftColumn && x + 1 < rightColumn;
         } else {
             return y - 2 > topRow && y + 4 < bottomRow && x - 1 > leftColumn && x + 1 < rightColumn;
         }
