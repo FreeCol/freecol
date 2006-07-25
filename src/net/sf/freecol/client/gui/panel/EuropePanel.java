@@ -215,9 +215,9 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         docksLabel.setSize(200, 20);
         cargoLabel.setSize(410, 20);
 
-        int totalHeight = toAmericaScroll.getHeight() + docksScroll.getHeight() + marketScroll.getHeight() + 2 * SPACE;
-        int spaceTop = (getHeight() - totalHeight) / 2;
-        int spaceLeft = (getWidth() - marketScroll.getWidth()) / 2;
+        int totalHeight = toEuropeScroll.getHeight() + docksScroll.getHeight() + marketScroll.getHeight() + 4 * SPACE;
+        int spaceTop = Math.max(0, (getHeight() - totalHeight) / 2);
+        int spaceLeft = Math.max(0, (getWidth() - marketScroll.getWidth()) / 2);
         int spaceRight = spaceLeft;
         int spaceBottom = spaceTop;
         
@@ -229,7 +229,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         inPortLabel.setLocation(spaceLeft, inPortScroll.getY() - 20);   
         docksScroll.setLocation(getWidth() - spaceRight - docksScroll.getWidth(), spaceTop + toEuropeScroll.getHeight() + SPACE);
         docksLabel.setLocation(getWidth() - spaceRight - docksScroll.getWidth(), docksScroll.getY() - 20);
-        marketScroll.setLocation(spaceLeft, getHeight() - spaceBottom - marketScroll.getHeight());
+        marketScroll.setLocation(spaceLeft, docksScroll.getY() + docksScroll.getHeight() + SPACE);
         cargoScroll.setLocation(spaceLeft, spaceTop + toAmericaScroll.getHeight() + inPortScroll.getHeight() + 2 * SPACE);
         cargoLabel.setLocation(spaceLeft, cargoScroll.getY() - 20);
         
