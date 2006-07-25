@@ -11,6 +11,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.MediaTracker;
+import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -891,6 +892,42 @@ public final class GUI {
         /*
         PART 4
         ======
+        Display drag-and-drop path
+        */
+
+        if (dragPath != null) {
+            PathNode temp = dragPath;
+            while (temp != null) {
+                Point p = getTilePosition(temp.getTile());
+                if (p != null) {
+                    Tile tile = temp.getTile();
+                    Image image;
+                    if (temp.getTurns() == 0) {
+                        g.setColor(Color.GREEN);
+                        image = (Image) UIManager.get("path.image");
+                    } else {
+                        g.setColor(Color.RED);
+                        image = (Image) UIManager.get("path.nextTurn.image");
+                    }                
+                    if (image != null) {
+                        g.drawImage(image, p.x + (tileWidth - image.getWidth(null))/2, p.y + (tileHeight - image.getHeight(null))/2, null);
+                    } else {
+                        g.fillOval(p.x + tileWidth/2, p.y + tileHeight/2, 10, 10);
+                        g.setColor(Color.BLACK);
+                        g.drawOval(p.x + tileWidth/2, p.y + tileHeight/2, 10, 10);
+                    }                
+                    if (temp.getTurns() > 0) {
+                        BufferedImage stringImage = createStringImage(g, Integer.toString(temp.getTurns()), Color.BLACK, tileWidth, 12);
+                        g.drawImage(stringImage, p.x + (tileWidth - stringImage.getWidth(null))/2, p.y + (tileHeight - stringImage.getHeight()) / 2, null);
+                    }
+                }                    
+                temp = temp.next;
+            }
+        }
+
+        /*
+        PART 5
+        ======
         Display the messages.
         */
 
@@ -1308,7 +1345,7 @@ public final class GUI {
      *      get the <code>ColonyTile</code> for the given <code>Tile</code>.
      */
     public void displayColonyTile(Graphics2D g, Map map, Tile tile, int x, int y, Colony colony) {
-        displayTile(g, map, tile, x, y, false, false);
+        displayTile(g, map, tile, x, y, false);
         if (tile.getOwner() != null && tile.getOwner() != colony) {
             g.drawImage(lib.getMiscImage(ImageLibrary.TILE_TAKEN), x, y, null);
         }
@@ -1340,7 +1377,7 @@ public final class GUI {
      * (in pixels).
      */
     public void displayTile(Graphics2D g, Map map, Tile tile, int x, int y) {
-        displayTile(g, map, tile, x, y, true, true);
+        displayTile(g, map, tile, x, y, true);
     }
 
 
@@ -1358,9 +1395,8 @@ public final class GUI {
      * (in pixels).
      * @param drawUnexploredBorders If true; draws border between explored and
      *        unexplored terrain.
-     * @param displayPath If true; draws the path as given by <code>displayPath</code>.
      */
-    public void displayTile(Graphics2D g, Map map, Tile tile, int x, int y, boolean drawUnexploredBorders, boolean displayPath) {
+    public void displayTile(Graphics2D g, Map map, Tile tile, int x, int y, boolean drawUnexploredBorders) {
         g.drawImage(lib.getTerrainImage(tile.getType(), tile.getX(), tile.getY()), x, y, null);
 
         Map.Position pos = new Map.Position(tile.getX(), tile.getY());
@@ -1623,37 +1659,6 @@ public final class GUI {
         if (displayColonyValue && tile.getType() != Tile.UNEXPLORED && tile.isLand()) {
             String posString = Integer.toString(tile.getColonyValue());
             g.drawString(posString, x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(posString))/2, y + (lib.getTerrainImageHeight(tile.getType()) - g.getFontMetrics().getAscent())/2);
-        }
-
-        if (displayPath && dragPath != null) {
-            PathNode temp = dragPath;
-            while (temp != null) {
-                if (temp.getTile() == tile) {
-                    Image image;
-                    if (temp.getTurns() == 0) {
-                        g.setColor(Color.GREEN);
-                        image = (Image) UIManager.get("path.image");
-                    } else {
-                        g.setColor(Color.RED);
-                        image = (Image) UIManager.get("path.nextTurn.image");
-                    }
-
-                    if (image != null) {
-                        g.drawImage(image, x + (lib.getTerrainImageWidth(tile.getType()) - image.getWidth(null))/2, y + (lib.getTerrainImageHeight(tile.getType()) - image.getHeight(null))/2, null);
-                    } else {
-                        g.fillOval(x + tileWidth/2, y + tileHeight/2, 10, 10);
-                        g.setColor(Color.BLACK);
-                        g.drawOval(x + tileWidth/2, y + tileHeight/2, 10, 10);
-                    }
-
-                    if (temp.getTurns() > 0) {
-                        BufferedImage stringImage = createStringImage(g, Integer.toString(temp.getTurns()), Color.BLACK, tileWidth, 12);
-                        g.drawImage(stringImage, x + (tileWidth - stringImage.getWidth(null))/2, y + (tileHeight - stringImage.getHeight()) / 2 + 1, null);
-                    }
-                }
-
-                temp = temp.next;
-            }
         }
     }
 
@@ -2468,7 +2473,31 @@ public final class GUI {
         return lib;
     }
 
-
+    /**
+     * Gets the position of the given <code>Tile</code>
+     * on the drawn map.
+     * 
+     * @param t The <code>Tile</code>.
+     * @return The position of the given <code>Tile</code>,
+     *      or <code>null</code> if the <code>Tile</code> is
+     *      not drawn on the mapboard.
+     */
+    public Point getTilePosition(Tile t) {
+        if (t.getY() >= topRow 
+                && t.getY() <= bottomRow 
+                && t.getX() >= leftColumn 
+                && t.getX() <= rightColumn) {
+            int x = ((t.getX() - leftColumn) * tileWidth) + leftColumnX;
+            int y = ((t.getY() - topRow) * tileHeight / 2) + topRowY;
+            if ((t.getY() % 2) != 0) {     
+                x += tileWidth / 2;
+            }
+            return new Point(x, y);
+        } else {
+            return null;
+        }
+    }
+    
     /**
      * Calculate the bounds of the rectangle containing a Tile on the screen,
      * and return it. If the Tile is not on-screen a maximal rectangle is returned.
