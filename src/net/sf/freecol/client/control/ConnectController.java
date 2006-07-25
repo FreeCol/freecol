@@ -235,13 +235,12 @@ public final class ConnectController {
     * Reconnects to the server.
     */
     public void reconnect() {
-        String username = freeColClient.getMyPlayer().getUsername();
-        String host = freeColClient.getClient().getHost();
-        int port = freeColClient.getClient().getPort();
+        final String username = freeColClient.getMyPlayer().getUsername();
+        final String host = freeColClient.getClient().getHost();
+        final int port = freeColClient.getClient().getPort();
 
-        logout(true);
         freeColClient.getCanvas().removeInGameComponents();
-
+        logout(true);        
         login(username, host, port);
     }
 

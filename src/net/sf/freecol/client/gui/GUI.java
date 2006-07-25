@@ -1629,15 +1629,27 @@ public final class GUI {
             PathNode temp = dragPath;
             while (temp != null) {
                 if (temp.getTile() == tile) {
+                    Image image;
                     if (temp.getTurns() == 0) {
                         g.setColor(Color.GREEN);
+                        image = (Image) UIManager.get("path.image");
                     } else {
                         g.setColor(Color.RED);
+                        image = (Image) UIManager.get("path.nextTurn.image");
                     }
 
-                    g.fillOval(x + tileWidth/2, y + tileHeight/2, 10, 10);
-                    g.setColor(Color.BLACK);
-                    g.drawOval(x + tileWidth/2, y + tileHeight/2, 10, 10);
+                    if (image != null) {
+                        g.drawImage(image, x + (lib.getTerrainImageWidth(tile.getType()) - image.getWidth(null))/2, y + (lib.getTerrainImageHeight(tile.getType()) - image.getHeight(null))/2, null);
+                    } else {
+                        g.fillOval(x + tileWidth/2, y + tileHeight/2, 10, 10);
+                        g.setColor(Color.BLACK);
+                        g.drawOval(x + tileWidth/2, y + tileHeight/2, 10, 10);
+                    }
+
+                    if (temp.getTurns() > 0) {
+                        BufferedImage stringImage = createStringImage(g, Integer.toString(temp.getTurns()), Color.BLACK, tileWidth, 12);
+                        g.drawImage(stringImage, x + (tileWidth - stringImage.getWidth(null))/2, y + (tileHeight - stringImage.getHeight()) / 2 + 1, null);
+                    }
                 }
 
                 temp = temp.next;

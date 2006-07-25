@@ -103,7 +103,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         this.inGameController = inGameController;
 
         setFocusCycleRoot(true);
-        setSize(parent.getSize());
+        setSize(parent.getWidth(), parent.getHeight() - parent.getMenuBarHeight());
 
         exitButton = new JButton("Close");
         
@@ -268,10 +268,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         add(docksLabel);
         add(cargoLabel);
 
-        try {
-            BevelBorder border = new BevelBorder(BevelBorder.RAISED);
-            setBorder(border);
-        } catch(Exception e) {}        
+        setBorder(null);
 
         selectedUnit = null;
         

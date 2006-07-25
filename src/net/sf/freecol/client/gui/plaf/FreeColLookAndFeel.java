@@ -220,6 +220,9 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
                 {"MiniMap.skin", "minimap-skin.png"},
                 {"InfoPanel.skin", "infopanel-skin.png"},
                 {"Declaration.image", "doi.png"},
+                {"path.image", "path.png"},
+                {"path.nextTurn.image", "path-nextturn.png"},
+                {"menuborder.image", "menuborder.png"},
             };
 
             /*
