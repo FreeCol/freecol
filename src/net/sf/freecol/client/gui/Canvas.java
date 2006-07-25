@@ -332,8 +332,7 @@ public final class Canvas extends JLayeredPane {
 
         if (game != null && player != null) {
             startGamePanel.initialize(singlePlayerMode);
-            startGamePanel.setLocation(getWidth() / 2 - startGamePanel.getWidth() / 2, getHeight() / 2 - startGamePanel.getHeight() / 2);
-            add(startGamePanel, START_GAME_LAYER);
+            addCentered(startGamePanel, START_GAME_LAYER);
             startGamePanel.requestFocus();
         } else {
             logger.warning("Tried to open 'StartGamePanel' without having 'game' and/or 'player' set.");
@@ -353,9 +352,8 @@ public final class Canvas extends JLayeredPane {
     public void showServerListPanel(String username, ArrayList serverList) {
         closeMenus();
 
-        serverListPanel.initialize(username, serverList);
-        serverListPanel.setLocation(getWidth() / 2 - serverListPanel.getWidth() / 2, getHeight() / 2 - serverListPanel.getHeight() / 2);
-        add(serverListPanel, SERVER_LIST_LAYER);
+        serverListPanel.initialize(username, serverList);        
+        addCentered(serverListPanel, SERVER_LIST_LAYER);
         serverListPanel.requestFocus();
     }
 
@@ -366,9 +364,8 @@ public final class Canvas extends JLayeredPane {
     */
     public void showVictoryPanel() {
         closeMenus();
-        victoryPanel.setLocation(getWidth() / 2 - victoryPanel.getWidth() / 2, getHeight() / 2 - victoryPanel.getHeight() / 2);
         setEnabled(false);
-        add(victoryPanel);
+        addCentered(victoryPanel);
         victoryPanel.requestFocus();
     }
 
@@ -379,9 +376,8 @@ public final class Canvas extends JLayeredPane {
     */
     public void showChatPanel() {
         closeMenus();
-        chatPanel.setLocation(getWidth() / 2 - chatPanel.getWidth() / 2, getHeight() / 2 - chatPanel.getHeight() / 2);
         setEnabled(false);
-        add(chatPanel);
+        addCentered(chatPanel);
         chatPanel.requestFocus();
     }
 
@@ -392,8 +388,7 @@ public final class Canvas extends JLayeredPane {
     */
     public void showNewGamePanel() {
         closeMenus();
-        newPanel.setLocation(getWidth() / 2 - newPanel.getWidth() / 2, getHeight() / 2 - newPanel.getHeight() / 2);
-        add(newPanel);
+        addCentered(newPanel);
         newPanel.requestFocus();
     }
     
@@ -450,9 +445,7 @@ public final class Canvas extends JLayeredPane {
                     (source instanceof Colony || source instanceof WorkLocation) && !colonyPanel.isShowing()) {
 
                 FreeColDialog confirmDialog = FreeColDialog.createConfirmDialog(message, okText, cancelText);
-                confirmDialog.setLocation(getWidth() / 2 - confirmDialog.getWidth() / 2,
-                                          getHeight() / 2 - confirmDialog.getHeight() / 2);
-                add(confirmDialog, MODEL_MESSAGE_LAYER);
+                addCentered(confirmDialog, MODEL_MESSAGE_LAYER);
                 confirmDialog.requestFocus();
 
                 if (!confirmDialog.getResponseBoolean()) {
@@ -470,8 +463,7 @@ public final class Canvas extends JLayeredPane {
                 }
             } else {
                 FreeColDialog informationDialog = FreeColDialog.createInformationDialog(message, okText);
-                informationDialog.setLocation(getWidth() / 2 - informationDialog.getWidth() / 2, getHeight() / 2 - informationDialog.getHeight() / 2);
-                add(informationDialog, MODEL_MESSAGE_LAYER);
+                addCentered(informationDialog, MODEL_MESSAGE_LAYER);
                 informationDialog.requestFocus();
 
                 informationDialog.getResponse();
@@ -513,9 +505,7 @@ public final class Canvas extends JLayeredPane {
             !colonyPanel.isShowing()) {
 
             FreeColDialog confirmDialog = FreeColDialog.createConfirmDialog(messageText, okText, cancelText);
-            confirmDialog.setLocation(getWidth() / 2 - confirmDialog.getWidth() / 2,
-                                      getHeight() / 2 - confirmDialog.getHeight() / 2);
-            add(confirmDialog, MODEL_MESSAGE_LAYER);
+            addCentered(confirmDialog, MODEL_MESSAGE_LAYER);
             confirmDialog.requestFocus();
 
             if (!confirmDialog.getResponseBoolean()) {
@@ -533,9 +523,7 @@ public final class Canvas extends JLayeredPane {
             }
         } else {
             FreeColDialog informationDialog = FreeColDialog.createInformationDialog(messageText);
-            informationDialog.setLocation(getWidth() / 2 - informationDialog.getWidth() / 2,
-                                          getHeight() / 2 - informationDialog.getHeight() / 2);
-            add(informationDialog, MODEL_MESSAGE_LAYER);
+            addCentered(informationDialog, MODEL_MESSAGE_LAYER);
             informationDialog.requestFocus();
 
             informationDialog.getResponse();
@@ -550,9 +538,7 @@ public final class Canvas extends JLayeredPane {
      * @see DeclarationDialog
      */
      public void showDeclarationDialog() {
-         declarationDialog.setLocation(getWidth() / 2 - declarationDialog.getWidth() / 2,
-                                   getHeight() / 2 - declarationDialog.getHeight() / 2);
-         add(declarationDialog, CONFIRM_LAYER);
+         addCentered(declarationDialog, CONFIRM_LAYER);
          declarationDialog.requestFocus();
 
          declarationDialog.initialize();
@@ -596,9 +582,7 @@ public final class Canvas extends JLayeredPane {
         }
 
         FreeColDialog confirmDialog = FreeColDialog.createConfirmDialog(text, okText, cancelText);
-        confirmDialog.setLocation(getWidth() / 2 - confirmDialog.getWidth() / 2,
-                                  getHeight() / 2 - confirmDialog.getHeight() / 2);
-        add(confirmDialog, CONFIRM_LAYER);
+        addCentered(confirmDialog, CONFIRM_LAYER);
         confirmDialog.requestFocus();
 
         boolean response = confirmDialog.getResponseBoolean();
@@ -641,8 +625,7 @@ public final class Canvas extends JLayeredPane {
     public boolean showGameOptionsDialog() {
         gameOptionsDialog.initialize();
 
-        gameOptionsDialog.setLocation(getWidth() / 2 - gameOptionsDialog.getWidth() / 2, getHeight() / 2 - gameOptionsDialog.getHeight() / 2);
-        add(gameOptionsDialog, GAME_OPTIONS_LAYER);
+        addCentered(gameOptionsDialog, GAME_OPTIONS_LAYER);
         gameOptionsDialog.requestFocus();
 
         boolean r = gameOptionsDialog.getResponseBoolean();
@@ -660,8 +643,7 @@ public final class Canvas extends JLayeredPane {
     public boolean showClientOptionsDialog() {
         clientOptionsDialog.initialize();
 
-        clientOptionsDialog.setLocation(getWidth() / 2 - clientOptionsDialog.getWidth() / 2, getHeight() / 2 - clientOptionsDialog.getHeight() / 2);
-        add(clientOptionsDialog, CLIENT_OPTIONS_LAYER);
+        addCentered(clientOptionsDialog, CLIENT_OPTIONS_LAYER);
         clientOptionsDialog.requestFocus();
 
         boolean r = clientOptionsDialog.getResponseBoolean();
@@ -699,8 +681,7 @@ public final class Canvas extends JLayeredPane {
     */
     public File showLoadDialog(File directory, FileFilter[] fileFilters) {
         FreeColDialog loadDialog = FreeColDialog.createLoadDialog(directory, fileFilters);
-        loadDialog.setLocation(getWidth() / 2 - loadDialog.getWidth() / 2, getHeight() / 2 - loadDialog.getHeight() / 2);
-        add(loadDialog, LOAD_LAYER);
+        addCentered(loadDialog, LOAD_LAYER);
         loadDialog.requestFocus();
 
         File response = (File) loadDialog.getResponse();
@@ -748,8 +729,7 @@ public final class Canvas extends JLayeredPane {
     */
     public File showSaveDialog(File directory, String standardName, FileFilter[] fileFilters) {
         FreeColDialog saveDialog = FreeColDialog.createSaveDialog(directory, standardName, fileFilters);
-        saveDialog.setLocation(getWidth() / 2 - saveDialog.getWidth() / 2, getHeight() / 2 - saveDialog.getHeight() / 2);
-        add(saveDialog, SAVE_LAYER);
+        addCentered(saveDialog, SAVE_LAYER);
         saveDialog.requestFocus();
 
         File response = (File) saveDialog.getResponse();
@@ -773,8 +753,7 @@ public final class Canvas extends JLayeredPane {
     */
     public int showScoutIndianSettlementDialog(IndianSettlement settlement) {
         FreeColDialog scoutDialog = FreeColDialog.createScoutIndianSettlementDialog(settlement, freeColClient.getMyPlayer());
-        scoutDialog.setLocation(getWidth() / 2 - scoutDialog.getWidth() / 2, getHeight() / 2 - scoutDialog.getHeight() / 2);
-        add(scoutDialog, SCOUT_INDIAN_SETTLEMENT_LAYER);
+        addCentered(scoutDialog, SCOUT_INDIAN_SETTLEMENT_LAYER);
         scoutDialog.requestFocus();
 
         int response = scoutDialog.getResponseInt();
@@ -802,8 +781,7 @@ public final class Canvas extends JLayeredPane {
     */
     public List showUseMissionaryDialog(IndianSettlement settlement) {
         FreeColDialog missionaryDialog = FreeColDialog.createUseMissionaryDialog(settlement, freeColClient.getMyPlayer());
-        missionaryDialog.setLocation(getWidth() / 2 - missionaryDialog.getWidth() / 2, getHeight() / 2 - missionaryDialog.getHeight() / 2);
-        add(missionaryDialog, USE_MISSIONARY_LAYER);
+        addCentered(missionaryDialog, USE_MISSIONARY_LAYER);
         missionaryDialog.requestFocus();
 
         Integer response = (Integer)missionaryDialog.getResponse();
@@ -814,8 +792,7 @@ public final class Canvas extends JLayeredPane {
 
         if (response.intValue() == FreeColDialog.MISSIONARY_INCITE_INDIANS) {
             FreeColDialog inciteDialog = FreeColDialog.createInciteDialog(freeColClient.getGame().getEuropeanPlayers(), freeColClient.getMyPlayer());
-            inciteDialog.setLocation(getWidth() / 2 - inciteDialog.getWidth() / 2, getHeight() / 2 - inciteDialog.getHeight() / 2);
-            add(inciteDialog, USE_MISSIONARY_LAYER);
+            addCentered(inciteDialog, USE_MISSIONARY_LAYER);
             inciteDialog.requestFocus();
 
             Player response2 = (Player)inciteDialog.getResponse();
@@ -849,8 +826,7 @@ public final class Canvas extends JLayeredPane {
         message = message.replaceAll("%amount%", String.valueOf(amount));
 
         FreeColDialog confirmDialog = FreeColDialog.createConfirmDialog(message, Messages.message("yes"), Messages.message("no"));
-        confirmDialog.setLocation(getWidth() / 2 - confirmDialog.getWidth() / 2, getHeight() / 2 - confirmDialog.getHeight() / 2);
-        add(confirmDialog, INCITE_LAYER);
+        addCentered(confirmDialog, INCITE_LAYER);
         confirmDialog.requestFocus();
         boolean result = confirmDialog.getResponseBoolean();
         remove(confirmDialog);
@@ -883,8 +859,7 @@ public final class Canvas extends JLayeredPane {
         }
 
         FreeColDialog inputDialog = FreeColDialog.createInputDialog(text, defaultValue, okText, cancelText);
-        inputDialog.setLocation(getWidth() / 2 - inputDialog.getWidth() / 2, getHeight() / 2 - inputDialog.getHeight() / 2);
-        add(inputDialog, INPUT_LAYER);
+        addCentered(inputDialog, INPUT_LAYER);
         inputDialog.requestFocus();
 
         String response = (String) inputDialog.getResponse();
@@ -902,17 +877,16 @@ public final class Canvas extends JLayeredPane {
             }
 
             FreeColDialog informationDialog = FreeColDialog.createInformationDialog(txt, okTxt);
-            informationDialog.setLocation(getWidth() / 2 - informationDialog.getWidth() / 2, getHeight() / 2 - informationDialog.getHeight() / 2);
 
             do {
                 remove(inputDialog);
-                add(informationDialog, INPUT_LAYER);
+                addCentered(informationDialog, INPUT_LAYER);
                 informationDialog.requestFocus();
 
                 informationDialog.getResponse();
                 remove(informationDialog);
 
-                add(inputDialog, INPUT_LAYER);
+                addCentered(inputDialog, INPUT_LAYER);
                 inputDialog.requestFocus();
 
                 response = (String) inputDialog.getResponse();
@@ -967,8 +941,7 @@ public final class Canvas extends JLayeredPane {
         */
 
         FreeColDialog choiceDialog = FreeColDialog.createChoiceDialog(text, cancelText, objects);
-        choiceDialog.setLocation(getWidth() / 2 - choiceDialog.getWidth() / 2, getHeight() / 2 - choiceDialog.getHeight() / 2);
-        add(choiceDialog, CHOICE_LAYER);
+        addCentered(choiceDialog, CHOICE_LAYER);
         choiceDialog.requestFocus();
 
         Object response = choiceDialog.getResponse();
@@ -992,9 +965,7 @@ public final class Canvas extends JLayeredPane {
     */
     public void showStatusPanel(String message) {
         statusPanel.setStatusMessage(message);
-
-        statusPanel.setLocation(getWidth() / 2 - statusPanel.getWidth() / 2, getHeight() / 2 - statusPanel.getHeight() / 2);
-        add(statusPanel, STATUS_LAYER);
+        addCentered(statusPanel, STATUS_LAYER);
     }
     
 
@@ -1013,10 +984,8 @@ public final class Canvas extends JLayeredPane {
      */
     public void showColopediaPanel(int type) {
         colopediaPanel.initialize(type);
-
-        colopediaPanel.setLocation(getWidth() / 2 - colopediaPanel.getWidth() / 2, getHeight() / 2 - colopediaPanel.getHeight() / 2);
         setEnabled(false);
-        add(colopediaPanel, COLOPEDIA_LAYER);
+        addCentered(colopediaPanel, COLOPEDIA_LAYER);
         colopediaPanel.requestFocus();
     }
 
@@ -1046,9 +1015,8 @@ public final class Canvas extends JLayeredPane {
 
         if (reportPanel != null) {
             reportPanel.initialize();
-            reportPanel.setLocation(getWidth() / 2 - reportPanel.getWidth() / 2, getHeight() / 2 - reportPanel.getHeight() / 2);
             setEnabled(false);
-            add(reportPanel, REPORT_LAYER);
+            addCentered(reportPanel, REPORT_LAYER);
             reportPanel.requestFocus();
         }
     }
@@ -1063,8 +1031,7 @@ public final class Canvas extends JLayeredPane {
     public int showChooseFoundingFatherDialog(int[] possibleFoundingFathers) {
         chooseFoundingFatherDialog.initialize(possibleFoundingFathers);
 
-        chooseFoundingFatherDialog.setLocation(getWidth() / 2 - chooseFoundingFatherDialog.getWidth() / 2, getHeight() / 2 - chooseFoundingFatherDialog.getHeight() / 2);
-        add(chooseFoundingFatherDialog, CHOOSE_FOUNDING_FATHER);
+        addCentered(chooseFoundingFatherDialog, CHOOSE_FOUNDING_FATHER);
         setEnabled(false);
         chooseFoundingFatherDialog.requestFocus();
 
@@ -1094,8 +1061,7 @@ public final class Canvas extends JLayeredPane {
     public boolean showEventDialog(int eventID) {
         eventPanel.initialize(eventID);
 
-        eventPanel.setLocation(getWidth() / 2 - eventPanel.getWidth() / 2, getHeight() / 2 - eventPanel.getHeight() / 2);
-        add(eventPanel, EVENT_LAYER);
+        addCentered(eventPanel, EVENT_LAYER);
         setEnabled(false);
         eventPanel.requestFocus();
 
@@ -1146,10 +1112,8 @@ public final class Canvas extends JLayeredPane {
         closeMenus();                                               
 
         colonyPanel.initialize(colony, freeColClient.getGame());
-        colonyPanel.setLocation(getWidth() / 2 - colonyPanel.getWidth() / 2,
-                                getHeight() / 2 - colonyPanel.getHeight() / 2);
         setEnabled(false);
-        add(colonyPanel, COLONY_LAYER);
+        addCentered(colonyPanel, COLONY_LAYER);
 
         colonyPanel.requestFocus();
     }
@@ -1164,14 +1128,8 @@ public final class Canvas extends JLayeredPane {
         closeMenus();
 
         indianSettlementPanel.initialize(settlement);
-        indianSettlementPanel.setLocation(
-                                getWidth() / 2 - indianSettlementPanel.getWidth() / 2,
-                                getHeight() / 2 - indianSettlementPanel.getHeight() / 2);
-
-        add(indianSettlementPanel, INDIAN_SETTLEMENT_LAYER);
-
+        addCentered(indianSettlementPanel, INDIAN_SETTLEMENT_LAYER);
         indianSettlementPanel.requestFocus();
-
         indianSettlementPanel.getResponseBoolean();
 
         remove(indianSettlementPanel);
@@ -1187,13 +1145,8 @@ public final class Canvas extends JLayeredPane {
         closeMenus();
 
         tilePanel.initialize(tile);
-        tilePanel.setLocation(getWidth() / 2 - tilePanel.getWidth() / 2,
-                              getHeight() / 2 - tilePanel.getHeight() / 2);
-
-        add(tilePanel, TILE_LAYER);
-
+        addCentered(tilePanel, TILE_LAYER);
         tilePanel.requestFocus();
-
         tilePanel.getResponseBoolean();
 
         remove(tilePanel);
@@ -1211,15 +1164,9 @@ public final class Canvas extends JLayeredPane {
         closeMenus();
 
         monarchPanel.initialize(action, replace);
-        monarchPanel.setLocation(getWidth() / 2 - monarchPanel.getWidth() / 2,
-                                 getHeight() / 2 - monarchPanel.getHeight() / 2);
-
-        add(monarchPanel, MONARCH_LAYER);
-
+        addCentered(monarchPanel, MONARCH_LAYER);
         monarchPanel.requestFocus();
-
         boolean response = monarchPanel.getResponseBoolean();
-
         remove(monarchPanel);
 
         return response;
@@ -1235,12 +1182,9 @@ public final class Canvas extends JLayeredPane {
     public int showEmigrationPanel() {
         emigrationPanel.initialize(freeColClient.getMyPlayer().getEurope());
 
-        emigrationPanel.setLocation(getWidth() / 2 - emigrationPanel.getWidth() / 2, getHeight() / 2 - emigrationPanel.getHeight() / 2);
-        add(emigrationPanel, EMIGRATION_LAYER);
+        addCentered(emigrationPanel, EMIGRATION_LAYER);
         emigrationPanel.requestFocus();
-
         int response = emigrationPanel.getResponseInt();
-
         remove(emigrationPanel);
 
         return response;
@@ -1313,22 +1257,33 @@ public final class Canvas extends JLayeredPane {
     * @return The component argument.
     */
     public Component add(Component comp) {
-        if ((takeFocusThread != null) && (takeFocusThread.isAlive())) {
-            takeFocusThread.stopWorking();
-        }
-
-        if (comp != statusPanel && !(comp instanceof JMenuItem) && !(comp instanceof FreeColDialog)) {
-            remove(statusPanel, false);
-        }
-
-        Component c = super.add(comp);
-        updateJMenuBar();
-        freeColClient.getActionManager().update();
-
-        return c;
+        add(comp, null);
+        return comp;
     }
 
-
+    /**
+     * Adds a component centered on this Canvas. Removes the statuspanel if visible
+     * (and <code>comp != statusPanel</code>).
+     * @param comp The component to add to this ToEuropePanel.
+     * @return The component argument.
+     */
+    public Component addCentered(Component comp) { 
+        addCentered(comp, null);
+        return comp;
+    }
+    
+    /**
+     * Adds a component centered on this Canvas. Removes the statuspanel if visible
+     * (and <code>comp != statusPanel</code>).
+     * @param comp The component to add to this ToEuropePanel.
+     * @param i The layer to add the component to (see JLayeredPane).
+     */
+    public void addCentered(Component comp, Integer i) { 
+        comp.setLocation(getWidth() / 2 - comp.getWidth() / 2,
+                (getHeight() + getMenuBarHeight()) / 2 - comp.getHeight() / 2);
+        add(comp, i);
+    }
+    
     /**
     * Adds a component to this Canvas. Removes the statuspanel if visible
     * (and <code>comp != statusPanel</code>).
@@ -1344,7 +1299,11 @@ public final class Canvas extends JLayeredPane {
             remove(statusPanel, false);
         }
 
-        super.add(comp, i);
+        if (i == null) {
+            super.add(comp);
+        } else {
+            super.add(comp, i);
+        }
         updateJMenuBar();
         freeColClient.getActionManager().update();
     }
@@ -1486,9 +1445,8 @@ public final class Canvas extends JLayeredPane {
         }
 
         errorPanel.initialize(message);
-        errorPanel.setLocation(getWidth() / 2 - errorPanel.getWidth() / 2, getHeight() / 2 - errorPanel.getHeight() / 2);
         //setEnabled(false);
-        add(errorPanel, ERROR_LAYER);
+        addCentered(errorPanel, ERROR_LAYER);
         errorPanel.requestFocus();
         errorPanel.getResponse();
         closeErrorPanel();
@@ -1532,10 +1490,7 @@ public final class Canvas extends JLayeredPane {
             logger.warning("Missing i18n resource: " + messageId);
         }
         FreeColDialog infoDialog = FreeColDialog.createInformationDialog(text);
-
-        infoDialog.setLocation(getWidth() / 2 - infoDialog.getWidth() / 2,
-                               getHeight() / 2 - infoDialog.getHeight() / 2);
-        add(infoDialog, INFORMATION_LAYER);
+        addCentered(infoDialog, INFORMATION_LAYER);
         infoDialog.requestFocus();
 
         infoDialog.getResponse();
@@ -1620,8 +1575,7 @@ public final class Canvas extends JLayeredPane {
     */
     public void showMainPanel() {
         closeMenus();
-        mainPanel.setLocation(getWidth() / 2 - mainPanel.getWidth() / 2, getHeight() / 2 - mainPanel.getHeight() / 2);
-        add(mainPanel, MAIN_LAYER);
+        addCentered(mainPanel, MAIN_LAYER);
         mainPanel.requestFocus();
     }
 
@@ -1761,8 +1715,7 @@ public final class Canvas extends JLayeredPane {
     *         <i>false</i> otherwise.
     */
     public boolean confirmQuitDialog() {
-        quitDialog.setLocation(getWidth() / 2 - quitDialog.getWidth() / 2, getHeight() / 2 - quitDialog.getHeight() / 2);
-        add(quitDialog, QUIT_LAYER);
+        addCentered(quitDialog, QUIT_LAYER);
         quitDialog.requestFocus();
 
         return quitDialog.getResponseBoolean();
