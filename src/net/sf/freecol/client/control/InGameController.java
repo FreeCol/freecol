@@ -399,6 +399,11 @@ public final class InGameController implements NetworkConstants {
             return;
         }   
         
+        boolean knownEnemyOnLastTile = path != null
+                && path.getLastNode() != null 
+                && path.getLastNode().getTile().getFirstUnit() != null
+                && path.getLastNode().getTile().getFirstUnit().getOwner() != freeColClient.getMyPlayer();
+        
         while (path != null) {
             int mt = unit.getMoveType(path.getDirection());
             switch (mt) {
@@ -424,21 +429,27 @@ public final class InGameController implements NetworkConstants {
                 path = null;
                 break;
             default:
-                Tile target = map.getNeighbourOrNull(path.getDirection(), unit.getTile());
-                int moveCost = unit.getMoveCost(target);                
-                if (moveCost > unit.getMovesLeft()
-                        && (target.getFirstUnit() == null
-                                || target.getFirstUnit().getOwner() == unit.getOwner())
-                        && (target.getSettlement() == null
-                                || target.getSettlement().getOwner() == unit.getOwner())) {
-                    // we can't go there now, but we don't want to wake up        
-                    unit.setMovesLeft(0);
-                    nextActiveUnit();
-                    return;
-                } else {           
-                    setDestination(unit, null);
-                    freeColClient.getGUI().setActiveUnit(unit);
-                    return;
+                if (path == path.getLastNode() 
+                        && mt != Unit.ILLEGAL_MOVE
+                        && (mt != Unit.ATTACK || knownEnemyOnLastTile)) {
+                    move(unit, path.getDirection());
+                } else {
+                    Tile target = map.getNeighbourOrNull(path.getDirection(), unit.getTile());
+                    int moveCost = unit.getMoveCost(target);                
+                    if (moveCost > unit.getMovesLeft()
+                            && (target.getFirstUnit() == null
+                                    || target.getFirstUnit().getOwner() == unit.getOwner())
+                                    && (target.getSettlement() == null
+                                            || target.getSettlement().getOwner() == unit.getOwner())) {
+                        // we can't go there now, but we don't want to wake up        
+                        unit.setMovesLeft(0);
+                        nextActiveUnit();
+                        return;
+                    } else {           
+                        setDestination(unit, null);
+                        freeColClient.getGUI().setActiveUnit(unit);
+                        return;
+                    }
                 }
             }
             if (path != null) {
