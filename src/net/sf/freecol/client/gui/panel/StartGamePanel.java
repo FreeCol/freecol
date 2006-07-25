@@ -187,9 +187,10 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
 
         // Disable while not implemented.
         mapSizeLabel.setEnabled(false);
+
         mapSize.setEnabled(false);
         
-
+        chatPanel.setOpaque(false);
 
         optionsPanel.add(mapSize);
         optionsPanel.add(mapSizeLabel);
