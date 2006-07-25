@@ -1228,6 +1228,10 @@ public final class Canvas extends JLayeredPane {
      */
     public void remove(Component comp, boolean update) {
         if (comp != null) {
+            if (comp == jMenuBar) {
+                jMenuBar = null;
+            }
+            
             boolean takeFocus = true;
             if (comp == statusPanel) {
                 takeFocus = false;
@@ -1674,7 +1678,7 @@ public final class Canvas extends JLayeredPane {
         }
 
         if (jMenuBar != null) {
-            remove(jMenuBar);
+            remove(jMenuBar);            
         }
     }
     
