@@ -1035,7 +1035,8 @@ public final class Tile extends FreeColGameObject implements Location {
     public boolean canBePlowed() {
         return (!isPlowed() && isLand() 
                         && getAddition() != Tile.ADD_HILLS
-                        && getAddition() != Tile.ADD_MOUNTAINS);
+                        && getAddition() != Tile.ADD_MOUNTAINS
+                        && getType() != Tile.ARCTIC);
     }    
 
     
