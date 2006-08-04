@@ -87,6 +87,15 @@ public final class UnitLabel extends JLabel implements ActionListener {
         setSmall(isSmall);
     }
 
+    
+    /**
+     * Returns the parent Canvas object.
+     * @return This UnitLabel's Canvas.
+     */
+    public Canvas getCanvas() {
+        return parent;
+    }
+
 
     /**
     * Returns this UnitLabel's unit data.
