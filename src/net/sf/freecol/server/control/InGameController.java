@@ -364,11 +364,14 @@ public final class InGameController extends Controller {
                     switch (action) {
                     case Monarch.RAISE_TAX:
                         int newTax = monarch.getNewTax();
+                        Goods goods = nextPlayer.getMostValuableGoods();
                         if (newTax > 100) {
                             logger.warning("Tax rate exceeds 100 percent.");
                             return;
                         }
                         monarchActionElement.setAttribute("amount", String.valueOf(newTax));
+                        if  (goods != null)
+                            monarchActionElement.setAttribute("goods", goods.getName());
                         try {
                             Element reply = nextPlayer.getConnection().ask(monarchActionElement);
                             boolean accepted = Boolean.valueOf(reply.getAttribute("accepted")).booleanValue();
@@ -376,7 +379,6 @@ public final class InGameController extends Controller {
                             if (accepted) {
                                 nextPlayer.setTax(newTax);
                             } else {
-                                Goods goods = nextPlayer.getMostValuableGoods();
                                 Element removeGoodsElement = Message.createNewRootElement("removeGoods");
                                 if (goods != null) {
                                     ((Colony) goods.getLocation()).removeGoods(goods);

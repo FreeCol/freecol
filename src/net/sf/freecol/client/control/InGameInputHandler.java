@@ -607,9 +607,9 @@ public final class InGameInputHandler extends InputHandler {
         switch (action) {
         case Monarch.RAISE_TAX:
             reply = Message.createNewRootElement("acceptTax");
-            if (freeColClient.getCanvas().
-                showMonarchPanel(action,
-                                 new String [][] {{"%replace%", element.getAttribute("amount")}})) {
+            String[][] replace = new String [][] {  {"%replace%", element.getAttribute("amount")},
+                                                    {"%goods%", element.getAttribute("goods")},    };
+            if (freeColClient.getCanvas().showMonarchPanel(action,replace)) {
                 int amount = new Integer(element.getAttribute("amount")).intValue();
                 freeColClient.getMyPlayer().setTax(amount);
                 reply.setAttribute("accepted", String.valueOf(true));
