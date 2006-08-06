@@ -29,6 +29,14 @@ public class ClientOptions extends OptionMap {
 
     
     public static final String GROUP_GUI = "gui";
+
+    /**
+     * Selected tiles always gets centered if this option is
+     * enabled (even if the tile is {@link GUI#onScreen(Position)}).
+     * 
+     * @see net.sf.freecol.client.gui.GUI
+     */
+    public static final String ALWAYS_CENTER = "alwaysCenter";
     
     /**
      * Used by GUI, the number will be displayed when a group of goods are higher than this number.
@@ -102,6 +110,7 @@ public class ClientOptions extends OptionMap {
         OptionGroup guiGroup = new OptionGroup("clientOptions.gui.name", "clientOptions.gui.shortDescription");
         guiGroup.add(new IntegerOption(MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT, "clientOptions.gui."+ MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT +".name", "clientOptions.gui."+ MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT +".shortDescription", 0, 10, 7));
         guiGroup.add(new IntegerOption(MAX_NUMBER_OF_GOODS_IMAGES, "clientOptions.gui."+ MAX_NUMBER_OF_GOODS_IMAGES +".name", "clientOptions.gui."+ MAX_NUMBER_OF_GOODS_IMAGES +".shortDescription", 1, 10, 7));
+        guiGroup.add(new BooleanOption(ALWAYS_CENTER, "clientOptions.gui."+ ALWAYS_CENTER +".name", "clientOptions.gui."+ ALWAYS_CENTER +".shortDescription", false));        
         add(guiGroup);
 
         OptionGroup messagesGroup = new OptionGroup("clientOptions.messages.name", "clientOptions.messages.shortDescription");

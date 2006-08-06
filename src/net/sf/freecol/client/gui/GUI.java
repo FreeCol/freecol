@@ -280,7 +280,8 @@ public final class GUI {
             }
 
             // Check if the gui needs to reposition:
-            if (!onScreen(selectedTile)) {
+            if (!onScreen(selectedTile)
+                    || freeColClient.getClientOptions().getBoolean(ClientOptions.ALWAYS_CENTER)) {
                 setFocus(selectedTile);
             } else {
                 if (oldPosition != null) {
