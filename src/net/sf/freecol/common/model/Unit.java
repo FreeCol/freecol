@@ -3241,8 +3241,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                     new String[][] {{"%colony%", colony.getName()},
                                     {"%amount%", Integer.toString(plunderGold)}},
                     ModelMessage.DEFAULT);            
-            
-            setLocation(colony.getTile());
                         
             // Demote all soldiers and clear all orders:
             Iterator it = colony.getTile().getUnitIterator();
@@ -3255,6 +3253,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 }
                 u.setState(Unit.ACTIVE);
             }
+            
+            setLocation(colony.getTile());
         } else { // Indian:
             if (colony.getUnitCount() <= 1) {
                 myPlayer.modifyGold(plunderGold);
