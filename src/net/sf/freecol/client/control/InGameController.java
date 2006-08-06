@@ -690,7 +690,7 @@ public final class InGameController implements NetworkConstants {
         Element reply = client.ask(exploreElement);
         freeColClient.getInGameInputHandler().handle(client.getConnection(), reply);
 
-        nextModelMessage();
+        nextActiveUnit();
     }
 
     /**
