@@ -2,6 +2,7 @@
 package net.sf.freecol.common.networking;
 
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -12,6 +13,9 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
+import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.util.ReplayableInputStream;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -75,6 +79,15 @@ public final class Message {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         Document tempDocument = null;
 
+        boolean  dumpMsgOnError = FreeCol.isInDebugMode();
+        dumpMsgOnError = true;
+        if ( dumpMsgOnError) {
+
+            inputSource.setByteStream(
+                    new ReplayableInputStream(inputSource.getByteStream()) );
+
+            inputSource.getByteStream().mark( 1000000 );
+        }
         try {
             DocumentBuilder builder = factory.newDocumentBuilder();
             tempDocument = builder.parse(inputSource);
@@ -87,6 +100,22 @@ public final class Message {
             throw se;
         } catch (IOException ie) {
             throw ie;
+        }
+        catch (ArrayIndexOutOfBoundsException e) {
+            // Xerces throws ArrayIndexOutOfBoundsException when it barfs on
+            // some FreeCol messages.  I'd like to see the messages upon which
+            // it barfs
+            if ( dumpMsgOnError) {
+                ByteArrayOutputStream  baos = new ByteArrayOutputStream();
+                inputSource.getByteStream().reset();
+                while (true) {
+                    int  i = inputSource.getByteStream().read();
+                    if (-1 == i) { break; }
+                    baos.write( i );
+                }
+                logger.severe( baos.toString() );
+            }
+            throw e;
         }
 
         document = tempDocument;
