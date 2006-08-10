@@ -69,8 +69,8 @@ public final class DummyConnection extends Connection {
     * @param element The element (root element in a DOM-parsed XML tree) that
     *                holds all the information
     * @throws IOException If an error occur while sending the message.
-    * @see #sendAndWait
-    * @see #ask
+    * @see #sendAndWait(Element)
+    * @see #ask(Element)
     */
     public void send(Element element) throws IOException {
         try {
@@ -105,8 +105,8 @@ public final class DummyConnection extends Connection {
     * @param element The element (root element in a DOM-parsed XML tree) that
     *                holds all the information
     * @throws IOException If an error occur while sending the message.
-    * @see #send
-    * @see #ask
+    * @see #send(Element)
+    * @see #ask(Element)
     */
     public void sendAndWait(Element element) throws IOException {
         Element reply = ask(element);

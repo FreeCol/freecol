@@ -3,7 +3,7 @@ package net.sf.freecol.client.gui.panel;
 
 
 /**
-* Can be used as a single choice for the {@link FreeColDialog#createChoiceDialog choice dialog}.
+* Can be used as a single choice for the {@link FreeColDialog#createChoiceDialog(String, String, Object[]) choice dialog}.
 */
 public class ChoiceItem {
 

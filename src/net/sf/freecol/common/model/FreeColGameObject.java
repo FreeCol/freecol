@@ -312,7 +312,7 @@ abstract public class FreeColGameObject {
      * @param data Contains the data to be displayed in the message or <i>null</i>.
      * @param type The type of message.
      * @see net.sf.freecol.client.gui.Canvas Canvas
-     * @see Game#addModelMessage
+     * @see Game#addModelMessage(ModelMessage)
      * @see ModelMessage
      */    
     protected void addModelMessage(FreeColGameObject source, String messageID, String[][] data, int type) {

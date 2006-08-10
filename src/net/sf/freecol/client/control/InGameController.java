@@ -138,7 +138,7 @@ public final class InGameController implements NetworkConstants {
 
     /**
     * Sets the "debug mode" to be active or not. Calls
-    * {@link FreeCol#setInDebugMode} and reinitialize the
+    * {@link FreeCol#setInDebugMode(boolean)} and reinitialize the
     * <code>FreeColMenuBar</code>.
     * 
     * @param debug Should be set to <code>true</code> in order

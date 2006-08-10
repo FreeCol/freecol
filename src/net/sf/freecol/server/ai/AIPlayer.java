@@ -1091,7 +1091,7 @@ public class AIPlayer extends AIObject {
     }
     
     /**
-     * Calls {@link AIColony#createAIGoods} for every colony
+     * Calls {@link AIColony#createAIGoods()} for every colony
      * this player owns.
      */
     private void createAIGoodsInColonies() {

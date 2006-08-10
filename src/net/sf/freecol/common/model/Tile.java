@@ -1030,7 +1030,7 @@ public final class Tile extends FreeColGameObject implements Location {
      * has already been plowed.
      *  
      * @return The result.
-     * @see Unit#canPlow
+     * @see Unit#canPlow()
      */
     public boolean canBePlowed() {
         return (!isPlowed() && isLand() 

@@ -956,7 +956,7 @@ public final class Canvas extends JLayeredPane {
     * The panel will be removed when another component
     * is added to this <code>Canvas</code>. This includes
     * all the <code>showXXX</code>-methods. In addition,
-    * {@link #closeStatusPanel} and {@link #closeMenus}
+    * {@link #closeStatusPanel()} and {@link #closeMenus()}
     * also removes this panel.
     *
     * @param message The text message to display on the
@@ -1632,7 +1632,7 @@ public final class Canvas extends JLayeredPane {
 
 
     /**
-    * Quits the application. This method uses {@link #confirmQuitDialog}
+    * Quits the application. This method uses {@link #confirmQuitDialog()}
     * in order to get a "Are you sure"-confirmation from the user.
     */
     public void quit() {

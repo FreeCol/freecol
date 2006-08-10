@@ -28,9 +28,9 @@ import org.w3c.dom.Element;
 * A network connection. Responsible for both sending and receiving
 * network messages.
 *
-* @see #send
-* @see #sendAndWait
-* @see #ask
+* @see #send(Element)
+* @see #sendAndWait(Element)
+* @see #ask(Element)
 */
 public class Connection {
     private static final Logger logger = Logger.getLogger(Connection.class.getName());
@@ -150,8 +150,8 @@ public class Connection {
     * @param element The element (root element in a DOM-parsed XML tree) that
     *                holds all the information
     * @throws IOException If an error occur while sending the message.
-    * @see #sendAndWait
-    * @see #ask
+    * @see #sendAndWait(Element)
+    * @see #ask(Element)
     */
     public void send(Element element) throws IOException {
         synchronized (out) {
@@ -230,8 +230,8 @@ public class Connection {
     * @param element The element (root element in a DOM-parsed XML tree) that
     *                holds all the information
     * @throws IOException If an error occur while sending the message.
-    * @see #send
-    * @see #ask
+    * @see #send(Element)
+    * @see #ask(Element)
     */
     public void sendAndWait(Element element) throws IOException {
         Element reply = ask(element);

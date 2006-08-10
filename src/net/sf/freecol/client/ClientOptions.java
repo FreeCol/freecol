@@ -17,7 +17,7 @@ import org.w3c.dom.Element;
 * <br><br>
 *
 * New options should be added to
-* {@link #addDefaultOptions} and each option should be given an unique
+* {@link #addDefaultOptions()} and each option should be given an unique
 * identifier (defined as a constant in this class).
 */
 public class ClientOptions extends OptionMap {
@@ -32,7 +32,7 @@ public class ClientOptions extends OptionMap {
 
     /**
      * Selected tiles always gets centered if this option is
-     * enabled (even if the tile is {@link GUI#onScreen(Position)}).
+     * enabled (even if the tile is {@link net.sf.freecol.client.gui.GUI#onScreen(Position)}).
      * 
      * @see net.sf.freecol.client.gui.GUI
      */

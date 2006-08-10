@@ -63,8 +63,8 @@ public final class Client {
     *
     * @param element The element (root element in a DOM-parsed XML tree) that
     *                holds all the information
-    * @see #sendAndWait
-    * @see #ask
+    * @see #sendAndWait(Element)
+    * @see #ask(Element)
     */
     public void send(Element element) {
         try {
@@ -81,8 +81,8 @@ public final class Client {
     *
     * @param element The element (root element in a DOM-parsed XML tree) that
     *                holds all the information
-    * @see #send
-    * @see #ask
+    * @see #send(Element)
+    * @see #ask(Element)
     */
     public void sendAndWait(Element element) {
         try {

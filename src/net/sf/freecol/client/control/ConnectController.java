@@ -414,7 +414,7 @@ public final class ConnectController {
     *
     * @param host The name of the machine running the <code>FreeColServer</code>.
     * @param port The port to use when connecting to the host.
-    * @return A list of available {@link Player#getUsername usernames}.
+    * @return A list of available {@link Player#getUsername() usernames}.
     */
     private List getVacantPlayers(String host, int port) {
         Canvas canvas = freeColClient.getCanvas();

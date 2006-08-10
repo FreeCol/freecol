@@ -13,7 +13,7 @@ import org.w3c.dom.Element;
 
 /**
 * Keeps track of the available game options. New options should be added to
-* {@link #addDefaultOptions} and each option should be given an unique
+* {@link #addDefaultOptions()} and each option should be given an unique
 * identifier (defined as a constant in this class).
 */
 public class GameOptions extends OptionMap {

@@ -41,8 +41,9 @@ public final class MergeTableModel extends AbstractTableModel
         for ( int i = from;  i <= to;  i ++ )
         {
             String  line = leftLineAtRow( i );
-            // use a double = for newly inserted lines for ease of editing new messages
-            line = line.replace( "=", "==" );
+            // prefix newly inserted lines with an "@" to make it easy to find
+            // them when translating the new messages
+            line = "@" + line;
             merge.lineFromFile2.add( i, line );
         }
 

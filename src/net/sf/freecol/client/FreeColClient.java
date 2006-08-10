@@ -361,7 +361,7 @@ public final class FreeColClient {
     * Gets the <code>Player</code> that uses this client.
     *
     * @return The <code>Player</code> made to represent this clients user.
-    * @see #setMyPlayer
+    * @see #setMyPlayer(Player)
     */
     public Player getMyPlayer() {
         return player;
@@ -372,7 +372,7 @@ public final class FreeColClient {
     * Sets the <code>Player</code> that uses this client.
     *
     * @param player The <code>Player</code> made to represent this clients user.
-    * @see #getMyPlayer
+    * @see #getMyPlayer()
     */
     public void setMyPlayer(Player player) {
         this.player = player;
@@ -384,7 +384,7 @@ public final class FreeColClient {
     * by the client gui.
     *
     * @param freeColServer The <code>FreeColServer</code>.
-    * @see #getFreeColServer
+    * @see #getFreeColServer()
     */
     public void setFreeColServer(FreeColServer freeColServer) {
         this.freeColServer = freeColServer;
