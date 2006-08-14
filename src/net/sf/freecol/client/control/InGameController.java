@@ -717,7 +717,7 @@ public final class InGameController implements NetworkConstants {
         
         freeColClient.getCanvas().updateGoldLabel();
 
-        nextModelMessage();
+        nextActiveUnit();
     }
 
 
