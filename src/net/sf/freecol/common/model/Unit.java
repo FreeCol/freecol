@@ -770,12 +770,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             } else {
                 return ILLEGAL_MOVE;
             }
-        } else if (target.getType() == Tile.HIGH_SEAS) {
-            if (getOwner().canMoveToEurope()) {
-                return MOVE_HIGH_SEAS;
-            } else {
-                return MOVE;
-            }
         } else if (target.isLand()) {
             Settlement settlement = target.getSettlement();
             if (settlement != null) {
@@ -813,6 +807,12 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 return ATTACK;
             } else {
                 return ILLEGAL_MOVE;
+            }
+        } else if (target.getType() == Tile.HIGH_SEAS) {
+            if (getOwner().canMoveToEurope()) {
+                return MOVE_HIGH_SEAS;
+            } else {
+                return MOVE;
             }
         } else {
             // this must be ocean
