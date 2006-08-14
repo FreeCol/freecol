@@ -2251,7 +2251,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         // Check if this move is illegal or not:
         if (!canMoveToEurope()) {
             throw new IllegalStateException("It is not allowed to move units to europe from the tile where this unit is located.");
-        } else {        
+        } else if (getLocation() instanceof Tile) {
+            // Don't set entry location if location isn't Tile
             setEntryLocation(getLocation());
         }
 
