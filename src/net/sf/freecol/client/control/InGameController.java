@@ -651,6 +651,7 @@ public final class InGameController implements NetworkConstants {
         client.sendAndWait(tradeElement);
 
         unit.trade(settlement, goods, gold);
+        nextActiveUnit(unit.getTile());
         
         freeColClient.getCanvas().updateGoldLabel();
     }
@@ -671,6 +672,7 @@ public final class InGameController implements NetworkConstants {
         client.sendAndWait(deliverGiftElement);
 
         unit.deliverGift(settlement, goods);
+        nextActiveUnit(unit.getTile());
     }
 
     /**
