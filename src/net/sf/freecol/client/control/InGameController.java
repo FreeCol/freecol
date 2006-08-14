@@ -90,6 +90,7 @@ public final class InGameController implements NetworkConstants {
                             SwingUtilities.invokeLater(new Runnable() {
                                 public void run() {
                                     canvas.closeStatusPanel();
+                                    canvas.requestFocusInWindow();
                                 }
                             });
                         } catch (IOException e) {
