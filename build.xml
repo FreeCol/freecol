@@ -90,7 +90,7 @@
     </copy>
 
     <native2ascii src="${freecol.src.dir}" dest="${freecol.build.dir}"
-                  includes="**/*.properties" excludes="classes/**" />
+                  encoding="UTF-8" includes="**/*.properties" excludes="classes/**" />
   </target>
 
   <target name="package" depends="init,build">
