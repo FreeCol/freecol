@@ -1161,7 +1161,6 @@ public final class Canvas extends JLayeredPane {
      * @see net.sf.freecol.common.model.Monarch
      */
     public boolean showMonarchPanel(int action, String [][] replace) {
-        closeMenus();
 
         monarchPanel.initialize(action, replace);
         addCentered(monarchPanel, MONARCH_LAYER);
