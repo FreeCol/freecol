@@ -147,6 +147,25 @@ public class Tension {
     }
 
     /** 
+     * Returns the current tension level as the string used to translate it.
+     * @return A <code>String</code>-representation of the
+     *      current tension level, used to translate it in properties files.
+     */
+    public String getCodeString() {
+        if (value <= TENSION_HAPPY) {
+            return "Happy";
+        } else if (value <= TENSION_CONTENT) {
+            return "Content";
+        } else if (value <= TENSION_DISPLEASED) {
+            return "Displeased";
+        } else if (value <= TENSION_ANGRY) {
+            return "Angry";
+        } else {
+            return "Hateful";
+        }
+    }    
+    
+    /** 
      * Returns the current tension level as a string.
      * @return A <code>String</code>-representation of the
      *      current tension level.

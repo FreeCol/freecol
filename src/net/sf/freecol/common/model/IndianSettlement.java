@@ -255,7 +255,7 @@ public class IndianSettlement extends Settlement {
      * @return The ID of an alarm level message.
      */
     public String getAlarmLevelMessage(Player player) {
-        return "indianSettlement.alarm." + alarm[player.getNation()];
+        return "indianSettlement.alarm." + alarm[player.getNation()].getCodeString();
     }
 
     /**
