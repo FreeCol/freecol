@@ -217,7 +217,7 @@ public final class DeclarationDialog extends FreeColDialog {
         }
         
         /**
-         * Adds an <code>ActionListener</code> to this ¨
+         * Adds an <code>ActionListener</code> to this
          * <code>SignaturePanel</code>. An event gets fired
          * when the animation is stopped.
          * 

@@ -32,7 +32,7 @@ public class ClientOptions extends OptionMap {
 
     /**
      * Selected tiles always gets centered if this option is
-     * enabled (even if the tile is {@link net.sf.freecol.client.gui.GUI#onScreen(Position)}).
+     * enabled (even if the tile is {@link net.sf.freecol.client.gui.GUI#onScreen(Map.Position)}).
      * 
      * @see net.sf.freecol.client.gui.GUI
      */

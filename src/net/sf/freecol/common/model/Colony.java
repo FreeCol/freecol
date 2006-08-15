@@ -224,7 +224,7 @@ public final class Colony extends Settlement implements Location {
      * <code>Tile</code>. That is: they are sent to the closest
      * location for repair.
      *
-     * @see Unit#damageShip
+     * @see Unit#shipDamaged
      */
     public void damageAllShips() {
         Iterator iter = getTile().getUnitIterator();
