@@ -200,11 +200,6 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      *         if the improvement does not exist.
      */
     public String getNextName() {
-
-        if ( ! canBuildNext() ) {
-            return null;
-        }
-
         return level < buildingType.numberOfLevels() 
                 ? buildingType.level(level).name 
                 : null;
@@ -255,10 +250,6 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      *      the building does not exist.
      */
     public int getNextPop() {
-        if (!canBuildNext()) {
-            return -1;
-        }
-
         return level < buildingType.numberOfLevels() 
                 ? buildingType.level(level).populationRequired 
                 : -1;
@@ -290,7 +281,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
                 || type == DISTILLER || type == FUR_TRADER || type == ARMORY)) {
             return false;
         }
-        BuildingType  buildingType = FreeCol.specification.buildingType( type );
+        
         // if there are no more improvements available for this building type..
         if ( buildingType.numberOfLevels() == level ) {
             return false;

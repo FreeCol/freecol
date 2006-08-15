@@ -1625,8 +1625,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             this.addItem(nothingItem);
             BuildingBoxItem toSelect = nothingItem;
             for (int i = 0; i < Building.NUMBER_OF_TYPES; i++) {
-                if (colonyPanel.getColony().getBuilding(i).getNextName() != null &&
-                        colonyPanel.getColony().getUnitCount() >= colonyPanel.getColony().getBuilding(i).getNextPop()) {
+                if (colonyPanel.getColony().getBuilding(i).canBuildNext()) {
                     String theText = new String(
                         colony.getBuilding(i).getNextName() +
                         " (" +
