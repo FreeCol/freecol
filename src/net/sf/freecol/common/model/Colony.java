@@ -1191,7 +1191,6 @@ public final class Colony extends Settlement implements Location {
             if ((hammers >= hammersRequired) && (hammersRequired != -1)) {
                 hammers = hammersRequired;
                 if (getGoodsCount(Goods.TOOLS) >= toolsRequired) {
-                    //TODO: Adam Smith check for factory level buildings
                     if (!getBuilding(currentlyBuilding).canBuildNext()) {
                         throw new IllegalStateException("Cannot build the selected building.");
                     }
