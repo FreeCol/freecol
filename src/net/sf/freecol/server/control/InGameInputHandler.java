@@ -873,7 +873,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 defender.getTile().getSettlement() != null && defender.getTile().getSettlement() instanceof IndianSettlement
                 && ((IndianSettlement) defender.getTile().getSettlement()).getUnitCount()+defender.getTile().getUnitCount() <= 1
                 || defender.getTile().getColony() != null && !defender.isArmed() && !defender.isMounted() && defender.getType() != Unit.ARTILLERY
-                && defender.getType() != Unit.DAMAGED_ARTILLERY && !defender.isMounted())) {
+                && defender.getType() != Unit.DAMAGED_ARTILLERY)) {
             result = Unit.ATTACK_DONE_SETTLEMENT;
         }
 
