@@ -2870,8 +2870,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             throw new IllegalStateException("Cannot attack allied players.");
         }
 
-        // make sure we are at war, unless attacker == PRIVATEER
-        if (getOwner().isEuropean() && defender.getOwner().isEuropean() && getType() != PRIVATEER) {
+        // make sure we are at war, unless one of both units is a privateer
+        if (getOwner().isEuropean() && defender.getOwner().isEuropean() &&
+            getType() != PRIVATEER && defender.getType() != PRIVATEER) {
             getOwner().setStance(defender.getOwner(), Player.WAR);
         }
         if (getType() == PRIVATEER) {
@@ -3642,13 +3643,20 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         unitElement.setAttribute("state", Integer.toString(state));
         unitElement.setAttribute("workLeft", Integer.toString(workLeft));
         unitElement.setAttribute("numberOfTools", Integer.toString(numberOfTools));
-        unitElement.setAttribute("owner", owner.getID());
         unitElement.setAttribute("turnsOfTraining", Integer.toString(turnsOfTraining));
         unitElement.setAttribute("trainingType", Integer.toString(trainingType));
         unitElement.setAttribute("workType", Integer.toString(workType));
         unitElement.setAttribute("treasureAmount", Integer.toString(treasureAmount));
         unitElement.setAttribute("hitpoints", Integer.toString(hitpoints));
 
+        String owner_id;
+        if (getOwner().equals(player) || getType() != PRIVATEER) {
+            owner_id = owner.getID();
+        } else {
+            owner_id = "unknown";
+        }
+        unitElement.setAttribute("owner", owner_id);
+        
         if (indianSettlement != null) {
             unitElement.setAttribute("indianSettlement", indianSettlement.getID());
         }
@@ -3706,9 +3714,15 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         state = Integer.parseInt(unitElement.getAttribute("state"));
         workLeft = Integer.parseInt(unitElement.getAttribute("workLeft"));
         numberOfTools = Integer.parseInt(unitElement.getAttribute("numberOfTools"));
-        owner = (Player) getGame().getFreeColGameObject(unitElement.getAttribute("owner"));
         turnsOfTraining = Integer.parseInt(unitElement.getAttribute("turnsOfTraining"));
         trainingType = Integer.parseInt(unitElement.getAttribute("trainingType"));
+        
+        String owner_id = unitElement.getAttribute("owner");
+        if (owner_id.equals("unknown")) {
+            owner = Game.unknownEnemy;
+        } else {
+            owner = (Player) getGame().getFreeColGameObject(owner_id);
+        }
 
         if (unitElement.hasAttribute("indianSettlement")) {
             indianSettlement = (IndianSettlement) getGame().getFreeColGameObject(unitElement.getAttribute("indianSettlement"));

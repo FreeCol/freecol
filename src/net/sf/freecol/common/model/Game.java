@@ -29,7 +29,9 @@ public class Game extends FreeColGameObject {
     private static final Logger logger = Logger.getLogger(Game.class.getName());
 
 
-
+    /** A virtual player to use with enemy privateers */
+    public static final Player unknownEnemy = new Player(null, "", false, Player.NO_NATION);
+    
     /** Contains all the players in the game. */
     private Vector players = new Vector();
 

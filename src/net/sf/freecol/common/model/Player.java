@@ -129,6 +129,7 @@ public class Player extends FreeColGameObject {
     private int[] stance = new int[NUMBER_OF_NATIONS];
 
 
+    private static final Color noNationColor = Color.BLACK;
     private static final Color[] defaultNationColors = {
         new Color(255, 157, 60),
         Color.RED,
@@ -274,7 +275,7 @@ public class Player extends FreeColGameObject {
         this.admin = admin;
         this.nation = nation;
 
-        color = getDefaultNationColor(nation);
+        color = (nation == NO_NATION) ? noNationColor : getDefaultNationColor(nation);
         /** No initial arrears. */
         for (int i = 0; i < arrears.length; i++) {
             arrears[i] = 0;
@@ -563,7 +564,7 @@ public class Player extends FreeColGameObject {
      * @return <i>true</i> if this player is indian and <i>false</i> otherwise.
      */
     public boolean isIndian() {
-        return !isEuropean();
+        return !isEuropean() && nation != NO_NATION;
     }
 
     /**
@@ -637,7 +638,11 @@ public class Player extends FreeColGameObject {
     * @return The defult color for the given nation.
     */
     public static Color getDefaultNationColor(int nation) {
-        return defaultNationColors[nation];
+        if (nation == NO_NATION) {
+            return noNationColor;
+        } else {
+            return defaultNationColors[nation];
+        }
     }
 
     /**
@@ -649,7 +654,11 @@ public class Player extends FreeColGameObject {
      *      contacted the given nation.
      */
     public boolean hasContacted(int nation) {
-        return contacted[nation];
+        if (nation == NO_NATION) {
+            return true;
+        } else {
+            return contacted[nation];
+        }
     }
 
     /** 
@@ -677,7 +686,7 @@ public class Player extends FreeColGameObject {
     public void setContacted(Player player, boolean b) {
         int type = player.getNation();
 
-        if (type == getNation()) {
+        if (type == getNation() || type == NO_NATION) {
             return;
         }
 
@@ -732,7 +741,7 @@ public class Player extends FreeColGameObject {
      *      contacted the given <code>Player</code>.
      */
     public void setContacted(int nation, boolean b) {
-        if (nation == getNation()) {
+        if (nation == getNation() || nation == NO_NATION) {
             return;
         }
 
@@ -1309,6 +1318,8 @@ public class Player extends FreeColGameObject {
     */
     public static String getNationAsString(int nation) {
         switch (nation) {
+            case NO_NATION:
+                return Messages.message("model.nation.unknownEnemy");
             case DUTCH:
                 return Messages.message("model.nation.Dutch");
             case ENGLISH:
@@ -1711,7 +1722,7 @@ public class Player extends FreeColGameObject {
     }
 
     public void modifyTension(int nation, int addToTension) {   
-        if (getNation() == nation) {
+        if (getNation() == nation || nation == NO_NATION) {
             return;
         }
         tension[nation].modify(addToTension);
@@ -1725,7 +1736,7 @@ public class Player extends FreeColGameObject {
     * @param newTension The <code>Tension</code>.
     */
     public void setTension(Player player, Tension newTension) {
-        if (player == this) {
+        if (player == this || player.getNation() == NO_NATION) {
             return;
         }
         tension[player.getNation()] = newTension;
@@ -1738,7 +1749,11 @@ public class Player extends FreeColGameObject {
     * @return An object representing the tension level.
     */
     public Tension getTension(Player player) {
-        return tension[player.getNation()];
+        if (player.getNation() == NO_NATION) {
+            return new Tension();
+        } else {
+            return tension[player.getNation()];
+        }
     }
 
 
@@ -1753,11 +1768,15 @@ public class Player extends FreeColGameObject {
     * @return The stance.
     */
     public int getStance(Player player) {
-        return stance[player.getNation()];
+        return getStance(player.getNation());
     }
 
     public int getStance(int nation) {
-        return stance[nation];
+        if (nation == NO_NATION) {
+            return 0;
+        } else {
+            return stance[nation];
+        }
     }
 
     /**
@@ -1788,6 +1807,9 @@ public class Player extends FreeColGameObject {
     * @param newStance The stance.
     */
     public void setStance(Player player, int newStance) {
+        if (player.getNation() == NO_NATION) {
+            return;
+        }
         int oldStance = stance[player.getNation()];
         
         // Ignore requests to change the stance when indian players are involved:
@@ -2565,6 +2587,21 @@ public class Player extends FreeColGameObject {
         return goods;
     }
     
+    /**
+     * Checks if the given <code>Player</code> equals this object.
+     *
+     * @param o The <code>Player</code> to compare against this object.
+     * @return <i>true</i> if the two <code>Player</code> are equal and
+     * none of both have <code>nation == NO_NATION</code> and <i>false</i> otherwise.
+     */
+     public boolean equals(Player o) {
+         if (o != null && getNation() != NO_NATION && o.getNation() != NO_NATION) {
+             return getID().equals(o.getID());
+         } else {
+             return false;
+         }
+     }
+     
 
     /**
      * A predicate that can be applied to a unit.
