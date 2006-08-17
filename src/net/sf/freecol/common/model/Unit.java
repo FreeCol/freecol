@@ -2870,8 +2870,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             throw new IllegalStateException("Cannot attack allied players.");
         }
 
-        // make sure we are at war
-        if (getOwner().isEuropean() && defender.getOwner().isEuropean()) {
+        // make sure we are at war, unless attacker == PRIVATEER
+        if (getOwner().isEuropean() && defender.getOwner().isEuropean() && getType() != PRIVATEER) {
             getOwner().setStance(defender.getOwner(), Player.WAR);
         }
         if (getType() == PRIVATEER) {
