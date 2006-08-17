@@ -127,7 +127,7 @@ public class GoodsContainer extends FreeColGameObject {
     * @param amount The treshold.
     */
     public void removeAbove(int amount) {
-        for (int i=0; i<storedGoods.length; i++) {
+        for (int i=1; i<storedGoods.length; i++) {
             if (storedGoods[i] > amount) {
                 storedGoods[i] = amount;
             }
