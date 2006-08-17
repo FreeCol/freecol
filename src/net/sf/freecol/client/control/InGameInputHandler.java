@@ -345,6 +345,34 @@ public final class InGameInputHandler extends InputHandler {
         
         unit.attack(defender, result, plunderGold);
 
+        Canvas canvas = getFreeColClient().getCanvas();
+        switch (result) {
+        case Unit.ATTACK_EVADES:
+            if (unit.isNaval()) {
+                canvas.showInformationMessage("model.unit.shipEvaded",
+                                              new String [][] {{"%ship%", defender.getName()},
+                                                               {"%nation%",
+                                                                defender.getOwner().getNationAsString()}});
+            }
+            break;
+        case Unit.ATTACK_LOSS:
+            if (unit.isNaval()) {
+                canvas.showInformationMessage("model.unit.enemyShipDamaged",
+                                              new String [][] {{"%ship%", unit.getName()},
+                                                               {"%nation%",
+                                                                unit.getOwner().getNationAsString()}});
+            }
+            break;
+        case Unit.ATTACK_GREAT_LOSS:
+            if (unit.isNaval()) {
+                canvas.showInformationMessage("model.unit.shipSunk",
+                                              new String [][] {{"%ship%", unit.getName()},
+                                                               {"%nation%",
+                                                                unit.getOwner().getNationAsString()}});
+            }
+            break;
+        }
+
         if (!unit.isDisposed() && (unit.getLocation() == null || !unit.isVisibleTo(getFreeColClient().getMyPlayer()))) {
             unit.dispose(); 
         }

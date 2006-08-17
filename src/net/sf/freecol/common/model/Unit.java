@@ -2891,7 +2891,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         case ATTACK_EVADES:
             if (isNaval()) {
                 addModelMessage(this, "model.unit.shipEvaded",
-                                new String [][] {{"%ship%", getName()}},
+                                new String [][] {{"%ship%", defender.getName()},
+                                                 {"%nation%", defender.getOwner().getNationAsString()}},
                                 ModelMessage.DEFAULT);
             } else {
                 logger.warning("Non-naval unit evades!");
@@ -2930,6 +2931,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             if (isNaval()) {
                 captureGoods(defender);
                 defender.shipDamaged();
+                addModelMessage(this, "model.unit.enemyShipDamaged",
+                                new String [][] {{"%ship%", defender.getName()},
+                                                 {"%nation%", defender.getOwner().getNationAsString()}},
+                                ModelMessage.UNIT_DEMOTED);
             } else {
                 if (getOwner().hasFather(FoundingFather.GEORGE_WASHINGTON)) {
                     promote();
@@ -2941,6 +2946,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             if (isNaval()) {
                 captureGoods(defender);
                 defender.shipSunk();
+                addModelMessage(this, "model.unit.shipSunk",
+                                new String [][] {{"%ship%", defender.getName()},
+                                                 {"%nation%", defender.getOwner().getNationAsString()}},
+                                ModelMessage.UNIT_DEMOTED);
             } else {
                 promote();
                 defender.demote(this, true);
