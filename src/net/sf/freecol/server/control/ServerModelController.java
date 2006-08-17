@@ -289,11 +289,13 @@ public class ServerModelController implements ModelController {
         Iterator enemyPlayerIterator = first.getGame().getPlayerIterator();
         while (enemyPlayerIterator.hasNext()) {
             ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
-            try {
-                enemyPlayer.getConnection().send(element);
-            } catch (IOException e) {
-                logger.warning("Could not send message to: " + enemyPlayer.getName() 
-                               + " with connection " + enemyPlayer.getConnection());
+            if (!enemyPlayer.equals(first)) {
+	            try {
+	                enemyPlayer.getConnection().send(element);
+	            } catch (IOException e) {
+	                logger.warning("Could not send message to: " + enemyPlayer.getName() 
+	                               + " with connection " + enemyPlayer.getConnection());
+	            }
             }
         }        
     }
