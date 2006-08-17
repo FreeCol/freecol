@@ -2980,7 +2980,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                         ModelMessage.UNIT_DEMOTED);
         setHitpoints(1);
         getUnitContainer().disposeAllUnits();
-        goodsContainer.removeAbove(0);
+        goodsContainer.removeAll();
         sendToRepairLocation();
     }
 
@@ -3650,7 +3650,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         unitElement.setAttribute("hitpoints", Integer.toString(hitpoints));
 
         String owner_id;
-        if (getOwner().equals(player) || getType() != PRIVATEER) {
+        if (showAll || toSavedGame || getOwner().equals(player) || getType() != PRIVATEER) {
             owner_id = owner.getID();
         } else {
             owner_id = "unknown";

@@ -136,6 +136,17 @@ public class GoodsContainer extends FreeColGameObject {
 
     
     /**
+    * Removes all goods.
+    * 
+    */
+    public void removeAll() {
+        for (int i=0; i<storedGoods.length; i++) {
+            storedGoods[i] = 0;
+        }
+    }
+
+    
+    /**
      * Checks if any type of goods, except for
      * <code>Goods.FOOD</code>, has reached the given
      * amount.
@@ -255,7 +266,6 @@ public class GoodsContainer extends FreeColGameObject {
 
         return totalGoods.iterator();
     }
-
 
     /**
     * Gets the first <code>Goods</code> in this <code>GoodsContainer</code>.
