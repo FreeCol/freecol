@@ -713,10 +713,14 @@ public final class InGameInputHandler extends InputHandler {
         int stance = Integer.parseInt(element.getAttribute("stance"));
         Player first = (Player) game.getFreeColGameObject(element.getAttribute("first"));
         Player second = (Player) game.getFreeColGameObject(element.getAttribute("second"));
-        
-        if (first.getStance(second) == stance) {
+
+        /* War declared messages are sometimes not shown, because opponentAttack message
+         * arrives before and when setStance message arrives the player has the new stance.
+         * So not check stance is going to change.
+         */
+        /*if (first.getStance(second) == stance) {
             return null;
-        }
+        }*/
         
         first.setStance(second, stance);
 
