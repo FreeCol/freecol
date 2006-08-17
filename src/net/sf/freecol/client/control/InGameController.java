@@ -841,6 +841,15 @@ public final class InGameController implements NetworkConstants {
             updateTile.readFromXMLElement(utElement);
         }
 
+        // If there are captured goods, add to unit
+        NodeList capturedGoods = attackResultElement.getElementsByTagName("capturedGoods");
+        for (int i=0; i < capturedGoods.getLength(); ++i) {
+            Element goods = (Element) capturedGoods.item(i);
+            int type = Integer.parseInt(goods.getAttribute("type"));
+            int amount = Integer.parseInt(goods.getAttribute("amount"));
+            unit.getGoodsContainer().addGoods(type, amount);
+        }
+
         // Get the defender:
         Element unitElement = getChildElement(attackResultElement, Unit.getXMLElementTagName());
         if (unitElement != null) {

@@ -790,7 +790,27 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             reply.appendChild(defender.toXMLElement(player, reply.getOwnerDocument()));
         }
 
+        int[] oldGoodsCounts = new int[Goods.NUMBER_OF_TYPES];
+        for (int i=0; i < oldGoodsCounts.length; i++) {
+            oldGoodsCounts[i] = unit.getGoodsContainer().getGoodsCount(i);
+        }
         unit.attack(defender, result, plunderGold);
+
+        // Send capturedGoods if UNIT_HIDING is true
+        // because when it's false unit is already sent with carried goods and units
+        if (unit.canCaptureGoods() && game.getGameOptions().getBoolean(GameOptions.UNIT_HIDING)) {
+            Iterator goodsIt = unit.getGoodsContainer().getCompactGoodsIterator();
+            while (goodsIt.hasNext()) {
+                Goods newGoods = (Goods) goodsIt.next();
+                int capturedGoods = newGoods.getAmount() - oldGoodsCounts[newGoods.getType()];
+                if (capturedGoods > 0) {
+                    Element captured = reply.getOwnerDocument().createElement("capturedGoods");
+                    captured.setAttribute("type", Integer.toString(newGoods.getType()));
+                    captured.setAttribute("amount", Integer.toString(capturedGoods));
+                    reply.appendChild(captured);
+                }
+            }
+        }
         
         // TODO: REMOVE MAGIC: This should not really be necessary:
         /*if (result == Unit.ATTACK_DONE_SETTLEMENT) {
