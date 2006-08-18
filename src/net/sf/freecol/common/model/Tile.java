@@ -1351,8 +1351,11 @@ public final class Tile extends FreeColGameObject implements Location {
             owner = (Settlement) getGame().getFreeColGameObject(tileElement.getAttribute("owner"));
         }
 
+        boolean settlementSent = false;
+
         Element colonyElement = getChildElement(tileElement, Colony.getXMLElementTagName());
         if (colonyElement != null) {
+            settlementSent = true;
             if (settlement != null && settlement instanceof Colony) {
                 settlement.readFromXMLElement(colonyElement);
             } else {
@@ -1362,11 +1365,16 @@ public final class Tile extends FreeColGameObject implements Location {
 
         Element indianSettlementElement = getChildElement(tileElement, IndianSettlement.getXMLElementTagName());
         if (indianSettlementElement != null) {
+            settlementSent = true;
             if (settlement != null && settlement instanceof IndianSettlement) {
                 settlement.readFromXMLElement(indianSettlementElement);
             } else {
                 settlement = new IndianSettlement(getGame(), indianSettlementElement);
             }
+        }
+
+        if (!settlementSent && settlement != null) {
+            settlement.dispose();
         }
 
         Element unitContainerElement = getChildElement(tileElement, UnitContainer.getXMLElementTagName());
