@@ -791,8 +791,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
 
         int[] oldGoodsCounts = new int[Goods.NUMBER_OF_TYPES];
-        for (int i=0; i < oldGoodsCounts.length; i++) {
-            oldGoodsCounts[i] = unit.getGoodsContainer().getGoodsCount(i);
+        if (unit.canCaptureGoods() && game.getGameOptions().getBoolean(GameOptions.UNIT_HIDING)) {
+	        for (int i=0; i < oldGoodsCounts.length; i++) {
+	            oldGoodsCounts[i] = unit.getGoodsContainer().getGoodsCount(i);
+	        }
         }
         unit.attack(defender, result, plunderGold);
 
