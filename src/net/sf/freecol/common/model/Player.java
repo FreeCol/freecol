@@ -1693,7 +1693,8 @@ public class Player extends FreeColGameObject {
 
                     count += 2;
                 }
-            } else if (t != null && t.getColony() != null && t.getColony().getOwner() == this) {
+            }
+            if (t != null && t.getColony() != null && t.getColony().getOwner() == this) {
                 count += t.getColony().getUnitCount() * 4; // Units in colonies count doubly. -sjm
             }
         }
