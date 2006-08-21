@@ -270,6 +270,10 @@ public final class GUI {
                     // Because of the following comment from somewhere else I've put the end in comment -FV
                     // The user might what to check the status of a unit - SG
                     if (unitInFront != activeUnit /*&& unitInFront.getMovesLeft() > 0*/) {
+                        // Clear goto order when unit is activated
+                        if (unitInFront.getDestination() != null) {
+                            freeColClient.getInGameController().clearOrders(unitInFront);
+                        }
                         setActiveUnit(unitInFront);
                     } else {
                         freeColClient.getInGameController().clearOrders(unitInFront);
