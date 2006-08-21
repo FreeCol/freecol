@@ -508,6 +508,10 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         warehousePanel.initialize();
     }
 
+    public void updateBuildingsPanel() {
+        buildingsPanel.initialize();
+    }
+
 
     /**
     * Updates the building progress label.
@@ -1519,6 +1523,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                             
                             updateBuildingBox();
                             updateWarehouse();
+                            updateBuildingsPanel();
 
                             ((UnitLabel) comp).setSmall(false);
                             colonyPanel.updateSoLLabel();
