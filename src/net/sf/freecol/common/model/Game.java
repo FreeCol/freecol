@@ -692,7 +692,12 @@ public class Game extends FreeColGameObject {
         while (iterator.hasNext()) {
             FreeColGameObject freeColGameObject = (FreeColGameObject) iterator.next();
 
-            // Take the settlements after the buildings and colonytiles:
+            /*
+            * Take the settlements after the buildings
+            * and all other objects before the buildings.
+            * If changes are made: ColonyTile should have
+            * it's newTurn method called before Building.
+            */
             if (freeColGameObject instanceof Settlement) {
                 later2.add(freeColGameObject);
             } else if (freeColGameObject instanceof Building) {
