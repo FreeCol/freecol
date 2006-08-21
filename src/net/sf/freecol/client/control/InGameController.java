@@ -1223,6 +1223,7 @@ public final class InGameController implements NetworkConstants {
     */
     public void equipUnit(Unit unit, int type, int amount) {
         Client client = freeColClient.getClient();
+        Player myPlayer = freeColClient.getMyPlayer();
 
         Unit carrier = null;
         if (unit.getLocation() instanceof Unit) {
@@ -1249,12 +1250,36 @@ public final class InGameController implements NetworkConstants {
                 unit.setMissionary((amount > 0));
                 break;
             case Goods.MUSKETS:
+                if (unit.isInEurope()) {
+                    if (!myPlayer.canTrade(type)) {
+                        payArrears(type);
+                        if (!myPlayer.canTrade(type)) {
+                            return; // The user cancelled the action.
+                        }
+                    }
+                }
                 unit.setArmed((amount > 0)); // So give them muskets if the amount we want is greater than zero.
                 break;
             case Goods.HORSES:
+                if (unit.isInEurope()) {
+                    if (!myPlayer.canTrade(type)) {
+                        payArrears(type);
+                        if (!myPlayer.canTrade(type)) {
+                            return; // The user cancelled the action.
+                        }
+                    }
+                }
                 unit.setMounted((amount > 0)); // As above.
                 break;
             case Goods.TOOLS:
+                if (unit.isInEurope()) {
+                    if (!myPlayer.canTrade(type)) {
+                        payArrears(type);
+                        if (!myPlayer.canTrade(type)) {
+                            return; // The user cancelled the action.
+                        }
+                    }
+                }
                 int actualAmount = amount;
                 if ((actualAmount % 20) > 0) {
                     logger.warning("Trying to set a number of tools that is not a multiple of 20.");
