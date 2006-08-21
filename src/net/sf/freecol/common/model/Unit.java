@@ -3019,6 +3019,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             type = ModelMessage.UNIT_LOST;
             dispose();
         } else if (getType() == BRAVE) {
+            nation = "";
             messageID = "model.unit.unitSlaughtered";
             type = ModelMessage.UNIT_LOST;
             dispose();
@@ -3050,6 +3051,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         } else {
             // civilians
             if (enemyUnit.getOwner().isEuropean()) {
+                // this unit is captured, don't show old owner's messages to new owner
+                Iterator i = getGame().getModelMessageIterator(getOwner());
+                while (i.hasNext()) {
+                    ((ModelMessage) i.next()).setBeenDisplayed(true);
+                }
                 messageID = "model.unit.unitCaptured";
                 type = ModelMessage.UNIT_LOST;
                 setHitpoints(getInitialHitpoints(enemyUnit.getType()));
@@ -3067,6 +3073,15 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                                          {"%newName%", newName},
                                          {"%nation%", nation}},
                         type);
+        
+        if (getOwner() != enemyUnit.getOwner()) { 
+            // this unit hasn't been captured by enemyUnit, show message to enemyUnit's owner
+            addModelMessage(enemyUnit, messageID,
+                            new String [][] {{"%oldName%", oldName},
+                                             {"%newName%", newName},
+                                             {"%nation%", nation}},
+                            type);
+        }
     }
 
     /**
