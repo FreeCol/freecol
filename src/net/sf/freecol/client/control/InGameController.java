@@ -2128,6 +2128,11 @@ public final class InGameController implements NetworkConstants {
         Client client = freeColClient.getClient();
         Canvas canvas = freeColClient.getCanvas();
 
+        Player myPlayer = freeColClient.getMyPlayer();
+        while (myPlayer.hasNextGoingToUnit()) {
+            moveToDestination(myPlayer.getNextGoingToUnit());
+        }
+            
         canvas.getGUI().setActiveUnit(null);
         canvas.setEnabled(false);
         canvas.showStatusPanel(Messages.message("waitingForOtherPlayers"));
