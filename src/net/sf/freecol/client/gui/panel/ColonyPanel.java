@@ -210,7 +210,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         buildingsScroll.setSize(424,225);
         goldLabel.setSize(100, 20);
 
-        solLabel.setSize(180, 20);
+        solLabel.setSize(400, 20);
 
         EtchedBorder eBorder = new EtchedBorder();
         tilesScroll.setBorder(new CompoundBorder(new TitledBorder(Messages.message("surroundingArea")), new BevelBorder(BevelBorder.LOWERED)));
