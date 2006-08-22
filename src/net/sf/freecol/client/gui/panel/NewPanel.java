@@ -92,21 +92,20 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         group.add(start);
         group.add(meta);
 
-        name.setSize(175, 20);
-        nameLabel.setSize(40, 20);
-        ok.setSize(80, 20);
-        cancel.setSize(80, 20);
-        single.setSize(200, 20);
-        join.setSize(200, 20);
+        nameLabel.setSize(nameLabel.getPreferredSize().width, 20);
+        ok.setSize(110, 20);
+        cancel.setSize(110, 20);
+        single.setSize(320, 20);
+        join.setSize(320, 20);
         ipLabel.setSize(40, 20);
         server.setSize(80, 20);
         port1Label.setSize(40, 20);
         port1.setSize(40, 20);
-        start.setSize(200, 20);
-        port2Label.setSize(140, 20);
-        publicServer.setSize(140, 20);
+        start.setSize(320, 20);
+        port2Label.setSize(port2Label.getPreferredSize().width, 20);
+        publicServer.setSize(300, 20);
         port2.setSize(40, 20);
-        meta.setSize(240, 20);
+        meta.setSize(320, 20);
 
         /*
         name.setLocation(60, 10);
@@ -123,10 +122,10 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         port2Label.setLocation(55, 155);
         port2.setLocation(195, 155);
         */
-        name.setLocation(60, 10);
         nameLabel.setLocation(10, 10);
+        name.setLocation(nameLabel.getX() + nameLabel.getWidth() + 10, 10);
         ok.setLocation(30, 240);
-        cancel.setLocation(150, 240);
+        cancel.setLocation(200, 240);
         single.setLocation(10, 45);
         meta.setLocation(10, 70);
         join.setLocation(10, 95);
@@ -135,10 +134,11 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         port1Label.setLocation(155, 120);
         port1.setLocation(195, 120);
         start.setLocation(10, 155);
-        port2Label.setLocation(55, 180);
-        publicServer.setLocation(55, 200);
-        port2.setLocation(195, 180);
+        port2Label.setLocation(30, 180);
+        publicServer.setLocation(30, 200);
+        port2.setLocation(port2Label.getX() + port2Label.getWidth() + 10, 180);
 
+        name.setSize(340 - name.getX() - 20, 20);
         setLayout(null);
 
         ok.setActionCommand(String.valueOf(OK));
@@ -179,7 +179,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         add(meta);
         add(publicServer);
 
-        setSize(260, 280);
+        setSize(340, 280);
     }
 
 

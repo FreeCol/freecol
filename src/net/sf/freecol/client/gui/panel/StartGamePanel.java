@@ -137,21 +137,21 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         tableScroll.getViewport().setOpaque(false);
         tableScroll.getColumnHeader().setOpaque(false);
 
+        mapSizeLabel.setSize(mapSizeLabel.getPreferredSize().width, 20);
         mapSize.setSize(65, 20);
-        mapSizeLabel.setSize(60, 20);
-        optionsPanel.setSize(150, 380);
+        optionsPanel.setSize(230, 380);
         start.setSize(110, 20);
-        cancel.setSize(80, 20);
+        cancel.setSize(110, 20);
         readyBox.setSize(90, 20);
-        chat.setSize(240, 20);
-        chatScroll.setSize(240, 110);
-        tableScroll.setSize(240, 170);
-        chatPanel.setSize(260, 160);
-        gameOptions.setSize(120, 20);
+        chat.setSize(260, 20);
+        chatScroll.setSize(260, 110);
+        tableScroll.setSize(260, 170);
+        chatPanel.setSize(270, 160);
+        gameOptions.setSize(200, 20);
 
-        mapSize.setLocation(75, 20);
         mapSizeLabel.setLocation(10, 20);
-        optionsPanel.setLocation(260, 5);
+        mapSize.setLocation(mapSizeLabel.getX() + mapSizeLabel.getWidth() + 10, 20);
+        optionsPanel.setLocation(285, 5);
         start.setLocation(15, 370);
         cancel.setLocation(155, 370);
         readyBox.setLocation(90, 335);
@@ -161,6 +161,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         chatPanel.setLocation(0, 180);
         gameOptions.setLocation(15, 345);
 
+        mapSize.setSize(230 - mapSize.getX() - 10, 20);
         setLayout(null);
         optionsPanel.setLayout(null);
         chatPanel.setLayout(null);
@@ -210,7 +211,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
             optionsPanel.setBorder(border2);
         } catch(Exception e) {}
 
-        setSize(420, 400);
+        setSize(525, 400);
     }
 
 
