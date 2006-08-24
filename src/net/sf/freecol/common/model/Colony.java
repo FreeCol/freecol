@@ -1060,14 +1060,13 @@ public final class Colony extends Settlement implements Location {
             
             if (colonyTile.canAdd(unit)) {
                 Tile workTile = colonyTile.getWorkTile();
-                Unit workUnit = colonyTile.getUnit();
-                /* unit can use if it's using it, or nobody it's using it and indian 
-                 * don't claim for it or unit's owner has father Peter Minuit
+                /* canAdd ensures workTile it's empty or unit it's working in it
+                 * so unit can work in it if it's owned by none, by europeans or
+                 * unit's owner has the founding father Peter Minuit
                  */
-                boolean ourLand = workUnit == unit || (workUnit == null &&
-                                    (workTile.getNationOwner() == Player.NO_NATION
-                                        || Player.isEuropean(workTile.getNationOwner())
-                                        || unit.getOwner().hasFather(FoundingFather.PETER_MINUIT)));
+                boolean ourLand = workTile.getNationOwner() == Player.NO_NATION
+                                  || Player.isEuropean(workTile.getNationOwner())
+                                  || unit.getOwner().hasFather(FoundingFather.PETER_MINUIT);
                 if (ourLand && unit.getFarmedPotential(goodsType, colonyTile.getWorkTile()) > highestProduction) {
                     highestProduction = unit.getFarmedPotential(goodsType, colonyTile.getWorkTile());
                     bestPick = colonyTile;
