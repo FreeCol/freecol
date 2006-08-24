@@ -1248,7 +1248,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         return getTile() != null && player.canSee(getTile()) 
                     && (getTile().getSettlement() == null 
                             || getTile().getSettlement().getOwner() == player
-                            || !getGameOptions().getBoolean(GameOptions.UNIT_HIDING))
+                            || (!getGameOptions().getBoolean(GameOptions.UNIT_HIDING)
+                                && getLocation() instanceof Tile))
                     && (!(getLocation() instanceof Unit)
                             || ((Unit) getLocation()).getOwner() == player
                             || !getGameOptions().getBoolean(GameOptions.UNIT_HIDING));
