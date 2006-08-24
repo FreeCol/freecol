@@ -1029,6 +1029,8 @@ public final class Canvas extends JLayeredPane {
     * @see net.sf.freecol.common.model.FoundingFather
     */
     public int showChooseFoundingFatherDialog(int[] possibleFoundingFathers) {
+        remove(statusPanel);
+        
         chooseFoundingFatherDialog.initialize(possibleFoundingFathers);
 
         addCentered(chooseFoundingFatherDialog, CHOOSE_FOUNDING_FATHER);
@@ -1161,6 +1163,7 @@ public final class Canvas extends JLayeredPane {
      * @see net.sf.freecol.common.model.Monarch
      */
     public boolean showMonarchPanel(int action, String [][] replace) {
+        remove(statusPanel);
 
         monarchPanel.initialize(action, replace);
         addCentered(monarchPanel, MONARCH_LAYER);

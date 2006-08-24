@@ -129,10 +129,6 @@ public final class InGameController extends Controller {
 
         game.setCurrentPlayer(nextPlayer);
 
-        Element setCurrentPlayerElement = Message.createNewRootElement("setCurrentPlayer");
-        setCurrentPlayerElement.setAttribute("player", nextPlayer.getID());
-        freeColServer.getServer().sendToAll(setCurrentPlayerElement, null);
-
         // Ask the player to choose a founding father if none has been chosen:
         if (nextPlayer.isEuropean()) {
             if (nextPlayer.getCurrentFather() == -1) {
@@ -142,7 +138,11 @@ public final class InGameController extends Controller {
                 monarchAction(nextPlayer);
             }
         }
-    }
+ 
+        Element setCurrentPlayerElement = Message.createNewRootElement("setCurrentPlayer");
+        setCurrentPlayerElement.setAttribute("player", nextPlayer.getID());
+        freeColServer.getServer().sendToAll(setCurrentPlayerElement, null);
+   }
 
 
     private void chooseFoundingFather(ServerPlayer player) {
