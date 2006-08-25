@@ -682,10 +682,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         // Remember to also change map.findPath(...) if you change anything here.
 
         int cost = target.getMoveCost(getTile());
-
-        // Using +2 in order to make 1/3 and 2/3 move count as 3/3.
+        
+        // Using +2 in order to make 1/3 and 2/3 move count as 3/3, only when getMovesLeft > 0
         if (cost > getMovesLeft()) {
-            if (getMovesLeft() + 2 >= getInitialMovesLeft() || cost <= getMovesLeft() + 2) {
+            if ((getMovesLeft() + 2 >= getInitialMovesLeft() || cost <= getMovesLeft() + 2)
+                    && getMovesLeft() != 0) {
                 return getMovesLeft();
             }
 
