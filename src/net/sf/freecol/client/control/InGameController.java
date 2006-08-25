@@ -320,6 +320,8 @@ public final class InGameController implements NetworkConstants {
             }
         }
         
+        final Settlement inSettlement = (unit.getTile() != null) ? unit.getTile().getSettlement() : null;
+        
         // Search for destinations we can reach:
         map.search(unit, new GoalDecider() {
             public PathNode getGoal() {
@@ -327,7 +329,8 @@ public final class InGameController implements NetworkConstants {
             }            
             public boolean check(Unit u, PathNode p) {
                if (p.getTile().getSettlement() != null
-                       && p.getTile().getSettlement().getOwner() == player) {
+                       && p.getTile().getSettlement().getOwner() == player
+                       && p.getTile().getSettlement() != inSettlement) {
                    Settlement s = p.getTile().getSettlement();
                    int turns = p.getTurns();
                    destinations.add(new ChoiceItem(s.toString() + " (" + turns + ")", s));
