@@ -59,7 +59,7 @@ public class DefaultCostDecider implements CostDecider {
                 newTurn = true;
                 movesLeft = 0;
                 return ml;
-            } else if (mc - 2 <= movesLeft) {
+            } else if (mc - 2 <= movesLeft && getMovesLeft() != 0) {
                 // Normal move: Using -2 in order to make 1/3 and 2/3 move count as 3/3.
                 if (mc <= movesLeft) {
                     movesLeft -= mc;
