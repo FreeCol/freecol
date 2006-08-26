@@ -29,6 +29,12 @@ public class GameOptions extends OptionMap {
     /** The cost of a single hammer when buying a building in a colony. */
     public static final String HAMMER_PRICE = "hammerPrice";
 
+    /** The Stock the custom house should keep when selling goods. */
+    public static final String CUSTOM_STOCK = "customStock";
+
+    /** Does the Custom House sell boycotted goods **/
+    public static final String CUSTOM_IGNORE_BOYCOTT = "customIgnoreBoycott";
+
     /** Enables/disables fog of war. */
     public static final String FOG_OF_WAR = "fogOfWar";
 
@@ -53,7 +59,6 @@ public class GameOptions extends OptionMap {
      */
     public static final String VICTORY_DEFEAT_HUMANS = "victoryDefeatHumans";
     
-     
     /**
     * Creates a new <code>GameOptions</code>.
     */
@@ -101,6 +106,9 @@ public class GameOptions extends OptionMap {
         /* Colony options: */
         OptionGroup colony = new OptionGroup("gameOptions.colony.name", "gameOptions.colony.shortDescription");
         colony.add(new IntegerOption(HAMMER_PRICE, "gameOptions.hammerPrice.name", "gameOptions.hammerPrice.shortDescription", 0, 50, 20));
+        colony.add(new IntegerOption(CUSTOM_STOCK, "gameOptions.customStock.name", "gameOptions.customStock.shortDescription", 0, 300, 50));
+        colony.add(new BooleanOption(CUSTOM_IGNORE_BOYCOTT, "gameOptions.customIgnoreBoycott.name", "gameOptions.customIgnoreBoycott.shortDescription", false));
+
         add(colony);
 
         /* Victory Conditions */
