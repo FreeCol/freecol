@@ -58,6 +58,12 @@ public class GameOptions extends OptionMap {
      * other human players win the game?
      */
     public static final String VICTORY_DEFEAT_HUMANS = "victoryDefeatHumans";
+
+
+    /**
+     * The difficulty of the game.
+     */
+    public static final String DIFFICULTY = "difficulty";
     
     /**
     * Creates a new <code>GameOptions</code>.
@@ -116,7 +122,15 @@ public class GameOptions extends OptionMap {
         victoryConditions.add(new BooleanOption(VICTORY_DEFEAT_REF, "gameOptions.victoryDefeatREF.name", "gameOptions.victoryDefeatREF.shortDescription", true));
         victoryConditions.add(new BooleanOption(VICTORY_DEFEAT_EUROPEANS, "gameOptions.victoryDefeatEuropeans.name", "gameOptions.victoryDefeatEuropeans.shortDescription", true));
         victoryConditions.add(new BooleanOption(VICTORY_DEFEAT_HUMANS, "gameOptions.victoryDefeatHumans.name", "gameOptions.victoryDefeatHumans.shortDescription", false));
-        add(victoryConditions);        
+        add(victoryConditions);
+
+        /* Difficulty settings */
+        OptionGroup difficultySettings = new OptionGroup("gameOptions.difficultySettings.name",
+                                                         "gameOptions.difficultySettings.shortDescription");
+        difficultySettings.add(new IntegerOption(DIFFICULTY, "gameOptions.difficulty.name",
+                                                 "gameOptions.difficulty.shortDescription",
+                                                 0, 4, 2));
+        add(difficultySettings);
     }
 
 

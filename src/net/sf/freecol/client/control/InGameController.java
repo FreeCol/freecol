@@ -1945,7 +1945,7 @@ public final class InGameController implements NetworkConstants {
                                   new String [][] {{"%replace%", String.valueOf(arrears)}})) {
                 player.modifyGold(-arrears);
                 freeColClient.getCanvas().updateGoldLabel();
-                player.setArrears(type, 0);
+                player.resetArrears(type);
                 // send to server
                 Element payArrearsElement = Message.createNewRootElement("payArrears");
                 payArrearsElement.setAttribute("goodsType", String.valueOf(type));

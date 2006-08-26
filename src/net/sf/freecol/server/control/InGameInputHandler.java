@@ -1856,7 +1856,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalStateException("Not enough gold to pay tax arrears!");
         } else {
             player.modifyGold(-arrears);
-            player.setArrears(goods, 0);
+            player.resetArrears(goods);
         }
 
         return null;

@@ -106,9 +106,6 @@ public class Player extends FreeColGameObject {
     HARD = 3,
     VERY_HARD = 4;
 
-    /** 5000 in the original game, IIRC. */
-    public static final int DEFAULT_ARREARS = 5000;
-    
     private int difficulty = 2;
     
     /**
@@ -1979,8 +1976,8 @@ public class Player extends FreeColGameObject {
                     break;
                 case FoundingFather.JACOB_FUGGER:
                     // lift all current boycotts
-                    for (int goods = 0; goods < Goods.NUMBER_OF_TYPES; goods++) {
-                        setArrears(goods, 0);
+                    for (int typeOfGoods = 0; typeOfGoods < Goods.NUMBER_OF_TYPES; typeOfGoods++) {
+                        resetArrears(typeOfGoods);
                     }
                     break;
                 }
@@ -2388,41 +2385,32 @@ public class Player extends FreeColGameObject {
      * Sets the arrears for a type of goods.
      *
      * @param typeOfGoods The type of goods.
-     * @param amount The arrears due for this type of goods.
-     */
-    public void setArrears(int typeOfGoods, int amount) {
-        if ( amount < 0 ) {
-            amount = 0;
-        }
-        arrears[typeOfGoods] = amount;
-    }
-
-    /**
-     * Sets the default arrears for a type of goods.
-     *
-     * @param typeOfGoods The type of goods.
      */
     public void setArrears(int typeOfGoods) {
-        arrears[typeOfGoods] = (difficulty + 3) * 1000;
+        arrears[typeOfGoods] = (difficulty + 3) * 100 * getGame().getMarket().paidForSale(typeOfGoods);
     }
 
     /**
      * Sets the arrears for these goods.
      *
      * @param goods The goods.
-     * @param amount The arrears due for this type of goods.
-     */
-    public void setArrears(Goods goods, int amount) {
-        setArrears(goods.getType(), amount);
-    }
-    
-    /**
-     * Sets the default arrears for these goods.
-     *
-     * @param goods The goods.
      */
     public void setArrears(Goods goods) {
         setArrears(goods.getType());
+    }
+
+    /**
+     * Resets the arrears for this type of goods to zero.
+     */
+    public void resetArrears(int typeOfGoods) {
+        arrears[typeOfGoods] = 0;
+    }
+
+    /**
+     * Resets the arrears for these goods to zero.
+     */
+    public void resetArrears(Goods goods) {
+        resetArrears(goods.getType());
     }
     
     /**
