@@ -31,6 +31,7 @@ public class ModelMessage {
 
     private final FreeColGameObject source;
     private final int type;
+    private final int typeOfGoods;
     private final String messageID;
     private final String[][] data;
     private boolean beenDisplayed = false;
@@ -45,14 +46,32 @@ public class ModelMessage {
     * @param messageID The ID of the message to display.
     * @param data Contains data to be displayed in the message or <i>null</i>.
     * @param type The type of this model message.
+    * @param typeOfGoods The type of goods this model message refers to.
     * @see Game#addModelMessage(ModelMessage)
     * @see FreeColGameObject#addModelMessage(FreeColGameObject, String, String[][], int)
     */
-    public ModelMessage(FreeColGameObject source, String messageID, String[][] data, int type) {
+    public ModelMessage(FreeColGameObject source, String messageID, String[][] data, int type, int typeOfGoods) {
         this.source = source;
         this.messageID = messageID;
         this.data = data;
         this.type = type;
+        this.typeOfGoods = typeOfGoods;
+    }
+
+    /**
+    * Creates a new <code>ModelMessage</code>.
+    *
+    * @param source The source of the message. This is what the message should be
+    *               associated with. In addition, the owner of the source is the
+    *               player getting the message.
+    * @param messageID The ID of the message to display.
+    * @param data Contains data to be displayed in the message or <i>null</i>.
+    * @param type The type of this model message.
+    * @see Game#addModelMessage(ModelMessage)
+    * @see FreeColGameObject#addModelMessage(FreeColGameObject, String, String[][], int)
+    */
+    public ModelMessage(FreeColGameObject source, String messageID, String[][] data, int type) {
+        this(source, messageID, data, type, -1);
     }
 
     /**
@@ -67,11 +86,9 @@ public class ModelMessage {
     * @see FreeColGameObject#addModelMessage(FreeColGameObject, String, String[][], int)
     */
     public ModelMessage(FreeColGameObject source, String messageID, String[][] data) {
-        this.source = source;
-        this.messageID = messageID;
-        this.data = data;
-        this.type = DEFAULT;
+        this(source, messageID, data, DEFAULT, -1);
     }
+
 
     /**
     * Checks if this <code>ModelMessage</code> has been displayed.
@@ -132,6 +149,14 @@ public class ModelMessage {
      */
     public int getType() {
         return type;
+
+    }
+    /**
+     * Gets the type of goods. 
+     * @return The type of goods.
+     */
+    public int getTypeOfGoods() {
+        return typeOfGoods;
     }
     
 

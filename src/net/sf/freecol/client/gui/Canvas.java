@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.MissingResourceException;
 import java.util.logging.Logger;
 
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLayeredPane;
 import javax.swing.JMenuBar;
@@ -34,11 +35,14 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.Map.Position;
 
@@ -410,7 +414,7 @@ public final class Canvas extends JLayeredPane {
     *
     * @param m The <code>ModelMessage</code> to be displayed.
     */
-    public void showModelMessage(ModelMessage m) {
+    public void oldshowModelMessage(ModelMessage m) {
         String okText = "ok";
         String cancelText = "display";
         String message = m.getMessageID();
@@ -462,7 +466,14 @@ public final class Canvas extends JLayeredPane {
                     freeColClient.getInGameController().nextModelMessage();
                 }
             } else {
-                FreeColDialog informationDialog = FreeColDialog.createInformationDialog(message, okText);
+                FreeColDialog informationDialog = null;
+                if (m.getTypeOfGoods() < 0) {
+                    informationDialog = FreeColDialog.createInformationDialog(message, okText);
+                } else {
+                    ImageIcon image = getImageProvider().getGoodsImageIcon(m.getTypeOfGoods());
+                    informationDialog = FreeColDialog.createInformationDialog(message, okText, image);
+                }
+        
                 addCentered(informationDialog, MODEL_MESSAGE_LAYER);
                 informationDialog.requestFocus();
 
@@ -474,11 +485,17 @@ public final class Canvas extends JLayeredPane {
         }
     }
 
+    public void showModelMessage(ModelMessage modelMessage) {
+        showModelMessages(new ModelMessage[] {modelMessage});
+    }
+
     public void showModelMessages(ModelMessage[] modelMessages) {
         String okText = "ok";
         String cancelText = "display";
         //String message = m.getMessageID();
         String[] messageText = new String[modelMessages.length];
+        ImageIcon[] messageIcon = new ImageIcon[modelMessages.length];
+        ImageLibrary imageLibrary = (ImageLibrary) getImageProvider();
         try {
             okText = Messages.message(okText);
         } catch (MissingResourceException e) {
@@ -496,6 +513,67 @@ public final class Canvas extends JLayeredPane {
             } catch (MissingResourceException e) {
                 logger.warning("could not find message with id: " + modelMessages[i].getMessageID() + ".");
             }
+
+            switch (modelMessages[i].getType()) {
+            case ModelMessage.DEFAULT:
+                break;
+            case ModelMessage.WARNING:
+                break;
+            case ModelMessage.SONS_OF_LIBERTY:
+            case ModelMessage.GOVERNMENT_EFFICIENCY:
+                try {
+                    messageIcon[i] = imageLibrary.getGoodsImageIcon(Goods.BELLS);
+                } catch(Exception e) {
+                    logger.warning("could not find image for bells");
+                }
+                break;
+            case ModelMessage.UNIT_IMPROVED:
+            case ModelMessage.UNIT_DEMOTED:
+            case ModelMessage.UNIT_LOST:
+            case ModelMessage.UNIT_ADDED:
+                FreeColGameObject source = modelMessages[i].getSource();
+                if (source instanceof Unit) {
+                    try {
+                        int unitType = imageLibrary.getUnitGraphicsType((Unit) source);
+                        messageIcon[i] = imageLibrary.getUnitButtonImageIcon(unitType,
+                                                                             ((Unit) source).getState());
+                    } catch(Exception e) {
+                        logger.warning("could not find image for unit");
+                    }
+                }
+                break;
+            case ModelMessage.BUILDING_COMPLETED:
+                try {                
+                    Settlement settlement = (Settlement) modelMessages[i].getSource();
+                    int settlementType = imageLibrary.getSettlementGraphicsType(settlement);
+                    messageIcon[i] = new ImageIcon(imageLibrary.getColonyImage(settlementType));
+                } catch(Exception e) {
+                    logger.warning("could not find image for colony");
+                }
+                break;
+            case ModelMessage.FOREIGN_DIPLOMACY:
+                break;
+            case ModelMessage.MARKET_PRICES:
+            case ModelMessage.WAREHOUSE_CAPACITY:
+                int typeOfGoods = modelMessages[i].getTypeOfGoods();
+                if (typeOfGoods < 0) {
+                    messageIcon[i] = null;
+                } else {
+                    try {
+                        messageIcon[i] = imageLibrary.getGoodsImageIcon(typeOfGoods);
+                    } catch(Exception e) {
+                        logger.warning("could not find image for goods with type: " + typeOfGoods);
+                    }
+                } 
+                break;
+            case ModelMessage.LOST_CITY_RUMOUR:
+                try {
+                    messageIcon[i] = new ImageIcon(imageLibrary.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR));
+                } catch(Exception e) {
+                    logger.warning("could not find image for lost city rumour");
+                }
+                break;
+            }
         }
 
         // source should be the same for all messages
@@ -504,7 +582,7 @@ public final class Canvas extends JLayeredPane {
             (source instanceof Colony || source instanceof WorkLocation) && 
             !colonyPanel.isShowing()) {
 
-            FreeColDialog confirmDialog = FreeColDialog.createConfirmDialog(messageText, okText, cancelText);
+            FreeColDialog confirmDialog = FreeColDialog.createConfirmDialog(messageText, messageIcon, okText, cancelText);
             addCentered(confirmDialog, MODEL_MESSAGE_LAYER);
             confirmDialog.requestFocus();
 
@@ -522,7 +600,7 @@ public final class Canvas extends JLayeredPane {
                 freeColClient.getInGameController().nextModelMessage();
             }
         } else {
-            FreeColDialog informationDialog = FreeColDialog.createInformationDialog(messageText);
+            FreeColDialog informationDialog = FreeColDialog.createInformationDialog(messageText, messageIcon);
             addCentered(informationDialog, MODEL_MESSAGE_LAYER);
             informationDialog.requestFocus();
 
@@ -1495,7 +1573,7 @@ public final class Canvas extends JLayeredPane {
             text = messageId;
             logger.warning("Missing i18n resource: " + messageId);
         }
-        FreeColDialog infoDialog = FreeColDialog.createInformationDialog(text);
+        FreeColDialog infoDialog = FreeColDialog.createInformationDialog(new String[] {text}, new ImageIcon[] {null});
         addCentered(infoDialog, INFORMATION_LAYER);
         infoDialog.requestFocus();
 

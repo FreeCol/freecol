@@ -320,6 +320,11 @@ abstract public class FreeColGameObject {
     }
 
 
+    protected void addModelMessage(FreeColGameObject source, String messageID, String[][] data, int type, int typeOfGoods) {
+        getGame().addModelMessage(new ModelMessage(source, messageID, data, type, typeOfGoods));
+    }
+
+
     /**
     * Checks if this object has the specified ID.
     *

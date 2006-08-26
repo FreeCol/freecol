@@ -7,6 +7,7 @@ import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.MenuComponent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -20,11 +21,13 @@ import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.border.CompoundBorder;
@@ -179,6 +182,19 @@ public class FreeColDialog extends FreeColPanel {
     * @return The <code>FreeColDialog</code>.
     */
     public static FreeColDialog createInformationDialog(String text, String okText) {
+        return createInformationDialog(text, okText, null);
+    }
+
+    /**
+    * Creates a new <code>FreeColDialog</code> with a text and an ok-button.
+    * The "ok"-option calls {@link #setResponse setResponse(new Boolean(true))}.
+    *
+    * @param text The text that explains the choice for the user.
+    * @param okText The text displayed on the "ok"-button.
+    * @param image The image to be displayed.
+    * @return The <code>FreeColDialog</code>.
+    */
+    public static FreeColDialog createInformationDialog(String text, String okText, ImageIcon image) {
         final JButton okButton = new JButton(okText);
 
         final FreeColDialog informationDialog = new FreeColDialog() {
@@ -193,16 +209,81 @@ public class FreeColDialog extends FreeColPanel {
             }
         });
 
-        informationDialog.setLayout(new FlowLayout(FlowLayout.CENTER, 10,10));
-        JLabel l = new JLabel(text);
-        int width = l.getMinimumSize().width;
+        informationDialog.setLayout(new BorderLayout(10, 10));
+        JLabel textLabel = new JLabel(text);
+        int width = textLabel.getMinimumSize().width;
 
-        informationDialog.add(l);
-        informationDialog.add(okButton);
+        if (image == null) {
+            informationDialog.add(textLabel, BorderLayout.CENTER);
+        } else {
+            JLabel imageLabel = new JLabel(image);
+            informationDialog.add(imageLabel, BorderLayout.LINE_START);
+            informationDialog.add(textLabel, BorderLayout.LINE_END);
+        }
+        informationDialog.add(okButton, BorderLayout.PAGE_END);
 
-        informationDialog.setSize(width + 20, l.getMinimumSize().height + okButton.getMinimumSize().height + 40);
+        informationDialog.setSize(width + 20, textLabel.getMinimumSize().height +
+                                  okButton.getMinimumSize().height + 40);
 
         informationDialog.setCancelComponent(okButton);
+
+        return informationDialog;
+    }
+
+    /**
+    * Returns an information dialog that shows the given 
+    * texts and images, and an "OK" button.
+    * 
+    * @param texts The texts to be displayed in the dialog.
+    * @param images The images to be displayed in the dialog.
+    * @return An information dialog that shows the given text 
+    *       and an "OK" button.
+    */
+    public static FreeColDialog createInformationDialog(String[] texts, ImageIcon[] images) {
+
+        int margin = 10;
+        int[] widths = {margin, 0, 10, 250, margin};
+        int[] heights = new int[texts.length + 4];
+        heights[0] = margin;
+
+        for (int i = 0; i < texts.length; i++) {
+            // add one to index because of margin
+            heights[i+1] = 0;
+        }
+        heights[texts.length + 1] = 10;
+        heights[texts.length + 2] = 0;
+        heights[texts.length + 3] = margin;
+
+        final JButton theButton = new JButton(Messages.message("ok"));
+        final FreeColDialog informationDialog = new FreeColDialog() {
+            public void requestFocus() {
+                theButton.requestFocus();
+            }
+        };
+
+        HIGLayout layout = new HIGLayout(widths, heights);
+        informationDialog.setLayout(layout);
+
+        theButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                informationDialog.setResponse(null);
+            }
+        });
+
+        for (int i = 0; i < texts.length; i++) {
+            // add two to index because HIGLayout starts at one and
+            // there is a margin
+            int row = i + 2;
+            if (images[i] != null) {
+                informationDialog.add(new JLabel(images[i]), higConst.rc(row, 2));
+            }
+            informationDialog.add(new JLabel("<html><body><p>" + texts[i] + "</body></html>"),
+                                  higConst.rc(row, 4));
+        }
+        int buttonRow = texts.length + 3;
+        informationDialog.add(theButton, higConst.rcwh(buttonRow, 2, 3, 1));
+
+        informationDialog.setSize(informationDialog.getPreferredSize());
 
         return informationDialog;
     }
@@ -280,10 +361,10 @@ public class FreeColDialog extends FreeColPanel {
     * @return The <code>FreeColDialog</code>.
     */
     public static FreeColDialog createConfirmDialog(String text, String okText, String cancelText) {
-        return createConfirmDialog(new String[] {text}, okText, cancelText);
+        return createConfirmDialog(new String[] {text}, new ImageIcon[] {null}, okText, cancelText);
     }
 
-    public static FreeColDialog createConfirmDialog(String[] texts, String okText, String cancelText) {
+    public static FreeColDialog createConfirmDialog(String[] texts, ImageIcon[] images, String okText, String cancelText) {
 
         // create the OK button early so that the dialog may refer to it
         final JButton  okButton = new JButton();
@@ -297,16 +378,32 @@ public class FreeColDialog extends FreeColPanel {
             }
         };
 
-        String text = "<html><body>";
-        for (int i = 0; i < texts.length; i++) {
-            text += "<p>" + texts[i];
-        }
-        text += "</body></html>";
+        int margin = 10;
+        int[] widths = {margin, 0, 10, 250, margin};
+        int[] heights = new int[texts.length + 4];
+        heights[0] = margin;
 
-        // build the label panel
-        JPanel  labelPanel = new JPanel( new FlowLayout() );
-        labelPanel.setOpaque(false);
-        labelPanel.add( new JLabel(text) );
+        for (int i = 0; i < texts.length; i++) {
+            // add one to index because of margin
+            heights[i+1] = 0;
+        }
+        heights[texts.length + 1] = 10;
+        heights[texts.length + 2] = 0;
+        heights[texts.length + 3] = margin;
+
+        HIGLayout layout = new HIGLayout(widths, heights);
+        confirmDialog.setLayout(layout);
+
+        for (int i = 0; i < texts.length; i++) {
+            // add two to index because HIGLayout starts at one and
+            // there is a margin
+            int row = i + 2;
+            if (images[i] != null) {
+                confirmDialog.add(new JLabel(images[i]), higConst.rc(row, 2));
+            }
+            confirmDialog.add(new JLabel("<html><body><p>" + texts[i] + "</body></html>"),
+                              higConst.rc(row, 4));
+        }
 
         // decide on some mnemonics for the actions
         char  okButtonMnemonic = '\0';
@@ -365,61 +462,15 @@ public class FreeColDialog extends FreeColPanel {
         buttonPanel.add( new JButton(cancelAction) );
 
         // finish building the dialog
-        confirmDialog.setLayout( new BorderLayout() );
-        confirmDialog.add( labelPanel, BorderLayout.CENTER );
-        confirmDialog.add( buttonPanel, BorderLayout.SOUTH );
+        //confirmDialog.setLayout( new BorderLayout() );
+        //confirmDialog.add( labelPanel, BorderLayout.CENTER );
+        //confirmDialog.add( buttonPanel, BorderLayout.SOUTH );
+        int buttonRow = texts.length + 3;
+        confirmDialog.add(buttonPanel, higConst.rcwh(buttonRow, 2, 3, 1));
         confirmDialog.setSize( confirmDialog.getPreferredSize() );
         confirmDialog.setCancelComponent( new JButton(cancelAction) );
 
         return confirmDialog;
-    }
-
-
-    /**
-    * Returns an information dialog that shows the given 
-    * text and an "OK" button.
-    * 
-    * @param text The text to be displayed in the dialog.
-    * @return An information dialog that shows the given text 
-    *       and an "OK" button.
-    */
-    public static FreeColDialog createInformationDialog(String text) {
-        return createInformationDialog(new String[] {text});
-    }
-
-    public static FreeColDialog createInformationDialog(String[] texts) {
-        String text = "<html><body>";
-        for (int i = 0; i < texts.length; i++) {
-            text += "<p>" + texts[i];
-        }
-        text += "</body></html>";
-        final JLabel theText = new JLabel(text);
-        final JButton theButton = new JButton(Messages.message("ok"));
-        final FreeColDialog informationDialog = new FreeColDialog() {
-            public void requestFocus() {
-                theButton.requestFocus();
-            }
-        };
-
-        int[] w1 = {10, 90, 80, 90, 10};
-        int[] h1 = {10, 100, 10, 20, 10};
-        HIGLayout layout = new HIGLayout(w1, h1);
-        higConst.clearCorrection();
-        layout.setRowWeight(2,1);
-        informationDialog.setLayout(layout);
-
-        theButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                informationDialog.setResponse(null);
-            }
-        });
-
-        informationDialog.add(theText, higConst.rcwh(2, 2, 3, 1));
-        informationDialog.add(theButton, higConst.rc(4, 3));
-
-        informationDialog.setSize(informationDialog.getPreferredSize());
-
-        return informationDialog;
     }
 
 
@@ -465,11 +516,12 @@ public class FreeColDialog extends FreeColPanel {
             }
         };
 
-        int[] w1 = {10, 30, 200, 30, 10};
-        int[] h1 = {10, 100, 10, 100, 10, 20, 10, 20, 10, 20, 10, 20, 10};
+        int[] w1 = {10, 300, 10};
+        int[] h1 = {10, 70, 10, 70, 10, 20, 10, 20, 10, 20, 10, 20, 10};
+
         HIGLayout layout = new HIGLayout(w1, h1);
-        higConst.clearCorrection();
-        layout.setRowWeight(2,1);
+        //higConst.clearCorrection();
+        //layout.setRowWeight(2,1);
         scoutDialog.setLayout(layout);
 
         speak.addActionListener(new ActionListener() {
@@ -493,12 +545,12 @@ public class FreeColDialog extends FreeColPanel {
             }
         });
 
-        scoutDialog.add(intro, higConst.rcwh(2, 2, 3, 1));
-        scoutDialog.add(question, higConst.rcwh(4, 2, 3, 1));
-        scoutDialog.add(speak, higConst.rc(6, 3));
-        scoutDialog.add(demand, higConst.rc(8, 3));
-        scoutDialog.add(attack, higConst.rc(10, 3));
-        scoutDialog.add(cancel, higConst.rc(12, 3));
+        scoutDialog.add(intro, higConst.rc(2, 2));
+        scoutDialog.add(question, higConst.rc(4, 2));
+        scoutDialog.add(speak, higConst.rc(6, 2));
+        scoutDialog.add(demand, higConst.rc(8, 2));
+        scoutDialog.add(attack, higConst.rc(10, 2));
+        scoutDialog.add(cancel, higConst.rc(12, 2));
 
         scoutDialog.setSize(scoutDialog.getPreferredSize());
 

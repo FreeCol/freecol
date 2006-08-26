@@ -316,32 +316,43 @@ public class GoodsContainer extends FreeColGameObject {
 
         FreeColGameObject source = (FreeColGameObject) parent;
         
-        for (int i = 0; i < Goods.NUMBER_OF_TYPES; i++) {
-            if (i == Goods.FOOD) {
+        for (int typeOfGoods = 0; typeOfGoods < Goods.NUMBER_OF_TYPES; typeOfGoods++) {
+            if (typeOfGoods == Goods.FOOD) {
                 // ignore food
                 continue;
-            } else if (storedGoods[i] > limit ) {
+            } else if (storedGoods[typeOfGoods] > limit ) {
                 // limit has been exceeded
-                storedGoods[i] = limit;
-                addModelMessage(source, "model.building.warehouseOverfull",
-                                new String [][] {{"%goods%", Goods.getName(i)},
-                                                 {"%colony%", ((Colony) parent).getName()}},
-                                ModelMessage.WAREHOUSE_CAPACITY);
-            } else if (storedGoods[i] == limit && oldStoredGoods[i] < limit) {
+                storedGoods[typeOfGoods] = limit;
+                ModelMessage message =
+                    new ModelMessage(source, "model.building.warehouseOverfull",
+                                     new String [][] {{"%goods%", Goods.getName(typeOfGoods)},
+                                                      {"%colony%", ((Colony) parent).getName()}},
+                                     ModelMessage.WAREHOUSE_CAPACITY,
+                                     typeOfGoods);
+                getGame().addModelMessage(message);
+            } else if (storedGoods[typeOfGoods] == limit && 
+                       oldStoredGoods[typeOfGoods] < limit) {
                 // limit has been reached during this turn
-                addModelMessage(source, "model.building.warehouseOverfull",
-                                new String [][] {{"%goods%", Goods.getName(i)},
-                                                 {"%colony%", ((Colony) parent).getName()}},
-                                ModelMessage.WAREHOUSE_CAPACITY) ;
+                ModelMessage message =
+                    new ModelMessage(source, "model.building.warehouseOverfull",
+                                     new String [][] {{"%goods%", Goods.getName(typeOfGoods)},
+                                                      {"%colony%", ((Colony) parent).getName()}},
+                                     ModelMessage.WAREHOUSE_CAPACITY,
+                                     typeOfGoods);
+                getGame().addModelMessage(message);
             } else {
                 // check whether certain levels have been exceeded
-                for (int k = 0; k < levels.length; k++) {
-                    if (storedGoods[i] > levels[k] && oldStoredGoods[i] <= levels[k]) {
-                        addModelMessage(source, "model.building.warehouseFull",
-                                        new String [][] {{"%goods%", Goods.getName(i)},
-                                                         {"%level%", String.valueOf(levels[k])},
-                                                         {"%colony%", ((Colony) parent).getName()}},
-                                        ModelMessage.WAREHOUSE_CAPACITY) ;
+                for (int level = 0; level < levels.length; level++) {
+                    if (storedGoods[typeOfGoods] > levels[level] &&
+                        oldStoredGoods[typeOfGoods] <= levels[level]) {
+                        ModelMessage message = 
+                            new ModelMessage(source, "model.building.warehouseFull",
+                                             new String [][] {{"%goods%", Goods.getName(typeOfGoods)},
+                                                              {"%level%", String.valueOf(levels[level])},
+                                                              {"%colony%", ((Colony) parent).getName()}},
+                                             ModelMessage.WAREHOUSE_CAPACITY,
+                                             typeOfGoods);
+                        getGame().addModelMessage(message);
                         // don't report on more than one level
                         break;
                     }
