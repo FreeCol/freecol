@@ -387,6 +387,9 @@ public final class InGameController implements NetworkConstants {
         final Map map = freeColClient.getGame().getMap();
         final Location destination = unit.getDestination();
 
+        /* Fix a bug I don't know what caused it. Sometimes a unit have a goto order
+         * but it's already in destination
+         */
         if (destination == unit.getTile()) {
             clearOrders(unit);
             return;
