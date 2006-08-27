@@ -354,7 +354,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                             new String[][] {{"%player%", getOwner().getNationAsString()},
                                             {"%type%", Goods.getName(type)},
                                             {"%amount%", Integer.toString(amount)}},
-                            ModelMessage.DEFAULT);
+                            ModelMessage.GIFT_GOODS, type);
         }
     }
  

@@ -28,6 +28,7 @@ public class ModelMessage {
     public static final int FOREIGN_DIPLOMACY = 10;
     public static final int MARKET_PRICES = 11;
     public static final int LOST_CITY_RUMOUR = 12;
+    public static final int GIFT_GOODS = 13;
 
     private final FreeColGameObject source;
     private final int type;

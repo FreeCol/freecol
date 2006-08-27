@@ -554,6 +554,7 @@ public final class Canvas extends JLayeredPane {
                 break;
             case ModelMessage.MARKET_PRICES:
             case ModelMessage.WAREHOUSE_CAPACITY:
+            case ModelMessage.GIFT_GOODS:
                 int typeOfGoods = modelMessages[i].getTypeOfGoods();
                 if (typeOfGoods < 0) {
                     messageIcon[i] = null;
