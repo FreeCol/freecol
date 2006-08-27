@@ -217,6 +217,17 @@ public final class GUI {
         this.cursor = cursor;
     }
 
+    /**
+    * Selects the tile at the specified position, without clearing
+    * the orders of the first unit contained.
+    *
+    * @param selectedTile The <code>Position</code> of the tile
+    *                     to be selected.
+    * @see #setSelectedTile(Map.Position, boolean)
+    */
+    public void setSelectedTile(Position selectedTile) {
+        setSelectedTile(selectedTile, false);
+    }
 
     /**
     * Selects the tile at the specified position. There are three
@@ -226,7 +237,8 @@ public final class GUI {
     *   <li>If there is a {@link Colony} on the {@link Tile} the
     *       {@link Canvas#showColonyPanel} will be invoked.
     *   <li>If the tile contains a unit that can become active, then
-    *       that unit will be set as the active unit.
+    *       that unit will be set as the active unit, and clear their
+    *       goto orders if clearGoToOrders is <code>true</code>
     *   <li>If the two conditions above do not match, then the
     *       <code>selectedTile</code> will become the map focus.
     * </ol>
@@ -236,11 +248,13 @@ public final class GUI {
     *
     * @param selectedTile The <code>Position</code> of the tile
     *                     to be selected.
+    * @param clearGoToOrders Use <code>true</code> to clear goto orders
+    *                        of the unit which is activated.
     * @see #getSelectedTile
     * @see #setActiveUnit
     * @see #setFocus(Map.Position)
     */
-    public void setSelectedTile(Position selectedTile) {
+    public void setSelectedTile(Position selectedTile, boolean clearGoToOrders) {
         Game gameData = freeColClient.getGame();
 
         if (selectedTile != null && !gameData.getMap().isValid(selectedTile)) {
@@ -271,7 +285,7 @@ public final class GUI {
                     // The user might what to check the status of a unit - SG
                     if (unitInFront != activeUnit /*&& unitInFront.getMovesLeft() > 0*/) {
                         // Clear goto order when unit is activated
-                        if (unitInFront.getDestination() != null) {
+                        if (clearGoToOrders && unitInFront.getDestination() != null) {
                             freeColClient.getInGameController().clearOrders(unitInFront);
                         }
                         setActiveUnit(unitInFront);
