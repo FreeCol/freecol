@@ -537,7 +537,7 @@ public final class Canvas extends JLayeredPane {
                         int unitType = imageLibrary.getUnitGraphicsType((Unit) source);
                         messageIcon[i] = imageLibrary.getUnitImageIcon(unitType);
                     } catch(Exception e) {
-                        logger.warning("could not find image for unit");
+                        logger.warning("could not find image for unit " + ((Unit) source).getName());
                     }
                 }
                 break;
