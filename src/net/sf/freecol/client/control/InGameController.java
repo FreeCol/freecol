@@ -387,6 +387,11 @@ public final class InGameController implements NetworkConstants {
         final Map map = freeColClient.getGame().getMap();
         final Location destination = unit.getDestination();
 
+        if (destination == unit.getTile()) {
+            clearOrders(unit);
+            return;
+        }
+        
         PathNode path;
         if (destination instanceof Europe) {
             path = map.findPathToEurope(unit, unit.getTile());
