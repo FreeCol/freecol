@@ -857,7 +857,9 @@ public class IndianSettlement extends Settlement {
 
         /* Increase alarm: */
         if (getUnitCount() > 0) {
-            Iterator ci = getGame().getMap().getCircleIterator(getTile().getPosition(), true, getRadius());
+            // the radius in which Europeans cause alarm
+            int alarmRadius = getRadius() + 2;
+            Iterator ci = getGame().getMap().getCircleIterator(getTile().getPosition(), true, alarmRadius);
             while (ci.hasNext()) {
                 Tile t = getGame().getMap().getTile((Map.Position) ci.next());
                 if (t.getFirstUnit() != null && t.getFirstUnit().getOwner().isEuropean()) {
@@ -867,27 +869,29 @@ public class IndianSettlement extends Settlement {
                         Unit u = (Unit) ui.next();
                         if (u.isOffensiveUnit() && !u.isNaval()) {
                             int d = (u.getOwner().hasFather(FoundingFather.POCAHONTAS)) ? 2 : 1;
-                            modifyAlarm(u.getOwner(), u.getOffensePower(getTile().getDefendingUnit(u)) / d);
+                            modifyAlarm(u.getOwner(), u.getOffensePower(getTile().getDefendingUnit(u)) * 4 / d);
                         }
                     }
                 } else if (t.getOwner() != null && t.getOwner().getOwner().isEuropean()) {
                     // Land being used by another settlement:
                     int d = (t.getOwner().getOwner().hasFather(FoundingFather.POCAHONTAS)) ? 2 : 1;
-                    modifyAlarm(t.getOwner().getOwner(), 2 / d);
+                    modifyAlarm(t.getOwner().getOwner(), 8 / d);
                 }
 
                 // Settlement:
                 if (t.getSettlement() != null && t.getSettlement().getOwner().isEuropean()) {
                     int d = (t.getSettlement().getOwner().hasFather(FoundingFather.POCAHONTAS)) ? 2 : 1;
-                    modifyAlarm(t.getSettlement().getOwner(), (t.getSettlement().getUnitCount() / 2) / d);
+                    modifyAlarm(t.getSettlement().getOwner(), (t.getSettlement().getUnitCount() * 4 / 2) / d);
                 }
             }
 
             /* Decrease alarm slightly: */
+            /*
             for (int i=0; i<alarm.length; i++) {
                 int newAlarm = 4 + alarm[i].getValue()/100;
                 modifyAlarm(i, -newAlarm);
             }
+            */
         }
 
         /* Increase convert progress and generate convert if needed. */
