@@ -874,7 +874,7 @@ public final class Colony extends Settlement implements Location {
             return;
         }
 
-        int membership = (bells * 2) / (getUnitCount() + 1);
+        int membership = (bells * 2) / (getUnitCount() + 10);
         if (membership < 0) membership = 0;
         if (membership > 100) membership = 100;
         oldSonsOfLiberty = sonsOfLiberty;
