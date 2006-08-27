@@ -3298,7 +3298,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 if (victim == null) {
                     return;
                 }
-                addModelMessage(enemy, "model.unit.colonistSlaughtered",
+                addModelMessage(victim, "model.unit.colonistSlaughtered",
                                 new String[][] {{"%colony%", colony.getName()},
                                                 {"%unit%", victim.getName()}},
                                 ModelMessage.UNIT_LOST);
