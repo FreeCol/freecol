@@ -517,7 +517,7 @@ public class FreeColDialog extends FreeColPanel {
         };
 
         int[] w1 = {10, 300, 10};
-        int[] h1 = {10, 0, 10, 0, 10, 20, 10, 20, 10, 20, 10, 20, 10};
+        int[] h1 = {10, 70, 10, 70, 10, 20, 10, 20, 10, 20, 10, 20, 10};
 
         HIGLayout layout = new HIGLayout(w1, h1);
         //higConst.clearCorrection();
