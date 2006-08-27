@@ -378,6 +378,10 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         if (!defender.isDisposed() && (defender.getLocation() == null || !defender.isVisibleTo(getFreeColClient().getMyPlayer()))) {
+            if (result == Unit.ATTACK_DONE_SETTLEMENT && defender.getColony() != null
+                    && !defender.getColony().isDisposed()) {
+                defender.getColony().setUnitCount(defender.getColony().getUnitCount());
+            }
             defender.dispose();
         }
 

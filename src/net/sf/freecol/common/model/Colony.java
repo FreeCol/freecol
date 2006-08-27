@@ -206,7 +206,7 @@ public final class Colony extends Settlement implements Location {
     */
     public void setOwner(Player owner) {
         super.setOwner(owner);
-
+        
         Iterator unitIterator = getUnitIterator();
         while (unitIterator.hasNext()) {
             ((Unit)unitIterator.next()).setOwner(owner);
@@ -217,6 +217,16 @@ public final class Colony extends Settlement implements Location {
             Unit target = (Unit) tileUnitIterator.next();
             target.setOwner(getOwner());
         }
+    }
+    
+    /**
+     * Sets the number of units inside the colony, used in enemy colonies
+     * 
+     * @param unitCount The units inside the colony
+     * @see getUnitCount
+     */
+    public void setUnitCount(int unitCount) {
+        this.unitCount = unitCount;
     }
 
     /**
