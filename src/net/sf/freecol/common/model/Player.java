@@ -2342,7 +2342,7 @@ public class Player extends FreeColGameObject {
     * @see #incrementBells
     */
     public int getTotalFoundingFatherCost() {
-        return (getFatherCount() * getFatherCount() * 5) + 25;
+        return (getFatherCount() * getFatherCount() * (5 + getDifficulty()) + 50);
     }
 
     /**
