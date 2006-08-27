@@ -25,7 +25,7 @@ public final class ReportForeignAffairPanel extends ReportPanel implements Actio
      * @param parent The parent of this panel.
      */
     public ReportForeignAffairPanel(Canvas parent) {
-        super(parent, "Foreign Affairs Report");
+        super(parent, Messages.message("menuBar.report.foreign"));
     }
 
     /**

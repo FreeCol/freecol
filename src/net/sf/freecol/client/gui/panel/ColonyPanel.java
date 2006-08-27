@@ -200,7 +200,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         buildingsScroll.setAutoscrolls(true);
 
         buyBuilding.setSize(132, 20);
-        exitButton.setSize(80, 20);
+        exitButton.setSize(110, 20);
         outsideColonyScroll.setSize(204, 275);
         inPortScroll.setSize(250, 120);
         cargoScroll.setSize(365, 120);
@@ -340,7 +340,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         warehouseScroll.setLocation (10, y);    //450);
 
         y+= 120;
-        exitButton.setLocation      (760, y);   //570);
+        exitButton.setLocation      (730, y);   //570);
 
     }
 
@@ -1626,7 +1626,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         public void initialize() {
             super.removeActionListener(buildingBoxListener);
             removeAllItems();
-            BuildingBoxItem nothingItem = new BuildingBoxItem("Nothing", -1);
+            BuildingBoxItem nothingItem = new BuildingBoxItem(Messages.message("nothing"), -1);
             this.addItem(nothingItem);
             BuildingBoxItem toSelect = nothingItem;
             for (int i = 0; i < Building.NUMBER_OF_TYPES; i++) {

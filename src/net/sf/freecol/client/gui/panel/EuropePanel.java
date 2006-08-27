@@ -105,7 +105,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         setFocusCycleRoot(true);
         setSize(parent.getWidth(), parent.getHeight() - parent.getMenuBarHeight());
 
-        exitButton = new JButton("Close");
+        exitButton = new JButton(Messages.message("close"));
         
         // Use ESCAPE for closing the ColonyPanel:
         InputMap inputMap = new ComponentInputMap(exitButton);
@@ -205,7 +205,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         inPortScroll.setSize(430, 96);
         cargoScroll.setSize(inPortScroll.getSize());
         docksScroll.setSize(marketScroll.getWidth() - inPortScroll.getWidth() - SPACE, cargoScroll.getHeight() + inPortScroll.getHeight() + SPACE);        
-        exitButton.setSize(80, 20);
+        exitButton.setSize(110, 20);
         recruitButton.setSize(100, 20);
         purchaseButton.setSize(100, 20);
         trainButton.setSize(100, 20);                        
