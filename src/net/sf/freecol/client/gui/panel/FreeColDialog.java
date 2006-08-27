@@ -242,7 +242,7 @@ public class FreeColDialog extends FreeColPanel {
     public static FreeColDialog createInformationDialog(String[] texts, ImageIcon[] images) {
 
         int margin = 10;
-        int[] widths = {margin, 0, 10, 250, margin};
+        int[] widths = {margin, 0, 10, 0, margin};
         int[] heights = new int[texts.length + 4];
         heights[0] = margin;
 
@@ -379,7 +379,7 @@ public class FreeColDialog extends FreeColPanel {
         };
 
         int margin = 10;
-        int[] widths = {margin, 0, 10, 250, margin};
+        int[] widths = {margin, 0, 10, 0, margin};
         int[] heights = new int[texts.length + 4];
         heights[0] = margin;
 
@@ -517,7 +517,7 @@ public class FreeColDialog extends FreeColPanel {
         };
 
         int[] w1 = {10, 300, 10};
-        int[] h1 = {10, 70, 10, 70, 10, 20, 10, 20, 10, 20, 10, 20, 10};
+        int[] h1 = {10, 0, 10, 0, 10, 20, 10, 20, 10, 20, 10, 20, 10};
 
         HIGLayout layout = new HIGLayout(w1, h1);
         //higConst.clearCorrection();
