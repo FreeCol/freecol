@@ -1014,6 +1014,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 }
             }
         }
+        
+        // For updating the number of colonist:
+        sendUpdatedTileToAll(unit.getTile(), player);
 
         return null;
     }
