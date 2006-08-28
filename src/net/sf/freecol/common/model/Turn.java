@@ -1,6 +1,8 @@
 
 package net.sf.freecol.common.model;
 
+import net.sf.freecol.client.gui.i18n.Messages;
+
 
 /**
 * Represents a given turn in the game.
@@ -108,6 +110,7 @@ public class Turn {
         }
 
         int c = turn - (SEASON_YEAR - STARTING_YEAR - 1);
-        return ((c%2==0) ? "Spring " : "Autumn ") + Integer.toString(SEASON_YEAR + c/2 - 1);
+        return ((c%2==0) ? Messages.message("spring") : Messages.message("autumn"))
+                + " " + Integer.toString(SEASON_YEAR + c/2 - 1);
     }
 }
