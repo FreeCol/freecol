@@ -890,6 +890,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                     logger.fine("Attempting marine assault with " + getName());
                     return ILLEGAL_MOVE;
                 }
+            } else if (target.getFirstUnit() != null && target.getFirstUnit().isNaval() &&
+                       target.getFirstUnit().getOwner() != getOwner()) {
+                // An enemy ship in land tile without a settlement
+                return ILLEGAL_MOVE;
             } else if (getMoveCost(target) > getMovesLeft()) {
                 return ILLEGAL_MOVE;
             } else if (target.hasLostCityRumour()) {
