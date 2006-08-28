@@ -56,33 +56,35 @@ public class DefaultCostDecider implements CostDecider {
             if (newTile.getSettlement() != null
                     && newTile.getSettlement().getOwner() != unit.getOwner()) {
                 // A settlement is blocking the path:
-                newTurn = true;
-                movesLeft = 0;
-                return ml;
+                return ILLEGAL_MOVE;
             } else if (mc - 2 <= movesLeft && getMovesLeft() != 0) {
                 // Normal move: Using -2 in order to make 1/3 and 2/3 move count as 3/3.
                 if (mc <= movesLeft) {
-                    movesLeft -= mc;
-                    return mc;
+                    if ((unit.isNaval() || unit.getType() == Unit.WAGON_TRAIN) &&
+                            newTile.getSettlement() != null) {
+                        // A ship or wagon entering in a colony
+                        movesLeft = 0;
+                        return ml;
+                    } else if (unit.isNaval() && oldTile.isLand() && oldTile.getSettlement() == null) {
+                        // Ship on land due to it was in a colony which was abandoned
+                        movesLeft = 0;
+                        return ml;
+                    } else {
+                        movesLeft -= mc;
+                        return mc;
+                    }
                 } else {
                     movesLeft = 0;
                     return ml;
                 }
-            } else if (movesLeft == unit.getInitialMovesLeft()) {
+            } else if (movesLeft + 2 >= unit.getInitialMovesLeft()) {
                 movesLeft = 0;
                 return ml;
             } else {
                 // This move takes an extra turn to complete:
+                mc = getCost(unit, oldTile, newTile, unit.getInitialMovesLeft(), turns+1);
                 newTurn = true;
-                if (mc > unit.getInitialMovesLeft()) {
-                    // Entering a terrain with a higher move cost than the initial moves:
-                    movesLeft = 0;
-                    return mc + unit.getInitialMovesLeft();
-                } else {
-                    // Normal move:
-                    movesLeft = unit.getInitialMovesLeft() - mc;
-                    return movesLeft + mc;
-                }
+                return ml + mc;
             }
         }
     }
