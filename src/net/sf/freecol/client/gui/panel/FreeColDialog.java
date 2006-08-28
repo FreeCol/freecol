@@ -4,8 +4,10 @@ import java.awt.AWTEvent;
 import java.awt.ActiveEvent;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
+import java.awt.FontMetrics;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.MenuComponent;
@@ -16,11 +18,13 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
+import java.text.BreakIterator;
 import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -512,8 +516,8 @@ public class FreeColDialog extends FreeColPanel {
     
         String mainText = Messages.message(messageID, data);
 
-        final JLabel intro = new JLabel("<html><body><p>" + introText + "</p></body></html>");
-        final JLabel question = new JLabel("<html><body><p>" + mainText + "</p></body></html>");
+        final JLabel intro = new WrapLabel(introText, 300);
+        final JLabel question = new WrapLabel(mainText, 300);
         final JButton speak = new JButton(Messages.message("scoutSettlement.speak")),
                 demand = new JButton(Messages.message("scoutSettlement.tribute")),
                 attack = new JButton(Messages.message("scoutSettlement.attack")),
@@ -526,7 +530,7 @@ public class FreeColDialog extends FreeColPanel {
         };
 
         int[] w1 = {10, 300, 10};
-        int[] h1 = {10, 70, 10, 70, 10, 20, 10, 20, 10, 20, 10, 20, 10};
+        int[] h1 = {10, 0, 10, 0, 10, 20, 10, 20, 10, 20, 10, 20, 10};
 
         HIGLayout layout = new HIGLayout(w1, h1);
         //higConst.clearCorrection();
@@ -578,12 +582,12 @@ public class FreeColDialog extends FreeColPanel {
     * @return The FreeColDialog that asks the question to the user.
     */
     public static FreeColDialog createUseMissionaryDialog(IndianSettlement settlement, Player player) {
-        String intro = Messages.message(settlement.getAlarmLevelMessage(player),
+        String introText = Messages.message(settlement.getAlarmLevelMessage(player),
                                         new String [][] {{"%nation%", settlement.getOwner().getNationAsString()}});
         String mainText = Messages.message("missionarySettlement.question");
 
-        final JLabel question = new JLabel("<html><body><p>" + intro +
-                                           "</p><p>" + mainText + "</p></body></html>");
+        final JLabel intro = new WrapLabel(introText, 260);
+        final JLabel main = new WrapLabel(mainText, 260);
         final JButton establishOrHeresy = new JButton(),
                 incite = new JButton(Messages.message("missionarySettlement.incite")),
                 cancel = new JButton(Messages.message("missionarySettlement.cancel"));
@@ -602,7 +606,7 @@ public class FreeColDialog extends FreeColPanel {
         };
 
         int[] w1 = {10, 30, 200, 30, 10};
-        int[] h1 = {10, 100, 10, 20, 10, 20, 10, 20, 10};
+        int[] h1 = {10, 0, 10, 0, 10, 20, 10, 20, 10, 20, 10};
         HIGLayout layout = new HIGLayout(w1, h1);
         higConst.clearCorrection();
         layout.setRowWeight(2,1);
@@ -634,10 +638,11 @@ public class FreeColDialog extends FreeColPanel {
             }
         });
 
-        missionaryDialog.add(question, higConst.rcwh(2, 2, 3, 1));
-        missionaryDialog.add(establishOrHeresy, higConst.rc(4, 3));
-        missionaryDialog.add(incite, higConst.rc(6, 3));
-        missionaryDialog.add(cancel, higConst.rc(8, 3));
+        missionaryDialog.add(intro, higConst.rcwh(2, 2, 3, 1));
+        missionaryDialog.add(main, higConst.rcwh(4, 2, 3, 1));
+        missionaryDialog.add(establishOrHeresy, higConst.rc(6, 3));
+        missionaryDialog.add(incite, higConst.rc(8, 3));
+        missionaryDialog.add(cancel, higConst.rc(10, 3));
 
         missionaryDialog.setSize(missionaryDialog.getPreferredSize());
 
@@ -659,7 +664,7 @@ public class FreeColDialog extends FreeColPanel {
     public static FreeColDialog createInciteDialog(Vector allPlayers, Player thisUser) {
         String mainText = Messages.message("missionarySettlement.inciteQuestion");
 
-        final JLabel question = new JLabel("<html><body>" + mainText + "</body></html>");
+        final JLabel question = new WrapLabel(mainText, 260);
         final JButton[] players = new JButton[allPlayers.size() - 1];
         final JButton cancel = new JButton(Messages.message("missionarySettlement.cancel"));
 
@@ -682,9 +687,9 @@ public class FreeColDialog extends FreeColPanel {
         int[] w1 = {10, 30, 200, 30, 10};
         int[] h1 = new int[3 + allPlayers.size() * 2];
 
-        // h1 = {10, 100, 10, 20, 10, 20, 10, 20, 10, ...};
+        // h1 = {10, 0, 10, 20, 10, 20, 10, 20, 10, ...};
         h1[0] = 10;
-        h1[1] = 100;
+        h1[1] = 0;
         h1[2] = 10;
         for (int i = 3; i < h1.length; i += 2) {
             h1[i] = 20;
@@ -958,4 +963,59 @@ public class FreeColDialog extends FreeColPanel {
         }
     }
 
+    static final class WrapLabel extends JLabel {
+        public WrapLabel() {
+            super();
+        }
+        
+        public WrapLabel(Icon image) {
+            super(image);
+        }
+        
+        public WrapLabel(Icon image, int horizontalAlignment) {
+            super(image, horizontalAlignment);
+        }
+            
+        public WrapLabel(String text, int maxWidth) {
+            setText(text, maxWidth);
+        }
+        
+        public WrapLabel(String text, int maxWidth, Icon icon, int horizontalAlignment) {
+            super(icon, horizontalAlignment);
+            setText(text, maxWidth);
+        }
+        
+        public WrapLabel(String text, int maxWidth, int horizontalAlignment) {
+            setText(text, maxWidth);
+            setHorizontalAlignment(horizontalAlignment);
+        }
+            
+        public void setText(String text, int maxWidth) {
+            FontMetrics fm = getFontMetrics(getFont());
+
+            BreakIterator boundary = BreakIterator.getWordInstance();
+            boundary.setText(text);
+
+            StringBuffer trial = new StringBuffer();
+            StringBuffer real = new StringBuffer("<html><body><p>");
+
+            int lines = 1;
+            int start = boundary.first();
+            for (int end = boundary.next(); end != BreakIterator.DONE;
+                    start = end, end = boundary.next()) {
+                    String word = text.substring(start,end);
+                    trial.append(word);
+                    int trialWidth = fm.stringWidth(trial.toString());
+                    if (trialWidth > maxWidth) {
+                            trial = new StringBuffer(word);
+                            lines++;
+                    }
+                    real.append(word);
+            }
+            real.append("</p></body></html>");
+
+            setText(real.toString());
+            setPreferredSize(new Dimension(maxWidth, fm.getHeight() * lines));
+        }
+    }
 }
