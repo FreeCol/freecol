@@ -1613,8 +1613,12 @@ public final class InGameController implements NetworkConstants {
         switch (userAction) {
             case FreeColDialog.SCOUT_INDIAN_SETTLEMENT_ATTACK:
                 scoutMessage.setAttribute("action", "attack");
+                // The movesLeft has been set to 0 when the scout initiated its action.
+                // If it wants to attack then it can and it will need some moves to do it.
+                unit.setMovesLeft(1);
                 client.sendAndWait(scoutMessage);
                 attack(unit, direction);
+                return;
             case FreeColDialog.SCOUT_INDIAN_SETTLEMENT_CANCEL:
                 scoutMessage.setAttribute("action", "cancel");
                 client.sendAndWait(scoutMessage);
