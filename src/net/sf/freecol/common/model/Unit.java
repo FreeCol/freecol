@@ -694,6 +694,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
         } else if ((isNaval() || getType() == WAGON_TRAIN) && target.getSettlement() != null) {            
             return getMovesLeft();
+        } else if (isNaval() && getTile().isLand() && getTile().getSettlement() == null) {
+            // Ship on land due to it was in a colony which was abandoned
+            return getMovesLeft();
         } else {
             return cost;
         }
