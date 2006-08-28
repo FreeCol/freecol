@@ -381,6 +381,7 @@ public class FreeColDialog extends FreeColPanel {
         int margin = 10;
         int[] widths = {margin, 0, 10, 0, margin};
         int[] heights = new int[texts.length + 4];
+        int buttonsWidth = -widths[3];
         heights[0] = margin;
 
         for (int i = 0; i < texts.length; i++) {
@@ -394,16 +395,22 @@ public class FreeColDialog extends FreeColPanel {
         HIGLayout layout = new HIGLayout(widths, heights);
         confirmDialog.setLayout(layout);
 
+        int maxImageWidth = 0;
+        int maxTextWidth = 0;
         for (int i = 0; i < texts.length; i++) {
             // add two to index because HIGLayout starts at one and
             // there is a margin
             int row = i + 2;
             if (images[i] != null) {
-                confirmDialog.add(new JLabel(images[i]), higConst.rc(row, 2));
+                JLabel image = new JLabel(images[i]);
+                confirmDialog.add(image, higConst.rc(row, 2));
+                maxImageWidth = Math.max(maxImageWidth, image.getPreferredSize().width);
             }
-            confirmDialog.add(new JLabel("<html><body><p>" + texts[i] + "</body></html>"),
-                              higConst.rc(row, 4));
+            JLabel text = new JLabel("<html><body><p>" + texts[i] + "</body></html>");
+            confirmDialog.add(text, higConst.rc(row, 4));
+            maxTextWidth = Math.max(maxTextWidth, text.getPreferredSize().width);
         }
+        buttonsWidth -= maxImageWidth;
 
         // decide on some mnemonics for the actions
         char  okButtonMnemonic = '\0';
@@ -456,10 +463,11 @@ public class FreeColDialog extends FreeColPanel {
         cancelAction.putValue( Action.MNEMONIC_KEY, new Integer(cancelButtonMnemonic) );
 
         // build the button panel
-        JPanel  buttonPanel = new JPanel( new FlowLayout(FlowLayout.CENTER) );
+        JPanel buttonPanel = new JPanel( new FlowLayout(FlowLayout.CENTER) );
         buttonPanel.setOpaque(false);
         buttonPanel.add( okButton );
         buttonPanel.add( new JButton(cancelAction) );
+        buttonsWidth += buttonPanel.getPreferredSize().width;
 
         // finish building the dialog
         //confirmDialog.setLayout( new BorderLayout() );
@@ -467,6 +475,7 @@ public class FreeColDialog extends FreeColPanel {
         //confirmDialog.add( buttonPanel, BorderLayout.SOUTH );
         int buttonRow = texts.length + 3;
         confirmDialog.add(buttonPanel, higConst.rcwh(buttonRow, 2, 3, 1));
+        layout.setPreferredColumnWidth(4, Math.max(buttonsWidth, maxTextWidth));
         confirmDialog.setSize( confirmDialog.getPreferredSize() );
         confirmDialog.setCancelComponent( new JButton(cancelAction) );
 
