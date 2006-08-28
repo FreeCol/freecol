@@ -367,7 +367,7 @@ public class Map extends FreeColGameObject {
                 
                 // Disembark from 'carrier':
                 if (carrier != null && newTile.isLand() && unit.isNaval()
-                        && (newTile.getSettlement() == null || newTile.getSettlement().getOwner() != unit.getOwner())
+                        && (newTile.getSettlement() == null || newTile.getSettlement().getOwner() == unit.getOwner())
                         && newTile != end) {
                     int mc = newTile.getMoveCost(currentNode.getTile());
                     if (theUnit.getInitialMovesLeft() < carrier.getInitialMovesLeft()) {
