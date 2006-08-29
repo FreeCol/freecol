@@ -749,6 +749,10 @@ public final class InGameController implements NetworkConstants {
         Element moveElement = Message.createNewRootElement("move");
         moveElement.setAttribute("unit", unit.getID());
         moveElement.setAttribute("direction", Integer.toString(direction));
+
+        //client.send(moveElement);
+        Element reply = client.ask(moveElement);
+        freeColClient.getInGameInputHandler().handle(client.getConnection(), reply);
         
         unit.move(direction);
 
@@ -760,10 +764,6 @@ public final class InGameController implements NetworkConstants {
             client.sendAndWait(setNewLandNameElement);
             canvas.showEventDialog(EventPanel.FIRST_LANDING);
         }
-
-        //client.send(moveElement);
-        Element reply = client.ask(moveElement);
-        freeColClient.getInGameInputHandler().handle(client.getConnection(), reply);
 
         if (unit.getTile().getSettlement() != null && unit.isCarrier()) {
             canvas.showColonyPanel((Colony) unit.getTile().getSettlement());
