@@ -353,7 +353,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             addModelMessage(settlement.getOwner(), "model.unit.gift",
                             new String[][] {{"%player%", getOwner().getNationAsString()},
                                             {"%type%", Goods.getName(type)},
-                                            {"%amount%", Integer.toString(amount)}},
+                                            {"%amount%", Integer.toString(amount)},
+                                            {"%colony%", ((Colony) settlement).getName()}},
                             ModelMessage.GIFT_GOODS, type);
         }
     }
