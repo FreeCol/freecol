@@ -422,7 +422,11 @@ public final class InGameController implements NetworkConstants {
                 reallyMove(unit, path.getDirection());
                 break;
             case Unit.EXPLORE_LOST_CITY_RUMOUR:
-                exploreLostCityRumour(unit, path.getDirection());
+                if (canvas.showConfirmDialog("exploreLostCityRumour.text",
+                                             "exploreLostCityRumour.yes",
+                                             "exploreLostCityRumour.no")) {
+                    reallyMove(unit, path.getDirection());
+                }
                 break;
             case Unit.MOVE_HIGH_SEAS:
                 if (destination instanceof Europe) {
@@ -515,7 +519,12 @@ public final class InGameController implements NetworkConstants {
             case Unit.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS:
                                         tradeWithSettlement(unit, direction); break;
             case Unit.EXPLORE_LOST_CITY_RUMOUR:
-                                        exploreLostCityRumour(unit, direction); break;
+                if (canvas.showConfirmDialog("exploreLostCityRumour.text",
+                                             "exploreLostCityRumour.yes",
+                                             "exploreLostCityRumour.no")) {
+                    reallyMove(unit, direction);
+                }
+                break;
             case Unit.ILLEGAL_MOVE:     freeColClient.playSound(SfxLibrary.ILLEGAL_MOVE); break;
             default:                    throw new RuntimeException("unrecognised move: " + move);
         }
@@ -683,27 +692,6 @@ public final class InGameController implements NetworkConstants {
 
         unit.deliverGift(settlement, goods);
         nextActiveUnit(unit.getTile());
-    }
-
-    /**
-     * Explores a lost city rumour.
-     *
-     * @param unit The unit to be moved.
-     * @param direction The direction in which to move the Unit.
-     */
-    private void exploreLostCityRumour(Unit unit, int direction) {
-        Client client = freeColClient.getClient();
-        // first, really move in that direction
-        reallyMove(unit, direction);
-
-        // next, see what we find there
-        Element exploreElement = Message.createNewRootElement("explore");
-        exploreElement.setAttribute("unit", unit.getID());
-
-        Element reply = client.ask(exploreElement);
-        freeColClient.getInGameInputHandler().handle(client.getConnection(), reply);
-
-        nextActiveUnit();
     }
 
     /**
@@ -942,11 +930,7 @@ public final class InGameController implements NetworkConstants {
                 Unit u = (Unit) unitIterator.next();
 
                 if ((u.getState() == Unit.ACTIVE) && u.getMovesLeft() > 0) {
-                    if (destinationTile.hasLostCityRumour()) {
-                        exploreLostCityRumour(u, direction);
-                    } else {
-                        reallyMove(u, direction);
-                    }
+                    reallyMove(u, direction);
                     return;
                 }
             }
