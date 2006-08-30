@@ -881,7 +881,7 @@ public final class InGameInputHandler extends InputHandler {
         default:
             throw new IllegalStateException( "No such rumour." );
         }
-        canvas.showModelMessage(m);
+        game.addModelMessage(m);
         return null;
     }
 }

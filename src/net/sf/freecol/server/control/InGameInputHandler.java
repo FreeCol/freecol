@@ -493,7 +493,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
          * outside indian territory:
          */          
         if (tile.getNationOwner() == Player.NO_NATION
-            || !game.getPlayer(tile.getNationOwner()).isIndian()) {
+            || Player.isEuropean(tile.getNationOwner())) {
             probability[LostCityRumour.BURIAL_GROUND] = 0;
         }
 
@@ -561,9 +561,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalStateException( "No such rumour." );
         }
 
-        // tell the player about the result
+        // tell the player about the result, sendAndWait to avoid a block
         try {
-            player.getConnection().send(rumourElement);
+            player.getConnection().sendAndWait(rumourElement);
         } catch (IOException e) {
             logger.warning("Could not send rumour message to: " +
                            player.getName() + " with connection " +
