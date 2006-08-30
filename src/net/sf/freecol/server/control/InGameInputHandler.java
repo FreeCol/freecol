@@ -420,8 +420,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
 
         if (newTile.hasLostCityRumour()) {
+            newTile.setLostCityRumour(false);
             exploreLostCityRumour(newTile, unit, player);
-            newTile.setLostCityRumour(false);           
         }
 
         return reply;
