@@ -738,11 +738,19 @@ public final class InGameController implements NetworkConstants {
         moveElement.setAttribute("unit", unit.getID());
         moveElement.setAttribute("direction", Integer.toString(direction));
 
+        // move before ask to server, to be in new tile in case there is a rumour
+        unit.move(direction);
+
         //client.send(moveElement);
         Element reply = client.ask(moveElement);
         freeColClient.getInGameInputHandler().handle(client.getConnection(), reply);
         
-        unit.move(direction);
+        // set location again in order to meet with people player don't see before move
+        unit.setLocation(unit.getTile());
+        // if unit was disposed, it's in tile again due to setLocation, remove it
+        if (unit.isDisposed()) {
+            unit.getTile().remove(unit);
+        }
 
         if (unit.getTile().isLand() && unit.getOwner().getNewLandName() == null) {
             String newLandName = canvas.showInputDialog("newLand.text", unit.getOwner().getDefaultNewLandName(), "newLand.yes", null);
