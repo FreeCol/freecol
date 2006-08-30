@@ -214,7 +214,21 @@ public final class PreGameInputHandler extends InputHandler {
     *                holds all the information.
     */
     private Element startGame(Element element) {
-        getFreeColClient().getPreGameController().startGame();
+        /* Wait until map is received from server, sometimes this message arrives
+         * when map is still null. Wait in other thread in order not to block and
+         * it can receive the map.
+         */
+        new Thread() {
+            public void run() {
+                while (getFreeColClient().getGame().getMap() == null) {
+                    try {
+                        Thread.sleep(200);
+                    } catch (Exception ex) {}
+                }
+
+                getFreeColClient().getPreGameController().startGame();
+            }
+        }.start();
         return null;
     }
 
