@@ -246,12 +246,90 @@ public final class InGameController implements NetworkConstants {
 
         Unit unit = freeColClient.getGUI().getActiveUnit();
 
-        if (unit == null) {
+        if (unit == null || !unit.canBuildColony()) {
             return;
         }
 
-        if (!unit.canBuildColony()) {
+        Tile tile = unit.getTile();
+
+        if (tile == null) {
             return;
+        }
+
+        if (freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_COLONY_WARNINGS)) {
+
+            boolean landLocked = true;
+            int lumber = 0;
+            int food = tile.potential(Goods.FOOD);
+            int ore = 0;
+            boolean ownedByEuropeans = false;
+            boolean ownedBySelf = false;
+            boolean ownedByIndians = false;
+
+            if (tile.secondaryGoods() == Goods.ORE) {
+                ore = 3;
+            }
+
+            Map map = game.getMap();
+            Iterator tileIterator = map.getAdjacentIterator(tile.getPosition());
+            while (tileIterator.hasNext()) {
+                Tile newTile = map.getTile((Position) tileIterator.next());
+                if (newTile.isLand()) {
+                    lumber += newTile.potential(Goods.LUMBER);
+                    food += newTile.potential(Goods.FOOD);
+                    ore += newTile.potential(Goods.ORE);
+                    int tileOwner = newTile.getNationOwner();
+                    if (tileOwner == unit.getNation()) {
+                        ownedBySelf = true;
+                    } else if (Player.isEuropean(tileOwner)) {
+                        ownedByEuropeans = true;
+                    } else if (tileOwner != Player.NO_NATION) {
+                        ownedByIndians = true;
+                    }
+                } else {
+                    landLocked = false;
+                }
+            }
+
+            ArrayList messages = new ArrayList();
+            if (landLocked) {
+                messages.add(new ModelMessage(unit, "buildColony.landLocked", null, 
+                                              ModelMessage.MISSING_GOODS, Goods.FISH));
+                }
+            if (food < 8) {
+                messages.add(new ModelMessage(unit, "buildColony.noFood", null,
+                                              ModelMessage.MISSING_GOODS, Goods.FOOD));
+            }
+            if (lumber < 4) {
+                messages.add(new ModelMessage(unit, "buildColony.noLumber", null,
+                                              ModelMessage.MISSING_GOODS, Goods.LUMBER));
+            }
+            if (ore < 2) {
+                messages.add(new ModelMessage(unit, "buildColony.noOre", null,
+                                              ModelMessage.MISSING_GOODS, Goods.ORE));
+            }
+            if (ownedBySelf) {
+                messages.add(new ModelMessage(unit, "buildColony.ownLand", null,
+                                              ModelMessage.WARNING));
+            }
+            if (ownedByEuropeans) {
+                messages.add(new ModelMessage(unit, "buildColony.EuropeanLand", null,
+                                              ModelMessage.WARNING));
+            }
+            if (ownedByIndians) {
+                messages.add(new ModelMessage(unit, "buildColony.IndianLand", null,
+                                              ModelMessage.WARNING));
+            }
+
+            if (messages.size() > 0) {
+                ModelMessage[] modelMessages = new ModelMessage[messages.size()];
+                for (int i = 0; i < messages.size(); i++) {
+                    modelMessages[i] = (ModelMessage) messages.get(i);
+                }
+                if (!freeColClient.getCanvas().showConfirmDialog(modelMessages, "buildColony.yes", "buildColony.no")) {
+                    return;
+                }
+            }
         }
 
         String name = freeColClient.getCanvas().showInputDialog("nameColony.text", 
@@ -2148,6 +2226,8 @@ public final class InGameController implements NetworkConstants {
             return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_FOREIGN_DIPLOMACY);
         case ModelMessage.MARKET_PRICES:
             return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_MARKET_PRICES);
+        case ModelMessage.MISSING_GOODS:
+            return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_MISSING_GOODS);
         default:
             return true;
         }

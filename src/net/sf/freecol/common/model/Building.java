@@ -653,7 +653,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
                                 new String[][] {{"%inputGoods%", Goods.getName(goodsInputType)},
                                                 {"%building%", getName()},
                                                 {"%colony%", colony.getName()}},
-                                ModelMessage.WARNING);
+                                ModelMessage.MISSING_GOODS, goodsInputType);
             }
 
             if (goodsOutput <= 0) return;

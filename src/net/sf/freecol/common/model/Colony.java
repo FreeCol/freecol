@@ -1196,7 +1196,7 @@ public final class Colony extends Settlement implements Location {
                     addModelMessage(this, "model.colony.itemNeedTools",
                                     new String[][] {{"%colony%", getName()},
                                                     {"%item%", Unit.getName(unitType)}},
-                                    ModelMessage.WARNING);
+                                    ModelMessage.MISSING_GOODS, Goods.TOOLS);
                 }
             }
         } else if (currentlyBuilding != -1) {
@@ -1223,7 +1223,7 @@ public final class Colony extends Settlement implements Location {
                     addModelMessage(this, "model.colony.itemNeedTools",
                                     new String[][] {{"%colony%", getName()},
                                                     {"%item%", getBuilding(currentlyBuilding).getNextName()}},
-                                    ModelMessage.WARNING);
+                                    ModelMessage.MISSING_GOODS, Goods.TOOLS);
                 }
             }
         }

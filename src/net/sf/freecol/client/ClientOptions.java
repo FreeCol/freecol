@@ -77,6 +77,8 @@ public class ClientOptions extends OptionMap {
     public static final String SHOW_FOREIGN_DIPLOMACY = "guiShowForeignDiplomacy";
     public static final String SHOW_MARKET_PRICES = "guiShowMarketPrices";
     public static final String SHOW_LOST_CITY_RUMOURS = "guiShowLostCityRumours";
+    public static final String SHOW_MISSING_GOODS = "guiShowMissingGoods";
+    public static final String SHOW_COLONY_WARNINGS = "guiShowColonyWarnings";
 
     /**
     * Creates a new <code>ClientOptions</code>.
@@ -167,6 +169,14 @@ public class ClientOptions extends OptionMap {
                                        "clientOptions.gui."+ SHOW_MARKET_PRICES +".name",
                                        "clientOptions.gui."+ SHOW_MARKET_PRICES +".shortDescription", 
                                        false));
+        messagesGroup.add(new BooleanOption(SHOW_MISSING_GOODS,
+                                       "clientOptions.gui." + SHOW_MISSING_GOODS + ".name",
+                                       "clientOptions.gui." + SHOW_MISSING_GOODS + ".shortDescription",
+                                       true));
+        messagesGroup.add(new BooleanOption(SHOW_COLONY_WARNINGS,
+                                       "clientOptions.gui." + SHOW_COLONY_WARNINGS + ".name",
+                                       "clientOptions.gui." + SHOW_COLONY_WARNINGS + ".shortDescription",
+                                       true));
         add(messagesGroup);
     }
 

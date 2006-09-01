@@ -555,6 +555,7 @@ public final class Canvas extends JLayeredPane {
             case ModelMessage.MARKET_PRICES:
             case ModelMessage.WAREHOUSE_CAPACITY:
             case ModelMessage.GIFT_GOODS:
+            case ModelMessage.MISSING_GOODS:
                 int typeOfGoods = modelMessages[i].getTypeOfGoods();
                 if (typeOfGoods < 0) {
                     messageIcon[i] = null;
@@ -670,6 +671,56 @@ public final class Canvas extends JLayeredPane {
         return response;
     }
 
+    /**
+    * Displays a dialog with a text and a ok/cancel option.
+    *
+    * @param messages The messages that explains the choice for the user.
+    * @param okText The text displayed on the "ok"-button.
+    * @param cancelText The text displayed on the "cancel"-button.
+    * @return <i>true</i> if the user clicked the "ok"-button
+    *         and <i>false</i> otherwise.
+    * @see FreeColDialog
+    */
+    public boolean showConfirmDialog(ModelMessage[] messages, String okText, String cancelText) {
+        try {
+            okText = Messages.message(okText);
+        } catch (MissingResourceException e) {
+            logger.warning("could not find message with id: " + okText + ".");
+        }
+        try {
+            cancelText = Messages.message(cancelText);
+        } catch (MissingResourceException e) {
+            logger.warning("could not find message with id: " + cancelText + ".");
+        }
+
+        String[] texts = new String[messages.length];
+        ImageIcon[] images = new ImageIcon[messages.length];
+        for (int i = 0; i < messages.length; i++) {
+            String ID = messages[i].getMessageID();
+            try {
+                texts[i] = Messages.message(ID);
+            } catch (MissingResourceException e) {
+                logger.warning("could not find message with id: " + ID + ".");
+            }
+            switch (messages[i].getType()) {
+            case ModelMessage.MISSING_GOODS:
+                images[i] = getImageProvider().getGoodsImageIcon(messages[i].getTypeOfGoods());
+                break;
+            default:
+                images[i] = null;
+            }
+        }            
+
+        FreeColDialog confirmDialog = FreeColDialog.createConfirmDialog(texts, images, okText, cancelText);
+        addCentered(confirmDialog, CONFIRM_LAYER);
+        confirmDialog.requestFocus();
+
+        boolean response = confirmDialog.getResponseBoolean();
+
+        remove(confirmDialog);
+
+        return response;
+    }
 
     /**
     * Checks if this <code>Canvas</code> displaying another panel.
