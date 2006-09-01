@@ -40,8 +40,10 @@ public final class SelectOptionUI extends JPanel implements OptionUpdater {
 
         this.option = option;
 
-        JLabel label = new JLabel(option.getName(), JLabel.LEFT);
-        label.setToolTipText(option.getShortDescription());
+        String name = option.getName();
+        String description = option.getShortDescription();
+        JLabel label = new JLabel(name, JLabel.LEFT);
+        label.setToolTipText((description != null) ? description : name);
         add(label);
 
         String[] strings = option.getOptions();

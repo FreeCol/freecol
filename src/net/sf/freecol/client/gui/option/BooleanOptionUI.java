@@ -37,8 +37,10 @@ public final class BooleanOptionUI extends JPanel implements OptionUpdater {
 
         this.option = option;
 
-        checkBox = new JCheckBox(option.getName(), option.getValue());
-        checkBox.setToolTipText(option.getShortDescription());
+        String name = option.getName();
+        String description = option.getShortDescription();
+        checkBox = new JCheckBox(name, option.getValue());
+        checkBox.setToolTipText((description != null) ? description : name);
         
         add(checkBox);
         setBorder(null);

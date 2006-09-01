@@ -71,7 +71,7 @@ public final class ClientOptionsDialog extends FreeColDialog implements ActionLi
         FreeColPanel.enterPressesWhenFocused(ok);
         setCancelComponent(cancel);
 
-        setSize(640, 480);
+        setSize(750, 500);
     }
 
 
