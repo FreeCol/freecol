@@ -921,12 +921,29 @@ public final class GUI {
                 if (p != null) {
                     Tile tile = temp.getTile();
                     Image image;
+                    final Color textColor; 
                     if (temp.getTurns() == 0) {
-                        g.setColor(Color.GREEN);
-                        image = (Image) UIManager.get("path.image");
+                        g.setColor(Color.GREEN);                        
+                        image = getPathImage(activeUnit);
+                        if (activeUnit != null 
+                                && tile.isExplored()
+                                && activeUnit.isNaval()
+                                && tile.isLand() 
+                                && (tile.getColony() == null || tile.getColony().getOwner() != activeUnit.getOwner())) {
+                            image = getPathImage(activeUnit.getFirstUnit());
+                        }
+                        textColor = Color.BLACK;
                     } else {
                         g.setColor(Color.RED);
-                        image = (Image) UIManager.get("path.nextTurn.image");
+                        image = getPathNextTurnImage(activeUnit);
+                        if (activeUnit != null
+                                && tile.isExplored()
+                                && activeUnit.isNaval()
+                                && tile.isLand() 
+                                && (tile.getColony() == null || tile.getColony().getOwner() != activeUnit.getOwner())) {
+                            image = getPathNextTurnImage(activeUnit.getFirstUnit());
+                        }
+                        textColor = Color.WHITE;
                     }                
                     if (image != null) {
                         g.drawImage(image, p.x + (tileWidth - image.getWidth(null))/2, p.y + (tileHeight - image.getHeight(null))/2, null);
@@ -936,7 +953,7 @@ public final class GUI {
                         g.drawOval(p.x + tileWidth/2, p.y + tileHeight/2, 10, 10);
                     }                
                     if (temp.getTurns() > 0) {
-                        BufferedImage stringImage = createStringImage(g, Integer.toString(temp.getTurns()), Color.BLACK, tileWidth, 12);
+                        BufferedImage stringImage = createStringImage(g, Integer.toString(temp.getTurns()), textColor, tileWidth, 12);
                         g.drawImage(stringImage, p.x + (tileWidth - stringImage.getWidth(null))/2, p.y + (tileHeight - stringImage.getHeight()) / 2, null);
                     }
                 }                    
@@ -964,7 +981,60 @@ public final class GUI {
             }
         }
     }
-
+    
+    /**
+     * Gets an image to represent the path of the given <code>Unit</code>.
+     * 
+     * @param u The <code>Unit</code>
+     * @return The <code>Image</code>.
+     */
+    private Image getPathImage(Unit u) {
+        if (u == null || u.isNaval()) {
+            return (Image) UIManager.get("path.naval.image");
+        } else if (u.isMounted()) {
+            return (Image) UIManager.get("path.horse.image");
+        } else if (u.getType() == Unit.WAGON_TRAIN || u.getType() == Unit.TREASURE_TRAIN || u.getType() == Unit.ARTILLERY || u.getType() == Unit.DAMAGED_ARTILLERY) {
+            return (Image) UIManager.get("path.wagon.image");
+        } else {
+            return (Image) UIManager.get("path.foot.image");
+        }
+    }
+    
+    /**
+     * Gets an image to represent the path of the given <code>Unit</code>.
+     * 
+     * @param u The <code>Unit</code>
+     * @return The <code>Image</code>.
+     */
+    private Image getPathIllegalImage(Unit u) {
+        if (u == null || u.isNaval()) {
+            return (Image) UIManager.get("path.naval.illegal.image");
+        } else if (u.isMounted()) {
+            return (Image) UIManager.get("path.horse.illegal.image");
+        } else if (u.getType() == Unit.WAGON_TRAIN || u.getType() == Unit.TREASURE_TRAIN || u.getType() == Unit.ARTILLERY || u.getType() == Unit.DAMAGED_ARTILLERY) {
+            return (Image) UIManager.get("path.wagon.illegal.image");
+        } else {
+            return (Image) UIManager.get("path.foot.illegal.image");
+        }
+    }
+    
+    /**
+     * Gets an image to represent the path of the given <code>Unit</code>.
+     * 
+     * @param u The <code>Unit</code>
+     * @return The <code>Image</code>.
+     */
+    private Image getPathNextTurnImage(Unit u) {
+        if (u == null || u.isNaval()) {
+            return (Image) UIManager.get("path.naval.nextTurn.image");
+        } else if (u.isMounted()) {
+            return (Image) UIManager.get("path.horse.nextTurn.image");
+        } else if (u.getType() == Unit.WAGON_TRAIN || u.getType() == Unit.TREASURE_TRAIN || u.getType() == Unit.ARTILLERY || u.getType() == Unit.DAMAGED_ARTILLERY) {
+            return (Image) UIManager.get("path.wagon.nextTurn.image");
+        } else {
+            return (Image) UIManager.get("path.foot.nextTurn.image");
+        }
+    }
 
     /**
     * Creates an image with a string of a given color and with 
