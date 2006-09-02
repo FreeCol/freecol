@@ -37,6 +37,7 @@ import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
@@ -414,6 +415,7 @@ public final class Canvas extends JLayeredPane {
     *
     * @param m The <code>ModelMessage</code> to be displayed.
     */
+    /*
     public void oldshowModelMessage(ModelMessage m) {
         String okText = "ok";
         String cancelText = "display";
@@ -484,18 +486,27 @@ public final class Canvas extends JLayeredPane {
             }
         }
     }
+    */
 
+    /**
+     * Displays a single ModelMessage.
+     *
+     * @param modelMessage The message to display.
+     */
     public void showModelMessage(ModelMessage modelMessage) {
         showModelMessages(new ModelMessage[] {modelMessage});
     }
 
+    /**
+     * Displays a number of ModelMessages.
+     *
+     * @param modelMessages
+     */
     public void showModelMessages(ModelMessage[] modelMessages) {
         String okText = "ok";
         String cancelText = "display";
-        //String message = m.getMessageID();
         String[] messageText = new String[modelMessages.length];
         ImageIcon[] messageIcon = new ImageIcon[modelMessages.length];
-        ImageLibrary imageLibrary = (ImageLibrary) getImageProvider();
         try {
             okText = Messages.message(okText);
         } catch (MissingResourceException e) {
@@ -514,67 +525,7 @@ public final class Canvas extends JLayeredPane {
                 logger.warning("could not find message with id: " + modelMessages[i].getMessageID() + ".");
             }
 
-            switch (modelMessages[i].getType()) {
-            case ModelMessage.DEFAULT:
-                break;
-            case ModelMessage.WARNING:
-                break;
-            case ModelMessage.SONS_OF_LIBERTY:
-            case ModelMessage.GOVERNMENT_EFFICIENCY:
-                try {
-                    messageIcon[i] = imageLibrary.getGoodsImageIcon(Goods.BELLS);
-                } catch(Exception e) {
-                    logger.warning("could not find image for bells");
-                }
-                break;
-            case ModelMessage.UNIT_IMPROVED:
-            case ModelMessage.UNIT_DEMOTED:
-            case ModelMessage.UNIT_LOST:
-            case ModelMessage.UNIT_ADDED:
-                FreeColGameObject source = modelMessages[i].getSource();
-                if (source instanceof Unit) {
-                    try {
-                        int unitType = imageLibrary.getUnitGraphicsType((Unit) source);
-                        messageIcon[i] = imageLibrary.getUnitImageIcon(unitType);
-                    } catch(Exception e) {
-                        logger.warning("could not find image for unit " + ((Unit) source).getName());
-                    }
-                }
-                break;
-            case ModelMessage.BUILDING_COMPLETED:
-                try {                
-                    Settlement settlement = (Settlement) modelMessages[i].getSource();
-                    int settlementType = imageLibrary.getSettlementGraphicsType(settlement);
-                    messageIcon[i] = new ImageIcon(imageLibrary.getColonyImage(settlementType));
-                } catch(Exception e) {
-                    logger.warning("could not find image for colony");
-                }
-                break;
-            case ModelMessage.FOREIGN_DIPLOMACY:
-                break;
-            case ModelMessage.MARKET_PRICES:
-            case ModelMessage.WAREHOUSE_CAPACITY:
-            case ModelMessage.GIFT_GOODS:
-            case ModelMessage.MISSING_GOODS:
-                int typeOfGoods = modelMessages[i].getTypeOfGoods();
-                if (typeOfGoods < 0) {
-                    messageIcon[i] = null;
-                } else {
-                    try {
-                        messageIcon[i] = imageLibrary.getGoodsImageIcon(typeOfGoods);
-                    } catch(Exception e) {
-                        logger.warning("could not find image for goods with type: " + typeOfGoods);
-                    }
-                } 
-                break;
-            case ModelMessage.LOST_CITY_RUMOUR:
-                try {
-                    messageIcon[i] = new ImageIcon(imageLibrary.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR));
-                } catch(Exception e) {
-                    logger.warning("could not find image for lost city rumour");
-                }
-                break;
-            }
+            messageIcon[i] = getImageIcon(modelMessages[i].getDisplay());
         }
 
         // source should be the same for all messages
@@ -611,6 +562,52 @@ public final class Canvas extends JLayeredPane {
             freeColClient.getInGameController().nextModelMessage();
         }
     }
+
+    /*
+     * Returns the appropriate ImageIcon for Object.
+     *
+     * @param display The Object to display.
+     * @return The appropriate ImageIcon.
+     */
+    public ImageIcon getImageIcon(Object display) {
+        ImageLibrary imageLibrary = (ImageLibrary) getImageProvider();
+        ImageIcon imageIcon = null;
+        if (display == null) {
+            return imageIcon;
+        } else if (display instanceof Goods) {
+            Goods goods = (Goods) display;
+            try {
+                imageIcon = imageLibrary.getGoodsImageIcon(goods.getType());
+            } catch(Exception e) {
+                logger.warning("could not find image for goods " + goods.getName());
+            }
+        } else if (display instanceof Unit) {
+            Unit unit = (Unit) display;
+            try {
+                int unitType = imageLibrary.getUnitGraphicsType(unit);
+                imageIcon = imageLibrary.getUnitImageIcon(unitType);
+            } catch(Exception e) {
+                logger.warning("could not find image for unit " + unit.getName());
+            }
+        } else if (display instanceof Settlement) {
+            Settlement settlement = (Settlement) display;
+            try {                
+                int settlementType = imageLibrary.getSettlementGraphicsType(settlement);
+                imageIcon = new ImageIcon(imageLibrary.getColonyImage(settlementType));
+            } catch(Exception e) {
+                logger.warning("could not find image for settlement " + settlement);
+            }
+        } else if (display instanceof LostCityRumour) {
+            try {
+                imageIcon = new ImageIcon(imageLibrary.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR));
+            } catch(Exception e) {
+                logger.warning("could not find image for lost city rumour");
+            }
+        }
+        return imageIcon;
+    }
+
+
 
     /**
      * Shows the <code>DeclarationDialog</code>.
@@ -702,13 +699,7 @@ public final class Canvas extends JLayeredPane {
             } catch (MissingResourceException e) {
                 logger.warning("could not find message with id: " + ID + ".");
             }
-            switch (messages[i].getType()) {
-            case ModelMessage.MISSING_GOODS:
-                images[i] = getImageProvider().getGoodsImageIcon(messages[i].getTypeOfGoods());
-                break;
-            default:
-                images[i] = null;
-            }
+            images[i] = getImageIcon(messages[i].getDisplay());
         }            
 
         FreeColDialog confirmDialog = FreeColDialog.createConfirmDialog(texts, images, okText, cancelText);

@@ -633,13 +633,13 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
                                         new String[][] {{"%oldName%", oldName},
                                                         {"%newName%", student.getName()},
                                                         {"%nation%", getOwner().getName()}},
-                                        ModelMessage.UNIT_IMPROVED);
+                                        ModelMessage.UNIT_IMPROVED, student);
                     }
                 } else {
                     addModelMessage(this, "model.building.noStudent",
                                     new String[][] {{"%teacher%", teacher.getName()},
                                                     {"%colony%", colony.getName()}},
-                                    ModelMessage.WARNING);
+                                    ModelMessage.WARNING, teacher);
                 }
             }
         } else if (getGoodsOutputType() != -1) {
@@ -653,7 +653,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
                                 new String[][] {{"%inputGoods%", Goods.getName(goodsInputType)},
                                                 {"%building%", getName()},
                                                 {"%colony%", colony.getName()}},
-                                ModelMessage.MISSING_GOODS, goodsInputType);
+                                ModelMessage.MISSING_GOODS, new Goods(goodsInputType));
             }
 
             if (goodsOutput <= 0) return;

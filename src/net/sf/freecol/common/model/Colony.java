@@ -907,13 +907,15 @@ public final class Colony extends Settlement implements Location {
                                 new String [][] {{"%oldSoL%", String.valueOf(oldSonsOfLiberty)},
                                                  {"%newSoL%", String.valueOf(sonsOfLiberty)},
                                                  {"%colony%", getName()}},
-                                ModelMessage.SONS_OF_LIBERTY);
+                                ModelMessage.SONS_OF_LIBERTY,
+                                new Goods(Goods.BELLS));
             } else {
                 addModelMessage(this, "model.colony.SoLDecrease",
                                 new String [][] {{"%oldSoL%", String.valueOf(oldSonsOfLiberty)},
                                                  {"%newSoL%", String.valueOf(sonsOfLiberty)},
                                                  {"%colony%", getName()}},
-                                ModelMessage.SONS_OF_LIBERTY);
+                                ModelMessage.SONS_OF_LIBERTY,
+                                new Goods(Goods.BELLS));
             }
         }
 
@@ -924,7 +926,8 @@ public final class Colony extends Settlement implements Location {
             if (oldSonsOfLiberty < 100) {
                 addModelMessage(this, "model.colony.SoL100",
                                 new String[][] {{"%colony%", getName()}},
-                                ModelMessage.SONS_OF_LIBERTY);
+                                ModelMessage.SONS_OF_LIBERTY,
+                                new Goods(Goods.BELLS));
             }
         } else {
 
@@ -933,7 +936,8 @@ public final class Colony extends Settlement implements Location {
                 if (oldSonsOfLiberty < 50) {
                     addModelMessage(this, "model.colony.SoL50",
                                     new String[][] {{"%colony%", getName()}},
-                                    ModelMessage.SONS_OF_LIBERTY);
+                                    ModelMessage.SONS_OF_LIBERTY,
+                                    new Goods(Goods.BELLS));
                 }
             }
 
@@ -943,7 +947,8 @@ public final class Colony extends Settlement implements Location {
                     // government has become very bad
                     addModelMessage(this, "model.colony.veryBadGovernment",
                                     new String[][] {{"%colony%", getName()}},
-                                    ModelMessage.GOVERNMENT_EFFICIENCY);
+                                    ModelMessage.GOVERNMENT_EFFICIENCY,
+                                    new Goods(Goods.BELLS));
                 }
             } else if (tories > badGovernment) {
                 bonus -= 1;
@@ -951,18 +956,21 @@ public final class Colony extends Settlement implements Location {
                     // government has become bad
                     addModelMessage(this, "model.colony.badGovernment",
                                     new String[][] {{"%colony%", getName()}},
-                                    ModelMessage.GOVERNMENT_EFFICIENCY);
+                                    ModelMessage.GOVERNMENT_EFFICIENCY,
+                                    new Goods(Goods.BELLS));
                 } else if (oldTories > veryBadGovernment) {
                     // government has improved, but is still bad
                     addModelMessage(this, "model.colony.governmentImproved1",
                                     new String[][] {{"%colony%", getName()}},
-                                    ModelMessage.GOVERNMENT_EFFICIENCY);
+                                    ModelMessage.GOVERNMENT_EFFICIENCY,
+                                    new Goods(Goods.BELLS));
                 }
             } else if (oldTories > badGovernment) {
                 // government was bad, but has improved
                 addModelMessage(this, "model.colony.governmentImproved2",
                                 new String[][] {{"%colony%", getName()}},
-                                ModelMessage.GOVERNMENT_EFFICIENCY);
+                                ModelMessage.GOVERNMENT_EFFICIENCY,
+                                new Goods(Goods.BELLS));
             }
 
         }
@@ -1191,12 +1199,13 @@ public final class Colony extends Settlement implements Location {
                     addModelMessage(this, "model.colony.unitReady",
                                     new String[][] {{"%colony%", getName()},
                                                     {"%unit%", unit.getName()}},
-                                    ModelMessage.UNIT_ADDED);
+                                    ModelMessage.UNIT_ADDED, unit);
                 } else {
                     addModelMessage(this, "model.colony.itemNeedTools",
                                     new String[][] {{"%colony%", getName()},
                                                     {"%item%", Unit.getName(unitType)}},
-                                    ModelMessage.MISSING_GOODS, Goods.TOOLS);
+                                    ModelMessage.MISSING_GOODS, 
+                                    new Goods(Goods.TOOLS));
                 }
             }
         } else if (currentlyBuilding != -1) {
@@ -1217,13 +1226,14 @@ public final class Colony extends Settlement implements Location {
                     addModelMessage(this, "model.colony.buildingReady", 
                                     new String[][] {{"%colony%", getName()},
                                                     {"%building%", getBuilding(currentlyBuilding).getName()}},
-                                    ModelMessage.BUILDING_COMPLETED);
+                                    ModelMessage.BUILDING_COMPLETED, this);
                     getTile().updatePlayerExploredTiles();
                 } else {
                     addModelMessage(this, "model.colony.itemNeedTools",
                                     new String[][] {{"%colony%", getName()},
                                                     {"%item%", getBuilding(currentlyBuilding).getNextName()}},
-                                    ModelMessage.MISSING_GOODS, Goods.TOOLS);
+                                    ModelMessage.MISSING_GOODS,
+                                    new Goods(Goods.TOOLS));
                 }
             }
         }

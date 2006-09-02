@@ -83,6 +83,13 @@ public class Goods implements Locatable, Ownable {
         readFromXMLElement(element);
     }
 
+    public Goods(int type) {
+        this.game = null;
+        this.location = null;
+        this.type = type;
+        this.amount = 0;
+    }
+
 
     /**
     * Gets the owner of this <code>Ownable</code>.

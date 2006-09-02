@@ -32,8 +32,8 @@ public class ModelMessage {
     public static final int MISSING_GOODS = 14;
 
     private final FreeColGameObject source;
+    private final Object display;
     private final int type;
-    private final int typeOfGoods;
     private final String messageID;
     private final String[][] data;
     private boolean beenDisplayed = false;
@@ -48,16 +48,16 @@ public class ModelMessage {
     * @param messageID The ID of the message to display.
     * @param data Contains data to be displayed in the message or <i>null</i>.
     * @param type The type of this model message.
-    * @param typeOfGoods The type of goods this model message refers to.
+    * @param display The Object to display.
     * @see Game#addModelMessage(ModelMessage)
     * @see FreeColGameObject#addModelMessage(FreeColGameObject, String, String[][], int)
     */
-    public ModelMessage(FreeColGameObject source, String messageID, String[][] data, int type, int typeOfGoods) {
+    public ModelMessage(FreeColGameObject source, String messageID, String[][] data, int type, Object display) {
         this.source = source;
         this.messageID = messageID;
         this.data = data;
         this.type = type;
-        this.typeOfGoods = typeOfGoods;
+        this.display = display;
     }
 
     /**
@@ -73,7 +73,40 @@ public class ModelMessage {
     * @see FreeColGameObject#addModelMessage(FreeColGameObject, String, String[][], int)
     */
     public ModelMessage(FreeColGameObject source, String messageID, String[][] data, int type) {
-        this(source, messageID, data, type, -1);
+        this.source = source;
+        this.messageID = messageID;
+        this.data = data;
+        this.type = type;
+        Object newDisplay = null;
+
+        switch(type) {
+        case SONS_OF_LIBERTY:
+        case GOVERNMENT_EFFICIENCY:
+            newDisplay = new Goods(Goods.BELLS);
+            break;
+        case LOST_CITY_RUMOUR:
+            newDisplay = new LostCityRumour();
+            break;
+        case UNIT_IMPROVED:
+        case UNIT_DEMOTED:
+        case UNIT_LOST:
+        case UNIT_ADDED:
+            newDisplay = source;
+            break;
+        case BUILDING_COMPLETED:
+            newDisplay = new Goods(Goods.HAMMERS);
+            break;
+        case DEFAULT:
+        case WARNING:
+        case WAREHOUSE_CAPACITY:
+        case FOREIGN_DIPLOMACY:
+        case MARKET_PRICES:
+        case GIFT_GOODS:
+        case MISSING_GOODS:
+        default:
+        }
+
+        this.display = newDisplay;
     }
 
     /**
@@ -88,7 +121,7 @@ public class ModelMessage {
     * @see FreeColGameObject#addModelMessage(FreeColGameObject, String, String[][], int)
     */
     public ModelMessage(FreeColGameObject source, String messageID, String[][] data) {
-        this(source, messageID, data, DEFAULT, -1);
+        this(source, messageID, data, DEFAULT, null);
     }
 
 
@@ -154,13 +187,12 @@ public class ModelMessage {
 
     }
     /**
-     * Gets the type of goods. 
-     * @return The type of goods.
+     * Gets the Object to display.
+     * @return The Object to display.
      */
-    public int getTypeOfGoods() {
-        return typeOfGoods;
+    public Object getDisplay() {
+        return display;
     }
-    
 
     /**
     * Returns the owner of this message. The owner of this method

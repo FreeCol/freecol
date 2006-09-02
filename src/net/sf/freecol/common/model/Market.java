@@ -377,14 +377,14 @@ public final class Market extends FreeColGameObject {
                                                     {"%buy%", String.valueOf(dataForGoodType[typeOfGoods].costToBuy)},
                                                     {"%sell%", String.valueOf(dataForGoodType[typeOfGoods].paidForSale)}},
                                     ModelMessage.MARKET_PRICES,
-                                    typeOfGoods);
+                                    new Goods(typeOfGoods));
                 } else if (oldPrices[typeOfGoods] < dataForGoodType[typeOfGoods].costToBuy) {
                     addModelMessage(this, "model.market.priceIncrease",
                                     new String[][] {{"%goods%", Goods.getName(typeOfGoods)},
                                                     {"%buy%", String.valueOf(dataForGoodType[typeOfGoods].costToBuy)},
                                                     {"%sell%", String.valueOf(dataForGoodType[typeOfGoods].paidForSale)}},
                                     ModelMessage.MARKET_PRICES,
-                                    typeOfGoods);
+                                    new Goods(typeOfGoods));
                 }
             }
         }
