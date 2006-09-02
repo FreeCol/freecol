@@ -419,7 +419,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             reply.appendChild(t.toXMLElement(player, reply.getOwnerDocument()));
         }
 
-        if (newTile.hasLostCityRumour()) {
+        if (newTile.hasLostCityRumour() && player.isEuropean()) {
             newTile.setLostCityRumour(false);
             exploreLostCityRumour(newTile, unit, player);
         }
@@ -436,7 +436,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param unit The <code>Unit</code> exploring the lost city rumour.
      * @param player The <code>ServerPlayer</code> to send a message to.
      */
-    public static void exploreLostCityRumour(Tile tile, Unit unit, ServerPlayer player) {
+    private static void exploreLostCityRumour(Tile tile, Unit unit, ServerPlayer player) {
 
         Game game = unit.getGame();
         //Player player = unit.getOwner();
