@@ -1443,14 +1443,31 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
 
     /**
+     * Checks whether this unit can be equipped with goods at the
+     * current location. This is the case if the unit is in a colony
+     * in which the goods are present, or if it is in Europe and the
+     * player can trade the goods and has enough gold to pay for them.
+     *
+     * @param type The type of goods.
+     * @param amount The amount of goods.
+     * @return whether this unit can be equipped with goods at the current location.
+     */
+    private boolean canBeEquipped(int type, int amount) {
+        return ((getGoodsDumpLocation() != null &&
+                 getGoodsDumpLocation().getGoodsCount(type) >= amount) ||
+                ((location instanceof Europe ||
+                  location instanceof Unit && ((Unit) location).getLocation() instanceof Europe) &&
+                 getOwner().getGold() >= getGame().getMarket().getBidPrice(type, amount) &&
+                 getOwner().canTrade(type)));
+    }
+
+    /**
     * Checks if this unit can be armed in the current location.
     * @return <code>true</code> if it can be armed at the current
     *       location.
     */
     public boolean canBeArmed() {
-        return isArmed() || getGoodsDumpLocation() != null && getGoodsDumpLocation().getGoodsCount(Goods.MUSKETS) >= 50 ||
-               (location instanceof Europe || location instanceof Unit && ((Unit) location).getLocation() instanceof Europe) &&
-               getOwner().getGold() >= getGame().getMarket().getBidPrice(Goods.MUSKETS, 50);
+        return isArmed() || canBeEquipped(Goods.MUSKETS, 50);
     }
 
 
@@ -1460,9 +1477,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     *       location.
     */
     public boolean canBeMounted() {
-        return isMounted() || getGoodsDumpLocation() != null && getGoodsDumpLocation().getGoodsCount(Goods.HORSES) >= 50 ||
-               (location instanceof Europe || location instanceof Unit && ((Unit) location).getLocation() instanceof Europe)
-               && getOwner().getGold() >= getGame().getMarket().getBidPrice(Goods.HORSES, 50);
+        return isMounted() || canBeEquipped(Goods.HORSES, 50);
     }
 
 
@@ -1472,9 +1487,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     *       location.
     */
     public boolean canBeEquippedWithTools() {
-        return isPioneer() || getGoodsDumpLocation() != null && getGoodsDumpLocation().getGoodsCount(Goods.TOOLS) >= 20 ||
-               (location instanceof Europe || location instanceof Unit && ((Unit) location).getLocation() instanceof Europe)
-               && getOwner().getGold() >= getGame().getMarket().getBidPrice(Goods.TOOLS, 20);
+        return isPioneer() || canBeEquipped(Goods.TOOLS, 20);
     }
 
 
@@ -2567,11 +2580,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         if (numberOfTools == 0) {
             if (getType() == HARDY_PIONEER) {
                 addModelMessage(this, "model.unit.noMoreToolsPioneer", null,
-                                ModelMessage.WARNING);
+                                ModelMessage.WARNING, new Goods(Goods.TOOLS));
             } else {
                 addModelMessage(this, "model.unit.noMoreTools",
                                 new String [][] {{"%name%", getName()}},
-                                ModelMessage.WARNING);
+                                ModelMessage.WARNING, new Goods(Goods.TOOLS));
             }
         }
     }
@@ -2904,7 +2917,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 addModelMessage(this, "model.unit.shipEvaded",
                                 new String [][] {{"%ship%", defender.getName()},
                                                  {"%nation%", defender.getOwner().getNationAsString()}},
-                                ModelMessage.DEFAULT);
+                                ModelMessage.DEFAULT, this);
             } else {
                 logger.warning("Non-naval unit evades!");
             }
@@ -3040,7 +3053,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 if (enemyUnit.getType() == BRAVE && greatDemote) {
                     addModelMessage(this, "model.unit.braveMounted",
                                     new String [][] {{"%nation%", enemyUnit.getOwner().getNationAsString()}},
-                                    ModelMessage.FOREIGN_DIPLOMACY);
+                                    ModelMessage.FOREIGN_DIPLOMACY, enemyUnit);
                     enemyUnit.setMounted(true, true);
                 }
             } else {
@@ -3055,7 +3068,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             if (enemyUnit.getType() == BRAVE && greatDemote) {
                 addModelMessage(this, "model.unit.braveArmed",
                                 new String [][] {{"%nation%", enemyUnit.getOwner().getNationAsString()}},
-                                ModelMessage.FOREIGN_DIPLOMACY);
+                                ModelMessage.FOREIGN_DIPLOMACY, enemyUnit);
                 enemyUnit.setArmed(true, true);
             }
         } else {
