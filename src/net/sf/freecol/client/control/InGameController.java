@@ -1615,8 +1615,7 @@ public final class InGameController implements NetworkConstants {
 
             if (skillName == null) {
                 canvas.errorMessage("indianSettlement.noMoreSkill");
-            }
-            else {
+            } else {
                 Element learnSkill = Message.createNewRootElement("learnSkillAtSettlement");
                 learnSkill.setAttribute("unit", unit.getID());
                 learnSkill.setAttribute("direction", Integer.toString(direction));
@@ -1625,18 +1624,23 @@ public final class InGameController implements NetworkConstants {
                                              "learnSkill.yes",
                                              "learnSkill.no",
                                              new String [][] {{"%replace%", skillName}})) {
-                    unit.setType(skill);
-                    settlement.setLearnableSkill(IndianSettlement.NONE);
-                }
-                else {
-                    learnSkill.setAttribute("action", "cancel");
-                }
+                    //                } else {
+                    //learnSkill.setAttribute("action", "cancel");
+                    //}
 
-                client.sendAndWait(learnSkill);
+                    Element reply2 = freeColClient.getClient().ask(learnSkill);
+                    String result = reply2.getAttribute("result");
+                    if (result.equals("die")) {
+                        unit.dispose();
+                        canvas.showInformationMessage("learnSkill.die");
+                    } else if (result.equals("leave")) {
+                        canvas.showInformationMessage("learnSkill.leave");
+                    } else {
+                        unit.setType(skill);
+                        settlement.setLearnableSkill(IndianSettlement.NONE);
+                    }
+                }
             }
-        }
-        else {
-            canvas.errorMessage("indianSettlement.noMoreSkill");
         }
 
         nextActiveUnit(unit.getTile());

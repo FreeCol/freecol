@@ -1030,20 +1030,32 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalStateException("Not your unit!");
         }
 
+        Element reply = Message.createNewRootElement("learnSkillResult");
+
         // The unit was relocated to the indian settlement. See askSkill for more info.
         IndianSettlement settlement = (IndianSettlement) unit.getLocation();
         Tile tile = map.getNeighbourOrNull(Map.getReverseDirection(direction), unit.getTile());
         unit.setLocation(tile);
 
         if (!cancelAction) {
-            unit.setType(settlement.getLearnableSkill());
-            settlement.setLearnableSkill(IndianSettlement.NONE);
-
-            // Set the Tile.PlayerExploredTile attribute.
-            settlement.getTile().updateIndianSettlementSkill(player);
+            switch (settlement.getAlarm(player.getNation()).getLevel()) {
+            case Tension.HATEFUL:
+                reply.setAttribute("result", "die");
+                unit.dispose();
+                break;
+            case Tension.ANGRY:
+                reply.setAttribute("result", "leave");
+                break;
+            default:
+                unit.setType(settlement.getLearnableSkill());
+                settlement.setLearnableSkill(IndianSettlement.NONE);
+                // Set the Tile.PlayerExploredTile attribute.
+                settlement.getTile().updateIndianSettlementSkill(player);
+                reply.setAttribute("result", "success");
+            }
         }
 
-        return null;
+        return reply;
     }
 
 
@@ -1092,6 +1104,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
 
             // Set the Tile.PlayerExploredTile attribute.
             settlement.getTile().updateIndianSettlementInformation(player);
+        } else if (settlement.getAlarm(player.getNation()).getLevel() == Tension.HATEFUL) {
+            reply.setAttribute("result", "die");
+            unit.dispose();
         } else if (action.equals("speak")) {
             if (!settlement.hasBeenVisited()) {
                 // This can probably be randomized, I don't think the AI needs to do anything here.
@@ -1122,13 +1137,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     reply.setAttribute("amount", Integer.toString(beadsGold));
                     player.modifyGold(beadsGold);
                 } 
-                
-                /* This should only happen if you have "Searched for a treasure in the burial mounds":
-                else {
-                    reply.setAttribute("result", "die");
-                    unit.dispose();
-                }
-                */
                 settlement.setVisited();
             } else {
                 reply.setAttribute("result", "nothing");
