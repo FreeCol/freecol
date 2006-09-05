@@ -1104,6 +1104,13 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
 
             // Set the Tile.PlayerExploredTile attribute.
             settlement.getTile().updateIndianSettlementInformation(player);
+        } else if (action.equals("cancel")) {
+            return null;
+        } else if (action.equals("attack")) {
+            // The movesLeft has been set to 0 when the scout initiated its action.
+            // If it wants to attack then it can and it will need some moves to do it.
+            unit.setMovesLeft(1);
+            return null;
         } else if (settlement.getAlarm(player.getNation()).getLevel() == Tension.HATEFUL) {
             reply.setAttribute("result", "die");
             unit.dispose();
@@ -1153,13 +1160,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 reply.setAttribute("result", "disagree");
             }
             settlement.getOwner().modifyTension(player, Tension.TENSION_ADD_MINOR);
-        } else if (action.equals("attack")) {
-            // The movesLeft has been set to 0 when the scout initiated its action.
-            // If it wants to attack then it can and it will need some moves to do it.
-            unit.setMovesLeft(1);
-            return null;
-        } else if (action.equals("cancel")) {
-            return null;
         }
 
         return reply;

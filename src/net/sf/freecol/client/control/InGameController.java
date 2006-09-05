@@ -1713,7 +1713,11 @@ public final class InGameController implements NetworkConstants {
         if (reply.getTagName().equals("scoutIndianSettlementResult")) {
             String result = reply.getAttribute("result"),
                 action = scoutMessage.getAttribute("action");
-            if (action.equals("speak") && result.equals("tales")) {
+            if (result.equals("die")) {
+                unit.dispose();
+                canvas.showInformationMessage("scoutSettlement.speakDie");
+            }
+            else if (action.equals("speak") && result.equals("tales")) {
                 // Parse the tiles.
                 Element updateElement = getChildElement(reply, "update");
                 if (updateElement != null) {
@@ -1730,10 +1734,6 @@ public final class InGameController implements NetworkConstants {
             }
             else if (action.equals("speak") && result.equals("nothing")) {
                 canvas.showInformationMessage("scoutSettlement.speakNothing");
-            }
-            else if (action.equals("speak") && result.equals("die")) {
-                unit.dispose();
-                canvas.showInformationMessage("scoutSettlement.speakDie");
             }
             else if (action.equals("tribute") && result.equals("agree")) {
                 String amount = reply.getAttribute("amount");
