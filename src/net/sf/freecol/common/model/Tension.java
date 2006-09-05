@@ -22,8 +22,8 @@ public class Tension {
 
     public static final String[] level = {
         "happy",
-        "displeased",
         "content",
+        "displeased",
         "angry",
         "hateful"
     };
