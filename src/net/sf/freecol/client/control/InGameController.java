@@ -1545,8 +1545,10 @@ public final class InGameController implements NetworkConstants {
         if (unit == null) {
             return;
         }
-        // affect client only
-        unit.setDestination(null);
+        /* report to server, in order not to restore destination
+         * if it's received in a update message
+         */
+        setDestination(unit, null);
         changeState(unit, Unit.ACTIVE);
     }
 
