@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.model.Map.Position;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -948,12 +950,29 @@ public class IndianSettlement extends Settlement {
         }
     }
 
-
+    /**
+     * Disposes this settlement and removes its claims to adjacent
+     * tiles.
+     */
     public void dispose() {
         while (ownedUnits.size() > 0) {
             ((Unit) ownedUnits.remove(0)).setIndianSettlement(null);
         }
         unitContainer.dispose();
+
+        Map map = game.getMap();
+        Position position = getTile().getPosition();
+        map.getTile(position).setSettlement(null);
+        map.getTile(position).setClaim(Tile.CLAIM_NONE);
+        map.getTile(position).setOwner(null);
+
+        Iterator circleIterator = map.getCircleIterator(position, true, getRadius());
+        while (circleIterator.hasNext()) {
+            Position adjPos = (Position)circleIterator.next();
+            map.getTile(adjPos).setClaim(Tile.CLAIM_NONE);
+            map.getTile(adjPos).setNationOwner(Player.NO_NATION);
+        }
+
         super.dispose();
     }
 
@@ -972,7 +991,7 @@ public class IndianSettlement extends Settlement {
     /**
     * Make a XML-representation of this object.
     *
-    * @param document The document to use when creating new componenets.
+    * @param document The document to use when creating new components.
     * @return The DOM-element ("Document Object Model") made to represent this "IndianSettlement".
     */
     public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
