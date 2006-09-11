@@ -1,32 +1,31 @@
 \documentclass[12pt]{article}
-\usepackage{html}
 \usepackage{graphicx}
+\usepackage{hyperref}
 \begin{document}
-\author{\htmladdnormallink{The FreeCol
-    Team}{http://freecol.sourceforge.net/index.php?section=8}}
-\title{FreeCol Documentation\\User Guide v0.2.0}
+\author{\href{http://freecol.sourceforge.net/index.php?section=8}
+  {The FreeCol Team}}
+\title{FreeCol Documentation\\User Guide for Version v0.5.1}
 \maketitle{}
 \section{Introduction}
 \label{introduction}
-Welcome to FreeCol! If you're interested in development of
-this program, please see the \htmladdnormallink{FreeCol web
-  site}{http://freecol.sourceforge.net}. This is a draft version of
+Welcome to FreeCol! If you're interested in development of this
+program, please see the \href{http://freecol.sourceforge.net}{FreeCol
+web site}. This is a draft version of
 the user's guide. You can find the latest version at the 
-\htmladdnormallink{FreeCol
-  homepage}{http://freecol.sourceforge.net}.\\
+\href{http://freecol.sourceforge.net}{FreeCol homepage}.
 
-\section{History}
-\label{history}
-This section gives details about the history of this user guide.
-\begin{itemize}
-\item v0.2.0: add the «About» section and disband shortcut.
-\item v0.1.2: corrections from Bryce Harrington and copyright notice.
-\item v0.1.1: Main screen's, Colony panel's and Europe panel's images
-  were added.
-\item v0.1: Creation of the user guide! The guide contains the
-  following sections: «Introduction», «History», «Installation» and
-  «Interface».
-\end{itemize}
+%% \section{History}
+%% \label{history}
+%% This section gives details about the history of this user guide.
+%% \begin{itemize}
+%% \item v0.2.0: add the «About» section and disband shortcut.
+%% \item v0.1.2: corrections from Bryce Harrington and copyright notice.
+%% \item v0.1.1: Main screen's, Colony panel's and Europe panel's images
+%%   were added.
+%% \item v0.1: Creation of the user guide! The guide contains the
+%%   following sections: «Introduction», «History», «Installation» and
+%%   «Interface».
+%% \end{itemize}
 
 \section{About}
 \label{about}
@@ -34,20 +33,20 @@ This section gives details about the history of this user guide.
 \label{about_freecol}
 The FreeCol team aims to create an Open Source version of
 Colonization (released under the
-\htmladdnormallink{GPL}{http://www.gnu.org/licenses/gpl.html}). At
+\href{http://www.gnu.org/licenses/gpl.html}{GPL}). At
 first we'll try to make an exact clone of Colonization. The visuals
 will be brought up to date with more recent standards but will remain
 clean, simple and functional. Certain new 'features' will be
 implemented but the gameplay and the rules will be exactly the same as
 the original game. Examples of modern features are: an isometric map
-and multiplayer support.\\
+and multiplayer support.
 
 This clone will be developed incrementally and result in
 \textbf{FreeCol 1.0.0 which will be an almost exact Colonization
-  clone}. Incremental development basically means that we'll add
+clone}. Incremental development basically means that we'll add
 features one at a time. This allows us to have a running program at
 all times and also to release an unfinished but working game once in a
-while.\\
+while.
 
 Once FreeCol 1.0.0 is finished we'll start working towards FreeCol
 2.0.0. \textbf{FreeCol 2 will go beyond the original Colonization} and
@@ -56,67 +55,67 @@ our users') image of what Colonization 2 would have been.
 
 \subsection{The Original Colonization}
 \label{original_col}
-The original Colonization was released in 1994 by
-Microprose. \textbf{Colonization is heavily based on Civilization}
-which is generally considered to be the best turn-based strategy game
-for the PC in the history of mankind.\\
+The original Colonization was released in 1994 by Microprose.
+\textbf{Colonization is heavily based on Civilization} which is
+generally considered to be the best turn-based strategy game for the
+PC in the history of mankind.
 
 In Civilization the object of the game was to build a nation that
 could stand the test of times and that could also do one of the
 following: conquer the world or be the first to launch a
-spaceship. In Colonization things are bit different...\\
+spaceship. In Colonization things are bit different...
 
 A Colonization game starts in 1492 and \textbf{the object of the game
-  is to colonize America}. You begin the game with one vessel and two
-colonists.\\
+is to colonize America}. You begin the game with one vessel and two
+colonists.
 
 As in Civilization you need to build a powerful nation, but
 fortunately in the early part of the game \textbf{you'll be able to
-  send ships back to Europe} in order to sell the goods you've
-produced or to bring back some colonists. \textbf{Getting colonists
-  into the new world is a very important aspect of the game} as one
-game turn takes one year and later on even one season and as a result
-colonies don't grow as rapidly as they do in Civilization. You can pay
+send ships back to Europe} in order to sell the goods you've produced
+or to bring back some colonists. \textbf{Getting colonists into the
+new world is a very important aspect of the game} as one game turn
+takes one year and later on even one season and as a result colonies
+don't grow as rapidly as they do in Civilization. You can pay
 colonists to come to the new world or you can show off with the
 religious freedom of your people in which case they will hop on your
-vessels for no money at all.\\
+vessels for no money at all.
 
 Another important aspect is \textbf{trade: the source of all income}
 (apart from Inca and Aztec gold). In a land filled with precious
 resources it is important to \textbf{build your colonies at the right
-  location} and to place crafstmen where they belong. This is not only
+location} and to place crafstmen where they belong. This is not only
 to have an income but also to be able to \textbf{live off the land}
-when you can no longer count on the support of Europe.\\
+when you can no longer count on the support of Europe.
 
 Through all this you'll have to decide whether or not you want to
 \textbf{live next to the native americans} peacefully. They can teach
 your colonists new skills that cannot be tought anywhere else and they
 will offer you goods in case you choose to treat them as your
 friends. On the other hand, their villages can be attacked and their
-valuable goods can be taken from them and sold in Europe.\\
+valuable goods can be taken from them and sold in Europe.
 
-\textbf{Other Eurpean forces are also busy occupying their piece of
-  the new world}. Should their borders go too far then take over some
+\textbf{Other European forces are also busy occupying their piece of
+the new world}. Should their borders go too far then take over some
 of their colonies by force because they wouldn't hesitate to do the
-same thing to you.\\
+same thing to you.
 
-The object of Colonization is to \textbf{declare your indepence and
-  survive an attack of the King's forces}. Before declaring your
+The object of Colonization is to \textbf{declare your independence and
+survive an attack of the King's forces}. Before declaring your
 independence \textbf{you need to have the majority of the people
-  behind you}. This can be done by \textbf{promoting free speech} and
-by providing a strong governmental system.
+behind you}. This can be done by \textbf{promoting free speech} and by
+providing a strong governmental system.
 
 \section{Installation}
 \label{installation}
 To compile FreeCol you'll need Java and the Ant program. Ant can be
-found at \htmladdnormallink{Ant homepage}{http://ant.apache.org/}.\\
+found at \href{Ant homepage}{http://ant.apache.org/}.
 
-When these are installed, go to the root directory of
-FreeCol and type \verb$ant$ to build a JAR file containing the
-game. The game is started using the command \verb$java -jar FreeCol.jar$.
-If something goes wrong, send a bug report at the
-\htmladdnormallink{SourceForge page of
-  FreeCol}{http://sourceforge.net/projects/freecol}.
+When these are installed, go to the root directory of FreeCol and type
+\verb$ant$ to build a JAR file containing the game. The game is
+started using the command \verb$java -jar FreeCol.jar$.  If something
+goes wrong, send a bug report at the
+\href{http://sourceforge.net/projects/freecol}{SourceForge page of
+FreeCol}.
 
 \section{Interface}
 \label{interface}
@@ -128,41 +127,55 @@ the different actions that can be used in the game.
 The figure \ref{main_screen_fig} represents the main screen.
 \begin{figure}
   \begin{center}
-    \includegraphics[scale=0.975]{images/main_screen.png}
+    \includegraphics[scale=0.35]{images/main_screen.png}
     \caption{The main screen.\label{main_screen_fig}}
   \end{center}
 \end{figure}
 
 The units, colonies, and so forth can be seen on the main screen. You
-can move the currently selected unit using the numeric keypad. You can
-change the currently selected unit by clicking on any other unit. If
-you right click on a tile, you can see the different units that are on
-this tile.\\
+can change the currently selected unit by clicking on any other
+unit. You can move the currently selected unit using the numeric
+keypad. If you select a unit with the left mouse button and drag the
+mouse, the main screen will display the best path from the unit's
+current position to the tile the mouse is hovering over. The path
+consists of green and red dots, indicating whether the tiles can be
+reached during this turn or not. Once you release the mouse button,
+the selected unit will begin to follow this path. It will awake once
+it has arrived at its destination or if it can no longer follow the
+path (if an enemy unit is in the way, for instance).
+
+If you right click on a tile containing neither units nor settlements,
+a popup window will show you some information about the goods that can
+be produced on this tile (unless the tile has not yet been explored,
+in which case nothing will happen). If the tile contains units or
+settlements, you will be presented with a menu from which you can
+select the units or the settlement present, or the tile information.
 
 The following shortcuts are also available:
 \begin{itemize}
-\item\verb$w$: wait.
-\item\verb$space$: skip for this turn.
+\item\verb$b$: build a colony.
+\item\verb$c$: center on the currently selected unit.
+\item\verb$d$: disband the active unit.
+\item\verb$e$: show the Europe panel.
 \item\verb$f$: fortify.
-\item\verb$s$: sentry.
+\item\verb$g$: goto selected destination.
 \item\verb$p$: plow the current tile.
 \item\verb$r$: build a road on the current tile.
-\item\verb$b$: build a colony.
-\item\verb$d$: disband the active unit.
-\item\verb$c$: center on the currently selected unit.
+\item\verb$s$: sentry.
+\item\verb$w$: wait.
+\item\verb$space$: skip for this turn.
 \item\verb$enter$: end the turn.
-\item\verb$ctrl-e$: show the Europe panel.
-\item\verb$ctrl-t$: show the chat panel.
 \item\verb$plus$ or \verb$equals$: zoom in.
 \item\verb$minus$ or \verb$underscore$: zoom out.
-\item\verb$ctrl-n$: new game.
-\item\verb$ctrl-o$: open a game.
-\item\verb$ctrl-s$: save a game.
-\item\verb$ctrl-r$: reconnect.
-\item\verb$ctrl-q$: quit the game.
-\item\verb$ctrl-m$: show/hide the map controls.
 \item\verb$ctrl-d$: display tile names.
 \item\verb$ctrl-g$: display grid.
+\item\verb$ctrl-m$: show/hide the map controls.
+\item\verb$ctrl-n$: new game.
+\item\verb$ctrl-o$: open a game.
+\item\verb$ctrl-q$: quit the game.
+\item\verb$ctrl-r$: reconnect.
+\item\verb$ctrl-s$: save a game.
+\item\verb$ctrl-t$: show the chat panel.
 \end{itemize}
 
 \subsection{The Europe panel}
@@ -170,7 +183,7 @@ The following shortcuts are also available:
 The figure \ref{europe_panel_fig} represents the Europe panel.
 \begin{figure}
   \begin{center}
-    \includegraphics[scale=0.975]{images/europe_panel.png}
+    \includegraphics[scale=0.35]{images/europe_panel.png}
     \caption{The Europe Panel.\label{europe_panel_fig}}
   \end{center}
 \end{figure}
@@ -178,19 +191,26 @@ The figure \ref{europe_panel_fig} represents the Europe panel.
 In this panel, you can control the ships embarked for America or Europe,
 and the ships currently stationed in Europe. You can also buy goods,
 recruit, purchase and train units. Units recruited, purchased or trained
-are in the «Docks» area in the Europe panel.\\
+are in the «Docks» area in the Europe panel.
 
 If a ship has set sail for Europe or America, you can change its
-direction.\\
+direction by dragging it from the «Going to America» box to the «Going
+to Europe» box (or vice versa).
 
 Ships that are docked at the European port can also do the following:
 \begin{itemize}
 \item Embark/Disembark units: drag and drop between the «Docks»
   and «Cargo» sections of the Europe panel.
-\item Sell/Buy goods: drag and drop between the «Cargo» part of
-  the Europe panel and the part of the Europe panel where all the
-  goods are listed. If you want to sell/buy only a part of a type of
-  goods, use the shift key while dropping it.
+\item Sell/Buy goods: drag and drop between the «Cargo» panel and the
+  «Market» panel. If you want to sell only a part of your cargo, or
+  want to buy less than 100 units of goods, press the shift key while
+  dragging. This will allow you to specify how many units you wish to
+  transfer. If any of the goods are displayed in grey, this means they
+  are being boycotted by the Crown because you refused a tax
+  raise. You must pay your tax arrears before you can trade these
+  goods. You can do this by dragging the goods as usual, in which case
+  you will be given the chance to pay your tax arrears (provided you
+  have enough money).
 \item Arm/Mount/Equip with tools/Dress as missionaries a unit: 
   right click on the unit.
 \item Move your ship to the «Going to America» section of the Europe
@@ -202,7 +222,7 @@ Ships that are docked at the European port can also do the following:
 The figure \ref{colony_panel_fig} represents the Colony panel.
 \begin{figure}
   \begin{center}
-    \includegraphics[scale=0.975]{images/colony_panel.png}
+    \includegraphics[scale=0.35]{images/colony_panel.png}
     \caption{The Colony Panel.\label{colony_panel_fig}}
   \end{center}
 \end{figure}
@@ -210,39 +230,172 @@ The figure \ref{colony_panel_fig} represents the Colony panel.
 To view a colony's panel, left click on it from the main
 screen. From this panel, colonist's cultivation, production, and other
 tasks can be assigned:
+
 \begin{itemize}
 \item Cultivation: Drop the unit onto the appropriate plot of land in
   the colony. You can change what a colonist cultivate by right
-  clicking on it.
+  clicking on it. Note that your colonists can not go fishing on ocean
+  tiles before they have built a dock.
 \item Production: Drop the unit onto the relevant «Buildings».
 \item Depart colony: Drop the unit onto the colony's gate.
 \item Embark on a ship: If there is a ship in port, you can embark
   your colonist on it by dropping it onto the «Cargo» section of the
   colony panel.
+\item Build a building: Drop the unit onto the carpenter's house and
+  select the building you want from the building menu.
 \end{itemize}
 
 You can also load cargo into a ship's hold by dropping the goods onto
 the ship or the specific hold within the ship. Use the shift key while
 dropping it if you want to load only a portion of the goods.
 
+\section{Colonies}
+
+\subsection{Picking a suitable site}
+
+Your colonies are your most important assets in the new world.
+Therefore, it is very important to build them in the right
+place. There are several aspects to consider:
+
+\subsubsection{The colony tile}
+
+Some terrain types are more suitable for establishing a colony than
+others. Colonies can not be built on arctic tiles, nor on
+mountains. Hills and deserts are less suitable than other tiles
+because they produce less food, which is very important in the long
+run. Tiles with forest generally produce less food than tiles without,
+but pioneers are able to cut down the forest and plow the tile, which
+will increase food production. The presence of a river will also
+increase food production.
+
+\subsubsection{The adjacent tiles}
+
+In the early stages of the game, you will need to generate cash by
+selling products from the New World in your Home Port. Thus, many of
+your early colonies should probably be situated next to bonus tiles,
+which greatly increase production. Rivers also increase production,
+though not as much as a bonus resource. On the other hand, they
+increase the production of many different kinds of goods, unlike a
+bonus resource.
+
+In order to improve your colony, you will have to construct various
+buildings. This will require large amounts of lumber. For this reason,
+you should make sure that at least one tile adjacent to your colony
+site can produce sufficient amounts of lumber. You will also need
+tools to construct advanced buildings. Therefore, it is an advantage
+if the colony can also produce ore, which can be refined to produce
+tools. However, ore is not as important as lumber.
+
+Some of the tiles may be owned by other European powers, or claimed by
+Indians. Building a colony too close to other settlements is not a
+good idea, unless you plan to conquer or destroy these settlements.
+Keeping your own colonies close together is a good strategy, however,
+as long as you avoid sharing tiles between several colonies as far as
+possible.
+
+\subsubsection{No Reforestation}
+
+You can order your pioneers to cut down forests by plowing a tile.
+This will increase the food produced on these tiles, and the lumber
+will be delivered to your colonies. However, you can not plant new
+forests later. Once cleared, a tile will never produce lumber again.
+
+\subsection{Colony buildings}
+
+A newly established colony already includes several buildings, namely
+a town hall, a carpenter's house, a blacksmith's house, a
+tobacconist's house, a weaver's house, a distiller's house, a fur
+trader's house, and a warehouse. You can improve your colonies by
+upgrading these buildings, except the town hall, and by constructing
+various new buildings.
+
+The craftsmen's houses can be upgraded to workshops and then to
+factories (after Adam Smith has joined the Continental Congress),
+which can produce more manufactured goods. While the town hall itself
+can not be upgraded, its effect, namely the production of Liberty
+Bells, can be boosted by constructing a printing press and then a
+newspaper.
+
+All in all, there are sixteen different buildings, eight of which are
+immediately present in a newly established colony:
+
+\begin{itemize}
+\item The \textbf{Town Hall}, which can not be upgraded, provides
+  workplaces for up to three colonists producing \textbf{Liberty
+  Bells}. Its effect can be increased by building a \textbf{Printing
+  Press} and a \textbf{Newspaper}.
+
+\item The \textbf{Carpenter's House}, which can be upgraded to a
+  \textbf{Lumber Mill}, is used to convert \textbf{Lumber} to
+  \textbf{Hammers}. Hammers are required to construct or upgrade all
+  kinds of buildings.
+
+\item The \textbf{Blacksmith's House}, which can be upgraded to a
+  \textbf{Blacksmith's Workshop} and then to \textbf{Iron Works}, is
+  used to convert \textbf{Ore} to \textbf{Tools}. Tools are required
+  to construct certain kinds of buildings and to upgrade all kinds of
+  buildings. Tools are also used by \textbf{Pioneers} and to produce
+  \textbf{Muskets}.
+
+\item The \textbf{Tobacconist's House}, which can be upgraded to a
+  \textbf{Tobacconist's Shop} and then to a \textbf{Cigar Factory}, is
+  used to produce \textbf{Cigars} from \textbf{Tobacco}.
+
+\item The \textbf{Weaver's House}, which can be upgraded to a
+  \textbf{Weaver's Shop} and then to a \textbf{Textile Mill}, is used
+  to turn \textbf{Cotton} into \textbf{Cloth}.
+
+\item The \textbf{Fur Trader's House}, which can be upgraded to a
+  \textbf{Fur Trader's Post} and then to a \textbf{Fur Factory}, is
+  used to produce \textbf{Coats} from \textbf{Fur}.
+
+\item The \textbf{Distiller's House}, which can be upgraded to a
+  \textbf{Rum Distillery} and then to a \textbf{Rum Factory}, is used
+  to produce \textbf{Rum} from \textbf{Sugar}.
+
+\item The \textbf{Warehouse} stores all kinds of goods. Its initial
+  capacity is 100 units of each kind of goods, but it can be upgraded
+  to 200 and finally 300 units.
+\end{itemize}
+
+The following eight buildings are not available for free and have to
+be constructed later:
+
+\begin{itemize}
+\item The \textbf{Schoolhouse}
+
+
+                            SCHOOLHOUSE = 7, //10
+                            ARMORY = 8,
+                            CHURCH = 9, //13
+                            STOCKADE = 10, //7
+                            WAREHOUSE = 11,
+                            STABLES = 12,
+                            DOCK = 13, //9
+                            PRINTING_PRESS = 14,
+                            CUSTOM_HOUSE = 15;
+
+\end{itemize}
+
 \section{Copyright Notice}
-Copyright © 2004 \htmladdnormallink{The FreeCol
-  Team}{http://freecol.sourceforge.net/index.php?section=8}.\\
+Copyright © 2006
+\href{http://freecol.sourceforge.net/index.php?section=8}{The FreeCol
+Team}.
 
 This manual is free software; you may redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the
 Free Software Foundation; either version 2, or (at your option) any
-later version.\\
+later version.
 
 This is distributed in the hope that it will be useful, but without
 any warranty; without even the implied warranty of merchantability or
 fitness for a particular purpose. See the GNU General Public License
-for more details.\\
+for more details.
 
 A copy of the GNU General Public License is available on the World
-Wide Web at \htmladdnormallink{the GNU General Public
-  Licence}{http://www.gnu.org/copyleft/gpl.html}. You can also obtain
-it by writing to the Free Software Foundation, Inc., 59 Temple Place -
-Suite 330, Boston, MA 02111-1307, USA.
+Wide Web at \href{http://www.gnu.org/copyleft/gpl.html}{the GNU
+General Public Licence}. You can also obtain it by writing to the Free
+Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
 
 \end{document}

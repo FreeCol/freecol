@@ -209,4 +209,25 @@
 
   </target>
 
+  <target name="print-manual">
+    <exec executable="pdflatex" dir="doc" >
+      <arg file="doc/FreeCol.tex"/>
+    </exec>
+    <!-- run twice to get references right -->
+    <exec executable="pdflatex" dir="doc" >
+      <arg file="doc/FreeCol.tex"/>
+    </exec>
+  </target>
+
+  <target name="online-manual">
+    <exec executable="htlatex" dir="doc" >
+      <arg file="doc/FreeCol.tex"/>
+    </exec>
+  </target>
+
+  <target name="manual" depends="print-manual,online-manual">
+  </target>
+
+
+
 </project>
