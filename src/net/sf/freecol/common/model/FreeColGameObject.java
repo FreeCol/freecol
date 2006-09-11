@@ -25,7 +25,7 @@ abstract public class FreeColGameObject {
 
 
     private String id;
-    protected Game game;
+    private Game game;
     private boolean disposed = false;
 
 
