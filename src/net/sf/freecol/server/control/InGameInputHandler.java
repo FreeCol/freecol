@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Game;
@@ -1689,10 +1690,19 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new NullPointerException();
         }
 
+        Location oldLocation = unit.getLocation();
         unit.work(workLocation);
         
         // For updating the number of colonist:
         sendUpdatedTileToAll(unit.getTile(), player);
+        // oldLocation is empty now
+        if (oldLocation instanceof ColonyTile) {
+            sendUpdatedTileToAll(((ColonyTile) oldLocation).getWorkTile(), player);
+        }
+        // workLocation is occupied now
+        if (workLocation instanceof ColonyTile) {
+            sendUpdatedTileToAll(((ColonyTile) workLocation).getWorkTile(), player);
+        }
 
         return null;
     }

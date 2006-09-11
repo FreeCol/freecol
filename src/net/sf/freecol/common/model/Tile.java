@@ -1349,6 +1349,8 @@ public final class Tile extends FreeColGameObject implements Location {
 
         if (tileElement.hasAttribute("owner")) {
             owner = (Settlement) getGame().getFreeColGameObject(tileElement.getAttribute("owner"));
+        } else {
+            owner = null;
         }
 
         boolean settlementSent = false;
