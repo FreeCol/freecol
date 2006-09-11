@@ -960,17 +960,26 @@ public class IndianSettlement extends Settlement {
         }
         unitContainer.dispose();
 
-        Map map = game.getMap();
+        Map map = getGame().getMap();
         Position position = getTile().getPosition();
         map.getTile(position).setSettlement(null);
         map.getTile(position).setClaim(Tile.CLAIM_NONE);
         map.getTile(position).setOwner(null);
 
+        /** TODO: tile ownership code needs to be cleaned up, so that
+            we can limit this action to tiles actually owned by the
+            disposed settlement. Furthermore, tiles no longer owned by
+            the disposed settlement might then be owned by other
+            nearby settlements.
+        */
+        int nation = owner.getNation();
         Iterator circleIterator = map.getCircleIterator(position, true, getRadius());
         while (circleIterator.hasNext()) {
-            Position adjPos = (Position)circleIterator.next();
-            map.getTile(adjPos).setClaim(Tile.CLAIM_NONE);
-            map.getTile(adjPos).setNationOwner(Player.NO_NATION);
+            Tile tile = map.getTile((Position) circleIterator.next());
+            if (tile.getNationOwner() == nation) {
+                tile.setNationOwner(Player.NO_NATION);
+                tile.setClaim(Tile.CLAIM_NONE);
+            }
         }
 
         super.dispose();
