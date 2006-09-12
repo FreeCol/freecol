@@ -1998,11 +1998,10 @@ public class Player extends FreeColGameObject {
             int oldSoL = 0;
             int newSoL = 0;
             int numberOfColonies = settlements.size();
-            if (numberOfColonies > 0) {
+            if (numberOfColonies > 1) {
                 Iterator iterator = getColonyIterator();
                 while (iterator.hasNext()) {
                     Colony colony = (Colony) iterator.next();
-                    colony.updateSoL();
                     oldSoL += colony.getOldSoL();
                     newSoL += colony.getSoL();
                 }

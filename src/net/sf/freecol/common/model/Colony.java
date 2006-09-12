@@ -26,6 +26,7 @@ public final class Colony extends Settlement implements Location {
     public static final String  REVISION = "$Revision$";
 
     public static final int BUILDING_UNIT_ADDITION = 1000;
+    private static final int BELLS_PER_REBEL = 100;
 
     /** The name of the colony. */
     private String name;
@@ -827,15 +828,14 @@ public final class Colony extends Settlement implements Location {
     * @param amount The number of bells to add.
     */
     public void addBells(int amount) {
-        bells += amount;
-
-        // This is by 51 now because the removal of bells
-        // happens *after* the bells are added;
-        // each unit will eat one bell at 100% membership,
-        // hence the extra 1.
-        if (bells >= ((getUnitCount() + 1) * 51)) {
-            bells = ((getUnitCount() + 1) * 51);
-        } else if (bells <= 0) {
+        // Update "updateSoL(int)" and "addBells(int") if this formula gets changed:
+        int members = bells / (BELLS_PER_REBEL * getUnitCount());
+        
+        if (members <= getUnitCount() + 1) {
+            bells += amount;
+        }
+        
+        if (bells <= 0) {
             bells = 0;
         }
     }
@@ -846,6 +846,15 @@ public final class Colony extends Settlement implements Location {
     * @param amount The percentage of SoL to add.
     */
     public void addSoL(int amount) {
+        /* 
+         * The number of bells to be generated in order
+         * to get the appropriate SoL is determined by the
+         * formula:
+         * 
+         * int membership = ...
+         * 
+         * in "updateSoL()":
+         */
         bells += (bells * amount) / 100;
     }
 
@@ -873,18 +882,25 @@ public final class Colony extends Settlement implements Location {
     public int getOldSoL() {
         return oldSonsOfLiberty;
     }
-
+ 
     /**
-     * Calculates the current SoL membership of the colony. This
+     * Calculates the current SoL membership of the colony
+     * and adjusts the level of bells.
+     * 
+     * <br><br>
+     * 
+     * <code>Warning:</code> This
      * method should be called exactly once per turn.
      */
-    public void updateSoL() {
+    private void updateSoL() {
         int units = getUnitCount();
         if (units == -1) {
             return;
-        }
-
-        int membership = (bells * 2) / (getUnitCount() + 10);
+        }              
+        
+        // Update "addSol(int)" and "addBells(int") if this formula gets changed:
+        int membership = (bells * 100) / (BELLS_PER_REBEL * getUnitCount());
+        
         if (membership < 0) membership = 0;
         if (membership > 100) membership = 100;
         oldSonsOfLiberty = sonsOfLiberty;
@@ -1404,12 +1420,15 @@ public final class Colony extends Settlement implements Location {
         
         // Throw away goods there is no room for.
         goodsContainer.cleanAndReport(getWarehouseCapacity(), new int [] {200, 100});
-
+        
         // Remove bells:
-        bells -= (getSoL() * getUnitCount()) / 100;
+        bells -= getUnitCount();
         if (bells < 0) {
             bells = 0;
         }
+        
+        // Update SoL:
+        updateSoL();
     }
 
 
