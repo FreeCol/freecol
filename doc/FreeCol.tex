@@ -6,15 +6,17 @@
   {The FreeCol Team}}
 \title{FreeCol Documentation\\User Guide for Version v0.5.1}
 \maketitle{}
-\section{Introduction}
-\label{introduction}
+
+
+\hypertarget{Introduction}{\section{Introduction}}
+
 Welcome to FreeCol! If you're interested in development of this
 program, please see the \href{http://freecol.sourceforge.net}{FreeCol
-web site}. This is a draft version of
-the user's guide. You can find the latest version at the 
+web site}. This is a draft version of the user's guide. You can find
+the latest version at the
 \href{http://freecol.sourceforge.net}{FreeCol homepage}.
 
-%% \section{History}
+%% \hypertarget{History}{\section{History}}
 %% \label{history}
 %% This section gives details about the history of this user guide.
 %% \begin{itemize}
@@ -27,10 +29,12 @@ the user's guide. You can find the latest version at the
 %%   «Interface».
 %% \end{itemize}
 
-\section{About}
-\label{about}
-\subsection{About FreeCol}
-\label{about_freecol}
+
+
+\hypertarget{About}{\section{About}}
+
+\hypertarget{About FreeCol}{\subsection{About FreeCol}}
+
 The FreeCol team aims to create an Open Source version of
 Colonization (released under the
 \href{http://www.gnu.org/licenses/gpl.html}{GPL}). At
@@ -53,8 +57,8 @@ Once FreeCol 1.0.0 is finished we'll start working towards FreeCol
 will have many new features, it will be an implementation of our (and
 our users') image of what Colonization 2 would have been.
 
-\subsection{The Original Colonization}
-\label{original_col}
+\hypertarget{The Original Colonization}{\subsection{The Original Colonization}}
+
 The original Colonization was released in 1994 by Microprose.
 \textbf{Colonization is heavily based on Civilization} which is
 generally considered to be the best turn-based strategy game for the
@@ -105,8 +109,8 @@ independence \textbf{you need to have the majority of the people
 behind you}. This can be done by \textbf{promoting free speech} and by
 providing a strong governmental system.
 
-\section{Installation}
-\label{installation}
+\hypertarget{Installation}{\section{Installation}}
+
 To compile FreeCol you'll need Java and the Ant program. Ant can be
 found at \href{Ant homepage}{http://ant.apache.org/}.
 
@@ -117,13 +121,13 @@ goes wrong, send a bug report at the
 \href{http://sourceforge.net/projects/freecol}{SourceForge page of
 FreeCol}.
 
-\section{Interface}
-\label{interface}
+\hypertarget{Interface}{\section{Interface}}
+
 This section will provide information about the keyboard shortcuts and
 the different actions that can be used in the game.
 
-\subsection{The main screen}
-\label{main_screen}
+\hypertarget{The main screen}{\subsection{The main screen}}
+
 The figure \ref{main_screen_fig} represents the main screen.
 \begin{figure}
   \begin{center}
@@ -137,12 +141,15 @@ can change the currently selected unit by clicking on any other
 unit. You can move the currently selected unit using the numeric
 keypad. If you select a unit with the left mouse button and drag the
 mouse, the main screen will display the best path from the unit's
-current position to the tile the mouse is hovering over. The path
-consists of green and red dots, indicating whether the tiles can be
-reached during this turn or not. Once you release the mouse button,
-the selected unit will begin to follow this path. It will awake once
-it has arrived at its destination or if it can no longer follow the
-path (if an enemy unit is in the way, for instance).
+current position to the tile the mouse is hovering over. 
+
+The tiles the path consists of will be marked with boots if the unit
+is on foot, horseshoes if the unit is mounted, or sextants if the unit
+is a naval unit. These symbols will also indicate whether the tiles
+can be reached during this turn or not. Once you release the mouse
+button, the selected unit will begin to follow this path. It will
+awake once it has arrived at its destination or if it can no longer
+follow the path (if an enemy unit is in the way, for instance).
 
 If you right click on a tile containing neither units nor settlements,
 a popup window will show you some information about the goods that can
@@ -161,7 +168,7 @@ The following shortcuts are also available:
 \item\verb$g$: goto selected destination.
 \item\verb$p$: plow the current tile.
 \item\verb$r$: build a road on the current tile.
-\item\verb$s$: sentry.
+\item\verb$s$: sentry (not implemented).
 \item\verb$w$: wait.
 \item\verb$space$: skip for this turn.
 \item\verb$enter$: end the turn.
@@ -178,8 +185,8 @@ The following shortcuts are also available:
 \item\verb$ctrl-t$: show the chat panel.
 \end{itemize}
 
-\subsection{The Europe panel}
-\label{europe_panel}
+\hypertarget{The Europe panel}{\subsection{The Europe panel}}
+
 The figure \ref{europe_panel_fig} represents the Europe panel.
 \begin{figure}
   \begin{center}
@@ -217,8 +224,8 @@ Ships that are docked at the European port can also do the following:
   panel.
 \end{itemize}
 
-\subsection{The Colony panel}
-\label{colony_panel}
+\hypertarget{The Colony panel}{\subsection{The Colony panel}}
+
 The figure \ref{colony_panel_fig} represents the Colony panel.
 \begin{figure}
   \begin{center}
@@ -249,15 +256,15 @@ You can also load cargo into a ship's hold by dropping the goods onto
 the ship or the specific hold within the ship. Use the shift key while
 dropping it if you want to load only a portion of the goods.
 
-\section{Colonies}
+\hypertarget{Colonies}{\section{Colonies}}
 
-\subsection{Picking a suitable site}
+\hypertarget{Picking a suitable site}{\subsection{Picking a suitable site}}
 
 Your colonies are your most important assets in the new world.
 Therefore, it is very important to build them in the right
 place. There are several aspects to consider:
 
-\subsubsection{The colony tile}
+\hypertarget{The colony tile}{\subsubsection{The colony tile}}
 
 Some terrain types are more suitable for establishing a colony than
 others. Colonies can not be built on arctic tiles, nor on
@@ -268,7 +275,7 @@ but pioneers are able to cut down the forest and plow the tile, which
 will increase food production. The presence of a river will also
 increase food production.
 
-\subsubsection{The adjacent tiles}
+\hypertarget{The adjacent tiles}{\subsubsection{The adjacent tiles}}
 
 In the early stages of the game, you will need to generate cash by
 selling products from the New World in your Home Port. Thus, many of
@@ -293,91 +300,211 @@ Keeping your own colonies close together is a good strategy, however,
 as long as you avoid sharing tiles between several colonies as far as
 possible.
 
-\subsubsection{No Reforestation}
+\hypertarget{No Reforestation}{\subsubsection{No Reforestation}}
 
 You can order your pioneers to cut down forests by plowing a tile.
 This will increase the food produced on these tiles, and the lumber
 will be delivered to your colonies. However, you can not plant new
 forests later. Once cleared, a tile will never produce lumber again.
 
-\subsection{Colony buildings}
+\hypertarget{Colony Buildings}{\subsection{Colony Buildings}}
 
 A newly established colony already includes several buildings, namely
 a town hall, a carpenter's house, a blacksmith's house, a
 tobacconist's house, a weaver's house, a distiller's house, a fur
 trader's house, and a warehouse. You can improve your colonies by
-upgrading these buildings, except the town hall, and by constructing
-various new buildings.
+upgrading all of these buildings except the town hall, and by
+constructing various new buildings. However, many buildings can only
+be constructed in colonies of a certain size, or after certain
+\hyperlink{Founding Fathers}{Founding Fathers} have joined the
+\hyperlink{Continental Congress}{Continental Congress}.
 
-The craftsmen's houses can be upgraded to workshops and then to
-factories (after Adam Smith has joined the Continental Congress),
-which can produce more manufactured goods. While the town hall itself
-can not be upgraded, its effect, namely the production of Liberty
-Bells, can be boosted by constructing a printing press and then a
-newspaper.
+The craftsmen's houses can be upgraded to workshops, which produce
+more manufactured goods. After \hyperlink{Adam Smith}{Adam Smith} has
+joined the \hyperlink{Continental Congress}{Continental Congress},
+workshops can be upgraded to factories, which produce one and a half
+units of manufactured goods from each unit of raw material. While the
+town hall itself can not be upgraded, the production of
+\hyperlink{Liberty Bells}{Liberty Bells} can be boosted by
+constructing a printing press and then a newspaper.
 
 All in all, there are sixteen different buildings, eight of which are
 immediately present in a newly established colony:
 
 \begin{itemize}
-\item The \textbf{Town Hall}, which can not be upgraded, provides
-  workplaces for up to three colonists producing \textbf{Liberty
-  Bells}. Its effect can be increased by building a \textbf{Printing
-  Press} and a \textbf{Newspaper}.
+\item The \hypertarget{Town Hall}{\textbf{Town Hall}}, which can not
+  be upgraded, provides workplaces for up to three colonists producing
+  \textbf{Liberty Bells}. Its effect can be increased by building a
+  \hyperlink{Printing Press}{Printing Press} and a
+  \hyperlink{Newspaper}{Newspaper}.
 
-\item The \textbf{Carpenter's House}, which can be upgraded to a
-  \textbf{Lumber Mill}, is used to convert \textbf{Lumber} to
-  \textbf{Hammers}. Hammers are required to construct or upgrade all
-  kinds of buildings.
+\item The \hypertarget{Carpenter's House}{\textbf{Carpenter's House}},
+  which can be upgraded to a \textbf{Lumber Mill} once the colony's
+  population reaches 3, is used to convert \hyperlink{Lumber}{Lumber}
+  to \hyperlink{Hammers}{Hammers}. Hammers are required to construct
+  or upgrade all kinds of buildings.
 
-\item The \textbf{Blacksmith's House}, which can be upgraded to a
-  \textbf{Blacksmith's Workshop} and then to \textbf{Iron Works}, is
-  used to convert \textbf{Ore} to \textbf{Tools}. Tools are required
+\item The \hypertarget{Blacksmith's House}{\textbf{Blacksmith's
+  House}}, which can be upgraded to a \hypertarget{Blacksmith's
+  Workshop}{\textbf{Blacksmith's Workshop}}, is used to convert
+  \hyperlink{Ore}{Ore} to \hyperlink{Tools}{Tools}. Tools are required
   to construct certain kinds of buildings and to upgrade all kinds of
-  buildings. Tools are also used by \textbf{Pioneers} and to produce
-  \textbf{Muskets}.
+  buildings. Tools are also used by \hyperlink{Pioneers}{Pioneers} and
+  to produce \hyperlink{Muskets}{Muskets}. Once the population of the
+  colony has reached 8, the Blacksmith's Workshop can be replaced by
+  \hypertarget{Iron Works}{\textbf{Iron Works}}, provided that
+  \hyperlink{Adam Smith}{Adam Smith} has joined the
+  \hyperlink{Continental Congress}{Continental Congress}.
 
-\item The \textbf{Tobacconist's House}, which can be upgraded to a
-  \textbf{Tobacconist's Shop} and then to a \textbf{Cigar Factory}, is
-  used to produce \textbf{Cigars} from \textbf{Tobacco}.
+\item The \hypertarget{Tobacconist's House}{\textbf{Tobacconist's
+  House}}, which can be upgraded to a \hypertarget{Tobacconist's
+  Shop}{\textbf{Tobacconist's Shop}}, is used to produce
+  \hyperlink{Cigars}{Cigars} from \hyperlink{Tobacco}{Tobacco}.  Once
+  the colony's population has reached 8, it can be further upgraded to
+  a \hypertarget{Cigar Factory}{\textbf{Cigar Factory}}, provided that
+  \hyperlink{Adam Smith}{Adam Smith} has joined the
+  \hyperlink{Continental Congress}{Continental Congress}.
 
-\item The \textbf{Weaver's House}, which can be upgraded to a
-  \textbf{Weaver's Shop} and then to a \textbf{Textile Mill}, is used
-  to turn \textbf{Cotton} into \textbf{Cloth}.
+\item The \hypertarget{Weaver's House}{\textbf{Weaver's House}},
+  which can be upgraded to a \hypertarget{Weaver's
+  Shop}{\textbf{Weaver's Shop}}, is used to turn
+  \hyperlink{Cotton}{Cotton} into \hyperlink{Cloth}{Cloth}. It can be
+  upgraded to a \hypertarget{Textile Mill}{\textbf{Textile Mill}} as
+  soon as the population of the colony is at least 8 and
+  \hyperlink{Adam Smith}{Adam Smith} has joined the
+  \hyperlink{Continental Congress}{Continental Congress}.
 
-\item The \textbf{Fur Trader's House}, which can be upgraded to a
-  \textbf{Fur Trader's Post} and then to a \textbf{Fur Factory}, is
-  used to produce \textbf{Coats} from \textbf{Fur}.
+\item The \hypertarget{Distiller's House}{\textbf{Distiller's
+  House}}, which can be upgraded to a \hypertarget{Rum
+  Distillery}{\textbf{Rum Distillery}}, is used to produce
+  \hyperlink{Rum}{Rum} from \hyperlink{Sugar}{Sugar}. Once
+  \hyperlink{Adam Smith}{Adam Smith} has joined the
+  \hyperlink{Continental Congress}{Continental Congress} and the
+  colony's population is at least 8, the rum distillery can be
+  replaced by a \hypertarget{Rum Factory}{\textbf{Rum Factory}}.
 
-\item The \textbf{Distiller's House}, which can be upgraded to a
-  \textbf{Rum Distillery} and then to a \textbf{Rum Factory}, is used
-  to produce \textbf{Rum} from \textbf{Sugar}.
+\item The \hypertarget{Fur Trader's House}{\textbf{Fur Trader's
+  House}}, which can be upgraded to a \hypertarget{Fur Trader's
+  Post}{\textbf{Fur Trader's Post}}, is used to produce
+  \hyperlink{Coats}{Coats} from \hyperlink{Fur}{Fur}. Once the
+  colony's population has reached 6, it can be further upgraded to a
+  \hypertarget{Fur Factory}{\textbf{Fur Factory}}, provided that
+  \hyperlink{Adam Smith}{Adam Smith} has joined the
+  \hyperlink{Continental Congress}{Continental Congress}.
 
-\item The \textbf{Warehouse} stores all kinds of goods. Its initial
-  capacity is 100 units of each kind of goods, but it can be upgraded
-  to 200 and finally 300 units.
+\item The \hypertarget{Warehouse}{\textbf{Warehouse}} stores all kinds
+  of goods. Its initial capacity is 100 units of each kind of goods,
+  but it can be upgraded to 200 and finally 300 units.
 \end{itemize}
 
 The following eight buildings are not available for free and have to
 be constructed later:
 
 \begin{itemize}
-\item The \textbf{Schoolhouse}
+\item A colony with a population of at least 4 may build a 
+  \hypertarget{Schoolhouse}{\textbf{Schoolhouse}}, which enables some
+  master craftsman to teach an unskilled colonist their trade. As soon
+  as the population reaches 8, it can be upgraded to a
+  \hypertarget{College}{\textbf{College}}, in which additional trades
+  can be taught by two colonists. Once the population reaches 10, the
+  college can be replaced by a
+  \hypertarget{University}{\textbf{University}}, at which all trades
+  can be taught by three colonists. See \hyperlink{Skills and
+  Education}{Skills and Education} for details.
 
+\item The \hypertarget{Armory}{\textbf{Armory}} is used to produce
+  \hyperlink{Muskets}{Muskets} from \hyperlink{Tools}{Tools}. As soon
+  as the population reaches 8, the armory can be upgraded to a
+  \hypertarget{Magazine}{\textbf{Magazine}} and then to an
+  \hypertarget{Arsenal}{\textbf{Arsenal}}, provided that
+  \hyperlink{Adam Smith}{Adam Smith} has joined the
+  \hyperlink{Continental Congress}{Continental Congress}.
 
-                            SCHOOLHOUSE = 7, //10
-                            ARMORY = 8,
-                            CHURCH = 9, //13
-                            STOCKADE = 10, //7
-                            WAREHOUSE = 11,
-                            STABLES = 12,
-                            DOCK = 13, //9
-                            PRINTING_PRESS = 14,
-                            CUSTOM_HOUSE = 15;
+\item A colony with a population of 3 or more may build a
+  \hypertarget{Church}{\textbf{Church}}, which can be upgraded to a
+  \hypertarget{Cathedral}{\textbf{Cathedral}} as soon as the
+  population reaches 8. The religious freedom of the New World
+  (symbolized by \hyperlink{Crosses}{Crosses}) causes increased
+  emigration from Europe.
+
+\item The \hypertarget{Stockade}{\textbf{Stockade}}, which can be
+  constructed as soon as the colony's population reaches 3, protects
+  the colonists from attacks. Note that a colony with a stockade can
+  not be abandoned, it can only be burned to the ground by
+  natives. The stockade can be upgraded to a
+  \hypertarget{Fort}{\textbf{Fort}}, which provides better protection
+  and bombards \hyperlink{Privateers}{Privateers} and enemy naval
+  units on adjacent ocean tiles. The fort can be replaced by a
+  \hypertarget{Fortress}{\textbf{Fortress}} as soon as the population
+  reaches 8.
+
+\item The \hypertarget{Stables}{\textbf{Stables}} increase the
+  production of \hyperlink{Horses}{Horses}.
+
+\item The \hypertarget{Dock}{\textbf{Dock}} allows colonists to 
+  produce \hyperlink{Fish}{Fish} on ocean tiles adjacent to the
+  colony. As soon as the population is at least 4, it can be upgraded
+  to a \hypertarget{Drydock}{\textbf{Drydock}}, which allows the
+  colony to repair damaged ships. When the colony's population reaches
+  8, it can be further upgraded to a
+  \hypertarget{Shipyard}{\textbf{Shipyard}}, which enables the colony
+  to build new ships.
+
+\item The \hypertarget{Printing Press}{\textbf{Printing Press}}, 
+  which can be upgraded to a
+  \hypertarget{Newspaper}{\textbf{Newspaper}} as soon as the
+  population reaches 4, increases the colony's production of
+  \hyperlink{Liberty Bells}{Liberty Bells}.
+
+\item The \hypertarget{Custom House}{\textbf{Custom House}}, which can
+  be built as soon as \hyperlink{Peter Stuyvesant}{Peter Stuyvesant}
+  has joined the \hyperlink{Continental Congress}{Continental
+  Congress}, allows the colony to export goods to Europe directly
+  without the help of ships. Optionally, it may also ignore
+  \hyperlink{Boycotts}{Boycotts}.
 
 \end{itemize}
 
-\section{Copyright Notice}
+
+
+\hypertarget{Skills and Education}{\section{Skills and Education}}
+
+In FreeCol, your colonists come from all walks of life. Some are
+unskilled \hypertarget{Petty Criminals}{\textbf{Petty Criminals}}, who
+are deported to the colonies. Others are \hypertarget{Indentured
+Servants}{\textbf{Indentured Servants}}, or \hypertarget{Free
+Colonists}{\textbf{Free Colonists}} with moderate skills. Still others
+are masters of their craft, experts at their trade or profession, who
+were educated at the Royal College in Europe. If you have enough gold,
+you can recruit units directly from the Royal College.
+
+Not all skills, however, can be learned in Europe. The cultivation of
+\hyperlink{Sugar}{Sugar}, \hyperlink{Cotton}{Cotton} and
+\hyperlink{Tobacco}{Tobacco} is unknown in Europe. Thus,
+\hypertarget{Master Sugar Planters}{\textbf{Master Sugar
+Planters}}, \hypertarget{Master Sugar Planters}{\textbf{Master Cotton
+Planters}}, \hypertarget{Master Sugar Planters}{\textbf{Master Tobacco
+Planters}}, as well \hypertarget{Master Fur Trappers}{\textbf{Master
+Fur Trappers}}, can not be recruited in Europe.
+
+At the beginning of the game, these skills can only be learned at
+Indian Settlements. As soon as you construct a
+\hyperlink{Schoolhouse}{Schoolhouse}, however, you can order your
+master craftsmen to teach other free colonists their skills. Petty
+criminals and indentured servants can not become master craftsmen.
+However, a petty criminal may become an indentured servant, and an
+indentured servant may become a free colonist through education.
+
+Indian units are more productive than free colonists when working
+outside of the colony, and less productive when working inside a
+building. Indian units can not become free colonists through
+education, but all Indian units become free colonists as soon as
+\hyperlink{Bartolome de las Casas}{Bartolome de las Casas} joins the
+\hyperlink{Continental Congress}{Continental Congress}.
+
+
+
+\hypertarget{Copyright Notice}{\section{Copyright Notice}}
 Copyright © 2006
 \href{http://freecol.sourceforge.net/index.php?section=8}{The FreeCol
 Team}.
