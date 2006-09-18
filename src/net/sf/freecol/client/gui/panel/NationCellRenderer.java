@@ -26,6 +26,7 @@ public final class NationCellRenderer implements TableCellRenderer {
     private static final JComboBox refNationsComboBox = new JComboBox(Player.REF_NATIONS);
 
     private Vector players;
+    private Player thisPlayer;
 
     /**
     * The default constructor.
@@ -35,13 +36,25 @@ public final class NationCellRenderer implements TableCellRenderer {
 
 
     /**
-    * Sets the players that should be rendered in the table.
+    * Gives this table model the data that is being used in the table.
+    *
     * @param players The players that should be rendered in the table.
+    * @param owningPlayer The player running the client that is displaying the table.
     */
-    public void setPlayers(Vector players) {
+    public void setData(Vector players, Player owningPlayer) {
         this.players = players;
+        thisPlayer = owningPlayer;
     }
 
+    private Player getPlayer(int i) {
+        if (i == 0) {
+            return thisPlayer;
+        } else if (players.get(i) == thisPlayer) {
+            return (Player) players.get(0);
+        } else {
+            return (Player) players.get(i);
+        }
+    }
 
     /**
     * Returns the component used to render the cell's value.
@@ -55,7 +68,7 @@ public final class NationCellRenderer implements TableCellRenderer {
     public Component getTableCellRendererComponent(JTable table, Object value,
             boolean isSelected, boolean hasFocus, int row, int column) {
 
-        Player player = (Player) players.get(row);
+        Player player = getPlayer(row);
 
         JComboBox component;
         if (player.isREF()) {

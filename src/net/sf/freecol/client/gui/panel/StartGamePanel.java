@@ -235,10 +235,10 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         tableModel.setData(game.getPlayers(), thisPlayer);
 
         ((NationCellRenderer)table.getColumnModel().getColumn(1).getCellRenderer())
-                .setPlayers(game.getPlayers());
+                .setData(game.getPlayers(), thisPlayer);
 
         ((ColorCellEditor)table.getColumnModel().getColumn(2).getCellEditor())
-                .setPlayers(game.getPlayers());
+                .setData(game.getPlayers(), thisPlayer);
 
         if (singlePlayerGame) {
             // If we set the ready flag to false then the player will be able to change the

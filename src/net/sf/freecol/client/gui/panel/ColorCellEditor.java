@@ -46,6 +46,7 @@ public final class ColorCellEditor extends AbstractCellEditor implements TableCe
     private Color currentColor;
     private Vector players;
     private int lastRow;
+    private Player thisPlayer;
 
 
     /**
@@ -119,13 +120,25 @@ public final class ColorCellEditor extends AbstractCellEditor implements TableCe
 
 
     /**
-    * Sets the players that should be edited in the table.
+    * Gives this table model the data that is being used in the table.
+    *
     * @param players The players that should be edited in the table.
+    * @param owningPlayer The player running the client that is displaying the table.
     */
-    public void setPlayers(Vector players) {
+    public void setData(Vector players, Player owningPlayer) {
         this.players = players;
+        thisPlayer = owningPlayer;
     }
 
+    private Player getPlayer(int i) {
+        if (i == 0) {
+            return thisPlayer;
+        } else if (players.get(i) == thisPlayer) {
+            return (Player) players.get(0);
+        } else {
+            return (Player) players.get(i);
+        }
+    }
 
     /**
     * This function analyses an event and calls the right methods to take
@@ -145,7 +158,7 @@ public final class ColorCellEditor extends AbstractCellEditor implements TableCe
             currentColor = colorChooser.getColor();
 
             if ((lastRow >= 0) && (lastRow < players.size())) {
-                Player player = (Player)players.get(lastRow);
+                Player player = getPlayer(lastRow);
                 player.setColor(currentColor);
             }
 
@@ -161,6 +174,8 @@ public final class ColorCellEditor extends AbstractCellEditor implements TableCe
             canvas.remove(colorChooserPanel);
             parent.setEnabled(true);
             // No repainting needed apparently.
+            
+            fireEditingCanceled();
         }
         else {
             logger.warning("Invalid action command");
