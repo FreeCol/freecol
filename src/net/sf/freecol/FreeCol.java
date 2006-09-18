@@ -39,7 +39,7 @@ public final class FreeCol {
 
     public static final  Specification  specification = new Specification();
 
-    private  static final String FREECOL_VERSION = "0.5.0";
+    private  static final String FREECOL_VERSION = "0.5.1";
 
     public static final String  META_SERVER_ADDRESS = "meta.freecol.org";
     public static final int     META_SERVER_PORT = 3540;
