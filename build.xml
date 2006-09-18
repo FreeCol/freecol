@@ -1,11 +1,17 @@
 <?xml version="1.0"?>
 
 <project name="FreeCol" default="package">
-    
-  <property environment="env"/>
+
+  <property name="freecol.name" value="freecol"/>
+  <property name="freecol.version" value="0.5.1"/>  
+      
+  <property environment="env"/>  
+  <property name="freecol.release.name" value="${freecol.name}-${freecol.version}"/>  
   <property name="freecol.data.dir" value="${basedir}/data"/>
   <property name="freecol.src.dir" value="${basedir}/src"/>
   <property name="freecol.build.dir" value="${basedir}/build"/>
+  <property name="freecol.packaging.dir" value="${basedir}/packaging"/>
+  <property name="freecol.release.dir" value="${basedir}/release"/>
   <property name="freecol.javadoc.dir" value="${basedir}/javadoc"/>
   <property name="freecol.jar.file" value="${basedir}/FreeCol.jar"/>
   <property name="freecol.overview.file" value="${freecol.src.dir}/overview.html"/>
@@ -111,10 +117,49 @@
     />
   </target>
 
+  <target name="release" depends="clean">
+    <property name="nodata" value="true"/>
+    <property name="nosound" value="true"/>
+    <property name="nojars" value="true"/>
+    <antcall target="package"/>
+    
+    <mkdir dir="${freecol.release.dir}"/>
+    <mkdir dir="${freecol.release.dir}/${freecol.name}"/>
+        
+    <copy todir="${freecol.release.dir}/${freecol.name}">
+      <fileset dir="${basedir}" includes="FreeCol.jar"/>
+      <fileset dir="${freecol.packaging.dir}/common" excludes="**/CVS/**"/>
+      <fileset dir="${basedir}" includes="**/data/**" excludes="**/CVS/**"/>
+      <fileset dir="${basedir}" includes="**/jars/**" excludes="/CVS/**"/>    
+    </copy>
+        
+    <zip destfile="${freecol.release.dir}/${freecol.release.name}.zip">
+      <fileset dir="${freecol.release.dir}" includes="${freecol.name}/**"/>
+    </zip>    
+    <tar destfile="${freecol.release.dir}/${freecol.release.name}.tar.gz" compression="gzip">
+      <tarfileset dir="${freecol.release.dir}" includes="${freecol.name}/**"/>
+    </tar>
+    
+    <copy todir="${freecol.release.dir}/${freecol.name}">
+      <fileset dir="${basedir}" includes="src/**" excludes="**/CVS/**"/>
+      <fileset dir="${basedir}" includes="build.xml" />
+    </copy>
+    
+    <zip destfile="${freecol.release.dir}/${freecol.release.name}-src.zip">
+      <fileset dir="${freecol.release.dir}" includes="${freecol.name}/**"/>
+    </zip>    
+    <tar destfile="${freecol.release.dir}/${freecol.release.name}-src.tar.gz" compression="gzip">
+      <tarfileset dir="${freecol.release.dir}" includes="${freecol.name}/**"/>
+    </tar>    
+    
+    <delete quiet="true" dir="${freecol.release.dir}/${freecol.name}"/>
+  </target>
+
   <target name="clean" depends="init">
     <delete quiet="true" includeEmptyDirs="true">
       <fileset dir="${freecol.build.dir}" includes="net/**" />
       <fileset dir="${freecol.build.dir}" includes="timestamp.inf" />
+      <fileset dir="${freecol.release.dir}" />
     </delete>
     <delete quiet="true" file="${freecol.jar.file}"/>
     <delete quiet="true" dir="${freecol.javadoc.dir}"/>
