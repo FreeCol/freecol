@@ -22,9 +22,6 @@ In order to compile the game, you'll also need Apache Ant,
 get it at:
 http://ant.apache.org
 
-NOTE: you only need to compile FreeCol in case you downloaded
-the source package of FreeCol.
-
 NOTE: technically, it may be possible to run the game on an older
 JRE (for example Java 1.3). In this case you will need jar files
 in your CLASSPATH that provide standard XML parsers and the Java
@@ -34,8 +31,8 @@ chances are high that we won't be able to help you out if it fails.
 
 II.  Compiling FreeCol
 =================================
-NOTE: as mentioned above, you must skip this step in case you
-downloaded the binary version of FreeCol.
+NOTE: The compiled files are included with the releases, so this
+step is not required in order to play the game. 
 
 Launch a command prompt and go to the directory where you unpacked
 the FreeCol package.
@@ -56,7 +53,7 @@ the directory where you executed the 'ant' command (in case you
 downloaded the source package).
 Make sure the file named 'FreeCol.jar' is in your current directory.
 
-Execute the command 'java -jar FreeCol.jar'
+Execute the command 'java -Xmx256M -jar FreeCol.jar'
 
 Windows users may need to execute
 'java -Xmx256M -cp . -jar FreeCol.jar'
@@ -64,6 +61,9 @@ Windows users may need to execute
 In case the command could not be found, check your Java installation
 and make sure that the java (*nix) or java.exe (Windows) file is in
 your PATH.
+
+Run 'java -jar FreeCol.jar --usage' to get a list of available
+command-line parameters.
 
 You may ignore the message:
   "The music files could not be loaded by FreeCol. Disabling music."
@@ -73,10 +73,14 @@ because there is no music available yet for FreeCol.
 IV.  Troubleshooting
 =================================
 Q: I get the following error:
-     The data file "data/images/units/Unit0.png" could not be found.
+   The data file "data/images/units/Unit0.png" could not be found.
 A: Use the command-line option --freecol-data to specify the location
    of the 'data' directory.
    For example: java -jar FreeCol.jar --freecol-data C:\Games\FreeCol\data
+
+Q: I am unable to start the game.
+A: Try running the game in windowed mode: 
+   'java -Xmx256M -jar FreeCol.jar --windowed'
 
 
 V.   Help, Feedback & Bug Reports
@@ -118,4 +122,4 @@ VI.  About
 =================================
 Content is (C) 2002-2006 The FreeCol Team
 The authors of FreeCol can be found on the FreeCol homepage.
-FreeCol's homepage can be found at http://freecol.sourceforge.net
+FreeCol's homepage can be found at http://www.freecol.org
