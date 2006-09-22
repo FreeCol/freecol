@@ -224,7 +224,7 @@ public final class Colony extends Settlement implements Location {
      * Sets the number of units inside the colony, used in enemy colonies
      * 
      * @param unitCount The units inside the colony
-     * @see getUnitCount
+     * @see #getUnitCount
      */
     public void setUnitCount(int unitCount) {
         this.unitCount = unitCount;
