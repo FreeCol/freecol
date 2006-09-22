@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="iso-8859-1" standalone="yes" ?>
+
+<!-- IzPack specification for creating an installer. -->
+<!-- Used by "build.xml". -->
+
+<installation version="1.0">
+    <info>
+        <appname>FreeCol</appname>
+        <appversion>%ant:freecol.version%</appversion>
+        <appsubpath>freecol</appsubpath>
+        <url>http://www.freecol.org</url>
+        <authors>
+            <author name="The FreeCol Team" email="developers@freecol.org" />
+        </authors>
+        <javaversion>1.4</javaversion>
+    </info>
+    <guiprefs width="640" height="480" resizable="no"/>
+    <locale>
+        <langpack iso3="eng"/>
+        <langpack iso3="deu"/>
+        <langpack iso3="spa"/>
+        <langpack iso3="hun"/>
+    </locale>
+    <resources>
+        <res id="LicencePanel.licence" src="COPYING"/>
+        <res id="shortcutSpec.xml" src="../../build/winShortcutSpec.xml"/>
+        <res id="Unix_shortcutSpec.xml" src="../../build/unixShortcutSpec.xml"/>
+    </resources>
+    <native type="izpack" name="ShellLink.dll"/>
+    <panels>
+        <panel classname="HelloPanel"/>
+        <panel classname="LicencePanel"/>
+        <panel classname="TargetPanel"/>
+        <panel classname="InstallPanel"/>
+        <panel classname="ShortcutPanel"/>
+        <panel classname="SimpleFinishPanel"/>
+    </panels>
+    <packs>
+        <pack name="FreeCol" required="yes">
+            <description>The FreeCol game files.</description>
+            <fileset dir="" targetdir="$INSTALL_PATH" />
+            <executable targetfile="$INSTALL_PATH/freecol" stage="never" keep="true" />
+            <executable targetfile="$INSTALL_PATH/Uninstaller/uninstaller" stage="never" keep="true" />
+        </pack>
+    </packs>
+</installation>

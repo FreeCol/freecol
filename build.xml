@@ -3,7 +3,7 @@
 <project name="FreeCol" default="package">
 
   <property name="freecol.name" value="freecol"/>
-  <property name="freecol.version" value="0.5.1"/>  
+  <property name="freecol.version" value="0.5.1_cvs"/>  
       
   <property environment="env"/>  
   <property name="freecol.release.name" value="${freecol.name}-${freecol.version}"/>  
@@ -11,22 +11,40 @@
   <property name="freecol.src.dir" value="${basedir}/src"/>
   <property name="freecol.build.dir" value="${basedir}/build"/>
   <property name="freecol.packaging.dir" value="${basedir}/packaging"/>
-  <property name="freecol.release.dir" value="${basedir}/release"/>
-  <property name="freecol.javadoc.dir" value="${basedir}/javadoc"/>
+  <property name="freecol.release.dir" value="${basedir}/dist"/>
+  <property name="freecol.javadoc.dir" value="${basedir}/doc/javadoc"/>
   <property name="freecol.jar.file" value="${basedir}/FreeCol.jar"/>
+  <property name="freecol.metaserver.jar.file" value="${basedir}/FreeCol-metaserver.jar"/>
   <property name="freecol.overview.file" value="${freecol.src.dir}/overview.html"/>
-
   <path id="test.class.path">
     <fileset dir="test/lib" includes="*.jar" />
   </path>
 
+  
+  
+  <!-- TASK DEFINITIONS -->
+  <taskdef name="jsmoothgen"
+           classname="net.charabia.jsmoothgen.ant.JSmoothGen"
+           classpath="${freecol.build.dir}/jars/jsmoothgen-ant.jar"
+  />
+  <taskdef name="izpack"
+           classname="com.izforge.izpack.ant.IzPackTask"
+           classpath="${freecol.build.dir}/jars/standalone-compiler.jar"
+  />
 
   <target name="init" unless="TSTAMP">
     <tstamp/>
   </target>
 
+  
+  <!-- Compiles the java source files and updates the version numbers. -->
   <target name="compile" depends="init">
     <mkdir dir="${freecol.build.dir}"/>
+    
+    <replaceregexp file="${freecol.src.dir}/net/sf/freecol/FreeCol.java"
+                   match="FREECOL_VERSION\s*=\s*&quot;(.*?)&quot;\;"
+                   replace="FREECOL_VERSION = &quot;${freecol.version}&quot;\;"
+    />  
     <javac srcdir="${freecol.src.dir}"
            destdir="${freecol.build.dir}"
            classpath="${basedir}/jars/higlayout.jar"
@@ -34,9 +52,10 @@
            optimize="on"
            deprecation="off"
            source="1.4"
-    />
+    />    
   </target>
 
+  
   <target name="compile-test" depends="init">
     <mkdir dir="${freecol.build.dir}"/>
     <javac srcdir="test/src"
@@ -49,48 +68,8 @@
     />
   </target>
 
-  <target name="copy-sound-files" depends="init" unless="nosound">
-    <copy todir="${freecol.build.dir}/net/sf/freecol/data/audio">
-      <fileset dir="${freecol.data.dir}/audio">
-        <exclude name="**/CVS/**"/>
-      </fileset>
-    </copy>
-  </target>
-
-  <target name="copy-jar-files" depends="init" unless="nojars">
-    <mkdir dir="${freecol.build.dir}/jars"/>
-    <copy todir="${freecol.build.dir}/jars">
-      <fileset dir="${basedir}/jars">
-        <exclude name="**/CVS/**"/>
-      </fileset>
-    </copy>
-  </target>
-
-  <target name="copy-data-files" depends="init" unless="nodata">
-    <!-- Copy the image files -->
-    <copy todir="${freecol.build.dir}/net/sf/freecol/data/images">
-      <fileset dir="${freecol.data.dir}/images">
-        <exclude name="**/CVS/**"/>
-      </fileset>
-    </copy>
-
-    <copy todir="${freecol.build.dir}/net/sf/freecol/data/fonts">
-      <fileset dir="${freecol.data.dir}/fonts">
-        <exclude name="**/CVS/**"/>
-      </fileset>
-    </copy>
-
-    <!-- Copy the sound files unless the "nosound" property has been defined -->
-    <antcall target="copy-sound-files"/>
-  </target>
-
-  <target name="build" depends="init,compile">
-    <!-- Copy the data files unless the "nodata" property has been defined -->
-    <antcall target="copy-data-files"/>
-
-    <!-- Copy the jar files unless the "nojars" property has been defined -->
-    <antcall target="copy-jar-files"/>
-
+  
+  <target name="build" depends="init,compile" description="Compiles the source files.">
     <copy todir="${freecol.build.dir}">
       <fileset dir="${freecol.src.dir}" includes="**/*.xml" />
     </copy>
@@ -101,36 +80,42 @@
                   encoding="ISO-8859-1" includes="**/*_de_DE.properties **/*_hu.properties" excludes="classes/**" />
   </target>
 
-  <target name="package" depends="init,build">
+  
+  <!-- Compiles the source files and creates a JAR-file. -->
+  <target name="package" depends="init,build" description="Compiles the source files and creates a JAR-file.">
     <jar jarfile="${freecol.jar.file}"
          basedir="${freecol.build.dir}"
          manifest="${basedir}/src/MANIFEST.MF"
+         includes="net/**, org/**"
          excludes="**/CVS/**, **/metaserver/**"
     />
   </target>
 
-  <target name="fullpackage" depends="init,build">
-    <jar jarfile="${freecol.jar.file}"
+  
+  <!-- Compiles the metaserver and creates a JAR-file. -->
+  <target name="metaserver" depends="init,build" description="Compiles the metaserver and creates a JAR-file.">
+    <jar jarfile="${freecol.metaserver.jar.file}"
          basedir="${freecol.build.dir}"
          manifest="${basedir}/src/MANIFEST.MF"
+         includes="net/**, org/**"
          excludes="**/CVS/**"
     />
   </target>
 
-  <target name="release" depends="clean">
-    <property name="nodata" value="true"/>
-    <property name="nosound" value="true"/>
-    <property name="nojars" value="true"/>
-    <antcall target="package"/>
-    
+  
+  <!--
+    Creates archives and installers for distribution and places these in the
+    "dist" directory.
+  -->
+  <target name="dist" depends="clean, package" description="Creates archives and installers for distribution.">    
     <mkdir dir="${freecol.release.dir}"/>
     <mkdir dir="${freecol.release.dir}/${freecol.name}"/>
         
     <copy todir="${freecol.release.dir}/${freecol.name}">
       <fileset dir="${basedir}" includes="FreeCol.jar"/>
       <fileset dir="${freecol.packaging.dir}/common" excludes="**/CVS/**"/>
-      <fileset dir="${basedir}" includes="**/data/**" excludes="**/CVS/**"/>
-      <fileset dir="${basedir}" includes="**/jars/**" excludes="/CVS/**"/>    
+      <fileset dir="${basedir}" includes="data/**" excludes="**/CVS/**"/>
+      <fileset dir="${basedir}" includes="jars/**" excludes="**/CVS/**"/>    
     </copy>
         
     <zip destfile="${freecol.release.dir}/${freecol.release.name}.zip">
@@ -151,11 +136,59 @@
     <tar destfile="${freecol.release.dir}/${freecol.release.name}-src.tar.gz" compression="gzip">
       <tarfileset dir="${freecol.release.dir}" includes="${freecol.name}/**"/>
     </tar>    
-    
-    <delete quiet="true" dir="${freecol.release.dir}/${freecol.name}"/>
-  </target>
 
-  <target name="clean" depends="init">
+    <copy tofile="${freecol.build.dir}/installer-tmp.xml">
+      <fileset file="${freecol.build.dir}/installer.xml" />
+    </copy>
+    <replace file="${freecol.build.dir}/installer-tmp.xml"
+             token="%ant:freecol.version%"
+             value="${freecol.version}"
+    />
+    
+    <jsmoothgen project="${freecol.build.dir}/startup.jsmooth" skeletonroot="${freecol.build.dir}/skeletons"/>    
+    <move todir="${freecol.release.dir}/${freecol.name}">
+      <fileset dir="${freecol.build.dir}" includes="freecol.exe"/>
+    </move>
+
+    <mkdir dir="${freecol.release.dir}/${freecol.name}/Uninstaller"/>
+    <jsmoothgen project="${freecol.build.dir}/uninstaller.jsmooth" skeletonroot="${freecol.build.dir}/skeletons"/>    
+    <move todir="${freecol.release.dir}/${freecol.name}/Uninstaller">
+      <fileset dir="${freecol.build.dir}" includes="uninstaller.exe"/>
+    </move>
+        
+    <izpack input="${freecol.build.dir}/installer-tmp.xml" 
+            output="${freecol.release.dir}/${freecol.release.name}-installer.jar" installerType="standard" 
+            basedir="${freecol.release.dir}/${freecol.name}"
+            izpackdir="${freecol.build.dir}"
+    />
+    <delete quiet="true" file="${freecol.build.dir}/installer-tmp.xml"/>
+
+    <copy todir="${freecol.release.dir}">
+      <fileset dir="${freecol.build.dir}" includes="installer.jsmooth"/>
+    </copy>
+    <replace file="${freecol.release.dir}/installer.jsmooth" 
+             token="%ant:freecol.release.name%"
+             value="${freecol.release.name}"
+    />
+    <replace file="${freecol.release.dir}/installer.jsmooth" 
+             token="%ant:freecol.installerjar%"
+             value="${freecol.release.dir}/${freecol.release.name}-installer.jar"
+    />        
+    <jsmoothgen project="${freecol.release.dir}/installer.jsmooth" skeletonroot="${freecol.build.dir}/skeletons"/>
+
+    <delete quiet="true" dir="${freecol.release.dir}/${freecol.name}"/>
+    <delete quiet="true" file="${freecol.release.dir}/installer.jsmooth"/>
+    
+    <echo message="" />
+    <echo message="-------------------------------------------------"/>
+    <echo message="Distribution files created:"/>
+    <echo message="${freecol.release.dir}"/>
+    <echo message="-------------------------------------------------"/>
+  </target>
+  
+  
+  <!-- Cleans the directories by removing auto-generated files. -->
+  <target name="clean" depends="init" description="Cleans the directories by removing auto-generated files.">
     <delete quiet="true" includeEmptyDirs="true">
       <fileset dir="${freecol.build.dir}" includes="net/**" />
       <fileset dir="${freecol.build.dir}" includes="timestamp.inf" />
@@ -163,7 +196,6 @@
     </delete>
     <delete quiet="true" file="${freecol.jar.file}"/>
     <delete quiet="true" dir="${freecol.javadoc.dir}"/>
-    <delete quiet="true" dir="${freecol.build.dir}"/>
   </target>
 
   <target name="fix" depends="init">
@@ -177,7 +209,9 @@
     />
   </target>
 
-  <target name="javadoc" depends="init">
+  
+  <!-- Generate JavaDoc documentation. -->
+  <target name="javadoc" depends="init" description="Generate JavaDoc documentation.">
     <mkdir dir="${freecol.javadoc.dir}"/>
     <javadoc sourcepath="${freecol.src.dir}"
              overview="${freecol.overview.file}"
@@ -187,6 +221,11 @@
              Author="true"
              Windowtitle="FreeCol Code Documentation"
     />
+    <echo message="" />
+    <echo message="-------------------------------------------------"/>
+    <echo message="JavaDoc-generated documentation created:"/>
+    <echo message="${freecol.javadoc.dir}"/>
+    <echo message="-------------------------------------------------"/>
   </target>
 
 
@@ -194,7 +233,7 @@
        ant -lib test/lib/junit.jar -Dtest=common.model.Building test
        -->
   <target name="test" depends="build, build-unit-tests"
-          description="runs a particular unit test"
+          description="Runs a particular unit test"
   >
     <echo message="if the next task fails then please read the build script" />
     <!-- if the next fails then here is the long answer:
@@ -219,7 +258,7 @@
 
 
   <target name="testall" depends="build-unit-tests"
-          description="runs all unit tests"
+          description="Runs all unit tests"
   >
     <echo message="if the next task fails then please read the build script" />
     <!-- if the next fails then here is the long answer:
@@ -274,7 +313,4 @@
 
   <target name="manual" depends="print-manual,online-manual">
   </target>
-
-
-
 </project>

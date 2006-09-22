@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!-- Specifies the shortcuts to be created by an installer on a UNIX system. -->
+
+<shortcuts>
+    <skipIfNotSupported/>
+    <programGroup defaultName="FreeCol" location="applications"/>
+        
+    <shortcut name="FreeCol"
+              target="$INSTALL_PATH/freecol"
+              encoding="UTF-8"
+              type="Application"
+              commandLine=""
+              workingDirectory="$INSTALL_PATH"
+              description="FreeCol"
+              iconFile="$INSTALL_PATH/freecol.xpm"
+              iconIndex="0"
+              initialState="normal"
+              programGroup="yes"
+              desktop="yes"
+              applications="no"
+              startMenu="no"
+              startup="no"
+    />
+    
+    <shortcut name="FreeCol (windowed)"
+              target="$INSTALL_PATH/freecol"
+              encoding="UTF-8"
+              type="Application"
+              commandLine="--windowed"
+              workingDirectory="$INSTALL_PATH"
+              description="FreeCol - Windowed"
+              iconFile="$INSTALL_PATH/freecol.xpm"
+              iconIndex="0"
+              initialState="normal"
+              programGroup="yes"
+              desktop="no"
+              applications="no"
+              startMenu="no"
+              startup="no"
+    />
+    
+    <shortcut name="Uninstaller"
+              target="$INSTALL_PATH/Uninstaller/uninstaller"
+              encoding="UTF-8"
+              type="Application"
+              commandLine=""
+              workingDirectory="$INSTALL_PATH/Uninstaller"
+              description="Uninstall FreeCol"
+              iconFile="trashcan_full"
+              iconIndex="0"
+              initialState="normal"
+              programGroup="yes"
+              desktop="no"
+              applications="no"
+              startMenu="no"
+              startup="no"
+    />
+    
+    <shortcut name="FreeCol Website"
+              url="http://www.freecol.org"
+              encoding="UTF-8"
+              type="Link"
+              description="The FreeCol Website"
+              iconFile="$INSTALL_PATH/freecol.xpm"
+              iconIndex="0"
+              programGroup="yes"
+              desktop="no"
+              applications="no"
+              startMenu="no"
+              startup="no"
+    />  
+</shortcuts>
+              
