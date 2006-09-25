@@ -6,12 +6,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 import net.sf.freecol.FreeCol;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * Represents a building in a colony. 
@@ -100,7 +102,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      */
     private List units = new ArrayList();
 
-    private final BuildingType buildingType;
+    private BuildingType buildingType;
 
     
     /**
@@ -124,18 +126,50 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
 
     /**
-     * Initiates a new <code>Building</code> from an <code>Element</code>.
+     * Initiates a new <code>Building</code> from an
+     * XML representation.
      *
      * @param game The <code>Game</code> this object belongs to.
-     * @param element The <code>Element</code> (in a DOM-parsed XML-tree) 
-     *      that describes this object.
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
      */
-    public Building(Game game, Element element) {
-        super(game, element);
+    public Building(Game game, XMLStreamReader in) throws XMLStreamException {
+        super(game, in);
 
-        readFromXMLElement(element);
+        readFromXML(in);
 
         buildingType = FreeCol.specification.buildingType( type );
+    }
+    
+    /**
+     * Initiates a new <code>Building</code> from an
+     * XML representation.
+     *
+     * @param game The <code>Game</code> this object belongs to.
+     * @param e An XML-element that will be used to initialize
+     *      this object.
+     */
+    public Building(Game game, Element e) {
+        super(game, e);
+
+        readFromXMLElement(e);
+
+        buildingType = FreeCol.specification.buildingType( type );
+    }
+    
+    /**
+     * Initiates a new <code>Building</code> 
+     * with the given ID. The object should later be
+     * initialized by calling either
+     * {@link #readFromXML(XMLStreamReader)} or
+     * {@link #readFromXMLElement(Element)}.
+     *
+     * @param game The <code>Game</code> in which this object belong.
+     * @param id The unique identifier for this object.
+     */
+    public Building(Game game, String id) {
+        super(game, id);
     }
 
 
@@ -906,61 +940,76 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     }    
 
     /**
-     * Makes an XML-representation of this object.
-     *
-     * @param document The document to use when creating new 
-     *      componenets.
-     * @return The DOM-element ("Document Object Model") made to 
-     *      represent this "Building".
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     * 
+     * <br><br>
+     * 
+     * Only attributes visible to the given <code>Player</code> will 
+     * be added to that representation if <code>showAll</code> is
+     * set to <code>false</code>.
+     *  
+     * @param out The target stream.
+     * @param player The <code>Player</code> this XML-representation 
+     *      should be made for, or <code>null</code> if
+     *      <code>showAll == true</code>.
+     * @param showAll Only attributes visible to <code>player</code> 
+     *      will be added to the representation if <code>showAll</code>
+     *      is set to <i>false</i>.
+     * @param toSavedGame If <code>true</code> then information that
+     *      is only needed when saving a game is added.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
      */
-    public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
-        Element buildingElement = document.createElement(getXMLElementTagName());
+    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame) throws XMLStreamException {
+        // Start element:
+        out.writeStartElement(getXMLElementTagName());
+        
+        // Add attributes:       
+        out.writeAttribute("ID", getID());
+        out.writeAttribute("colony", colony.getID());
+        out.writeAttribute("type", Integer.toString(type));
+        out.writeAttribute("level", Integer.toString(level));
 
-        buildingElement.setAttribute("ID", getID());
-        buildingElement.setAttribute("colony", colony.getID());
-        buildingElement.setAttribute("type", Integer.toString(type));
-        buildingElement.setAttribute("level", Integer.toString(level));
-
+        // Add child elements:
         Iterator unitIterator = getUnitIterator();
         while (unitIterator.hasNext()) {
-            buildingElement.appendChild(((FreeColGameObject) unitIterator.next()).toXMLElement(player, document, showAll, toSavedGame));
+            ((FreeColGameObject) unitIterator.next()).toXML(out, player, showAll, toSavedGame);
         }
 
-        return buildingElement;
+        // End element:
+        out.writeEndElement();
     }
 
     /**
-     * Initializes this object from an XML-representation of this object.
-     * @param buildingElement The DOM-element ("Document Object Model") 
-     *      made to represent this "Building".
+     * Initialize this object from an XML-representation of this object.
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
      */
-    public void readFromXMLElement(Element buildingElement) {
-        setID(buildingElement.getAttribute("ID"));
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        setID(in.getAttributeValue(null, "ID"));
 
-        colony = (Colony) getGame().getFreeColGameObject(buildingElement.getAttribute("colony"));
-        type = Integer.parseInt(buildingElement.getAttribute("type"));
-        level = Integer.parseInt(buildingElement.getAttribute("level"));
+        colony = (Colony) getGame().getFreeColGameObject(in.getAttributeValue(null, "colony"));
+        if (colony == null) {
+            colony = new Colony(getGame(), in.getAttributeValue(null, "colony"));
+        }
+        type = Integer.parseInt(in.getAttributeValue(null, "type"));
+        level = Integer.parseInt(in.getAttributeValue(null, "level"));
 
         units.clear();
 
-        NodeList unitNodeList = buildingElement.getChildNodes();
-        for (int i=0; i<unitNodeList.getLength(); i++) {
-            Node node = unitNodeList.item(i);
-            if (!(node instanceof Element)) {
-                continue;
-            }
-            Element unitElement = (Element) node;
-
-            Unit unit = (Unit) getGame().getFreeColGameObject(unitElement.getAttribute("ID"));
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            Unit unit = (Unit) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
             if (unit != null) {
-                unit.readFromXMLElement(unitElement);
+                unit.readFromXML(in);
                 if (!units.contains(unit)) {
                     units.add(unit);
                 }
             } else {
-                unit = new Unit(getGame(), unitElement);
+                unit = new Unit(getGame(), in);
                 units.add(unit);
-            }
+            }            
         }
     }
 

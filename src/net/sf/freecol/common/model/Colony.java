@@ -6,6 +6,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -174,19 +179,47 @@ public final class Colony extends Settlement implements Location {
     
 
     /**
-    * Initiates a new <code>Colony</code> from an <code>Element</code>.
+    * Initiates a new <code>Colony</code> from an 
+    * XML representation.
     *
     * @param game The <code>Game</code> this object belongs to.
-    * @param element The <code>Element</code> (in a DOM-parsed XML-tree) that describes
-    *                this object.
+    * @param in The input stream containing the XML.
+    * @throws XMLStreamException if an error occured during parsing.
     */
-    public Colony(Game game, Element element) {
-        super(game, element);
+    public Colony(Game game, XMLStreamReader in) throws XMLStreamException {      
+        super(game, in);
 
-        readFromXMLElement(element);
+        readFromXML(in);
     }
 
+    /**
+     * Initiates a new <code>Colony</code> from an 
+     * XML representation.
+     *
+     * @param game The <code>Game</code> this object belongs to.
+     * @param e An XML-element that will be used to initialize
+     *      this object.
+     */
+     public Colony(Game game, Element e) {
+         super(game, e);
 
+         readFromXMLElement(e);
+     }
+     
+     /**
+      * Initiates a new <code>Colony</code> 
+      * with the given ID. The object should later be
+      * initialized by calling either
+      * {@link #readFromXML(XMLStreamReader)} or
+      * {@link #readFromXMLElement(Element)}.
+      *
+      * @param game The <code>Game</code> in which this object belong.
+      * @param id The unique identifier for this object.
+      */
+     public Colony(Game game, String id) {
+         super(game, id);
+     }
+     
     /**
      * Returns whether this colony is landlocked, or has access to the
      * ocean.
@@ -1459,165 +1492,191 @@ public final class Colony extends Settlement implements Location {
         super.dispose();
     }
 
-
     /**
-    * Make a XML-representation of this object.
-    *
-    * @param document The document to use when creating new componenets.
-    * @return The DOM-element ("Document Object Model") made to represent this "Colony".
-    */
-    public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
-        Element colonyElement = document.createElement(getXMLElementTagName());
-
-        colonyElement.setAttribute("ID", getID());
-        colonyElement.setAttribute("name", name);
-        colonyElement.setAttribute("owner", owner.getID());
-        colonyElement.setAttribute("tile", tile.getID());
-
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     * 
+     * <br><br>
+     * 
+     * Only attributes visible to the given <code>Player</code> will 
+     * be added to that representation if <code>showAll</code> is
+     * set to <code>false</code>.
+     *  
+     * @param out The target stream.
+     * @param player The <code>Player</code> this XML-representation 
+     *      should be made for, or <code>null</code> if
+     *      <code>showAll == true</code>.
+     * @param showAll Only attributes visible to <code>player</code> 
+     *      will be added to the representation if <code>showAll</code>
+     *      is set to <i>false</i>.
+     * @param toSavedGame If <code>true</code> then information that
+     *      is only needed when saving a game is added.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame) throws XMLStreamException {
+        // Start element:
+        out.writeStartElement(getXMLElementTagName());
+        
+        // Add attributes:       
+        out.writeAttribute("ID", getID());    
+        out.writeAttribute("name", name);
+        out.writeAttribute("owner", owner.getID());
+        out.writeAttribute("tile", tile.getID());
         if (showAll || player == getOwner()) {
-            colonyElement.setAttribute("hammers", Integer.toString(hammers));
-            colonyElement.setAttribute("bells", Integer.toString(bells));
-            colonyElement.setAttribute("sonsOfLiberty", Integer.toString(sonsOfLiberty));
-            colonyElement.setAttribute("oldSonsOfLiberty", Integer.toString(oldSonsOfLiberty));
-            colonyElement.setAttribute("tories", Integer.toString(tories));
-            colonyElement.setAttribute("oldTories", Integer.toString(oldTories));
-            colonyElement.setAttribute("productionBonus", Integer.toString(productionBonus));
-            colonyElement.setAttribute("currentlyBuilding", Integer.toString(currentlyBuilding));
-            colonyElement.setAttribute("landLocked", Boolean.toString(landLocked));
+            out.writeAttribute("hammers", Integer.toString(hammers));
+            out.writeAttribute("bells", Integer.toString(bells));
+            out.writeAttribute("sonsOfLiberty", Integer.toString(sonsOfLiberty));
+            out.writeAttribute("oldSonsOfLiberty", Integer.toString(oldSonsOfLiberty));
+            out.writeAttribute("tories", Integer.toString(tories));
+            out.writeAttribute("oldTories", Integer.toString(oldTories));
+            out.writeAttribute("productionBonus", Integer.toString(productionBonus));
+            out.writeAttribute("currentlyBuilding", Integer.toString(currentlyBuilding));
+            out.writeAttribute("landLocked", Boolean.toString(landLocked));
 
             char[] exportsCharArray = new char[exports.length];
             for(int i = 0; i < exports.length; i++) {
                 exportsCharArray[i] = (exports[i] ? '1' : '0');
             }
-            colonyElement.setAttribute("exports", new String(exportsCharArray));
+            out.writeAttribute("exports", new String(exportsCharArray));
 
             Iterator workLocationIterator = workLocations.iterator();
             while (workLocationIterator.hasNext()) {
-                colonyElement.appendChild(((FreeColGameObject) workLocationIterator.next()).toXMLElement(player, document, showAll, toSavedGame));
+                ((FreeColGameObject) workLocationIterator.next()).toXML(out, player, showAll, toSavedGame);
             }
         } else {
-            colonyElement.setAttribute("unitCount", Integer.toString(getUnitCount()));
-            colonyElement.appendChild(getBuilding(Building.STOCKADE).toXMLElement(player, document, showAll, toSavedGame));
+            out.writeAttribute("unitCount", Integer.toString(getUnitCount()));
+            getBuilding(Building.STOCKADE).toXML(out, player, showAll, toSavedGame);
         }
 
-        colonyElement.appendChild(goodsContainer.toXMLElement(player, document, showAll, toSavedGame));
+        goodsContainer.toXML(out, player, showAll, toSavedGame);
 
-        return colonyElement;
+        // End element:
+        out.writeEndElement();
     }
 
-
     /**
-    * Initialize this object from an XML-representation of this object.
-    * @param colonyElement The DOM-element ("Document Object Model") made to represent this "Colony".
-    */
-    public void readFromXMLElement(Element colonyElement) {
-        setID(colonyElement.getAttribute("ID"));
+     * Initialize this object from an XML-representation of this object.
+     * @param in The input stream with the XML.
+     */
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        setID(in.getAttributeValue(null, "ID"));
 
-        name = colonyElement.getAttribute("name");
-        owner = (Player) getGame().getFreeColGameObject(colonyElement.getAttribute("owner"));
-        tile = (Tile) getGame().getFreeColGameObject(colonyElement.getAttribute("tile"));
+        name = in.getAttributeValue(null, "name");
+        owner = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "owner"));
+        if (owner == null) {
+            owner = new Player(getGame(), in.getAttributeValue(null, "owner"));
+        }
+        tile = (Tile) getGame().getFreeColGameObject(in.getAttributeValue(null, "tile"));
+        if (tile == null) {
+            tile = new Tile(getGame(), in.getAttributeValue(null, "owner"));
+        }
         
         owner.addSettlement(this);
 
-        if (colonyElement.hasAttribute("hammers")) {
-            hammers = Integer.parseInt(colonyElement.getAttribute("hammers"));
+        final String hammersStr = in.getAttributeValue(null, "hammers");
+        if (hammersStr != null) {
+            hammers = Integer.parseInt(hammersStr);
         } else {
             hammers = 0;
         }
 
-        if (colonyElement.hasAttribute("bells")) {
-            bells = Integer.parseInt(colonyElement.getAttribute("bells"));
+        final String bellsStr = in.getAttributeValue(null, "bells");
+        if (bellsStr != null) {
+            bells = Integer.parseInt(bellsStr);
         } else {
             bells = 0;
         }
 
-        if (colonyElement.hasAttribute("sonsOfLiberty")) {
-            sonsOfLiberty = Integer.parseInt(colonyElement.getAttribute("sonsOfLiberty"));
+        final String sonsOfLibertyStr = in.getAttributeValue(null, "sonsOfLiberty");
+        if (sonsOfLibertyStr != null) {
+            sonsOfLiberty = Integer.parseInt(sonsOfLibertyStr);
         } else {
             sonsOfLiberty = 0;
         }
 
-        if (colonyElement.hasAttribute("oldSonsOfLiberty")) {
-            oldSonsOfLiberty = Integer.parseInt(colonyElement.getAttribute("oldSonsOfLiberty"));
+        final String oldSonsOfLibertyStr = in.getAttributeValue(null, "oldSonsOfLiberty");
+        if (oldSonsOfLibertyStr != null) {
+            oldSonsOfLiberty = Integer.parseInt(oldSonsOfLibertyStr);
         } else {
             oldSonsOfLiberty = 0;
         }
 
-        if (colonyElement.hasAttribute("tories")) {
-            tories = Integer.parseInt(colonyElement.getAttribute("tories"));
+        final String toriesStr = in.getAttributeValue(null, "tories");
+        if (toriesStr != null) {
+            tories = Integer.parseInt(toriesStr);
         } else {
             tories = 0;
         }
 
-        if (colonyElement.hasAttribute("oldTories")) {
-            oldTories = Integer.parseInt(colonyElement.getAttribute("oldTories"));
+        final String oldToriesStr = in.getAttributeValue(null, "oldTories");
+        if (oldToriesStr != null) {
+            oldTories = Integer.parseInt(oldToriesStr);
         } else {
             oldTories = 0;
         }
 
-        if (colonyElement.hasAttribute("productionBonus")) {
-            productionBonus = Integer.parseInt(colonyElement.getAttribute("productionBonus"));
+        final String productionBonusStr = in.getAttributeValue(null, "productionBonus");
+        if (productionBonusStr != null) {
+            productionBonus = Integer.parseInt(productionBonusStr);
         } else {
             productionBonus = 0;
         }
 
-        if (colonyElement.hasAttribute("currentlyBuilding")) {
-            currentlyBuilding = Integer.parseInt(colonyElement.getAttribute("currentlyBuilding"));
+        final String currentlyBuildingStr = in.getAttributeValue(null, "currentlyBuilding");
+        if (currentlyBuildingStr != null) {
+            currentlyBuilding = Integer.parseInt(currentlyBuildingStr);
         } else {
             currentlyBuilding = -1;
         }
 
-        if (colonyElement.hasAttribute("landLocked")) {
-            landLocked = Boolean.valueOf(colonyElement.getAttribute("landLocked")).booleanValue();
+        final String landLockedStr = in.getAttributeValue(null, "landLocked");
+        if (landLockedStr != null) {
+            landLocked = Boolean.valueOf(landLockedStr).booleanValue();
         } else {
             landLocked = true;
         }
-
-        if (colonyElement.hasAttribute("unitCount")) {
-            unitCount = Integer.parseInt(colonyElement.getAttribute("unitCount"));
+        
+        final String unitCountStr = in.getAttributeValue(null, "unitCount");
+        if (unitCountStr != null) {
+            unitCount = Integer.parseInt(unitCountStr);
         } else {
             unitCount = -1;
         }
 
-        if (colonyElement.hasAttribute("exports")) {
+        final String exportString = in.getAttributeValue(null, "exports");
+        if (exportString != null) {
             exports = new boolean[Goods.NUMBER_OF_TYPES];
-            String exportString = colonyElement.getAttribute("exports");
             for(int i = 0; i < exportString.length(); i++) {
                 exports[i] = ( (exportString.charAt(i) == '1') ? true : false );
             }
         }
 
-        NodeList childNodes = colonyElement.getChildNodes();
-        for (int i=0; i<childNodes.getLength(); i++) {
-            Node node = childNodes.item(i);
-            if (!(node instanceof Element)) {
-                continue;
-            }        
-            Element childElement = (Element) node;
-
-            if (childElement.getTagName().equals(ColonyTile.getXMLElementTagName())) {
-                ColonyTile ct = (ColonyTile) getGame().getFreeColGameObject(childElement.getAttribute("ID"));
+        // Read child elements:
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            if (in.getLocalName().equals(ColonyTile.getXMLElementTagName())) {
+                ColonyTile ct = (ColonyTile) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
 
                 if (ct != null) {
-                    ct.readFromXMLElement(childElement);
+                    ct.readFromXML(in);
                 } else {
-                    workLocations.add(new ColonyTile(getGame(), childElement));
+                    workLocations.add(new ColonyTile(getGame(), in));
                 }
-            } else if (childElement.getTagName().equals(Building.getXMLElementTagName())) {
-                Building b = (Building) getGame().getFreeColGameObject(childElement.getAttribute("ID"));
+            } else if (in.getLocalName().equals(Building.getXMLElementTagName())) {
+                Building b = (Building) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
 
                 if (b != null) {
-                    b.readFromXMLElement(childElement);
+                    b.readFromXML(in);
                 } else {
-                    workLocations.add(new Building(getGame(), childElement));
+                    workLocations.add(new Building(getGame(), in));
                 }
-            } else if (childElement.getTagName().equals(GoodsContainer.getXMLElementTagName())) {
-                GoodsContainer gc = (GoodsContainer) getGame().getFreeColGameObject(childElement.getAttribute("ID"));
+            } else if (in.getLocalName().equals(GoodsContainer.getXMLElementTagName())) {
+                GoodsContainer gc = (GoodsContainer) getGame().getFreeColGameObject(in.getAttributeValue(null,"ID"));
 
                 if (gc != null) {
-                    goodsContainer.readFromXMLElement(childElement);
+                    goodsContainer.readFromXML(in);
                 } else {
-                    goodsContainer = new GoodsContainer(getGame(), this, childElement);
+                    goodsContainer = new GoodsContainer(getGame(), this, in);
                 }
             } 
         }

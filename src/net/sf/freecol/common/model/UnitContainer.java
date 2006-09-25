@@ -5,6 +5,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -49,23 +54,44 @@ public class UnitContainer extends FreeColGameObject {
 
 
     /**
-    * Initiates a new <code>UnitContainer</code> from an <code>Element</code>.
-    *
-    * @param game The <code>Game</code> in which this 
-    *       <code>UnitContainer</code> belong.
-    * @param parent The parent panel.
-    * @param element The <code>Element</code> (in a DOM-parsed XML-tree) 
-    *       that describes this object.
-    */
-    public UnitContainer(Game game, Location parent, Element element) {
-        super(game, element);
+     * Initiates a new <code>UnitContainer</code> from an <code>Element</code>.
+     *
+     * @param game The <code>Game</code> in which this 
+     *       <code>UnitContainer</code> belong.
+     * @param parent The parent panel.
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    public UnitContainer(Game game, Location parent, XMLStreamReader in) throws XMLStreamException {
+        super(game, in);
 
         if (parent == null) {
             throw new NullPointerException();
         }
 
         this.parent = parent;
-        readFromXMLElement(element);
+        readFromXML(in);
+    }
+
+    /**
+     * Initiates a new <code>UnitContainer</code> from an <code>Element</code>.
+     *
+     * @param game The <code>Game</code> in which this 
+     *       <code>UnitContainer</code> belong.
+     * @param parent The parent panel.
+     * @param e An XML-element that will be used to initialize
+     *      this object.
+     */
+    public UnitContainer(Game game, Location parent, Element e) {
+        super(game, e);
+
+        if (parent == null) {
+            throw new NullPointerException();
+        }
+
+        this.parent = parent;
+        readFromXMLElement(e);
     }
 
 
@@ -214,60 +240,63 @@ public class UnitContainer extends FreeColGameObject {
 
     }
 
-
     /**
-    * Makes an XML-representation of this object.
-    *
-    * @param document The document to use when creating new componenets.
-    * @return The DOM-element ("Document Object Model") made to represent this "UnitContainer".
-    */
-    public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
-        Element element = document.createElement(getXMLElementTagName());
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     * 
+     * <br><br>
+     * 
+     * Only attributes visible to the given <code>Player</code> will 
+     * be added to that representation if <code>showAll</code> is
+     * set to <code>false</code>.
+     *  
+     * @param out The target stream.
+     * @param player The <code>Player</code> this XML-representation 
+     *      should be made for, or <code>null</code> if
+     *      <code>showAll == true</code>.
+     * @param showAll Only attributes visible to <code>player</code> 
+     *      will be added to the representation if <code>showAll</code>
+     *      is set to <i>false</i>.
+     * @param toSavedGame If <code>true</code> then information that
+     *      is only needed when saving a game is added.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame) throws XMLStreamException {
+        // Start element:
+        out.writeStartElement(getXMLElementTagName());
 
-        element.setAttribute("ID", getID());
+        out.writeAttribute("ID", getID());
 
         Iterator unitIterator = getUnitIterator();
-
         while (unitIterator.hasNext()) {
-            element.appendChild(((Unit) unitIterator.next()).toXMLElement(player, document, showAll, toSavedGame));
+            Unit u = (Unit) unitIterator.next();
+            u.toXML(out, player, showAll, toSavedGame);
         }
 
-        return element;
+        out.writeEndElement();
     }
 
-
     /**
-    * Initializes this object from an XML-representation of this object.
-    * @param element The DOM-element ("Document Object Model") made to represent this "UnitContainer".
-    */
-    public void readFromXMLElement(Element element) {
-        setID(element.getAttribute("ID"));
-
-        //NodeList unitNodeList = element.getElementsByTagName(Unit.getXMLElementTagName());
-        NodeList unitNodeList = element.getChildNodes();
+     * Initialize this object from an XML-representation of this object.
+     * @param in The input stream with the XML.
+     */
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        setID(in.getAttributeValue(null, "ID"));
 
         units.clear();
 
-        for (int i=0; i<unitNodeList.getLength(); i++) {
-            Node node = unitNodeList.item(i);
-            if (!(node instanceof Element)) {
-                continue;
-            }
-            Element unitElement = (Element) node;
-
-            // Check if the unit is already here -> only update:
-            Unit u = (Unit) getGame().getFreeColGameObject(unitElement.getAttribute("ID"));
-
-            if (u != null) {
-                u.readFromXMLElement(unitElement);
-                if (!units.contains(u)) {
-                    units.add(u);
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            Unit unit = (Unit) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+            if (unit != null) {
+                unit.readFromXML(in);
+                if (!units.contains(unit)) {
+                    units.add(unit);
                 }
-                //u.setLocation(parent);
             } else {
-                u = new Unit(getGame(), unitElement);
-                units.add(u);
-            }
+                unit = new Unit(getGame(), in);
+                units.add(unit);
+            }            
         }
     }
 

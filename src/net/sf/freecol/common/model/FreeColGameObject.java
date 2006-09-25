@@ -1,12 +1,31 @@
 
 package net.sf.freecol.common.model;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.lang.reflect.Method;
 import java.util.logging.Logger;
 
-import net.sf.freecol.common.networking.Message;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 
 
@@ -27,11 +46,13 @@ abstract public class FreeColGameObject {
     private String id;
     private Game game;
     private boolean disposed = false;
+    private boolean uninitialized;
 
 
 
     public FreeColGameObject() {    
         logger.info("FreeColGameObject without ID created.");
+        uninitialized = false;
     }
     
 
@@ -45,8 +66,13 @@ abstract public class FreeColGameObject {
         this.game = game;
 
         if (game != null) {
-            //game.setFreeColGameObject(id, this);
-            String nextID = game.getNextID();
+            //game.setFreeColGameObject(id, this);            
+            String tagName = "";
+            try {
+                Method m = getClass().getMethod("getXMLElementTagName", null);
+                tagName = (String) m.invoke(null, null);
+            } catch (Exception e) {}
+            String nextID = tagName + ":" + game.getNextID();
             if (nextID != null) {
                 setID(nextID);
             }
@@ -55,29 +81,69 @@ abstract public class FreeColGameObject {
         } else {
             logger.warning("Created 'FreeColGameObject' with 'game == null': " + this);
         }
-
+        
+        uninitialized = false;
     }
-
-
+    
+    
     /**
-    * Initiates a new <code>FreeColGameObject</code> from an <code>Element</code>.
-    *
-    * @param game The <code>Game</code> in which this object belong.
-    * @param element The <code>Element</code> (in a DOM-parsed XML-tree) that describes
-    *                this object.
-    */
-    public FreeColGameObject(Game game, Element element) {
+     * Initiates a new <code>FreeColGameObject</code> from an <code>Element</code>.
+     *
+     * @param game The <code>Game</code> in which this object belong.
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    public FreeColGameObject(Game game, XMLStreamReader in) throws XMLStreamException {
         this.game = game;
 
         if (game == null && !(this instanceof Game)) {
             logger.warning("Created 'FreeColGameObject' with 'game == null': " + this);
         }
 
+        uninitialized = false;
     }
 
+    /**
+     * Initiates a new <code>FreeColGameObject</code> from an <code>Element</code>.
+     *
+     * @param game The <code>Game</code> in which this object belong.
+     * @param e An XML-element that will be used to initialize
+     *      this object.
+     */
+    public FreeColGameObject(Game game, Element e) {
+        this.game = game;
 
+        if (game == null && !(this instanceof Game)) {
+            logger.warning("Created 'FreeColGameObject' with 'game == null': " + this);
+        }
 
+        uninitialized = false;
+    }
 
+    /**
+     * Initiates a new <code>FreeColGameObject</code> 
+     * with the given ID. The object should later be
+     * initialized by calling either
+     * {@link #readFromXML(XMLStreamReader)} or
+     * {@link #readFromXMLElement(Element)}.
+     *
+     * @param game The <code>Game</code> in which this object belong.
+     * @param id The unique identifier for this object.
+     */
+    public FreeColGameObject(Game game, String id) {
+        this.game = game;
+
+        if (game == null && !(this instanceof Game)) {
+            logger.warning("Created 'FreeColGameObject' with 'game == null': " + this);
+        }
+
+        setID(id);
+        
+        uninitialized = true;
+    }
+    
+    
     /**
     * Gets the game object this <code>FreeColGameObject</code> belongs to.
     * @return The <code>game</code>.
@@ -132,6 +198,17 @@ abstract public class FreeColGameObject {
         return disposed;
     }
 
+    /**
+     * Checks if this <code>FreeColGameObject</code> 
+     * is uninitialized. That is: it has been referenced
+     * by another object, but has not yet been updated with
+     * {@link #readFromXML}.
+     * 
+     * @return <code>true</code> if this object is not initialized.
+     */
+    public boolean isUninitialized() {
+        return uninitialized;
+    }
 
     /**
     * Updates the id. This method should be overwritten
@@ -141,72 +218,229 @@ abstract public class FreeColGameObject {
         
     }
     
-        
     /**
-    * This method should return an XML-representation of this object.
-    * Only attributes visible to <code>player</code> will be added to
-    * that representation.
-    *
-    * @param player The <code>Player</code> this XML-representation is
-    *               made for.
-    * @param document The document to use when creating new componenets.
-    * @return The DOM-element ("Document Object Model").
-    * @see #toXMLElement(Player, Document, boolean, boolean)
-    */
+     * This method writes an XML-representation of this object to
+     * the given stream. Only attributes visible to the given
+     * <code>Player</code> will be added to that representation.
+     *
+     * @param out The target stream.
+     * @param player The <code>Player</code> this XML-representation is
+     *               made for.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     * @see #toXML(XMLStreamWriter, Player, boolean, boolean)
+     */
+    public void toXML(XMLStreamWriter out, Player player) throws XMLStreamException {
+        toXML(out, player, false, false);
+    }   
+    
+    /**
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     * 
+     * All attributes will be made visable.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     * @see #toXML(XMLStreamWriter, Player, boolean, boolean)
+     */
+    public void toXML(XMLStreamWriter out) throws XMLStreamException {
+        toXML(out, null, true, false);
+    }        
+    
+    /**
+     * This method writes an XML-representation of this object to
+     * the given stream for the purpose of storing this object
+     * as a part of a saved game.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     * @see #toXML(XMLStreamWriter, Player, boolean, boolean)
+     */
+    public void toSavedXML(XMLStreamWriter out) throws XMLStreamException {
+        toXML(out, null, true, true);
+    }
+
+    /**
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     * 
+     * <br><br>
+     * 
+     * Only attributes visible to the given <code>Player</code> will 
+     * be added to that representation if <code>showAll</code> is
+     * set to <code>false</code>.
+     *  
+     * @param player The <code>Player</code> this XML-representation 
+     *      should be made for, or <code>null</code> if
+     *      <code>showAll == true</code>.
+     * @param document The <code>Document</code>.
+     * @return An XML-representation of this object.
+     */    
     public Element toXMLElement(Player player, Document document) {
         return toXMLElement(player, document, false, false);
     }
     
-    
     /**
-    * This method should return an XML-representation of this object.
-    * All attributes will be made visable.
-    *
-    * @param document The document to use when creating new componenets.
-    * @return The DOM-element ("Document Object Model").
-    * @see #toXMLElement(Player, Document, boolean, boolean)
-    */
-    public Element toXMLElement(Document document) {
-        return toXMLElement(null, document, true, false);
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     * 
+     * <br><br>
+     * 
+     * Only attributes visible to the given <code>Player</code> will 
+     * be added to that representation if <code>showAll</code> is
+     * set to <code>false</code>.
+     *  
+     * @param player The <code>Player</code> this XML-representation 
+     *      should be made for, or <code>null</code> if
+     *      <code>showAll == true</code>.
+     * @param document The <code>Document</code>.
+     * @param showAll Only attributes visible to <code>player</code> 
+     *      will be added to the representation if <code>showAll</code>
+     *      is set to <i>false</i>.
+     * @param toSavedGame If <code>true</code> then information that
+     *      is only needed when saving a game is added.
+     * @return An XML-representation of this object.
+     */    
+    public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
+        try {
+            StringWriter sw = new StringWriter();
+            XMLOutputFactory xif = XMLOutputFactory.newInstance();
+            XMLStreamWriter xsw = xif.createXMLStreamWriter(sw);
+            toXML(xsw, player, showAll, toSavedGame);      
+            
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            Document tempDocument = null;
+            try {
+                DocumentBuilder builder = factory.newDocumentBuilder();
+                tempDocument = builder.parse(new InputSource(new StringReader(sw.toString())));;
+                return (Element) document.importNode(tempDocument.getDocumentElement(), true);
+            } catch (ParserConfigurationException pce) {
+                // Parser with specified options can't be built
+                StringWriter swe = new StringWriter();
+                pce.printStackTrace(new PrintWriter(swe));
+                logger.warning(swe.toString());
+                throw new IllegalStateException("ParserConfigurationException", pce);
+            } catch (SAXException se) {
+                StringWriter swe = new StringWriter();
+                se.printStackTrace(new PrintWriter(swe));
+                logger.warning(swe.toString());
+                throw new IllegalStateException("SAXException", se);
+            } catch (IOException ie) {
+                StringWriter swe = new StringWriter();
+                ie.printStackTrace(new PrintWriter(swe));
+                logger.warning(swe.toString());
+                throw new IllegalStateException("IOException", ie);
+            }                                    
+        } catch (XMLStreamException e) {
+            logger.warning(e.toString());
+            throw new IllegalStateException("XMLStreamException", e);
+        }
     }
-        
     
     /**
-    * This method should return an XML-representation of this object
-    * for the purpose of storing this object when saving the game.
-    *
-    * @param document The document to use when creating new componenets.
-    * @return The DOM-element ("Document Object Model").
-    * @see #toXMLElement(Player, Document, boolean, boolean)
-    */
-    public Element toSavedXMLElement(Document document) {
-        return toXMLElement(null, document, true, true);
+     * Initialize this object from an XML-representation of this object.
+     * @param element An XML-element that will be used to initialize
+     *      this object.
+     */
+    public void readFromXMLElement(Element element) {
+        XMLInputFactory xif = XMLInputFactory.newInstance();        
+        try {
+            try {
+                TransformerFactory factory = TransformerFactory.newInstance();
+                Transformer xmlTransformer = factory.newTransformer();
+                StringWriter stringWriter = new StringWriter();
+                xmlTransformer.transform(new DOMSource(element), new StreamResult(stringWriter));
+                String xml = stringWriter.toString();
+                XMLStreamReader xsr = xif.createXMLStreamReader(new StringReader(xml));
+                xsr.nextTag();
+                readFromXML(xsr);
+            } catch (TransformerException e) {
+                StringWriter sw = new StringWriter();
+                e.printStackTrace(new PrintWriter(sw));
+                logger.warning(sw.toString());
+                throw new IllegalStateException("TransformerException");
+            }
+        } catch (XMLStreamException e) {
+            logger.warning(e.toString());
+            throw new IllegalStateException("XMLStreamException");
+        }
     }
-        
+            
+    /**
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     * 
+     * <br><br>
+     * 
+     * Only attributes visible to the given <code>Player</code> will 
+     * be added to that representation if <code>showAll</code> is
+     * set to <code>false</code>.
+     *  
+     * @param out The target stream.
+     * @param player The <code>Player</code> this XML-representation 
+     *      should be made for, or <code>null</code> if
+     *      <code>showAll == true</code>.
+     * @param showAll Only attributes visible to <code>player</code> 
+     *      will be added to the representation if <code>showAll</code>
+     *      is set to <i>false</i>.
+     * @param toSavedGame If <code>true</code> then information that
+     *      is only needed when saving a game is added.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */    
+    abstract protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame) throws XMLStreamException;
+
+
+    /**
+     * Initialize this object from an XML-representation of this object.
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    abstract protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException;
+
+    /**
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     * 
+     * <br><br>
+     * 
+     * Only attributes visible to the given <code>Player</code> will 
+     * be added to that representation if <code>showAll</code> is
+     * set to <code>false</code>.
+     *  
+     * @param out The target stream.
+     * @param player The <code>Player</code> this XML-representation 
+     *      should be made for, or <code>null</code> if
+     *      <code>showAll == true</code>.
+     * @param showAll Only attributes visible to <code>player</code> 
+     *      will be added to the representation if <code>showAll</code>
+     *      is set to <i>false</i>.
+     * @param toSavedGame If <code>true</code> then information that
+     *      is only needed when saving a game is added.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */    
+    public final void toXML(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame) throws XMLStreamException {
+        if (toSavedGame && !showAll) {
+            throw new IllegalArgumentException("'showAll' should be true when saving a game.");
+        }
+        toXMLImpl(out, player, showAll, toSavedGame);
+    }
     
     /**
-    * This method should return an XML-representation of this object.
-    * Only attributes visible to <code>player</code> will be added to
-    * that representation if <code>showAll</code> is set to <i>false</i>.
-    *
-    * @param player The <code>Player</code> this XML-representation is
-    *               made for.
-    * @param document The document to use when creating new componenets.
-    * @param showAll Only attributes visible to <code>player</code> will be added to
-    *                the representation if <code>showAll</code> is set to <i>false</i>.
-    * @param toSavedGame If <i>true</i> then information that is only needed when saving a
-    *                    game is added.
-    * @return The DOM-element ("Document Object Model").
-    */    
-    abstract public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame);
-
-
-    /**
-    * Initialize this object from an XML-representation of this object.
-    * @param element The DOM-element ("Document Object Model") made to represent this object.
-    */
-    abstract public void readFromXMLElement(Element element);
-
+     * Initialize this object from an XML-representation of this object.
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    public final void readFromXML(XMLStreamReader in) throws XMLStreamException {
+        uninitialized = false;
+        readFromXMLImpl(in);
+    }
 
     /**
     * Gets the tag name of the root element representing this object.
@@ -223,7 +457,7 @@ abstract public class FreeColGameObject {
     /**
     * Gets the unique ID of this object.
     *
-    * @return The unique ID of this object,
+    * @return The unique ID of this object.
     */
     public String getID() {
         return id;
@@ -244,11 +478,12 @@ abstract public class FreeColGameObject {
                     game.removeFreeColGameObject(getID());
                 }
 
+                this.id = newID;
                 game.setFreeColGameObject(newID, this);
             }
+        } else {
+            this.id = newID;
         }
-
-        this.id = newID;
     }
 
     
@@ -368,20 +603,6 @@ abstract public class FreeColGameObject {
     public String toString() {
         return getClass().getName() + ": " + getID() + " (super's hash code: " + Integer.toHexString(super.hashCode()) + ")";
     }
-
-
-    /**
-    * Convenience method: returns the first child element with the
-    * specified tagname.
-    *
-    * @param element The <code>Element</code> to search for the child element.
-    * @param tagName The tag name of the child element to be found.
-    * @return The first child element with the given name.
-    */
-    protected Element getChildElement(Element element, String tagName) {
-        return Message.getChildElement(element, tagName);
-    }
-
     
     /**
     * Creates an XML-representation of an array.
@@ -389,23 +610,22 @@ abstract public class FreeColGameObject {
     * @param tagName The tagname for the <code>Element</code>
     *       representing the array.
     * @param array The array to represent.
-    * @param document The document context in which the
-    *       elemt should be created.
-    * @return An XML DOM <code>Element</code> representing
-    *       the given array.
+    * @param out The target stream.
+    * @throws XMLStreamException if there are any problems writing
+    *      to the stream.
     */
-    protected Element toArrayElement(String tagName, int[][] array, Document document) {
-        Element arrayElement = document.createElement(tagName);
-        arrayElement.setAttribute("xLength", Integer.toString(array.length));
-        arrayElement.setAttribute("yLength", Integer.toString(array[0].length));
-
+    protected void toArrayElement(String tagName, int[][] array, XMLStreamWriter out) throws XMLStreamException {
+        out.writeStartElement(tagName);
+        
+        out.writeAttribute("xLength", Integer.toString(array.length));
+        out.writeAttribute("yLength", Integer.toString(array[0].length));
         for (int x=0; x < array.length; x++) {
             for (int y=0; y < array[0].length; y++) {
-                arrayElement.setAttribute("x" + Integer.toString(x) + "y" + Integer.toString(y), Integer.toString(array[x][y]));
+                out.writeAttribute("x" + Integer.toString(x) + "y" + Integer.toString(y), Integer.toString(array[x][y]));
             }
         }
         
-        return arrayElement;
+        out.writeEndElement();
     }
     
 
@@ -414,20 +634,26 @@ abstract public class FreeColGameObject {
     * 
     * @param tagName The tagname for the <code>Element</code>
     *       representing the array.
-    * @param arrayElement An XML DOM <code>Element</code> 
-    *       representing an array.
+    * @param in The input stream with the XML.
     * @param arrayType The type of array to be read.
     * @return The array.
+    * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
     */                
-    protected int[][] readFromArrayElement(String tagName, Element arrayElement, int[][] arrayType) {
-        int[][] array = new int[Integer.parseInt(arrayElement.getAttribute("xLength"))][Integer.parseInt(arrayElement.getAttribute("yLength"))];
+    protected int[][] readFromArrayElement(String tagName, XMLStreamReader in, int[][] arrayType) throws XMLStreamException {
+        if (!in.getLocalName().equals(tagName)) {
+            in.nextTag();
+        }
+        
+        int[][] array = new int[Integer.parseInt(in.getAttributeValue(null, "xLength"))][Integer.parseInt(in.getAttributeValue(null, "yLength"))];
         
         for (int x=0; x<array.length; x++) {
             for (int y=0; y<array[0].length; y++) {
-                array[x][y] = Integer.parseInt(arrayElement.getAttribute("x" + Integer.toString(x) + "y" + Integer.toString(y)));
+                array[x][y] = Integer.parseInt(in.getAttributeValue(null, "x" + Integer.toString(x) + "y" + Integer.toString(y)));
             }
         }
         
+        in.nextTag();
         return array;
     }
 
@@ -438,20 +664,19 @@ abstract public class FreeColGameObject {
      * @param tagName The tagname for the <code>Element</code>
      *       representing the array.
      * @param array The array to represent.
-     * @param document The document context in which the
-     *       elemt should be created.
-     * @return An XML DOM <code>Element</code> representing
-     *       the given array.
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
      */
-    protected Element toArrayElement(String tagName, int[] array, Document document) {
-        Element arrayElement = document.createElement(tagName);
-        arrayElement.setAttribute("xLength", Integer.toString(array.length));
-
+    protected void  toArrayElement(String tagName, int[] array, XMLStreamWriter out) throws XMLStreamException {
+        out.writeStartElement(tagName);
+        
+        out.writeAttribute("xLength", Integer.toString(array.length));
         for (int x=0; x < array.length; x++) {
-            arrayElement.setAttribute("x" + Integer.toString(x), Integer.toString(array[x]));
+            out.writeAttribute("x" + Integer.toString(x), Integer.toString(array[x]));
         }
         
-        return arrayElement;
+        out.writeEndElement();
     }
     
 
@@ -460,18 +685,24 @@ abstract public class FreeColGameObject {
      * 
      * @param tagName The tagname for the <code>Element</code>
      *       representing the array.
-     * @param arrayElement An XML DOM <code>Element</code> 
-     *       representing an array.
+     * @param in The input stream with the XML.
      * @param arrayType The type of array to be read.
      * @return The array.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
      */               
-    protected int[] readFromArrayElement(String tagName, Element arrayElement, int[] arrayType) {
-        int[] array = new int[Integer.parseInt(arrayElement.getAttribute("xLength"))];
-        
-        for (int x=0; x<array.length; x++) {
-            array[x] = Integer.parseInt(arrayElement.getAttribute("x" + Integer.toString(x)));
+    protected int[] readFromArrayElement(String tagName, XMLStreamReader in, int[] arrayType) throws XMLStreamException {
+        if (!in.getLocalName().equals(tagName)) {
+            in.nextTag();
         }
         
+        int[] array = new int[Integer.parseInt(in.getAttributeValue(null, "xLength"))];
+        
+        for (int x=0; x<array.length; x++) {
+            array[x] = Integer.parseInt(in.getAttributeValue(null, "x" + Integer.toString(x)));
+        }
+        
+        in.nextTag();
         return array;
     }
 
@@ -482,20 +713,19 @@ abstract public class FreeColGameObject {
      * @param tagName The tagname for the <code>Element</code>
      *       representing the array.
      * @param array The array to represent.
-     * @param document The document context in which the
-     *       elemt should be created.
-     * @return An XML DOM <code>Element</code> representing
-     *       the given array.
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
      */    
-    protected Element toArrayElement(String tagName, boolean[][] array, Document document) {
-        Element arrayElement = document.createElement(tagName);
-        arrayElement.setAttribute("xLength", Integer.toString(array.length));
-        arrayElement.setAttribute("yLength", Integer.toString(array[0].length));
+    protected void toArrayElement(String tagName, boolean[][] array, XMLStreamWriter out) throws XMLStreamException {
+        out.writeStartElement(tagName);
+        
+        out.writeAttribute("xLength", Integer.toString(array.length));
+        out.writeAttribute("yLength", Integer.toString(array[0].length));
         
         StringBuffer sb = new StringBuffer(array.length * array[0].length);
         for (int x=0; x < array.length; x++) {
             for (int y=0; y < array[0].length; y++) {
-                //arrayElement.setAttribute("x" + Integer.toString(x) + "y" + Integer.toString(y), Boolean.toString(array[x][y]));
                 if (array[x][y]) {
                     sb.append("1");
                 } else {
@@ -504,9 +734,9 @@ abstract public class FreeColGameObject {
             }
         }
         
-        arrayElement.setAttribute("data", sb.toString());
+        out.writeAttribute("data", sb.toString());
 
-        return arrayElement;
+        out.writeEndElement();
     }
 
 
@@ -515,18 +745,20 @@ abstract public class FreeColGameObject {
      * 
      * @param tagName The tagname for the <code>Element</code>
      *       representing the array.
-     * @param arrayElement An XML DOM <code>Element</code> 
-     *       representing an array.
+     * @param in The input stream with the XML.
      * @param arrayType The type of array to be read.
      * @return The array.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
      */ 
-    protected boolean[][] readFromArrayElement(String tagName, Element arrayElement, boolean[][] arrayType) {
-        boolean[][] array = new boolean[Integer.parseInt(arrayElement.getAttribute("xLength"))][Integer.parseInt(arrayElement.getAttribute("yLength"))];
+    protected boolean[][] readFromArrayElement(String tagName, XMLStreamReader in, boolean[][] arrayType) throws XMLStreamException {
+        if (!in.getLocalName().equals(tagName)) {
+            in.nextTag();
+        }
+        
+        boolean[][] array = new boolean[Integer.parseInt(in.getAttributeValue(null, "xLength"))][Integer.parseInt(in.getAttributeValue(null, "yLength"))];
 
-        String data = null;
-        if (arrayElement.hasAttribute("data")) {
-            data = arrayElement.getAttribute("data");
-        } 
+        String data = in.getAttributeValue(null, "data");
         
         for (int x=0; x<array.length; x++) {
             for (int y=0; y<array[0].length; y++) {
@@ -537,11 +769,12 @@ abstract public class FreeColGameObject {
                         array[x][y] = false;
                     }
                 } else { // Old type of storing booleans:
-                    array[x][y] = Boolean.valueOf(arrayElement.getAttribute("x" + Integer.toString(x) + "y" + Integer.toString(y))).booleanValue();
+                    array[x][y] = Boolean.valueOf(in.getAttributeValue(null, "x" + Integer.toString(x) + "y" + Integer.toString(y))).booleanValue();
                 }
             }
         }
 
+        in.nextTag();
         return array;
     }
 
@@ -553,20 +786,19 @@ abstract public class FreeColGameObject {
      * @param tagName The tagname for the <code>Element</code>
      *       representing the array.
      * @param array The array to represent.
-     * @param document The document context in which the
-     *       elemt should be created.
-     * @return An XML DOM <code>Element</code> representing
-     *       the given array.
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
      */
-    protected Element toArrayElement(String tagName, String[] array, Document document) {
-        Element arrayElement = document.createElement(tagName);
-        arrayElement.setAttribute("xLength", Integer.toString(array.length));
-
+    protected void toArrayElement(String tagName, String[] array, XMLStreamWriter out) throws XMLStreamException {
+        out.writeStartElement(tagName);
+        
+        out.writeAttribute("xLength", Integer.toString(array.length));
         for (int x=0; x < array.length; x++) {
-            arrayElement.setAttribute("x" + Integer.toString(x), array[x]);
+            out.writeAttribute("x" + Integer.toString(x), array[x]);
         }
         
-        return arrayElement;
+        out.writeEndElement();
     }
     
 
@@ -575,18 +807,22 @@ abstract public class FreeColGameObject {
      * 
      * @param tagName The tagname for the <code>Element</code>
      *       representing the array.
-     * @param arrayElement An XML DOM <code>Element</code> 
-     *       representing an array.
+     * @param in The input stream with the XML.
      * @param arrayType The type of array to be read.
      * @return The array.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
      */               
-    protected String[] readFromArrayElement(String tagName, Element arrayElement, String[] arrayType) {
-        String[] array = new String[Integer.parseInt(arrayElement.getAttribute("xLength"))];
-        
+    protected String[] readFromArrayElement(String tagName, XMLStreamReader in, String[] arrayType) throws XMLStreamException {
+        if (!in.getLocalName().equals(tagName)) {
+            in.nextTag();
+        }
+        String[] array = new String[Integer.parseInt(in.getAttributeValue(null, "xLength"))];        
         for (int x=0; x<array.length; x++) {
-            array[x] = arrayElement.getAttribute("x" + Integer.toString(x));
+            array[x] = in.getAttributeValue(null, "x" + Integer.toString(x));
         }
         
+        in.nextTag();
         return array;
     }
 

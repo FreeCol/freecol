@@ -356,7 +356,13 @@ public final class InGameController implements NetworkConstants {
                 freeColClient.getInGameInputHandler().update(updateElement);
             }
 
-            Colony colony = new Colony(game, (Element) reply.getChildNodes().item(0));
+            Colony colony = (Colony) game.getFreeColGameObject(((Element) reply.getChildNodes().item(0)).getAttribute("ID"));
+            if (colony == null) {
+                colony = new Colony(game, (Element) reply.getChildNodes().item(0));
+            } else {
+                colony.readFromXMLElement((Element) reply.getChildNodes().item(0));
+            }
+            
             changeWorkType(unit, Goods.FOOD);
             unit.buildColony(colony);
             gui.setActiveUnit(null);
@@ -937,8 +943,13 @@ public final class InGameController implements NetworkConstants {
 
         // Get the defender:
         Element unitElement = getChildElement(attackResultElement, Unit.getXMLElementTagName());
-        if (unitElement != null) {
-            defender = new Unit(game, unitElement);
+        if (unitElement != null) {            
+            defender = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
+            if (defender == null) {
+                defender = new Unit(game, unitElement);
+            } else {
+                defender.readFromXMLElement(unitElement);
+            }
             defender.setLocation(target);
         } else {
             defender = map.getNeighbourOrNull(direction, unit.getTile()).getDefendingUnit(unit);
@@ -1899,7 +1910,13 @@ public final class InGameController implements NetworkConstants {
 
         Element reply = client.ask(trainUnitInEuropeElement);
         if (reply.getTagName().equals("trainUnitInEuropeConfirmed")) {
-            Unit unit = new Unit(game, (Element) reply.getChildNodes().item(0));
+            Element unitElement = (Element) reply.getChildNodes().item(0);
+            Unit unit = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
+            if (unit == null) {
+                unit = new Unit(game, unitElement);
+            } else {
+                unit.readFromXMLElement(unitElement);
+            }
             europe.train(unit);
         } else {
             logger.warning("Could not train unit in europe.");
@@ -1959,7 +1976,13 @@ public final class InGameController implements NetworkConstants {
 
         Element reply = client.ask(recruitUnitInEuropeElement);
         if (reply.getTagName().equals("recruitUnitInEuropeConfirmed")) {
-            Unit unit = new Unit(game, (Element) reply.getChildNodes().item(0));
+            Element unitElement = (Element) reply.getChildNodes().item(0);
+            Unit unit = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
+            if (unit == null) {
+                unit = new Unit(game, unitElement);
+            } else {
+                unit.readFromXMLElement(unitElement);
+            }
             europe.recruit(slot, unit, Integer.parseInt(reply.getAttribute("newRecruitable")));
         } else {
             logger.warning("Could not recruit the specified unit in europe.");
@@ -1999,7 +2022,13 @@ public final class InGameController implements NetworkConstants {
             slot = Integer.parseInt(reply.getAttribute("slot"));
         }
 
-        Unit unit = new Unit(game, (Element) reply.getChildNodes().item(0));
+        Element unitElement = (Element) reply.getChildNodes().item(0);
+        Unit unit = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
+        if (unit == null) {
+            unit = new Unit(game, unitElement);
+        } else {
+            unit.readFromXMLElement(unitElement);
+        }
         int newRecruitable = Integer.parseInt(reply.getAttribute("newRecruitable"));
         europe.emigrate(slot, unit, newRecruitable);
 

@@ -5,6 +5,10 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
@@ -14,6 +18,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIUnit;
@@ -123,6 +128,20 @@ public class BuildColonyMission extends Mission {
     public BuildColonyMission(AIMain aiMain, Element element) {
         super(aiMain);
         readFromXMLElement(element);
+    }
+    
+    /**
+     * Creates a new <code>BuildColonyMission</code> and reads the given element.
+     * 
+     * @param aiMain The main AI-object.
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     * @see #readFromXML
+     */
+    public BuildColonyMission(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
+        super(aiMain);
+        readFromXML(in);
     }
     
     
@@ -337,38 +356,49 @@ public class BuildColonyMission extends Mission {
     }     
     
     /**
-     * Creates an XML-representation of this object.
-     * @param document The <code>Document</code> in which
-     *      the XML-representation should be created.
-     * @return The XML-representation.
-     */    
-    public Element toXMLElement(Document document) {
-        Element element = document.createElement(getXMLElementTagName());
+     * Writes all of the <code>AIObject</code>s and other AI-related 
+     * information to an XML-stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        out.writeStartElement(getXMLElementTagName());
         
-        element.setAttribute("unit", getUnit().getID());
-        element.setAttribute("target", target.getID());
-        element.setAttribute("doNotGiveUp", Boolean.toString(doNotGiveUp));
-        element.setAttribute("colonyBuilt", Boolean.toString(colonyBuilt));
+        out.writeAttribute("unit", getUnit().getID());
+        if (target != null) {
+            out.writeAttribute("target", target.getID());
+        }
+        out.writeAttribute("doNotGiveUp", Boolean.toString(doNotGiveUp));
+        out.writeAttribute("colonyBuilt", Boolean.toString(colonyBuilt));
         
-        return element;
+        out.writeEndElement();
     }
     
     /**
-     * Updates this object from an XML-representation of
-     * a <code>BuildColonyMission</code>.
-     * 
-     * @param element The XML-representation.
-     */    
-    public void readFromXMLElement(Element element) {
-        setAIUnit((AIUnit) getAIMain().getAIObject(element.getAttribute("unit")));
+     * Reads all the <code>AIObject</code>s and other AI-related information
+     * from XML data.
+     * @param in The input stream with the XML.
+     */
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null, "unit")));
         
-        target = (Tile) getGame().getFreeColGameObject(element.getAttribute("target"));
-        if (element.hasAttribute("doNotGiveUp")) {
-            doNotGiveUp = Boolean.valueOf(element.getAttribute("doNotGiveUp")).booleanValue();
+        final String targetStr = in.getAttributeValue(null, "target");
+        if (targetStr != null) {
+            target = (Tile) getGame().getFreeColGameObject(targetStr);
+        } else {
+            target = null;
+        }
+        
+        final String doNotGiveUpStr = in.getAttributeValue(null, "doNotGiveUp");
+        if (doNotGiveUpStr != null) {
+            doNotGiveUp = Boolean.valueOf(doNotGiveUpStr).booleanValue();
         } else {
             doNotGiveUp = false;
         }
-        colonyBuilt = Boolean.valueOf(element.getAttribute("colonyBuilt")).booleanValue();      
+        colonyBuilt = Boolean.valueOf(in.getAttributeValue(null, "colonyBuilt")).booleanValue();
+        in.nextTag();
     }   
     
     /**

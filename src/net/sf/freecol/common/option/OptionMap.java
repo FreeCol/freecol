@@ -5,10 +5,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
-import org.w3c.dom.Document;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 
 /**
@@ -47,6 +50,24 @@ public abstract class OptionMap extends OptionGroup {
         addToMap(this);
     }
 
+    /**
+     * Creates an <code>OptionMap</code> from an XML representation.
+     *
+     * <br><br>
+     *
+     * @param in The XML stream to read the data from.
+     * @param xmlTagName The tag name that should be used for the parent XML-element
+     *           returned by {@link #toXMLElement}.
+     * @param name The name of the <code>Option</code>. This text is used for identifying
+     *           the option for a user. Example: The text related to a checkbox.
+     * @param shortDescription Should give a short description of the <code>OptionGroup</code>.
+     *           This might be used as a tooltip text.
+     * @throws XMLStreamException if an error occured during parsing.          
+     */
+     public OptionMap(XMLStreamReader in, String xmlTagName, String name, String shortDescription) throws XMLStreamException {
+         this(xmlTagName, name, shortDescription);
+         readFromXML(in);
+     }
 
     /**
     * Creates an <code>OptionMap</code> from an XML representation.
@@ -141,73 +162,70 @@ public abstract class OptionMap extends OptionGroup {
         }
     }
 
-
     /**
-    * Makes an XML-representation of this object.
-    *
-    * @param document The document to use when creating new componenets.
-    * @return The DOM-element ("Document Object Model") made to represent this "GameOptions".
-    */
-    public Element toXMLElement(Document document) {
-        Element gameOptionsElement = document.createElement(xmlTagName);
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     *  
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    public void toXML(XMLStreamWriter out) throws XMLStreamException {
+        // Start element:
+        out.writeStartElement(xmlTagName);
 
         Iterator it = values.values().iterator();
         while (it.hasNext()) {
-            gameOptionsElement.appendChild(((Option) it.next()).toXMLElement(document));
+            ((Option) it.next()).toXML(out);
         }
 
-        return gameOptionsElement;
+        out.writeEndElement();
     }
 
-
     /**
-    * Initializes this object from an XML-representation of this object.
-    * @param gameOptionsElement The DOM-element ("Document Object Model")
-    *        made to represent this "GameOptions".
-    */
-    public void readFromXMLElement(Element gameOptionsElement) {
-        updateFromElement(gameOptionsElement);
+     * Initialize this object from an XML-representation of this object.
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        updateFromXML(in);
     }
 
-
     /**
-    * Updates this <code>OptionMap</code> from the given XML-representation.
-    * @param element The base <code>Element</code> of this object's 
-    *                XML-representation.
-    */
-    private void updateFromElement(Element element) {
-        NodeList nl = element.getChildNodes();
-        for (int i=0; i<nl.getLength(); i++) {
-            Node n = nl.item(i);
-            if (!(n instanceof Element)) {
-                continue;
-            }
-            Element optionElement = (Element) n;
-
-            if (optionElement.getTagName().equals(OptionGroup.getXMLElementTagName())) {
-                updateFromElement(optionElement);
+     * Initialize this object from an XML-representation of this object.
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    private void updateFromXML(XMLStreamReader in) throws XMLStreamException {
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            if (in.getLocalName().equals(OptionGroup.getXMLElementTagName())) {
+                updateFromXML(in);
             } else {
-                if (optionElement.hasAttribute("id")) {
+                final String idStr = in.getAttributeValue(null, "id");
+                if (idStr != null) {
                     // old protocols:
-                    Option o = getObject(optionElement.getAttribute("id"));
+                    Option o = getObject(idStr);
 
                     if (o != null) {
-                        o.readFromXMLElement(optionElement);
+                        o.readFromXML(in);
                     } else {
                         // Normal only if this option is from an old save game:
-                        logger.info("Option \"" + optionElement.getAttribute("id") + "\" (" + optionElement.getTagName() + ") could not be found.");
+                        logger.info("Option \"" + idStr + "\" (" + in.getLocalName() + ") could not be found.");
                     }
                 } else {
-                    Option o = getObject(optionElement.getTagName());
+                    Option o = getObject(in.getLocalName());
                     if (o != null) {
-                        o.readFromXMLElement(optionElement);
+                        o.readFromXML(in);
                     } else {
                         // Normal only if this option is from an old save game:
-                        logger.info("Option \"" + optionElement.getTagName() + " not found.");
+                        logger.info("Option \"" + in.getLocalName() + " not found.");
                     }
                 }
             }
         }
+        // DONE BY while-loop: in.nextTag();
     }
 
 

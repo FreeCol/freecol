@@ -5,12 +5,16 @@ package net.sf.freecol.client.control;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
@@ -189,40 +193,57 @@ public final class ConnectController {
 
         freeColClient.setClient(client);
 
-        Element element = Message.createNewRootElement("login");
-        element.setAttribute("username", username);
-        element.setAttribute("freeColVersion", FreeCol.getVersion());
+        Connection c = client.getConnection();
+        XMLStreamReader in = null;
+        try {
+            XMLStreamWriter out = c.ask();
+            out.writeStartElement("login");
+            out.writeAttribute("username", username);
+            out.writeAttribute("freeColVersion", FreeCol.getVersion());
+            out.writeEndElement();
+            in = c.getReply();
+            if (in.getLocalName().equals("loginConfirmed")) {
+                final String startGameStr = in.getAttributeValue(null, "startGame");
+                boolean startGame = (startGameStr != null) && Boolean.valueOf(startGameStr).booleanValue();
+                boolean isCurrentPlayer = Boolean.valueOf(in.getAttributeValue(null, "isCurrentPlayer")).booleanValue();
+                
+                in.nextTag();
+                Game game = new Game(freeColClient.getModelController(), in, username);
+                Player thisPlayer = game.getPlayerByName(username);
 
-        Element reply = client.ask(element);
-        String type = reply.getTagName();
+                freeColClient.setGame(game);
+                freeColClient.setMyPlayer(thisPlayer);
 
-        if (type.equals("loginConfirmed")) {
-            Game game = new Game(freeColClient.getModelController(), (Element) reply.getElementsByTagName(Game.getXMLElementTagName()).item(0), username);
-            Player thisPlayer = game.getPlayerByName(username);
+                // If (true) --> reconnect
+                if (startGame) {
+                    freeColClient.setSingleplayer(false);
+                    freeColClient.getPreGameController().startGame();
 
-            freeColClient.setGame(game);
-            freeColClient.setMyPlayer(thisPlayer);
-
-            // If (true) --> reconnect
-            if (reply.hasAttribute("startGame") && Boolean.valueOf(reply.getAttribute("startGame")).booleanValue()) {
-                freeColClient.setSingleplayer(false);
-                freeColClient.getPreGameController().startGame();
-
-                if (Boolean.valueOf(reply.getAttribute("isCurrentPlayer")).booleanValue()) {
-                    freeColClient.getInGameController().setCurrentPlayer(thisPlayer);
+                    if (isCurrentPlayer) {
+                        freeColClient.getInGameController().setCurrentPlayer(thisPlayer);
+                    }
                 }
-            }
-        } else if (type.equals("error")) {
-            if (reply.hasAttribute("messageID")) {
-                canvas.errorMessage(reply.getAttribute("messageID"), reply.getAttribute("message"));
-            } else {
-                canvas.errorMessage(null, reply.getAttribute("message"));
-            }
+                c.endTransmission(in);
+            } else if (in.getLocalName().equals("error")) {
+                canvas.errorMessage(in.getAttributeValue(null, "messageID"), in.getAttributeValue(null, "message"));
 
-            return false;
-        } else {
-            logger.warning("Unkown message received: " + reply);
-            return false;
+                c.endTransmission(in);
+                return false;
+            } else {
+                logger.warning("Unkown message received: " + in.getLocalName());
+                c.endTransmission(in);
+                return false;
+            }            
+        } catch (Exception e) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            logger.warning(sw.toString());
+            canvas.errorMessage(null, "Could not send XML to the server.");
+            try {
+                c.endTransmission(in);
+            } catch (IOException ie) {
+                logger.warning("Exception while trying to end transmission: " + ie.toString());
+            }
         }
 
         freeColClient.setLoggedIn(true);
@@ -295,20 +316,18 @@ public final class ConnectController {
                 };
 
                 FreeColServer freeColServer = null;
-                try {
+                try {                    
                     freeColServer = new FreeColServer( theFile, port );
                     freeColClient.setFreeColServer( freeColServer );
-
                     final String username = freeColServer.getOwner();
-
                     freeColClient.setSingleplayer( freeColServer.isSingleplayer() );
 
                     SwingUtilities.invokeLater( new Runnable() {
                         public void run() {
-                            login( username, "127.0.0.1", 3541 );
+                            login( username, "127.0.0.1", 3541 );               
                             canvas.closeStatusPanel();
                         }
-                    } );
+                    } );                    
                 }
                 catch ( FileNotFoundException e ) {
                     SwingUtilities.invokeLater( new ErrorJob("fileNotFound") );
@@ -330,7 +349,7 @@ public final class ConnectController {
                 }
             }
         };
-        freeColClient.worker.schedule( loadGameJob );
+        freeColClient.worker.schedule( loadGameJob );        
     }
 
 

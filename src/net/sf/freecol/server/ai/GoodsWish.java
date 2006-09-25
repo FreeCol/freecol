@@ -3,6 +3,10 @@ package net.sf.freecol.server.ai;
 
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Unit;
 
@@ -37,14 +41,11 @@ public class GoodsWish extends Wish {
     *       completly.
     */
     public GoodsWish(AIMain aiMain, Location destination, int value, int goodsType) {
-        super(aiMain);
+        super(aiMain, getXMLElementTagName() + ":" + aiMain.getNextID());
 
         if (destination == null) {
             throw new NullPointerException("destination == null");
-        }
-        
-        id = aiMain.getNextID();
-        aiMain.addAIObject(id, this);
+        }       
 
         this.destination = destination;
         this.value = value;
@@ -59,61 +60,92 @@ public class GoodsWish extends Wish {
     * @param element The root element for the XML-representation of a <code>GoodsWish</code>.
     */
     public GoodsWish(AIMain aiMain, Element element) {
-        super(aiMain);
-        aiMain.addAIObject(element.getAttribute("ID"), this);
+        super(aiMain, element.getAttribute("ID"));
         readFromXMLElement(element);
     }
-
-
+    
     /**
-    * Returns the type of unit needed for releasing this wish.
-    * @return The {@link Unit#getType type of unit}.
-    */
-    public int getGoodsType() {
-        return goodsType;
-    }
+     * Creates a new <code>GoodsWish</code>.
+     *
+     * @param aiMain The main AI-object.
+     * @param id The unique ID of this object.
+     */
+     public GoodsWish(AIMain aiMain, String id) {
+         super(aiMain, id);
+     }
+     
+     /**
+      * Creates a new <code>GoodsWish</code>.
+      * 
+      * @param aiMain The main AI-object.
+      * @param element An <code>Element</code> containing an
+      *      XML-representation of this object.
+      * @param in The input stream containing the XML.
+      * @throws XMLStreamException if a problem was encountered
+      *      during parsing.
+      */
+     public GoodsWish(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
+         super(aiMain, in.getAttributeValue(null, "ID"));
+         readFromXML(in);
+     }
 
+     
+     /**
+      * Returns the type of unit needed for releasing this wish.
+      * @return The {@link Unit#getType type of unit}.
+      */
+     public int getGoodsType() {
+         return goodsType;
+     }
+     
+     /**
+      * Writes this object to an XML stream.
+      *
+      * @param out The target stream.
+      * @throws XMLStreamException if there are any problems writing
+      *      to the stream.
+      */
+     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+         out.writeStartElement(getXMLElementTagName());
+         
+         out.writeAttribute("ID", getID());
+         
+         out.writeAttribute("destination", destination.getID());
+         if (transportable != null) {
+             out.writeAttribute("transportable", transportable.getID());
+         }
+         out.writeAttribute("value", Integer.toString(value));
+         
+         out.writeAttribute("goodsType", Integer.toString(goodsType));
+         
+         out.writeEndElement();
+     }
 
-    /**
-     * Creates an XML-representation of this object.
-     * @param document The <code>Document</code> in which
-     *      the XML-representation should be created.
-     * @return The XML-representation.
-     */    
-    public Element toXMLElement(Document document) {
-        Element element = document.createElement(getXMLElementTagName());
-
-        element.setAttribute("ID", id);
-        element.setAttribute("destination", destination.getID());
-        if (transportable != null) {
-            element.setAttribute("transportable", transportable.getID());
-        }
-        element.setAttribute("value", Integer.toString(value));
-
-        element.setAttribute("goodsType", Integer.toString(goodsType));
-
-        return element;
-    }
-
-
-    /**
-     * Updates this object from an XML-representation of
-     * a <code>GoodsWish</code>.
-     * 
-     * @param element The XML-representation.
-     */    
-    public void readFromXMLElement(Element element) {
-        id = element.getAttribute("ID");
-        destination = (Location) getAIMain().getFreeColGameObject(element.getAttribute("destination"));
-        if (element.hasAttribute("transportable")) {
-            transportable = (Transportable) getAIMain().getAIObject(element.getAttribute("transportable"));
-        } else {
-            transportable = null;
-        }
-        value = Integer.parseInt(element.getAttribute("value"));
-
-        goodsType = Integer.parseInt(element.getAttribute("goodsType"));
-    }
+     /**
+      * Reads information for this object from an XML stream.
+      * @param in The input stream with the XML.
+      * @throws XMLStreamException if there are any problems reading
+      *      from the stream.
+      */
+     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {        
+         id = in.getAttributeValue(null, "ID");
+         destination = (Location) getAIMain().getFreeColGameObject(in.getAttributeValue(null, "destination"));
+         
+         final String transportableStr = in.getAttributeValue(null, "transportable");
+         if (transportableStr != null) {
+             transportable = (Transportable) getAIMain().getAIObject(transportableStr);
+             if (transportable == null) {
+                 transportable = new AIGoods(getAIMain(), transportableStr);
+             }
+         } else {
+             transportable = null;
+         }
+         value = Integer.parseInt(in.getAttributeValue(null, "value"));
+         
+         goodsType = Integer.parseInt(in.getAttributeValue(null, "goodsType"));
+         
+         in.nextTag();
+     }
 
 
     /**

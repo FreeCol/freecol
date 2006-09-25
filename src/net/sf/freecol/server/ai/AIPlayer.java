@@ -12,6 +12,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
@@ -110,7 +114,7 @@ public class AIPlayer extends AIObject {
      *        <code>AIPlayer</code>.
      */
     public AIPlayer(AIMain aiMain, ServerPlayer player) {
-        super(aiMain);
+        super(aiMain, player.getID());
          
         this.player = player;        
         switch (player.getNation()) {
@@ -134,8 +138,23 @@ public class AIPlayer extends AIObject {
      * @param element The XML-element containing information.
      */
     public AIPlayer(AIMain aiMain, Element element) {
-        super(aiMain);
+        super(aiMain, element.getAttribute("ID"));
         readFromXMLElement(element);
+    }
+    
+    /**
+     * Creates a new <code>AIPlayer</code>.
+     * 
+     * @param aiMain The main AI-object.
+     * @param element An <code>Element</code> containing an
+     *      XML-representation of this object.
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    public AIPlayer(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
+        super(aiMain, in.getAttributeValue(null, "ID"));
+        readFromXML(in);
     }
     
     
@@ -161,10 +180,10 @@ public class AIPlayer extends AIObject {
         cheat();        
         determineStances();
         moveREFToDocks();
-        abortInvalidMissions();        
+        rearrangeWorkersInColonies();  
+        abortInvalidAndOneTimeMissions();        
         ensureCorrectMissions();        
-        giveNavalMissions();
-        rearrangeWorkersInColonies();        
+        giveNavalMissions();      
         secureSettlements();        
         giveNormalMissions(); 
         bringGifts();
@@ -173,6 +192,8 @@ public class AIPlayer extends AIObject {
         createTransportLists();
         doMissions();
         rearrangeWorkersInColonies();
+        abortInvalidMissions();        
+        ensureCorrectMissions();   
         
         aiUnits.clear();
     }
@@ -428,6 +449,22 @@ public class AIPlayer extends AIObject {
      * Aborts all the missions which are no longer valid.
      */
     private void abortInvalidMissions() {
+        Iterator aiUnitsIterator = getAIUnitIterator();
+        while (aiUnitsIterator.hasNext()) {
+            AIUnit aiUnit = (AIUnit) aiUnitsIterator.next();
+            if (aiUnit.getMission() == null) {
+                continue;
+            }
+            if (!aiUnit.getMission().isValid()) {
+                aiUnit.setMission(null);
+            }
+        }
+    }
+    
+    /**
+     * Aborts all the missions which are no longer valid.
+     */
+    private void abortInvalidAndOneTimeMissions() {
         Iterator aiUnitsIterator = getAIUnitIterator();
         while (aiUnitsIterator.hasNext()) {
             AIUnit aiUnit = (AIUnit) aiUnitsIterator.next();
@@ -1889,7 +1926,7 @@ public class AIPlayer extends AIObject {
                 if (a != null) {
                     au.add(a);
                 } else {
-                    logger.warning("Could not find the AIUnit for: " + theUnit);
+                    logger.warning("Could not find the AIUnit for: " + theUnit + " (" + theUnit.getID() + ") - " + (getGame().getFreeColGameObject(theUnit.getID()) != null));
                 }
             }
             
@@ -1978,30 +2015,31 @@ public class AIPlayer extends AIObject {
         return player.getID();
     }
     
-    
     /**
-     * Creates an XML-representation of this object.
-     * @param document The <code>Document</code> in which
-     *      the XML-representation should be created.
-     * @return The XML-representation.
-     */    
-    public Element toXMLElement(Document document) {
-        Element element = document.createElement(getXMLElementTagName());
+     * Writes this object to an XML stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        out.writeStartElement(getXMLElementTagName());
         
-        element.setAttribute("ID", getID());
+        out.writeAttribute("ID", getID());
         
-        return element;
+        out.writeEndElement();
     }
     
     
     /**
-     * Updates this object from an XML-representation of
-     * a <code>AIPlayer</code>.
-     * 
-     * @param element The XML-representation.
-     */    
-    public void readFromXMLElement(Element element) {
-        player = (ServerPlayer) getAIMain().getFreeColGameObject(element.getAttribute("ID"));
+     * Reads information for this object from an XML stream.
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException if there are any problems reading
+     *      from the stream.
+     */
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {        
+        player = (ServerPlayer) getAIMain().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+        in.nextTag();
     }
     
     

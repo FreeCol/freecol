@@ -3,6 +3,11 @@ package net.sf.freecol.server.ai;
 
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.server.ai.mission.WishRealizationMission;
 
@@ -19,8 +24,6 @@ public abstract class Wish extends AIObject {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    
-    protected String id;
     protected Location destination = null;
     protected int value;
 
@@ -37,9 +40,10 @@ public abstract class Wish extends AIObject {
     /**
     * Creates a new <code>Wish</code>.
     * @param aiMain The main AI-object.
+    * @param id The unique ID of this object.
     */
-    public Wish(AIMain aiMain) {
-        super(aiMain);
+    public Wish(AIMain aiMain, String id) {
+        super(aiMain, id);
     }
 
 
@@ -51,13 +55,32 @@ public abstract class Wish extends AIObject {
     *       of a <code>Wish</code>.
     */
     public Wish(AIMain aiMain, Element element) {
-        super(aiMain);
+        super(aiMain, element.getAttribute("ID"));
         readFromXMLElement(element);
     }
-
-
+    
+    /**
+     * Creates a new <code>Wish</code> from the given XML-representation.
+     *
+     * @param aiMain The main AI-object.
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    public Wish(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
+        super(aiMain, in.getAttributeValue(null, "ID"));
+        readFromXML(in);
+    }
     
 
+    /**
+     * Checks if this <code>Wish</code> needs to be stored in a savegame.
+     * @return The result.
+     */
+    public boolean shouldBeStored() {
+        return (transportable != null);
+    }
+    
     /**
     * Returns the ID for this <code>Wish</code>.
     * @return The ID of this <code>Wish</code>.
@@ -100,6 +123,24 @@ public abstract class Wish extends AIObject {
         return transportable;
     }
 
+    /**
+     * Disposes this <code>AIObject</code> by removing
+     * any referances to this object.
+     */
+    public void dispose() {
+        if (destination instanceof Colony) {
+            AIColony ac = (AIColony) getAIMain().getAIObject((FreeColGameObject) destination);
+            ac.removeWish(this);
+        } else {
+            logger.warning("Unknown destination: " + destination);
+        }
+        if (transportable != null) {
+            Transportable temp = transportable;
+            transportable = null;
+            temp.abortWish(this);
+        }
+        super.dispose();
+    }
 
     /**
     * Gets the destination of this <code>Wish</code>.

@@ -1,17 +1,35 @@
 
 package net.sf.freecol.server.ai;
 
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.logging.Logger;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColGameObjectListener;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -20,6 +38,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -57,7 +77,6 @@ public class AIMain implements FreeColGameObjectListener {
         this.freeColServer = freeColServer;
         findNewObjects();
     }
-
     
     /**
     * Creates a new <code>AIMain</code> and reads the given element.
@@ -73,6 +92,21 @@ public class AIMain implements FreeColGameObjectListener {
         readFromXMLElement(element);
     }
 
+    /**
+     * Creates a new <code>AIMain</code> and reads the given element.
+     * 
+     * @param freeColServer The main controller object for the
+     *       server.
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     * @see #readFromXML
+     */
+     public AIMain(FreeColServer freeColServer, XMLStreamReader in) throws XMLStreamException {
+         this(freeColServer);
+         readFromXML(in);
+     }
+     
 
     /**
      * Gets the main controller object for the server.
@@ -87,11 +121,47 @@ public class AIMain implements FreeColGameObjectListener {
     * @return A unique ID.
     */
     public String getNextID() {
-        String id = "aiMain:" + Integer.toString(nextID);
+        String id = "am" + Integer.toString(nextID);
         nextID++;
         return id;
     }
 
+    /**
+     * Checks the integrity of this <code>AIMain</code
+     * by checking if there are any
+     * {@link AIObject#isUninitialized() uninitialized objects}.
+     * 
+     * Detected problems gets written to the log.
+     * 
+     * @return <code>true</code> if the <code>Game</code> has
+     *      been loaded properly.
+     */
+    public boolean checkIntegrity() {
+        boolean ok = true;
+        Iterator iterator = ((HashMap) aiObjects.clone()).values().iterator();
+        while (iterator.hasNext()) {
+            AIObject ao = (AIObject) iterator.next();
+            if (ao.isUninitialized()) {
+                logger.warning("Uninitialized object: " + ao.getID() + " (" + ao.getClass() + ")");
+                ok = false;
+            }
+        }
+        Iterator fit = getGame().getFreeColGameObjectIterator();
+        while (fit.hasNext()) {
+            FreeColGameObject f = (FreeColGameObject) fit.next();
+            if ((f instanceof Unit || f instanceof Player || f instanceof Colony)
+                    && !aiObjects.containsKey(f.getID())) {
+                logger.warning("Missing AIObject for: " + f.getID());
+                ok = false;
+            }
+        }
+        if (ok) {
+            logger.info("AIMain integrity ok.");
+        } else {
+            logger.warning("AIMain integrity test failed.");
+        }
+        return ok;
+    }
 
     /**
     * Returns the game.
@@ -164,7 +234,7 @@ public class AIMain implements FreeColGameObjectListener {
     * @see #getAIObject(FreeColGameObject)
     * @return The <code>AIObject</code>.
     */
-    public AIObject getAIObject(String id) {
+    public AIObject getAIObject(String id) {        
         return (AIObject) aiObjects.get(id);
     }
 
@@ -175,8 +245,16 @@ public class AIMain implements FreeColGameObjectListener {
     * @param id The ID of the <code>AIObject</code>.
     * @param aiObject The <code>AIObject</code> to store a reference
     *        for.
+    * @exception IllegalStateException if an <code>AIObject</code> with
+    *       the same <code>id</code> has already been created.
     */
     public void addAIObject(String id, AIObject aiObject) {
+        if (aiObjects.containsKey(id)) {
+            throw new IllegalStateException("AIObject already created: " + id);
+        }
+        if (aiObject == null) {
+            throw new NullPointerException("aiObject == null");
+        }
         aiObjects.put(id, aiObject);
     }
 
@@ -203,6 +281,13 @@ public class AIMain implements FreeColGameObjectListener {
         return freeColServer.getGame().getFreeColGameObject(id);
     }
 
+    public void ownerChanged(FreeColGameObject source, Player oldOwner, Player newOwner) {
+        AIObject ao = getAIObject(source);
+        if (ao != null) {
+            ao.dispose();
+            setFreeColGameObject(source.getID(), source);
+        }
+    }
 
     /**
     * Creates a new <code>AIObject</code> for a given
@@ -216,12 +301,18 @@ public class AIMain implements FreeColGameObjectListener {
     * @see FreeColGameObject#getID
     */
     public void setFreeColGameObject(String id, FreeColGameObject freeColGameObject) {
+        if (aiObjects.containsKey(id)) {
+            return;
+        }
+        if (!id.equals(freeColGameObject.getID())) {
+            throw new IllegalArgumentException("!id.equals(freeColGameObject.getID())");
+        }
         if (freeColGameObject instanceof Unit) {
-            addAIObject(id, new AIUnit(this, (Unit) freeColGameObject));
+            new AIUnit(this, (Unit) freeColGameObject);
         } else if (freeColGameObject instanceof ServerPlayer) {
-            addAIObject(id, new AIPlayer(this, (ServerPlayer) freeColGameObject));
+            new AIPlayer(this, (ServerPlayer) freeColGameObject);
         } else if (freeColGameObject instanceof Colony) {
-            addAIObject(id, new AIColony(this, (Colony) freeColGameObject));
+            new AIColony(this, (Colony) freeColGameObject);
         }
     }
 
@@ -238,32 +329,101 @@ public class AIMain implements FreeColGameObjectListener {
         //removeAIObject(id);
     }
 
+    /**
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     * 
+     * <br><br>
+     *  
+     * @param document The <code>Document</code>.
+     * @return An XML-representation of this object.
+     */    
+    public Element toXMLElement(Document document) {
+        try {
+            StringWriter sw = new StringWriter();
+            XMLOutputFactory xif = XMLOutputFactory.newInstance();
+            XMLStreamWriter xsw = xif.createXMLStreamWriter(sw);
+            toXML(xsw);      
+            
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            Document tempDocument = null;
+            try {
+                DocumentBuilder builder = factory.newDocumentBuilder();
+                tempDocument = builder.parse(new InputSource(new StringReader(sw.toString())));;
+                return (Element) document.importNode(tempDocument.getDocumentElement(), true);
+            } catch (ParserConfigurationException pce) {
+                // Parser with specified options can't be built
+                StringWriter swe = new StringWriter();
+                pce.printStackTrace(new PrintWriter(swe));
+                logger.warning(swe.toString());
+                throw new IllegalStateException("ParserConfigurationException", pce);
+            } catch (SAXException se) {
+                StringWriter swe = new StringWriter();
+                se.printStackTrace(new PrintWriter(swe));
+                logger.warning(swe.toString());
+                throw new IllegalStateException("SAXException", se);
+            } catch (IOException ie) {
+                StringWriter swe = new StringWriter();
+                ie.printStackTrace(new PrintWriter(swe));
+                logger.warning(swe.toString());
+                throw new IllegalStateException("IOException", ie);
+            }                                    
+        } catch (XMLStreamException e) {
+            logger.warning(e.toString());
+            throw new IllegalStateException("XMLStreamException", e);
+        }
+    }
+    
+    /**
+     * Initialize this object from an XML-representation of this object.
+     * @param element An XML-element that will be used to initialize
+     *      this object.
+     */
+    public void readFromXMLElement(Element element) {
+        XMLInputFactory xif = XMLInputFactory.newInstance();        
+        try {
+            try {
+                TransformerFactory factory = TransformerFactory.newInstance();
+                Transformer xmlTransformer = factory.newTransformer();
+                StringWriter stringWriter = new StringWriter();
+                xmlTransformer.transform(new DOMSource(element), new StreamResult(stringWriter));
+                String xml = stringWriter.toString();
+                XMLStreamReader xsr = xif.createXMLStreamReader(new StringReader(xml));
+                xsr.nextTag();
+                readFromXML(xsr);
+            } catch (TransformerException e) {
+                StringWriter sw = new StringWriter();
+                e.printStackTrace(new PrintWriter(sw));
+                logger.warning(sw.toString());
+                throw new IllegalStateException("TransformerException");
+            }
+        } catch (XMLStreamException e) {
+            logger.warning(e.toString());
+            throw new IllegalStateException("XMLStreamException");
+        }
+    }
 
     /**
-    * Stores all the <code>AIObject</code>s and other AI-related information
-    * to an <code>Element</code> and returns it.
-    *
-    * @param document The document in which the <code>Element</code>
-    *        should be created.
-    * @return The XML-<code>Element</code>.
-    */
-    public Element toXMLElement(Document document) {
-        Element element = document.createElement(getXMLElementTagName());
+     * Writes all of the <code>AIObject</code>s and other AI-related 
+     * information to an XML-stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        out.writeStartElement(getXMLElementTagName());
 
-        element.setAttribute("nextID", Integer.toString(nextID));
+        out.writeAttribute("nextID", Integer.toString(nextID));
 
         Iterator i = aiObjects.values().iterator();
         while (i.hasNext()) {
             AIObject aio = (AIObject) i.next();
 
-            // TODO: Remove debugging line:
-            if (aio instanceof AIUnit && ((AIUnit) aio).getUnit() == null) {
-                logger.warning("aoi.getUnit() == null");
-                continue;
-            }
-
             try {
-                element.appendChild(aio.toXMLElement(document));
+                if (!(aio instanceof Wish) || ((Wish) aio).shouldBeStored()) {
+                    aio.toXML(out);
+                }
             } catch (Exception e) {
                 StringWriter sw = new StringWriter();
                 e.printStackTrace(new PrintWriter(sw));
@@ -271,67 +431,83 @@ public class AIMain implements FreeColGameObjectListener {
             }
         }
 
-        return element;
+        out.writeEndElement();
     }
 
+    /**
+     * Writes all of the <code>AIObject</code>s and other AI-related 
+     * information to an XML-stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    public void toXML(XMLStreamWriter out) throws XMLStreamException {
+        toXMLImpl(out);
+    }
+    
+    /**
+     * Reads all the <code>AIObject</code>s and other AI-related information
+     * from XML data.
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException if an error occured during parsing.
+     */
+    public void readFromXML(XMLStreamReader in) throws XMLStreamException {
+        readFromXMLImpl(in);
+    }
 
     /**
-    * Reads all the <code>AIObject</code>s and other AI-related information
-    * stored in an <code>Element</code>.
-    *
-    * @param element The XML-<code>Element</code> containing the information.
-    */
-    public void readFromXMLElement(Element element) {
-        if (element.hasAttribute("nextID")) {
-            nextID = Integer.parseInt(element.getAttribute("nextID"));
+     * Reads all the <code>AIObject</code>s and other AI-related information
+     * from XML data.
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException if an error occured during parsing.
+     */
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        aiObjects.clear();
+        
+        if (!in.getLocalName().equals(getXMLElementTagName())) {
+            logger.warning("Expected element name, got: " + in.getLocalName());
         }
-        NodeList nl = element.getChildNodes();
-        for (int i=0; i<nl.getLength(); i++) {
-            Node n = nl.item(i);
-            if (!(n instanceof Element)) {
-                continue;
-            }
-            try {
-                Element childElement = (Element) n;
-                if (childElement.getTagName().equals(AIUnit.getXMLElementTagName())) {
-                    addAIObject(childElement.getAttribute("ID"), new AIUnit(this, childElement));
-                } else if (childElement.getTagName().equals(AIPlayer.getXMLElementTagName())) {
-                    addAIObject(childElement.getAttribute("ID"), new AIPlayer(this, childElement));
-                } else if (childElement.getTagName().equals(AIColony.getXMLElementTagName())) {
-                    addAIObject(childElement.getAttribute("ID"), new AIColony(this, childElement));
-                } else if (childElement.getTagName().equals(AIGoods.getXMLElementTagName())) {
-                    addAIObject(childElement.getAttribute("ID"), new AIGoods(this, childElement));
-                } else if (childElement.getTagName().equals(WorkerWish.getXMLElementTagName())) {
-                    addAIObject(childElement.getAttribute("ID"), new WorkerWish(this, childElement));
-                } else if (childElement.getTagName().equals(GoodsWish.getXMLElementTagName())) {
-                    addAIObject(childElement.getAttribute("ID"), new GoodsWish(this, childElement));
-                } else if (childElement.getTagName().equals(TileImprovement.getXMLElementTagName())) {
-                    addAIObject(childElement.getAttribute("ID"), new TileImprovement(this, childElement));                
+        final String nextIDStr = in.getAttributeValue(null, "nextID");
+        if (nextIDStr != null) {
+            nextID = Integer.parseInt(nextIDStr);
+        }
+        
+        String lastTag = "";
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {            
+            try {         
+                final String oid = in.getAttributeValue(null, "ID");
+                if (oid != null && aiObjects.containsKey(oid)) {
+                    getAIObject(oid).readFromXML(in);
+                } else if (in.getLocalName().equals(AIUnit.getXMLElementTagName())) {
+                    new AIUnit(this, in);
+                } else if (in.getLocalName().equals(AIPlayer.getXMLElementTagName())) {
+                    new AIPlayer(this, in);
+                } else if (in.getLocalName().equals(AIColony.getXMLElementTagName())) {
+                    new AIColony(this, in);
+                } else if (in.getLocalName().equals(AIGoods.getXMLElementTagName())) {
+                    new AIGoods(this, in);
+                } else if (in.getLocalName().equals(WorkerWish.getXMLElementTagName())) {
+                    new WorkerWish(this, in);
+                } else if (in.getLocalName().equals(GoodsWish.getXMLElementTagName())) {
+                    new GoodsWish(this, in);
+                } else if (in.getLocalName().equals(TileImprovement.getXMLElementTagName())) {
+                    new TileImprovement(this, in);                
                 } else {
-                    logger.warning("Unkown AI-object read: " + childElement.getTagName());
+                    logger.warning("Unkown AI-object read: " + in.getLocalName() + "(" + lastTag + ")");
                 }
+                lastTag = in.getLocalName();
             } catch (Exception e) {
                 StringWriter sw = new StringWriter();
                 e.printStackTrace(new PrintWriter(sw));
                 logger.warning("Exception while reading an AIObject: " + sw.toString());
             }
         }
-
-        // TODO: Avoid this:
-        logger.info("Second pass.");
-        nl = element.getChildNodes();
-        for (int i=0; i<nl.getLength(); i++) {
-            Node n = nl.item(i);
-            if (!(n instanceof Element)) {
-                continue;
-            }
-            Element childElement = (Element) n;
-            AIObject ao = getAIObject(childElement.getAttribute("ID"));
-            if (ao != null) {
-                ao.readFromXMLElement(childElement);
-            }
+        
+        if (!in.getLocalName().equals(getXMLElementTagName())) {
+            logger.warning("Expected element name (2), got: " + in.getLocalName());
         }
-
+        
         // This should not be necessary - but just in case:
         findNewObjects(false);
     }

@@ -7,6 +7,11 @@ import java.util.Iterator;
 import java.util.Vector;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Map.Position;
@@ -238,16 +243,44 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
 
     /**
-    * Initialize this object from an XML-representation of this object.
-    *
-    * @param game The <code>Game</code> in which this <code>Unit</code> belong.
-    * @param element The DOM-element ("Document Object Model") made to represent this "Unit".
-    */
-    public Unit(Game game, Element element) {
-        super(game, element);
-        readFromXMLElement(element);
+     * Initialize this object from an XML-representation of this object.
+     *
+     * @param game The <code>Game</code> in which this <code>Unit</code> belong.
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    public Unit(Game game, XMLStreamReader in) throws XMLStreamException {
+        super(game, in);
+        readFromXML(in);
+    }
+    
+    /**
+     * Initialize this object from an XML-representation of this object.
+     *
+     * @param game The <code>Game</code> in which this <code>Unit</code> belong.
+     * @param e An XML-element that will be used to initialize
+     *      this object.
+     */
+    public Unit(Game game, Element e) {
+        super(game, e);
+        readFromXMLElement(e);
     }
 
+    /**
+     * Initiates a new <code>Unit</code> 
+     * with the given ID. The object should later be
+     * initialized by calling either
+     * {@link #readFromXML(XMLStreamReader)} or
+     * {@link #readFromXMLElement(Element)}.
+     *
+     * @param game The <code>Game</code> in which this object belong.
+     * @param id The unique identifier for this object.
+     */
+    public Unit(Game game, String id) {
+        super(game, id);
+    }
+    
 
     /**
     * Returns the current amount of treasure in this unit.
@@ -1838,6 +1871,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         
         oldOwner.invalidateCanSeeTiles();
         getOwner().setExplored(this);
+        
+        if (getGame().getFreeColGameObjectListener() != null) {
+            getGame().getFreeColGameObjectListener().ownerChanged(this, oldOwner, owner);
+        }
     }
 
     /**
@@ -2373,6 +2410,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             throw new IllegalStateException();
         }
 
+        getTile().setNationOwner(owner.getNation());
         getTile().setSettlement(colony);
         setLocation(colony);
 
@@ -3659,191 +3697,265 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     * Prepares the <code>Unit</code> for a new turn.
     */
     public void newTurn() {
+        if (isUninitialized()) {
+            logger.warning("Calling newTurn for an uninitialized object: " + getID());
+        }
         movesLeft = getInitialMovesLeft();
         doAssignedWork();
     }
 
     /**
-    * Make a XML-representation of this object.
-    *
-    * @param document The document to use when creating new componenets.
-    * @return The DOM-element ("Document Object Model") made to represent this "Unit".
-    */
-    public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
-        Element unitElement = document.createElement(getXMLElementTagName());
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     * 
+     * <br><br>
+     * 
+     * Only attributes visible to the given <code>Player</code> will 
+     * be added to that representation if <code>showAll</code> is
+     * set to <code>false</code>.
+     *  
+     * @param out The target stream.
+     * @param player The <code>Player</code> this XML-representation 
+     *      should be made for, or <code>null</code> if
+     *      <code>showAll == true</code>.
+     * @param showAll Only attributes visible to <code>player</code> 
+     *      will be added to the representation if <code>showAll</code>
+     *      is set to <i>false</i>.
+     * @param toSavedGame If <code>true</code> then information that
+     *      is only needed when saving a game is added.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame) throws XMLStreamException {
+        // Start element:
+        out.writeStartElement(getXMLElementTagName());
 
-        unitElement.setAttribute("ID", getID());
-        unitElement.setAttribute("type", Integer.toString(type));
-        unitElement.setAttribute("armed", Boolean.toString(armed));
-        unitElement.setAttribute("mounted", Boolean.toString(mounted));
-        unitElement.setAttribute("missionary", Boolean.toString(missionary));
-        unitElement.setAttribute("movesLeft", Integer.toString(movesLeft));
-        unitElement.setAttribute("state", Integer.toString(state));
-        unitElement.setAttribute("workLeft", Integer.toString(workLeft));
-        unitElement.setAttribute("numberOfTools", Integer.toString(numberOfTools));
-        unitElement.setAttribute("turnsOfTraining", Integer.toString(turnsOfTraining));
-        unitElement.setAttribute("trainingType", Integer.toString(trainingType));
-        unitElement.setAttribute("workType", Integer.toString(workType));
-        unitElement.setAttribute("treasureAmount", Integer.toString(treasureAmount));
-        unitElement.setAttribute("hitpoints", Integer.toString(hitpoints));
-
-        String owner_id;
-        if (showAll || toSavedGame || getOwner().equals(player) || getType() != PRIVATEER) {
-            owner_id = owner.getID();
-        } else {
-            owner_id = "unknown";
-        }
-        unitElement.setAttribute("owner", owner_id);
+        out.writeAttribute("ID", getID());
+        out.writeAttribute("type", Integer.toString(type));
+        out.writeAttribute("armed", Boolean.toString(armed));
+        out.writeAttribute("mounted", Boolean.toString(mounted));
+        out.writeAttribute("missionary", Boolean.toString(missionary));
+        out.writeAttribute("movesLeft", Integer.toString(movesLeft));
+        out.writeAttribute("state", Integer.toString(state));
+        out.writeAttribute("workLeft", Integer.toString(workLeft));
+        out.writeAttribute("numberOfTools", Integer.toString(numberOfTools));
+        String ownerID = (getOwner().equals(player) || getType() != PRIVATEER || showAll) ? owner.getID() : "unknown";
+        out.writeAttribute("owner", ownerID);
+        out.writeAttribute("turnsOfTraining", Integer.toString(turnsOfTraining));
+        out.writeAttribute("trainingType", Integer.toString(trainingType));
+        out.writeAttribute("workType", Integer.toString(workType));
+        out.writeAttribute("treasureAmount", Integer.toString(treasureAmount));
+        out.writeAttribute("hitpoints", Integer.toString(hitpoints));
         
         if (indianSettlement != null) {
-            unitElement.setAttribute("indianSettlement", indianSettlement.getID());
+            if (showAll || player == getOwner()) {
+                out.writeAttribute("indianSettlement", indianSettlement.getID());
+            }
         }
 
         if (entryLocation != null) {
-            unitElement.setAttribute("entryLocation", entryLocation.getID());
+            out.writeAttribute("entryLocation", entryLocation.getID());
         }
 
         if (location != null) {
             if (showAll || player == getOwner() || !(location instanceof Building || location instanceof ColonyTile)) {
-                unitElement.setAttribute("location", location.getID());
+                out.writeAttribute("location", location.getID());
             } else {
-                unitElement.setAttribute("location", getTile().getColony().getID());
+                out.writeAttribute("location", getTile().getColony().getID());
             }
         }
         
         if (destination != null) {
-            unitElement.setAttribute("destination", destination.getID());
+            out.writeAttribute("destination", destination.getID());
         }
 
         // Do not show enemy units hidden in a carrier:
         if (isCarrier()) {
             if (showAll || getOwner().equals(player) || !getGameOptions().getBoolean(GameOptions.UNIT_HIDING) && player.canSee(getTile())) {
-                unitElement.appendChild(unitContainer.toXMLElement(player, document, showAll, toSavedGame));
-                unitElement.appendChild(goodsContainer.toXMLElement(player, document, showAll, toSavedGame));
+                unitContainer.toXML(out, player, showAll, toSavedGame);
+                goodsContainer.toXML(out, player, showAll, toSavedGame);
             } else {                
-                unitElement.setAttribute("visibleGoodsCount", Integer.toString(getGoodsCount()));
+                out.writeAttribute("visibleGoodsCount", Integer.toString(getGoodsCount()));
                 UnitContainer emptyUnitContainer = new UnitContainer(getGame(), this);
-                emptyUnitContainer.setID(unitContainer.getID());
-                unitElement.appendChild(emptyUnitContainer.toXMLElement(player, document, showAll, toSavedGame));
+                emptyUnitContainer.setFakeID(unitContainer.getID());
+                emptyUnitContainer.toXML(out, player, showAll, toSavedGame);
                 GoodsContainer emptyGoodsContainer = new GoodsContainer(getGame(), this);
-                emptyGoodsContainer.setID(unitContainer.getID());
-                unitElement.appendChild(emptyGoodsContainer.toXMLElement(player, document, showAll, toSavedGame));
+                emptyGoodsContainer.setFakeID(goodsContainer.getID());
+                emptyGoodsContainer.toXML(out, player, showAll, toSavedGame);
             }
         }
 
-        return unitElement;
+        out.writeEndElement();
     }
 
-
     /**
-    * Initialize this object from an XML-representation of this object.
-    *
-    * @param unitElement The DOM-element ("Document Object Model") made to represent this "Unit".
-    */
-    public void readFromXMLElement(Element unitElement) {
-        setID(unitElement.getAttribute("ID"));
+     * Initialize this object from an XML-representation of this object.
+     * @param in The input stream with the XML.
+     */
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        setID(in.getAttributeValue(null, "ID"));
 
-        type = Integer.parseInt(unitElement.getAttribute("type"));
+        type = Integer.parseInt(in.getAttributeValue(null, "type"));
         unitType = FreeCol.specification.unitType( type );
-        armed = Boolean.valueOf(unitElement.getAttribute("armed")).booleanValue();
-        mounted = Boolean.valueOf(unitElement.getAttribute("mounted")).booleanValue();
-        missionary = Boolean.valueOf(unitElement.getAttribute("missionary")).booleanValue();
-        movesLeft = Integer.parseInt(unitElement.getAttribute("movesLeft"));
-        state = Integer.parseInt(unitElement.getAttribute("state"));
-        workLeft = Integer.parseInt(unitElement.getAttribute("workLeft"));
-        numberOfTools = Integer.parseInt(unitElement.getAttribute("numberOfTools"));
-        turnsOfTraining = Integer.parseInt(unitElement.getAttribute("turnsOfTraining"));
-        trainingType = Integer.parseInt(unitElement.getAttribute("trainingType"));
-        
-        String owner_id = unitElement.getAttribute("owner");
-        if (owner_id.equals("unknown")) {
+        armed = Boolean.valueOf(in.getAttributeValue(null, "armed")).booleanValue();
+        mounted = Boolean.valueOf(in.getAttributeValue(null, "mounted")).booleanValue();
+        missionary = Boolean.valueOf(in.getAttributeValue(null, "missionary")).booleanValue();
+        movesLeft = Integer.parseInt(in.getAttributeValue(null, "movesLeft"));
+        state = Integer.parseInt(in.getAttributeValue(null, "state"));
+        workLeft = Integer.parseInt(in.getAttributeValue(null, "workLeft"));
+        numberOfTools = Integer.parseInt(in.getAttributeValue(null, "numberOfTools"));
+      
+        String ownerID = in.getAttributeValue(null, "owner");
+        if (ownerID.equals("unknown")) {
             owner = Game.unknownEnemy;
         } else {
-            owner = (Player) getGame().getFreeColGameObject(owner_id);
+            owner = (Player) getGame().getFreeColGameObject(ownerID);
+            if (owner == null) {
+                owner = new Player(getGame(), in.getAttributeValue(null, "owner"));
+            }
         }
+        
+        turnsOfTraining = Integer.parseInt(in.getAttributeValue(null, "turnsOfTraining"));
+        trainingType = Integer.parseInt(in.getAttributeValue(null, "trainingType"));
+        hitpoints = Integer.parseInt(in.getAttributeValue(null, "hitpoints"));
 
-        if (unitElement.hasAttribute("indianSettlement")) {
-            indianSettlement = (IndianSettlement) getGame().getFreeColGameObject(unitElement.getAttribute("indianSettlement"));
+        final String indianSettlementStr = in.getAttributeValue(null, "indianSettlement");
+        if (indianSettlementStr != null) {
+            indianSettlement = (IndianSettlement) getGame().getFreeColGameObject(indianSettlementStr);
+            if (indianSettlement == null) {
+                indianSettlement = new IndianSettlement(getGame(), indianSettlementStr);
+            }
         } else {
             setIndianSettlement(null);
-        }
+        }        
 
-        if (unitElement.hasAttribute("hitpoints")) {
-            hitpoints = Integer.parseInt(unitElement.getAttribute("hitpoints"));
-        } else { // Support for PRE-0.0.3 protocols:
-            hitpoints = getInitialHitpoints(getType());
-        }
-
-        if (unitElement.hasAttribute("treasureAmount")) {
-            treasureAmount = Integer.parseInt(unitElement.getAttribute("treasureAmount"));
+        final String treasureAmountStr = in.getAttributeValue(null, "treasureAmount");
+        if (treasureAmountStr != null) {
+            treasureAmount = Integer.parseInt(treasureAmountStr);
         } else {
             treasureAmount = 0;
         }
 
-        if (unitElement.hasAttribute("destination")) {
-            destination = (Location) getGame().getFreeColGameObject(unitElement.getAttribute("destination"));
+        final String destinationStr = in.getAttributeValue(null, "destination");
+        if (destinationStr != null) {
+            destination = (Location) getGame().getFreeColGameObject(destinationStr);
+            if (destination == null) {
+                if (destinationStr.startsWith(Tile.getXMLElementTagName())) {
+                    destination = new Tile(getGame(), destinationStr);
+                } else if (destinationStr.startsWith(Colony.getXMLElementTagName())) {
+                    destination = new Colony(getGame(), destinationStr);
+                } else if (destinationStr.startsWith(IndianSettlement.getXMLElementTagName())) {
+                    destination = new IndianSettlement(getGame(), destinationStr);
+                } else if (destinationStr.startsWith(Europe.getXMLElementTagName())) {
+                    destination = new Europe(getGame(), destinationStr);
+                } else if (destinationStr.startsWith(ColonyTile.getXMLElementTagName())) {
+                    destination = new ColonyTile(getGame(), destinationStr);
+                } else if (destinationStr.startsWith(Building.getXMLElementTagName())) {
+                    destination = new Building(getGame(), destinationStr);
+                } else if (destinationStr.startsWith(Unit.getXMLElementTagName())) {
+                    destination = new Unit(getGame(), destinationStr);
+                } else {
+                    logger.warning("Unknown type of Location.");
+                    destination = new Tile(getGame(), destinationStr);
+                }
+            }
         } else {
             destination = null;
         }
         
-        if (unitElement.hasAttribute("workType")) {
-            workType = Integer.parseInt(unitElement.getAttribute("workType"));
+        final String workTypeStr = in.getAttributeValue(null, "workType");
+        if (workTypeStr != null) {
+            workType = Integer.parseInt(workTypeStr);
         }
         
-        if (unitElement.hasAttribute("visibleGoodsCount")) {
-            visibleGoodsCount = Integer.parseInt(unitElement.getAttribute("visibleGoodsCount"));
+        final String visibleGoodsCountStr = in.getAttributeValue(null, "visibleGoodsCount");
+        if (visibleGoodsCountStr != null) {
+            visibleGoodsCount = Integer.parseInt(visibleGoodsCountStr);
         } else {
             visibleGoodsCount = -1;
         }
 
-        if (owner == null) {
-            logger.warning("VERY BAD: Can't find player with ID " + unitElement.getAttribute("owner") + "!");
+        final String entryLocationStr = in.getAttributeValue(null, "entryLocation");
+        if (entryLocationStr != null) {
+            entryLocation = (Location) getGame().getFreeColGameObject(entryLocationStr);
+            if (entryLocation == null) {
+                if (entryLocationStr.startsWith(Tile.getXMLElementTagName())) {
+                    entryLocation = new Tile(getGame(), entryLocationStr);
+                } else if (entryLocationStr.startsWith(Colony.getXMLElementTagName())) {
+                    entryLocation = new Colony(getGame(), entryLocationStr);
+                } else if (entryLocationStr.startsWith(IndianSettlement.getXMLElementTagName())) {
+                    entryLocation = new IndianSettlement(getGame(), entryLocationStr);
+                } else if (entryLocationStr.startsWith(Europe.getXMLElementTagName())) {
+                    entryLocation = new Europe(getGame(), entryLocationStr);
+                } else if (entryLocationStr.startsWith(ColonyTile.getXMLElementTagName())) {
+                    entryLocation = new ColonyTile(getGame(), entryLocationStr);
+                } else if (entryLocationStr.startsWith(Building.getXMLElementTagName())) {
+                    entryLocation = new Building(getGame(), entryLocationStr);
+                } else if (entryLocationStr.startsWith(Unit.getXMLElementTagName())) {
+                    entryLocation = new Unit(getGame(), entryLocationStr);
+                } else {
+                    logger.warning("Unknown type of Location (2).");
+                    entryLocation = new Tile(getGame(), entryLocationStr);
+                }
+            }
         }
 
-        if (unitElement.hasAttribute("entryLocation")) {
-            entryLocation = (Location) getGame().getFreeColGameObject(unitElement.getAttribute("entryLocation"));
-        }
-
-        if (unitElement.hasAttribute("location")) {
-            location = (Location) getGame().getFreeColGameObject(unitElement.getAttribute("location"));
-
-            /*
-             In this case, 'location == null' can only occur if the location specified in the
-             XML-Element does not exists:
-            */
+        final String locationStr = in.getAttributeValue(null, "location");
+        if (locationStr != null) {
+            location = (Location) getGame().getFreeColGameObject(locationStr);
             if (location == null) {
-                logger.warning("The unit's location could not be found.");
-                throw new NullPointerException("The unit's location could not be found.");
+                if (locationStr.startsWith(Tile.getXMLElementTagName())) {
+                    location = new Tile(getGame(), locationStr);
+                } else if (locationStr.startsWith(Colony.getXMLElementTagName())) {
+                    location = new Colony(getGame(), locationStr);
+                } else if (locationStr.startsWith(IndianSettlement.getXMLElementTagName())) {
+                    location = new IndianSettlement(getGame(), locationStr);
+                } else if (locationStr.startsWith(Europe.getXMLElementTagName())) {
+                    location = new Europe(getGame(), locationStr);
+                } else if (locationStr.startsWith(ColonyTile.getXMLElementTagName())) {
+                    location = new ColonyTile(getGame(), locationStr);
+                } else if (locationStr.startsWith(Building.getXMLElementTagName())) {
+                    location = new Building(getGame(), locationStr);
+                } else if (locationStr.startsWith(Unit.getXMLElementTagName())) {
+                    location = new Unit(getGame(), locationStr);                
+                } else {
+                    logger.warning("Unknown type of Location (3): " + locationStr);
+                    location = new Tile(getGame(), locationStr);
+                }
             }
         }
 
         if (isCarrier()) {
-            Element unitContainerElement = getChildElement(unitElement, UnitContainer.getXMLElementTagName());
-            if (unitContainerElement != null) {
-                if (unitContainer != null) {
-                    unitContainer.readFromXMLElement(unitContainerElement);
-                } else {
-                    unitContainer = new UnitContainer(getGame(), this, unitContainerElement);
+            while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                if (in.getLocalName().equals(UnitContainer.getXMLElementTagName())) {
+                    unitContainer = (UnitContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                    if (unitContainer != null) {
+                        unitContainer.readFromXML(in);
+                    } else {
+                        unitContainer = new UnitContainer(getGame(), this, in);
+                    }
+                } else if (in.getLocalName().equals(GoodsContainer.getXMLElementTagName())) {
+                    goodsContainer = (GoodsContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                    if (goodsContainer != null) {
+                        goodsContainer.readFromXML(in);
+                    } else {
+                        goodsContainer = new GoodsContainer(getGame(), this, in);
+                    }
+
                 }
-            } else {
-                // Probably an old (incompatible) save game (will cause an error if this is a client):
+            }
+            if (unitContainer == null) {
                 logger.warning("Carrier did not have a \"unitContainer\"-tag.");
                 unitContainer = new UnitContainer(getGame(), this);
+
             }
-
-
-            Element goodsContainerElement = getChildElement(unitElement, GoodsContainer.getXMLElementTagName());
-            if (goodsContainerElement != null) {
-                if (goodsContainer != null) {
-                    goodsContainer.readFromXMLElement(goodsContainerElement);
-                } else {
-                    goodsContainer = new GoodsContainer(getGame(), this, goodsContainerElement);
-                }
-            } else {
-                // Probably an old (incompatible) save game (will cause an error if this is a client):
+            if (goodsContainer == null) {
                 logger.warning("Carrier did not have a \"goodsContainer\"-tag.");
                 goodsContainer = new GoodsContainer(getGame(), this);
+
             }
+        } else {
+            in.nextTag();
         }
         
         getOwner().invalidateCanSeeTiles();        

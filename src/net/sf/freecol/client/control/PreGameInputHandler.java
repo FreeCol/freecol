@@ -3,11 +3,16 @@ package net.sf.freecol.client.control;
 
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.StreamedMessageHandler;
 
 import org.w3c.dom.Element;
 
@@ -16,7 +21,7 @@ import org.w3c.dom.Element;
 /**
 * Handles the network messages that arrives before the game starts.
 */
-public final class PreGameInputHandler extends InputHandler {
+public final class PreGameInputHandler extends InputHandler implements StreamedMessageHandler {
     private static final Logger logger = Logger.getLogger(PreGameInputHandler.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
@@ -62,8 +67,6 @@ public final class PreGameInputHandler extends InputHandler {
                 reply = updateNation(element);
             } else if (type.equals("updateColor")) {
                 reply = updateColor(element);
-            } else if (type.equals("updateGame")) {
-                reply = updateGame(element);
             } else if (type.equals("startGame")) {
                 reply = startGame(element);
             } else if (type.equals("logout")) {
@@ -80,6 +83,29 @@ public final class PreGameInputHandler extends InputHandler {
         return reply;
     }
 
+    /**
+     * Handles the main element of an XML message.
+     *
+     * @param connection The connection the message came from.
+     * @param in The stream containing the message.
+     * @param out The output stream for the reply.
+     */
+    public void handle(Connection connection, XMLStreamReader in, XMLStreamWriter out) {
+        if (in.getLocalName().equals("updateGame")) {
+            updateGame(connection, in, out);
+        } else {
+            logger.warning("Unkown (streamed) request: " + in.getLocalName());
+        }
+    }
+    
+    /**
+     * Checks if the message handler support the given message.
+     * @param tagName The tag name of the message to check.
+     * @return The result.
+     */
+    public boolean accepts(String tagName) {
+        return tagName.equals("updateGame");
+    }
 
     /**
     * Handles an "addPlayer"-message.
@@ -196,14 +222,14 @@ public final class PreGameInputHandler extends InputHandler {
 
     /**
     * Handles an "updateGame"-message.
-    *
-    * @param element The element (root element in a DOM-parsed XML tree) that
-    *                holds all the information.
     */
-    private Element updateGame(Element element) {
-        getFreeColClient().getGame().readFromXMLElement((Element) element.getElementsByTagName(Game.getXMLElementTagName()).item(0));
-
-        return null;
+    private void updateGame(Connection connection, XMLStreamReader in, XMLStreamWriter out) {
+        try {
+            in.nextTag();
+            getFreeColClient().getGame().readFromXML(in);
+        } catch (XMLStreamException e) {
+            logger.warning(e.toString());
+        }
     }
 
 

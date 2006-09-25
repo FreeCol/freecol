@@ -6,6 +6,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -48,20 +53,47 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         }
     }
 
-
     /**
-    * Initiates a new <code>ColonyTile</code> from an <code>Element</code>.
-    *
-    * @param game The <code>Game</code> this object belongs to.
-    * @param element The <code>Element</code> (in a DOM-parsed XML-tree) that describes
-    *                this object.
-    */
-    public ColonyTile(Game game, Element element) {
-        super(game, element);
+     * Initiates a new <code>Building</code> from an
+     * XML representation.
+     *
+     * @param game The <code>Game</code> this object belongs to.
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if an error occured during parsing.
+     */
+    public ColonyTile(Game game, XMLStreamReader in) throws XMLStreamException {
+        super(game, in);
 
-        readFromXMLElement(element);
+        readFromXML(in);
+    }
+    
+    /**
+     * Initiates a new <code>Building</code> from an
+     * XML representation.
+     *
+     * @param game The <code>Game</code> this object belongs to.
+     * @param e An XML-element that will be used to initialize
+     *      this object.
+     */
+    public ColonyTile(Game game, Element e) {
+        super(game, e);
+
+        readFromXMLElement(e);
     }
 
+    /**
+     * Initiates a new <code>ColonyTile</code> 
+     * with the given ID. The object should later be
+     * initialized by calling either
+     * {@link #readFromXML(XMLStreamReader)} or
+     * {@link #readFromXMLElement(Element)}.
+     *
+     * @param game The <code>Game</code> in which this object belong.
+     * @param id The unique identifier for this object.
+     */
+    public ColonyTile(Game game, String id) {
+        super(game, id);
+    }
 
 
     /**
@@ -453,49 +485,74 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         super.dispose();
     }
 
-
     /**
-    * Makes an XML-representation of this object.
-    *
-    * @param document The document to use when creating new componenets.
-    * @return The DOM-element ("Document Object Model") made to represent this "ColonyTile".
-    */
-    public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
-        Element colonyTileElement = document.createElement(getXMLElementTagName());
-
-        colonyTileElement.setAttribute("ID", getID());
-        colonyTileElement.setAttribute("colony", colony.getID());
-        colonyTileElement.setAttribute("workTile", workTile.getID());
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     * 
+     * <br><br>
+     * 
+     * Only attributes visible to the given <code>Player</code> will 
+     * be added to that representation if <code>showAll</code> is
+     * set to <code>false</code>.
+     *  
+     * @param out The target stream.
+     * @param player The <code>Player</code> this XML-representation 
+     *      should be made for, or <code>null</code> if
+     *      <code>showAll == true</code>.
+     * @param showAll Only attributes visible to <code>player</code> 
+     *      will be added to the representation if <code>showAll</code>
+     *      is set to <i>false</i>.
+     * @param toSavedGame If <code>true</code> then information that
+     *      is only needed when saving a game is added.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame) throws XMLStreamException {
+        // Start element:
+        out.writeStartElement(getXMLElementTagName());
+        
+        // Add attributes:       
+        out.writeAttribute("ID", getID());
+        out.writeAttribute("colony", colony.getID());
+        out.writeAttribute("workTile", workTile.getID());
 
         if (unit != null) {
-            colonyTileElement.appendChild(unit.toXMLElement(player, document, showAll, toSavedGame));
+            unit.toXML(out, player, showAll, toSavedGame);
         }
 
-        return colonyTileElement;
+        // End element:
+        out.writeEndElement();
     }
 
-
     /**
-    * Initialize this object from an XML-representation of this object.
-    * @param colonyTileElement The DOM-element ("Document Object Model") made to represent this "ColonyTile".
-    */
-    public void readFromXMLElement(Element colonyTileElement) {
-        setID(colonyTileElement.getAttribute("ID"));
+     * Initialize this object from an XML-representation of this object.
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        setID(in.getAttributeValue(null, "ID"));
 
-        colony = (Colony) getGame().getFreeColGameObject(colonyTileElement.getAttribute("colony"));
-        workTile = (Tile) getGame().getFreeColGameObject(colonyTileElement.getAttribute("workTile"));
-
-        Element unitElement = getChildElement(colonyTileElement, Unit.getXMLElementTagName());
-        if (unitElement != null) {
-            Unit unit = (Unit) getGame().getFreeColGameObject(unitElement.getAttribute("ID"));
-            if (unit != null) {
-                unit.readFromXMLElement(unitElement);
-                this.unit = unit;
-            } else {
-                this.unit = new Unit(getGame(), unitElement);
+        colony = (Colony) getGame().getFreeColGameObject(in.getAttributeValue(null, "colony"));
+        if (colony == null) {
+            colony = new Colony(getGame(), in.getAttributeValue(null, "colony"));
+        }
+        workTile = (Tile) getGame().getFreeColGameObject(in.getAttributeValue(null, "workTile"));
+        if (workTile == null) {
+            workTile = new Tile(getGame(), in.getAttributeValue(null, "workTile"));
+        }
+        
+        unit = null;
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
+                Unit unit = (Unit) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                if (unit != null) {
+                    unit.readFromXML(in);
+                    this.unit = unit;
+                } else {
+                    this.unit = new Unit(getGame(), in);
+                } 
             }
-        } else {
-            unit = null;
         }
 
         if (colony.getTile() == workTile) {

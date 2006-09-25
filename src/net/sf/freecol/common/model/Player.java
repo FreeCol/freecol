@@ -9,6 +9,11 @@ import java.util.List;
 import java.util.MissingResourceException;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 import net.sf.freecol.client.gui.i18n.Messages;
 
 import org.w3c.dom.Document;
@@ -217,17 +222,6 @@ public class Player extends FreeColGameObject {
 
     }
 
-
-    /**
-    * Creates a new non-admin <code>Player</code> with the specified name.
-    *
-    * @param game The <code>Game</code> this <code>Player</code> belongs to.
-    * @param name The name that this player will use.
-    */
-    public Player(Game game, String name) {
-        this(game, name, false, game.getVacantNation());
-    }
-
     /**
     * Creates an new AI <code>Player</code> with the specified name.
     *
@@ -310,19 +304,48 @@ public class Player extends FreeColGameObject {
 
 
     /**
-    * Initiates a new <code>Player</code> from an <code>Element</code>
-    * and registers this <code>Player</code> at the specified game.
-    *
-    * @param game The <code>Game</code> this object belongs to.
-    * @param element The <code>Element</code> in a DOM-parsed XML-tree that describes
-    *                this object.
-    */
-    public Player(Game game, Element element) {
-        super(game, element);
+     * Initiates a new <code>Player</code> from an <code>Element</code>
+     * and registers this <code>Player</code> at the specified game.
+     *
+     * @param game The <code>Game</code> this object belongs to.
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    public Player(Game game, XMLStreamReader in) throws XMLStreamException {
+        super(game, in);
 
-        readFromXMLElement(element);
+        readFromXML(in);
     }
 
+    /**
+     * Initiates a new <code>Player</code> from an <code>Element</code>
+     * and registers this <code>Player</code> at the specified game.
+     *
+     * @param game The <code>Game</code> this object belongs to.
+     * @param e An XML-element that will be used to initialize
+     *      this object.
+     */
+    public Player(Game game, Element e) {
+        super(game, e);
+
+        readFromXMLElement(e);
+    }
+
+    /**
+     * Initiates a new <code>Player</code> 
+     * with the given ID. The object should later be
+     * initialized by calling either
+     * {@link #readFromXML(XMLStreamReader)} or
+     * {@link #readFromXMLElement(Element)}.
+     *
+     * @param game The <code>Game</code> in which this object belong.
+     * @param id The unique identifier for this object.
+     */
+    public Player(Game game, String id) {
+        super(game, id);
+    }
+    
     
     /**
      * Checks if this player owns the given 
@@ -2024,53 +2047,63 @@ public class Player extends FreeColGameObject {
         }
     }
 
-
     /**
-    * Makes an XML-representation of this object.
-    *
-    * @param document The document to use when creating new componenets.
-    * @return The DOM-element ("Document Object Model") made to represent this "Player".
-    */
-    public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
-        Element playerElement = document.createElement(getXMLElementTagName());
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     * 
+     * <br><br>
+     * 
+     * Only attributes visible to the given <code>Player</code> will 
+     * be added to that representation if <code>showAll</code> is
+     * set to <code>false</code>.
+     *  
+     * @param out The target stream.
+     * @param player The <code>Player</code> this XML-representation 
+     *      should be made for, or <code>null</code> if
+     *      <code>showAll == true</code>.
+     * @param showAll Only attributes visible to <code>player</code> 
+     *      will be added to the representation if <code>showAll</code>
+     *      is set to <i>false</i>.
+     * @param toSavedGame If <code>true</code> then information that
+     *      is only needed when saving a game is added.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame) throws XMLStreamException {
+        // Start element:
+        out.writeStartElement(getXMLElementTagName());
 
-        playerElement.setAttribute("ID", getID());
-        playerElement.setAttribute("username", name);
-        playerElement.setAttribute("nation", Integer.toString(nation));
-        playerElement.setAttribute("color", Integer.toString(color.getRGB()));
-        playerElement.setAttribute("admin", Boolean.toString(admin));
-        playerElement.setAttribute("ready", Boolean.toString(ready));
-        playerElement.setAttribute("dead", Boolean.toString(dead));
-        playerElement.setAttribute("rebellionState", Integer.toString(rebellionState));
-        playerElement.setAttribute("ai", Boolean.toString(ai));
-        playerElement.setAttribute("tax", Integer.toString(tax));
-        playerElement.setAttribute("difficulty", Integer.toString(difficulty));
-        playerElement.setAttribute("bellsBonus", Integer.toString(bellsBonus));
+        out.writeAttribute("ID", getID());
+        out.writeAttribute("username", name);
+        out.writeAttribute("nation", Integer.toString(nation));
+        out.writeAttribute("color", Integer.toString(color.getRGB()));
+        out.writeAttribute("admin", Boolean.toString(admin));
+        out.writeAttribute("ready", Boolean.toString(ready));
+        out.writeAttribute("dead", Boolean.toString(dead));
+        out.writeAttribute("rebellionState", Integer.toString(rebellionState));
+        out.writeAttribute("ai", Boolean.toString(ai));
+        out.writeAttribute("tax", Integer.toString(tax));
+        out.writeAttribute("difficulty", Integer.toString(difficulty));
+        out.writeAttribute("bellsBonus", Integer.toString(bellsBonus));
 
         int[] tensionArray = new int[tension.length];
         for (int i = 0; i < tension.length; i++) {
             tensionArray[i] = tension[i].getValue();
         }            
-        playerElement.appendChild(toArrayElement("tension", tensionArray, document));
-        playerElement.appendChild(toArrayElement("stance", stance, document));
-        playerElement.appendChild(toArrayElement("arrears", arrears, document));
-        playerElement.appendChild(toArrayElement("sales", sales, document));
-        playerElement.appendChild(toArrayElement("incomeBeforeTaxes", incomeBeforeTaxes, document));
-        playerElement.appendChild(toArrayElement("incomeAfterTaxes", incomeAfterTaxes, document));
-
+        
         if (showAll || equals(player)) {
-            playerElement.setAttribute("gold", Integer.toString(gold));
-            playerElement.setAttribute("crosses", Integer.toString(crosses));
-            playerElement.setAttribute("bells", Integer.toString(bells));
-            playerElement.setAttribute("currentFather", Integer.toString(currentFather));
-            playerElement.setAttribute("crossesRequired", Integer.toString(crossesRequired));
-            playerElement.setAttribute("attackedByPrivateers", Boolean.toString(attackedByPrivateers));
+            out.writeAttribute("gold", Integer.toString(gold));
+            out.writeAttribute("crosses", Integer.toString(crosses));
+            out.writeAttribute("bells", Integer.toString(bells));
+            out.writeAttribute("currentFather", Integer.toString(currentFather));
+            out.writeAttribute("crossesRequired", Integer.toString(crossesRequired));
+            out.writeAttribute("attackedByPrivateers", Boolean.toString(attackedByPrivateers));
             
             char[] fatherCharArray = new char[FoundingFather.FATHER_COUNT];
             for(int i = 0; i < fathers.length; i++) {
                 fatherCharArray[i] = (fathers[i] ? '1' : '0');
             }
-            playerElement.setAttribute("foundingFathers", new String(fatherCharArray));
+            out.writeAttribute("foundingFathers", new String(fatherCharArray));
 
             StringBuffer sb = new StringBuffer(contacted.length);
             for(int i = 0; i < contacted.length; i++) {
@@ -2080,114 +2113,76 @@ public class Player extends FreeColGameObject {
                     sb.append('0');
                 }
             }
-            playerElement.setAttribute("contacted", sb.toString());
+            out.writeAttribute("contacted", sb.toString());
         } else {
-            playerElement.setAttribute("gold", Integer.toString(-1));
-            playerElement.setAttribute("crosses", Integer.toString(-1));
-            playerElement.setAttribute("bells", Integer.toString(-1));
-            playerElement.setAttribute("currentFather", Integer.toString(-1));
-            playerElement.setAttribute("crossesRequired", Integer.toString(-1));
+            out.writeAttribute("gold", Integer.toString(-1));
+            out.writeAttribute("crosses", Integer.toString(-1));
+            out.writeAttribute("bells", Integer.toString(-1));
+            out.writeAttribute("currentFather", Integer.toString(-1));
+            out.writeAttribute("crossesRequired", Integer.toString(-1));
         }
 
         if (newLandName != null) {
-            playerElement.setAttribute("newLandName", newLandName);
+            out.writeAttribute("newLandName", newLandName);
         }
 
         if (entryLocation != null) {
-            playerElement.setAttribute("entryLocation", entryLocation.getID());
+            out.writeAttribute("entryLocation", entryLocation.getID());
         }
 
         if (showAll || equals(player)) {
             if (europe != null) {
-                playerElement.appendChild(europe.toXMLElement(player, document, showAll, toSavedGame));
+                europe.toXML(out, player, showAll, toSavedGame);
             }
             if (monarch != null) {
-                playerElement.appendChild(monarch.toXMLElement(player, document, showAll, toSavedGame));
+                monarch.toXML(out, player, showAll, toSavedGame);
             }
         }
+        
+        toArrayElement("tension", tensionArray, out);
+        toArrayElement("stance", stance, out);
+        toArrayElement("arrears", arrears, out);
+        toArrayElement("sales", sales, out);
+        toArrayElement("incomeBeforeTaxes", incomeBeforeTaxes, out);
+        toArrayElement("incomeAfterTaxes", incomeAfterTaxes, out);
 
-        return playerElement;
+        out.writeEndElement();
     }
 
-
     /**
-    * Initialize this object from an XML-representation of this object.
-    * @param playerElement The DOM-element ("Document Object Model") made to represent this "Player".
-    */
-    public void readFromXMLElement(Element playerElement) {
-        setID(playerElement.getAttribute("ID"));
-
-        name = playerElement.getAttribute("username");
-        nation = Integer.parseInt(playerElement.getAttribute("nation"));
-        color = new Color(Integer.parseInt(playerElement.getAttribute("color")));
-        admin = (new Boolean(playerElement.getAttribute("admin"))).booleanValue();
-        gold = Integer.parseInt(playerElement.getAttribute("gold"));
-        crosses = Integer.parseInt(playerElement.getAttribute("crosses"));
-        bells = Integer.parseInt(playerElement.getAttribute("bells"));
-        if (playerElement.hasAttribute("bellsBonus")) {
-            bellsBonus = Integer.parseInt(playerElement.getAttribute("bellsBonus"));
+     * Initialize this object from an XML-representation of this object.
+     * @param in The input stream with the XML.
+     */
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        setID(in.getAttributeValue(null, "ID"));
+        
+        name = in.getAttributeValue(null, "username");
+        nation = Integer.parseInt(in.getAttributeValue(null, "nation"));
+        color = new Color(Integer.parseInt(in.getAttributeValue(null, "color")));
+        admin = (new Boolean(in.getAttributeValue(null, "admin"))).booleanValue();
+        gold = Integer.parseInt(in.getAttributeValue(null, "gold"));
+        crosses = Integer.parseInt(in.getAttributeValue(null, "crosses"));
+        bells = Integer.parseInt(in.getAttributeValue(null, "bells"));
+        
+        final String bellsBonusStr = in.getAttributeValue(null, "bellsBonus");
+        if (bellsBonusStr != null) {
+            bellsBonus = Integer.parseInt(bellsBonusStr);
         } else {
             bellsBonus = 0;
         }
-        ready = (new Boolean(playerElement.getAttribute("ready"))).booleanValue();
-        ai = (new Boolean(playerElement.getAttribute("ai"))).booleanValue();
-        dead = (new Boolean(playerElement.getAttribute("dead"))).booleanValue();
-        tax = Integer.parseInt(playerElement.getAttribute("tax"));
-        difficulty = Integer.parseInt(playerElement.getAttribute("difficulty"));
-        rebellionState = Integer.parseInt(playerElement.getAttribute("rebellionState"));
-        currentFather = Integer.parseInt(playerElement.getAttribute("currentFather"));
-        crossesRequired = Integer.parseInt(playerElement.getAttribute("crossesRequired"));
+        ready = (new Boolean(in.getAttributeValue(null, "ready"))).booleanValue();
+        ai = (new Boolean(in.getAttributeValue(null, "ai"))).booleanValue();
+        dead = (new Boolean(in.getAttributeValue(null, "dead"))).booleanValue();
+        tax = Integer.parseInt(in.getAttributeValue(null, "tax"));
+        difficulty = Integer.parseInt(in.getAttributeValue(null, "difficulty"));
+        rebellionState = Integer.parseInt(in.getAttributeValue(null, "rebellionState"));
+        currentFather = Integer.parseInt(in.getAttributeValue(null, "currentFather"));
+        crossesRequired = Integer.parseInt(in.getAttributeValue(null, "crossesRequired"));
 
-        if (getChildElement(playerElement, "tension") != null) {
-            int[] tensionArray = readFromArrayElement("tension", getChildElement(playerElement, "tension"), new int[0]);
-            for (int i = 0; i < tensionArray.length; i++) {
-                tension[i] = new Tension(tensionArray[i]);
-            }
-        } else {
-            tension = new Tension[TRIBES.length + NATIONS.length];
-            for (int i = 0; i < tension.length; i++) {
-                tension[i] = new Tension(0);
-            }            
-        }
-        
-        if (getChildElement(playerElement, "stance") != null) {
-            stance = readFromArrayElement("stance", getChildElement(playerElement, "stance"), new int[0]);
-        } else {
-            stance = new int[TRIBES.length + NATIONS.length];
-        }
-
-        if (getChildElement(playerElement, "arrears") != null) {
-            arrears = readFromArrayElement("arrears", getChildElement(playerElement, "arrears"), new int[0]);
-        } else {
-            arrears = new int[Goods.NUMBER_OF_TYPES];
-        }
-
-        if (getChildElement(playerElement, "sales") != null) {
-            sales = readFromArrayElement("sales", getChildElement(playerElement, "sales"), new int[0]);
-        } else {
-            sales = new int[Goods.NUMBER_OF_TYPES];
-        }
-
-        if (getChildElement(playerElement, "incomeBeforeTaxes") != null) {
-            incomeBeforeTaxes = readFromArrayElement("incomeBeforeTaxes",
-                                                     getChildElement(playerElement,
-                                                                     "incomeBeforeTaxes"), new int[0]);
-        } else {
-            incomeBeforeTaxes = new int[Goods.NUMBER_OF_TYPES];
-        }
-
-        if (getChildElement(playerElement, "incomeAfterTaxes") != null) {
-            incomeAfterTaxes = readFromArrayElement("incomeAfterTaxes",
-                                                    getChildElement(playerElement,
-                                                                    "incomeAfterTaxes"), new int[0]);
-        } else {
-            incomeAfterTaxes = new int[Goods.NUMBER_OF_TYPES];
-        }
-
-        if (playerElement.hasAttribute("contacted")) {
-            String contacts = playerElement.getAttribute("contacted");
-            for(int i = 0; i < contacts.length(); i++) {
-                if(contacts.charAt(i) == '1') {
+        final String contactedStr = in.getAttributeValue(null, "contacted");
+        if (contactedStr != null) {
+            for(int i = 0; i < contactedStr.length(); i++) {
+                if(contactedStr.charAt(i) == '1') {
                     contacted[i] = true;
                 } else {
                     contacted[i] = false;
@@ -2195,43 +2190,93 @@ public class Player extends FreeColGameObject {
             }
         }
 
-        if (playerElement.hasAttribute("newLandName")) {
-            newLandName = playerElement.getAttribute("newLandName");
+        final String newLandNameStr = in.getAttributeValue(null, "newLandName");
+        if (newLandNameStr != null) {
+            newLandName = newLandNameStr;
         }
 
-        if (playerElement.hasAttribute("foundingFathers")) {
-            String fatherStr = playerElement.getAttribute("foundingFathers");
-            for(int i = 0; i < fatherStr.length(); i++) {
-                fathers[i] = ( (fatherStr.charAt(i) == '1') ? true : false );
+        final String foundingFathersStr = in.getAttributeValue(null, "foundingFathers");
+        if (foundingFathersStr != null) {
+            for(int i = 0; i < foundingFathersStr.length(); i++) {
+                fathers[i] = ( (foundingFathersStr.charAt(i) == '1') ? true : false );
             }
         }
 
-        if (playerElement.hasAttribute("attackedByPrivateers")) {
-            attackedByPrivateers = Boolean.valueOf(playerElement.getAttribute("attackedByPrivateers")).booleanValue();
+        final String attackedByPrivateersStr = in.getAttributeValue(null, "attackedByPrivateers");
+        if (attackedByPrivateersStr != null) {
+            attackedByPrivateers = Boolean.valueOf(attackedByPrivateersStr).booleanValue();
         }
         
-        if (playerElement.hasAttribute("entryLocation")) {
-            entryLocation = (Location) getGame().getFreeColGameObject(playerElement.getAttribute("entryLocation"));
-        }
-
-        Element europeElement = getChildElement(playerElement, Europe.getXMLElementTagName());
-        if (europeElement != null) {
-            if (europe != null) {
-                europe.readFromXMLElement(europeElement);
-            } else {
-                europe = new Europe(getGame(), europeElement);
+        final String entryLocationStr = in.getAttributeValue(null, "entryLocation");
+        if (entryLocationStr != null) {
+            entryLocation = (Location) getGame().getFreeColGameObject(entryLocationStr);
+            if (entryLocation == null) {
+                entryLocation = new Tile(getGame(), entryLocationStr);
             }
         }
         
-        Element monarchElement = getChildElement(playerElement, Monarch.getXMLElementTagName());
-        if (monarchElement != null) {
-            if (monarch != null) {
-                monarch.readFromXMLElement(monarchElement);
-            } else {
-                monarch = new Monarch(getGame(), monarchElement);
+        tension = null;
+        stance = null;
+        arrears = null;
+        sales = null;
+        incomeBeforeTaxes = null;
+        incomeAfterTaxes = null;
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            if (in.getLocalName().equals("tension")) {
+                tension = new Tension[NUMBER_OF_NATIONS]; 
+                int[] tensionArray = readFromArrayElement("tension", in, new int[0]);
+                for (int i = 0; i < tensionArray.length; i++) {
+                    tension[i] = new Tension(tensionArray[i]);
+                }
+            } else if (in.getLocalName().equals("stance")) {
+                stance = readFromArrayElement("stance", in, new int[0]);
+            } else if (in.getLocalName().equals("arrears")) {
+                arrears = readFromArrayElement("arrears", in, new int[0]);
+            } else if (in.getLocalName().equals("sales")) {
+                sales = readFromArrayElement("sales", in, new int[0]);
+            } else if (in.getLocalName().equals("incomeBeforeTaxes")) {
+                incomeBeforeTaxes = readFromArrayElement("incomeBeforeTaxes", in, new int[0]);
+            } else if (in.getLocalName().equals("incomeAfterTaxes")) {
+                incomeAfterTaxes = readFromArrayElement("incomeAfterTaxes", in, new int[0]);
+            } else if (in.getLocalName().equals(Europe.getXMLElementTagName())) {
+                europe = (Europe) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                if (europe != null) {
+                    europe.readFromXML(in);
+                } else {
+                    europe = new Europe(getGame(), in);
+                }                
+            } else if (in.getLocalName().equals(Monarch.getXMLElementTagName())) {
+                monarch = (Monarch) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                if (monarch != null) {
+                    monarch.readFromXML(in);
+                } else {
+                    monarch = new Monarch(getGame(), in);
+                }
             }
         }
-        invalidateCanSeeTiles();        
+        if (tension == null) {
+            tension = new Tension[TRIBES.length + NATIONS.length];
+            for (int i = 0; i < tension.length; i++) {
+                tension[i] = new Tension(0);
+            }    
+        }
+        if (stance == null) {
+            stance = new int[TRIBES.length + NATIONS.length];
+        }
+        if (arrears == null) {
+            arrears = new int[Goods.NUMBER_OF_TYPES];
+        }
+        if (sales == null) {
+            sales = new int[Goods.NUMBER_OF_TYPES];
+        }
+        if (incomeBeforeTaxes == null) {
+            incomeBeforeTaxes = new int[Goods.NUMBER_OF_TYPES];
+        }
+        if (incomeAfterTaxes == null) {
+            incomeAfterTaxes = new int[Goods.NUMBER_OF_TYPES];
+        }
+        
+        invalidateCanSeeTiles();
     }
 
 
@@ -2400,6 +2445,8 @@ public class Player extends FreeColGameObject {
 
     /**
      * Resets the arrears for this type of goods to zero.
+     * @param typeOfGoods The type of goods to reset the
+     *      arrears for.
      */
     public void resetArrears(int typeOfGoods) {
         arrears[typeOfGoods] = 0;
@@ -2407,6 +2454,13 @@ public class Player extends FreeColGameObject {
 
     /**
      * Resets the arrears for these goods to zero.
+     * This is the same as calling:
+     * 
+     * <br><br>
+     * <code>resetArrears(goods.getType());</code>
+     * 
+     * @param goods The goods to reset the arrears for.
+     * @see #resetArrears(int)
      */
     public void resetArrears(Goods goods) {
         resetArrears(goods.getType());

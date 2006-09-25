@@ -4,6 +4,10 @@ package net.sf.freecol.server.ai.mission;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Ownable;
@@ -14,9 +18,10 @@ import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIUnit;
+import net.sf.freecol.server.ai.GoodsWish;
 import net.sf.freecol.server.ai.Wish;
+import net.sf.freecol.server.ai.WorkerWish;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 
@@ -65,6 +70,19 @@ public class WishRealizationMission extends Mission {
         readFromXMLElement(element);
     }
 
+    /**
+     * Creates a new <code>WishRealizationMission</code> and reads the given element.
+     * 
+     * @param aiMain The main AI-object.
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     * @see #readFromXML
+     */
+    public WishRealizationMission(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
+        super(aiMain);
+        readFromXML(in);
+    }
 
     /**
     * Disposes this <code>Mission</code>.
@@ -172,33 +190,42 @@ public class WishRealizationMission extends Mission {
         return !(l instanceof Ownable && ((Ownable) l).getOwner() != getUnit().getOwner());
     }
 
-
     /**
-     * Creates an XML-representation of this object.
-     * @param document The <code>Document</code> in which
-     *      the XML-representation should be created.
-     * @return The XML-representation.
-     */    
-    public Element toXMLElement(Document document) {
-        Element element = document.createElement(getXMLElementTagName());
+     * Writes all of the <code>AIObject</code>s and other AI-related 
+     * information to an XML-stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        out.writeStartElement(getXMLElementTagName());
+        
+        out.writeAttribute("unit", getUnit().getID());
+        out.writeAttribute("wish", wish.getID());
 
-        element.setAttribute("unit", getUnit().getID());
-        element.setAttribute("wish", wish.getID());
-
-        return element;
+        out.writeEndElement();
     }
 
-
     /**
-     * Updates this object from an XML-representation of
-     * a <code>WishRealizationMission</code>.
-     * 
-     * @param element The XML-representation.
-     */    
-    public void readFromXMLElement(Element element) {
-        setAIUnit((AIUnit) getAIMain().getAIObject(element.getAttribute("unit")));
-        
-        wish = (Wish) getAIMain().getAIObject(element.getAttribute("wish"));
+     * Reads all the <code>AIObject</code>s and other AI-related information
+     * from XML data.
+     * @param in The input stream with the XML.
+     */
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null, "unit")));
+        wish = (Wish) getAIMain().getAIObject(in.getAttributeValue(null, "wish"));
+        if (wish == null) {
+            final String wid = in.getAttributeValue(null, "wish");
+            if (wid.startsWith(GoodsWish.getXMLElementTagName())) {
+                wish = new GoodsWish(getAIMain(), wid);
+            } else if (wid.startsWith(WorkerWish.getXMLElementTagName())) {
+                wish = new WorkerWish(getAIMain(), wid);
+            } else {
+                logger.warning("Unknown type of Wish.");
+            }
+        }
+        in.nextTag();
     }
 
 

@@ -7,6 +7,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
@@ -73,6 +77,19 @@ public class IndianDemandMission extends Mission {
         readFromXMLElement(element);
     }
 
+    /**
+     * Creates a new <code>IndianDemandMission</code> and reads the given element.
+     * 
+     * @param aiMain The main AI-object.
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     * @see #readFromXML
+     */
+    public IndianDemandMission(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
+        super(aiMain);
+        readFromXML(in);
+    }
     
     /**
     * Performs the mission.
@@ -282,39 +299,35 @@ public class IndianDemandMission extends Mission {
     }
 
     /**
-     * Creates an XML-representation of this object.
-     * @param document The <code>Document</code> in which
-     *      the XML-representation should be created.
-     * @return The XML-representation.
-     */    
-    public Element toXMLElement(Document document) {
-        Element element = document.createElement(getXMLElementTagName());
+     * Writes all of the <code>AIObject</code>s and other AI-related 
+     * information to an XML-stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        out.writeStartElement(getXMLElementTagName());
+        
+        out.writeAttribute("unit", getUnit().getID());
+        out.writeAttribute("target", target.getID());
+        out.writeAttribute("completed", Boolean.toString(completed));
 
-        element.setAttribute("unit", getUnit().getID());
-        element.setAttribute("target", target.getID());
-        element.setAttribute("completed", Boolean.toString(completed));
-
-        return element;
+        out.writeEndElement();
     }
 
-
     /**
-     * Updates this object from an XML-representation of
-     * a <code>IndianDemandMission</code>.
-     * 
-     * @param element The XML-representation.
-     */    
-    public void readFromXMLElement(Element element) {
-        setAIUnit((AIUnit) getAIMain().getAIObject(element.getAttribute("unit")));
+     * Reads all the <code>AIObject</code>s and other AI-related information
+     * from XML data.
+     * @param in The input stream with the XML.
+     */
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null, "unit")));        
+           
+        target = (Colony) getGame().getFreeColGameObject(in.getAttributeValue(null, "target"));
+        completed = Boolean.valueOf(in.getAttributeValue(null, "completed")).booleanValue();
         
-        if (element.hasAttribute("target")) {
-            target = (Colony) getGame().getFreeColGameObject(element.getAttribute("target"));
-        } else {
-            // For PRE-0.1.1-protocols
-            target = null;
-        }
-
-        completed = Boolean.valueOf(element.getAttribute("completed")).booleanValue();
+        in.nextTag();
     }
 
 

@@ -92,6 +92,11 @@ public interface Transportable {
     */
     public void setTransport(AIUnit transport);
     
+    /**
+     * Aborts the given <code>Wish</code>.
+     * @param w The <code>Wish</code> to be aborted.
+     */
+    public void abortWish(Wish w);
     
     /**
      * Returns the ID of the <code>AIObject</code> implementing

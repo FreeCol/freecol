@@ -47,7 +47,7 @@
     />  
     <javac srcdir="${freecol.src.dir}"
            destdir="${freecol.build.dir}"
-           classpath="${basedir}/jars/higlayout.jar"
+           classpath="${basedir}/jars/higlayout.jar:${basedir}/jars/jsr173_1.0_api.jar:${basedir}/jars/sjsxp.jar"
            debug="on"
            optimize="on"
            deprecation="off"
@@ -217,7 +217,7 @@
              overview="${freecol.overview.file}"
              destdir="${freecol.javadoc.dir}"
              packagenames="net.sf.freecol.*"
-             classpath="${basedir}/jars/higlayout.jar"
+             classpath="${basedir}/jars/higlayout.jar:${basedir}/jars/jsr173_1.0_api.jar:${basedir}/jars/sjsxp.jar"
              Author="true"
              Windowtitle="FreeCol Code Documentation"
     />

@@ -1,12 +1,32 @@
 
 package net.sf.freecol.common.option;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.logging.Logger;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import net.sf.freecol.client.gui.i18n.Messages;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 
 
@@ -84,23 +104,117 @@ abstract public class AbstractOption implements Option {
     public String getName() {
         return Messages.message(name);
     }
-
+    
+    /**
+     * Makes an XML-representation of this object.
+     *
+     * @param document The document to use when creating new componenets.
+     * @param out The output stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    public void toXML(XMLStreamWriter out) throws XMLStreamException {
+        toXMLImpl(out);
+    }
+    
+    /**
+     * Initializes this object from an XML-representation of this object.
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    public void readFromXML(XMLStreamReader in) throws XMLStreamException {
+        readFromXMLImpl(in);
+    }
+    
+    /**
+     * Makes an XML-representation of this object.
+     *
+     * @param document The document to use when creating new componenets.
+     * @param out The output stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    abstract protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException;
+    
+    /**
+     * Initializes this object from an XML-representation of this object.
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    abstract protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException;
+    
 
     /**
-    * Makes an XML-representation of this object.
-    *
-    * @param document The document to use when creating new componenets.
-    * @return The DOM-element ("Document Object Model") made to represent this "Option".
-    */
-    public abstract Element toXMLElement(Document document);
-
-
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     *  
+     * @param document The <code>Document</code>.
+     * @return An XML-representation of this object.
+     */    
+    public Element toXMLElement(Document document) {
+        try {
+            StringWriter sw = new StringWriter();
+            XMLOutputFactory xif = XMLOutputFactory.newInstance();
+            XMLStreamWriter xsw = xif.createXMLStreamWriter(sw);
+            toXML(xsw);      
+            
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            Document tempDocument = null;
+            try {
+                DocumentBuilder builder = factory.newDocumentBuilder();
+                tempDocument = builder.parse(new InputSource(new StringReader(sw.toString())));
+                return (Element) document.importNode(tempDocument.getDocumentElement(), true);
+            } catch (ParserConfigurationException pce) {
+                // Parser with specified options can't be built
+                StringWriter swe = new StringWriter();
+                pce.printStackTrace(new PrintWriter(swe));
+                logger.warning(swe.toString());
+                throw new IllegalStateException("ParserConfigurationException");
+            } catch (SAXException se) {
+                StringWriter swe = new StringWriter();
+                se.printStackTrace(new PrintWriter(swe));
+                logger.warning(swe.toString());
+                throw new IllegalStateException("SAXException");
+            } catch (IOException ie) {
+                StringWriter swe = new StringWriter();
+                ie.printStackTrace(new PrintWriter(swe));
+                logger.warning(swe.toString());
+                throw new IllegalStateException("IOException");
+            }                                    
+        } catch (XMLStreamException e) {
+            logger.warning(e.toString());
+            throw new IllegalStateException("XMLStreamException");
+        }
+    }
+    
     /**
-    * Initializes this object from an XML-representation of this object.
-    * @param element The DOM-element ("Document Object Model") made to represent this "Option".
-    */
-    public abstract void readFromXMLElement(Element element);
-
+     * Initialize this object from an XML-representation of this object.
+     */
+    public void readFromXMLElement(Element element) {
+        XMLInputFactory xif = XMLInputFactory.newInstance();        
+        try {
+            try {
+                TransformerFactory factory = TransformerFactory.newInstance();
+                Transformer xmlTransformer = factory.newTransformer();
+                StringWriter stringWriter = new StringWriter();
+                xmlTransformer.transform(new DOMSource(element), new StreamResult(stringWriter));
+                String xml = stringWriter.toString();
+                XMLStreamReader xsr = xif.createXMLStreamReader(new StringReader(xml));
+                xsr.nextTag();
+                readFromXML(xsr);
+            } catch (TransformerException e) {
+                StringWriter sw = new StringWriter();
+                e.printStackTrace(new PrintWriter(sw));
+                logger.warning(sw.toString());
+                throw new IllegalStateException("TransformerException");
+            }
+        } catch (XMLStreamException e) {
+            logger.warning(e.toString());
+            throw new IllegalStateException("XMLStreamException", e);
+        }
+    }
 
     /**
     * Gets the tag name of the root element representing this object.

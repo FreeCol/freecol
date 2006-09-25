@@ -13,6 +13,7 @@ public class NetworkReplyObject {
     
     private Object response = null;
     private int networkReplyId;
+    private boolean streamed;
     
     
     
@@ -21,11 +22,25 @@ public class NetworkReplyObject {
     *
     * @param networkReplyId The unique identifier for the network message
     *                       this object will store.
+    * @param streamed Should be set to <code>true</code> if the
+    *       incoming data should be handled as stream data.
     */
-    public NetworkReplyObject(int networkReplyId) {
+    public NetworkReplyObject(int networkReplyId, boolean streamed) {
         this.networkReplyId = networkReplyId;
+        this.streamed = streamed;
     }
+    
 
+    /**
+     * Checks if this <code>NetworkReplyObject</code> 
+     * expects streamed data.
+     * 
+     * @return <code>true</code> if the incoming data
+     *      should be handled as a stream.
+     */
+    public boolean isStreamed() {
+        return streamed;
+    }
     
     /**
     * Sets the response and continues <code>getResponse()</code>.

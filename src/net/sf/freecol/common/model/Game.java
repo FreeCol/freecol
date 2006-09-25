@@ -7,6 +7,11 @@ import java.util.Iterator;
 import java.util.Vector;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -104,12 +109,13 @@ public class Game extends FreeColGameObject {
     * @param modelController A controller object the model can
     *       use to make actions not allowed from the model
     *       (generate random numbers etc).
-    * @param element An XML representation of a game to be loaded.
+    * @param in The input stream containing the XML.
     * @param fcgos A list of <code>FreeColGameObject</code>s to
     *       be added to this <code>Game</code>.
+    * @throws XMLStreamException if an error occured during parsing.
     */
-    public Game(FreeColGameObjectListener freeColGameObjectListener, ModelController modelController, Element element, FreeColGameObject[] fcgos) {
-        super(null, element);
+    public Game(FreeColGameObjectListener freeColGameObjectListener, ModelController modelController, XMLStreamReader in, FreeColGameObject[] fcgos) throws XMLStreamException {
+        super(null, in);
 
         setFreeColGameObjectListener(freeColGameObjectListener);
         this.modelController = modelController;
@@ -126,9 +132,44 @@ public class Game extends FreeColGameObject {
             }
         }
 
-        readFromXMLElement(element);
+        readFromXML(in);
     }
 
+    
+    /**
+     * Initiate a new <code>Game</code> with information from
+     * a saved game.
+     * 
+     * @param freeColGameObjectListener A listener that should be 
+     *       monitoring this <code>Game</code>.
+     * @param modelController A controller object the model can
+     *       use to make actions not allowed from the model
+     *       (generate random numbers etc).
+     * @param fcgos A list of <code>FreeColGameObject</code>s to
+     *       be added to this <code>Game</code>.
+     * @param e An XML-element that will be used to initialize
+     *      this object.
+     */
+     public Game(FreeColGameObjectListener freeColGameObjectListener, ModelController modelController, Element e, FreeColGameObject[] fcgos){
+         super(null, e);
+
+         setFreeColGameObjectListener(freeColGameObjectListener);
+         this.modelController = modelController;
+         this.viewOwner = null;
+
+         canGiveID = true;
+
+         for (int i=0; i<fcgos.length; i++) {
+             fcgos[i].setGame(this);
+             fcgos[i].updateID();
+
+             if (fcgos[i] instanceof Player) {
+                 players.add(fcgos[i]);
+             }
+         }
+
+         readFromXMLElement(e);
+     }
 
     /**
     * Initiate a new <code>Game</code> object from a <code>Element</code>
@@ -137,19 +178,38 @@ public class Game extends FreeColGameObject {
     * @param modelController A controller object the model can
     *       use to make actions not allowed from the model
     *       (generate random numbers etc).
-    * @param element An XML representation of a game to be loaded.
     * @param viewOwnerUsername The username of the owner of this view of the game.
+    * @param e An XML-element that will be used to initialize
+     *      this object.
     */
-    public Game(ModelController modelController, Element element, String viewOwnerUsername) {
-        super(null, element);
+    public Game(ModelController modelController, Element e, String viewOwnerUsername){
+        super(null, e);
 
         this.modelController = modelController;
-
         canGiveID = false;
-        readFromXMLElement(element);
+        readFromXMLElement(e);
         this.viewOwner = getPlayerByName(viewOwnerUsername);
     }
 
+    /**
+     * Initiate a new <code>Game</code> object from an
+     * XML-representation.
+     * 
+     * @param modelController A controller object the model can
+     *       use to make actions not allowed from the model
+     *       (generate random numbers etc).
+     * @param in The XML stream to read the data from.
+     * @param viewOwnerUsername The username of the owner of this view of the game.
+     * @throws XMLStreamException if an error occured during parsing.
+     */
+     public Game(ModelController modelController, XMLStreamReader in, String viewOwnerUsername) throws XMLStreamException {
+         super(null, in);
+
+         this.modelController = modelController;
+         canGiveID = false;
+         readFromXML(in);
+         this.viewOwner = getPlayerByName(viewOwnerUsername);
+     }
 
 
     public ModelController getModelController() {
@@ -268,7 +328,11 @@ public class Game extends FreeColGameObject {
             throw new NullPointerException();
         }
 
-        freeColGameObjects.put(id, freeColGameObject);
+        FreeColGameObject old = (FreeColGameObject) freeColGameObjects.put(id, freeColGameObject);
+        if (old != null) {
+            logger.warning("Replacing FreeColGameObject: " + old.getClass() + " with " + freeColGameObject.getClass());
+            throw new IllegalArgumentException("Replacing FreeColGameObject: " + old.getClass() + " with " + freeColGameObject.getClass());
+        }
 
         if (freeColGameObjectListener != null) {
             freeColGameObjectListener.setFreeColGameObject(id, freeColGameObject);
@@ -280,6 +344,9 @@ public class Game extends FreeColGameObject {
         this.freeColGameObjectListener = freeColGameObjectListener;
     }
 
+    public FreeColGameObjectListener getFreeColGameObjectListener() {
+        return freeColGameObjectListener;
+    }
 
     /**
     * Gets the <code>FreeColGameObject</code> with the specified ID.
@@ -673,7 +740,34 @@ public class Game extends FreeColGameObject {
         modelMessages.clear();
     }
 
-
+    /**
+     * Checks the integrity of this <code>Game</code
+     * by checking if there are any
+     * {@link FreeColGameObject#isUninitialized() uninitialized objects}.
+     * 
+     * Detected problems gets written to the log.
+     * 
+     * @return <code>true</code> if the <code>Game</code> has
+     *      been loaded properly.
+     */
+    public boolean checkIntegrity() {
+        boolean ok = true;
+        Iterator iterator = ((HashMap) freeColGameObjects.clone()).values().iterator();
+        while (iterator.hasNext()) {
+            FreeColGameObject fgo = (FreeColGameObject) iterator.next();
+            if (fgo.isUninitialized()) {
+                logger.warning("Uinitialized object: " + fgo.getID() + " (" + fgo.getClass() + ")");
+                ok = false;
+            }
+        }
+        if (ok) {
+            logger.info("Game integrity ok.");
+        } else {
+            logger.warning("Game integrity test failed.");
+        }
+        return ok;
+    }
+     
     /**
     * Prepares this <code>Game</code> for a new turn.
     *
@@ -702,8 +796,8 @@ public class Game extends FreeColGameObject {
                 later2.add(freeColGameObject);
             } else if (freeColGameObject instanceof Building) {
                 later1.add(freeColGameObject);
-            } else {
-                freeColGameObject.newTurn();
+            } else {                
+                freeColGameObject.newTurn();                
             }
         }
 
@@ -759,146 +853,124 @@ public class Game extends FreeColGameObject {
         return Math.max(amount, 650);
     }
 
-
     /**
-    * Make a XML-representation of this object.
-    *
-    * @param document The document to use when creating new componenets.
-    * @return The DOM-element ("Document Object Model") made to represent this "Game".
-    */
-    public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     * 
+     * <br><br>
+     * 
+     * Only attributes visible to the given <code>Player</code> will 
+     * be added to that representation if <code>showAll</code> is
+     * set to <code>false</code>.
+     *  
+     * @param out The target stream.
+     * @param player The <code>Player</code> this XML-representation 
+     *      should be made for, or <code>null</code> if
+     *      <code>showAll == true</code>.
+     * @param showAll Only attributes visible to <code>player</code> 
+     *      will be added to the representation if <code>showAll</code>
+     *      is set to <i>false</i>.
+     * @param toSavedGame If <code>true</code> then information that
+     *      is only needed when saving a game is added.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame) throws XMLStreamException {
+        // Start element:
+        out.writeStartElement(getXMLElementTagName());
+
         if (toSavedGame && !showAll) {
             throw new IllegalArgumentException("showAll must be set to true when toSavedGame is true.");
         }
 
-        Element gameElement = document.createElement(getXMLElementTagName());
-
-        gameElement.setAttribute("ID", getID());
-        gameElement.setAttribute("turn", Integer.toString(getTurn().getNumber()));
-
-        if (toSavedGame) {
-            gameElement.setAttribute("nextID", Integer.toString(nextId));
+        out.writeAttribute("ID", getID());
+        out.writeAttribute("turn", Integer.toString(getTurn().getNumber()));
+        if (currentPlayer != null) {
+            out.writeAttribute("currentPlayer", currentPlayer.getID());
         }
 
-        gameElement.appendChild(gameOptions.toXMLElement(document));
+        if (toSavedGame) {
+            out.writeAttribute("nextID", Integer.toString(nextId));
+        }
+
+        gameOptions.toXML(out);
 
         Iterator playerIterator = getPlayerIterator();
         while (playerIterator.hasNext()) {
             Player p = (Player) playerIterator.next();
-            gameElement.appendChild(p.toXMLElement(player, document, showAll, toSavedGame));
+            p.toXML(out, player, showAll, toSavedGame);
         }
 
         if (map != null) {
-            gameElement.appendChild(map.toXMLElement(player, document, showAll, toSavedGame));
+            map.toXML(out, player, showAll, toSavedGame);
         }
 
-        gameElement.appendChild(market.toXMLElement(player, document, showAll, toSavedGame));
+        market.toXML(out, player, showAll, toSavedGame);
 
-        if (currentPlayer != null) {
-            gameElement.setAttribute("currentPlayer", currentPlayer.getID());
-        }
-
-        return gameElement;
+        out.writeEndElement();
     }
 
-
     /**
-    * Initialize this object from an XML-representation of this object.
-    *
-    * @param gameElement The DOM-element ("Document Object Model") made to represent this "Game".
-    */
-    public void readFromXMLElement(Element gameElement) {
-        if (gameElement == null) {
-            throw new NullPointerException();
+     * Initialize this object from an XML-representation of this object.
+     * @param in The input stream with the XML.
+     */
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        setID(in.getAttributeValue(null, "ID"));
+        
+        getTurn().setNumber(Integer.parseInt(in.getAttributeValue(null, "turn")));
+        
+        final String nextIDStr = in.getAttributeValue(null, "nextID");
+        if (nextIDStr != null) {
+            nextId = Integer.parseInt(nextIDStr);
         }
-
-        setID(gameElement.getAttribute("ID"));
-        getTurn().setNumber(Integer.parseInt(gameElement.getAttribute("turn")));
-
-        if (gameElement.hasAttribute("nextID")) {
-            nextId = Integer.parseInt(gameElement.getAttribute("nextID"));
-        }
-
-        // Gets the game options:
-        Element gameOptionsElement = getChildElement(gameElement, GameOptions.getXMLElementTagName());
-        if (gameOptionsElement != null) {
-            if (gameOptions != null) {
-                gameOptions.readFromXMLElement(gameOptionsElement);
-            } else {
-                gameOptions = new GameOptions(gameOptionsElement);
+        
+        final String currentPlayerStr = in.getAttributeValue(null, "currentPlayer");
+        if (currentPlayerStr != null) {
+            currentPlayer = (Player) getFreeColGameObject(currentPlayerStr);
+            if (currentPlayer == null) {
+                currentPlayer = new Player(this, currentPlayerStr);
+                players.add(currentPlayer);
             }
-        } else {
-            gameOptions = new GameOptions();
-        }
-
-        // Get the market
-        Element marketElement = getChildElement(gameElement, Market.getXMLElementTagName());
-        if (market != null) {
-            market.readFromXMLElement(marketElement);
-        } else {
-            market = new Market(this, marketElement);
-        }
-
-        // Get the players:
-        NodeList playerList = gameElement.getElementsByTagName(Player.getXMLElementTagName());
-        for (int i=0; i<playerList.getLength(); i++) {
-            Element playerElement = (Element) playerList.item(i);
-
-            Player player = (Player) getFreeColGameObject(playerElement.getAttribute("ID"));
-            if (player != null) {
-                player.readFromXMLElement(playerElement);
-            } else {
-                player = new Player(this, playerElement);
-                players.add(player);
-            }
-        }
-
-        // Get the map:
-        Element mapElement = getChildElement(gameElement, Map.getXMLElementTagName());
-        if (mapElement != null) {
-            if (map != null) {
-                map.readFromXMLElement(mapElement);
-            } else {
-                map = new Map(this, mapElement);
-            }
-        }
-
-        // Get the players again:
-        playerList = gameElement.getElementsByTagName(Player.getXMLElementTagName());
-        for (int i=0; i<playerList.getLength(); i++) {
-            Element playerElement = (Element) playerList.item(i);
-
-            Player player = (Player) getFreeColGameObject(playerElement.getAttribute("ID"));
-            if (player != null) {
-                player.readFromXMLElement(playerElement);
-            } else {
-                player = new Player(this, playerElement);
-                players.add(player);
-            }
-        }
-
-        // Get the map again:
-        mapElement = getChildElement(gameElement, Map.getXMLElementTagName());
-        if (mapElement != null) {
-            if (map != null) {
-                map.readFromXMLElement(mapElement);
-            } else {
-                map = new Map(this, mapElement);
-            }
-        }
-
-        // Get the market again
-        marketElement = getChildElement(gameElement, Market.getXMLElementTagName());
-        if (market != null) {
-            market.readFromXMLElement(marketElement);
-        } else {
-            market = new Market(this, marketElement);
-        }
-
-        if (gameElement.hasAttribute("currentPlayer")) {
-            currentPlayer = (Player) getFreeColGameObject(gameElement.getAttribute("currentPlayer"));
         } else {
             currentPlayer = null;
+        }
+        
+        gameOptions = null;
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {            
+            if (in.getLocalName().equals(GameOptions.getXMLElementTagName())) {
+                // Gets the game options:
+                if (gameOptions != null) {
+                    gameOptions.readFromXML(in);
+                } else {
+                    gameOptions = new GameOptions(in);
+                }                
+            } else if (in.getLocalName().equals(Market.getXMLElementTagName())) {
+                market = (Market) getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                // Get the market
+                if (market != null) {
+                    market.readFromXML(in);
+                } else {
+                    market = new Market(this, in);
+                }                
+            } else if (in.getLocalName().equals(Player.getXMLElementTagName())) {
+                Player player = (Player) getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                if (player != null) {
+                    player.readFromXML(in);
+                } else {
+                    player = new Player(this, in);                    
+                    players.add(player);
+                }                
+            } else if (in.getLocalName().equals(Map.getXMLElementTagName())) {
+                map = (Map) getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                if (map != null) {
+                    map.readFromXML(in);
+                } else {
+                    map = new Map(this, in);
+                }                
+            }
+        }        
+        if (gameOptions != null) {
+            gameOptions = new GameOptions();
         }
     }
 

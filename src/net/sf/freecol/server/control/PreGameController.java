@@ -1,9 +1,10 @@
 
 package net.sf.freecol.server.control;
 
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.logging.Logger;
+
+import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
@@ -135,7 +136,7 @@ public final class PreGameController extends Controller {
         
         Element startGameElement = Message.createNewRootElement("startGame");
         freeColServer.getServer().sendToAll(startGameElement);
-        freeColServer.getServer().setMessageHandlerToAllConnections(freeColServer.getInGameInputHandler());
+        freeColServer.getServer().setMessageHandlerToAllConnections(freeColServer.getInGameInputHandler());        
     }
     
     
@@ -162,13 +163,26 @@ public final class PreGameController extends Controller {
             if (player.isEuropean() && !player.isREF()) {
                 player.setGold(game.getGameOptions().getInteger(GameOptions.STARTING_MONEY));
             }
+            if (player.isAI()) {
+                continue;
+            }
 
+            /*
             Element updateGameElement = Message.createNewRootElement("updateGame");
             updateGameElement.appendChild(game.toXMLElement(player, updateGameElement.getOwnerDocument()));
 
             try {
                 player.getConnection().send(updateGameElement);
             } catch (IOException e) {
+                logger.warning("EXCEPTION: " + e);
+            }*/
+            try {
+                XMLStreamWriter out = player.getConnection().send();
+                out.writeStartElement("updateGame");
+                game.toXML(out, player);
+                out.writeEndElement();
+                player.getConnection().endTransmission(null);
+            } catch (Exception e) {
                 logger.warning("EXCEPTION: " + e);
             }
         }

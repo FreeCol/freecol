@@ -3,6 +3,9 @@ package net.sf.freecol.common.model;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
 import org.w3c.dom.Element;
 
 
@@ -54,16 +57,41 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     
 
     /**
-    * Initiates a new <code>Settlement</code> from an <code>Element</code>.
-    *
-    * @param game The <code>Game</code> in which this object belong.
-    * @param element The <code>Element</code> (in a DOM-parsed XML-tree) that describes
-    *                this object.
-    */
-    public Settlement(Game game, Element element) {
-        super(game, element);
+     * Initiates a new <code>Settlement</code> from an <code>Element</code>.
+     *
+     * @param game The <code>Game</code> in which this object belong.
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    public Settlement(Game game, XMLStreamReader in) throws XMLStreamException {
+        super(game, in);
     }
-    
+
+    /**
+     * Initiates a new <code>Settlement</code> from an <code>Element</code>.
+     *
+     * @param game The <code>Game</code> in which this object belong.
+     * @param e An XML-element that will be used to initialize
+     *      this object.
+     */
+    public Settlement(Game game, Element e) {
+        super(game, e);
+    }
+
+    /**
+     * Initiates a new <code>Settlement</code> 
+     * with the given ID. The object should later be
+     * initialized by calling either
+     * {@link #readFromXML(XMLStreamReader)} or
+     * {@link #readFromXMLElement(Element)}.
+     *
+     * @param game The <code>Game</code> in which this object belong.
+     * @param id The unique identifier for this object.
+     */
+    public Settlement(Game game, String id) {
+        super(game, id);
+    }
     
 
     /**
@@ -162,6 +190,10 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         while (positionIterator.hasNext()) {
             Map.Position p = (Map.Position) positionIterator.next();
             owner.setExplored(getGame().getMap().getTile(p));
+        }
+        
+        if (getGame().getFreeColGameObjectListener() != null) {
+            getGame().getFreeColGameObjectListener().ownerChanged(this, oldOwner, owner);
         }
     }
 

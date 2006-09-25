@@ -8,6 +8,11 @@ import java.util.NoSuchElementException;
 import java.util.Vector;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 import net.sf.freecol.common.FreeColException;
 
 import org.w3c.dom.Document;
@@ -105,17 +110,32 @@ public class Map extends FreeColGameObject {
 
 
     /**
-    * Create a new <code>Map</code> from an <code>Element</code>
-    * in a DOM-parsed XML-tree.
-    *
-    * @param game The <code>Game</code> this map belongs to.
-    * @param element The <code>Element</code> in a DOM-parsed XML-tree that describes
-    *                this object.
-    */
-    public Map(Game game, Element element) {
-        super(game, element);
+     * Create a new <code>Map</code> from an <code>Element</code>
+     * in a DOM-parsed XML-tree.
+     *
+     * @param game The <code>Game</code> this map belongs to.
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    public Map(Game game, XMLStreamReader in) throws XMLStreamException {
+        super(game, in);
 
-        readFromXMLElement(element);
+        readFromXML(in);
+    }
+    
+    /**
+     * Initiates a new <code>Map</code> 
+     * with the given ID. The object should later be
+     * initialized by calling either
+     * {@link #readFromXML(XMLStreamReader)} or
+     * {@link #readFromXMLElement(Element)}.
+     *
+     * @param game The <code>Game</code> in which this object belong.
+     * @param id The unique identifier for this object.
+     */
+    public Map(Game game, String id) {
+        super(game, id);
     }
 
 
@@ -1571,48 +1591,62 @@ public class Map extends FreeColGameObject {
 
     }
 
-
     /**
-    * Make a XML-representation of this object.
-    *
-    * @param document The document to use when creating new componenets.
-    * @return The DOM-element ("Document Object Model") made to represent this "Map".
-    */
-    public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
-        Element mapElement = document.createElement(getXMLElementTagName());
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     * 
+     * <br><br>
+     * 
+     * Only attributes visible to the given <code>Player</code> will 
+     * be added to that representation if <code>showAll</code> is
+     * set to <code>false</code>.
+     *  
+     * @param out The target stream.
+     * @param player The <code>Player</code> this XML-representation 
+     *      should be made for, or <code>null</code> if
+     *      <code>showAll == true</code>.
+     * @param showAll Only attributes visible to <code>player</code> 
+     *      will be added to the representation if <code>showAll</code>
+     *      is set to <i>false</i>.
+     * @param toSavedGame If <code>true</code> then information that
+     *      is only needed when saving a game is added.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame) throws XMLStreamException {
+        // Start element:
+        out.writeStartElement(getXMLElementTagName());
 
-        mapElement.setAttribute("ID", getID());
-        mapElement.setAttribute("width", Integer.toString(getWidth()));
-        mapElement.setAttribute("height", Integer.toString(getHeight()));
+        out.writeAttribute("ID", getID());
+        out.writeAttribute("width", Integer.toString(getWidth()));
+        out.writeAttribute("height", Integer.toString(getHeight()));
 
         Iterator tileIterator = getWholeMapIterator();
         while (tileIterator.hasNext()) {
             Tile tile = getTile((Position) tileIterator.next());
 
             if (showAll || player.hasExplored(tile)) {
-                mapElement.appendChild(tile.toXMLElement(player, document, showAll, toSavedGame));
+                tile.toXML(out, player, showAll, toSavedGame);
             } else {
                 Tile hiddenTile = new Tile(getGame(), tile.getX(), tile.getY());
                 hiddenTile.setFakeID(tile.getID());
-                mapElement.appendChild(hiddenTile.toXMLElement(player, document, showAll, toSavedGame));
+                hiddenTile.toXML(out, player, showAll, toSavedGame);
             }
         }
 
-        return mapElement;
+        out.writeEndElement();
     }
 
-
     /**
-    * Initialize this object from an XML-representation of this object.
-    *
-    * @param mapElement The DOM-element ("Document Object Model") made to represent this "Map".
-    */
-    public void readFromXMLElement(Element mapElement) {
-        setID(mapElement.getAttribute("ID"));
-
+     * Initialize this object from an XML-representation of this object.
+     * @param in The input stream with the XML.
+     */
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        setID(in.getAttributeValue(null, "ID"));
+        
         if (columns == null) {
-            int width = Integer.parseInt(mapElement.getAttribute("width"));
-            int height = Integer.parseInt(mapElement.getAttribute("height"));
+            int width = Integer.parseInt(in.getAttributeValue(null, "width"));
+            int height = Integer.parseInt(in.getAttributeValue(null, "height"));
 
             //createColumns(width, height);
             columns = new Vector(width);
@@ -1625,21 +1659,18 @@ public class Map extends FreeColGameObject {
             }
         }
 
-        NodeList tileList = mapElement.getElementsByTagName(Tile.getXMLElementTagName());
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            if (in.getLocalName().equals(Tile.getXMLElementTagName())) {               
+                Tile t = (Tile) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                int x = Integer.parseInt(in.getAttributeValue(null, "x"));
+                int y = Integer.parseInt(in.getAttributeValue(null, "y"));
 
-        for (int i=0; i<tileList.getLength(); i++) {
-            Node node = tileList.item(i);
-            if (!(node instanceof Element)) {
-                continue;
-            }        
-            Element tileElement = (Element) node;
-            int x = Integer.parseInt(tileElement.getAttribute("x"));
-            int y = Integer.parseInt(tileElement.getAttribute("y"));
-
-            if (getTile(x, y) != null) {
-                getTile(x, y).readFromXMLElement(tileElement);
-            } else {
-                setTile(new Tile(getGame(), tileElement), x, y);
+                if (t != null) {
+                    t.readFromXML(in);
+                } else {
+                    t = new Tile(getGame(), in);
+                }
+                setTile(t, x, y);
             }
         }
     }

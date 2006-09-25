@@ -3,6 +3,10 @@ package net.sf.freecol.server.ai;
 
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.ai.mission.PioneeringMission;
@@ -27,7 +31,6 @@ public class TileImprovement extends AIObject {
     public static final int PLOW = Unit.PLOW;
     public static final int BUILD_ROAD = Unit.BUILD_ROAD;
        
-    private String id;
     
     /**
      * The type of improvement, either {@link #PLOW} or {@link #BUILD_ROAD}.
@@ -61,16 +64,13 @@ public class TileImprovement extends AIObject {
     *         signals a higher importance.
      */
     public TileImprovement(AIMain aiMain, Tile target, int type, int value) {
-        super(aiMain);
-        
-        id = aiMain.getNextID();
-        aiMain.addAIObject(id, this);       
+        super(aiMain, getXMLElementTagName() + ":" + aiMain.getNextID());
         
         this.target = target;
         this.type = type;
         this.value = value;
     }
-
+    
     /**
      * Creates a new <code>TileImprovement</code> from the given XML-representation.
      *
@@ -79,8 +79,33 @@ public class TileImprovement extends AIObject {
      *       of a <code>Wish</code>.
      */
     public TileImprovement(AIMain aiMain, Element element) {
-        super(aiMain);
+        super(aiMain, element.getAttribute("ID"));
         readFromXMLElement(element);
+    }
+    
+    /**
+     * Creates a new <code>TileImprovement</code> from the given XML-representation.
+     *
+     * @param aiMain The main AI-object.
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    public TileImprovement(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
+        super(aiMain, in.getAttributeValue(null, "ID"));
+        readFromXML(in);
+    }
+    
+    /**
+     * Creates a new <code>TileImprovement</code> from the given XML-representation.
+     *
+     * @param aiMain The main AI-object.
+     * @param id The ID.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    public TileImprovement(AIMain aiMain, String id) throws XMLStreamException {
+        super(aiMain, id);
     }
 
     
@@ -180,41 +205,48 @@ public class TileImprovement extends AIObject {
     }
     
     /**
-     * Creates an XML-representation of this object.
-     * @param document The <code>Document</code> in which
-     *      the XML-representation should be created.
-     * @return The XML-representation.
-     */    
-    public Element toXMLElement(Document document) {
-        Element element = document.createElement(getXMLElementTagName());
+     * Writes this object to an XML stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        out.writeStartElement(getXMLElementTagName());
 
-        element.setAttribute("ID", id);
-        element.setAttribute("type", Integer.toString(type));
-        element.setAttribute("value", Integer.toString(value));
+        out.writeAttribute("ID", getID());        
+        out.writeAttribute("type", Integer.toString(type));
+        out.writeAttribute("value", Integer.toString(value));
         if (pioneer != null) {
-            element.setAttribute("pioneer", pioneer.getID());
+            out.writeAttribute("pioneer", pioneer.getID());
         }
-        element.setAttribute("target", target.getID());
+        out.writeAttribute("target", target.getID());
 
-        return element;
+        out.writeEndElement();
     }
 
     /**
-     * Updates this object from an XML-representation of
-     * a <code>TileImprovement</code>.
-     * 
-     * @param element The XML-representation.
-     */    
-    public void readFromXMLElement(Element element) {
-        id = element.getAttribute("ID");
-        type = Integer.parseInt(element.getAttribute("type"));
-        value = Integer.parseInt(element.getAttribute("value"));
-        if (element.hasAttribute("pioneer")) {
-            pioneer = (AIUnit) getAIMain().getAIObject(element.getAttribute("pioneer"));
+     * Reads information for this object from an XML stream.
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException if there are any problems reading
+     *      from the stream.
+     */
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        id = in.getAttributeValue(null, "ID");
+        type = Integer.parseInt(in.getAttributeValue(null, "type"));
+        value = Integer.parseInt(in.getAttributeValue(null, "value"));
+        
+        final String pioneerStr = in.getAttributeValue(null, "pioneer");
+        if (pioneerStr != null) {
+            pioneer = (AIUnit) getAIMain().getAIObject(pioneerStr);
+            if (pioneer == null) {
+                pioneer = new AIUnit(getAIMain(), pioneerStr);
+            }
         } else {
             pioneer = null;
         }
-        target = (Tile) getAIMain().getFreeColGameObject(element.getAttribute("target"));        
+        target = (Tile) getAIMain().getFreeColGameObject(in.getAttributeValue(null, "target"));
+        in.nextTag();
     }
 
     /**

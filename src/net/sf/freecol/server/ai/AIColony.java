@@ -9,6 +9,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
@@ -21,9 +26,7 @@ import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.mission.TransportMission;
 import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 
 /**
@@ -54,7 +57,7 @@ public class AIColony extends AIObject {
      * @param colony The colony to make an {@link AIObject} for.
      */
     public AIColony(AIMain aiMain, Colony colony) {
-        super(aiMain);
+        super(aiMain, colony.getID());
 
         this.colony = colony;
         colonyPlan = new ColonyPlan(aiMain, colony);
@@ -69,10 +72,34 @@ public class AIColony extends AIObject {
      *      XML-representation of this object.
      */
     public AIColony(AIMain aiMain, Element element) {
-        super(aiMain);
+        super(aiMain, element.getAttribute("ID"));
         readFromXMLElement(element);
     }
 
+    /**
+     * Creates a new <code>AIColony</code>.
+     * 
+     * @param aiMain The main AI-object.
+     * @param element An <code>Element</code> containing an
+     *      XML-representation of this object.
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    public AIColony(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
+        super(aiMain, in.getAttributeValue(null, "ID"));
+        readFromXML(in);
+    }
+
+    /**
+     * Creates a new <code>AIColony</code>.
+     * 
+     * @param aiMain The main AI-object.
+     * @param id
+     */
+    public AIColony(AIMain aiMain, String id) {
+        this(aiMain, (Colony) aiMain.getGame().getFreeColGameObject(id));
+    }
 
     /**
     * Gets the <code>Colony</code> this <code>AIColony</code> controls.
@@ -94,11 +121,11 @@ public class AIColony extends AIObject {
                 ag.dispose();
             }
         }
-        Iterator it2 = wishes.iterator();
+        Iterator it2 = ((ArrayList) ((ArrayList) wishes).clone()).iterator();
         while (it2.hasNext()) {
             ((Wish) it2.next()).dispose();
         }   
-        Iterator it3 = tileImprovements.iterator();
+        Iterator it3 = ((ArrayList) ((ArrayList) tileImprovements).clone()).iterator();
         while (it3.hasNext()) {
             ((TileImprovement) it3.next()).dispose();
         } 
@@ -262,6 +289,8 @@ public class AIColony extends AIObject {
         List newWishes = new ArrayList();
         int value = 120;    // TODO: Better method for determining the value of the wish.
         while (workLocationPlans.size() > 0) {
+            int unitType = -1;
+            
             // Farmer/fisherman wishes:
             if (production[Goods.FOOD] < 2) {
                 Iterator wlpIterator = workLocationPlans.iterator();
@@ -272,90 +301,89 @@ public class AIColony extends AIObject {
                         production[Goods.FOOD] -= 2;
                         wlpIterator.remove();
 
-                        int unitType = ((ColonyTile) wlp.getWorkLocation()).getWorkTile().isLand()
+                        unitType = ((ColonyTile) wlp.getWorkLocation()).getWorkTile().isLand()
                                         ? Unit.EXPERT_FARMER
                                         : Unit.EXPERT_FISHERMAN;
-                        if (nonExpertUnits.size() > 0) {
-                            newWishes.add(new WorkerWish(getAIMain(), colony, value, unitType, false));
-                            nonExpertUnits.remove(0);
-                        } else {
-                            newWishes.add(new WorkerWish(getAIMain(), colony, value, unitType, true));
+                        break;
+                    }
+                }
+            }
+            if (unitType == -1) {
+                Iterator wlpIterator = workLocationPlans.iterator();
+                while (wlpIterator.hasNext()) {
+                    WorkLocationPlan wlp = (WorkLocationPlan) wlpIterator.next();
+                    // TODO: Check if the production of the raw material is sufficient.
+                    if (true) {
+                        if (wlp.getGoodsType() < production.length) {
+                            production[wlp.getGoodsType()] += wlp.getProductionOf(wlp.getGoodsType());
                         }
-                        value -= 5;
-                        if (value < 50) {
-                            value = 50;
+                        production[Goods.FOOD] -= 2;
+                        wlpIterator.remove();
+                        
+                        if (wlp.getWorkLocation() instanceof ColonyTile) {
+                            unitType = ((ColonyTile) wlp.getWorkLocation()).getExpertForProducing(wlp.getGoodsType());
+                        } else {
+                            unitType = ((Building) wlp.getWorkLocation()).getExpertUnitType();
                         }
                         break;
                     }
                 }
             }
-
-            Iterator wlpIterator = workLocationPlans.iterator();
-            while (wlpIterator.hasNext()) {
-                WorkLocationPlan wlp = (WorkLocationPlan) wlpIterator.next();
-                // TODO: Check if the production of the raw material is sufficient.
-                if (true) {
-                    if (wlp.getGoodsType() < production.length) {
-                        production[wlp.getGoodsType()] += wlp.getProductionOf(wlp.getGoodsType());
+            if (unitType >= 0) {
+                boolean expert = (nonExpertUnits.size() <= 0);
+                
+                boolean wishFound = false;
+                Iterator wishIterator = wishes.iterator();
+                while (wishIterator.hasNext()) {
+                    Wish w = (Wish) wishIterator.next();
+                    if (w instanceof WorkerWish) {
+                        WorkerWish ww = (WorkerWish) w;
+                        if (ww.getUnitType() == unitType
+                                && !newWishes.contains(ww)) {
+                            ww.update(value, unitType, expert);
+                            newWishes.add(ww);
+                            wishFound = true;
+                            break;
+                        }
                     }
-                    production[Goods.FOOD] -= 2;
-                    wlpIterator.remove();
-
-                    int unitType;
-                    if (wlp.getWorkLocation() instanceof ColonyTile) {
-                        unitType = ((ColonyTile) wlp.getWorkLocation()).getExpertForProducing(wlp.getGoodsType());
-                    } else {
-                        unitType = ((Building) wlp.getWorkLocation()).getExpertUnitType();
-                    }
-                    if (unitType < 0) {
-                        logger.warning("unitType < 0");
-                    }
-                    if (nonExpertUnits.size() > 0) {
-                        newWishes.add(new WorkerWish(getAIMain(), colony, value, unitType, false));
-                        nonExpertUnits.remove(0);
-                    } else {
-                        newWishes.add(new WorkerWish(getAIMain(), colony, value, unitType, true));
-                    }
-                    value -= 5;
-                    if (value < 50) {
-                        value = 50;
-                    }
-                    break;
+                }
+                
+                if (!wishFound) {
+                    WorkerWish ww = new WorkerWish(getAIMain(), colony, value, unitType, expert);
+                    wishes.add(ww);
+                    newWishes.add(ww);
+                }
+                if (!expert) {
+                    nonExpertUnits.remove(0);
+                }
+                value -= 5;
+                if (value < 50) {
+                    value = 50;
                 }
             }
         }
-
-        Iterator wishIterator = wishes.iterator();
+        Iterator wishIterator = ((ArrayList) ((ArrayList) wishes).clone()).iterator();
         while (wishIterator.hasNext()) {
             Wish w = (Wish) wishIterator.next();
             if (w instanceof WorkerWish) {
-                WorkerWish ww = (WorkerWish) w;
-                Iterator newWishIterator = newWishes.iterator();
-                boolean wishFound = false;
-                while (!wishFound && newWishIterator.hasNext()) {
-                    WorkerWish ww2 = (WorkerWish) newWishIterator.next();
-                    if (ww2.getTransportable() == null && ww2.getUnitType() == ww.getUnitType()) {
-                        ww2.setTransportable(ww.getTransportable());
-                        wishFound = true;
-                    }
-                }
-                if (!wishFound && ww.getTransportable() != null) {
-                    ((AIUnit) ww.getTransportable()).setMission(null);
+                if (!newWishes.contains(w)) {
+                    w.dispose();
                 }
             } else if (w instanceof GoodsWish) {
                 GoodsWish gw = (GoodsWish) w;
                 //TODO: check for a certain required amount?
-                if (getColony().getGoodsCount(gw.getGoodsType()) == 0) {
-                    newWishes.add(gw);
+                if (getColony().getGoodsCount(gw.getGoodsType()) != 0) {
+                    gw.dispose();
                 }
             } else {
                 logger.warning("Unknown type of Wish.");
             }
         }
-
-        wishes = newWishes;
     }
-
+    
+    public void removeWish(Wish w) {
+        wishes.remove(w);
+    }
 
     /**
     * Creates a list of the goods which should be shipped to and from this colony.
@@ -399,11 +427,15 @@ public class AIColony extends AIObject {
                     AIGoods ag = ((AIGoods) aiGoods.get(j));
                     if (ag == null) {
                         logger.warning("aiGoods == null");
-                    }
-                    if (ag.getGoods() == null) {
+                    } else if (ag.getGoods() == null) {
                         logger.warning("aiGoods.getGoods() == null");
+                        if (ag.isUninitialized()) {
+                            logger.warning("AIGoods uninitialized: " + ag.getID());
+                        }                        
                     }
-                    if (ag != null && ag.getGoods().getType() == goodsType
+                    if (ag != null
+                            && ag.getGoods() != null
+                            && ag.getGoods().getType() == goodsType
                             && ag.getGoods().getLocation() == colony) {
                         alreadyAdded.add(ag);
                     }
@@ -866,64 +898,73 @@ public class AIColony extends AIObject {
         return colony.getID();
     }
 
-
     /**
-     * Creates an XML-representation of this object.
-     * @param document The <code>Document</code> in which
-     *      the XML-representation should be created.
-     * @return The XML-representation.
+     * Writes this object to an XML stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
      */
-    public Element toXMLElement(Document document) {
-        Element element = document.createElement(getXMLElementTagName());
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        out.writeStartElement(getXMLElementTagName());
 
-        element.setAttribute("ID", getID());
+        out.writeAttribute("ID", getID());
 
         Iterator aiGoodsIterator = aiGoods.iterator();
         while (aiGoodsIterator.hasNext()) {
             AIGoods ag = (AIGoods) aiGoodsIterator.next();
-            Element agElement = document.createElement(AIGoods.getXMLElementTagName() + "ListElement");
-            agElement.setAttribute("ID", ag.getID());
-            element.appendChild(agElement);
+            if (ag == null) {
+                logger.warning("ag == null");
+                continue;
+            }
+            if (ag.getID() == null) {
+                logger.warning("ag.getID() == null");
+                continue;
+            }
+            out.writeStartElement(AIGoods.getXMLElementTagName() + "ListElement");
+            out.writeAttribute("ID", ag.getID());
+            out.writeEndElement();
         }
 
         Iterator wishesIterator = wishes.iterator();
         while (wishesIterator.hasNext()) {
             Wish w = (Wish) wishesIterator.next();
-            Element wElement;
+            if (!w.shouldBeStored()) {
+                continue;
+            }
             if (w instanceof WorkerWish) {
-                wElement = document.createElement(WorkerWish.getXMLElementTagName() + "WishListElement");
+                out.writeStartElement(WorkerWish.getXMLElementTagName() + "WishListElement");
             } else if (w instanceof GoodsWish) {
-                wElement = document.createElement(GoodsWish.getXMLElementTagName() + "WishListElement");
+                out.writeStartElement(GoodsWish.getXMLElementTagName() + "WishListElement");
             } else {
                 logger.warning("Unknown type of wish.");
                 continue;
             }
-            wElement.setAttribute("ID", w.getID());
-            element.appendChild(wElement);
+            out.writeAttribute("ID", w.getID());
+            out.writeEndElement();
         }
         
         Iterator tileImprovementIterator = tileImprovements.iterator();
         while (tileImprovementIterator.hasNext()) {
             TileImprovement ti = (TileImprovement) tileImprovementIterator.next();
-            Element tiElement = document.createElement(TileImprovement.getXMLElementTagName() + "ListElement");
-            tiElement.setAttribute("ID", ti.getID());
-            element.appendChild(tiElement);
+            out.writeStartElement(TileImprovement.getXMLElementTagName() + "ListElement");
+            out.writeAttribute("ID", ti.getID());
+            out.writeEndElement();
         }        
 
-        return element;
+        out.writeEndElement();
     }
 
-
     /**
-     * Updates this object from an XML-representation of
-     * a <code>AIColony</code>.
-     * 
-     * @param element The XML-representation.
+     * Reads information for this object from an XML stream.
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException if there are any problems reading
+     *      from the stream.
      */
-    public void readFromXMLElement(Element element) {
-        colony = (Colony) getAIMain().getFreeColGameObject(element.getAttribute("ID"));       
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {        
+        colony = (Colony) getAIMain().getFreeColGameObject(in.getAttributeValue(null, "ID"));       
         if (colony == null) {
-            throw new NullPointerException("Could not find Colony with ID: " + element.getAttribute("ID"));
+            throw new NullPointerException("Could not find Colony with ID: " + in.getAttributeValue(null, "ID"));
         }
 
         aiGoods.clear();
@@ -932,39 +973,42 @@ public class AIColony extends AIObject {
         colonyPlan = new ColonyPlan(getAIMain(), colony);
         colonyPlan.create();
 
-        NodeList nl = element.getChildNodes();
-        for (int i=0; i<nl.getLength(); i++) {
-            if (!(nl.item(i) instanceof Element)) {
-                continue;
-            }
-            Element e = (Element) nl.item(i);
-            if (e.getTagName().equals(AIGoods.getXMLElementTagName() + "ListElement")) {
-                AIGoods ag = (AIGoods) getAIMain().getAIObject(e.getAttribute("ID"));
-                aiGoods.add(ag);
-            } else if (e.getTagName().equals(WorkerWish.getXMLElementTagName() + "WishListElement")) {
-                Wish w = (Wish) getAIMain().getAIObject(e.getAttribute("ID"));
-                if (w != null) {
-                    wishes.add(w);
-                } else {
-                    logger.warning("Wish with ID: " + e.getAttribute("ID") + " could not be found.");
-                }                
-            } else if (e.getTagName().equals(GoodsWish.getXMLElementTagName() + "WishListElement")) {
-                Wish w = (Wish) getAIMain().getAIObject(e.getAttribute("ID"));
-                if (w != null) {
-                    wishes.add(w);
-                } else {
-                    logger.warning("Wish with ID: " + e.getAttribute("ID") + " could not be found.");
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            if (in.getLocalName().equals(AIGoods.getXMLElementTagName() + "ListElement")) {
+                AIGoods ag = (AIGoods) getAIMain().getAIObject(in.getAttributeValue(null, "ID"));
+                if (ag == null) {
+                    ag = new AIGoods(getAIMain(), in.getAttributeValue(null, "ID"));
                 }
-            } else if (e.getTagName().equals(TileImprovement.getXMLElementTagName() + "ListElement")) {
-                TileImprovement ti = (TileImprovement) getAIMain().getAIObject(e.getAttribute("ID"));
-                if (ti != null) {
-                    tileImprovements.add(ti);
-                } else {
-                    logger.warning("TileImprovement with ID: " + e.getAttribute("ID") + " could not be found.");
-                }               
+                aiGoods.add(ag);
+                in.nextTag();
+            } else if (in.getLocalName().equals(WorkerWish.getXMLElementTagName() + "WishListElement")) {
+                Wish w = (Wish) getAIMain().getAIObject(in.getAttributeValue(null, "ID"));
+                if (w == null) {
+                    w = new WorkerWish(getAIMain(), in.getAttributeValue(null, "ID"));
+                }
+                wishes.add(w);
+                in.nextTag();
+            } else if (in.getLocalName().equals(GoodsWish.getXMLElementTagName() + "WishListElement")) {
+                Wish w = (Wish) getAIMain().getAIObject(in.getAttributeValue(null, "ID"));
+                if (w == null) {
+                    w = new GoodsWish(getAIMain(), in.getAttributeValue(null, "ID"));
+                }
+                wishes.add(w);
+                in.nextTag();
+            } else if (in.getLocalName().equals(TileImprovement.getXMLElementTagName() + "ListElement")) {
+                TileImprovement ti = (TileImprovement) getAIMain().getAIObject(in.getAttributeValue(null, "ID"));
+                if (ti == null) {
+                    ti = new TileImprovement(getAIMain(), in.getAttributeValue(null, "ID"));
+                }
+                tileImprovements.add(ti);
+                in.nextTag();
             } else {
-                logger.warning("Unknown tag name: " + e.getTagName());
+                logger.warning("Unknown tag name: " + in.getLocalName());
             }
+        }
+        
+        if (!in.getLocalName().equals(getXMLElementTagName())) {
+            logger.warning("Expected end tag, received: " + in.getLocalName());
         }
     }
 

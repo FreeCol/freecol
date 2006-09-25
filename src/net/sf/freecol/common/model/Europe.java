@@ -5,6 +5,11 @@ package net.sf.freecol.common.model;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -72,15 +77,41 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
     * Initializes this object from an XML-representation of this object.
     *
     * @param game The <code>Game</code> in which this object belong.
-    * @param element The DOM-element ("Document Object Model") made to represent this "Europe".
+    * @param in The input stream containing the XML.
+    * @throws XMLStreamException if an error occured during parsing.
     */
-    public Europe(Game game, Element element) {
-        super(game, element);
+    public Europe(Game game, XMLStreamReader in) throws XMLStreamException {
+        super(game, in);
 
-        readFromXMLElement(element);
+        readFromXML(in);
     }
-
-
+    
+    /**
+     * Initializes this object from an XML-representation of this object.
+     *
+     * @param game The <code>Game</code> in which this object belong.
+     * @param e An XML-element that will be used to initialize
+     *      this object.
+     */
+    public Europe(Game game, Element e) {
+        super(game, e);
+        
+        readFromXMLElement(e);
+    }
+    
+    /**
+     * Initiates a new <code>Europe</code> 
+     * with the given ID. The object should later be
+     * initialized by calling either
+     * {@link #readFromXML(XMLStreamReader)} or
+     * {@link #readFromXMLElement(Element)}.
+     *
+     * @param game The <code>Game</code> in which this object belong.
+     * @param id The unique identifier for this object.
+     */
+    public Europe(Game game, String id) {
+        super(game, id);
+    }
 
 
 
@@ -361,47 +392,71 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         }
     }
     
-
     /**
-    * Makes an XML-representation of this object.
-    *
-    * @param document The document to use when creating new componenets.
-    * @return The DOM-element ("Document Object Model") made to represent this "Europe".
-    */
-    public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
-        Element europeElement = document.createElement(getXMLElementTagName());
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     * 
+     * <br><br>
+     * 
+     * Only attributes visible to the given <code>Player</code> will 
+     * be added to that representation if <code>showAll</code> is
+     * set to <code>false</code>.
+     *  
+     * @param out The target stream.
+     * @param player The <code>Player</code> this XML-representation 
+     *      should be made for, or <code>null</code> if
+     *      <code>showAll == true</code>.
+     * @param showAll Only attributes visible to <code>player</code> 
+     *      will be added to the representation if <code>showAll</code>
+     *      is set to <i>false</i>.
+     * @param toSavedGame If <code>true</code> then information that
+     *      is only needed when saving a game is added.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame) throws XMLStreamException {
+        // Start element:
+        out.writeStartElement(getXMLElementTagName());
 
-        europeElement.setAttribute("ID", getID());
-        europeElement.setAttribute("recruit0", Integer.toString(recruitables[0]));
-        europeElement.setAttribute("recruit1", Integer.toString(recruitables[1]));
-        europeElement.setAttribute("recruit2", Integer.toString(recruitables[2]));
-        europeElement.setAttribute("artilleryPrice", Integer.toString(artilleryPrice));
-        europeElement.setAttribute("owner", owner.getID());
+        out.writeAttribute("ID", getID());
+        out.writeAttribute("recruit0", Integer.toString(recruitables[0]));
+        out.writeAttribute("recruit1", Integer.toString(recruitables[1]));
+        out.writeAttribute("recruit2", Integer.toString(recruitables[2]));
+        out.writeAttribute("artilleryPrice", Integer.toString(artilleryPrice));
+        out.writeAttribute("owner", owner.getID());
 
-        europeElement.appendChild(unitContainer.toXMLElement(player, document, showAll, toSavedGame));
+        unitContainer.toXML(out,player, showAll, toSavedGame);
 
-        return europeElement;
+        out.writeEndElement();
     }
 
-
     /**
-    * Initializes this object from an XML-representation of this object.
-    * @param europeElement The DOM-element ("Document Object Model") made to represent this "Europe".
-    */
-    public void readFromXMLElement(Element europeElement) {
-        setID(europeElement.getAttribute("ID"));
+     * Initialize this object from an XML-representation of this object.
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        setID(in.getAttributeValue(null, "ID"));
 
-        recruitables[0] = Integer.parseInt(europeElement.getAttribute("recruit0"));
-        recruitables[1] = Integer.parseInt(europeElement.getAttribute("recruit1"));
-        recruitables[2] = Integer.parseInt(europeElement.getAttribute("recruit2"));
-        artilleryPrice = Integer.parseInt(europeElement.getAttribute("artilleryPrice"));
-        owner = (Player) getGame().getFreeColGameObject(europeElement.getAttribute("owner"));
+        recruitables[0] = Integer.parseInt(in.getAttributeValue(null, "recruit0"));
+        recruitables[1] = Integer.parseInt(in.getAttributeValue(null, "recruit1"));
+        recruitables[2] = Integer.parseInt(in.getAttributeValue(null, "recruit2"));
+        artilleryPrice = Integer.parseInt(in.getAttributeValue(null, "artilleryPrice"));
+        owner = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "owner"));
+        if (owner == null) {
+            owner = new Player(getGame(), in.getAttributeValue(null, "owner"));
+        }
 
-        Element unitContainerElement = getChildElement(europeElement, UnitContainer.getXMLElementTagName());
-        if (unitContainer != null) {
-            unitContainer.readFromXMLElement(unitContainerElement);
-        } else {
-            unitContainer = new UnitContainer(getGame(), this, unitContainerElement);
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            if (in.getLocalName().equals(UnitContainer.getXMLElementTagName())) {
+                unitContainer = (UnitContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                if (unitContainer != null) {
+                    unitContainer.readFromXML(in);
+                } else {
+                    unitContainer = new UnitContainer(getGame(), this, in);
+                }
+            }
         }
     }
 

@@ -3,6 +3,11 @@ package net.sf.freecol.server.ai;
 
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 import net.sf.freecol.common.model.Locatable;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Tile;
@@ -25,7 +30,6 @@ import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 
 /**
@@ -58,7 +62,7 @@ public class AIUnit extends AIObject implements Transportable {
      * @param unit The unit to make an {@link AIObject} for.
      */    
     public AIUnit(AIMain aiMain, Unit unit) {
-        super(aiMain);
+        super(aiMain, unit.getID());
 
         this.unit = unit;
         if (unit == null) {
@@ -77,10 +81,39 @@ public class AIUnit extends AIObject implements Transportable {
      *      XML-representation of this object.
      */    
     public AIUnit(AIMain aiMain, Element element) {
-        super(aiMain);
+        super(aiMain, element.getAttribute("ID"));
         readFromXMLElement(element);
     }
-    
+
+    /**
+     * Creates a new <code>AIUnit</code>.
+     * 
+     * @param aiMain The main AI-object.
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     * @see #readFromXML
+     */    
+    public AIUnit(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
+        super(aiMain, in.getAttributeValue(null, "ID"));
+        readFromXML(in);
+    }
+
+    /**
+     * Creates a new <code>AIUnit</code>.
+     * 
+     * @param aiMain The main AI-object.
+     * @param id The unique ID of this object.
+     */    
+    public AIUnit(AIMain aiMain, String id) {
+        super(aiMain, id);
+        unit = (Unit) getAIMain().getFreeColGameObject(id);        
+        if (unit == null) {
+            logger.warning("Could not find unit: " + id);
+        }
+        uninitialized = true;
+    }
+
 
     /**
     * Gets the <code>Unit</code> this <code>AIUnit</code> controls.
@@ -89,7 +122,19 @@ public class AIUnit extends AIObject implements Transportable {
     public Unit getUnit() {
         return unit;
     }
-          
+      
+    /**
+     * Aborts the given <code>Wish</code>.
+     * @param w The <code>Wish</code> to be aborted.
+     */
+    public void abortWish(Wish w) {
+        if (mission instanceof WishRealizationMission) {
+            mission = null;
+        }
+        if (w.getTransportable() == this) {
+            w.dispose();
+        }
+    }
     
     /**
     * Gets the <code>Locatable</code> which should be transported.
@@ -210,6 +255,10 @@ public class AIUnit extends AIObject implements Transportable {
     * @param mission The new <code>Mission</code>.
     */
     public void setMission(Mission mission) {
+        final Mission oldMission = this.mission;
+        if (oldMission != null) {
+            oldMission.dispose();
+        }
         this.mission = mission;
     }
     
@@ -233,6 +282,12 @@ public class AIUnit extends AIObject implements Transportable {
         if (hasMission()) {
             getMission().dispose();
         }
+        if (transport != null
+                && transport.getMission() != null
+                && transport.getMission() instanceof TransportMission) {
+            TransportMission tm = (TransportMission) transport.getMission();
+            tm.removeFromTransportList(this);
+        }
         super.dispose();
     }
     
@@ -246,87 +301,85 @@ public class AIUnit extends AIObject implements Transportable {
         return unit.getID();
     }
 
-
     /**
-     * Creates an XML-representation of this object.
-     * @param document The <code>Document</code> in which
-     *      the XML-representation should be created.
-     * @return The XML-representation.
-     */    
-    public Element toXMLElement(Document document) {
-        Element element = document.createElement(getXMLElementTagName());
+     * Writes this object to an XML stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        out.writeStartElement(getXMLElementTagName());
 
-        element.setAttribute("ID", getID());
+        out.writeAttribute("ID", getID());
         if (transport != null) {
-            element.setAttribute("transport", transport.getUnit().getID());
+            out.writeAttribute("transport", transport.getUnit().getID());
         }
         if (mission != null) {
-            element.appendChild(mission.toXMLElement(document));
+            mission.toXML(out);
         }
 
-        return element;
+        out.writeEndElement();
     }
 
     /**
-     * Updates this object from an XML-representation of
-     * a <code>AIUnit</code>.
-     * 
-     * @param element The XML-representation.
+     * Reads information for this object from an XML stream.
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException if there are any problems reading
+     *      from the stream.
      */
-    public void readFromXMLElement(Element element) {
-        unit = (Unit) getAIMain().getFreeColGameObject(element.getAttribute("ID"));
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        final String inID =  in.getAttributeValue(null, "ID");
+        unit = (Unit) getAIMain().getFreeColGameObject(inID);
         
         if (unit == null) {
-            logger.warning("Could not find unit: " + unit);
+            logger.warning("Could not find unit: " + inID);
         }
 
-        if (element.hasAttribute("transport")) {
-            transport = (AIUnit) getAIMain().getAIObject(element.getAttribute("transport"));
+        final String transportStr = in.getAttributeValue(null, "transport");
+        if (transportStr != null) {
+            transport = (AIUnit) getAIMain().getAIObject(transportStr);
+            if (transport == null) {
+                transport = new AIUnit(getAIMain(), transportStr);
+            }
         } else {
             transport = null;
         }
-
-        if (element.getChildNodes().getLength() > 0) {
-            Element missionElement = null;
-            NodeList nl = element.getChildNodes();
-            for (int i=0; i<nl.getLength(); i++) {
-                if (nl.item(i) instanceof Element) {
-                    missionElement = (Element) nl.item(i);
-                    break;
-                }
-            }            
-            if (missionElement != null) {
-                if (missionElement.getTagName().equals(UnitWanderHostileMission.getXMLElementTagName())) {
-                    mission = new UnitWanderHostileMission(getAIMain(), missionElement);
-                } else if (missionElement.getTagName().equals(UnitWanderMission.getXMLElementTagName())) {
-                    mission = new UnitWanderMission(getAIMain(), missionElement);
-                } else if (missionElement.getTagName().equals(IndianBringGiftMission.getXMLElementTagName())) {
-                    mission = new IndianBringGiftMission(getAIMain(), missionElement);
-                } else if (missionElement.getTagName().equals(BuildColonyMission.getXMLElementTagName())) {
-                    mission = new BuildColonyMission(getAIMain(), missionElement);
-                } else if (missionElement.getTagName().equals(IndianDemandMission.getXMLElementTagName())) {                    
-                    mission = new IndianDemandMission(getAIMain(), missionElement);
-                } else if (missionElement.getTagName().equals(TransportMission.getXMLElementTagName())) {
-                    mission = new TransportMission(getAIMain(), missionElement);
-                } else if (missionElement.getTagName().equals(WishRealizationMission.getXMLElementTagName())) {
-                    mission = new WishRealizationMission(getAIMain(), missionElement);
-                } else if (missionElement.getTagName().equals(UnitSeekAndDestroyMission.getXMLElementTagName())) {
-                    mission = new UnitSeekAndDestroyMission(getAIMain(), missionElement);
-                } else if (missionElement.getTagName().equals(PioneeringMission.getXMLElementTagName())) {
-                    mission = new PioneeringMission(getAIMain(), missionElement);
-                } else if (missionElement.getTagName().equals(DefendSettlementMission.getXMLElementTagName())) {
-                    mission = new DefendSettlementMission(getAIMain(), missionElement);
-                } else if (missionElement.getTagName().equals(WorkInsideColonyMission.getXMLElementTagName())) {
-                    mission = new WorkInsideColonyMission(getAIMain(), missionElement);
-                } else if (missionElement.getTagName().equals(ScoutingMission.getXMLElementTagName())) {
-                    mission = new ScoutingMission(getAIMain(), missionElement);
-                } else if (missionElement.getTagName().equals(CashInTreasureTrainMission.getXMLElementTagName())) {
-                    mission = new CashInTreasureTrainMission(getAIMain(), missionElement);                    
-                } else {
-                    logger.warning("Could not find mission-class for: " + missionElement.getTagName());
-                    mission = new UnitWanderHostileMission(getAIMain(), this);
-                }
+                
+        if (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            if (in.getLocalName().equals(UnitWanderHostileMission.getXMLElementTagName())) {
+                mission = new UnitWanderHostileMission(getAIMain(), in);
+            } else if (in.getLocalName().equals(UnitWanderMission.getXMLElementTagName())) {
+                mission = new UnitWanderMission(getAIMain(), in);
+            } else if (in.getLocalName().equals(IndianBringGiftMission.getXMLElementTagName())) {
+                mission = new IndianBringGiftMission(getAIMain(), in);
+            } else if (in.getLocalName().equals(BuildColonyMission.getXMLElementTagName())) {
+                mission = new BuildColonyMission(getAIMain(), in);
+            } else if (in.getLocalName().equals(IndianDemandMission.getXMLElementTagName())) {                    
+                mission = new IndianDemandMission(getAIMain(), in);
+            } else if (in.getLocalName().equals(TransportMission.getXMLElementTagName())) {
+                mission = new TransportMission(getAIMain(), in);
+            } else if (in.getLocalName().equals(WishRealizationMission.getXMLElementTagName())) {
+                mission = new WishRealizationMission(getAIMain(), in);
+            } else if (in.getLocalName().equals(UnitSeekAndDestroyMission.getXMLElementTagName())) {
+                mission = new UnitSeekAndDestroyMission(getAIMain(), in);
+            } else if (in.getLocalName().equals(PioneeringMission.getXMLElementTagName())) {
+                mission = new PioneeringMission(getAIMain(), in);
+            } else if (in.getLocalName().equals(DefendSettlementMission.getXMLElementTagName())) {
+                mission = new DefendSettlementMission(getAIMain(), in);
+            } else if (in.getLocalName().equals(WorkInsideColonyMission.getXMLElementTagName())) {
+                mission = new WorkInsideColonyMission(getAIMain(), in);
+            } else if (in.getLocalName().equals(ScoutingMission.getXMLElementTagName())) {
+                mission = new ScoutingMission(getAIMain(), in);
+            } else if (in.getLocalName().equals(CashInTreasureTrainMission.getXMLElementTagName())) {
+                mission = new CashInTreasureTrainMission(getAIMain(), in);                    
+            } else {
+                logger.warning("Could not find mission-class for: " + in.getLocalName());
+                mission = new UnitWanderHostileMission(getAIMain(), this);
+                return;
             }
+            
+            in.nextTag();            
         }
     }
 

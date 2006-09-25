@@ -4,6 +4,10 @@ package net.sf.freecol.server.model;
 import java.net.Socket;
 import java.util.Iterator;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Map;
@@ -12,9 +16,6 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.option.BooleanOption;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 
 /**
@@ -87,8 +88,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
 
-    public ServerPlayer(Element serverAdditionElement) {
-        readFromServerAdditionElement(serverAdditionElement);
+    public ServerPlayer(XMLStreamReader in) throws XMLStreamException {
+        readFromServerAdditionElement(in);
     }
 
 
@@ -247,12 +248,12 @@ public class ServerPlayer extends Player implements ServerModelObject {
         connected = (connection != null);
     }
     
-    public Element toServerAdditionElement(Document document) {
-        Element element = document.createElement(getServerAdditionXMLElementTagName());
+    public void toServerAdditionElement(XMLStreamWriter out) throws XMLStreamException {
+        out.writeStartElement(getServerAdditionXMLElementTagName());
 
-        element.setAttribute("ID", getID());
+        out.writeAttribute("ID", getID());
         
-        return element;
+        out.writeEndElement();
     }
     
     
@@ -264,8 +265,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
     
     
-    public void readFromServerAdditionElement(Element element) {
-        serverID = element.getAttribute("ID");                
+    public void readFromServerAdditionElement(XMLStreamReader in) throws XMLStreamException {
+        serverID = in.getAttributeValue(null, "ID");
+        in.nextTag();
     }
     
     

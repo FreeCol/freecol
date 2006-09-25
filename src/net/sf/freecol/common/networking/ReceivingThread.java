@@ -1,12 +1,19 @@
 
 package net.sf.freecol.common.networking;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Vector;
 import java.util.logging.Logger;
+
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
@@ -29,12 +36,15 @@ final class ReceivingThread extends Thread {
     private static final int MAXIMUM_RETRIES = 5;
     
     private final FreeColNetworkInputStream in;
+    private XMLStreamReader xmlIn = null;
     private boolean shouldRun;
 
     private int nextNetworkReplyId = 0;
 
     private Vector threadsWaitingForNetworkReply = new Vector();
     private final Connection connection;
+    
+    private boolean locked = false;
 
 
     /**
@@ -49,6 +59,7 @@ final class ReceivingThread extends Thread {
 
         this.connection = connection;
         this.in = new FreeColNetworkInputStream(in);
+        
         shouldRun = true;
     }
 
@@ -74,12 +85,29 @@ final class ReceivingThread extends Thread {
     *       the network message.
     */
     public NetworkReplyObject waitForNetworkReply(int networkReplyId) {
-        NetworkReplyObject nro = new NetworkReplyObject(networkReplyId);
+        NetworkReplyObject nro = new NetworkReplyObject(networkReplyId, false);
 
         threadsWaitingForNetworkReply.add(nro);
 
         return nro;
     }
+    
+    /**
+     * Creates and registers a new <code>NetworkReplyObject</code> 
+     * with the specified ID.
+     *
+     * @param networkReplyId The id of the message the calling 
+     *       thread should wait for.
+     * @return The <code>NetworkReplyObject</code> containing 
+     *       the network message.
+     */
+     public NetworkReplyObject waitForStreamedNetworkReply(int networkReplyId) {
+         NetworkReplyObject nro = new NetworkReplyObject(networkReplyId, true);
+
+         threadsWaitingForNetworkReply.add(nro);
+
+         return nro;
+     }
 
     /**
      * Receives messages from the network in a loop.
@@ -93,58 +121,100 @@ final class ReceivingThread extends Thread {
             try {
                 listen();
                 timesFailed = 0;
-            } catch (SAXException e) {
+            } catch (XMLStreamException e) {
                 timesFailed++;
-                //warnOf(exception);
+                //warnOf(e);
                 if (timesFailed > MAXIMUM_RETRIES) {
                     disconnect();
-                }                
+                }        
+            } catch (SAXException e) {
+                timesFailed++;
+                //warnOf(e);
+                if (timesFailed > MAXIMUM_RETRIES) {
+                    disconnect();
+                }                  
             } catch (IOException e) {
-                //warnOf(exception);
+                //warnOf(e);
                 disconnect();
             }
         }
     }
 
+    public void unlock() {
+        locked = false;
+    }
+    
     /**
      * Listens to the inputstream and calls the messagehandler 
      * for each message received.
      * 
      * @exception IOException If thrown by the
      *      {@link FreeColNetworkInputStream}.
-     * @exception SAXException If thrown by
-     *      {@link Message}.      
      */
-    public void listen() throws IOException, SAXException {
-        Message  msg = null;
-
-        in.enable();
-        msg = new Message(in);
+    private void listen() throws IOException, SAXException, XMLStreamException {
+        while (locked) {
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {}
+        }
+            
+        BufferedInputStream bis = new BufferedInputStream(in);
+        
+        final int LOOK_AHEAD = 500;
+        in.enable();        
+        bis.mark(LOOK_AHEAD);
 
         if (!shouldRun()) {
             return;
         }
 
+        /*
         if (msg.isType("invalid")) {
             logger.warning("--INVALID MESSAGE RECIEVED--");
         }
+        */
 
         // START DEBUG-LINES:
         if (FreeCol.isInDebugMode()) {
-            System.out.println(connection.convertElementToString(msg.getDocument().getDocumentElement()));
-            System.out.println();
-            System.out.flush();
+            byte[] buf = new byte[LOOK_AHEAD];
+            int r = bis.read(buf, 0, LOOK_AHEAD);
+            if (r > 0) {
+                System.out.print(new String(buf, 0, r));
+                if (buf[LOOK_AHEAD-1] != 0) {
+                    System.out.println("...");
+                } else {
+                    System.out.println();
+                }
+                System.out.println();
+            }
+            bis.reset();
         }
         // END DEBUB
 
-        if (msg.isType("reply")) {
+        XMLInputFactory xif = XMLInputFactory.newInstance();
+        xmlIn = xif.createXMLStreamReader(bis);
+        xmlIn.nextTag();
+
+        boolean disconnectMessage = (xmlIn.getLocalName().equals("disconnect")) ? true : false;
+        if (xmlIn.getLocalName().equals("reply")) {
             boolean foundNetworkReplyObject = false;
 
+            String networkReplyID = xmlIn.getAttributeValue(null, "networkReplyId");
             for (int i=0; i<threadsWaitingForNetworkReply.size(); i++) {
                 NetworkReplyObject nro = (NetworkReplyObject) threadsWaitingForNetworkReply.get(i);
 
-                if (nro.getNetworkReplyId() == Integer.parseInt(msg.getAttribute("networkReplyId"))) {
-                    nro.setResponse(msg);
+                if (nro.getNetworkReplyId() == Integer.parseInt(networkReplyID)) {
+                    if (nro.isStreamed()) {
+                        locked = true;
+                        nro.setResponse(xmlIn);
+                    } else {                        
+                        xmlIn.close();
+                        xmlIn = null;
+                        bis.reset();
+
+                        final Message msg = new Message(bis);      
+                        nro.setResponse(msg);                        
+                    }
                     threadsWaitingForNetworkReply.remove(i);
                     foundNetworkReplyObject = true;
                     break; // Should only be one 'NetworkReplyObject' for each 'networkReplyId'.
@@ -152,25 +222,14 @@ final class ReceivingThread extends Thread {
             }
 
             if (!foundNetworkReplyObject) {
-                logger.warning("Could not find networkReplyId=" + msg.getAttribute("networkReplyId"));
+                logger.warning("Could not find networkReplyId=" + networkReplyID);
             }
         } else {
-            final Message theMsg  = msg;
-
-            /*
-             * TODO: The tag "urgent" should be used to mark messages
-             *       that should be processed in a separate thread:
-             */
-            Thread t = new Thread() {
-                public void run() {
-                    connection.handleAndSendReply(theMsg);
-                }
-            };
-            t.setName("MessageHandler:"+t.getName());
-            t.start();
+            bis.reset();
+            connection.handleAndSendReply(bis);
         }
 
-        if (msg.isType("disconnect")) {
+        if (disconnectMessage) {
             askToStop();
         }
     }
@@ -275,7 +334,7 @@ final class ReceivingThread extends Thread {
                 bEnd = 0;
             }
             return true;
-        }
+        }        
 
         /**
          * Prepares the input stream for a new message.
@@ -286,12 +345,12 @@ final class ReceivingThread extends Thread {
         void enable() {
             wait = false;
         }
-
+        
         /**
          * Reads a single byte.
          * @see #read(byte[], int, int)
          */
-        public int read() throws IOException {
+        public int read() throws IOException {           
             if (wait) {
                 return -1;
             }

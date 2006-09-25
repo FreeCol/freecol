@@ -264,7 +264,7 @@ public final class PreGameController {
             canvas.requestFocus();
         } else {
             canvas.setEnabled(false);
-            canvas.showStatusPanel(Messages.message("waitingForOtherPlayers"));
+            canvas.showStatusPanel(Messages.message("waitingForOtherPlayers"));            
         }
     }
 }

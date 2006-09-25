@@ -6,6 +6,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Map.Position;
@@ -149,22 +154,59 @@ public final class Tile extends FreeColGameObject implements Location {
 
 
     /**
-    * Initialize this object from an XML-representation of this object.
-    *
-    * @param game The <code>Game</code> this <code>Tile</code>
+     * Initialize this object from an XML-representation of this object.
+     *
+     * @param game The <code>Game</code> this <code>Tile</code>
      *      should be created in.
-    * @param element The DOM-element ("Document Object Model") made to represent this "Tile".
-    */
-    public Tile(Game game, Element element) {
-        super(game, element);
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    public Tile(Game game, XMLStreamReader in) throws XMLStreamException {
+        super(game, in);
 
         if (getGame().getViewOwner() == null) {
             playerExploredTiles = new PlayerExploredTile[Player.NUMBER_OF_NATIONS];
         }
 
-        readFromXMLElement(element);
+        readFromXML(in);
+    }
+    
+    /**
+     * Initialize this object from an XML-representation of this object.
+     *
+     * @param game The <code>Game</code> this <code>Tile</code>
+     *      should be created in.
+     * @param e An XML-element that will be used to initialize
+     *      this object.
+     */
+    public Tile(Game game, Element e) {
+        super(game, e);
+
+        if (getGame().getViewOwner() == null) {
+            playerExploredTiles = new PlayerExploredTile[Player.NUMBER_OF_NATIONS];
+        }
+
+        readFromXMLElement(e);
     }
 
+    /**
+     * Initiates a new <code>Tile</code> 
+     * with the given ID. The object should later be
+     * initialized by calling either
+     * {@link #readFromXML(XMLStreamReader)} or
+     * {@link #readFromXMLElement(Element)}.
+     *
+     * @param game The <code>Game</code> in which this object belong.
+     * @param id The unique identifier for this object.
+     */
+    public Tile(Game game, String id) {
+        super(game, id);
+        
+        if (getGame().getViewOwner() == null) {
+            playerExploredTiles = new PlayerExploredTile[Player.NUMBER_OF_NATIONS];
+        }
+    }
 
     /**
     * Gets the name of this tile. The value of the name depends
@@ -1202,211 +1244,316 @@ public final class Tile extends FreeColGameObject implements Location {
 
     }
 
-
     /**
-    * Make a XML-representation of this object.
-    *
-    * @param document The document to use when creating new componenets.
-    * @return The DOM-element ("Document Object Model") made to represent this "Tile".
-    */
-    public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
-        // TODO: This method always generates an XML with the latest version of this Tile,
-        //       but this method is called for each Tile after loading a game when updating
-        //       the map for each client so all players always end up receiving the very
-        //       latest version of a Tile after loadGame (even if they didn't visit the Tile
-        //       in ages).
-        //       To solve this problem we could add an extra toXMLElement method with a parameter
-        //       that indicates whether we should use the Tile data in the XML element or the
-        //       ExploredTile data of 'player'. The toXMLElement method of IndianSettlement
-        //       should also be expanded in the same way and the parameter should be passed on
-        //       to that method. (Create new class PlayerExploredIndianSettlement?)
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     * 
+     * <br><br>
+     * 
+     * Only attributes visible to the given <code>Player</code> will 
+     * be added to that representation if <code>showAll</code> is
+     * set to <code>false</code>.
+     *  
+     * @param out The target stream.
+     * @param player The <code>Player</code> this XML-representation 
+     *      should be made for, or <code>null</code> if
+     *      <code>showAll == true</code>.
+     * @param showAll Only attributes visible to <code>player</code> 
+     *      will be added to the representation if <code>showAll</code>
+     *      is set to <i>false</i>.
+     * @param toSavedGame If <code>true</code> then information that
+     *      is only needed when saving a game is added.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame) throws XMLStreamException {
+        // Start element:
+        out.writeStartElement(getXMLElementTagName());
+
         if (toSavedGame && !showAll) {
             logger.warning("toSavedGame is true, but showAll is false");
         }
-
-        Element tileElement = document.createElement(getXMLElementTagName());
-
-        tileElement.setAttribute("ID", getID());
-        tileElement.setAttribute("x", Integer.toString(x));
-        tileElement.setAttribute("y", Integer.toString(y));
-        tileElement.setAttribute("type", Integer.toString(type));
-        tileElement.setAttribute("river", Integer.toString(river));
-        if (addition_type != ADD_NONE) {
-            tileElement.setAttribute("addition", Integer.toString(addition_type));
-        }
-        if (road) {
-            tileElement.setAttribute("road", Boolean.toString(road));
-        }
-        if (plowed) {
-            tileElement.setAttribute("plowed", Boolean.toString(plowed));
-        }
-        if (forested) {
-            tileElement.setAttribute("forested", Boolean.toString(forested));
-        }
-        if (bonus) {
-            tileElement.setAttribute("bonus", Boolean.toString(bonus));
-        }
-
-        if (lostCityRumour) {
-            tileElement.setAttribute("lostCityRumour", Boolean.toString(lostCityRumour));
-        }
         
-        if (nationOwner != Player.NO_NATION && (showAll || player.canSee(this))) {
-            tileElement.setAttribute("nationOwner", Integer.toString(nationOwner));
-        }
-
-        if ((showAll || player.canSee(this)) && (owner != null)) {
-            tileElement.setAttribute("owner", owner.getID());
-        }
-
-        //if ((settlement != null) && (showAll || player.canSee(this))) {
-        if (settlement != null) {
-            tileElement.appendChild(settlement.toXMLElement(player, document, showAll, toSavedGame));
-        }
-
-        // Check if the player can see the tile: Do not show enemy units on a tile out-of-sight.
-        if (showAll 
-                || (player.canSee(this) && (settlement == null || settlement.getOwner() == player)) 
-                || !getGameOptions().getBoolean(GameOptions.UNIT_HIDING) && player.canSee(this)) {
-            tileElement.appendChild(unitContainer.toXMLElement(player, document, showAll, toSavedGame));
-        } else {
-            UnitContainer emptyUnitContainer = new UnitContainer(getGame(), this);
-            emptyUnitContainer.setFakeID(unitContainer.getID());
-            tileElement.appendChild(emptyUnitContainer.toXMLElement(player, document, showAll, toSavedGame));
-        }
-
+        PlayerExploredTile pet = null;
         if (!showAll) {
             // We're sending the Tile from the server to the client and showAll is false.
             if (player != null) {
                 if (playerExploredTiles[player.getNation()] != null) {
-                    playerExploredTiles[player.getNation()].setAttributes(tileElement, player, document);
+                    pet = playerExploredTiles[player.getNation()];
                 }
             } else {
                 logger.warning("player == null");
             }
         }
 
-        if (toSavedGame) {
-            for (int i=0; i<playerExploredTiles.length; i++) {
-                if (playerExploredTiles[i] != null && playerExploredTiles[i].isExplored()) {
-                    tileElement.appendChild(playerExploredTiles[i].toXMLElement(player, document, showAll, toSavedGame));
+        out.writeAttribute("ID", getID());
+        out.writeAttribute("x", Integer.toString(x));
+        out.writeAttribute("y", Integer.toString(y));
+        out.writeAttribute("type", Integer.toString(type));
+        
+        if (river != 0) {
+            out.writeAttribute("river", Integer.toString(river));
+        }
+
+        if (addition_type != ADD_NONE) {
+            out.writeAttribute("addition", Integer.toString(addition_type));
+        }
+
+        final String[] names = new String[] {
+            "road",
+            "plowed",
+            "forested",
+            "bonus",
+            "lostCityRumour"     
+        };
+        boolean[] values;
+        if (pet == null) {
+            values = new boolean[] {
+                road,
+                plowed,
+                forested,
+                bonus,
+                lostCityRumour
+            };
+        } else {
+            values = new boolean[] {
+                    pet.hasRoad(),
+                    pet.isPlowed(),
+                    pet.isForested(),
+                    pet.hasBonus(),
+                    pet.hasLostCityRumour()
+                };
+        }
+        for (int i=0; i<names.length; i++) {
+            if (values[i]) {
+                out.writeAttribute(names[i], Boolean.toString(values[i]));
+            }
+        }
+        
+        if (nationOwner != Player.NO_NATION && (showAll || player.canSee(this))) {
+            out.writeAttribute("nationOwner", Integer.toString(nationOwner));
+        }
+
+        if ((showAll || player.canSee(this)) && (owner != null)) {
+            out.writeAttribute("owner", owner.getID());
+        }
+
+        //if ((settlement != null) && (showAll || player.canSee(this))) {
+        if (settlement != null) {
+            if (pet == null) {
+                settlement.toXML(out, player, showAll, toSavedGame);
+            } else {
+                if (getColony() != null) {
+                    if (!player.canSee(getTile())) {
+                        if (pet.getColonyUnitCount() != 0) {
+                            out.writeStartElement(Colony.getXMLElementTagName());
+                            out.writeAttribute("ID", getColony().getID());
+                            out.writeAttribute("name", getColony().getName());
+                            out.writeAttribute("owner", getColony().getOwner().getID());
+                            out.writeAttribute("tile", getID());
+                            out.writeAttribute("unitCount", Integer.toString(pet.getColonyUnitCount()));
+                            
+                            Building b = getColony().getBuilding(Building.STOCKADE);
+                            out.writeStartElement(Building.getXMLElementTagName());
+                            out.writeAttribute("ID", b.getID());
+                            out.writeAttribute("level", Integer.toString(pet.getColonyStockadeLevel()));                            
+                            out.writeAttribute("colony", getColony().getID());
+                            out.writeAttribute("type", Integer.toString(Building.STOCKADE));                            
+                            out.writeEndElement();
+                            
+                            GoodsContainer emptyGoodsContainer = new GoodsContainer(getGame(), getColony());
+                            emptyGoodsContainer.setFakeID(getColony().getGoodsContainer().getID());
+                            emptyGoodsContainer.toXML(out, player, showAll, toSavedGame);                            
+
+                            out.writeEndElement();
+                        } // Else: Colony not discovered.
+                    } else {
+                        settlement.toXML(out, player, showAll, toSavedGame);
+                    }
+                } else if (getSettlement() instanceof IndianSettlement) {
+                    final IndianSettlement is = (IndianSettlement) getSettlement();
+                    
+                    out.writeStartElement(IndianSettlement.getXMLElementTagName());
+                    out.writeAttribute("ID", getSettlement().getID());                    
+                    out.writeAttribute("tile", getID());
+                    out.writeAttribute("owner", getSettlement().getOwner().getID());
+                    out.writeAttribute("tribe", Integer.toString(is.getTribe()));
+                    out.writeAttribute("kind", Integer.toString(is.getKind()));
+                    out.writeAttribute("isCapital", Boolean.toString(is.isCapital()));                                        
+                    out.writeAttribute("learnableSkill", Integer.toString(pet.getSkill()));
+                    out.writeAttribute("highlyWantedGoods", Integer.toString(pet.getHighlyWantedGoods()));
+                    out.writeAttribute("wantedGoods1", Integer.toString(pet.getWantedGoods1()));
+                    out.writeAttribute("wantedGoods2", Integer.toString(pet.getWantedGoods2()));                    
+                    
+                    int[] tensionArray = new int[Player.NUMBER_OF_NATIONS];
+                    for (int i = 0; i < tensionArray.length; i++) {
+                        tensionArray[i] = is.getAlarm(i).getValue();
+                    }
+                    toArrayElement("alarm", tensionArray, out);
+                    
+                    if (pet.getMissionary() != null) {
+                        out.writeStartElement("missionary");
+                        pet.getMissionary().toXML(out, player, false, false);
+                        out.writeEndElement();
+                    }
+                    
+                    UnitContainer emptyUnitContainer = new UnitContainer(getGame(), getSettlement());
+                    emptyUnitContainer.setFakeID(is.getUnitContainer().getID());
+                    emptyUnitContainer.toXML(out, player, showAll, toSavedGame);
+                    
+                    GoodsContainer emptyGoodsContainer = new GoodsContainer(getGame(), is);
+                    emptyGoodsContainer.setFakeID(is.getGoodsContainer().getID());
+                    emptyGoodsContainer.toXML(out, player, showAll, toSavedGame);
+                    
+                    out.writeEndElement();
+                } else {
+                    logger.warning("Unknown type of settlement: " + getSettlement());
                 }
             }
         }
 
-        return tileElement;
+        // Check if the player can see the tile: Do not show enemy units on a tile out-of-sight.
+        if (showAll 
+                || (player.canSee(this) && (settlement == null || settlement.getOwner() == player)) 
+                || !getGameOptions().getBoolean(GameOptions.UNIT_HIDING) && player.canSee(this)) {
+            unitContainer.toXML(out, player, showAll, toSavedGame);
+        } else {
+            UnitContainer emptyUnitContainer = new UnitContainer(getGame(), this);
+            emptyUnitContainer.setFakeID(unitContainer.getID());
+            emptyUnitContainer.toXML(out, player, showAll, toSavedGame);
+        }
+
+        if (toSavedGame) {
+            for (int i=0; i<playerExploredTiles.length; i++) {
+                if (playerExploredTiles[i] != null && playerExploredTiles[i].isExplored()) {
+                    playerExploredTiles[i].toXML(out, player, showAll, toSavedGame);
+                }
+            }
+        }
+
+        out.writeEndElement();
     }
 
-
     /**
-    * Initialize this object from an XML-representation of this object.
-    * @param tileElement The DOM-element ("Document Object Model") made to represent this "Tile".
-    */
-    public void readFromXMLElement(Element tileElement) {
-        setID(tileElement.getAttribute("ID"));
+     * Initialize this object from an XML-representation of this object.
+     * @param in The input stream with the XML.
+     */
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        setID(in.getAttributeValue(null, "ID"));
 
-        x = Integer.parseInt(tileElement.getAttribute("x"));
-        y = Integer.parseInt(tileElement.getAttribute("y"));
-        type = Integer.parseInt(tileElement.getAttribute("type"));
-        river = Integer.parseInt(tileElement.getAttribute("river"));
-        if (tileElement.hasAttribute("addition")) {
-            addition_type = Integer.parseInt(tileElement.getAttribute("addition"));
+        x = Integer.parseInt(in.getAttributeValue(null, "x"));
+        y = Integer.parseInt(in.getAttributeValue(null, "y"));
+        type = Integer.parseInt(in.getAttributeValue(null, "type"));
+        
+        final String riverStr = in.getAttributeValue(null, "river");
+        if (riverStr != null) {
+            river = Integer.parseInt(riverStr);
+        } else {
+            river = 0;
+        }
+        
+        final String additionStr = in.getAttributeValue(null, "addition");
+        if (additionStr != null) {
+            addition_type = Integer.parseInt(additionStr);
         } else {
             addition_type = ADD_NONE;
         }
-        if (tileElement.hasAttribute("road")) {
-            road = Boolean.valueOf(tileElement.getAttribute("road")).booleanValue();
+        
+        final String roadStr = in.getAttributeValue(null, "road");
+        if (roadStr != null) {
+            road = Boolean.valueOf(roadStr).booleanValue();
         } else {
             road = false;
         }
-        if (tileElement.hasAttribute("plowed")) {
-            plowed = Boolean.valueOf(tileElement.getAttribute("plowed")).booleanValue();
+        
+        final String plowedStr = in.getAttributeValue(null, "plowed");
+        if (plowedStr != null) {
+            plowed = Boolean.valueOf(plowedStr).booleanValue();
         } else {
             plowed = false;
         }
-        if (tileElement.hasAttribute("forested")) {
-            forested = Boolean.valueOf(tileElement.getAttribute("forested")).booleanValue();
+        
+        final String forestedStr = in.getAttributeValue(null, "forested");
+        if (forestedStr != null) {
+            forested = Boolean.valueOf(forestedStr).booleanValue();
         } else {
             forested = false;
         }
-        if (tileElement.hasAttribute("bonus")) {
-            bonus = Boolean.valueOf(tileElement.getAttribute("bonus")).booleanValue();
+        
+        final String bonusStr = in.getAttributeValue(null, "bonus");
+        if (bonusStr != null) {
+            bonus = Boolean.valueOf(bonusStr).booleanValue();
         } else {
             bonus = false;
         }
 
-        if (tileElement.hasAttribute("lostCityRumour")) {
-            lostCityRumour = Boolean.valueOf(tileElement.getAttribute("lostCityRumour")).booleanValue();
+        final String lostCityRumourStr = in.getAttributeValue(null, "lostCityRumour");
+        if (lostCityRumourStr != null) {
+            lostCityRumour = Boolean.valueOf(lostCityRumourStr).booleanValue();
         } else {
             lostCityRumour = false;
         }
 
-        if (tileElement.hasAttribute("nationOwner")) {
-            nationOwner = Integer.parseInt(tileElement.getAttribute("nationOwner"));
+        final String nationOwnerStr = in.getAttributeValue(null, "nationOwner");
+        if (nationOwnerStr != null) {
+            nationOwner = Integer.parseInt(nationOwnerStr);
         } else {
             nationOwner = Player.NO_NATION;
         }
 
-        if (tileElement.hasAttribute("owner")) {
-            owner = (Settlement) getGame().getFreeColGameObject(tileElement.getAttribute("owner"));
+        final String ownerStr = in.getAttributeValue(null, "owner");
+        if (ownerStr != null) {
+            owner = (Settlement) getGame().getFreeColGameObject(ownerStr);
+            if (owner == null) {
+                if (ownerStr.startsWith(IndianSettlement.getXMLElementTagName())) {
+                    owner = new IndianSettlement(getGame(), ownerStr);
+                } else if (ownerStr.startsWith(Colony.getXMLElementTagName())) {
+                    owner = new Colony(getGame(), ownerStr);
+                } else {
+                    logger.warning("Unknown type of Settlement.");
+                }
+            }
         } else {
             owner = null;
         }
 
         boolean settlementSent = false;
-
-        Element colonyElement = getChildElement(tileElement, Colony.getXMLElementTagName());
-        if (colonyElement != null) {
-            settlementSent = true;
-            if (settlement != null && settlement instanceof Colony) {
-                settlement.readFromXMLElement(colonyElement);
-            } else {
-                settlement = new Colony(getGame(), colonyElement);
-            }
-        }
-
-        Element indianSettlementElement = getChildElement(tileElement, IndianSettlement.getXMLElementTagName());
-        if (indianSettlementElement != null) {
-            settlementSent = true;
-            if (settlement != null && settlement instanceof IndianSettlement) {
-                settlement.readFromXMLElement(indianSettlementElement);
-            } else {
-                settlement = new IndianSettlement(getGame(), indianSettlementElement);
-            }
-        }
-
-        if (!settlementSent && settlement != null) {
-            settlement.dispose();
-        }
-
-        Element unitContainerElement = getChildElement(tileElement, UnitContainer.getXMLElementTagName());
-
-        if (unitContainerElement == null) {
-            throw new NullPointerException();
-        }
-
-        if (unitContainer != null) {
-            unitContainer.readFromXMLElement(unitContainerElement);
-        } else {
-            unitContainer = new UnitContainer(getGame(), this, unitContainerElement);
-        }
-
-        // Only from a savegame:
-        NodeList nl = tileElement.getElementsByTagName("playerExploredTile");
-        for (int i=0; i<nl.getLength(); i++) {
-            Node node = nl.item(i);
-            if (!(node instanceof Element)) {
-                continue;
-            }
-            Element petElement = (Element) node;
-            if (Boolean.valueOf(petElement.getAttribute("explored")).booleanValue()) {
-                if (playerExploredTiles[Integer.parseInt(petElement.getAttribute("nation"))] == null) {
-                    PlayerExploredTile pet = new PlayerExploredTile(petElement);
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            if (in.getLocalName().equals(Colony.getXMLElementTagName())) {
+                settlement = (Settlement) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                if (settlement != null) {
+                    settlement.readFromXML(in);
+                } else {
+                    settlement = new Colony(getGame(), in);
+                }
+                settlementSent = true;
+            } else if (in.getLocalName().equals(IndianSettlement.getXMLElementTagName())) {
+                settlement = (Settlement) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                if (settlement != null) {
+                    settlement.readFromXML(in);
+                } else {
+                    settlement = new IndianSettlement(getGame(), in);
+                }
+                settlementSent = true;
+            } else if (in.getLocalName().equals(UnitContainer.getXMLElementTagName())) {
+                unitContainer = (UnitContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                if (unitContainer != null) {
+                    unitContainer.readFromXML(in);
+                } else {
+                    unitContainer = new UnitContainer(getGame(), this, in);
+                }
+            } else if (in.getLocalName().equals("playerExploredTile")) {
+                // Only from a savegame:
+                if (playerExploredTiles[Integer.parseInt(in.getAttributeValue(null, "nation"))] == null) {
+                    PlayerExploredTile pet = new PlayerExploredTile(in);
                     playerExploredTiles[pet.getNation()] = pet;
                 } else {
-                    playerExploredTiles[Integer.parseInt(petElement.getAttribute("nation"))].readFromXMLElement(petElement);
-                }
+                    playerExploredTiles[Integer.parseInt(in.getAttributeValue(null, "nation"))].readFromXML(in);
+                }                
             }
+        }
+        if (!settlementSent && settlement != null) {
+            settlement.dispose();
         }
     }
 
@@ -1510,6 +1657,8 @@ public final class Tile extends FreeColGameObject implements Location {
              * These attributes should not be updated by this method:
              * skill, highlyWantedGoods, wantedGoods1 and wantedGoods2
              */
+        } else {
+            playerExploredTiles[nation].setColonyUnitCount(0);
         }
     }
 
@@ -1594,7 +1743,8 @@ public final class Tile extends FreeColGameObject implements Location {
         playerExploredTile.setWantedGoods2(is.getWantedGoods2());
     }
 
-
+    private final Tile theTile = this;
+    
     /**
     * This class contains the data visible to a specific player.
     *
@@ -1646,75 +1796,114 @@ public final class Tile extends FreeColGameObject implements Location {
 
         /**
         * Initialize this object from an XML-representation of this object.
-        * @param element The DOM-element ("Document Object Model") made to represent this "PlayerExploredTile".
+        * 
+        * @param in The XML stream to read the data from.
+        * @throws XMLStreamException if an error occured during parsing.
         */
-        public PlayerExploredTile(Element element) {
-            readFromXMLElement(element);
+        public PlayerExploredTile(XMLStreamReader in) throws XMLStreamException {
+            readFromXML(in);
         }
 
 
         public void setColonyUnitCount(int colonyUnitCount) {
             this.colonyUnitCount = colonyUnitCount;
         }
-
+        
+        public int getColonyUnitCount() {
+            return colonyUnitCount;
+        }
 
         public void setColonyStockadeLevel(int colonyStockadeLevel) {
             this.colonyStockadeLevel = colonyStockadeLevel;
         }
 
+        public int getColonyStockadeLevel() {
+            return colonyStockadeLevel;
+        }
 
         public void setRoad(boolean road) {
             this.road = road;
         }
-
+        
+        public boolean hasRoad() {
+            return road;
+        }
 
         public void setPlowed(boolean plowed) {
             this.plowed = plowed;
         }
-
+        
+        public boolean isPlowed() {
+            return plowed;
+        }
 
         public void setForested(boolean forested) {
             this.forested = forested;
         }
-
+        
+        public boolean isForested() {
+            return forested;
+        }
 
         public void setBonus(boolean bonus) {
             this.bonus = bonus;
         }
+        
+        public boolean hasBonus() {
+            return bonus;
+        }
 
         public void setLostCityRumour(boolean lostCityRumour) {
             this.lostCityRumour = lostCityRumour;
+        }
+        
+        public boolean hasLostCityRumour() {
+            return lostCityRumour;
         }
 
         public void setExplored(boolean explored) {
             this.explored = explored;
         }
 
-
         public void setSkill(int newSkill) {
             this.skill = newSkill;
         }
 
+        public int getSkill() {
+            return skill;
+        }
 
         public void setHighlyWantedGoods(int highlyWantedGoods) {
             this.highlyWantedGoods = highlyWantedGoods;
         }
 
+        public int getHighlyWantedGoods() {
+            return highlyWantedGoods;
+        }
 
         public void setWantedGoods1(int wantedGoods1) {
             this.wantedGoods1 = wantedGoods1;
         }
-
+        
+        public int getWantedGoods1() {
+            return wantedGoods1;
+        }
 
         public void setWantedGoods2(int wantedGoods1) {
             this.wantedGoods1 = wantedGoods1;
         }
-
+        
+        public int getWantedGoods2() {
+            return wantedGoods2;
+        }
 
         public void setMissionary(Unit missionary) {
             this.missionary = missionary;
         }
 
+        public Unit getMissionary() {
+            return missionary;
+        }
 
         /**
         * Checks if this <code>Tile</code> has been explored. 
@@ -1733,154 +1922,163 @@ public final class Tile extends FreeColGameObject implements Location {
             return nation;
         }
 
-
         /**
-        * Hides the invisible features of the given <code>tileElement</code>.
-        * 
-        * @param tileElement The <code>Element</code> to hide information on.
-        * @param player The <code>Player</code>.
-        * @param document The document the given element is a part of.
-        */
-        public void setAttributes(Element tileElement, Player player, Document document) {
-            tileElement.setAttribute("road", Boolean.toString(road));
-            tileElement.setAttribute("plowed", Boolean.toString(plowed));
-            tileElement.setAttribute("forested", Boolean.toString(forested));
-            tileElement.setAttribute("bonus", Boolean.toString(bonus));
-            tileElement.setAttribute("lostCityRumour", Boolean.toString(lostCityRumour));
-
-            if (getColony() != null) {
-                Element colonyElement = getChildElement(tileElement, Colony.getXMLElementTagName());
-
-                if (!player.canSee(getTile())) {
-                    if (colonyUnitCount != 0) {
-                        if (colonyElement.hasAttribute("unitCount")) {
-                            colonyElement.setAttribute("unitCount", Integer.toString(colonyUnitCount));
-                        }
-
-                        NodeList childNodes = colonyElement.getChildNodes();
-                        for (int i=0; i<childNodes.getLength(); i++) {
-                            Element childElement = (Element) childNodes.item(i);
-
-                            if (childElement.getTagName().equals(Building.getXMLElementTagName())) {
-                                Building b = (Building) getGame().getFreeColGameObject(childElement.getAttribute("ID"));
-
-                                if (b.getType() == Building.STOCKADE) {
-                                    childElement.setAttribute("level", Integer.toString(colonyStockadeLevel));
-                                }
-                            }
-                        }
-                    } else {    // Colony not discovered.
-                        colonyElement.getParentNode().removeChild(colonyElement);
-                    }
-                }
-            } else if ((getSettlement() != null) && (getSettlement() instanceof IndianSettlement)) {
-                Element settlementElement = getChildElement(tileElement, IndianSettlement.getXMLElementTagName());
-
-                settlementElement.setAttribute("learnableSkill", Integer.toString(skill));
-                settlementElement.setAttribute("highlyWantedGoods", Integer.toString(highlyWantedGoods));
-                settlementElement.setAttribute("wantedGoods1", Integer.toString(wantedGoods1));
-                settlementElement.setAttribute("wantedGoods2", Integer.toString(wantedGoods2));
-
-                Element missionaryElement = getChildElement(settlementElement, "missionary");
-                if (missionaryElement != null) {
-                    settlementElement.removeChild(missionaryElement);
-                }
-                if (missionary != null) {
-                    missionaryElement = document.createElement("missionary");
-                    missionaryElement.appendChild(missionary.toXMLElement(player, document, false, false));
-                    settlementElement.appendChild(missionaryElement);
-                }
-            } else if (getSettlement() != null) {
-                logger.warning("Unknown type of settlement: " + getSettlement());
+         * This method writes an XML-representation of this object to
+         * the given stream.
+         * 
+         * <br><br>
+         * 
+         * Only attributes visible to the given <code>Player</code> will 
+         * be added to that representation if <code>showAll</code> is
+         * set to <code>false</code>.
+         *  
+         * @param out The target stream.
+         * @param player The <code>Player</code> this XML-representation 
+         *      should be made for, or <code>null</code> if
+         *      <code>showAll == true</code>.
+         * @param showAll Only attributes visible to <code>player</code> 
+         *      will be added to the representation if <code>showAll</code>
+         *      is set to <i>false</i>.
+         * @param toSavedGame If <code>true</code> then information that
+         *      is only needed when saving a game is added.
+         * @throws XMLStreamException if there are any problems writing
+         *      to the stream.
+         */
+        public void toXML(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame) throws XMLStreamException {
+            // Start element:
+            out.writeStartElement("playerExploredTile");
+            
+            out.writeAttribute("nation", Integer.toString(nation));
+            
+            if (!explored) {
+                out.writeAttribute("explored", Boolean.toString(explored));
+            }            
+            if (theTile.hasRoad() != road) {
+                out.writeAttribute("road", Boolean.toString(road));
             }
-        }
-
-
-        /**
-        * Make a XML-representation of this object.
-        *
-        * @param player The <code>Player</code> the XML-representation
-        *       should be created for.
-        * @param document The document to use when creating new componenets.
-        * @param showAll Should be set to <code>true</code> in order to display all
-        *       information about this <code>Tile</code> and not just the information
-        *       for the given <code>Player</code>.
-        * @param toSavedGame Use <code>true</code> in order to add information which 
-        *       should not be sent across the network, but only be saved.
-        * @return The DOM-element ("Document Object Model") made to represent this "PlayerExploredTile".
-        */
-        public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
-            Element tileElement = document.createElement("playerExploredTile");
-
-            tileElement.setAttribute("explored", Boolean.toString(explored));
-            tileElement.setAttribute("nation", Integer.toString(nation));
-
-            tileElement.setAttribute("road", Boolean.toString(road));
-            tileElement.setAttribute("plowed", Boolean.toString(plowed));
-            tileElement.setAttribute("forested", Boolean.toString(forested));
-            tileElement.setAttribute("bonus", Boolean.toString(bonus));
-            tileElement.setAttribute("lostCityRumour", Boolean.toString(lostCityRumour));
-
-            tileElement.setAttribute("colonyUnitCount", Integer.toString(colonyUnitCount));
-            tileElement.setAttribute("colonyStockadeLevel", Integer.toString(colonyStockadeLevel));
-            tileElement.setAttribute("learnableSkill", Integer.toString(skill));
-            tileElement.setAttribute("highlyWantedGoods", Integer.toString(highlyWantedGoods));
-            tileElement.setAttribute("wantedGoods1", Integer.toString(wantedGoods1));
-            tileElement.setAttribute("wantedGoods2", Integer.toString(wantedGoods2));
-
+            if (theTile.isPlowed() != plowed) {
+                out.writeAttribute("plowed", Boolean.toString(plowed));
+            }
+            if (theTile.isForested() != forested) {
+                out.writeAttribute("forested", Boolean.toString(forested));
+            }
+            if (theTile.hasBonus() != bonus) {
+                out.writeAttribute("bonus", Boolean.toString(bonus));
+            }
+            if (theTile.hasLostCityRumour()) {
+                out.writeAttribute("lostCityRumour", Boolean.toString(lostCityRumour));
+            }
+            if (colonyUnitCount != 0) {
+                out.writeAttribute("colonyUnitCount", Integer.toString(colonyUnitCount));
+                out.writeAttribute("colonyStockadeLevel", Integer.toString(colonyStockadeLevel));
+            }            
+            if (skill != IndianSettlement.UNKNOWN) {
+                out.writeAttribute("learnableSkill", Integer.toString(skill));
+            }            
+            if (highlyWantedGoods != IndianSettlement.UNKNOWN) {
+                out.writeAttribute("highlyWantedGoods", Integer.toString(highlyWantedGoods));
+                out.writeAttribute("wantedGoods1", Integer.toString(wantedGoods1));
+                out.writeAttribute("wantedGoods2", Integer.toString(wantedGoods2));
+            }
             if (missionary != null) {
-                Element missionaryElement = document.createElement("missionary");
-                missionaryElement.appendChild(missionary.toXMLElement(player, document, false, false));
-                tileElement.appendChild(missionaryElement);
+                out.writeStartElement("missionary");
+                missionary.toXML(out, player, false, false);
+                out.writeEndElement();
             }
-
-            return tileElement;
+            out.writeEndElement();
         }
 
 
         /**
-        * Initialize this object from an XML-representation of this object.
-        * @param tileElement The DOM-element ("Document Object Model") made to represent this "PlayerExploredTile".
-        */
-        public void readFromXMLElement(Element tileElement) {
-            explored = Boolean.valueOf(tileElement.getAttribute("explored")).booleanValue();
-            nation = Integer.parseInt(tileElement.getAttribute("nation"));
+         * Initialize this object from an XML-representation of this object.
+         * @param in The input stream with the XML.
+         * @throws XMLStreamException if an error occured during parsing.
+         */
+        public void readFromXML(XMLStreamReader in) throws XMLStreamException {
+            nation = Integer.parseInt(in.getAttributeValue(null, "nation"));
+            
+            final String exploredStr = in.getAttributeValue(null, "explored");
+            if (exploredStr != null) {
+                explored = Boolean.valueOf(exploredStr).booleanValue();
+            } else {
+                explored = true;
+            }
 
-            road = Boolean.valueOf(tileElement.getAttribute("road")).booleanValue();
-            plowed = Boolean.valueOf(tileElement.getAttribute("plowed")).booleanValue();
-            forested = Boolean.valueOf(tileElement.getAttribute("forested")).booleanValue();
-            bonus = Boolean.valueOf(tileElement.getAttribute("bonus")).booleanValue();
-            lostCityRumour = Boolean.valueOf(tileElement.getAttribute("lostCityRumour")).booleanValue();
+            final String roadStr = in.getAttributeValue(null, "road");
+            if (roadStr != null) {
+                road = Boolean.valueOf(roadStr).booleanValue();
+            } else {
+                road = theTile.hasRoad();
+            }
+            
+            final String plowedStr = in.getAttributeValue(null, "plowed");
+            if (plowedStr != null) {
+                plowed = Boolean.valueOf(plowedStr).booleanValue();
+            } else {
+                plowed = theTile.isPlowed();
+            }
+            
+            final String forestedStr = in.getAttributeValue(null, "forested");
+            if (forestedStr != null) {
+                forested = Boolean.valueOf(forestedStr).booleanValue();
+            } else {
+                forested = theTile.isForested();
+            }
+            
+            final String bonusStr = in.getAttributeValue(null, "bonus");
+            if (bonusStr != null) {
+                bonus = Boolean.valueOf(bonusStr).booleanValue();
+            } else {
+                bonus = theTile.hasBonus();
+            }
 
-            colonyUnitCount = Integer.parseInt(tileElement.getAttribute("colonyUnitCount"));
-            colonyStockadeLevel = Integer.parseInt(tileElement.getAttribute("colonyStockadeLevel"));
+            final String lostCityRumourStr = in.getAttributeValue(null, "lostCityRumour");
+            if (lostCityRumourStr != null) {
+                lostCityRumour = Boolean.valueOf(lostCityRumourStr).booleanValue();
+            } else {
+                lostCityRumour = theTile.hasLostCityRumour();
+            }
 
-            if (tileElement.hasAttribute("learnableSkill")) {
-                skill = Integer.parseInt(tileElement.getAttribute("learnableSkill"));
-            } else { // Support for pre-0.1.0 protocols:
+            final String colonyUnitCountStr = in.getAttributeValue(null, "colonyUnitCount");
+            if (colonyUnitCountStr != null) {
+                colonyUnitCount = Integer.parseInt(colonyUnitCountStr);
+                colonyStockadeLevel = Integer.parseInt(in.getAttributeValue(null, "colonyStockadeLevel"));
+            } else {
+                colonyUnitCount = 0;
+            }
+
+            final String learnableSkillStr = in.getAttributeValue(null, "learnableSkill");
+            if (learnableSkillStr != null) {
+                skill = Integer.parseInt(learnableSkillStr);
+            } else {
                 skill = IndianSettlement.UNKNOWN;
             }
 
-            if (tileElement.hasAttribute("highlyWantedGoods")) {
-                highlyWantedGoods = Integer.parseInt(tileElement.getAttribute("highlyWantedGoods"));
-                wantedGoods1 = Integer.parseInt(tileElement.getAttribute("wantedGoods1"));
-                wantedGoods2 = Integer.parseInt(tileElement.getAttribute("wantedGoods2"));
-            } else { // Support for pre-0.1.0 protocols:
+            final String highlyWantedGoodsStr = in.getAttributeValue(null, "highlyWantedGoods");
+            if (highlyWantedGoodsStr != null) {
+                highlyWantedGoods = Integer.parseInt(highlyWantedGoodsStr);
+                wantedGoods1 = Integer.parseInt(in.getAttributeValue(null, "wantedGoods1"));
+                wantedGoods2 = Integer.parseInt(in.getAttributeValue(null, "wantedGoods2"));
+            } else {
                 highlyWantedGoods = IndianSettlement.UNKNOWN;
                 wantedGoods1 = IndianSettlement.UNKNOWN;
                 wantedGoods2 = IndianSettlement.UNKNOWN;
             }
 
-            Element missionaryElement = getChildElement(tileElement, "missionary");
-            if (missionaryElement != null) {
+            in.nextTag(); // <missionary> | </playerExploredTile> 
+            if (in.getLocalName().equals("missionary")) {
+                in.nextTag();
+                missionary = (Unit) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
                 if (missionary == null) {
-                    missionary = new Unit(getGame(), getChildElement(missionaryElement, Unit.getXMLElementTagName()));
+                    missionary = new Unit(getGame(), in);
                 } else {
-                    missionary.readFromXMLElement(getChildElement(missionaryElement, Unit.getXMLElementTagName()));
+                    missionary.readFromXML(in);
                 }
+                in.nextTag(); // </missionary>
+                in.nextTag(); // </playerExploredTile>
             } else {
                 missionary = null;
-            }
+            }            
         }
 
 

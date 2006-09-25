@@ -3,6 +3,10 @@ package net.sf.freecol.common.model;
 
 import java.util.Random;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 import net.sf.freecol.client.gui.i18n.Messages;
 
 import org.w3c.dom.Document;
@@ -67,6 +71,11 @@ public final class Monarch extends FreeColGameObject {
      */
     public Monarch(Game game, Player player, String name) {
         super(game);
+        
+        if (player == null) {
+            throw new NullPointerException("player == null");
+        }
+        
         this.player = player;
         this.name = name;
         int dx = player.getDifficulty();
@@ -83,14 +92,44 @@ public final class Monarch extends FreeColGameObject {
      * and registers this <code>Monarch</code> at the specified game.
      *
      * @param game The <code>Game</code> this object belongs to.
-     * @param element The <code>Element</code> in a DOM-parsed XML-tree that describes
-     *                this object.
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
      */
-    public Monarch(Game game, Element element) {
-        super(game, element);
+    public Monarch(Game game, XMLStreamReader in) throws XMLStreamException {
+        super(game, in);
 
-        readFromXMLElement(element);
+        readFromXML(in);
     }
+    
+    /**
+     * Initiates a new <code>Monarch</code> from an <code>Element</code>
+     * and registers this <code>Monarch</code> at the specified game.
+     *
+     * @param game The <code>Game</code> this object belongs to.
+     * @param e An XML-element that will be used to initialize
+     *      this object.
+     */
+    public Monarch(Game game, Element e) {
+        super(game, e);
+
+        readFromXMLElement(e);
+    }
+
+    /**
+     * Initiates a new <code>Monarch</code> 
+     * with the given ID. The object should later be
+     * initialized by calling either
+     * {@link #readFromXML(XMLStreamReader)} or
+     * {@link #readFromXMLElement(Element)}.
+     *
+     * @param game The <code>Game</code> in which this object belong.
+     * @param id The unique identifier for this object.
+     */
+    public Monarch(Game game, String id) {
+        super(game, id);
+    }
+    
 
     /**
      * Returns a monarch action. Not all actions are always
@@ -430,46 +469,62 @@ public final class Monarch extends FreeColGameObject {
     }
     
     /**
-     * This method should return an XML-representation of this object.
-     * Only attributes visible to <code>player</code> will be added to
-     * that representation if <code>showAll</code> is set to <i>false</i>.
-     *
-     * @param xmlPlayer The <code>Player</code> this XML-representation is
-     *         made for.
-     * @param document The document to use when creating new components.
-     * @param showAll Only attributes visible to <code>player</code> will be added to
-     *         the representation if <code>showAll</code> is set to <i>false</i>.
-     * @param toSavedGame If <i>true</i> then information that is only needed when saving a
-     *         game is added.
-     * @return The DOM-element ("Document Object Model").
-     */    
-    public Element toXMLElement(Player xmlPlayer, Document document, boolean showAll, boolean toSavedGame) {
-        Element monarchElement = document.createElement(getXMLElementTagName());
-        monarchElement.setAttribute("ID", getID());
-        monarchElement.setAttribute("player", player.getID());
-        monarchElement.setAttribute("name", name);
-        monarchElement.setAttribute("supportSea", String.valueOf(supportSea));
-        monarchElement.appendChild(toArrayElement("ref", ref, document));
-        return monarchElement;
-    }
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     * 
+     * <br><br>
+     * 
+     * Only attributes visible to the given <code>Player</code> will 
+     * be added to that representation if <code>showAll</code> is
+     * set to <code>false</code>.
+     *  
+     * @param out The target stream.
+     * @param player The <code>Player</code> this XML-representation 
+     *      should be made for, or <code>null</code> if
+     *      <code>showAll == true</code>.
+     * @param showAll Only attributes visible to <code>player</code> 
+     *      will be added to the representation if <code>showAll</code>
+     *      is set to <i>false</i>.
+     * @param toSavedGame If <code>true</code> then information that
+     *      is only needed when saving a game is added.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame) throws XMLStreamException {
+        // Start element:
+        out.writeStartElement(getXMLElementTagName());
 
+        out.writeAttribute("ID", getID());
+        out.writeAttribute("player", this.player.getID());
+        out.writeAttribute("name", name);
+        out.writeAttribute("supportSea", String.valueOf(supportSea));
+        toArrayElement("ref", ref, out);
+        
+        out.writeEndElement();
+    }
 
     /**
      * Initialize this object from an XML-representation of this object.
-     * @param monarchElement The DOM-element ("Document Object Model") 
-     *      made to represent this object.
+     * @param in The input stream with the XML.
      */
-    public void readFromXMLElement(Element monarchElement) {
-        setID(monarchElement.getAttribute("ID"));
-        player = (Player) getGame().getFreeColGameObject(monarchElement.getAttribute("player"));
-        name = monarchElement.getAttribute("name");
-        supportSea = Boolean.valueOf(monarchElement.getAttribute("supportSea")).booleanValue();
-        if (getChildElement(monarchElement, "ref") != null) {
-            ref = readFromArrayElement("ref", getChildElement(monarchElement, "ref"), new int[0]);
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        setID(in.getAttributeValue(null, "ID"));
+        
+        player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
+        if (player == null) {
+            player = new Player(getGame(), in.getAttributeValue(null, "player"));
+        }
+        name = in.getAttributeValue(null, "name");
+        supportSea = Boolean.valueOf(in.getAttributeValue(null, "supportSea")).booleanValue();
+        
+        in.nextTag();
+        if (in.getLocalName().equals("ref")) {
+            ref = readFromArrayElement("ref", in, new int[0]);
         } else {
             ref = new int[NUMBER_OF_TYPES];
         }
 
+        in.nextTag();
     }
 
 

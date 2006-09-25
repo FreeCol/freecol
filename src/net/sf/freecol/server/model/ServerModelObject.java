@@ -1,7 +1,8 @@
 package net.sf.freecol.server.model;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
 /**
  * Interface for server-side objects which needs to store
@@ -12,6 +13,6 @@ public interface ServerModelObject  {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    public Element toServerAdditionElement(Document document);
-    public void readFromServerAdditionElement(Element element);
+    public void toServerAdditionElement(XMLStreamWriter out) throws XMLStreamException;
+    public void readFromServerAdditionElement(XMLStreamReader in) throws XMLStreamException;
 } 

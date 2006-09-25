@@ -3,6 +3,10 @@ package net.sf.freecol.server.ai;
 
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Unit;
 
@@ -39,15 +43,12 @@ public class WorkerWish extends Wish {
     *       required or not.
     */
     public WorkerWish(AIMain aiMain, Location destination, int value, int unitType, boolean expertNeeded) {
-        super(aiMain);
+        super(aiMain, getXMLElementTagName() + ":" + aiMain.getNextID());
 
         if (destination == null) {
             throw new NullPointerException("destination == null");
         }
         
-        id = aiMain.getNextID();
-        aiMain.addAIObject(id, this);
-
         this.destination = destination;
         this.value = value;
         this.unitType = unitType;
@@ -64,11 +65,51 @@ public class WorkerWish extends Wish {
     *       of a <code>WorkerWish</code>.
     */
     public WorkerWish(AIMain aiMain, Element element) {
-        super(aiMain);
-        aiMain.addAIObject(element.getAttribute("ID"), this);
+        super(aiMain, element.getAttribute("ID"));
         readFromXMLElement(element);
     }
+    
+    /**
+     * Creates a new <code>WorkerWish</code> from the given 
+     * XML-representation.
+     *
+     * @param aiMain The main AI-object.
+     * @param id The unique ID of this object.
+     */
+    public WorkerWish(AIMain aiMain, String id) {
+        super(aiMain, id);
+    }
+    
+    /**
+     * Creates a new <code>WorkerWish</code> from the given 
+     * XML-representation.
+     *
+     * @param aiMain The main AI-object.
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    public WorkerWish(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
+        super(aiMain, in.getAttributeValue(null, "ID"));
+        readFromXML(in);
+    }
 
+    /**
+     * Updates this <code>WorkerWish</code> with the
+     * given attributes.
+     * 
+     * @param value The value identifying the importance of
+     *       this <code>Wish</code>.
+     * @param unitType The type of unit needed for releasing this wish
+     *       completly.
+     * @param expertNeeded Determines wether the <code>unitType</code> is
+     *       required or not.
+     */
+    public void update(int value, int unitType, boolean expertNeeded) {
+        this.value = value;
+        this.unitType = unitType;
+        this.expertNeeded = expertNeeded;
+    }
 
     /**
     * Returns the type of unit needed for releasing this wish.
@@ -78,48 +119,53 @@ public class WorkerWish extends Wish {
         return unitType;
     }
 
-
     /**
-     * Creates an XML-representation of this object.
-     * @param document The <code>Document</code> in which
-     *      the XML-representation should be created.
-     * @return The XML-representation.
-     */    
-    public Element toXMLElement(Document document) {
-        Element element = document.createElement(getXMLElementTagName());
+     * Writes this object to an XML stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        out.writeStartElement(getXMLElementTagName());
 
-        element.setAttribute("ID", id);
-        element.setAttribute("destination", destination.getID());
+        out.writeAttribute("ID", getID());
+        out.writeAttribute("destination", destination.getID());
         if (transportable != null) {
-            element.setAttribute("transportable", transportable.getID());
+            out.writeAttribute("transportable", transportable.getID());
         }
-        element.setAttribute("value", Integer.toString(value));
+        out.writeAttribute("value", Integer.toString(value));
 
-        element.setAttribute("unitType", Integer.toString(unitType));
-        element.setAttribute("expertNeeded", Boolean.toString(expertNeeded));
+        out.writeAttribute("unitType", Integer.toString(unitType));
+        out.writeAttribute("expertNeeded", Boolean.toString(expertNeeded));
 
-        return element;
+        out.writeEndElement();
     }
 
-
     /**
-     * Updates this object from an XML-representation of
-     * a <code>WorkerWish</code>.
-     * 
-     * @param element The XML-representation.
-     */    
-    public void readFromXMLElement(Element element) {
-        id = element.getAttribute("ID");
-        destination = (Location) getAIMain().getFreeColGameObject(element.getAttribute("destination"));
-        if (element.hasAttribute("transportable")) {
-            transportable = (Transportable) getAIMain().getAIObject(element.getAttribute("transportable"));
+     * Reads information for this object from an XML stream.
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException if there are any problems reading
+     *      from the stream.
+     */
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {        
+        id = in.getAttributeValue(null, "ID");
+        destination = (Location) getAIMain().getFreeColGameObject(in.getAttributeValue(null, "destination"));
+        
+        final String transportableStr = in.getAttributeValue(null, "transportable"); 
+        if (transportableStr != null) {
+            transportable = (Transportable) getAIMain().getAIObject(transportableStr);
+            if (transportable == null) {
+                transportable = new AIUnit(getAIMain(), transportableStr);
+            }
         } else {
             transportable = null;
         }
-        value = Integer.parseInt(element.getAttribute("value"));
+        value = Integer.parseInt(in.getAttributeValue(null, "value"));
 
-        unitType = Integer.parseInt(element.getAttribute("unitType"));
-        expertNeeded = Boolean.valueOf(element.getAttribute("expertNeeded")).booleanValue();
+        unitType = Integer.parseInt(in.getAttributeValue(null, "unitType"));
+        expertNeeded = Boolean.valueOf(in.getAttributeValue(null, "expertNeeded")).booleanValue();
+        in.nextTag();
     }
 
 

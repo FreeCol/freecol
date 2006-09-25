@@ -1,12 +1,17 @@
 
 package net.sf.freecol.common.model;
 
+import net.sf.freecol.common.model.Map.Position;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
-import net.sf.freecol.common.model.Map.Position;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -179,14 +184,15 @@ public class IndianSettlement extends Settlement {
 
 
     /**
-    * Initiates a new <code>IndianSettlement</code> from an <code>Element</code>.
-    *
-    * @param game The <code>Game</code> in which this object belong.
-    * @param element The <code>Element</code> (in a DOM-parsed XML-tree) that describes
-    *                this object.
-    */
-    public IndianSettlement(Game game, Element element) {
-        super(game, element);
+     * Initiates a new <code>IndianSettlement</code> from an <code>Element</code>.
+     *
+     * @param game The <code>Game</code> in which this object belong.
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    public IndianSettlement(Game game, XMLStreamReader in) throws XMLStreamException {
+        super(game, in);
 
         // The client doesn't know a lot at first.
         this.learnableSkill = UNKNOWN;
@@ -197,10 +203,53 @@ public class IndianSettlement extends Settlement {
         missionary = null;
         convertProgress = 0;
 
-        readFromXMLElement(element);
+        readFromXML(in);
     }
 
+    /**
+     * Initiates a new <code>IndianSettlement</code> from an <code>Element</code>.
+     *
+     * @param game The <code>Game</code> in which this object belong.
+     * @param e An XML-element that will be used to initialize
+     *      this object.
+     */
+    public IndianSettlement(Game game, Element e) {
+        super(game, e);
 
+        // The client doesn't know a lot at first.
+        this.learnableSkill = UNKNOWN;
+        this.highlyWantedGoods = UNKNOWN;
+        this.wantedGoods1 = UNKNOWN;
+        this.wantedGoods2 = UNKNOWN;
+        isVisited = false;
+        missionary = null;
+        convertProgress = 0;
+
+        readFromXMLElement(e);
+    }
+
+    /**
+     * Initiates a new <code>IndianSettlement</code> 
+     * with the given ID. The object should later be
+     * initialized by calling either
+     * {@link #readFromXML(XMLStreamReader)} or
+     * {@link #readFromXMLElement(Element)}.
+     *
+     * @param game The <code>Game</code> in which this object belong.
+     * @param id The unique identifier for this object.
+     */
+    public IndianSettlement(Game game, String id) {
+        super(game, id);
+        
+        // The client doesn't know a lot at first.
+        this.learnableSkill = UNKNOWN;
+        this.highlyWantedGoods = UNKNOWN;
+        this.wantedGoods1 = UNKNOWN;
+        this.wantedGoods2 = UNKNOWN;
+        isVisited = false;
+        missionary = null;
+        convertProgress = 0;
+    }
 
     /**
     * Modifies the alarm level towards the given player.
@@ -792,9 +841,13 @@ public class IndianSettlement extends Settlement {
 
 
     public void newTurn() {
+        if (isUninitialized()) {
+            logger.warning("Uninitialized when calling newTurn");
+        }
         /* Determine the maximum possible production for each type of goods: */
         int totalGoods = 0;
         int[] potential = new int[Goods.NUMBER_OF_TYPES];
+
         Iterator it = getGame().getMap().getCircleIterator(getTile().getPosition(), true, getRadius());
         while (it.hasNext()) {
             Tile workTile = getGame().getMap().getTile((Map.Position) it.next());
@@ -985,6 +1038,9 @@ public class IndianSettlement extends Settlement {
         super.dispose();
     }
 
+    public UnitContainer getUnitContainer() {
+        return unitContainer;
+    }
 
     /**
     * Creates the {@link GoodsContainer}.
@@ -996,157 +1052,206 @@ public class IndianSettlement extends Settlement {
         goodsContainer = new GoodsContainer(getGame(), this);
     }
 
-
     /**
-    * Make a XML-representation of this object.
-    *
-    * @param document The document to use when creating new components.
-    * @return The DOM-element ("Document Object Model") made to represent this "IndianSettlement".
-    */
-    public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     * 
+     * <br><br>
+     * 
+     * Only attributes visible to the given <code>Player</code> will 
+     * be added to that representation if <code>showAll</code> is
+     * set to <code>false</code>.
+     *  
+     * @param out The target stream.
+     * @param player The <code>Player</code> this XML-representation 
+     *      should be made for, or <code>null</code> if
+     *      <code>showAll == true</code>.
+     * @param showAll Only attributes visible to <code>player</code> 
+     *      will be added to the representation if <code>showAll</code>
+     *      is set to <i>false</i>.
+     * @param toSavedGame If <code>true</code> then information that
+     *      is only needed when saving a game is added.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame) throws XMLStreamException {
+        // Start element:
+        out.writeStartElement(getXMLElementTagName());
+
         if (toSavedGame && !showAll) {
             logger.warning("toSavedGame is true, but showAll is false");
         }
 
-        Element indianSettlementElement = document.createElement(getXMLElementTagName());
+        out.writeAttribute("ID", getID());
+        out.writeAttribute("tile", tile.getID());
+        out.writeAttribute("owner", owner.getID());
+        out.writeAttribute("tribe", Integer.toString(tribe));
+        out.writeAttribute("kind", Integer.toString(kind));
+        out.writeAttribute("isCapital", Boolean.toString(isCapital));
 
-        indianSettlementElement.setAttribute("ID", getID());
-        indianSettlementElement.setAttribute("tile", tile.getID());
-        indianSettlementElement.setAttribute("owner", owner.getID());
-        indianSettlementElement.setAttribute("tribe", Integer.toString(tribe));
-        indianSettlementElement.setAttribute("kind", Integer.toString(kind));
-        indianSettlementElement.setAttribute("isCapital", Boolean.toString(isCapital));
-
-        String ownedUnitsString = "";
-        for (int i=0; i<ownedUnits.size(); i++) {
-            ownedUnitsString += ((Unit) ownedUnits.get(i)).getID();
-            if (i != ownedUnits.size() - 1) {
-                ownedUnitsString += ", ";
+        if (showAll || player == getOwner()) {
+            String ownedUnitsString = "";
+            for (int i=0; i<ownedUnits.size(); i++) {
+                ownedUnitsString += ((Unit) ownedUnits.get(i)).getID();
+                if (i != ownedUnits.size() - 1) {
+                    ownedUnitsString += ", ";
+                }
             }
-        }
-        if (!ownedUnitsString.equals("")) {
-            indianSettlementElement.setAttribute("ownedUnits", ownedUnitsString);
+            if (!ownedUnitsString.equals("")) {
+                out.writeAttribute("ownedUnits", ownedUnitsString);
+            }
         }
 
         if (showAll || player == getOwner()) {
-            indianSettlementElement.setAttribute("hasBeenVisted", Boolean.toString(isVisited));
+            out.writeAttribute("hasBeenVisted", Boolean.toString(isVisited));
         }
 
-        indianSettlementElement.setAttribute("learnableSkill", Integer.toString(learnableSkill));
-        indianSettlementElement.setAttribute("highlyWantedGoods", Integer.toString(highlyWantedGoods));
-        indianSettlementElement.setAttribute("wantedGoods1", Integer.toString(wantedGoods1));
-        indianSettlementElement.setAttribute("wantedGoods2", Integer.toString(wantedGoods2));
+        out.writeAttribute("learnableSkill", Integer.toString(learnableSkill));
+        out.writeAttribute("highlyWantedGoods", Integer.toString(highlyWantedGoods));
+        out.writeAttribute("wantedGoods1", Integer.toString(wantedGoods1));
+        out.writeAttribute("wantedGoods2", Integer.toString(wantedGoods2));
 
+        if (showAll || player == getOwner()) {
+            out.writeAttribute("convertProgress", Integer.toString(convertProgress));
+        }
+        
         int[] tensionArray = new int[alarm.length];
         for (int i = 0; i < alarm.length; i++) {
             tensionArray[i] = alarm[i].getValue();
         }
-        indianSettlementElement.appendChild(toArrayElement("alarm", tensionArray, document));
+        toArrayElement("alarm", tensionArray, out);
 
         if (missionary != null) {
-            Element missionaryElement = document.createElement("missionary");
-            missionaryElement.appendChild(missionary.toXMLElement(player, document, showAll, toSavedGame));
-            indianSettlementElement.appendChild(missionaryElement);
+            out.writeStartElement("missionary");
+            missionary.toXML(out, player, showAll, toSavedGame);
+            out.writeEndElement();
         }
 
         if (showAll || player == getOwner()) {
-            indianSettlementElement.setAttribute("convertProgress", Integer.toString(convertProgress));
-            indianSettlementElement.appendChild(unitContainer.toXMLElement(player, document, showAll, toSavedGame));
-            indianSettlementElement.appendChild(goodsContainer.toXMLElement(player, document, showAll, toSavedGame));
+            unitContainer.toXML(out, player, showAll, toSavedGame);
+            goodsContainer.toXML(out, player, showAll, toSavedGame);
         } else {
             UnitContainer emptyUnitContainer = new UnitContainer(getGame(), this);
             emptyUnitContainer.setFakeID(unitContainer.getID());
-            indianSettlementElement.appendChild(emptyUnitContainer.toXMLElement(player, document, showAll, toSavedGame));
+            emptyUnitContainer.toXML(out, player, showAll, toSavedGame);
 
             GoodsContainer emptyGoodsContainer = new GoodsContainer(getGame(), this);
             emptyGoodsContainer.setFakeID(goodsContainer.getID());
-            indianSettlementElement.appendChild(emptyGoodsContainer.toXMLElement(player, document, showAll, toSavedGame));
+            emptyGoodsContainer.toXML(out, player, showAll, toSavedGame);
         }
 
-        return indianSettlementElement;
+        out.writeEndElement();
     }
 
-
     /**
-    * Initialize this object from an XML-representation of this object.
-    *
-    * @param indianSettlementElement The DOM-element ("Document Object Model") made to represent this "IndianSettlement".
-    */
-    public void readFromXMLElement(Element indianSettlementElement) {
-        setID(indianSettlementElement.getAttribute("ID"));
+     * Initialize this object from an XML-representation of this object.
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        setID(in.getAttributeValue(null, "ID"));
 
-        tile = (Tile) getGame().getFreeColGameObject(indianSettlementElement.getAttribute("tile"));
-        owner = (Player)getGame().getFreeColGameObject(indianSettlementElement.getAttribute("owner"));
-        tribe = Integer.parseInt(indianSettlementElement.getAttribute("tribe"));
-        kind = Integer.parseInt(indianSettlementElement.getAttribute("kind"));
-        isCapital = (new Boolean(indianSettlementElement.getAttribute("isCapital"))).booleanValue();
+        tile = (Tile) getGame().getFreeColGameObject(in.getAttributeValue(null, "tile"));
+        if (tile == null) {
+            tile = new Tile(getGame(), in.getAttributeValue(null, "tile"));
+        }
+        owner = (Player)getGame().getFreeColGameObject(in.getAttributeValue(null, "owner"));
+        if (owner == null) {
+            owner = new Player(getGame(), in.getAttributeValue(null, "owner"));
+        }
+        tribe = Integer.parseInt(in.getAttributeValue(null, "tribe"));
+        kind = Integer.parseInt(in.getAttributeValue(null, "kind"));
+        isCapital = (new Boolean(in.getAttributeValue(null, "isCapital"))).booleanValue();
 
         owner.addSettlement(this);
         
         ownedUnits.clear();
-        if (indianSettlementElement.hasAttribute("ownedUnits")) {
-            StringTokenizer st = new StringTokenizer(indianSettlementElement.getAttribute("ownedUnits"), ", ", false);
+        
+        final String ownedUnitsStr = in.getAttributeValue(null, "ownedUnits");
+        if (ownedUnitsStr != null) {
+            StringTokenizer st = new StringTokenizer(ownedUnitsStr, ", ", false);
             while (st.hasMoreTokens()) {
-                Unit u = (Unit) getGame().getFreeColGameObject(st.nextToken());
-                if (u != null) {
-                    ownedUnits.add(u);
+                final String token = st.nextToken();
+                Unit u = (Unit) getGame().getFreeColGameObject(token);
+                if (u == null) {
+                    u = new Unit(getGame(), token);
                 }
+                ownedUnits.add(u);
             }
         }
 
-        if (getChildElement(indianSettlementElement, "alarm") != null) {
-            int[] tensionArray = readFromArrayElement("alarm", getChildElement(indianSettlementElement, "alarm"), new int[0]);
-            for (int i = 0; i < tensionArray.length; i++) {
-                alarm[i] = new Tension(tensionArray[i]);
-            }
+        final String learnableSkillStr = in.getAttributeValue(null, "learnableSkill");
+        if (learnableSkillStr != null) {
+            learnableSkill = Integer.parseInt(learnableSkillStr);
         } else {
-            alarm = new Tension
-                [Player.NUMBER_OF_NATIONS];
+            learnableSkill = UNKNOWN;
         }
-
-        if (indianSettlementElement.hasAttribute("learnableSkill")) {
-            learnableSkill = Integer.parseInt(indianSettlementElement.getAttribute("learnableSkill"));
-        }
-        if (indianSettlementElement.hasAttribute("highlyWantedGoods")) {
-            highlyWantedGoods = Integer.parseInt(indianSettlementElement.getAttribute("highlyWantedGoods"));
-        }
-        if (indianSettlementElement.hasAttribute("wantedGoods1")) {
-            wantedGoods1 = Integer.parseInt(indianSettlementElement.getAttribute("wantedGoods1"));
-        }
-        if (indianSettlementElement.hasAttribute("wantedGoods2")) {
-            wantedGoods2 = Integer.parseInt(indianSettlementElement.getAttribute("wantedGoods2"));
-        }
-        if (indianSettlementElement.hasAttribute("hasBeenVisited")) {
-            isVisited = Boolean.getBoolean(indianSettlementElement.getAttribute("hasBeenVisited"));
-        }
-        if (indianSettlementElement.hasAttribute("convertProgress")) {
-            convertProgress = Integer.parseInt(indianSettlementElement.getAttribute("convertProgress"));
-        }
-
-        Element missionaryElement = getChildElement(indianSettlementElement, "missionary");
-        if (missionaryElement != null) {
-            if (missionary == null) {
-                missionary = new Unit(getGame(), getChildElement(missionaryElement, Unit.getXMLElementTagName()));
-            } else {
-                missionary.readFromXMLElement(getChildElement(missionaryElement, Unit.getXMLElementTagName()));
-            }
-        }
-
-        Element unitContainerElement = getChildElement(indianSettlementElement, UnitContainer.getXMLElementTagName());
-        if (unitContainer != null) {
-            unitContainer.readFromXMLElement(unitContainerElement);
+        
+        final String highlyWantedGoodsStr = in.getAttributeValue(null, "highlyWantedGoods");
+        if (highlyWantedGoodsStr != null) {
+            highlyWantedGoods = Integer.parseInt(highlyWantedGoodsStr);
         } else {
-            unitContainer = new UnitContainer(getGame(), this, unitContainerElement);
+            highlyWantedGoods = UNKNOWN;
+        }
+        
+        final String wantedGoods1Str = in.getAttributeValue(null, "wantedGoods1");
+        if (wantedGoods1Str != null) {
+            wantedGoods1 = Integer.parseInt(wantedGoods1Str);
+        } else {
+            wantedGoods1 = UNKNOWN;
+        }
+        
+        final String wantedGoods2Str = in.getAttributeValue(null, "wantedGoods2");
+        if (wantedGoods2Str != null) {
+            wantedGoods2 = Integer.parseInt(wantedGoods2Str);
+        } else {
+            wantedGoods2 = UNKNOWN;
+        }
+        
+        final String hasBeenVisitedStr = in.getAttributeValue(null, "hasBeenVisited");
+        if (hasBeenVisitedStr != null) {
+            isVisited = Boolean.getBoolean(hasBeenVisitedStr);
+        } else {
+            isVisited = false;
+        }
+        
+        final String convertProgressStr = in.getAttributeValue(null, "convertProgress");
+        if (convertProgressStr != null) {
+            convertProgress = Integer.parseInt(convertProgressStr);
+        } else {
+            convertProgress = UNKNOWN;
         }
 
-        Element goodsContainerElement = getChildElement(indianSettlementElement, GoodsContainer.getXMLElementTagName());
-        if (goodsContainerElement != null) {  // "if" used to ensure compatibility with PRE-0.0.3 FreeCol-protocols.
-            GoodsContainer gc = (GoodsContainer) getGame().getFreeColGameObject(goodsContainerElement.getAttribute("ID"));
-
-            if (gc != null) {
-                goodsContainer.readFromXMLElement(goodsContainerElement);
-            } else {
-                goodsContainer = new GoodsContainer(getGame(), this, goodsContainerElement);
+        alarm = new Tension[Player.NUMBER_OF_NATIONS];
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            if (in.getLocalName().equals("alarm")) {
+                int[] tensionArray = readFromArrayElement("alarm", in, new int[0]);
+                for (int i = 0; i < tensionArray.length; i++) {
+                    alarm[i] = new Tension(tensionArray[i]);
+                }
+            } else if (in.getLocalName().equals("missionary")) {
+                missionary = (Unit) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                if (missionary == null) {
+                    missionary = new Unit(getGame(), in);
+                } else {
+                    missionary.readFromXML(in);
+                }
+                in.nextTag();                
+            } else if (in.getLocalName().equals(UnitContainer.getXMLElementTagName())) {
+                unitContainer = (UnitContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                if (unitContainer != null) {
+                    unitContainer.readFromXML(in);
+                } else {
+                    unitContainer = new UnitContainer(getGame(), this, in);
+                } 
+            } else if (in.getLocalName().equals(GoodsContainer.getXMLElementTagName())) {
+                goodsContainer = (GoodsContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                if (goodsContainer != null) {
+                    goodsContainer.readFromXML(in);
+                } else {
+                    goodsContainer = new GoodsContainer(getGame(), this, in);
+                }                
             }
         }
     }

@@ -256,7 +256,13 @@ public final class InGameInputHandler extends InputHandler {
                 logger.warning("unitElement == null");
                 throw new NullPointerException("unitElement == null");
             }
-            final Unit unit = new Unit(game, unitElement);
+            Unit u = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
+            if (u == null) {
+                u = new Unit(game, unitElement);
+            } else {
+                u.readFromXMLElement(unitElement);
+            }
+            final Unit unit = u;
 
             if (game.getFreeColGameObject(tileID) == null) {
                 logger.warning("Could not find tile with id: " + tileID);
@@ -302,7 +308,12 @@ public final class InGameInputHandler extends InputHandler {
                     logger.warning("unitElement == null");
                     throw new NullPointerException("unitElement == null");
                 }
-                unit = new Unit(game, unitElement);
+                unit = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
+                if (unit == null) {
+                    unit = new Unit(game, unitElement);
+                } else {
+                    unit.readFromXMLElement(unitElement);
+                }
                 unit.setLocation(unit.getTile());
                 if (unit.getTile() == null) {
                     logger.warning("unit.getTile() == null");
@@ -319,8 +330,13 @@ public final class InGameInputHandler extends InputHandler {
                 if (defenderElement == null) {
                     logger.warning("defenderElement == null");
                     throw new NullPointerException("defenderElement == null");
-                }
-                defender = new Unit(game, defenderElement);
+                }                
+                defender = (Unit) game.getFreeColGameObject(defenderElement.getAttribute("ID"));
+                if (defender == null) {
+                    defender = new Unit(game, defenderElement);
+                } else {
+                    defender.readFromXMLElement(defenderElement);
+                }                
                 defender.setLocation(defender.getTile());
 
                 if (defender.getTile() == null) {
@@ -672,7 +688,12 @@ public final class InGameInputHandler extends InputHandler {
             NodeList unitList = element.getChildNodes();
             for (int i = 0; i < unitList.getLength(); i++) {
                 Element unitElement = (Element) unitList.item(i);
-                Unit newUnit = new Unit(freeColClient.getGame(), unitElement);
+                Unit newUnit = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
+                if (newUnit == null) {
+                    newUnit = new Unit(game, unitElement);
+                } else {
+                    newUnit.readFromXMLElement(unitElement);
+                }                
                 player.getEurope().add(newUnit);
             }
             if (action == Monarch.ADD_UNITS || !canvas.showMonarchPanel(action, null)) {
@@ -851,8 +872,13 @@ public final class InGameInputHandler extends InputHandler {
                                  ModelMessage.LOST_CITY_RUMOUR);
             unitList = element.getChildNodes();
             for (int i = 0; i < unitList.getLength(); i++) {
-                Element unitElement = (Element) unitList.item(i);
-                newUnit = new Unit(game, unitElement);
+                Element unitElement = (Element) unitList.item(i);                
+                newUnit = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
+                if (newUnit == null) {
+                    newUnit = new Unit(game, unitElement);
+                } else {
+                    newUnit.readFromXMLElement(unitElement);
+                }
                 tile.add(newUnit);
             }
             break;
@@ -864,7 +890,12 @@ public final class InGameInputHandler extends InputHandler {
             unitList = element.getChildNodes();
             for (int i = 0; i < unitList.getLength(); i++) {
                 Element unitElement = (Element) unitList.item(i);
-                newUnit = new Unit(game, unitElement);
+                newUnit = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
+                if (newUnit == null) {
+                    newUnit = new Unit(game, unitElement);
+                } else {
+                    newUnit.readFromXMLElement(unitElement);
+                }
                 tile.add(newUnit);
             }
             break;
@@ -874,7 +905,12 @@ public final class InGameInputHandler extends InputHandler {
             unitList = element.getChildNodes();
             for (int i = 0; i < unitList.getLength(); i++) {
                 Element unitElement = (Element) unitList.item(i);
-                newUnit = new Unit(game, unitElement);
+                newUnit = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
+                if (newUnit == null) {
+                    newUnit = new Unit(game, unitElement);
+                } else {
+                    newUnit.readFromXMLElement(unitElement);
+                }
                 player.getEurope().add(newUnit);
             }
             break;

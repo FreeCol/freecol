@@ -2,6 +2,10 @@
 package net.sf.freecol.common.option;
 
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -66,4 +70,22 @@ public interface Option {
     * @param element The DOM-element ("Document Object Model") made to represent this "Option".
     */
     public void readFromXMLElement(Element element);
+    
+    /**
+     * Initializes this object from an XML-representation of this object.
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    public void readFromXML(XMLStreamReader in) throws XMLStreamException;
+    
+    /**
+     * Makes an XML-representation of this object.
+     *
+     * @param document The document to use when creating new componenets.
+     * @param out The output stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    public void toXML(XMLStreamWriter out) throws XMLStreamException;     
 }

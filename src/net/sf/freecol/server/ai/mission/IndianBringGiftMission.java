@@ -6,6 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
@@ -80,6 +84,19 @@ public class IndianBringGiftMission extends Mission {
         readFromXMLElement(element);
     }
 
+    /**
+     * Creates a new <code>IndianBringGiftMission</code> and reads the given element.
+     * 
+     * @param aiMain The main AI-object.
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     * @see #readFromXML
+     */
+    public IndianBringGiftMission(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
+        super(aiMain);
+        readFromXML(in);
+    }
     
     /**
     * Performs the mission.
@@ -201,41 +218,36 @@ public class IndianBringGiftMission extends Mission {
             owner.getTension(targetPlayer).getLevel() <= Tension.HAPPY;
     }
 
-
     /**
-     * Creates an XML-representation of this object.
-     * @param document The <code>Document</code> in which
-     *      the XML-representation should be created.
-     * @return The XML-representation.
-     */    
-    public Element toXMLElement(Document document) {
-        Element element = document.createElement(getXMLElementTagName());
+     * Writes all of the <code>AIObject</code>s and other AI-related 
+     * information to an XML-stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        out.writeStartElement(getXMLElementTagName());
+        
+        out.writeAttribute("unit", getUnit().getID());
+        out.writeAttribute("target", target.getID());
+        out.writeAttribute("giftDelivered", Boolean.toString(giftDelivered));
 
-        element.setAttribute("unit", getUnit().getID());
-        element.setAttribute("target", target.getID());
-        element.setAttribute("giftDelivered", Boolean.toString(giftDelivered));
-
-        return element;
+        out.writeEndElement();
     }
 
-
     /**
-     * Updates this object from an XML-representation of
-     * a <code>IndianBringGiftMission</code>.
-     * 
-     * @param element The XML-representation.
-     */    
-    public void readFromXMLElement(Element element) {
-        setAIUnit((AIUnit) getAIMain().getAIObject(element.getAttribute("unit")));
+     * Reads all the <code>AIObject</code>s and other AI-related information
+     * from XML data.
+     * @param in The input stream with the XML.
+     */
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null, "unit")));
         
-        if (element.hasAttribute("target")) {
-            target = (Colony) getGame().getFreeColGameObject(element.getAttribute("target"));
-        } else {
-            // For PRE-0.1.1-protocols
-            target = null;
-        }
-
-        giftDelivered = Boolean.valueOf(element.getAttribute("giftDelivered")).booleanValue();
+        target = (Colony) getGame().getFreeColGameObject(in.getAttributeValue(null, "target"));
+        giftDelivered = Boolean.valueOf(in.getAttributeValue(null, "giftDelivered")).booleanValue();
+        
+        in.nextTag();
     }
 
 

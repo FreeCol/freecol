@@ -6,6 +6,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -50,24 +54,46 @@ public class GoodsContainer extends FreeColGameObject {
 
 
     /**
-    * Initiates a new <code>GoodsContainer</code> from an <code>Element</code>.
-    *
-    * @param game The <code>Game</code> in which this <code>GoodsContainer</code>
-    *       belong.
-    * @param parent The object using this <code>GoodsContainer</code>
-    *       for storing it's goods.
-    * @param element The <code>Element</code> (in a DOM-parsed XML-tree) 
-    *       that describes this object.
-    */
-    public GoodsContainer(Game game, Location parent, Element element) {
-        super(game, element);
+     * Initiates a new <code>GoodsContainer</code> from an <code>Element</code>.
+     *
+     * @param game The <code>Game</code> in which this <code>GoodsContainer</code>
+     *       belong.
+     * @param parent The object using this <code>GoodsContainer</code>
+     *       for storing it's goods.
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    public GoodsContainer(Game game, Location parent, XMLStreamReader in) throws XMLStreamException {
+        super(game, in);
 
         if (parent == null) {
             throw new NullPointerException();
         }
 
         this.parent = parent;
-        readFromXMLElement(element);
+        readFromXML(in);
+    }
+
+    /**
+     * Initiates a new <code>GoodsContainer</code> from an <code>Element</code>.
+     *
+     * @param game The <code>Game</code> in which this <code>GoodsContainer</code>
+     *       belong.
+     * @param parent The object using this <code>GoodsContainer</code>
+     *       for storing it's goods.
+     * @param e An XML-element that will be used to initialize
+     *      this object.
+     */
+    public GoodsContainer(Game game, Location parent, Element e) {
+        super(game, e);
+
+        if (parent == null) {
+            throw new NullPointerException();
+        }
+
+        this.parent = parent;
+        readFromXMLElement(e);
     }
 
 
@@ -357,36 +383,53 @@ public class GoodsContainer extends FreeColGameObject {
     }
 
     /**
-    * Makes an XML-representation of this object.
-    *
-    * @param document The document to use when creating new componenets.
-    * @return The DOM-element ("Document Object Model") made to represent this "GoodsContainer".
-    */
-    public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
-        Element element = document.createElement(getXMLElementTagName());
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     * 
+     * <br><br>
+     * 
+     * Only attributes visible to the given <code>Player</code> will 
+     * be added to that representation if <code>showAll</code> is
+     * set to <code>false</code>.
+     *  
+     * @param out The target stream.
+     * @param player The <code>Player</code> this XML-representation 
+     *      should be made for, or <code>null</code> if
+     *      <code>showAll == true</code>.
+     * @param showAll Only attributes visible to <code>player</code> 
+     *      will be added to the representation if <code>showAll</code>
+     *      is set to <i>false</i>.
+     * @param toSavedGame If <code>true</code> then information that
+     *      is only needed when saving a game is added.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame) throws XMLStreamException {
+        // Start element:
+        out.writeStartElement(getXMLElementTagName());
 
-        element.setAttribute("ID", getID());
+        out.writeAttribute("ID", getID());
 
         for (int i=0; i<storedGoods.length; i++) {
-            element.setAttribute("goods" + Integer.toString(i), Integer.toString(storedGoods[i]));
+            out.writeAttribute("goods" + Integer.toString(i), Integer.toString(storedGoods[i]));
         }
-        return element;
+        out.writeEndElement();
     }
 
-
     /**
-    * Initializes this object from an XML-representation of this object.
-    * @param element The DOM-element ("Document Object Model") made to represent this "GoodsContainer".
-    */
-    public void readFromXMLElement(Element element) {
-        setID(element.getAttribute("ID"));
-
+     * Initialize this object from an XML-representation of this object.
+     * @param in The input stream with the XML.
+     */
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        setID(in.getAttributeValue(null, "ID"));
+        
         storedGoods = new int[Goods.NUMBER_OF_TYPES];
 
         for (int i=0; i<storedGoods.length; i++) {
-            storedGoods[i] = Integer.parseInt(element.getAttribute("goods" + Integer.toString(i)));
+            storedGoods[i] = Integer.parseInt(in.getAttributeValue(null, "goods" + Integer.toString(i)));
         }
 
+        in.nextTag();
     }
 
 

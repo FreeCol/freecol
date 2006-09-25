@@ -1,6 +1,11 @@
 
 package net.sf.freecol.common.model;
 
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -60,12 +65,48 @@ public final class Market extends FreeColGameObject {
         priceGoods();
     }
 
+    /**
+     * Initiates a new <code>Market</code> from an
+     * XML representation.
+     *
+     * @param game The <code>Game</code> this object belongs to.
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    public Market(Game game, XMLStreamReader in) throws XMLStreamException {
+        super(game, in);
+
+        readFromXML(in);
+    }
+
+    /**
+     * Initiates a new <code>Market</code> from an
+     * XML representation.
+     *
+     * @param game The <code>Game</code> this object belongs to.
+     * @param e An XML-element that will be used to initialize
+     *      this object.
+     */
     public Market(Game game, Element e) {
         super(game, e);
 
         readFromXMLElement(e);
     }
 
+    /**
+     * Initiates a new <code>Market</code> 
+     * with the given ID. The object should later be
+     * initialized by calling either
+     * {@link #readFromXML(XMLStreamReader)} or
+     * {@link #readFromXMLElement(Element)}.
+     *
+     * @param game The <code>Game</code> in which this object belong.
+     * @param id The unique identifier for this object.
+     */
+    public Market(Game game, String id) {
+        super(game, id);
+    }
 
     // ------------------------------------------------------------ API methods
 
@@ -277,21 +318,38 @@ public final class Market extends FreeColGameObject {
     }
 
     /**
-     * Make a XML-representation of this object.
-     *
-     * @param document The document to use when creating new componenets.
-     * @return The DOM-element ("Document Object Model") made to represent this "Map".
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     * 
+     * <br><br>
+     * 
+     * Only attributes visible to the given <code>Player</code> will 
+     * be added to that representation if <code>showAll</code> is
+     * set to <code>false</code>.
+     *  
+     * @param out The target stream.
+     * @param player The <code>Player</code> this XML-representation 
+     *      should be made for, or <code>null</code> if
+     *      <code>showAll == true</code>.
+     * @param showAll Only attributes visible to <code>player</code> 
+     *      will be added to the representation if <code>showAll</code>
+     *      is set to <i>false</i>.
+     * @param toSavedGame If <code>true</code> then information that
+     *      is only needed when saving a game is added.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
      */
-    public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
-        Element marketElement = document.createElement(getXMLElementTagName());
+    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame) throws XMLStreamException {
+        // Start element:
+        out.writeStartElement(getXMLElementTagName());
 
-        marketElement.setAttribute("ID", getID());
+        out.writeAttribute("ID", getID());
 
         for (int i=0; i<dataForGoodType.length;i++) {
-            marketElement.appendChild(dataForGoodType[i].toXMLElement(player, document, showAll, toSavedGame));
+            dataForGoodType[i].toXML(out, player, showAll, toSavedGame);
         }
 
-        return marketElement;
+        out.writeEndElement();
     }
 
     /**
@@ -340,12 +398,11 @@ public final class Market extends FreeColGameObject {
 
     /**
      * Initialize this object from an XML-representation of this object.
-     *
-     * @param marketElement The DOM-element ("Document Object Model")
-     *      made to represent this "Map".
+     * @param in The input stream with the XML.
      */
-    public void readFromXMLElement(Element marketElement) {
-
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        setID(in.getAttributeValue(null, "ID"));
+        
         int[] oldPrices = new int[dataForGoodType.length];
         for(int i = 0; i < dataForGoodType.length; i++) {
             if (dataForGoodType[i] != null) {
@@ -353,20 +410,19 @@ public final class Market extends FreeColGameObject {
             }
         }
 
-        setID(marketElement.getAttribute("ID"));
-
-        NodeList dataList = marketElement.getElementsByTagName(Data.getXMLElementTagName());
-
-        for (int i=0; i<dataList.getLength(); i++) {
-            Node node = dataList.item(i);
-            if (!(node instanceof Element)) {
-                continue;
-            }        
-            Element dataElement = (Element) node;
-
-            dataForGoodType[i] = new Data(getGame(), dataElement);
+        int i = 0;
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            if (in.getLocalName().equals(Data.getXMLElementTagName())) {
+                dataForGoodType[i] = (Data) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                if (dataForGoodType[i] != null) {
+                    dataForGoodType[i].readFromXML(in);    
+                } else {
+                    dataForGoodType[i] = new Data(getGame(), in);
+                }
+                i++;
+            }
         }
-
+        
         priceGoods();
 
         if (getGame().getTurn().getNumber() > 1) {
@@ -420,37 +476,54 @@ public final class Market extends FreeColGameObject {
             super(game);
         }
 
-        Data(Game game, Element e) {
-            super(game, e);
+        Data(Game game, XMLStreamReader in) throws XMLStreamException {
+            super(game, in);
 
-            readFromXMLElement(e);
+            readFromXML(in);
         }
 
         /**
-         * Make a XML-representation of this object.
-         *
-         * @param document The document to use when creating new componenets.
-         * @return The DOM-element ("Document Object Model") made to represent this "Data".
+         * This method writes an XML-representation of this object to
+         * the given stream.
+         * 
+         * <br><br>
+         * 
+         * Only attributes visible to the given <code>Player</code> will 
+         * be added to that representation if <code>showAll</code> is
+         * set to <code>false</code>.
+         *  
+         * @param out The target stream.
+         * @param player The <code>Player</code> this XML-representation 
+         *      should be made for, or <code>null</code> if
+         *      <code>showAll == true</code>.
+         * @param showAll Only attributes visible to <code>player</code> 
+         *      will be added to the representation if <code>showAll</code>
+         *      is set to <i>false</i>.
+         * @param toSavedGame If <code>true</code> then information that
+         *      is only needed when saving a game is added.
+         * @throws XMLStreamException if there are any problems writing
+         *      to the stream.
          */
-        public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
-            Element dataElement = document.createElement(getXMLElementTagName());
+        protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame) throws XMLStreamException {
+            // Start element:
+            out.writeStartElement(getXMLElementTagName());
 
-            dataElement.setAttribute("ID", getID());
+            out.writeAttribute("ID", getID());
+            out.writeAttribute("amount", Integer.toString(amountInMarket));
 
-            dataElement.setAttribute("amount", Integer.toString(amountInMarket));
-
-            return dataElement;
+            out.writeEndElement();
         }
 
         /**
          * Initialize this object from an XML-representation of this object.
-         *
-         * @param dataElement The DOM-element ("Document Object Model") made to represent this "Data".
+         * @param in The input stream with the XML.
          */
-        public void readFromXMLElement(Element dataElement) {
-            setID(dataElement.getAttribute("ID"));
+        protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+            setID(in.getAttributeValue(null, "ID"));
 
-            amountInMarket = Integer.parseInt(dataElement.getAttribute("amount"));
+            amountInMarket = Integer.parseInt(in.getAttributeValue(null, "amount"));
+            
+            in.nextTag();
         }
 
         /**

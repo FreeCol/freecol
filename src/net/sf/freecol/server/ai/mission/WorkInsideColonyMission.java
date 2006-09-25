@@ -2,6 +2,10 @@ package net.sf.freecol.server.ai.mission;
 
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
@@ -35,6 +39,9 @@ public class WorkInsideColonyMission extends Mission{
     public WorkInsideColonyMission(AIMain aiMain, AIUnit aiUnit, AIColony aiColony) {
         super(aiMain, aiUnit);
         this.aiColony = aiColony;
+        if (aiColony == null) {
+            throw new NullPointerException("aiColony == null");
+        }
     }
 
 
@@ -50,6 +57,20 @@ public class WorkInsideColonyMission extends Mission{
         readFromXMLElement(element);
     }
 
+    /**
+     * Creates a new <code>WorkInsideColonyMission</code> and reads the given element.
+     * 
+     * @param aiMain The main AI-object.
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     * @see #readFromXML
+     */
+    public WorkInsideColonyMission(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
+        super(aiMain);
+        readFromXML(in);
+    }
+    
 
     /**
     * Disposes this <code>Mission</code>.
@@ -79,33 +100,35 @@ public class WorkInsideColonyMission extends Mission{
         return !aiColony.getColony().isDisposed();
     }
 
-
     /**
-     * Creates an XML-representation of this object.
-     * @param document The <code>Document</code> in which
-     *      the XML-representation should be created.
-     * @return The XML-representation.
-     */    
-    public Element toXMLElement(Document document) {
-        Element element = document.createElement(getXMLElementTagName());
+     * Writes all of the <code>AIObject</code>s and other AI-related 
+     * information to an XML-stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        out.writeStartElement(getXMLElementTagName());
+        
+        out.writeAttribute("unit", getUnit().getID());
+        out.writeAttribute("colony", aiColony.getID());
 
-        element.setAttribute("unit", getUnit().getID());
-        element.setAttribute("colony", aiColony.getID());
-
-        return element;
+        out.writeEndElement();
     }
 
-
     /**
-     * Updates this object from an XML-representation of
-     * a <code>WorkInsideColonyMission</code>.
-     * 
-     * @param element The XML-representation.
-     */    
-    public void readFromXMLElement(Element element) {
-        setAIUnit((AIUnit) getAIMain().getAIObject(element.getAttribute("unit")));
-        
-        aiColony = (AIColony) getAIMain().getAIObject(element.getAttribute("colony"));
+     * Reads all the <code>AIObject</code>s and other AI-related information
+     * from XML data.
+     * @param in The input stream with the XML.
+     */
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null, "unit")));
+        aiColony = (AIColony) getAIMain().getAIObject(in.getAttributeValue(null, "colony"));
+        if (aiColony == null) {
+            aiColony = new AIColony(getAIMain(), in.getAttributeValue(null, "colony"));
+        }
+        in.nextTag();
     }
 
 

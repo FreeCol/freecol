@@ -7,6 +7,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Goods;
@@ -80,6 +85,20 @@ public class TransportMission extends Mission {
     public TransportMission(AIMain aiMain, Element element) {
         super(aiMain);
         readFromXMLElement(element);
+    }
+    
+    /**
+     * Creates a new <code>TransportMission</code> and reads the given element.
+     * 
+     * @param aiMain The main AI-object.
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     * @see #readFromXML
+     */
+    public TransportMission(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
+        super(aiMain);
+        readFromXML(in);
     }
 
 
@@ -535,7 +554,6 @@ public class TransportMission extends Mission {
             }
         }
     }
-
 
     /**
     * Buys the given cargo.
@@ -1054,56 +1072,55 @@ public class TransportMission extends Mission {
     }
     
     /**
-     * Creates an XML-representation of this object.
-     * @param document The <code>Document</code> in which
-     *      the XML-representation should be created.
-     * @return The XML-representation.
-     */    
-    public Element toXMLElement(Document document) {
-        Element element = document.createElement(getXMLElementTagName());
-
-        element.setAttribute("unit", getUnit().getID());
-
+     * Writes all of the <code>AIObject</code>s and other AI-related 
+     * information to an XML-stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        out.writeStartElement(getXMLElementTagName());
+        
+        out.writeAttribute("unit", getUnit().getID());
+        
         Iterator tli = transportList.iterator();
         while (tli.hasNext()) {
             Transportable t = (Transportable) tli.next();
-            Element tElement = document.createElement(ELEMENT_TRANSPORTABLE);
-            tElement.setAttribute("ID", ((AIObject) t).getID());
-            element.appendChild(tElement);
-
+            out.writeStartElement(ELEMENT_TRANSPORTABLE);
+            out.writeAttribute("ID", ((AIObject) t).getID());
+            out.writeEndElement();
         }
-        return element;
+        out.writeEndElement();
     }
 
-
     /**
-     * Updates this object from an XML-representation of
-     * a <code>TransportMission</code>.
-     * 
-     * @param element The XML-representation.
-     */    
-    public void readFromXMLElement(Element element) {
-        setAIUnit((AIUnit) getAIMain().getAIObject(element.getAttribute("unit")));
-
+     * Reads all the <code>AIObject</code>s and other AI-related information
+     * from XML data.
+     * @param in The input stream with the XML.
+     */
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null, "unit")));
+        
         transportList.clear();
 
-        NodeList nl = element.getChildNodes();
-        for (int i=0; i<nl.getLength(); i++) {
-            if (!(nl.item(i) instanceof Element)) {
-                continue;
-            }
-            Element e = (Element) nl.item(i);
-            if (e.getTagName().equals(ELEMENT_TRANSPORTABLE)) {
-                AIObject ao = getAIMain().getAIObject(e.getAttribute("ID"));
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            if (in.getLocalName().equals(ELEMENT_TRANSPORTABLE)) {
+                String tid = in.getAttributeValue(null, "ID");
+                AIObject ao = getAIMain().getAIObject(tid);
                 if (ao == null) {
-                    logger.warning("ao == null for: " + e.getAttribute("ID"));
-                } else if (!(ao instanceof Transportable)) {
-                    logger.warning("AIObject not Transportable, ID: " + e.getAttribute("ID"));
-                } else if (ao != null) {
-                    transportList.add(ao);
-                } else {
-                    logger.warning("Could not find unit with ID: " + e.getAttribute("ID"));
+                    if (tid.startsWith(Unit.getXMLElementTagName())) {
+                        ao = new AIUnit(getAIMain(), tid);
+                    } else {
+                        ao = new AIGoods(getAIMain(), tid);
+                    }
                 }
+                if (!(ao instanceof Transportable)) {
+                    logger.warning("AIObject not Transportable, ID: " + in.getAttributeValue(null, "ID"));
+                } else {
+                    transportList.add(ao);
+                }
+                in.nextTag();
             } else {
                 logger.warning("Unknown tag.");
             }

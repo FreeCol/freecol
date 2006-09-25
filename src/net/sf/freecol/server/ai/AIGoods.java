@@ -3,6 +3,10 @@ package net.sf.freecol.server.ai;
 
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Locatable;
 import net.sf.freecol.common.model.Location;
@@ -27,8 +31,6 @@ public class AIGoods extends AIObject implements Transportable {
     public static final int IMPORTANT_DELIVERY = 110;
     public static final int FULL_DELIVERY = 100;
 
-    private String id;
-
     private Goods goods;
     private Location destination;
     private int transportPriority;
@@ -46,10 +48,7 @@ public class AIGoods extends AIObject implements Transportable {
      *      <code>Location</code> to which the goods should be transported.
      */
     public AIGoods(AIMain aiMain, Location location, int type, int amount, Location destination) {
-        super(aiMain);
-
-        id = aiMain.getNextID();
-        aiMain.addAIObject(id, this);
+        super(aiMain, getXMLElementTagName() + ":" + aiMain.getNextID());
 
         goods = new Goods(aiMain.getGame(), location, type, amount);
         this.destination = destination;
@@ -64,11 +63,46 @@ public class AIGoods extends AIObject implements Transportable {
      *      XML-representation of this object.
      */    
     public AIGoods(AIMain aiMain, Element element) {
-        super(aiMain);
-        aiMain.addAIObject(element.getAttribute("ID"), this);
+        super(aiMain, element.getAttribute("ID"));
         readFromXMLElement(element);
     }
+    
+    /**
+     * Creates a new <code>AIGoods</code>.
+     * 
+     * @param aiMain The main AI-object.
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */    
+    public AIGoods(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
+        super(aiMain, in.getAttributeValue(null, "ID"));
+        readFromXML(in);
+    }
+    
+    /**
+     * Creates a new <code>AIGoods</code>.
+     * 
+     * @param aiMain The main AI-object.
+     * @param id The unique ID of this object.
+     */    
+    public AIGoods(AIMain aiMain, String id) {
+        super(aiMain, id);
+        uninitialized = true;
+    }
 
+    /**
+     * Aborts the given <code>Wish</code>.
+     * @param w The <code>Wish</code> to be aborted.
+     */
+    public void abortWish(Wish w) {
+        if (destination == w.getDestination()) {
+            destination = null;
+        }
+        if (w.getTransportable() == this) {
+            w.dispose();
+        }
+    }
 
     /**
     * Returns the source for this <code>Transportable</code>.
@@ -142,6 +176,18 @@ public class AIGoods extends AIObject implements Transportable {
         return transport;
     }
 
+    /**
+     * Disposes this object.
+     */
+    public void dispose() {
+        if (transport != null
+                && transport.getMission() != null
+                && transport.getMission() instanceof TransportMission) {
+            TransportMission tm = (TransportMission) transport.getMission();
+            tm.removeFromTransportList(this);
+        }
+        super.dispose();
+    }
     
     /**
     * Sets the carrier responsible for transporting this <code>Transportable</code>.
@@ -183,7 +229,7 @@ public class AIGoods extends AIObject implements Transportable {
      * Sets the goods this <code>AIGoods</code> is controlling.
      * @param goods The <code>Goods</code>.
      */    
-    public void setGoods(Goods goods) {
+    public void setGoods(Goods goods) {        
         if (goods == null) {
             throw new NullPointerException();
         }
@@ -199,60 +245,65 @@ public class AIGoods extends AIObject implements Transportable {
         return id;
     }
 
-
     /**
-     * Creates an XML-representation of this object.
-     * @param document The <code>Document</code> in which
-     *      the XML-representation should be created.
-     * @return The XML-representation.
-     */    
-    public Element toXMLElement(Document document) {
-        if (document == null) {
-            throw new NullPointerException("document == null");
-        }
-        Element element = document.createElement(getXMLElementTagName());
+     * Writes this object to an XML stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        out.writeStartElement(getXMLElementTagName());
 
-        element.setAttribute("ID", id);
+        out.writeAttribute("ID", id);
         if (destination != null) {
-            element.setAttribute("destination", destination.getID());
+            out.writeAttribute("destination", destination.getID());
         }
-        element.setAttribute("transportPriority", Integer.toString(transportPriority));
+        out.writeAttribute("transportPriority", Integer.toString(transportPriority));
         if (transport != null) {
-            element.setAttribute("transport", transport.getID());
+            out.writeAttribute("transport", transport.getID());
         }
-        element.appendChild(goods.toXMLElement(null, document));
+        goods.toXML(out, null);
 
-        return element;
+        out.writeEndElement();
     }
 
-
     /**
-     * Updates this object from an XML-representation of
-     * a <code>AIGoods</code>.
-     * 
-     * @param element The XML-representation.
-     */    
-    public void readFromXMLElement(Element element) {
-        id = element.getAttribute("ID");
-        if (element.hasAttribute("destination")) {
-            destination = (Location) getAIMain().getFreeColGameObject(element.getAttribute("destination"));
+     * Reads information for this object from an XML stream.
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException if there are any problems reading
+     *      from the stream.
+     */
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        id = in.getAttributeValue(null, "ID");
+        final String destinationStr = in.getAttributeValue(null, "destination");
+        if (destinationStr != null) {
+            destination = (Location) getAIMain().getFreeColGameObject(destinationStr);
         } else {
             destination = null;
         }
         if (destination == null) {
             logger.warning("Could not find destination: " + destination);
         }
-        transportPriority = Integer.parseInt(element.getAttribute("transportPriority"));
-        if (goods != null) {
-            goods.readFromXMLElement(Message.getChildElement(element, Goods.getXMLElementTagName()));
-        } else {
-            goods = new Goods(getAIMain().getGame(), Message.getChildElement(element, Goods.getXMLElementTagName()));
-        }
-        if (element.hasAttribute("transport")) {
-            transport = (AIUnit) getAIMain().getAIObject(element.getAttribute("transport"));
+        transportPriority = Integer.parseInt(in.getAttributeValue(null, "transportPriority"));
+        
+        final String transportStr = in.getAttributeValue(null, "transport");
+        if (transportStr != null) {
+            transport = (AIUnit) getAIMain().getAIObject(transportStr);
+            if (transport == null) {
+                transport = new AIUnit(getAIMain(), transportStr);
+            }
         } else {
             transport = null;
         }
+        
+        in.nextTag();
+        if (goods != null) {
+            goods.readFromXML(in);
+        } else {
+            goods = new Goods(getAIMain().getGame(), in);
+        }
+        in.nextTag();
     }
 
     

@@ -6,6 +6,9 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Game;
@@ -16,6 +19,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MessageHandler;
+import net.sf.freecol.common.networking.StreamedMessageHandler;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.networking.DummyConnection;
@@ -26,7 +30,7 @@ import org.w3c.dom.Element;
 /**
 * Handles the network messages that arrives while in the game.
 */
-public final class AIInGameInputHandler implements MessageHandler {
+public final class AIInGameInputHandler implements MessageHandler, StreamedMessageHandler {
     private static final Logger logger = Logger.getLogger(AIInGameInputHandler.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
@@ -123,7 +127,25 @@ public final class AIInGameInputHandler implements MessageHandler {
         return reply;
     }
 
-
+    /**
+     * Handles the main element of an XML message.
+     *
+     * @param connection The connection the message came from.
+     * @param in The stream containing the message.
+     * @param out The output stream for the reply.
+     */
+    public void handle(Connection connection, XMLStreamReader in, XMLStreamWriter out) {
+        // Nothing yet.
+    }
+    
+    /**
+     * Checks if the message handler support the given message.
+     * @param tagName The tag name of the message to check.
+     * @return The result.
+     */
+    public boolean accepts(String tagName) {
+        return false;
+    }
 
     /**
     * Handles a "setCurrentPlayer"-message.

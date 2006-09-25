@@ -1,12 +1,12 @@
 
 package net.sf.freecol.server;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -18,22 +18,17 @@ import java.util.logging.Logger;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.IndianSettlement;
-import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Monarch;
-import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIInGameInputHandler;
@@ -50,11 +45,7 @@ import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.networking.DummyConnection;
 import net.sf.freecol.server.networking.Server;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 
 /**
@@ -75,7 +66,7 @@ public final class FreeColServer {
 
     private static Logger logger = Logger.getLogger(FreeColServer.class.getName());
 
-    private static final boolean DISABLE_SAVEGAME_COMPRESSION = false;
+    private static final boolean DISABLE_SAVEGAME_COMPRESSION = true;
 
     private static final int META_SERVER_UPDATE_INTERVAL = 60000;
 
@@ -195,21 +186,19 @@ public final class FreeColServer {
             server.shutdown();
             throw e;
         }
-
         try {
-            owner = loadGame(file);
+            owner = loadGame(file);       
         } catch (FreeColException e) {
-            server.shutdown();
+            server.shutdown();          
             throw e;
         } catch (Exception e) {
             server.shutdown();
             FreeColException fe = new FreeColException("couldNotLoadGame");
-            fe.initCause(e);
+            fe.initCause(e);            
             throw fe;
         }
-
         updateMetaServer(true);
-        startMetaServerUpdateThread();
+        startMetaServerUpdateThread();        
     }
 
 
@@ -418,55 +407,60 @@ public final class FreeColServer {
     *        to open, write or close the file.
     */
     public void saveGame(File file, String username) throws IOException {
-        Game game = getGame();
-
-        Element savedGameElement = Message.createNewRootElement("savedGame");
-        Document document = savedGameElement.getOwnerDocument();
-
-        savedGameElement.setAttribute("owner", username);
-        savedGameElement.setAttribute("publicServer", Boolean.toString(publicServer));
-        savedGameElement.setAttribute("singleplayer", Boolean.toString(singleplayer));
-        savedGameElement.setAttribute("version", Message.getFreeColProtocolVersion());
-
-        // Add server side model information:
-        Element serverObjectsElement = document.createElement("serverObjects");
-        Iterator fcgoIterator = game.getFreeColGameObjectIterator();
-        while (fcgoIterator.hasNext()) {
-            FreeColGameObject fcgo = (FreeColGameObject) fcgoIterator.next();
-            if (fcgo instanceof ServerModelObject) {
-                serverObjectsElement.appendChild(((ServerModelObject) fcgo).toServerAdditionElement(document));
-            }
-        }
-        savedGameElement.appendChild(serverObjectsElement);
-
-        // Add the game:
-        savedGameElement.appendChild(game.toSavedXMLElement(document));
-
-        // Add the AIObjects:
-        savedGameElement.appendChild(aiMain.toXMLElement(document));
-
-        // Write the XML Element to the file:
+        final Game game = getGame();
+        
+        XMLOutputFactory xof = XMLOutputFactory.newInstance();        
         try {
-            TransformerFactory factory = TransformerFactory.newInstance();
-            Transformer xmlTransformer = factory.newTransformer();
-            xmlTransformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
-            xmlTransformer.setOutputProperty(OutputKeys.INDENT, "yes");
-
+            XMLStreamWriter xsw;
             if (DISABLE_SAVEGAME_COMPRESSION) {
                 // No compression
-                OutputStream out = new FileOutputStream(file);
-                xmlTransformer.transform(new DOMSource(savedGameElement), new StreamResult(out));
-                out.close();
+                xsw = xof.createXMLStreamWriter(new FileOutputStream(file));
             } else {
                 // Compression
-                DeflaterOutputStream out = new DeflaterOutputStream(new FileOutputStream(file));
-                xmlTransformer.transform(new DOMSource(savedGameElement), new StreamResult(out));
-                out.close();
+                xsw = xof.createXMLStreamWriter( new DeflaterOutputStream(new FileOutputStream(file)));
             }
+            
+            xsw.writeStartDocument();
+            xsw.writeStartElement("savedGame");
+            
+            // Add the attributes:
+            xsw.writeAttribute("owner", username);
+            xsw.writeAttribute("publicServer", Boolean.toString(publicServer));
+            xsw.writeAttribute("singleplayer", Boolean.toString(singleplayer));
+            xsw.writeAttribute("version", Message.getFreeColProtocolVersion());
+            
+            // Add server side model information:
+            xsw.writeStartElement("serverObjects");
+            Iterator fcgoIterator = game.getFreeColGameObjectIterator();
+            while (fcgoIterator.hasNext()) {
+                FreeColGameObject fcgo = (FreeColGameObject) fcgoIterator.next();
+                if (fcgo instanceof ServerModelObject) {
+                    ((ServerModelObject) fcgo).toServerAdditionElement(xsw);
+                }
+            }
+            xsw.writeEndElement();
 
-        } catch (TransformerException e) {
-            e.printStackTrace();
-            return;
+            // Add the game:
+            game.toSavedXML(xsw);
+
+            // Add the AIObjects:
+            aiMain.toXML(xsw);
+            
+            xsw.writeEndElement();
+            xsw.writeEndDocument();
+            
+            xsw.flush();
+            xsw.close();
+        } catch (XMLStreamException e) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            logger.warning(sw.toString());
+            throw new IOException("XMLStreamException.");
+        } catch (Exception e) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            logger.warning(sw.toString());
+            throw new IOException(e.toString());
         }
     }
 
@@ -478,81 +472,85 @@ public final class FreeColServer {
     * @return The username of the player saving the game.
     * @throws IOException If a problem was encountered while trying
     *        to open, read or close the file.
-    * @exception IOException if thrown while loading the game, or if
-    *        a <code>SAXException</code> is thrown while parsing the
-    *        text.
+    * @exception IOException if thrown while loading the game or if
+    *        a <code>XMLStreamException</code> have been thrown by
+    *        the parser.
     * @exception FreeColException if the savegame contains incompatible
     *        data.
     */
     public String loadGame(File file) throws IOException, FreeColException {
-        InputStream in;
-        if (DISABLE_SAVEGAME_COMPRESSION) {
-            // No compression
-            in = new FileInputStream(file);
-        } else {
-            // Compression
-            in = new InflaterInputStream(new FileInputStream(file));
-        }
-
-        Message message;
         try {
-            message = new Message(in);
-        } catch (SAXException sxe) {
-            // Error generated during parsing
-            Exception  x = sxe;
-            if (sxe.getException() != null) {
-                x = sxe.getException();
+            InputStream in = new BufferedInputStream(new FileInputStream(file));
+            
+            // Automatically detect savegame compression:
+            in.mark(10);
+            byte[] buf = new byte[5];
+            in.read(buf, 0, 5);
+            in.reset();
+            
+            if (!(new String(buf)).equals("<?xml")) {                
+                in = new BufferedInputStream(new InflaterInputStream(in));
             }
-            StringWriter sw = new StringWriter();
-            x.printStackTrace(new PrintWriter(sw));
-            logger.warning(sw.toString());
-            throw new IOException("SAXException while creating Message.");
-        }
-
-        Element savedGameElement = message.getDocument().getDocumentElement();
-        String version = savedGameElement.getAttribute("version");
-
-        if (Message.getFreeColProtocolVersion().equals(version)) {
-            Element serverObjectsElement = (Element) savedGameElement.getElementsByTagName("serverObjects").item(0);
-
-            singleplayer = Boolean.valueOf(savedGameElement.getAttribute("singleplayer")).booleanValue();
-
-            if (savedGameElement.hasAttribute("publicServer")) {
-                publicServer = Boolean.valueOf(savedGameElement.getAttribute("publicServer")).booleanValue();
-            }
-
+            
+            boolean doNotLoadAI = false;
+            
+            XMLInputFactory xif = XMLInputFactory.newInstance();
+            XMLStreamReader xsr;
             try {
-                // Read the ServerAdditionObjects:
-                ArrayList serverObjects = new ArrayList();
-                ArrayList serverPlayerElements = new ArrayList();
-                NodeList serverObjectsNodeList = serverObjectsElement.getChildNodes();
-                for (int i=0; i<serverObjectsNodeList.getLength(); i++) {
-                    Node node = serverObjectsNodeList.item(i);
-                    if (!(node instanceof Element)) {
-                        continue;
-                    }
-                    Element element = (Element) node;
-                    if (element.getTagName().equals(ServerPlayer.getServerAdditionXMLElementTagName())) {
-                        serverObjects.add(new ServerPlayer(element));
-                        serverPlayerElements.add(element);
+                xsr = xif.createXMLStreamReader(in);
+                xsr.nextTag();
+                
+                final String version = xsr.getAttributeValue(null, "version");
+                if (!Message.getFreeColProtocolVersion().equals(version)) {
+                    if (version.equals("0.1.3")) {
+                        doNotLoadAI = true;
+                    } else {
+                        throw new FreeColException("incompatibleVersions");
                     }
                 }
-
-                // Read the game model:
-                Element gameElement = (Element) savedGameElement.getElementsByTagName(Game.getXMLElementTagName()).item(0);
-                game = new Game(aiMain, getModelController(), gameElement, (FreeColGameObject[]) serverObjects.toArray(new FreeColGameObject[0]));
-                game.setCurrentPlayer(null);
-
-                gameState = IN_GAME;
-
-                // Read the AIObjects:
-                if (savedGameElement.getElementsByTagName(AIMain.getXMLElementTagName()).getLength() > 0) {
-                    Element aiMainElement = (Element) savedGameElement.getElementsByTagName(AIMain.getXMLElementTagName()).item(0);
-                    aiMain = new AIMain(this, aiMainElement);
-                } else {
-                    aiMain = new AIMain(this);
+                
+                singleplayer = Boolean.valueOf(xsr.getAttributeValue(null, "singleplayer")).booleanValue();
+                final String publicServerStr =  xsr.getAttributeValue(null, "publicServer");
+                if (publicServerStr != null) {
+                    publicServer = Boolean.valueOf(publicServerStr).booleanValue();
                 }
-
+                
+                final String owner = xsr.getAttributeValue(null, "owner");
+                
+                ArrayList serverObjects = null;
+                aiMain = null;            
+                while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                    if (xsr.getLocalName().equals("serverObjects")) {
+                        // Reads the ServerAdditionObjects:
+                        serverObjects = new ArrayList();
+                        while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                            if (xsr.getLocalName().equals(ServerPlayer.getServerAdditionXMLElementTagName())) {
+                                serverObjects.add(new ServerPlayer(xsr));
+                            } else {
+                                throw new XMLStreamException("Unknown tag: " + xsr.getLocalName());
+                            }
+                        }                    
+                    } else if (xsr.getLocalName().equals(Game.getXMLElementTagName())) {
+                        // Read the game model:
+                        game = new Game(null, getModelController(), xsr, (FreeColGameObject[]) serverObjects.toArray(new FreeColGameObject[0]));
+                        game.setCurrentPlayer(null);
+                        gameState = IN_GAME;
+                        game.checkIntegrity();
+                    } else if (xsr.getLocalName().equals(AIMain.getXMLElementTagName())) {
+                        if (doNotLoadAI) {
+                            aiMain = new AIMain(this);
+                            game.setFreeColGameObjectListener(aiMain);
+                            break;
+                        }
+                        // Read the AIObjects:
+                        aiMain = new AIMain(this, xsr);
+                        aiMain.checkIntegrity();
+                        game.setFreeColGameObjectListener(aiMain);
+                    } else {
+                        throw new XMLStreamException("Unknown tag: " + xsr.getLocalName());
+                    }
+                }
+                
                 // Connect the AI-players:
                 Iterator playerIterator = game.getPlayerIterator();
                 while (playerIterator.hasNext()) {
@@ -562,37 +560,32 @@ public final class FreeColServer {
                         DummyConnection aiConnection = new DummyConnection(new AIInGameInputHandler(this, player, aiMain));
                         aiConnection.setOutgoingMessageHandler(theConnection);
                         theConnection.setOutgoingMessageHandler(aiConnection);
-
+                        
                         getServer().addConnection(theConnection, -1);
                         player.setConnection(theConnection);
                         player.setConnected(true);
                     }
                 }
-
-                // Support for pre-0.0.3 protocols:
-                Iterator pi = game.getMap().getWholeMapIterator();
-                while (pi.hasNext()) {
-                    Tile t = game.getMap().getTile((Map.Position) pi.next());
-                    if (t.getSettlement() != null && t.getSettlement() instanceof IndianSettlement) {
-                        ((IndianSettlement) t.getSettlement()).createGoodsContainer();
-                    }
-                }
-
-                // Support for pre-0.1.3 protocols:
-                Iterator monarchPlayerIterator = game.getPlayerIterator();
-                while (monarchPlayerIterator.hasNext()) {
-                    Player p = (Player) monarchPlayerIterator.next();
-                    if (p.getMonarch() == null) {
-                        p.setMonarch(new Monarch(game, p, ""));
-                    }
-                }
-
-                return savedGameElement.getAttribute("owner");
-            } catch (Exception e) {
-                throw new IOException(e.getMessage());
+                
+                xsr.close();
+                
+                return owner;
+            } catch (XMLStreamException e) {
+                StringWriter sw = new StringWriter();
+                e.printStackTrace(new PrintWriter(sw));
+                logger.warning(sw.toString());
+                throw new IOException("XMLStreamException.");
+            } catch (FreeColException fe) {
+                StringWriter sw = new StringWriter();
+                fe.printStackTrace(new PrintWriter(sw));
+                logger.warning(sw.toString());
+                throw fe;
             }
-        } else {
-            throw new FreeColException("incompatibleVersions");
+        } catch (Exception e) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            logger.warning(sw.toString());
+            throw new IOException(e.toString());
         }
     }
 

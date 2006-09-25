@@ -6,6 +6,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -64,30 +68,33 @@ public class OptionGroup extends AbstractOption {
         return options.iterator();
     }
 
-
     /**
-    * Makes an XML-representation of this object.
-    *
-    * @param document The document to use when creating new componenets.
-    * @return The DOM-element ("Document Object Model") made to represent this "OptionGroup".
-    */
-    public Element toXMLElement(Document document) {
-        Element optionGroupElement = document.createElement(getXMLElementTagName());
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     *  
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        // Start element:
+        out.writeStartElement(getXMLElementTagName());
 
         Iterator oi = options.iterator();
         while (oi.hasNext()) {
-            optionGroupElement.appendChild(((Option) oi.next()).toXMLElement(document));
+            ((Option) oi.next()).toXML(out);
         }
 
-        return optionGroupElement;
+        out.writeEndElement();
     }
 
-
     /**
-    * Initializes this object from an XML-representation of this object.
-    * @param optionGroupElement The DOM-element ("Document Object Model") made to represent this "OptionGroup".
-    */
-    public void readFromXMLElement(Element optionGroupElement) {
+     * Initialize this object from an XML-representation of this object.
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         throw new UnsupportedOperationException();
     }
 

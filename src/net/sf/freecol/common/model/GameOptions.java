@@ -2,6 +2,9 @@
 package net.sf.freecol.common.model;
 
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.IntegerOption;
@@ -78,11 +81,23 @@ public class GameOptions extends OptionMap {
     *
     * <br><br>
     *
-    * @param element The XML <code>Element</code> from which this object
-    *                should be constructed.
+    * @param in The input stream containing the XML.
+    * @throws XMLStreamException if an error occured during parsing.
     */
-    public GameOptions(Element element) {
-        super(element, getXMLElementTagName(), "gameOptions.name", "gameOptions.shortDescription");
+    public GameOptions(XMLStreamReader in) throws XMLStreamException {
+        super(in, getXMLElementTagName(), "gameOptions.name", "gameOptions.shortDescription");
+    }
+    
+    /**
+     * Creates an <code>GameOptions</code> from an XML representation.
+     *
+     * <br><br>
+     *
+     * @param e An XML-element that will be used to initialize
+     *      this object.
+     */
+    public GameOptions(Element e) {
+        super(e, getXMLElementTagName(), "gameOptions.name", "gameOptions.shortDescription");
     }
 
 

@@ -2,6 +2,7 @@
 package net.sf.freecol.common.networking;
 
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,9 +14,10 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.util.ReplayableInputStream;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -34,7 +36,7 @@ public final class Message {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    private static final String FREECOL_PROTOCOL_VERSION = "0.1.3";
+    private static final String FREECOL_PROTOCOL_VERSION = "0.1.4";
     private static final String INVALID_MESSAGE = "invalid";
 
 
@@ -82,12 +84,17 @@ public final class Message {
         boolean  dumpMsgOnError = FreeCol.isInDebugMode();
         dumpMsgOnError = true;
         if ( dumpMsgOnError) {
-
+            /*
             inputSource.setByteStream(
                     new ReplayableInputStream(inputSource.getByteStream()) );
 
+*/
+            inputSource.setByteStream(
+                    new BufferedInputStream(inputSource.getByteStream()) );
+
             inputSource.getByteStream().mark( 1000000 );
         }
+
         try {
             DocumentBuilder builder = factory.newDocumentBuilder();
             tempDocument = builder.parse(inputSource);
@@ -193,6 +200,32 @@ public final class Message {
 
         return errorElement;
     }
+    
+    /**
+     * Creates an error message.
+     *
+     * @param out       The output stream for the message.
+     * @param messageID Identifies the "i18n"-keyname.
+     *                  Not specified in the message if <i>null</i>.
+     * @param message   The error in plain text.
+     *                  Not specified in the message if <i>null</i>.
+     */
+     public static void createError(XMLStreamWriter out, String messageID, String message) {
+         try {
+             out.writeStartElement("error");
+             
+             if (messageID != null && !messageID.equals("")) {
+                 out.writeAttribute("messageID", messageID);
+             }
+             
+             if (message != null && !message.equals("")) {
+                 out.writeAttribute("message", message);
+             }
+             out.writeEndElement();
+         } catch (XMLStreamException e) {
+             logger.warning("Could not send error message.");
+         }
+     }
 
 
     /**

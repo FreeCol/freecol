@@ -1,6 +1,7 @@
 
 package net.sf.freecol.common.networking;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -9,6 +10,11 @@ import java.io.StringWriter;
 import java.net.Socket;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -45,6 +51,9 @@ public class Connection {
     private final Transformer xmlTransformer;
     private final ReceivingThread thread;
     private MessageHandler messageHandler;
+    
+    private XMLStreamWriter xmlOut = null;
+    private int currentQuestionID = -1;
 
     /**
     * Dead constructor, for DummyConnection purposes.
@@ -84,7 +93,7 @@ public class Connection {
 
         out = socket.getOutputStream();
         in = socket.getInputStream();
-
+        
         Transformer myTransformer;
         try {
             TransformerFactory factory = TransformerFactory.newInstance();
@@ -153,8 +162,14 @@ public class Connection {
     * @see #sendAndWait(Element)
     * @see #ask(Element)
     */
-    public void send(Element element) throws IOException {
+    public void send(Element element) throws IOException {      
         synchronized (out) {
+            while (currentQuestionID != -1) {
+                try {
+                    out.wait();
+                } catch (InterruptedException e) {}
+            }
+
             try {
                 xmlTransformer.transform(new DOMSource(element), new StreamResult(out));
             } catch (TransformerException e) {
@@ -164,8 +179,8 @@ public class Connection {
             }
 
             out.write('\n');
-            out.flush();
-        }
+            out.flush();           
+        }        
     }
 
 
@@ -221,7 +236,97 @@ public class Connection {
             return (Element) ((Message) nro.getResponse()).getDocument().getDocumentElement().getFirstChild();
         }
     }
-
+    
+    public XMLStreamWriter ask() throws IOException {
+        synchronized (out) {
+            while (currentQuestionID != -1) {
+                try {
+                    out.wait();
+                } catch (InterruptedException e) {}
+            }
+            currentQuestionID = thread.getNextNetworkReplyId();
+        }
+        try {
+            XMLOutputFactory xof = XMLOutputFactory.newInstance();        
+            xmlOut = xof.createXMLStreamWriter(out);
+        } catch (XMLStreamException e) {
+            throw new IOException(e.toString());
+        }
+        try {
+            xmlOut.writeStartElement("question");
+            xmlOut.writeAttribute("networkReplyId", Integer.toString(currentQuestionID));
+            return xmlOut;
+        } catch (XMLStreamException e) {
+            currentQuestionID = -1;
+            throw new IOException(e.toString());
+        }
+    }
+    
+    public XMLStreamWriter send() throws IOException {
+        synchronized (out) {
+            while (currentQuestionID != -1) {
+                try {
+                    out.wait();
+                } catch (InterruptedException e) {}
+            }
+            currentQuestionID = thread.getNextNetworkReplyId();
+        }
+        try {
+            XMLOutputFactory xof = XMLOutputFactory.newInstance();        
+            xmlOut = xof.createXMLStreamWriter(out);
+        } catch (XMLStreamException e) {
+            throw new IOException(e.toString());
+        }
+        return xmlOut;
+    }
+    
+    /*
+    try {
+        XMLStreamWriter out = ask();
+        // Write XML
+        XMLStreamReader in = connection.getReply();
+        // Read XML
+        connection.endTransmission(in);
+    } catch (IOException e) {
+        logger.warning("Could not send XML.");
+    }        
+    */
+    public XMLStreamReader getReply() throws IOException {
+        try {
+            NetworkReplyObject nro = thread.waitForStreamedNetworkReply(currentQuestionID);            
+            xmlOut.writeEndElement();
+            xmlOut.writeCharacters("\n");
+            xmlOut.flush();
+            
+            XMLStreamReader in = (XMLStreamReader) nro.getResponse();
+            in.nextTag();
+            
+            return in;
+        } catch (XMLStreamException e) {
+            throw new IOException(e.toString());
+        }
+    }   
+    
+    public void endTransmission(XMLStreamReader in) throws IOException {
+        try {
+            if (in != null) {
+                while (in.hasNext()) {
+                    in.next();
+                }
+                thread.unlock();
+            } else {
+                xmlOut.writeCharacters("\n");
+                xmlOut.flush();
+            }
+            
+            synchronized (out) {
+                currentQuestionID = -1;
+                out.notifyAll();
+            }
+        } catch (XMLStreamException e) {
+            throw new IOException(e.toString());
+        }
+    }
 
     /**
     * Sends the given message over this <code>Connection</code>
@@ -236,9 +341,9 @@ public class Connection {
     public void sendAndWait(Element element) throws IOException {
         Element reply = ask(element);
 
-        if (reply != null) {
+        /*if (reply != null) {
             handleAndSendReply(reply);
-        }
+        }*/
     }
 
 
@@ -258,16 +363,103 @@ public class Connection {
         return messageHandler;
     }
 
-    public void handleAndSendReply(Message message) {
+    /*public void handleAndSendReply(Message message) {
         handleAndSendReply(message.getDocument().getDocumentElement());
-    }
+    }*/
 
+    /**
+     * Handles a message using the registered <code>MessageHandler</code>.
+     * @param in The stream containing the message.
+     */
+    public void handleAndSendReply(final BufferedInputStream in) {        
+        try {
+            in.mark(200);
+            final XMLInputFactory xif = XMLInputFactory.newInstance();
+            final XMLStreamReader xmlIn = xif.createXMLStreamReader(in);
+            xmlIn.nextTag();
+            
+            final String networkReplyId = xmlIn.getAttributeValue(null, "networkReplyId");
+            
+            final boolean question = xmlIn.getLocalName().equals("question");
+            boolean messagedConsumed = false;
+            if (messageHandler instanceof StreamedMessageHandler) {
+                StreamedMessageHandler smh = (StreamedMessageHandler) messageHandler;
+                if (question) {
+                    xmlIn.nextTag();
+                }
+                if (smh.accepts(xmlIn.getLocalName())) {                    
+                    XMLStreamWriter xmlOut = send(); 
+                    if (question) {
+                        xmlOut.writeStartElement("reply");
+                        xmlOut.writeAttribute("networkReplyId", networkReplyId);
+                    }
+                    smh.handle(this, xmlIn, xmlOut);
+                    if (question) {
+                        xmlOut.writeEndElement();
+                    }
+                    endTransmission(null);
+                    while (xmlIn.hasNext()) {
+                        xmlIn.next();
+                    }
+                    thread.unlock();
+                    messagedConsumed = true;
+                }
+            }
+            if (!messagedConsumed) {
+                xmlIn.close();
+                in.reset();
+                final Message msg = new Message(in);
+                
+                final Connection connection = this;
+                Thread t = new Thread() {
+                    public void run() {
+                        try {                      
+                            Element element = msg.getDocument().getDocumentElement();
+                            
+                            if (question) {
+                                Element reply = messageHandler.handle(connection, (Element) element.getFirstChild());
+                                
+                                if (reply == null) {
+                                    reply = Message.createNewRootElement("reply");
+                                    reply.setAttribute("networkReplyId", networkReplyId);
+                                    logger.info("reply == null");
+                                } else {
+                                    Element replyHeader = reply.getOwnerDocument().createElement("reply");
+                                    replyHeader.setAttribute("networkReplyId", networkReplyId);
+                                    replyHeader.appendChild(reply);
+                                    reply = replyHeader;
+                                }
+                                
+                                connection.send(reply);
+                            } else {
+                                Element reply = messageHandler.handle(connection, element);
+                                
+                                if (reply != null) {
+                                    connection.send(reply);
+                                }
+                            }
+                        } catch (Exception e) {
+                            StringWriter sw = new StringWriter();
+                            e.printStackTrace(new PrintWriter(sw));
+                            logger.warning(sw.toString());
+                        }
+                    }
+                };
+                t.setName("MessageHandler:" + t.getName());
+                t.start();
+            }
+        } catch (Exception e) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            logger.warning(sw.toString());
+        }
+    }
 
     /**
     * Handles a message using the registered <code>MessageHandler</code>.
     * @param element The message as a DOM-parsed XML-tree.
     */
-    public void handleAndSendReply(Element element) {
+    /*public void handleAndSendReply(Element element) {
         try {
             if (element.getTagName().equals("question")) {
                 String networkReplyId = element.getAttribute("networkReplyId");
@@ -302,7 +494,7 @@ public class Connection {
             e.printStackTrace(new PrintWriter(sw));
             logger.warning(sw.toString());
         }
-    }
+    }*/
 
 
     /**
@@ -311,5 +503,5 @@ public class Connection {
     */
     public Socket getSocket() {
         return socket;
-    }
+    }    
 }

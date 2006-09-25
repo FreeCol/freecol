@@ -817,11 +817,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 lineOfSight = Math.max(lineOfSight, newTile.getSettlement().getLineOfSight());
             }
             Vector surroundingTiles = game.getMap().getSurroundingTiles(unit.getTile(), lineOfSight);
-
             for (int i=0; i<surroundingTiles.size(); i++) {
                 Tile t = (Tile) surroundingTiles.get(i);
                 update.appendChild(t.toXMLElement(player, update.getOwnerDocument()));
             }
+            update.appendChild(unit.getTile().toXMLElement(player, update.getOwnerDocument()));
 
             reply.appendChild(update);
         }
