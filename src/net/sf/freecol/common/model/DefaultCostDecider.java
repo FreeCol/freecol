@@ -56,7 +56,16 @@ public class DefaultCostDecider implements CostDecider {
             if (newTile.getSettlement() != null
                     && newTile.getSettlement().getOwner() != unit.getOwner()) {
                 // A settlement is blocking the path:
-                return ILLEGAL_MOVE;
+                movesLeft = 0;
+                return ml;
+                
+                /* 
+                 * This cannot be done in the CostDecider because the AI needs
+                 * to determine the cost when searching for a target. Making
+                 * this move illegal effectivly makes it impossible for
+                 * the AI to attack settlements:
+                 */
+                //return ILLEGAL_MOVE;
             } else if (mc - 2 <= movesLeft && getMovesLeft() != 0) {
                 // Normal move: Using -2 in order to make 1/3 and 2/3 move count as 3/3.
                 if (mc <= movesLeft) {
