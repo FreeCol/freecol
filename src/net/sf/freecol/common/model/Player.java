@@ -448,6 +448,14 @@ public class Player extends FreeColGameObject {
         setStance(getREFPlayer(), WAR);
         setTax(0);
         
+        // Dispose all units in Europe.
+        // TODO: Create a ModelMessage.
+        Iterator it = europe.getUnitIterator();
+        while (it.hasNext()) {
+            Unit u = (Unit) it.next();
+            u.dispose();            
+        }
+        
         europe.dispose();
         europe = null;
     }
