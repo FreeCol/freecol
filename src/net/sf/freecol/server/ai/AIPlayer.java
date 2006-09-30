@@ -474,8 +474,9 @@ public class AIPlayer extends AIObject {
             if (!aiUnit.getMission().isValid() 
                     || aiUnit.getMission() instanceof UnitWanderHostileMission
                     || aiUnit.getMission() instanceof UnitWanderMission
-                    || aiUnit.getMission() instanceof DefendSettlementMission
-                    || aiUnit.getMission() instanceof UnitSeekAndDestroyMission) {
+                    //|| aiUnit.getMission() instanceof DefendSettlementMission
+                    //|| aiUnit.getMission() instanceof UnitSeekAndDestroyMission
+                    ) {
                 aiUnit.setMission(null);
             }
         }
@@ -1411,7 +1412,7 @@ public class AIPlayer extends AIObject {
         }                       
 
         // Use the best target:
-        if (bestTarget != null && bestValue > 10000) {
+        if (bestTarget != null && bestValue > 0) {
             if (bestTarget.getOwner() == unit.getOwner()) {
                 aiUnit.setMission(new DefendSettlementMission(getAIMain(), aiUnit, (Colony) bestTarget));
             } else {
@@ -1419,7 +1420,7 @@ public class AIPlayer extends AIObject {
             }
         } else {
             // Just give a simple mission if we could not find a better one:
-            aiUnit.setMission(new UnitWanderHostileMission(getAIMain(), aiUnit));
+            aiUnit.setMission(new UnitWanderHostileMission(getAIMain(), aiUnit));            
         }
     }
     
