@@ -474,7 +474,7 @@ public final class InGameController implements NetworkConstants {
         /* Fix a bug I don't know what caused it. Sometimes a unit have a goto order
          * but it's already in destination
          */
-        if (destination == unit.getTile()) {
+        if (destination.getTile() == unit.getTile()) {
             clearOrders(unit);
             return;
         }
