@@ -1543,12 +1543,12 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     *
     */
     public void setArmed(boolean b, boolean isCombat) {
-        setMovesLeft(0);
-
         if (isCombat) {
             armed = b; // No questions asked.
             return;
         }
+
+        setMovesLeft(0);
 
         if (b) {
             if (isPioneer()) {
@@ -1610,12 +1610,12 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     * @param isCombat Whether this is a result of combat.
     */
     public void setMounted(boolean b, boolean isCombat) {
-        setMovesLeft(0);
-
         if (isCombat) {
             mounted = b; // No questions asked.
             return;
         }
+
+        setMovesLeft(0);
 
         if (b) {
             if (isPioneer()) {
