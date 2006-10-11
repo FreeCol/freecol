@@ -496,8 +496,10 @@ public final class InGameController implements NetworkConstants {
         
         boolean knownEnemyOnLastTile = path != null
                 && path.getLastNode() != null 
-                && path.getLastNode().getTile().getFirstUnit() != null
-                && path.getLastNode().getTile().getFirstUnit().getOwner() != freeColClient.getMyPlayer();
+                && ((path.getLastNode().getTile().getFirstUnit() != null
+                     && path.getLastNode().getTile().getFirstUnit().getOwner() != freeColClient.getMyPlayer())
+                   || (path.getLastNode().getTile().getSettlement() != null
+                       && path.getLastNode().getTile().getSettlement().getOwner() != freeColClient.getMyPlayer()));
         
         while (path != null) {
             int mt = unit.getMoveType(path.getDirection());
