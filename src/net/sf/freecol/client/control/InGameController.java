@@ -510,6 +510,8 @@ public final class InGameController implements NetworkConstants {
                                              "exploreLostCityRumour.yes",
                                              "exploreLostCityRumour.no")) {
                     reallyMove(unit, path.getDirection());
+                    if (unit.isDisposed())
+                        return;
                 }
                 break;
             case Unit.MOVE_HIGH_SEAS:
