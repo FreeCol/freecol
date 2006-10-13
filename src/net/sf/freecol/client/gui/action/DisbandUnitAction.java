@@ -26,8 +26,9 @@ public class DisbandUnitAction extends MapboardAction {
 
 
     /**
-    * Creates a new <code>DisbandUnitAction</code>.
-    */
+     * Creates a new <code>DisbandUnitAction</code>.
+     * @param freeColClient The main controller object for the client.
+     */
     DisbandUnitAction(FreeColClient freeColClient) {
         super(freeColClient, "unit.state.8", null, KeyEvent.VK_D, KeyStroke.getKeyStroke('D', 0));
         putValue(BUTTON_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_DISBAND, 0));

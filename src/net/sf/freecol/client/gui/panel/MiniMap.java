@@ -192,8 +192,11 @@ public final class MiniMap extends JPanel implements MouseInputListener {
 
 
     /**
-    * Paints the skin onto this component.
-    */
+     * Paints the skin onto this component.
+     * 
+     * @param graphics The <code>Graphics</code> to draw the skin on.
+     * @param skin The skin.
+     */
     private void paintSkin(Graphics graphics, Image skin) {
         graphics.drawImage(skin, 0, 0, null);
     }

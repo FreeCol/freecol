@@ -32,8 +32,9 @@ public class PlowAction extends MapboardAction {
 
 
     /**
-    * Creates a new <code>PlowAction</code>.
-    */
+     * Creates a new <code>PlowAction</code>.
+     * @param freeColClient The main controller object for the client.
+     */
     PlowAction(FreeColClient freeColClient) {
         super(freeColClient, "unit.state.5", null, KeyEvent.VK_P, KeyStroke.getKeyStroke('P', 0));
         

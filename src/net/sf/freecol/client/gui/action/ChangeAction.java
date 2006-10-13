@@ -35,8 +35,9 @@ public class ChangeAction extends MapboardAction {
 
 
     /**
-    * Creates a new <code>ChangeAction</code>.
-    */
+     * Creates a new <code>ChangeAction</code>.
+     * @param freeColClient The main controller object for the client.
+     */
     ChangeAction(FreeColClient freeColClient) {
         super(freeColClient, "menuBar.orders.nextUnitOnTile", null, KeyEvent.VK_E, KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0));
     }

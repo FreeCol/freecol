@@ -27,8 +27,9 @@ public class BuildRoadAction extends MapboardAction {
     public static final String ID = "buildRoadAction";
 
     /**
-    * Creates a new <code>BuildRoadAction</code>.
-    */
+     * Creates a new <code>BuildRoadAction</code>.
+     * @param freeColClient The main controller object for the client.
+     */
     BuildRoadAction(FreeColClient freeColClient) {
         super(freeColClient, "unit.state.6", null, KeyEvent.VK_R, KeyStroke.getKeyStroke('R', 0));
         putValue(BUTTON_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_ROAD, 0));

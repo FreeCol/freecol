@@ -25,6 +25,7 @@ public class DeclareIndependenceAction extends MapboardAction {
     
     /**
      * Creates a new <code>DeclareIndependenceAction</code>.
+     * @param freeColClient The main controller object for the client.
      */
     DeclareIndependenceAction(FreeColClient freeColClient) {
         super(freeColClient, "menuBar.game.declareIndependence", null, KeyEvent.VK_D, null);

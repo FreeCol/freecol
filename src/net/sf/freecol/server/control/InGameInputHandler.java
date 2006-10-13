@@ -831,8 +831,17 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
 
 
     /**
-    * Generates a result of an attack.
-    */
+     * Generates a result of an attack.
+     * 
+     * @param unit The <code>Unit</code> attacking.
+     * @param defender The defending unit.
+     * @return The result: {@link Unit#ATTACK_GREAT_LOSS},
+     *      {@link Unit#ATTACK_LOSS}, 
+     *      {@link Unit#ATTACK_EVADES},
+     *      {@link Unit#ATTACK_WIN},
+     *      {@link Unit#ATTACK_GREAT_WIN} or
+     *      {@link Unit#ATTACK_DONE_SETTLEMENT}.
+     */
     private int generateAttackResult(Unit unit, Unit defender) {
         int attackPower = unit.getOffensePower(defender);
         int totalProbability = attackPower + defender.getDefensePower(unit);

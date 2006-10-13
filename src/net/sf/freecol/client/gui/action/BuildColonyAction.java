@@ -27,8 +27,9 @@ public class BuildColonyAction extends MapboardAction {
 
 
     /**
-    * Creates a new <code>BuildColonyAction</code>.
-    */
+     * Creates a new <code>BuildColonyAction</code>.
+     * @param freeColClient The main controller object for the client.
+     */
     BuildColonyAction(FreeColClient freeColClient) {
         super(freeColClient, "unit.state.7", null, KeyEvent.VK_B, KeyStroke.getKeyStroke('B', 0));
         putValue(BUTTON_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_BUILD, 0));

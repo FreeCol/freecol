@@ -221,8 +221,12 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
 
 
     /**
-    * Handles an "updateGame"-message.
-    */
+     * Handles an "updateGame"-message.
+     * @param connection The <code>Connection</code> the message
+     *       will be read from.
+     * @param in The stream to read the message from.
+     * @param out The stream for the reply.   
+     */
     private void updateGame(Connection connection, XMLStreamReader in, XMLStreamWriter out) {
         try {
             in.nextTag();

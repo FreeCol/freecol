@@ -148,6 +148,8 @@ final class ReceivingThread extends Thread {
      * 
      * @exception IOException If thrown by the
      *      {@link FreeColNetworkInputStream}.
+     * @exception SAXException if a problem occured during parsing.
+     * @exception XMLStreamException if a problem occured during parsing.
      */
     private void listen() throws IOException, SAXException, XMLStreamException {
         while (locked) {
@@ -305,6 +307,7 @@ final class ReceivingThread extends Thread {
          * 
          * @return <i>true</i> if the buffer has been filled with
          *         data, and <i>false</i> if an error occured.
+         * @exception IOException if thrown by the underlying stream.
          */
         private boolean fill() throws IOException {
             int r;

@@ -807,8 +807,9 @@ public class Map extends FreeColGameObject {
 
 
     /**
-    * Creates the columns contains the rows that contains the tiles.
-    */
+     * Creates the columns contains the rows that contains the tiles.
+     * @exception FreeColException If the given size is invalid.
+     */
     private void createColumns(int size) throws FreeColException {
         int width, height;
 

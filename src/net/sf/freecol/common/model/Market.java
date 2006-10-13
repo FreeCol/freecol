@@ -468,6 +468,8 @@ public final class Market extends FreeColGameObject {
         /**
          * Package constructor: This class is only supposed to be constructed
          * by {@link Market}.
+         * 
+         * @param game The game this object should be created within.
          */
         Data(Game game) {
             super(game);

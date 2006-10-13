@@ -102,9 +102,13 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
     }
 
     /**
-    * Handles a "getVacantPlayers"-request.
-    * @param element The element containing the request.
-    */
+     * Handles a "getVacantPlayers"-request.
+     * 
+     * @param connection The connection the message came from. 
+     * @param element The element containing the request.
+     * @return The reply: An XML element containing a list of the
+     *       vacant players.
+     */
     private Element getVacantPlayers(Connection connection, Element element) {
         Game game = freeColServer.getGame();
 
@@ -130,6 +134,10 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
 
     /**
      * Handles a "login"-request.
+     * 
+     * @param connection The connection the message is comming from.
+     * @param in The stream with the incoming data.
+     * @param out The target stream for the reply.
      */
     private void login(Connection connection, XMLStreamReader in, XMLStreamWriter out) {        
         // TODO: Do not allow more than one (human) player to connect to a singleplayer game.

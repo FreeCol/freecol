@@ -33,8 +33,9 @@ public class MapControlsAction extends MapboardAction {
 
 
     /**
-    * Creates a new <code>MapControlsAction</code>.
-    */
+     * Creates a new <code>MapControlsAction</code>.
+     * @param freeColClient The main controller object for the client.
+     */
     MapControlsAction(FreeColClient freeColClient) {
         super(freeColClient, "menuBar.view.mapControls", null, KeyEvent.VK_M, KeyStroke.getKeyStroke('M', InputEvent.CTRL_MASK));
     }

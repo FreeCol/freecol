@@ -25,8 +25,9 @@ public class ClearOrdersAction extends MapboardAction {
 
 
     /**
-    * Creates a new <code>ClearOrdersAction</code>.
-    */
+     * Creates a new <code>ClearOrdersAction</code>.
+     * @param freeColClient The main controller object for the client.
+     */
     ClearOrdersAction(FreeColClient freeColClient) {
         super(freeColClient, "menuBar.orders.clearOrders", null, KeyEvent.VK_L, KeyStroke.getKeyStroke('L', 0));
     }

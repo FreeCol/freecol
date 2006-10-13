@@ -679,9 +679,12 @@ public class TransportMission extends Mission {
 
 
     /**
-    * Returns the cheapest unit which can be bought in <code>Europe</code>.
-    * @return The <code>AIUnit</code>.
-    */
+     * Returns the cheapest unit which can be bought in <code>Europe</code>.
+     * 
+     * @param connection The connection to use when communicating
+     *      with the server.
+     * @return The <code>AIUnit</code>.
+     */
     private AIUnit getCheapestUnitInEurope(Connection connection) {
         AIPlayer aiPlayer = (AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getID());
         Player player = aiPlayer.getPlayer();

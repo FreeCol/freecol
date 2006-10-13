@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.server.FreeColServer;
 
 import org.w3c.dom.Element;
 
@@ -163,6 +164,9 @@ public final class MetaRegister {
     * @param slotsAvailable Number of players that may conncet.
     * @param currentlyPlaying Number of players that are currently connected.
     * @param isGameStarted <i>true</i> if the game has started.
+    * @param version The version of the server.
+    * @param gameState The current state of the game: {@link FreeColServer#STARTING_GAME},
+    *       {@link FreeColServer#IN_GAME} or {@link FreeColServer#ENDING_GAME}.
     */
     private void updateServer(MetaItem mi, String name, String address, int port, int slotsAvailable,
             int currentlyPlaying, boolean isGameStarted, String version, int gameState) {

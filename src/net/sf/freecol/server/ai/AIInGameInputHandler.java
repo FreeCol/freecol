@@ -150,7 +150,7 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
     /**
     * Handles a "setCurrentPlayer"-message.
     *
-    * @param connection The connectio the message was received on.
+    * @param connection The connection the message was received on.
     * @param setCurrentPlayerElement The element (root element in a DOM-parsed XML tree) that
     *                holds all the information.
     */

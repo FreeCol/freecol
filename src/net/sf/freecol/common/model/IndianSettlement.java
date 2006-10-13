@@ -479,9 +479,9 @@ public class IndianSettlement extends Settlement {
 
 
     /**
-    * Gets the kind of Indian settlement.
-    * @return The kind of <code>IndianSettlement</code>.
-    */
+     * Gets the kind of Indian settlement.
+     * @return {@link #CAMP}, {@link #VILLAGE} or {@link #CITY}.
+     */
     public int getKind() {
         return kind;
     }

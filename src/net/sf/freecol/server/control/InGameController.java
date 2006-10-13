@@ -296,7 +296,9 @@ public final class InGameController extends Controller {
 
 
     /**
-     * Checks if this player has died.
+     * Checks if the given player has died.
+     * 
+     * @param player The <code>Player</code>.
      * @return <i>true</i> if this player should die.
      */
     private boolean checkForDeath(Player player) {

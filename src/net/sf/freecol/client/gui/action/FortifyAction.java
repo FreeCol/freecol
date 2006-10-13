@@ -27,8 +27,9 @@ public class FortifyAction extends MapboardAction {
 
 
     /**
-    * Creates a new <code>FortifyAction</code>.
-    */
+     * Creates a new <code>FortifyAction</code>.
+     * @param freeColClient The main controller object for the client.
+     */
     FortifyAction(FreeColClient freeColClient) {
         super(freeColClient, "unit.state.2", null, KeyEvent.VK_F, KeyStroke.getKeyStroke('F', 0));
         putValue(BUTTON_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_FORTIFY, 0));

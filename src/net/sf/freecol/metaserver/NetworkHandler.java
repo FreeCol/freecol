@@ -78,18 +78,25 @@ public final class NetworkHandler implements MessageHandler {
 
     
     /**
-    * Handles a "getServerList"-request.
-    * @param element The element containing the request.
-    */
+     * Handles a "getServerList"-request.
+     * @param connection The <code>Connection</code> the message
+     *       was received on.
+     * @param element The element containing the request.
+     * @return The reply: An <code>Element</code> with a list of the
+     *      servers in the {@link MetaRegister}.
+     */
     private Element getServerList(Connection connection, Element element) {
         return metaRegister.createServerList();
     }
 
 
     /**
-    * Handles a "register"-request.
-    * @param element The element containing the request.
-    */
+     * Handles a "register"-request.
+     * 
+     * @param connection The connection the message was received on.
+     * @param element The element containing the request.
+     * @return The reply: <code>null</code>.
+     */
     private Element register(Connection connection, Element element) {
         String name = element.getAttribute("name");
         String address = connection.getSocket().getInetAddress().getHostAddress();
@@ -107,9 +114,12 @@ public final class NetworkHandler implements MessageHandler {
 
 
     /**
-    * Handles an "update"-request.
-    * @param element The element containing the request.
-    */
+     * Handles an "update"-request.
+     * 
+     * @param connection The connection the message came from.
+     * @param element The element containing the request.
+     * @return The reply: <code>null</code>.
+     */
     private Element update(Connection connection, Element element) {
         String name = element.getAttribute("name");
         String address = connection.getSocket().getInetAddress().getHostAddress();
@@ -127,9 +137,12 @@ public final class NetworkHandler implements MessageHandler {
 
 
     /**
-    * Handles a "remove"-request.
-    * @param element The element containing the request.
-    */
+     * Handles a "remove"-request.
+     * 
+     * @param connection The connection the message came from.
+     * @param element The element containing the request.
+     * @return The reply: <code>null</code>.
+     */
     private Element remove(Connection connection, Element element) {
         String address = connection.getSocket().getInetAddress().getHostAddress();
         int port = Integer.parseInt(element.getAttribute("port"));
@@ -141,9 +154,12 @@ public final class NetworkHandler implements MessageHandler {
 
 
     /**
-    * Handles a "disconnect"-request.
-    * @param element The element containing the request.
-    */
+     * Handles a "disconnect"-request.
+     * 
+     * @param connection The connection the message came from.
+     * @param element The element containing the request.
+     * @return The reply: <code>null</code>.
+     */
     private Element disconnect(Connection connection, Element element) {
         try {
             connection.reallyClose();

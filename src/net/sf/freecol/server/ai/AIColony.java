@@ -791,6 +791,8 @@ public class AIColony extends AIObject {
 
     /**
      * Decides what to build in the <code>Colony</code>.
+     * @param connection The connection to use when communicating
+     *      with the server.
      */
     private void decideBuildable(Connection connection) {
         // TODO: Request tools if needed.

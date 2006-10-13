@@ -27,8 +27,9 @@ public class SkipUnitAction extends MapboardAction {
 
 
     /**
-    * Creates a new <code>SkipUnitAction</code>.
-    */
+     * Creates a new <code>SkipUnitAction</code>.
+     * @param freeColClient The main controller object for the client.
+     */
     SkipUnitAction(FreeColClient freeColClient) {
         super(freeColClient, "unit.state.1", null, KeyEvent.VK_S, KeyStroke.getKeyStroke(' ', 0));
         putValue(BUTTON_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_DONE, 0));

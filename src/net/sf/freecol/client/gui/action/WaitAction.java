@@ -26,8 +26,9 @@ public class WaitAction extends MapboardAction {
 
 
     /**
-    * Creates a new <code>WaitAction</code>.
-    */
+     * Creates a new <code>WaitAction</code>.
+     * @param freeColClient The main controller object for the client.
+     */
     WaitAction(FreeColClient freeColClient) {
         super(freeColClient, "unit.state.0", null, KeyEvent.VK_W, KeyStroke.getKeyStroke('W', 0));
         putValue(BUTTON_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_WAIT, 0));

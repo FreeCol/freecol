@@ -326,12 +326,14 @@ public final class ImageLibrary extends ImageProvider {
     }
 
     /**
-    * Finds the image file in the given <code>filePath</code>.
-    *
-    * @param doLookup If <i>true</i> then the <code>resourceLocator</code>
-    *           is used when searching for the image file.
-    * @return An ImageIcon with data loaded from the image file.
-    */
+     * Finds the image file in the given <code>filePath</code>.
+     *
+     * @param filePath The path to the image file.
+     * @param doLookup If <i>true</i> then the <code>resourceLocator</code>
+     *           is used when searching for the image file.
+     * @return An ImageIcon with data loaded from the image file.
+     * @exception FreeColException If the image could not be found.
+     */
     private ImageIcon findImage(String filePath, Class resourceLocator, boolean doLookup) throws FreeColException {
         if (doLookup) {
             URL url = resourceLocator.getResource(filePath);
@@ -650,6 +652,8 @@ public final class ImageLibrary extends ImageProvider {
      * @param gc The GraphicsConfiguration is needed to create images that are compatible with the
      * local environment.
      * @param c The color of the color chip to create.
+     * @param expertMission Should be <code>true</code> if the mission chip should represent
+     *      an expert missionary.
      */
     private void loadMissionChip(GraphicsConfiguration gc, Color c, boolean expertMission) {
         BufferedImage tempImage = gc.createCompatibleImage(10, 17);

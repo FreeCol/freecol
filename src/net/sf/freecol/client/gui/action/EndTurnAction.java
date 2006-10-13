@@ -26,8 +26,9 @@ public class EndTurnAction extends MapboardAction {
 
 
     /**
-    * Creates a new <code>EndTurnAction</code>.
-    */
+     * Creates a new <code>EndTurnAction</code>.
+     * @param freeColClient The main controller object for the client.
+     */
     EndTurnAction(FreeColClient freeColClient) {
         super(freeColClient, "menuBar.game.endTurn", null, KeyEvent.VK_E, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
     }

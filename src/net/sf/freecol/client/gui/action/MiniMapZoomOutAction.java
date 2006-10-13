@@ -27,6 +27,7 @@ public class MiniMapZoomOutAction extends MapboardAction {
 
     /**
      * Creates a new <code>MiniMapZoomOutAction</code>.
+     * @param freeColClient The main controller object for the client.
      */
     MiniMapZoomOutAction(FreeColClient freeColClient) {
         super(freeColClient, "unit.state.10", null, KeyEvent.VK_PLUS, KeyStroke.getKeyStroke('+', 0));

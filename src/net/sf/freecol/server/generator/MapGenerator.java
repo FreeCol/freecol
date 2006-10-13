@@ -13,6 +13,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Map.Position;
@@ -272,7 +273,13 @@ public class MapGenerator {
      * location can be found (the iterator is exhausted) the settlement will
      * be discarded.
      *
+     * @param owner The nation owning the new settlement.
+     * @param type The {@link IndianSettlement#getKind() kind} of settlement.
+     * @param capital <code>true</code> if the settlement should be a
+     *      {@link IndianSettlement#isCapital() capital}.
      * @param iterator The nation's iterator to use
+     * @param map The map that should get a new settlement.
+     * @param players The list of the {@link Player players}.
      */
     private void placeIndianSettlement(int owner, int type,
                                        boolean capital,
@@ -328,10 +335,12 @@ public class MapGenerator {
 
 
     /**
-    * Generates wanted goods for a given location (indian settlement).
-    * @param mainTile The tile where the settlement is located.
-    * @return An int array containing the 3 wanted goods.
-    */
+     * Generates wanted goods for a given location (indian settlement).
+     * 
+     * @param map The <code>Map</code>.
+     * @param mainTile The tile where the settlement is located.
+     * @return An int array containing the 3 wanted goods.
+     */
     private int[] generateWantedGoodsForLocation(Map map, Tile mainTile) {
 
         Iterator iter = map.getAdjacentIterator(mainTile.getPosition());
@@ -480,6 +489,8 @@ public class MapGenerator {
     * Generates a skill that could be taught from a settlement on the given Tile.
     * TODO: This method should be properly implemented. The surrounding terrain
     *       should be taken into account and it should be partially randomized.
+    *       
+    * @param map The <code>Map</code>.
     * @param tile The tile where the settlement will be located.
     * @return A skill that can be taught to Europeans.
     */
@@ -584,6 +595,8 @@ public class MapGenerator {
      * of two tiles, a village or camp needs one tile in every direction.
      * There must be at least three productive tiles in the area including
      * the settlement tile.
+     * 
+     * @param map The <code>Map</code>.
      * @param position Candidate position
      * @param radius necessary radius
      * @return True if position suitable for settlement
@@ -615,6 +628,8 @@ public class MapGenerator {
 
     /**
      * Select a random position on the map to use as a starting position.
+     * 
+     * @param map The <code>Map</code>.
      * @return Position selected
      */
     private Position getRandomLandPosition(Map map) {

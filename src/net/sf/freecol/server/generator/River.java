@@ -70,6 +70,7 @@ public class River {
      * Constructor.
      *
      * @param map The map on which the river flows.
+     * @param riverMap A hashtable of position-river pairs.
      */
     public River(Map map, Hashtable riverMap) {
 
@@ -95,6 +96,7 @@ public class River {
      * Adds a new section to this river.
      *
      * @param position Where this section is located.
+     * @param direction The direction the river is flowing in.
      */
     public void add(Map.Position position, int direction) {
         this.sections.add(new Section(position, direction));

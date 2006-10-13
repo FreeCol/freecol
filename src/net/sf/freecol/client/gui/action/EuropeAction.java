@@ -25,8 +25,9 @@ public class EuropeAction extends MapboardAction {
 
 
     /**
-    * Creates a new <code>EuropeAction</code>.
-    */
+     * Creates a new <code>EuropeAction</code>.
+     * @param freeColClient The main controller object for the client.
+     */
     EuropeAction(FreeColClient freeColClient) {
         super(freeColClient, "menuBar.view.europe", null, KeyEvent.VK_E, KeyStroke.getKeyStroke('E', 0));
     }

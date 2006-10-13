@@ -65,13 +65,14 @@ public class SoundLibrary {
 
 
     /**
-    * Get a number from a filename like this:
-    *
-    * "01Attack.wav" returns 1.
-    * "Build12.wav" returns 12.
-    *
-    * @return Mentioned above.
-    */
+     * Get a number from a filename like this:
+     *
+     * "01Attack.wav" returns 1.
+     * "Build12.wav" returns 12.
+     *
+     * @param filename The filename to get the number from.
+     * @return Mentioned above.
+     */
     private int getNumber(String filename) {
         StringBuffer stringBuffer = new StringBuffer();
 

@@ -28,8 +28,9 @@ public class GotoAction extends MapboardAction {
 
 
     /**
-    * Creates a new <code>GotoAction</code>.
-    */
+     * Creates a new <code>GotoAction</code>.
+     * @param freeColClient The main controller object for the client.
+     */
     GotoAction(FreeColClient freeColClient) {
         super(freeColClient, "menuBar.orders.goto", null, KeyEvent.VK_G, KeyStroke.getKeyStroke('G', 0));
     }

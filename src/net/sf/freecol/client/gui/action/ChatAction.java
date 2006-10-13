@@ -26,8 +26,9 @@ public class ChatAction extends MapboardAction {
 
 
     /**
-    * Creates a new <code>ChatAction</code>.
-    */
+     * Creates a new <code>ChatAction</code>.
+     * @param freeColClient The main controller object for the client.
+     */
     ChatAction(FreeColClient freeColClient) {
         super(freeColClient, "menuBar.game.chat", null, KeyEvent.VK_T, KeyStroke.getKeyStroke('T', 0));
     }
