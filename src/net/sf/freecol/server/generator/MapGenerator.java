@@ -987,9 +987,12 @@ public class MapGenerator {
 
 
         /**
-        * Creates a new <code>LandGenerator</code>.
-        * @see #createLandMap
-        */
+         * Creates a new <code>LandGenerator</code>.
+         * 
+         * @param width The width of the map to be generated.
+         * @param height The height of the map to be generated.
+         * @see #createLandMap
+         */
         LandGenerator(int width, int height) {
             map = new boolean[width][height];
             visited = new boolean[width][height];
@@ -998,10 +1001,11 @@ public class MapGenerator {
 
 
         /**
-        * Creates a new land map. That is; an array
-        * where <i>true</i> means land and <i>false</i>
-        * means ocean.
-        */
+         * Creates a new land map.
+         * 
+         * @return An array where <i>true</i> means land 
+         * and <i>false</i> means ocean.
+         */
         boolean[][] createLandMap() {
             int x;
             int y;
