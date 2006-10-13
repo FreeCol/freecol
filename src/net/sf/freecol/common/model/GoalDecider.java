@@ -3,12 +3,14 @@ package net.sf.freecol.common.model;
 
 
 /**
- * Used by {@link Map#search} in order to determine a goal.
+ * Used by {@link Map#search(Unit, Tile, GoalDecider, CostDecider, int, Unit) search}
+ * in order to determine a goal.
  * 
  * <br /><br />
  * 
  * The method {@link #check(Unit, PathNode)} will be called by
- * {@link Map#search} until:
+ * {@link Map#search(Unit, Tile, GoalDecider, CostDecider, int, Unit) search}
+ * until:
  * 
  * <ol>
  *   <li>The method returns <code>true</code> and there is 

@@ -35,9 +35,7 @@ import net.sf.freecol.server.ai.Transportable;
 import net.sf.freecol.server.ai.Wish;
 import net.sf.freecol.server.ai.WorkerWish;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 
 /**
@@ -94,7 +92,7 @@ public class TransportMission extends Mission {
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
-     * @see #readFromXML
+     * @see AIObject#readFromXML
      */
     public TransportMission(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
         super(aiMain);

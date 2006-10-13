@@ -11,10 +11,7 @@ import javax.swing.AbstractButton;
 import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.MapControls;
-import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.Unit;
 
 
 /**
@@ -43,8 +40,7 @@ public class MapControlsAction extends MapboardAction {
     }
 
     /**
-     * Updates the "enabled"-status with the value
-     * returned by {@link #shouldBeEnabled} and
+     * Updates the "enabled"-status and
      * calls {@link #showMapControls(boolean)}.
      */
     public void update() {

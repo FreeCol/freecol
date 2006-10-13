@@ -17,6 +17,7 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
+import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.AIUnit;
 import net.sf.freecol.server.ai.GoodsWish;
 import net.sf.freecol.server.ai.Wish;
@@ -77,7 +78,7 @@ public class WishRealizationMission extends Mission {
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
-     * @see #readFromXML
+     * @see AIObject#readFromXML
      */
     public WishRealizationMission(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
         super(aiMain);

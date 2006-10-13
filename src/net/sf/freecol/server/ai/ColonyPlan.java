@@ -176,7 +176,7 @@ public class ColonyPlan {
                 && !colony.getBuilding(Building.ARMORY).isBuilt()) {
             buildList.add(new Integer(Building.ARMORY));
         }
-        buildList.add(new Integer(colony.BUILDING_UNIT_ADDITION + Unit.ARTILLERY)); 
+        buildList.add(new Integer(Colony.BUILDING_UNIT_ADDITION + Unit.ARTILLERY)); 
 
         //buildList.add(new Integer(Building.SCHOOLHOUSE));
         

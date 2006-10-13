@@ -129,9 +129,8 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
 
 
     /**
-    * Handles a "login"-request.
-    * @param element The element containing the request.
-    */
+     * Handles a "login"-request.
+     */
     private void login(Connection connection, XMLStreamReader in, XMLStreamWriter out) {        
         // TODO: Do not allow more than one (human) player to connect to a singleplayer game.
         Game game = freeColServer.getGame();

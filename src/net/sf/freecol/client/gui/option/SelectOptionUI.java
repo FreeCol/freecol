@@ -5,13 +5,13 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.util.logging.Logger;
 
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JComboBox;
 
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.option.SelectOption;
 import net.sf.freecol.common.option.Option;
+import net.sf.freecol.common.option.SelectOption;
 
 
 

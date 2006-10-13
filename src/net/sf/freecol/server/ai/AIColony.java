@@ -80,8 +80,6 @@ public class AIColony extends AIObject {
      * Creates a new <code>AIColony</code>.
      * 
      * @param aiMain The main AI-object.
-     * @param element An <code>Element</code> containing an
-     *      XML-representation of this object.
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.

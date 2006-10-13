@@ -363,7 +363,7 @@ public final class GUI {
     * Gets the selected tile.
     *
     * @return The <code>Position</code> of that tile.
-    * @see #setSelectedTile
+    * @see #setSelectedTile(Map.Position)
     */
     public Position getSelectedTile() {
         return selectedTile;
@@ -382,12 +382,12 @@ public final class GUI {
 
 
     /**
-    * Sets the active unit. Invokes {@link #setSelectedTile} if the
+    * Sets the active unit. Invokes {@link #setSelectedTile(Map.Position)} if the
     * selected tile is another tile than where the <code>activeUnit</code>
     * is located.
     *
     * @param activeUnit The new active unit.
-    * @see #setSelectedTile
+    * @see #setSelectedTile(Map.Position)
     */
     public void setActiveUnit(Unit activeUnit) {
         // Don't select a unit with zero moves left. -sjm

@@ -55,7 +55,6 @@ import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.networking.DummyConnection;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 
@@ -146,8 +145,6 @@ public class AIPlayer extends AIObject {
      * Creates a new <code>AIPlayer</code>.
      * 
      * @param aiMain The main AI-object.
-     * @param element An <code>Element</code> containing an
-     *      XML-representation of this object.
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.

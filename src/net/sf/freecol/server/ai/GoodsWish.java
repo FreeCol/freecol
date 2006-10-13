@@ -10,7 +10,6 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Unit;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 
@@ -78,8 +77,6 @@ public class GoodsWish extends Wish {
       * Creates a new <code>GoodsWish</code>.
       * 
       * @param aiMain The main AI-object.
-      * @param element An <code>Element</code> containing an
-      *      XML-representation of this object.
       * @param in The input stream containing the XML.
       * @throws XMLStreamException if a problem was encountered
       *      during parsing.

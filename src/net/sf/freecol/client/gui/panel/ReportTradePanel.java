@@ -14,7 +14,6 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
-
 import cz.autel.dmi.HIGLayout;
 
 /**

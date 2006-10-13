@@ -15,10 +15,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Map.Position;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 
 
@@ -1756,8 +1753,8 @@ public final class Tile extends FreeColGameObject implements Location {
     *
     * <br><br>
     *
-    * The <code>toXMLElement</code> of {@link Tile} uses {@link #setAttributes}
-    * in this class to hide information that is not available.
+    * The <code>toXMLElement</code> of {@link Tile} uses information
+    * from this class to hide information that is not available.
     */
     public class PlayerExploredTile {
 

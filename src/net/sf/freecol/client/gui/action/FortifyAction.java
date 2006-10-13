@@ -10,7 +10,6 @@ import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 
 

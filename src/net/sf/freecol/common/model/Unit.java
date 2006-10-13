@@ -15,10 +15,8 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Map.Position;
-import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.util.EmptyIterator;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 
@@ -97,7 +95,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
     /**
      * A move type.
-     * @see #getMoveType
+     * @see #getMoveType(int direction)
      */
     public static final int MOVE = 0,
                             MOVE_HIGH_SEAS = 1,
@@ -742,7 +740,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * @param settlement The settlement to enter.
      * @return <code>true</code> if this <code>Player</code> can trade
      *       with the given <code>Settlement</code>. The unit will for
-     *       instance need to be a {@link #isCarrier carrier} and have
+     *       instance need to be a {@link #isCarrier() carrier} and have
      *       goods onboard.
      */
     public boolean canTradeWith(Settlement settlement) {

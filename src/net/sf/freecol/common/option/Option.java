@@ -82,7 +82,6 @@ public interface Option {
     /**
      * Makes an XML-representation of this object.
      *
-     * @param document The document to use when creating new componenets.
      * @param out The output stream.
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.

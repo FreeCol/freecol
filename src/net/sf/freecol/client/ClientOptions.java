@@ -2,6 +2,7 @@
 package net.sf.freecol.client;
 
 
+import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.OptionGroup;

@@ -28,7 +28,6 @@ import net.sf.freecol.server.ai.mission.UnitWanderMission;
 import net.sf.freecol.server.ai.mission.WishRealizationMission;
 import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 
@@ -92,7 +91,7 @@ public class AIUnit extends AIObject implements Transportable {
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
-     * @see #readFromXML
+     * @see AIObject#readFromXML
      */    
     public AIUnit(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
         super(aiMain, in.getAttributeValue(null, "ID"));

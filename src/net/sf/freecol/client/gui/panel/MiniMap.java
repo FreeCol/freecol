@@ -8,7 +8,6 @@ import java.awt.Insets;
 import java.awt.event.MouseEvent;
 import java.util.logging.Logger;
 
-import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;

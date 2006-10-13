@@ -46,7 +46,7 @@ public class PlowAction extends MapboardAction {
      * Updates this action to be either a "plow" or a
      * "clear forest".
      * 
-     * @param plow <code>true</code> if this action should
+     * @param p <code>true</code> if this action should
      *      be "clear forest".
      */
     private void updateValues(boolean p) {

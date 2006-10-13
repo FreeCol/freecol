@@ -9,7 +9,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.client.gui.i18n.Messages;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**

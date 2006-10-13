@@ -15,10 +15,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.FreeColException;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 
 

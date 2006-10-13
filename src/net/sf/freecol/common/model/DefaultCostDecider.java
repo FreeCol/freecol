@@ -8,8 +8,9 @@ package net.sf.freecol.common.model;
  * <br /><br />
  * 
  * This {@link CostDecider} is used as a default by
- * {@link Map#findPath} and {@link Map#search} if no
- * other <code>CostDecider</code> has been specified.
+ * {@link Map#findPath(Unit, Tile, Tile) findPath} and 
+ * {@link Map#search(Unit, Tile, GoalDecider, CostDecider, int, Unit) search} 
+ * if no other <code>CostDecider</code> has been specified.
  */
 public class DefaultCostDecider implements CostDecider {
     

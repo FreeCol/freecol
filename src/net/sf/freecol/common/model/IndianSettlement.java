@@ -1,8 +1,6 @@
 
 package net.sf.freecol.common.model;
 
-import net.sf.freecol.common.model.Map.Position;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.StringTokenizer;
@@ -13,7 +11,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.w3c.dom.Document;
+import net.sf.freecol.common.model.Map.Position;
+
 import org.w3c.dom.Element;
 
 

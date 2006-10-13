@@ -4,10 +4,10 @@ package net.sf.freecol.client.gui.i18n;
 
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.logging.Logger;
 import java.util.Map;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
 
 /**

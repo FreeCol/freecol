@@ -24,7 +24,6 @@ import javax.xml.transform.stream.StreamResult;
 
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Player;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

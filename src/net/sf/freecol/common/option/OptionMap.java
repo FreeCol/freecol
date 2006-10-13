@@ -11,7 +11,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 
 /**
@@ -34,7 +33,7 @@ public abstract class OptionMap extends OptionGroup {
     * Creates a new <code>OptionMap</code>.
     *
     * @param xmlTagName The tag name that should be used for the parent XML-element
-    *           returned by {@link #toXMLElement}.
+    *           returned by {@link Option#toXMLElement}.
     * @param name The name of the <code>Option</code>. This text is used for identifying
     *           the option for a user. Example: The text related to a checkbox.
     * @param shortDescription Should give a short description of the <code>OptionGroup</code>.
@@ -57,7 +56,7 @@ public abstract class OptionMap extends OptionGroup {
      *
      * @param in The XML stream to read the data from.
      * @param xmlTagName The tag name that should be used for the parent XML-element
-     *           returned by {@link #toXMLElement}.
+     *           returned by {@link Option#toXMLElement}.
      * @param name The name of the <code>Option</code>. This text is used for identifying
      *           the option for a user. Example: The text related to a checkbox.
      * @param shortDescription Should give a short description of the <code>OptionGroup</code>.
@@ -77,7 +76,7 @@ public abstract class OptionMap extends OptionGroup {
     * @param element The XML <code>Element</code> from which this object
     *                should be constructed.
     * @param xmlTagName The tag name that should be used for the parent XML-element
-    *           returned by {@link #toXMLElement}.
+    *           returned by {@link Option#toXMLElement}.
     * @param name The name of the <code>Option</code>. This text is used for identifying
     *           the option for a user. Example: The text related to a checkbox.
     * @param shortDescription Should give a short description of the <code>OptionGroup</code>.

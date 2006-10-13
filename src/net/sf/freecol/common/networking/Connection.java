@@ -22,8 +22,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import net.sf.freecol.common.FreeColException;
-
 import org.w3c.dom.Element;
 
 
@@ -217,8 +215,8 @@ public class Connection {
     * @param element The question for the other peer.
     * @return The reply from the other peer.
     * @throws IOException If an error occur while sending the message.
-    * @see #send
-    * @see #sendAndWait
+    * @see #send(Element)
+    * @see #sendAndWait(Element)
     */
     public Element ask(Element element) throws IOException {
         int networkReplyId = thread.getNextNetworkReplyId();

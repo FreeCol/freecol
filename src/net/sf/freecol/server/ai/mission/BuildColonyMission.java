@@ -18,12 +18,11 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
-import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
+import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.AIUnit;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 
@@ -137,7 +136,7 @@ public class BuildColonyMission extends Mission {
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
-     * @see #readFromXML
+     * @see AIObject#readFromXML
      */
     public BuildColonyMission(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
         super(aiMain);

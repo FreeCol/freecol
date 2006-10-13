@@ -15,11 +15,11 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIMain;
+import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
 import net.sf.freecol.server.ai.TileImprovement;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 
@@ -74,7 +74,7 @@ public class PioneeringMission extends Mission {
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
-     * @see #readFromXML
+     * @see AIObject#readFromXML
      */
     public PioneeringMission(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
         super(aiMain);
