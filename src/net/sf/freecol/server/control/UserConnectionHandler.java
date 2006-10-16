@@ -144,10 +144,11 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
         Game game = freeColServer.getGame();
         Server server = freeColServer.getServer();
         
-        final String username = in.getAttributeValue(null, "username");
+        String username = in.getAttributeValue(null, "username");
         if (username == null) {
             throw new IllegalArgumentException("The attribute 'username' is missing.");
         }
+        username = username.replace("&quot;", "\"");
         
         final String freeColVersion = in.getAttributeValue(null, "freeColVersion");
         if (freeColVersion == null) {

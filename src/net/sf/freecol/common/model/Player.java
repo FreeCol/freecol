@@ -2081,7 +2081,7 @@ public class Player extends FreeColGameObject {
         out.writeStartElement(getXMLElementTagName());
 
         out.writeAttribute("ID", getID());
-        out.writeAttribute("username", name);
+        out.writeAttribute("username", name.replace("\"", "&quot;"));
         out.writeAttribute("nation", Integer.toString(nation));
         out.writeAttribute("color", Integer.toString(color.getRGB()));
         out.writeAttribute("admin", Boolean.toString(admin));
@@ -2164,6 +2164,8 @@ public class Player extends FreeColGameObject {
         setID(in.getAttributeValue(null, "ID"));
         
         name = in.getAttributeValue(null, "username");
+        if (name != null)
+            name = name.replace("&quot;", "\"");
         nation = Integer.parseInt(in.getAttributeValue(null, "nation"));
         color = new Color(Integer.parseInt(in.getAttributeValue(null, "color")));
         admin = (new Boolean(in.getAttributeValue(null, "admin"))).booleanValue();

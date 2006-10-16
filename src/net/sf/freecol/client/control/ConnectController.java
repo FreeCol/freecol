@@ -198,7 +198,8 @@ public final class ConnectController {
         try {
             XMLStreamWriter out = c.ask();
             out.writeStartElement("login");
-            out.writeAttribute("username", username);
+            // Don't send " in username
+            out.writeAttribute("username", username.replace("\"", "&quot;"));
             out.writeAttribute("freeColVersion", FreeCol.getVersion());
             out.writeEndElement();
             in = c.getReply();
