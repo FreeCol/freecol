@@ -210,7 +210,9 @@ abstract public class AbstractOption implements Option {
             }
         } catch (XMLStreamException e) {
             logger.warning(e.toString());
-            throw new IllegalStateException("XMLStreamException", e);
+            IllegalStateException ex = new IllegalStateException("XMLStreamException");
+            ex.initCause(e);
+            throw ex;
         }
     }
 

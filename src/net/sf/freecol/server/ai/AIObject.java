@@ -124,21 +124,29 @@ public abstract class AIObject {
                 StringWriter swe = new StringWriter();
                 pce.printStackTrace(new PrintWriter(swe));
                 logger.warning(swe.toString());
-                throw new IllegalStateException("ParserConfigurationException", pce);
+                IllegalStateException ex = new IllegalStateException("ParserConfigurationException");
+                ex.initCause(pce);
+                throw ex;
             } catch (SAXException se) {
                 StringWriter swe = new StringWriter();
                 se.printStackTrace(new PrintWriter(swe));
                 logger.warning(swe.toString());
-                throw new IllegalStateException("SAXException", se);
+                IllegalStateException ex = new IllegalStateException("SAXException");
+                ex.initCause(se);
+                throw ex;
             } catch (IOException ie) {
                 StringWriter swe = new StringWriter();
                 ie.printStackTrace(new PrintWriter(swe));
                 logger.warning(swe.toString());
-                throw new IllegalStateException("IOException", ie);
+                IllegalStateException ex = new IllegalStateException("IOException");
+                ex.initCause(ie);
+                throw ex;
             }                                    
         } catch (XMLStreamException e) {
             logger.warning(e.toString());
-            throw new IllegalStateException("XMLStreamException", e);
+            IllegalStateException ex = new IllegalStateException("XMLStreamException");
+            ex.initCause(e);
+            throw ex;
         }
     }
     
