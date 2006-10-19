@@ -436,7 +436,8 @@ public class Goods implements Locatable, Ownable {
             StringWriter sw = new StringWriter();
             XMLOutputFactory xif = XMLOutputFactory.newInstance();
             XMLStreamWriter xsw = xif.createXMLStreamWriter(sw);
-            toXML(xsw, player);      
+            toXML(xsw, player);
+            xsw.close();
             
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             Document tempDocument = null;

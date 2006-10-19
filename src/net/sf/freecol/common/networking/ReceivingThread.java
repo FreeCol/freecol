@@ -222,9 +222,16 @@ final class ReceivingThread extends Thread {
             }
 
             if (!foundNetworkReplyObject) {
+                while (xmlIn.hasNext()) {
+                    xmlIn.next();
+                }
+                xmlIn.close();
+                xmlIn = null;
                 logger.warning("Could not find networkReplyId=" + networkReplyID);
             }
         } else {
+            xmlIn.close();
+            xmlIn = null;
             bis.reset();
             connection.handleAndSendReply(bis);
         }

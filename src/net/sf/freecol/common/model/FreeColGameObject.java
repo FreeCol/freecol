@@ -309,8 +309,9 @@ abstract public class FreeColGameObject {
             StringWriter sw = new StringWriter();
             XMLOutputFactory xif = XMLOutputFactory.newInstance();
             XMLStreamWriter xsw = xif.createXMLStreamWriter(sw);
-            toXML(xsw, player, showAll, toSavedGame);      
-            
+            toXML(xsw, player, showAll, toSavedGame);
+            xsw.close();
+
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             Document tempDocument = null;
             try {

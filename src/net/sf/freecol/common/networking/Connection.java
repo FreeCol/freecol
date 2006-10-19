@@ -48,6 +48,7 @@ public class Connection {
     private final Socket socket;
     private final Transformer xmlTransformer;
     private final ReceivingThread thread;
+    private final XMLOutputFactory xof = XMLOutputFactory.newInstance(); 
     private MessageHandler messageHandler;
     
     private XMLStreamWriter xmlOut = null;
@@ -245,7 +246,6 @@ public class Connection {
             currentQuestionID = thread.getNextNetworkReplyId();
         }
         try {
-            XMLOutputFactory xof = XMLOutputFactory.newInstance();        
             xmlOut = xof.createXMLStreamWriter(out);
         } catch (XMLStreamException e) {
             throw new IOException(e.toString());
@@ -269,8 +269,7 @@ public class Connection {
             }
             currentQuestionID = thread.getNextNetworkReplyId();
         }
-        try {
-            XMLOutputFactory xof = XMLOutputFactory.newInstance();        
+        try {       
             xmlOut = xof.createXMLStreamWriter(out);
         } catch (XMLStreamException e) {
             throw new IOException(e.toString());
@@ -295,6 +294,8 @@ public class Connection {
             xmlOut.writeEndElement();
             xmlOut.writeCharacters("\n");
             xmlOut.flush();
+            xmlOut.close();
+            xmlOut = null;
             
             XMLStreamReader in = (XMLStreamReader) nro.getResponse();
             in.nextTag();
@@ -312,9 +313,12 @@ public class Connection {
                     in.next();
                 }
                 thread.unlock();
+                in.close();
             } else {
                 xmlOut.writeCharacters("\n");
                 xmlOut.flush();
+                xmlOut.close();
+                xmlOut = null;
             }
             
             synchronized (out) {
@@ -322,7 +326,12 @@ public class Connection {
                 out.notifyAll();
             }
         } catch (XMLStreamException e) {
-            throw new IOException(e.toString());
+            IOException ie = new IOException(e.toString());
+            ie.initCause(e);
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            logger.warning(sw.toString());
+            throw ie;
         }
     }
 
@@ -386,19 +395,17 @@ public class Connection {
                     xmlIn.nextTag();
                 }
                 if (smh.accepts(xmlIn.getLocalName())) {                    
-                    XMLStreamWriter xmlOut = send(); 
+                    XMLStreamWriter xmlOut = null;
                     if (question) {
+                        xmlOut = send();
                         xmlOut.writeStartElement("reply");
                         xmlOut.writeAttribute("networkReplyId", networkReplyId);
                     }
                     smh.handle(this, xmlIn, xmlOut);
                     if (question) {
                         xmlOut.writeEndElement();
-                    }
-                    endTransmission(null);
-                    while (xmlIn.hasNext()) {
-                        xmlIn.next();
-                    }
+                        endTransmission(null);
+                    }                                        
                     thread.unlock();
                     messagedConsumed = true;
                 }

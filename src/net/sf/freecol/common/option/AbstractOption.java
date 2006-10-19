@@ -156,7 +156,8 @@ abstract public class AbstractOption implements Option {
             StringWriter sw = new StringWriter();
             XMLOutputFactory xif = XMLOutputFactory.newInstance();
             XMLStreamWriter xsw = xif.createXMLStreamWriter(sw);
-            toXML(xsw);      
+            toXML(xsw);
+            xsw.close();
             
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             Document tempDocument = null;

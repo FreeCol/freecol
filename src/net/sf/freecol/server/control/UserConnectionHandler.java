@@ -148,7 +148,6 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
         if (username == null) {
             throw new IllegalArgumentException("The attribute 'username' is missing.");
         }
-        username = username.replace("&quot;", "\"");
         
         final String freeColVersion = in.getAttributeValue(null, "freeColVersion");
         if (freeColVersion == null) {
