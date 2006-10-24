@@ -174,6 +174,13 @@ public class FreeColDialog extends FreeColPanel {
         return ((Integer) getResponse()).intValue();
     }
 
+    /**
+     * Sets that no response has been given.
+     */
+    public void resetResponse() {
+        response = null;
+        responseGiven = false;
+    }
 
     /**
     * Creates a new <code>FreeColDialog</code> with a text and an ok-button.

@@ -45,6 +45,11 @@ public class FAFile {
      * @return The <code>Dimension</code>.
      */
     public Dimension getDimension(String text) {
+        FAName fn = getFAName(text);
+        if (fn != null) {
+            return new Dimension(fn.width, fn.height);
+        }
+
         int width = 0;
         
         for (int i=0; i<text.length(); i++) {
@@ -84,6 +89,11 @@ public class FAFile {
      *      should be drawn.
      */
     public Point[] getPoints(String text) {
+        FAName fn = getFAName(text);
+        if (fn != null) {
+            return fn.points;
+        }
+
         List points = new ArrayList();
 
         int x = 0;
@@ -111,6 +121,40 @@ public class FAFile {
         maxHeight = Integer.parseInt(st.nextToken());
         
         String line = in.readLine();
+        while (!line.startsWith("[Chars]") && line != null) {
+            String name = line;
+            st = new StringTokenizer(in.readLine());
+            int width = Integer.parseInt(st.nextToken());
+            int height = Integer.parseInt(st.nextToken());
+            int numberOfPoints = Integer.parseInt(st.nextToken());
+            int[] xs = new int[numberOfPoints];
+            int[] ys = new int[numberOfPoints];
+
+            line = in.readLine();
+            st = new StringTokenizer(line);
+            for (int i=0; i<numberOfPoints; i++) {
+                xs[i] = Integer.parseInt(st.nextToken());               
+            }
+
+            line = in.readLine();
+            st = new StringTokenizer(line);         
+            for (int i=0; i<numberOfPoints; i++) {
+                ys[i] = Integer.parseInt(st.nextToken());               
+            }   
+            
+            FAName newLetter = new FAName();
+            newLetter.name = name;
+            newLetter.width = width;
+            newLetter.height = height;
+            newLetter.points = new Point[numberOfPoints];
+            for (int i=0; i<numberOfPoints; i++) {
+                newLetter.points[i] = new Point(xs[i], ys[i]);                
+            }                       
+            letters.put(name, newLetter);
+            
+            line = in.readLine();
+        }
+        line = in.readLine();
         while (line != null) {
             st = new StringTokenizer(line.substring(1));
             char letter = line.charAt(0);
@@ -150,9 +194,19 @@ public class FAFile {
         return (FALetter) letters.get(new Character(letter));
     }
 
+    private FAName getFAName(String name) {
+        return (FAName) letters.get(name);
+    }
+
     private class FALetter {
         public char letter;
         public Point[] points;
         public int advance;
+    }
+    private class FAName {
+        public String name;
+        public Point[] points;
+        public int width;
+        public int height;
     }
 }

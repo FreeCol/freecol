@@ -95,6 +95,7 @@ public final class DeclarationDialog extends FreeColDialog {
      */
     public void initialize() { 
         final int SIGNATURE_Y = 450;
+        resetResponse();
         
         signaturePanel.initialize(freeColClient.getMyPlayer().getName());
         signaturePanel.setLocation((getWidth() - signaturePanel.getWidth())/2,
