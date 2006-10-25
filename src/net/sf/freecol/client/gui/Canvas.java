@@ -1314,11 +1314,13 @@ public final class Canvas extends JLayeredPane {
     public boolean showMonarchPanel(int action, String [][] replace) {
         remove(statusPanel);
 
+        setEnabled(false);
         monarchPanel.initialize(action, replace);
         addCentered(monarchPanel, MONARCH_LAYER);
         monarchPanel.requestFocus();
         boolean response = monarchPanel.getResponseBoolean();
         remove(monarchPanel);
+        setEnabled(true);
 
         return response;
     }
