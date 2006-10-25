@@ -139,7 +139,7 @@ public final class Canvas extends JLayeredPane {
                                 INPUT_LAYER = new Integer(DEFAULT_LAYER.intValue() + 11),
                                 CHOICE_LAYER = new Integer(DEFAULT_LAYER.intValue() + 11),
                                 STATUS_LAYER = new Integer(DEFAULT_LAYER.intValue() + 7),
-                                COLOPEDIA_LAYER = new Integer(DEFAULT_LAYER.intValue() + 1),
+                                COLOPEDIA_LAYER = new Integer(DEFAULT_LAYER.intValue() + 20),
                                 REPORT_LAYER = new Integer(DEFAULT_LAYER.intValue() + 1),
                                 MAIN_LAYER = DEFAULT_LAYER,
                                 QUIT_LAYER = new Integer(DEFAULT_LAYER.intValue() + 15),
