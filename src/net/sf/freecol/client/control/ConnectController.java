@@ -214,6 +214,7 @@ public final class ConnectController {
                 freeColClient.setGame(game);
                 freeColClient.setMyPlayer(thisPlayer);
 
+                c.endTransmission(in);
                 // If (true) --> reconnect
                 if (startGame) {
                     freeColClient.setSingleplayer(false);
@@ -223,7 +224,6 @@ public final class ConnectController {
                         freeColClient.getInGameController().setCurrentPlayer(thisPlayer);
                     }
                 }
-                c.endTransmission(in);
             } else if (in.getLocalName().equals("error")) {
                 canvas.errorMessage(in.getAttributeValue(null, "messageID"), in.getAttributeValue(null, "message"));
 
