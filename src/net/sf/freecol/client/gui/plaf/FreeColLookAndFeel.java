@@ -232,7 +232,17 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
                 {"path.horse.image", "path-horse.png"},
                 {"path.horse.nextTurn.image", "path-horse-nextturn.png"},
                 {"path.horse.illegal.image", "path-horse-illegal.png"},
-                {"menuborder.image", "menuborder.png"},
+                {"menuborder.n.image", "menuborder-n.png"},
+                {"menuborder.nw.image", "menuborder-nw.png"},
+                {"menuborder.ne.image", "menuborder-ne.png"},
+                {"menuborder.w.image", "menuborder-w.png"},
+                {"menuborder.e.image", "menuborder-e.png"},
+                {"menuborder.s.image", "menuborder-s.png"},
+                {"menuborder.sw.image", "menuborder-sw.png"},
+                {"menuborder.se.image", "menuborder-se.png"},
+                {"menuborder.shadow.sw.image", "menuborder-shadow-sw.png"},
+                {"menuborder.shadow.s.image", "menuborder-shadow-s.png"},
+                {"menuborder.shadow.se.image", "menuborder-shadow-se.png"},                
             };
 
             /*

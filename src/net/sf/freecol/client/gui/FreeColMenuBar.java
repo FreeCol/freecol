@@ -2,6 +2,9 @@
 package net.sf.freecol.client.gui;
 
 import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -14,6 +17,8 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
+import javax.swing.UIManager;
+import javax.swing.border.CompoundBorder;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
@@ -35,6 +40,7 @@ import net.sf.freecol.client.gui.action.SkipUnitAction;
 import net.sf.freecol.client.gui.action.WaitAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ColopediaPanel;
+import net.sf.freecol.client.gui.panel.FreeColImageBorder;
 import net.sf.freecol.client.gui.panel.ReportContinentalCongressPanel;
 import net.sf.freecol.client.gui.panel.ReportForeignAffairPanel;
 import net.sf.freecol.client.gui.panel.ReportIndianPanel;
@@ -84,11 +90,28 @@ public class FreeColMenuBar extends JMenuBar {
     */
     public FreeColMenuBar(FreeColClient f, Canvas c, GUI g) {
         super();
-
+        
+        setOpaque(false);
+        
         this.freeColClient = f;
         this.canvas = c;
         this.gui = g;
 
+        Image menuborderN = (Image) UIManager.get("menuborder.n.image");
+        Image menuborderNW = (Image) UIManager.get("menuborder.nw.image");
+        Image menuborderNE = (Image) UIManager.get("menuborder.ne.image");
+        Image menuborderW = (Image) UIManager.get("menuborder.w.image");
+        Image menuborderE = (Image) UIManager.get("menuborder.e.image");
+        Image menuborderS = (Image) UIManager.get("menuborder.s.image");
+        Image menuborderSW = (Image) UIManager.get("menuborder.sw.image");
+        Image menuborderSE = (Image) UIManager.get("menuborder.se.image");
+        Image menuborderShadowSW = (Image) UIManager.get("menuborder.shadow.sw.image");
+        Image menuborderShadowS = (Image) UIManager.get("menuborder.shadow.s.image");
+        Image menuborderShadowSE = (Image) UIManager.get("menuborder.shadow.se.image");
+        final FreeColImageBorder innerBorder = new FreeColImageBorder(menuborderN, menuborderW, menuborderS, menuborderE, menuborderNW, menuborderNE, menuborderSW, menuborderSE);
+        final FreeColImageBorder outerBorder = new FreeColImageBorder(null, null, menuborderShadowS, null, null, null, menuborderShadowSW, menuborderShadowSE);
+        setBorder(new CompoundBorder(outerBorder, innerBorder));
+        
         ActionManager am = f.getActionManager();
 
         // --> Game
@@ -660,13 +683,37 @@ public class FreeColMenuBar extends JMenuBar {
 
 
     public void paintComponent(Graphics g) {
-        super.paintComponent(g);
+        if (isOpaque()) {
+            super.paintComponent(g);
+        } else {
+            Insets insets = getInsets();
+            int width = getWidth() - insets.left - insets.right;
+            int height = getHeight() - insets.top - insets.bottom;
+
+            Image tempImage = (Image) UIManager.get("BackgroundImage");
+
+            final Shape originalClip = g.getClip();
+            g.setClip(insets.left, insets.top, width, height);
+            if (tempImage != null) {                
+                for (int x=0; x<width; x+=tempImage.getWidth(null)) {
+                    for (int y=0; y<height; y+=tempImage.getHeight(null)) {
+                        g.drawImage(tempImage, x, y, null);
+                    }
+                }
+            } else {
+                g.setColor(getBackground());
+                g.fillRect(0, 0, width, height);
+            }
+            g.setClip(originalClip);
+        }
+        
         String displayString = Messages.message("menuBar.statusLine", new String[][]{
             {"%gold%", Integer.toString(freeColClient.getMyPlayer().getGold())},
             {"%tax%", Integer.toString(freeColClient.getMyPlayer().getTax())},
             {"%year%", freeColClient.getGame().getTurn().toString()}
         });
         Rectangle2D displayStringBounds = g.getFontMetrics().getStringBounds(displayString, g);
-        g.drawString(displayString, getWidth()-10-(int)displayStringBounds.getWidth(), 15);
+        int y = 15 + getInsets().top;
+        g.drawString(displayString, getWidth()-10-(int)displayStringBounds.getWidth(), y);
     }
 }

@@ -281,7 +281,7 @@ public class AIGoods extends AIObject implements Transportable {
             destination = null;
         }
         if (destination == null) {
-            logger.warning("Could not find destination: " + destination);
+            logger.warning("Could not find destination: " + destinationStr);
         }
         transportPriority = Integer.parseInt(in.getAttributeValue(null, "transportPriority"));
         

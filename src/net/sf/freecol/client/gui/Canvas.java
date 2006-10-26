@@ -5,7 +5,6 @@ package net.sf.freecol.client.gui;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
@@ -23,7 +22,6 @@ import javax.swing.JLayeredPane;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 
 import net.sf.freecol.client.FreeColClient;
@@ -279,12 +277,7 @@ public final class Canvas extends JLayeredPane {
             remove(jMenuBar);
         }
 
-        Image menuborderImage = (Image) UIManager.get("menuborder.image");
-        if (menuborderImage == null) {
-            mb.setLocation(0, 0);
-        } else {
-            mb.setLocation(0, menuborderImage.getHeight(null));
-        }
+        mb.setLocation(0, 0);
         mb.setSize(getWidth(), (int) mb.getPreferredSize().getHeight());
         add(mb);
 
@@ -320,18 +313,6 @@ public final class Canvas extends JLayeredPane {
     public void paintComponent(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
         gui.display(g2d);
-
-        // Draw menubar border: 
-        if (jMenuBar != null) {
-            Image menuborderImage = (Image) UIManager.get("menuborder.image");
-            if (menuborderImage != null) {
-                int width = getWidth();
-                for (int x=0; x<width; x+=menuborderImage.getWidth(null)) {
-                    g.drawImage(menuborderImage, x, 0, null);
-                    g.drawImage(menuborderImage, x, menuborderImage.getHeight(null) + jMenuBar.getHeight(), null);
-                }
-            }
-        }
     }
 
     /**
@@ -342,12 +323,7 @@ public final class Canvas extends JLayeredPane {
         if (jMenuBar == null) {
             return 0;
         } else {
-            int height = jMenuBar.getHeight();
-            Image menuborderImage = (Image) UIManager.get("menuborder.image");
-            if (menuborderImage != null) {
-                height += menuborderImage.getHeight(null) * 2;
-            }
-            return height;
+            return jMenuBar.getHeight();
         }
     }
 
