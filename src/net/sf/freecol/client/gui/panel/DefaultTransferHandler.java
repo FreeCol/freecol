@@ -1,9 +1,12 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
+import java.awt.MediaTracker;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
@@ -465,14 +468,34 @@ public final class DefaultTransferHandler extends TransferHandler {
 
                         Image image;
                         if (bestSize.width > bestSize.height) {
-                            image = imageIcon.getImage().getScaledInstance(bestSize.width, -1, Image.SCALE_DEFAULT);
+                            bestSize.height = (int) ((((double) bestSize.width) / ((double) imageIcon.getIconWidth())) * imageIcon.getIconHeight());
                         } else {
-                            image = imageIcon.getImage().getScaledInstance(-1, bestSize.height, Image.SCALE_DEFAULT);
+                        	bestSize.width = (int) ((((double) bestSize.height) / ((double) imageIcon.getIconHeight())) * imageIcon.getIconWidth());                            
                         }
+                        image = imageIcon.getImage().getScaledInstance(bestSize.width, bestSize.height, Image.SCALE_DEFAULT);
 
-                        //Point point = new Point(0, 0);
+                        /*
+                          We have to use a MediaTracker to ensure that the
+                          image has been scaled before we use it.
+                         */
+                        MediaTracker mt = new MediaTracker(c);
+                        mt.addImage(image, 0, bestSize.width, bestSize.height);
+                        try {
+                        	mt.waitForID(0);
+                        } catch (InterruptedException e) {
+                        	dge.startDrag(null, t, this);
+                        	return;
+                        }
+                        
                         Point point = new Point(bestSize.width / 2, bestSize.height / 2);
-                        dge.startDrag(tk.createCustomCursor(image, point, "freeColDragIcon"), t, this);
+                        Cursor cursor;
+                        try {
+                        	cursor = tk.createCustomCursor(image, point, "freeColDragIcon");                        	
+                        } catch (RuntimeException re) {
+                        	cursor = null;
+                        }
+                        //Point point = new Point(0, 0);
+                        dge.startDrag(cursor, t, this);                    
                     } else {
                         dge.startDrag(null, t, this);
                     }
