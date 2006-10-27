@@ -911,6 +911,8 @@ public class IndianSettlement extends Settlement {
 
         /* Increase alarm: */
         if (getUnitCount() > 0) {
+            int[] extraAlarm = new int[Player.NUMBER_OF_NATIONS];
+            
             // the radius in which Europeans cause alarm
             int alarmRadius = getRadius() + 2;
             Iterator ci = getGame().getMap().getCircleIterator(getTile().getPosition(), true, alarmRadius);
@@ -920,23 +922,33 @@ public class IndianSettlement extends Settlement {
                     // Nearby military units.
                     Iterator ui = t.getUnitIterator();
                     while (ui.hasNext()) {
-                        Unit u = (Unit) ui.next();
-                        if (u.isOffensiveUnit() && !u.isNaval()) {
-                            int d = (u.getOwner().hasFather(FoundingFather.POCAHONTAS)) ? 2 : 1;
-                            modifyAlarm(u.getOwner(), u.getOffensePower(getTile().getDefendingUnit(u)) * 4 / d);
-                        }
+                    	Unit u = (Unit) ui.next();
+                    	if (u.isOffensiveUnit() && !u.isNaval()) {
+                    		if (t.getSettlement() != null) {
+                    			extraAlarm[u.getOwner().getNation()] += u.getOffensePower(getTile().getDefendingUnit(u));
+                    		}
+                    	}
                     }
                 } else if (t.getOwner() != null && t.getOwner().getOwner().isEuropean()) {
                     // Land being used by another settlement:
-                    int d = (t.getOwner().getOwner().hasFather(FoundingFather.POCAHONTAS)) ? 2 : 1;
-                    modifyAlarm(t.getOwner().getOwner(), 8 / d);
+                    extraAlarm[t.getOwner().getOwner().getNation()] += 2;
                 }
 
                 // Settlement:
                 if (t.getSettlement() != null && t.getSettlement().getOwner().isEuropean()) {
-                    int d = (t.getSettlement().getOwner().hasFather(FoundingFather.POCAHONTAS)) ? 2 : 1;
-                    modifyAlarm(t.getSettlement().getOwner(), (t.getSettlement().getUnitCount() * 4 / 2) / d);
-                }
+                	extraAlarm[t.getSettlement().getOwner().getNation()] += t.getSettlement().getUnitCount();
+                }                
+            }
+            
+            for (int i=0; i<extraAlarm.length; i++) {
+            	Player p = getGame().getPlayer(i);
+            	if (p.isEuropean()) {
+                    int d = (p.hasFather(FoundingFather.POCAHONTAS)) ? 2 : 1;
+                    if (p.getNation() == Player.FRENCH) {
+                    	d *= 2;
+                    }
+                    modifyAlarm(p, extraAlarm[i] / d);            		
+            	}
             }
 
             /* Decrease alarm slightly: */
