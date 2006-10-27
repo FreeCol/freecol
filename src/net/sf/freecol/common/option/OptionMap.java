@@ -116,9 +116,12 @@ public abstract class OptionMap extends OptionGroup {
     * @exception NullPointerException if the given <code>Option</code> does not exist.
     */
     public int getInteger(String id) {
-        try {
-            return ((IntegerOption) values.get(id)).getValue();
-        } catch (ClassCastException e) {
+    	Option o = (Option) values.get(id);
+    	if (o instanceof IntegerOption) {
+    		return ((IntegerOption) o).getValue();
+    	} else if (o instanceof SelectOption) {
+    		return ((SelectOption) o).getValue();
+    	} else {
             throw new IllegalArgumentException("No integer value associated with the specified option.");
         }
     }

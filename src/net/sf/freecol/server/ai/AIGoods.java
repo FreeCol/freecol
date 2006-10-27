@@ -277,14 +277,14 @@ public class AIGoods extends AIObject implements Transportable {
         final String destinationStr = in.getAttributeValue(null, "destination");
         if (destinationStr != null) {
             destination = (Location) getAIMain().getFreeColGameObject(destinationStr);
+            if (destination == null) {
+                logger.warning("Could not find destination: " + destinationStr);
+            }
         } else {
             destination = null;
         }
-        if (destination == null) {
-            logger.warning("Could not find destination: " + destinationStr);
-        }
         transportPriority = Integer.parseInt(in.getAttributeValue(null, "transportPriority"));
-        
+
         final String transportStr = in.getAttributeValue(null, "transport");
         if (transportStr != null) {
             transport = (AIUnit) getAIMain().getAIObject(transportStr);
@@ -296,6 +296,7 @@ public class AIGoods extends AIObject implements Transportable {
         }
         
         in.nextTag();
+
         if (goods != null) {
             goods.readFromXML(in);
         } else {

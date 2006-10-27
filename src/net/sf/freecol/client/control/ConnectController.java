@@ -13,13 +13,16 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.ServerInfo;
@@ -284,8 +287,69 @@ public final class ConnectController {
     */
     public void loadGame(File file) {
         final Canvas canvas = freeColClient.getCanvas();
-        final int port = 3541;
+        final File theFile = file;
 
+        class ErrorJob implements Runnable {
+            private final  String  message;
+            ErrorJob( String message ) {
+                this.message = message;
+            }
+            public void run() {
+                canvas.closeMenus();
+                canvas.errorMessage( message );
+            }
+        };
+
+        final boolean publicServer;
+        final boolean singleplayer;
+        final String name;
+        final int port;
+        try {
+            // Get suggestions for "singleplayer" and "public game" settings from the file:
+            XMLStreamReader in = FreeColServer.createXMLStreamReader(theFile);
+            in.nextTag();                    
+            final boolean defaultSingleplayer = Boolean.valueOf(in.getAttributeValue(null, "singleplayer")).booleanValue();
+            final boolean defaultPublicServer;
+            final String publicServerStr =  in.getAttributeValue(null, "publicServer");
+            if (publicServerStr != null) {
+                defaultPublicServer = Boolean.valueOf(publicServerStr).booleanValue();
+            } else {
+                defaultPublicServer = false;
+            }
+            in.close();
+            
+            final int sgo = freeColClient.getClientOptions().getInteger(ClientOptions.SHOW_SAVEGAME_SETTINGS);
+            if (sgo == ClientOptions.SHOW_SAVEGAME_SETTINGS_ALWAYS
+            		|| !defaultSingleplayer && sgo == ClientOptions.SHOW_SAVEGAME_SETTINGS_MULTIPLAYER) {
+            	if (canvas.showLoadingSavegameDialog(defaultPublicServer, defaultSingleplayer)) {
+            		LoadingSavegameDialog lsd = canvas.getLoadingSavegameDialog();
+            		publicServer = lsd.isPublic();
+            		singleplayer = lsd.isSingleplayer();
+            		name = lsd.getName();
+            		port = lsd.getPort();
+            	} else {
+            		return;
+            	}
+            } else {
+            	publicServer = defaultPublicServer;
+            	singleplayer = defaultSingleplayer;
+            	name = null;
+            	port = 3541;
+            }
+        } catch (FileNotFoundException e) {
+            SwingUtilities.invokeLater( new ErrorJob("fileNotFound") );
+            return;
+        } catch (IOException e) {
+            SwingUtilities.invokeLater( new ErrorJob("server.couldNotStart") );
+            return;
+        } catch (XMLStreamException e) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            logger.warning(sw.toString());                    
+            SwingUtilities.invokeLater( new ErrorJob("server.couldNotStart") );
+            return;
+        }
+        
         if (freeColClient.getFreeColServer() != null && freeColClient.getFreeColServer().getServer().getPort() == port) {
             if (freeColClient.getCanvas().showConfirmDialog("stopServer.text", "stopServer.yes", "stopServer.no")) {
                 freeColClient.getFreeColServer().getController().shutdown();
@@ -295,57 +359,58 @@ public final class ConnectController {
         }
 
         canvas.showStatusPanel(Messages.message("status.loadingGame"));
-
-        final File theFile = file;
-
-        Runnable  loadGameJob = new Runnable() {
+        
+        Runnable loadGameJob = new Runnable() {
             public void run() {
-
-                class ErrorJob implements Runnable {
-
-                    private final  String  message;
-
-                    ErrorJob( String message ) {
-                        this.message = message;
-                    }
-
-                    public void run() {
-                        canvas.closeMenus();
-                        canvas.errorMessage( message );
-                    }
-                };
-
                 FreeColServer freeColServer = null;
                 try {                    
-                    freeColServer = new FreeColServer( theFile, port );
-                    freeColClient.setFreeColServer( freeColServer );
+                    freeColServer = new FreeColServer(theFile, publicServer, singleplayer, port, name);
+                    freeColClient.setFreeColServer(freeColServer);
                     final String username = freeColServer.getOwner();
-                    freeColClient.setSingleplayer( freeColServer.isSingleplayer() );
+                    freeColClient.setSingleplayer(singleplayer);
 
                     SwingUtilities.invokeLater( new Runnable() {
                         public void run() {
-                            login( username, "127.0.0.1", 3541 );               
+                            login(username, "127.0.0.1", 3541);               
                             canvas.closeStatusPanel();
                         }
                     } );                    
-                }
-                catch ( FileNotFoundException e ) {
+                } catch (FileNotFoundException e) {                    
+                    final FreeColServer theFreeColServer = freeColServer;
+                    SwingUtilities.invokeLater(new Runnable() {
+                    	public void run() {
+                            if (theFreeColServer != null) {
+                            	theFreeColServer.getServer().shutdown();
+                            }
+                            freeColClient.getCanvas().closeMainPanel();
+                          	freeColClient.getCanvas().showMainPanel();
+                    	}
+                    });
                     SwingUtilities.invokeLater( new ErrorJob("fileNotFound") );
-                    if (freeColServer != null) {
-                        freeColServer.getServer().shutdown();
-                    }
-                }
-                catch ( IOException e ) {
+                } catch (IOException e) {
+                    final FreeColServer theFreeColServer = freeColServer;
+                    SwingUtilities.invokeLater(new Runnable() {
+                    	public void run() {
+                            if (theFreeColServer != null) {
+                            	theFreeColServer.getServer().shutdown();
+                            }
+                            freeColClient.getCanvas().closeMainPanel();
+                          	freeColClient.getCanvas().showMainPanel();
+                    	}
+                    });
                     SwingUtilities.invokeLater( new ErrorJob("server.couldNotStart") );
-                    if (freeColServer != null) {
-                        freeColServer.getServer().shutdown();
-                    }
-                }
-                catch ( FreeColException e ) {
-                    SwingUtilities.invokeLater( new ErrorJob(e.getMessage()) );
-                    if (freeColServer != null) {
-                        freeColServer.getServer().shutdown();
-                    }
+                } catch (FreeColException e) {
+                    final FreeColServer theFreeColServer = freeColServer;
+                    SwingUtilities.invokeLater(new Runnable() {
+                    	public void run() {
+                            if (theFreeColServer != null) {
+                            	theFreeColServer.getServer().shutdown();
+                            }
+                            freeColClient.getCanvas().closeMainPanel();
+                          	freeColClient.getCanvas().showMainPanel();
+                    	}
+                    });
+                    SwingUtilities.invokeLater( new ErrorJob(e.getMessage()) );                    
                 }
             }
         };

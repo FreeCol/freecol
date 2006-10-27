@@ -34,7 +34,8 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
     
     public static final int     NEW = 0,
                                 OPEN = 1,
-                                QUIT = 2;
+                                OPTIONS = 2,
+                                QUIT = 3;
     
     private final Canvas parent;
     private final FreeColClient freeColClient;
@@ -53,6 +54,7 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
         this.freeColClient = freeColClient;
 
         JButton         openButton = new JButton( Messages.message("menuBar.game.open") ),
+                        optionsButton = new JButton( Messages.message("mainPanel.options") ),
                         quitButton = new JButton( Messages.message("menuBar.game.quit") );
         
         setCancelComponent(quitButton);
@@ -60,10 +62,12 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
 
         newButton.setActionCommand(String.valueOf(NEW));
         openButton.setActionCommand(String.valueOf(OPEN));
+        optionsButton.setActionCommand(String.valueOf(OPTIONS));
         quitButton.setActionCommand(String.valueOf(QUIT));
 
         newButton.addActionListener(this);
         openButton.addActionListener(this);
+        optionsButton.addActionListener(this);
         quitButton.addActionListener(this);
 
         Image tempImage = (Image) UIManager.get("TitleImage");
@@ -74,10 +78,11 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
             add(logoLabel, BorderLayout.CENTER);
         }
 
-        JPanel buttons = new JPanel(new GridLayout(3, 1, 50, 10));
+        JPanel buttons = new JPanel(new GridLayout(4, 1, 50, 10));
 
         buttons.add(newButton);
         buttons.add(openButton);
+        buttons.add(optionsButton);
         buttons.add(quitButton);
 
         buttons.setBorder(new EmptyBorder(5, 25, 20, 25));        
@@ -122,6 +127,9 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
                     break;
                 case OPEN:
                     freeColClient.getConnectController().loadGame();
+                    break;
+                case OPTIONS:
+                    parent.showClientOptionsDialog();
                     break;
                 case QUIT:
                     parent.quit();

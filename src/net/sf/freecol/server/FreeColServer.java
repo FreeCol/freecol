@@ -152,23 +152,33 @@ public final class FreeColServer {
         startMetaServerUpdateThread();
     }
 
-
     /**
-    * Starts a new server in a specified mode and with a specified port
-    * and loads the game from the given file.
-    *
-    * @param file         The file where the game data is located.
-    *
-    * @param port         The TCP port to use for the public socket.
-    *                     That is the port the clients will connect to.
-    *
-    * @throws IOException if the public socket cannot be created (the exception
-    *                     will be logged by this class).
-    *                     
-    * @throws FreeColException if the savegame could not be loaded.
-    */
-    public FreeColServer(File file, int port) throws IOException, FreeColException {
+     * Starts a new server in a specified mode and with a specified port
+     * and loads the game from the given file.
+     *
+     * @param file         The file where the game data is located.
+     *
+     * @param publicServer This value should be set to <code>true</code>
+     *                     in order to appear on the meta server's listing.
+     *
+     * @param singleplayer Sets the game as singleplayer (if <i>true</i>)
+     *                     or multiplayer (if <i>false</i>).
+     * @param port         The TCP port to use for the public socket.
+     *                     That is the port the clients will connect to.
+     *
+     * @param name         The name of the server, or <code>null</code> if the
+     *                     default name should be used.
+     *                     
+     * @throws IOException if the public socket cannot be created (the exception
+     *                     will be logged by this class).
+     *                                          
+     * @throws FreeColException if the savegame could not be loaded.
+     */
+    public FreeColServer(File file, boolean publicServer, boolean singleplayer, int port, String name) throws IOException, FreeColException {
+        this.publicServer = publicServer;
+        this.singleplayer = singleplayer;
         this.port = port;
+        this.name = name;
 
         modelController = new ServerModelController(this);
 
@@ -464,6 +474,41 @@ public final class FreeColServer {
         }
     }
 
+    /**
+     * Creates a <code>XMLStreamReader</code> for reading the
+     * given file. Compression is automatically detected.
+     * 
+     * @param file The file to be read.
+     * @return The <code>XMLStreamReader</code>.
+     * @exception IOException if thrown while loading the game or if
+     *        a <code>XMLStreamException</code> have been thrown by
+     *        the parser.
+     */
+    public static XMLStreamReader createXMLStreamReader(File file) throws IOException {
+        InputStream in = new BufferedInputStream(new FileInputStream(file));
+        
+        // Automatically detect compression:
+        in.mark(10);
+        byte[] buf = new byte[5];
+        in.read(buf, 0, 5);
+        in.reset();
+        
+        if (!(new String(buf)).equals("<?xml")) {                
+            in = new BufferedInputStream(new InflaterInputStream(in));
+        }
+
+        XMLInputFactory xif = XMLInputFactory.newInstance();
+        
+        try {            
+            return xif.createXMLStreamReader(in);
+        } catch (XMLStreamException e) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            logger.warning(sw.toString());
+            throw new IOException("XMLStreamException.");            
+        }
+
+    }
 
     /**
     * Loads a game.
@@ -479,25 +524,11 @@ public final class FreeColServer {
     *        data.
     */
     public String loadGame(File file) throws IOException, FreeColException {
-        try {
-            InputStream in = new BufferedInputStream(new FileInputStream(file));
-            
-            // Automatically detect savegame compression:
-            in.mark(10);
-            byte[] buf = new byte[5];
-            in.read(buf, 0, 5);
-            in.reset();
-            
-            if (!(new String(buf)).equals("<?xml")) {                
-                in = new BufferedInputStream(new InflaterInputStream(in));
-            }
-            
+        try {            
             boolean doNotLoadAI = false;
             
-            XMLInputFactory xif = XMLInputFactory.newInstance();
-            XMLStreamReader xsr;
             try {
-                xsr = xif.createXMLStreamReader(in);
+                XMLStreamReader xsr = createXMLStreamReader(file);
                 xsr.nextTag();
                 
                 final String version = xsr.getAttributeValue(null, "version");
@@ -507,12 +538,6 @@ public final class FreeColServer {
                     } else {
                         throw new FreeColException("incompatibleVersions");
                     }
-                }
-                
-                singleplayer = Boolean.valueOf(xsr.getAttributeValue(null, "singleplayer")).booleanValue();
-                final String publicServerStr =  xsr.getAttributeValue(null, "publicServer");
-                if (publicServerStr != null) {
-                    publicServer = Boolean.valueOf(publicServerStr).booleanValue();
                 }
                 
                 final String owner = xsr.getAttributeValue(null, "owner");

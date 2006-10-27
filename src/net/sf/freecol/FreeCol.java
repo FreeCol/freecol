@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
@@ -76,6 +77,14 @@ public final class FreeCol {
      */
     public static void main(String[] args) {
 
+        // TODO: The location of the save directory should be determined by the installer.
+        saveDirectory = new File(System.getProperty("user.home"));
+        if (!saveDirectory.exists()) {
+            saveDirectory = new File("save");
+        } else {        
+            saveDirectory = new File(saveDirectory, "freecol" + FILE_SEP + "save");
+        }
+        
         handleArgs(args);
 
         if (javaCheck && !checkJavaVersion()) {
@@ -103,16 +112,6 @@ public final class FreeCol {
         } catch (FreeColException e) {
             e.printStackTrace();
         }
-
-
-        
-        // TODO: The location of the save directory should be determined by the installer.
-        saveDirectory = new File(System.getProperty("user.home"));
-        if (!saveDirectory.exists()) {
-            saveDirectory = new File("save");
-        } else {        
-            saveDirectory = new File(saveDirectory, "freecol" + FILE_SEP + "save");
-        }
         
         if (!saveDirectory.exists()) {
             saveDirectory.mkdirs();
@@ -121,7 +120,30 @@ public final class FreeCol {
         if (standAloneServer) {
             logger.info("Starting stand-alone server.");
             try {
-                final FreeColServer freeColServer = new FreeColServer(true, false, serverPort, serverName);
+                final FreeColServer freeColServer;
+                if (savegameFile != null) {
+                    try {
+                        // Get suggestions for "singleplayer" and "public game" settings from the file:
+                        XMLStreamReader in = FreeColServer.createXMLStreamReader(savegameFile);
+                        in.nextTag();                    
+                        final boolean defaultSingleplayer = Boolean.valueOf(in.getAttributeValue(null, "singleplayer")).booleanValue();
+                        final boolean defaultPublicServer;
+                        final String publicServerStr =  in.getAttributeValue(null, "publicServer");
+                        if (publicServerStr != null) {
+                            defaultPublicServer = Boolean.valueOf(publicServerStr).booleanValue();
+                        } else {
+                            defaultPublicServer = false;
+                        }
+                        in.close();
+                        
+                        freeColServer = new FreeColServer(savegameFile, defaultPublicServer, defaultSingleplayer, serverPort, serverName);
+                    } catch (Exception e) {
+                        System.out.println("Could not load savegame.");
+                        return;
+                    }
+                } else {
+                    freeColServer = new FreeColServer(true, false, serverPort, serverName);
+                }
 
                 Runtime runtime = Runtime.getRuntime();
                 runtime.addShutdownHook(new Thread() {
@@ -310,9 +332,12 @@ public final class FreeCol {
                 i++;
                 if (i < args.length) {
                     savegameFile = new File(args[i]);
-                    if (!savegameFile.exists() || !savegameFile.isFile()) {
-                        System.out.println("The given savegame file could not be found: " + args[i]);
-                        System.exit(1);
+                    if (!savegameFile.exists() || !savegameFile.isFile()) {                        
+                        savegameFile = new File(getSaveDirectory(), args[i]);
+                        if (!savegameFile.exists() || !savegameFile.isFile()) {
+                        	System.out.println("The given savegame file could not be found: " + args[i]);
+                        	System.exit(1);
+                        }
                     }
                 } else {
                     printUsage();
@@ -384,6 +409,10 @@ public final class FreeCol {
         System.out.println("Options:");
         System.out.println("--server-name NAME");
         System.out.println("  specifies a custom name for the server");
+        System.out.println("--load-savegame SAVEGAME_FILE");
+        System.out.println("  loads the given savegame.");      
+        System.out.println("--no-java-check");
+        System.out.println("  skips the java version check");        
         System.out.println();
     }
 

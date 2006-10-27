@@ -28,8 +28,8 @@ public class ClientOptions extends OptionMap {
     public static final String  REVISION = "$Revision$";
 
 
-    
-    public static final String GROUP_GUI = "gui";
+
+    private static final String GROUP_GUI = "gui";
 
     /**
      * Selected tiles always gets centered if this option is
@@ -80,7 +80,39 @@ public class ClientOptions extends OptionMap {
     public static final String SHOW_LOST_CITY_RUMOURS = "guiShowLostCityRumours";
     public static final String SHOW_MISSING_GOODS = "guiShowMissingGoods";
     public static final String SHOW_COLONY_WARNINGS = "guiShowColonyWarnings";
+    
+    /**
+     * Use default values for savegames instead of displaying a dialog.
+     * <br><br>
+     * Possible values for this option are:
+     * <ol>
+     *   <li>{@link #SHOW_SAVEGAME_SETTINGS_NEVER}</li>
+     *   <li>{@link #SHOW_SAVEGAME_SETTINGS_MULTIPLAYER}</li>
+     *   <li>{@link #SHOW_SAVEGAME_SETTINGS_ALWAYS}</li>
+     * </ol>
+     */
+    public static final String SHOW_SAVEGAME_SETTINGS = "showSavegameSettings";
+    
+    /**
+     * A possible value for the {@link SelectOption}: {@link #SHOW_SAVEGAME_SETTINGS}.
+     * Specifies that the dialog should never be enabled.
+     */
+    public static final int SHOW_SAVEGAME_SETTINGS_NEVER = 0;
+    
+    /**
+     * A possible value for the {@link SelectOption}: {@link #SHOW_SAVEGAME_SETTINGS}.
+     * Specifies that the dialog should only be enabled when loading savegames being
+     * marked as multiplayer..
+     */
+    public static final int SHOW_SAVEGAME_SETTINGS_MULTIPLAYER = 1;
+    
+    /**
+     * A possible value for the {@link SelectOption}: {@link #SHOW_SAVEGAME_SETTINGS}.
+     * Specifies that the dialog should always be enabled.
+     */
+    public static final int SHOW_SAVEGAME_SETTINGS_ALWAYS = 2;
 
+    
     /**
     * Creates a new <code>ClientOptions</code>.
     */
@@ -179,6 +211,17 @@ public class ClientOptions extends OptionMap {
                                        "clientOptions.gui." + SHOW_COLONY_WARNINGS + ".shortDescription",
                                        true));
         add(messagesGroup);
+        
+        OptionGroup savegamesGroup = new OptionGroup("clientOptions.savegames.name", "clientOptions.savegames.shortDescription");
+        savegamesGroup.add(new SelectOption(SHOW_SAVEGAME_SETTINGS,
+                "clientOptions.savegames." + SHOW_SAVEGAME_SETTINGS + ".name", 
+                "clientOptions.savegames." + SHOW_SAVEGAME_SETTINGS + ".shortDescription", 
+                new String[] {"clientOptions.savegames." + SHOW_SAVEGAME_SETTINGS + ".never",
+                              "clientOptions.savegames." + SHOW_SAVEGAME_SETTINGS + ".multiplayer",
+                              "clientOptions.savegames." + SHOW_SAVEGAME_SETTINGS + ".always"},
+                1)
+        );        
+        add(savegamesGroup);          
     }
 
 

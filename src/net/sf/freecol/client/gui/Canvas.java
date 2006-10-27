@@ -42,6 +42,7 @@ import net.sf.freecol.client.gui.panel.GameOptionsDialog;
 import net.sf.freecol.client.gui.panel.ImageProvider;
 import net.sf.freecol.client.gui.panel.IndianSettlementPanel;
 import net.sf.freecol.client.gui.panel.InfoPanel;
+import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.client.gui.panel.MainPanel;
 import net.sf.freecol.client.gui.panel.MonarchPanel;
 import net.sf.freecol.client.gui.panel.NewPanel;
@@ -129,6 +130,7 @@ public final class Canvas extends JLayeredPane {
                                 CONFIRM_LAYER = new Integer(DEFAULT_LAYER.intValue() + 12),
                                 GAME_OPTIONS_LAYER = new Integer(DEFAULT_LAYER.intValue() + 9),
                                 CLIENT_OPTIONS_LAYER = new Integer(DEFAULT_LAYER.intValue() + 9),
+                                LOADING_SAVEGAME_LAYER = new Integer(DEFAULT_LAYER.intValue() + 11),
                                 LOAD_LAYER = new Integer(DEFAULT_LAYER.intValue() + 10),
                                 SAVE_LAYER = new Integer(DEFAULT_LAYER.intValue() + 10),
                                 SCOUT_INDIAN_SETTLEMENT_LAYER = new Integer(DEFAULT_LAYER.intValue() + 9),
@@ -183,6 +185,7 @@ public final class Canvas extends JLayeredPane {
     private final GameOptionsDialog gameOptionsDialog;
     private final ClientOptionsDialog clientOptionsDialog;
     private final DeclarationDialog declarationDialog;
+    private final LoadingSavegameDialog loadingSavegameDialog;
     private TakeFocusThread         takeFocusThread;
     private JMenuBar                jMenuBar;
 
@@ -234,6 +237,7 @@ public final class Canvas extends JLayeredPane {
         reportContinentalCongressPanel = new ReportContinentalCongressPanel(this);
         gameOptionsDialog = new GameOptionsDialog(this, freeColClient);
         clientOptionsDialog = new ClientOptionsDialog(this, freeColClient);
+        loadingSavegameDialog = new LoadingSavegameDialog(this, freeColClient);
 
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
@@ -756,6 +760,36 @@ public final class Canvas extends JLayeredPane {
         boolean r = gameOptionsDialog.getResponseBoolean();
         remove(gameOptionsDialog);
 
+        return r;
+    }
+
+    /**
+     * Gets the <code>LoadingSavegameDialog</code>.
+     * @return The <code>LoadingSavegameDialog</code>.
+     */
+    public LoadingSavegameDialog getLoadingSavegameDialog() {
+        return loadingSavegameDialog;
+    }
+    
+    /**
+     * Displays a dialog for setting options when loading a savegame.
+     * The settings can be retrived directly from {@link LoadingSavegameDialog}
+     * after calling this method. 
+     * 
+     * @param publicServer Default value.
+     * @param singleplayer Default value. 
+     * @return <code>true</code> if the "ok"-button was pressed and
+     *      <code>false</code> otherwise.
+     */
+    public boolean showLoadingSavegameDialog(boolean publicServer, boolean singleplayer) {
+        loadingSavegameDialog.initialize(publicServer, singleplayer);
+        
+        addCentered(loadingSavegameDialog, GAME_OPTIONS_LAYER);
+        loadingSavegameDialog.requestFocus();
+        
+        boolean r = loadingSavegameDialog.getResponseBoolean();
+        remove(loadingSavegameDialog);
+        
         return r;
     }
 
@@ -1414,6 +1448,7 @@ public final class Canvas extends JLayeredPane {
     public void addCentered(Component comp, Integer i) { 
         comp.setLocation(getWidth() / 2 - comp.getWidth() / 2,
                 (getHeight() + getMenuBarHeight()) / 2 - comp.getHeight() / 2);
+        
         add(comp, i);
     }
     
@@ -1712,6 +1747,14 @@ public final class Canvas extends JLayeredPane {
         mainPanel.requestFocus();
     }
 
+    /**
+     * Gets the <code>MainPanel</code>.
+     * @return The <code>MainPanel</code>.
+     * @see MainPanel
+     */
+    public MainPanel getMainPanel() {
+    	return mainPanel;
+    }
     
     /**
     * Closes the {@link MainPanel}.
