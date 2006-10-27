@@ -117,9 +117,12 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
         Game game = getFreeColClient().getGame();
 
         Element playerElement = (Element) element.getElementsByTagName(Player.getXMLElementTagName()).item(0);
-        Player newPlayer = new Player(game, playerElement);
-
-        getFreeColClient().getGame().addPlayer(newPlayer);
+        if (game.getFreeColGameObject(playerElement.getAttribute("ID")) == null) {
+           Player newPlayer = new Player(game, playerElement);
+           getFreeColClient().getGame().addPlayer(newPlayer);
+        } else {
+           game.getFreeColGameObject(playerElement.getAttribute("ID")).readFromXMLElement(playerElement);
+        }
         getFreeColClient().getCanvas().getStartGamePanel().refreshPlayersTable();
 
         return null;

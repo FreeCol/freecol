@@ -1230,6 +1230,7 @@ public class IndianSettlement extends Settlement {
                     alarm[i] = new Tension(tensionArray[i]);
                 }
             } else if (in.getLocalName().equals("missionary")) {
+                in.nextTag();
                 missionary = (Unit) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
                 if (missionary == null) {
                     missionary = new Unit(getGame(), in);
