@@ -399,6 +399,23 @@ public class AIColony extends AIObject {
         wishes.add(gw);
     }
 
+    /**
+     * Removes the given <code>AIGoods</code> from this colony's list.
+     * The <code>AIGoods</code>-object is not disposed as part of this
+     * operation. Use that method instead to remove the object completely
+     * (this method would then be called indirectly).
+     * 
+     * @param ag The <code>AIGoods</code> to be removed.
+     * @see AIGoods#dispose()
+     */
+    public void removeAIGoods(AIGoods ag) {
+    	Iterator it = aiGoods.iterator();
+    	while (it.hasNext()) {
+    		if (it.next() == ag) {
+    			it.remove();
+    		}
+    	}
+    }
 
     /**
     * Creates a list of the goods which should be shipped out of this colony.

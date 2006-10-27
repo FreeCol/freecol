@@ -7,6 +7,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Locatable;
 import net.sf.freecol.common.model.Location;
@@ -183,6 +185,15 @@ public class AIGoods extends AIObject implements Transportable {
                 && transport.getMission() instanceof TransportMission) {
             TransportMission tm = (TransportMission) transport.getMission();
             tm.removeFromTransportList(this);
+        }
+        if (destination != null) {
+        	if (destination instanceof Colony) {
+        		((AIColony) getAIMain().getAIObject((Colony) destination)).removeAIGoods(this);
+        	} else if (destination instanceof Europe) {
+        		// Nothing to remove.
+        	} else {
+        		logger.warning("Unknown type of destination: " + destination);
+        	}
         }
         super.dispose();
     }
