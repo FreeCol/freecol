@@ -69,8 +69,8 @@ abstract public class FreeColGameObject {
             //game.setFreeColGameObject(id, this);            
             String tagName = "";
             try {
-                Method m = getClass().getMethod("getXMLElementTagName", null);
-                tagName = (String) m.invoke(null, null);
+                Method m = getClass().getMethod("getXMLElementTagName", (Class[]) null);
+                tagName = (String) m.invoke((Object) null, (Object[]) null);
             } catch (Exception e) {}
             String nextID = tagName + ":" + game.getNextID();
             if (nextID != null) {

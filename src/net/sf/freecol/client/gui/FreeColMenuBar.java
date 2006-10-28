@@ -654,7 +654,7 @@ public class FreeColMenuBar extends JMenuBar {
             });
         }
         
-        update();
+        update();        
     }
 
 

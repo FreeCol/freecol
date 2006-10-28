@@ -1,7 +1,6 @@
 
 package net.sf.freecol.client.control;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
