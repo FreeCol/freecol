@@ -913,24 +913,26 @@ public class IndianSettlement extends Settlement {
         if (getUnitCount() > 0) {
             int[] extraAlarm = new int[Player.NUMBER_OF_NATIONS];
             
-            // the radius in which Europeans cause alarm
-            int alarmRadius = getRadius() + 2;
+            int alarmRadius = getRadius() + 2; // the radius in which Europeans cause alarm
             Iterator ci = getGame().getMap().getCircleIterator(getTile().getPosition(), true, alarmRadius);
             while (ci.hasNext()) {
                 Tile t = getGame().getMap().getTile((Map.Position) ci.next());
-                if (t.getFirstUnit() != null && t.getFirstUnit().getOwner().isEuropean()) {
-                    // Nearby military units.
-                    Iterator ui = t.getUnitIterator();
-                    while (ui.hasNext()) {
-                    	Unit u = (Unit) ui.next();
-                    	if (u.isOffensiveUnit() && !u.isNaval()) {
-                    		if (t.getSettlement() != null) {
-                    			extraAlarm[u.getOwner().getNation()] += u.getOffensePower(getTile().getDefendingUnit(u));
-                    		}
-                    	}
-                    }
-                } else if (t.getOwner() != null && t.getOwner().getOwner().isEuropean()) {
-                    // Land being used by another settlement:
+                
+                // Nearby military units:
+                if (t.getFirstUnit() != null 
+                		&& t.getFirstUnit().getOwner().isEuropean()
+                		&& t.getSettlement() == null) {                    
+                	Iterator ui = t.getUnitIterator();
+                	while (ui.hasNext()) {
+                		Unit u = (Unit) ui.next();
+                		if (u.isOffensiveUnit() && !u.isNaval()) {                    		
+                			extraAlarm[u.getOwner().getNation()] += u.getOffensePower(getTile().getDefendingUnit(u));
+                		}
+                	}
+                }
+                
+                // Land being used by another settlement:
+                if (t.getOwner() != null && t.getOwner().getOwner().isEuropean()) {                    
                     extraAlarm[t.getOwner().getOwner().getNation()] += 2;
                 }
 
