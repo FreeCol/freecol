@@ -1,6 +1,7 @@
 
 package net.sf.freecol.client.control;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
@@ -60,17 +61,17 @@ public abstract class InputHandler implements MessageHandler {
     */
     protected Element disconnect(Element disconnectElement) {
         // Updating the GUI should always be done in the EDT:
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                if (freeColClient.getCanvas().containsInGameComponents()) {
-                    if (freeColClient.getFreeColServer() == null) {
-                        freeColClient.getCanvas().returnToTitle();
-                    } else {
-                        freeColClient.getCanvas().removeInGameComponents();
-                    }
-                }
-            }
-        });
+    	javax.swing.SwingUtilities.invokeLater(new Runnable() {
+    		public void run() {
+    			if (freeColClient.getCanvas().containsInGameComponents()) {
+    				if (freeColClient.getFreeColServer() == null) {
+    					freeColClient.getCanvas().returnToTitle();
+    				} else {
+    					freeColClient.getCanvas().removeInGameComponents();
+    				}
+    			}
+    		}
+    	});
 
         return null;
     }

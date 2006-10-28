@@ -262,9 +262,9 @@ public final class ConnectController {
         final String username = freeColClient.getMyPlayer().getUsername();
         final String host = freeColClient.getClient().getHost();
         final int port = freeColClient.getClient().getPort();
-
+        
         freeColClient.getCanvas().removeInGameComponents();
-        logout(true);        
+        logout(true);
         login(username, host, port);
     }
 
@@ -444,7 +444,7 @@ public final class ConnectController {
         freeColClient.setMyPlayer(null);
         freeColClient.setClient(null);
 
-        freeColClient.setLoggedIn(false);
+        freeColClient.setLoggedIn(false);        
     }
 
 

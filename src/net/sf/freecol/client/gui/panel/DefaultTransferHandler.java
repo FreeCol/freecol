@@ -1,7 +1,6 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;

@@ -122,18 +122,20 @@ final class ReceivingThread extends Thread {
             } catch (XMLStreamException e) {
                 timesFailed++;
                 //warnOf(e);
-                if (timesFailed > MAXIMUM_RETRIES) {
+                if (shouldRun && timesFailed > MAXIMUM_RETRIES) {
                     disconnect();
                 }        
             } catch (SAXException e) {
                 timesFailed++;
                 //warnOf(e);
-                if (timesFailed > MAXIMUM_RETRIES) {
+                if (shouldRun && timesFailed > MAXIMUM_RETRIES) {
                     disconnect();
                 }                  
             } catch (IOException e) {
                 //warnOf(e);
-                disconnect();
+            	if (shouldRun) {
+            		disconnect();
+            	}
             }
         }
     }

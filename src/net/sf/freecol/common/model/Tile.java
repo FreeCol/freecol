@@ -1500,7 +1500,7 @@ public final class Tile extends FreeColGameObject implements Location {
 
         final String ownerStr = in.getAttributeValue(null, "owner");
         if (ownerStr != null) {
-            owner = (Settlement) getGame().getFreeColGameObject(ownerStr);
+            owner = (Settlement) getGame().getFreeColGameObject(ownerStr);            
             if (owner == null) {
                 if (ownerStr.startsWith(IndianSettlement.getXMLElementTagName())) {
                     owner = new IndianSettlement(getGame(), ownerStr);
