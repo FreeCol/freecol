@@ -113,7 +113,9 @@ public final class ClientOptionsDialog extends FreeColDialog implements ActionLi
             switch (Integer.valueOf(command).intValue()) {
                 case OK:
                     ui.updateOption();
-                    freeColClient.getCanvas().resetFreeColMenuBar();    // TODO: Find a better method to reset set accelerators.
+                    if (freeColClient.getCanvas().getJMenuBar() != null) {
+                    	freeColClient.getCanvas().resetFreeColMenuBar();    // TODO: Find a better method to reset set accelerators.
+                    }
                     parent.remove(this);
                     freeColClient.getActionManager().update();
                     freeColClient.saveClientOptions();

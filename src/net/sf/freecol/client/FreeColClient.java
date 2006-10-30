@@ -270,7 +270,6 @@ public final class FreeColClient {
     */
     public void saveClientOptions(File saveFile) {
         Element element = getClientOptions().toXMLElement(Message.createNewDocument());
-
         // Write the XML Element to the file:
         try {
             TransformerFactory factory = TransformerFactory.newInstance();
@@ -285,7 +284,7 @@ public final class FreeColClient {
                 logger.warning("Could not store client options.");
             }
         } catch (TransformerException e) {
-            e.printStackTrace();
+            logger.warning("TransformerException");
             return;
         }
     }
