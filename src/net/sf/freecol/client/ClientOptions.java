@@ -112,6 +112,12 @@ public class ClientOptions extends OptionMap {
      */
     public static final int SHOW_SAVEGAME_SETTINGS_ALWAYS = 2;
 
+    /**
+     * Option for setting the period of autosaves. The value 0 signals that autosaving
+     * is disabled. 
+     */
+    public static final String AUTOSAVE_PERIOD = "autosavePeriod"; 
+    
     
     /**
     * Creates a new <code>ClientOptions</code>.
@@ -220,7 +226,8 @@ public class ClientOptions extends OptionMap {
                               "clientOptions.savegames." + SHOW_SAVEGAME_SETTINGS + ".multiplayer",
                               "clientOptions.savegames." + SHOW_SAVEGAME_SETTINGS + ".always"},
                 1)
-        );        
+        );
+        savegamesGroup.add(new IntegerOption(AUTOSAVE_PERIOD, "clientOptions.savegames."+ AUTOSAVE_PERIOD +".name", "clientOptions.savegames."+ AUTOSAVE_PERIOD +".shortDescription", 0, 100, 0));
         add(savegamesGroup);          
     }
 

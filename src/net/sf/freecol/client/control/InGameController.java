@@ -80,31 +80,41 @@ public final class InGameController implements NetworkConstants {
 
         if (freeColClient.getMyPlayer().isAdmin() && freeColClient.getFreeColServer() != null) {
             final File file = canvas.showSaveDialog(FreeCol.getSaveDirectory());
-
             if (file != null) {
-                canvas.showStatusPanel(Messages.message("status.savingGame"));
-                Thread t = new Thread() {
-                    public void run() {
-                        try {
-                            freeColClient.getFreeColServer().saveGame(file, freeColClient.getMyPlayer().getUsername());
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    canvas.closeStatusPanel();
-                                    canvas.requestFocusInWindow();
-                                }
-                            });
-                        } catch (IOException e) {
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    canvas.errorMessage("couldNotSaveGame");
-                                }
-                            });
-                        }
-                    }
-                };
-                t.start();
+            	saveGame(file);
             }
         }
+    }
+            
+    /**
+     * Saves the game to the given file.
+     * 
+     * @param file The <code>File</code>.
+     */
+    public void saveGame(final File file) {   
+        final Canvas canvas = freeColClient.getCanvas();
+        
+    	canvas.showStatusPanel(Messages.message("status.savingGame"));
+    	Thread t = new Thread() {
+    		public void run() {
+    			try {
+    				freeColClient.getFreeColServer().saveGame(file, freeColClient.getMyPlayer().getUsername());
+    				SwingUtilities.invokeLater(new Runnable() {
+    					public void run() {
+    						canvas.closeStatusPanel();
+    						canvas.requestFocusInWindow();
+    					}
+    				});
+    			} catch (IOException e) {
+    				SwingUtilities.invokeLater(new Runnable() {
+    					public void run() {
+    						canvas.errorMessage("couldNotSaveGame");
+    					}
+    				});
+    			}
+    		}
+    	};
+    	t.start();
     }
 
 
@@ -196,6 +206,16 @@ public final class InGameController implements NetworkConstants {
         game.setCurrentPlayer(currentPlayer);
 
         if (freeColClient.getMyPlayer().equals(currentPlayer)) {
+            // Autosave the game:
+            final int turnNumber = freeColClient.getGame().getTurn().getNumber();
+            final int savegamePeriod = freeColClient.getClientOptions().getInteger(ClientOptions.AUTOSAVE_PERIOD);        
+            if (savegamePeriod == 1 || 
+            		(savegamePeriod != 0 && turnNumber % savegamePeriod == 0)) {
+            	final String turn = freeColClient.getGame().getTurn().toString().replaceAll(" ", "");
+            	final String filename = Messages.message("clientOptions.savegames.autosave.fileprefix") + '-' + turn + ".fsg";
+            	saveGame(new File(FreeCol.getAutosaveDirectory(), filename));
+            }
+            
             removeUnitsOutsideLOS();
             freeColClient.getCanvas().closeMenus();
             freeColClient.getCanvas().setEnabled(true);

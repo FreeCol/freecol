@@ -125,7 +125,7 @@ public final class InGameController extends Controller {
             } catch (IOException e) {
                 logger.warning("Could not send message to: " + nextPlayer.getName() + " with connection " + nextPlayer.getConnection());
             }
-        }
+        }        
 
         game.setCurrentPlayer(nextPlayer);
 
