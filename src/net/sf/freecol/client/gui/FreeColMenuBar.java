@@ -697,12 +697,12 @@ public class FreeColMenuBar extends JMenuBar {
             if (tempImage != null) {                
                 for (int x=0; x<width; x+=tempImage.getWidth(null)) {
                     for (int y=0; y<height; y+=tempImage.getHeight(null)) {
-                        g.drawImage(tempImage, x, y, null);
+                        g.drawImage(tempImage, insets.left + x, insets.top + y, null);
                     }
                 }
             } else {
                 g.setColor(getBackground());
-                g.fillRect(0, 0, width, height);
+                g.fillRect(insets.left, insets.top, width, height);
             }
             g.setClip(originalClip);
         }
