@@ -105,16 +105,27 @@ public class UnitSeekAndDestroyMission extends Mission {
     */
     public void doMission(Connection connection) {
         Unit unit = getUnit();
-
+if (unit.isDisposed()) System.exit(1);
         if (!isValid()) {
             return;
         }
         
         PathNode pathToTarget = null;
         if (unit.getLocation() instanceof Unit) {
-            pathToTarget = getDisembarkPath(unit, unit.getTile(), target.getTile(), (Unit) unit.getLocation());            
+        	if (unit.getTile() == null) {
+        		pathToTarget = null;
+        	} else {
+        		pathToTarget = getDisembarkPath(unit, unit.getTile(), target.getTile(), (Unit) unit.getLocation());
+        		if (pathToTarget.getTransportDropNode() != pathToTarget) {
+        			pathToTarget = null;
+        		}
+        	}
         } else {
-            pathToTarget = getUnit().findPath(target.getTile());
+        	if (unit.getTile() == null) {
+        		pathToTarget = null;
+        	} else {
+        		pathToTarget = getUnit().findPath(target.getTile());
+        	}
         }
         
         if (pathToTarget != null) {
