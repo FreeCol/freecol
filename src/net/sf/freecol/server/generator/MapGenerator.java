@@ -92,11 +92,63 @@ public class MapGenerator {
         Map map = terrainGenerator.createMap();
 
         game.setMap(map);
+	createMountains(map);
         createRivers(map);
         createIndianSettlements(map, players);
         createEuropeanUnits(map, width, height, players);
         createLostCityRumours(map);        
     }
+
+
+    /**
+     * Creates mountain ranges on the given map.  The number and size
+     * of mountain ranges depends on the map size.
+     *
+     * @param map The map to use.
+     */
+    public void createMountains(Map map) {
+	int maximumLength = Math.max(width, height) / 10;
+        int number = (width * height) / 300;
+        int counter = 0;
+	logger.fine("Maximum length of mountain ranges is " + maximumLength);
+
+        for (int i = 0; i < number; i++) {
+	    //MountainRange range = new MountainRange(map, maximumLength);
+            for (int tries = 0; tries < 100; tries++) {
+		Position p = getRandomLandPosition(map);
+                if (map.getTile(p).isLand()) {
+		    int direction = random.nextInt(8);
+		    int length = maximumLength - random.nextInt(maximumLength/2);
+		    logger.info("Direction of mountain range is " + direction +
+				", length of mountain range is " + length);
+		    for (int index = 0; index < length; index++) {
+			p = getAdjacent(p, direction);
+			Tile t = map.getTile(p);
+			if (t != null && t.isLand()) {
+			    t.setAddition(Tile.ADD_MOUNTAINS);
+			    Iterator it = map.getCircleIterator(p, false, 1);
+			    while (it.hasNext()) {
+				t = map.getTile((Position) it.next());
+				if (t.isLand() &&
+				    t.getAddition() != Tile.ADD_MOUNTAINS) {
+				    int r = random.nextInt(8);
+				    if (r == 0) {
+					t.setAddition(Tile.ADD_MOUNTAINS);
+				    } else if (r > 2) {
+					t.setAddition(Tile.ADD_HILLS);
+				    }
+				    if (random.nextInt(10) == 0) {
+					t.setBonus(true);
+				    }
+				}
+			    }
+			}
+		    }
+		    break;
+		}
+	    }
+	}
+    }	
 
 
     /**
@@ -907,10 +959,10 @@ public class MapGenerator {
                         if ((t.getType() != Tile.ARCTIC) && (tileType.nextInt(3) > 1)) {
                             t.setForested(true);
                         } else if ((t.getType() != Tile.ARCTIC) && (t.getType() != Tile.TUNDRA)) {
-                            int k = tileType.nextInt(8);
-                            if (k >= 6) {
+                            int k = tileType.nextInt(16);
+                            if (k < 1) {
                                 t.setAddition(Tile.ADD_MOUNTAINS);
-                            } else if (k >= 4) {
+                            } else if (k < 2) {
                                 t.setAddition(Tile.ADD_HILLS);
                             }
                         }
