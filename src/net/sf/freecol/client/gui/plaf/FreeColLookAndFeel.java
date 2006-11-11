@@ -281,7 +281,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
                         
             // Add font UI resources:
             resources = new String[][] {                
-                {"HeaderFont", "Plakat-Fraktur.ttf"},
+                {"HeaderFont", "ShadowedBlack.ttf"},
             };                  
             
             for (int i=0; i<resources.length; i++) {
