@@ -31,11 +31,13 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
+import javax.swing.ListCellRenderer;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -95,10 +97,11 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     private final JLabel                    solLabel;
     private final JLabel                    hammersLabel;
     private final JLabel                    toolsLabel;
-    private final JLabel                    colonyNameLabel;    // CHRIS
+    //private final JLabel                    colonyNameLabel;    // CHRIS
 
     private final ProductionPanel           productionPanel;
     private final BuildingBox               buildingBox;
+    private final ColonyNameBox             nameBox;
     private final OutsideColonyPanel        outsideColonyPanel;
     private final InPortPanel               inPortPanel;
     private final CargoPanel                cargoPanel;
@@ -194,8 +197,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 buildingsLabel = new JLabel(Messages.message("buildings"));
 
         // Make the colony label
-        colonyNameLabel = new JLabel("", SwingConstants.CENTER);    // CHRIS
-        colonyNameLabel.setFont(new Font(colonyNameLabel.getFont().getName(),Font.BOLD,24));
+	nameBox = new ColonyNameBox(this);
 
         buildingsScroll.setAutoscrolls(true);
 
@@ -223,8 +225,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         buildingBox.setSize(265, 20);
         hammersLabel.setSize(180, 20);  // was: 150,20  CHRIS
         toolsLabel.setSize(150, 20);
-        colonyNameLabel.setSize(windowWidth, 30);
-        
+        nameBox.setSize(400, 32);
 
         assignLocations(outsideColonyScroll, inPortScroll, cargoScroll, warehouseScroll, tilesScroll, buildingsScroll);
 
@@ -287,7 +288,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         add(hammersLabel);
         add(toolsLabel);
         add(buyBuilding);
-        add(colonyNameLabel);
+	add(nameBox);
     }
 
 
@@ -306,7 +307,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
      */
     private void assignLocations(JScrollPane outsideColonyScroll, JScrollPane inPortScroll, JScrollPane cargoScroll, JScrollPane warehouseScroll, JScrollPane tilesScroll, JScrollPane buildingsScroll) {
         int y = 10;
-        colonyNameLabel.setLocation (0,y);   //602);
+	nameBox.setLocation(225, y);
         
         y+= 30;
         tilesScroll.setLocation     (10, y);         //10);
@@ -457,12 +458,13 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         goldLabel.setText(Messages.message("goldTitle") + ": " + freeColClient.getMyPlayer().getGold());
 
         buildingBox.initialize();
+	nameBox.initialize(colony);
 
         updateSoLLabel();
         updateProgressLabel();
 
-        ImageIcon imageIcon = new ImageIcon(freeColClient.getGUI().createStringImage(colonyNameLabel, colony.getName(), colony.getOwner().getColor(), 200, 24));
-        this.colonyNameLabel.setIcon(imageIcon);
+        //ImageIcon imageIcon = new ImageIcon(freeColClient.getGUI().createStringImage(colonyNameLabel, colony.getName(), colony.getOwner().getColor(), 200, 24));
+        //this.colonyNameLabel.setIcon(imageIcon);
     }
 
 
@@ -726,6 +728,13 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         return colony;
     }
 
+    /**
+     * Returns the current <code>Game</code>.
+     * @return The current <code>Game</code>.
+     */
+    public final Game getGame() {
+	return game;
+    }
 
     /**
      * Toggles the export settings of the custom house.
@@ -1748,5 +1757,95 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 colonyPanel.updateProgressLabel();
             }
         }
+    }
+
+
+    /**
+    * A combo box that contains a list of all the player's colonies.
+    */
+    public final class ColonyNameBox extends JComboBox {
+
+        private final ColonyPanel colonyPanel;
+        private final ColonyNameBoxListener nameBoxListener;
+
+        /**
+        * Creates a new ColonyNameBox for this Colony.
+        * @param colonyPanel The <code>ColonyPanel</code> this object is
+        *       created for.
+        */
+        public ColonyNameBox(ColonyPanel colonyPanel) {
+            super();
+            this.colonyPanel = colonyPanel;
+
+            nameBoxListener = new ColonyNameBoxListener(this, colonyPanel);
+            super.addActionListener(nameBoxListener);
+	    super.setRenderer(new MyCellRenderer());
+        }
+
+        /**
+        * Sets up the ColonyNameBox.
+        */
+        public void initialize(Colony thisColony) {
+            super.removeActionListener(nameBoxListener);
+            removeAllItems();
+	    Iterator colonyIterator = thisColony.getOwner().getColonyIterator();
+	    while (colonyIterator.hasNext()) {
+		this.addItem((Colony) colonyIterator.next());
+            }
+	    this.setSelectedItem(thisColony);
+            super.addActionListener(nameBoxListener);
+        }
+
+        /**
+        * The ActionListener for the ColonyNameBox.
+        */
+        public final class ColonyNameBoxListener implements ActionListener {
+
+            private ColonyPanel colonyPanel;
+            private ColonyNameBox nameBox;
+
+            /**
+            * Sets up this ColonyNameBoxListener's nameBox and colonyPanel.
+            * 
+            * @param nameBox The <code>ColonyNameBox</code> to be listening on.
+            * @param colonyPanel The <code>ColonyPanel</code> this object is
+            *       created for.
+            */
+            public ColonyNameBoxListener(ColonyNameBox nameBox, ColonyPanel colonyPanel) {
+                super();
+                this.nameBox = nameBox;
+                this.colonyPanel = colonyPanel;
+            }
+
+            /**
+            * Sets the ColonyPanel's Colony's type of building.
+            */
+            public void actionPerformed(ActionEvent e) {
+                colonyPanel.initialize((Colony) nameBox.getSelectedItem(), 
+				       colonyPanel.getGame());
+            }
+        }
+
+	public final class MyCellRenderer extends JLabel implements ListCellRenderer {
+	    public MyCellRenderer() {
+		setOpaque(false);
+	    }
+	    
+	    public Component getListCellRendererComponent(JList list,
+                                                   Object value,
+                                                   int index,
+                                                   boolean isSelected,
+                                                   boolean cellHasFocus) {
+
+		Colony colony = (Colony) value;
+		setIcon(new ImageIcon(freeColClient.getGUI().
+				      createStringImage(this,
+							colony.getName(),
+							colony.getOwner().getColor(),
+							200, 24)));
+		setHorizontalAlignment(SwingConstants.CENTER);
+		return this;
+	    }
+	}
     }
 }
