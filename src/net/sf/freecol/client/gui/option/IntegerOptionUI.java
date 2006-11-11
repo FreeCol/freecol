@@ -47,7 +47,8 @@ public final class IntegerOptionUI extends JPanel implements OptionUpdater {
         add(label);
 
         int stepSize = Math.min((option.getMaximumValue() - option.getMinimumValue()) / 10, 1000);
-        spinner = new JSpinner(new SpinnerNumberModel(option.getValue(), option.getMinimumValue(), option.getMaximumValue(), stepSize));
+        spinner = new JSpinner(new SpinnerNumberModel(option.getValue(), option.getMinimumValue(),
+                option.getMaximumValue(), Math.max(1, stepSize)));
         spinner.setToolTipText(option.getShortDescription());
         add(spinner);
         
