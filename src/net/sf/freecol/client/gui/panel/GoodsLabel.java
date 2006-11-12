@@ -14,6 +14,7 @@ import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Ownable;
@@ -117,7 +118,8 @@ public final class GoodsLabel extends JLabel implements ActionListener {
         if (location instanceof Ownable) {
             player = ((Ownable) location).getOwner();
         }
-        if (player == null || player.canTrade(goods)) {
+        if (player == null || player.canTrade(goods) || (location instanceof Colony
+                && player.getGameOptions().getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT))) {
             setToolTipText(goods.getName());
             setEnabled(true);
         } else {
