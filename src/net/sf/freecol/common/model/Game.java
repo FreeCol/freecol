@@ -967,7 +967,7 @@ public class Game extends FreeColGameObject {
                 }                
             }
         }        
-        if (gameOptions != null) {
+        if (gameOptions == null) {
             gameOptions = new GameOptions();
         }
     }
