@@ -559,48 +559,54 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * @param unitType The unit type to train for.
      * @return The <code>Unit</code>.
      */
-    private Unit getUnitToTrain(int unitType) {
-        Unit bestUnit = null;
-        int bestScore = 0;
-
-        Iterator i = colony.getUnitIterator();
-        while (i.hasNext()) {
-            Unit unit = (Unit) i.next();
-
-            if (unit.getTrainingType() != -1 && unit.getNeededTurnsOfTraining() <= unit.getTurnsOfTraining()) {
-                continue;
-            }
-
-            if (unit.getType() == Unit.FREE_COLONIST && unit.getTrainingType() == unitType) {
-                if (bestUnit == null || unit.getTurnsOfTraining() > bestUnit.getTurnsOfTraining()) {
-                    bestUnit = unit;
-                    bestScore = 5;
-                }
-            } else if (unit.getType() == Unit.FREE_COLONIST && unit.getTurnsOfTraining() == 0) {
-                if (bestScore < 4) {
-                    bestUnit = unit;
-                    bestScore = 4;
-                }
-            } else if (unit.getType() == Unit.INDENTURED_SERVANT) {
-                if (bestScore < 3) {
-                    bestUnit = unit;
-                    bestScore = 3;
-                }
-            } else if (unit.getType() == Unit.PETTY_CRIMINAL) {
-                if (bestScore < 2) {
-                    bestUnit = unit;
-                    bestScore = 2;
-                }
-            } else if (unit.getType() == Unit.FREE_COLONIST && getTeacher(unitType) == null) {
-                if (bestScore < 1) {
-                    bestUnit = unit;
-                    bestScore = 1;
-                }
-            }
-        }
-
-        return bestUnit;
+    private Unit getUnitToTrain(int teacherType) {
+	Unit bestUnit = null;
+	int bestScore = 0;
+ 
+	Iterator i = colony.getUnitIterator();
+	while (i.hasNext()) {
+	    Unit unit = (Unit) i.next();
+ 
+	    switch(unit.getType()) {
+	    case Unit.FREE_COLONIST:
+		if (unit.getTrainingType() == teacherType &&
+		    (bestUnit == null || unit.getTurnsOfTraining() > bestUnit.getTurnsOfTraining())) {
+		    // this unit is already training for the job
+		    bestUnit = unit;
+		    bestScore = 5;
+		} else if (unit.getTurnsOfTraining() == 0 && bestScore < 4) {
+		    // this unit has not started training
+		    bestUnit = unit;
+		    bestScore = 4;
+		} else if (bestScore == 0 &&
+			   (bestScore == 1 || unit.getTurnsOfTraining() < bestUnit.getTurnsOfTraining())) {
+		    // this unit has started training for another job,
+		    // but has spent less time training than the previous
+		    // best choice
+		    bestUnit = unit;
+		    bestScore = 1;
+		}
+		break;
+	    case Unit.INDENTURED_SERVANT:
+		if (bestScore < 3) {
+		    bestUnit = unit;
+		    bestScore = 3;
+		}
+		break;
+	    case Unit.PETTY_CRIMINAL:
+		if (bestScore < 2) {
+		    bestUnit = unit;
+		    bestScore = 2;
+		}
+		break;
+	    default:
+		// ignore any other type of unit
+	    }
+ 
+	}
+	return bestUnit;
     }
+
 
     /**
      * Gets this <code>Location</code>'s <code>GoodsContainer</code>.
