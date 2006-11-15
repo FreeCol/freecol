@@ -578,8 +578,8 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 		    // this unit has not started training
 		    bestUnit = unit;
 		    bestScore = 4;
-		} else if (bestScore == 0 &&
-			   (bestScore == 1 || unit.getTurnsOfTraining() < bestUnit.getTurnsOfTraining())) {
+		} else if (bestScore < 1 &&
+			   (bestUnit == null || unit.getTurnsOfTraining() < bestUnit.getTurnsOfTraining())) {
 		    // this unit has started training for another job,
 		    // but has spent less time training than the previous
 		    // best choice
