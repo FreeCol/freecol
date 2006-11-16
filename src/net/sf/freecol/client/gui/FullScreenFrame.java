@@ -34,6 +34,7 @@ public final class FullScreenFrame extends JFrame {
         super(gd.getDefaultConfiguration());
         logger.info("FullScreenFrame's JFrame created.");
 
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setUndecorated(true);
         //setIgnoreRepaint(true);
 
@@ -55,6 +56,7 @@ public final class FullScreenFrame extends JFrame {
 
     public void setCanvas(Canvas canvas) {
         this.canvas = canvas;
+        addWindowListener(new WindowedFrameListener(canvas));
     }
 
 
