@@ -15,6 +15,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.util.EmptyIterator;
 
 import org.w3c.dom.Element;
 
@@ -549,7 +550,7 @@ public class Player extends FreeColGameObject {
                 name = Messages.message("newColonyName."
                         + Integer.toString(getNation()) + "."
                         + Integer.toString(colonyNameIndex));
-                colonyNameIndex++;
+                colonyNameIndex++;                
             } while (getGame().getColony(name) != null);
 
             return name;
@@ -1525,7 +1526,11 @@ public class Player extends FreeColGameObject {
     * @see Colony
     */
     public Iterator getColonyIterator() {
-        return settlements.iterator();
+        if (isIndian()) {
+            return EmptyIterator.SHARED_INSTANCE;
+        } else {
+            return settlements.iterator();
+        }
     }
 
 
