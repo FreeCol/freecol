@@ -50,7 +50,8 @@ public final class FreeCol {
 
     private static boolean  windowed = false,
                             sound = true,
-                            javaCheck = true;
+                            javaCheck = true,
+                            memoryCheck = true;
     private static Rectangle windowSize = new Rectangle(-1, -1);
     private static String   dataFolder = "";
     private static FreeColClient freeColClient;
@@ -95,7 +96,7 @@ public final class FreeCol {
         }
 
         int  minMemory = 128;  // million bytes
-        if (Runtime.getRuntime().maxMemory() < minMemory * 1000000) {
+        if (memoryCheck && Runtime.getRuntime().maxMemory() < minMemory * 1000000) {
             System.out.println("You need to assign more memory to the JVM. Restart FreeCol with:");
             System.out.println("java -Xmx" + minMemory + "M -jar FreeCol.jar");
             return;
@@ -313,6 +314,8 @@ public final class FreeCol {
                 windowed = true;
             } else if (args[i].equals("--no-sound")) {
                 sound = false;
+            } else if (args[i].equals("--no-memory-check")) {
+                memoryCheck = false;
             } else if (args[i].equals("--usage") || args[i].equals("--help")) {
                 printUsage();
                 System.exit(0);
@@ -445,6 +448,8 @@ public final class FreeCol {
         System.out.println("  runs FreeCol without sound");
         System.out.println("--no-java-check");
         System.out.println("  skips the java version check");
+        System.out.println("--no-memory-check");
+        System.out.println("  skips the memory check");        
         System.out.println("--usage");
         System.out.println("  displays this help screen");
         System.out.println("--version");
