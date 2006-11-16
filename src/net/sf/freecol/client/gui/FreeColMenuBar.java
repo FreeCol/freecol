@@ -78,7 +78,7 @@ public class FreeColMenuBar extends JMenuBar {
     private final GUI gui;
 
     private JMenuItem saveMenuItem;
-
+    private final FreeColImageBorder outerBorder;
 
     /**
     * Creates a new <code>FreeColMenuBar</code>. This menu bar will include
@@ -109,7 +109,7 @@ public class FreeColMenuBar extends JMenuBar {
         Image menuborderShadowS = (Image) UIManager.get("menuborder.shadow.s.image");
         Image menuborderShadowSE = (Image) UIManager.get("menuborder.shadow.se.image");
         final FreeColImageBorder innerBorder = new FreeColImageBorder(menuborderN, menuborderW, menuborderS, menuborderE, menuborderNW, menuborderNE, menuborderSW, menuborderSE);
-        final FreeColImageBorder outerBorder = new FreeColImageBorder(null, null, menuborderShadowS, null, null, null, menuborderShadowSW, menuborderShadowSE);
+        outerBorder = new FreeColImageBorder(null, null, menuborderShadowS, null, null, null, menuborderShadowSW, menuborderShadowSE);
         setBorder(new CompoundBorder(outerBorder, innerBorder));
         
         ActionManager am = f.getActionManager();
@@ -670,6 +670,14 @@ public class FreeColMenuBar extends JMenuBar {
         repaint();
     }
 
+    /**
+     * Returns the opaque height of this menubar.
+     * @return The height of this menubar including all the borders except
+     * 		the ones being transparent.
+     */
+    public int getOpaqueHeight() {
+    	return getHeight() - outerBorder.getBorderInsets(this).bottom;
+    }
 
     /**
     * When a <code>FreeColMenuBar</code> is disabled, it does

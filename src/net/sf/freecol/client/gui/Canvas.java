@@ -326,6 +326,8 @@ public final class Canvas extends JLayeredPane {
     public int getMenuBarHeight() {
         if (jMenuBar == null) {
             return 0;
+        } else if (jMenuBar instanceof FreeColMenuBar) {
+        	return ((FreeColMenuBar) jMenuBar).getOpaqueHeight();
         } else {
             return jMenuBar.getHeight();
         }
@@ -1255,7 +1257,7 @@ public final class Canvas extends JLayeredPane {
             errorMessage("europe.noGame");
         } else {
             europePanel.initialize(freeColClient.getMyPlayer().getEurope(), freeColClient.getGame());
-            europePanel.setLocation(0, 0);
+            europePanel.setLocation(0, getMenuBarHeight());
             setEnabled(false);
             add(europePanel, EUROPE_LAYER);
 
