@@ -228,14 +228,15 @@ public final class FreeColClient {
             frame = new WindowedFrame(windowSize);
         } else {
             if (!gd.isFullScreenSupported()) {
+                logger.info("It seems that full screen mode is not fully supported for this GraphicsDevice. Please try the \"--windowed\" option if you experience any graphical problems while running FreeCol.");
+                /* We might want this behavior later:
                 logger.warning("It seems that full screen mode is not supported for this GraphicsDevice! Using windowed mode instead.");
-
                 windowed = true;
                 setWindowed(true);
                 frame = new WindowedFrame(windowSize);
-            } else {
-                frame = new FullScreenFrame(gd);
+                */
             }
+            frame = new FullScreenFrame(gd);
         }
 
         gui = new GUI(this, frame.getBounds(), imageLibrary);
