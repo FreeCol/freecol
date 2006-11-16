@@ -550,7 +550,7 @@ public class Player extends FreeColGameObject {
                         + Integer.toString(getNation()) + "."
                         + Integer.toString(colonyNameIndex));
                 colonyNameIndex++;
-            } while (getColony(name) != null);
+            } while (getGame().getColony(name) != null);
 
             return name;
         } catch (MissingResourceException e) {

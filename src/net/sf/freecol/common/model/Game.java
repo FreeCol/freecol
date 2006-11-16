@@ -239,6 +239,29 @@ public class Game extends FreeColGameObject {
         return market;
     }
 
+    /**
+     * Returns the first <code>Colony</code> with the given name.
+     *
+     * @param name The name of the <code>Colony</code>.
+     * @return The <code>Colony</code> or <code>null</code>
+     *         if there is no known <code>Colony</code>
+     *         with the specified name (the colony might not be
+     *         visible to a client).
+     */
+    public Colony getColony(String name) {
+    	Iterator pit = getPlayerIterator();
+    	while (pit.hasNext()) {
+    		Player p = (Player) pit.next();
+    		Iterator it = p.getColonyIterator();
+    		while (it.hasNext()) {
+    			Colony colony = (Colony) it.next();
+    			if (colony.getName().equals(name)) {
+    				return colony;
+    			}
+    		}
+    	}
+    	return null;
+    }
 
     public Turn getTurn() {
         return turn;
