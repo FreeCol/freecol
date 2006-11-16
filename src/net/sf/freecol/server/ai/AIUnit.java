@@ -33,6 +33,15 @@ import org.w3c.dom.Element;
 
 /**
 * Objects of this class contains AI-information for a single {@link Unit}.
+* 
+* <br><br>
+* 
+* The method {@link #doMission(Connection)} is called once each turn,
+* by {@link AIPlayer#startWorking()}, to perform the assigned
+* <code>Mission</code>. Most of the methods in this class just delegates
+* the call to that mission.
+* 
+* @see Mission
 */
 public class AIUnit extends AIObject implements Transportable {
     private static final Logger logger = Logger.getLogger(AIUnit.class.getName());
@@ -51,6 +60,11 @@ public class AIUnit extends AIObject implements Transportable {
     */
     private Mission mission;
 
+    /**
+     * The <code>AIUnit</code> which has this <code>Transportable</code>
+     * in it's transport list. This <code>Transportable</code> has not been
+     * scheduled for transport if this value is <code>null</code>.
+     */
     private AIUnit transport = null;
 
 

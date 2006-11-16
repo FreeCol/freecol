@@ -125,7 +125,7 @@ public class AIMain implements FreeColGameObjectListener {
     }
 
     /**
-     * Checks the integrity of this <code>AIMain</code
+     * Checks the integrity of this <code>AIMain</code>
      * by checking if there are any
      * {@link AIObject#isUninitialized() uninitialized objects}.
      * 
