@@ -1255,7 +1255,7 @@ public final class Canvas extends JLayeredPane {
             errorMessage("europe.noGame");
         } else {
             europePanel.initialize(freeColClient.getMyPlayer().getEurope(), freeColClient.getGame());
-            europePanel.setLocation(0, getMenuBarHeight());
+            europePanel.setLocation(0, 0);
             setEnabled(false);
             add(europePanel, EUROPE_LAYER);
 
