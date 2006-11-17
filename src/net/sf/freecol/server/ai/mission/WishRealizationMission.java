@@ -200,12 +200,14 @@ public class WishRealizationMission extends Mission {
      *      to the stream.
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-        
-        out.writeAttribute("unit", getUnit().getID());
-        out.writeAttribute("wish", wish.getID());
+        if (wish.shouldBeStored()) {
+            out.writeStartElement(getXMLElementTagName());
 
-        out.writeEndElement();
+            out.writeAttribute("unit", getUnit().getID());
+            out.writeAttribute("wish", wish.getID());
+
+            out.writeEndElement();
+        }
     }
 
     /**
