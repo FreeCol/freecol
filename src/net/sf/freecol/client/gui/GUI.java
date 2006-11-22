@@ -1600,7 +1600,9 @@ public final class GUI {
     private void displayTileOverlays(Graphics2D g, Map map, Tile tile, int x, int y, boolean drawUnexploredBorders) {  
         Map.Position pos = new Map.Position(tile.getX(), tile.getY());
 
-        if (tile.isExplored()) {
+        if (!tile.isExplored()) {
+            g.drawImage(lib.getTerrainImage(tile.getType(), tile.getX(), tile.getY()), x, y, null);
+        } else {
             // Until the mountain/hill bordering tiles are done... -sjm
 /*            if (tile.isLand()) {
                 for (int i = 0; i < 8; i++) {
