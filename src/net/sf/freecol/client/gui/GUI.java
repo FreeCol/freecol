@@ -832,8 +832,15 @@ public final class GUI {
         g.setColor(Color.black);
         g.fillRect(clipBounds.x, clipBounds.y, clipBounds.width, clipBounds.height);
         int xx;
-        int yy = clipTopY;
         Map map = gameData.getMap();
+
+        /*
+        PART 2a
+        =======
+        Display the base Tiles
+        */
+        
+        int yy = clipTopY;
 
         // Row per row; start with the top modified row
         for (int tileY = clipTopRow; tileY <= clipBottomRow; tileY++) {
@@ -846,11 +853,24 @@ public final class GUI {
             for (int tileX = clipLeftCol; tileX <= clipRightCol; tileX++) {
                 if (map.isValid(tileX, tileY)) {
                     // Display the Tile:
-                    displayTile(g, map, map.getTile(tileX, tileY), xx, yy);
+                    displayBaseTile(g, map, map.getTile(tileX, tileY), xx, yy, true);
                 }
                 xx += tileWidth;
             }
 
+            yy += tileHeight / 2;
+        }
+
+        /*
+        PART 2b
+        =======
+        Display the Tile overlays and Units
+        */
+        
+        yy = clipTopY;
+
+        // Row per row; start with the top modified row
+        for (int tileY = clipTopRow; tileY <= clipBottomRow; tileY++) {
             xx = clipLeftX;
             if ((tileY % 2) != 0) {
                 xx += tileWidth / 2;
@@ -862,6 +882,20 @@ public final class GUI {
                 g.setColor(Color.BLACK);
                 g.draw(gridPath);
                 g.translate(- xx, - (yy + (tileHeight / 2)));
+            }
+
+            // Column per column; start at the left side to display the tiles.
+            for (int tileX = clipLeftCol; tileX <= clipRightCol; tileX++) {
+                if (map.isValid(tileX, tileY)) {
+                    // Display the Tile overlays:
+                    displayTileOverlays(g, map, map.getTile(tileX, tileY), xx, yy, true);
+                }
+                xx += tileWidth;
+            }
+
+            xx = clipLeftX;
+            if ((tileY % 2) != 0) {
+                xx += tileWidth / 2;
             }
 
             // Again, column per column starting at the left side. Now display the units
@@ -1434,10 +1468,12 @@ public final class GUI {
      *      get the <code>ColonyTile</code> for the given <code>Tile</code>.
      */
     public void displayColonyTile(Graphics2D g, Map map, Tile tile, int x, int y, Colony colony) {
-        displayTile(g, map, tile, x, y, false);
+        //displayTile(g, map, tile, x, y, false);
+        displayBaseTile(g, map, tile, x, y, false);        
         if (tile.getOwner() != null && tile.getOwner() != colony) {
             g.drawImage(lib.getMiscImage(ImageLibrary.TILE_TAKEN), x, y, null);
         }
+        displayTileOverlays(g, map, tile, x, y, false);
         int nation = tile.getNationOwner();
         if (nation != Player.NO_NATION
                 && !Player.isEuropean(nation)
@@ -1469,7 +1505,6 @@ public final class GUI {
         displayTile(g, map, tile, x, y, true);
     }
 
-
     /**
      * Displays the given Tile onto the given Graphics2D object at the
      * location specified by the coordinates. Everything located on the
@@ -1486,6 +1521,26 @@ public final class GUI {
      *        unexplored terrain.
      */
     public void displayTile(Graphics2D g, Map map, Tile tile, int x, int y, boolean drawUnexploredBorders) {
+        displayBaseTile(g, map, tile, x, y, drawUnexploredBorders);
+        displayTileOverlays(g, map, tile, x, y, drawUnexploredBorders);
+    }
+
+    /**
+     * Displays the given Tile onto the given Graphics2D object at the
+     * location specified by the coordinates. Everything located on the
+     * Tile will also be drawn except for units because their image can
+     * be larger than a Tile.
+     * @param g The Graphics2D object on which to draw the Tile.
+     * @param map The map.
+     * @param tile The Tile to draw.
+     * @param x The x-coordinate of the location where to draw the Tile
+     * (in pixels).
+     * @param y The y-coordinate of the location where to draw the Tile
+     * (in pixels).
+     * @param drawUnexploredBorders If true; draws border between explored and
+     *        unexplored terrain.
+     */
+    private void displayBaseTile(Graphics2D g, Map map, Tile tile, int x, int y, boolean drawUnexploredBorders) {
         g.drawImage(lib.getTerrainImage(tile.getType(), tile.getX(), tile.getY()), x, y, null);
 
         Map.Position pos = new Map.Position(tile.getX(), tile.getY());
@@ -1525,6 +1580,25 @@ public final class GUI {
 
             }
         }
+    }    
+
+    /**
+     * Displays the given Tile onto the given Graphics2D object at the
+     * location specified by the coordinates. Everything located on the
+     * Tile will also be drawn except for units because their image can
+     * be larger than a Tile.
+     * @param g The Graphics2D object on which to draw the Tile.
+     * @param map The map.
+     * @param tile The Tile to draw.
+     * @param x The x-coordinate of the location where to draw the Tile
+     * (in pixels).
+     * @param y The y-coordinate of the location where to draw the Tile
+     * (in pixels).
+     * @param drawUnexploredBorders If true; draws border between explored and
+     *        unexplored terrain.
+     */
+    private void displayTileOverlays(Graphics2D g, Map map, Tile tile, int x, int y, boolean drawUnexploredBorders) {  
+        Map.Position pos = new Map.Position(tile.getX(), tile.getY());
 
         if (tile.isExplored()) {
             // Until the mountain/hill bordering tiles are done... -sjm
@@ -1651,7 +1725,7 @@ public final class GUI {
                     }
 
                     BufferedImage stringImage = createStringImage(g, populationString, theColor, lib.getTerrainImageWidth(tile.getType()), 12);
-                    g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType()) - stringImage.getWidth())/2 + 1, y + ((lib.getColonyImageHeight(lib.getSettlementGraphicsType(settlement))) / 2) + 1, null);
+                    g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType()) - stringImage.getWidth())/2 + 1, y + ((lib.getTerrainImageHeight(tile.getType()) - stringImage.getHeight()) / 2) + 1, null);
 
                     g.setColor(Color.BLACK);
                 } else if (settlement instanceof IndianSettlement) {

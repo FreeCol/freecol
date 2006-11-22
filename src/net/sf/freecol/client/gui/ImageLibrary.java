@@ -183,8 +183,10 @@ public final class ImageLibrary extends ImageProvider {
                             COLONY_STOCKADE = 3,
                             COLONY_FORT = 4,
                             COLONY_FORTRESS = 5,
-
-                            COLONY_COUNT = 6,
+                            COLONY_MEDIUM_STOCKADE = 6,
+                            COLONY_LARGE_STOCKADE = 7,
+                            COLONY_LARGE_FORT = 8,
+                            COLONY_COUNT = 9,
 
                             INDIAN_SETTLEMENT_CAMP = 0,
                             INDIAN_SETTLEMENT_VILLAGE = 1,
@@ -1064,9 +1066,19 @@ public final class ImageLibrary extends ImageProvider {
             int stockadeLevel = colony.getBuilding(Building.STOCKADE).getLevel();
 
             if (stockadeLevel == Building.HOUSE) {
-                return COLONY_STOCKADE;
+                if (colony.getUnitCount() > 7) {
+                    return COLONY_LARGE_STOCKADE;
+                } else if (colony.getUnitCount() > 3) {
+                    return COLONY_MEDIUM_STOCKADE;
+                } else {
+                    return COLONY_STOCKADE;
+                }
             } else if (stockadeLevel == Building.SHOP) {
-                return COLONY_FORT;
+                if (colony.getUnitCount() > 7) {
+                    return COLONY_LARGE_FORT;
+                } else {
+                    return COLONY_FORT;
+                }
             } else if (stockadeLevel == Building.FACTORY) {
                 return COLONY_FORTRESS;
             } else if (colony.getUnitCount() <= 3) {
