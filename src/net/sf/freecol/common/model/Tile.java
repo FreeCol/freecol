@@ -1337,7 +1337,7 @@ public final class Tile extends FreeColGameObject implements Location {
 
         //if ((settlement != null) && (showAll || player.canSee(this))) {
         if (settlement != null) {
-            if (pet == null) {
+            if (pet == null || showAll || settlement.getOwner() == player) {
                 settlement.toXML(out, player, showAll, toSavedGame);
             } else {
                 if (getColony() != null) {

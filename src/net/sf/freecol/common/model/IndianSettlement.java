@@ -1116,7 +1116,7 @@ public class IndianSettlement extends Settlement {
         }
 
         if (showAll || player == getOwner()) {
-            out.writeAttribute("hasBeenVisted", Boolean.toString(isVisited));
+            out.writeAttribute("hasBeenVisited", Boolean.toString(isVisited));
         }
 
         out.writeAttribute("learnableSkill", Integer.toString(learnableSkill));
@@ -1224,7 +1224,7 @@ public class IndianSettlement extends Settlement {
         
         final String hasBeenVisitedStr = in.getAttributeValue(null, "hasBeenVisited");
         if (hasBeenVisitedStr != null) {
-            isVisited = Boolean.getBoolean(hasBeenVisitedStr);
+            isVisited = Boolean.valueOf(hasBeenVisitedStr).booleanValue();            
         } else {
             isVisited = false;
         }
