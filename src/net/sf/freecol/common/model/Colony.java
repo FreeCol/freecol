@@ -248,6 +248,9 @@ public final class Colony extends Settlement implements Location {
             Unit target = (Unit) tileUnitIterator.next();
             target.setOwner(getOwner());
         }
+        
+        // Changing the owner might alter bonuses applied by founding fathers:
+        updatePopulation();
     }
     
     /**
