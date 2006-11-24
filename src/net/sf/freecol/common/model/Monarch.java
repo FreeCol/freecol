@@ -49,6 +49,11 @@ public final class Monarch extends FreeColGameObject {
 
     /** The minimum price for mercenaries. */
     public static final int MINIMUM_PRICE = 100;
+    
+    /**
+     * The maximum possible tax rate (given in percentage).
+     */
+    private static final int MAXIMUM_TAX_RATE = 95;
 
     /** The number of units in the REF. */
     private int[] ref = new int[NUMBER_OF_TYPES];       
@@ -179,15 +184,15 @@ public final class Monarch extends FreeColGameObject {
         int[] probability = new int[NUMBER_OF_ACTIONS];
     
 
-	for (int j = 0; j < NUMBER_OF_ACTIONS; j++ ) {
+        for (int j = 0; j < NUMBER_OF_ACTIONS; j++ ) {
             probability[j] = 0;
-	}
+        }
 
         // the more time has passed, the less likely the monarch will
         // do nothing
         probability[NO_ACTION] = Math.max(200 - turn, 100);
 
-        if (player.getTax() < 100) {
+        if (player.getTax() < MAXIMUM_TAX_RATE) {
             probability[RAISE_TAX] = 10 + dx;
         }
         
@@ -238,7 +243,7 @@ public final class Monarch extends FreeColGameObject {
     }
     
     /**
-     * Returns the new increased tax, but never more than 100 percent.
+     * Returns the new increased tax.
      *
      * @return The increased tax.
      */
@@ -248,7 +253,7 @@ public final class Monarch extends FreeColGameObject {
         // later in the game, the taxes will increase by more
         int increase = random.nextInt(5 + turn/adjustment) + 1;
         int newTax = player.getTax() + increase;
-        return Math.min(newTax, 100);            
+        return Math.min(newTax, MAXIMUM_TAX_RATE);            
     }
 
 
