@@ -266,6 +266,7 @@ public final class ConnectController {
         freeColClient.getCanvas().removeInGameComponents();
         logout(true);
         login(username, host, port);
+        freeColClient.getInGameController().nextModelMessage();
     }
 
 

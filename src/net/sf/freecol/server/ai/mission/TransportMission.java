@@ -137,7 +137,7 @@ public class TransportMission extends Mission {
     * Disposes this <code>Mission</code>.
     */
     public void dispose() {
-        Iterator ti = transportList.iterator();
+        Iterator ti = ((List) ((ArrayList) transportList).clone()).iterator();
         while (ti.hasNext()) {
             Transportable t = (Transportable) ti.next();
             if (isCarrying(t)) {

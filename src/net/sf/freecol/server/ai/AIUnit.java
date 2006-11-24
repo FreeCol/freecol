@@ -311,7 +311,12 @@ public class AIUnit extends AIObject implements Transportable {
      *      <code>AIObject</code> controls.
      */
     public String getID() {
-        return unit.getID();
+        if (unit != null) {
+            return unit.getID();
+        } else {
+            logger.warning("unit == null");
+            return null;
+        }
     }
 
     /**
@@ -326,7 +331,11 @@ public class AIUnit extends AIObject implements Transportable {
 
         out.writeAttribute("ID", getID());
         if (transport != null) {
-            out.writeAttribute("transport", transport.getUnit().getID());
+            if (transport.getUnit() != null) {
+                out.writeAttribute("transport", transport.getUnit().getID());
+            } else {
+                logger.warning("transport.getUnit() == null");
+            }
         }
         if (mission != null) {
             mission.toXML(out);

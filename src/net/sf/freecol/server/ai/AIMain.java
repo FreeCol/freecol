@@ -428,7 +428,11 @@ public class AIMain implements FreeColGameObjectListener {
 
             try {
                 if (!(aio instanceof Wish) || ((Wish) aio).shouldBeStored()) {
-                    aio.toXML(out);
+                    if (aio.getID() != null) {
+                        aio.toXML(out);
+                    } else {
+                        logger.warning("aio.getID() == null, for: " + aio.getClass().getName());
+                    }
                 }
             } catch (Exception e) {
                 StringWriter sw = new StringWriter();

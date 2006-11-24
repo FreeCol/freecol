@@ -891,6 +891,9 @@ public class Player extends FreeColGameObject {
                     }
 
                     Map.Position position = unit.getTile().getPosition();
+                    if (position == null) {
+                        logger.warning("position == null");
+                    }
                     canSeeTiles[position.getX()][position.getY()] = true;
                     /*if (getGame().getViewOwner() == null && !hasExplored(map.getTile(position))) {
                         logger.warning("Trying to set a non-explored Tile to be visible (1). Unit: " + unit.getName() + ", Tile: " + position);
