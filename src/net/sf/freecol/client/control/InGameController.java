@@ -2249,6 +2249,8 @@ public final class InGameController implements NetworkConstants {
             ModelMessage[]  store = new ModelMessage[ messageList.size() ];
             canvas.showModelMessages( (ModelMessage[]) messageList.toArray(store) );
         }
+        
+        freeColClient.getActionManager().update();
     }
 
 

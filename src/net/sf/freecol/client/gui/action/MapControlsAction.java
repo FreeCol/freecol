@@ -12,6 +12,8 @@ import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.panel.MapControls;
+import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Player;
 
 
 /**
@@ -45,7 +47,13 @@ public class MapControlsAction extends MapboardAction {
      * calls {@link #showMapControls(boolean)}.
      */
     public void update() {
-        super.update();        
+        super.update();
+        
+        final Game game = getFreeColClient().getGame();
+        final Player p = getFreeColClient().getMyPlayer();
+        if (game != null && p != null && game.getModelMessageIterator(p).hasNext()) {
+            enabled = false;
+        }
         showMapControls(enabled && selected);
     }
 
