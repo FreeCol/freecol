@@ -58,7 +58,7 @@ public class DefaultCostDecider implements CostDecider {
                     && newTile.getSettlement().getOwner() != unit.getOwner()) {
                 // A settlement is blocking the path:
                 movesLeft = 0;
-                return ml;
+                return ml + unit.getInitialMovesLeft() * 5;
                 
                 /* 
                  * This cannot be done in the CostDecider because the AI needs
