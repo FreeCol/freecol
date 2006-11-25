@@ -1651,7 +1651,6 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                     }
 
                     theText += ")";
-
                     BuildingBoxItem nextItem = new BuildingBoxItem(theText, i);
                     this.addItem(nextItem);
                     if (i == colonyPanel.getColony().getCurrentlyBuilding()) {
@@ -1666,7 +1665,6 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
                 String theText = new String(Unit.getName(unitID) +
                     " (" + Unit.getNextHammers(unitID) + " hammers");
-
                 if (Unit.getNextTools(unitID) > 0) {
                     theText += ", " + Integer.toString(Unit.getNextTools(unitID)) + " tools";
                 }

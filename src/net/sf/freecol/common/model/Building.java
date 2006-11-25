@@ -303,13 +303,6 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         if (level >= MAX_LEVEL) {
             return false;
         }
-        if (getType() == CUSTOM_HOUSE) {
-            if (getColony().getOwner().hasFather(FoundingFather.PETER_STUYVESANT)) {
-                return true;
-            }
-
-            return false;
-        }
         if (level+1 >= FACTORY && !getColony().getOwner().hasFather(FoundingFather.ADAM_SMITH)
                 && (type == BLACKSMITH || type == TOBACCONIST || type == WEAVER
                 || type == DISTILLER || type == FUR_TRADER || type == ARMORY)) {
@@ -317,14 +310,20 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         }
         
         // if there are no more improvements available for this building type..
-        if ( buildingType.numberOfLevels() == level ) {
+        if (buildingType.numberOfLevels() < level + 1) {
             return false;
         }
+
         if (getType() == DOCK && getColony().isLandLocked()) {
             return false;
         }
         
         if (buildingType.level(level).populationRequired > colony.getUnitCount()) {
+            return false;
+        }
+        
+        if (getType() == CUSTOM_HOUSE
+                && !getColony().getOwner().hasFather(FoundingFather.PETER_STUYVESANT)) {
             return false;
         }
         
