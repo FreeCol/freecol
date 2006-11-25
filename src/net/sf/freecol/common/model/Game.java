@@ -1,6 +1,8 @@
 
 package net.sf.freecol.common.model;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -818,20 +820,38 @@ public class Game extends FreeColGameObject {
             } else if (freeColGameObject instanceof Building) {
                 later1.add(freeColGameObject);
             } else {                
-                freeColGameObject.newTurn();                
+                try {
+                    freeColGameObject.newTurn();
+                } catch (Exception e) {
+                    StringWriter sw = new StringWriter();
+                    e.printStackTrace(new PrintWriter(sw));
+                    logger.warning(sw.toString());
+                }
             }
         }
 
         iterator = later1.iterator();
         while (iterator.hasNext()) {
             FreeColGameObject freeColGameObject = (FreeColGameObject) iterator.next();
-            freeColGameObject.newTurn();
+            try {
+                freeColGameObject.newTurn();
+            } catch (Exception e) {
+                StringWriter sw = new StringWriter();
+                e.printStackTrace(new PrintWriter(sw));
+                logger.warning(sw.toString());
+            }
         }
 
         iterator = later2.iterator();
         while (iterator.hasNext()) {
             FreeColGameObject freeColGameObject = (FreeColGameObject) iterator.next();
-            freeColGameObject.newTurn();
+            try {
+                freeColGameObject.newTurn();
+            } catch (Exception e) {
+                StringWriter sw = new StringWriter();
+                e.printStackTrace(new PrintWriter(sw));
+                logger.warning(sw.toString());
+            }
         }
     }
 

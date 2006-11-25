@@ -873,7 +873,7 @@ public class TransportMission extends Mission {
 
         boolean transportListChanged = false;
 
-        Iterator tli = transportList.iterator();
+        Iterator tli = ((List) ((ArrayList) transportList).clone()).iterator();
         while (tli.hasNext()) {
             Transportable t = (Transportable) tli.next();
             if (!isCarrying(t)) {
@@ -900,7 +900,7 @@ public class TransportMission extends Mission {
                         }
                         mission.doMission(connection);
                         if (u.getLocation() != getUnit()) {
-                            tli.remove();
+                            removeFromTransportList(au);
                             transportListChanged = true;
                         }
                     } else if (!(carrier.getLocation() instanceof Europe)
@@ -909,7 +909,7 @@ public class TransportMission extends Mission {
                         if (p != null && p.getTransportDropNode().getTurns() <= 2) {
                             mission.doMission(connection);
                             if (u.getLocation() != getUnit()) {
-                                tli.remove();
+                                removeFromTransportList(au);
                                 transportListChanged = true;
                             }
                         }
@@ -926,7 +926,7 @@ public class TransportMission extends Mission {
                         sellGoodsElement.appendChild(ag.getGoods().toXMLElement(carrier.getOwner(), sellGoodsElement.getOwnerDocument()));
                         try {
                             connection.sendAndWait(sellGoodsElement);
-                            tli.remove();
+                            removeFromTransportList(ag);
                             ag.dispose();
                             transportListChanged = true;
                         } catch (IOException e) {
@@ -937,7 +937,7 @@ public class TransportMission extends Mission {
                         unloadCargoElement.appendChild(ag.getGoods().toXMLElement(carrier.getOwner(), unloadCargoElement.getOwnerDocument()));
                         try {
                             connection.sendAndWait(unloadCargoElement);
-                            tli.remove();
+                            removeFromTransportList(ag);
                             ag.dispose();
                             transportListChanged = true;
                         } catch (IOException e) {
