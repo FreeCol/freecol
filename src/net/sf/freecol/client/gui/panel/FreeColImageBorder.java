@@ -85,7 +85,12 @@ public class FreeColImageBorder extends AbstractBorder {
         if (insets == null) {
             return new Insets(top, left, bottom, right);
         } else {
-            insets.set(top, left, bottom, right);
+            //insets.set(top, left, bottom, right);
+            insets.top = top;
+            insets.left = left;
+            insets.bottom = bottom;
+            insets.right = right;
+            
             return insets;
         }
     }
