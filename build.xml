@@ -3,10 +3,8 @@
 <project name="FreeCol" default="package">
 
   <property name="freecol.name" value="freecol"/>
-  <property name="freecol.version" value="0.5.1_cvs"/>  
       
   <property environment="env"/>  
-  <property name="freecol.release.name" value="${freecol.name}-${freecol.version}"/>  
   <property name="freecol.data.dir" value="${basedir}/data"/>
   <property name="freecol.src.dir" value="${basedir}/src"/>
   <property name="freecol.build.dir" value="${basedir}/build"/>
@@ -41,10 +39,6 @@
   <target name="compile" depends="init">
     <mkdir dir="${freecol.build.dir}"/>
     
-    <replaceregexp file="${freecol.src.dir}/net/sf/freecol/FreeCol.java"
-                   match="FREECOL_VERSION\s*=\s*&quot;(.*?)&quot;\;"
-                   replace="FREECOL_VERSION = &quot;${freecol.version}&quot;\;"
-    />  
     <javac srcdir="${freecol.src.dir}"
            destdir="${freecol.build.dir}"
            classpath="${basedir}/jars/higlayout.jar:${basedir}/jars/jsr173_1.0_api.jar:${basedir}/jars/wstx-lgpl-3.0.2.jar"
@@ -107,10 +101,22 @@
     Creates archives and installers for distribution and places these in the
     "dist" directory.
   -->
-  <target name="dist" depends="clean, package" description="Creates archives and installers for distribution.">    
+  <target name="dist" description="Creates archives and installers for distribution.">
+    <input message="Please specify the release version (x.y.z): " addproperty="freecol.version" defaultvalue="custom_build" />    
+    <property name="freecol.release.name" value="${freecol.name}-${freecol.version}"/>  
+    
+    <replaceregexp file="${freecol.src.dir}/net/sf/freecol/FreeCol.java"
+                   match="FREECOL_VERSION\s*=\s*&quot;(.*?)&quot;\;"
+                   replace="FREECOL_VERSION = &quot;${freecol.version}&quot;\;"
+    />
+    <echo message="Game version updated in FreeCol.java" />
+    
+    <antcall target="clean" />
+    <antcall target="package" />    
+    
     <mkdir dir="${freecol.release.dir}"/>
     <mkdir dir="${freecol.release.dir}/${freecol.name}"/>
-        
+            
     <copy todir="${freecol.release.dir}/${freecol.name}">
       <fileset dir="${basedir}" includes="FreeCol.jar"/>
       <fileset dir="${freecol.packaging.dir}/common" excludes="**/CVS/**"/>
