@@ -455,7 +455,9 @@ public class TransportMission extends Mission {
             while (space > 0) {
                 AIUnit newUnit = getCheapestUnitInEurope(connection);
                 if (newUnit != null) {
-                    if (newUnit.getUnit().isColonist() && !newUnit.getUnit().isArmed()) {
+                    if (newUnit.getUnit().isColonist()
+                            && !newUnit.getUnit().isArmed()
+                            && !newUnit.getUnit().isMounted()) {
                         newUnit.setMission(new BuildColonyMission(getAIMain(), newUnit));
                     }
                     addToTransportList(newUnit);
