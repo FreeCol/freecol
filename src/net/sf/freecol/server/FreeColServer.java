@@ -524,88 +524,82 @@ public final class FreeColServer {
     *        data.
     */
     public String loadGame(File file) throws IOException, FreeColException {
-        try {            
-            boolean doNotLoadAI = false;
-            
-            try {
-                XMLStreamReader xsr = createXMLStreamReader(file);
-                xsr.nextTag();
-                
-                final String version = xsr.getAttributeValue(null, "version");
-                if (!Message.getFreeColProtocolVersion().equals(version)) {
-                    if (version.equals("0.1.3")) {
-                        doNotLoadAI = true;
-                    } else {
-                        throw new FreeColException("incompatibleVersions");
-                    }
-                }
-                
-                final String owner = xsr.getAttributeValue(null, "owner");
-                
-                ArrayList serverObjects = null;
-                aiMain = null;            
-                while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                    if (xsr.getLocalName().equals("serverObjects")) {
-                        // Reads the ServerAdditionObjects:
-                        serverObjects = new ArrayList();
-                        while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                            if (xsr.getLocalName().equals(ServerPlayer.getServerAdditionXMLElementTagName())) {
-                                serverObjects.add(new ServerPlayer(xsr));
-                            } else {
-                                throw new XMLStreamException("Unknown tag: " + xsr.getLocalName());
-                            }
-                        }                    
-                    } else if (xsr.getLocalName().equals(Game.getXMLElementTagName())) {
-                        // Read the game model:
-                        game = new Game(null, getModelController(), xsr, (FreeColGameObject[]) serverObjects.toArray(new FreeColGameObject[0]));
-                        game.setCurrentPlayer(null);
-                        gameState = IN_GAME;
-                        game.checkIntegrity();
-                    } else if (xsr.getLocalName().equals(AIMain.getXMLElementTagName())) {
-                        if (doNotLoadAI) {
-                            aiMain = new AIMain(this);
-                            game.setFreeColGameObjectListener(aiMain);
-                            break;
-                        }
-                        // Read the AIObjects:
-                        aiMain = new AIMain(this, xsr);
-                        aiMain.checkIntegrity();
-                        game.setFreeColGameObjectListener(aiMain);
-                    } else {
-                        throw new XMLStreamException("Unknown tag: " + xsr.getLocalName());
-                    }
-                }
-                
-                // Connect the AI-players:
-                Iterator playerIterator = game.getPlayerIterator();
-                while (playerIterator.hasNext()) {
-                    ServerPlayer player = (ServerPlayer) playerIterator.next();
-                    if (player.isAI()) {
-                        DummyConnection theConnection = new DummyConnection(getInGameInputHandler());
-                        DummyConnection aiConnection = new DummyConnection(new AIInGameInputHandler(this, player, aiMain));
-                        aiConnection.setOutgoingMessageHandler(theConnection);
-                        theConnection.setOutgoingMessageHandler(aiConnection);
-                        
-                        getServer().addConnection(theConnection, -1);
-                        player.setConnection(theConnection);
-                        player.setConnected(true);
-                    }
-                }
-                
-                xsr.close();
-                
-                return owner;
-            } catch (XMLStreamException e) {
-                StringWriter sw = new StringWriter();
-                e.printStackTrace(new PrintWriter(sw));
-                logger.warning(sw.toString());
-                throw new IOException("XMLStreamException.");
-            } catch (FreeColException fe) {
-                StringWriter sw = new StringWriter();
-                fe.printStackTrace(new PrintWriter(sw));
-                logger.warning(sw.toString());
-                throw fe;
+        boolean doNotLoadAI = false;
+
+        try {
+            XMLStreamReader xsr = createXMLStreamReader(file);
+            xsr.nextTag();
+
+            final String version = xsr.getAttributeValue(null, "version");
+            if (!Message.getFreeColProtocolVersion().equals(version)) {
+                throw new FreeColException("incompatibleVersions");
             }
+
+            final String owner = xsr.getAttributeValue(null, "owner");
+
+            ArrayList serverObjects = null;
+            aiMain = null;            
+            while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                if (xsr.getLocalName().equals("serverObjects")) {
+                    // Reads the ServerAdditionObjects:
+                    serverObjects = new ArrayList();
+                    while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                        if (xsr.getLocalName().equals(ServerPlayer.getServerAdditionXMLElementTagName())) {
+                            serverObjects.add(new ServerPlayer(xsr));
+                        } else {
+                            throw new XMLStreamException("Unknown tag: " + xsr.getLocalName());
+                        }
+                    }                    
+                } else if (xsr.getLocalName().equals(Game.getXMLElementTagName())) {
+                    // Read the game model:
+                    game = new Game(null, getModelController(), xsr, (FreeColGameObject[]) serverObjects.toArray(new FreeColGameObject[0]));
+                    game.setCurrentPlayer(null);
+                    gameState = IN_GAME;
+                    game.checkIntegrity();
+                } else if (xsr.getLocalName().equals(AIMain.getXMLElementTagName())) {
+                    if (doNotLoadAI) {
+                        aiMain = new AIMain(this);
+                        game.setFreeColGameObjectListener(aiMain);
+                        break;
+                    }
+                    // Read the AIObjects:
+                    aiMain = new AIMain(this, xsr);
+                    aiMain.checkIntegrity();
+                    game.setFreeColGameObjectListener(aiMain);
+                } else {
+                    throw new XMLStreamException("Unknown tag: " + xsr.getLocalName());
+                }
+            }
+
+            // Connect the AI-players:
+            Iterator playerIterator = game.getPlayerIterator();
+            while (playerIterator.hasNext()) {
+                ServerPlayer player = (ServerPlayer) playerIterator.next();
+                if (player.isAI()) {
+                    DummyConnection theConnection = new DummyConnection(getInGameInputHandler());
+                    DummyConnection aiConnection = new DummyConnection(new AIInGameInputHandler(this, player, aiMain));
+                    aiConnection.setOutgoingMessageHandler(theConnection);
+                    theConnection.setOutgoingMessageHandler(aiConnection);
+
+                    getServer().addConnection(theConnection, -1);
+                    player.setConnection(theConnection);
+                    player.setConnected(true);
+                }
+            }
+
+            xsr.close();
+
+            return owner;
+        } catch (XMLStreamException e) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            logger.warning(sw.toString());
+            throw new IOException("XMLStreamException.");
+        } catch (FreeColException fe) {
+            StringWriter sw = new StringWriter();
+            fe.printStackTrace(new PrintWriter(sw));
+            logger.warning(sw.toString());
+            throw fe;
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
