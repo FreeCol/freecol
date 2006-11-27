@@ -105,7 +105,7 @@ public class UnitSeekAndDestroyMission extends Mission {
     */
     public void doMission(Connection connection) {
         Unit unit = getUnit();
-if (unit.isDisposed()) System.exit(1);
+
         if (!isValid()) {
             return;
         }

@@ -115,17 +115,7 @@ public class AIPlayer extends AIObject {
     public AIPlayer(AIMain aiMain, ServerPlayer player) {
         super(aiMain, player.getID());
          
-        this.player = player;        
-        switch (player.getNation()) {
-        case Player.DUTCH:
-            this.strategy = STRATEGY_TRADE; break;
-        case Player.ENGLISH:
-            this.strategy = STRATEGY_IMMIGRATION; break;
-        case Player.FRENCH:
-            this.strategy = STRATEGY_COOPERATION; break;
-        case Player.SPANISH:
-            this.strategy = STRATEGY_CONQUEST; break;
-        }
+        this.player = player;                
     }
     
     
@@ -163,6 +153,17 @@ public class AIPlayer extends AIObject {
     public void startWorking() {
         //logger.info("Entering AI code for: " + player.getNationAsString());
 
+        switch (player.getNation()) {
+        case Player.DUTCH:
+            this.strategy = STRATEGY_TRADE; break;
+        case Player.ENGLISH:
+            this.strategy = STRATEGY_IMMIGRATION; break;
+        case Player.FRENCH:
+            this.strategy = STRATEGY_COOPERATION; break;
+        case Player.SPANISH:
+            this.strategy = STRATEGY_CONQUEST; break;
+        }
+        
         sessionRegister.clear();
         aiUnits.clear();
         
@@ -537,8 +538,8 @@ public class AIPlayer extends AIObject {
                             if (t.getFirstUnit().getOwner() == player) {
                                 defenders++;
                             } else {
-                                if (player.getTension(t.getFirstUnit().getOwner()).getValue() >=
-                                    Tension.TENSION_ADD_MAJOR) {
+                                if (player.getTension(t.getFirstUnit().getOwner()).getValue() >= 
+                                        Tension.TENSION_ADD_MAJOR) {
                                     threat += 2;
                                     if (t.getUnitCount() * 2 > worstThreat) {
                                         if (t.getSettlement() != null) {
@@ -549,7 +550,7 @@ public class AIPlayer extends AIObject {
                                         worstThreat = t.getUnitCount() * 2;
                                     }
                                 } else if (player.getTension(t.getFirstUnit().getOwner()).getValue() >=
-                                    Tension.TENSION_ADD_MINOR) {
+                                        Tension.TENSION_ADD_MINOR) {
                                     threat += 1;
                                     if (t.getUnitCount() > worstThreat) {
                                         if (t.getSettlement() != null) {

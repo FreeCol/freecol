@@ -213,6 +213,13 @@ public abstract class Mission extends AIObject {
                     if (newTile.getDefendingUnit(unit).getType() == Unit.VETERAN_SOLDIER && !newTile.getDefendingUnit(unit).isArmed()) {
                         tension += 50 - newTile.getDefendingUnit(unit).getDefensePower(unit) * 2;
                     }
+                    // TODO-AI-CHEATING: REMOVE WHEN THE AI KNOWNS HOW TO HANDLE PEACE WITH THE INDIANS:
+                    if (unit.getOwner().isIndian() 
+                            && newTile.getDefendingUnit(unit) != null
+                            && newTile.getDefendingUnit(unit).getOwner().isAI()) {
+                        tension -= 200;
+                    }
+                    // END: TODO-AI-CHEATING
                     if (tension > Tension.TENSION_CONTENT) {
                         if (bestTarget == null) {
                             bestTarget = pathNode;                           
