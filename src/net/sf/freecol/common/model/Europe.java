@@ -358,6 +358,17 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         return owner;
     }
 
+    /**
+     * Sets the owner of this <code>Ownable</code>.
+     *
+     * @param p The <code>Player</code> that should take ownership
+     *      of this {@link Ownable}.
+     * @exception UnsupportedOperationException is always thrown by
+     *      this method.
+     */
+    public void setOwner(Player p) {
+        throw new UnsupportedOperationException();
+    }
 
     /**
     * Prepares this object for a new turn.

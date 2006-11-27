@@ -50,7 +50,14 @@ public class AIGoods extends AIObject implements Transportable {
      * if a Pioneer is lacking tools
      */
     public static final int TOOLS_FOR_PIONEER = 90;
-    
+
+    /**
+     * The extra priority value added to the base value of
+     * {@link #TOOLS_FOR_COLONY_PRIORITY}
+     * if a building is lacking tools. The number of tools
+     * is also added to the total amount.
+     */
+    public static final int TOOLS_FOR_BUILDING = 100;
     
     private Goods goods;
     private Location destination;

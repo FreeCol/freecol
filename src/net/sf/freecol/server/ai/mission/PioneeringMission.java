@@ -16,6 +16,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.AIPlayer;
@@ -180,65 +181,71 @@ public class PioneeringMission extends Mission {
         if (!isValid()) {
             return;
         }
-               
-        if (getUnit().getNumberOfTools() == 0) {
-            // Get tools from a Colony.
-            if (getUnit().getTile().getColony() != null) {
-                int tools = getUnit().getTile().getColony().getGoodsContainer().getGoodsCount(Goods.TOOLS);
-                if (tools >= 20) {                    
-                    Element equipUnitElement = Message.createNewRootElement("equipunit");
-                    equipUnitElement.setAttribute("unit", getUnit().getID());
-                    equipUnitElement.setAttribute("type", Integer.toString(Goods.TOOLS));
-                    equipUnitElement.setAttribute("amount", Integer.toString(Math.min(tools - tools % 20, 100)));
-                    try {
-                        connection.sendAndWait(equipUnitElement);
-                    } catch (Exception e) {
-                        logger.warning("Could not send equip message.");
+        
+        if (getUnit().getTile() != null) {
+            if (getUnit().getNumberOfTools() == 0) {
+                // Get tools from a Colony.
+                if (getUnit().getTile().getColony() != null) {
+                    AIColony ac = (AIColony) getAIMain().getAIObject(getUnit().getTile().getColony());
+                    final int tools = ac.getAvailableTools();
+                    if (tools >= 20) {                    
+                        Element equipUnitElement = Message.createNewRootElement("equipunit");
+                        equipUnitElement.setAttribute("unit", getUnit().getID());
+                        equipUnitElement.setAttribute("type", Integer.toString(Goods.TOOLS));
+                        equipUnitElement.setAttribute("amount", Integer.toString(Math.min(tools - tools % 20, 100)));
+                        try {
+                            connection.sendAndWait(equipUnitElement);
+                        } catch (Exception e) {
+                            logger.warning("Could not send equip message.");
+                        }
+                    } else {
+                        skipMission = true;
                     }
                 } else {
-                    skipMission = true;
+                    GoalDecider destinationDecider = new GoalDecider() {
+                        private PathNode best = null;
+
+                        public PathNode getGoal() {
+                            return best;
+                        }
+
+                        public boolean hasSubGoals() {
+                            return false;
+                        }
+
+                        public boolean check(Unit u, PathNode pathNode) {
+                            Tile t = pathNode.getTile();
+                            boolean target = false;
+                            if (t.getColony() != null 
+                                    && t.getColony().getOwner() == u.getOwner()
+                                    && t.getColony().getGoodsContainer().getGoodsCount(Goods.TOOLS) >= 20) {
+                                AIColony ac = (AIColony) getAIMain().getAIObject(t.getColony());
+                                if (ac.getAvailableTools() >= 20) {
+                                    target = true;
+                                }
+                            }
+                            if (target) {
+                                best = pathNode;
+                            }
+                            return target;
+                        }
+                    };
+                    PathNode bestPath = getGame().getMap().search(getUnit(), destinationDecider, Integer.MAX_VALUE);        
+
+                    if (bestPath != null) {
+                        int direction = moveTowards(connection, bestPath);
+                        if (direction >= 0) {
+                            if (getUnit().getMoveType(direction) == Unit.MOVE
+                                    || getUnit().getMoveType(direction) == Unit.EXPLORE_LOST_CITY_RUMOUR) {
+                                move(connection, direction);                    
+                            }
+                        }
+                    } else {
+                        skipMission = true;
+                    }
                 }
-            } else {
-                GoalDecider destinationDecider = new GoalDecider() {
-                    private PathNode best = null;
-
-                    public PathNode getGoal() {
-                        return best;
-                    }
-
-                    public boolean hasSubGoals() {
-                        return false;
-                    }
-
-                    public boolean check(Unit u, PathNode pathNode) {
-                        Tile t = pathNode.getTile();
-                        boolean target = false;
-                        if (t.getColony() != null 
-                                && t.getColony().getOwner() == u.getOwner()
-                                && t.getColony().getGoodsContainer().getGoodsCount(Goods.TOOLS) >= 20) {
-                            target = true;
-                        }
-                        if (target) {
-                            best = pathNode;
-                        }
-                        return target;
-                    }
-                };
-                PathNode bestPath = getGame().getMap().search(getUnit(), destinationDecider, Integer.MAX_VALUE);        
-
-                if (bestPath != null) {
-                    int direction = moveTowards(connection, bestPath);
-                    if (direction >= 0) {
-                        if (getUnit().getMoveType(direction) == Unit.MOVE
-                                || getUnit().getMoveType(direction) == Unit.EXPLORE_LOST_CITY_RUMOUR) {
-                            move(connection, direction);                    
-                        }
-                    }
-                } else {
-                    skipMission = true;
-                }
+                return;
             }
-            return;
         }
         
         if (tileImprovement == null) {

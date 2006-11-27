@@ -182,7 +182,19 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     public Player getOwner() {
         return colony.getOwner();
     }
-        
+    
+    /**
+     * Sets the owner of this <code>Ownable</code>.
+     *
+     * @param p The <code>Player</code> that should take ownership
+     *      of this {@link Ownable}.
+     * @exception UnsupportedOperationException is always thrown by
+     *      this method.
+     */
+    public void setOwner(Player p) {
+        throw new UnsupportedOperationException();
+    }
+    
     /**
      * Gets the <code>Tile</code> where this <code>Building</code> 
      * is located.

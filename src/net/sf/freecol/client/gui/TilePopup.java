@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
@@ -16,6 +17,10 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Locatable;
+import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Ownable;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -102,9 +107,16 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
         if (FreeCol.isInDebugMode() 
                 && freeColClient.getFreeColServer() != null) {
             addSeparator();
+            JMenu takeOwnership = new JMenu("Take ownership");
+            boolean notEmpty = false;
             Iterator it = tile.getUnitIterator();
             while (it.hasNext()) {
                 Unit u = (Unit) it.next();
+                JMenuItem toMenuItem = new JMenuItem(u.toString());
+                toMenuItem.setActionCommand("TO" + u.getID());
+                toMenuItem.addActionListener(this);
+                takeOwnership.add(toMenuItem);
+                notEmpty = true;
                 if (u.isCarrier() && u.getOwner().isAI()) {
                     AIUnit au = (AIUnit) freeColClient.getFreeColServer().getAIMain().getAIObject(u);                
                     if (au.getMission() != null && au.getMission() instanceof TransportMission) {
@@ -114,6 +126,20 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
                         add(menuItem);
                     }
                 }
+            }
+            if (tile.getSettlement() != null) {
+                if (!notEmpty) {
+                    takeOwnership.addSeparator();
+                }
+                JMenuItem toMenuItem = new JMenuItem(tile.getSettlement().toString());
+                toMenuItem.setActionCommand("TO" + tile.getSettlement().getID());
+                toMenuItem.addActionListener(this);
+                takeOwnership.add(toMenuItem);
+                notEmpty = true;
+            }
+            if (notEmpty) {
+                add(takeOwnership);
+                hasAnItem = true;
             }
         }
         // END DEBUG
@@ -255,6 +281,16 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
             String unitID = command.substring(("TL"+Unit.getXMLElementTagName()).length());
             AIUnit au = (AIUnit) freeColClient.getFreeColServer().getAIMain().getAIObject(unitID);
             canvas.showInformationMessage(au.getMission().toString());
+        } else if (command.startsWith("TO")) {
+            String id = command.substring(("TO").length());
+            Ownable o = (Ownable) freeColClient.getFreeColServer().getGame().getFreeColGameObject(id);
+            Player mp = (Player) freeColClient.getFreeColServer().getGame().getFreeColGameObject(freeColClient.getMyPlayer().getID());
+            o.setOwner(mp);
+            if (o instanceof Location) {
+                freeColClient.getFreeColServer().getModelController().update(((Location) o).getTile());
+            } else if (o instanceof Locatable) {
+                freeColClient.getFreeColServer().getModelController().update(((Locatable) o).getTile());
+            }
             // END DEBUG
         } else {
             logger.warning("Invalid actioncommand.");

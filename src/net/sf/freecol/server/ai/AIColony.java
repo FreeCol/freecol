@@ -362,15 +362,24 @@ public class AIColony extends AIObject {
             }
         }
         
-        // We might need more tools:
+        // We might need more tools for a building or a pioneer:
         AIUnit unequippedHardyPioneer = getUnequippedHardyPioneer();
-        if (colony.getGoodsCount(Goods.TOOLS) < 20 && colony.getProductionNetOf(Goods.TOOLS) == 0
-                && (tileImprovements.size() > 0 
-                    || unequippedHardyPioneer != null 
-                       && PioneeringMission.isValid(unequippedHardyPioneer))) {
+        final boolean needsPioneer = (tileImprovements.size() > 0 
+                || unequippedHardyPioneer != null  && PioneeringMission.isValid(unequippedHardyPioneer));
+        int toolsRequiredForBuilding = 0;
+        if (colony.getCurrentlyBuilding() >= 0) {
+            toolsRequiredForBuilding = (colony.getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) 
+                    ? Unit.getNextTools(colony.getCurrentlyBuilding()-Colony.BUILDING_UNIT_ADDITION)
+                    : colony.getBuilding(colony.getCurrentlyBuilding()).getNextTools();
+        }
+        if (colony.getProductionNetOf(Goods.TOOLS) == 0
+                && (colony.getGoodsCount(Goods.TOOLS) < 20 && needsPioneer)
+                    || toolsRequiredForBuilding > colony.getGoodsCount(Goods.TOOLS)) {
             int goodsWishValue = AIGoods.TOOLS_FOR_COLONY_PRIORITY 
                     + AIGoods.TOOLS_FOR_IMPROVEMENT * tileImprovements.size()
-                    + ((unequippedHardyPioneer != null) ? AIGoods.TOOLS_FOR_PIONEER : 0);
+                    + ((unequippedHardyPioneer != null) ? AIGoods.TOOLS_FOR_PIONEER : 0)
+                    + ((toolsRequiredForBuilding > colony.getGoodsCount(Goods.TOOLS)) 
+                        ? AIGoods.TOOLS_FOR_BUILDING + (toolsRequiredForBuilding - colony.getGoodsCount(Goods.TOOLS)): 0);
             boolean goodsOrdered = false;
             Iterator wishIterator = wishes.iterator();
             while (wishIterator.hasNext()) {
@@ -534,11 +543,18 @@ public class AIColony extends AIObject {
                     int requiredTools = 0;
                     int buildTurns = 0;
                     final int currentlyBuilding = colony.getCurrentlyBuilding();                
-                    if (currentlyBuilding >= 0 && currentlyBuilding < Colony.BUILDING_UNIT_ADDITION) {
-                        Building b = colony.getBuilding(currentlyBuilding);
-                        requiredTools += b.getNextTools();
-                        buildTurns += (b.getNextHammers() - colony.getHammers()) / (colony.getProductionOf(Goods.HAMMERS)+1);
+                    if (currentlyBuilding >= 0) {
+                        if (colony.getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) {
+                            final int nextHammers = Unit.getNextHammers(colony.getCurrentlyBuilding()-Colony.BUILDING_UNIT_ADDITION);
+                            requiredTools += Unit.getNextTools(colony.getCurrentlyBuilding()-Colony.BUILDING_UNIT_ADDITION);
+                            buildTurns += (nextHammers - colony.getHammers()) / (colony.getProductionOf(Goods.HAMMERS)+1);
+                        } else {
+                            Building b = colony.getBuilding(currentlyBuilding);
+                            requiredTools += b.getNextTools();
+                            buildTurns += (b.getNextHammers() - colony.getHammers()) / (colony.getProductionOf(Goods.HAMMERS)+1);
+                        }
                     }
+                                        
                     if (requiredTools > 0) {
                         if (colony.getWarehouseCapacity() > 100) {
                             requiredTools += 100;
@@ -639,6 +655,21 @@ public class AIColony extends AIObject {
         }
     }
 
+    /**
+     * Returns the available amount of tools.
+     * @return The amount of tools not needed for the next
+     *     {@link Buildable buildable}.
+     */
+    public int getAvailableTools() {
+        int toolsRequiredForBuilding = 0;
+        if (colony.getCurrentlyBuilding() >= 0) {
+            toolsRequiredForBuilding = (colony.getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) 
+                    ? Unit.getNextTools(colony.getCurrentlyBuilding()-Colony.BUILDING_UNIT_ADDITION)
+                    : colony.getBuilding(colony.getCurrentlyBuilding()).getNextTools();
+        }
+        
+        return Math.max(0, colony.getGoodsCount(Goods.TOOLS) - toolsRequiredForBuilding);
+    }
 
     /**
     * Rearranges the workers within this colony.
@@ -653,8 +684,9 @@ public class AIColony extends AIObject {
 
         // TODO: Detect a siege and move the workers temporarily around.
         
+        // Move a pioneer outside the colony if we have a sufficient amount of tools:
         if (colony.getUnitCount() > 1
-                && colony.getGoodsCount(Goods.TOOLS) >= 20) {
+                && getAvailableTools() >= 20) {
             AIUnit unequippedPioneer = getUnequippedHardyPioneer();
             if (unequippedPioneer != null
                     && (unequippedPioneer.getMission() == null
