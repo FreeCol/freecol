@@ -637,12 +637,17 @@ public final class FreeColServer {
         while (playerIterator.hasNext()) {
             ServerPlayer player = (ServerPlayer) playerIterator.next();
             player.revealMap();
-
-            Element updateElement = Message.createNewRootElement("update");
-            updateElement.appendChild(getGame().getMap().toXMLElement(player, updateElement.getOwnerDocument()));
+        }
+        
+        playerIterator = getGame().getPlayerIterator();
+        while (playerIterator.hasNext()) {
+            ServerPlayer player = (ServerPlayer) playerIterator.next();
+            Element reconnect = Message.createNewRootElement("reconnect");
             try {
-                player.getConnection().sendAndWait(updateElement);
-            } catch (IOException e) {}
+                player.getConnection().send(reconnect);
+            } catch (IOException ex) {
+                logger.warning("Could not send reconnect message!");
+            }
         }
     }
 
