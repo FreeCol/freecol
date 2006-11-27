@@ -185,23 +185,7 @@ public class PioneeringMission extends Mission {
         if (getUnit().getTile() != null) {
             if (getUnit().getNumberOfTools() == 0) {
                 // Get tools from a Colony.
-                if (getUnit().getTile().getColony() != null) {
-                    AIColony ac = (AIColony) getAIMain().getAIObject(getUnit().getTile().getColony());
-                    final int tools = ac.getAvailableTools();
-                    if (tools >= 20) {                    
-                        Element equipUnitElement = Message.createNewRootElement("equipunit");
-                        equipUnitElement.setAttribute("unit", getUnit().getID());
-                        equipUnitElement.setAttribute("type", Integer.toString(Goods.TOOLS));
-                        equipUnitElement.setAttribute("amount", Integer.toString(Math.min(tools - tools % 20, 100)));
-                        try {
-                            connection.sendAndWait(equipUnitElement);
-                        } catch (Exception e) {
-                            logger.warning("Could not send equip message.");
-                        }
-                    } else {
-                        skipMission = true;
-                    }
-                } else {
+                if (getUnit().getTile().getColony() == null) {
                     GoalDecider destinationDecider = new GoalDecider() {
                         private PathNode best = null;
 
@@ -244,6 +228,23 @@ public class PioneeringMission extends Mission {
                         skipMission = true;
                     }
                 }
+                if (getUnit().getTile().getColony() != null) {
+                    AIColony ac = (AIColony) getAIMain().getAIObject(getUnit().getTile().getColony());
+                    final int tools = ac.getAvailableTools();
+                    if (tools >= 20) {                    
+                        Element equipUnitElement = Message.createNewRootElement("equipunit");
+                        equipUnitElement.setAttribute("unit", getUnit().getID());
+                        equipUnitElement.setAttribute("type", Integer.toString(Goods.TOOLS));
+                        equipUnitElement.setAttribute("amount", Integer.toString(Math.min(tools - tools % 20, 100)));
+                        try {
+                            connection.sendAndWait(equipUnitElement);
+                        } catch (Exception e) {
+                            logger.warning("Could not send equip message.");
+                        }
+                    } else {
+                        skipMission = true;
+                    }
+                }
                 return;
             }
         }
@@ -258,7 +259,17 @@ public class PioneeringMission extends Mission {
         
         if (tileImprovement != null) {
             if (getUnit().getTile() != null) {
-                if (getUnit().getTile() == tileImprovement.getTarget()) {
+                if (getUnit().getTile() != tileImprovement.getTarget()) {
+                    PathNode pathToTarget = getUnit().findPath(tileImprovement.getTarget());
+                    if (pathToTarget != null) {
+                        int direction = moveTowards(connection, pathToTarget);
+                        if (direction >= 0 && getUnit().getMoveType(direction) == Unit.MOVE) {
+                            move(connection, direction);
+                        }
+                    }
+                }
+                if (getUnit().getTile() == tileImprovement.getTarget()
+                        && getUnit().checkSetState(tileImprovement.getType())) {
                     Element changeStateElement = Message.createNewRootElement("changeState");
                     changeStateElement.setAttribute("unit", getUnit().getID());
                     changeStateElement.setAttribute("state", Integer.toString(tileImprovement.getType()));
@@ -266,14 +277,6 @@ public class PioneeringMission extends Mission {
                         connection.sendAndWait(changeStateElement);
                     } catch (IOException e) {
                         logger.warning("Could not send message!");
-                    }
-                } else {
-                    PathNode pathToTarget = getUnit().findPath(tileImprovement.getTarget());
-                    if (pathToTarget != null) {
-                        int direction = moveTowards(connection, pathToTarget);
-                        if (direction >= 0 && getUnit().getMoveType(direction) == Unit.MOVE) {
-                            move(connection, direction);
-                        }
                     }
                 }
             }

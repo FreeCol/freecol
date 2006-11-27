@@ -159,7 +159,8 @@ public class BuildColonyMission extends Mission {
             return;
         }
         
-        if (target == null || doNotGiveUp && colonyValue > target.getColonyValue()) {
+        if (target == null || doNotGiveUp 
+                && (colonyValue > target.getColonyValue() || target.getSettlement() != null)) {
             target = findColonyLocation(getUnit());
             if (target == null) {
                 doNotGiveUp = false;
