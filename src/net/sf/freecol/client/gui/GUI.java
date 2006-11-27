@@ -2011,17 +2011,20 @@ public final class GUI {
         }
         
         // FOR DEBUGGING:
-        if (debugShowMission && unit.getOwner().isAI() && freeColClient.getFreeColServer() != null) {
+        if (debugShowMission && freeColClient.getFreeColServer() != null) {
             net.sf.freecol.server.ai.AIUnit au = (net.sf.freecol.server.ai.AIUnit) freeColClient.getFreeColServer().getAIMain().getAIObject(unit);
             if (au != null) {
                 g.setColor(Color.WHITE);
+                String text = (unit.getOwner().isAI()) ? "" : "(";
                 if (au.getMission() != null) {
                     String missionName = au.getMission().getClass().toString();
                     missionName = missionName.substring(missionName.lastIndexOf('.') + 1);
-                    g.drawString(missionName, x , y);
+                    text += missionName;                    
                 } else {
-                    g.drawString("No mission", x , y);
+                    text += "No mission";
                 }
+                text += (unit.getOwner().isAI()) ? "" : ")";
+                g.drawString(text, x , y);
             }
         }
     }

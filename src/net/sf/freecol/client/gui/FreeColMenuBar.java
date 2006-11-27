@@ -490,7 +490,7 @@ public class FreeColMenuBar extends JMenuBar {
             
             debugMenu.addSeparator();
 
-            JCheckBoxMenuItem sc = new JCheckBoxMenuItem(Messages.message("menuBar.debug.showCoordinates"));
+            JCheckBoxMenuItem sc = new JCheckBoxMenuItem(Messages.message("menuBar.debug.showCoordinates"), gui.displayCoordinates);
             sc.setOpaque(false);
             sc.setMnemonic(KeyEvent.VK_S);
             debugMenu.add(sc);
@@ -501,7 +501,7 @@ public class FreeColMenuBar extends JMenuBar {
                 }
             });
 
-            JCheckBoxMenuItem cv = new JCheckBoxMenuItem(Messages.message("menuBar.debug.showColonyValue"));
+            JCheckBoxMenuItem cv = new JCheckBoxMenuItem(Messages.message("menuBar.debug.showColonyValue"), gui.displayColonyValue);
             cv.setOpaque(false);
             cv.setMnemonic(KeyEvent.VK_C);
             debugMenu.add(cv);
@@ -512,7 +512,7 @@ public class FreeColMenuBar extends JMenuBar {
                 }
             });
             
-            JCheckBoxMenuItem dam = new JCheckBoxMenuItem("Display AI-missions");
+            JCheckBoxMenuItem dam = new JCheckBoxMenuItem("Display AI-missions", gui.debugShowMission);
             dam.setOpaque(false);
             dam.setMnemonic(KeyEvent.VK_M);
             debugMenu.add(dam);
@@ -586,7 +586,7 @@ public class FreeColMenuBar extends JMenuBar {
                         net.sf.freecol.server.ai.AIPlayer ap = (net.sf.freecol.server.ai.AIPlayer) aiMain.getAIObject(freeColClient.getMyPlayer().getID());
                         ap.setDebuggingConnection(freeColClient.getClient().getConnection());
                         ap.startWorking();
-                        //freeColClient.getConnectController().reconnect();
+                        freeColClient.getConnectController().reconnect();
                     }
                 }
             });            
