@@ -582,6 +582,9 @@ public class AIPlayer extends AIObject {
             return;
         }
         
+        // Temporarily deactive this feature:
+        if (1==1) return;
+        
         // Ok, we are a European player. Things are about to get fun.
         Iterator it = player.getColonyIterator();
         
@@ -895,7 +898,7 @@ public class AIPlayer extends AIObject {
                             || unit.getType() == Unit.VETERAN_SOLDIER
                             || getGame().getTurn().getNumber() > 5)) {
                 giveMilitaryMission(aiUnit);
-            } else if (unit.isPioneer() && PioneeringMission.isValid(aiUnit)) {
+            } else if (unit.getNumberOfTools() > 0 && PioneeringMission.isValid(aiUnit)) {
                 aiUnit.setMission(new PioneeringMission(getAIMain(), aiUnit));
             } else if (unit.isColonist()) {
                 // Check if this unit is needed as an expert (using: "WorkerWish"):

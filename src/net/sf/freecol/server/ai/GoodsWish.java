@@ -24,7 +24,7 @@ public class GoodsWish extends Wish {
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
-
+    
     private int goodsType;
 
     /**

@@ -30,7 +30,28 @@ public class AIGoods extends AIObject implements Transportable {
 
     public static final int IMPORTANT_DELIVERY = 110;
     public static final int FULL_DELIVERY = 100;
+    
+    /**
+     * The priority of tools intended for a Colony with none stored
+     * at the present (and with no special needs).
+     */
+    public static final int TOOLS_FOR_COLONY_PRIORITY = 10;
+    
+    /**
+     * The extra priority value added to the base value of
+     * {@link #TOOLS_FOR_COLONY_PRIORITY}
+     * for each ColonyTile needing a terrain improvement.
+     */
+    public static final int TOOLS_FOR_IMPROVEMENT = 10;
 
+    /**
+     * The extra priority value added to the base value of
+     * {@link #TOOLS_FOR_COLONY_PRIORITY}
+     * if a Pioneer is lacking tools
+     */
+    public static final int TOOLS_FOR_PIONEER = 90;
+    
+    
     private Goods goods;
     private Location destination;
     private int transportPriority;

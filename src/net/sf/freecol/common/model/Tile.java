@@ -265,8 +265,7 @@ public final class Tile extends FreeColGameObject implements Location {
         
         return amount;
     }
-    
-    
+        
     /**
      * Returns the treasure train carrying the largest treasure located on 
      * this <code>Tile</code>.

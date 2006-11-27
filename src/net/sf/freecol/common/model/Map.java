@@ -730,6 +730,7 @@ public class Map extends FreeColGameObject {
         }
     }
    
+    
     /**
      * Gets the default <code>CostDecider</code>.
      * @return The default <code>CostDecider</code>. This is currently

@@ -9,6 +9,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.GoalDecider;
+import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -41,6 +43,11 @@ public class PioneeringMission extends Mission {
     public static final String  REVISION = "$Revision$";
 
     private TileImprovement tileImprovement = null;
+    
+    /**
+     * Temporary variable for skipping the mission.
+     */
+    private boolean skipMission = false;
 
 
     /**
@@ -174,8 +181,63 @@ public class PioneeringMission extends Mission {
             return;
         }
                
-        if (!getUnit().isPioneer()) {
-            // TODO: Get tools from a Colony
+        if (getUnit().getNumberOfTools() == 0) {
+            // Get tools from a Colony.
+            if (getUnit().getTile().getColony() != null) {
+                int tools = getUnit().getTile().getColony().getGoodsContainer().getGoodsCount(Goods.TOOLS);
+                if (tools >= 20) {                    
+                    Element equipUnitElement = Message.createNewRootElement("equipunit");
+                    equipUnitElement.setAttribute("unit", getUnit().getID());
+                    equipUnitElement.setAttribute("type", Integer.toString(Goods.TOOLS));
+                    equipUnitElement.setAttribute("amount", Integer.toString(Math.min(tools - tools % 20, 100)));
+                    try {
+                        connection.sendAndWait(equipUnitElement);
+                    } catch (Exception e) {
+                        logger.warning("Could not send equip message.");
+                    }
+                } else {
+                    skipMission = true;
+                }
+            } else {
+                GoalDecider destinationDecider = new GoalDecider() {
+                    private PathNode best = null;
+
+                    public PathNode getGoal() {
+                        return best;
+                    }
+
+                    public boolean hasSubGoals() {
+                        return false;
+                    }
+
+                    public boolean check(Unit u, PathNode pathNode) {
+                        Tile t = pathNode.getTile();
+                        boolean target = false;
+                        if (t.getColony() != null 
+                                && t.getColony().getOwner() == u.getOwner()
+                                && t.getColony().getGoodsContainer().getGoodsCount(Goods.TOOLS) >= 20) {
+                            target = true;
+                        }
+                        if (target) {
+                            best = pathNode;
+                        }
+                        return target;
+                    }
+                };
+                PathNode bestPath = getGame().getMap().search(getUnit(), destinationDecider, Integer.MAX_VALUE);        
+
+                if (bestPath != null) {
+                    int direction = moveTowards(connection, bestPath);
+                    if (direction >= 0) {
+                        if (getUnit().getMoveType(direction) == Unit.MOVE
+                                || getUnit().getMoveType(direction) == Unit.EXPLORE_LOST_CITY_RUMOUR) {
+                            move(connection, direction);                    
+                        }
+                    }
+                } else {
+                    skipMission = true;
+                }
+            }
             return;
         }
         
@@ -261,7 +323,7 @@ public class PioneeringMission extends Mission {
         updateTileImprovement();        
         //return tileImprovement != null;
         // TODO: Remove the second test after code for getting tools has been added:
-        return (tileImprovement != null) && getUnit().isPioneer();
+        return !skipMission && (tileImprovement != null) && (getUnit().isPioneer() || getUnit().getType() == Unit.HARDY_PIONEER);
     }
 
     /**

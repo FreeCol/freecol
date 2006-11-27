@@ -457,7 +457,8 @@ public class TransportMission extends Mission {
                 if (newUnit != null) {
                     if (newUnit.getUnit().isColonist()
                             && !newUnit.getUnit().isArmed()
-                            && !newUnit.getUnit().isMounted()) {
+                            && !newUnit.getUnit().isMounted()
+                            && !newUnit.getUnit().isPioneer()) {
                         newUnit.setMission(new BuildColonyMission(getAIMain(), newUnit));
                     }
                     addToTransportList(newUnit);
@@ -484,20 +485,22 @@ public class TransportMission extends Mission {
 
         /* Add the colony containing the wish with the highest value
            to the "aiColonies"-list: */
-        Iterator highValueWishIterator = ((AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getID())).getWishIterator();
+        Iterator highValueWishIterator = ((AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getID())).getWishIterator();        
         while (highValueWishIterator.hasNext()) {
             Wish w = (Wish) highValueWishIterator.next();
             if (w.getTransportable() != null) {
                 continue;
             }
-            if (w instanceof WorkerWish) {
+            if (w instanceof WorkerWish
+                    && w.getDestination() instanceof Colony) {
                 WorkerWish ww = (WorkerWish) w;
                 Colony c = (Colony) ww.getDestination();
                 AIColony ac = (AIColony) getAIMain().getAIObject(c);
                 if (!aiColonies.contains(ac)) {
                     aiColonies.add(ac);
                 }
-            } else if (w instanceof GoodsWish) {
+            } else if (w instanceof GoodsWish
+                    && w.getDestination() instanceof Colony) {
                 GoodsWish gw = (GoodsWish) w;
                 Colony c = (Colony) gw.getDestination();
                 AIColony ac = (AIColony) getAIMain().getAIObject(c);
@@ -508,17 +511,16 @@ public class TransportMission extends Mission {
                 logger.warning("Unknown type of wish: " + w);
             }
         }
-
         for (int i=0; i<aiColonies.size(); i++) {
             AIColony ac = (AIColony) aiColonies.get(i);
             // Assuming that all colonists which can be bought in Europe take the same space:
-            int space = getAvailableSpace(Unit.FREE_COLONIST, getUnit().getOwner().getEurope(), ac.getColony());
+            int space = getAvailableSpace(Unit.FREE_COLONIST, getUnit().getOwner().getEurope(), ac.getColony());            
             Iterator wishIterator = ac.getWishIterator();
             while (space > 0 && wishIterator.hasNext()) {
                 Wish w = (Wish) wishIterator.next();
-                if (w.getTransportable() != null) {
+                if (w.getTransportable() != null) {         
                     continue;
-                }
+                }                
                 if (w instanceof WorkerWish) {
                     WorkerWish ww = (WorkerWish) w;
                     AIUnit newUnit = getUnitInEurope(connection, ww.getUnitType());
@@ -528,10 +530,10 @@ public class TransportMission extends Mission {
                         addToTransportList(newUnit);
                         space--;
                     }
-                } else if (w instanceof GoodsWish) {
+                } else if (w instanceof GoodsWish) {                    
                     GoodsWish gw = (GoodsWish) w;
-                    AIGoods ag = buyGoodsInEurope(connection, gw.getGoodsType(), 100, gw.getDestination());
-                    if (ag != null) {
+                    AIGoods ag = buyGoodsInEurope(connection, gw.getGoodsType(), 100, gw.getDestination());                    
+                    if (ag != null) {                        
                         gw.setTransportable(ag);
                         addToTransportList(ag);
                         space--;
@@ -924,6 +926,13 @@ public class TransportMission extends Mission {
                         && carrier.getState() != Unit.TO_EUROPE
                         && carrier.getState() != Unit.TO_AMERICA) {
                     if (carrier.getLocation() instanceof Europe) {
+                        // TODO-AI-CHEATING: REMOVE WHEN THE AI IS GOOD ENOUGH:
+                        Player p = carrier.getOwner();
+                        if (p.isAI() && getAIMain().getFreeColServer().isSingleplayer()) {
+                            // Double the income by adding this bonus:
+                            p.modifyGold(p.getGame().getMarket().getSalePrice(ag.getGoods()));
+                        }
+                        // END: TODO-AI-CHEATING.
                         Element sellGoodsElement = Message.createNewRootElement("sellGoods");
                         sellGoodsElement.appendChild(ag.getGoods().toXMLElement(carrier.getOwner(), sellGoodsElement.getOwnerDocument()));
                         try {

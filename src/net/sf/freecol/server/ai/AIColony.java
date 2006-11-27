@@ -23,6 +23,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.server.ai.mission.PioneeringMission;
 import net.sf.freecol.server.ai.mission.TransportMission;
 import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
 
@@ -360,6 +361,48 @@ public class AIColony extends AIObject {
                 }
             }
         }
+        
+        // We might need more tools:
+        AIUnit unequippedHardyPioneer = getUnequippedHardyPioneer();
+        if (colony.getGoodsCount(Goods.TOOLS) < 20 && colony.getProductionNetOf(Goods.TOOLS) == 0
+                && (tileImprovements.size() > 0 
+                    || unequippedHardyPioneer != null 
+                       && PioneeringMission.isValid(unequippedHardyPioneer))) {
+            int goodsWishValue = AIGoods.TOOLS_FOR_COLONY_PRIORITY 
+                    + AIGoods.TOOLS_FOR_IMPROVEMENT * tileImprovements.size()
+                    + ((unequippedHardyPioneer != null) ? AIGoods.TOOLS_FOR_PIONEER : 0);
+            boolean goodsOrdered = false;
+            Iterator wishIterator = wishes.iterator();
+            while (wishIterator.hasNext()) {
+                Wish w = (Wish) wishIterator.next();
+                if (w instanceof GoodsWish) {
+                    GoodsWish gw = (GoodsWish) w;
+                    //TODO: check for a certain required amount?
+                    if (gw.getGoodsType() == Goods.TOOLS) {
+                        gw.value = goodsWishValue;
+                        goodsOrdered = true;
+                        break;
+                    }
+                }
+            }
+            if (!goodsOrdered) {
+                GoodsWish gw = new GoodsWish(getAIMain(), colony, goodsWishValue, Goods.TOOLS);
+                wishes.add(gw);
+            }            
+        } else {
+            Iterator wishIterator = ((List) ((ArrayList) wishes).clone()).iterator();
+            while (wishIterator.hasNext()) {
+                Wish w = (Wish) wishIterator.next();
+                if (w instanceof GoodsWish) {
+                    GoodsWish gw = (GoodsWish) w;
+                    //TODO: check for a certain required amount?
+                    if (gw.getGoodsType() == Goods.TOOLS) {
+                        gw.dispose();                      
+                    }
+                }
+            }
+        }
+        
         Iterator wishIterator = ((ArrayList) ((ArrayList) wishes).clone()).iterator();
         while (wishIterator.hasNext()) {
             Wish w = (Wish) wishIterator.next();
@@ -370,13 +413,52 @@ public class AIColony extends AIObject {
             } else if (w instanceof GoodsWish) {
                 GoodsWish gw = (GoodsWish) w;
                 //TODO: check for a certain required amount?
-                if (getColony().getGoodsCount(gw.getGoodsType()) != 0) {
+                if (getColony().getGoodsCount(gw.getGoodsType()) >= 20) {
                     gw.dispose();
                 }
             } else {
                 logger.warning("Unknown type of Wish.");
             }
         }
+        
+        Collections.sort(wishes, new Comparator() {
+            public int compare(Object o, Object p) {
+                Integer i = new Integer(((Wish) o).getValue());
+                Integer j = new Integer(((Wish) p).getValue());
+                return j.compareTo(i);
+            }
+        });
+
+    }
+    
+    /**
+     * Returns an unequipped pioneer that is either
+     * inside this colony or standing on the same <code>Tile</code>.
+     * 
+     * @return A unit with a {@link PioneeringMission} or a unit being
+     *      a {@link Unit#HARDY_PIONEER hardy pioneer} - and with
+     *      no tools. Returns <code>null</code> if no such unit was found. 
+     */
+    private AIUnit getUnequippedHardyPioneer() {
+        Iterator ui = colony.getTile().getUnitIterator();
+        while (ui.hasNext()) {
+            Unit u = (Unit) ui.next();
+            AIUnit au = (AIUnit) getAIMain().getAIObject(u);
+            if (au.getMission() != null
+                    && au.getMission() instanceof PioneeringMission
+                    && u.getNumberOfTools() == 0) {
+                return au;
+            }
+        }
+        ui = colony.getUnitIterator();
+        while (ui.hasNext()) {
+            Unit u = (Unit) ui.next();
+            AIUnit au = (AIUnit) getAIMain().getAIObject(u);
+            if (u.getType() == Unit.HARDY_PIONEER) {
+                return au;
+            }
+        }
+        return null;
     }
     
     public void removeWish(Wish w) {
@@ -428,14 +510,52 @@ public class AIColony extends AIObject {
         // TODO: Do not sell raw material we are lacking.
 
         for (int goodsType=0; goodsType<Goods.NUMBER_OF_TYPES; goodsType++) {
-            if (goodsType == Goods.FOOD || goodsType == Goods.LUMBER || goodsType == Goods.HORSES) {
+            // Never export food and lumber
+            if (goodsType == Goods.FOOD || goodsType == Goods.LUMBER) {
                 continue;
             }
-            if (goodsType == Goods.MUSKETS 
-                    && colony.getProductionOf(Goods.MUSKETS) > 0
-                    && colony.getGoodsCount(Goods.MUSKETS) > colony.getWarehouseCapacity() - 50) {
+            // Only export muskets if we do not have room for them:
+            if (goodsType == Goods.MUSKETS && (colony.getProductionOf(Goods.MUSKETS) == 0
+                    || colony.getGoodsCount(Goods.MUSKETS) < colony.getWarehouseCapacity() - colony.getProductionOf(Goods.MUSKETS))) {
                 continue;
             }
+            // Only export horses if we do not have room for them:
+            if (goodsType == Goods.HORSES && (colony.getProductionOf(Goods.HORSES) == 0
+                    || colony.getGoodsCount(Goods.HORSES) < colony.getWarehouseCapacity() - colony.getProductionOf(Goods.HORSES))) {
+                continue;
+            }
+            
+            /*
+             * Only export tools if we are producing it in this colony
+             * and have sufficient amounts in warehouse:
+             */
+            if (goodsType == Goods.TOOLS && colony.getGoodsCount(Goods.TOOLS) > 0) {                
+                if (colony.getProductionNetOf(Goods.TOOLS) > 0) {                    
+                    int requiredTools = 0;
+                    int buildTurns = 0;
+                    final int currentlyBuilding = colony.getCurrentlyBuilding();                
+                    if (currentlyBuilding >= 0 && currentlyBuilding < Colony.BUILDING_UNIT_ADDITION) {
+                        Building b = colony.getBuilding(currentlyBuilding);
+                        requiredTools += b.getNextTools();
+                        buildTurns += (b.getNextHammers() - colony.getHammers()) / (colony.getProductionOf(Goods.HAMMERS)+1);
+                    }
+                    if (requiredTools > 0) {
+                        if (colony.getWarehouseCapacity() > 100) {
+                            requiredTools += 100;
+                        }
+                        int toolsProductionTurns = requiredTools / colony.getProductionNetOf(Goods.TOOLS);
+                        if (buildTurns <= toolsProductionTurns + 1) {
+                            continue;
+                        }
+                    } else if (colony.getWarehouseCapacity() > 100
+                            && colony.getGoodsCount(Goods.TOOLS) <= 100) {
+                        continue;
+                    }
+                } else {
+                    continue;
+                }
+            }
+            
             if (colony.getGoodsCount(goodsType) > 0) {
                 List alreadyAdded = new ArrayList();
                 for (int j=0; j<aiGoods.size(); j++) {
@@ -532,6 +652,18 @@ public class AIColony extends AIObject {
         colonyPlan.create();
 
         // TODO: Detect a siege and move the workers temporarily around.
+        
+        if (colony.getUnitCount() > 1
+                && colony.getGoodsCount(Goods.TOOLS) >= 20) {
+            AIUnit unequippedPioneer = getUnequippedHardyPioneer();
+            if (unequippedPioneer != null
+                    && (unequippedPioneer.getMission() == null
+                            || !(unequippedPioneer.getMission() instanceof PioneeringMission))
+                            && PioneeringMission.isValid(unequippedPioneer)) {
+                unequippedPioneer.getUnit().setLocation(colony.getTile());
+                unequippedPioneer.setMission(new PioneeringMission(getAIMain(), unequippedPioneer));
+            }
+        }
 
         List units = new ArrayList();
         List workLocationPlans = new ArrayList(colonyPlan.getWorkLocationPlans());
@@ -555,7 +687,7 @@ public class AIColony extends AIObject {
         // Place all the experts:
         Iterator uit = units.iterator();
         while (uit.hasNext()) {
-            Unit unit = (Unit) uit.next();
+            Unit unit = (Unit) uit.next();            
             if (unit.getExpertWorkType() >= 0) {
                 Iterator wlpIterator = workLocationPlans.iterator();
                 while (wlpIterator.hasNext()) {
@@ -801,8 +933,8 @@ public class AIColony extends AIObject {
         }
 
         decideBuildable(connection);
-        createWishes();
         createTileImprovements();
+        createWishes();
     }
 
 
