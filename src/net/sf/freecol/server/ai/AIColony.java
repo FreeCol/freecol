@@ -658,7 +658,7 @@ public class AIColony extends AIObject {
     /**
      * Returns the available amount of tools.
      * @return The amount of tools not needed for the next
-     *     {@link Buildable buildable}.
+     *     thing we are building.
      */
     public int getAvailableTools() {
         int toolsRequiredForBuilding = 0;
