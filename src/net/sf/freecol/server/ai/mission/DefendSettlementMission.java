@@ -8,6 +8,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
@@ -266,5 +267,22 @@ public class DefendSettlementMission extends Mission {
      */
     public static String getXMLElementTagName() {
         return "defendSettlementMission";
+    }
+    
+    /**
+     * Gets debugging information about this mission.
+     * This string is a short representation of this
+     * object's state.
+     * 
+     * @return The <code>String</code>: 
+     *      "(x, y) ColonyName"
+     *      where <code>x</code> and <code>y</code> is the
+     *      coordinates of the settlement for this mission,
+     *      and <code>ColonyName</code> is the name
+     *      (if available).
+     */
+    public String getDebuggingInfo() {
+        String name = (settlement instanceof Colony) ? ((Colony) settlement).getName() : "";
+        return settlement.getTile().getPosition().toString() + " " + name;
     }
 }

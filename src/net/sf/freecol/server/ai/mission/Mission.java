@@ -302,7 +302,6 @@ public abstract class Mission extends AIObject {
             return 0;
         }
     }
-
     
     /**
      * Disposes this mission by removing any referances to it.
@@ -359,5 +358,17 @@ public abstract class Mission extends AIObject {
      */    
     protected void setAIUnit(AIUnit aiUnit) {
         this.aiUnit = aiUnit;
+    }
+    
+    /**
+     * Gets debugging information about this mission.
+     * This string is a short representation of this
+     * object's state.
+     * 
+     * @return An empty <code>String</code>. Should be
+     *      replaced by subclasses.
+     */
+    public String getDebuggingInfo() {
+        return "";
     }
 }

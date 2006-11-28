@@ -319,10 +319,12 @@ public final class Tile extends FreeColGameObject implements Location {
                     // can build next to an indian settlement
                     value -= 10;
                 } else {
-
                     if (tile.isLand()) {
                         for (int i = 0; i < Goods.NUMBER_OF_TYPES; i++) {
                             value += tile.potential(i);
+                            if (!tile.isLand()) {
+                                value += 4;
+                            }
                         }
                         if (tile.isForested()) {
                             nearbyTileHasForest = true;
@@ -330,6 +332,9 @@ public final class Tile extends FreeColGameObject implements Location {
                     } else {
                         nearbyTileIsOcean = true;
                         value += tile.potential(Goods.FISH);
+                    }
+                    if (tile.hasBonus()) {
+                        value += 20;
                     }
 
                     if (tile.getNationOwner() != Player.NO_NATION) {

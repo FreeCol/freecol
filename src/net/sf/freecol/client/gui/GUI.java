@@ -140,7 +140,9 @@ public final class GUI {
     // Debug variables:
     boolean displayCoordinates = false;
     boolean displayColonyValue = false;
+    Player displayColonyValuePlayer = null;
     boolean debugShowMission = false;
+    boolean debugShowMissionInfo = false;
 
 
     /**
@@ -1822,8 +1824,13 @@ public final class GUI {
             g.drawString(posString, x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(posString))/2, y + (lib.getTerrainImageHeight(tile.getType()) - g.getFontMetrics().getAscent())/2);
         }
         if (displayColonyValue && tile.getType() != Tile.UNEXPLORED && tile.isLand()) {
-            String posString = Integer.toString(tile.getColonyValue());
-            g.drawString(posString, x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(posString))/2, y + (lib.getTerrainImageHeight(tile.getType()) - g.getFontMetrics().getAscent())/2);
+            String valueString;
+            if (displayColonyValuePlayer == null) {
+                valueString = Integer.toString(tile.getColonyValue());
+            } else {
+                valueString = Integer.toString(displayColonyValuePlayer.getColonyValue(tile));
+            }
+            g.drawString(valueString, x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(valueString))/2, y + (lib.getTerrainImageHeight(tile.getType()) - g.getFontMetrics().getAscent())/2);
         }
     }
 
@@ -2016,15 +2023,20 @@ public final class GUI {
             if (au != null) {
                 g.setColor(Color.WHITE);
                 String text = (unit.getOwner().isAI()) ? "" : "(";
+                String debuggingInfo = "";
                 if (au.getMission() != null) {
                     String missionName = au.getMission().getClass().toString();
                     missionName = missionName.substring(missionName.lastIndexOf('.') + 1);
-                    text += missionName;                    
+                    text += missionName;
+                    if (debugShowMissionInfo) {
+                        debuggingInfo = au.getMission().getDebuggingInfo();
+                    }
                 } else {
                     text += "No mission";
-                }
+                }                
                 text += (unit.getOwner().isAI()) ? "" : ")";
                 g.drawString(text, x , y);
+                g.drawString(debuggingInfo, x , y+25);
             }
         }
     }

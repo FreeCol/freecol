@@ -3,6 +3,7 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -224,8 +225,9 @@ public class UnitContainer extends FreeColGameObject {
     * Disposes all units in this <code>UnitContainer</code>.
     */
     public void disposeAllUnits() {
-        for (int i=units.size()-1; i>=0; i--) {
-            ((Unit) units.get(i)).dispose();
+        Iterator it = ((List) ((ArrayList) units).clone()).iterator();
+        while (it.hasNext()) {
+            ((Unit) it.next()).dispose();
         }
     }
 

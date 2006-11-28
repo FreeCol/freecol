@@ -258,4 +258,20 @@ public class IndianBringGiftMission extends Mission {
     public static String getXMLElementTagName() {
         return "indianBringGiftMission";
     }
+    
+    /**
+     * Gets debugging information about this mission.
+     * This string is a short representation of this
+     * object's state.
+     * 
+     * @return The <code>String</code>: 
+     *      "[ColonyName] GIFT_TYPE" or "[ColonyName] Getting gift: (x, y)".
+     */
+    public String getDebuggingInfo() {
+        if (hasGift()) {
+            return "[" + target.getName() + "] Getting gift: " + getUnit().getIndianSettlement().getTile().getPosition();
+        } else {
+            return "[" + target.getName() + "] " + ((Goods) getUnit().getGoodsIterator().next()).getName();
+        }
+    }
 }

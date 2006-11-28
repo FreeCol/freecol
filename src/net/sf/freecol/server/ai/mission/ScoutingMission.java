@@ -41,6 +41,9 @@ public class ScoutingMission extends Mission {
     private boolean valid = true;
     private Tile transportDestination = null;
     
+    // Debug variable:
+    private String debugAction = "";
+    
 
     /**
      * Creates a mission for the given <code>AIUnit</code>.
@@ -117,6 +120,7 @@ public class ScoutingMission extends Mission {
                     }
                     return;
                 } else {
+                    debugAction = "Awaiting 52 horses";
                     return;
                 }
             } else {
@@ -142,7 +146,8 @@ public class ScoutingMission extends Mission {
                     boolean target = isTarget(t, getUnit());
                     if (target) {
                         best = pathNode;
-                    }
+                        debugAction = "Target: " + t.getPosition();
+                    }                    
                     return target;
                 }
             };
@@ -188,6 +193,7 @@ public class ScoutingMission extends Mission {
                         Tile t = map.getTile((Map.Position) it.next());
                         if (isTarget(t, getUnit())) {
                             transportDestination = t;
+                            debugAction = "Transport to: " + transportDestination.getPosition();
                             return;
                         }
                     }
@@ -211,12 +217,13 @@ public class ScoutingMission extends Mission {
             } catch (IOException e) {
                 logger.warning("Could not send \"equipUnit (0)\"-message!");
                 return;
-            }                    
+            }
+            debugAction = "Awaiting 52 horses";
         }
     }
     
     private static boolean isTarget(Tile t, Unit u) {
-        if (t.hasLostCityRumour()) {
+        if (t.hasLostCityRumour()) {            
             return true;
         } else if (t.getColony() != null 
                 && t.getColony().getOwner() == u.getOwner()
@@ -329,5 +336,16 @@ public class ScoutingMission extends Mission {
      */
     public static String getXMLElementTagName() {
         return "scoutingMission";
+    }
+    
+    /**
+     * Gets debugging information about this mission.
+     * This string is a short representation of this
+     * object's state.
+     * 
+     * @return The <code>String</code>.
+     */
+    public String getDebuggingInfo() {        
+        return debugAction;
     }
 }

@@ -146,6 +146,7 @@ public class TransportMission extends Mission {
                 t.setTransport(null);
             }
         }
+        super.dispose();
     }
 
 
@@ -171,14 +172,19 @@ public class TransportMission extends Mission {
 
     /**
     * Removes the given <code>Transportable</code> from the transport list.
+    * This method calls {@link Transportable#setTransport(AIUnit)}.
+    * 
     * @param transportable The <code>Transportable</code>.
     */
     public void removeFromTransportList(Transportable transportable) {
         Iterator ti = transportList.iterator();
         while (ti.hasNext()) {
             Transportable t = (Transportable) ti.next();
-            if (t == transportable) {
+            if (t == transportable) {                
                 ti.remove();
+                if (transportable.getTransport() == getAIUnit()) {
+                    transportable.setTransport(null);
+                }
             }
         }
 

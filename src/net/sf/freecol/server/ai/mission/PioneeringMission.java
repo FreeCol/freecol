@@ -173,6 +173,38 @@ public class PioneeringMission extends Mission {
         }    
     }
     
+    private PathNode findColonyWithTools() {
+        GoalDecider destinationDecider = new GoalDecider() {
+            private PathNode best = null;
+
+            public PathNode getGoal() {
+                return best;
+            }
+
+            public boolean hasSubGoals() {
+                return false;
+            }
+
+            public boolean check(Unit u, PathNode pathNode) {
+                Tile t = pathNode.getTile();
+                boolean target = false;
+                if (t.getColony() != null 
+                        && t.getColony().getOwner() == u.getOwner()
+                        && t.getColony().getGoodsContainer().getGoodsCount(Goods.TOOLS) >= 20) {
+                    AIColony ac = (AIColony) getAIMain().getAIObject(t.getColony());
+                    if (ac.getAvailableTools() >= 20) {
+                        target = true;
+                    }
+                }
+                if (target) {
+                    best = pathNode;
+                }
+                return target;
+            }
+        };
+        return getGame().getMap().search(getUnit(), destinationDecider, Integer.MAX_VALUE);     
+    }
+    
     /**
      * Performs this mission.
      * @param connection The <code>Connection</code> to the server.
@@ -186,35 +218,7 @@ public class PioneeringMission extends Mission {
             if (getUnit().getNumberOfTools() == 0) {
                 // Get tools from a Colony.
                 if (getUnit().getTile().getColony() == null) {
-                    GoalDecider destinationDecider = new GoalDecider() {
-                        private PathNode best = null;
-
-                        public PathNode getGoal() {
-                            return best;
-                        }
-
-                        public boolean hasSubGoals() {
-                            return false;
-                        }
-
-                        public boolean check(Unit u, PathNode pathNode) {
-                            Tile t = pathNode.getTile();
-                            boolean target = false;
-                            if (t.getColony() != null 
-                                    && t.getColony().getOwner() == u.getOwner()
-                                    && t.getColony().getGoodsContainer().getGoodsCount(Goods.TOOLS) >= 20) {
-                                AIColony ac = (AIColony) getAIMain().getAIObject(t.getColony());
-                                if (ac.getAvailableTools() >= 20) {
-                                    target = true;
-                                }
-                            }
-                            if (target) {
-                                best = pathNode;
-                            }
-                            return target;
-                        }
-                    };
-                    PathNode bestPath = getGame().getMap().search(getUnit(), destinationDecider, Integer.MAX_VALUE);        
+                    PathNode bestPath = findColonyWithTools();        
 
                     if (bestPath != null) {
                         int direction = moveTowards(connection, bestPath);
@@ -330,9 +334,7 @@ public class PioneeringMission extends Mission {
      *         and <code>false</code> otherwise.
      */
     public boolean isValid() {  
-        updateTileImprovement();        
-        //return tileImprovement != null;
-        // TODO: Remove the second test after code for getting tools has been added:
+        updateTileImprovement();
         return !skipMission && (tileImprovement != null) && (getUnit().isPioneer() || getUnit().getType() == Unit.HARDY_PIONEER);
     }
 
@@ -401,5 +403,31 @@ public class PioneeringMission extends Mission {
      */
     public static String getXMLElementTagName() {
         return "tileImprovementMission";
+    }
+    
+    /**
+     * Gets debugging information about this mission.
+     * This string is a short representation of this
+     * object's state.
+     * 
+     * @return The <code>String</code>: 
+     *      <ul>
+     *          <li>"(x, y) P" (for plowing)</li>
+     *          <li>"(x, y) R" (for building road)</li>
+     *          <li>"(x, y) Getting tools: (x, y)"</li>
+     *      </ul>
+     */
+    public String getDebuggingInfo() {
+        if (tileImprovement != null) {
+            final String action = (tileImprovement.getType() == Unit.PLOW) ? "P" : "R";
+            return tileImprovement.getTarget().getPosition().toString() + " " + action;
+        } else {
+            PathNode bestPath = findColonyWithTools();
+            if (bestPath != null) {
+                return "Getting tools: " + bestPath.getLastNode().getTile().getPosition().toString();
+            } else {
+                return "No target";
+            }
+        }
     }
 }

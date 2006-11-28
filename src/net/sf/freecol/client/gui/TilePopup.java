@@ -108,6 +108,7 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
                 && freeColClient.getFreeColServer() != null) {
             addSeparator();
             JMenu takeOwnership = new JMenu("Take ownership");
+            takeOwnership.setOpaque(false);
             boolean notEmpty = false;
             Iterator it = tile.getUnitIterator();
             while (it.hasNext()) {
@@ -117,7 +118,7 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
                 toMenuItem.addActionListener(this);
                 takeOwnership.add(toMenuItem);
                 notEmpty = true;
-                if (u.isCarrier() && u.getOwner().isAI()) {
+                if (u.isCarrier()) {
                     AIUnit au = (AIUnit) freeColClient.getFreeColServer().getAIMain().getAIObject(u);                
                     if (au.getMission() != null && au.getMission() instanceof TransportMission) {
                         JMenuItem menuItem = new JMenuItem("Transport list for: " + u.toString());

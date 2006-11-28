@@ -12,10 +12,12 @@ import java.awt.event.KeyEvent;
 import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.border.CompoundBorder;
@@ -499,19 +501,17 @@ public class FreeColMenuBar extends JMenuBar {
                     gui.displayCoordinates = ((JCheckBoxMenuItem) e.getSource()).isSelected();
                     canvas.refresh();
                 }
-            });
-
-            JCheckBoxMenuItem cv = new JCheckBoxMenuItem(Messages.message("menuBar.debug.showColonyValue"), gui.displayColonyValue);
-            cv.setOpaque(false);
-            cv.setMnemonic(KeyEvent.VK_C);
-            debugMenu.add(cv);
-            cv.addActionListener(new ActionListener() {
+            });                        
+            
+            final JCheckBoxMenuItem dami = new JCheckBoxMenuItem("Additional AI-mission info", gui.debugShowMissionInfo);
+            dami.setOpaque(false);
+            dami.setMnemonic(KeyEvent.VK_I);
+            dami.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    gui.displayColonyValue = ((JCheckBoxMenuItem) e.getSource()).isSelected();
+                    gui.debugShowMissionInfo = ((JCheckBoxMenuItem) e.getSource()).isSelected();
                     canvas.refresh();
                 }
-            });
-            
+            });   
             JCheckBoxMenuItem dam = new JCheckBoxMenuItem("Display AI-missions", gui.debugShowMission);
             dam.setOpaque(false);
             dam.setMnemonic(KeyEvent.VK_M);
@@ -519,9 +519,12 @@ public class FreeColMenuBar extends JMenuBar {
             dam.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     gui.debugShowMission = ((JCheckBoxMenuItem) e.getSource()).isSelected();
+                    dami.setEnabled(gui.debugShowMission);
                     canvas.refresh();
                 }
-            });    
+            });
+            debugMenu.add(dami);
+            dami.setEnabled(gui.debugShowMission);
             
             final JMenuItem reveal = new JCheckBoxMenuItem(Messages.message("menuBar.debug.revealEntireMap"));
             reveal.setOpaque(false);
@@ -536,7 +539,56 @@ public class FreeColMenuBar extends JMenuBar {
                     reveal.setEnabled(false);
                 }
             });
-
+            
+            JMenu cvpMenu = new JMenu(Messages.message("menuBar.debug.showColonyValue"));
+            cvpMenu.setOpaque(false);
+            ButtonGroup bg = new ButtonGroup();
+            JRadioButtonMenuItem cv1 = new JRadioButtonMenuItem("Do not display", !gui.displayColonyValue);
+            cv1.setOpaque(false);
+            cv1.setMnemonic(KeyEvent.VK_C);
+            cvpMenu.add(cv1);
+            bg.add(cv1);
+            cv1.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    gui.displayColonyValue = false;
+                    gui.displayColonyValuePlayer = null;
+                    canvas.refresh();
+                }
+            });
+            add(cvpMenu);
+            JRadioButtonMenuItem cv3 = new JRadioButtonMenuItem("Common values", gui.displayColonyValue && gui.displayColonyValuePlayer == null);
+            cv3.setOpaque(false);
+            cv3.setMnemonic(KeyEvent.VK_C);
+            cvpMenu.add(cv3);
+            bg.add(cv3);
+            cv3.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    gui.displayColonyValue = true;
+                    gui.displayColonyValuePlayer = null;
+                    canvas.refresh();
+                }
+            });
+            debugMenu.add(cvpMenu);
+            cvpMenu.addSeparator();
+            Iterator it = freeColClient.getGame().getPlayerIterator();
+            while (it.hasNext()) {
+                final Player p = (Player) it.next();
+                if (p.isEuropean() && p.canBuildColonies()) {
+                    JRadioButtonMenuItem cv2 = new JRadioButtonMenuItem(Player.getNationAsString(p.getNation()), gui.displayColonyValue && gui.displayColonyValuePlayer == p);
+                    cv2.setOpaque(false);
+                    cv2.setMnemonic(KeyEvent.VK_C);
+                    cvpMenu.add(cv2);
+                    bg.add(cv2);
+                    cv2.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            gui.displayColonyValue = true;
+                            gui.displayColonyValuePlayer = p;
+                            canvas.refresh();
+                        }
+                    });
+                }
+            }
+            
             debugMenu.addSeparator();
             
             final JMenuItem skipTurns = new JMenuItem("Skip turns");

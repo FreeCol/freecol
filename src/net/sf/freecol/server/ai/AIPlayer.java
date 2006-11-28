@@ -183,14 +183,20 @@ public class AIPlayer extends AIObject {
         ensureCorrectMissions();        
         giveNavalMissions();      
         secureSettlements();        
-        giveNormalMissions(); 
+        giveNormalMissions();
         bringGifts();
         demandTribute();       
         createAIGoodsInColonies();
         createTransportLists();
         doMissions();
         rearrangeWorkersInColonies();
-        abortInvalidMissions();        
+        abortInvalidMissions();
+        // Some of the mission might have been invalidated by a another mission.
+        giveNormalMissions();
+        doMissions();
+        rearrangeWorkersInColonies();
+        abortInvalidMissions();
+        
         ensureCorrectMissions();   
         
         aiUnits.clear();
@@ -363,6 +369,9 @@ public class AIPlayer extends AIObject {
         Iterator playerIterator = getGame().getPlayerIterator();
         while (playerIterator.hasNext()) {
             Player p = (Player) playerIterator.next();
+            if (p == player) {
+                continue;
+            }
             if (p.getREFPlayer() == getPlayer() 
                     && p.getRebellionState() == Player.REBELLION_IN_WAR) {
                 getPlayer().getTension(p).modify(1000);
@@ -857,7 +866,7 @@ public class AIPlayer extends AIObject {
     }    
     
     /**
-     * Gives a mission to non-nava) units. 
+     * Gives a mission to non-naval units. 
      */
     private void giveNormalMissions() {
         // Create a datastructure for the worker wishes:
@@ -971,7 +980,7 @@ public class AIPlayer extends AIObject {
                 
                 // Choose to build a new colony:
                 if (colonyTile != null) {
-                    aiUnit.setMission(new BuildColonyMission(getAIMain(), aiUnit, colonyTile, colonyTile.getColonyValue()));
+                    aiUnit.setMission(new BuildColonyMission(getAIMain(), aiUnit, colonyTile, player.getColonyValue(colonyTile)));
                     if (aiUnit.getUnit().getLocation() instanceof Unit) {
                         AIUnit carrier = (AIUnit) getAIMain().getAIObject((FreeColGameObject) aiUnit.getUnit().getLocation());
                         ((TransportMission) carrier.getMission()).addToTransportList(aiUnit);
@@ -1151,7 +1160,9 @@ public class AIPlayer extends AIObject {
         Iterator aiUnitsIterator = getAIUnitIterator();
         while (aiUnitsIterator.hasNext()) {
             AIUnit aiUnit = (AIUnit) aiUnitsIterator.next();
-            if (aiUnit.hasMission() && aiUnit.getMission().isValid()) {
+            if (aiUnit.hasMission()
+                    && aiUnit.getMission().isValid()
+                    && !(aiUnit.getUnit().getLocation() instanceof Unit)) {
                 try {
                     aiUnit.doMission(getConnection());
                 } catch  (Exception e) {
@@ -1463,6 +1474,7 @@ public class AIPlayer extends AIObject {
         if (!getPlayer().canBuildColonies()) {
             return false;
         }
+        
         Iterator it = getPlayer().getColonyIterator();
         int numberOfColonies = 0;
         int numberOfWorkers = 0;

@@ -239,4 +239,20 @@ public class WishRealizationMission extends Mission {
     public static String getXMLElementTagName() {
         return "wishRealizationMission";
     }
+    
+    /**
+     * Gets debugging information about this mission.
+     * This string is a short representation of this
+     * object's state.
+     * 
+     * @return The <code>String</code>.
+     */
+    public String getDebuggingInfo() {
+        if (wish == null) {
+            return "No wish";
+        } else {
+            return wish.getDestination().getTile().getPosition() + " " + wish.getValue();
+        }
+    }
+
 }

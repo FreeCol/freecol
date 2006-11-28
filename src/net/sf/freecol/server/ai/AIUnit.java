@@ -235,11 +235,23 @@ public class AIUnit extends AIObject implements Transportable {
     *
     */
     public void setTransport(AIUnit transport) {
+        if (this.transport != null) {
+            // Remove from old carrier:
+            if (this.transport.getMission() != null
+                    && this.transport.getMission() instanceof TransportMission) {
+                TransportMission tm = (TransportMission) this.transport.getMission();
+                if (tm.isOnTransportList(this)) {
+                    tm.removeFromTransportList(this);
+                }
+            }
+        }
+            
         this.transport = transport;
 
         if (transport != null
-            && transport.getMission() instanceof TransportMission
-            && !((TransportMission) transport.getMission()).isOnTransportList(this)) {
+                && transport.getMission() instanceof TransportMission
+                && !((TransportMission) transport.getMission()).isOnTransportList(this)) {
+            // Add to new carrier:
             ((TransportMission) transport.getMission()).addToTransportList(this);
         }
     }
@@ -331,10 +343,16 @@ public class AIUnit extends AIObject implements Transportable {
 
         out.writeAttribute("ID", getID());
         if (transport != null) {
-            if (transport.getUnit() != null) {
-                out.writeAttribute("transport", transport.getUnit().getID());
-            } else {
+            if (transport.getUnit() == null) {
                 logger.warning("transport.getUnit() == null");
+            } else if (getAIMain().getAIObject(transport.getID()) == null) {
+                logger.warning("broken reference to transport");
+            } else if (transport.getMission() != null
+                    && transport.getMission() instanceof TransportMission
+                    && !((TransportMission) transport.getMission()).isOnTransportList(this)) {
+                logger.warning("We should not be on the transport list.");
+            } else {
+                out.writeAttribute("transport", transport.getUnit().getID());
             }
         }
         if (mission != null) {

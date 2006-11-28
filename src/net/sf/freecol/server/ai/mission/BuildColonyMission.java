@@ -13,7 +13,6 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.PathNode;
-import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
@@ -160,8 +159,10 @@ public class BuildColonyMission extends Mission {
         }
         
         if (target == null || doNotGiveUp 
-                && (colonyValue > target.getColonyValue() || target.getSettlement() != null)) {
+                && (colonyValue != getUnit().getOwner().getColonyValue(target) 
+                        || target.getSettlement() != null)) {
             target = findColonyLocation(getUnit());
+            colonyValue = getUnit().getOwner().getColonyValue(target);
             if (target == null) {
                 doNotGiveUp = false;
                 return;
@@ -273,7 +274,7 @@ public class BuildColonyMission extends Mission {
                     }
                     
                     if (path != null) {
-                        int newColonyValue = 10000 + tile.getColonyValue() + getNearbyColonyBonus(unit.getOwner(), tile) 
+                        int newColonyValue = 10000 + unit.getOwner().getColonyValue(tile) 
                                 - path.getTotalTurns() 
                                 * ((unit.getGame().getTurn().getNumber() < 10 && unit.getLocation() instanceof Unit) ? 25 : 4);
                         if (newColonyValue > highestColonyValue) {
@@ -282,7 +283,7 @@ public class BuildColonyMission extends Mission {
                         }
                     }
                 } else {
-                    int newColonyValue = 10000 + tile.getColonyValue() + getNearbyColonyBonus(unit.getOwner(), tile);
+                    int newColonyValue = 10000 + unit.getOwner().getColonyValue(tile);
                     if (newColonyValue > highestColonyValue) {
                         highestColonyValue = newColonyValue;
                         bestTile = tile;
@@ -296,47 +297,7 @@ public class BuildColonyMission extends Mission {
         } else {
             return null;
         }
-    }    
-    
-    private static int getNearbyColonyBonus(Player owner, Tile tile) {
-        Game game = tile.getGame();
-        Map map = game.getMap();
-        
-        Iterator it = map.getCircleIterator(tile.getPosition(), false, 3);
-        while (it.hasNext()) {
-            Tile ct = map.getTile((Map.Position) it.next());
-            if (ct.getColony() != null && ct.getColony().getOwner() == owner) {
-                return 45;
-            }
-        }
-        
-        it = map.getCircleIterator(tile.getPosition(), false, 4);
-        while (it.hasNext()) {
-            Tile ct = map.getTile((Map.Position) it.next());
-            if (ct.getColony() != null && ct.getColony().getOwner() == owner) {
-                return 25;
-            }
-        }       
-        
-        it = map.getCircleIterator(tile.getPosition(), false, 5);
-        while (it.hasNext()) {
-            Tile ct = map.getTile((Map.Position) it.next());
-            if (ct.getColony() != null && ct.getColony().getOwner() == owner) {
-                return 20;
-            }
-        }           
-        
-        it = map.getCircleIterator(tile.getPosition(), false, 4);
-        while (it.hasNext()) {
-            Tile ct = map.getTile((Map.Position) it.next());
-            if (ct.getColony() != null && ct.getColony().getOwner() == owner) {
-                return 15;
-            }
-        }       
-        
-        return 0;
-    }
-    
+    }        
     
     /**
      * Checks if this mission is still valid to perform.
@@ -352,7 +313,7 @@ public class BuildColonyMission extends Mission {
     public boolean isValid() {
         return (!colonyBuilt && (doNotGiveUp 
                 || target != null 
-                && colonyValue <= target.getColonyValue() + getNearbyColonyBonus(getUnit().getOwner(), target)));
+                && colonyValue <= target.getColonyValue() + getUnit().getOwner().getColonyValue(target)));
     }     
     
     /**
@@ -407,5 +368,23 @@ public class BuildColonyMission extends Mission {
      */
     public static String getXMLElementTagName() {
         return "buildColonyMission";
+    }
+    
+    /**
+     * Gets debugging information about this mission.
+     * This string is a short representation of this
+     * object's state.
+     * 
+     * @return The <code>String</code>: 
+     *      "(x, y) z" or "(x, y) z!"
+     *      where <code>x</code> and <code>y</code> is the
+     *      coordinates of the target tile for this mission,
+     *      and <code>z</code> is the value of building the
+     *      colony. The exclamation mark is added if the
+     *      unit should continue searching for a colony
+     *      site if the targeted site is lost.
+     */
+    public String getDebuggingInfo() {
+        return target.getPosition().toString() + " " + colonyValue + (doNotGiveUp ? "!" : "");
     }
 }

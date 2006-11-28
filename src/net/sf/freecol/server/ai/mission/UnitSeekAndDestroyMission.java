@@ -8,6 +8,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.GoalDecider;
 import net.sf.freecol.common.model.Location;
@@ -352,5 +353,28 @@ public class UnitSeekAndDestroyMission extends Mission {
     */
     public static String getXMLElementTagName() {
         return "unitSeekAndDestroyMission";
+    }
+    
+    /**
+     * Gets debugging information about this mission.
+     * This string is a short representation of this
+     * object's state.
+     * 
+     * @return The <code>String</code>.
+     */
+    public String getDebuggingInfo() {
+        if (target == null) {
+            return "No target";
+        } else {
+            final String name;
+            if (target instanceof Unit) {
+                name = ((Unit) target).getName();
+            } else if (target instanceof Colony) {
+                name = ((Colony) target).getName();
+            } else {
+                name = "";
+            }
+            return target.getTile().getPosition() + " " + name;
+        }
     }
 }
