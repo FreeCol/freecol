@@ -348,7 +348,7 @@ public class IndianDemandMission extends Mission {
      *      "[ColonyName] GIFT_TYPE" or "[ColonyName] Getting gift: (x, y)".
      */
     public String getDebuggingInfo() {
-        if (hasGift()) {
+        if (!hasGift()) {
             return "[" + target.getName() + "] Getting gift: " + getUnit().getIndianSettlement().getTile().getPosition();
         } else {
             return "[" + target.getName() + "] " + ((Goods) getUnit().getGoodsIterator().next()).getName();
