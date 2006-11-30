@@ -637,7 +637,7 @@ public final class InGameController implements NetworkConstants {
             default:                    throw new RuntimeException("unrecognised move: " + move);
         }
 
-        // Display a "cash in"-dialog if a treasure train have been moved into a colony:
+        // Display a "cash in"-dialog if a treasure train have been moved into a colony:  
         if (unit.getType() == Unit.TREASURE_TRAIN && unit.getLocation() != null && unit.getLocation() instanceof Tile && unit.getLocation().getTile().getColony() != null) {
             String message = (unit.getOwner().hasFather(FoundingFather.HERNAN_CORTES)) ? "cashInTreasureTrain.text.free" : "cashInTreasureTrain.text.pay";
             if (canvas.showConfirmDialog(message, "cashInTreasureTrain.yes", "cashInTreasureTrain.no")) {
@@ -648,7 +648,7 @@ public final class InGameController implements NetworkConstants {
         freeColClient.getActionManager().update();
         freeColClient.getCanvas().updateJMenuBar();
         
-        nextModelMessage();
+        nextModelMessage();   
     }
 
 
@@ -848,7 +848,7 @@ public final class InGameController implements NetworkConstants {
 
         // move before ask to server, to be in new tile in case there is a rumour
         unit.move(direction);
-
+       
         //client.send(moveElement);
         Element reply = client.ask(moveElement);
         freeColClient.getInGameInputHandler().handle(client.getConnection(), reply);

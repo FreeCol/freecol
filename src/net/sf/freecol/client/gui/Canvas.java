@@ -1102,6 +1102,9 @@ public final class Canvas extends JLayeredPane {
         */
 
         FreeColDialog choiceDialog = FreeColDialog.createChoiceDialog(text, cancelText, objects);
+        if (choiceDialog.getHeight() > getHeight() / 3) {
+            choiceDialog.setSize(choiceDialog.getWidth(), (getHeight() * 2) / 3);
+        }
         addCentered(choiceDialog, CHOICE_LAYER);
         choiceDialog.requestFocus();
 
