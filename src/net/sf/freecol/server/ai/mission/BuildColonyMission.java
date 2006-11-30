@@ -162,10 +162,11 @@ public class BuildColonyMission extends Mission {
                 && (colonyValue != getUnit().getOwner().getColonyValue(target) 
                         || target.getSettlement() != null)) {
             target = findColonyLocation(getUnit());
-            colonyValue = getUnit().getOwner().getColonyValue(target);
             if (target == null) {
                 doNotGiveUp = false;
                 return;
+            } else {
+                colonyValue = getUnit().getOwner().getColonyValue(target);
             }
         }   
         
