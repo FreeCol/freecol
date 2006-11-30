@@ -580,8 +580,9 @@ public final class InGameController implements NetworkConstants {
             }
         }
         
-        if (map.isAdjacentToMapEdge(unit.getTile())
-                && destination instanceof Europe) {
+        if (unit.getTile() != null
+                && destination instanceof Europe
+                && map.isAdjacentToMapEdge(unit.getTile())) {
             moveToEurope(unit);
         }
         setDestination(unit, null);
