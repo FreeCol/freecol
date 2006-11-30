@@ -571,6 +571,7 @@ public class FreeColDialog extends FreeColPanel {
         scoutDialog.add(cancel, higConst.rc(12, 2));
 
         scoutDialog.setSize(scoutDialog.getPreferredSize());
+        scoutDialog.setCancelComponent(cancel);
 
         return scoutDialog;
     }
