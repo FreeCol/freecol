@@ -421,6 +421,8 @@ public final class InGameController implements NetworkConstants {
             if (path != null) {
                 int turns = path.getTotalTurns();
                 destinations.add(new ChoiceItem(player.getEurope() + " (" + turns + ")", player.getEurope()));
+            } else if (unit.getTile() != null && unit.getTile().getType() == Tile.HIGH_SEAS) {
+                destinations.add(new ChoiceItem(player.getEurope() + " (0)", player.getEurope()));
             }
         }
         
@@ -456,9 +458,16 @@ public final class InGameController implements NetworkConstants {
         }
         
         Location destination = (Location) choice.getObject();
-        setDestination(unit, destination);
         
-        moveToDestination(unit);
+        if (destination instanceof Europe
+                && unit.getTile() != null
+                && unit.getTile().getType() == Tile.HIGH_SEAS) {            
+            moveToEurope(unit);
+            nextActiveUnit();
+        } else {
+            setDestination(unit, destination);
+            moveToDestination(unit);
+        }
     }
 
     /**
@@ -508,8 +517,8 @@ public final class InGameController implements NetworkConstants {
         
         if (path == null) {
             canvas.showInformationMessage("selectDestination.failed",
-                                          new String [][] {{"%destination%",
-                                                            ((Location) destination).toString()}});
+                    new String [][] {{"%destination%",
+                        ((Location) destination).toString()}});
             setDestination(unit, null);
             return;
         }   
