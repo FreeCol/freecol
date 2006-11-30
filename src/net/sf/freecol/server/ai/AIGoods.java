@@ -208,12 +208,7 @@ public class AIGoods extends AIObject implements Transportable {
      * Disposes this object.
      */
     public void dispose() {
-        if (transport != null
-                && transport.getMission() != null
-                && transport.getMission() instanceof TransportMission) {
-            TransportMission tm = (TransportMission) transport.getMission();
-            tm.removeFromTransportList(this);
-        }
+        setTransport(null);
         if (destination != null) {
         	if (destination instanceof Colony) {
         		((AIColony) getAIMain().getAIObject((Colony) destination)).removeAIGoods(this);
