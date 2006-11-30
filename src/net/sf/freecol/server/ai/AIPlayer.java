@@ -375,9 +375,6 @@ public class AIPlayer extends AIObject {
             if (p.getREFPlayer() == getPlayer() 
                     && p.getRebellionState() == Player.REBELLION_IN_WAR) {
                 getPlayer().getTension(p).modify(1000);
-            }            
-            if (strategy == STRATEGY_CONQUEST && p.isEuropean()) {
-                getPlayer().getTension(p).modify(10);
             }
             if (getPlayer().getStance(p) != Player.WAR
                     && getPlayer().getTension(p).getLevel() >= Tension.HATEFUL) {
