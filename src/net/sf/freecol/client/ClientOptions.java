@@ -117,6 +117,11 @@ public class ClientOptions extends OptionMap {
      * is disabled. 
      */
     public static final String AUTOSAVE_PERIOD = "autosavePeriod"; 
+
+    /**
+     * Option for setting wether or not the fog of war should be displayed.
+     */
+    public static final String DISPLAY_FOG_OF_WAR = "displayFogOfWar";
     
     
     /**
@@ -151,7 +156,8 @@ public class ClientOptions extends OptionMap {
         OptionGroup guiGroup = new OptionGroup("clientOptions.gui.name", "clientOptions.gui.shortDescription");
         guiGroup.add(new IntegerOption(MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT, "clientOptions.gui."+ MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT +".name", "clientOptions.gui."+ MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT +".shortDescription", 0, 10, 7));
         guiGroup.add(new IntegerOption(MAX_NUMBER_OF_GOODS_IMAGES, "clientOptions.gui."+ MAX_NUMBER_OF_GOODS_IMAGES +".name", "clientOptions.gui."+ MAX_NUMBER_OF_GOODS_IMAGES +".shortDescription", 1, 10, 7));
-        guiGroup.add(new BooleanOption(ALWAYS_CENTER, "clientOptions.gui."+ ALWAYS_CENTER +".name", "clientOptions.gui."+ ALWAYS_CENTER +".shortDescription", false));        
+        guiGroup.add(new BooleanOption(ALWAYS_CENTER, "clientOptions.gui."+ ALWAYS_CENTER +".name", "clientOptions.gui."+ ALWAYS_CENTER +".shortDescription", false));
+        guiGroup.add(new BooleanOption(DISPLAY_FOG_OF_WAR, "clientOptions.gui."+ DISPLAY_FOG_OF_WAR +".name", "clientOptions.gui."+ DISPLAY_FOG_OF_WAR +".shortDescription", false));        
         add(guiGroup);
 
         OptionGroup messagesGroup = new OptionGroup("clientOptions.messages.name", "clientOptions.messages.shortDescription");

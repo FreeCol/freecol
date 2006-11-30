@@ -30,7 +30,6 @@ import javax.swing.JComponent;
 import javax.swing.Timer;
 import javax.swing.UIManager;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.Colony;
@@ -1763,7 +1762,8 @@ public final class GUI {
                             x + RUMOUR_OFFSET_X, y + RUMOUR_OFFSET_Y, null);
             }
 
-            if (FreeCol.isInDebugMode() && !freeColClient.getMyPlayer().canSee(tile)) {
+            final boolean displayFogOfWar = freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_FOG_OF_WAR);
+            if (displayFogOfWar && !freeColClient.getMyPlayer().canSee(tile)) {
                 g.setColor(Color.BLACK);
                 Composite oldComposite = g.getComposite();
                 g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.2f));
