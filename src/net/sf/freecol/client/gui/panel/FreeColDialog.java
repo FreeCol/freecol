@@ -530,7 +530,7 @@ public class FreeColDialog extends FreeColPanel {
 
         final FreeColDialog scoutDialog = new FreeColDialog() {
             public void requestFocus() {
-                cancel.requestFocus();
+                speak.requestFocus();
             }
         };
 
