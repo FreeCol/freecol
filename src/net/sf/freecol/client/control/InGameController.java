@@ -421,7 +421,9 @@ public final class InGameController implements NetworkConstants {
             if (path != null) {
                 int turns = path.getTotalTurns();
                 destinations.add(new ChoiceItem(player.getEurope() + " (" + turns + ")", player.getEurope()));
-            } else if (unit.getTile() != null && unit.getTile().getType() == Tile.HIGH_SEAS) {
+            } else if (unit.getTile() != null 
+                    && (unit.getTile().getType() == Tile.HIGH_SEAS
+                            || map.isAdjacentToMapEdge(unit.getTile()))) {
                 destinations.add(new ChoiceItem(player.getEurope() + " (0)", player.getEurope()));
             }
         }
@@ -461,7 +463,8 @@ public final class InGameController implements NetworkConstants {
         
         if (destination instanceof Europe
                 && unit.getTile() != null
-                && unit.getTile().getType() == Tile.HIGH_SEAS) {            
+                && (unit.getTile().getType() == Tile.HIGH_SEAS
+                        || map.isAdjacentToMapEdge(unit.getTile()))) {            
             moveToEurope(unit);
             nextActiveUnit();
         } else {
@@ -596,8 +599,11 @@ public final class InGameController implements NetworkConstants {
         }
         setDestination(unit, null);
         
-        if (unit.getMovesLeft() > 0) {
+        if (unit.getMovesLeft() > 0
+                && unit.getTile() != null) {
             freeColClient.getGUI().setActiveUnit(unit);
+        } else if (freeColClient.getGUI().getActiveUnit() == unit) {
+            nextActiveUnit();
         }
     }
 
