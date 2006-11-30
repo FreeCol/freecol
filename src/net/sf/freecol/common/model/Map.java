@@ -1113,7 +1113,7 @@ public class Map extends FreeColGameObject {
      * @return Iterator
      */
     public Iterator getFloodFillIterator(Position centerPosition) {
-        return new FloodFillIterator(centerPosition);
+        return new CircleIterator(centerPosition, true, Integer.MAX_VALUE);
     }
 
 
@@ -1351,10 +1351,7 @@ public class Map extends FreeColGameObject {
             throw new NoSuchElementException("Iterator exhausted");
         }
     }
-
-
-
-
+    
 
     private final class AdjacentIterator extends MapIterator {
         // The starting tile position
@@ -1401,79 +1398,20 @@ public class Map extends FreeColGameObject {
     }
 
 
-
-
-
-    private final class FloodFillIterator extends MapIterator {
-        // The center of the circles to use
-        private Position center;
-        // An inner iterator for an individual circle around the center
-        private Iterator iterator;
-        // The radius of the current circle
-        private int currentRadius;
-        // True if the last circle has been exhausted
-        private boolean exhausted;
-
-        /**
-         * The constructor to use.
-         * @param center The position at the center of the area
-         */
-        public FloodFillIterator(Position center) {
-            this.center = center;
-            exhausted = false;
-            currentRadius = 1;
-            iterator = getCircleIterator(center, false, currentRadius);
-        }
-
-        /**
-         * Determine if the iterator has another position in it.
-         * @return True of there is another position
-         */
-        public boolean hasNext() {
-            if (!exhausted) {
-                if (!iterator.hasNext()) {
-                    iterator = getCircleIterator(center, false,
-                                                 ++currentRadius);
-                    exhausted = !iterator.hasNext();
-                }
-            }
-            return !exhausted;
-        }
-
-        /**
-         * Obtain the next position to iterate over.
-         * @return Next position
-         * @throws NoSuchElementException if last position already returned
-         */
-        public Position nextPosition() {
-            return (Position) iterator.next();
-        }
-    }
-
-
-
-
-
-    private final class CircleIterator extends MapIterator {
-        // The center of the circle
-        //int centerX;
-        //int centerY;
-        // The minimum and maximum limits of the area to iterate over
-        //int minX;
-        //int maxX;
-        //int maxY;
-        // The last position returned by the iterator
-        //int currentX;
-        //int currentY;
-        // The desired radius of the circle
-        //int radius;
-        // If true, all of the positions inside the circle are to be iterated
-        // over; if false, only the edge of the circle
-        //boolean isFilled;
-        private Iterator positionIterator;
-        private ArrayList positions = new ArrayList();
+    /**
+     * An interator returning positions in a spiral starting at
+     * a given center tile. The center tile is never included in the
+     * positions returned, and all returned positions are valid.
+     * 
+     * @see Position.
+     */
+    public final class CircleIterator extends MapIterator {
         private int radius;
+        private int currentRadius;
         private boolean isFilled;
+        private Position nextPosition = null;
+        // The current position in the circle with the current radius:
+        private int n;
 
         /**
          * The constructor to use.
@@ -1484,68 +1422,97 @@ public class Map extends FreeColGameObject {
         public CircleIterator(Position center, boolean isFilled, int radius) {
             this.radius = radius;
             this.isFilled = isFilled;
-
-            normal(center, N, 0);
-            edge(center, NE, 0);
-            normal(center, E, 0);
-            edge(center, SE, 0);
-            normal(center, S, 0);
-            edge(center, SW, 0);
-            normal(center, W, 0);
-            edge(center, NW, 0);
-
-            positionIterator = positions.iterator();
-        }
-
-        private void edge(Map.Position p, int type, int radiusCompleted) {
-            for (int r=radiusCompleted; r<radius; r++) {
-                normal(p, type - 1, r);
-                normal(p, type+1==8?0:type+1, r);
-                p = getAdjacent(p, type);
-
-                if (isFilled && isValid(p)) {
-                    positions.add(p);
+            
+            if (center == null) {
+                throw new NullPointerException("center == null");
+            }
+            
+            n = 0;            
+            
+            if (isFilled || radius == 1) {
+                nextPosition = getAdjacent(center, NE);
+                currentRadius = 1;
+            } else {
+                currentRadius = radius;
+                nextPosition = center;
+                for (int i=1; i<radius; i++) {                    
+                    nextPosition = getAdjacent(nextPosition, N);
                 }
+                nextPosition = getAdjacent(nextPosition, NE);
             }
-
-            if (!isFilled && isValid(p)) {
-                positions.add(p);
+            if (!isValid(nextPosition)) {
+                determineNextPosition();
             }
         }
-
-        private void normal(Map.Position p, int type, int radiusCompleted) {
-            for (int r=radiusCompleted; r<radius; r++) {
-                p = getAdjacent(p, type);
-
-                if (isFilled && isValid(p)) {
-                    positions.add(p);
+        
+        /**
+         * Returns the current radius of the circle.
+         * @return The distance from the center tile this
+         *      <code>CircleIterator</code> was initialized with.
+         */
+        public int getCurrentRadius() {
+            return currentRadius;
+        }
+        
+        /**
+         * Finds the next position.
+         */
+        private void determineNextPosition() {            
+            boolean positionReturned = (n != 0);            
+            do {
+                n++;
+                final int width = currentRadius * 2;
+                if (n >= width * 4) {
+                    currentRadius++;                    
+                    if (currentRadius > radius) {
+                        nextPosition = null;
+                    } else if (!positionReturned) {
+                        nextPosition = null;
+                    } else {
+                        n = 0;
+                        positionReturned = false;
+                        nextPosition = getAdjacent(nextPosition, NE);
+                    }
+                } else {
+                    int i = n / width;
+                    int direction;
+                    switch (i) {
+                    case 0: direction = SE; break;
+                    case 1: direction = SW; break;
+                    case 2: direction = NW; break;
+                    case 3: direction = NE; break;
+                    default: throw new IllegalStateException("i=" + i + ", n=" + n + ", width=" + width);
+                    }
+                    nextPosition = getAdjacent(nextPosition, direction);
                 }
-            }
-
-            if (!isFilled && isValid(p)) {
-                positions.add(p);
-            }
+            } while (nextPosition != null && !isValid(nextPosition));
         }
-
-
+        
         /**
          * Determine if the iterator has another position in it.
-         * @return True of there is another position
+         * @return <code>true</code> of there is another position and
+         *      <code>false</code> otherwise. 
          */
         public boolean hasNext() {
-            return positionIterator.hasNext();
+            return nextPosition != null;
         }
 
 
         /**
-         * Obtain the next position to iterate over.
-         * @return Next position
+         * Obtains the next position.
+         * @return The next position. This position is guaratied to
+         *      be {@link Map#isValid(net.sf.freecol.common.model.Map.Position) valid}.
          */
         public Position nextPosition() {
-            return (Position) positionIterator.next();
+            if (nextPosition != null) {
+                final Position p = nextPosition;
+                determineNextPosition();
+                return p;
+            } else {
+                return null;
+            }
         }
     }
-
 
 
 
