@@ -741,6 +741,23 @@ public class Map extends FreeColGameObject {
     }
     
     /**
+     * Checks if the given <code>Tile</code> is adjacent to the edge
+     * of the map.
+     * 
+     * @param tile The <code>Tile</code> to be checked.
+     * @return <code>true</code> if the given tile is at the edge of
+     *      the map.
+     */
+    public boolean isAdjacentToMapEdge(Tile tile) {
+        for (int direction=0; direction<Map.NUMBER_OF_DIRECTIONS; direction++) {
+            if (getNeighbourOrNull(direction, tile) == null) {                  
+                return true; 
+            }
+        }  
+        return false;
+    }
+    
+    /**
      * Finds the best path to <code>Europe</code>.
      *
      * @param unit The <code>Unit</code> that should be used to determine
@@ -769,16 +786,10 @@ public class Map extends FreeColGameObject {
                     goal = pathNode;
                     return true;
                 }
-                
-                Iterator it = map.getAdjacentIterator(u.getTile().getPosition());
-                while (it.hasNext()) {
-                    Tile t = map.getTile((Map.Position) it.next());
-                    if (t == null) {
-                        goal = pathNode;
-                        return true; 
-                    }
-                }
-                
+                if (map.isAdjacentToMapEdge(pathNode.getTile())) {
+                    goal = pathNode;                    
+                    return true; 
+                }                
                 return false;
             }
         };
