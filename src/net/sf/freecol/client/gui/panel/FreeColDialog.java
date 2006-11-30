@@ -311,9 +311,15 @@ public class FreeColDialog extends FreeColPanel {
     public static FreeColDialog createChoiceDialog(String text, String cancelText, Object[] objects) {
         final JButton cancelButton = new JButton(cancelText);
 
+        final JButton firstButton;
+        if (objects.length > 0) {
+            firstButton = new JButton(objects[0].toString());
+        } else {
+            firstButton = cancelButton;
+        }
         final FreeColDialog choiceDialog = new FreeColDialog() {
             public void requestFocus() {
-                cancelButton.requestFocus();
+                firstButton.requestFocus();
             }
         };
 
@@ -334,7 +340,17 @@ public class FreeColDialog extends FreeColPanel {
         objectsPanel.setBorder(new CompoundBorder(objectsPanel.getBorder(), new EmptyBorder(10,20,10,20)));
         int width = Math.max(l.getMinimumSize().width, objectsPanel.getPreferredSize().width) + 20;
 
-        for (int i=0; i<objects.length; i++) {
+        if (objects.length > 0) {
+            final Object firstObject = objects[0];
+            firstButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    choiceDialog.setResponse(firstObject);
+                }
+            });
+            objectsPanel.add(firstButton);
+            height += firstButton.getMinimumSize().height;
+        }
+        for (int i=1; i<objects.length; i++) {
             final Object object = objects[i];
             final JButton objectButton = new JButton(object.toString());
             objectButton.addActionListener(new ActionListener() {
