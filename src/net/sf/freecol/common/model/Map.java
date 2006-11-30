@@ -3,8 +3,11 @@ package net.sf.freecol.common.model;
 
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.PriorityQueue;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -314,21 +317,31 @@ public class Map extends FreeColGameObject {
         } else {
             firstNode = new PathNode(start, 0, getDistance(start.getPosition(), end.getPosition()), -1, -1, -1);
         }
-
-        // TODO: Choose a better datastructur:
-        ArrayList openList = new ArrayList();
-        ArrayList closedList = new ArrayList();
-
-        openList.add(firstNode);
-
-        while (openList.size() > 0) {
-            // TODO: Better method for choosing the node with the lowest f:
-            PathNode currentNode = (PathNode) openList.get(0);
-            for (int i=1; i<openList.size(); i++) {
-                if (currentNode.compareTo(openList.get(i)) < 0) {
-                    currentNode = (PathNode) openList.get(i);
+        
+        final HashMap openList = new HashMap();
+        final PriorityQueue openListQueue = new PriorityQueue(1024, new Comparator() {
+            public int compare(Object o, Object p) {
+                int i = ((PathNode) o).getF()-((PathNode) p).getF();
+                if (i != 0) {
+                    return i;
+                } else {
+                    i = ((PathNode) o).getTile().getX()-((PathNode) p).getTile().getX();
+                    if (i != 0) {
+                        return i;
+                    } else {
+                        return ((PathNode) o).getTile().getY()-((PathNode) p).getTile().getY();
+                    }
                 }
             }
+        });
+        final HashMap closedList = new HashMap();
+
+        openList.put(firstNode.getTile().getID(), firstNode);
+        openListQueue.offer(firstNode);
+
+        while (openList.size() > 0) {            
+            // Choosing the node with the lowest f:
+            PathNode currentNode = (PathNode) openListQueue.peek();
 
             // Found our goal:
             if (currentNode.getTile() == end) {
@@ -346,7 +359,7 @@ public class Map extends FreeColGameObject {
             }
 
             // Try every direction:
-            for (int direction=0; direction<8; direction++) {
+            for (int direction=0; direction<8; direction++) {                
                 Tile newTile = getNeighbourOrNull(direction, currentNode.getTile());
 
                 if (newTile == null) {
@@ -396,35 +409,24 @@ public class Map extends FreeColGameObject {
 
                 int f = cost + getDistance(newTile.getPosition(), end.getPosition());
 
-                PathNode successor = null;
-                // TODO: Better method for finding the node on the open list:
-                int i;
-                for (i=0; i<openList.size(); i++) {
-                    if (((PathNode) openList.get(i)).getTile() == newTile) {
-                        successor = (PathNode) openList.get(i);
-                        break;
-                    }
-                }
+                // Finding the node on the open list:
+                PathNode successor = (PathNode) openList.get(newTile.getID());
 
                 if (successor != null) {
                     if (successor.getF() <= f) {
                         continue;
                     } else {
-                        openList.remove(i);
+                        openList.remove(successor.getTile().getID());
+                        openListQueue.remove(successor);
                     }
                 } else {
                     // TODO: Better method for finding the node on the closed list:
-                    for (i=0; i<closedList.size(); i++) {
-                        if (((PathNode) closedList.get(i)).getTile() == newTile) {
-                            successor = (PathNode) closedList.get(i);
-                            break;
-                        }
-                    }
+                    successor = (PathNode) closedList.get(newTile.getID());
                     if (successor != null) {
                         if (successor.getF() <= f) {
                             continue;
                         } else {
-                            closedList.remove(i);
+                            closedList.remove(newTile.getID());
                         }
                     }
                 }
@@ -440,23 +442,21 @@ public class Map extends FreeColGameObject {
                     successor.setOnCarrier(false);
                 }
 
-                openList.add(successor);
+                // Adding the new node to the open list:
+                openList.put(successor.getTile().getID(), successor);
+                openListQueue.offer(successor);
             }
 
-            closedList.add(currentNode);
+            closedList.put(currentNode.getTile().getID(), currentNode);
 
-            // TODO: Better method for removing the node on the open list:
-            for (int i=0; i<openList.size(); i++) {
-                if (((PathNode) openList.get(i)) == currentNode) {
-                    openList.remove(i);
-                    break;
-                }
-            }
+            // Removing the current node from the open list:
+            openList.remove(currentNode.getTile().getID());
+            openListQueue.remove(currentNode);
         }
 
         return null;
-    }
-      
+    }  
+    
     /**
      * Finds a path to a goal determined by the given 
      * <code>GoalDecider</code>.
@@ -1403,7 +1403,7 @@ public class Map extends FreeColGameObject {
      * a given center tile. The center tile is never included in the
      * positions returned, and all returned positions are valid.
      * 
-     * @see Position.
+     * @see Map.Position
      */
     public final class CircleIterator extends MapIterator {
         private int radius;

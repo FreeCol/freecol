@@ -252,4 +252,26 @@ public class PathNode implements Comparable {
     public int compareTo(Object o) {
         return ((PathNode) o).getF()-f;
     }
+    
+    /**
+     * Checks if this <code>PathNode</code> is equal to another object.
+     * 
+     * @param o The <code>Object</code> to compare with.
+     * @return <code>true</code> if the given object is a <code>PathNode</code>
+     *      with the same {@link #getTile() tile} as this one.
+     */
+    public boolean equals(Object o) {
+        if (!(o instanceof PathNode)) {
+            return false;
+        } else {
+            return tile.getID().equals(((PathNode) o).getTile().getID()); 
+        }
+    }
+    
+    /**
+     * Returns the hashCode of this object.
+     */
+    public int hashCode() {
+        return tile.getX() * 10000 + tile.getY();
+    }
 }
