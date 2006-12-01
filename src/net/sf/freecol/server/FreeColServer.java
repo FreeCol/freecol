@@ -40,6 +40,7 @@ import net.sf.freecol.server.control.PreGameController;
 import net.sf.freecol.server.control.PreGameInputHandler;
 import net.sf.freecol.server.control.ServerModelController;
 import net.sf.freecol.server.control.UserConnectionHandler;
+import net.sf.freecol.server.generator.MapGenerator;
 import net.sf.freecol.server.model.ServerModelObject;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.networking.DummyConnection;
@@ -91,6 +92,7 @@ public final class FreeColServer {
 
     private Game game;
     private AIMain aiMain;
+    private MapGenerator mapGenerator;
     private boolean singleplayer;
 
     // The username of the player owning this server.
@@ -133,6 +135,7 @@ public final class FreeColServer {
         modelController = new ServerModelController(this);
 
         game = new Game(modelController);
+        mapGenerator = new MapGenerator(game);
 
         userConnectionHandler = new UserConnectionHandler(this);
         preGameController = new PreGameController(this);
@@ -197,7 +200,7 @@ public final class FreeColServer {
             throw e;
         }
         try {
-            owner = loadGame(file);       
+            owner = loadGame(file);
         } catch (FreeColException e) {
             server.shutdown();          
             throw e;
@@ -232,7 +235,16 @@ public final class FreeColServer {
         }, META_SERVER_UPDATE_INTERVAL, META_SERVER_UPDATE_INTERVAL);        
     }
 
-
+    /**
+     * Gets the <code>MapGenerator</code> this 
+     * <code>FreeColServer</code> is using when creating
+     * random maps.
+     * 
+     * @return The <code>MapGenerator</code>.
+     */
+    public MapGenerator getMapGenerator() {
+        return mapGenerator;
+    }
 
     /**
     * Sends information about this server to the meta-server.
@@ -589,6 +601,9 @@ public final class FreeColServer {
 
             xsr.close();
 
+            // Later, we might want to modify loaded savegames:
+            mapGenerator = new MapGenerator(game);
+            
             return owner;
         } catch (XMLStreamException e) {
             StringWriter sw = new StringWriter();

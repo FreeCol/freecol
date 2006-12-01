@@ -28,6 +28,8 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.option.SelectOption;
+import net.sf.freecol.server.generator.MapGeneratorOptions;
 
 /**
 * The panel where you choose your nation and color and connected players are shown.
@@ -50,6 +52,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
     private final String[]  mapSizes = { Messages.message("small"),
                                          Messages.message("medium"),
                                          Messages.message("large"),
+                                         Messages.message("veryLarge"),
                                          Messages.message("huge"),
                                         };
     private final String[]  colors = { Messages.message("black"),
@@ -187,9 +190,8 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         chatArea.setEditable(false);
 
         // Disable while not implemented.
-        mapSizeLabel.setEnabled(false);
-
-        mapSize.setEnabled(false);
+        //mapSizeLabel.setEnabled(false);
+        //mapSize.setEnabled(false);
         
         chatPanel.setOpaque(false);
 
@@ -273,10 +275,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
 
         components = optionsPanel.getComponents();
         for (int i = 0; i < components.length; i++) {
-            //components[i].setEnabled(enabled);
-
-            // Disable while not implemented.
-            components[i].setEnabled(false);
+            components[i].setEnabled(enabled && freeColClient.isAdmin());
         }
 
         components = chatPanel.getComponents();
@@ -323,7 +322,9 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
                     parent.showNewGamePanel();
                     break;
                 case MAPSIZE:
-                    // TODO
+                    SelectOption o = (SelectOption) freeColClient.getPreGameController().getMapGeneratorOptions().getObject(MapGeneratorOptions.MAP_SIZE);
+                    o.setValue(mapSize.getSelectedIndex());
+                    freeColClient.getPreGameController().sendMapGeneratorOptions();
                     break;
                 case READY:
                     freeColClient.getPreGameController().setReady(readyBox.isSelected());

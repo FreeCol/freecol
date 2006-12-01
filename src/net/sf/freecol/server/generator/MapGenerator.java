@@ -48,10 +48,8 @@ public class MapGenerator {
     private final static int[] EVEN_DY = {-2, -1, 0, 1, 2, 1, 0, -1};
 
     private Random random = new Random();
-    private Game game;
-    private int width;
-    private int height;
-
+    private final Game game;
+    private final MapGeneratorOptions mapGeneratorOptions;
 
 
     /**
@@ -63,42 +61,45 @@ public class MapGenerator {
     */
     public MapGenerator(Game game) {
         this.game = game;
+        this.mapGeneratorOptions = new MapGeneratorOptions();
     }
 
 
 
 
     /**
-    * Creates a new <code>Map</code> where the given players
-    * have random starting locations. During this process,
-    * <code>game.setMap(...)</code> is invoked.
-    *
-    * @param players The players to create <code>Settlement</code>s
-    *       and starting locations for. That is; both indian and 
-    *       european players.
-    * @param width The width of the map to create.
-    * @param height The height of the map to create.
-    * @see LandGenerator
-    * @see TerrainGenerator
-    */
-    public void createMap(Vector players, int width, int height) {
-        this.width = width;
-        this.height = height;
-
-        LandGenerator landGenerator = new LandGenerator(width, height);
+     * Creates a new <code>Map</code> where the given players
+     * have random starting locations. During this process,
+     * <code>game.setMap(...)</code> is invoked.
+     *
+     * @param players The players to create <code>Settlement</code>s
+     *       and starting locations for. That is; both indian and 
+     *       european players.
+     * @see LandGenerator
+     * @see TerrainGenerator
+     */
+    public void createMap(Vector players) {
+        LandGenerator landGenerator = new LandGenerator(getMapGeneratorOptions().getWidth(), getMapGeneratorOptions().getHeight());
         boolean[][] landMap = landGenerator.createLandMap();
 
         TerrainGenerator terrainGenerator = new TerrainGenerator(landMap);
         Map map = terrainGenerator.createMap();
 
         game.setMap(map);
-	createMountains(map);
+	    createMountains(map);
         createRivers(map);
         createIndianSettlements(map, players);
-        createEuropeanUnits(map, width, height, players);
+        createEuropeanUnits(map, getMapGeneratorOptions().getWidth(), getMapGeneratorOptions().getHeight(), players);
         createLostCityRumours(map);        
     }
 
+    /**
+     * Gets the options used when generating the map.
+     * @return The <code>MapGeneratorOptions</code>.
+     */
+    public MapGeneratorOptions getMapGeneratorOptions() {
+        return mapGeneratorOptions;
+    }
 
     /**
      * Creates mountain ranges on the given map.  The number and size
@@ -107,47 +108,47 @@ public class MapGenerator {
      * @param map The map to use.
      */
     public void createMountains(Map map) {
-	int maximumLength = Math.max(width, height) / 10;
-        int number = (width * height) / 300;
+        int maximumLength = Math.max(getMapGeneratorOptions().getWidth(), getMapGeneratorOptions().getHeight()) / 10;
+        int number = (getMapGeneratorOptions().getWidth() * getMapGeneratorOptions().getHeight()) / 300;
         int counter = 0;
-	logger.fine("Maximum length of mountain ranges is " + maximumLength);
+        logger.fine("Maximum length of mountain ranges is " + maximumLength);
 
         for (int i = 0; i < number; i++) {
-	    //MountainRange range = new MountainRange(map, maximumLength);
+            //MountainRange range = new MountainRange(map, maximumLength);
             for (int tries = 0; tries < 100; tries++) {
-		Position p = getRandomLandPosition(map);
+                Position p = getRandomLandPosition(map);
                 if (map.getTile(p).isLand()) {
-		    int direction = random.nextInt(8);
-		    int length = maximumLength - random.nextInt(maximumLength/2);
-		    logger.info("Direction of mountain range is " + direction +
-				", length of mountain range is " + length);
-		    for (int index = 0; index < length; index++) {
-			p = getAdjacent(p, direction);
-			Tile t = map.getTile(p);
-			if (t != null && t.isLand()) {
-			    t.setAddition(Tile.ADD_MOUNTAINS);
-			    Iterator it = map.getCircleIterator(p, false, 1);
-			    while (it.hasNext()) {
-				t = map.getTile((Position) it.next());
-				if (t.isLand() &&
-				    t.getAddition() != Tile.ADD_MOUNTAINS) {
-				    int r = random.nextInt(8);
-				    if (r == 0) {
-					t.setAddition(Tile.ADD_MOUNTAINS);
-				    } else if (r > 2) {
-					t.setAddition(Tile.ADD_HILLS);
-				    }
-				    if (random.nextInt(10) == 0) {
-					t.setBonus(true);
-				    }
-				}
-			    }
-			}
-		    }
-		    break;
-		}
-	    }
-	}
+                    int direction = random.nextInt(8);
+                    int length = maximumLength - random.nextInt(maximumLength/2);
+                    logger.info("Direction of mountain range is " + direction +
+                            ", length of mountain range is " + length);
+                    for (int index = 0; index < length; index++) {
+                        p = getAdjacent(p, direction);
+                        Tile t = map.getTile(p);
+                        if (t != null && t.isLand()) {
+                            t.setAddition(Tile.ADD_MOUNTAINS);
+                            Iterator it = map.getCircleIterator(p, false, 1);
+                            while (it.hasNext()) {
+                                t = map.getTile((Position) it.next());
+                                if (t.isLand() &&
+                                        t.getAddition() != Tile.ADD_MOUNTAINS) {
+                                    int r = random.nextInt(8);
+                                    if (r == 0) {
+                                        t.setAddition(Tile.ADD_MOUNTAINS);
+                                    } else if (r > 2) {
+                                        t.setAddition(Tile.ADD_HILLS);
+                                    }
+                                    if (random.nextInt(10) == 0) {
+                                        t.setBonus(true);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+        }
     }	
 
 
@@ -158,12 +159,12 @@ public class MapGenerator {
      * @param map The map to use.
      */
     public void createLostCityRumours(Map map) {
-        int number = (width * height) / 100;
+        int number = (getMapGeneratorOptions().getWidth() * getMapGeneratorOptions().getHeight()) / 100;
         int counter = 0;
 
         for (int i = 0; i < number; i++) {
             for (int tries=0; tries<100; tries++) {
-                Position p = new Position(random.nextInt(width), random.nextInt(height));
+                Position p = new Position(random.nextInt(getMapGeneratorOptions().getWidth()), random.nextInt(getMapGeneratorOptions().getHeight()));
                 Tile t = map.getTile(p);
                 if (map.getTile(p).isLand()
                         && !t.hasLostCityRumour()
@@ -187,14 +188,14 @@ public class MapGenerator {
      * @param map The map to create rivers on.
      */
     public void createRivers(Map map) {
-        int number = (width * height) / 100;
+        int number = (getMapGeneratorOptions().getWidth() * getMapGeneratorOptions().getHeight()) / 100;
         int counter = 0;
         Hashtable riverMap = new Hashtable();
 
         for (int i = 0; i < number; i++) {
             River river = new River(map, riverMap);
             for (int tries = 0; tries < 100; tries++) {
-                Position position = new Position(random.nextInt(width), random.nextInt(height));
+                Position position = new Position(random.nextInt(getMapGeneratorOptions().getWidth()), random.nextInt(getMapGeneratorOptions().getHeight()));
 
                 if (riverMap.get(position) == null) {
                     if (river.flowFromSource(position)) {
@@ -688,8 +689,8 @@ public class MapGenerator {
         int x;
         int y;
         do {
-            x = random.nextInt(width - 20) + 10;
-            y = random.nextInt(height - 20) + 10;
+            x = random.nextInt(getMapGeneratorOptions().getWidth() - 20) + 10;
+            y = random.nextInt(getMapGeneratorOptions().getHeight() - 20) + 10;
         } while (!map.getTile(x, y).isLand());
         return new Map.Position(x, y);
     }
@@ -864,7 +865,7 @@ public class MapGenerator {
      *        within the bounds of the map and <code>false</code> otherwise
      */
     protected boolean isValid(int x, int y) {
-        return x>=0 && x < width && y >= 0 && y < height;
+        return x>=0 && x < getMapGeneratorOptions().getWidth() && y >= 0 && y < getMapGeneratorOptions().getHeight();
     }
 
     
@@ -946,15 +947,15 @@ public class MapGenerator {
         * @return The new <code>Map</code>.
         */
         public Map createMap() {
-            Vector columns = new Vector(width);
+            Vector columns = new Vector(getMapGeneratorOptions().getWidth());
             tileType = new Random();
-            for (int i = 0; i < width; i++) {
-                Vector v = new Vector(height);
-                for (int j = 0; j < height; j++) {
+            for (int i = 0; i < getMapGeneratorOptions().getWidth(); i++) {
+                Vector v = new Vector(getMapGeneratorOptions().getHeight());
+                for (int j = 0; j < getMapGeneratorOptions().getHeight(); j++) {
                     Tile t;
 
                     if (landMap[i][j]) {
-                        t = new Tile(game, getRandomTileType(((Math.min(j, height - j) * 200) / height)), i, j);
+                        t = new Tile(game, getRandomTileType(((Math.min(j, getMapGeneratorOptions().getHeight() - j) * 200) / getMapGeneratorOptions().getHeight())), i, j);
 
                         if ((t.getType() != Tile.ARCTIC) && (tileType.nextInt(3) > 1)) {
                             t.setForested(true);
@@ -1008,13 +1009,13 @@ public class MapGenerator {
         * @param map The <code>Map</code> to create high seas on.
         */
         protected void createHighSeas(Map map) {
-            for (int y = 0; y < height; y++) {
+            for (int y = 0; y < getMapGeneratorOptions().getHeight(); y++) {
                 for (int x=0; x<MAX_DISTANCE_TO_EDGE && !map.isLandWithinDistance(x, y, DISTANCE_TO_LAND_FROM_HIGH_SEAS); x++) {
                         map.getTile(x, y).setType(Tile.HIGH_SEAS);
                 }
 
-                for (int x=1; x<=MAX_DISTANCE_TO_EDGE && !map.isLandWithinDistance(width-x, y, DISTANCE_TO_LAND_FROM_HIGH_SEAS); x++) {
-                        map.getTile(width-x, y).setType(Tile.HIGH_SEAS);
+                for (int x=1; x<=MAX_DISTANCE_TO_EDGE && !map.isLandWithinDistance(getMapGeneratorOptions().getWidth()-x, y, DISTANCE_TO_LAND_FROM_HIGH_SEAS); x++) {
+                        map.getTile(getMapGeneratorOptions().getWidth()-x, y).setType(Tile.HIGH_SEAS);
                 }
             }
         }
@@ -1183,6 +1184,5 @@ public class MapGenerator {
         }
 
     }
-
 
 }

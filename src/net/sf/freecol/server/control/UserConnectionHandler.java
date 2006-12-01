@@ -198,6 +198,7 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
                 out.writeAttribute("startGame", "true");
                 out.writeAttribute("isCurrentPlayer", Boolean.toString(isCurrentPlayer));
                 freeColServer.getGame().toXML(out, player);
+                freeColServer.getMapGenerator().getMapGeneratorOptions().toXML(out);
                 out.writeEndElement();
             } catch (XMLStreamException e) {
                 logger.warning("Could not write XML to stream (2).");
@@ -252,6 +253,7 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
             out.writeStartElement("loginConfirmed");
             out.writeAttribute("admin", (admin ? "true" : "false"));
             freeColServer.getGame().toXML(out, newPlayer);
+            freeColServer.getMapGenerator().getMapGeneratorOptions().toXML(out);
             out.writeEndElement();
         }  catch (XMLStreamException e) {
             logger.warning("Could not write XML to stream (2).");

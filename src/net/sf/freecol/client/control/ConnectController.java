@@ -31,6 +31,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.generator.MapGeneratorOptions;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -217,7 +218,16 @@ public final class ConnectController {
                 freeColClient.setGame(game);
                 freeColClient.setMyPlayer(thisPlayer);
 
+                final MapGeneratorOptions mgo;
+                if (in.getLocalName().equals(MapGeneratorOptions.getXMLElementTagName())) {
+                    mgo = new MapGeneratorOptions(in);
+                } else {
+                    mgo = new MapGeneratorOptions();
+                }
+                freeColClient.getPreGameController().setMapGeneratorOptions(mgo);
+                
                 c.endTransmission(in);
+                
                 // If (true) --> reconnect
                 if (startGame) {
                     freeColClient.setSingleplayer(false);

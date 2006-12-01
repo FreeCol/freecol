@@ -72,9 +72,10 @@ public final class PreGameController extends Controller {
         FreeColServer freeColServer = getFreeColServer();
 
         Game game = freeColServer.getGame();
-        AIMain aiMain = new AIMain(freeColServer);
+        MapGenerator mapGenerator = freeColServer.getMapGenerator();
+        AIMain aiMain = new AIMain(freeColServer);        
         freeColServer.setAIMain(aiMain);
-        game.setFreeColGameObjectListener(aiMain);
+        game.setFreeColGameObjectListener(aiMain);        
 
         // Add AI players:
         for (int i = 0; i < Player.NUMBER_OF_NATIONS; i++) {
@@ -115,9 +116,8 @@ public final class PreGameController extends Controller {
             freeColServer.getServer().sendToAll(addNewPlayer, theConnection);
         }
         
-        // Make the map:
-        MapGenerator mapGenerator = new MapGenerator(game);
-        mapGenerator.createMap(game.getPlayers(), 30, 64);
+        // Make the map:        
+        mapGenerator.createMap(game.getPlayers());
         Map map = game.getMap();
         
         // Inform the clients:

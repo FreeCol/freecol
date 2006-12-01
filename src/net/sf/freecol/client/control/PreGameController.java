@@ -31,6 +31,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.server.generator.MapGeneratorOptions;
 
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -49,6 +50,7 @@ public final class PreGameController {
 
     private FreeColClient freeColClient;
 
+    private MapGeneratorOptions mapGeneratorOptions = null;
 
 
 
@@ -63,7 +65,25 @@ public final class PreGameController {
 
 
 
-
+    /**
+     * Sets the <code>MapGeneratorOptions</code> used when creating
+     * a map.
+     * 
+     * @param mapGeneratorOptions The <code>MapGeneratorOptions</code>.
+     */
+    void setMapGeneratorOptions(MapGeneratorOptions mapGeneratorOptions) {
+        this.mapGeneratorOptions = mapGeneratorOptions; 
+    }
+    
+    /**
+     * Gets the <code>MapGeneratorOptions</code> used when creating
+     * a map.
+     * 
+     * @return The <code>MapGeneratorOptions</code>.
+     */
+    public MapGeneratorOptions getMapGeneratorOptions() {
+        return mapGeneratorOptions; 
+    }
 
     /**
     * Sets this client to be (or not be) ready to start the game.
@@ -159,6 +179,17 @@ public final class PreGameController {
         freeColClient.getClient().send(updateGameOptionsElement);        
     }
 
+    /**
+     * Sends the {@link MapGeneratorOptions} to the server.
+     * This method should be called after updating that object.
+     */
+     public void sendMapGeneratorOptions() {
+         if (mapGeneratorOptions != null) {
+             Element updateMapGeneratorOptionsElement = Message.createNewRootElement("updateMapGeneratorOptions");
+             updateMapGeneratorOptionsElement.appendChild(mapGeneratorOptions.toXMLElement(updateMapGeneratorOptionsElement.getOwnerDocument()));
+             freeColClient.getClient().send(updateMapGeneratorOptionsElement);        
+         }
+     }
     
     /**
     * Reads the {@link GameOptions} from the given file.

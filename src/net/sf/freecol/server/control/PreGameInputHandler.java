@@ -54,6 +54,8 @@ public final class PreGameInputHandler extends InputHandler {
         if (element != null) {
             if (type.equals("updateGameOptions")) {
                 reply = updateGameOptions(connection, element);
+            } else if (type.equals("updateMapGeneratorOptions")) {
+                reply = updateMapGeneratorOptions(connection, element);
             } else if (type.equals("ready")) {
                 reply = ready(connection, element);
             } else if (type.equals("setNation")) {
@@ -94,7 +96,25 @@ public final class PreGameInputHandler extends InputHandler {
 
         return null;
     }
+    
+    /**
+     * Handles a "updateMapGeneratorOptions"-message from a client.
+     *
+     * @param connection The connection the message came from.
+     * @param element The element containing the request.
+     * @return The reply.
+     */
+    public Element updateMapGeneratorOptions(Connection connection, Element element) {
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
 
+        if (!player.isAdmin()) {
+            throw new IllegalStateException();
+        }
+
+        getFreeColServer().getMapGenerator().getMapGeneratorOptions().readFromXMLElement((Element) element.getChildNodes().item(0));
+
+        return null;
+    }    
 
     /**
     * Handles a "ready"-message from a client.
