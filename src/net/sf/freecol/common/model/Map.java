@@ -2,7 +2,6 @@
 package net.sf.freecol.common.model;
 
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -292,6 +291,17 @@ public class Map extends FreeColGameObject {
     * @exception IllegalArgumentException if <code>start == end</code>.
     */
     private PathNode findPath(Unit unit, Tile start, final Tile end, int type, Unit carrier) {
+        /*
+         * Using A* with the Manhatten distace as the heuristics.
+         * 
+         * The datastructure for the open list is a combined structure: using a HashMap
+         * for membership tests and a PriorityQueue for getting the node with the minimal
+         * f (cost+heuristics). This gives O(1) on membership test and O(log N) for
+         * remove-best and insertions.
+         * 
+         * The datastructure for the closed list is simply a HashMap.
+         */
+        
         if (start == end) {
             throw new IllegalArgumentException("start == end");
         }
@@ -420,7 +430,7 @@ public class Map extends FreeColGameObject {
                         openListQueue.remove(successor);
                     }
                 } else {
-                    // TODO: Better method for finding the node on the closed list:
+                    // Finding the node on the closed list.
                     successor = (PathNode) closedList.get(newTile.getID());
                     if (successor != null) {
                         if (successor.getF() <= f) {
@@ -576,8 +586,14 @@ public class Map extends FreeColGameObject {
      * @return The path to a goal determined by the given 
      *      <code>GoalDecider</code>.
      */
-    public PathNode search(Unit unit, Tile startTile, GoalDecider gd, CostDecider costDecider, int maxTurns, Unit carrier) {         
-        // This is just a temporary implementation; modify at will ;-)
+    public PathNode search(Unit unit, Tile startTile, GoalDecider gd, CostDecider costDecider, int maxTurns, Unit carrier) {
+        /*
+         * Using Dijkstra's algorithm with a closedList for marking the visited nodes
+         * and using a PriorityQueue for getting the next edge with the least cost.
+         * This implementation could be improved by having the visited attribute stored
+         * on each Tile in order to avoid both of the HashMaps currently being used
+         * to serve this purpose.
+         */
         
         if (startTile == null) {
             throw new NullPointerException("startTile == null");
@@ -591,20 +607,32 @@ public class Map extends FreeColGameObject {
         PathNode firstNode = new PathNode(startTile, 0, 0, -1, ml, 0);
         firstNode.setOnCarrier(carrier != null);
         
-        // TODO: Choose a better datastructur:
-        ArrayList openList = new ArrayList();
-        ArrayList closedList = new ArrayList();
-        
-        openList.add(firstNode);
-        
-        while (openList.size() > 0) {
-            // TODO: Better method for choosing the node with the lowest f:
-            PathNode currentNode = (PathNode) openList.get(0);
-            for (int i=1; i<openList.size(); i++) {
-                if (currentNode.compareTo(openList.get(i)) < 0) {
-                    currentNode = (PathNode) openList.get(i);
+        final HashMap openList = new HashMap();
+        final PriorityQueue openListQueue = new PriorityQueue(1024, new Comparator() {
+            public int compare(Object o, Object p) {
+                int i = ((PathNode) o).getCost()-((PathNode) p).getCost();
+                if (i != 0) {
+                    return i;
+                } else {
+                    i = ((PathNode) o).getTile().getX()-((PathNode) p).getTile().getX();
+                    if (i != 0) {
+                        return i;
+                    } else {
+                        return ((PathNode) o).getTile().getY()-((PathNode) p).getTile().getY();
+                    }
                 }
             }
+        });
+        final HashMap closedList = new HashMap();
+        
+        openList.put(startTile.getID(), firstNode);
+        openListQueue.offer(firstNode);
+        
+        while (openList.size() > 0) {
+            // Choosing the node with the lowest cost:
+            PathNode currentNode = (PathNode) openListQueue.poll();
+            openList.remove(currentNode.getTile().getID());
+            closedList.put(currentNode.getTile().getID(), currentNode);
 
             // Reached the end
             if (currentNode.getTurns() > maxTurns) {
@@ -664,56 +692,30 @@ public class Map extends FreeColGameObject {
                 if (costDecider.isNewTurn()) {
                     turns++;
                 }
-                
-                int f = cost; // + getDistance(newTile.getPosition(), end.getPosition());
 
-                PathNode successor = null;
-                // TODO: Better method for finding the node on the open list:
-                int i;
-                for (i=0; i<openList.size(); i++) {
-                    if (((PathNode) openList.get(i)).getTile() == newTile) {
-                        successor = (PathNode) openList.get(i);
-                        break;
-                    }
-                }
-
+                // Finding the node on the open list:
+                PathNode successor = (PathNode) closedList.get(newTile.getID());
                 if (successor != null) {
-                    if (successor.getF() <= f) {
+                    if (successor.getCost() <= cost) {
                         continue;
                     } else {
-                        openList.remove(i);
+                        logger.warning("This should not happen. :-(");
                     }
                 } else {
-                    // TODO: Better method for finding the node on the closed list:
-                    for (i=0; i<closedList.size(); i++) {
-                        if (((PathNode) closedList.get(i)).getTile() == newTile) {
-                            successor = (PathNode) closedList.get(i);
-                            break;
-                        }
-                    }
+                    successor = (PathNode) openList.get(newTile.getID());
                     if (successor != null) {
-                        if (successor.getF() <= f) {
+                        if (successor.getCost() <= cost) {
                             continue;
                         } else {
-                            closedList.remove(i);
+                            openList.remove(successor.getTile().getID());
+                            openListQueue.remove(successor);
                         }
                     }
-                }
-
-                successor = new PathNode(newTile, cost, f, direction, movesLeft, turns);
-                successor.previous = currentNode;
-                successor.setOnCarrier(currentNode.isOnCarrier() && unit != theUnit);
-                
-                openList.add(successor);
-            }
-
-            closedList.add(currentNode);
-
-            // TODO: Better method for removing the node on the open list:
-            for (int i=0; i<openList.size(); i++) {
-                if (((PathNode) openList.get(i)) == currentNode) {
-                    openList.remove(i);
-                    break;
+                    successor = new PathNode(newTile, cost, cost, direction, movesLeft, turns);
+                    successor.previous = currentNode;
+                    successor.setOnCarrier(currentNode.isOnCarrier() && unit != theUnit);                
+                    openList.put(successor.getTile().getID(), successor);
+                    openListQueue.offer(successor);
                 }
             }
         }
