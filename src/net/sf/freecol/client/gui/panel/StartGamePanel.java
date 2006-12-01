@@ -256,6 +256,9 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         chatArea.setText("");
 
         setEnabled(true);
+        
+        SelectOption o = (SelectOption) freeColClient.getPreGameController().getMapGeneratorOptions().getObject(MapGeneratorOptions.MAP_SIZE);
+        mapSize.setSelectedIndex(o.getValue());
     }
 
 
