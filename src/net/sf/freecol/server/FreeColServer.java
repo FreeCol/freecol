@@ -583,6 +583,11 @@ public final class FreeColServer {
                 }
             }
 
+            if (aiMain == null) {
+                aiMain = new AIMain(this);
+                game.setFreeColGameObjectListener(aiMain);
+            }
+            
             // Connect the AI-players:
             Iterator playerIterator = game.getPlayerIterator();
             while (playerIterator.hasNext()) {
