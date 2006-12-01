@@ -230,19 +230,20 @@ public class AIGoods extends AIObject implements Transportable {
     *
     */
     public void setTransport(AIUnit transport) {
-        if (this.transport != null) {
+        AIUnit oldTransport = this.transport;
+        this.transport = transport;
+        
+        if (oldTransport != null) {
             // Remove from old carrier:
-            if (this.transport.getMission() != null
-                    && this.transport.getMission() instanceof TransportMission) {
-                TransportMission tm = (TransportMission) this.transport.getMission();
+            if (oldTransport.getMission() != null
+                    && oldTransport.getMission() instanceof TransportMission) {
+                TransportMission tm = (TransportMission) oldTransport.getMission();
                 if (tm.isOnTransportList(this)) {
                     tm.removeFromTransportList(this);
                 }
             }
         }
             
-        this.transport = transport;
-
         if (transport != null
                 && transport.getMission() instanceof TransportMission
                 && !((TransportMission) transport.getMission()).isOnTransportList(this)) {
