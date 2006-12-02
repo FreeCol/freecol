@@ -46,6 +46,8 @@ public class MapGenerator {
     private final static int[] ODD_DY = {-2, -1, 0, 1, 2, 1, 0, -1};
     private final static int[] EVEN_DX = {0, 0, 1, 0, 0, -1, -1, -1};
     private final static int[] EVEN_DY = {-2, -1, 0, 1, 2, 1, 0, -1};
+    
+    private final static int NUM_STARTING_LOCATIONS = 4;
 
     private Random random = new Random();
     private final Game game;
@@ -708,8 +710,8 @@ public class MapGenerator {
      *      european players.
      */
     protected void createEuropeanUnits(Map map, int width, int height, Vector players) {
-        int[] shipYPos = new int[4];
-        for (int i = 0; i < 4; i++) {
+        int[] shipYPos = new int[NUM_STARTING_LOCATIONS];
+        for (int i = 0; i < NUM_STARTING_LOCATIONS; i++) {
             shipYPos[i] = 0;
         }
 
@@ -820,7 +822,6 @@ public class MapGenerator {
         }
     }
 
-
     /**
      * Determine whether a proposed ship starting Y position is "too close"
      * to those already used.
@@ -831,7 +832,7 @@ public class MapGenerator {
     protected boolean isAShipTooClose(int proposedY,
                                         int[] usedYPositions) {
         for (int i = 0; i < 4 && usedYPositions[i] != 0; i++) {
-            if (Math.abs(usedYPositions[i] - proposedY) < 8) {
+            if (Math.abs(usedYPositions[i] - proposedY) < (getMapGeneratorOptions().getHeight() / 2) / NUM_STARTING_LOCATIONS) {
                 return true;
             }
         }
