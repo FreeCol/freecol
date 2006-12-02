@@ -83,7 +83,9 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
         optionUpdaters = (OptionUpdater[]) ou.toArray(new OptionUpdater[0]);
 
         add(northPanel, BorderLayout.NORTH);
-        add(tb, BorderLayout.CENTER);
+        if (tb.getTabCount() > 0) {
+            add(tb, BorderLayout.CENTER);
+        }
 
         setOpaque(false);
     }

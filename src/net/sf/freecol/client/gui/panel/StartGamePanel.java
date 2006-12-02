@@ -47,7 +47,8 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
                                 MAPSIZE = 2,
                                 READY = 3,
                                 CHAT = 4,
-                                GAME_OPTIONS = 5;
+                                GAME_OPTIONS = 5,
+                                MAP_GENERATOR_OPTIONS = 6;
 
     private final String[]  mapSizes = { Messages.message("small"),
                                          Messages.message("medium"),
@@ -88,6 +89,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
 
     private JButton start;
     private JButton gameOptions;
+    private JButton mapGeneratorOptions;
 
 
     /**
@@ -108,6 +110,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
 
         start = new JButton(Messages.message("startGame") );
         gameOptions = new JButton(Messages.message("gameOptions"));
+        mapGeneratorOptions = new JButton(Messages.message("mapGeneratorOptions"));
 
         optionsPanel = new JPanel();
         readyBox = new JCheckBox(Messages.message("iAmReady"));
@@ -151,6 +154,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         tableScroll.setSize(260, 170);
         chatPanel.setSize(270, 160);
         gameOptions.setSize(200, 20);
+        mapGeneratorOptions.setSize(200, 20);
 
         mapSizeLabel.setLocation(10, 20);
         mapSize.setLocation(mapSizeLabel.getX() + mapSizeLabel.getWidth() + 10, 20);
@@ -163,6 +167,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         tableScroll.setLocation(10, 10);
         chatPanel.setLocation(0, 180);
         gameOptions.setLocation(15, 345);
+        mapGeneratorOptions.setLocation(15, 315);
 
         mapSize.setSize(230 - mapSize.getX() - 10, 20);
         setLayout(null);
@@ -174,6 +179,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         cancel.setActionCommand(String.valueOf(CANCEL));
         readyBox.setActionCommand(String.valueOf(READY));
         gameOptions.setActionCommand(String.valueOf(GAME_OPTIONS));
+        mapGeneratorOptions.setActionCommand(String.valueOf(MAP_GENERATOR_OPTIONS));
 
         chat.setActionCommand(String.valueOf(CHAT));
 
@@ -183,6 +189,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         readyBox.addActionListener(this);
         chat.addActionListener(this);
         gameOptions.addActionListener(this);
+        mapGeneratorOptions.addActionListener(this);
 
         // if I'm not an admin
         // start.setEnabled(false);
@@ -198,6 +205,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         optionsPanel.add(mapSize);
         optionsPanel.add(mapSizeLabel);
         optionsPanel.add(gameOptions);
+        optionsPanel.add(mapGeneratorOptions);
         add(optionsPanel);
         add(start);
         add(cancel);
@@ -257,10 +265,16 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
 
         setEnabled(true);
         
+        updateMapGeneratorOptions();
+    }
+
+    /**
+     * Updates the map generator options.
+     */
+    public void updateMapGeneratorOptions() {
         SelectOption o = (SelectOption) freeColClient.getPreGameController().getMapGeneratorOptions().getObject(MapGeneratorOptions.MAP_SIZE);
         mapSize.setSelectedIndex(o.getValue());
     }
-
 
     /**
     * Sets whether or not this component is enabled. It also does this for
@@ -295,6 +309,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         if (enabled) {
             start.setEnabled(freeColClient.isAdmin());
             gameOptions.setEnabled(freeColClient.isAdmin());
+            mapGeneratorOptions.setEnabled(freeColClient.isAdmin());
         }
     }
 
@@ -343,6 +358,9 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
                     break;
                 case GAME_OPTIONS:
                     parent.showGameOptionsDialog();
+                    break;
+                case MAP_GENERATOR_OPTIONS:
+                    parent.showMapGeneratorOptionsDialog();
                     break;
                 default:
                     logger.warning("Invalid Actioncommand: invalid number.");

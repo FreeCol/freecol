@@ -90,7 +90,7 @@ public class MapGeneratorOptions extends OptionMap {
         add(new SelectOption(MAP_SIZE,
                 "mapGeneratorOptions." + MAP_SIZE + ".name", 
                 "mapGeneratorOptions." + MAP_SIZE + ".shortDescription", 
-                new String[] {"small", "medium", "large", "huge"},
+                new String[] {"small", "medium", "large", "veryLarge", "huge"},
                 0)
         );
     }

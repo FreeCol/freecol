@@ -44,6 +44,7 @@ import net.sf.freecol.client.gui.panel.IndianSettlementPanel;
 import net.sf.freecol.client.gui.panel.InfoPanel;
 import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.client.gui.panel.MainPanel;
+import net.sf.freecol.client.gui.panel.MapGeneratorOptionsDialog;
 import net.sf.freecol.client.gui.panel.MonarchPanel;
 import net.sf.freecol.client.gui.panel.NewPanel;
 import net.sf.freecol.client.gui.panel.QuitDialog;
@@ -184,6 +185,7 @@ public final class Canvas extends JLayeredPane {
     private final ServerListPanel   serverListPanel;
     private final GameOptionsDialog gameOptionsDialog;
     private final ClientOptionsDialog clientOptionsDialog;
+    private final MapGeneratorOptionsDialog mapGeneratorOptionsDialog;
     private final DeclarationDialog declarationDialog;
     private final LoadingSavegameDialog loadingSavegameDialog;
     private TakeFocusThread         takeFocusThread;
@@ -237,6 +239,7 @@ public final class Canvas extends JLayeredPane {
         reportContinentalCongressPanel = new ReportContinentalCongressPanel(this);
         gameOptionsDialog = new GameOptionsDialog(this, freeColClient);
         clientOptionsDialog = new ClientOptionsDialog(this, freeColClient);
+        mapGeneratorOptionsDialog = new MapGeneratorOptionsDialog(this, freeColClient);
         loadingSavegameDialog = new LoadingSavegameDialog(this, freeColClient);
 
         setFocusable(true);
@@ -809,6 +812,23 @@ public final class Canvas extends JLayeredPane {
 
         boolean r = clientOptionsDialog.getResponseBoolean();
         remove(clientOptionsDialog);
+
+        return r;
+    }
+
+    /**
+     * Displays a dialog for setting the map generator options.
+     * @return <code>true</code> if the options have been modified,
+     *         and <code>false</code> otherwise.
+     */
+    public boolean showMapGeneratorOptionsDialog() {
+        mapGeneratorOptionsDialog.initialize();
+
+        addCentered(mapGeneratorOptionsDialog, CLIENT_OPTIONS_LAYER);
+        mapGeneratorOptionsDialog.requestFocus();
+
+        boolean r = mapGeneratorOptionsDialog.getResponseBoolean();
+        remove(mapGeneratorOptionsDialog);
 
         return r;
     }
