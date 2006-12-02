@@ -143,7 +143,7 @@ public final class Colony extends Settlement implements Location {
         if (initializeWorkLocations) {
             workLocations.add(new ColonyTile(game, this, tile));
 
-            
+            // place building with workplaces at the beginning
             workLocations.add(new Building(game, this, Building.TOWN_HALL, Building.HOUSE));
             workLocations.add(new Building(game, this, Building.CARPENTER, Building.HOUSE));
             workLocations.add(new Building(game, this, Building.BLACKSMITH, Building.HOUSE));
@@ -151,13 +151,13 @@ public final class Colony extends Settlement implements Location {
             workLocations.add(new Building(game, this, Building.WEAVER, Building.HOUSE));
             workLocations.add(new Building(game, this, Building.DISTILLER, Building.HOUSE));
             workLocations.add(new Building(game, this, Building.FUR_TRADER, Building.HOUSE));
-            workLocations.add(new Building(game, this, Building.STOCKADE, Building.NOT_BUILT));
             workLocations.add(new Building(game, this, Building.ARMORY, Building.NOT_BUILT));
-            workLocations.add(new Building(game, this, Building.DOCK, Building.NOT_BUILT));
             workLocations.add(new Building(game, this, Building.SCHOOLHOUSE, Building.NOT_BUILT));
-            workLocations.add(new Building(game, this, Building.WAREHOUSE, Building.NOT_BUILT));
-            workLocations.add(new Building(game, this, Building.STABLES, Building.NOT_BUILT));
             workLocations.add(new Building(game, this, Building.CHURCH, Building.NOT_BUILT));
+            workLocations.add(new Building(game, this, Building.DOCK, Building.NOT_BUILT));
+            workLocations.add(new Building(game, this, Building.WAREHOUSE, Building.NOT_BUILT));
+            workLocations.add(new Building(game, this, Building.STOCKADE, Building.NOT_BUILT));
+            workLocations.add(new Building(game, this, Building.STABLES, Building.NOT_BUILT));
             workLocations.add(new Building(game, this, Building.PRINTING_PRESS, Building.NOT_BUILT));
             workLocations.add(new Building(game, this, Building.CUSTOM_HOUSE, Building.NOT_BUILT));
             
