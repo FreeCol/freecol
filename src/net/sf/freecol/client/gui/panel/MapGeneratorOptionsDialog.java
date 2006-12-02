@@ -38,7 +38,7 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog implements Ac
     private final Canvas        parent;
     private final FreeColClient freeColClient;
 
-    private JButton ok;
+    private JButton ok, cancel;
     private JPanel buttons = new JPanel(new FlowLayout());
     private JLabel header;
     private OptionMapUI ui;
@@ -62,7 +62,7 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog implements Ac
         ok.setMnemonic('O');
         buttons.add(ok);
 
-        JButton cancel = new JButton(Messages.message("cancel"));
+        cancel = new JButton(Messages.message("cancel"));
         cancel.setActionCommand(String.valueOf(CANCEL));
         cancel.addActionListener(this);
         cancel.setMnemonic('C');
@@ -76,7 +76,7 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog implements Ac
     }
 
 
-    public void initialize() {
+    public void initialize(boolean editable) {
         removeAll();
 
         final MapGeneratorOptions mgo = freeColClient.getPreGameController().getMapGeneratorOptions();
@@ -90,18 +90,24 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog implements Ac
         // Options:
         JPanel uiPanel = new JPanel(new BorderLayout());
         uiPanel.setOpaque(false);
-        ui = new OptionMapUI(mgo);
+        ui = new OptionMapUI(mgo, editable);
         uiPanel.add(ui, BorderLayout.CENTER);
         uiPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         add(uiPanel, BorderLayout.CENTER);
 
         // Buttons:
         add(buttons, BorderLayout.SOUTH);
+        
+        ok.setEnabled(editable);
     }
 
 
     public void requestFocus() {
-        ok.requestFocus();
+        if (ok.isEnabled()) {
+            ok.requestFocus();
+        } else {
+            cancel.requestFocus();
+        }
     }
 
 
@@ -115,6 +121,7 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog implements Ac
         try {
             switch (Integer.valueOf(command).intValue()) {
                 case OK:
+                    ui.unregister();
                     ui.updateOption();
                     parent.remove(this);
                     freeColClient.getPreGameController().sendMapGeneratorOptions();
@@ -122,6 +129,7 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog implements Ac
                     setResponse(new Boolean(true));
                     break;
                 case CANCEL:
+                    ui.unregister();
                     parent.remove(this);
                     setResponse(new Boolean(false));
                     break;

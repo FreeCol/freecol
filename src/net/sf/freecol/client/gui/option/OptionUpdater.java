@@ -20,5 +20,9 @@ public interface OptionUpdater {
     * this object keeps.
     */
     public void updateOption();
-
+    
+    /**
+     * Unregister <code>PropertyChangeListener</code>s.
+     */
+    public void unregister();
 }

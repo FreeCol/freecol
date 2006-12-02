@@ -756,8 +756,8 @@ public final class Canvas extends JLayeredPane {
     * @return <code>true</code> if the game options have been modified,
     *         and <code>false</code> otherwise.
     */
-    public boolean showGameOptionsDialog() {
-        gameOptionsDialog.initialize();
+    public boolean showGameOptionsDialog(boolean editable) {
+        gameOptionsDialog.initialize(editable);
 
         addCentered(gameOptionsDialog, GAME_OPTIONS_LAYER);
         gameOptionsDialog.requestFocus();
@@ -815,14 +815,17 @@ public final class Canvas extends JLayeredPane {
 
         return r;
     }
-
+    
     /**
      * Displays a dialog for setting the map generator options.
+     * 
+     * @param editable The options are only allowed to be changed
+     *      if this variable is <code>true</code>.
      * @return <code>true</code> if the options have been modified,
      *         and <code>false</code> otherwise.
      */
-    public boolean showMapGeneratorOptionsDialog() {
-        mapGeneratorOptionsDialog.initialize();
+    public boolean showMapGeneratorOptionsDialog(boolean editable) {
+        mapGeneratorOptionsDialog.initialize(editable);
 
         addCentered(mapGeneratorOptionsDialog, CLIENT_OPTIONS_LAYER);
         mapGeneratorOptionsDialog.requestFocus();

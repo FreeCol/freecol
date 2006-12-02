@@ -58,7 +58,12 @@ public class BooleanOption extends AbstractOption {
     * @param value The value.
     */
     public void setValue(boolean value) {
+        final boolean oldValue = this.value;
         this.value = value;
+        
+        if (value != oldValue) {
+            firePropertyChange("value", Boolean.valueOf(oldValue), Boolean.valueOf(value));
+        }
     }
 
 
@@ -86,8 +91,13 @@ public class BooleanOption extends AbstractOption {
      *      during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        final boolean oldValue = value;
         value = Boolean.valueOf(in.getAttributeValue(null, "value")).booleanValue();
         in.nextTag();
+        
+        if (value != oldValue) {
+            firePropertyChange("value", Boolean.valueOf(oldValue), Boolean.valueOf(value));
+        }
     }
 
 

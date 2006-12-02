@@ -82,7 +82,12 @@ public class IntegerOption extends AbstractOption {
     * @param value The value to be set.
     */
     public void setValue(int value) {
+        final int oldValue = this.value;
         this.value = value;
+        
+        if (value != oldValue) {
+            firePropertyChange("value", Integer.valueOf(oldValue), Integer.valueOf(value));
+        }
     }
 
     /**
@@ -108,9 +113,15 @@ public class IntegerOption extends AbstractOption {
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {        
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        final int oldValue = this.value;
+        
         value = Integer.parseInt(in.getAttributeValue(null, "value"));
         in.nextTag();
+        
+        if (value != oldValue) {
+            firePropertyChange("value", Integer.valueOf(oldValue), Integer.valueOf(value));
+        }
     }
 
 

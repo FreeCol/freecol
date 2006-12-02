@@ -3,6 +3,8 @@ package net.sf.freecol.client.gui.option;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
 
 import javax.swing.JComboBox;
@@ -19,7 +21,7 @@ import net.sf.freecol.common.option.SelectOption;
 * This class provides visualization for an {@link SelectOption}. In order to
 * enable values to be both seen and changed.
 */
-public final class SelectOptionUI extends JPanel implements OptionUpdater {
+public final class SelectOptionUI extends JPanel implements OptionUpdater, PropertyChangeListener {
     private static final Logger logger = Logger.getLogger(SelectOptionUI.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
@@ -35,7 +37,7 @@ public final class SelectOptionUI extends JPanel implements OptionUpdater {
     * Creates a new <code>SelectOptionUI</code> for the given <code>SelectOption</code>.
     * @param option The <code>SelectOption</code> to make a user interface for.
     */
-    public SelectOptionUI(SelectOption option) {
+    public SelectOptionUI(SelectOption option, boolean editable) {
         super(new FlowLayout(FlowLayout.LEFT));
 
         this.option = option;
@@ -56,9 +58,30 @@ public final class SelectOptionUI extends JPanel implements OptionUpdater {
         comboBox.setSelectedIndex(option.getValue());
         add(comboBox);
         
+        comboBox.setEnabled(editable);
+
+        option.addPropertyChangeListener(this);
         setOpaque(false);
     }
 
+    
+    /**
+     * Unregister <code>PropertyChangeListener</code>s.
+     */
+    public void unregister() {
+        option.removePropertyChangeListener(this);    
+    }
+    
+    /**
+     * Updates this UI with the new data from the option.
+     * @param event The event.
+     */
+    public void propertyChange(PropertyChangeEvent event) {
+        if (event.getPropertyName().equals("value")) {
+            comboBox.setSelectedIndex(((Integer) event.getNewValue()).intValue());
+        }
+    }
+    
     /**
      * {@inheritDoc}
      */

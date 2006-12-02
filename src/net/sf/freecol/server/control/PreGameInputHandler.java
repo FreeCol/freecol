@@ -94,6 +94,10 @@ public final class PreGameInputHandler extends InputHandler {
 
         getFreeColServer().getGame().getGameOptions().readFromXMLElement((Element) element.getChildNodes().item(0));
 
+        Element updateGameOptionsElement = Message.createNewRootElement("updateGameOptions");
+        updateGameOptionsElement.appendChild(getFreeColServer().getGame().getGameOptions().toXMLElement(updateGameOptionsElement.getOwnerDocument()));
+        getFreeColServer().getServer().sendToAll(updateGameOptionsElement, connection);
+        
         return null;
     }
     
@@ -113,6 +117,10 @@ public final class PreGameInputHandler extends InputHandler {
 
         getFreeColServer().getMapGenerator().getMapGeneratorOptions().readFromXMLElement((Element) element.getChildNodes().item(0));
 
+        Element umge = Message.createNewRootElement("updateMapGeneratorOptions");
+        umge.appendChild(getFreeColServer().getMapGenerator().getMapGeneratorOptions().toXMLElement(umge.getOwnerDocument()));
+        getFreeColServer().getServer().sendToAll(umge, connection);
+        
         return null;
     }    
 

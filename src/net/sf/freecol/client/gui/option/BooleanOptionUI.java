@@ -3,6 +3,8 @@ package net.sf.freecol.client.gui.option;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
 
 import javax.swing.JCheckBox;
@@ -17,7 +19,7 @@ import net.sf.freecol.common.option.Option;
 * This class provides visualization for an {@link BooleanOption}. In order to
 * enable values to be both seen and changed.
 */
-public final class BooleanOptionUI extends JPanel implements OptionUpdater {
+public final class BooleanOptionUI extends JPanel implements OptionUpdater, PropertyChangeListener {
     private static final Logger logger = Logger.getLogger(BooleanOptionUI.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
@@ -32,7 +34,7 @@ public final class BooleanOptionUI extends JPanel implements OptionUpdater {
     * Creates a new <code>BooleanOptionUI</code> for the given <code>BooleanOption</code>.
     * @param option The <code>BooleanOption</code> to make a user interface for.
     */
-    public BooleanOptionUI(BooleanOption option) {
+    public BooleanOptionUI(BooleanOption option, boolean editable) {
         super(new FlowLayout(FlowLayout.LEFT));
 
         this.option = option;
@@ -40,13 +42,34 @@ public final class BooleanOptionUI extends JPanel implements OptionUpdater {
         String name = option.getName();
         String description = option.getShortDescription();
         checkBox = new JCheckBox(name, option.getValue());
+        checkBox.setEnabled(editable);
         checkBox.setToolTipText((description != null) ? description : name);
+        
+        option.addPropertyChangeListener(this);
         
         add(checkBox);
         setBorder(null);
         setOpaque(false);
     }
 
+    
+    /**
+     * Unregister <code>PropertyChangeListener</code>s.
+     */
+    public void unregister() {
+        option.removePropertyChangeListener(this);    
+    }
+    
+    /**
+     * Updates this UI with the new data from the option.
+     * @param event The event.
+     */
+    public void propertyChange(PropertyChangeEvent event) {
+        if (event.getPropertyName().equals("value")) {
+            checkBox.setSelected(((Boolean) event.getNewValue()).booleanValue());
+        }
+    }
+    
     /**
      * {@inheritDoc}
      */

@@ -3,6 +3,8 @@ package net.sf.freecol.client.gui.option;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
 
 import javax.swing.JLabel;
@@ -19,7 +21,7 @@ import net.sf.freecol.common.option.Option;
 * This class provides visualization for an {@link IntegerOption}. In order to
 * enable values to be both seen and changed.
 */
-public final class IntegerOptionUI extends JPanel implements OptionUpdater {
+public final class IntegerOptionUI extends JPanel implements OptionUpdater, PropertyChangeListener {
     private static final Logger logger = Logger.getLogger(IntegerOptionUI.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
@@ -35,7 +37,7 @@ public final class IntegerOptionUI extends JPanel implements OptionUpdater {
     * Creates a new <code>IntegerOptionUI</code> for the given <code>IntegerOption</code>.
     * @param option The <code>IntegerOption</code> to make a user interface for.
     */
-    public IntegerOptionUI(IntegerOption option) {
+    public IntegerOptionUI(IntegerOption option, boolean editable) {
         super(new FlowLayout(FlowLayout.LEFT));
 
         this.option = option;
@@ -52,9 +54,31 @@ public final class IntegerOptionUI extends JPanel implements OptionUpdater {
         spinner.setToolTipText(option.getShortDescription());
         add(spinner);
         
+        spinner.setEnabled(editable);
+        
+        option.addPropertyChangeListener(this);
+        
         setOpaque(false);
     }
 
+
+    /**
+     * Unregister <code>PropertyChangeListener</code>s.
+     */
+    public void unregister() {
+        option.removePropertyChangeListener(this);    
+    }
+    
+    /**
+     * Updates this UI with the new data from the option.
+     * @param event The event.
+     */
+    public void propertyChange(PropertyChangeEvent event) {
+        if (event.getPropertyName().equals("value")) {
+            spinner.setValue((Integer) event.getNewValue());
+        }
+    }
+    
     /**
      * {@inheritDoc}
      */

@@ -43,7 +43,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
     * Creates a new <code>OptionGroupUI</code> for the given <code>OptionGroup</code>.
     * @param option The <code>OptionGroup</code> to make a user interface for.
     */
-    public OptionGroupUI(OptionGroup option) {
+    public OptionGroupUI(OptionGroup option, boolean editable) {
         setLayout(new FlowLayout(FlowLayout.LEFT, H_GAP, 5));
 
         this.option = option;
@@ -55,13 +55,13 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
 
             JComponent c = null;
             if (o instanceof OptionGroup) {
-                c = new OptionGroupUI((OptionGroup) o);
+                c = new OptionGroupUI((OptionGroup) o, editable);
             } else if (o instanceof BooleanOption) {
-                c = new BooleanOptionUI((BooleanOption) o);
+                c = new BooleanOptionUI((BooleanOption) o, editable);
             } else if (o instanceof IntegerOption) {
-                c = new IntegerOptionUI((IntegerOption) o);
+                c = new IntegerOptionUI((IntegerOption) o, editable);
             } else if (o instanceof SelectOption) {
-                c = new SelectOptionUI((SelectOption) o);
+                c = new SelectOptionUI((SelectOption) o, editable);
             } else if (o instanceof FreeColAction) {
                 c = new FreeColActionUI((FreeColAction) o, this);
             } else {
@@ -79,6 +79,15 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
     }
 
 
+    /**
+     * Unregister <code>PropertyChangeListener</code>s.
+     */
+    public void unregister() {
+        for (int i=0; i<optionUpdaters.length; i++) {
+            optionUpdaters[i].updateOption();
+        }    
+    }
+    
     /**
     * Updates the value of the {@link Option} this object keeps.
     */

@@ -1,10 +1,15 @@
 
 package net.sf.freecol.common.option;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -42,6 +47,8 @@ abstract public class AbstractOption implements Option {
 
     private static Logger logger = Logger.getLogger(AbstractOption.class.getName());
 
+    private List propertyChangeListeners = new ArrayList();
+    
     private String id;
     private String name;
     private String shortDescription;
@@ -65,7 +72,41 @@ abstract public class AbstractOption implements Option {
 
     
     
+    /**
+     * Adds a new <code>PropertyChangeListener</code> for
+     * monitoring state changes. Events are generated when
+     * variables are changed.
+     * 
+     * @param pcl The <code>PropertyChangeListener</code> to be
+     *      added.
+     */
+    public void addPropertyChangeListener(PropertyChangeListener pcl) {
+        propertyChangeListeners.add(pcl);
+    }
     
+    /**
+     * Remove the given <code>PropertyChangeListener</code>.
+     * 
+     * @param pcl The <code>PropertyChangeListener</code> to be
+     *      removed.
+     */
+    public void removePropertyChangeListener(PropertyChangeListener pcl) {
+        propertyChangeListeners.remove(pcl);
+    }
+    
+    /**
+     * Fires a <code>PropertyChangeEvent</code> to all listeners.
+     * 
+     * @param name The name of the changed variable.
+     * @param oldValue The old value.
+     * @param newValue The new value.
+     */
+    protected void firePropertyChange(String name, Object oldValue, Object newValue) {
+        Iterator it = propertyChangeListeners.iterator();       
+        while (it.hasNext()) {
+            ((PropertyChangeListener) it.next()).propertyChange(new PropertyChangeEvent(this, name, oldValue, newValue));
+        }
+    }
 
     /**
     * Gives a short description of this <code>Option</code>.

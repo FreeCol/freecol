@@ -10,9 +10,11 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.StreamedMessageHandler;
+import net.sf.freecol.server.generator.MapGeneratorOptions;
 
 import org.w3c.dom.Element;
 
@@ -59,6 +61,10 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
                 reply = addPlayer(element);
             } else if (type.equals("removePlayer")) {
                 reply = removePlayer(element);
+            } else if (type.equals("updateGameOptions")) {
+                reply = updateGameOptions(element);
+            } else if (type.equals("updateMapGeneratorOptions")) {
+                reply = updateMapGeneratorOptions(element);
             } else if (type.equals("chat")) {
                 reply = chat(element);
             } else if (type.equals("playerReady")) {
@@ -147,7 +153,40 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
         return null;
     }
 
+    /**
+     * Handles an "updateGameOptions"-message.
+     *
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *                holds all the information.
+     */
+    private Element updateGameOptions(Element element) {
+        Game game = getFreeColClient().getGame();
 
+        Element mgoElement = (Element) element.getElementsByTagName(GameOptions.getXMLElementTagName()).item(0);
+        getFreeColClient().getGame().getGameOptions().readFromXMLElement(mgoElement);
+
+        getFreeColClient().getCanvas().getStartGamePanel().updateGameOptions();
+
+        return null;
+    }
+    
+    /**
+     * Handles an "updateMapGeneratorOptions"-message.
+     *
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *                holds all the information.
+     */
+    private Element updateMapGeneratorOptions(Element element) {
+        Game game = getFreeColClient().getGame();
+
+        Element mgoElement = (Element) element.getElementsByTagName(MapGeneratorOptions.getXMLElementTagName()).item(0);
+        getFreeColClient().getPreGameController().getMapGeneratorOptions().readFromXMLElement(mgoElement);
+
+        getFreeColClient().getCanvas().getStartGamePanel().updateMapGeneratorOptions();
+
+        return null;
+    }
+    
     /**
     * Handles a "chat"-message.
     *

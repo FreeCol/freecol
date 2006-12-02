@@ -39,10 +39,26 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
 
 
     /**
-    * Creates a new <code>OptionMapUI</code> for the given <code>OptionMap</code>.
-    * @param option The <code>OptionMap</code> to make a user interface for.
-    */
+     * Creates a new <code>OptionMapUI</code> for the given
+     * <code>OptionMap</code>. This is the same as using
+     * {@link #OptionMapUI(OptionMap, boolean)} with
+     * <code>editable == true</code>.
+     * 
+     * @param option The <code>OptionMap</code> to make a user
+     *      interface for.
+     */
     public OptionMapUI(OptionMap option) {
+        this(option, true);
+    }
+    
+    /**
+     * Creates a new <code>OptionMapUI</code> for the given
+     * <code>OptionMap</code>.
+     * 
+     * @param option The <code>OptionMap</code> to make a user
+     *      interface for.
+     */
+    public OptionMapUI(OptionMap option, boolean editable) {
         super(new BorderLayout());
         this.option = option;
 
@@ -59,21 +75,21 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
             Option o = (Option) it.next();
 
             if (o instanceof OptionGroup) {
-                JComponent c = new OptionGroupUI((OptionGroup) o);
+                JComponent c = new OptionGroupUI((OptionGroup) o, editable);
                 c.setBorder(BorderFactory.createEmptyBorder(OptionGroupUI.H_GAP-5,0,0,0));
                 c.setOpaque(true);
                 tb.addTab(o.getName(), null, c, o.getShortDescription());
                 ou.add(c);
             } else if (o instanceof BooleanOption) {
-                JComponent c = new BooleanOptionUI((BooleanOption) o);
+                JComponent c = new BooleanOptionUI((BooleanOption) o, editable);
                 northPanel.add(c);
                 ou.add(c);
             } else if (o instanceof IntegerOption) {
-                JComponent c = new IntegerOptionUI((IntegerOption) o);
+                JComponent c = new IntegerOptionUI((IntegerOption) o, editable);
                 northPanel.add(c);
                 ou.add(c);
             } else if (o instanceof SelectOption) {
-                JComponent c = new SelectOptionUI((SelectOption) o);
+                JComponent c = new SelectOptionUI((SelectOption) o, editable);
                 northPanel.add(c);
                 ou.add(c);
             } else {
@@ -92,13 +108,21 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
 
     
     /**
+     * Unregister <code>PropertyChangeListener</code>s.
+     */
+    public void unregister() {
+        for (int i=0; i<optionUpdaters.length; i++) {
+            optionUpdaters[i].unregister();
+        }            
+    }
+    
+    /**
     * Updates the value of the {@link Option} this object keeps.
     */
     public void updateOption() {
         for (int i=0; i<optionUpdaters.length; i++) {
             optionUpdaters[i].updateOption();
         }
-
     }
 
 }

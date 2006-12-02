@@ -43,7 +43,7 @@ public final class GameOptionsDialog extends FreeColDialog implements ActionList
     private final Canvas        parent;
     private final FreeColClient freeColClient;
 
-    private JButton ok;
+    private JButton ok, load, save, cancel;
     private JPanel buttons = new JPanel(new FlowLayout());
     private JLabel header;
     private OptionMapUI ui;
@@ -66,19 +66,19 @@ public final class GameOptionsDialog extends FreeColDialog implements ActionList
         ok.setMnemonic('O');
         buttons.add(ok);
         
-        JButton load = new JButton(Messages.message("load"));
+        load = new JButton(Messages.message("load"));
         load.setActionCommand(String.valueOf(LOAD));
         load.addActionListener(this);
         load.setMnemonic('L');
         buttons.add(load);
 
-        JButton save = new JButton(Messages.message("save"));
+        save = new JButton(Messages.message("save"));
         save.setActionCommand(String.valueOf(SAVE));
         save.addActionListener(this);
         save.setMnemonic('S');
         buttons.add(save);
 
-        JButton cancel = new JButton(Messages.message("cancel"));
+        cancel = new JButton(Messages.message("cancel"));
         cancel.setActionCommand(String.valueOf(CANCEL));
         cancel.addActionListener(this);
         cancel.setMnemonic('C');
@@ -92,7 +92,7 @@ public final class GameOptionsDialog extends FreeColDialog implements ActionList
     }
 
 
-    public void initialize() {
+    public void initialize(boolean editable) {
         removeAll();
 
         // Header:
@@ -104,18 +104,26 @@ public final class GameOptionsDialog extends FreeColDialog implements ActionList
         // Options:
         JPanel uiPanel = new JPanel(new BorderLayout());
         uiPanel.setOpaque(false);
-        ui = new OptionMapUI(freeColClient.getGame().getGameOptions());
+        ui = new OptionMapUI(freeColClient.getGame().getGameOptions(), editable);
         uiPanel.add(ui, BorderLayout.CENTER);
         uiPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         add(uiPanel, BorderLayout.CENTER);
 
         // Buttons:
         add(buttons, BorderLayout.SOUTH);
+        
+        ok.setEnabled(editable);
+        save.setEnabled(editable);
+        load.setEnabled(editable);
     }
 
 
     public void requestFocus() {
-        ok.requestFocus();
+        if (ok.isEnabled()) {
+            ok.requestFocus();
+        } else {
+            cancel.requestFocus();
+        }
     }
 
 
@@ -129,12 +137,14 @@ public final class GameOptionsDialog extends FreeColDialog implements ActionList
         try {
             switch (Integer.valueOf(command).intValue()) {
                 case OK:
+                    ui.unregister();
                     ui.updateOption();
                     freeColClient.getPreGameController().sendGameOptions();
                     parent.remove(this);
                     setResponse(new Boolean(true));
                     break;
                 case CANCEL:
+                    ui.unregister();
                     parent.remove(this);
                     setResponse(new Boolean(false));
                     break;

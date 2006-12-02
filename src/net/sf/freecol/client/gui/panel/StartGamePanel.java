@@ -269,11 +269,20 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
     }
 
     /**
-     * Updates the map generator options.
+     * Updates the map generator options displayed
+     * on this panel.
      */
     public void updateMapGeneratorOptions() {
         SelectOption o = (SelectOption) freeColClient.getPreGameController().getMapGeneratorOptions().getObject(MapGeneratorOptions.MAP_SIZE);
         mapSize.setSelectedIndex(o.getValue());
+    }
+    
+    /**
+     * Updates the game options displayed
+     * on this panel.
+     */
+    public void updateGameOptions() {
+        // Nothing yet.
     }
 
     /**
@@ -308,9 +317,10 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
 
         if (enabled) {
             start.setEnabled(freeColClient.isAdmin());
-            gameOptions.setEnabled(freeColClient.isAdmin());
-            mapGeneratorOptions.setEnabled(freeColClient.isAdmin());
         }
+        
+        mapGeneratorOptions.setEnabled(enabled);
+        gameOptions.setEnabled(enabled);
     }
 
 
@@ -357,10 +367,10 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
                     }
                     break;
                 case GAME_OPTIONS:
-                    parent.showGameOptionsDialog();
+                    parent.showGameOptionsDialog(freeColClient.isAdmin());
                     break;
                 case MAP_GENERATOR_OPTIONS:
-                    parent.showMapGeneratorOptionsDialog();
+                    parent.showMapGeneratorOptionsDialog(freeColClient.isAdmin());
                     break;
                 default:
                     logger.warning("Invalid Actioncommand: invalid number.");

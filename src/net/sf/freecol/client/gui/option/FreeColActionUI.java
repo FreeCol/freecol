@@ -84,6 +84,12 @@ public final class FreeColActionUI extends JPanel implements OptionUpdater, Acti
         setOpaque(false);
     }
 
+    /**
+     * Unregister <code>PropertyChangeListener</code>s.
+     */
+    public void unregister() {
+            
+    }
     
     /**
     * Creates an icon for symbolizing the recording of a <code>KeyStroke</code>.
