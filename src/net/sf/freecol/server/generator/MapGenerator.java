@@ -831,7 +831,7 @@ public class MapGenerator {
      */
     protected boolean isAShipTooClose(int proposedY,
                                         int[] usedYPositions) {
-        for (int i = 0; i < 4 && usedYPositions[i] != 0; i++) {
+        for (int i = 0; i < NUM_STARTING_LOCATIONS && usedYPositions[i] != 0; i++) {
             if (Math.abs(usedYPositions[i] - proposedY) < (getMapGeneratorOptions().getHeight() / 2) / NUM_STARTING_LOCATIONS) {
                 return true;
             }
