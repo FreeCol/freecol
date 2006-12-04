@@ -17,6 +17,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -119,7 +120,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         chatPanel = new JPanel();
         chat = new JTextField();
         chatArea = new JTextArea();
-        chatScroll = new JScrollPane(chatArea);
+        chatScroll = new JScrollPane(chatArea, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         tableModel = new PlayersTableModel(freeColClient, freeColClient.getPreGameController());
         table = new JTable(tableModel);
 
@@ -195,6 +196,8 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         // start.setEnabled(false);
 
         chatArea.setEditable(false);
+        chatArea.setLineWrap(true);
+        chatArea.setWrapStyleWord(true);
 
         // Disable while not implemented.
         //mapSizeLabel.setEnabled(false);
