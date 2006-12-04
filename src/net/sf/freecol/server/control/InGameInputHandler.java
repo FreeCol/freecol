@@ -159,6 +159,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                         reply = endTurn(connection, element);
                     } else if (type.equals("disbandUnit")) {
                         reply = disbandUnit(connection, element);
+                    } else if (type.equals("skipUnit")) {
+                        reply = skipUnit(connection, element);
                     } else if (type.equals("cashInTreasureTrain")) {
                         reply = cashInTreasureTrain(connection, element);
                     } else if (type.equals("tradeProposition")) {
@@ -1937,6 +1939,31 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         return null;
     }
 
+    /**
+     * Handles a "skipUnit"-message.
+     *
+     * @param connection The <code>Connection</code> the message was received on.
+     * @param element The element containing the request.
+     */
+    private Element skipUnit(Connection connection, Element element) {
+        Game game = getFreeColServer().getGame();
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
+        Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
+
+        if (unit == null) {
+            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: " + element.getAttribute("unit"));
+        }
+
+        if (unit.getOwner() != player) {
+            throw new IllegalStateException("Not your unit!");
+        }
+
+        Tile oldTile = unit.getTile();
+
+        unit.skip();
+
+        return null;
+    }
 
     /**
      * Handles a "disbandUnit"-message.

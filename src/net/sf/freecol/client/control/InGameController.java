@@ -2368,9 +2368,14 @@ public final class InGameController implements NetworkConstants {
         GUI gui = freeColClient.getGUI();
 
         Unit unit = gui.getActiveUnit();
-
+        
         if (unit != null) {
+            Element skipUnit = Message.createNewRootElement("skipUnit");
+            skipUnit.setAttribute("unit", unit.getID());
+           
             unit.skip();
+            
+            freeColClient.getClient().sendAndWait(skipUnit);
         }
 
         nextActiveUnit();
@@ -2402,9 +2407,9 @@ public final class InGameController implements NetworkConstants {
 
         unit.dispose();
 
-        nextActiveUnit();
-
         client.sendAndWait(disbandUnit);
+        
+        nextActiveUnit();
     }
 
 
