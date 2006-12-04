@@ -15,7 +15,7 @@ import net.sf.freecol.client.FreeColClient;
 * An action for initiating chatting.
 * @see net.sf.freecol.client.gui.panel.MapControls
 */
-public class ChatAction extends MapboardAction {
+public class ChatAction extends FreeColAction {
     private static final Logger logger = Logger.getLogger(ChatAction.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
@@ -34,6 +34,19 @@ public class ChatAction extends MapboardAction {
     }
 
 
+    /**
+     * Checks if this action should be enabled.
+     * 
+     * @return <code>true</code> if the mapboard is selected.
+     */
+    protected boolean shouldBeEnabled() { 
+        return super.shouldBeEnabled()  
+                && getFreeColClient().getCanvas() != null
+                && (!getFreeColClient().getCanvas().isShowingSubPanel()
+                        || getFreeColClient().getGame() != null
+                           && getFreeColClient().getGame().getCurrentPlayer() != getFreeColClient().getMyPlayer());
+    }
+    
     /**
     * Returns the id of this <code>Option</code>.
     * @return "chatAction"

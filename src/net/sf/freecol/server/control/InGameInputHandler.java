@@ -92,10 +92,12 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     reply = getVacantEntryLocation(connection, element);
                 } else if (type.equals("disconnect")) {
                     reply = disconnect(connection, element);
-                } else if (freeColServer.getGame().getCurrentPlayer().equals(freeColServer.getPlayer(connection))) {
-                    if (type.equals("chat")) {
-                        reply = chat(connection, element);
-                    } else if (type.equals("move")) {
+                } else if (type.equals("chat")) {
+                    reply = chat(connection, element);                
+                } else if (type.equals("setDestination")) {
+                    reply = setDestination(connection, element);                    
+                } else if (freeColServer.getGame().getCurrentPlayer().equals(freeColServer.getPlayer(connection))) {                    
+                    if (type.equals("move")) {
                         reply = move(connection, element);
                         //} else if (type.equals("explore")) {
                         //reply = explore(connection, element);
@@ -178,9 +180,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     } else if (type.equals("declareIndependence")) {
                         reply = declareIndependence(connection, element);
                     } else if (type.equals("giveIndependence")) {
-                        reply = giveIndependence(connection, element);
-                    } else if (type.equals("setDestination")) {
-                        reply = setDestination(connection, element);                                                
+                        reply = giveIndependence(connection, element);                                              
                     } else {
                         logger.warning("Unknown request from client " + element.getTagName());
                     }

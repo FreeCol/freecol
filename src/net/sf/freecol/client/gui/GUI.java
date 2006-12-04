@@ -32,6 +32,7 @@ import javax.swing.UIManager;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Game;
@@ -127,7 +128,7 @@ public final class GUI {
     OTHER_UNITS_WIDTH = 3,
     MAX_OTHER_UNITS = 10,
     MESSAGE_COUNT = 3,
-    MESSAGE_AGE = 10000; // The amount of time before a message gets deleted (in milliseconds).
+    MESSAGE_AGE = 30000; // The amount of time before a message gets deleted (in milliseconds).
 
     private boolean displayTileNames = false;
     private boolean displayGrid = false;
@@ -296,6 +297,15 @@ public final class GUI {
                 } else {
                     setFocus(selectedTile);
                 }
+            } else if (activeUnit.getTile() != null
+                    && activeUnit.getTile().getPosition().equals(selectedTile)) {
+                if (activeUnit.getState() != Unit.ACTIVE || activeUnit.getDestination() != null) {
+                    if (freeColClient.getGame().getCurrentPlayer() == freeColClient.getMyPlayer()) {
+                        freeColClient.getInGameController().clearOrders(activeUnit);
+                    } else {
+                        freeColClient.getInGameController().clearGotoOrders(activeUnit);
+                    }
+                }
             }
 
             // Check if the gui needs to reposition:
@@ -397,7 +407,7 @@ public final class GUI {
             freeColClient.getInGameController().nextActiveUnit();
             return;
         }*/
-
+        
         if (activeUnit != null && activeUnit.getOwner() != freeColClient.getMyPlayer()) {
             enemyUnitsOnTop.add(0, activeUnit);
             freeColClient.getCanvas().repaint(0, 0, getWidth(), getHeight());
@@ -410,8 +420,13 @@ public final class GUI {
 
         this.activeUnit = activeUnit;
 
-        if (activeUnit != null && freeColClient.getGame().getCurrentPlayer() == freeColClient.getMyPlayer() && activeUnit.getState() != Unit.ACTIVE) {
-            freeColClient.getInGameController().clearOrders(activeUnit);
+        if (activeUnit != null && (activeUnit.getState() != Unit.ACTIVE
+                    || activeUnit.getDestination() != null)) {
+            if (freeColClient.getGame().getCurrentPlayer() == freeColClient.getMyPlayer()) {
+                freeColClient.getInGameController().clearOrders(activeUnit);
+            } else {
+                freeColClient.getInGameController().clearGotoOrders(activeUnit);
+            }
         }
 
         freeColClient.getActionManager().update();
@@ -998,6 +1013,29 @@ public final class GUI {
 
         /*
         PART 5
+        ======
+        Grey out the map if it is not my turn (and a multiplayer game).
+         */
+        if (freeColClient.getMyPlayer() != freeColClient.getGame().getCurrentPlayer()
+                && !freeColClient.isSingleplayer()) {
+            g.setColor(Color.BLACK);
+            Composite oldComposite = g.getComposite();
+            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.6f));
+            g.fill(new Rectangle(0, 0, bounds.width, bounds.height));
+            g.setComposite(oldComposite);
+            
+            final Color currentPlayerColor = freeColClient.getGame().getCurrentPlayer().getColor();
+            final String nation = freeColClient.getGame().getCurrentPlayer().getNationAsString();
+            Image im = createStringImage(g, 
+                    Messages.message("waitingFor") + " " + nation,
+                    currentPlayerColor,
+                    640,
+                    18);
+            g.drawImage(im, (bounds.width - im.getWidth(null)) / 2, (bounds.height - im.getHeight(null)) / 2, null);
+        }
+
+        /*
+        PART 6
         ======
         Display the messages.
         */

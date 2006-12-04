@@ -421,6 +421,10 @@ public final class InGameInputHandler extends InputHandler {
 
         freeColClient.getInGameController().setCurrentPlayer(currentPlayer);
 
+        if (!freeColClient.isSingleplayer()) {
+            freeColClient.getCanvas().refresh();
+        }
+        
         return null;
     }
 

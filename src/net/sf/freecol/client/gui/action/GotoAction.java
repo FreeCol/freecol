@@ -37,13 +37,23 @@ public class GotoAction extends MapboardAction {
     
 
     /**
+     * Checks if this action should be enabled.
+     * 
+     * @return <code>true</code> if the mapboard is selected.
+     */
+    protected boolean shouldBeEnabled() {
+        // super.shouldBeEnabled();
+        return getFreeColClient().getCanvas() != null
+                && !getFreeColClient().getCanvas().isShowingSubPanel();
+    }
+    
+    /**
     * Returns the id of this <code>Option</code>.
     * @return "europeAction"
     */
     public String getId() {
         return ID;
     }
-
     
     /**
      * Applies this action.

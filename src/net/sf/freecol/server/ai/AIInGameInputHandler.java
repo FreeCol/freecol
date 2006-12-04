@@ -102,6 +102,7 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
                 } else if (type.equals("disconnect")) {
                 } else if (type.equals("logout")) {
                 } else if (type.equals("error")) {
+                } else if (type.equals("chat")) {
                 } else if (type.equals("chooseFoundingFather")) {
                     reply = chooseFoundingFather((DummyConnection) connection, element);
                 } else if (type.equals("reconnect")) {            

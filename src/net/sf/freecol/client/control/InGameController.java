@@ -166,6 +166,11 @@ public final class InGameController implements NetworkConstants {
      * Declares independence for the home country.
      */
     public void declareIndependence() {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         Canvas canvas = freeColClient.getCanvas();        
         if (freeColClient.getMyPlayer().getSoL() < 50) {
             canvas.showInformationMessage("declareIndependence.notMajority", new String[][] {{"%percentage%", Integer.toString(freeColClient.getMyPlayer().getSoL())}});
@@ -260,6 +265,11 @@ public final class InGameController implements NetworkConstants {
     * Uses the active unit to build a colony.
     */
     public void buildColony() {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         Client client = freeColClient.getClient();
         Game game = freeColClient.getGame();
         GUI gui = freeColClient.getGUI();
@@ -400,6 +410,11 @@ public final class InGameController implements NetworkConstants {
     public void moveActiveUnit(int direction) {
         Unit unit = freeColClient.getGUI().getActiveUnit();
 
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         if (unit != null) {
             move(unit, direction);
         } // else: nothing: There is no active unit that can be moved.
@@ -461,6 +476,10 @@ public final class InGameController implements NetworkConstants {
         
         Location destination = (Location) choice.getObject();
         
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            return;
+        }
+        
         if (destination instanceof Europe
                 && unit.getTile() != null
                 && (unit.getTile().getType() == Tile.HIGH_SEAS
@@ -503,6 +522,11 @@ public final class InGameController implements NetworkConstants {
         final Map map = freeColClient.getGame().getMap();
         final Location destination = unit.getDestination();
 
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         /* Fix a bug I don't know what caused it. Sometimes a unit have a goto order
          * but it's already in destination
          */
@@ -630,6 +654,11 @@ public final class InGameController implements NetworkConstants {
     public void move(Unit unit, int direction) {
         Canvas canvas = freeColClient.getCanvas();
 
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         // Be certain the tile we are about to move into has been updated by the server:
         // Can be removed if we use 'client.ask' when moving:
         /*
@@ -690,6 +719,11 @@ public final class InGameController implements NetworkConstants {
     * @param tile The land which should be bought from the indians. 
     */
     public void buyLand(Tile tile) {   
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         Element buyLandElement = Message.createNewRootElement("buyLand");
         buyLandElement.setAttribute("tile", tile.getID());
 
@@ -713,6 +747,11 @@ public final class InGameController implements NetworkConstants {
     * @see Settlement
     */
     private void tradeWithSettlement(Unit unit, int direction) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         Canvas canvas = freeColClient.getCanvas();
         Map map = freeColClient.getGame().getMap();
         Client client = freeColClient.getClient();
@@ -800,6 +839,11 @@ public final class InGameController implements NetworkConstants {
     * and the {@link Unit#getOwner unit's owner} collects the payment.
     */
     private void tradeWithSettlement(Unit unit, Settlement settlement, Goods goods, int gold) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         Client client = freeColClient.getClient();
 
         Element tradeElement = Message.createNewRootElement("trade");
@@ -822,6 +866,11 @@ public final class InGameController implements NetworkConstants {
     * from the given <code>Unit</code> to the given <code>Settlement</code>.
     */
     private void deliverGiftToSettlement(Unit unit, Settlement settlement, Goods goods) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         Client client = freeColClient.getClient();
 
         Element deliverGiftElement = Message.createNewRootElement("deliverGift");
@@ -843,6 +892,11 @@ public final class InGameController implements NetworkConstants {
      *                                  location.
      */
     private void cashInTreasureTrain(Unit unit) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         Client client = freeColClient.getClient();
 
         if (unit.getType() != Unit.TREASURE_TRAIN) {
@@ -870,6 +924,11 @@ public final class InGameController implements NetworkConstants {
     * @param direction The direction in which to move the Unit.
     */
     private void reallyMove(Unit unit, int direction) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         GUI gui = freeColClient.getGUI();
         Canvas canvas = freeColClient.getCanvas();
         Client client = freeColClient.getClient();
@@ -922,6 +981,11 @@ public final class InGameController implements NetworkConstants {
     * @param direction The direction in which to attack.
     */
     private void attack(Unit unit, int direction) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         Client client = freeColClient.getClient();
         Canvas canvas = freeColClient.getCanvas();
         Game game = freeColClient.getGame();
@@ -1071,6 +1135,11 @@ public final class InGameController implements NetworkConstants {
      * @param direction The direction in which to disembark the Unit.
      */
     private void disembark(Unit unit, int direction) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         Game game = freeColClient.getGame();
         Canvas canvas = freeColClient.getCanvas();
         Tile destinationTile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
@@ -1099,6 +1168,11 @@ public final class InGameController implements NetworkConstants {
      * @param direction The direction in which to embark the Unit.
      */
     private void embark(Unit unit, int direction) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         Game game = freeColClient.getGame();
         Client client = freeColClient.getClient();
         GUI gui = freeColClient.getGUI();
@@ -1158,6 +1232,11 @@ public final class InGameController implements NetworkConstants {
     *         on the <code>carrier</code>.
     */
     public boolean boardShip(Unit unit, Unit carrier) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            throw new IllegalStateException("Not your turn.");
+        }
+        
         if (unit == null) {
             logger.warning("unit == null");
             return false;
@@ -1205,6 +1284,11 @@ public final class InGameController implements NetworkConstants {
     * @param unit The <code>Unit</code> to clear the speciality of.
     */
     public void clearSpeciality(Unit unit) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         Client client = freeColClient.getClient();
 
         Element clearSpecialityElement = Message.createNewRootElement("clearSpeciality");
@@ -1222,6 +1306,11 @@ public final class InGameController implements NetworkConstants {
     * @param unit The unit who is going to leave the ship where it is located.
     */
     public void leaveShip(Unit unit) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         Client client = freeColClient.getClient();
 
         unit.leaveShip();
@@ -1239,6 +1328,11 @@ public final class InGameController implements NetworkConstants {
     * @param carrier The carrier.
     */
     public void loadCargo(Goods goods, Unit carrier) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         if (carrier == null) {
             throw new NullPointerException();
         }
@@ -1265,6 +1359,11 @@ public final class InGameController implements NetworkConstants {
     * @param goods The goods which are going to leave the ship where it is located.
     */
     public void unloadCargo(Goods goods) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         Client client = freeColClient.getClient();
 
         goods.adjustAmount();
@@ -1287,6 +1386,11 @@ public final class InGameController implements NetworkConstants {
     * @param carrier The carrier.
     */
     public void buyGoods(int type, int amount, Unit carrier) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         Client client = freeColClient.getClient();
         Game game = freeColClient.getGame();
         Player myPlayer = freeColClient.getMyPlayer();
@@ -1330,6 +1434,11 @@ public final class InGameController implements NetworkConstants {
     * @param goods The goods to be sold.
     */
     public void sellGoods(Goods goods) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         Client client = freeColClient.getClient();
         Player player = freeColClient.getMyPlayer();
 
@@ -1372,6 +1481,11 @@ public final class InGameController implements NetworkConstants {
     * @param amount How many of these goods the unit should have.
     */
     public void equipUnit(Unit unit, int type, int amount) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         Client client = freeColClient.getClient();
         Player myPlayer = freeColClient.getMyPlayer();
 
@@ -1461,6 +1575,11 @@ public final class InGameController implements NetworkConstants {
     * @param workLocation The <code>WorkLocation</code>.
     */
     public void work(Unit unit, WorkLocation workLocation) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         Client client = freeColClient.getClient();
 
         Element workElement = Message.createNewRootElement("work");
@@ -1491,6 +1610,11 @@ public final class InGameController implements NetworkConstants {
     * @return <i>true</i> if the unit was successfully put outside the colony.
     */
     public boolean putOutsideColony(Unit unit, boolean skipCheck) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            throw new IllegalStateException("Not your turn.");
+        }
+        
         Client client = freeColClient.getClient();
         Canvas canvas = freeColClient.getCanvas();
 
@@ -1515,6 +1639,11 @@ public final class InGameController implements NetworkConstants {
     * @param workType The new work type.
     */
     public void changeWorkType(Unit unit, int workType) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         Client client = freeColClient.getClient();
 
         Element changeWorkTypeElement = Message.createNewRootElement("changeWorkType");
@@ -1532,6 +1661,11 @@ public final class InGameController implements NetworkConstants {
     * @param type The new type of building to build.
     */
     public void setCurrentlyBuilding(Colony colony, int type) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         Client client = freeColClient.getClient();
 
         colony.setCurrentlyBuilding(type);
@@ -1550,6 +1684,11 @@ public final class InGameController implements NetworkConstants {
     * @param state The state of the unit.
     */
     public void changeState(Unit unit, int state) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         Client client = freeColClient.getClient();
         Game game = freeColClient.getGame();
         Canvas canvas = freeColClient.getCanvas();
@@ -1610,6 +1749,11 @@ public final class InGameController implements NetworkConstants {
     * @param unit The <code>Unit</code>.
     */
     public void clearOrders(Unit unit) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         if (unit == null) {
             return;
         }
@@ -1620,6 +1764,22 @@ public final class InGameController implements NetworkConstants {
         changeState(unit, Unit.ACTIVE);
     }
 
+    /**
+     * Clears the orders of the given <code>Unit</code>.
+     * The orders are cleared by making the unit {@link Unit#ACTIVE}.
+     *
+     * @param unit The <code>Unit</code>.
+     */
+    public void clearGotoOrders(Unit unit) {
+        if (unit == null) {
+            return;
+        }
+
+        /* report to server, in order not to restore destination
+         * if it's received in a update message
+         */
+        setDestination(unit, null);
+    }
 
     /**
      * Moves the specified unit in the "high seas" in a specified direction.
@@ -1629,6 +1789,11 @@ public final class InGameController implements NetworkConstants {
      * @param direction The direction in which to move the Unit.
      */
     private void moveHighSeas(Unit unit, int direction) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         Canvas canvas = freeColClient.getCanvas();
         Map map = freeColClient.getGame().getMap();
 
@@ -1650,6 +1815,11 @@ public final class InGameController implements NetworkConstants {
      * @param direction The direction in which the Indian settlement lies.
      */
     private void learnSkillAtIndianSettlement(Unit unit, int direction) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         Client client = freeColClient.getClient();
         Canvas canvas = freeColClient.getCanvas();
         Map map = freeColClient.getGame().getMap();
@@ -1727,6 +1897,11 @@ public final class InGameController implements NetworkConstants {
      * @param direction The direction in which the Indian settlement lies.
      */
     private void scoutIndianSettlement(Unit unit, int direction) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         Client client = freeColClient.getClient();
         Canvas canvas = freeColClient.getCanvas();
         Map map = freeColClient.getGame().getMap();
@@ -1829,6 +2004,11 @@ public final class InGameController implements NetworkConstants {
     * @param direction The direction in which the Indian settlement lies.
     */
     private void useMissionary(Unit unit, int direction) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         Client client = freeColClient.getClient();
         Canvas canvas = freeColClient.getCanvas();
         Map map = freeColClient.getGame().getMap();
@@ -1918,6 +2098,11 @@ public final class InGameController implements NetworkConstants {
      * @param unit The unit to be moved to Europe.
      */
     public void moveToEurope(Unit unit) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         Client client = freeColClient.getClient();
 
         unit.moveToEurope();
@@ -1934,6 +2119,11 @@ public final class InGameController implements NetworkConstants {
      * @param unit The unit to be moved to America.
      */
     public void moveToAmerica(Unit unit) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         Client client = freeColClient.getClient();
 
         unit.moveToAmerica();
@@ -1950,6 +2140,11 @@ public final class InGameController implements NetworkConstants {
     * @param unitType The type of unit to be trained.
     */
     public void trainUnitInEurope(int unitType) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         Client client = freeColClient.getClient();
         Canvas canvas = freeColClient.getCanvas();
         Game game = freeColClient.getGame();
@@ -1991,6 +2186,11 @@ public final class InGameController implements NetworkConstants {
     * @param colony The {@link Colony} where the building should be bought.
     */
     public void payForBuilding(Colony colony) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         if (!freeColClient.getCanvas().
             showConfirmDialog("payForBuilding.text",
                               "payForBuilding.yes",
@@ -2017,6 +2217,11 @@ public final class InGameController implements NetworkConstants {
     * @param slot The slot to recruit the unit from. Either 1, 2 or 3.
     */
     public void recruitUnitInEurope(int slot) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         Client client = freeColClient.getClient();
         Canvas canvas = freeColClient.getCanvas();
         Game game = freeColClient.getGame();
@@ -2058,6 +2263,11 @@ public final class InGameController implements NetworkConstants {
     * is in the congress.
     */
     private void emigrateUnitInEurope(int slot) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         Client client = freeColClient.getClient();
         Game game = freeColClient.getGame();
         Player myPlayer = freeColClient.getMyPlayer();
@@ -2108,6 +2318,11 @@ public final class InGameController implements NetworkConstants {
      * @param type The type of goods for which to pay arrears.
      */
     public void payArrears(int type) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         Client client = freeColClient.getClient();
         Player player = freeColClient.getMyPlayer();
 
@@ -2145,6 +2360,11 @@ public final class InGameController implements NetworkConstants {
     * Skips the active unit by setting it's <code>movesLeft</code> to 0.
     */
     public void skipActiveUnit() {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         GUI gui = freeColClient.getGUI();
 
         Unit unit = gui.getActiveUnit();
@@ -2160,6 +2380,11 @@ public final class InGameController implements NetworkConstants {
      * Disbands the active unit.
      */
     public void disbandActiveUnit() {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         GUI gui = freeColClient.getGUI();
         Unit unit = gui.getActiveUnit();
         Client client = freeColClient.getClient();
@@ -2187,6 +2412,11 @@ public final class InGameController implements NetworkConstants {
     * Centers the map on the selected tile.
     */
     public void centerActiveUnit() {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         GUI gui = freeColClient.getGUI();
 
         if (gui.getActiveUnit() != null && gui.getActiveUnit().getTile() != null) {
@@ -2209,6 +2439,11 @@ public final class InGameController implements NetworkConstants {
     * @param tile The tile to select if no new unit can be made active.
     */
     public void nextActiveUnit(Tile tile) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         nextModelMessage();
 
         GUI gui = freeColClient.getGUI();
@@ -2242,7 +2477,6 @@ public final class InGameController implements NetworkConstants {
     * @see net.sf.freecol.common.model.ModelMessage ModelMessage
     */
     public void nextModelMessage() {
-
         Canvas  canvas = freeColClient.getCanvas();
 
         List  messageList = new ArrayList();
@@ -2332,6 +2566,11 @@ public final class InGameController implements NetworkConstants {
     * End the turn.
     */
     public void endTurn() {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        
         Client client = freeColClient.getClient();
         Canvas canvas = freeColClient.getCanvas();
 
@@ -2341,8 +2580,11 @@ public final class InGameController implements NetworkConstants {
         }
             
         canvas.getGUI().setActiveUnit(null);
-        canvas.setEnabled(false);
-        canvas.showStatusPanel(Messages.message("waitingForOtherPlayers"));
+        //canvas.setEnabled(false);
+        
+        if (freeColClient.isSingleplayer()) {
+            canvas.showStatusPanel(Messages.message("waitingForOtherPlayers"));
+        }
 
         Element endTurnElement = Message.createNewRootElement("endTurn");
         client.sendAndWait(endTurnElement);

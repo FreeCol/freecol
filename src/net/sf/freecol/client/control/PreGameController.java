@@ -294,8 +294,10 @@ public final class PreGameController {
         if (freeColClient.getMyPlayer().equals(freeColClient.getGame().getCurrentPlayer())) {
             canvas.requestFocus();
         } else {
-            canvas.setEnabled(false);
-            canvas.showStatusPanel(Messages.message("waitingForOtherPlayers"));            
+            //canvas.setEnabled(false);
+            if (freeColClient.isSingleplayer()) {
+                canvas.showStatusPanel(Messages.message("waitingForOtherPlayers"));
+            }
         }
     }
 }

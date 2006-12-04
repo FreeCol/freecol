@@ -17,7 +17,7 @@ public final class CanvasMouseListener implements MouseListener {
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
-    
+
     private final Canvas canvas;
     private final GUI               gui;
 
@@ -88,7 +88,9 @@ public final class CanvasMouseListener implements MouseListener {
             // Move the unit:            
             Unit unit = gui.getActiveUnit();
             canvas.getClient().getInGameController().setDestination(unit, temp.getLastNode().getTile());
-            canvas.getClient().getInGameController().moveToDestination(unit);
+            if (canvas.getClient().getGame().getCurrentPlayer() == canvas.getClient().getMyPlayer()) {
+                canvas.getClient().getInGameController().moveToDestination(unit);
+            }
         } else if (gui.isDragStarted()) {
             gui.stopDrag();
         }
