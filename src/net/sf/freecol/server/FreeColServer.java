@@ -576,7 +576,10 @@ public final class FreeColServer {
                     }
                     // Read the AIObjects:
                     aiMain = new AIMain(this, xsr);
-                    aiMain.checkIntegrity();
+                    if (!aiMain.checkIntegrity()) {
+                        aiMain = new AIMain(this);
+                        logger.info("Replacing AIMain.");
+                    }
                     game.setFreeColGameObjectListener(aiMain);
                 } else {
                     throw new XMLStreamException("Unknown tag: " + xsr.getLocalName());

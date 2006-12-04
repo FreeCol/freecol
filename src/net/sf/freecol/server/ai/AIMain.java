@@ -484,33 +484,40 @@ public class AIMain implements FreeColGameObjectListener {
         }
         
         String lastTag = "";
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {            
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            final String tagName = in.getLocalName();
             try {         
                 final String oid = in.getAttributeValue(null, "ID");
                 if (oid != null && aiObjects.containsKey(oid)) {
                     getAIObject(oid).readFromXML(in);
-                } else if (in.getLocalName().equals(AIUnit.getXMLElementTagName())) {
+                } else if (tagName.equals(AIUnit.getXMLElementTagName())) {
                     new AIUnit(this, in);
-                } else if (in.getLocalName().equals(AIPlayer.getXMLElementTagName())) {
+                } else if (tagName.equals(AIPlayer.getXMLElementTagName())) {
                     new AIPlayer(this, in);
-                } else if (in.getLocalName().equals(AIColony.getXMLElementTagName())) {
+                } else if (tagName.equals(AIColony.getXMLElementTagName())) {
                     new AIColony(this, in);
-                } else if (in.getLocalName().equals(AIGoods.getXMLElementTagName())) {
+                } else if (tagName.equals(AIGoods.getXMLElementTagName())) {
                     new AIGoods(this, in);
-                } else if (in.getLocalName().equals(WorkerWish.getXMLElementTagName())) {
+                } else if (tagName.equals(WorkerWish.getXMLElementTagName())) {
                     new WorkerWish(this, in);
-                } else if (in.getLocalName().equals(GoodsWish.getXMLElementTagName())) {
+                } else if (tagName.equals(GoodsWish.getXMLElementTagName())) {
                     new GoodsWish(this, in);
-                } else if (in.getLocalName().equals(TileImprovement.getXMLElementTagName())) {
+                } else if (tagName.equals(TileImprovement.getXMLElementTagName())) {
                     new TileImprovement(this, in);                
                 } else {
-                    logger.warning("Unkown AI-object read: " + in.getLocalName() + "(" + lastTag + ")");
+                    logger.warning("Unkown AI-object read: " + tagName + "(" + lastTag + ")");
                 }
                 lastTag = in.getLocalName();
             } catch (Exception e) {
                 StringWriter sw = new StringWriter();
                 e.printStackTrace(new PrintWriter(sw));
                 logger.warning("Exception while reading an AIObject: " + sw.toString());
+                while (!in.getLocalName().equals(tagName) && !in.getLocalName().equals(getXMLElementTagName())) {
+                    in.nextTag();                    
+                }
+                if (!in.getLocalName().equals(getXMLElementTagName())) {
+                    in.nextTag();
+                }
             }
         }
         
