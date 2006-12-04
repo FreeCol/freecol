@@ -3126,6 +3126,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 dispose();
             }
         }
+        if (!isDisposed()
+                && getMovesLeft() > getInitialMovesLeft()) {
+            setMovesLeft(getInitialMovesLeft());
+        }
         String newName = getName();
         addModelMessage(this, messageID,
                         new String [][] {{"%oldName%", oldName},
