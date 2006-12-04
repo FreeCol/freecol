@@ -36,22 +36,22 @@ public final class Market extends FreeColGameObject {
 
         /* seed these objects with the initial amount of each type of good */
         int[]  initialAmounts = {
-           10000, // FOOD
-           2000, // SUGAR
-           2000, // TOBACCO
-           2000, // COTTON
-           2000, // FURS
-           8000, // LUMBER
-           5000, // ORE
-            500, // SILVER
+          10000, // FOOD
+           4000, // SUGAR
+           4000, // TOBACCO
+           4000, // COTTON
+           4000, // FURS
+           6000, // LUMBER
+           3000, // ORE
+              0, // SILVER
            8000, // HORSES
            1000, // RUM
            1000, // CIGARS
            1000, // CLOTH
            1000, // COATS
           10000, // TRADE_GOODS
-           4000, // TOOLS
-           3000  // MUSKETS
+           7500, // TOOLS
+           5000  // MUSKETS
            
         };
         for (int i = 0; i < initialAmounts.length; i++) {
