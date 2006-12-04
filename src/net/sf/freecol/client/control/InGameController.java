@@ -586,7 +586,7 @@ public final class InGameController implements NetworkConstants {
                         return;
                     }
                 }
-            }
+            }            
             if (path != null) {
                 path = path.next;
             }
@@ -599,7 +599,20 @@ public final class InGameController implements NetworkConstants {
         }
         setDestination(unit, null);
         
-        if (unit.getMovesLeft() > 0
+        // Display a "cash in"-dialog if a treasure train have been moved into a colony:  
+        if (unit.getType() == Unit.TREASURE_TRAIN
+                && unit.getLocation() != null
+                && unit.getLocation() instanceof Tile
+                && unit.getLocation().getTile().getColony() != null) {
+            String message = (unit.getOwner().hasFather(FoundingFather.HERNAN_CORTES)) ? "cashInTreasureTrain.text.free" : "cashInTreasureTrain.text.pay";
+            if (canvas.showConfirmDialog(message, "cashInTreasureTrain.yes", "cashInTreasureTrain.no")) {
+                cashInTreasureTrain(unit);
+                unit = null;
+            }
+        }
+        
+        if (unit != null
+                && unit.getMovesLeft() > 0
                 && unit.getTile() != null) {
             freeColClient.getGUI().setActiveUnit(unit);
         } else if (freeColClient.getGUI().getActiveUnit() == unit) {
