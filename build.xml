@@ -317,6 +317,6 @@
     </exec>
   </target>
 
-  <target name="manual" depends="print-manual,online-manual">
+  <target name="manual" depends="print-manual,online-manual" description="Creates the user guide.">
   </target>
 </project>
