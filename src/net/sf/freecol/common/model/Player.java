@@ -2578,23 +2578,45 @@ public class Player extends FreeColGameObject {
     }
     
     /**
-     * Returns true if there are no arrears due for a type of goods.
-     *
+     * Returns true if type of goods can be traded in Europe.
+     * 
      * @param typeOfGoods The type of goods.
      * @return True if there are no arrears due for this type of goods.
      */
-    public boolean canTrade(int typeOfGoods) {
-        return (arrears[typeOfGoods] == 0);
+    public boolean canTrade(int typeOfGoods) {        
+        return canTrade(typeOfGoods, Market.EUROPE);
     }
 
     /**
-     * Returns true if there are no arrears due for a type of goods.
+     * Returns true if type of goods can be traded at specified place.
+     * 
+     * @param typeOfGoods The type of goods.
+     * @param marketAccess Way the goods are traded (Europe OR Custom)
+     * @return <code>true</code> if type of goods can be traded.
+     */
+    public boolean canTrade(int typeOfGoods, int marketAccess) {
+        return (arrears[typeOfGoods] == 0 || (marketAccess == Market.CUSTOM_HOUSE && getGameOptions().getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT)));
+    }
+    
+    /**
+     * Returns true if type of goods can be traded at specified place
+     *
+     * @param goods The goods.
+     * @param marketAccess Place where the goods are traded (Europe OR Custom)
+     * @return True if type of goods can be traded.
+     */
+    public boolean canTrade(Goods goods, int marketAccess) {
+        return canTrade(goods.getType(), marketAccess);
+    }    
+    
+    /**
+     * Returns true if type of goods can be traded in Europe.
      *
      * @param goods The goods.
      * @return True if there are no arrears due for this type of goods.
      */
     public boolean canTrade(Goods goods) {
-        return (arrears[goods.getType()] == 0);
+        return canTrade(goods, Market.EUROPE);
     }
 
     /**

@@ -1440,12 +1440,12 @@ public final class Colony extends Settlement implements Location {
             Iterator goodsIterator = getCompactGoodsIterator();
             while (goodsIterator.hasNext()) {
                 Goods goods = (Goods) goodsIterator.next();
-                if (getExports(goods) && (owner.canTrade(goods) || getGameOptions().getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT))) {
+                if (getExports(goods) && (owner.canTrade(goods, Market.CUSTOM_HOUSE))) {
                     int type = goods.getType();
                     int amount = (goods.getAmount() - getGameOptions().getInteger(GameOptions.CUSTOM_STOCK));
                     if (amount > 0) {
                         removeGoods(type, amount);
-                        getGame().getMarket().sell(type, amount, owner);
+                        getGame().getMarket().sell(type, amount, owner, Market.CUSTOM_HOUSE);
                     }
                 }
             }

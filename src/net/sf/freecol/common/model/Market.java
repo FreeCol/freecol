@@ -19,6 +19,14 @@ public final class Market extends FreeColGameObject {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
+    /**
+     * Constant for specifying the access to this <code>Market</code>
+     * when {@link #buy(int, int, Player) buying} and
+     * {@link #sell(int, int, Player, int) selling} goods.
+     */
+    public static final int EUROPE = 0,
+                            CUSTOM_HOUSE = 1;
+    
     private static final int GOODS_STABILIZER = 750;
 
     private final Data[]  dataForGoodType = new Data[Goods.NUMBER_OF_TYPES];
@@ -133,14 +141,29 @@ public final class Market extends FreeColGameObject {
 
     /**
      * Sells a particular amount of a particular type of good with the proceeds
+     * of the sale being paid to a particular player. The goods is
+     * sold using {@link #EUROPE} as the accesspoint for this market.
+     *
+     * @param  type   The type of goods to be sold.
+     * @param  amount The amount of goods to be sold.
+     * @param  player The player selling the goods
+     * @param  marketAccess Place where goods are traded
+     */
+    public void sell(int type, int amount, Player player) {
+        sell(type, amount, player, Market.EUROPE);
+    }
+    
+    /**
+     * Sells a particular amount of a particular type of good with the proceeds
      * of the sale being paid to a particular player.
      *
      * @param  type   The type of goods to be sold.
      * @param  amount The amount of goods to be sold.
      * @param  player The player selling the goods
+     * @param  marketAccess Place where goods are traded
      */
-    public void sell(int type, int amount, Player player) {
-        if (player.canTrade(type)) {
+    public void sell(int type, int amount, Player player, int marketAccess) {
+        if (player.canTrade(type, marketAccess)) {
             int incomeBeforeTaxes = getSalePrice(type, amount);
             int incomeAfterTaxes = ((100 - player.getTax()) * incomeBeforeTaxes) / 100;
             player.modifyGold(incomeAfterTaxes);
@@ -157,7 +180,8 @@ public final class Market extends FreeColGameObject {
 
     /**
      * Sells a particular amount of a particular type of good with the proceeds
-     * of the sale being paid to a particular player.
+     * of the sale being paid to a particular player. The goods is
+     * sold using {@link #EUROPE} as the accesspoint for this market.
      *
      * @param  goods  The Goods object being sold.
      * @param  player      the player selling the goods
@@ -170,7 +194,7 @@ public final class Market extends FreeColGameObject {
 
         goods.setLocation(null);
 
-        sell(type, amount, player);
+        sell(type, amount, player, Market.EUROPE);
     }
 
     /**
