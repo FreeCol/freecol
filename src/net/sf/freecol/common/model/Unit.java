@@ -435,7 +435,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
         if (canCashInTreasureTrain()) {
             boolean inEurope = (getLocation() instanceof Unit && ((Unit) getLocation()).getLocation() instanceof Europe);
-            int cashInAmount = (getOwner().hasFather(FoundingFather.HERNAN_CORTES) || inEurope) ? getTreasureAmount() : getTreasureAmount() / 2; // TODO: Use tax
+            int cashInAmount = (getOwner().hasFather(FoundingFather.HERNAN_CORTES) || inEurope) ? getTreasureAmount() : getTreasureAmount() / 2; 
+	    cashInAmount = cashInAmount * (100 - getOwner().getTax()) / 100;
             FreeColGameObject o = getOwner();
             if (inEurope) {
                 o = getOwner().getEurope();
@@ -2950,7 +2951,12 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         switch (result) {
         case ATTACK_EVADES:
             if (isNaval()) {
+		// send message to both parties
                 addModelMessage(this, "model.unit.shipEvaded",
+                                new String [][] {{"%ship%", defender.getName()},
+                                                 {"%nation%", defender.getOwner().getNationAsString()}},
+                                ModelMessage.DEFAULT, this);
+                addModelMessage(defender, "model.unit.shipEvaded",
                                 new String [][] {{"%ship%", defender.getName()},
                                                  {"%nation%", defender.getOwner().getNationAsString()}},
                                 ModelMessage.DEFAULT, this);
@@ -3051,7 +3057,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         addModelMessage(this, "model.unit.shipSunk",
                         new String [][] {{"%ship%", getName()},
                                          {"%nation%", nation}},
-                        ModelMessage.UNIT_DEMOTED);
+                        ModelMessage.UNIT_LOST);
         dispose();
     }
 
@@ -3072,12 +3078,14 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         if (getType() == ARTILLERY) {
             messageID = "model.unit.artilleryDamaged";
             setType(DAMAGED_ARTILLERY);
-        } else if (getType() == DAMAGED_ARTILLERY 
-                || getType() == KINGS_REGULAR) {
+        } else if (getType() == DAMAGED_ARTILLERY ||
+		   getType() == WAGON_TRAIN ||
+		   getType() == TREASURE_TRAIN) {
             messageID = "model.unit.unitDestroyed";
             type = ModelMessage.UNIT_LOST;
             dispose();
-        } else if (getType() == BRAVE) {
+        } else if (getType() == BRAVE ||
+		   getType() == KINGS_REGULAR) {
             nation = "";
             messageID = "model.unit.unitSlaughtered";
             type = ModelMessage.UNIT_LOST;

@@ -1004,33 +1004,31 @@ public final class InGameController implements NetworkConstants {
          * war, attack.  Otherwise make sure the player knows
          * what he/she is doing.
          */
-        if (enemy.isEuropean()) {
-            if (unit.getType() != Unit.PRIVATEER) {
-                switch (stance) {
-                case Player.CEASE_FIRE:
-                    if (!canvas.showConfirmDialog("model.diplomacy.attack.ceaseFire",
-                            "model.diplomacy.attack.confirm",
-                            "cancel",
-                            new String [][] {{"%replace%", enemy.getNationAsString()}})) {
-                        return;
-                    }
-                    break;
-                case Player.PEACE:
-                    if (!canvas.showConfirmDialog("model.diplomacy.attack.peace",
-                            "model.diplomacy.attack.confirm",
-                            "cancel",
-                            new String [][] {{"%replace%", enemy.getNationAsString()}})) {
-                        return;
-                    }
-                    break;
-                case Player.ALLIANCE:
-                    freeColClient.playSound(SfxLibrary.ILLEGAL_MOVE); 
-                    canvas.showInformationMessage("model.diplomacy.attack.alliance",
-                            new String [][] {{"%replace%", enemy.getNationAsString()}});
-                    return;
-                }
-            }
-        }
+	if (unit.getType() != Unit.PRIVATEER) {
+	    switch (stance) {
+	    case Player.CEASE_FIRE:
+		if (!canvas.showConfirmDialog("model.diplomacy.attack.ceaseFire",
+					      "model.diplomacy.attack.confirm",
+					      "cancel",
+					      new String [][] {{"%replace%", enemy.getNationAsString()}})) {
+		    return;
+		}
+		break;
+	    case Player.PEACE:
+		if (!canvas.showConfirmDialog("model.diplomacy.attack.peace",
+					      "model.diplomacy.attack.confirm",
+					      "cancel",
+					      new String [][] {{"%replace%", enemy.getNationAsString()}})) {
+		    return;
+		}
+		break;
+	    case Player.ALLIANCE:
+		freeColClient.playSound(SfxLibrary.ILLEGAL_MOVE); 
+		canvas.showInformationMessage("model.diplomacy.attack.alliance",
+					      new String [][] {{"%replace%", enemy.getNationAsString()}});
+		return;
+	    }
+	}
         
         if (unit.getType() == Unit.ARTILLERY || unit.getType() == Unit.DAMAGED_ARTILLERY || unit.isNaval()) {
             freeColClient.playSound(SfxLibrary.ARTILLERY);

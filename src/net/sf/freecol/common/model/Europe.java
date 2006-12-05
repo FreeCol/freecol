@@ -202,7 +202,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         if (!unit.getOwner().hasFather(FoundingFather.WILLIAM_BREWSTER)) {
             addModelMessage(this, "model.europe.emigrate", 
                             new String[][] {{"%unit%", unit.getName()}},
-                            ModelMessage.UNIT_ADDED);
+                            ModelMessage.UNIT_ADDED, unit);
         }
         // In case William Brewster is in the congress we don't need to show a message to the
         // user because he has already been busy picking a unit.
