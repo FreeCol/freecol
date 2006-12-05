@@ -209,7 +209,8 @@ public final class ConnectController {
             if (in.getLocalName().equals("loginConfirmed")) {
                 final String startGameStr = in.getAttributeValue(null, "startGame");
                 boolean startGame = (startGameStr != null) && Boolean.valueOf(startGameStr).booleanValue();
-                boolean isCurrentPlayer = Boolean.valueOf(in.getAttributeValue(null, "isCurrentPlayer")).booleanValue();
+                boolean singleplayer = Boolean.valueOf(in.getAttributeValue(null, "singleplayer")).booleanValue();
+                boolean isCurrentPlayer = Boolean.valueOf(in.getAttributeValue(null, "isCurrentPlayer")).booleanValue();                
                 
                 in.nextTag();
                 Game game = new Game(freeColClient.getModelController(), in, username);
@@ -230,7 +231,7 @@ public final class ConnectController {
                 
                 // If (true) --> reconnect
                 if (startGame) {
-                    freeColClient.setSingleplayer(false);
+                    freeColClient.setSingleplayer(singleplayer);
                     freeColClient.getPreGameController().startGame();
 
                     if (isCurrentPlayer) {
@@ -379,7 +380,6 @@ public final class ConnectController {
                     freeColClient.setFreeColServer(freeColServer);
                     final String username = freeColServer.getOwner();
                     freeColClient.setSingleplayer(singleplayer);
-
                     SwingUtilities.invokeLater( new Runnable() {
                         public void run() {
                             login(username, "127.0.0.1", 3541);               

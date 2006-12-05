@@ -195,6 +195,7 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
             try {
                 out.writeStartElement("loginConfirmed");
                 out.writeAttribute("admin", Boolean.toString(player.isAdmin()));
+                out.writeAttribute("singleplayer", Boolean.toString(freeColServer.isSingleplayer()));
                 out.writeAttribute("startGame", "true");
                 out.writeAttribute("isCurrentPlayer", Boolean.toString(isCurrentPlayer));
                 freeColServer.getGame().toXML(out, player);
@@ -252,6 +253,7 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
         try {
             out.writeStartElement("loginConfirmed");
             out.writeAttribute("admin", (admin ? "true" : "false"));
+            out.writeAttribute("singleplayer", Boolean.toString(freeColServer.isSingleplayer()));
             freeColServer.getGame().toXML(out, newPlayer);
             freeColServer.getMapGenerator().getMapGeneratorOptions().toXML(out);
             out.writeEndElement();
