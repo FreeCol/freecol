@@ -1995,6 +1995,12 @@ public final class GUI {
 
             // Draw an occupation and nation indicator.
             g.drawImage(lib.getColorChip(unit.getOwner().getColor()), x + STATE_OFFSET_X, y, null);
+            
+            if (unit.getOwner().getColor() == Color.BLACK) {
+                g.setColor(Color.WHITE);
+            } else {
+                g.setColor(Color.BLACK);
+            }
             String occupationString;
             if (unit.getOwner() != freeColClient.getMyPlayer()
                     && unit.isNaval()) {
@@ -2005,6 +2011,10 @@ public final class GUI {
                     occupationString = "-";
                     break;
                 case Unit.FORTIFY:
+                    occupationString = "F";
+                    g.setColor(Color.GRAY);
+                    break;
+                case Unit.FORTIFYING:
                     occupationString = "F";
                     break;
                 case Unit.SENTRY:
@@ -2027,11 +2037,6 @@ public final class GUI {
                 if (unit.getDestination() != null) {
                     occupationString = "G";
                 }
-            }
-            if (unit.getOwner().getColor() == Color.BLACK) {
-                g.setColor(Color.WHITE);
-            } else {
-                g.setColor(Color.BLACK);
             }
             g.drawString(occupationString, x + TEXT_OFFSET_X + STATE_OFFSET_X, y + TEXT_OFFSET_Y);
 

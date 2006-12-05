@@ -47,7 +47,7 @@ public class FortifyAction extends MapboardAction {
     protected boolean shouldBeEnabled() { 
         return super.shouldBeEnabled()  
                 && getFreeColClient().getGUI().getActiveUnit() != null
-                && getFreeColClient().getGUI().getActiveUnit().checkSetState(Unit.FORTIFY);
+                && getFreeColClient().getGUI().getActiveUnit().checkSetState(Unit.FORTIFYING);
     }
     
     /**
@@ -64,6 +64,6 @@ public class FortifyAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */    
     public void actionPerformed(ActionEvent e) {
-        getFreeColClient().getInGameController().changeState(getFreeColClient().getGUI().getActiveUnit(), Unit.FORTIFY);
+        getFreeColClient().getInGameController().changeState(getFreeColClient().getGUI().getActiveUnit(), Unit.FORTIFYING);
     }
 }

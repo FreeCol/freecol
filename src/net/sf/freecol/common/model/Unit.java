@@ -90,7 +90,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                             TO_EUROPE = 6,
                             IN_EUROPE = 7,
                             TO_AMERICA = 8,
-                            NUMBER_OF_STATES = 9;
+                            FORTIFYING = 9,
+                            NUMBER_OF_STATES = 10;
 
 
     /**
@@ -2230,6 +2231,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 workLeft = -1;
                 movesLeft = 0;
                 break;
+            case FORTIFYING:
+                movesLeft = 0;
+                workLeft = 1;
+                break;
             case BUILD_ROAD:
             case PLOW:
                 switch(getTile().getType()) {
@@ -2351,7 +2356,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     * new value, 'false' otherwise.
     */
     public boolean checkSetState(int s) {
-        if (movesLeft <= 0 && (s == PLOW || s == BUILD_ROAD || s == FORTIFY)) {
+        if (movesLeft <= 0 && (s == PLOW || s == BUILD_ROAD || s == FORTIFYING)) {
             return false;
         }
         switch (s) {
@@ -2367,7 +2372,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             case IN_COLONY:
                 return !isNaval();
             case FORTIFY:
-                return (getMovesLeft() > 0);
+                return getState() == FORTIFYING;
+            case FORTIFYING:
+                return (getMovesLeft() > 0);             
             case SENTRY:
                 return true;
             case TO_EUROPE:
@@ -2553,13 +2560,19 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                                 u.cashInTreasureTrain();
                             }
                         }
+                        setState(ACTIVE);
                         break;
                     case TO_AMERICA:
                         getGame().getModelController().setToVacantEntryLocation(this);
+                        setState(ACTIVE);
+                        break;
+                    case FORTIFYING:
+                        setState(FORTIFY);    
                         break;
                     case BUILD_ROAD:
                         getTile().setRoad(true);
                         expendTools(20);
+                        setState(ACTIVE);
                         break;
                     case PLOW:
                         if (getTile().isForested()) {
@@ -2596,12 +2609,12 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                             getTile().setPlowed(true);
                         }
                         expendTools(20);
+                        setState(ACTIVE);
                         break;
                     default:
                         logger.warning("Unknown work completed. State: " + state);
+                        setState(ACTIVE);
                 }
-
-                setState(ACTIVE);
             }
         }
     }

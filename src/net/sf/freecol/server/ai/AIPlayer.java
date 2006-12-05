@@ -744,7 +744,7 @@ public class AIPlayer extends AIObject {
                         
                         Element changeStateElement = Message.createNewRootElement("changeState");
                         changeStateElement.setAttribute("unit", u.getID());
-                        changeStateElement.setAttribute("state", Integer.toString(Unit.FORTIFY));
+                        changeStateElement.setAttribute("state", Integer.toString(Unit.FORTIFYING));
                         //u.putOutsideColony();
                         try {
                             getConnection().sendAndWait(changeStateElement);

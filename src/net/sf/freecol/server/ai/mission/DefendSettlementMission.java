@@ -157,10 +157,11 @@ public class DefendSettlementMission extends Mission {
                 move(connection, r);
             }
         } else {
-            if (getUnit().getState() != Unit.FORTIFY) {
+            if (getUnit().getState() != Unit.FORTIFY
+                    || getUnit().getState() != Unit.FORTIFYING) {
                 Element changeStateElement = Message.createNewRootElement("changeState");
                 changeStateElement.setAttribute("unit", getUnit().getID());
-                changeStateElement.setAttribute("state", Integer.toString(Unit.FORTIFY));
+                changeStateElement.setAttribute("state", Integer.toString(Unit.FORTIFYING));
                 try {
                     connection.sendAndWait(changeStateElement);
                 } catch (IOException e) {
