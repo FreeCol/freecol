@@ -297,16 +297,7 @@ public final class GUI {
                 } else {
                     setFocus(selectedTile);
                 }
-            } else if (activeUnit.getTile() != null
-                    && activeUnit.getTile().getPosition().equals(selectedTile)) {
-                if (activeUnit.getState() != Unit.ACTIVE || activeUnit.getDestination() != null) {
-                    if (freeColClient.getGame().getCurrentPlayer() == freeColClient.getMyPlayer()) {
-                        freeColClient.getInGameController().clearOrders(activeUnit);
-                    } else {
-                        freeColClient.getInGameController().clearGotoOrders(activeUnit);
-                    }
-                }
-            }
+            } 
 
             // Check if the gui needs to reposition:
             if (!onScreen(selectedTile)
@@ -420,12 +411,15 @@ public final class GUI {
 
         this.activeUnit = activeUnit;
 
-        if (activeUnit != null && (activeUnit.getState() != Unit.ACTIVE
-                    || activeUnit.getDestination() != null)) {
+        if (activeUnit != null) {
             if (freeColClient.getGame().getCurrentPlayer() == freeColClient.getMyPlayer()) {
-                freeColClient.getInGameController().clearOrders(activeUnit);
+                if (activeUnit.getState() != Unit.ACTIVE) {
+                    freeColClient.getInGameController().clearOrders(activeUnit);
+                }
             } else {
-                freeColClient.getInGameController().clearGotoOrders(activeUnit);
+                if (activeUnit.getDestination() != null) {
+                    freeColClient.getInGameController().clearGotoOrders(activeUnit);
+                }
             }
         }
 
