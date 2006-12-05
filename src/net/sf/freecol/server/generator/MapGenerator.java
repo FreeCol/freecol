@@ -161,7 +161,12 @@ public class MapGenerator {
      * @param map The map to use.
      */
     public void createLostCityRumours(Map map) {
-        int number = (getMapGeneratorOptions().getWidth() * getMapGeneratorOptions().getHeight()) / 100;
+//JLP DEB
+        int number = ( getMapGeneratorOptions().getWidth() 
+                     * getMapGeneratorOptions().getHeight() 
+                     * getMapGeneratorOptions().getLandMass() / 100 )
+                     * 3 / 100 ;
+//JLP END
         int counter = 0;
 
         for (int i = 0; i < number; i++) {
@@ -190,7 +195,12 @@ public class MapGenerator {
      * @param map The map to create rivers on.
      */
     public void createRivers(Map map) {
-        int number = (getMapGeneratorOptions().getWidth() * getMapGeneratorOptions().getHeight()) / 100;
+//JLP DEB
+        int number = ( getMapGeneratorOptions().getWidth() 
+                     * getMapGeneratorOptions().getHeight() 
+                     * getMapGeneratorOptions().getLandMass() / 100 )
+                     * 3 / 100 ;
+//JLP END
         int counter = 0;
         Hashtable riverMap = new Hashtable();
 
@@ -342,9 +352,10 @@ public class MapGenerator {
         while (iterator.hasNext()) {
             Position position = (Position)iterator.next();
             int radius = (type == IndianSettlement.CITY) ? 2 : 1;
-            if (isIndianSettlementCandidate(position, radius + 1, map) &&
+//JLP DEB
+            if (isIndianSettlementCandidate(position, radius + 3, map) &&
                         random.nextInt(2) != 0) {
-
+//JLP END
                 ServerPlayer player = getIndianPlayer(owner, players);
                 //System.out.println("Setting indian settlement at "
                 //                   + position.getX() + "x" + position.getY());
@@ -888,8 +899,10 @@ public class MapGenerator {
     */
     protected class TerrainGenerator {
 
-        private static final int DISTANCE_TO_LAND_FROM_HIGH_SEAS = 4;
-        private static final int MAX_DISTANCE_TO_EDGE = 12;
+//JLP DEB
+		int distToLandFromHighSeas = getMapGeneratorOptions().getDistLandHighSea();
+		int maxDistanceToEdge = getMapGeneratorOptions().getMaxDistToEdge();
+//JLP END
 
         private boolean[][] landMap;
 
@@ -1011,11 +1024,11 @@ public class MapGenerator {
         */
         protected void createHighSeas(Map map) {
             for (int y = 0; y < getMapGeneratorOptions().getHeight(); y++) {
-                for (int x=0; x<MAX_DISTANCE_TO_EDGE && !map.isLandWithinDistance(x, y, DISTANCE_TO_LAND_FROM_HIGH_SEAS); x++) {
+                for (int x=0; x<maxDistanceToEdge && !map.isLandWithinDistance(x, y, distToLandFromHighSeas); x++) {
                         map.getTile(x, y).setType(Tile.HIGH_SEAS);
                 }
 
-                for (int x=1; x<=MAX_DISTANCE_TO_EDGE && !map.isLandWithinDistance(getMapGeneratorOptions().getWidth()-x, y, DISTANCE_TO_LAND_FROM_HIGH_SEAS); x++) {
+                for (int x=1; x<=maxDistanceToEdge && !map.isLandWithinDistance(getMapGeneratorOptions().getWidth()-x, y, distToLandFromHighSeas); x++) {
                         map.getTile(getMapGeneratorOptions().getWidth()-x, y).setType(Tile.HIGH_SEAS);
                 }
             }
@@ -1031,7 +1044,9 @@ public class MapGenerator {
     protected class LandGenerator {
 
 
-        private static final int PREFERRED_DISTANCE_TO_EDGE = 4;
+//JLP DEB
+		int preferredDistanceToEdge = getMapGeneratorOptions().getPrefDistToEdge();
+//JLP END
         private static final int C = 2;
 
         private boolean[][] map;
@@ -1063,13 +1078,14 @@ public class MapGenerator {
         boolean[][] createLandMap() {
             int x;
             int y;
-
-            int minLandMass = 25;
-            int minimumNumberOfTiles = (map.length * map[0].length * minLandMass - 2 * PREFERRED_DISTANCE_TO_EDGE) / 100;
+//JLP DEB
+            int minLandMass = getMapGeneratorOptions().getLandMass();
+//JLP END
+            int minimumNumberOfTiles = (map.length * map[0].length * minLandMass - 2 * preferredDistanceToEdge) / 100;
             while (numberOfLandTiles < minimumNumberOfTiles) {
                 do {
-                    x=((int) (Math.random() * (map.length-PREFERRED_DISTANCE_TO_EDGE*2))) + PREFERRED_DISTANCE_TO_EDGE;
-                    y=((int) (Math.random() * (map[0].length-PREFERRED_DISTANCE_TO_EDGE*4))) + PREFERRED_DISTANCE_TO_EDGE * 2;
+                    x=((int) (Math.random() * (map.length-preferredDistanceToEdge*2))) + preferredDistanceToEdge;
+                    y=((int) (Math.random() * (map[0].length-preferredDistanceToEdge*4))) + preferredDistanceToEdge * 2;
                 } while (map[x][y]);
 
                 map[x][y] = true;
@@ -1131,8 +1147,8 @@ public class MapGenerator {
 
 
         private int getEdge(int x, int y) {
-            int u = Math.max(PREFERRED_DISTANCE_TO_EDGE-Math.min(x, map.length-x),
-                             2*PREFERRED_DISTANCE_TO_EDGE-Math.min(y, map[0].length-y))
+            int u = Math.max(preferredDistanceToEdge-Math.min(x, map.length-x),
+                             2*preferredDistanceToEdge-Math.min(y, map[0].length-y))
                     + C;
 
             return (u>0 ? u : 0);

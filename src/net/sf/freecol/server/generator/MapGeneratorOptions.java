@@ -142,6 +142,94 @@ public class MapGeneratorOptions extends OptionMap {
     }
 
     /**
+     * Gets the percentage of land of the map to be created.
+     * @return The percentage of land.
+     */
+    public int getLandMass() {
+        final int size = getInteger(MAP_SIZE);
+        switch (size) {
+        case MAP_SIZE_SMALL:
+            return 25; // 25
+        case MAP_SIZE_MEDIUM:
+            return 25; // 45
+        case MAP_SIZE_LARGE:
+            return 25; // 50
+        case MAP_SIZE_VERY_LARGE:
+            return 25; // 65
+        case MAP_SIZE_HUGE:
+            return 25; // 70
+        default:
+            throw new IllegalStateException("Invalid map-size: " + size + ".");
+        }
+    }
+
+    /**
+     * Gets the width of "short sea" of the map to be created.
+     * @return The distance to land from high seas.
+     */
+    public int getDistLandHighSea() {
+        final int size = getInteger(MAP_SIZE);
+        switch (size) {
+        case MAP_SIZE_SMALL:
+            return 4;
+        case MAP_SIZE_MEDIUM:
+            return 4;
+        case MAP_SIZE_LARGE:
+            return 4;
+        case MAP_SIZE_VERY_LARGE:
+            return 4;
+        case MAP_SIZE_HUGE:
+            return 4;
+        default:
+            throw new IllegalStateException("Invalid map-size: " + size + ".");
+        }
+    }
+
+    /**
+     * Gets the maximum distance to edge of the map to be created.
+     * @return The maximum distance to edge.
+     */
+    public int getMaxDistToEdge() {
+        final int size = getInteger(MAP_SIZE);
+        switch (size) {
+        case MAP_SIZE_SMALL:
+            return 12;
+        case MAP_SIZE_MEDIUM:
+            return 12;
+        case MAP_SIZE_LARGE:
+            return 12;
+        case MAP_SIZE_VERY_LARGE:
+            return 12;
+        case MAP_SIZE_HUGE:
+            return 12;
+        default:
+            throw new IllegalStateException("Invalid map-size: " + size + ".");
+        }
+    }
+
+    /**
+     * Gets the prefered distance to edge of the map to be created.
+     * @return The prefered distance to edge.
+     */
+    public int getPrefDistToEdge() {
+        final int size = getInteger(MAP_SIZE);
+        switch (size) {
+        case MAP_SIZE_SMALL:
+            return 4;
+        case MAP_SIZE_MEDIUM:
+            return 4;
+        case MAP_SIZE_LARGE:
+            return 4;
+        case MAP_SIZE_VERY_LARGE:
+            return 4;
+        case MAP_SIZE_HUGE:
+            return 4;
+        default:
+            throw new IllegalStateException("Invalid map-size: " + size + ".");
+        }
+    }
+
+    /**
      * Gets the tag name of the root element representing this object.
      * @return "mapGeneratorOptions".
      */
