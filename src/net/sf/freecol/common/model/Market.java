@@ -147,7 +147,6 @@ public final class Market extends FreeColGameObject {
      * @param  type   The type of goods to be sold.
      * @param  amount The amount of goods to be sold.
      * @param  player The player selling the goods
-     * @param  marketAccess Place where goods are traded
      */
     public void sell(int type, int amount, Player player) {
         sell(type, amount, player, Market.EUROPE);
