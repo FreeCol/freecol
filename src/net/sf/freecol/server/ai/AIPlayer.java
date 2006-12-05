@@ -843,7 +843,7 @@ public class AIPlayer extends AIObject {
                 Iterator uit = colony.getUnitIterator();
                 while (uit.hasNext()) {
                     Unit candidate = (Unit)(uit.next());
-                    if (candidate.isOffensiveUnit() && candidate.getState() == Unit.FORTIFY) {
+                    if (candidate.isOffensiveUnit() && candidate.getState() == Unit.FORTIFIED) {
                         u = candidate;
                         break;
                     }

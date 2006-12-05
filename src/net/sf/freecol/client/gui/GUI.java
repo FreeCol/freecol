@@ -2010,7 +2010,7 @@ public final class GUI {
                 case Unit.ACTIVE:
                     occupationString = "-";
                     break;
-                case Unit.FORTIFY:
+                case Unit.FORTIFIED:
                     occupationString = "F";
                     g.setColor(Color.GRAY);
                     break;

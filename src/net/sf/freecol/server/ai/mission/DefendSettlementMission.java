@@ -157,7 +157,7 @@ public class DefendSettlementMission extends Mission {
                 move(connection, r);
             }
         } else {
-            if (getUnit().getState() != Unit.FORTIFY
+            if (getUnit().getState() != Unit.FORTIFIED
                     || getUnit().getState() != Unit.FORTIFYING) {
                 Element changeStateElement = Message.createNewRootElement("changeState");
                 changeStateElement.setAttribute("unit", getUnit().getID());

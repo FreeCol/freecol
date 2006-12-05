@@ -82,7 +82,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
     /** A state a Unit can have. */
     public static final int ACTIVE = 0,
-                            FORTIFY = 1,
+                            FORTIFIED = 1,
                             SENTRY = 2,
                             IN_COLONY = 3,
                             PLOW = 4,
@@ -188,7 +188,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     * @param location The <code>Location</code> to place this <code>Unit</code> upon.
     * @param owner The <code>Player</code> owning this unit.
     * @param type The type of the unit.
-    * @param s The initial state for this Unit (one of {@link #ACTIVE}, {@link #FORTIFY}...).
+    * @param s The initial state for this Unit (one of {@link #ACTIVE}, {@link #FORTIFIED}...).
     */
     public Unit(Game game, Location location, Player owner, int type, int s) {
         this(game, location, owner, type, s,
@@ -206,7 +206,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     * @param location The <code>Location</code> to place this <code>Unit</code> upon.
     * @param owner The <code>Player</code> owning this unit.
     * @param type The type of the unit.
-    * @param s The initial state for this Unit (one of {@link #ACTIVE}, {@link #FORTIFY}...).
+    * @param s The initial state for this Unit (one of {@link #ACTIVE}, {@link #FORTIFIED}...).
     * @param armed Determines wether the unit should be armed or not.
     * @param mounted Determines wether the unit should be mounted or not.
     * @param numberOfTools The number of tools the unit will be carrying.
@@ -2100,7 +2100,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     */
     public void setHitpoints(int hitpoints) {
         this.hitpoints = hitpoints;
-        if (hitpoints >= getInitialHitpoints(getType()) && getState() == FORTIFY) {
+        if (hitpoints >= getInitialHitpoints(getType()) && getState() == FORTIFIED) {
             setState(ACTIVE);
         }
     }
@@ -2227,7 +2227,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                     movesLeft = 0;
                 }
                 break;
-            case FORTIFY:
+            case FORTIFIED:
                 workLeft = -1;
                 movesLeft = 0;
                 break;
@@ -2371,7 +2371,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 return (getNumberOfTools() >= 20);
             case IN_COLONY:
                 return !isNaval();
-            case FORTIFY:
+            case FORTIFIED:
                 return getState() == FORTIFYING;
             case FORTIFYING:
                 return (getMovesLeft() > 0);             
@@ -2567,7 +2567,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                         setState(ACTIVE);
                         break;
                     case FORTIFYING:
-                        setState(FORTIFY);    
+                        setState(FORTIFIED);    
                         break;
                     case BUILD_ROAD:
                         getTile().setRoad(true);
@@ -2794,7 +2794,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             return modified_power;
         }
 
-        if (getState() == FORTIFY) {
+        if (getState() == FORTIFIED) {
             modified_power += (base_power / 2); // 50% fortify bonus
         }
 
@@ -2831,7 +2831,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             if ((attacker.getType() == BRAVE) && (getTile().getSettlement() != null)) {
                 modified_power += base_power; // 100% defense bonus against an Indian raid
             }
-            if (((getTile().getSettlement()) == null) && (getState() != FORTIFY)) {
+            if (((getTile().getSettlement()) == null) && (getState() != FORTIFIED)) {
                 modified_power -= ((base_power * 3) / 4); // -75% Artillery in the Open penalty
             }
         }
