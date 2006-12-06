@@ -2585,10 +2585,6 @@ public final class InGameController implements NetworkConstants {
             
         canvas.getGUI().setActiveUnit(null);
         //canvas.setEnabled(false);
-        
-        if (freeColClient.isSingleplayer()) {
-            canvas.showStatusPanel(Messages.message("waitingForOtherPlayers"));
-        }
 
         Element endTurnElement = Message.createNewRootElement("endTurn");
         client.sendAndWait(endTurnElement);

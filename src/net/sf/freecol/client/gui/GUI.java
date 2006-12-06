@@ -1010,8 +1010,7 @@ public final class GUI {
         ======
         Grey out the map if it is not my turn (and a multiplayer game).
          */
-        if (freeColClient.getMyPlayer() != freeColClient.getGame().getCurrentPlayer()
-                && !freeColClient.isSingleplayer()) {
+        if (freeColClient.getMyPlayer() != freeColClient.getGame().getCurrentPlayer()) {
             g.setColor(Color.BLACK);
             Composite oldComposite = g.getComposite();
             g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.6f));
