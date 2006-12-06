@@ -3,17 +3,21 @@
 package net.sf.freecol.client.gui;
 
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
+import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.UIManager;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -67,6 +71,16 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
         this.canvas = canvas;
         this.gui = gui;
 
+        if (gui.getActiveUnit() != null) {
+            //final Image gotoImage = (Image) UIManager.get("cursor.go.image");
+            //JMenuItem gotoMenuItem = new JMenuItem(Messages.message("gotoThisTile"), new ImageIcon(gotoImage));
+            JMenuItem gotoMenuItem = new JMenuItem(Messages.message("gotoThisTile"));
+            gotoMenuItem.setActionCommand("GOTO" + tile.getID());
+            gotoMenuItem.addActionListener(this);
+            add(gotoMenuItem);
+            hasAnItem = true;
+            addSeparator();
+        }
 
         Iterator unitIterator = tile.getUnitIterator();
         while (unitIterator.hasNext()) {
@@ -85,7 +99,7 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
             }
         }
         
-        if (hasItem()) {
+        if (tile.getUnitCount() > 0) {
             addSeparator();
         }
 
@@ -293,6 +307,15 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
                 freeColClient.getFreeColServer().getModelController().update(((Locatable) o).getTile());
             }
             // END DEBUG
+        } else if (command.startsWith("GOTO")) {
+            String tileID = command.substring(("GOTO").length());
+            Tile gotoTile = (Tile) freeColClient.getGame().getFreeColGameObject(tileID);
+            if (gotoTile != null && gui.getActiveUnit() != null) {
+                freeColClient.getInGameController().setDestination(gui.getActiveUnit(), gotoTile);
+                if (freeColClient.getGame().getCurrentPlayer() == freeColClient.getMyPlayer()) {
+                    freeColClient.getInGameController().moveToDestination(gui.getActiveUnit());
+                }
+            }
         } else {
             logger.warning("Invalid actioncommand.");
         }

@@ -477,6 +477,7 @@ public final class InGameController implements NetworkConstants {
         Location destination = (Location) choice.getObject();
         
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            setDestination(unit, destination);
             return;
         }
         
