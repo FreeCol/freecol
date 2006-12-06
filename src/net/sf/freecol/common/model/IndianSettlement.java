@@ -129,7 +129,7 @@ public class IndianSettlement extends Settlement {
      * @exception IllegalArgumentException if an invalid tribe or kind is given
      */
     public IndianSettlement(Game game, Player player, Tile tile, int tribe, int kind,
-            boolean isCapital, int learnableSkill, int highlyWantedGoods, int wantedGoods1, int wantedGoods2, boolean isVisited, Unit missionary) {
+            boolean isCapital, int learnableSkill, boolean isVisited, Unit missionary) {
 
         // TODO: Change 'null' to the indian AI-player:
 
@@ -154,13 +154,11 @@ public class IndianSettlement extends Settlement {
 
         this.kind = kind;
         this.learnableSkill = learnableSkill;
-        this.highlyWantedGoods = highlyWantedGoods;
-        this.wantedGoods1 = wantedGoods1;
-        this.wantedGoods2 = wantedGoods2;
         this.isCapital = isCapital;
         this.isVisited = isVisited;
         this.missionary = missionary;
 
+        //updateWantedGoods();
         /*
         for (int goodsType=0; goodsType<Goods.NUMBER_OF_TYPES; goodsType++) {
             if (goodsType == Goods.LUMBER || goodsType == Goods.HORSES || goodsType == Goods.MUSKETS
@@ -486,6 +484,31 @@ public class IndianSettlement extends Settlement {
         return kind;
     }
 
+    /**
+     * Gets the kind of <code>Settlment</code> being used
+     * by the given tribe.
+     *
+     * @param tribe The tribe.
+     * @return {@link #CAMP}, {@link #VILLAGE} or {@link #CITY}.
+     */
+    public static int getKind(int tribe) {
+        switch (tribe) {
+        case INCA:
+        case AZTEC:
+            return CITY;
+        case CHEROKEE:
+        case ARAWAK:
+        case IROQUOIS:
+            return VILLAGE;
+        case SIOUX:
+        case APACHE:
+        case TUPI:
+            return CAMP;
+        default:
+            logger.warning("Unknown tribe: " + tribe);
+            return CAMP;
+        }
+    }
 
     /**
     * Gets the tribe of the Indian settlement.
@@ -495,7 +518,6 @@ public class IndianSettlement extends Settlement {
         return tribe;
     }
 
-
     /**
      * Gets the radius of what the <code>Settlement</code> considers
      * as it's own land.  Cities dominate 2 tiles, other settlements 1 tile.
@@ -503,13 +525,24 @@ public class IndianSettlement extends Settlement {
      * @return Settlement radius
      */
     public int getRadius() {
+        return getRadius(kind);
+    }
+    
+    /**
+     * Gets the radius of what the <code>Settlement</code> considers
+     * as it's own land.  Cities dominate 2 tiles, other settlements 1 tile.
+     * 
+     * @param kind The kind of settlement. One of: {@link #CAMP},
+     *      {@link #VILLAGE} or {@link #CITY}.
+     * @return Settlement radius
+     */
+    public static int getRadius(int kind) {
         if (kind == CITY) {
             return 2;
         } else {
             return 1;
         }
     }
-
 
     public boolean isCapital() {
         return isCapital;

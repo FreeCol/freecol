@@ -837,7 +837,8 @@ public class Player extends FreeColGameObject {
                 || getGame().getMap() == null 
                 || unit == null 
                 || unit.getLocation() == null 
-                || unit.getTile() == null) {
+                || unit.getTile() == null
+                || isIndian()) {
             return;
         }
 

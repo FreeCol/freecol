@@ -1388,9 +1388,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         }
 
         // Check for adjacent units owned by a player that our owner has not met before:
-        if (getGame().getMap() != null &&
-            location != null &&
-            location instanceof Tile && !isNaval()) {
+        if (getGame().getMap() != null 
+                && location != null
+                && location instanceof Tile
+                && !isNaval()) {
             Iterator tileIterator = getGame().getMap().getAdjacentIterator(getTile().getPosition());
             while (tileIterator.hasNext()) {
                 Tile t = getGame().getMap().getTile((Position) tileIterator.next());
@@ -1417,7 +1418,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             }
         }
 
-        getOwner().setExplored(this);
+        if (!getOwner().isIndian()) {
+            getOwner().setExplored(this);
+        }
     }
 
 

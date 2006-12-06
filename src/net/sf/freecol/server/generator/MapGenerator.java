@@ -1,5 +1,7 @@
 package net.sf.freecol.server.generator;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Random;
@@ -80,13 +82,12 @@ public class MapGenerator {
      * @see LandGenerator
      * @see TerrainGenerator
      */
-    public void createMap(Vector players) {
-        LandGenerator landGenerator = new LandGenerator(getMapGeneratorOptions().getWidth(), getMapGeneratorOptions().getHeight());
+    public void createMap(Vector players) {        
+        LandGenerator landGenerator = new LandGenerator(getMapGeneratorOptions().getWidth(), getMapGeneratorOptions().getHeight());        
         boolean[][] landMap = landGenerator.createLandMap();
 
         TerrainGenerator terrainGenerator = new TerrainGenerator(landMap);
         Map map = terrainGenerator.createMap();
-
         game.setMap(map);
 	    createMountains(map);
         createRivers(map);
@@ -161,12 +162,10 @@ public class MapGenerator {
      * @param map The map to use.
      */
     public void createLostCityRumours(Map map) {
-//JLP DEB
         int number = ( getMapGeneratorOptions().getWidth() 
                      * getMapGeneratorOptions().getHeight() 
                      * getMapGeneratorOptions().getLandMass() / 100 )
                      * 3 / 100 ;
-//JLP END
         int counter = 0;
 
         for (int i = 0; i < number; i++) {
@@ -195,12 +194,11 @@ public class MapGenerator {
      * @param map The map to create rivers on.
      */
     public void createRivers(Map map) {
-//JLP DEB
         int number = ( getMapGeneratorOptions().getWidth() 
                      * getMapGeneratorOptions().getHeight() 
                      * getMapGeneratorOptions().getLandMass() / 100 )
                      * 3 / 100 ;
-//JLP END
+
         int counter = 0;
         Hashtable riverMap = new Hashtable();
 
@@ -235,84 +233,55 @@ public class MapGenerator {
      *       european players.
      */
     protected void createIndianSettlements(Map map, Vector players) {
-        Iterator incaIterator = map.getFloodFillIterator
-                                                (getRandomLandPosition(map));
-        Iterator aztecIterator = map.getFloodFillIterator
-                                                (getRandomLandPosition(map));
-        Iterator arawakIterator = map.getFloodFillIterator
-                                                (getRandomLandPosition(map));
-        Iterator cherokeeIterator = map.getFloodFillIterator
-                                                (getRandomLandPosition(map));
-        Iterator iroquoisIterator = map.getFloodFillIterator
-                                                (getRandomLandPosition(map));
-        Iterator siouxIterator = map.getFloodFillIterator
-                                                (getRandomLandPosition(map));
-        Iterator apacheIterator = map.getFloodFillIterator
-                                                (getRandomLandPosition(map));
-        Iterator tupiIterator = map.getFloodFillIterator
-                                                (getRandomLandPosition(map));
+        Collections.sort(players, new Comparator() {
+            public int compare(Object o, Object p) {
+                return ((Player) o).getNation() - ((Player) p).getNation();
+            }
+        });
 
-        placeIndianSettlement(IndianSettlement.INCA,
-                              IndianSettlement.CITY,
-                              true, incaIterator, map, players);
-        placeIndianSettlement(IndianSettlement.AZTEC,
-                              IndianSettlement.CITY,
-                              true, aztecIterator, map, players);
-        placeIndianSettlement(IndianSettlement.ARAWAK,
-                              IndianSettlement.VILLAGE,
-                              true, arawakIterator, map, players);
-        placeIndianSettlement(IndianSettlement.CHEROKEE,
-                              IndianSettlement.VILLAGE,
-                              true, cherokeeIterator, map, players);
-        placeIndianSettlement(IndianSettlement.IROQUOIS,
-                              IndianSettlement.VILLAGE,
-                              true, iroquoisIterator, map, players);
-        placeIndianSettlement(IndianSettlement.SIOUX,
-                              IndianSettlement.CAMP,
-                              true, siouxIterator, map, players);
-        placeIndianSettlement(IndianSettlement.APACHE,
-                              IndianSettlement.CAMP,
-                              true, apacheIterator, map, players);
-        placeIndianSettlement(IndianSettlement.TUPI,
-                              IndianSettlement.CAMP,
-                              true, tupiIterator, map, players);
-
-        while (incaIterator.hasNext() || aztecIterator.hasNext() ||
-                arawakIterator.hasNext() || cherokeeIterator.hasNext() ||
-                iroquoisIterator.hasNext() || siouxIterator.hasNext() ||
-                apacheIterator.hasNext() || tupiIterator.hasNext()) {
-            if (incaIterator.hasNext() && random.nextInt(5) != 0)
-                placeIndianSettlement(IndianSettlement.INCA,
-                                      IndianSettlement.CITY,
-                                      false, incaIterator, map, players);
-            if (aztecIterator.hasNext() && random.nextInt(5) != 0)
-                placeIndianSettlement(IndianSettlement.AZTEC,
-                                      IndianSettlement.CITY,
-                                      false, aztecIterator, map, players);
-            if (arawakIterator.hasNext() && random.nextInt(3) != 0)
-                placeIndianSettlement(IndianSettlement.ARAWAK,
-                                      IndianSettlement.VILLAGE,
-                                      false, arawakIterator, map, players);
-            if (cherokeeIterator.hasNext() && random.nextInt(4) != 0)
-                placeIndianSettlement(IndianSettlement.CHEROKEE,
-                                      IndianSettlement.VILLAGE,
-                                      false, cherokeeIterator, map, players);
-            if (iroquoisIterator.hasNext() && random.nextInt(4) != 0)
-                placeIndianSettlement(IndianSettlement.IROQUOIS,
-                                      IndianSettlement.VILLAGE,
-                                      false, iroquoisIterator, map, players);
-            if (siouxIterator.hasNext() && random.nextInt(4) != 0)
-                placeIndianSettlement(IndianSettlement.SIOUX,
-                                      IndianSettlement.CAMP,
-                                      false, siouxIterator, map, players);
-            if (apacheIterator.hasNext() && random.nextInt(3) != 0)
-                placeIndianSettlement(IndianSettlement.APACHE,
-                                      IndianSettlement.CAMP,
-                                      false, apacheIterator, map, players);
-            if (tupiIterator.hasNext() && random.nextInt(2) != 0)
-                placeIndianSettlement(IndianSettlement.TUPI,
-                                      IndianSettlement.CAMP,
-                                      false, tupiIterator, map, players);
+        Position[] territoryCenter = new Position[IndianSettlement.LAST_TRIBE+1];
+        for (int tribe=0; tribe<territoryCenter.length; tribe++) {        
+            int x = random.nextInt(map.getWidth());
+            int y = random.nextInt(map.getHeight());
+            territoryCenter[tribe] = new Position(x, y);
+        }
+        
+        IndianSettlement[] capitalCandidate = new IndianSettlement[IndianSettlement.LAST_TRIBE+1];
+        final int minSettlementDistance = 4;
+        final int width = map.getWidth() / minSettlementDistance;
+        final int height = map.getHeight() / (minSettlementDistance*2);
+        for (int i=1; i<width; i++) {            
+            for (int j=1; j<height; j++) {
+                int x = i * minSettlementDistance + random.nextInt(3) - 1;
+                if (j % 2 != 0) {
+                    x += minSettlementDistance / 2;
+                }
+                int y = j * (2*minSettlementDistance) + random.nextInt(3) - 1;
+                if (!map.isValid(x, y)) {        
+                    continue;
+                }
+                Tile candidate = map.getTile(x, y);
+                if (candidate.isSettleable()) {
+                    int bestTribe = 0;
+                    int minDistance = Integer.MAX_VALUE;
+                    for (int t=0; t<territoryCenter.length; t++) {
+                        if (map.getDistance(territoryCenter[t], candidate.getPosition()) < minDistance) {
+                            minDistance = map.getDistance(territoryCenter[t], candidate.getPosition());
+                            bestTribe = t;
+                        }
+                    }
+                    IndianSettlement is = placeIndianSettlement((Player) players.get(bestTribe+4), bestTribe, false, candidate.getPosition(), map, players);
+                    if (capitalCandidate == null
+                            || random.nextInt(width+height) == 1) {
+                        capitalCandidate[bestTribe] = is; 
+                    }
+                }
+            }
+        }
+        for (int i=0; i<capitalCandidate.length; i++) {
+            if (capitalCandidate[i] != null) {
+                capitalCandidate[i].setCapital(true);
+            }
         }
     }
 
@@ -334,223 +303,53 @@ public class MapGenerator {
 
 
     /**
-     * Finds a suitable location for a settlement and builds it there. If no
-     * location can be found (the iterator is exhausted) the settlement will
-     * be discarded.
+     * Builds a <code>IndianSettlement</code> at the given position.
      *
-     * @param owner The nation owning the new settlement.
-     * @param type The {@link IndianSettlement#getKind() kind} of settlement.
+     * @param tribe The tribe owning the new settlement.
      * @param capital <code>true</code> if the settlement should be a
      *      {@link IndianSettlement#isCapital() capital}.
-     * @param iterator The nation's iterator to use
+     * @param position The position to place the settlement.
      * @param map The map that should get a new settlement.
      * @param players The list of the {@link Player players}.
+     * @return The <code>IndianSettlement</code> just being placed
+     *      on the map.
      */
-    private void placeIndianSettlement(int owner, int type,
-                                       boolean capital,
-                                       Iterator iterator, Map map, Vector players) {
-        while (iterator.hasNext()) {
-            Position position = (Position)iterator.next();
-            int radius = (type == IndianSettlement.CITY) ? 2 : 1;
-//JLP DEB
-            if (isIndianSettlementCandidate(position, radius + 3, map) &&
-                        random.nextInt(2) != 0) {
-//JLP END
-                ServerPlayer player = getIndianPlayer(owner, players);
-                //System.out.println("Setting indian settlement at "
-                //                   + position.getX() + "x" + position.getY());
+    private IndianSettlement placeIndianSettlement(Player player, int tribe, boolean capital,
+                                       Position position, Map map, Vector players) {
+        final int kind = IndianSettlement.getKind(tribe);
+        final Tile tile = map.getTile(position);
+        IndianSettlement settlement = 
+            new IndianSettlement(game, player,
+                    tile, tribe, kind, capital,
+                    generateSkillForLocation(map, map.getTile(position)),
+                    false, null);
 
-                int[] wantedGoods = generateWantedGoodsForLocation(map,map.getTile(position));
-
-                IndianSettlement settlement = 
-                    new IndianSettlement(game, player,
-                                         map.getTile(position), owner, type, capital,
-                                         generateSkillForLocation(map, map.getTile(position)),
-                                         wantedGoods[0],
-                                         wantedGoods[1],
-                                         wantedGoods[2],
-                                         false, null);
-
-                map.getTile(position).setSettlement(settlement);
-
-                map.getTile(position).setClaim(Tile.CLAIM_CLAIMED);
-                map.getTile(position).setOwner(settlement);
-                Iterator circleIterator = map.getCircleIterator
-                                                (position, true, radius);
-                while (circleIterator.hasNext()) {
-                    Position adjPos = (Position)circleIterator.next();
-                    map.getTile(adjPos).setClaim(Tile.CLAIM_CLAIMED);
-                    map.getTile(adjPos).setNationOwner(player.getNation());
-                }
-
-                for (int i = 0; i < (type * 2) + 4; i++) {
-                    Unit unit = new Unit(game, player, Unit.BRAVE);
-                    unit.setIndianSettlement(settlement);
-                    if (i == 0) {
-                        unit.setLocation(map.getTile(position));
-                    } else {
-                        unit.setLocation(settlement);
-                    }
-
-                }
-
-                return;
-            }
-        }
-    }
-
-
-    /**
-     * Generates wanted goods for a given location (indian settlement).
-     * 
-     * @param map The <code>Map</code>.
-     * @param mainTile The tile where the settlement is located.
-     * @return An int array containing the 3 wanted goods.
-     */
-    private int[] generateWantedGoodsForLocation(Map map, Tile mainTile) {
-
-        Iterator iter = map.getAdjacentIterator(mainTile.getPosition());
-
-        //logger.info("creating want list for settlement");
-
-        /* this probably needs finetuning.
-           The indians should prefer manufactured goods.
-
-           TODO: take hills and mountains into consideration
-
-        */
-
-        // for every good there's a counter, some of them are randomized
-        // depending on the surrounding fields, the values are decremented
-
-        int[] goodsTable=new int[16];
-
-        goodsTable[Goods.FOOD]=20;
-        goodsTable[Goods.SUGAR]=10;
-        goodsTable[Goods.TOBACCO]=10;
-        goodsTable[Goods.COTTON]=10;
-        goodsTable[Goods.FURS]=10;
-        goodsTable[Goods.LUMBER]=10;
-        goodsTable[Goods.ORE]=10;
-        goodsTable[Goods.SILVER]=10;
-        goodsTable[Goods.HORSES]=7+random.nextInt(10);
-        goodsTable[Goods.RUM]=8+random.nextInt(10);
-        goodsTable[Goods.CIGARS]=8+random.nextInt(10);
-        goodsTable[Goods.CLOTH]=7+random.nextInt(10);
-        goodsTable[Goods.COATS]=7+random.nextInt(10);
-        goodsTable[Goods.TRADE_GOODS]=7+random.nextInt(10);
-        goodsTable[Goods.TOOLS]=10;
-        goodsTable[Goods.MUSKETS]=5+random.nextInt(10);
-
-        while (iter.hasNext()) {
+        tile.setSettlement(settlement);
         
-            Map.Position p = (Map.Position)iter.next();
-            Tile tile = map.getTile(p);
+        tile.setClaim(Tile.CLAIM_CLAIMED);
+        tile.setOwner(settlement);
         
-            int forested=0;
-        
-            if (tile.isForested()) forested=1;
-            
-            switch (tile.getType()) {
-                case Tile.PLAINS:     goodsTable[Goods.FOOD]-=4;
-                                      goodsTable[Goods.COTTON]-=2;
-                                      goodsTable[Goods.CLOTH]-=2;
-                                      goodsTable[Goods.ORE]-=1;
-                                      goodsTable[Goods.MUSKETS]-=1;
-                                      goodsTable[Goods.LUMBER]-=forested*3;
-                                      break;
-                case Tile.DESERT:     goodsTable[Goods.FOOD]--;
-                                      goodsTable[Goods.COTTON]--;
-                                      goodsTable[Goods.CLOTH]--;
-                                      goodsTable[Goods.ORE]-=2;
-                                      goodsTable[Goods.MUSKETS]-=1;
-                                      goodsTable[Goods.LUMBER]-=forested*1;
-                                      break;
-                case Tile.TUNDRA:     goodsTable[Goods.FOOD]-=2;
-                                      goodsTable[Goods.ORE]-=2;
-                                      goodsTable[Goods.MUSKETS]-=1;
-                                      goodsTable[Goods.LUMBER]-=forested*2;
-                                      break;
-                case Tile.PRAIRIE:    goodsTable[Goods.FOOD]-=2;
-                                      goodsTable[Goods.COTTON]-=3;
-                                      goodsTable[Goods.CLOTH]-=3;
-                                      goodsTable[Goods.LUMBER]-=forested*2;
-                                      break;
-                case Tile.GRASSLANDS: goodsTable[Goods.FOOD]-=2;
-                                      goodsTable[Goods.TOBACCO]-=3;
-                                      goodsTable[Goods.CIGARS]-=3;
-                                      goodsTable[Goods.LUMBER]-=forested*3;
-                                      break;
-                case Tile.SAVANNAH:   goodsTable[Goods.FOOD]-=3;
-                                      goodsTable[Goods.SUGAR]-=3;
-                                      goodsTable[Goods.RUM]-=3;
-                                      goodsTable[Goods.LUMBER]-=forested*2;
-                                      break;
-                case Tile.MARSH:      goodsTable[Goods.FOOD]-=2;
-                                      goodsTable[Goods.TOBACCO]-=2;
-                                      goodsTable[Goods.CIGARS]-=2;
-                                      goodsTable[Goods.ORE]-=2;
-                                      goodsTable[Goods.MUSKETS]-=1;
-                                      goodsTable[Goods.LUMBER]-=forested*2;
-                                      break;
-                case Tile.SWAMP:      goodsTable[Goods.FOOD]-=2;
-                                      goodsTable[Goods.SUGAR]-=2;
-                                      goodsTable[Goods.RUM]-=2;
-                                      goodsTable[Goods.ORE]-=2;
-                                      goodsTable[Goods.MUSKETS]-=1;
-                                      goodsTable[Goods.LUMBER]-=forested*2;
-            }
-            /*System.out.print("tile type: "+ tile.getType());
-            System.out.println(" forested: "+forested);
-            System.out.println("FD  |SG  |TB  |CT  |FU  |LU  |OR  |SI  |HO  |  RU|CI  |CL  |CA  |TG  |TO  |MU");
-            for (int i=0;i<=15;i++) {
-                if (goodsTable[i]>9||goodsTable[i]<0) System.out.print(goodsTable[i]+"  |");
-                if (goodsTable[i]<10&&goodsTable[i]>-1) System.out.print(goodsTable[i]+"   |");
-            }*/
-        }       
-        
-        int good = 0;
-        int good1 = 0;
-        int good2 = 0;
-        int curval;
-
-        for (int i=0;i<=15;i++) {
-        
-                curval=goodsTable[i];
-                
-                // found a good that is the greatest so far
-                if (curval>=goodsTable[good]) {
-                        good2=good1;
-                        good1=good;
-                        good=i;
-                }       
-
-                // found a good that is > good1 but <good
-                if (curval>=goodsTable[good1] && curval<goodsTable[good]) {
-                        good2=good1;
-                        good1=i;
-                }
-
-                // found a good that is > good2 but <good1
-                if (curval>=goodsTable[good2] && curval<goodsTable[good1]) {
-                        good2=i;
-                }
-                
+        Iterator circleIterator = map.getCircleIterator(position, true, IndianSettlement.getRadius(kind));
+        while (circleIterator.hasNext()) {
+            Position adjPos = (Position)circleIterator.next();
+            map.getTile(adjPos).setClaim(Tile.CLAIM_CLAIMED);
+            map.getTile(adjPos).setNationOwner(player.getNation());
         }
 
-        //logger.info("the indians choose: "+good+" and "+good1+" and "+good2);
-        //logger.info("===============");
-        
-        // constructs the return array
-        int[] rv = new int[3];
-        rv[0]=good;
-        rv[1]=good1;
-        rv[2]=good2;
+        for (int i = 0; i < (kind * 2) + 4; i++) {
+            Unit unit = new Unit(game, player, Unit.BRAVE);
+            unit.setIndianSettlement(settlement);
 
-        return rv;
+            if (i == 0) {
+                unit.setLocation(tile);
+            } else {
+                unit.setLocation(settlement);
+            }
+        }
         
+        return settlement;
     }
-
+    
     /**
     * Generates a skill that could be taught from a settlement on the given Tile.
     * TODO: This method should be properly implemented. The surrounding terrain
@@ -699,13 +498,36 @@ public class MapGenerator {
      * @return Position selected
      */
     private Position getRandomLandPosition(Map map) {
-        int x;
-        int y;
-        do {
-            x = random.nextInt(getMapGeneratorOptions().getWidth() - 20) + 10;
-            y = random.nextInt(getMapGeneratorOptions().getHeight() - 20) + 10;
-        } while (!map.getTile(x, y).isLand());
-        return new Map.Position(x, y);
+        int x = random.nextInt(getMapGeneratorOptions().getWidth() - 20) + 10;
+        int y = random.nextInt(getMapGeneratorOptions().getHeight() - 20) + 10;
+        Position centerPosition = new Position(x, y);
+        Iterator it = map.getFloodFillIterator(centerPosition);
+        while (it.hasNext()) {
+            Position p = (Position) it.next();
+            if (map.getTile(p).isLand()) {
+                return p;
+            }
+        }
+        return null;    }
+    
+    /**
+     * Select a random position on the map to use as a starting position.
+     * 
+     * @param map The <code>Map</code>.
+     * @return Position selected
+     */
+    private Position getRandomSettleablePosition(Map map) {
+        int x = random.nextInt(getMapGeneratorOptions().getWidth() - 20) + 10;
+        int y = random.nextInt(getMapGeneratorOptions().getHeight() - 20) + 10;
+        Position centerPosition = new Position(x, y);
+        Iterator it = map.getFloodFillIterator(centerPosition);
+        while (it.hasNext()) {
+            Position p = (Position) it.next();
+            if (map.getTile(p).isSettleable()) {
+                return p;
+            }
+        }
+        return null;
     }
 
 
@@ -898,11 +720,8 @@ public class MapGenerator {
     * Class for making a <code>Map</code> based upon a land map.
     */
     protected class TerrainGenerator {
-
-//JLP DEB
 		int distToLandFromHighSeas = getMapGeneratorOptions().getDistLandHighSea();
 		int maxDistanceToEdge = getMapGeneratorOptions().getMaxDistToEdge();
-//JLP END
 
         private boolean[][] landMap;
 
@@ -1042,11 +861,7 @@ public class MapGenerator {
     * Class for creating a land map.
     */
     protected class LandGenerator {
-
-
-//JLP DEB
 		int preferredDistanceToEdge = getMapGeneratorOptions().getPrefDistToEdge();
-//JLP END
         private static final int C = 2;
 
         private boolean[][] map;
@@ -1078,9 +893,9 @@ public class MapGenerator {
         boolean[][] createLandMap() {
             int x;
             int y;
-//JLP DEB
+
             int minLandMass = getMapGeneratorOptions().getLandMass();
-//JLP END
+
             int minimumNumberOfTiles = (map.length * map[0].length * minLandMass - 2 * preferredDistanceToEdge) / 100;
             while (numberOfLandTiles < minimumNumberOfTiles) {
                 do {
