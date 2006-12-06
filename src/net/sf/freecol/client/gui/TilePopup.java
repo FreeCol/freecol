@@ -3,17 +3,14 @@
 package net.sf.freecol.client.gui;
 
 import java.awt.Font;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
-import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import javax.swing.UIManager;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
