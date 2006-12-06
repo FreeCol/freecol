@@ -3,7 +3,11 @@ package net.sf.freecol.client.gui;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.lang.reflect.InvocationTargetException;
 
+import javax.swing.SwingUtilities;
+
+import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
@@ -22,8 +26,8 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
     private final Map map;
     private ScrollThread scrollThread;
 
-    private static final int SCROLLSPACE = 3;
-    //private static final int SCROLLSPACE = 100;
+    //private static final int SCROLLSPACE = 3;
+    private static final int SCROLLSPACE = 100;
 
     
 
@@ -48,11 +52,28 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
      * @param e The MouseEvent that holds all the information.
      */
     public void mouseMoved(MouseEvent e) {
-        if (1==1) return; // <-- Remove this to enable scrolling.
-
-        int x = e.getX(),
-            y = e.getY(),
-            direction;
+        /*if (e.getComponent().isEnabled()) {
+            scroll(e.getX(), e.getY());
+        } else if (scrollThread != null) {
+            scrollThread.stopScrolling();
+            scrollThread = null;
+        }*/
+    }
+    
+    private void scroll(int x, int y) {
+        if (!canvas.getClient().getClientOptions().getBoolean(ClientOptions.MAP_SCROLL_ON_DRAG)) {
+            return;
+        }
+        /*if (y < canvas.getMenuBarHeight()) {
+            if (scrollThread != null) {
+                scrollThread.stopScrolling();
+                scrollThread = null;
+            }
+            return;
+        } else if (y < canvas.getMenuBarHeight() + SCROLLSPACE) {
+            y -= canvas.getMenuBarHeight();
+        }*/
+        int direction;
         if ((x < SCROLLSPACE) && (y < SCROLLSPACE)) {
             // Upper-Left
             direction = Map.NW;
@@ -88,9 +109,8 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
 
         if (scrollThread != null) {
             scrollThread.setDirection(direction);
-        } else if (e.getComponent().isEnabled()) {
+        } else {
             scrollThread = new ScrollThread(map, gui);
-            scrollThread.setDirection(direction);
             scrollThread.start();
         }
     }
@@ -101,6 +121,14 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
      */
     public void mouseDragged(MouseEvent e) {
         Map.Position p = gui.convertToMapCoordinates(e.getX(), e.getY());
+        
+        if (e.getComponent().isEnabled()) {
+            scroll(e.getX(), e.getY());
+        } else if (scrollThread != null) {
+            scrollThread.stopScrolling();
+            scrollThread = null;
+        }
+        
         if (p == null || !map.isValid(p)) {
             return;
         }
@@ -165,68 +193,77 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
          * Performs the actual scrolling.
          */
         public void run() {
-            int x, y;
             do {
                 try {
                     sleep(100);
+                } catch (InterruptedException e) {}
+
+                try {
+                    SwingUtilities.invokeAndWait(new Runnable() {
+                        public void run() {
+                            int x, y;
+                            Tile t = map.getTileOrNull(gui.getFocus().getX(), gui.getFocus().getY());
+                            if (t == null) {
+                                return;
+                            }
+
+                            t = map.getNeighbourOrNull(direction, t);
+                            if (t == null) {
+                                return;
+                            }
+
+                            if (gui.isMapNearTop(t.getY()) && gui.isMapNearTop(gui.getFocus().getY())) {
+                                if (t.getY() > gui.getFocus().getY()) {
+                                    y = t.getY();
+                                    do {
+                                        y += 2;
+                                    } while (gui.isMapNearTop(y));
+                                } else {
+                                    y = gui.getFocus().getY();
+                                }
+                            } else if (gui.isMapNearBottom(t.getY()) && gui.isMapNearBottom(gui.getFocus().getY())) {
+                                if (t.getY() < gui.getFocus().getY()) {
+                                    y = t.getY();
+                                    do {
+                                        y -= 2;
+                                    } while (gui.isMapNearBottom(y));
+                                } else {
+                                    y = gui.getFocus().getY();
+                                }
+                            } else {
+                                y = t.getY();
+                            }
+
+                            if (gui.isMapNearLeft(t.getX(), t.getY()) && gui.isMapNearLeft(gui.getFocus().getX(), gui.getFocus().getY())) {
+                                if (t.getX() > gui.getFocus().getX()) {
+                                    x = t.getX();
+                                    do {
+                                        x++;
+                                    } while (gui.isMapNearLeft(x, y));
+                                } else {
+                                    x = gui.getFocus().getX();
+                                }
+                            } else if (gui.isMapNearRight(t.getX(), t.getY()) && gui.isMapNearRight(gui.getFocus().getX(), gui.getFocus().getY())) {
+                                if (t.getX() < gui.getFocus().getX()) {
+                                    x = t.getX();
+                                    do {
+                                        x--;
+                                    } while (gui.isMapNearRight(x, y));
+                                } else {
+                                    x = gui.getFocus().getX();
+                                }
+                            } else {
+                                x = t.getX();
+                            }
+
+                            gui.setFocus(x, y);
+                        }
+                    });
+                } catch (InvocationTargetException e) {
+                    cont = false;
                 } catch (InterruptedException e) {
+                    cont = false;
                 }
-
-                Tile t = map.getTileOrNull(gui.getFocus().getX(), gui.getFocus().getY());
-                if (t == null) {
-                    continue;
-                }
-
-                t = map.getNeighbourOrNull(direction, t);
-                if (t == null) {
-                    continue;
-                }
-
-                if (gui.isMapNearTop(t.getY()) && gui.isMapNearTop(gui.getFocus().getY())) {
-                    if (t.getY() > gui.getFocus().getY()) {
-                        y = t.getY();
-                        do {
-                            y += 2;
-                        } while (gui.isMapNearTop(y));
-                    } else {
-                        y = gui.getFocus().getY();
-                    }
-                } else if (gui.isMapNearBottom(t.getY()) && gui.isMapNearBottom(gui.getFocus().getY())) {
-                    if (t.getY() < gui.getFocus().getY()) {
-                        y = t.getY();
-                        do {
-                            y -= 2;
-                        } while (gui.isMapNearBottom(y));
-                    } else {
-                        y = gui.getFocus().getY();
-                    }
-                } else {
-                    y = t.getY();
-                }
-
-                if (gui.isMapNearLeft(t.getX(), t.getY()) && gui.isMapNearLeft(gui.getFocus().getX(), gui.getFocus().getY())) {
-                    if (t.getX() > gui.getFocus().getX()) {
-                        x = t.getX();
-                        do {
-                            x++;
-                        } while (gui.isMapNearLeft(x, y));
-                    } else {
-                        x = gui.getFocus().getX();
-                    }
-                } else if (gui.isMapNearRight(t.getX(), t.getY()) && gui.isMapNearRight(gui.getFocus().getX(), gui.getFocus().getY())) {
-                    if (t.getX() < gui.getFocus().getX()) {
-                        x = t.getX();
-                        do {
-                            x--;
-                        } while (gui.isMapNearRight(x, y));
-                    } else {
-                        x = gui.getFocus().getX();
-                    }
-                } else {
-                    x = t.getX();
-                }
-                
-                gui.setFocus(x, y);
             } while (cont);
         }
     }    

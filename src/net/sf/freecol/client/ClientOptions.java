@@ -123,6 +123,11 @@ public class ClientOptions extends OptionMap {
      */
     public static final String DISPLAY_FOG_OF_WAR = "displayFogOfWar";
     
+    /**
+     * Option for activating autoscroll when dragging units on the mapboard.
+     */
+    public static final String MAP_SCROLL_ON_DRAG = "mapScrollOnDrag";
+    
     
     /**
     * Creates a new <code>ClientOptions</code>.
@@ -158,6 +163,7 @@ public class ClientOptions extends OptionMap {
         guiGroup.add(new IntegerOption(MAX_NUMBER_OF_GOODS_IMAGES, "clientOptions.gui."+ MAX_NUMBER_OF_GOODS_IMAGES +".name", "clientOptions.gui."+ MAX_NUMBER_OF_GOODS_IMAGES +".shortDescription", 1, 10, 7));
         guiGroup.add(new BooleanOption(ALWAYS_CENTER, "clientOptions.gui."+ ALWAYS_CENTER +".name", "clientOptions.gui."+ ALWAYS_CENTER +".shortDescription", false));
         guiGroup.add(new BooleanOption(DISPLAY_FOG_OF_WAR, "clientOptions.gui."+ DISPLAY_FOG_OF_WAR +".name", "clientOptions.gui."+ DISPLAY_FOG_OF_WAR +".shortDescription", false));        
+        guiGroup.add(new BooleanOption(MAP_SCROLL_ON_DRAG, "clientOptions.gui."+ MAP_SCROLL_ON_DRAG +".name", "clientOptions.gui."+ MAP_SCROLL_ON_DRAG +".shortDescription", true));
         add(guiGroup);
 
         OptionGroup messagesGroup = new OptionGroup("clientOptions.messages.name", "clientOptions.messages.shortDescription");
@@ -247,3 +253,4 @@ public class ClientOptions extends OptionMap {
     }
 
 }
+
