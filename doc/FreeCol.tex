@@ -1,7 +1,17 @@
+\newcommand{\Goods}[1]{\index{#1}\index{Goods!#1}\hypertarget{#1}{\textbf{#1}}}
+\newcommand{\Terrain}[1]{\index{#1}\index{Terrain!#1}\hypertarget{#1}{\textbf{#1}}}
+\newcommand{\Unit}[1]{\index{#1}\index{Units!#1}\hypertarget{#1}{\textbf{#1}}}
+\newcommand{\Building}[1]{\index{#1}\index{Buildings!#1}\hypertarget{#1}{\textbf{#1}}}
+\newcommand{\Father}[1]{\index{#1}\index{Founding Fathers!#1}\hypertarget{#1}{\textbf{#1}}}
+\newcommand{\FFather}[2]{\index{#2}\index{Founding Fathers!#2}\hypertarget{#1}{\textbf{#2}}}
+
 \documentclass[12pt]{article}
 \usepackage{longtable}
 \usepackage{graphicx}
-\usepackage[colorlinks=true]{hyperref}
+\usepackage{index}
+\usepackage[colorlinks=true,hyperindex=true]{hyperref}
+\makeindex
+
 \begin{document}
 \author{\href{http://freecol.sourceforge.net/index.php?section=8}{The FreeCol Team}}
 \title{FreeCol Documentation\\User Guide for Version v0.5.3}
@@ -284,47 +294,37 @@ colonies and produce goods to send home to Europe.
 
 There are many different types of terrain in the New World, each with
 its own peculiar advantages. At the beginning of the game you will
-probably arrive at a \hypertarget{High Seas}{\textbf{High Seas}} tile
-(or at the edge of the map). High Seas tiles (and the map edge) allow
-you to sail between Europe and the New World. As you approach land,
-the High Seas will be replaced by \hypertarget{Ocean}{\textbf{Ocean}}
-tiles, which produce \hyperlink{Fish}{Fish}.
+probably arrive at a \Terrain{High Seas} tile (or at the edge of the
+map). High Seas tiles (and the map edge) allow you to sail between
+Europe and the New World. As you approach land, the High Seas will be
+replaced by \Terrain{Ocean} tiles, which produce
+\hyperlink{Fish}{Fish}.
 
-In the New World, you will also discover
-\hypertarget{Plains}{\textbf{Plains}}, which produce a great deal of
-Grain, a lesser amount of Cotton, and some Ore;
-\hypertarget{Grassland}{\textbf{Grassland}}, on which Grain and
-Tobacco can be cultivated; \hypertarget{Prairie}{\textbf{Prairies}},
-which are suitable for growing Grain and Cotton;
-\hypertarget{Savannah}{\textbf{Savannah}}, which produces Grain and
-Sugar; \hypertarget{Marsh}{\textbf{Marsh}}, where Grain can be
-cultivated and some Ore can be mined;
-\hypertarget{Swamp}{\textbf{Swamp}}, which yields some Grain, and
-small amounts of Sugar, Tobacco and Ore;
-\hypertarget{Desert}{\textbf{Deserts}}, which produce some Food,
-Cotton and Ore; as well as \hypertarget{Tundra}{\textbf{Tundra}},
-where Grain can be grown, and some Ore can be mined.
+In the New World, you will also discover \Terrain{Plains}, which
+produce a great deal of Grain, a lesser amount of Cotton, and some
+Ore; \Terrain{Grassland}, on which Grain and Tobacco can be
+cultivated; \Terrain{Prairie}, which are suitable for growing Grain
+and Cotton; \Terrain{Savannah}, which produces Grain and Sugar;
+\Terrain{Marsh}, where Grain can be cultivated and some Ore can be
+mined; \Terrain{Swamp}, which yields some Grain, and small amounts of
+Sugar, Tobacco and Ore; \Terrain{Desert}, which produce some Food,
+Cotton and Ore; as well as \Terrain{Tundra}, where Grain can be grown,
+and some Ore can be mined.
 
 Large parts of the New World are covered in forests, all of which
-yield varying amounts of Grain, Lumber and Furs. The
-\hypertarget{Boreal Forest}{\textbf{Boreal Forest}} also produces Ore,
-the \hypertarget{Mixed Forest}{\textbf{Mixed Forest}} Cotton, the
-\hypertarget{Conifer Forest}{\textbf{Conifer Forest}} Tobacco, the
-\hypertarget{Tropical Forest}{\textbf{Tropical Forest}} Sugar, the
-\hypertarget{Rain Forest}{\textbf{Rain Forest}} produces small amounts
-of Ore, Sugar and Tobacco, the \hypertarget{Wetland
-Forest}{\textbf{Wetland Forest}} and the \hypertarget{Scrub
-Forest}{\textbf{Scrub Forest}} yield some Ore, and the
-\hypertarget{Broadleaf Forest}{\textbf{Broadleaf Forest}} Cotton.
+yield varying amounts of Grain, Lumber and Furs. The \Terrain{Boreal
+Forest} also produces Ore, the \Terrain{Mixed Forest} Cotton, the
+\Terrain{Conifer Forest} Tobacco, the \Terrain{Tropical Forest} Sugar,
+the \Terrain{Rain Forest} produces small amounts of Ore, Sugar and
+Tobacco, the \Terrain{Wetland Forest} and the \Terrain{Scrub Forest}
+yield some Ore, and the \Terrain{Broadleaf Forest} Cotton.
 
-The \hypertarget{Hills}{\textbf{Hills}} produce a small amount of
-Grain, and can be mined for Ore and a lesser amount of Silver. The
-\hypertarget{Mountains}{\textbf{Mountains}} are unsuitable for
-agriculture, but yield some Ore and
-Silver. \hypertarget{Arctic}{Arctic} tiles are the least useful type
-of terrain, as they produce nothing at all. Terrain types that produce
-no Grain, such as the Mountains and Artic types, can not support
-colonies.
+The \Terrain{Hills} produce a small amount of Grain, and can be mined
+for Ore and a lesser amount of Silver. The \Terrain{Mountains} are
+unsuitable for agriculture, but yield some Ore and Silver.
+\Terrain{Arctic} tiles are the least useful type of terrain, as they
+produce nothing at all. Terrain types that produce no Grain, such as
+the Mountains and Artic types, can not support colonies.
 
 The New World is also irrigated by minor and major rivers. The
 prouction of most types of \hyperlink{Goods}{Goods} is increased by
@@ -350,87 +350,81 @@ want to export raw materials, such as \textbf{Sugar} and
 products, such as \textbf{Rum} and \textbf{Cigars}, which command
 higher prices.
 
-\hypertarget{Food}{\textbf{Food}} is the single most important good,
-since all your colonists consume two units of food each turn. If this
-demand can not be met, some of your colonists will starve to death.
-On the other hand, a colony that has accumulated 200 units of food
-will produce a new \hyperlink{Free Colonist}{Free Colonist}.  Buying
-food in Europe is always expensive, but unfortunately colonial
-foodstuffs fetch only poor prices.
+\Goods{Food} is the single most important good, since all your
+colonists consume two units of food each turn. If this demand can not
+be met, some of your colonists will starve to death.  On the other
+hand, a colony that has accumulated 200 units of food will produce a
+new \hyperlink{Free Colonist}{Free Colonist}.  Buying food in Europe
+is always expensive, but unfortunately colonial foodstuffs fetch only
+poor prices.
 
-Food comes in two varieties, \hypertarget{Grain}{\textbf{Grain}},
-which can be cultivated on nearly all land tiles, and
-\hypertarget{Fish}{\textbf{Fish}}, which is produced by
+Food comes in two varieties, \Goods{Grain}, which can be cultivated on
+nearly all land tiles, and \Goods{Fish}, which is produced by
 \hyperlink{Ocean}{ocean} and lake tiles. In order to harvest the
-bounty of the sea, you will need a \hyperlink{Dock}{Dock},
-however. 
+bounty of the sea, you will need a \hyperlink{Dock}{Dock}, however.
 
-Breeding new \hypertarget{Horses}{\textbf{Horses}} also requires food,
-but the horses you already have are content to eat grass and consume
-no more of your precious food. Breeding horses does not require
+Breeding new \Goods{Horses} also requires food, but the horses you
+already have are content to eat grass and consume no more of your
+precious food. Breeding horses does not require
 \hyperlink{Stables}{Stables}, but Stables do speed things up.
 
 Four raw materials are typical for the New World. They will initially
 generate a good income, but prices will inevitably drop. These goods
-are \hypertarget{Sugar}{\textbf{Sugar}}, which is best cultivated on
-\hyperlink{Savannah}{Savannah} tiles,
-\hypertarget{Tobacco}{\textbf{Tobacco}}, best cultivated on
-\hyperlink{Grassland}{Grassland},
-\hypertarget{Cotton}{\textbf{Cotton}}, which is most abundant on
-\hyperlink{Prairie}{Prairie} tiles, and
-\hypertarget{Furs}{\textbf{Furs}}, which are available on all forested
-tiles, but most abundantly on \hyperlink{Boreal Forest}{Boreal Forest}
-and \hyperlink{Mixed Forest}{Mixed Forest} tiles.
+are \Goods{Sugar}, which is best cultivated on
+\hyperlink{Savannah}{Savannah} tiles, \Goods{Tobacco}, best cultivated
+on \hyperlink{Grassland}{Grassland}, \Goods{Cotton}, which is most
+abundant on \hyperlink{Prairie}{Prairie} tiles, and \Goods{Furs},
+which are available on all forested tiles, but most abundantly on
+\hyperlink{Boreal Forest}{Boreal Forest} and \hyperlink{Mixed
+Forest}{Mixed Forest} tiles.
 
 These four materials can be used to produce corresponding luxury
 goods, which will fetch much higher prices in Europe. In a
-\hyperlink{Distiller's House}{distillery},
-\hypertarget{Rum}{\textbf{Rum}} is produced from Sugar. Tobacco is
-used to make \hypertarget{Cigars}{\textbf{Cigars}} in the
+\hyperlink{Distiller's House}{distillery}, \Goods{Rum} is produced
+from Sugar. Tobacco is used to make \Goods{Cigars} in the
 \hyperlink{Tobacconist's House}{Tobacconist's House}. The Weaver
-weaves \hypertarget{Cloth}{\textbf{Cloth}} from Cotton in his
-\hyperlink{Weaver's House}{house}, and the Fur Trader turns Furs into
-\hypertarget{Coats}{\textbf{Coats}} in his \hyperlink{Fur Trader's
-House}{house}.
+weaves \Goods{Cloth} from Cotton in his \hyperlink{Weaver's
+House}{house}, and the Fur Trader turns Furs into \Goods{Coats} in his
+\hyperlink{Fur Trader's House}{house}.
 
 Initially, the resource which fetches the highest prices in Europe is
-\hypertarget{Silver}{\textbf{Silver}}, which can be mined in
-\hyperlink{Hills}{Hills} and \hyperlink{Mountains}{Mountains}. As
-prices drop, Silver will become less and less useful, however. On the
-other hand, Hills and Mountains also produce
-\hypertarget{Ore}{\textbf{Ore}}, which is not in great demand in
-Europe, but which can be refined to produce
-\hypertarget{Tools}{\textbf{Tools}} in the \hyperlink{Blacksmith's
-House}{Blacksmith's House}. Tools are required for clearing forests
-and plowing fields, as well as for constructing advanced buildings and
-units. Furthermore, \hypertarget{Muskets}{\textbf{Muskets}} can be
+\Goods{Silver}, which can be mined in \hyperlink{Hills}{Hills} and
+\hyperlink{Mountains}{Mountains}. As prices drop, Silver will become
+less and less useful, however. On the other hand, Hills and Mountains
+also produce \Goods{Ore}, which is not in great demand in Europe, but
+which can be refined to produce \Goods{Tools} in the
+\hyperlink{Blacksmith's House}{Blacksmith's House}. Tools are required
+for clearing forests and plowing fields, as well as for constructing
+advanced buildings and units. Furthermore, \Goods{Muskets} can be
 produced from Tools in the \hyperlink{Armory}{Armory}.
 
-\hypertarget{Lumber}{\textbf{Lumber}} also fetches poor prices in
-Europe, but can be used to produce
-\hypertarget{Hammers}{\textbf{Hammers}} in the \hyperlink{Carpenter's
+\Goods{Lumber} also fetches poor prices in Europe, but can be used to
+produce \Goods{Hammers} in the \hyperlink{Carpenter's
 House}{Carpenter's House}. Hammers are required for constructing all
 buildings, as well as \hyperlink{Naval Units}{naval units} and
 \hyperlink{Wagon Train}{Wagon Trains}. Hammers are ``abstract'' goods
 that can neither be transported nor traded. They represent the work
 required to finish a building rather than some tangible material.
 
-The two other ``abstract'' goods are \hypertarget{Liberty
-Bells}{\textbf{Liberty Bells}}, which are produced in the
-\hyperlink{Town Hall}{Town Hall}, and
-\hypertarget{Crosses}{\textbf{Crosses}}, which are generated by the
-\hyperlink{Church}{Church}. They represent the concepts of liberty and
-of religious freedom. Liberty Bells are needed to convince your
-colonists of your policies, and to elect \hyperlink{Founding
-Fathers}{Founding Fathers} to the \hyperlink{Continental
-Congress}{Continental Congress}, whereas Crosses attract further
-colonists.
+The two other ``abstract'' goods are \Goods{Liberty Bells}, which are
+produced in the \hyperlink{Town Hall}{Town Hall}, and \Goods{Crosses},
+which are generated by the \hyperlink{Church}{Church}. They represent
+the concepts of liberty and of religious freedom. Liberty Bells are
+needed to convince your colonists of your policies, and to elect
+\hyperlink{Founding Fathers}{Founding Fathers} to the
+\hyperlink{Continental Congress}{Continental Congress}, whereas
+Crosses attract further colonists.
 
-\hypertarget{Trade Goods}{\textbf{Trade Goods}}, on the other hand,
-can be transported and traded, but they can not be produced in your
-colonies. They are only available in Europe and are useful for trading
-with native settlements, which generally demand Trade Goods.
+\Goods{Trade Goods}, on the other hand, can be transported and traded,
+but they can not be produced in your colonies. They are only available
+in Europe and are useful for trading with native settlements, which
+generally demand Trade Goods.
 
+
+%% \hypertarget{Resources}{\subsection{Special Resources}}
+
+%% Some types of terrain can also have special resources, which increase
+%% the production of one or more types of goods.
 
 
 \hypertarget{Colonies}{\section{Colonies}}
@@ -533,131 +527,115 @@ All in all, there are sixteen different buildings, eight of which are
 part of every newly established colony:
 
 \begin{itemize}
-\item The \hypertarget{Town Hall}{\textbf{Town Hall}}, which can not
-  be upgraded, provides workplaces for up to three colonists producing
-  \textbf{Liberty Bells}. Its effect can be increased by building a
+\item The \Building{Town Hall}, which can not be upgraded, provides
+  workplaces for up to three colonists producing \textbf{Liberty
+  Bells}. Its effect can be increased by building a
   \hyperlink{Printing Press}{Printing Press} and a
   \hyperlink{Newspaper}{Newspaper}.
 
-\item The \hypertarget{Carpenter's House}{\textbf{Carpenter's House}},
-  which can be upgraded to a \textbf{Lumber Mill} once the colony's
-  population reaches 3, is used to convert \hyperlink{Lumber}{Lumber}
-  to \hyperlink{Hammers}{Hammers}. Hammers are required to construct
-  or upgrade all kinds of buildings.
+\item The \Building{Carpenter's House}, which can be upgraded to a
+  \textbf{Lumber Mill} once the colony's population reaches 3, is used
+  to convert \hyperlink{Lumber}{Lumber} to
+  \hyperlink{Hammers}{Hammers}. Hammers are required to construct or
+  upgrade all kinds of buildings.
 
-\item The \hypertarget{Blacksmith's House}{\textbf{Blacksmith's
-  House}}, which can be upgraded to a \hypertarget{Blacksmith's
-  Workshop}{\textbf{Blacksmith's Workshop}}, is used to convert
+\item The \Building{Blacksmith's House}, which can be upgraded to a
+  \Building{Blacksmith's Workshop}, is used to convert
   \hyperlink{Ore}{Ore} to \hyperlink{Tools}{Tools}. Tools are required
   to construct certain kinds of buildings and to upgrade all kinds of
   buildings. Tools are also used by \hyperlink{Pioneer}{Pioneers} and
   to produce \hyperlink{Muskets}{Muskets}. Once the population of the
   colony has reached 8, the Blacksmith's Workshop can be replaced by
-  \hypertarget{Iron Works}{\textbf{Iron Works}}, provided that
-  \hyperlink{Adam Smith}{Adam Smith} has joined the
-  \hyperlink{Continental Congress}{Continental Congress}.
+  \Building{Iron Works}, provided that \hyperlink{Adam Smith}{Adam
+  Smith} has joined the \hyperlink{Continental Congress}{Continental
+  Congress}.
 
-\item The \hypertarget{Tobacconist's House}{\textbf{Tobacconist's
-  House}}, which can be upgraded to a \hypertarget{Tobacconist's
-  Shop}{\textbf{Tobacconist's Shop}}, is used to produce
+\item The \Building{Tobacconist's House}, which can be upgraded to a
+  \Building{Tobacconist's Shop}, is used to produce
   \hyperlink{Cigars}{Cigars} from \hyperlink{Tobacco}{Tobacco}.  Once
   the colony's population has reached 8, it can be further upgraded to
-  a \hypertarget{Cigar Factory}{\textbf{Cigar Factory}}, provided that
-  \hyperlink{Adam Smith}{Adam Smith} has joined the
+  a \Building{Cigar Factory}, provided that \hyperlink{Adam
+  Smith}{Adam Smith} has joined the \hyperlink{Continental
+  Congress}{Continental Congress}.
+
+\item The \Building{Weaver's House}, which can be upgraded to a
+  \Building{Weaver's Shop}, is used to turn \hyperlink{Cotton}{Cotton}
+  into \hyperlink{Cloth}{Cloth}. It can be upgraded to a
+  \Building{Textile Mill} as soon as the population of the colony is
+  at least 8 and \hyperlink{Adam Smith}{Adam Smith} has joined the
   \hyperlink{Continental Congress}{Continental Congress}.
 
-\item The \hypertarget{Weaver's House}{\textbf{Weaver's House}},
-  which can be upgraded to a \hypertarget{Weaver's
-  Shop}{\textbf{Weaver's Shop}}, is used to turn
-  \hyperlink{Cotton}{Cotton} into \hyperlink{Cloth}{Cloth}. It can be
-  upgraded to a \hypertarget{Textile Mill}{\textbf{Textile Mill}} as
-  soon as the population of the colony is at least 8 and
-  \hyperlink{Adam Smith}{Adam Smith} has joined the
-  \hyperlink{Continental Congress}{Continental Congress}.
+\item The \Building{Distiller's House}, which can be upgraded to a
+  \Building{Rum Distillery}, is used to produce \hyperlink{Rum}{Rum}
+  from \hyperlink{Sugar}{Sugar}. Once \hyperlink{Adam Smith}{Adam
+  Smith} has joined the \hyperlink{Continental Congress}{Continental
+  Congress} and the colony's population is at least 8, the rum
+  distillery can be replaced by a \Building{Rum Factory}.
 
-\item The \hypertarget{Distiller's House}{\textbf{Distiller's
-  House}}, which can be upgraded to a \hypertarget{Rum
-  Distillery}{\textbf{Rum Distillery}}, is used to produce
-  \hyperlink{Rum}{Rum} from \hyperlink{Sugar}{Sugar}. Once
-  \hyperlink{Adam Smith}{Adam Smith} has joined the
-  \hyperlink{Continental Congress}{Continental Congress} and the
-  colony's population is at least 8, the rum distillery can be
-  replaced by a \hypertarget{Rum Factory}{\textbf{Rum Factory}}.
-
-\item The \hypertarget{Fur Trader's House}{\textbf{Fur Trader's
-  House}}, which can be upgraded to a \hypertarget{Fur Trader's
-  Post}{\textbf{Fur Trader's Post}}, is used to produce
+\item The \Building{Fur Trader's House}, which can be upgraded to a
+  \Building{Fur Trader's Post}, is used to produce
   \hyperlink{Coats}{Coats} from \hyperlink{Furs}{Furs}. Once the
   colony's population has reached 6, it can be further upgraded to a
-  \hypertarget{Fur Factory}{\textbf{Fur Factory}}, provided that
-  \hyperlink{Adam Smith}{Adam Smith} has joined the
-  \hyperlink{Continental Congress}{Continental Congress}.
+  \Building{Fur Factory}, provided that \hyperlink{Adam Smith}{Adam
+  Smith} has joined the \hyperlink{Continental Congress}{Continental
+  Congress}.
 
-\item The \hypertarget{Warehouse}{\textbf{Warehouse}} stores all kinds
-  of goods. Its initial capacity is 100 units of each kind of goods,
-  but it can be upgraded to 200 and finally 300 units.
+\item The \Building{Warehouse} stores all kinds of goods. Its initial
+  capacity is 100 units of each kind of goods, but it can be upgraded
+  to 200 and finally 300 units.
 \end{itemize}
 
 The following eight buildings are not part of your basic colony and
 have to be constructed later:
 
 \begin{itemize}
-\item A colony with a population of at least 4 may build a 
-  \hypertarget{Schoolhouse}{\textbf{Schoolhouse}}, which enables some
-  master craftsman to teach an unskilled colonist their trade. As soon
-  as the population reaches 8, it can be upgraded to a
-  \hypertarget{College}{\textbf{College}}, in which additional trades
-  can be taught by two colonists. Once the population reaches 10, the
-  college can be replaced by a
-  \hypertarget{University}{\textbf{University}}, at which all trades
-  can be taught by three colonists. See \hyperlink{Skills and
-  Education}{Skills and Education} for details.
+\item A colony with a population of at least 4 may build a
+  \Building{Schoolhouse}, which enables some master craftsman to teach
+  an unskilled colonist their trade. As soon as the population reaches
+  8, it can be upgraded to a \Building{College}, in which additional
+  trades can be taught by two colonists. Once the population reaches
+  10, the college can be replaced by a \Building{University}, at which
+  all trades can be taught by three colonists. See \hyperlink{Skills
+  and Education}{Skills and Education} for details.
 
-\item The \hypertarget{Armory}{\textbf{Armory}} is used to produce
+\item The \Building{Armory} is used to produce
   \hyperlink{Muskets}{Muskets} from \hyperlink{Tools}{Tools}. As soon
   as the population reaches 8, the armory can be upgraded to a
-  \hypertarget{Magazine}{\textbf{Magazine}} and then to an
-  \hypertarget{Arsenal}{\textbf{Arsenal}}, provided that
+  \Building{Magazine} and then to an \Building{Arsenal}, provided that
   \hyperlink{Adam Smith}{Adam Smith} has joined the
   \hyperlink{Continental Congress}{Continental Congress}.
 
 \item A colony with a population of 3 or more may build a
-  \hypertarget{Church}{\textbf{Church}}, which can be upgraded to a
-  \hypertarget{Cathedral}{\textbf{Cathedral}} as soon as the
-  population reaches 8. The religious freedom of the New World
-  (symbolized by \hyperlink{Crosses}{Crosses}) causes increased
-  emigration from Europe.
+  \Building{Church}, which can be upgraded to a \Building{Cathedral}
+  as soon as the population reaches 8. The religious freedom of the
+  New World (symbolized by \hyperlink{Crosses}{Crosses}) causes
+  increased emigration from Europe.
 
-\item The \hypertarget{Stockade}{\textbf{Stockade}}, which can be
-  constructed as soon as the colony's population reaches 3, protects
-  the colonists from attacks. Note that a colony with a stockade can
-  not be abandoned, it can only be burned to the ground by
-  natives. The stockade can be upgraded to a
-  \hypertarget{Fort}{\textbf{Fort}}, which provides better protection
-  and bombards \hyperlink{Privateer}{Privateers} and enemy naval
-  units on adjacent ocean tiles. The fort can be replaced by a
-  \hypertarget{Fortress}{\textbf{Fortress}} as soon as the population
-  reaches 8.
+\item The \Building{Stockade}, which can be constructed as soon as the
+  colony's population reaches 3, protects the colonists from
+  attacks. Note that a colony with a stockade can not be abandoned, it
+  can only be burned to the ground by natives. The stockade can be
+  upgraded to a \Building{Fort}, which provides better protection and
+  bombards \hyperlink{Privateer}{Privateers} and enemy naval units on
+  adjacent ocean tiles. The fort can be replaced by a
+  \Building{Fortress} as soon as the population reaches 8.
 
-\item The \hypertarget{Stables}{\textbf{Stables}} increase the
-  production of \hyperlink{Horses}{Horses}.
+\item The \Building{Stables} increase the production of
+  \hyperlink{Horses}{Horses}.
 
-\item The \hypertarget{Dock}{\textbf{Dock}} allows colonists to 
-  produce \hyperlink{Fish}{Fish} on ocean tiles adjacent to the
-  colony. As soon as the population is at least 4, it can be upgraded
-  to a \hypertarget{Drydock}{\textbf{Drydock}}, which allows the
-  colony to repair damaged ships. When the colony's population reaches
-  8, it can be further upgraded to a
-  \hypertarget{Shipyard}{\textbf{Shipyard}}, which enables the colony
-  to build new ships.
+\item The \Building{Dock} allows colonists to produce
+  \hyperlink{Fish}{Fish} on ocean tiles adjacent to the colony. As
+  soon as the population is at least 4, it can be upgraded to a
+  \Building{Drydock}, which allows the colony to repair damaged
+  ships. When the colony's population reaches 8, it can be further
+  upgraded to a \Building{Shipyard}, which enables the colony to build
+  new ships.
 
-\item The \hypertarget{Printing Press}{\textbf{Printing Press}}, 
-  which can be upgraded to a
-  \hypertarget{Newspaper}{\textbf{Newspaper}} as soon as the
-  population reaches 4, increases the colony's production of
-  \hyperlink{Liberty Bells}{Liberty Bells}.
+\item The \Building{Printing Press}, which can be upgraded to a
+  \Building{Newspaper} as soon as the population reaches 4, increases
+  the colony's production of \hyperlink{Liberty Bells}{Liberty Bells}.
 
-\item The \hypertarget{Custom House}{\textbf{Custom House}}, which can
+\item The \Building{Custom House}, which can
   be built as soon as \hyperlink{Peter Stuyvesant}{Peter Stuyvesant}
   has joined the \hyperlink{Continental Congress}{Continental
   Congress}, allows the colony to export goods to Europe directly
@@ -677,39 +655,34 @@ units are available to all players. Some units are available only to
 \textbf{Royal Expeditionary Force}.
 
 The most basic unit of the European Players (including you) is the
-\hypertarget{Free Colonist}{\textbf{Free Colonist}}. The Free
-Colonist is quite good at any task, but has no special skills. At the
-beginning of the game, many of the colonists will not be volunteers,
-but \hypertarget{Indentured Servant}{\textbf{Indentured Servants}}, or
-\hypertarget{Petty Criminal}{\textbf{Petty Criminals}}, who are
-deported to the New World. Indentured Servants are pretty bad at all
-jobs within the colony, but just like Free Colonists, they can be sent
-to native villages to learn a skill from the natives. Petty Criminals
-are very bad at all jobs within the colony and can not learn anything
-from the natives. However, both Indentured Servants and Petty
-Criminals can become Free Colonists through \hyperlink{Skills and
-Education}{Education}.
+\Unit{Free Colonist}. The Free Colonist is quite good at any task, but
+has no special skills. At the beginning of the game, many of the
+colonists will not be volunteers, but \Unit{Indentured Servant}, or
+\Unit{Petty Criminal}, who are deported to the New World. Indentured
+Servants are pretty bad at all jobs within the colony, but just like
+Free Colonists, they can be sent to native villages to learn a skill
+from the natives. Petty Criminals are very bad at all jobs within the
+colony and can not learn anything from the natives. However, both
+Indentured Servants and Petty Criminals can become Free Colonists
+through \hyperlink{Skills and Education}{Education}.
 
 Many early colonies failed due to a lack of food. In order to avoid a
 similar fate, you must ensure adequate food production from the very
 beginning. All your colonists can produce some amount of food,
-especially on the more fertile terrain types, but \hypertarget{Expert
-Farmer}{\textbf{Expert Farmer}} and the \hypertarget{Expert
-Fisherman}{\textbf{Expert Fisherman}} will greatly increase your food
+especially on the more fertile terrain types, but \Unit{Expert Farmer}
+and the \Unit{Expert Fisherman} will greatly increase your food
 production. But note that the Expert Fisherman requires a
 \hyperlink{Dock}{Dock} to moor his boat to, and that this requires at
 least one ocean tile adjacent to your colony.
 
 Three types of units are not available in Europe because they posses
 skills that can only be learned from the native population. These are
-the \hypertarget{Master Sugar Planter}{\textbf{Master Sugar Planter}},
-the \hypertarget{Master Cotton Planter}{\textbf{Master Cotton
-Planter}}, the \hypertarget{Master Tobacco Planter}{\textbf{Master
-Tobacco Planter}}, and the \hypertarget{Expert Fur
-Trapper}{\textbf{Expert Fur Trapper}}. These units are able to greatly
-increase your production of \hyperlink{Sugar}{Sugar},
-\hyperlink{Cotton}{Cotton}, \hyperlink{Tobacco}{Tobacco}, and
-\hyperlink{Furs}{Furs}, respectively.
+the \Unit{Master Sugar Planter}, the \Unit{Master Cotton Planter}, the
+\Unit{Master Tobacco Planter}, and the \Unit{Expert Fur
+Trapper}. These units are able to greatly increase your production of
+\hyperlink{Sugar}{Sugar}, \hyperlink{Cotton}{Cotton},
+\hyperlink{Tobacco}{Tobacco}, and \hyperlink{Furs}{Furs},
+respectively.
 
 In the beginning of the game, you will most likely export a great deal
 of these goods to Europe, but beware, prices will drop! However, all
@@ -720,157 +693,138 @@ can be used to distill \hyperlink{Rum}{Rum},
 \hyperlink{Cloth}{Cloth}, \hyperlink{Cigars}{Cigars} are made from
 \hyperlink{Tobacco}{Tobacco}, and \hyperlink{Coats}{Coats} are made
 from \hyperlink{Furs}{Furs}. All your colonists can do this, but the
-\hypertarget{Master Distiller}{\textbf{Master Distiller}}, the
-\hypertarget{Master Weaver}{\textbf{Master Weaver}}, the
-\hypertarget{Master Tobacconist}{\textbf{Master Tobacconist}}, and the
-\hypertarget{Master Fur Trader}{\textbf{Master Fur Trader}} are the
-experts who will really rev up your production.
+\Unit{Master Distiller}, the \Unit{Master Weaver}, the \Unit{Master
+Tobacconist}, and the \Unit{Master Fur Trader} are the experts who
+will really rev up your production.
 
 The New World also has two mineral resources, \hyperlink{Ore}{Ore} and
 \hyperlink{Silver}{Silver}, to offer. Again, all your colonists are
 able to mine these resources to a certain extent, but you will need
-the \hypertarget{Expert Ore Miner}{\textbf{Expert Ore Miner}} and the
-\hypertarget{Expert SilverMiner}{\textbf{Expert SilverMiner}} to make
+the \Unit{Expert Ore Miner} and the \Unit{Expert SilverMiner} to make
 the most of them.
 
 \hyperlink{Lumber}{Lumber} can be produced in all forested tiles, and
 can also be exported to Europe, although prices are low. However, you
 will need vast amounts of lumber in order to upgrade your colonies,
 and no colonist is more skilled at cutting down forests than the
-\hypertarget{Expert LumberJack}{\textbf{Expert Lumberjack}}. Nor is
-any colonist more skilled at turning the lumber into buildings than
-the \hypertarget{Master Carpenter}{\textbf{Master Carpenter}}.
+\Unit{Expert LumberJack}. Nor is any colonist more skilled at turning
+the lumber into buildings than the \Unit{Master Carpenter}.
 
 The more advanced buildings you can construct in the your colonies
 require not only lumber but also \hyperlink{Tools}{Tools}, which are
-produced from \hyperlink{Ore}{Ore}. This is the job the
-\hypertarget{Master Blacksmith}{\textbf{Master Blacksmith}} excels in.
-Tools are also used by your \hypertarget{Pioneer}{\textbf{Pioneers}}
-to clear forests and plow fields, but none of your other colonists can
-match the outdoors skills of your \hypertarget{Hardy
-Pioneer}{\textbf{Hardy Pioneers}}. And finally, Tools are required for
-the production of \hyperlink{Muskets}{Muskets}, a demanding task best
-left to the \hypertarget{Master Gunsmith}{\textbf{Master Gunsmith}}.
+produced from \hyperlink{Ore}{Ore}. This is the job the \Unit{Master
+Blacksmith} excels in.  Tools are also used by your \Unit{Pioneer} to
+clear forests and plow fields, but none of your other colonists can
+match the outdoors skills of your \Unit{Hardy Pioneer}. And finally,
+Tools are required for the production of \hyperlink{Muskets}{Muskets},
+a demanding task best left to the \Unit{Master Gunsmith}.
 
 All your units are able to explore the New World, but the colonist
-most suited to this dangerous endeavour is the
-\hypertarget{Scout}{\textbf{Scout}}, a mounted colonist. A Scout may
-become a \hypertarget{Seasoned Scout}{\textbf{Seasoned Scout}} through
+most suited to this dangerous endeavour is the \Unit{Scout}, a mounted
+colonist. A Scout may become a \Unit{Seasoned Scout} through
 \hyperlink{Skills and Education}{experience}, either by visiting
 native settlements, or by investigating \hyperlink{Lost City
 Rumours}{Lost City Rumours}. The Seasoned Scout is much more skillful
 at these jobs, but beware, they are dangerous!
 
 Another colonist able to visit native settlements is the
-\hypertarget{Missionary}{\textbf{Missionary}}. Any colonist can be
-converted to a Missionary by blessing him in a colony with a
-\hyperlink{Church}{Church}, or in the \hyperlink{Home Port}{Home
-Port}, which is sure to have several churches and maybe even a
+\Unit{Missionary}. Any colonist can be converted to a Missionary by
+blessing him in a colony with a \hyperlink{Church}{Church}, or in the
+\hyperlink{Home Port}{Home Port}, which is sure to have several
+churches and maybe even a
 \hyperlink{Cathedral}{Cathedral}. Missionaries are able to establish a
 \hyperlink{Mission}{Mission} in the native settlement, and to convert
-the natives. \hypertarget{Jesuit Missionary}{\textbf{Jesuit
-Missionaries}}, however, are much more accomplished at the job.
+the natives. \Unit{Jesuit Missionary}, however, are much more
+accomplished at the job.
 
-The converted natives may join your colonies as \hypertarget{Indian
-Convert}{\textbf{Indian Converts}}. They are unskilled at all jobs
-within the colony, but more skilled than your Free Colonists at all
-outdoor jobs. Indian Converts can not be upgraded through
-\hyperlink{Skills and Education}{Education}, but they become Free
-Colonists as soon as \hyperlink{Bartolom\'e de las Casas}{Bartolom\'e
-de las Casas} joins the \hyperlink{Continental Congress}{Continental
-Congress}.
+The converted natives may join your colonies as \Unit{Indian
+Convert}. They are unskilled at all jobs within the colony, but more
+skilled than your Free Colonists at all outdoor jobs. Indian Converts
+can not be upgraded through \hyperlink{Skills and
+Education}{Education}, but they become Free Colonists as soon as
+\hyperlink{Bartolome de las Casas}{Bartolom{\'e} de las Casas} joins
+the \hyperlink{Continental Congress}{Continental Congress}.
 
 Many colonists come to the New World in search of religious
 freedom. Thus, they desire a \hyperlink{Church}{Church} in which to
 preach and pray. This religious freedom, which attracts more European
 colonists, is represented by \hyperlink{Crosses}{Crosses}. Naturally,
 some colonists are more eloquent and inspired than others, and the
-most famous of these are known as \hypertarget{Firebrand
-Preacher}{\textbf{Firebrand Preachers}}.
+most famous of these are known as \Unit{Firebrand Preacher}.
 
 While the preachers are concerned with the spiritual welfare of the
 colonists, the colonists concerned with the secular welfare of their
 fellow citizens meet in the \hyperlink{Town Hall}{Town Hall}, which
 generates \hyperlink{Liberty Bells}{Liberty Bells}. The most dignified
-and influential of these citizens are considered \hypertarget{Elder
-Statesman}{\textbf{Elder Statesmen}}.
+and influential of these citizens are considered \Unit{Elder
+Statesman}.
 
 Any colonist can be equipped with \hyperlink{Muskets}{Muskets}, which
-makes him a \hypertarget{Soldier}{\textbf{Soldier}}, or a
-\hypertarget{Dragoon}{\textbf{Dragoon}} if he is mounted. However,
-combat-hardened \hypertarget{Veteran Soldier}{\textbf{Veteran
-Soldiers}} and \hypertarget{Veteran Dragoon}{\textbf{Veteran
-Dragoons}} are much more effective. A dragoon that is beaten in battle
-is downgraded to a soldier. A beaten soldier becomes an unarmed
-colonist. 
+makes him a \Unit{Soldier}, or a \Unit{Dragoon} if he is
+mounted. However, combat-hardened \Unit{Veteran Soldier} and
+\Unit{Veteran Dragoon} are much more effective. A dragoon that is
+beaten in battle is downgraded to a soldier. A beaten soldier becomes
+an unarmed colonist.
 
 On the other hand, any soldier or dragoon that wins a battle may be
 upgraded. A Petty Criminal will be upgraded to an Indentured Servant,
 an Indentured Servant will be upgraded to a Free Colonist, and a Free
 Colonist to a veteran unit. Veteran units may be further upgraded to
-\hypertarget{Colonial Regular}{\textbf{Colonial Regulars}} or
-\hypertarget{Colonial Cavalry}{\textbf{Colonial Cavalry}}, but only
-after the \hyperlink{Declaration of Independence}{Declaration of
-Independence}.
+\Unit{Colonial Regular} or \Unit{Colonial Cavalry}, but only after the
+\hyperlink{Declaration of Independence}{Declaration of Independence}.
 
-\hypertarget{Artillery}{\textbf{Artillery}} is most effective at
-attacking and defending colonies and fortified units, but is also very
-vulnerable in the open. Artillery may become damaged, which decreases
-its efficiency. \hypertarget{Damaged Artillery}{\textbf{Damaged
-Artillery}} is still quite powerful, but it can not be repaired, and
-further damage will destroy it.
+\Unit{Artillery} is most effective at attacking and defending colonies
+and fortified units, but is also very vulnerable in the
+open. Artillery may become damaged, which decreases its
+efficiency. \Unit{Damaged Artillery} is still quite powerful, but it
+can not be repaired, and further damage will destroy it.
 
-The \hypertarget{Wagon Train}{\textbf{Wagon Train}}, which has to be
-built in one of your colonies, can be used to transport up to 200
-units of goods over land and to trade with native settlements, and
-foreign colonies if \hyperlink{Jan de Witt}{Jan de Witt} has joined
-the \hyperlink{Continental Congress}{Continental Congress}.
+The \Unit{Wagon Train}, which has to be built in one of your colonies,
+can be used to transport up to 200 units of goods over land and to
+trade with native settlements, and foreign colonies if \hyperlink{Jan
+de Witt}{Jan de Witt} has joined the \hyperlink{Continental
+Congress}{Continental Congress}.
 
-The \hypertarget{Treasure Train}{\textbf{Treasure Train}} is similar
-to the Wagon Train, but is used only to transport treasures. You can
-find these treasures in \hyperlink{Lost City Rumours}{Lost Cities}, or
-in the ruins of native settlements you have destroyed. If you move
-your Treasure Trains into a colony with access to the sea, your
-\hyperlink{Monarch}{Monarch} will offer to ship it to Europe for a
-``reasonable fee'', unless \hyperlink{Hern\'an Cort\'es}{Hern\'an
-Cort\'es} has joined the \hyperlink{Continental Congress}{Continental
-Congress}, in which case it will be shipped free of charge. If you
-have a \hyperlink{Galleon}{Galleon}, however, you can take the
-Treasure Train to Europe yourself.
+The \Unit{Treasure Train} is similar to the Wagon Train, but is used
+only to transport treasures. You can find these treasures in
+\hyperlink{Lost City Rumours}{Lost Cities}, or in the ruins of native
+settlements you have destroyed. If you move your Treasure Trains into
+a colony with access to the sea, your \hyperlink{Monarch}{Monarch}
+will offer to ship it to Europe for a ``reasonable fee'', unless
+\hyperlink{Hernan Cortes}{Hern\'an Cort\'es} has joined the
+\hyperlink{Continental Congress}{Continental Congress}, in which case
+it will be shipped free of charge. If you have a
+\hyperlink{Galleon}{Galleon}, however, you can take the Treasure Train
+to Europe yourself.
 
-The \hypertarget{Caravel}{\textbf{Caravel}}, the
-\hypertarget{Merchantman}{\textbf{Merchantman}} and the
-\hypertarget{Galleon}{\textbf{Galleon}} are unarmed \hypertarget{Naval
-Units}{naval units}, with two, four or six cargo holds,
-respectively. A cargo hold may contain up to 100 units of goods, or
-any land unit except the Treasure Train, which takes up six cargo
-holds all by itself, and the Wagon Train, which can not be transported
-by sea at all.
+The \Unit{Caravel}, the \Unit{Merchantman} and the \Unit{Galleon} are
+unarmed \hypertarget{Naval Units}{naval units}, with two, four or six
+cargo holds, respectively. A cargo hold may contain up to 100 units of
+goods, or any land unit except the Treasure Train, which takes up six
+cargo holds all by itself, and the Wagon Train, which can not be
+transported by sea at all.
 
-The \hypertarget{Privateer}{\textbf{Privateer}} and the
-\hypertarget{Frigate}{\textbf{Frigate}} are armed naval vessel with
-two or four cargo holds, respectively. The Privateer is unique in that
-it does not fly the flag of your country and can attack the vessels of
-other countries with impunity. It becomes even more deadly when
-\hyperlink{Francis Drake}{Francis Drake} joins the
+The \Unit{Privateer} and the \Unit{Frigate} are armed naval vessel
+with two or four cargo holds, respectively. The Privateer is unique in
+that it does not fly the flag of your country and can attack the
+vessels of other countries with impunity. It becomes even more deadly
+when \hyperlink{Francis Drake}{Francis Drake} joins the
 \hyperlink{Continental Congress}{Continental Congress}.
 
-The \hypertarget{Man of War}{\textbf{Man of War}} is the most powerful
-naval vessel, and has six cargo holds. At the beginning of the game,
-only the \hyperlink{Monarch}{Monarch} has these powerful ships, but
-after the \hyperlink{Declaration of Independence}{Declaration of
-Independence} you can also construct them in your colonies.
+The \Unit{Man of War} is the most powerful naval vessel, and has six
+cargo holds. At the beginning of the game, only the
+\hyperlink{Monarch}{Monarch} has these powerful ships, but after the
+\hyperlink{Declaration of Independence}{Declaration of Independence}
+you can also construct them in your colonies.
 
 The Monarch has two types of units that you can never command,
-however. These are the \hypertarget{King's Regular}{\textbf{King's
-Regulars}} and \hypertarget{King's Cavalry}{\textbf{King's Cavalry}},
-which are roughly as powerful as your \hyperlink{Colonial
-Regular}{Colonial Regulars} and \hyperlink{Colonial
-Cavalry}{Colonial Cavalry}.
+however. These are the \Unit{King's Regular} and \Unit{King's
+Cavalry}, which are roughly as powerful as your \hyperlink{Colonial
+Regular}{Colonial Regulars} and \hyperlink{Colonial Cavalry}{Colonial
+Cavalry}.
 
 The natives also have two types of units that you can not recruit,
-namely the \hypertarget{Indian Brave}{\textbf{Indian Brave}} and the
-\hypertarget{Indian Dragoon}{\textbf{Indian Dragoon}}. These are
+namely the \Unit{Indian Brave} and the \Unit{Indian Dragoon}. These are
 strong fighting units that can also carry up to 100 units of goods
 each.
 
@@ -886,20 +840,22 @@ each.
 \hypertarget{Skills and Education}{\subsection{Skills and Education}}
 
 In FreeCol, your colonists come from all walks of life. Some are
-unskilled {\textbf{Petty Criminals}}, who are deported to the
-colonies. Others are {\textbf{Indentured Servants}}, or {\textbf{Free
-Colonists}} with moderate skills. Still others are masters of their
+unskilled \hyperlink{Petty Criminal}{Petty Criminals}, who are
+deported to the colonies. Others are \hyperlink{Indentured
+Servants}{Indentured Servants}, or \hyperlink{Free Colonist}{Free
+Colonists} with moderate skills. Still others are masters of their
 craft, experts at their trade or profession, who were educated at the
 Royal College in Europe. If you have enough gold, you can recruit
 units directly from the Royal College.
 
-Not all skills, however, can be learned in Europe. The cultivation of
+Not all skills, however, can be learned in Europe.
 \hyperlink{Sugar}{Sugar}, \hyperlink{Cotton}{Cotton} and
-\hyperlink{Tobacco}{Tobacco}, and the skill of
-\hyperlink{Fur}{trapping} are apparently unknown in Europe. Thus,
-{\textbf{Master Sugar Planters}}, {\textbf{Master Cotton Planters}},
-{\textbf{Master Tobacco Planters}}, as well as the {\textbf{Master Fur
-Trappers}}, can not be recruited in Europe.
+\hyperlink{Tobacco}{Tobacco}, as well as \hyperlink{Furs}{Furs} are
+apparently unknown in Europe. Thus, \hyperlink{Master Sugar
+Planter}{Master Sugar Planters}, \hyperlink{Master Cotton
+Planter}{Master Cotton Planters}, \hyperlink{Master Tobacco
+Planter}{Master Tobacco Planters}, as well as the \hyperlink{Master
+Fur Trapper}{Master Fur Trappers}, can not be recruited in Europe.
 
 At the beginning of the game, these skills can only be learned at
 Indian Settlements. As soon as you construct a
@@ -915,15 +871,15 @@ Indian units are more productive than free colonists when working
 outside of the colony, and less productive when working inside a
 building. Indian units can not become free colonists through
 education, but all Indian units become free colonists as soon as
-\hyperlink{Bartolom\'e de las Casas}{Bartolom\'e de las Casas} joins
+\hyperlink{Bartolome de las Casas}{Bartolom\'e de las Casas} joins
 the \hyperlink{Continental Congress}{Continental Congress}.
 
-\textbf{Scouts} can explore the New World and enter Indian Settlements
-in order to speak with the tribal chiefs. A scout entering an Indian
-Settlement may become a \textbf{Seasoned Scout} through experience. A
-colonist investigating a \hyperlink{Lost City Rumour}{Lost City
-Rumour} may also be upgraded to a Seasoned Scout, unless that unit
-already has another skill.
+\hyperlink{Scout}{Scouts} can explore the New World and enter Indian
+Settlements in order to speak with the tribal chiefs. A scout entering
+an Indian Settlement may become a \hyperlink{Seasoned Scout}{Seasoned
+Scout} through experience. A colonist investigating a \hyperlink{Lost
+City Rumour}{Lost City Rumour} may also be upgraded to a Seasoned
+Scout, unless that unit already has another skill.
 
 
 \hypertarget{Combat}{\subsection{Combat}}
@@ -993,182 +949,175 @@ beginning of the game, you will need only a few Liberty Bells to elect
 a Founding Father to the Continental Congress, but as the game
 progresses this number may increase to many hundred Bells.
 
-\hypertarget{Adam Smith}{\textbf{Adam Smith}} (1723--1790), better
-known as the Father of Modern Economics, penned several texts
-pertaining to Economic theory, including, ``The Wealth of Nations''
-his most famous text. As soon as Adam Smith joins the Continental
-Congress, the player is allowed to build factories, which produce 1.5
-units of manufactured goods for each unit of raw material consumed.
+\Father{Adam Smith} (1723--1790), better known as the Father of Modern
+Economics, penned several texts pertaining to Economic theory,
+including, ``The Wealth of Nations'' his most famous text. As soon as
+Adam Smith joins the Continental Congress, the player is allowed to
+build factories, which produce 1.5 units of manufactured goods for
+each unit of raw material consumed.
 
-\hypertarget{Jacob Fugger II}{\textbf{Jacob Fugger II}} (1459--1525)
-was an extremely wealthy German merchant and banker who amassed a
-fortune with family partnerships and stock holdings in the mining
-industries. As soon as Jacob Fugger joins the Continental Congress,
-all \hyperlink{boycotts}{boycotts} currently in effect are dropped.
+\Father{Jacob Fugger II} (1459--1525) was an extremely wealthy German
+merchant and banker who amassed a fortune with family partnerships and
+stock holdings in the mining industries. As soon as Jacob Fugger joins
+the Continental Congress, all \hyperlink{boycotts}{boycotts} currently
+in effect are dropped.
 
-\hypertarget{Peter Minuit}{\textbf{Peter Minuit}} (1580--1638) bought
-what later became known as Manhattan Island from Native Americans for
-about 60 Dutch guilders. He later colonized the Delware Bay area
-as well. As soon as Peter Minuit is elected to the Continental
-Congress, the Indians no longer demand payment for their land.
+\Father{Peter Minuit} (1580--1638) bought what later became known as
+Manhattan Island from Native Americans for about 60 Dutch guilders. He
+later colonized the Delware Bay area as well. As soon as Peter Minuit
+is elected to the Continental Congress, the Indians no longer demand
+payment for their land.
 
-\hypertarget{Peter Stuyvesant}{\textbf{Peter Stuyvesant}} (1592--1672)
-was appointed Governor General of the New Netherlands, which, after a
-British invasion he could not stop, became New York. With the election
-of Peter Stuyvesant, the construction of \hyperlink{Custom
-House}{custom houses} becomes possible.
+\Father{Peter Stuyvesant} (1592--1672) was appointed Governor General
+of the New Netherlands, which, after a British invasion he could not
+stop, became New York. With the election of Peter Stuyvesant, the
+construction of \hyperlink{Custom House}{custom houses} becomes
+possible.
 
-\hypertarget{Jan de Witt}{\textbf{Jan de Witt}} (1625--1672) was a
-great Dutch statesmen.  He represented the merchants and a encouraged
-industry and commerce. He also negotiated several important treaties
-for the Dutch to end wars with England. As soon as Jan de Witt is a
-member of the Continental Congress, trade with foreign colonies
-becomes possible.
+\Father{Jan de Witt} (1625--1672) was a great Dutch statesmen.  He
+represented the merchants and a encouraged industry and commerce. He
+also negotiated several important treaties for the Dutch to end wars
+with England. As soon as Jan de Witt is a member of the Continental
+Congress, trade with foreign colonies becomes possible.
 
-\hypertarget{Ferdinand Magellan}{\textbf{Ferdinand Magellan}}
-(1480--1521) was one of the greatest explorers to navigate the
-globe. Magellan was first to circumnavigate the globe and cross the
-Pacific Ocean. Magellan's election to the Continental Congress
-increases the movement of all naval vessels by one, and the time
-to sail between Europe and the New World is reduced.
+\Father{Ferdinand Magellan} (1480--1521) was one of the greatest
+explorers to navigate the globe. Magellan was first to circumnavigate
+the globe and cross the Pacific Ocean. Magellan's election to the
+Continental Congress increases the movement of all naval vessels by
+one, and the time to sail between Europe and the New World is reduced.
 
-\hypertarget{Francisco de Coronado}{\textbf{Francisco de Coronado}}
-(1510--1554) was the first European explorer to see the Grand
-Canyon. Though he never found the golden cities he searched for, his
-mapping of the area now called the Southwestern US was important to
-further exploration. As soon as Francisco de Coronado joins the
-Continental Congress, all existing colonies become visible on the map.
+\Father{Francisco de Coronado} (1510--1554) was the first European
+explorer to see the Grand Canyon. Though he never found the golden
+cities he searched for, his mapping of the area now called the
+Southwestern US was important to further exploration. As soon as
+Francisco de Coronado joins the Continental Congress, all existing
+colonies become visible on the map.
 
-\hypertarget{Hernando de Soto}{\textbf{Hernando de Soto}} (1496--1542)
-was the first European to explore Florida and the southeastern US.  He
-also held a prominent role in conquests of Central America. If
-Hernando de Soto is a member of the Continental Congress, the
-exploration of \hyperlink{Lost City Rumours}{Lost City Rumours} always
-yields a positive result, and all units have an extended sight radius.
+\Father{Hernando de Soto} (1496--1542) was the first European to
+explore Florida and the southeastern US.  He also held a prominent
+role in conquests of Central America. If Hernando de Soto is a member
+of the Continental Congress, the exploration of \hyperlink{Lost City
+Rumours}{Lost City Rumours} always yields a positive result, and all
+units have an extended sight radius.
 
-\hypertarget{Henry Hudson}{\textbf{Henry Hudson}} (1565--1611) was an
-English navigator who explored and mapped a large area of the
-northeastern North American continent.  Many waterways in that region
-are named in his honour. His original goal was to find the famed
-Northwest Passage. The election of Henry Hudson to the Continental
-Congress doubles the output of all \hyperlink{Expert Fur Trapper}{Fur
-Trappers}.
+\Father{Henry Hudson} (1565--1611) was an English navigator who
+explored and mapped a large area of the northeastern North American
+continent.  Many waterways in that region are named in his honour. His
+original goal was to find the famed Northwest Passage. The election of
+Henry Hudson to the Continental Congress doubles the output of all
+\hyperlink{Expert Fur Trapper}{Fur Trappers}.
 
-\hypertarget{Robert La Salle}{\textbf{Robert La Salle}} (1643--1687)
-was the first European to travel the length of the Mississippi river,
-while on a mission to set up numerous trading posts along its banks.
-He later claimed the whole basin as Louisiana in honor of the French
-King. Later, he explored several of the Great Lakes. If Robert La
-Salle is a member of the Continental Congress, all colonies gain a
-stockade as soon as their population reaches three colonists.
+\Father{Robert La Salle} (1643--1687) was the first European to travel
+the length of the Mississippi river, while on a mission to set up
+numerous trading posts along its banks.  He later claimed the whole
+basin as Louisiana in honor of the French King. Later, he explored
+several of the Great Lakes. If Robert La Salle is a member of the
+Continental Congress, all colonies gain a stockade as soon as their
+population reaches three colonists.
 
-\hypertarget{Hern\'an Cort\'es}{\textbf{Hern\'an Cort\'es}}
-(1485--1547) was a famed Spanish conquistador who overthrew the Aztec
-Empire and claimed Mexico for Spain. As soon as Hern\'an Cort\'es
-joins the Continental Congress, conquered native settlements always
-yield treasure (and in greater abundance) and the King's
-\hyperlink{Galleon}{galleons} transport it free of charge.
+\FFather{Hernan Cortes}{Hern\'an Cort\'es} (1485--1547) was a famed Spanish
+conquistador who overthrew the Aztec Empire and claimed Mexico for
+Spain. As soon as Hern\'an Cort\'es joins the Continental Congress,
+conquered native settlements always yield treasure (and in greater
+abundance) and the King's \hyperlink{Galleon}{galleons} transport it
+free of charge.
 
-\hypertarget{George Washington}{\textbf{George Washington}}
-(1732--1799) was the general who lead the colonial army to victory
-over the British to gain independence for the colonies. This victory
-and his leadership led to his being named the new nation's first
-President. If George Washington is a member of the Continental
-Congress, any soldier or dragoon who wins a combat is automatically
-upgraded to the next possible level.
+\Father{George Washington} (1732--1799) was the general who lead the
+colonial army to victory over the British to gain independence for the
+colonies. This victory and his leadership led to his being named the
+new nation's first President. If George Washington is a member of the
+Continental Congress, any soldier or dragoon who wins a combat is
+automatically upgraded to the next possible level.
 
-\hypertarget{Paul Revere}{\textbf{Paul Revere}} (1734--1818) was the
-famed rider of colonial America who mounted his horse and rode through
-the countryside alerting colonists that British soldiers were
-coming. He was captured during the ride and later released when his
-captors believed they were in grave danger and their prisoner might
-slow them down. With Paul Revere a member of the Continental Congress,
-a colonist automatically takes up any stockpiled muskets and defends
-an otherwise undefended colony if it is attacked.
+\Father{Paul Revere} (1734--1818) was the famed rider of colonial
+America who mounted his horse and rode through the countryside
+alerting colonists that British soldiers were coming. He was captured
+during the ride and later released when his captors believed they were
+in grave danger and their prisoner might slow them down. With Paul
+Revere a member of the Continental Congress, a colonist automatically
+takes up any stockpiled muskets and defends an otherwise undefended
+colony if it is attacked.
 
-\hypertarget{Francis Drake}{\textbf{Francis Drake}} (1542--1596) was a
-great English sea captain, the first Englishman to circumnavigate the
-globe and a hero in the fights against the Spanish Armada. The
-presence of Francis Drake in the Continental Congress increases the
-combat strength of all Privateers by 50\%.
+\Father{Francis Drake} (1542--1596) was a great English sea captain,
+the first Englishman to circumnavigate the globe and a hero in the
+fights against the Spanish Armada. The presence of Francis Drake in
+the Continental Congress increases the combat strength of all
+Privateers by 50\%.
 
-\hypertarget{John Paul Jones}{\textbf{John Paul Jones}} (1741--1792)
-was hailed as a great sea captain in America, and uttered the famous
-words "Sir, I have not yet begun to fight" while fighting the British
-at sea. He later watched his ship sink to the bottom of the ocean from
-the deck of a British vessel. As soon as John Paul Jones is elected to
-the Continental Congress, a \hyperlink{Frigate}{Frigate} is added to
-your colonial navy for free.
+\Father{John Paul Jones} (1741--1792) was hailed as a great sea
+captain in America, and uttered the famous words "Sir, I have not yet
+begun to fight" while fighting the British at sea. He later watched
+his ship sink to the bottom of the ocean from the deck of a British
+vessel. As soon as John Paul Jones is elected to the Continental
+Congress, a \hyperlink{Frigate}{Frigate} is added to your colonial
+navy for free.
 
-\hypertarget{Thomas Jefferson}{\textbf{Thomas Jefferson}}
-(1743--1826), a powerful voice of patriotism, was credited with
-writing the Declaration of Independence. He later became the 3rd
-President of the US. The election of Thomas Jefferson to the
-Continental Congress increases Liberty Bell production in colonies by
-50\%.
+\Father{Thomas Jefferson} (1743--1826), a powerful voice of
+patriotism, was credited with writing the Declaration of
+Independence. He later became the 3rd President of the US. The
+election of Thomas Jefferson to the Continental Congress increases
+Liberty Bell production in colonies by 50\%.
 
-\hypertarget{Pocahontas}{\textbf{Pocahontas}} (1595--1617) was a
-peacemaker between early Jamestown settlers and the Native
-Americans. She is credited with sending food and other supplies to
-starving colonists there during harsh times.  She later converted to
-Christianity and married an Englishman.  When Pocahontas joins the
-Continental Congress, all tension levels between you and natives are
-removed and Indian alarm is generated half as fast.
+\Father{Pocahontas} (1595--1617) was a peacemaker between early
+Jamestown settlers and the Native Americans. She is credited with
+sending food and other supplies to starving colonists there during
+harsh times.  She later converted to Christianity and married an
+Englishman.  When Pocahontas joins the Continental Congress, all
+tension levels between you and natives are removed and Indian alarm is
+generated half as fast.
 
-\hypertarget{Thomas Paine}{\textbf{Thomas Paine}} (1737--1809)
-inspired colonists with his pen at the urging of Benjamin Franklin. He
-published a pamphlet, "Common Sense", guiding the thoughts of patriots
-all over the colonies. The election of Thomas Pain to the Continental
-Congress increases Liberty Bell production in all your colonies by the
-value of the current \hyperlink{Taxes}{tax rate}.
+\Father{Thomas Paine} (1737--1809) inspired colonists with his pen at
+the urging of Benjamin Franklin. He published a pamphlet, "Common
+Sense", guiding the thoughts of patriots all over the colonies. The
+election of Thomas Pain to the Continental Congress increases Liberty
+Bell production in all your colonies by the value of the current
+\hyperlink{Taxes}{tax rate}.
 
-\hypertarget{Sim\'on Bol\'{\i}var}{\textbf{Sim\'on Bol\'{\i}var}}
-(1783--1830) is remembered as a great leader in the struggle for South
-American independence from Spain. Bol\'{\i}var freed what is now
-Venezuela and later became its first President. When Sim\'on
-Bol\'{\i}var joins the Continental Congress, the Sons of Liberty
-membership in all existing colonies is increased by 20\%.
+\FFather{Simon Bolivar}{Sim\'on Bol\'{\i}var} (1783--1830) is remembered as a great
+leader in the struggle for South American independence from
+Spain. Bol\'{\i}var freed what is now Venezuela and later became its
+first President. When Sim\'on Bol\'{\i}var joins the Continental
+Congress, the Sons of Liberty membership in all existing colonies is
+increased by 20\%.
 
-\hypertarget{Benjamin Franklin}{\textbf{Benjamin Franklin}}
-(1706--1790), a heavy contributor to the Declaration of Independence,
-was one of the voices of the Revolution. He traveled extensively
-between Europe and the colonies, and gained the support of the French
-in the war. As soon as Benjamin Franklin is elected to the Continental
-Congress, the King's foreign wars no longer have effect on
-relationships in the New World, and Europeans in the New World always
-offer peace in negotiations.
+\Father{Benjamin Franklin} (1706--1790), a heavy contributor to the
+Declaration of Independence, was one of the voices of the
+Revolution. He traveled extensively between Europe and the colonies,
+and gained the support of the French in the war. As soon as Benjamin
+Franklin is elected to the Continental Congress, the King's foreign
+wars no longer have effect on relationships in the New World, and
+Europeans in the New World always offer peace in negotiations.
 
-\hypertarget{William Brewster}{\textbf{William Brewster}} (1567--1644)
-was the Puritan leader of the Plymouth colony in New England. As soon
-as William Brewster joins the Continental Congress, criminals or
-indentured servants no longer appear on the docks and you can select
-which immigrant in the recruitment pool to move to the docks.
+\Father{William Brewster} (1567--1644) was the Puritan leader of the
+Plymouth colony in New England. As soon as William Brewster joins the
+Continental Congress, criminals or indentured servants no longer
+appear on the docks and you can select which immigrant in the
+recruitment pool to move to the docks.
 
-\hypertarget{William Penn}{\textbf{William Penn}} (1644--1718), a
-close friend of the Duke of York, was granted the land that is mostly
-Pennsylvania, Delaware, and New Jersey. He governed the Quaker colony
-for several years to provide a haven to fellow Quakers. The election
-of William Penn increases cross production in all colonies by 50\%.
+\Father{William Penn} (1644--1718), a close friend of the Duke of
+York, was granted the land that is mostly Pennsylvania, Delaware, and
+New Jersey. He governed the Quaker colony for several years to provide
+a haven to fellow Quakers. The election of William Penn increases
+cross production in all colonies by 50\%.
 
-\hypertarget{Father Jean de Brebeuf}{\textbf{Father Jean de Brebeuf}}
-(1593--1649) founded Quebec City in Canada, befriended the Huron
-Indians and converted many to Christianity. He died at the hands of
-the Iroquois who had finally defeated their enemy, the Hurons. With
-Jean de Brebeuf a member of the Continental Congress, all missionaries
-function as experts.
+\Father{Father Jean de Brebeuf} (1593--1649) founded Quebec City in
+Canada, befriended the Huron Indians and converted many to
+Christianity. He died at the hands of the Iroquois who had finally
+defeated their enemy, the Hurons. With Jean de Brebeuf a member of the
+Continental Congress, all missionaries function as experts.
 
-\hypertarget{Juan de Sepulveda}{\textbf{Juan de Sepulveda}}
-(1781--1872) was a Spanish missionary who traveled throughout the
-Indies converting the Natives to Catholicism and speaking out against
-their harsh treatment by Spain. The election of Juan de Sepulveda to
-the Continental Congress increases the chance that a subjugated
-Indian settlement will ``convert'' and join a colony.
+\Father{Juan de Sepulveda} (1781--1872) was a Spanish missionary who
+traveled throughout the Indies converting the Natives to Catholicism
+and speaking out against their harsh treatment by Spain. The election
+of Juan de Sepulveda to the Continental Congress increases the chance
+that a subjugated Indian settlement will ``convert'' and join a
+colony.
 
-\hypertarget{Bartolom\'e de las Casas}{\textbf{Bartolom\'e de las
-Casas}} (1474--1566) was a Catholic Priest who traveled the Indies
-converting Indians and chastising Spain for their treatment of the
-Natives. When Bartolom\'e de las Casas joins the Continental Congress,
-all existing Indian converts become free colonists.
+\FFather{Bartolome de las Casas}{Bartolom\'e de las Casas} (1474--1566) was a Catholic Priest
+who traveled the Indies converting Indians and chastising Spain for
+their treatment of the Natives. When Bartolom\'e de las Casas joins
+the Continental Congress, all existing Indian converts become free
+colonists.
 
 
 
@@ -1203,7 +1152,6 @@ may support your effort if you generate a sufficient number of Liberty
 Bells after the War of Independence has begun.
 
 
-
 \hypertarget{Copyright Notice}{\section{Copyright Notice}}
 Copyright © 2006
 \href{http://freecol.sourceforge.net/index.php?section=8}{The FreeCol
@@ -1224,5 +1172,8 @@ Wide Web at \href{http://www.gnu.org/copyleft/gpl.html}{the GNU
 General Public Licence}. You can also obtain it by writing to the Free
 Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 02111--1307, USA.
+
+
+\printindex
 
 \end{document}

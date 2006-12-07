@@ -302,16 +302,29 @@
   </target>
 
   <target name="print-manual">
+    <delete file="doc/FreeCol.ind" />
     <exec executable="pdflatex" dir="doc" >
       <arg file="doc/FreeCol.tex"/>
     </exec>
-    <!-- run twice to get references right -->
+    <exec executable="makeindex" dir="doc" >
+      <arg file="doc/FreeCol.idx"/>
+    </exec>
     <exec executable="pdflatex" dir="doc" >
       <arg file="doc/FreeCol.tex"/>
     </exec>
   </target>
 
   <target name="online-manual">
+    <delete file="doc/FreeCol.ind" />
+    <exec executable="htlatex" dir="doc" >
+      <arg file="doc/FreeCol.tex"/>
+    </exec>
+    <exec executable="tex" dir="doc">
+      <arg line="\def\filename{{FreeCol}{idx}{4dx}{ind}} \input  idxmake.4ht" />
+    </exec>
+    <exec executable="makeindex" dir="doc" >
+      <arg file="doc/FreeCol.4dx"/>
+    </exec>
     <exec executable="htlatex" dir="doc" >
       <arg file="doc/FreeCol.tex"/>
     </exec>
