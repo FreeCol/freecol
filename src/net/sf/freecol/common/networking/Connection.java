@@ -236,6 +236,38 @@ public class Connection {
         }
     }
     
+    /**
+     * Starts a session for asking a question using
+     * streaming. There is also a simpler method for
+     * sending data using 
+     * {@link #ask(Element) XML Elements} that can be
+     * used when streaming is not required (that is:
+     * when the messages to be transmitted are small).
+     *
+     * <br><br>
+     * 
+     * <b>Example:</b>
+     * <PRE>
+     * try {
+     *     XMLStreamWriter out = ask();
+     *     // Write XML here
+     *     XMLStreamReader in = connection.getReply();
+     *     // Read XML here
+     *     connection.endTransmission(in);     
+     * } catch (IOException e) {
+     *     logger.warning("Could not send XML.");
+     * }
+     * </PRE>
+     *    
+     * @return The <code>XMLStreamWriter</code> for sending
+     *      the question. The method {@link #getReply()}
+     *      should be called when the message has been
+     *      written and the reply is required.
+     * @throws IOException if thrown by the underlying
+     *      network stream.
+     * @see #getReply()
+     * @see #endTransmission(XMLStreamReader)
+     */
     public XMLStreamWriter ask() throws IOException {
         synchronized (out) {
             while (currentQuestionID != -1) {
@@ -260,6 +292,37 @@ public class Connection {
         }
     }
     
+    /**
+     * Starts a session for sending a message using
+     * streaming. There is also a simpler method for
+     * sending data using 
+     * {@link #send(Element) XML Elements} that can be
+     * used when streaming is not required (that is:
+     * when the messages to be transmitted are small).
+     *
+     * <br><br>
+     * 
+     * <b>Example:</b>
+     * <PRE>
+     * try {
+     *     XMLStreamWriter out = send();
+     *     // Write XML here
+     *     connection.endTransmission(in);     
+     * } catch (IOException e) {
+     *     logger.warning("Could not send XML.");
+     * }
+     * </PRE>
+     *    
+     * @return The <code>XMLStreamWriter</code> for sending
+     *      the question. The method 
+     *      {@link #endTransmission(XMLStreamReader)}
+     *      should be called when the message has been
+     *      written.
+     * @throws IOException if thrown by the underlying
+     *      network stream.
+     * @see #getReply()
+     * @see #endTransmission(XMLStreamReader)
+     */
     public XMLStreamWriter send() throws IOException {
         synchronized (out) {
             while (currentQuestionID != -1) {
@@ -277,17 +340,14 @@ public class Connection {
         return xmlOut;
     }
     
-    /*
-    try {
-        XMLStreamWriter out = ask();
-        // Write XML
-        XMLStreamReader in = connection.getReply();
-        // Read XML
-        connection.endTransmission(in);
-    } catch (IOException e) {
-        logger.warning("Could not send XML.");
-    }        
-    */
+    /**
+     * Gets the reply being received after sending a question.
+     * @return An <code>XMLStreamReader</code> for reading the
+     *      incoming data.
+     * @throws IOException if thrown by the underlying
+     *      network stream.
+     * @see #ask()
+     */
     public XMLStreamReader getReply() throws IOException {
         try {
             NetworkReplyObject nro = thread.waitForStreamedNetworkReply(currentQuestionID);            
@@ -306,6 +366,17 @@ public class Connection {
         }
     }   
     
+    /**
+     * Ends the transmission of a message or a ask/get-reply
+     * session.
+     *  
+     * @return An <code>XMLStreamReader</code> for reading the
+     *      incoming data.
+     * @throws IOException if thrown by the underlying
+     *      network stream.
+     * @see #ask()
+     * @see #send()
+     */
     public void endTransmission(XMLStreamReader in) throws IOException {
         try {
             if (in != null) {
