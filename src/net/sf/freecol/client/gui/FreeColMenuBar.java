@@ -34,6 +34,7 @@ import net.sf.freecol.client.gui.action.DeclareIndependenceAction;
 import net.sf.freecol.client.gui.action.DisbandUnitAction;
 import net.sf.freecol.client.gui.action.EndTurnAction;
 import net.sf.freecol.client.gui.action.EuropeAction;
+import net.sf.freecol.client.gui.action.ExecuteGotoOrdersAction;
 import net.sf.freecol.client.gui.action.FortifyAction;
 import net.sf.freecol.client.gui.action.GotoAction;
 import net.sf.freecol.client.gui.action.MapControlsAction;
@@ -298,6 +299,9 @@ public class FreeColMenuBar extends JMenuBar {
 
         ordersMenu.addSeparator();
 
+        final JMenuItem executeGotoOrdersMenuItem = new JMenuItem(am.getFreeColAction(ExecuteGotoOrdersAction.ID));
+        executeGotoOrdersMenuItem.setOpaque(false);
+        ordersMenu.add(executeGotoOrdersMenuItem);
 
         final JMenuItem skipMenuItem = new JMenuItem(am.getFreeColAction(SkipUnitAction.ID));
         skipMenuItem.setOpaque(false);

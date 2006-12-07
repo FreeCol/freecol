@@ -62,10 +62,15 @@ public final class InGameController implements NetworkConstants {
     private final FreeColClient freeColClient;
 
     /**
-     * Sets that t he turn will be ended when all going-to units have been moved.
+     * Sets that the turn will be ended when all going-to units have been moved.
      */
     private boolean endingTurn = false;
-    
+
+    /**
+     * Sets that all going-to orders should be executed.
+     */
+    private boolean executeGoto = false;
+
 
     /**
     * The constructor to use.
@@ -2431,6 +2436,13 @@ public final class InGameController implements NetworkConstants {
         }
     }
 
+    /**
+     * Executes the units' goto orders.
+     */
+    public void executeGotoOrders() {
+        executeGoto = true;
+        nextActiveUnit(null);
+    }
 
     /**
     * Makes a new unit active.
@@ -2455,7 +2467,7 @@ public final class InGameController implements NetworkConstants {
 
         Canvas canvas = freeColClient.getCanvas();        
         Player myPlayer = freeColClient.getMyPlayer();
-        if (endingTurn) {
+        if (endingTurn || executeGoto) {
             while (!freeColClient.getCanvas().isShowingSubPanel()
                     && myPlayer.hasNextGoingToUnit()) {
                 moveToDestination(myPlayer.getNextGoingToUnit());
@@ -2464,13 +2476,17 @@ public final class InGameController implements NetworkConstants {
 
             if (!myPlayer.hasNextGoingToUnit()
                     && !freeColClient.getCanvas().isShowingSubPanel()) {
-                canvas.getGUI().setActiveUnit(null);
-                //canvas.setEnabled(false);
+                if (endingTurn) {
+                    canvas.getGUI().setActiveUnit(null);
+                    //canvas.setEnabled(false);
 
-                Element endTurnElement = Message.createNewRootElement("endTurn");
-                freeColClient.getClient().sendAndWait(endTurnElement);
-                
-                endingTurn = false;
+                    Element endTurnElement = Message.createNewRootElement("endTurn");
+                    freeColClient.getClient().sendAndWait(endTurnElement);
+
+                    endingTurn = false;
+                } else {
+                    executeGoto = false;
+                }
             }
         } else {
             GUI gui = freeColClient.getGUI();

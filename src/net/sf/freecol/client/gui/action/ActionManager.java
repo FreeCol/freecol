@@ -47,6 +47,7 @@ public class ActionManager extends OptionGroup {
         add(new DeclareIndependenceAction(freeColClient));
         add(new MiniMapZoomOutAction(freeColClient));
         add(new MiniMapZoomInAction(freeColClient));
+        add(new ExecuteGotoOrdersAction(freeColClient));
         
         freeColClient.getClientOptions().add(this);
         freeColClient.getClientOptions().addToMap(this);
