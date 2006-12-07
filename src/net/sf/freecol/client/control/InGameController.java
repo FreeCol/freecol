@@ -946,11 +946,9 @@ public final class InGameController implements NetworkConstants {
         Element reply = client.ask(moveElement);
         freeColClient.getInGameInputHandler().handle(client.getConnection(), reply);
         
-        // set location again in order to meet with people player don't see before move
-        unit.setLocation(unit.getTile());
-        // if unit was disposed, it's in tile again due to setLocation, remove it
-        if (unit.isDisposed()) {
-            unit.getTile().remove(unit);
+        // set location again in order to meet with people player don't see before move        
+        if (!unit.isDisposed()) {
+            unit.setLocation(unit.getTile());
         }
 
         if (unit.getTile().isLand() && unit.getOwner().getNewLandName() == null) {
@@ -964,7 +962,7 @@ public final class InGameController implements NetworkConstants {
 
         if (unit.getTile().getSettlement() != null && unit.isCarrier()) {
             canvas.showColonyPanel((Colony) unit.getTile().getSettlement());
-        } else if (unit.getMovesLeft() > 0) {
+        } else if (unit.getMovesLeft() > 0 && !unit.isDisposed()) {
             gui.setActiveUnit(unit);
         } else {
             nextActiveUnit(unit.getTile());
