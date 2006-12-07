@@ -61,6 +61,11 @@ public final class InGameController implements NetworkConstants {
 
     private final FreeColClient freeColClient;
 
+    /**
+     * Sets that t he turn will be ended when all going-to units have been moved.
+     */
+    private boolean endingTurn = false;
+    
 
     /**
     * The constructor to use.
@@ -210,7 +215,7 @@ public final class InGameController implements NetworkConstants {
         Game game = freeColClient.getGame();
         game.setCurrentPlayer(currentPlayer);
 
-        if (freeColClient.getMyPlayer().equals(currentPlayer)) {
+        if (freeColClient.getMyPlayer().equals(currentPlayer)) {           
             // Autosave the game:
             final int turnNumber = freeColClient.getGame().getTurn().getNumber();
             final int savegamePeriod = freeColClient.getClientOptions().getInteger(ClientOptions.AUTOSAVE_PERIOD);        
@@ -2448,27 +2453,46 @@ public final class InGameController implements NetworkConstants {
         
         nextModelMessage();
 
-        GUI gui = freeColClient.getGUI();
+        Canvas canvas = freeColClient.getCanvas();        
         Player myPlayer = freeColClient.getMyPlayer();
+        if (endingTurn) {
+            while (!freeColClient.getCanvas().isShowingSubPanel()
+                    && myPlayer.hasNextGoingToUnit()) {
+                moveToDestination(myPlayer.getNextGoingToUnit());
+                nextModelMessage();
+            }
 
-        Unit nextActiveUnit = myPlayer.getNextActiveUnit();
+            if (!myPlayer.hasNextGoingToUnit()
+                    && !freeColClient.getCanvas().isShowingSubPanel()) {
+                canvas.getGUI().setActiveUnit(null);
+                //canvas.setEnabled(false);
 
-        if (nextActiveUnit != null) {
-            gui.setActiveUnit(nextActiveUnit);
+                Element endTurnElement = Message.createNewRootElement("endTurn");
+                freeColClient.getClient().sendAndWait(endTurnElement);
+                
+                endingTurn = false;
+            }
         } else {
-            // no more active units, so we can move the others
-            nextActiveUnit = myPlayer.getNextGoingToUnit();
+            GUI gui = freeColClient.getGUI();
+            Unit nextActiveUnit = myPlayer.getNextActiveUnit();
+
             if (nextActiveUnit != null) {
-                moveToDestination(nextActiveUnit);
-            } else if (tile != null) {
-                Position p = tile.getPosition();
-                if (p != null) {
-                    // this really shouldn't happen
-                    gui.setSelectedTile(p);
-                }
-                gui.setActiveUnit(null);
+                gui.setActiveUnit(nextActiveUnit);
             } else {
-                gui.setActiveUnit(null);
+                // no more active units, so we can move the others
+                nextActiveUnit = myPlayer.getNextGoingToUnit();
+                if (nextActiveUnit != null) {
+                    moveToDestination(nextActiveUnit);
+                } else if (tile != null) {
+                    Position p = tile.getPosition();
+                    if (p != null) {
+                        // this really shouldn't happen
+                        gui.setSelectedTile(p);
+                    }
+                    gui.setActiveUnit(null);
+                } else {
+                    gui.setActiveUnit(null);
+                }
             }
         }
     }
@@ -2573,19 +2597,9 @@ public final class InGameController implements NetworkConstants {
             return;
         }
         
-        Client client = freeColClient.getClient();
-        Canvas canvas = freeColClient.getCanvas();
+        endingTurn = true;
 
-        Player myPlayer = freeColClient.getMyPlayer();
-        while (myPlayer.hasNextGoingToUnit()) {
-            moveToDestination(myPlayer.getNextGoingToUnit());
-        }
-            
-        canvas.getGUI().setActiveUnit(null);
-        //canvas.setEnabled(false);
-
-        Element endTurnElement = Message.createNewRootElement("endTurn");
-        client.sendAndWait(endTurnElement);
+        nextActiveUnit(null);
     }
 
 
