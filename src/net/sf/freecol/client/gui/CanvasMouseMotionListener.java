@@ -58,6 +58,10 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
             scrollThread.stopScrolling();
             scrollThread = null;
         }*/
+        if (scrollThread != null) {
+            scrollThread.stopScrolling();
+            scrollThread = null;
+        }
     }
     
     private void scroll(int x, int y) {
