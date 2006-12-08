@@ -45,7 +45,7 @@
            debug="on"
            optimize="on"
            deprecation="off"
-           source="1.4"
+           source="1.5"
     />    
   </target>
 

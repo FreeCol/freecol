@@ -45,7 +45,7 @@ public final class FreeCol {
     public static final String  META_SERVER_ADDRESS = "meta.freecol.org";
     public static final int     META_SERVER_PORT = 3540;
 
-    private static final String MIN_JDK_VERSION = "1.4";
+    private static final String MIN_JDK_VERSION = "1.5";
     private static final String  FILE_SEP = System.getProperty("file.separator");
 
     private static boolean  windowed = false,

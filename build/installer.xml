@@ -12,7 +12,7 @@
         <authors>
             <author name="The FreeCol Team" email="developers@freecol.org" />
         </authors>
-        <javaversion>1.4</javaversion>
+        <javaversion>1.5</javaversion>
     </info>
     <guiprefs width="640" height="480" resizable="no"/>
     <locale>
