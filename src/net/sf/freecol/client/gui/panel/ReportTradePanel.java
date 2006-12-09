@@ -14,6 +14,7 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Player;
 import cz.autel.dmi.HIGLayout;
 
@@ -30,7 +31,7 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
     /** How many additional columns are defined. */
     private final int extraColumns = 3; // labels and margins
     /** How many additional rows are defined. */
-    private final int extraRows = 7; // labels and margins
+    private final int extraRows = 9; // labels and margins
     /** How many columns are defined all together. */
     private final int columns = columnsPerLabel * Goods.NUMBER_OF_TYPES + extraColumns;
     /** How much space to leave between labels. */
@@ -43,6 +44,7 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
     private final int[] heights;
 
     private final JLabel[] goodsLabels;
+    private final JLabel priceLabel;
     private final JLabel salesLabel;
     private final JLabel beforeTaxesLabel;
     private final JLabel afterTaxesLabel;
@@ -60,6 +62,7 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
             goodsLabels[i] = new JLabel(parent.getImageProvider().getGoodsImageIcon(i));
         }
             
+	priceLabel = new JLabel(Messages.message("report.trade.prices"), JLabel.TRAILING);
         salesLabel = new JLabel(Messages.message("report.trade.unitsSold"), JLabel.TRAILING);
         beforeTaxesLabel = new JLabel(Messages.message("report.trade.beforeTaxes"), JLabel.TRAILING);
         afterTaxesLabel = new JLabel(Messages.message("report.trade.afterTaxes"), JLabel.TRAILING);
@@ -85,6 +88,7 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
      */
     public void initialize() {
         Player player = parent.getClient().getMyPlayer();
+	Market market = player.getGame().getMarket();
         // Display Panel
         reportPanel.removeAll();
         tradeReportPanel.removeAll();
@@ -99,14 +103,15 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
             heights[h] = 0;
         }
         heights[0] = marginWidth;
-        heights[5] = marginWidth;
+        heights[7] = marginWidth;
         heights[heights.length - 1] = marginWidth;
 
         tradeReportPanel.setLayout(new HIGLayout(widths, heights));
 
-        tradeReportPanel.add(salesLabel, higConst.rc(3, 2));
-        tradeReportPanel.add(beforeTaxesLabel, higConst.rc(4, 2));
-        tradeReportPanel.add(afterTaxesLabel, higConst.rc(5, 2));
+        tradeReportPanel.add(priceLabel, higConst.rc(3, 2));
+        tradeReportPanel.add(salesLabel, higConst.rc(4, 2));
+        tradeReportPanel.add(beforeTaxesLabel, higConst.rc(5, 2));
+        tradeReportPanel.add(afterTaxesLabel, higConst.rc(6, 2));
 
         int sales, beforeTaxes, afterTaxes;
         JLabel currentLabel;
@@ -116,24 +121,28 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
             beforeTaxes = player.getIncomeBeforeTaxes(i);
             afterTaxes = player.getIncomeAfterTaxes(i);
             tradeReportPanel.add(goodsLabels[i], higConst.rc(2, column));
-            
+
+	    currentLabel = new JLabel(String.valueOf(market.paidForSale(i)) + "/" +
+				      String.valueOf(market.costToBuy(i)), JLabel.TRAILING);
+	    tradeReportPanel.add(currentLabel, higConst.rc(3, column));
+
             currentLabel = new JLabel(String.valueOf(sales), JLabel.TRAILING);
             if (sales < 0) {
                 currentLabel.setForeground(Color.RED);
             }
-            tradeReportPanel.add(currentLabel, higConst.rc(3, column));
+            tradeReportPanel.add(currentLabel, higConst.rc(4, column));
 
             currentLabel = new JLabel(String.valueOf(beforeTaxes), JLabel.TRAILING);
             if (beforeTaxes < 0) {
                 currentLabel.setForeground(Color.RED);
             }
-            tradeReportPanel.add(currentLabel, higConst.rc(4, column));
+            tradeReportPanel.add(currentLabel, higConst.rc(5, column));
 
             currentLabel = new JLabel(String.valueOf(afterTaxes), JLabel.TRAILING);
             if (afterTaxes < 0) {
                 currentLabel.setForeground(Color.RED);
             }
-            tradeReportPanel.add(currentLabel, higConst.rc(5, column));
+            tradeReportPanel.add(currentLabel, higConst.rc(6, column));
         }
 
 	MatteBorder myBorder = new MatteBorder(0, 0, 1, 0, Color.BLACK);
