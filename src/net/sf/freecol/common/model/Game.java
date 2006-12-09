@@ -38,7 +38,7 @@ public class Game extends FreeColGameObject {
     public static final Player unknownEnemy = new Player(null, "", false, Player.NO_NATION);
     
     /** Contains all the players in the game. */
-    private Vector players = new Vector();
+    private Vector<Player> players = new Vector<Player>();
 
     private Map map;
 
@@ -57,10 +57,10 @@ public class Game extends FreeColGameObject {
     private int maxPlayers = 4;
 
     /** Contains references to all objects created in this game. */
-    private HashMap freeColGameObjects = new HashMap(10000);
+    private HashMap<String, FreeColGameObject> freeColGameObjects = new HashMap<String, FreeColGameObject>(10000);
 
     /** Contains all the messages for this round. */
-    private ArrayList modelMessages = new ArrayList();
+    private ArrayList<ModelMessage> modelMessages = new ArrayList<ModelMessage>();
 
     /** The next availeble ID, that can be given to a new <code>FreeColGameObject</code>. */
     private int nextId = 1;
@@ -128,7 +128,7 @@ public class Game extends FreeColGameObject {
             fcgos[i].updateID();
 
             if (fcgos[i] instanceof Player) {
-                players.add(fcgos[i]);
+                players.add((Player) fcgos[i]);
             }
         }
 
@@ -164,7 +164,7 @@ public class Game extends FreeColGameObject {
              fcgos[i].updateID();
 
              if (fcgos[i] instanceof Player) {
-                 players.add(fcgos[i]);
+                 players.add((Player) fcgos[i]);
              }
          }
 
@@ -251,9 +251,9 @@ public class Game extends FreeColGameObject {
      *         visible to a client).
      */
     public Colony getColony(String name) {
-    	Iterator pit = getPlayerIterator();
+    	Iterator<Player> pit = getPlayerIterator();
     	while (pit.hasNext()) {
-    		Player p = (Player) pit.next();
+    		Player p = pit.next();
     		Iterator it = p.getColonyIterator();
     		while (it.hasNext()) {
     			Colony colony = (Colony) it.next();
@@ -351,7 +351,7 @@ public class Game extends FreeColGameObject {
             throw new NullPointerException();
         }
 
-        FreeColGameObject old = (FreeColGameObject) freeColGameObjects.put(id, freeColGameObject);
+        FreeColGameObject old = freeColGameObjects.put(id, freeColGameObject);
         if (old != null) {
             logger.warning("Replacing FreeColGameObject: " + old.getClass() + " with " + freeColGameObject.getClass());
             throw new IllegalArgumentException("Replacing FreeColGameObject: " + old.getClass() + " with " + freeColGameObject.getClass());
@@ -383,7 +383,7 @@ public class Game extends FreeColGameObject {
             throw new NullPointerException();
         }
 
-        return (FreeColGameObject) freeColGameObjects.get(id);
+        return freeColGameObjects.get(id);
     }
 
 
@@ -404,7 +404,7 @@ public class Game extends FreeColGameObject {
             freeColGameObjectListener.removeFreeColGameObject(id);
         }
 
-        return (FreeColGameObject) freeColGameObjects.remove(id);
+        return freeColGameObjects.remove(id);
     }
 
 
@@ -436,9 +436,9 @@ public class Game extends FreeColGameObject {
     public int getVacantNation() {
         boolean[] nationTaken = new boolean[4];
 
-        Iterator playerIterator = getPlayerIterator();
+        Iterator<Player> playerIterator = getPlayerIterator();
         while (playerIterator.hasNext()) {
-            Player player = (Player) playerIterator.next();
+            Player player = playerIterator.next();
             if (player.getNation() < 4) {
                 nationTaken[player.getNation()] = true;
             }
@@ -460,9 +460,9 @@ public class Game extends FreeColGameObject {
     * @return The <code>Player</code> of the given nation.
     */
     public Player getPlayer(int nation) {
-        Iterator playerIterator = getPlayerIterator();
+        Iterator<Player> playerIterator = getPlayerIterator();
         while (playerIterator.hasNext()) {
-            Player player = (Player) playerIterator.next();
+            Player player = playerIterator.next();
             if (player.getNation() == nation) {
                 return player;
             }
@@ -535,7 +535,7 @@ public class Game extends FreeColGameObject {
 
         // Find first non-dead player:
         while (true) {
-            Player player = (Player) players.get(index);            
+            Player player = players.get(index);            
             if (!player.isDead()) {                
                 return player;
             }
@@ -573,7 +573,7 @@ public class Game extends FreeColGameObject {
     */
     public Player getFirstPlayer() {
         if (players.size() > 0) {
-            return (Player) players.get(0);
+            return players.get(0);
         } else {
             return null;
         }
@@ -586,7 +586,7 @@ public class Game extends FreeColGameObject {
     * @return an <code>Iterator</code> containing every registered <code>FreeColGameObject</code>.
     * @see #setFreeColGameObject
     */
-    public Iterator getFreeColGameObjectIterator() {
+    public Iterator<FreeColGameObject> getFreeColGameObjectIterator() {
         return freeColGameObjects.values().iterator();
     }
 
@@ -598,10 +598,10 @@ public class Game extends FreeColGameObject {
     * @return The <code>Player</code>.
     */
     public Player getPlayerByName(String name) {
-        Iterator playerIterator = getPlayerIterator();
+        Iterator<Player> playerIterator = getPlayerIterator();
 
         while (playerIterator.hasNext()) {
-            Player player = (Player) playerIterator.next();
+            Player player = playerIterator.next();
             if (player.getName().equals(name)) {
                 return player;
             }
@@ -618,10 +618,10 @@ public class Game extends FreeColGameObject {
     * @return <i>true</i> if the name is already in use and <i>false</i> otherwise.
     */
     public boolean playerNameInUse(String username) {
-        Iterator playerIterator = getPlayerIterator();
+        Iterator<Player> playerIterator = getPlayerIterator();
 
         while (playerIterator.hasNext()) {
-            Player player = (Player) playerIterator.next();
+            Player player = playerIterator.next();
 
             if (player.getUsername().equals(username)) {
                 return true;
@@ -637,7 +637,7 @@ public class Game extends FreeColGameObject {
     *
     * @return The <code>Iterator</code>.
     */
-    public Iterator getPlayerIterator() {
+    public Iterator<Player> getPlayerIterator() {
         return players.iterator();
     }
 
@@ -647,7 +647,7 @@ public class Game extends FreeColGameObject {
     *
     * @return The <code>Vector</code>.
     */
-    public Vector getPlayers() {
+    public Vector<Player> getPlayers() {
         return players;
     }
 
@@ -656,12 +656,12 @@ public class Game extends FreeColGameObject {
     * Returns all the European players known by the player of this game.
     * @return All the European players known by the player of this game.
     */
-    public Vector getEuropeanPlayers() {
-        Vector europeans = new Vector();
-        Iterator playerIterator = getPlayerIterator();
+    public Vector<Player> getEuropeanPlayers() {
+        Vector<Player> europeans = new Vector<Player>();
+        Iterator<Player> playerIterator = getPlayerIterator();
 
         while (playerIterator.hasNext()) {
-            Player player = (Player) playerIterator.next();
+            Player player = playerIterator.next();
 
             if (player.isEuropean()) {
                 europeans.addElement(player);
@@ -701,10 +701,10 @@ public class Game extends FreeColGameObject {
     * @return <i>true</i> if all players are ready to launch and <i>false</i> otherwise.
     */
     public boolean isAllPlayersReadyToLaunch() {
-        Iterator playerIterator = getPlayerIterator();
+        Iterator<Player> playerIterator = getPlayerIterator();
 
         while (playerIterator.hasNext()) {
-            Player player = (Player) playerIterator.next();
+            Player player = playerIterator.next();
 
             if (!player.isReady()) {
                 return false;
@@ -724,12 +724,12 @@ public class Game extends FreeColGameObject {
     }
 
 
-    public Iterator getModelMessageIterator(Player player) {
-        ArrayList out = new ArrayList();
+    public Iterator<ModelMessage> getModelMessageIterator(Player player) {
+        ArrayList<ModelMessage> out = new ArrayList<ModelMessage>();
 
-        Iterator i = modelMessages.iterator();
+        Iterator<ModelMessage> i = modelMessages.iterator();
         while (i.hasNext()) {
-            ModelMessage m = (ModelMessage) i.next();
+            ModelMessage m = i.next();
             if ((m.getOwner() == null || m.getOwner() == player) &&
                 !m.hasBeenDisplayed()) {
                 out.add(m);
@@ -746,9 +746,9 @@ public class Game extends FreeColGameObject {
     *       messages for.
     */
     public void removeModelMessagesFor(Player player) {
-        Iterator i = modelMessages.iterator();
+        Iterator<ModelMessage> i = modelMessages.iterator();
         while(i.hasNext()) {
-            ModelMessage m = (ModelMessage) i.next();
+            ModelMessage m = i.next();
             if (m.hasBeenDisplayed()) {
                 i.remove();
             }
@@ -775,9 +775,9 @@ public class Game extends FreeColGameObject {
      */
     public boolean checkIntegrity() {
         boolean ok = true;
-        Iterator iterator = ((HashMap) freeColGameObjects.clone()).values().iterator();
+        Iterator<FreeColGameObject> iterator = ((HashMap<String, FreeColGameObject>) freeColGameObjects.clone()).values().iterator();
         while (iterator.hasNext()) {
-            FreeColGameObject fgo = (FreeColGameObject) iterator.next();
+            FreeColGameObject fgo = iterator.next();
             if (fgo.isUninitialized()) {
                 logger.warning("Uinitialized object: " + fgo.getID() + " (" + fgo.getClass() + ")");
                 ok = false;
@@ -802,12 +802,12 @@ public class Game extends FreeColGameObject {
         //Iterator iterator = getFreeColGameObjectIterator();
         turn.increase();
 
-        Iterator iterator = ((HashMap) freeColGameObjects.clone()).values().iterator();
+        Iterator<FreeColGameObject> iterator = ((HashMap<String, FreeColGameObject>) freeColGameObjects.clone()).values().iterator();
 
-        ArrayList later1 = new ArrayList();
-        ArrayList later2 = new ArrayList();
+        ArrayList<FreeColGameObject> later1 = new ArrayList<FreeColGameObject>();
+        ArrayList<FreeColGameObject> later2 = new ArrayList<FreeColGameObject>();
         while (iterator.hasNext()) {
-            FreeColGameObject freeColGameObject = (FreeColGameObject) iterator.next();
+            FreeColGameObject freeColGameObject = iterator.next();
 
             /*
             * Take the settlements after the buildings
@@ -832,7 +832,7 @@ public class Game extends FreeColGameObject {
 
         iterator = later1.iterator();
         while (iterator.hasNext()) {
-            FreeColGameObject freeColGameObject = (FreeColGameObject) iterator.next();
+            FreeColGameObject freeColGameObject = iterator.next();
             try {
                 freeColGameObject.newTurn();
             } catch (Exception e) {
@@ -844,7 +844,7 @@ public class Game extends FreeColGameObject {
 
         iterator = later2.iterator();
         while (iterator.hasNext()) {
-            FreeColGameObject freeColGameObject = (FreeColGameObject) iterator.next();
+            FreeColGameObject freeColGameObject = iterator.next();
             try {
                 freeColGameObject.newTurn();
             } catch (Exception e) {
@@ -936,9 +936,9 @@ public class Game extends FreeColGameObject {
 
         gameOptions.toXML(out);
 
-        Iterator playerIterator = getPlayerIterator();
+        Iterator<Player> playerIterator = getPlayerIterator();
         while (playerIterator.hasNext()) {
-            Player p = (Player) playerIterator.next();
+            Player p = playerIterator.next();
             p.toXML(out, player, showAll, toSavedGame);
         }
 

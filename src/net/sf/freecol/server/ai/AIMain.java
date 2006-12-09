@@ -58,7 +58,7 @@ public class AIMain implements FreeColGameObjectListener {
     * Contains mappings between <code>FreeColGameObject</code>s
     * and <code>AIObject</code>s.
     */
-    private HashMap aiObjects = new HashMap();
+    private HashMap<String, AIObject> aiObjects = new HashMap<String, AIObject>();
 
 
 
@@ -136,17 +136,15 @@ public class AIMain implements FreeColGameObjectListener {
      */
     public boolean checkIntegrity() {
         boolean ok = true;
-        Iterator iterator = ((HashMap) aiObjects.clone()).values().iterator();
-        while (iterator.hasNext()) {
-            AIObject ao = (AIObject) iterator.next();
+        for (AIObject ao : aiObjects.values()) {
             if (ao.isUninitialized()) {
                 logger.warning("Uninitialized object: " + ao.getID() + " (" + ao.getClass() + ")");
                 ok = false;
             }
         }
-        Iterator fit = getGame().getFreeColGameObjectIterator();
+        Iterator<FreeColGameObject> fit = getGame().getFreeColGameObjectIterator();
         while (fit.hasNext()) {
-            FreeColGameObject f = (FreeColGameObject) fit.next();
+            FreeColGameObject f = fit.next();
             if ((f instanceof Unit || f instanceof Player || f instanceof Colony)
                     && !aiObjects.containsKey(f.getID())) {
                 logger.warning("Missing AIObject for: " + f.getID());
@@ -233,7 +231,7 @@ public class AIMain implements FreeColGameObjectListener {
     * @return The <code>AIObject</code>.
     */
     public AIObject getAIObject(String id) {        
-        return (AIObject) aiObjects.get(id);
+        return aiObjects.get(id);
     }
 
 
@@ -422,9 +420,9 @@ public class AIMain implements FreeColGameObjectListener {
 
         out.writeAttribute("nextID", Integer.toString(nextID));
 
-        Iterator i = aiObjects.values().iterator();
+        Iterator<AIObject> i = aiObjects.values().iterator();
         while (i.hasNext()) {
-            AIObject aio = (AIObject) i.next();
+            AIObject aio = i.next();
 
             try {
                 if (!(aio instanceof Wish) || ((Wish) aio).shouldBeStored()) {
