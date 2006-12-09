@@ -762,9 +762,9 @@ public class MapGenerator {
                 case 2: return Tile.MARSH;
             }
             case 3: case 4: case 5: default: switch (dryOrWet) {
-                case 0: return Tile.PLAINS;
-                case 1: default: return Tile.PRAIRIE;
-                case 2: return Tile.DESERT;
+                case 0: return Tile.DESERT;
+                case 1: default: return Tile.PLAINS;
+                case 2: return Tile.PRAIRIE;
             }
             case 6: case 7: case 8: case 9: switch (dryOrWet) {
                 case 0: return Tile.GRASSLANDS;
