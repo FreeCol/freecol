@@ -8,6 +8,7 @@ import java.util.Iterator;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.border.MatteBorder;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -135,15 +136,16 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
             tradeReportPanel.add(currentLabel, higConst.rc(5, column));
         }
 
+	MatteBorder myBorder = new MatteBorder(0, 0, 1, 0, Color.BLACK);
         colonyIterator = colonies.iterator();
         int row = extraRows;
         while (colonyIterator.hasNext()) {
             Colony colony = (Colony) colonyIterator.next();
             currentLabel = new JLabel(colony.getName());
             tradeReportPanel.add(currentLabel, higConst.rc(row, 2));
-            for (int i = 0; i < Goods.NUMBER_OF_TYPES; i++) {
-                int column = columnsPerLabel * i + 4;
-                int amount = colony.getGoodsCount(i);
+            for (int goodsType = 0; goodsType < Goods.NUMBER_OF_TYPES; goodsType++) {
+                int column = columnsPerLabel * goodsType + 4;
+                int amount = colony.getGoodsCount(goodsType);
                 currentLabel = new JLabel(String.valueOf(amount),
                                           JLabel.TRAILING);
                 if (amount > 100) {
@@ -151,6 +153,9 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
                 } else if (amount > 200) {
                     currentLabel.setForeground(Color.BLUE);
                 }
+		if (colony.getExports(goodsType)) {
+		    currentLabel.setBorder(myBorder);
+		}
                 tradeReportPanel.add(currentLabel, higConst.rc(row, column));
             }
             row++;
