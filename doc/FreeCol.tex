@@ -4,6 +4,9 @@
 \newcommand{\Building}[1]{\index{#1}\index{Buildings!#1}\hypertarget{#1}{\textbf{#1}}}
 \newcommand{\Father}[1]{\index{#1}\index{Founding Fathers!#1}\hypertarget{#1}{\textbf{#1}}}
 \newcommand{\FFather}[2]{\index{#2}\index{Founding Fathers!#2}\hypertarget{#1}{\textbf{#2}}}
+\newcommand{\Concept}[1]{\index{#1}\hypertarget{#1}{\textbf{#1}}}
+\newcommand{\Wikipedia}[1]{\href{http://en.wikipedia.org/wiki/#1}%
+{\includegraphics[scale=0.6]{images/wikipedia.png}}}
 
 \documentclass[12pt]{article}
 \usepackage{longtable}
@@ -27,18 +30,6 @@ web site}. This is a draft version of the user's guide. You can find
 the latest version at the
 \href{http://freecol.sourceforge.net}{FreeCol homepage}.
 
-%% \hypertarget{History}{\section{History}}
-%% \label{history}
-%% This section gives details about the history of this user guide.
-%% \begin{itemize}
-%% \item v0.2.0: add the «About» section and disband shortcut.
-%% \item v0.1.2: corrections from Bryce Harrington and copyright notice.
-%% \item v0.1.1: Main screen's, Colony panel's and Europe panel's images
-%%   were added.
-%% \item v0.1: Creation of the user guide! The guide contains the
-%%   following sections: «Introduction», «History», «Installation» and
-%%   «Interface».
-%% \end{itemize}
 
 \hypertarget{About}{\section{About}}
 
@@ -148,12 +139,20 @@ The figure \ref{main_screen_fig} represents the main screen.
   \end{center}
 \end{figure}
 
-The units, colonies, and so forth can be seen on the main screen. You
-can change the currently selected unit by clicking on any other
-unit. You can move the currently selected unit using the numeric
-keypad. If you select a unit with the left mouse button and drag the
-mouse, the main screen will display the best path from the unit's
-current position to the tile the mouse is hovering over. 
+The main screen consists of five different areas: the menu bar at the
+top, the minimap in the lower left corner, the info panel in the lower
+right corner, the order buttons between the minimap and the info
+panel, and the main map in the background. The units, colonies, and so
+forth can be seen on the main map. They are also represented as
+coloured dots on the minimap.
+
+If a unit is selected, further information about that unit is
+displayed in the info panel, otherwise the info panel contains the end
+turn button. You can change the currently selected unit by clicking on
+any other unit. And you can move the currently selected unit using the
+numeric keypad. If you select a unit with the left mouse button and
+drag the mouse, the main screen will display the best path from the
+unit's current position to the tile the mouse is hovering over.
 
 The tiles the path consists of will be marked with boots if the unit
 is on foot, with horseshoes if the unit is mounted, with wheels if the
@@ -183,7 +182,41 @@ in which case nothing will happen). If the tile contains units or
 settlements, you will be presented with a menu from which you can
 select the units or the settlement present, or the tile information.
 
-The following shortcuts are also available:
+Units are marked with small coloured shields, which may or may not
+display a letter. The background colour indicates the nation this unit
+belongs to. The Dutch units, for example, are usually marked with
+orange shields. The letter indicates the current state of the unit:
+
+\begin{itemize}
+\item\verb$-$: the unit is active (no orders).
+\item\verb$F$: the unit is fortified.
+\item\verb$G$: the unit is going somewhere.
+\item\verb$P$: the unit is plowing a tile.
+\item\verb$R$: the unit is building a road.
+\item\verb$S$: the unit is a sentry (not implemented yet).
+\end{itemize}
+
+If the unit is a foreign naval unit, the shield will display a number
+instead. This is the number of holds this unit is using.
+
+Indian Settlements display at least two shields: the first indicates
+the nation this settlement belongs to, and the second, which bears an
+exclamation mark ($!$), indicates the current relations between the
+nation and your colonists. Its background may be green, blue, yellow,
+orange or red, depending on whether your relations are good, mediocre
+or bad. A Settlement with a European mission displays a third shield
+bearing a cross on a black or grey background. The colour of the cross
+indicates the European nation that established the mission. The
+background of the shield is black if the mission was established by a
+\hyperlink{Jesuit Missionary}{Jesuit Missionary}, and gray otherwise.
+
+The order buttons represent some of the orders you can give to your
+units. You can move your mouse over the buttons to see their
+respective orders. If a unit is unable to perform a certain action,
+the corresponding order button will be disabled. The orders are also
+available from the ``Orders'' menu, and you can use the following
+shortcuts:
+
 \begin{itemize}
 \item\verb$b$: build a colony.
 \item\verb$c$: center on the currently selected unit.
@@ -193,12 +226,12 @@ The following shortcuts are also available:
 \item\verb$g$: goto some destination.
 \item\verb$p$: plow the current tile.
 \item\verb$r$: build a road on the current tile.
-\item\verb$s$: sentry (not implemented).
+\item\verb$s$: sentry (not yet implemented).
 \item\verb$w$: wait.
 \item\verb$space$: skip for this turn.
 \item\verb$enter$: end the turn.
-\item\verb$plus$ or \verb$equals$: zoom in.
-\item\verb$minus$ or \verb$underscore$: zoom out.
+\item\verb$plus$ or \verb$equals$: zoom in (not yet implemented).
+\item\verb$minus$ or \verb$underscore$: zoom out (not yet implemented).
 \item\verb$ctrl-d$: display tile names.
 \item\verb$ctrl-g$: display grid.
 \item\verb$ctrl-m$: show/hide the map controls.
@@ -246,7 +279,7 @@ Ships that are docked at the European port can also do the following:
 \item Arm/Mount/Equip with tools/Dress as missionaries a unit: 
   right click on the unit.
 \item Move your ship to the «Going to America» section of the Europe
-  panel.
+  panel in order to sail to the New World.
 \end{itemize}
 
 \hypertarget{The Colony panel}{\subsection{The Colony panel}}
@@ -267,7 +300,7 @@ tasks can be assigned:
 \item Cultivation: Drop the unit onto the appropriate plot of land in
   the colony. You can change what a colonist cultivate by right
   clicking on it. Note that your colonists can not go fishing on ocean
-  tiles before they have built a dock.
+  tiles before they have built \hyperlink{Dock}{Docks}.
 \item Production: Drop the unit onto the relevant «Buildings».
 \item Depart colony: Drop the unit onto the colony's gate.
 \item Embark on a ship: If there is a ship in port, you can embark
@@ -277,9 +310,24 @@ tasks can be assigned:
   select the building you want from the building menu.
 \end{itemize}
 
-You can also load cargo into a ship's hold by dropping the goods onto
-the ship or the specific hold within the ship. Use the shift key while
-dropping it if you want to load only a portion of the goods.
+You can also load a ship by dragging goods from the warehouse panel to
+the ship, and unload it by dragging goods from the ship to the
+warehouse panel. Use the shift key while dragging if you want to load
+only a portion of the goods.
+
+The \hyperlink{Warehouse}{Warehouse} can only hold a certain amount of
+goods of each type. Its initial capacity is limited to 100 units of
+each type of goods, but it can be increased to 300 by building two
+\hyperlink{Warehouse Expansion}{Warehouse Expansions}. If the current
+limit of the warehouse is exceeded, the number of goods is printed in
+red. If you do not store the excess units elsewhere, they will be lost
+at the end of the turn.
+
+If you have already built a \hyperlink{Custom House}{Custom House} in
+the colony, you can right-click on the goods in the Warehouse in order
+to export them to Europe automatically. Goods marked to be exported
+are printed in green. Right-click on the goods again to stop exporting
+them automatically.
 
 
 \hypertarget{The New World}{\section{The New World}}
@@ -425,6 +473,90 @@ generally demand Trade Goods.
 
 %% Some types of terrain can also have special resources, which increase
 %% the production of one or more types of goods.
+
+
+\hypertarget{Native Settlements}{\subsection{Native Settlements}}
+
+The New World is by no means an uninhabited country. Various tribes of
+Indians already live there, and make use of the land. When your
+colonists arrive, you will have to decide whether you will attempt to
+peacefully coexist with the natives, or to wipe them out. The
+\hyperlink{France}{French} player has the advantage of generating only
+half the alarm among the natives. The \hyperlink{Spain}{Spanish}
+player has the advantage of greater military efficiency against the
+natives. Your choice of \hyperlink{Home Country}{Home Country} may
+influence your strategy --- or vice versa.
+
+Small Native Settlements use the tile they are built on as well as all
+adjacent tiles, just like your \hyperlink{Colonies}{Colonies}
+do. Large Native Settlements also use tiles that are two moves
+away. Your colonists can not use tiles that are already used by
+natives. If they attempt to do so, the natives will demand some gold
+for the land. You must then decide whether to pay their price, take
+the land away from the by force, or to leave the land alone.
+Naturally, the natives will not be pleased if you take the land away
+from them. As soon as \hyperlink{Peter Minuit}{Peter Minuit} has
+joined the \hyperlink{Continental Congress}{Continental Congress},
+however, the natives no longer demand payment for their land.
+
+Colonies and armed units near their settlements will alarm the natives
+and poison your relations. If the natives are happy, they will come to
+your colonies offering gifts. If they are unhappy, they will come and
+make demands instead. If they get really angry, they may attack your
+units or colonies. After a few turns, however, they will usually calm
+down again.
+
+Some types of units may enter Native Settlements. Units that carry
+goods, such as \hyperlink{Wagon Train}{Wagon Trains} and
+\hyperlink{Naval Units}{Ships}, can enter the settlements and trade
+with them. Trade always improves your relations with the natives.
+
+\hyperlink{Scout}{Scouts} can either demand tribute, or ask to speak 
+with the chief of the tribe. Demanding tribute is obviously not good
+for your relations with the natives, whereas speaking with the chief
+for the first time may be to your advantage. The chief may offer you
+some gold, or tell you about nearby lands. If your Scout is not a
+\hyperlink{Seasoned Scout}{Seasoned Scout} already, he may become so.
+
+\hyperlink{Free Colonist}{Free
+Colonists} and \hyperlink{Indentured Servant}{Indentured Servants} may
+enter a settlement in order to learn the skills of the natives. And
+\hyperlink{Missionary}{Missionaries}, which may be either
+\hyperlink{Jesuit Missionary}{Jesuit Missionaries} or ordinary
+colonists blessed as missionaries in the \hyperlink{Home Port}{Home
+Port} or any colony with a \hyperlink{Church}{Church}, are able to
+establish a \Concept{Mission} or to incite the natives against another
+European nation.
+
+The presence of a Mission will reduce tension between the natives and
+your colonists. In time, some of the natives may also convert and join
+your colonies as \hyperlink{Indian Convert}{Indian Converts}.
+
+
+\hypertarget{Lost City Rumours}{\subsection{Lost City Rumours}}
+
+In the New World, there are also rumours about \Concept{Lost Cities},
+such as El Dorado, or C{\'\i}bola. You may send your colonists to
+explore these rumours, and you might indeed discover one of the Seven
+Cities of Gold, and a \hyperlink{Treasure Train}{Treasure Train}.
+Other outcomes, however, are also possible.
+
+Mostly, the rumour proves to be nothing but a rumour. Occasionally,
+you might disturb the burial grounds of a native tribe, which will
+cause the tribe to declare war on you. It is also possible that your
+expedition simply vanishes without a trace. On the other hand, you
+might also discover a small tribe and a few trinkets. Your colonist
+might become a \hyperlink{Seasoned Scout}{Seasoned Scout} if he has no
+other skill, or you might discover the sole survivor of a lost
+colony.
+
+Possibly the best outcome is the discovery of the \Concept{Fountain of
+Youth}, which will cause numerous colonists to appear on the docks in
+your \hyperlink{Home Port}{Home Port}.
+
+As soon as \hyperlink{Hernando de Soto}{Hernando de Soto} has joined
+the \hyperlink{Continental Congress}{Continental Congress}, Lost City
+Rumours always yield positive results.
 
 
 \hypertarget{Colonies}{\section{Colonies}}
@@ -582,7 +714,8 @@ part of every newly established colony:
 
 \item The \Building{Warehouse} stores all kinds of goods. Its initial
   capacity is 100 units of each kind of goods, but it can be upgraded
-  to 200 and finally 300 units.
+  to a \Building{Warehouse Expansion}, which holds 200 and finally 300
+  units.
 \end{itemize}
 
 The following eight buildings are not part of your basic colony and
@@ -643,6 +776,101 @@ have to be constructed later:
   \hyperlink{Boycotts}{Boycotts}.
 
 \end{itemize}
+
+
+\hypertarget{Home Country}{\section{Your Home Country}}
+
+Your \textbf{Home Country} is a European monarchy, either 
+\Concept{Spain}, \Concept{France}, \Concept{England} or the 
+\Concept{Netherlands}\index{Dutch}. Each of these countries has one
+special ability. If you hail from Spain, you will be more successful
+fighting against the natives. If you are French, you will be more
+successful cooperating with the natives. The English generate more
+colonists, and the Dutch are better traders.
+
+\hypertarget{Home Port}{\subsection{Your Home Port}}
+
+The \textbf{Home Port} is a port city in your home country, where you
+can trade \hyperlink{Goods}{Goods}, and train, recruit and buy
+\hyperlink{Units}{Units}. If you have not built a
+\hyperlink{Drydock}{Drydock} in any of your colonies, your damaged
+ships will also return to the Home Port for repairs.
+
+As you generate \hyperlink{Crosses}{Crosses} in your colonies,
+colonists will appear at the docks of the Home Port. Unless
+\hyperlink{William Brewster}{William Brewster} has joined the
+\hyperlink{Continental Congress}{Continental Congress}, many of these
+colonists will be \hyperlink{Indentured Servant}{Indentured Servants}
+and \hyperlink{Petty Criminal}{Petty Criminals}. Once William
+Brewster has been elected, these units will no longer appear at the
+docks, and you will be able to select the next colonist to emigrate
+from the recruitment list.
+
+The recruitment list is a list of three colonists who are thinking
+about emigrating to the New World, but have not yet reached a
+decision. You can recruit them by offering gold as an incentive. At
+the beginning of the game, this is a good way of increasing the
+population of your colonies. However, the amount of gold required will
+greatly increase during the game.
+
+If you have enough gold, you can also train colonists at the
+\hypertarget{Royal Academy}{Royal Academy}. In exchange for the
+education you provide, they will also emigrate to the New World. Not
+all types of colonists can be trained at the Royal Academy, however.
+
+\hyperlink{Naval Units}{Ships} and \hyperlink{Artillery}{Artillery}
+can also be purchased in the Home Port. You can also build these units
+in your colonies, as soon as you have built a
+\hyperlink{Shipyard}{Shipyard} and an \hyperlink{Armory}{Armory},
+respectively.
+
+
+\hypertarget{Monarch}{\subsection{Your Monarch}}
+
+Your Home Country is ruled by a \textbf{Monarch} whose actions can
+have a profound influence on your colonies and your relations to other
+nations present in the New World. 
+
+From time to time, the Monarch may decide to raise the
+\Concept{Taxes}{Taxes} you pay on all goods you sell in the Home
+Port. You may refuse to accept these taxes, however, in which case
+your colonists will stage a protest similar to the \Concept{Boston Tea
+Party} and throw some goods into the harbour. The Monarch will not be
+amused and will \index{Boycotts} \hypertarget{Boycotts}{boycott} this
+type of goods. This means that you will no longer be able to trade
+these goods in the Home Port until the Boycott is lifted.
+
+You can end a Boycott by paying the outstanding tax arrears. As soon
+as \hyperlink{Jacob Fugger II} joins the \hyperlink{Continental
+Congress}{Continental Congress}, all Boycotts will be lifted, but the
+Monarch may declare further Boycotts later on. As soon as
+\hyperlink{Peter Stuyvesant} joins the \hyperlink{Continental
+Congress}, you will be able to build \hyperlink{Custom House}{Custom
+Houses} in your colonies. The original Colonization game contained a
+bug which made the Custom House ignore all Boycotts, and this
+behaviour is available as a rule variant.
+
+Naturally, the Monarch does not trust your colonists, some of which
+are nothing but \hyperlink{Petty Criminal}{Petty Criminals}, and some
+of which even support the infamous \hyperlink{Sons of Liberty}{Sons of
+Liberty}. For this reason, the crown maintains the
+\Concept{Royal Expeditionary Force}, which is to put an end to
+insurrections in the New World. From time to time the Monarch may
+inform you that further units have been added to the Royal
+Expeditionary Force, just so that you don't get any ideas.
+
+The Monarch may also declare war on any nation present in the New
+World, both European and native. This will also affect your relations
+with this nation, unless \hyperlink{Benjamin Franklin}{Benjamin
+Franklin} has already been elected to the \hyperlink{Continental
+Congress}{Continental Congress}. In this case, the Monarch's wars do
+not affect you anymore.
+
+If you are already at war with some nation, either due to the
+Monarch's actions, or your own, the crown may offer you some cheap
+\Concept{Mercenaries}. If you agree to their price, these units will
+appear at the docks in your Home Port, ready to set sail for the New
+World.
 
 
 
@@ -734,7 +962,7 @@ blessing him in a colony with a \hyperlink{Church}{Church}, or in the
 churches and maybe even a
 \hyperlink{Cathedral}{Cathedral}. Missionaries are able to establish a
 \hyperlink{Mission}{Mission} in the native settlement, and to convert
-the natives. \Unit{Jesuit Missionary}, however, are much more
+the natives. The \Unit{Jesuit Missionary}, however, is much more
 accomplished at the job.
 
 The converted natives may join your colonies as \Unit{Indian
@@ -842,7 +1070,7 @@ each.
 In FreeCol, your colonists come from all walks of life. Some are
 unskilled \hyperlink{Petty Criminal}{Petty Criminals}, who are
 deported to the colonies. Others are \hyperlink{Indentured
-Servants}{Indentured Servants}, or \hyperlink{Free Colonist}{Free
+Servant}{Indentured Servants}, or \hyperlink{Free Colonist}{Free
 Colonists} with moderate skills. Still others are masters of their
 craft, experts at their trade or profession, who were educated at the
 Royal College in Europe. If you have enough gold, you can recruit
@@ -854,8 +1082,8 @@ Not all skills, however, can be learned in Europe.
 apparently unknown in Europe. Thus, \hyperlink{Master Sugar
 Planter}{Master Sugar Planters}, \hyperlink{Master Cotton
 Planter}{Master Cotton Planters}, \hyperlink{Master Tobacco
-Planter}{Master Tobacco Planters}, as well as the \hyperlink{Master
-Fur Trapper}{Master Fur Trappers}, can not be recruited in Europe.
+Planter}{Master Tobacco Planters}, as well as the \hyperlink{Expert
+Fur Trapper}{Expert Fur Trappers}, can not be recruited in Europe.
 
 At the beginning of the game, these skills can only be learned at
 Indian Settlements. As soon as you construct a
@@ -954,58 +1182,61 @@ Economics, penned several texts pertaining to Economic theory,
 including, ``The Wealth of Nations'' his most famous text. As soon as
 Adam Smith joins the Continental Congress, the player is allowed to
 build factories, which produce 1.5 units of manufactured goods for
-each unit of raw material consumed.
+each unit of raw material consumed. \Wikipedia{Adam_Smith}
 
 \Father{Jacob Fugger II} (1459--1525) was an extremely wealthy German
 merchant and banker who amassed a fortune with family partnerships and
 stock holdings in the mining industries. As soon as Jacob Fugger joins
-the Continental Congress, all \hyperlink{boycotts}{boycotts} currently
-in effect are dropped.
+the Continental Congress, all \hyperlink{Boycotts}{Boycotts} currently
+in effect are dropped. \Wikipedia{Jacob_Fugger}
 
 \Father{Peter Minuit} (1580--1638) bought what later became known as
 Manhattan Island from Native Americans for about 60 Dutch guilders. He
 later colonized the Delware Bay area as well. As soon as Peter Minuit
 is elected to the Continental Congress, the Indians no longer demand
-payment for their land.
+payment for their land. \Wikipedia{Peter_Minuit}
 
 \Father{Peter Stuyvesant} (1592--1672) was appointed Governor General
 of the New Netherlands, which, after a British invasion he could not
 stop, became New York. With the election of Peter Stuyvesant, the
 construction of \hyperlink{Custom House}{custom houses} becomes
-possible.
+possible. \Wikipedia{Peter_Stuyvesant}
 
 \Father{Jan de Witt} (1625--1672) was a great Dutch statesmen.  He
 represented the merchants and a encouraged industry and commerce. He
 also negotiated several important treaties for the Dutch to end wars
 with England. As soon as Jan de Witt is a member of the Continental
 Congress, trade with foreign colonies becomes possible.
+\Wikipedia{Jan_de_Witt}
 
 \Father{Ferdinand Magellan} (1480--1521) was one of the greatest
 explorers to navigate the globe. Magellan was first to circumnavigate
 the globe and cross the Pacific Ocean. Magellan's election to the
 Continental Congress increases the movement of all naval vessels by
-one, and the time to sail between Europe and the New World is reduced.
+one, and the time to sail between Europe and the New World is
+reduced. \Wikipedia{Ferdinand_Magellan}
 
-\Father{Francisco de Coronado} (1510--1554) was the first European
-explorer to see the Grand Canyon. Though he never found the golden
-cities he searched for, his mapping of the area now called the
-Southwestern US was important to further exploration. As soon as
-Francisco de Coronado joins the Continental Congress, all existing
-colonies become visible on the map.
+\FFather{Francisco de Coronado}{Francisco V\'azquez de Coronado}
+(1510--1554) was the first European explorer to see the Grand
+Canyon. Though he never found the golden cities he searched for, his
+mapping of the area now called the Southwestern US was important to
+further exploration. As soon as Francisco de Coronado joins the
+Continental Congress, all existing colonies become visible on the
+map. \Wikipedia{Francisco_Vázquez_de_Coronado}
 
 \Father{Hernando de Soto} (1496--1542) was the first European to
 explore Florida and the southeastern US.  He also held a prominent
 role in conquests of Central America. If Hernando de Soto is a member
 of the Continental Congress, the exploration of \hyperlink{Lost City
 Rumours}{Lost City Rumours} always yields a positive result, and all
-units have an extended sight radius.
+units have an extended sight radius. \Wikipedia{Hernando_de_Soto_(explorer)}
 
 \Father{Henry Hudson} (1565--1611) was an English navigator who
 explored and mapped a large area of the northeastern North American
 continent.  Many waterways in that region are named in his honour. His
 original goal was to find the famed Northwest Passage. The election of
 Henry Hudson to the Continental Congress doubles the output of all
-\hyperlink{Expert Fur Trapper}{Fur Trappers}.
+\hyperlink{Expert Fur Trapper}{Fur Trappers}. \Wikipedia{Henry_Hudson}
 
 \Father{Robert La Salle} (1643--1687) was the first European to travel
 the length of the Mississippi river, while on a mission to set up
@@ -1013,21 +1244,22 @@ numerous trading posts along its banks.  He later claimed the whole
 basin as Louisiana in honor of the French King. Later, he explored
 several of the Great Lakes. If Robert La Salle is a member of the
 Continental Congress, all colonies gain a stockade as soon as their
-population reaches three colonists.
+population reaches three colonists. \Wikipedia{Robert_La_Salle}
 
 \FFather{Hernan Cortes}{Hern\'an Cort\'es} (1485--1547) was a famed Spanish
 conquistador who overthrew the Aztec Empire and claimed Mexico for
 Spain. As soon as Hern\'an Cort\'es joins the Continental Congress,
 conquered native settlements always yield treasure (and in greater
 abundance) and the King's \hyperlink{Galleon}{galleons} transport it
-free of charge.
+free of charge. \Wikipedia{Hernan_Cortes}
 
 \Father{George Washington} (1732--1799) was the general who lead the
 colonial army to victory over the British to gain independence for the
 colonies. This victory and his leadership led to his being named the
 new nation's first President. If George Washington is a member of the
 Continental Congress, any soldier or dragoon who wins a combat is
-automatically upgraded to the next possible level.
+automatically upgraded to the next possible
+level. \Wikipedia{George_Washington}
 
 \Father{Paul Revere} (1734--1818) was the famed rider of colonial
 America who mounted his horse and rode through the countryside
@@ -1036,13 +1268,13 @@ during the ride and later released when his captors believed they were
 in grave danger and their prisoner might slow them down. With Paul
 Revere a member of the Continental Congress, a colonist automatically
 takes up any stockpiled muskets and defends an otherwise undefended
-colony if it is attacked.
+colony if it is attacked. \Wikipedia{Paul_Revere}
 
 \Father{Francis Drake} (1542--1596) was a great English sea captain,
 the first Englishman to circumnavigate the globe and a hero in the
 fights against the Spanish Armada. The presence of Francis Drake in
 the Continental Congress increases the combat strength of all
-Privateers by 50\%.
+Privateers by 50\%. \Wikipedia{Francis_Drake}
 
 \Father{John Paul Jones} (1741--1792) was hailed as a great sea
 captain in America, and uttered the famous words "Sir, I have not yet
@@ -1050,13 +1282,14 @@ begun to fight" while fighting the British at sea. He later watched
 his ship sink to the bottom of the ocean from the deck of a British
 vessel. As soon as John Paul Jones is elected to the Continental
 Congress, a \hyperlink{Frigate}{Frigate} is added to your colonial
-navy for free.
+navy for free. \Wikipedia{John_Paul_Jones}
 
 \Father{Thomas Jefferson} (1743--1826), a powerful voice of
 patriotism, was credited with writing the Declaration of
 Independence. He later became the 3rd President of the US. The
 election of Thomas Jefferson to the Continental Congress increases
-Liberty Bell production in colonies by 50\%.
+Liberty Bell production in colonies by
+50\%. \Wikipedia{Thomas_Jefferson}
 
 \Father{Pocahontas} (1595--1617) was a peacemaker between early
 Jamestown settlers and the Native Americans. She is credited with
@@ -1064,21 +1297,21 @@ sending food and other supplies to starving colonists there during
 harsh times.  She later converted to Christianity and married an
 Englishman.  When Pocahontas joins the Continental Congress, all
 tension levels between you and natives are removed and Indian alarm is
-generated half as fast.
+generated half as fast. \Wikipedia{Pocahontas}
 
 \Father{Thomas Paine} (1737--1809) inspired colonists with his pen at
 the urging of Benjamin Franklin. He published a pamphlet, "Common
 Sense", guiding the thoughts of patriots all over the colonies. The
 election of Thomas Pain to the Continental Congress increases Liberty
 Bell production in all your colonies by the value of the current
-\hyperlink{Taxes}{tax rate}.
+\hyperlink{Taxes}{tax rate}. \Wikipedia{Thomas_Paine}
 
 \FFather{Simon Bolivar}{Sim\'on Bol\'{\i}var} (1783--1830) is remembered as a great
 leader in the struggle for South American independence from
 Spain. Bol\'{\i}var freed what is now Venezuela and later became its
 first President. When Sim\'on Bol\'{\i}var joins the Continental
 Congress, the Sons of Liberty membership in all existing colonies is
-increased by 20\%.
+increased by 20\%. \Wikipedia{Simon_Bolivar}
 
 \Father{Benjamin Franklin} (1706--1790), a heavy contributor to the
 Declaration of Independence, was one of the voices of the
@@ -1086,38 +1319,42 @@ Revolution. He traveled extensively between Europe and the colonies,
 and gained the support of the French in the war. As soon as Benjamin
 Franklin is elected to the Continental Congress, the King's foreign
 wars no longer have effect on relationships in the New World, and
-Europeans in the New World always offer peace in negotiations.
+Europeans in the New World always offer peace in
+negotiations. \Wikipedia{Benjamin_Franklin}
 
 \Father{William Brewster} (1567--1644) was the Puritan leader of the
 Plymouth colony in New England. As soon as William Brewster joins the
 Continental Congress, criminals or indentured servants no longer
 appear on the docks and you can select which immigrant in the
-recruitment pool to move to the docks.
+recruitment pool to move to the docks. \Wikipedia{William_Brewster_(Pilgrim)}
 
 \Father{William Penn} (1644--1718), a close friend of the Duke of
 York, was granted the land that is mostly Pennsylvania, Delaware, and
 New Jersey. He governed the Quaker colony for several years to provide
 a haven to fellow Quakers. The election of William Penn increases
-cross production in all colonies by 50\%.
+cross production in all colonies by 50\%. \Wikipedia{William_Penn}
 
-\Father{Father Jean de Brebeuf} (1593--1649) founded Quebec City in
-Canada, befriended the Huron Indians and converted many to
-Christianity. He died at the hands of the Iroquois who had finally
-defeated their enemy, the Hurons. With Jean de Brebeuf a member of the
-Continental Congress, all missionaries function as experts.
+\FFather{Father Jean de Brebeuf}{Father Jean de Br\'ebeuf} (1593--1649) 
+founded Quebec City in Canada, befriended the Huron Indians and
+converted many to Christianity. He died at the hands of the Iroquois
+who had finally defeated their enemy, the Hurons. With Jean de Brebeuf
+a member of the Continental Congress, all missionaries function as
+experts. \Wikipedia{Jean_de_Brebeuf}
 
-\Father{Juan de Sepulveda} (1781--1872) was a Spanish missionary who
-traveled throughout the Indies converting the Natives to Catholicism
-and speaking out against their harsh treatment by Spain. The election
-of Juan de Sepulveda to the Continental Congress increases the chance
-that a subjugated Indian settlement will ``convert'' and join a
-colony.
+\FFather{Juan de Sepulveda}{Juan Gin\'es de Sep\'ulveda} (1781--1872) 
+was a Spanish missionary who traveled throughout the Indies converting
+the Natives to Catholicism and speaking out against their harsh
+treatment by Spain. The election of Juan de Sepulveda to the
+Continental Congress increases the chance that a subjugated Indian
+settlement will ``convert'' and join a
+colony. \Wikipedia{Juan_Gines_de_Sepulveda}
 
-\FFather{Bartolome de las Casas}{Bartolom\'e de las Casas} (1474--1566) was a Catholic Priest
-who traveled the Indies converting Indians and chastising Spain for
-their treatment of the Natives. When Bartolom\'e de las Casas joins
-the Continental Congress, all existing Indian converts become free
-colonists.
+\FFather{Bartolome de las Casas}{Bartolom\'e de las Casas}
+(1474--1566) was a Catholic Priest who traveled the Indies converting
+Indians and chastising Spain for their treatment of the Natives. When
+Bartolom\'e de las Casas joins the Continental Congress, all existing
+Indian converts become free
+colonists. \Wikipedia{Bartolome_de_las_Casas}
 
 
 
