@@ -57,7 +57,8 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
     private static final int    EXIT = 0,
                                 RECRUIT = 1,
                                 PURCHASE = 2,
-                                TRAIN = 3;
+                                TRAIN = 3,
+                                UNLOAD = 4;
 
     private static final int TITLE_FONT_SIZE = 12;
     
@@ -104,14 +105,41 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         setFocusCycleRoot(true);
         setSize(parent.getWidth(), parent.getHeight() - parent.getMenuBarHeight());
 
+	// Use ESCAPE for closing the ColonyPanel:
         exitButton = new JButton(Messages.message("close"));
-        
-        // Use ESCAPE for closing the ColonyPanel:
-        InputMap inputMap = new ComponentInputMap(exitButton);
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false), "pressed");
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, true), "released");
-        SwingUtilities.replaceUIInputMap(exitButton, JComponent.WHEN_IN_FOCUSED_WINDOW, inputMap);                
-        
+        InputMap closeInputMap = new ComponentInputMap(exitButton);
+        closeInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false), "pressed");
+        closeInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, true), "released");
+        SwingUtilities.replaceUIInputMap(exitButton, JComponent.WHEN_IN_FOCUSED_WINDOW, closeInputMap);
+
+	// train button
+	JButton trainButton = new JButton(Messages.message("train"));
+        InputMap trainInputMap = new ComponentInputMap(trainButton);
+        trainInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_T, 0, false), "pressed");
+        trainInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_T, 0, true), "released");
+        SwingUtilities.replaceUIInputMap(trainButton, JComponent.WHEN_IN_FOCUSED_WINDOW, trainInputMap);
+
+	// purchase button
+	JButton purchaseButton = new JButton(Messages.message("purchase"));
+        InputMap purchaseInputMap = new ComponentInputMap(purchaseButton);
+        purchaseInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_P, 0, false), "pressed");
+        purchaseInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_P, 0, true), "released");
+        SwingUtilities.replaceUIInputMap(purchaseButton, JComponent.WHEN_IN_FOCUSED_WINDOW, purchaseInputMap);
+
+	// recruit button
+        JButton recruitButton = new JButton(Messages.message("recruit"));
+        InputMap recruitInputMap = new ComponentInputMap(recruitButton);
+        recruitInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_R, 0, false), "pressed");
+        recruitInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_R, 0, true), "released");
+        SwingUtilities.replaceUIInputMap(recruitButton, JComponent.WHEN_IN_FOCUSED_WINDOW, recruitInputMap);
+
+	// unload button
+	JButton unloadButton = new JButton(Messages.message("unload"));
+        InputMap unloadInputMap = new ComponentInputMap(unloadButton);
+        unloadInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0, false), "pressed");
+        unloadInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0, true), "released");
+        SwingUtilities.replaceUIInputMap(unloadButton, JComponent.WHEN_IN_FOCUSED_WINDOW, unloadInputMap);
+
         toAmericaPanel = new ToAmericaPanel(this);
         toEuropePanel = new ToEuropePanel(this);
         inPortPanel = new InPortPanel();
@@ -151,9 +179,6 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         docksPanel.setLayout(new GridLayout(0 , 2));
         cargoPanel.setLayout(new GridLayout(1 , 0));
 
-        JButton recruitButton = new JButton( Messages.message("recruit") ),
-                purchaseButton = new JButton( Messages.message("purchase") ),
-                trainButton = new JButton( Messages.message("train") );
         JScrollPane toAmericaScroll = new JScrollPane(toAmericaPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER),
                     toEuropeScroll = new JScrollPane(toEuropePanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER),
                     inPortScroll = new JScrollPane(inPortPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER),
@@ -194,6 +219,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         purchaseButton.setOpaque(true);
         trainButton.setOpaque(true);
         exitButton.setOpaque(true);
+	unloadButton.setOpaque(true);
         
         final int SPACE = 30;
         final int SPACE_BUTTON = 10;
@@ -207,7 +233,8 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         exitButton.setSize(110, 20);
         recruitButton.setSize(100, 20);
         purchaseButton.setSize(100, 20);
-        trainButton.setSize(100, 20);                        
+        trainButton.setSize(100, 20);
+	unloadButton.setSize(100, 20);
         toAmericaLabel.setSize(200, 20);
         toEuropeLabel.setSize(200, 20);
         inPortLabel.setSize(200, 20);
@@ -236,6 +263,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         recruitButton.setLocation((spaceLeft - recruitButton.getWidth()) / 2, spaceTopButtons);
         purchaseButton.setLocation((spaceLeft - purchaseButton.getWidth()) / 2, spaceTopButtons + recruitButton.getHeight() + SPACE_BUTTON);
         trainButton.setLocation((spaceLeft - trainButton.getWidth()) / 2, purchaseButton.getY() + purchaseButton.getHeight() + SPACE_BUTTON);
+        unloadButton.setLocation((spaceLeft - unloadButton.getWidth()) / 2, trainButton.getY() + trainButton.getHeight() + SPACE_BUTTON);
                                 
         exitButton.setLocation((marketScroll.getWidth() + marketScroll.getX() + getWidth() - exitButton.getWidth()) / 2, marketScroll.getY() + (marketScroll.getHeight() - exitButton.getHeight()) / 2);                
     
@@ -245,16 +273,19 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         recruitButton.setActionCommand(String.valueOf(RECRUIT));
         purchaseButton.setActionCommand(String.valueOf(PURCHASE));
         trainButton.setActionCommand(String.valueOf(TRAIN));
+        unloadButton.setActionCommand(String.valueOf(UNLOAD));
 
         exitButton.addActionListener(this);
         recruitButton.addActionListener(this);
         purchaseButton.addActionListener(this);
         trainButton.addActionListener(this);
+        unloadButton.addActionListener(this);
 
         add(exitButton);
         add(recruitButton);
         add(purchaseButton);
         add(trainButton);
+        add(unloadButton);
         add(toAmericaScroll);
         add(toEuropeScroll);
         add(inPortScroll);
@@ -498,40 +529,45 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             if (selectedUnit != null) {
                 selectedUnit.setSelected(false);
             }
-            cargoPanel.removeAll();
             selectedUnit = unitLabel;
-
-            if (selectedUnit != null) {
-                selectedUnit.setSelected(true);
-                Unit selUnit = selectedUnit.getUnit();
-
-                Iterator unitIterator = selUnit.getUnitIterator();
-                while (unitIterator.hasNext()) {
-                    Unit unit = (Unit) unitIterator.next();
-
-                    UnitLabel label = new UnitLabel(unit, parent);
-                    label.setTransferHandler(defaultTransferHandler);
-                    label.addMouseListener(pressListener);
-
-                    cargoPanel.add(label, false);
-                }
-
-                Iterator goodsIterator = selUnit.getGoodsIterator();
-                while (goodsIterator.hasNext()) {
-                    Goods g = (Goods) goodsIterator.next();
-
-                    GoodsLabel label = new GoodsLabel(g, parent);
-                    label.setTransferHandler(defaultTransferHandler);
-                    label.addMouseListener(pressListener);
-
-                    cargoPanel.add(label, false);
-                }
-            }
-
+	    updateCargoPanel();
             updateCargoLabel();
         }
         cargoPanel.revalidate();
         refresh();
+    }
+
+
+    private void updateCargoPanel () {
+	cargoPanel.removeAll();
+
+	if (selectedUnit != null) {
+	    selectedUnit.setSelected(true);
+	    Unit selUnit = selectedUnit.getUnit();
+
+	    Iterator unitIterator = selUnit.getUnitIterator();
+	    while (unitIterator.hasNext()) {
+		Unit unit = (Unit) unitIterator.next();
+
+		UnitLabel label = new UnitLabel(unit, parent);
+		label.setTransferHandler(defaultTransferHandler);
+		label.addMouseListener(pressListener);
+
+		cargoPanel.add(label, false);
+	    }
+
+	    Iterator goodsIterator = selUnit.getGoodsIterator();
+	    while (goodsIterator.hasNext()) {
+		Goods g = (Goods) goodsIterator.next();
+
+		GoodsLabel label = new GoodsLabel(g, parent);
+		label.setTransferHandler(defaultTransferHandler);
+		label.addMouseListener(pressListener);
+
+		cargoPanel.add(label, false);
+	    }
+	}
+
     }
 
 
@@ -556,7 +592,11 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
     * @return The currently select unit.
     */
     public Unit getSelectedUnit() {
-        return selectedUnit.getUnit();
+	if (selectedUnit == null) {
+	    return null;
+	} else {
+	    return selectedUnit.getUnit();
+	}
     }
 
     
@@ -568,6 +608,30 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         return selectedUnit;
     }
 
+
+
+    private void unload() { 
+	//UnitLabel unitLabel = getSelectedUnitLabel();
+	Unit unit = getSelectedUnit();
+        if (unit != null &&
+	    unit.isCarrier() && 
+	    unit.getGoodsCount() > 0) {
+	    Player player = freeColClient.getMyPlayer();
+	    Iterator goodsIterator = unit.getGoodsIterator();
+	    while (goodsIterator.hasNext()) {
+		Goods goods = (Goods) goodsIterator.next();
+		if (freeColClient.getMyPlayer().canTrade(goods)) {
+		    inGameController.sellGoods(goods);
+		    updateCargoLabel();
+		    updateCargoPanel();
+		} else {
+		    inGameController.payArrears(goods);
+		}
+		getCargoPanel().revalidate();
+		refresh();
+	    }
+	}
+    }
 
     /**
      * Analyzes an event and calls the right external methods to take
@@ -592,6 +656,9 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                 case TRAIN:
                     showTrainDialog();
                     break;
+	        case UNLOAD:
+		    unload();
+		    break;
                 default:
                     logger.warning("Invalid action command");
             }
