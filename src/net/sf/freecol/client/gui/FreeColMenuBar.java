@@ -40,6 +40,7 @@ import net.sf.freecol.client.gui.action.GotoAction;
 import net.sf.freecol.client.gui.action.MapControlsAction;
 import net.sf.freecol.client.gui.action.PlowAction;
 import net.sf.freecol.client.gui.action.SkipUnitAction;
+import net.sf.freecol.client.gui.action.UnloadAction;
 import net.sf.freecol.client.gui.action.WaitAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ColopediaPanel;
@@ -296,6 +297,10 @@ public class FreeColMenuBar extends JMenuBar {
         final JMenuItem roadMenuItem = new JMenuItem(am.getFreeColAction(BuildRoadAction.ID));
         roadMenuItem.setOpaque(false);
         ordersMenu.add(roadMenuItem);
+
+        final JMenuItem unloadMenuItem = new JMenuItem(am.getFreeColAction(UnloadAction.ID));
+        unloadMenuItem.setOpaque(false);
+        ordersMenu.add(unloadMenuItem);
 
         ordersMenu.addSeparator();
 
