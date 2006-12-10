@@ -226,6 +226,7 @@ public final class PreGameController {
 
         if (element != null) {
             freeColClient.getGame().getGameOptions().readFromXMLElement(element);
+            sendGameOptions();
         } else {
             throw new IOException("the given file does not contain game options.");
         }
