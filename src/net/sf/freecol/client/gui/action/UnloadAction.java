@@ -50,7 +50,7 @@ public class UnloadAction extends MapboardAction {
      * @return <code>true</code> if the player has access to Europe.
      */
     protected boolean shouldBeEnabled() { 
-	Unit unit = getUnit();
+	Unit unit = getFreeColClient().getGUI().getActiveUnit();
         return (unit != null &&
 		unit.isCarrier() && 
 		unit.getGoodsCount() > 0);
@@ -61,7 +61,7 @@ public class UnloadAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */    
     public void actionPerformed(ActionEvent e) {
-	Unit unit = getUnit();
+	Unit unit = getFreeColClient().getGUI().getActiveUnit();
 	if (unit != null) {
 	    Iterator goodsIterator = unit.getGoodsIterator();
 	    while (goodsIterator.hasNext()) {
@@ -70,18 +70,4 @@ public class UnloadAction extends MapboardAction {
 	    }
 	}
     }
-
-    private Unit getUnit() {
-	Unit unit = null;
-	if (getFreeColClient().getCanvas().getColonyPanel().isShowing()) {
-	    unit = getFreeColClient().getCanvas().getColonyPanel().getSelectedUnit();
-	} else if (getFreeColClient().getCanvas().getEuropePanel().isShowing()) {
-	    unit = getFreeColClient().getCanvas().getEuropePanel().getSelectedUnit();
-	} else {
-	    unit = getFreeColClient().getGUI().getActiveUnit();
-	}
-	return unit;
-    }
-
-
 }
