@@ -86,7 +86,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
 
     private static final int    EXIT = 0,
-                                BUY_BUILDING = 1;
+                                BUY_BUILDING = 1,
+                                UNLOAD = 2;
 
     private final Canvas  parent;
     private final FreeColClient freeColClient;
@@ -118,6 +119,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
     private JButton exitButton = new JButton(Messages.message("close"));
     private JButton buyBuilding = new JButton(Messages.message("buyBuilding"));
+    private JButton unloadButton = new JButton(Messages.message("unload"));
 
 
 
@@ -137,10 +139,16 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         setFocusCycleRoot(true);
 
         // Use ESCAPE for closing the ColonyPanel:
-        InputMap inputMap = new ComponentInputMap(exitButton);
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false), "pressed");
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, true), "released");
-        SwingUtilities.replaceUIInputMap(exitButton, JComponent.WHEN_IN_FOCUSED_WINDOW, inputMap);        
+        InputMap closeInputMap = new ComponentInputMap(exitButton);
+        closeInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false), "pressed");
+        closeInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, true), "released");
+        SwingUtilities.replaceUIInputMap(exitButton, JComponent.WHEN_IN_FOCUSED_WINDOW, closeInputMap);
+
+        InputMap unloadInputMap = new ComponentInputMap(unloadButton);
+        unloadInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0, false), "pressed");
+        unloadInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0, true), "released");
+        SwingUtilities.replaceUIInputMap(unloadButton, JComponent.WHEN_IN_FOCUSED_WINDOW, unloadInputMap);        
+        
         
         productionPanel = new ProductionPanel(this);
         outsideColonyPanel = new OutsideColonyPanel(this);
@@ -202,7 +210,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
         buyBuilding.setSize(132, 20);
         exitButton.setSize(110, 20);
-        outsideColonyScroll.setSize(204, 275);
+        unloadButton.setSize(110, 20);
+        outsideColonyScroll.setSize(204, 260);
         inPortScroll.setSize(250, 120);
         cargoScroll.setSize(365, 120);
         warehouseScroll.setSize(620, 140);
@@ -230,9 +239,11 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
         buyBuilding.setActionCommand(String.valueOf(BUY_BUILDING));
         exitButton.setActionCommand(String.valueOf(EXIT));
+        unloadButton.setActionCommand(String.valueOf(UNLOAD));
 
         buyBuilding.addActionListener(this);
         exitButton.addActionListener(this);
+        unloadButton.addActionListener(this);
 
         setContents(outsideColonyScroll, inPortScroll, cargoScroll, warehouseScroll, tilesScroll, buildingsScroll, outsideColonyLabel, inPortLabel, tilesLabel, buildingsLabel);
 
@@ -270,6 +281,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     private void setContents(JScrollPane outsideColonyScroll, JScrollPane inPortScroll, JScrollPane cargoScroll, JScrollPane warehouseScroll, JScrollPane tilesScroll, JScrollPane buildingsScroll, JLabel outsideColonyLabel, JLabel inPortLabel, JLabel tilesLabel, JLabel buildingsLabel) {
         setLayout(null);
         add(exitButton);
+        add(unloadButton);
         add(outsideColonyScroll);
         add(inPortScroll);
         add(cargoScroll);
@@ -309,38 +321,35 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 	nameBox.setLocation(225, y);
         
         y+= 30;
-        tilesScroll.setLocation     (10, y);         //10);
-        buildingsScroll.setLocation (415, y);    //10); // 400,40
+        tilesScroll.setLocation     (10, y);
+        buildingsScroll.setLocation (415, y);
         
         y+= 225;
-        productionPanel.setLocation (10, y);    //235);
+        productionPanel.setLocation (10, y);
         
         y+= 5;
-        buildingBox.setLocation     (417, y);   //240); // 15,305
-        hammersLabel.setLocation    (695, y);   //240); // 185,305 (345, 305)
+        buildingBox.setLocation     (417, y);
+        hammersLabel.setLocation    (695, y);
 
         y+= 20;
-        buyBuilding.setLocation     (550, y);   //260); //682
-        toolsLabel.setLocation      (695, y);   //260); //682
+        buyBuilding.setLocation     (550, y);
+        toolsLabel.setLocation      (695, y);
 
-        y+= 15;
-        solLabel.setLocation        (15, y);    //275);
-        
         y+= 10;
-        outsideColonyScroll.setLocation(635, y);    //285);
-        
-        y+= 10;
-        goldLabel.setLocation       (15, y);    //295);
+        solLabel.setLocation        (15, y);
+        goldLabel.setLocation       (265, y);
 
-        y+= 35;
-        inPortScroll.setLocation    (10, y);    //330);
-        cargoScroll.setLocation     (265, y);    //330);
+        y+= 30;
+        inPortScroll.setLocation    (10, y);
+        cargoScroll.setLocation     (265, y);
+        outsideColonyScroll.setLocation(635, y);
         
         y+= 120;
-        warehouseScroll.setLocation (10, y);    //450);
+        warehouseScroll.setLocation (10, y);
 
-        y+= 120;
-        exitButton.setLocation      (730, y);   //570);
+        y+= 150;
+	unloadButton.setLocation    (10, y);
+        exitButton.setLocation      (730, y);
 
     }
 
@@ -575,6 +584,9 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 case EXIT:
                     closeColonyPanel();
                     break;
+	        case UNLOAD:
+		    unload();
+		    break;
                 default:
                     logger.warning("Invalid action");
             }
@@ -583,6 +595,23 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         }
     }
 
+
+    private void unload() { 
+	Unit unit = getSelectedUnit();
+        if (unit != null &&
+	    unit.isCarrier() && 
+	    unit.getGoodsCount() > 0) {
+	    Iterator goodsIterator = unit.getGoodsIterator();
+	    while (goodsIterator.hasNext()) {
+		Goods goods = (Goods) goodsIterator.next();
+		inGameController.unloadCargo(goods);
+		updateWarehouse();
+		updateCargoPanel();
+		getCargoPanel().revalidate();
+		refresh();
+	    }
+	}
+    }
 
     /**
     * Closes the <code>ColonyPanel</code>.
@@ -649,41 +678,45 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             if (selectedUnit != null) {
                 selectedUnit.setSelected(false);
             }
-            cargoPanel.removeAll();
-            selectedUnit = unitLabel;
-
-            if (selectedUnit != null) {
-                selectedUnit.setSelected(true);
-                Unit selUnit = selectedUnit.getUnit();
-
-                Iterator unitIterator = selUnit.getUnitIterator();
-                while (unitIterator.hasNext()) {
-                    Unit unit = (Unit) unitIterator.next();
-
-                    UnitLabel label = new UnitLabel(unit, parent);
-                    label.setTransferHandler(defaultTransferHandler);
-                    label.addMouseListener(pressListener);
-
-                    cargoPanel.add(label, false);
-                }
-
-                Iterator goodsIterator = selUnit.getGoodsIterator();
-                while (goodsIterator.hasNext()) {
-                    Goods g = (Goods) goodsIterator.next();
-
-                    GoodsLabel label = new GoodsLabel(g, parent);
-                    label.setTransferHandler(defaultTransferHandler);
-                    label.addMouseListener(pressListener);
-
-                    cargoPanel.add(label, false);
-                }
-
-            }
-
+	    selectedUnit = unitLabel;
+	    updateCargoPanel();
             updateCargoLabel();
         }
         cargoPanel.revalidate();
         refresh();
+    }
+
+
+    private void updateCargoPanel() {
+	cargoPanel.removeAll();
+
+	if (selectedUnit != null) {
+	    selectedUnit.setSelected(true);
+	    Unit selUnit = selectedUnit.getUnit();
+
+	    Iterator unitIterator = selUnit.getUnitIterator();
+	    while (unitIterator.hasNext()) {
+		Unit unit = (Unit) unitIterator.next();
+
+		UnitLabel label = new UnitLabel(unit, parent);
+		label.setTransferHandler(defaultTransferHandler);
+		label.addMouseListener(pressListener);
+
+		cargoPanel.add(label, false);
+	    }
+
+	    Iterator goodsIterator = selUnit.getGoodsIterator();
+	    while (goodsIterator.hasNext()) {
+		Goods g = (Goods) goodsIterator.next();
+
+		GoodsLabel label = new GoodsLabel(g, parent);
+		label.setTransferHandler(defaultTransferHandler);
+		label.addMouseListener(pressListener);
+
+		cargoPanel.add(label, false);
+	    }
+
+	}
     }
 
 
