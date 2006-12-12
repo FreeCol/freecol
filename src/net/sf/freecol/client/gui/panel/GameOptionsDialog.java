@@ -164,8 +164,6 @@ public final class GameOptionsDialog extends FreeColDialog implements ActionList
                     if (loadFile != null) {
                         try {
                             freeColClient.getPreGameController().loadGameOptions(loadFile);
-                            parent.remove(this);
-                            setResponse(new Boolean(true));
                         } catch (IOException e) {
                             freeColClient.getCanvas().errorMessage("unspecifiedIOException");
                         }

@@ -158,7 +158,6 @@ public class IndianSettlement extends Settlement {
         this.isVisited = isVisited;
         this.missionary = missionary;
 
-        //updateWantedGoods();
         /*
         for (int goodsType=0; goodsType<Goods.NUMBER_OF_TYPES; goodsType++) {
             if (goodsType == Goods.LUMBER || goodsType == Goods.HORSES || goodsType == Goods.MUSKETS
@@ -167,16 +166,16 @@ public class IndianSettlement extends Settlement {
             }
             goodsContainer.addGoods(goodsType, (int) (Math.random() * 300));
         }
-        */
+        */        
 
         goodsContainer.addGoods(Goods.LUMBER, 300);
-        //updateWantedGoods();
         convertProgress = 0;
-
+        
         for (int k = 0; k < alarm.length; k++) {
             alarm[k] = new Tension(0);
         }
 
+        updateWantedGoods();
     }
 
 
@@ -796,11 +795,6 @@ public class IndianSettlement extends Settlement {
     * It is only meaningful to call this method from the
     * server, since the settlement's {@link GoodsContainer}
     * is hidden from the clients.
-    *
-    * <br><br>
-    *
-    * This method should only get called when
-    * a scout enters this settlement.
     */
     public void updateWantedGoods() {
         highlyWantedGoods = Goods.TRADE_GOODS;
@@ -810,7 +804,8 @@ public class IndianSettlement extends Settlement {
         int wantedGoods1Amount = 0;
         int wantedGoods2Amount = 0;
 
-        /* TODO: Try the different types goods in random order: */
+        /* TODO: Try the different types goods in "random" order 
+         * (based on the numbers of units on this tile etc): */
         for (int type=0; type<Goods.NUMBER_OF_TYPES; type++) {
             if (type == Goods.MUSKETS || type == Goods.HORSES) {
                 continue;
@@ -1038,6 +1033,8 @@ public class IndianSettlement extends Settlement {
                 }
             }
         }
+        
+        updateWantedGoods();
     }
 
 
