@@ -1,6 +1,7 @@
 
 package net.sf.freecol.server;
 
+import java.awt.Color;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,6 +30,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIInGameInputHandler;
@@ -233,6 +235,34 @@ public final class FreeColServer {
                 updateMetaServer();
             }
         }, META_SERVER_UPDATE_INTERVAL, META_SERVER_UPDATE_INTERVAL);        
+    }
+    
+    /**
+     * Enters revenge mode against those evil AIs. 
+     * @param username The player to enter revenge mode.
+     */
+    public void enterRevengeMode(String username) {
+        if (!singleplayer) {
+            throw new IllegalStateException("Cannot enter revenge mode when not singleplayer.");
+        }
+        
+        final ServerPlayer p = (ServerPlayer) getGame().getPlayerByName(username); 
+        synchronized (p) {
+            Unit theFlyingDutchman = new Unit(game, p.getEntryLocation(), p, Unit.FLYING_DUTCHMAN, Unit.ACTIVE);        
+            Unit unit666 = new Unit(game, theFlyingDutchman, p, Unit.REVENGER, Unit.SENTRY);
+
+            p.setDead(false);
+            p.setColor(Color.BLACK);
+
+            Element updateElement = Message.createNewRootElement("update");
+            updateElement.appendChild(((FreeColGameObject) p.getEntryLocation()).toXMLElement(p, updateElement.getOwnerDocument()));
+            updateElement.appendChild(p.toXMLElement(p, updateElement.getOwnerDocument()));
+            try {
+                p.getConnection().send(updateElement);
+            } catch (IOException e) {
+                logger.warning("Could not send update");
+            }
+        }
     }
 
     /**

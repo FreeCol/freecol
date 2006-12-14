@@ -69,13 +69,15 @@ public final class InGameController extends Controller {
 
         ServerPlayer nextPlayer = (ServerPlayer) game.getNextPlayer();
 
-        while (nextPlayer != null && checkForDeath(nextPlayer)) {
-            nextPlayer.setDead(true);
-            Element setDeadElement = Message.createNewRootElement("setDead");
-            setDeadElement.setAttribute("player", nextPlayer.getID());
-            freeColServer.getServer().sendToAll(setDeadElement, null);
+        synchronized (nextPlayer) {
+            while (nextPlayer != null && checkForDeath(nextPlayer)) {
+                nextPlayer.setDead(true);
+                Element setDeadElement = Message.createNewRootElement("setDead");
+                setDeadElement.setAttribute("player", nextPlayer.getID());
+                freeColServer.getServer().sendToAll(setDeadElement, null);
 
-            nextPlayer = (ServerPlayer) game.getNextPlayer();
+                nextPlayer = (ServerPlayer) game.getNextPlayer();
+            }
         }
 
         while (nextPlayer != null && !nextPlayer.isConnected()) {
@@ -93,7 +95,8 @@ public final class InGameController extends Controller {
         }
 
         Player winner = checkForWinner();
-        if (winner != null) {
+        if (winner != null && 
+                (!freeColServer.isSingleplayer() || !winner.isAI())) {
             Element gameEndedElement = Message.createNewRootElement("gameEnded");
             gameEndedElement.setAttribute("winner", winner.getID());
             freeColServer.getServer().sendToAll(gameEndedElement, null);

@@ -21,6 +21,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -876,6 +877,10 @@ public final class GUI {
         =======
         Display the Tile overlays and Units
         */
+
+        List<Unit> darkUnits = new ArrayList<Unit>();
+        List<Integer> darkUnitsX = new ArrayList<Integer>();
+        List<Integer> darkUnitsY = new ArrayList<Integer>();
         
         yy = clipTopY;
 
@@ -916,12 +921,36 @@ public final class GUI {
                     Unit unitInFront = getUnitInFront(map.getTile(tileX, tileY));
                     if (unitInFront != null) {
                         displayUnit(g, unitInFront, xx, yy);
+                        
+                        if (unitInFront.getType() == Unit.REVENGER
+                                || unitInFront.getType() == Unit.FLYING_DUTCHMAN) {
+                            darkUnits.add(unitInFront);
+                            darkUnitsX.add(xx);
+                            darkUnitsY.add(yy);
+                        }
                     }
                 }
                 xx += tileWidth;
             }
 
             yy += tileHeight / 2;
+        }
+
+        /*
+        PART 2c
+        =======
+        Display darkness (revenge mode)
+        */
+        if (darkUnits.size() > 0) {
+            g.setColor(Color.BLACK);
+            final Image im = getImageLibrary().getMiscImage(ImageLibrary.DARKNESS);
+            for (int index=0; index<darkUnits.size(); index++) {
+                final Unit u = darkUnits.get(index);
+                final int x = darkUnitsX.get(index);
+                final int y = darkUnitsY.get(index);            
+                g.drawImage(im, x  + tileWidth/2 - im.getWidth(null)/2, y + tileHeight/2 - im.getHeight(null)/2, null);
+                displayUnit(g, u, x, y);
+            }
         }
 
         /*

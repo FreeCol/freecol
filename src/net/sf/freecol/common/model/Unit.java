@@ -78,7 +78,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                             TREASURE_TRAIN = 37,
                             WAGON_TRAIN = 38,
                             MILKMAID = 39,
-                            UNIT_COUNT = 40;
+                            REVENGER = 40,
+                            FLYING_DUTCHMAN = 41,
+                            UNIT_COUNT = 42;
 
     /** A state a Unit can have. */
     public static final int ACTIVE = 0,
@@ -1003,7 +1005,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     public int getLineOfSight() {
         int type = getType();
 
-        if (isScout() || type == FRIGATE || type == GALLEON || type == MAN_O_WAR || type == PRIVATEER) {
+        if (type == REVENGER || type == FLYING_DUTCHMAN) {
+            return 3;
+        } else if (isScout() || type == FRIGATE || type == GALLEON || type == MAN_O_WAR || type == PRIVATEER) {
             return 2;
         } else if (getOwner().hasFather(FoundingFather.HERNANDO_DE_SOTO)) {
             return 2;
@@ -2057,12 +2061,16 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                     return 15+fMagellan;
                 case PRIVATEER:
                     return 24+fMagellan;
+                case FLYING_DUTCHMAN:
+                    return 1998;
                 default:
                     logger.warning("Unit.getInitialMovesLeft(): Unit has invalid naval type.");
                     return 9+fMagellan;
             }
         } else {
-            if (isMounted()) {
+            if (getType() == REVENGER) {
+                return 1998;
+            } else if (isMounted()) {
                 return 12;
             } else if (isMissionary()) {
                 return 6;
@@ -2504,6 +2512,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             case WAGON_TRAIN:
                 return 2;
             case BRAVE:
+                return 1;
+            case FLYING_DUTCHMAN:
                 return 1;
             default:
                 return 0;
@@ -2959,7 +2969,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         // Before, a unit could stay fortified during execution of an
         // attack. - sjm
         state = ACTIVE;
-        movesLeft = 0;
+        if (getType() != REVENGER) {
+            movesLeft = 0;
+        }
 
         Tile newTile = defender.getTile();
         adjustTension(defender);

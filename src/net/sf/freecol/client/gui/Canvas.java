@@ -1528,12 +1528,13 @@ public final class Canvas extends JLayeredPane {
             takeFocusThread.stopWorking();
         }
 
-        if (c != this) {
+        /*if (c != this) {
             c.requestFocus();
         } else {
             takeFocusThread = new TakeFocusThread(c);
             takeFocusThread.start();
-        }
+        }*/
+        c.requestFocus();
     }
 
 

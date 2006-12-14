@@ -422,6 +422,7 @@ public final class InGameInputHandler extends InputHandler {
         freeColClient.getInGameController().setCurrentPlayer(currentPlayer);
 
         freeColClient.getCanvas().refresh();
+        freeColClient.getCanvas().requestFocus();
         
         return null;
     }
@@ -455,8 +456,16 @@ public final class InGameInputHandler extends InputHandler {
 
         if (player == freeColClient.getMyPlayer()) {
             Canvas canvas = freeColClient.getCanvas();
-            if (!canvas.showConfirmDialog("defeated.text", "defeated.yes", "defeated.no")) {
-                freeColClient.quit();
+            if (freeColClient.isSingleplayer()) {
+                if (!canvas.showConfirmDialog("defeatedSingleplayer.text", "defeatedSingleplayer.yes", "defeatedSingleplayer.no")) {
+                    freeColClient.quit();
+                } else {
+                    freeColClient.getFreeColServer().enterRevengeMode(player.getUsername());
+                }
+            } else {
+                if (!canvas.showConfirmDialog("defeated.text", "defeated.yes", "defeated.no")) {
+                    freeColClient.quit();
+                }
             }
         }
 

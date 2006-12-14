@@ -1127,7 +1127,7 @@ public class Map extends FreeColGameObject {
      * @param radius Radius of circle
      * @return Iterator
      */
-    public Iterator getCircleIterator(Position center, boolean isFilled,
+    public CircleIterator getCircleIterator(Position center, boolean isFilled,
                                       int radius) {
         return new CircleIterator(center, isFilled, radius);
     }

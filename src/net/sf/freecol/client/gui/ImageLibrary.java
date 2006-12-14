@@ -42,7 +42,8 @@ public final class ImageLibrary extends ImageProvider {
                             TILE_TAKEN = 5,
                             TILE_OWNED_BY_INDIANS = 6,
                             LOST_CITY_RUMOUR = 7,
-                            MISC_COUNT = 8;
+                            DARKNESS = 8,
+                            MISC_COUNT = 9;
 
     /**
      * These finals represent the EXTRA terrain graphics; the ones that
@@ -161,8 +162,10 @@ public final class ImageLibrary extends ImageProvider {
 
                             MILKMAID = 58,
                             JESUIT_MISSIONARY_NO_CROSS = 59,
+                            REVENGER = 60,
+                            FLYING_DUTCHMAN = 61,
 
-                            UNIT_GRAPHICS_COUNT = 60;
+                            UNIT_GRAPHICS_COUNT = 62;
 
     public static final int UNIT_BUTTON_WAIT = 0,
                             UNIT_BUTTON_DONE = 1,
@@ -1305,6 +1308,10 @@ public final class ImageLibrary extends ImageProvider {
                 return WAGON_TRAIN;
             case Unit.MILKMAID:
                 return MILKMAID;
+            case Unit.REVENGER:
+                return REVENGER;
+            case Unit.FLYING_DUTCHMAN:
+                return FLYING_DUTCHMAN;
             default:
                 // This case can NOT occur.
                 return -1;
