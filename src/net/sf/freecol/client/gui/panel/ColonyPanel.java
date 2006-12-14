@@ -93,7 +93,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     private final FreeColClient freeColClient;
     private InGameController inGameController;
 
-    private final JLabel                    goldLabel;
+    //private final JLabel                    goldLabel;
     private final JLabel                    solLabel;
     private final JLabel                    hammersLabel;
     private final JLabel                    toolsLabel;
@@ -183,7 +183,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         cargoPanel.setLayout(new GridLayout(1 , 0));
         warehousePanel.setLayout(new GridLayout(2 , 8));
 
-        goldLabel = new JLabel(Messages.message("goldTitle") + ": 0");
+        //goldLabel = new JLabel(Messages.message("goldTitle") + ": 0");
 
         solLabel = new JLabel(Messages.message("sonsOfLiberty") + ": 0%, " + Messages.message("tory") + ": 100%");
         hammersLabel = new JLabel(Messages.message("model.goods.Hammers")+": 0/0");
@@ -218,7 +218,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         productionPanel.setSize(400, 35);
         tilesScroll.setSize(400, 225);
         buildingsScroll.setSize(424,225);
-        goldLabel.setSize(100, 20);
+        //goldLabel.setSize(100, 20);
 
         solLabel.setSize(400, 20);
 
@@ -292,7 +292,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         add(outsideColonyLabel);
         add(inPortLabel);
         add(solLabel);
-        add(goldLabel);
+        //add(goldLabel);
         add(tilesLabel);
         add(buildingsLabel);
         add(buildingBox);
@@ -337,7 +337,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
         y+= 10;
         solLabel.setLocation        (15, y);
-        goldLabel.setLocation       (265, y);
+        //goldLabel.setLocation       (265, y);
 
         y+= 30;
         inPortScroll.setLocation    (10, y);
@@ -463,7 +463,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
         tilePanel.initialize();
 
-        goldLabel.setText(Messages.message("goldTitle") + ": " + freeColClient.getMyPlayer().getGold());
+        //goldLabel.setText(Messages.message("goldTitle") + ": " + freeColClient.getMyPlayer().getGold());
 
         buildingBox.initialize();
 	nameBox.initialize(colony);
