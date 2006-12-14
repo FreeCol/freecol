@@ -1455,7 +1455,7 @@ public final class Colony extends Settlement implements Location {
         goodsContainer.cleanAndReport(getWarehouseCapacity(), new int [] {200, 100});
         
         // Remove bells:
-        bells -= getUnitCount();
+        bells -= Math.max(0, getUnitCount() - 2);
         if (bells < 0) {
             bells = 0;
         }
