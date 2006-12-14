@@ -172,6 +172,7 @@ public final class Colony extends Settlement implements Location {
             }
         }
         getTile().updatePlayerExploredTiles();
+        updateSoL();
     }
     
 
@@ -918,12 +919,7 @@ public final class Colony extends Settlement implements Location {
  
     /**
      * Calculates the current SoL membership of the colony
-     * and adjusts the level of bells.
-     * 
-     * <br><br>
-     * 
-     * <code>Warning:</code> This
-     * method should be called exactly once per turn.
+     * based on the number of bells and colonists.
      */
     private void updateSoL() {
         int units = getUnitCount();
@@ -940,96 +936,6 @@ public final class Colony extends Settlement implements Location {
         sonsOfLiberty = membership;
         oldTories = tories;
         tories = (units - ((units * sonsOfLiberty) / 100));
-        int difficulty = getOwner().getDifficulty();
-        int veryBadGovernment = 10 - difficulty;
-        int badGovernment = 6 - difficulty;
-
-        logger.fine(getName() +
-                    ": Tories: " + tories +
-                    "; OldTories: " + oldTories +
-                    "; SonsOfLiberty: " + sonsOfLiberty +
-                    "; OldSonsOfLiberty: " + oldSonsOfLiberty);
-
-        if (sonsOfLiberty/10 != oldSonsOfLiberty/10) {
-            if (sonsOfLiberty > oldSonsOfLiberty) {
-                addModelMessage(this, "model.colony.SoLIncrease",
-                                new String [][] {{"%oldSoL%", String.valueOf(oldSonsOfLiberty)},
-                                                 {"%newSoL%", String.valueOf(sonsOfLiberty)},
-                                                 {"%colony%", getName()}},
-                                ModelMessage.SONS_OF_LIBERTY,
-                                new Goods(Goods.BELLS));
-            } else {
-                addModelMessage(this, "model.colony.SoLDecrease",
-                                new String [][] {{"%oldSoL%", String.valueOf(oldSonsOfLiberty)},
-                                                 {"%newSoL%", String.valueOf(sonsOfLiberty)},
-                                                 {"%colony%", getName()}},
-                                ModelMessage.SONS_OF_LIBERTY,
-                                new Goods(Goods.BELLS));
-            }
-        }
-
-        int bonus = 0;
-        if (sonsOfLiberty == 100) {
-            // there are no tories left
-            bonus = 2;
-            if (oldSonsOfLiberty < 100) {
-                addModelMessage(this, "model.colony.SoL100",
-                                new String[][] {{"%colony%", getName()}},
-                                ModelMessage.SONS_OF_LIBERTY,
-                                new Goods(Goods.BELLS));
-            }
-        } else {
-
-            if (sonsOfLiberty >= 50) {
-                bonus += 1;
-                if (oldSonsOfLiberty < 50) {
-                    addModelMessage(this, "model.colony.SoL50",
-                                    new String[][] {{"%colony%", getName()}},
-                                    ModelMessage.SONS_OF_LIBERTY,
-                                    new Goods(Goods.BELLS));
-                }
-            }
-
-            if (tories > veryBadGovernment) {
-                bonus -= 2;
-                if (oldTories <= veryBadGovernment) {
-                    // government has become very bad
-                    addModelMessage(this, "model.colony.veryBadGovernment",
-                                    new String[][] {{"%colony%", getName()}},
-                                    ModelMessage.GOVERNMENT_EFFICIENCY,
-                                    new Goods(Goods.BELLS));
-                }
-            } else if (tories > badGovernment) {
-                bonus -= 1;
-                if (oldTories <= badGovernment) {
-                    // government has become bad
-                    addModelMessage(this, "model.colony.badGovernment",
-                                    new String[][] {{"%colony%", getName()}},
-                                    ModelMessage.GOVERNMENT_EFFICIENCY,
-                                    new Goods(Goods.BELLS));
-                } else if (oldTories > veryBadGovernment) {
-                    // government has improved, but is still bad
-                    addModelMessage(this, "model.colony.governmentImproved1",
-                                    new String[][] {{"%colony%", getName()}},
-                                    ModelMessage.GOVERNMENT_EFFICIENCY,
-                                    new Goods(Goods.BELLS));
-                }
-            } else if (oldTories > badGovernment) {
-                // government was bad, but has improved
-                addModelMessage(this, "model.colony.governmentImproved2",
-                                new String[][] {{"%colony%", getName()}},
-                                ModelMessage.GOVERNMENT_EFFICIENCY,
-                                new Goods(Goods.BELLS));
-            }
-
-        }
-
-        // TODO-LATER: REMOVE THIS WHEN THE AI CAN HANDLE PRODUCTION PENALTIES:
-        if (getOwner().isAI()) {
-            productionBonus = Math.max(0, bonus);
-        } else {
-            productionBonus = bonus;
-        }
     }
 
     
@@ -1462,6 +1368,85 @@ public final class Colony extends Settlement implements Location {
         
         // Update SoL:
         updateSoL();
+        final int difficulty = getOwner().getDifficulty();
+        final int veryBadGovernment = 10 - difficulty;
+        final int badGovernment = 6 - difficulty;
+        if (sonsOfLiberty/10 != oldSonsOfLiberty/10) {
+            if (sonsOfLiberty > oldSonsOfLiberty) {
+                addModelMessage(this, "model.colony.SoLIncrease",
+                                new String [][] {{"%oldSoL%", String.valueOf(oldSonsOfLiberty)},
+                                                 {"%newSoL%", String.valueOf(sonsOfLiberty)},
+                                                 {"%colony%", getName()}},
+                                ModelMessage.SONS_OF_LIBERTY,
+                                new Goods(Goods.BELLS));
+            } else {
+                addModelMessage(this, "model.colony.SoLDecrease",
+                                new String [][] {{"%oldSoL%", String.valueOf(oldSonsOfLiberty)},
+                                                 {"%newSoL%", String.valueOf(sonsOfLiberty)},
+                                                 {"%colony%", getName()}},
+                                ModelMessage.SONS_OF_LIBERTY,
+                                new Goods(Goods.BELLS));
+            }
+        }
+
+        int bonus = 0;
+        if (sonsOfLiberty == 100) {
+            // there are no tories left
+            bonus = 2;
+            if (oldSonsOfLiberty < 100) {
+                addModelMessage(this, "model.colony.SoL100",
+                                new String[][] {{"%colony%", getName()}},
+                                ModelMessage.SONS_OF_LIBERTY,
+                                new Goods(Goods.BELLS));
+            }
+        } else {
+            if (sonsOfLiberty >= 50) {
+                bonus += 1;
+                if (oldSonsOfLiberty < 50) {
+                    addModelMessage(this, "model.colony.SoL50",
+                                    new String[][] {{"%colony%", getName()}},
+                                    ModelMessage.SONS_OF_LIBERTY,
+                                    new Goods(Goods.BELLS));
+                }
+            }
+            if (tories > veryBadGovernment) {
+                bonus -= 2;
+                if (oldTories <= veryBadGovernment) {
+                    // government has become very bad
+                    addModelMessage(this, "model.colony.veryBadGovernment",
+                                    new String[][] {{"%colony%", getName()}},
+                                    ModelMessage.GOVERNMENT_EFFICIENCY,
+                                    new Goods(Goods.BELLS));
+                }
+            } else if (tories > badGovernment) {
+                bonus -= 1;
+                if (oldTories <= badGovernment) {
+                    // government has become bad
+                    addModelMessage(this, "model.colony.badGovernment",
+                                    new String[][] {{"%colony%", getName()}},
+                                    ModelMessage.GOVERNMENT_EFFICIENCY,
+                                    new Goods(Goods.BELLS));
+                } else if (oldTories > veryBadGovernment) {
+                    // government has improved, but is still bad
+                    addModelMessage(this, "model.colony.governmentImproved1",
+                                    new String[][] {{"%colony%", getName()}},
+                                    ModelMessage.GOVERNMENT_EFFICIENCY,
+                                    new Goods(Goods.BELLS));
+                }
+            } else if (oldTories > badGovernment) {
+                // government was bad, but has improved
+                addModelMessage(this, "model.colony.governmentImproved2",
+                                new String[][] {{"%colony%", getName()}},
+                                ModelMessage.GOVERNMENT_EFFICIENCY,
+                                new Goods(Goods.BELLS));
+            }
+        }
+        // TODO-LATER: REMOVE THIS WHEN THE AI CAN HANDLE PRODUCTION PENALTIES:
+        if (getOwner().isAI()) {
+            productionBonus = Math.max(0, bonus);
+        } else {
+            productionBonus = bonus;
+        }
     }
 
 
