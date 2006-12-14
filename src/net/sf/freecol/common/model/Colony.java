@@ -172,7 +172,10 @@ public final class Colony extends Settlement implements Location {
             }
         }
         getTile().updatePlayerExploredTiles();
-        updateSoL();
+        
+        if (getUnitCount() > 0) {
+            updateSoL();
+        }
     }
     
 
