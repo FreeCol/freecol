@@ -232,6 +232,11 @@ public final class Colony extends Settlement implements Location {
     public boolean isLandLocked() {
         return landLocked;
     }
+    
+    public boolean isUndead() {
+        final Iterator unitIterator = getUnitIterator();
+        return unitIterator.hasNext() && ((Unit) unitIterator.next()).isUndead();
+    }
 
     /**
     * Sets the owner of this <code>Colony</code>, including all units within.

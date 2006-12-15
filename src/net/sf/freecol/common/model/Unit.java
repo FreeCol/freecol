@@ -80,7 +80,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                             MILKMAID = 39,
                             REVENGER = 40,
                             FLYING_DUTCHMAN = 41,
-                            UNIT_COUNT = 42;
+                            UNDEAD = 42,
+                            UNIT_COUNT = 43;
 
     /** A state a Unit can have. */
     public static final int ACTIVE = 0,
@@ -2062,14 +2063,14 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 case PRIVATEER:
                     return 24+fMagellan;
                 case FLYING_DUTCHMAN:
-                    return 1998;
+                    return 36+fMagellan;
                 default:
                     logger.warning("Unit.getInitialMovesLeft(): Unit has invalid naval type.");
                     return 9+fMagellan;
             }
         } else {
             if (getType() == REVENGER) {
-                return 1998;
+                return 18;
             } else if (isMounted()) {
                 return 12;
             } else if (isMissionary()) {
@@ -2514,7 +2515,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             case BRAVE:
                 return 1;
             case FLYING_DUTCHMAN:
-                return 1;
+                return 6;
             default:
                 return 0;
         }
@@ -3056,6 +3057,15 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     }
 
     /**
+     * Checks if this unit is an undead.
+     */
+    public boolean isUndead() {
+        return (getType() == Unit.REVENGER 
+               || getType() == Unit.FLYING_DUTCHMAN 
+               || getType() == Unit.UNDEAD);    
+    }
+    
+    /**
      * Sets the damage to this ship and sends it to its repair
      * location.
      */
@@ -3103,7 +3113,19 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         String nation = owner.getNationAsString();
         int type = ModelMessage.UNIT_DEMOTED;
         
-        if (getType() == ARTILLERY) {
+        if (enemyUnit.isUndead()) {
+            // this unit is captured, don't show old owner's messages to new owner
+            Iterator i = getGame().getModelMessageIterator(getOwner());
+            while (i.hasNext()) {
+                ((ModelMessage) i.next()).setBeenDisplayed(true);
+            }
+            messageID = "model.unit.unitCaptured";
+            type = ModelMessage.UNIT_LOST;
+            setHitpoints(getInitialHitpoints(enemyUnit.getType()));
+            setLocation(enemyUnit.getTile());
+            setOwner(enemyUnit.getOwner());
+            setType(UNDEAD);
+        } else if (getType() == ARTILLERY) {
             messageID = "model.unit.artilleryDamaged";
             setType(DAMAGED_ARTILLERY);
         } else if (getType() == DAMAGED_ARTILLERY ||
@@ -3377,6 +3399,17 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                     u.setType(Unit.FREE_COLONIST);
                 }
                 u.setState(Unit.ACTIVE);
+                if (isUndead()) {
+                    u.setType(UNDEAD);
+                }
+            }
+            
+            if (isUndead()) {
+                Iterator it2 = colony.getUnitIterator();
+                while (it2.hasNext()) {
+                    Unit u = (Unit) it2.next();
+                    u.setType(UNDEAD);
+                }
             }
             
             setLocation(colony.getTile());

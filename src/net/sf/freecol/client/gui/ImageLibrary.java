@@ -164,8 +164,9 @@ public final class ImageLibrary extends ImageProvider {
                             JESUIT_MISSIONARY_NO_CROSS = 59,
                             REVENGER = 60,
                             FLYING_DUTCHMAN = 61,
+                            UNDEAD = 62,
 
-                            UNIT_GRAPHICS_COUNT = 62;
+                            UNIT_GRAPHICS_COUNT = 63;
 
     public static final int UNIT_BUTTON_WAIT = 0,
                             UNIT_BUTTON_DONE = 1,
@@ -189,7 +190,8 @@ public final class ImageLibrary extends ImageProvider {
                             COLONY_MEDIUM_STOCKADE = 6,
                             COLONY_LARGE_STOCKADE = 7,
                             COLONY_LARGE_FORT = 8,
-                            COLONY_COUNT = 9,
+                            COLONY_UNDEAD = 9,
+                            COLONY_COUNT = 10,
 
                             INDIAN_SETTLEMENT_CAMP = 0,
                             INDIAN_SETTLEMENT_VILLAGE = 1,
@@ -1068,7 +1070,9 @@ public final class ImageLibrary extends ImageProvider {
 
             int stockadeLevel = colony.getBuilding(Building.STOCKADE).getLevel();
 
-            if (stockadeLevel == Building.HOUSE) {
+            if (colony.isUndead()) {
+                return COLONY_UNDEAD;
+            } else if (stockadeLevel == Building.HOUSE) {
                 if (colony.getUnitCount() > 7) {
                     return COLONY_LARGE_STOCKADE;
                 } else if (colony.getUnitCount() > 3) {
@@ -1312,6 +1316,8 @@ public final class ImageLibrary extends ImageProvider {
                 return REVENGER;
             case Unit.FLYING_DUTCHMAN:
                 return FLYING_DUTCHMAN;
+            case Unit.UNDEAD:
+                return UNDEAD;
             default:
                 // This case can NOT occur.
                 return -1;

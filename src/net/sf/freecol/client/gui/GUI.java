@@ -922,8 +922,7 @@ public final class GUI {
                     if (unitInFront != null) {
                         displayUnit(g, unitInFront, xx, yy);
                         
-                        if (unitInFront.getType() == Unit.REVENGER
-                                || unitInFront.getType() == Unit.FLYING_DUTCHMAN) {
+                        if (unitInFront.isUndead()) {
                             darkUnits.add(unitInFront);
                             darkUnitsX.add(xx);
                             darkUnitsY.add(yy);

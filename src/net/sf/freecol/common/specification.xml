@@ -222,6 +222,7 @@
     <unit-type name="model.unit.milkmaid"             offence="0"  defence="1"                          expert-production="food"                 abilities="found-colony" />
     <unit-type name="model.unit.revenger"             offence="666"  defence="666" abilities="" />
     <unit-type name="model.unit.flyingDutchman"       offence="666"  defence="666" abilities="naval,capture-goods" />    
+    <unit-type name="model.unit.undead"               offence="18"  defence="4" abilities="found-colony" />    
   </unit-types>
 
 </freecol-specification>
