@@ -863,6 +863,13 @@ public final class Colony extends Settlement implements Location {
     public void setCurrentlyBuilding(int type) {
         currentlyBuilding = type;
     }
+    
+    /**
+     * Sets the type of building to None, so no building is done.
+     */
+     public void stopBuilding() {
+    	 setCurrentlyBuilding(Building.NONE);
+     }
 
     
     /**
@@ -1190,6 +1197,9 @@ public final class Colony extends Settlement implements Location {
                                     new String[][] {{"%colony%", getName()},
                                                     {"%building%", getBuilding(currentlyBuilding).getName()}},
                                     ModelMessage.BUILDING_COMPLETED, this);
+                    if(!getBuilding(currentlyBuilding).canBuildNext()){
+                    	stopBuilding();
+                    }
                     getTile().updatePlayerExploredTiles();
                 } else {
                     addModelMessage(this, "model.colony.itemNeedTools",
