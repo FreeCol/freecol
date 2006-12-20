@@ -168,10 +168,10 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
                 int amount = colony.getGoodsCount(goodsType);
                 JLabel goodsLabel = new JLabel(String.valueOf(amount),
                                                JLabel.TRAILING);
-                if (amount > 100) {
-                    goodsLabel.setForeground(Color.GREEN);
-                } else if (amount > 200) {
+                if (amount > 200) {
                     goodsLabel.setForeground(Color.BLUE);
+                } else if (amount > 100) {
+                    goodsLabel.setForeground(Color.GREEN);
                 }
                 if (colony.getExports(goodsType)) {
                     goodsLabel.setBorder(myBorder);
