@@ -1867,25 +1867,28 @@ public final class InGameController implements NetworkConstants {
                 learnSkill.setAttribute("unit", unit.getID());
                 learnSkill.setAttribute("direction", Integer.toString(direction));
 
-                if (canvas.showConfirmDialog("learnSkill.text",
+                if (!canvas.showConfirmDialog("learnSkill.text",
                                              "learnSkill.yes",
                                              "learnSkill.no",
                                              new String [][] {{"%replace%", skillName}})) {
-                    //                } else {
-                    //learnSkill.setAttribute("action", "cancel");
-                    //}
+                    // the player declined to learn the skill
+                    learnSkill.setAttribute("action", "cancel");
+                }
 
-                    Element reply2 = freeColClient.getClient().ask(learnSkill);
-                    String result = reply2.getAttribute("result");
-                    if (result.equals("die")) {
-                        unit.dispose();
-                        canvas.showInformationMessage("learnSkill.die");
-                    } else if (result.equals("leave")) {
-                        canvas.showInformationMessage("learnSkill.leave");
-                    } else {
-                        unit.setType(skill);
-                        settlement.setLearnableSkill(IndianSettlement.NONE);
-                    }
+                Element reply2 = freeColClient.getClient().ask(learnSkill);
+                String result = reply2.getAttribute("result");
+                if (result.equals("die")) {
+                    unit.dispose();
+                    canvas.showInformationMessage("learnSkill.die");
+                } else if (result.equals("leave")) {
+                    canvas.showInformationMessage("learnSkill.leave");
+                } else if (result.equals("sucess")) {
+                    unit.setType(skill);
+                    settlement.setLearnableSkill(IndianSettlement.NONE);
+                } else if (result.equals("cancelled")) {
+                    // do nothing
+                } else {
+                    logger.warning("Server gave an invalid reply to an learnSkillAtSettlement message");  
                 }
             }
         }

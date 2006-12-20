@@ -1065,6 +1065,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 settlement.getTile().updateIndianSettlementSkill(player);
                 reply.setAttribute("result", "success");
             }
+        } else {
+            reply.setAttribute("result", "cancelled");   
         }
 
         return reply;
