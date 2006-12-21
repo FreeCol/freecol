@@ -2033,37 +2033,9 @@ public final class GUI {
                     && unit.isNaval()) {
                 occupationString = Integer.toString(unit.getVisibleGoodsCount());
             } else {
-                switch (unit.getState()) {
-                case Unit.ACTIVE:
-                    occupationString = "-";
-                    break;
-                case Unit.FORTIFIED:
-                    occupationString = "F";
+                occupationString = unit.getOccupationIndicator();
+                if (unit.getState() == Unit.FORTIFIED)
                     g.setColor(Color.GRAY);
-                    break;
-                case Unit.FORTIFYING:
-                    occupationString = "F";
-                    break;
-                case Unit.SENTRY:
-                    //occupationString = "S";
-                    occupationString = "-";
-                    break;
-                case Unit.IN_COLONY:
-                    occupationString = "B";
-                    break;
-                case Unit.PLOW:
-                    occupationString = "P";
-                    break;
-                case Unit.BUILD_ROAD:
-                    occupationString = "R";
-                    break;
-                default:
-                    occupationString = "?";
-                logger.warning("Unit has an invalid occpuation: " + unit.getState());
-                }
-                if (unit.getDestination() != null) {
-                    occupationString = "G";
-                }
             }
             g.drawString(occupationString, x + TEXT_OFFSET_X + STATE_OFFSET_X, y + TEXT_OFFSET_Y);
 

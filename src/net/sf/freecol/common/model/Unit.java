@@ -2213,8 +2213,53 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
         return unitType.hasAbility( "naval" );
     }
+    
+    
+    /**
+    * Get occupation indicator
+    * @return The occupation indicator string 
+    */
+    public String getOccupationIndicator(){
+        String occupationString;
+        
+        switch (getState()) {
+            case Unit.ACTIVE:
+                occupationString = "-";
+                break;
+            case Unit.FORTIFIED:
+                occupationString = "F";
+                break;
+            case Unit.FORTIFYING:
+                occupationString = "F";
+                break;
+            case Unit.SENTRY:
+                occupationString = "S";
+                break;
+            case Unit.IN_COLONY:
+                occupationString = "B";
+                break;
+            case Unit.PLOW:
+                occupationString = "P";
+                break;
+            case Unit.BUILD_ROAD:
+                occupationString = "R";
+                break;
+            case Unit.TO_AMERICA:
+            case Unit.TO_EUROPE:
+                occupationString = "G";
+                break;
+            default:
+                occupationString = "?";
+                logger.warning("Unit has an invalid occpuation: " + getState());
+        }
+        if (getDestination() != null) {
+            occupationString = "G";
+        }
+        
+        return occupationString;
+    }
 
-
+    
     /**
     * Gets the state of this <code>Unit</code>.
     * @return The state of this <code>Unit</code>.
