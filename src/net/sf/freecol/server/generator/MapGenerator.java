@@ -55,7 +55,6 @@ public class MapGenerator {
     private final Game game;
     private final MapGeneratorOptions mapGeneratorOptions;
 
-
     /**
     * Creates a <code>MapGenerator</code> for generating
     * random maps for the given game.
@@ -82,14 +81,14 @@ public class MapGenerator {
      * @see LandGenerator
      * @see TerrainGenerator
      */
-    public void createMap(Vector players) {        
+    public void createMap(Vector<Player> players) {        
         LandGenerator landGenerator = new LandGenerator(getMapGeneratorOptions().getWidth(), getMapGeneratorOptions().getHeight());        
         boolean[][] landMap = landGenerator.createLandMap();
 
         TerrainGenerator terrainGenerator = new TerrainGenerator(landMap);
         Map map = terrainGenerator.createMap();
         game.setMap(map);
-	    createMountains(map);
+        createMountains(map);
         createRivers(map);
         createIndianSettlements(map, players);
         createEuropeanUnits(map, getMapGeneratorOptions().getWidth(), getMapGeneratorOptions().getHeight(), players);
@@ -232,10 +231,10 @@ public class MapGenerator {
      *       and starting locations for. That is; both indian and 
      *       european players.
      */
-    protected void createIndianSettlements(Map map, Vector players) {
-        Collections.sort(players, new Comparator() {
-            public int compare(Object o, Object p) {
-                return ((Player) o).getNation() - ((Player) p).getNation();
+    protected void createIndianSettlements(Map map, Vector<Player> players) {
+        Collections.sort(players, new Comparator<Player>() {
+            public int compare(Player o, Player p) {
+                return o.getNation() - p.getNation();
             }
         });
 
@@ -542,7 +541,7 @@ public class MapGenerator {
      *      and starting locations for. That is; both indian and 
      *      european players.
      */
-    protected void createEuropeanUnits(Map map, int width, int height, Vector players) {
+    protected void createEuropeanUnits(Map map, int width, int height, Vector<Player> players) {
         int[] shipYPos = new int[NUM_STARTING_LOCATIONS];
         for (int i = 0; i < NUM_STARTING_LOCATIONS; i++) {
             shipYPos[i] = 0;
@@ -780,10 +779,10 @@ public class MapGenerator {
         * @return The new <code>Map</code>.
         */
         public Map createMap() {
-            Vector columns = new Vector(getMapGeneratorOptions().getWidth());
+            Vector<Vector<Tile>> columns = new Vector<Vector<Tile>>(getMapGeneratorOptions().getWidth());
             tileType = new Random();
             for (int i = 0; i < getMapGeneratorOptions().getWidth(); i++) {
-                Vector v = new Vector(getMapGeneratorOptions().getHeight());
+                Vector<Tile> v = new Vector<Tile>(getMapGeneratorOptions().getHeight());
                 for (int j = 0; j < getMapGeneratorOptions().getHeight(); j++) {
                     Tile t;
 
