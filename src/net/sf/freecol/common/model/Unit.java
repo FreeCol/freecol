@@ -1372,6 +1372,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         if (armed) setArmed(false);
         if (mounted) setMounted(false);
         if (isPioneer()) setNumberOfTools(0);
+        
+        setState(Unit.IN_COLONY);
 
         setLocation(workLocation);
     }
@@ -1472,6 +1474,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     public void putOutsideColony() {
         if (getTile().getSettlement() == null) {
             throw new IllegalStateException();
+        }
+        
+        if(getState() == Unit.IN_COLONY){
+            setState(Unit.ACTIVE);
         }
 
         setLocation(getTile());
