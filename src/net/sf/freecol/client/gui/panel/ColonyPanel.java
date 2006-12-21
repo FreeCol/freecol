@@ -204,7 +204,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 buildingsLabel = new JLabel(Messages.message("buildings"));
 
         // Make the colony label
-	nameBox = new ColonyNameBox(this);
+        nameBox = new ColonyNameBox(this);
 
         buildingsScroll.setAutoscrolls(true);
 
@@ -299,7 +299,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         add(hammersLabel);
         add(toolsLabel);
         add(buyBuilding);
-	add(nameBox);
+        add(nameBox);
     }
 
 
@@ -318,7 +318,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
      */
     private void assignLocations(JScrollPane outsideColonyScroll, JScrollPane inPortScroll, JScrollPane cargoScroll, JScrollPane warehouseScroll, JScrollPane tilesScroll, JScrollPane buildingsScroll) {
         int y = 10;
-	nameBox.setLocation(225, y);
+        nameBox.setLocation(225, y);
         
         y+= 30;
         tilesScroll.setLocation     (10, y);
@@ -348,7 +348,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         warehouseScroll.setLocation (10, y);
 
         y+= 150;
-	unloadButton.setLocation    (10, y);
+        unloadButton.setLocation    (10, y);
         exitButton.setLocation      (730, y);
 
     }
@@ -444,6 +444,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             setSelectedUnitLabel(preSelectedUnitLabel);
         }
 
+
         //
         // Warehouse panel:
         //
@@ -466,7 +467,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         //goldLabel.setText(Messages.message("goldTitle") + ": " + freeColClient.getMyPlayer().getGold());
 
         buildingBox.initialize();
-	nameBox.initialize(colony);
+        nameBox.initialize(colony);
 
         updateSoLLabel();
         updateProgressLabel();
@@ -547,6 +548,24 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     }
 
 
+    private void updateOutsideColonyPanel() {
+        outsideColonyPanel.removeAll();
+        Tile tile = colony.getTile();
+        Iterator tileUnitIterator = tile.getUnitIterator();
+        while (tileUnitIterator.hasNext()) {
+            Unit unit = (Unit) tileUnitIterator.next();
+
+            UnitLabel unitLabel = new UnitLabel(unit, parent);
+            unitLabel.setTransferHandler(defaultTransferHandler);
+            unitLabel.addMouseListener(pressListener);
+
+            if (!unit.isCarrier()) {
+                outsideColonyPanel.add(unitLabel, false);
+            }
+        }
+    }
+
+
     /**
     * Returns the currently select unit.
     * @return The currently select unit.
@@ -584,9 +603,9 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 case EXIT:
                     closeColonyPanel();
                     break;
-	        case UNLOAD:
-		    unload();
-		    break;
+                case UNLOAD:
+                    unload();
+                    break;
                 default:
                     logger.warning("Invalid action");
             }
@@ -597,20 +616,29 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
 
     private void unload() { 
-	Unit unit = getSelectedUnit();
-        if (unit != null &&
-	    unit.isCarrier() && 
-	    unit.getGoodsCount() > 0) {
-	    Iterator goodsIterator = unit.getGoodsIterator();
-	    while (goodsIterator.hasNext()) {
-		Goods goods = (Goods) goodsIterator.next();
-		inGameController.unloadCargo(goods);
-		updateWarehouse();
-		updateCargoPanel();
-		getCargoPanel().revalidate();
-		refresh();
-	    }
-	}
+        Unit unit = getSelectedUnit();
+        if (unit != null && unit.isCarrier()) {
+            Iterator goodsIterator = unit.getGoodsIterator();
+            while (goodsIterator.hasNext()) {
+                Goods goods = (Goods) goodsIterator.next();
+                inGameController.unloadCargo(goods);
+                updateWarehouse();
+                updateCargoPanel();
+                getCargoPanel().revalidate();
+                refresh();
+            }
+            Iterator unitIterator = unit.getUnitIterator();
+            while (unitIterator.hasNext()) {
+                Unit newUnit = (Unit) unitIterator.next();
+                inGameController.leaveShip(newUnit);
+                updateCargoLabel();
+                updateCargoPanel();
+                updateOutsideColonyPanel();
+                outsideColonyPanel.revalidate();
+                getCargoPanel().revalidate();
+                refresh();
+            }
+        }
     }
 
     /**
@@ -678,8 +706,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             if (selectedUnit != null) {
                 selectedUnit.setSelected(false);
             }
-	    selectedUnit = unitLabel;
-	    updateCargoPanel();
+            selectedUnit = unitLabel;
+            updateCargoPanel();
             updateCargoLabel();
         }
         cargoPanel.revalidate();
@@ -688,35 +716,35 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
 
     private void updateCargoPanel() {
-	cargoPanel.removeAll();
+        cargoPanel.removeAll();
 
-	if (selectedUnit != null) {
-	    selectedUnit.setSelected(true);
-	    Unit selUnit = selectedUnit.getUnit();
+        if (selectedUnit != null) {
+            selectedUnit.setSelected(true);
+            Unit selUnit = selectedUnit.getUnit();
 
-	    Iterator unitIterator = selUnit.getUnitIterator();
-	    while (unitIterator.hasNext()) {
-		Unit unit = (Unit) unitIterator.next();
+            Iterator unitIterator = selUnit.getUnitIterator();
+            while (unitIterator.hasNext()) {
+                Unit unit = (Unit) unitIterator.next();
 
-		UnitLabel label = new UnitLabel(unit, parent);
-		label.setTransferHandler(defaultTransferHandler);
-		label.addMouseListener(pressListener);
+                UnitLabel label = new UnitLabel(unit, parent);
+                label.setTransferHandler(defaultTransferHandler);
+                label.addMouseListener(pressListener);
 
-		cargoPanel.add(label, false);
-	    }
+                cargoPanel.add(label, false);
+            }
 
-	    Iterator goodsIterator = selUnit.getGoodsIterator();
-	    while (goodsIterator.hasNext()) {
-		Goods g = (Goods) goodsIterator.next();
+            Iterator goodsIterator = selUnit.getGoodsIterator();
+            while (goodsIterator.hasNext()) {
+                Goods g = (Goods) goodsIterator.next();
 
-		GoodsLabel label = new GoodsLabel(g, parent);
-		label.setTransferHandler(defaultTransferHandler);
-		label.addMouseListener(pressListener);
+                GoodsLabel label = new GoodsLabel(g, parent);
+                label.setTransferHandler(defaultTransferHandler);
+                label.addMouseListener(pressListener);
 
-		cargoPanel.add(label, false);
-	    }
+                cargoPanel.add(label, false);
+            }
 
-	}
+        }
     }
 
 
@@ -765,7 +793,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
      * @return The current <code>Game</code>.
      */
     public final Game getGame() {
-	return game;
+        return game;
     }
 
     /**
@@ -1809,7 +1837,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
             nameBoxListener = new ColonyNameBoxListener(this, colonyPanel);
             super.addActionListener(nameBoxListener);
-	    super.setRenderer(new MyCellRenderer());
+            super.setRenderer(new MyCellRenderer());
         }
 
         /**
@@ -1818,11 +1846,11 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         public void initialize(Colony thisColony) {
             super.removeActionListener(nameBoxListener);
             removeAllItems();
-	    Iterator colonyIterator = thisColony.getOwner().getColonyIterator();
-	    while (colonyIterator.hasNext()) {
-		this.addItem((Colony) colonyIterator.next());
+            Iterator colonyIterator = thisColony.getOwner().getColonyIterator();
+            while (colonyIterator.hasNext()) {
+                this.addItem((Colony) colonyIterator.next());
             }
-	    this.setSelectedItem(thisColony);
+            this.setSelectedItem(thisColony);
             super.addActionListener(nameBoxListener);
         }
 
@@ -1852,30 +1880,30 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             */
             public void actionPerformed(ActionEvent e) {
                 colonyPanel.initialize((Colony) nameBox.getSelectedItem(), 
-				       colonyPanel.getGame());
+                                       colonyPanel.getGame());
             }
         }
 
-	public final class MyCellRenderer extends JLabel implements ListCellRenderer {
-	    public MyCellRenderer() {
-		setOpaque(false);
-	    }
-	    
-	    public Component getListCellRendererComponent(JList list,
+        public final class MyCellRenderer extends JLabel implements ListCellRenderer {
+            public MyCellRenderer() {
+                setOpaque(false);
+            }
+            
+            public Component getListCellRendererComponent(JList list,
                                                    Object value,
                                                    int index,
                                                    boolean isSelected,
                                                    boolean cellHasFocus) {
 
-		Colony colony = (Colony) value;
-		setIcon(new ImageIcon(freeColClient.getGUI().
-				      createStringImage(this,
-							colony.getName(),
-							colony.getOwner().getColor(),
-							200, 24)));
-		setHorizontalAlignment(SwingConstants.CENTER);
-		return this;
-	    }
-	}
+                Colony colony = (Colony) value;
+                setIcon(new ImageIcon(freeColClient.getGUI().
+                                      createStringImage(this,
+                                                        colony.getName(),
+                                                        colony.getOwner().getColor(),
+                                                        200, 24)));
+                setHorizontalAlignment(SwingConstants.CENTER);
+                return this;
+            }
+        }
     }
 }

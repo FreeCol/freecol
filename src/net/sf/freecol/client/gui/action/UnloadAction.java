@@ -50,10 +50,8 @@ public class UnloadAction extends MapboardAction {
      * @return <code>true</code> if the player has access to Europe.
      */
     protected boolean shouldBeEnabled() { 
-	Unit unit = getFreeColClient().getGUI().getActiveUnit();
-        return (unit != null &&
-		unit.isCarrier() && 
-		unit.getGoodsCount() > 0);
+        Unit unit = getFreeColClient().getGUI().getActiveUnit();
+        return (unit != null && unit.isCarrier());
     }    
     
     /**
@@ -61,13 +59,18 @@ public class UnloadAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */    
     public void actionPerformed(ActionEvent e) {
-	Unit unit = getFreeColClient().getGUI().getActiveUnit();
-	if (unit != null) {
-	    Iterator goodsIterator = unit.getGoodsIterator();
-	    while (goodsIterator.hasNext()) {
-		Goods goods = (Goods) goodsIterator.next();
-		getFreeColClient().getInGameController().unloadCargo(goods);
-	    }
-	}
+        Unit unit = getFreeColClient().getGUI().getActiveUnit();
+        if (unit != null) {
+            Iterator goodsIterator = unit.getGoodsIterator();
+            while (goodsIterator.hasNext()) {
+                Goods goods = (Goods) goodsIterator.next();
+                getFreeColClient().getInGameController().unloadCargo(goods);
+            }
+            Iterator unitIterator = unit.getUnitIterator();
+            while (unitIterator.hasNext()) {
+                Unit newUnit = (Unit) unitIterator.next();
+                getFreeColClient().getInGameController().leaveShip(newUnit);
+            }
+        }
     }
 }
