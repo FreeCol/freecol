@@ -205,7 +205,22 @@ public final class UnitLabel extends JLabel implements ActionListener {
                         inGameController.equipUnit(unit, Goods.HORSES, ((unit.isMounted()) ? 0 : 50));
                         break;
                     case TOOLS:
-                        inGameController.equipUnit(unit, Goods.TOOLS, ((unit.isPioneer()) ? 0 : 100));
+                        int tools = 100;
+                        if (!unit.isPioneer() && (event.getModifiers() & ActionEvent.SHIFT_MASK) != 0) {
+                            String s = getCanvas().showInputDialog("toolsEquip.text", "100", "ok", "cancel");
+                            tools = -1;
+
+                            while (s != null && tools == -1) {
+                                try {
+                                    tools = Integer.parseInt(s);
+                                } catch (NumberFormatException e) {
+                                    getCanvas().errorMessage("notANumber");
+                                    s = getCanvas().showInputDialog("goodsTransfer.text", "100", "ok", "cancel");
+                                }
+                            }
+                            if (s == null) break;
+                        }
+                        inGameController.equipUnit(unit, Goods.TOOLS, ((unit.isPioneer()) ? 0 : tools));
                         break;
                     case DRESS:
                         inGameController.equipUnit(unit, Goods.CROSSES, ((unit.isMissionary()) ? 0 : 1));
