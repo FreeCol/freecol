@@ -42,6 +42,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
     private int[] recruitables = {-1, -1, -1};
 
     private int artilleryPrice;
+    private int recruitPrice;
 
     /**
     * Contains the units on this location.
@@ -69,6 +70,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         setRecruitable(3, owner.generateRecruitable());
 
         artilleryPrice = 500;
+        recruitPrice = 200;
     }
 
 
@@ -161,11 +163,12 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
             throw new NullPointerException();
         }
 
-        if (unit.getOwner().getRecruitPrice() > unit.getOwner().getGold()) {
+        if (getRecruitPrice() > unit.getOwner().getGold()) {
             throw new IllegalStateException();
         }
 
-        unit.getOwner().modifyGold(-unit.getOwner().getRecruitPrice());
+        unit.getOwner().modifyGold(-getRecruitPrice());
+        incrementRecruitPrice();
         unit.setLocation(this);
         unit.getOwner().updateCrossesRequired();
         unit.getOwner().setCrosses(0);
@@ -350,6 +353,22 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         return artilleryPrice;
     }
 
+    /**
+    * Gets the current price for a recruit.
+    * @return The current price of the recruit in this
+    *       <code>Europe</code>.
+    */
+    public int getRecruitPrice() {
+        int required = owner.getCrossesRequired();
+        int crosses = owner.getCrosses();
+        int difference = Math.max(required - crosses, 0);
+        return Math.min((recruitPrice * difference) / required, 600);
+    }
+
+    private void incrementRecruitPrice() {
+        recruitPrice += 20 + getOwner().getDifficulty() * 10;
+    }
+
 
     /**
     * Gets the <code>Player</code> using this <code>Europe</code>.
@@ -433,6 +452,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         out.writeAttribute("recruit1", Integer.toString(recruitables[1]));
         out.writeAttribute("recruit2", Integer.toString(recruitables[2]));
         out.writeAttribute("artilleryPrice", Integer.toString(artilleryPrice));
+        out.writeAttribute("recruitPrice", Integer.toString(recruitPrice));
         out.writeAttribute("owner", owner.getID());
 
         unitContainer.toXML(out,player, showAll, toSavedGame);
@@ -453,6 +473,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         recruitables[1] = Integer.parseInt(in.getAttributeValue(null, "recruit1"));
         recruitables[2] = Integer.parseInt(in.getAttributeValue(null, "recruit2"));
         artilleryPrice = Integer.parseInt(in.getAttributeValue(null, "artilleryPrice"));
+        recruitPrice = Integer.parseInt(in.getAttributeValue(null, "recruitPrice"));
         owner = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "owner"));
         if (owner == null) {
             owner = new Player(getGame(), in.getAttributeValue(null, "owner"));
