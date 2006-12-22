@@ -23,7 +23,6 @@ public final class ReportReligiousPanel extends ReportPanel implements ActionLis
 
 
     private final ReportProductionPanel religiousReportPanel;
-    private final JPanel mainPanel;
     private Canvas parent;
 
     /**
@@ -34,8 +33,7 @@ public final class ReportReligiousPanel extends ReportPanel implements ActionLis
         super(parent, Messages.message("menuBar.report.religion"));
         this.parent = parent;
 
-        mainPanel = new JPanel();
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        reportPanel.setLayout(new BoxLayout(reportPanel, BoxLayout.Y_AXIS));
         religiousReportPanel = new ReportProductionPanel(Goods.CROSSES, parent);
     }
 
@@ -47,15 +45,13 @@ public final class ReportReligiousPanel extends ReportPanel implements ActionLis
 
         // Display Panel
         reportPanel.removeAll();
-        mainPanel.removeAll();
 
         String summary = Messages.message("crosses") + ": " + player.getCrosses() + " / " + player.getCrossesRequired();
-        mainPanel.add(new JLabel(summary));
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 24)));
+        reportPanel.add(new JLabel(summary));
+        reportPanel.add(Box.createRigidArea(new Dimension(0, 24)));
 
         religiousReportPanel.initialize();
-        mainPanel.add(religiousReportPanel);
-        reportPanel.add(mainPanel);
+        reportPanel.add(religiousReportPanel);
     }
 }
 

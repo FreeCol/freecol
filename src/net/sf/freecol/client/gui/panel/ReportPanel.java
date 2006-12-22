@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
@@ -31,6 +32,7 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
     protected JPanel reportPanel;
     private JLabel header;
     private JButton ok;
+    private JScrollPane scrollPane;
     
     /**
      * The constructor that will add the items to this panel.
@@ -45,13 +47,17 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
         
         header = new JLabel(title, JLabel.CENTER);
         header.setFont(((Font) UIManager.get("HeaderFont")).deriveFont(0, 48));
-        header.setBorder(new EmptyBorder(20, 0, 0, 0));
+        header.setBorder(new EmptyBorder(20, 0, 20, 0));
         add(header, BorderLayout.NORTH);
 
         reportPanel = new JPanel();
-        reportPanel.setOpaque(false);
+        reportPanel.setOpaque(true);
         reportPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
-        add(reportPanel, BorderLayout.CENTER);
+
+        scrollPane = new JScrollPane(reportPanel,
+                                     JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                                     JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        add(scrollPane, BorderLayout.CENTER);
 
         ok = new JButton(Messages.message("ok"));
         ok.setActionCommand(String.valueOf(OK));

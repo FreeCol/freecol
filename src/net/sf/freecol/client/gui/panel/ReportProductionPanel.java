@@ -40,8 +40,6 @@ public final class ReportProductionPanel extends JPanel {
     /** The heights of the rows. */
     private final int[] heights;
 
-    private final JPanel panel;
-    private final JScrollPane scrollPane;
     private Canvas parent;
     private final int goodsType;
 
@@ -54,13 +52,6 @@ public final class ReportProductionPanel extends JPanel {
         this.parent = parent;
 
         heights = null;
-        panel = new JPanel();
-        panel.setBorder(new EmptyBorder(20, 20, 20, 20));
-        scrollPane = new JScrollPane(panel,
-                                     //JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                                     JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-                                     JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-
     }
 
     /**
@@ -94,17 +85,17 @@ public final class ReportProductionPanel extends JPanel {
             heights[h] = 0;
         }
 
-        panel.setLayout(new HIGLayout(widths, heights));
+        setLayout(new HIGLayout(widths, heights));
         HIGConstraints higConst = new HIGConstraints();
 
         // labels
-        panel.add(new JLabel(Messages.message("Colony")),
+        add(new JLabel(Messages.message("Colony")),
             higConst.rc(1, colonyColumn));
 
-        panel.add(new JLabel(Messages.message("report.production")),
+        add(new JLabel(Messages.message("report.production")),
             higConst.rc(1, productionColumn));
 
-        panel.add(new JLabel(Messages.message("report.units")),
+        add(new JLabel(Messages.message("report.units")),
             higConst.rc(1, unitColumn));
 
 
@@ -118,7 +109,7 @@ public final class ReportProductionPanel extends JPanel {
 
             // colonyLabel
             JLabel colonyLabel = new JLabel(colony.getName());
-            panel.add(colonyLabel, higConst.rc(row, colonyColumn));
+            add(colonyLabel, higConst.rc(row, colonyColumn));
 
             // production
             Goods goods = new Goods(goodsType);
@@ -127,7 +118,7 @@ public final class ReportProductionPanel extends JPanel {
             totalProduction += newValue;
             GoodsLabel goodsLabel = new GoodsLabel(goods, parent);
             goodsLabel.setHorizontalAlignment(JLabel.LEADING);
-            panel.add(goodsLabel, higConst.rc(row, productionColumn));
+            add(goodsLabel, higConst.rc(row, productionColumn));
 
             // units
             Building building = colony.getBuildingForProducing(goodsType);
@@ -140,26 +131,26 @@ public final class ReportProductionPanel extends JPanel {
                     unitPanel.add(label);
                     totalUnits++;
                 }
-                panel.add(unitPanel, higConst.rc(row, unitColumn));
+                add(unitPanel, higConst.rc(row, unitColumn));
             }
 
             row++;
         }
 
         // summary
-        panel.add(new JLabel(Messages.message("report.allColonies")),
-            higConst.rc(3, colonyColumn));
+        JLabel allColonies = new JLabel(Messages.message("report.allColonies"));
+        allColonies.setForeground(Color.BLUE);
+        add(allColonies, higConst.rc(3, colonyColumn));
 
         Goods allGoods = new Goods(goodsType);
         allGoods.setAmount(totalProduction);
         GoodsLabel allGoodsLabel = new GoodsLabel(allGoods, parent);
         allGoodsLabel.setHorizontalAlignment(JLabel.LEADING);
-        panel.add(allGoodsLabel, higConst.rc(3, productionColumn));
+        add(allGoodsLabel, higConst.rc(3, productionColumn));
 
-        panel.add(new JLabel(String.valueOf(totalUnits)),
-                  higConst.rc(3, unitColumn));
+        add(new JLabel(String.valueOf(totalUnits)),
+            higConst.rc(3, unitColumn));
 
-        add(scrollPane);
     }
 }
 
