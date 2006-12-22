@@ -2120,7 +2120,9 @@ public class Player extends FreeColGameObject {
 
                 addModelMessage(this, "model.player.foundingFatherJoinedCongress",
                                 new String[][] {{"%foundingFather%",
-                                                 Messages.message(FoundingFather.getName(currentFather))}},
+                                                 Messages.message(FoundingFather.getName(currentFather))},
+                                                {"%description%",
+                                                 Messages.message(FoundingFather.getDescription(currentFather))}},
                                 ModelMessage.DEFAULT);
 
                 currentFather = FoundingFather.NONE;

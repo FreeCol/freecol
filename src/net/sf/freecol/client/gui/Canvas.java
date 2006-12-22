@@ -1207,7 +1207,7 @@ public final class Canvas extends JLayeredPane {
             reportPanel.requestFocus();
         }
     }
-
+    
 
     /**
     * Shows a panel where the player may choose the next founding father to recruit.

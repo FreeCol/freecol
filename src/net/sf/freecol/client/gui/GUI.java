@@ -1048,7 +1048,7 @@ public final class GUI {
             final Color currentPlayerColor = freeColClient.getGame().getCurrentPlayer().getColor();
             final String nation = freeColClient.getGame().getCurrentPlayer().getNationAsString();
             Image im = createStringImage(g, 
-                    Messages.message("waitingFor") + " " + nation,
+                    Messages.message("waitingFor", new String[][] {{"%nation%", nation}}),
                     currentPlayerColor,
                     640,
                     18);
