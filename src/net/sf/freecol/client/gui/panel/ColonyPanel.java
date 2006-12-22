@@ -571,7 +571,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     * @return The currently select unit.
     */
     public Unit getSelectedUnit() {
-        return selectedUnit.getUnit();
+        if (selectedUnit == null) return null;
+        else return selectedUnit.getUnit();
     }
 
 
