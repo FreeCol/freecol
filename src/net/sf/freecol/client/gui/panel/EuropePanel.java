@@ -676,6 +676,10 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         }
     }
 
+    /**
+     * Asks for pay arrears of a type of goods, if those goods are boycotted
+     * @param typeOfGoods The type of goods for paying arrears
+     */
     public void payArrears(int typeOfGoods) {
         if (freeColClient.getMyPlayer().getArrears(typeOfGoods) > 0) {
             inGameController.payArrears(typeOfGoods);
