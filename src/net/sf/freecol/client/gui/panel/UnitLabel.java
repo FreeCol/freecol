@@ -17,6 +17,8 @@ import javax.swing.JLabel;
 
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Goods;
@@ -154,7 +156,12 @@ public final class UnitLabel extends JLabel implements ActionListener {
         }
 
         super.paintComponent(g);
-
+        
+        if (getParent() instanceof ColonyPanel.OutsideColonyPanel) {
+            int x = (getWidth() - getIcon().getIconWidth()) / 2;
+            int y = (getHeight() - getIcon().getIconHeight()) / 2;
+            parent.getGUI().displayOccupationIndicator(g, unit, x, y);
+        }
 
         if (unit.getLocation() instanceof ColonyTile) {
             ImageIcon goodsIcon;

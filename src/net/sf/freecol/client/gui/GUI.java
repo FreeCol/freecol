@@ -1995,6 +1995,25 @@ public final class GUI {
         }
     }
 
+    public void displayOccupationIndicator(Graphics g, Unit unit, int x, int y) {
+        g.drawImage(lib.getColorChip(unit.getOwner().getColor()), x, y, null);
+
+        if (unit.getOwner().getColor() == Color.BLACK) {
+            g.setColor(Color.WHITE);
+        } else {
+            g.setColor(Color.BLACK);
+        }
+        String occupationString;
+        if (unit.getOwner() != freeColClient.getMyPlayer()
+                && unit.isNaval()) {
+            occupationString = Integer.toString(unit.getVisibleGoodsCount());
+        } else {
+            occupationString = unit.getOccupationIndicator();
+            if (unit.getState() == Unit.FORTIFIED)
+                g.setColor(Color.GRAY);
+        }
+        g.drawString(occupationString, x + TEXT_OFFSET_X, y + TEXT_OFFSET_Y);
+    }
 
     /**
      * Displays the given Unit onto the given Graphics2D object at the
@@ -2021,23 +2040,7 @@ public final class GUI {
             g.drawImage(lib.getUnitImage(type), (x + tileWidth / 2) - lib.getUnitImageWidth(type) / 2, (y + tileHeight / 2) - lib.getUnitImageHeight(type) / 2 - UNIT_OFFSET, null);
 
             // Draw an occupation and nation indicator.
-            g.drawImage(lib.getColorChip(unit.getOwner().getColor()), x + STATE_OFFSET_X, y, null);
-            
-            if (unit.getOwner().getColor() == Color.BLACK) {
-                g.setColor(Color.WHITE);
-            } else {
-                g.setColor(Color.BLACK);
-            }
-            String occupationString;
-            if (unit.getOwner() != freeColClient.getMyPlayer()
-                    && unit.isNaval()) {
-                occupationString = Integer.toString(unit.getVisibleGoodsCount());
-            } else {
-                occupationString = unit.getOccupationIndicator();
-                if (unit.getState() == Unit.FORTIFIED)
-                    g.setColor(Color.GRAY);
-            }
-            g.drawString(occupationString, x + TEXT_OFFSET_X + STATE_OFFSET_X, y + TEXT_OFFSET_Y);
+            displayOccupationIndicator(g, unit, x + STATE_OFFSET_X, y);
 
             // Draw one small line for each additional unit (like in civ3).
             int unitsOnTile = unit.getTile().getTotalUnitCount();
