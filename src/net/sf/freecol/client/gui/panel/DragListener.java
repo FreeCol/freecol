@@ -234,6 +234,10 @@ public final class DragListener extends MouseAdapter {
                         comp.repaint();
                     }
                 }
+            } else if (comp instanceof MarketLabel) {
+                if (parentPanel instanceof EuropePanel) {
+                    ((EuropePanel) parentPanel).payArrears(((MarketLabel) comp).getType());
+                }
             }
         } else {
             TransferHandler handler = comp.getTransferHandler();

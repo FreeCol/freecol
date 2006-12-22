@@ -676,7 +676,13 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         }
     }
 
-
+    public void payArrears(int typeOfGoods) {
+        if (freeColClient.getMyPlayer().getArrears(typeOfGoods) > 0) {
+            inGameController.payArrears(typeOfGoods);
+            getMarketPanel().revalidate();
+            refresh();
+        }
+    }
 
     /**
     * A panel that holds UnitsLabels that represent Units that are
