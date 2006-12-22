@@ -43,6 +43,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
 
     private int artilleryPrice;
     private int recruitPrice;
+    private static final int RECRUIT_PRICE_INITIAL = 200;
 
     /**
     * Contains the units on this location.
@@ -70,7 +71,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         setRecruitable(3, owner.generateRecruitable());
 
         artilleryPrice = 500;
-        recruitPrice = 200;
+        recruitPrice = RECRUIT_PRICE_INITIAL;
     }
 
 
@@ -473,11 +474,15 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         recruitables[1] = Integer.parseInt(in.getAttributeValue(null, "recruit1"));
         recruitables[2] = Integer.parseInt(in.getAttributeValue(null, "recruit2"));
         artilleryPrice = Integer.parseInt(in.getAttributeValue(null, "artilleryPrice"));
-        recruitPrice = Integer.parseInt(in.getAttributeValue(null, "recruitPrice"));
+        String recruitPriceString = in.getAttributeValue(null, "recruitPrice");
         owner = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "owner"));
         if (owner == null) {
             owner = new Player(getGame(), in.getAttributeValue(null, "owner"));
         }
+        if (recruitPriceString != null)
+            recruitPrice = Integer.parseInt(recruitPriceString);
+        else
+            recruitPrice = RECRUIT_PRICE_INITIAL;
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(UnitContainer.getXMLElementTagName())) {
