@@ -28,6 +28,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel implements
     public static final String  REVISION = "$Revision$";
 
     static final String title = Messages.message("report.continentalCongress.title");
+    static final String none = Messages.message("report.continentalCongress.none");
 
     private final ReportProductionPanel continentalCongressReportPanel;
     private final JPanel summaryPanel;
@@ -46,7 +47,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel implements
 
         summaryPanel = new JPanel();
         int[] widths = {0, 12, 0};
-        int[] heights = {0, 0, 0};
+        int[] heights = {0, 0, 0, 0};
         summaryPanel.setLayout(new HIGLayout(widths, heights));
 
         fatherPanel = new JPanel();
@@ -68,34 +69,50 @@ public final class ReportContinentalCongressPanel extends ReportPanel implements
 
         HIGConstraints higConst = new HIGConstraints();
 
-        summaryPanel.add(new JLabel(Messages.message("report.continentalCongress.recruiting")),
+        // summary
+        summaryPanel.add(new JLabel(Messages.message("sonsOfLiberty")),
                          higConst.rc(1, 1));
-        summaryPanel.add(new JLabel(Messages.message(FoundingFather.getName(player.getCurrentFather()))),
+        summaryPanel.add(new JLabel(String.valueOf(player.getSoL() + "%")),
                          higConst.rc(1, 3));
-        summaryPanel.add(new JLabel(Messages.message("report.continentalCongress.bellsCurrent")),
+        summaryPanel.add(new JLabel(Messages.message("report.continentalCongress.recruiting")),
                          higConst.rc(2, 1));
+        if (player.getFatherCount() < 1) {
+            summaryPanel.add(new JLabel(none), higConst.rc(2, 3));
+        } else {
+            summaryPanel.add(new JLabel(Messages.message(FoundingFather.getName(player.getCurrentFather()))),
+                             higConst.rc(2, 3));
+        }
+        summaryPanel.add(new JLabel(Messages.message("report.continentalCongress.bellsCurrent")),
+                         higConst.rc(3, 1));
         Goods current = new Goods(Goods.BELLS);
         current.setAmount(player.getBells());
         GoodsLabel currentLabel = new GoodsLabel(current, parent);
         currentLabel.setHorizontalAlignment(JLabel.LEADING);
-        summaryPanel.add(currentLabel, higConst.rc(2, 3));
+        summaryPanel.add(currentLabel, higConst.rc(3, 3));
         summaryPanel.add(new JLabel(Messages.message("report.continentalCongress.bellsRequired")),
-                         higConst.rc(3, 1));
+                         higConst.rc(4, 1));
         Goods total = new Goods(Goods.BELLS);
         total.setAmount(player.getTotalFoundingFatherCost());
         GoodsLabel totalLabel = new GoodsLabel(total, parent);
         totalLabel.setHorizontalAlignment(JLabel.LEADING);
-        summaryPanel.add(totalLabel, higConst.rc(3, 3));
+        summaryPanel.add(totalLabel, higConst.rc(4, 3));
         summaryPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         reportPanel.add(summaryPanel);
         reportPanel.add(Box.createRigidArea(new Dimension(0, 24)));
 
-        for (int fatherId = 0; fatherId < FoundingFather.FATHER_COUNT; fatherId++) {
-            if (player.hasFather(fatherId)) {
-                JLabel fatherLabel = new JLabel(Messages.message(FoundingFather.getName(fatherId)));
-                fatherLabel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-                fatherPanel.add(fatherLabel);
+        // founding fathers
+        if (player.getFatherCount() < 1) {
+            JLabel fatherLabel = new JLabel(none);
+            fatherLabel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+            fatherPanel.add(fatherLabel);
+        } else {
+            for (int fatherId = 0; fatherId < FoundingFather.FATHER_COUNT; fatherId++) {
+                if (player.hasFather(fatherId)) {
+                    JLabel fatherLabel = new JLabel(Messages.message(FoundingFather.getName(fatherId)));
+                    fatherLabel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+                    fatherPanel.add(fatherLabel);
+                }
             }
         }
         fatherPanel.setBorder(BorderFactory.createTitledBorder(player.getNationAsString() + " " + title));
@@ -103,6 +120,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel implements
         reportPanel.add(fatherPanel);
         reportPanel.add(Box.createRigidArea(new Dimension(0, 24)));
 
+        // production per colony
         continentalCongressReportPanel.initialize();
         continentalCongressReportPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
