@@ -35,7 +35,7 @@ public final class ReportProductionPanel extends JPanel {
     /** How wide the margins should be. */
     private final int marginWidth = 12;
     /** The widths of the columns. */
-    private final int[] widths = {0, columnSeparatorWidth, 0, columnSeparatorWidth, 0};
+    private final int[] widths;
 
     /** The heights of the rows. */
     private final int[] heights;
@@ -51,6 +51,14 @@ public final class ReportProductionPanel extends JPanel {
         this.goodsType = goodsType;
         this.parent = parent;
 
+        if (goodsType == Goods.BELLS) {
+            widths = new int[] {0, columnSeparatorWidth, 0, columnSeparatorWidth,
+                                0, columnSeparatorWidth, 0, columnSeparatorWidth,
+                                0, columnSeparatorWidth, 0, columnSeparatorWidth,
+                                0, columnSeparatorWidth, 0};
+        } else {
+            widths = new int[] {0, columnSeparatorWidth, 0, columnSeparatorWidth, 0};
+        }
         heights = null;
     }
 
@@ -63,6 +71,11 @@ public final class ReportProductionPanel extends JPanel {
         int colonyColumn = 1;
         int productionColumn = 3;
         int unitColumn = 5;
+        int pressColumn = 7;
+        int paperColumn = 9;
+        int percentageColumn = 11;
+        int solColumn = 13;
+        int toryColumn = 15;
 
         // Display Panel
         removeAll();
@@ -98,10 +111,35 @@ public final class ReportProductionPanel extends JPanel {
         add(new JLabel(Messages.message("report.units")),
             higConst.rc(1, unitColumn));
 
+        if (goodsType == Goods.BELLS) {
+
+            add(new JLabel(Messages.message("colopedia.buildings.name.PrintingPress")),
+                higConst.rc(1, pressColumn));
+            
+            add(new JLabel(Messages.message("colopedia.buildings.name.Newspaper")),
+                higConst.rc(1, paperColumn));
+            
+            add(new JLabel(Messages.message("sonsOfLiberty") + "%"),
+                higConst.rc(1, percentageColumn));
+
+            add(new JLabel(Messages.message("sonsOfLiberty")),
+                higConst.rc(1, solColumn));
+
+            add(new JLabel(Messages.message("tory")),
+                higConst.rc(1, toryColumn));
+
+        }            
+
 
         int row = 5;
         int totalProduction = 0;
         int totalUnits = 0;
+
+        int pressCount = 0;
+        int paperCount = 0;
+        int percentageCount = 0;
+        int solCount = 0;
+        int toryCount = 0;
 
         colonyIterator = colonies.iterator();
         while (colonyIterator.hasNext()) {
@@ -134,22 +172,67 @@ public final class ReportProductionPanel extends JPanel {
                 add(unitPanel, higConst.rc(row, unitColumn));
             }
 
+            // special
+            if (goodsType == Goods.BELLS) {
+
+                int level = colony.getBuilding(Building.PRINTING_PRESS).getLevel();
+                if (level == Building.HOUSE) {
+                    add(new JLabel("X"), higConst.rc(row, pressColumn));
+                    pressCount++;
+                } else if (level == Building.SHOP) {
+                    add(new JLabel("X"), higConst.rc(row, paperColumn));
+                    paperCount++;
+                }
+
+                int percentage = colony.getSoL();
+                percentageCount += percentage;
+                int count = colony.getUnitCount();
+                int sol = percentage * count / 100;
+                solCount += sol;
+                int tories = count - sol;
+                toryCount += tories;
+
+                add(new JLabel(String.valueOf(percentage), JLabel.TRAILING),
+                    higConst.rc(row, percentageColumn));
+                add(new JLabel(String.valueOf(sol), JLabel.TRAILING),
+                    higConst.rc(row, solColumn));
+                add(new JLabel(String.valueOf(tories), JLabel.TRAILING),
+                    higConst.rc(row, toryColumn));
+            }
+
             row++;
+                
         }
 
+
+        row = 3;
         // summary
         JLabel allColonies = new JLabel(Messages.message("report.allColonies"));
         allColonies.setForeground(Color.BLUE);
-        add(allColonies, higConst.rc(3, colonyColumn));
+        add(allColonies, higConst.rc(row, colonyColumn));
 
         Goods allGoods = new Goods(goodsType);
         allGoods.setAmount(totalProduction);
         GoodsLabel allGoodsLabel = new GoodsLabel(allGoods, parent);
         allGoodsLabel.setHorizontalAlignment(JLabel.LEADING);
-        add(allGoodsLabel, higConst.rc(3, productionColumn));
+        add(allGoodsLabel, higConst.rc(row, productionColumn));
 
         add(new JLabel(String.valueOf(totalUnits)),
-            higConst.rc(3, unitColumn));
+            higConst.rc(row, unitColumn));
+
+        if (goodsType == Goods.BELLS) {
+            add(new JLabel(String.valueOf(pressCount), JLabel.TRAILING),
+                higConst.rc(row, pressColumn));
+            add(new JLabel(String.valueOf(paperCount), JLabel.TRAILING),
+                higConst.rc(row, paperColumn));
+            add(new JLabel(String.valueOf(percentageCount / colonies.size()), JLabel.TRAILING),
+                higConst.rc(row, percentageColumn));
+            add(new JLabel(String.valueOf(solCount), JLabel.TRAILING),
+                higConst.rc(row, solColumn));
+            add(new JLabel(String.valueOf(toryCount), JLabel.TRAILING),
+                higConst.rc(row, toryColumn));
+        }
+
 
     }
 }
