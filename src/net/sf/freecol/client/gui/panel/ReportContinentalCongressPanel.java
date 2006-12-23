@@ -47,7 +47,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel implements
 
         summaryPanel = new JPanel();
         int[] widths = {0, 12, 0};
-        int[] heights = {0, 0, 0, 0};
+        int[] heights = {0, 0, 0};
         summaryPanel.setLayout(new HIGLayout(widths, heights));
 
         fatherPanel = new JPanel();
@@ -70,32 +70,34 @@ public final class ReportContinentalCongressPanel extends ReportPanel implements
         HIGConstraints higConst = new HIGConstraints();
 
         // summary
+        /*
         summaryPanel.add(new JLabel(Messages.message("sonsOfLiberty")),
                          higConst.rc(1, 1));
         summaryPanel.add(new JLabel(String.valueOf(player.getSoL() + "%")),
                          higConst.rc(1, 3));
+        */
         summaryPanel.add(new JLabel(Messages.message("report.continentalCongress.recruiting")),
-                         higConst.rc(2, 1));
-        if (player.getFatherCount() < 1) {
-            summaryPanel.add(new JLabel(none), higConst.rc(2, 3));
+                         higConst.rc(1, 1));
+        if (player.getCurrentFather() == FoundingFather.NONE) {
+            summaryPanel.add(new JLabel(none), higConst.rc(1, 3));
         } else {
             summaryPanel.add(new JLabel(Messages.message(FoundingFather.getName(player.getCurrentFather()))),
-                             higConst.rc(2, 3));
+                             higConst.rc(1, 3));
         }
         summaryPanel.add(new JLabel(Messages.message("report.continentalCongress.bellsCurrent")),
-                         higConst.rc(3, 1));
+                         higConst.rc(2, 1));
         Goods current = new Goods(Goods.BELLS);
         current.setAmount(player.getBells());
         GoodsLabel currentLabel = new GoodsLabel(current, parent);
         currentLabel.setHorizontalAlignment(JLabel.LEADING);
-        summaryPanel.add(currentLabel, higConst.rc(3, 3));
+        summaryPanel.add(currentLabel, higConst.rc(2, 3));
         summaryPanel.add(new JLabel(Messages.message("report.continentalCongress.bellsRequired")),
-                         higConst.rc(4, 1));
+                         higConst.rc(3, 1));
         Goods total = new Goods(Goods.BELLS);
         total.setAmount(player.getTotalFoundingFatherCost());
         GoodsLabel totalLabel = new GoodsLabel(total, parent);
         totalLabel.setHorizontalAlignment(JLabel.LEADING);
-        summaryPanel.add(totalLabel, higConst.rc(4, 3));
+        summaryPanel.add(totalLabel, higConst.rc(3, 3));
         summaryPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         reportPanel.add(summaryPanel);

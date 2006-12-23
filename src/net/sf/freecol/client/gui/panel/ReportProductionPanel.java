@@ -225,7 +225,11 @@ public final class ReportProductionPanel extends JPanel {
                 higConst.rc(row, pressColumn));
             add(new JLabel(String.valueOf(paperCount), JLabel.TRAILING),
                 higConst.rc(row, paperColumn));
-            add(new JLabel(String.valueOf(percentageCount / colonies.size()), JLabel.TRAILING),
+            int percentage = 0;
+            if (colonies.size() > 0) {
+                percentage = percentageCount / colonies.size();
+            }
+            add(new JLabel(String.valueOf(percentage), JLabel.TRAILING),
                 higConst.rc(row, percentageColumn));
             add(new JLabel(String.valueOf(solCount), JLabel.TRAILING),
                 higConst.rc(row, solColumn));
