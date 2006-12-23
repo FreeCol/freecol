@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionListener;
+import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.Iterator;
 
 import javax.swing.ImageIcon;
@@ -13,7 +15,11 @@ import javax.swing.JPanel;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.WorkLocation;
+
+import cz.autel.dmi.*;
 
 /**
  * This panel displays the Labour Report.
@@ -101,7 +107,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
     private final ImageLibrary library;
     
     private int[] unitCount;
-
+    private Hashtable[] unitLocations;
 
     /**
      * The constructor that will add the items to this panel.
@@ -118,15 +124,29 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
     public void initialize() {
         // Count Units
         unitCount = new int[Unit.UNIT_COUNT];
+        unitLocations = new Hashtable[Unit.UNIT_COUNT];
+        for (int index = 0; index < Unit.UNIT_COUNT; index++) {
+            unitLocations[index] = new Hashtable();
+        }
         Iterator units = parent.getClient().getMyPlayer().getUnitIterator();
         while (units.hasNext()) {
             Unit unit = (Unit) units.next();
+            int type = unit.getType();
+            if (unit.getLocation() instanceof WorkLocation) {
+                String name = ((WorkLocation) unit.getLocation()).getColony().getName();
+                if (unitLocations[type].containsKey(name)) {
+                    int oldValue = ((Integer) unitLocations[type].get(name)).intValue();
+                    unitLocations[type].put(name, new Integer(oldValue + 1));
+                } else {
+                    unitLocations[type].put(name, new Integer(1));
+                }
+            }
             unitCount[unit.getType()]++;
         }
 
         // Display Panel
         reportPanel.removeAll();
-        reportPanel.setLayout(new GridLayout(7, 4));
+        reportPanel.setLayout(new GridLayout(0, 3));
         buildLabourLabel(Unit.FREE_COLONIST,          FREE_COLONIST,            1f); //ImageLibrary.FREE_COLONIST);
         buildLabourLabel(Unit.INDENTURED_SERVANT,     INDENTURED_SERVANT,       1f); //ImageLibrary.INDENTURED_SERVANT);
         buildLabourLabel(Unit.PETTY_CRIMINAL,         PETTY_CRIMINAL,           1f); //ImageLibrary.PETTY_CRIMINAL);
@@ -163,19 +183,8 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
      * @param scale
      */
     private void buildLabourLabel(int unit, int unitIcon, float scale) {
-        JPanel p1 = new JPanel(null);
-        p1.setOpaque(false);
-
-        String labour = "<html><p align=\"left\">" + Unit.getName(unit) +
-                        "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + unitCount[unit] + "</p></html>";
-
-        JLabel label = new JLabel(labour, JLabel.CENTER);
-        label.setVerticalAlignment(JLabel.TOP);
-        label.setVerticalTextPosition(JLabel.TOP);
-        label.setLocation(65, 0);
-        label.setSize(label.getPreferredSize());
-        //label.setSize(100, label.getPreferredSize().height);
-        p1.add(label, BorderLayout.CENTER);
+        JPanel panel = new JPanel();
+        panel.setOpaque(false);
 
         JLabel imageLabel = null;
         if (unitIcon >= 0) {
@@ -189,11 +198,51 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
               icon = new ImageIcon(image);
             }
             imageLabel = new JLabel(icon);
-            imageLabel.setLocation(0, 0);
-            imageLabel.setSize(65, imageLabel.getPreferredSize().height);
-            p1.add(imageLabel, BorderLayout.WEST);
+            panel.add(imageLabel);
         }
 
-        reportPanel.add(p1);
+        JPanel textPanel = new JPanel();
+        textPanel.setOpaque(false);
+
+        int[] widths = {0, 5, 0};
+        int[] heights = null;
+        int colonyColumn = 1;
+        int countColumn = 3;
+        int keys = 0;
+        if (unitLocations[unit] != null) {
+            keys = unitLocations[unit].size();
+        }
+        if (keys == 0) {
+            heights = new int[] {0};
+        } else {
+            heights = new int[keys + 2];
+            for (int index = 0; index < heights.length; index++) {
+                heights[index] = 0;
+            }
+            heights[1] = 5;
+        }
+
+        textPanel.setLayout(new HIGLayout(widths, heights));
+        HIGConstraints higConst = new HIGConstraints();
+
+        // summary
+        int row = 1;
+        textPanel.add(new JLabel(Unit.getName(unit)),
+                      higConst.rc(row, colonyColumn));
+        textPanel.add(new JLabel(String.valueOf(unitCount[unit])),
+                      higConst.rc(row, countColumn));
+
+        row = 3;
+        for (Enumeration e = unitLocations[unit].keys() ; e.hasMoreElements() ;) {
+            String name = (String) e.nextElement();
+            textPanel.add(new JLabel(name),
+                          higConst.rc(row, colonyColumn));
+            textPanel.add(new JLabel(unitLocations[unit].get(name).toString()),
+                          higConst.rc(row, countColumn));
+            row++;
+        }
+
+        panel.add(textPanel);
+        reportPanel.add(panel);
     }
 }
