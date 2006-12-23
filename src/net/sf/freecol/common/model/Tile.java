@@ -1108,8 +1108,8 @@ public final class Tile extends FreeColGameObject implements Location {
     * @param road <code>true</code> to indicate a road
     * @return The amount of goods.
     */
-    public static int getTileTypePotential(int tileType, int goods, int addition_type, boolean bonus,
-                                            boolean forested, boolean plowed, boolean road) {
+    public int getTileTypePotential(int tileType, int goods, int addition_type, boolean bonus,
+                                    boolean forested, boolean plowed, boolean road) {
     
         if (!Goods.isFarmedGoods(goods)) {
             return 0;
@@ -1144,7 +1144,24 @@ public final class Tile extends FreeColGameObject implements Location {
             basepotential = potentialtable[13][goods][0];
             break;
         default:
-            basepotential = potentialtable[tileType][goods][(forested ? 1 : 0)];
+            if (tileType == OCEAN) {
+                int landCount = 0;
+                Iterator tileIterator = getMap().getAdjacentIterator(getPosition());
+                while (tileIterator.hasNext()) {
+                    if (getMap().getTile((Position) tileIterator.next()).isLand()) {
+                        landCount++;
+                    }
+                }
+                if (landCount > 5) {
+                    basepotential = 6;
+                } else if (landCount > 3) {
+                    basepotential = 4;
+                } else {
+                    basepotential = 2;
+                }
+            } else {
+                basepotential = potentialtable[tileType][goods][(forested ? 1 : 0)];
+            }
             break;
         }
 
