@@ -111,12 +111,11 @@ public class MapGenerator {
      */
     public void createMountains(Map map) {
         int maximumLength = Math.max(getMapGeneratorOptions().getWidth(), getMapGeneratorOptions().getHeight()) / 10;
-        int number = (getMapGeneratorOptions().getWidth() * getMapGeneratorOptions().getHeight()) / 300;
+        int number = getMapGeneratorOptions().getNumberOfMountains();
         int counter = 0;
         logger.fine("Maximum length of mountain ranges is " + maximumLength);
 
         for (int i = 0; i < number; i++) {
-            //MountainRange range = new MountainRange(map, maximumLength);
             for (int tries = 0; tries < 100; tries++) {
                 Position p = getRandomLandPosition(map);
                 if (map.getTile(p).isLand()) {
@@ -140,7 +139,7 @@ public class MapGenerator {
                                     } else if (r > 2) {
                                         t.setAddition(Tile.ADD_HILLS);
                                     }
-                                    if (random.nextInt(10) == 0) {
+                                    if (random.nextInt(100) < getMapGeneratorOptions().getPercentageOfBonusTiles()) {
                                         t.setBonus(true);
                                     }
                                 }
@@ -151,7 +150,7 @@ public class MapGenerator {
                 }
             }
         }
-    }	
+    }   
 
 
     /**
@@ -161,10 +160,7 @@ public class MapGenerator {
      * @param map The map to use.
      */
     public void createLostCityRumours(Map map) {
-        int number = ( getMapGeneratorOptions().getWidth() 
-                     * getMapGeneratorOptions().getHeight() 
-                     * getMapGeneratorOptions().getLandMass() / 100 )
-                     * 3 / 100 ;
+        int number = getMapGeneratorOptions().getNumberOfRumours();
         int counter = 0;
 
         for (int i = 0; i < number; i++) {
@@ -193,18 +189,15 @@ public class MapGenerator {
      * @param map The map to create rivers on.
      */
     public void createRivers(Map map) {
-        int number = ( getMapGeneratorOptions().getWidth() 
-                     * getMapGeneratorOptions().getHeight() 
-                     * getMapGeneratorOptions().getLandMass() / 100 )
-                     * 3 / 100 ;
-
+        int number = getMapGeneratorOptions().getNumberOfRivers();
         int counter = 0;
         Hashtable riverMap = new Hashtable();
 
         for (int i = 0; i < number; i++) {
             River river = new River(map, riverMap);
             for (int tries = 0; tries < 100; tries++) {
-                Position position = new Position(random.nextInt(getMapGeneratorOptions().getWidth()), random.nextInt(getMapGeneratorOptions().getHeight()));
+                Position position = new Position(random.nextInt(getMapGeneratorOptions().getWidth()),
+                                                 random.nextInt(getMapGeneratorOptions().getHeight()));
 
                 if (riverMap.get(position) == null) {
                     if (river.flowFromSource(position)) {
@@ -719,8 +712,8 @@ public class MapGenerator {
     * Class for making a <code>Map</code> based upon a land map.
     */
     protected class TerrainGenerator {
-		int distToLandFromHighSeas = getMapGeneratorOptions().getDistLandHighSea();
-		int maxDistanceToEdge = getMapGeneratorOptions().getMaxDistToEdge();
+                int distToLandFromHighSeas = getMapGeneratorOptions().getDistLandHighSea();
+                int maxDistanceToEdge = getMapGeneratorOptions().getMaxDistToEdge();
 
         private boolean[][] landMap;
 
@@ -789,7 +782,8 @@ public class MapGenerator {
                     if (landMap[i][j]) {
                         t = new Tile(game, getRandomTileType(((Math.min(j, getMapGeneratorOptions().getHeight() - j) * 200) / getMapGeneratorOptions().getHeight())), i, j);
 
-                        if ((t.getType() != Tile.ARCTIC) && (tileType.nextInt(2) > 0)) {
+                        if ((t.getType() != Tile.ARCTIC) && 
+                            (tileType.nextInt(100) < getMapGeneratorOptions().getPercentageOfForests())) {
                             t.setForested(true);
                         } else if ((t.getType() != Tile.ARCTIC) && (t.getType() != Tile.TUNDRA)) {
                             int k = tileType.nextInt(16);
@@ -801,7 +795,8 @@ public class MapGenerator {
                         }
 
                         // Terrain bonus:
-                        if (tileType.nextInt(10) == 0 && (t.getType() != Tile.ARCTIC && (t.getType() != Tile.TUNDRA || t.isForested())
+                        if (tileType.nextInt(100) < getMapGeneratorOptions().getPercentageOfBonusTiles() && 
+                            (t.getType() != Tile.ARCTIC && (t.getType() != Tile.TUNDRA || t.isForested())
                                 && t.getType() != Tile.HIGH_SEAS && t.getType() != Tile.DESERT && t.getType() != Tile.MARSH
                                 && t.getType() != Tile.SWAMP || t.getAddition() == Tile.ADD_MOUNTAINS || t.getAddition() == Tile.ADD_HILLS)) {
                             t.setBonus(true);
@@ -860,7 +855,7 @@ public class MapGenerator {
     * Class for creating a land map.
     */
     protected class LandGenerator {
-		int preferredDistanceToEdge = getMapGeneratorOptions().getPrefDistToEdge();
+                int preferredDistanceToEdge = getMapGeneratorOptions().getPrefDistToEdge();
         private static final int C = 2;
 
         private boolean[][] map;
