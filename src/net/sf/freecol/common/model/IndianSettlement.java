@@ -138,6 +138,8 @@ public class IndianSettlement extends Settlement {
         if (tile == null) {
             throw new NullPointerException();
         }
+        
+        tile.setNationOwner(player.getNation());
 
         unitContainer = new UnitContainer(game, this);
         goodsContainer = new GoodsContainer(game, this);
