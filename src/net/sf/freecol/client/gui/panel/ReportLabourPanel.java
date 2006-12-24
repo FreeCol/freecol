@@ -1,11 +1,9 @@
 package net.sf.freecol.client.gui.panel;
 
-//import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionListener;
-//import java.util.Enumeration;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -150,6 +148,10 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
             } else if (location instanceof Tile &&
                        ((Tile) location).getSettlement() != null) {
                 locationName = ((Colony) ((Tile) location).getSettlement()).getName();
+            } else if (location instanceof Unit) {
+                locationName = Messages.message("report.atSea");
+            } else {
+                locationName = Messages.message("report.onLand");
             }
 
             if (locationName != null) {
@@ -250,7 +252,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
         JLabel unitLabel = new JLabel(Unit.getName(unit)); 
         textPanel.add(unitLabel, higConst.rc(row, colonyColumn));
 
-        if (keys == 0) {
+        if (unitCount[unit] == 0) {
             unitLabel.setForeground(Color.GRAY);
         } else {
             textPanel.add(new JLabel(String.valueOf(unitCount[unit])),
