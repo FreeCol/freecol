@@ -68,6 +68,24 @@ public final class DragListener extends MouseAdapter {
                     menuItem.addActionListener(unitLabel);
                     menuItem.setEnabled((tempUnit.getMovesLeft() > 0));
                     menu.add(menuItem);
+                    
+                    menuItem = new JMenuItem( Messages.message("fortifyUnit") );
+                    menuItem.setActionCommand(String.valueOf(UnitLabel.FORTIFY));
+                    menuItem.addActionListener(unitLabel);
+                    menuItem.setEnabled( (tempUnit.getMovesLeft() > 0) && !(tempUnit.getState() == Unit.FORTIFIED || tempUnit.getState() == Unit.FORTIFYING) );
+                    menu.add(menuItem);
+
+                    /** TODO: uncomment when sentry feature is completed  
+                     * 
+                     */
+                    /*
+                    menuItem = new JMenuItem( Messages.message("sentryUnit") );
+                    menuItem.setActionCommand(String.valueOf(UnitLabel.SENTRY));
+                    menuItem.addActionListener(unitLabel);
+                    menuItem.setEnabled( (tempUnit.getMovesLeft() > 0) && (tempUnit.getState() != Unit.SENTRY) );
+                    menu.add(menuItem);
+                    */
+                    
                     menu.addSeparator();
                 }
             

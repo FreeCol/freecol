@@ -1739,7 +1739,8 @@ public final class InGameController implements NetworkConstants {
 
         unit.setState(state);
 
-        if (unit.getMovesLeft() == 0) {
+        if (!freeColClient.getCanvas().getColonyPanel().isShowing() &&
+                unit.getMovesLeft() == 0) {
             nextActiveUnit();
         } else {
             freeColClient.getCanvas().refresh();

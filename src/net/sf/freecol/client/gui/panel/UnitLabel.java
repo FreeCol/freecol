@@ -52,7 +52,10 @@ public final class UnitLabel extends JLabel implements ActionListener {
                             WORKTYPE_ORE = 10,
                             WORKTYPE_SILVER = 11,
                             CLEAR_SPECIALITY = 12,
-                            ACTIVATE_UNIT = 13;
+                            ACTIVATE_UNIT = 13,
+                            FORTIFY = 14,
+                            SENTRY = 15;
+    
 
     private final Unit unit;
     private final Canvas parent;
@@ -157,7 +160,8 @@ public final class UnitLabel extends JLabel implements ActionListener {
 
         super.paintComponent(g);
         
-        if (getParent() instanceof ColonyPanel.OutsideColonyPanel) {
+        if (getParent() instanceof ColonyPanel.OutsideColonyPanel ||
+                getParent() instanceof ColonyPanel.InPortPanel) {
             int x = (getWidth() - getIcon().getIconWidth()) / 2;
             int y = (getHeight() - getIcon().getIconHeight()) / 2;
             parent.getGUI().displayOccupationIndicator(g, unit, x, y);
@@ -196,6 +200,10 @@ public final class UnitLabel extends JLabel implements ActionListener {
         try {
             if (Integer.valueOf(command).intValue() == ACTIVATE_UNIT) {
                 parent.getGUI().setActiveUnit(unit);
+            } else if ( Integer.valueOf(command).intValue() == FORTIFY ) {
+                inGameController.changeState(unit, Unit.FORTIFYING);
+            } else if ( Integer.valueOf(command).intValue() == SENTRY ) {
+                inGameController.changeState(unit, Unit.SENTRY);
             } else if (!unit.isCarrier()) {
                 switch (Integer.valueOf(command).intValue()) {
                     case ARM:
