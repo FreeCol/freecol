@@ -168,33 +168,125 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
 
         // Display Panel
         reportPanel.removeAll();
-        reportPanel.setLayout(new GridLayout(0, 3));
-        buildLabourLabel(Unit.FREE_COLONIST,          FREE_COLONIST,            1f); //ImageLibrary.FREE_COLONIST);
-        buildLabourLabel(Unit.INDENTURED_SERVANT,     INDENTURED_SERVANT,       1f); //ImageLibrary.INDENTURED_SERVANT);
-        buildLabourLabel(Unit.PETTY_CRIMINAL,         PETTY_CRIMINAL,           1f); //ImageLibrary.PETTY_CRIMINAL);
-        buildLabourLabel(Unit.INDIAN_CONVERT,         INDIAN_CONVERT,           1f); //ImageLibrary.INDIAN_CONVERT);
-        buildLabourLabel(Unit.EXPERT_FARMER,          EXPERT_FARMER,            1f); //ImageLibrary.EXPERT_FARMER);
-        buildLabourLabel(Unit.EXPERT_FISHERMAN,       EXPERT_FISHERMAN,         1f); //ImageLibrary.EXPERT_FISHERMAN);
-        buildLabourLabel(Unit.MASTER_SUGAR_PLANTER,   MASTER_SUGAR_PLANTER,     1f); //ImageLibrary.MASTER_SUGAR_PLANTER);
-        buildLabourLabel(Unit.MASTER_DISTILLER,       MASTER_DISTILLER,         1f); //ImageLibrary.MASTER_DISTILLER);
-        buildLabourLabel(Unit.EXPERT_LUMBER_JACK,     EXPERT_LUMBER_JACK,       1f); //ImageLibrary.EXPERT_LUMBER_JACK);
-        buildLabourLabel(Unit.MASTER_CARPENTER,       MASTER_CARPENTER,         1f); //ImageLibrary.MASTER_CARPENTER);
-        buildLabourLabel(Unit.MASTER_TOBACCO_PLANTER, MASTER_TOBACCO_PLANTER,   1f); //ImageLibrary.MASTER_TOBACCO_PLANTER);
-        buildLabourLabel(Unit.MASTER_TOBACCONIST,     MASTER_TOBACCONIST,       1f); //ImageLibrary.MASTER_TOBACCONIST);
-        buildLabourLabel(Unit.EXPERT_FUR_TRAPPER,     EXPERT_FUR_TRAPPER,       1f); //ImageLibrary.EXPERT_FUR_TRAPPER);
-        buildLabourLabel(Unit.MASTER_FUR_TRADER,      MASTER_FUR_TRADER,        1f); //ImageLibrary.MASTER_FUR_TRADER);
-        buildLabourLabel(Unit.MASTER_COTTON_PLANTER,  MASTER_COTTON_PLANTER,    1f); //ImageLibrary.MASTER_COTTON_PLANTER);
-        buildLabourLabel(Unit.MASTER_WEAVER,          MASTER_WEAVER,            1f); //ImageLibrary.MASTER_WEAVER);
-        buildLabourLabel(Unit.EXPERT_ORE_MINER,       EXPERT_ORE_MINER,         1f); //ImageLibrary.EXPERT_ORE_MINER);
-        buildLabourLabel(Unit.MASTER_BLACKSMITH,      MASTER_BLACKSMITH,        1f); //ImageLibrary.MASTER_BLACKSMITH);
-        buildLabourLabel(Unit.MASTER_GUNSMITH,        MASTER_GUNSMITH,          1f); //ImageLibrary.MASTER_GUNSMITH);
-        buildLabourLabel(Unit.EXPERT_SILVER_MINER,    EXPERT_SILVER_MINER,      1f); //ImageLibrary.EXPERT_SILVER_MINER);
-        buildLabourLabel(Unit.HARDY_PIONEER,          HARDY_PIONEER_WITH_TOOLS, 1f); //ImageLibrary.HARDY_PIONEER_WITH_TOOLS);
-        buildLabourLabel(Unit.VETERAN_SOLDIER,        VETERAN_SOLDIER,          1f); //ImageLibrary.VETERAN_SOLDIER);
-        buildLabourLabel(Unit.SEASONED_SCOUT,         SEASONED_SCOUT_NOT_MOUNTED, 1f); //ImageLibrary.SEASONED_SCOUT_NOT_MOUNTED);
-        buildLabourLabel(Unit.JESUIT_MISSIONARY,      JESUIT_MISSIONARY,        1f); //ImageLibrary.JESUIT_MISSIONARY);
-        buildLabourLabel(Unit.ELDER_STATESMAN,        ELDER_STATESMAN,          1f); //ImageLibrary.ELDER_STATESMAN);
-        buildLabourLabel(Unit.FIREBRAND_PREACHER,     FIREBRAND_PREACHER,       1f); //ImageLibrary.FIREBRAND_PREACHER);
+        int margin = 30;
+        int[] widths = new int[] {0, 5, 0, margin, 0, 5, 0, margin, 0, 5, 0};
+        int[] heights = new int[] {0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0};
+        reportPanel.setLayout(new HIGLayout(widths, heights));
+
+        int row = 1;
+        reportPanel.add(buildUnitLabel(FREE_COLONIST,            1f), //ImageLibrary.FREE_COLONIST);
+                        higConst.rc(row, 1));
+        reportPanel.add(buildUnitReport(Unit.FREE_COLONIST),
+                        higConst.rc(row, 3));
+        reportPanel.add(buildUnitLabel(INDENTURED_SERVANT,       1f), //ImageLibrary.INDENTURED_SERVANT),
+                        higConst.rc(row, 5));
+        reportPanel.add(buildUnitReport(Unit.INDENTURED_SERVANT),
+                        higConst.rc(row, 7));
+        reportPanel.add(buildUnitLabel(PETTY_CRIMINAL,           1f), //ImageLibrary.PETTY_CRIMINAL),
+                        higConst.rc(row, 9));
+        reportPanel.add(buildUnitReport(Unit.PETTY_CRIMINAL),
+                        higConst.rc(row, 11));
+        row += 2;
+        reportPanel.add(buildUnitLabel(INDIAN_CONVERT,           1f), //ImageLibrary.INDIAN_CONVERT),
+                        higConst.rc(row, 1));
+        reportPanel.add(buildUnitReport(Unit.INDIAN_CONVERT),
+                        higConst.rc(row, 3));
+        reportPanel.add(buildUnitLabel(EXPERT_FARMER,            1f), //ImageLibrary.EXPERT_FARMER),
+                        higConst.rc(row, 5));
+        reportPanel.add(buildUnitReport(Unit.EXPERT_FARMER),
+                        higConst.rc(row, 7));
+        reportPanel.add(buildUnitLabel(EXPERT_FISHERMAN,         1f), //ImageLibrary.EXPERT_FISHERMAN),
+                        higConst.rc(row, 9));
+        reportPanel.add(buildUnitReport(Unit.EXPERT_FISHERMAN),
+                        higConst.rc(row, 11));
+        row += 2;
+        reportPanel.add(buildUnitLabel(MASTER_SUGAR_PLANTER,     1f), //ImageLibrary.MASTER_SUGAR_PLANTER),
+                        higConst.rc(row, 1));
+        reportPanel.add(buildUnitReport(Unit.MASTER_SUGAR_PLANTER),
+                        higConst.rc(row, 3));
+        reportPanel.add(buildUnitLabel(MASTER_DISTILLER,         1f), //ImageLibrary.MASTER_DISTILLER),
+                        higConst.rc(row, 5));
+        reportPanel.add(buildUnitReport(Unit.MASTER_DISTILLER),
+                        higConst.rc(row, 7));
+        reportPanel.add(buildUnitLabel(EXPERT_LUMBER_JACK,       1f), //ImageLibrary.EXPERT_LUMBER_JACK),
+                        higConst.rc(row, 9));
+        reportPanel.add(buildUnitReport(Unit.EXPERT_LUMBER_JACK),
+                        higConst.rc(row, 11));
+        row += 2;
+        reportPanel.add(buildUnitLabel(MASTER_CARPENTER,         1f), //ImageLibrary.MASTER_CARPENTER),
+                        higConst.rc(row, 1));
+        reportPanel.add(buildUnitReport(Unit.MASTER_CARPENTER),
+                        higConst.rc(row, 3));
+        reportPanel.add(buildUnitLabel(MASTER_TOBACCO_PLANTER,   1f), //ImageLibrary.MASTER_TOBACCO_PLANTER),
+                        higConst.rc(row, 5));
+        reportPanel.add(buildUnitReport(Unit.MASTER_TOBACCO_PLANTER),
+                        higConst.rc(row, 7));
+        reportPanel.add(buildUnitLabel(MASTER_TOBACCONIST,       1f), //ImageLibrary.MASTER_TOBACCONIST),
+                        higConst.rc(row, 9));
+        reportPanel.add(buildUnitReport(Unit.MASTER_TOBACCONIST),
+                        higConst.rc(row, 11));
+        row += 2;
+        reportPanel.add(buildUnitLabel(EXPERT_FUR_TRAPPER,       1f), //ImageLibrary.EXPERT_FUR_TRAPPER),
+                        higConst.rc(row, 1));
+        reportPanel.add(buildUnitReport(Unit.EXPERT_FUR_TRAPPER),
+                        higConst.rc(row, 3));
+        reportPanel.add(buildUnitLabel(MASTER_FUR_TRADER,        1f), //ImageLibrary.MASTER_FUR_TRADER),
+                        higConst.rc(row, 5));
+        reportPanel.add(buildUnitReport(Unit.MASTER_FUR_TRADER),
+                        higConst.rc(row, 7));
+        reportPanel.add(buildUnitLabel(MASTER_COTTON_PLANTER,    1f), //ImageLibrary.MASTER_COTTON_PLANTER),
+                        higConst.rc(row, 9));
+        reportPanel.add(buildUnitReport(Unit.MASTER_COTTON_PLANTER),
+                        higConst.rc(row, 11));
+        row += 2;
+        reportPanel.add(buildUnitLabel(MASTER_WEAVER,            1f), //ImageLibrary.MASTER_WEAVER),
+                        higConst.rc(row, 1));
+        reportPanel.add(buildUnitReport(Unit.MASTER_WEAVER),
+                        higConst.rc(row, 3));
+        reportPanel.add(buildUnitLabel(EXPERT_ORE_MINER,         1f), //ImageLibrary.EXPERT_ORE_MINER),
+                        higConst.rc(row, 5));
+        reportPanel.add(buildUnitReport(Unit.EXPERT_ORE_MINER),
+                        higConst.rc(row, 7));
+        reportPanel.add(buildUnitLabel(MASTER_BLACKSMITH,        1f), //ImageLibrary.MASTER_BLACKSMITH),
+                        higConst.rc(row, 9));
+        reportPanel.add(buildUnitReport(Unit.MASTER_BLACKSMITH),
+                        higConst.rc(row, 11));
+        row += 2;
+        reportPanel.add(buildUnitLabel(MASTER_GUNSMITH,          1f), //ImageLibrary.MASTER_GUNSMITH),
+                        higConst.rc(row, 1));
+        reportPanel.add(buildUnitReport(Unit.MASTER_GUNSMITH),
+                        higConst.rc(row, 3));
+        reportPanel.add(buildUnitLabel(EXPERT_SILVER_MINER,      1f), //ImageLibrary.EXPERT_SILVER_MINER),
+                        higConst.rc(row, 5));
+        reportPanel.add(buildUnitReport(Unit.EXPERT_SILVER_MINER),
+                        higConst.rc(row, 7));
+        reportPanel.add(buildUnitLabel(HARDY_PIONEER_WITH_TOOLS, 1f), //ImageLibrary.HARDY_PIONEER_WITH_TOOLS),
+                        higConst.rc(row, 9));
+        reportPanel.add(buildUnitReport(Unit.HARDY_PIONEER),
+                        higConst.rc(row, 11));
+        row += 2;
+        reportPanel.add(buildUnitLabel(VETERAN_SOLDIER,          1f), //ImageLibrary.VETERAN_SOLDIER),
+                        higConst.rc(row, 1));
+        reportPanel.add(buildUnitReport(Unit.VETERAN_SOLDIER),
+                        higConst.rc(row, 3));
+        reportPanel.add(buildUnitLabel(SEASONED_SCOUT_NOT_MOUNTED, 1f), //ImageLibrary.SEASONED_SCOUT_NOT_MOUNTED),
+                        higConst.rc(row, 5));
+        reportPanel.add(buildUnitReport(Unit.SEASONED_SCOUT),
+                        higConst.rc(row, 7));
+        reportPanel.add(buildUnitLabel(JESUIT_MISSIONARY,        1f), //ImageLibrary.JESUIT_MISSIONARY),
+                        higConst.rc(row, 9));
+        reportPanel.add(buildUnitReport(Unit.JESUIT_MISSIONARY),
+                        higConst.rc(row, 11));
+        row += 2;
+        reportPanel.add(buildUnitLabel(ELDER_STATESMAN,          1f), //ImageLibrary.ELDER_STATESMAN),
+                        higConst.rc(row, 1));
+        reportPanel.add(buildUnitReport(Unit.ELDER_STATESMAN),
+                        higConst.rc(row, 3));
+        reportPanel.add(buildUnitLabel(FIREBRAND_PREACHER,       1f), //ImageLibrary.FIREBRAND_PREACHER),
+                        higConst.rc(row, 5));
+        reportPanel.add(buildUnitReport(Unit.FIREBRAND_PREACHER),
+                        higConst.rc(row, 7));
+
         reportPanel.doLayout();
     }
 
@@ -204,9 +296,9 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
      * @param unitIcon
      * @param scale
      */
-    private void buildLabourLabel(int unit, int unitIcon, float scale) {
-        JPanel panel = new JPanel();
-        panel.setOpaque(false);
+    private JLabel buildUnitLabel(int unitIcon, float scale) {
+        //JPanel panel = new JPanel();
+        //panel.setOpaque(false);
 
         JLabel imageLabel = null;
         if (unitIcon >= 0) {
@@ -220,11 +312,17 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
               icon = new ImageIcon(image);
             }
             imageLabel = new JLabel(icon);
-            panel.add(imageLabel);
+            //panel.add(imageLabel);
         }
+        return imageLabel;
+    }
+
+    private JPanel buildUnitReport(int unit) {
 
         JPanel textPanel = new JPanel();
         textPanel.setOpaque(false);
+
+        HIGConstraints higConst = new HIGConstraints();
 
         int[] widths = {0, 5, 0};
         int[] heights = null;
@@ -245,7 +343,6 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
         }
 
         textPanel.setLayout(new HIGLayout(widths, heights));
-        HIGConstraints higConst = new HIGConstraints();
 
         // summary
         int row = 1;
@@ -273,8 +370,6 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
                 row++;
             }
         }
-
-        panel.add(textPanel);
-        reportPanel.add(panel);
+        return textPanel;
     }
 }
