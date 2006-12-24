@@ -70,12 +70,12 @@ public class DefaultCostDecider implements CostDecider {
             } else if (mc - 2 <= movesLeft && getMovesLeft() != 0) {
                 // Normal move: Using -2 in order to make 1/3 and 2/3 move count as 3/3.
                 if (mc <= movesLeft) {
-                    if ((unit.isNaval() || unit.getType() == Unit.WAGON_TRAIN) &&
+                    /*if ((unit.isNaval() || unit.getType() == Unit.WAGON_TRAIN) &&
                             newTile.getSettlement() != null) {
                         // A ship or wagon entering in a colony
                         movesLeft = 0;
                         return ml;
-                    } else if (unit.isNaval() && oldTile.isLand() && oldTile.getSettlement() == null) {
+                    } else */if (unit.isNaval() && oldTile.isLand() && oldTile.getSettlement() == null) {
                         // Ship on land due to it was in a colony which was abandoned
                         movesLeft = 0;
                         return ml;

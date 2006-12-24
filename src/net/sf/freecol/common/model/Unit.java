@@ -729,8 +729,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
             return cost;
 
-        } else if ((isNaval() || getType() == WAGON_TRAIN) && target.getSettlement() != null) {            
-            return getMovesLeft();
+        /*} else if ((isNaval() || getType() == WAGON_TRAIN) && target.getSettlement() != null) {            
+            return getMovesLeft();*/
         } else if (isNaval() && getTile().isLand() && getTile().getSettlement() == null) {
             // Ship on land due to it was in a colony which was abandoned
             return getMovesLeft();
@@ -1170,11 +1170,15 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 }
 
                 unitContainer.addUnit((Unit) locatable);
+                if (getMovesLeft() < getInitialMovesLeft())
+                    setMovesLeft(0);
             } else if (locatable instanceof Goods) {
                 goodsContainer.addGoods((Goods) locatable);
                 if (getSpaceLeft() < 0) {
                     throw new IllegalStateException("Not enough space for the given locatable!");
                 }
+                if (getMovesLeft() < getInitialMovesLeft())
+                    setMovesLeft(0);
             } else {
                 logger.warning("Tried to add an unrecognized 'Locatable' to a unit.");
             }
@@ -1192,8 +1196,12 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         if (isCarrier()) {
             if (locatable instanceof Unit) {
                 unitContainer.removeUnit((Unit) locatable);
+                if (getMovesLeft() < getInitialMovesLeft())
+                    setMovesLeft(0);
             } else if (locatable instanceof Goods) {
                 goodsContainer.removeGoods((Goods) locatable);
+                if (getMovesLeft() < getInitialMovesLeft())
+                    setMovesLeft(0);
             } else {
                 logger.warning("Tried to remove an unrecognized 'Locatable' from a unit.");
             }
