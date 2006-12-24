@@ -1,12 +1,15 @@
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.BorderLayout;
+//import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionListener;
-import java.util.Enumeration;
+//import java.util.Enumeration;
+import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -16,6 +19,10 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
 
@@ -128,19 +135,32 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
         for (int index = 0; index < Unit.UNIT_COUNT; index++) {
             unitLocations[index] = new Hashtable();
         }
-        Iterator units = parent.getClient().getMyPlayer().getUnitIterator();
+        Player player = parent.getClient().getMyPlayer();
+        Iterator units = player.getUnitIterator();
         while (units.hasNext()) {
             Unit unit = (Unit) units.next();
             int type = unit.getType();
-            if (unit.getLocation() instanceof WorkLocation) {
-                String name = ((WorkLocation) unit.getLocation()).getColony().getName();
-                if (unitLocations[type].containsKey(name)) {
-                    int oldValue = ((Integer) unitLocations[type].get(name)).intValue();
-                    unitLocations[type].put(name, new Integer(oldValue + 1));
+            Location location = unit.getLocation();
+            String locationName = null;
+
+            if (location instanceof WorkLocation) {
+                locationName = ((WorkLocation) location).getColony().getName();
+            } else if (location instanceof Europe) {
+                locationName = player.getEurope().toString();
+            } else if (location instanceof Tile &&
+                       ((Tile) location).getSettlement() != null) {
+                locationName = ((Colony) ((Tile) location).getSettlement()).getName();
+            }
+
+            if (locationName != null) {
+                if (unitLocations[type].containsKey(locationName)) {
+                    int oldValue = ((Integer) unitLocations[type].get(locationName)).intValue();
+                    unitLocations[type].put(locationName, new Integer(oldValue + 1));
                 } else {
-                    unitLocations[type].put(name, new Integer(1));
+                    unitLocations[type].put(locationName, new Integer(1));
                 }
             }
+
             unitCount[unit.getType()]++;
         }
 
@@ -227,19 +247,29 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
 
         // summary
         int row = 1;
-        textPanel.add(new JLabel(Unit.getName(unit)),
-                      higConst.rc(row, colonyColumn));
-        textPanel.add(new JLabel(String.valueOf(unitCount[unit])),
-                      higConst.rc(row, countColumn));
+        JLabel unitLabel = new JLabel(Unit.getName(unit)); 
+        textPanel.add(unitLabel, higConst.rc(row, colonyColumn));
 
-        row = 3;
-        for (Enumeration e = unitLocations[unit].keys() ; e.hasMoreElements() ;) {
-            String name = (String) e.nextElement();
-            textPanel.add(new JLabel(name),
-                          higConst.rc(row, colonyColumn));
-            textPanel.add(new JLabel(unitLocations[unit].get(name).toString()),
+        if (keys == 0) {
+            unitLabel.setForeground(Color.GRAY);
+        } else {
+            textPanel.add(new JLabel(String.valueOf(unitCount[unit])),
                           higConst.rc(row, countColumn));
-            row++;
+
+            row = 3;
+            List keyList = Collections.list(unitLocations[unit].keys());
+            Collections.sort(keyList);
+            Iterator keyIterator = keyList.iterator();
+            while (keyIterator.hasNext()) {
+                String name = (String) keyIterator.next();
+                JLabel colonyLabel = new JLabel(name);
+                colonyLabel.setForeground(Color.GRAY);
+                textPanel.add(colonyLabel, higConst.rc(row, colonyColumn));
+                JLabel countLabel = new JLabel(unitLocations[unit].get(name).toString());
+                countLabel.setForeground(Color.GRAY);
+                textPanel.add(countLabel, higConst.rc(row, countColumn));
+                row++;
+            }
         }
 
         panel.add(textPanel);
