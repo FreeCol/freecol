@@ -209,7 +209,7 @@ public class Player extends FreeColGameObject {
     private Iterator nextGoingToUnitIterator = new UnitIterator(this, new GoingToPredicate());
 
     // Settlements this player owns
-    private List settlements = new ArrayList();
+    private List<Settlement> settlements = new ArrayList();
 
     // Temporary variables:
     protected boolean[][] canSeeTiles = null;
@@ -1535,6 +1535,15 @@ public class Player extends FreeColGameObject {
         } else {
             return settlements.iterator();
         }
+    }
+
+    /**
+     * Gets the number of settlements this player owns.
+     *
+     * @return The number of settlements this player owns.
+     */
+    public int getNumberOfSettlements() {
+        return settlements.size();
     }
 
 

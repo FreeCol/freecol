@@ -80,12 +80,8 @@ public final class ReportProductionPanel extends JPanel {
         // Display Panel
         removeAll();
 
-        Iterator colonyIterator = player.getColonyIterator();
-        ArrayList colonies = new ArrayList();
-        while (colonyIterator.hasNext()) {
-            colonies.add(colonyIterator.next());
-        }
-        int[] heights = new int[colonies.size() + extraRows];
+        int numberOfColonies = player.getNumberOfSettlements();
+        int[] heights = new int[numberOfColonies + extraRows];
         
         // labels
         heights[0] = 0;
@@ -141,7 +137,7 @@ public final class ReportProductionPanel extends JPanel {
         int solCount = 0;
         int toryCount = 0;
 
-        colonyIterator = colonies.iterator();
+        Iterator colonyIterator = player.getColonyIterator();
         while (colonyIterator.hasNext()) {
             Colony colony = (Colony) colonyIterator.next();
 
@@ -207,7 +203,7 @@ public final class ReportProductionPanel extends JPanel {
 
         row = 3;
         // summary
-        JLabel allColonies = new JLabel(Messages.message("report.allColonies"));
+        JLabel allColonies = new JLabel(Messages.message("report.allColonies", new String[][] {{"%number%", String.valueOf(numberOfColonies)}}));
         allColonies.setForeground(Color.BLUE);
         add(allColonies, higConst.rc(row, colonyColumn));
 
@@ -226,8 +222,8 @@ public final class ReportProductionPanel extends JPanel {
             add(new JLabel(String.valueOf(paperCount), JLabel.TRAILING),
                 higConst.rc(row, paperColumn));
             int percentage = 0;
-            if (colonies.size() > 0) {
-                percentage = percentageCount / colonies.size();
+            if (numberOfColonies > 0) {
+                percentage = percentageCount / numberOfColonies;
             }
             add(new JLabel(String.valueOf(percentage), JLabel.TRAILING),
                 higConst.rc(row, percentageColumn));
