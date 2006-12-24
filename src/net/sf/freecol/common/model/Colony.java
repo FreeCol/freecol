@@ -1482,8 +1482,7 @@ public final class Colony extends Settlement implements Location {
     
     /**
      * Disposes this <code>Colony</code>. All <code>WorkLocation</code>s
-     * owned by this <code>Colony</code> will also be destroyed, and
-     * <code>getTile().setSettlement(null)</code> will get called.
+     * owned by this <code>Colony</code> will also be destroyed.
      */
     public void dispose() {
         Iterator i = getWorkLocationIterator();

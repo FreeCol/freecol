@@ -6,6 +6,8 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import net.sf.freecol.common.model.Map.Position;
+
 import org.w3c.dom.Element;
 
 
@@ -18,6 +20,8 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
+    
+    public static final int RADIUS =1;
 
     /** The <code>Player</code> owning this <code>Settlement</code>. */
     protected Player owner;
@@ -230,15 +234,43 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
 
 
     public void dispose() {
-        getTile().setSettlement(null);
+        
+        int nation = owner.getNation();
+        
+        Tile settlementTile = getTile();
         
         Player temp = owner;
         owner = null;
+        
+        Map map = getGame().getMap();
+        Position position = settlementTile.getPosition();
+        Iterator circleIterator = map.getCircleIterator(position, true, getRadius());
+        
+        settlementTile.setNationOwner(Player.NO_NATION);
+        while (circleIterator.hasNext()) {
+            Tile tile = map.getTile((Position) circleIterator.next());
+            if (tile.getNationOwner() == nation) {
+                tile.setNationOwner(Player.NO_NATION);
+            }
+        }
+        
+        
+        settlementTile.setSettlement(null);
         temp.removeSettlement(this);
         temp.invalidateCanSeeTiles();
         
         goodsContainer.dispose();
         super.dispose();
+    }
+    
+    /**
+     * Gets the radius of what the <code>Settlement</code> considers
+     * as it's own land.
+     *
+     * @return Settlement radius
+     */
+    public int getRadius() {
+        return Settlement.RADIUS;
     }
 
 }
