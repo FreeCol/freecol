@@ -970,7 +970,9 @@ public final class InGameController implements NetworkConstants {
             canvas.showEventDialog(EventPanel.FIRST_LANDING);
         }
 
-        if (unit.getTile().getSettlement() != null && unit.isCarrier()) {
+        if (unit.getTile().getSettlement() != null && unit.isCarrier() &&
+                (unit.getDestination() == null ||
+                unit.getDestination().getTile() == unit.getTile())) {
             canvas.showColonyPanel((Colony) unit.getTile().getSettlement());
         } else if (unit.getMovesLeft() > 0 && !unit.isDisposed()) {
             gui.setActiveUnit(unit);
