@@ -566,7 +566,8 @@ public final class Canvas extends JLayeredPane {
                 }
             } else {
                 remove(confirmDialog);
-                freeColClient.getInGameController().nextModelMessage();
+                if (!getColonyPanel().isShowing() && !getEuropePanel().isShowing())
+                    freeColClient.getInGameController().nextModelMessage();
             }
         } else {
             FreeColDialog informationDialog = FreeColDialog.createInformationDialog(messageText, messageIcon);
@@ -576,7 +577,8 @@ public final class Canvas extends JLayeredPane {
             informationDialog.getResponse();
             remove(informationDialog);
 
-            freeColClient.getInGameController().nextModelMessage();
+            if (!getColonyPanel().isShowing() && !getEuropePanel().isShowing())
+                freeColClient.getInGameController().nextModelMessage();
         }
     }
 

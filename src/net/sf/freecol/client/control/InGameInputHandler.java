@@ -708,7 +708,8 @@ public final class InGameInputHandler extends InputHandler {
                 }                
                 player.getEurope().add(newUnit);
             }
-            if (action == Monarch.ADD_UNITS || !canvas.showMonarchPanel(action, null)) {
+            if (!canvas.getColonyPanel().isShowing() && (action == Monarch.ADD_UNITS ||
+                    !canvas.showMonarchPanel(action, null))) {
                 canvas.showEuropePanel();
             }
             break;
