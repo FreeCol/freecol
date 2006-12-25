@@ -2232,7 +2232,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         
         switch (getState()) {
             case Unit.ACTIVE:
-                occupationString = "-";
+                occupationString = getMovesLeft() > 0 ? "-" : "0";
                 break;
             case Unit.FORTIFIED:
                 occupationString = "F";
