@@ -4,6 +4,8 @@ package net.sf.freecol.common.model;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.MissingResourceException;
@@ -372,6 +374,12 @@ public class Player extends FreeColGameObject {
                 s.setOwner(this);
             }
         }
+        // sort by ID, which should indicate order of establishment
+        Collections.sort(settlements, new Comparator<Settlement>() {
+            public int compare(Settlement s1, Settlement s2) {
+                return s1.getID().compareTo(s2.getID());
+            }
+        });
     }
     
     /**
