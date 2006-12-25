@@ -70,19 +70,14 @@ public final class ReportContinentalCongressPanel extends ReportPanel implements
         HIGConstraints higConst = new HIGConstraints();
 
         // summary
-        /*
-        summaryPanel.add(new JLabel(Messages.message("sonsOfLiberty")),
-                         higConst.rc(1, 1));
-        summaryPanel.add(new JLabel(String.valueOf(player.getSoL() + "%")),
-                         higConst.rc(1, 3));
-        */
         summaryPanel.add(new JLabel(Messages.message("report.continentalCongress.recruiting")),
                          higConst.rc(1, 1));
         if (player.getCurrentFather() == FoundingFather.NONE) {
             summaryPanel.add(new JLabel(none), higConst.rc(1, 3));
         } else {
-            summaryPanel.add(new JLabel(Messages.message(FoundingFather.getName(player.getCurrentFather()))),
-                             higConst.rc(1, 3));
+            JLabel currentFatherLabel = new JLabel(Messages.message(FoundingFather.getName(player.getCurrentFather())));
+            currentFatherLabel.setToolTipText(Messages.message(FoundingFather.getDescription(player.getCurrentFather())));
+            summaryPanel.add(currentFatherLabel, higConst.rc(1, 3));
         }
         summaryPanel.add(new JLabel(Messages.message("report.continentalCongress.bellsCurrent")),
                          higConst.rc(2, 1));
@@ -112,6 +107,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel implements
             for (int fatherId = 0; fatherId < FoundingFather.FATHER_COUNT; fatherId++) {
                 if (player.hasFather(fatherId)) {
                     JLabel fatherLabel = new JLabel(Messages.message(FoundingFather.getName(fatherId)));
+                    fatherLabel.setToolTipText(Messages.message(FoundingFather.getDescription(fatherId)));
                     fatherLabel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
                     fatherPanel.add(fatherLabel);
                 }
