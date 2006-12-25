@@ -10,6 +10,7 @@ import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.OptionMap;
+import net.sf.freecol.common.option.SelectOption;
 
 import org.w3c.dom.Element;
 
@@ -142,9 +143,19 @@ public class GameOptions extends OptionMap {
         /* Difficulty settings */
         OptionGroup difficultySettings = new OptionGroup("gameOptions.difficultySettings.name",
                                                          "gameOptions.difficultySettings.shortDescription");
+        /*
         difficultySettings.add(new IntegerOption(DIFFICULTY, "gameOptions.difficulty.name",
                                                  "gameOptions.difficulty.shortDescription",
                                                  0, 4, 2));
+        */
+        difficultySettings.add(new SelectOption(DIFFICULTY, "gameOptions.difficulty.name",
+                                                "gameOptions.difficulty.shortDescription",
+                                                new String[] {"gameOptions.difficulty.veryEasy", 
+                                                              "gameOptions.difficulty.easy", 
+                                                              "gameOptions.difficulty.normal", 
+                                                              "gameOptions.difficulty.hard", 
+                                                              "gameOptions.difficulty.veryHard"}, 
+                                                2));
         add(difficultySettings);
     }
 
