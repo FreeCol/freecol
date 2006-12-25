@@ -369,14 +369,16 @@ public final class InGameController extends Controller {
                     switch (action) {
                     case Monarch.RAISE_TAX:
                         int newTax = monarch.getNewTax();
-                        Goods goods = nextPlayer.getMostValuableGoods();
                         if (newTax > 100) {
                             logger.warning("Tax rate exceeds 100 percent.");
                             return;
                         }
+                        Goods goods = nextPlayer.getMostValuableGoods();
+                        if (goods == null) {
+                            return;
+                        }
                         monarchActionElement.setAttribute("amount", String.valueOf(newTax));
-                        if  (goods != null)
-                            monarchActionElement.setAttribute("goods", goods.getName());
+                        monarchActionElement.setAttribute("goods", goods.getName());
                         try {
                             Element reply = nextPlayer.getConnection().ask(monarchActionElement);
                             boolean accepted = Boolean.valueOf(reply.getAttribute("accepted")).booleanValue();
