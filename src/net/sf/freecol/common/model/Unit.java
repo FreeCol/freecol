@@ -2677,7 +2677,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                                     }
                                 }
                             }
-                            getTile().setForested(false);                                                        
+                            getTile().setForested(false);
+                            // TODO: check map generator options
+                            if (getGame().getModelController().getRandom(getID() + "doAssignedWork:plow", 10) == 0) {
+                                getTile().setBonus(true);
+                            }
                         } else {
                             getTile().setPlowed(true);
                         }
