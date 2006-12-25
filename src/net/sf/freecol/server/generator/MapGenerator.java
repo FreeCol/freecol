@@ -111,11 +111,11 @@ public class MapGenerator {
      */
     public void createMountains(Map map) {
         int maximumLength = Math.max(getMapGeneratorOptions().getWidth(), getMapGeneratorOptions().getHeight()) / 10;
-        int number = getMapGeneratorOptions().getNumberOfMountains();
+        int number = getMapGeneratorOptions().getNumberOfMountainTiles();
         int counter = 0;
         logger.fine("Maximum length of mountain ranges is " + maximumLength);
 
-        for (int i = 0; i < number; i++) {
+        while (counter < number) {
             for (int tries = 0; tries < 100; tries++) {
                 Position p = getRandomLandPosition(map);
                 if (map.getTile(p).isLand()) {
@@ -128,6 +128,7 @@ public class MapGenerator {
                         Tile t = map.getTile(p);
                         if (t != null && t.isLand()) {
                             t.setAddition(Tile.ADD_MOUNTAINS);
+                            counter++;
                             Iterator it = map.getCircleIterator(p, false, 1);
                             while (it.hasNext()) {
                                 t = map.getTile((Position) it.next());
@@ -136,6 +137,7 @@ public class MapGenerator {
                                     int r = random.nextInt(8);
                                     if (r == 0) {
                                         t.setAddition(Tile.ADD_MOUNTAINS);
+                                        counter++;
                                     } else if (r > 2) {
                                         t.setAddition(Tile.ADD_HILLS);
                                     }
@@ -146,10 +148,11 @@ public class MapGenerator {
                             }
                         }
                     }
-                    break;
+                    // break;
                 }
             }
         }
+        logger.info("Added " + counter + " mountain tiles.");
     }   
 
 

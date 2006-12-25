@@ -361,22 +361,22 @@ public class MapGeneratorOptions extends OptionMap {
     }
 
     /**
-     * Gets the number of mountains on the map to be created.
-     * @return The number of mountains..
+     * Gets the number of mountain tiles on the map to be created.
+     * @return The number of mountain tiles.
      */
-    public int getNumberOfMountains() {
+    public int getNumberOfMountainTiles() {
         final int number = getInteger(MOUNTAIN_NUMBER);
         switch (number) {
         case MOUNTAIN_NUMBER_SMALL:
-            return getLand() / 50;
-        case MOUNTAIN_NUMBER_MEDIUM:
-            return getLand() / 35;
-        case MOUNTAIN_NUMBER_LARGE:
-            return getLand() / 30;
-        case MOUNTAIN_NUMBER_VERY_LARGE:
-            return getLand() / 25;
-        case MOUNTAIN_NUMBER_HUGE:
             return getLand() / 20;
+        case MOUNTAIN_NUMBER_MEDIUM:
+            return getLand() / 10;
+        case MOUNTAIN_NUMBER_LARGE:
+            return getLand() / 9;
+        case MOUNTAIN_NUMBER_VERY_LARGE:
+            return getLand() / 8;
+        case MOUNTAIN_NUMBER_HUGE:
+            return getLand() / 7;
         default:
             throw new IllegalStateException("Invalid mountain number: " + number + ".");
         }
