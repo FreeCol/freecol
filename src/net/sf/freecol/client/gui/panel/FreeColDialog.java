@@ -120,8 +120,8 @@ public class FreeColDialog extends FreeColPanel {
                     if (event instanceof MouseEvent) {
                         MouseEvent me = (MouseEvent) event;
                         Component dc = SwingUtilities.getDeepestComponentAt(((ComponentEvent) event).getComponent(), me.getX(), me.getY());
-                        // Don't block MOUSE_RELEASED events out of the dialog, or the text stays selected forever
-                        if (event.getID() != MouseEvent.MOUSE_RELEASED &&
+                        // Block only MOUSE_CLICKED and MOUSE_PRESSED
+                        if ((event.getID() == MouseEvent.MOUSE_CLICKED || event.getID() == MouseEvent.MOUSE_PRESSED) &&
                         		(dc == null || !SwingUtilities.isDescendingFrom(dc, this) || dc.getListeners(MouseListener.class).length == 0)) {
                             continue;
                         }

@@ -84,7 +84,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
      */
     public void unregister() {
         for (int i=0; i<optionUpdaters.length; i++) {
-            optionUpdaters[i].updateOption();
+            optionUpdaters[i].unregister();
         }    
     }
     
