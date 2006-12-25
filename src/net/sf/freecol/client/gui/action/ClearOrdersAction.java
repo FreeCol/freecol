@@ -21,15 +21,15 @@ public class ClearOrdersAction extends MapboardAction {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    public static final String ID = "clearOrdersAction";
+    public static final String ID = ClearOrdersAction.class.toString();
 
 
     /**
-     * Creates a new <code>ClearOrdersAction</code>.
+     * Creates this action.
      * @param freeColClient The main controller object for the client.
      */
     ClearOrdersAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.orders.clearOrders", null, KeyEvent.VK_L, KeyStroke.getKeyStroke('L', 0));
+        super(freeColClient, "menuBar.orders.clearOrders", null, KeyStroke.getKeyStroke('L', 0));
     }
     
 
@@ -45,7 +45,7 @@ public class ClearOrdersAction extends MapboardAction {
     
     /**
     * Returns the id of this <code>Option</code>.
-    * @return "clearOrdersAction"
+    * @return 
     */
     public String getId() {
         return ID;

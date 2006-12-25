@@ -23,6 +23,7 @@ public final class ReportReligiousPanel extends ReportPanel implements ActionLis
 
 
     private final ReportProductionPanel religiousReportPanel;
+
     private Canvas parent;
 
     /**

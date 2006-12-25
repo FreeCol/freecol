@@ -21,15 +21,14 @@ public class EuropeAction extends MapboardAction {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    public static final String ID = "europeAction";
-
+    public static final String ID = EuropeAction.class.toString();
 
     /**
      * Creates a new <code>EuropeAction</code>.
      * @param freeColClient The main controller object for the client.
      */
     EuropeAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.view.europe", null, KeyEvent.VK_E, KeyStroke.getKeyStroke('E', 0));
+        super(freeColClient, "menuBar.view.europe", null, KeyStroke.getKeyStroke('E', 0));
     }
     
 

@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -31,15 +32,15 @@ public class ChangeAction extends MapboardAction {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    public static final String ID = "changeAction";
+    public static final String ID = ChangeAction.class.toString();
 
 
     /**
-     * Creates a new <code>ChangeAction</code>.
+     * Creates this action.
      * @param freeColClient The main controller object for the client.
      */
     ChangeAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.orders.nextUnitOnTile", null, KeyEvent.VK_E, KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0));
+        super(freeColClient, "menuBar.orders.nextUnitOnTile", null, KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0));
     }
     
     
@@ -51,6 +52,8 @@ public class ChangeAction extends MapboardAction {
     public void update() {
         super.update();
         
+        GUI gui = getFreeColClient().getGUI();
+        if (gui != null) {
         if (getFreeColClient().getGUI().getActiveUnit() != null) {
             Unit unit = getFreeColClient().getGUI().getActiveUnit();
             if (unit.getTile() != null) {
@@ -64,6 +67,7 @@ public class ChangeAction extends MapboardAction {
                 }
             }
         }
+        }
     }
     
     /**
@@ -75,6 +79,9 @@ public class ChangeAction extends MapboardAction {
         if (!super.shouldBeEnabled()) {
             return false;
         }        
+        GUI gui = getFreeColClient().getGUI();
+        if (gui == null) return false;
+        
         Unit unit = getFreeColClient().getGUI().getActiveUnit();
         if (unit == null) {
             return false;
@@ -85,7 +92,7 @@ public class ChangeAction extends MapboardAction {
     
     /**
     * Returns the id of this <code>Option</code>.
-    * @return "changeAction"
+    * @return 
     */
     public String getId() {
         return ID;

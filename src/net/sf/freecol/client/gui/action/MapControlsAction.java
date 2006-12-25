@@ -20,26 +20,25 @@ import net.sf.freecol.common.model.Player;
 * An action for displaying the map controls.
 * @see MapControls
 */
-public class MapControlsAction extends MapboardAction {
+public class MapControlsAction extends SelectableAction {
     private static final Logger logger = Logger.getLogger(MapControlsAction.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    public static final String ID = "mapControlsAction";
+    public static final String ID = MapControlsAction.class.toString();
 
     private MapControls mapControls;
-    private boolean selected = true;
-
-
 
     /**
-     * Creates a new <code>MapControlsAction</code>.
+     * Creates this action.
      * @param freeColClient The main controller object for the client.
      */
     MapControlsAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.view.mapControls", null, KeyEvent.VK_M, KeyStroke.getKeyStroke('M', InputEvent.CTRL_MASK));
+    	super(freeColClient, "menuBar.view.mapControls", null, KeyStroke.getKeyStroke('M', InputEvent.CTRL_MASK));
+    	
+    	setSelected(true);
     }
 
     /**
@@ -49,17 +48,12 @@ public class MapControlsAction extends MapboardAction {
     public void update() {
         super.update();
         
-        final Game game = getFreeColClient().getGame();
-        final Player p = getFreeColClient().getMyPlayer();
-        if (game != null && p != null && game.getModelMessageIterator(p).hasNext()) {
-            enabled = false;
-        }
-        showMapControls(enabled && selected);
+        showMapControls(enabled && isSelected());
     }
 
     /**
     * Returns the id of this <code>Option</code>.
-    * @return "mapControlsAction"
+    * @return 
     */
     public String getId() {
         return ID;
@@ -83,16 +77,6 @@ public class MapControlsAction extends MapboardAction {
         selected = ((AbstractButton) e.getSource()).isSelected();
         showMapControls(selected);
     }
-
-
-    /**
-     * Checks if the map controls is selcted.
-     * @return <code>true</code> if the map controls is selected.
-     */
-    public boolean isSelected() {
-        return selected;
-    }
-
 
     private void showMapControls(boolean value) {
         if (value && getFreeColClient().getGUI().isInGame()) {

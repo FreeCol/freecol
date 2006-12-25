@@ -21,7 +21,7 @@ public class ExecuteGotoOrdersAction extends MapboardAction {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    public static final String ID = "executeGotoOrdersAction";
+    public static final String ID = ExecuteGotoOrdersAction.class.toString();
 
 
     /**
@@ -29,10 +29,8 @@ public class ExecuteGotoOrdersAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     ExecuteGotoOrdersAction(FreeColClient freeColClient) {
-        super(freeColClient, "executeGotoOrders", null, KeyEvent.VK_O, KeyStroke.getKeyStroke('O', 0));
+        super(freeColClient, "executeGotoOrders", null, KeyStroke.getKeyStroke('O', 0));
     }
-
-    
     
     /**
     * Returns the id of this <code>Option</code>.
@@ -41,7 +39,6 @@ public class ExecuteGotoOrdersAction extends MapboardAction {
     public String getId() {
         return ID;
     }
-
 
     /**
      * Applies this action.

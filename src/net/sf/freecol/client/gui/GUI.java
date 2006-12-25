@@ -139,11 +139,11 @@ public final class GUI {
     private ArrayList enemyUnitsOnTop = new ArrayList();
     
     // Debug variables:
-    boolean displayCoordinates = false;
-    boolean displayColonyValue = false;
-    Player displayColonyValuePlayer = null;
-    boolean debugShowMission = false;
-    boolean debugShowMissionInfo = false;
+    public boolean displayCoordinates = false;
+    public boolean displayColonyValue = false;
+    public Player displayColonyValuePlayer = null;
+    public boolean debugShowMission = false;
+    public boolean debugShowMissionInfo = false;
 
 
     /**

@@ -3,15 +3,15 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
 import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.Unit;
 
 
 /**
@@ -24,21 +24,19 @@ public class UnloadAction extends MapboardAction {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    public static final String ID = "unloadAction";
-
+    public static final String ID = UnloadAction.class.toString();
 
     /**
-     * Creates a new <code>UnloadAction</code>.
+     * Creates this action.
      * @param freeColClient The main controller object for the client.
      */
     UnloadAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.orders.unload", null, KeyEvent.VK_U, KeyStroke.getKeyStroke('U', 0));
+        super(freeColClient, "menuBar.orders.unload", null, KeyStroke.getKeyStroke('U', 0));
     }
-    
 
     /**
     * Returns the id of this <code>Option</code>.
-    * @return "unloadAction"
+    * @return 
     */
     public String getId() {
         return ID;
@@ -50,7 +48,10 @@ public class UnloadAction extends MapboardAction {
      * @return <code>true</code> if the player has access to Europe.
      */
     protected boolean shouldBeEnabled() { 
-        Unit unit = getFreeColClient().getGUI().getActiveUnit();
+        GUI gui = getFreeColClient().getGUI();
+        if (gui == null) return false;
+   	
+    	Unit unit = getFreeColClient().getGUI().getActiveUnit();
         return (unit != null && unit.isCarrier());
     }    
     

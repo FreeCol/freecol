@@ -22,7 +22,7 @@ public class DisbandUnitAction extends MapboardAction {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    public static final String ID = "disbandUnitAction";
+    public static final String ID = DisbandUnitAction.class.toString();
 
 
     /**
@@ -30,7 +30,7 @@ public class DisbandUnitAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     DisbandUnitAction(FreeColClient freeColClient) {
-        super(freeColClient, "unit.state.8", null, KeyEvent.VK_D, KeyStroke.getKeyStroke('D', 0));
+        super(freeColClient, "unit.state.8", null, KeyStroke.getKeyStroke('D', 0));
         putValue(BUTTON_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_DISBAND, 0));
         putValue(BUTTON_ROLLOVER_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_DISBAND, 1));
         putValue(BUTTON_PRESSED_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_DISBAND, 2));

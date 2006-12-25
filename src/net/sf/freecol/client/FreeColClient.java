@@ -29,6 +29,7 @@ import net.sf.freecol.client.control.InGameInputHandler;
 import net.sf.freecol.client.control.PreGameController;
 import net.sf.freecol.client.control.PreGameInputHandler;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.FreeColMenuBar;
 import net.sf.freecol.client.gui.FullScreenFrame;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
@@ -110,7 +111,45 @@ public final class FreeColClient {
     */
     private boolean loggedIn = false;
 
+    public FreeColClient(boolean windowed, Rectangle windowSize, ImageLibrary imageLibrary, MusicLibrary musicLibrary, SfxLibrary sfxLibrary, boolean startThreads) {
+    	this.windowed = windowed;
+        this.imageLibrary = imageLibrary;
+        this.musicLibrary = musicLibrary;
+        this.sfxLibrary = sfxLibrary;
 
+        actionManager = new ActionManager(this);
+
+        // Control:
+        connectController = new ConnectController(this);
+        preGameController = new PreGameController(this);
+        preGameInputHandler = new PreGameInputHandler(this);
+        inGameController = new InGameController(this);
+        inGameInputHandler = new InGameInputHandler(this);
+        modelController = new ClientModelController(this);
+
+        if (startThreads) {
+	        // Gui:
+	        final Rectangle theWindowSize = windowSize;
+	        SwingUtilities.invokeLater(new Runnable() {
+	            public void run() {
+	                startGUI(theWindowSize);
+	            }
+	        });
+	
+	        worker = new Worker();
+	        new Thread("worker") {
+	            public void run() {
+	                worker.run();
+	            }
+	        }.start();
+	        
+	        createFreeColDirs();
+	        loadClientOptions();
+        }
+        else
+        	worker = null;
+
+    }
 
 
     /**
@@ -126,38 +165,7 @@ public final class FreeColClient {
     * @param sfxLibrary The object holding the sound effects.
     */
     public FreeColClient(boolean windowed, Rectangle windowSize, ImageLibrary imageLibrary, MusicLibrary musicLibrary, SfxLibrary sfxLibrary) {
-        this.windowed = windowed;
-        this.imageLibrary = imageLibrary;
-        this.musicLibrary = musicLibrary;
-        this.sfxLibrary = sfxLibrary;
-
-        actionManager = new ActionManager(this);
-
-        // Control:
-        connectController = new ConnectController(this);
-        preGameController = new PreGameController(this);
-        preGameInputHandler = new PreGameInputHandler(this);
-        inGameController = new InGameController(this);
-        inGameInputHandler = new InGameInputHandler(this);
-        modelController = new ClientModelController(this);
-
-        // Gui:
-        final Rectangle theWindowSize = windowSize;
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                startGUI(theWindowSize);
-            }
-        });
-
-        worker = new Worker();
-        new Thread("worker") {
-            public void run() {
-                worker.run();
-            }
-        }.start();
-
-        createFreeColDirs();
-        loadClientOptions();
+    	this(windowed, windowSize, imageLibrary, musicLibrary, sfxLibrary, true);
     }
 
 

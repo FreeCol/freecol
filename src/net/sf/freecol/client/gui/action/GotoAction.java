@@ -24,18 +24,16 @@ public class GotoAction extends MapboardAction {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    public static final String ID = "gotoAction";
-
+    public static final String ID = GotoAction.class.toString();
 
     /**
-     * Creates a new <code>GotoAction</code>.
+     * Creates this action.
      * @param freeColClient The main controller object for the client.
      */
     GotoAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.orders.goto", null, KeyEvent.VK_G, KeyStroke.getKeyStroke('G', 0));
+        super(freeColClient, "menuBar.orders.goto", null, KeyStroke.getKeyStroke('G', 0));
     }
     
-
     /**
      * Checks if this action should be enabled.
      * 
@@ -49,7 +47,7 @@ public class GotoAction extends MapboardAction {
     
     /**
     * Returns the id of this <code>Option</code>.
-    * @return "europeAction"
+    * @return 
     */
     public String getId() {
         return ID;

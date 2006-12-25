@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Tile;
@@ -26,17 +27,17 @@ public class PlowAction extends MapboardAction {
     public static final String  REVISION = "$Revision$";
 
     
-    public static final String ID = "plowAction";
+    public static final String ID = PlowAction.class.toString();
     
     private boolean plow;
 
 
     /**
-     * Creates a new <code>PlowAction</code>.
+     * Creates this action.
      * @param freeColClient The main controller object for the client.
      */
     PlowAction(FreeColClient freeColClient) {
-        super(freeColClient, "unit.state.5", null, KeyEvent.VK_P, KeyStroke.getKeyStroke('P', 0));
+        super(freeColClient, "unit.state.5", null, KeyStroke.getKeyStroke('P', 0));
         
         plow = false;
         updateValues(true);
@@ -79,6 +80,8 @@ public class PlowAction extends MapboardAction {
     public void update() {
         super.update();
         
+        GUI gui = getFreeColClient().getGUI();
+        if (gui != null) {
         Unit selectedOne = getFreeColClient().getGUI().getActiveUnit();
         if (enabled && selectedOne != null && selectedOne.getTile() != null) {
             Tile tile = selectedOne.getTile();
@@ -89,7 +92,8 @@ public class PlowAction extends MapboardAction {
             }
         } else {
             updateValues(true);
-        }        
+        }
+        }
     }    
 
     /**
@@ -103,6 +107,9 @@ public class PlowAction extends MapboardAction {
             return false;
         }        
 
+        GUI gui = getFreeColClient().getGUI();
+        if (gui == null) return false;
+
         Unit selectedOne = getFreeColClient().getGUI().getActiveUnit();
         return selectedOne != null 
                 && selectedOne.getTile() != null 
@@ -113,7 +120,7 @@ public class PlowAction extends MapboardAction {
     
     /**
      * Returns the id of this <code>Option</code>.
-     * @return "plowAction"
+     * @return 
      */
     public String getId() {
         return ID;

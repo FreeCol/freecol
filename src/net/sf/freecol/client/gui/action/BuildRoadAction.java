@@ -3,7 +3,6 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.util.logging.Logger;
 
 import javax.swing.KeyStroke;
@@ -24,14 +23,14 @@ public class BuildRoadAction extends MapboardAction {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    public static final String ID = "buildRoadAction";
+    public static final String ID = BuildRoadAction.class.toString();
 
     /**
-     * Creates a new <code>BuildRoadAction</code>.
+     * Creates this action.
      * @param freeColClient The main controller object for the client.
      */
     BuildRoadAction(FreeColClient freeColClient) {
-        super(freeColClient, "unit.state.6", null, KeyEvent.VK_R, KeyStroke.getKeyStroke('R', 0));
+        super(freeColClient, "unit.state.6", null, KeyStroke.getKeyStroke('R', 0));
         putValue(BUTTON_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_ROAD, 0));
         putValue(BUTTON_ROLLOVER_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_ROAD, 1));
         putValue(BUTTON_PRESSED_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_ROAD, 2));
@@ -62,7 +61,7 @@ public class BuildRoadAction extends MapboardAction {
     
     /**
     * Returns the id of this <code>Option</code>.
-    * @return "buildRoadAction"
+    * @return 
     */
     public String getId() {
         return ID;

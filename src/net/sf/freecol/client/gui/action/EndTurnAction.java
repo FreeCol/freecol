@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.i18n.Messages;
 
 
 /**
@@ -22,7 +23,7 @@ public class EndTurnAction extends MapboardAction {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    public static final String ID = "endTurnAction";
+    public static final String ID = EndTurnAction.class.toString();
 
 
     /**
@@ -30,7 +31,7 @@ public class EndTurnAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     EndTurnAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.game.endTurn", null, KeyEvent.VK_E, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
+    	super(freeColClient, "menuBar.game.endTurn", null, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
     }
 
 
@@ -41,7 +42,6 @@ public class EndTurnAction extends MapboardAction {
     public String getId() {
         return ID;
     }
-
 
     /**
      * Applies this action.

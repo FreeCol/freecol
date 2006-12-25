@@ -2,6 +2,7 @@
 
 package net.sf.freecol.client.gui.action;
 
+import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
@@ -13,7 +14,10 @@ import java.lang.reflect.Modifier;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.KeyStroke;
+import javax.swing.event.MenuKeyEvent;
+import javax.swing.event.MenuKeyListener;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -51,9 +55,11 @@ public abstract class FreeColAction extends AbstractAction implements Option {
     public static final String BUTTON_IMAGE = "BUTTON_IMAGE";
     public static final String BUTTON_ROLLOVER_IMAGE = "BUTTON_ROLLOVER_IMAGE";
     public static final String BUTTON_PRESSED_IMAGE = "BUTTON_PRESSED_IMAGE";
-    public static final String BUTTON_DISABLED_IMAGE = "BUTTON_DISABLED_IMAGE";    
+    public static final String BUTTON_DISABLED_IMAGE = "BUTTON_DISABLED_IMAGE";
     
-    private final FreeColClient freeColClient;
+    public static final Integer NO_MNEMONIC = null;
+    
+    protected final FreeColClient freeColClient;
 
     /**
      * Creates a new <code>FreeColAction</code>.
@@ -70,17 +76,45 @@ public abstract class FreeColAction extends AbstractAction implements Option {
      *      selecting this action or <code>null</code> if this action
      *      does not have an accelerator.
      */
-    protected FreeColAction(FreeColClient freeColClient, String name, 
-            String shortDescription, int mnemonic, KeyStroke accelerator) {
+    protected FreeColAction(FreeColClient freeColClient, String name, String shortDescription) {
+    	super(Messages.message(name));
+    	
+    	this.freeColClient = freeColClient;
+
+        putValue(SHORT_DESCRIPTION, shortDescription);
+    }
+    
+    protected FreeColAction(FreeColClient freeColClient, String name, String shortDescription, int mnemonic) {
         super(Messages.message(name));
 
         this.freeColClient = freeColClient;
 
         putValue(SHORT_DESCRIPTION, shortDescription);
-        putValue(MNEMONIC_KEY, new Integer(mnemonic));
-        putValue(ACCELERATOR_KEY, accelerator);
+       	putValue(MNEMONIC_KEY, new Integer(mnemonic));
     }
 
+    protected FreeColAction(FreeColClient freeColClient, String name, String shortDescription, KeyStroke accelerator) {
+        super(Messages.message(name));
+
+        this.freeColClient = freeColClient;
+
+        putValue(SHORT_DESCRIPTION, shortDescription);
+       	putValue(ACCELERATOR_KEY, accelerator);
+    }
+    
+    protected FreeColAction(FreeColClient freeColClient, String name, String shortDescription, int mnemonic, KeyStroke accelerator) {
+        super(Messages.message(name));
+
+        this.freeColClient = freeColClient;
+
+        putValue(SHORT_DESCRIPTION, shortDescription);
+       	putValue(MNEMONIC_KEY, new Integer(mnemonic));
+       	putValue(ACCELERATOR_KEY, accelerator);
+    }
+    
+    public Integer getMnemonic() {
+    	return (Integer)getValue(MNEMONIC_KEY);
+    }
     
     /**
      * Gets the main controller object for the client.
@@ -121,7 +155,6 @@ public abstract class FreeColAction extends AbstractAction implements Option {
      *        is the same as disabling the keyboard accelerator.
      */
     public void setAccelerator(KeyStroke accelerator) {
-        //KeyStroke oldValue = (KeyStroke) getValue(ACCELERATOR_KEY);
         putValue(ACCELERATOR_KEY, accelerator);
     }
     
@@ -364,5 +397,44 @@ public abstract class FreeColAction extends AbstractAction implements Option {
             logger.warning(e.toString());
             throw new IllegalStateException("XMLStreamException");
         }
+    }
+    
+    public MenuKeyListener getMenuKeyListener() {
+    	return new InnerMenuKeyListener();
+    }
+
+    /**
+     * A class used by Actions which have a mnemonic. Those Actions should assign this
+     * listener to the JMenuItem they are a part of. This captures the mnemonic key press
+     * and keeps other menus from processing keys meant for other actions.
+     * 
+     * @author johnathanj
+     */
+    public class InnerMenuKeyListener implements MenuKeyListener {
+
+		int mnemonic;
+		
+		public InnerMenuKeyListener() {
+			mnemonic = ((Integer)getValue(MNEMONIC_KEY)).intValue();
+		}
+    	
+    	public void menuKeyPressed(MenuKeyEvent e) {
+			
+			if (e.getKeyCode() == mnemonic) {
+				ActionEvent ae = new ActionEvent(e.getSource(), e.getID(), (String)getValue(Action.NAME), e.getModifiers());
+				actionPerformed(ae);
+				
+				e.consume();
+			}
+		}
+
+		public void menuKeyReleased(MenuKeyEvent e) {
+			// do nothing
+		}
+
+		public void menuKeyTyped(MenuKeyEvent e) {
+			// do nothing
+		}
+    	
     }
 }

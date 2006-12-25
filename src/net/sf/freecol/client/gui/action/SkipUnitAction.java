@@ -22,16 +22,14 @@ public class SkipUnitAction extends MapboardAction {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    public static final String ID = "skipUnitAction";
-
-
+    public static final String ID = SkipUnitAction.class.toString();
 
     /**
-     * Creates a new <code>SkipUnitAction</code>.
+     * Creates this action.
      * @param freeColClient The main controller object for the client.
      */
     SkipUnitAction(FreeColClient freeColClient) {
-        super(freeColClient, "unit.state.1", null, KeyEvent.VK_S, KeyStroke.getKeyStroke(' ', 0));
+        super(freeColClient, "unit.state.1", null, KeyStroke.getKeyStroke(' ', 0));
         putValue(BUTTON_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_DONE, 0));
         putValue(BUTTON_ROLLOVER_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_DONE, 1));
         putValue(BUTTON_PRESSED_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_DONE, 2));
@@ -51,7 +49,7 @@ public class SkipUnitAction extends MapboardAction {
     
     /**
     * Returns the id of this <code>Option</code>.
-    * @return "skipUnitAction"
+    * @return 
     */
     public String getId() {
         return ID;

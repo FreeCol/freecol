@@ -167,7 +167,7 @@ public final class InGameController implements NetworkConstants {
     */
     public void setInDebugMode(boolean debug) {
         FreeCol.setInDebugMode(debug);
-        freeColClient.getCanvas().setJMenuBar(new FreeColMenuBar(freeColClient, freeColClient.getCanvas(), freeColClient.getGUI()));
+        freeColClient.getCanvas().setJMenuBar(new FreeColMenuBar(freeColClient));
         freeColClient.getCanvas().updateJMenuBar();
     }
 
@@ -970,9 +970,7 @@ public final class InGameController implements NetworkConstants {
             canvas.showEventDialog(EventPanel.FIRST_LANDING);
         }
 
-        if (unit.getTile().getSettlement() != null && unit.isCarrier() &&
-                (unit.getDestination() == null ||
-                unit.getDestination().getTile() == unit.getTile())) {
+        if (unit.getTile().getSettlement() != null && unit.isCarrier()) {
             canvas.showColonyPanel((Colony) unit.getTile().getSettlement());
         } else if (unit.getMovesLeft() > 0 && !unit.isDisposed()) {
             gui.setActiveUnit(unit);

@@ -23,22 +23,19 @@ public class BuildColonyAction extends MapboardAction {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    public static final String ID = "buildColonyAction";
-
+    public static final String ID = BuildColonyAction.class.toString();
 
     /**
-     * Creates a new <code>BuildColonyAction</code>.
+     * Creates this action.
      * @param freeColClient The main controller object for the client.
      */
     BuildColonyAction(FreeColClient freeColClient) {
-        super(freeColClient, "unit.state.7", null, KeyEvent.VK_B, KeyStroke.getKeyStroke('B', 0));
+        super(freeColClient, "unit.state.7", null, KeyStroke.getKeyStroke('B', 0));
         putValue(BUTTON_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_BUILD, 0));
         putValue(BUTTON_ROLLOVER_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_BUILD, 1));
         putValue(BUTTON_PRESSED_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_BUILD, 2));
         putValue(BUTTON_DISABLED_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_BUILD, 3));
     }
-    
-    
     
     /**
      * Checks if this action should be enabled.
@@ -54,11 +51,10 @@ public class BuildColonyAction extends MapboardAction {
         Unit selectedOne = getFreeColClient().getGUI().getActiveUnit();
         return selectedOne != null && selectedOne.getTile() != null && selectedOne.canBuildColony();
     }
-
     
     /**
     * Returns the id of this <code>Option</code>.
-    * @return "buildColonyAction"
+    * @return 
     */
     public String getId() {
         return ID;

@@ -30,26 +30,49 @@ public class ActionManager extends OptionGroup {
         
         this.freeColClient = freeColClient;
         
+        // keep this list alphabetized.
+        
         add(new BuildColonyAction(freeColClient));
         add(new BuildRoadAction(freeColClient));
-        add(new PlowAction(freeColClient));
-        add(new ClearOrdersAction(freeColClient));
-        add(new DisbandUnitAction(freeColClient));
-        add(new EuropeAction(freeColClient));
-        add(new FortifyAction(freeColClient));
-        add(new MapControlsAction(freeColClient));
-        add(new WaitAction(freeColClient));
-        add(new SkipUnitAction(freeColClient));
-        add(new EndTurnAction(freeColClient));
-        add(new ChatAction(freeColClient));
         add(new ChangeAction(freeColClient));
-        add(new GotoAction(freeColClient));
+        add(new ChatAction(freeColClient));
+        add(new ClearOrdersAction(freeColClient));
+        add(new ColopediaBuildingAction(freeColClient));
+        add(new ColopediaFatherAction(freeColClient));
+        add(new ColopediaGoodsAction(freeColClient));
+        add(new ColopediaSkillAction(freeColClient));
+        add(new ColopediaTerrainAction(freeColClient));
+        add(new ColopediaUnitAction(freeColClient));        
         add(new DeclareIndependenceAction(freeColClient));
-        add(new MiniMapZoomOutAction(freeColClient));
-        add(new MiniMapZoomInAction(freeColClient));
+        add(new DisbandUnitAction(freeColClient));
+        add(new DisplayGridAction(freeColClient));
+        add(new DisplayTileNamesAction(freeColClient));
+        add(new EndTurnAction(freeColClient));
+        add(new EuropeAction(freeColClient));
         add(new ExecuteGotoOrdersAction(freeColClient));
+        add(new FortifyAction(freeColClient));
+        add(new GotoAction(freeColClient));
+        add(new MapControlsAction(freeColClient));
+        add(new MiniMapZoomInAction(freeColClient));
+        add(new MiniMapZoomOutAction(freeColClient));
+        add(new NewAction(freeColClient));
+        add(new OpenAction(freeColClient));
+        add(new PreferencesAction(freeColClient));
+        add(new PlowAction(freeColClient));
+        add(new ReconnectAction(freeColClient));
+        add(new ReportContinentalCongressAction(freeColClient));
+        add(new ReportForeignAction(freeColClient));
+        add(new ReportIndianAction(freeColClient));        
+        add(new ReportLabourAction(freeColClient));
+        add(new ReportMilitaryAction(freeColClient));
+        add(new ReportReligionAction(freeColClient));
+        add(new ReportTradeAction(freeColClient));        
+        add(new SaveAction(freeColClient));
+        add(new SkipUnitAction(freeColClient));
         add(new UnloadAction(freeColClient));
-        
+        add(new WaitAction(freeColClient));
+        add(new QuitAction(freeColClient));
+
         freeColClient.getClientOptions().add(this);
         freeColClient.getClientOptions().addToMap(this);
     }

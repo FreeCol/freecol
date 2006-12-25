@@ -23,15 +23,14 @@ public class FortifyAction extends MapboardAction {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    public static final String ID = "fortifyAction";
-
+    public static final String ID = FortifyAction.class.toString();
 
     /**
-     * Creates a new <code>FortifyAction</code>.
+     * Creates this action.
      * @param freeColClient The main controller object for the client.
      */
     FortifyAction(FreeColClient freeColClient) {
-        super(freeColClient, "unit.state.2", null, KeyEvent.VK_F, KeyStroke.getKeyStroke('F', 0));
+        super(freeColClient, "unit.state.2", null, KeyStroke.getKeyStroke('F', 0));
         putValue(BUTTON_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_FORTIFY, 0));
         putValue(BUTTON_ROLLOVER_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_FORTIFY, 1));
         putValue(BUTTON_PRESSED_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_FORTIFY, 2));
@@ -52,7 +51,7 @@ public class FortifyAction extends MapboardAction {
     
     /**
     * Returns the id of this <code>Option</code>.
-    * @return "fortifyAction"
+    * @return 
     */
     public String getId() {
         return ID;

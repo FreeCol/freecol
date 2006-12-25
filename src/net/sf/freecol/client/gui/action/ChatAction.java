@@ -3,6 +3,7 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.logging.Logger;
 
@@ -22,7 +23,7 @@ public class ChatAction extends FreeColAction {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    public static final String ID = "chatAction";
+    public static final String ID = ChatAction.class.toString();
 
 
     /**
@@ -30,7 +31,7 @@ public class ChatAction extends FreeColAction {
      * @param freeColClient The main controller object for the client.
      */
     ChatAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.game.chat", null, KeyEvent.VK_T, KeyStroke.getKeyStroke('T', 0));
+    	super(freeColClient, "menuBar.game.chat", null, KeyStroke.getKeyStroke('T', InputEvent.CTRL_MASK));
     }
 
 

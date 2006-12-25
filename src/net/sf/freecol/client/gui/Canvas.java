@@ -1402,7 +1402,7 @@ public final class Canvas extends JLayeredPane {
     * @see FreeColMenuBar
     */
     public void resetFreeColMenuBar() {
-        FreeColMenuBar freeColMenuBar = new FreeColMenuBar(freeColClient, this, freeColClient.getGUI());
+        FreeColMenuBar freeColMenuBar = new FreeColMenuBar(freeColClient);
         setJMenuBar(freeColMenuBar);
     }
 
