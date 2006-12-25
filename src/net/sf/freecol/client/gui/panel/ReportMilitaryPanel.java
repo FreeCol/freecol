@@ -121,7 +121,7 @@ public final class ReportMilitaryPanel extends ReportPanel implements ActionList
             Iterator unitIterator = unitList.iterator();
             while (unitIterator.hasNext()) {
                 Unit unit = (Unit) unitIterator.next();
-                unitPanel.add(new UnitLabel(unit, parent));
+                unitPanel.add(new UnitLabel(unit, parent, true));
             }
             reportPanel.add(unitPanel, higConst.rc(row, unitColumn, "l"));
             row++;
