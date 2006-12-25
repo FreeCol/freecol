@@ -49,6 +49,7 @@ import net.sf.freecol.client.gui.panel.ReportContinentalCongressPanel;
 import net.sf.freecol.client.gui.panel.ReportForeignAffairPanel;
 import net.sf.freecol.client.gui.panel.ReportIndianPanel;
 import net.sf.freecol.client.gui.panel.ReportLabourPanel;
+import net.sf.freecol.client.gui.panel.ReportMilitaryPanel;
 import net.sf.freecol.client.gui.panel.ReportReligiousPanel;
 import net.sf.freecol.client.gui.panel.ReportTradePanel;
 import net.sf.freecol.common.model.Colony;
@@ -395,6 +396,16 @@ public class FreeColMenuBar extends JMenuBar {
         reportTradeMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 canvas.showReportPanel(ReportTradePanel.class.getName());
+            }
+        });
+
+        JMenuItem reportMilitaryMenuItem = new JMenuItem(Messages.message("menuBar.report.military"));
+        reportMilitaryMenuItem.setOpaque(false);
+        reportMilitaryMenuItem.setMnemonic(KeyEvent.VK_M);
+        reportMenu.add(reportMilitaryMenuItem);
+        reportMilitaryMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                canvas.showReportPanel(ReportMilitaryPanel.class.getName());
             }
         });
 

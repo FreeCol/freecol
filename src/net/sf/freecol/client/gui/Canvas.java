@@ -52,6 +52,7 @@ import net.sf.freecol.client.gui.panel.ReportContinentalCongressPanel;
 import net.sf.freecol.client.gui.panel.ReportForeignAffairPanel;
 import net.sf.freecol.client.gui.panel.ReportIndianPanel;
 import net.sf.freecol.client.gui.panel.ReportLabourPanel;
+import net.sf.freecol.client.gui.panel.ReportMilitaryPanel;
 import net.sf.freecol.client.gui.panel.ReportPanel;
 import net.sf.freecol.client.gui.panel.ReportReligiousPanel;
 import net.sf.freecol.client.gui.panel.ReportTradePanel;
@@ -179,6 +180,7 @@ public final class Canvas extends JLayeredPane {
     private final ReportReligiousPanel     reportReligiousPanel;
     private final ReportTradePanel         reportTradePanel;
     private final ReportLabourPanel        reportLabourPanel;
+    private final ReportMilitaryPanel        reportMilitaryPanel;
     private final ReportForeignAffairPanel reportForeignAffairPanel;
     private final ReportIndianPanel        reportIndianPanel;
     private final ReportContinentalCongressPanel reportContinentalCongressPanel;
@@ -234,6 +236,7 @@ public final class Canvas extends JLayeredPane {
         reportReligiousPanel = new ReportReligiousPanel(this);
         reportTradePanel = new ReportTradePanel(this);
         reportLabourPanel = new ReportLabourPanel(this);
+        reportMilitaryPanel = new ReportMilitaryPanel(this);
         reportForeignAffairPanel = new ReportForeignAffairPanel(this);
         reportIndianPanel = new ReportIndianPanel(this);
         reportContinentalCongressPanel = new ReportContinentalCongressPanel(this);
@@ -1196,6 +1199,8 @@ public final class Canvas extends JLayeredPane {
             reportPanel = reportContinentalCongressPanel;
         } else if ("net.sf.freecol.client.gui.panel.ReportTradePanel".equals(classname)) {
             reportPanel = reportTradePanel;
+        } else if ("net.sf.freecol.client.gui.panel.ReportMilitaryPanel".equals(classname)) {
+            reportPanel = reportMilitaryPanel;
         } else {
             logger.warning("Request for Report panel could not be processed.  Name="+ classname );
         }
