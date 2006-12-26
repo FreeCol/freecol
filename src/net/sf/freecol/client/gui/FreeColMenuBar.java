@@ -7,6 +7,7 @@ import java.awt.Insets;
 import java.awt.Shape;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.geom.Rectangle2D;
 import java.util.logging.Logger;
 
 import javax.swing.JCheckBoxMenuItem;
@@ -380,13 +381,13 @@ public class FreeColMenuBar extends JMenuBar {
             g.setClip(originalClip);
         }
         
-//        String displayString = Messages.message("menuBar.statusLine", new String[][]{
-//            {"%gold%", Integer.toString(freeColClient.getMyPlayer().getGold())},
-//            {"%tax%", Integer.toString(freeColClient.getMyPlayer().getTax())},
-//            {"%year%", freeColClient.getGame().getTurn().toString()}
-//        });
-//        Rectangle2D displayStringBounds = g.getFontMetrics().getStringBounds(displayString, g);
-//        int y = 15 + getInsets().top;
-//        g.drawString(displayString, getWidth()-10-(int)displayStringBounds.getWidth(), y);
+       String displayString = Messages.message("menuBar.statusLine", new String[][]{
+           {"%gold%", Integer.toString(freeColClient.getMyPlayer().getGold())},
+           {"%tax%", Integer.toString(freeColClient.getMyPlayer().getTax())},
+           {"%year%", freeColClient.getGame().getTurn().toString()}
+       });
+       Rectangle2D displayStringBounds = g.getFontMetrics().getStringBounds(displayString, g);
+       int y = 15 + getInsets().top;
+       g.drawString(displayString, getWidth()-10-(int)displayStringBounds.getWidth(), y);
     }
 }
