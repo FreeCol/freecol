@@ -374,12 +374,6 @@ public class Player extends FreeColGameObject {
                 s.setOwner(this);
             }
         }
-        // sort by ID, which should indicate order of establishment
-        Collections.sort(settlements, new Comparator<Settlement>() {
-            public int compare(Settlement s1, Settlement s2) {
-                return s1.getID().compareTo(s2.getID());
-            }
-        });
     }
     
     /**
@@ -1546,14 +1540,12 @@ public class Player extends FreeColGameObject {
     }
 
     /**
-     * Gets the number of settlements this player owns.
-     *
-     * @return The number of settlements this player owns.
+     * Returns the settlements this player owns.
+     * @return The settlements this player owns.
      */
-    public int getNumberOfSettlements() {
-        return settlements.size();
+    public List getSettlements() {
+        return settlements;
     }
-
 
     /**
     * Returns the closest <code>Location</code> in which the given ship can get repaired.

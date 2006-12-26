@@ -1,8 +1,10 @@
 
 package net.sf.freecol.client;
 
+import java.util.Comparator;
 
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.OptionGroup;
@@ -128,6 +130,70 @@ public class ClientOptions extends OptionMap {
      */
     public static final String MAP_SCROLL_ON_DRAG = "mapScrollOnDrag";
     
+
+    /**
+     * Used by GUI to sort colonies.
+     */
+    public static final String COLONY_COMPARATOR = "colonyComparator";
+    public static final int COLONY_COMPARATOR_NAME = 0,
+                            COLONY_COMPARATOR_AGE = 1,
+                            COLONY_COMPARATOR_POSITION = 2,
+                            COLONY_COMPARATOR_SIZE = 3,
+                            COLONY_COMPARATOR_SOL = 4;
+
+    /**
+     * Comparators for sorting colonies.
+     */
+    private static Comparator colonyAgeComparator = new Comparator<Colony>() {
+        // ID should indicate age
+        public int compare(Colony s1, Colony s2) {
+            return s1.getID().compareTo(s2.getID());
+        }
+    };
+
+    private static Comparator colonyNameComparator = new Comparator<Colony>() {
+        public int compare(Colony s1, Colony s2) {
+            return s1.getName().compareTo(s2.getName());
+        }
+    };
+
+    private static Comparator colonySizeComparator = new Comparator<Colony>() {
+        // sort size descending, then SoL descending
+        public int compare(Colony s1, Colony s2) {
+            int dsize = s2.getUnitCount() - s1.getUnitCount();
+            if (dsize == 0) {
+                return s2.getSoL() - s1.getSoL();
+            } else {
+                return dsize;
+            }
+        }
+    };
+
+    private static Comparator colonySoLComparator = new Comparator<Colony>() {
+        // sort SoL descending, then size descending
+        public int compare(Colony s1, Colony s2) {
+            int dsol = s2.getSoL() - s1.getSoL();
+            if (dsol == 0) {
+                return s2.getUnitCount() - s1.getUnitCount();
+            } else {
+                return dsol;
+            }
+        }
+    };
+
+    private static Comparator colonyPositionComparator = new Comparator<Colony>() {
+        // sort north to south, then west to east
+        public int compare(Colony s1, Colony s2) {
+            int dy = s1.getTile().getY() - s2.getTile().getY();
+            if (dy == 0) {
+                return s1.getTile().getX() - s2.getTile().getX();
+            } else {
+                return dy;
+            }
+        }
+    };
+
+
     
     /**
     * Creates a new <code>ClientOptions</code>.
@@ -165,6 +231,17 @@ public class ClientOptions extends OptionMap {
         guiGroup.add(new BooleanOption(DISPLAY_FOG_OF_WAR, "clientOptions.gui."+ DISPLAY_FOG_OF_WAR +".name", "clientOptions.gui."+ DISPLAY_FOG_OF_WAR +".shortDescription", false));        
         guiGroup.add(new BooleanOption(MAP_SCROLL_ON_DRAG, "clientOptions.gui."+ MAP_SCROLL_ON_DRAG +".name", "clientOptions.gui."+ MAP_SCROLL_ON_DRAG +".shortDescription", true));
         add(guiGroup);
+
+        guiGroup.add(new SelectOption(COLONY_COMPARATOR,
+                                      "clientOptions.gui." + COLONY_COMPARATOR + ".name",
+                                      "clientOptions.gui." + COLONY_COMPARATOR + ".shortDescription",
+                                      new String[] {"clientOptions.gui." + COLONY_COMPARATOR + ".byName",
+                                                    "clientOptions.gui." + COLONY_COMPARATOR + ".byAge",
+                                                    "clientOptions.gui." + COLONY_COMPARATOR + ".byPosition",
+                                                    "clientOptions.gui." + COLONY_COMPARATOR + ".bySize",
+                                                    "clientOptions.gui." + COLONY_COMPARATOR + ".bySoL"},
+                                      0));
+
 
         OptionGroup messagesGroup = new OptionGroup("clientOptions.messages.name", "clientOptions.messages.shortDescription");
         messagesGroup.add(new SelectOption(MESSAGES_GROUP_BY,
@@ -242,6 +319,26 @@ public class ClientOptions extends OptionMap {
         savegamesGroup.add(new IntegerOption(AUTOSAVE_PERIOD, "clientOptions.savegames."+ AUTOSAVE_PERIOD +".name", "clientOptions.savegames."+ AUTOSAVE_PERIOD +".shortDescription", 0, 100, 0));
         add(savegamesGroup);          
     }
+
+
+    public Comparator getColonyComparator() {
+        switch(getInteger(COLONY_COMPARATOR)) {
+        case COLONY_COMPARATOR_AGE:
+            return colonyAgeComparator;
+        case COLONY_COMPARATOR_POSITION:
+            return colonyPositionComparator;
+        case COLONY_COMPARATOR_SIZE:
+            return colonySizeComparator;
+        case COLONY_COMPARATOR_SOL:
+            return colonySoLComparator;
+        case COLONY_COMPARATOR_NAME:
+            return colonyNameComparator;
+        default:
+            throw new IllegalStateException("Unknown comparator");
+        }
+    }
+
+
 
 
     /**

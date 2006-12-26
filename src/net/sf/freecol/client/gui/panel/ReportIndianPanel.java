@@ -61,15 +61,8 @@ public final class ReportIndianPanel extends ReportPanel implements ActionListen
         }
         String report = "<html><p align=center><b>" +
                         opponent.getNationAsString() + "</b>";
-        /*
-        int settlementCount = 0;
-        Iterator colonies = opponent.getIndianSettlementIterator();
-        while (colonies.hasNext()) {
-            settlementCount++;
-            colonies.next();
-        }
-        */
-        int settlementCount = opponent.getNumberOfSettlements();
+
+        int settlementCount = opponent.getSettlements().size();
         report += "<p>" + settlementCount + " known camps";
         String tensionString = opponent.getTension(player).toString();
         report += "<p>" + Messages.message("tension") + ": " + tensionString;

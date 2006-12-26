@@ -1,14 +1,15 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.ActionListener;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeMap;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -56,7 +57,17 @@ public final class ReportMilitaryPanel extends ReportPanel implements ActionList
      */
     public void initialize() {
         Player player = parent.getClient().getMyPlayer();
-        TreeMap<String, List<Unit>> locations = new TreeMap<String, List<Unit>>();
+
+        List colonies = player.getSettlements();
+        Collections.sort(colonies, parent.getClient().getClientOptions().getColonyComparator());
+        ArrayList colonyNames = new ArrayList();
+        Iterator colonyIterator = colonies.iterator();
+        while (colonyIterator.hasNext()) {
+            colonyNames.add(((Colony) colonyIterator.next()).getName());
+        }
+
+
+        HashMap<String, List<Unit>> locations = new HashMap<String, List<Unit>>();
 
         // Display Panel
         reportPanel.removeAll();
@@ -101,29 +112,34 @@ public final class ReportMilitaryPanel extends ReportPanel implements ActionList
         Set keySet = locations.keySet();
 
         int[] widths = new int[] {0, 12, 0};
-        int[] heights = new int[keySet.size()];
+        int[] heights = new int[colonies.size()];
         int row = 1;
         int colonyColumn = 1;
         int unitColumn = 3;
         reportPanel.setLayout(new HIGLayout(widths, heights));
 
-        Iterator keyIterator = keySet.iterator();
-        while (keyIterator.hasNext()) {
-            String colony = (String) keyIterator.next();
-            reportPanel.add(new JLabel(colony), higConst.rc(row, colonyColumn));
+        colonyIterator = colonyNames.iterator();
+        while (colonyIterator.hasNext()) {
+            String colony = (String) colonyIterator.next();
+            JLabel colonyLabel = new JLabel(colony);
+            reportPanel.add(colonyLabel, higConst.rc(row, colonyColumn));
             JPanel unitPanel = new JPanel();
             List unitList = locations.get(colony);
-            Collections.sort(unitList, new Comparator<Unit> () {
-                public int compare(Unit unit1, Unit unit2) {
-                    return unit2.getType() - unit1.getType();
+            if (unitList == null) {
+                colonyLabel.setForeground(Color.GRAY);
+            } else {       
+                Collections.sort(unitList, new Comparator<Unit> () {
+                    public int compare(Unit unit1, Unit unit2) {
+                        return unit2.getType() - unit1.getType();
+                    }
+                });
+                Iterator unitIterator = unitList.iterator();
+                while (unitIterator.hasNext()) {
+                    Unit unit = (Unit) unitIterator.next();
+                    unitPanel.add(new UnitLabel(unit, parent, true));
                 }
-            });
-            Iterator unitIterator = unitList.iterator();
-            while (unitIterator.hasNext()) {
-                Unit unit = (Unit) unitIterator.next();
-                unitPanel.add(new UnitLabel(unit, parent, true));
+                reportPanel.add(unitPanel, higConst.rc(row, unitColumn, "l"));
             }
-            reportPanel.add(unitPanel, higConst.rc(row, unitColumn, "l"));
             row++;
         }
 

@@ -3,7 +3,9 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Color;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
@@ -80,7 +82,8 @@ public final class ReportProductionPanel extends JPanel {
         // Display Panel
         removeAll();
 
-        int numberOfColonies = player.getNumberOfSettlements();
+        List colonies = player.getSettlements();
+        int numberOfColonies = colonies.size();
         int[] heights = new int[numberOfColonies + extraRows];
         
         // labels
@@ -137,6 +140,7 @@ public final class ReportProductionPanel extends JPanel {
         int solCount = 0;
         int toryCount = 0;
 
+        Collections.sort(colonies, parent.getClient().getClientOptions().getColonyComparator());
         Iterator colonyIterator = player.getColonyIterator();
         while (colonyIterator.hasNext()) {
             Colony colony = (Colony) colonyIterator.next();

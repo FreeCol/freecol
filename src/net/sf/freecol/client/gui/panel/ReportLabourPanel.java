@@ -4,8 +4,9 @@ import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -112,7 +113,8 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
     private final ImageLibrary library;
     
     private int[] unitCount;
-    private Hashtable[] unitLocations;
+    private HashMap<String, Integer>[] unitLocations;
+    private ArrayList locationNames = new ArrayList();
 
     /**
      * The constructor that will add the items to this panel.
@@ -129,12 +131,24 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
     public void initialize() {
         // Count Units
         unitCount = new int[Unit.UNIT_COUNT];
-        unitLocations = new Hashtable[Unit.UNIT_COUNT];
+        unitLocations = new HashMap[Unit.UNIT_COUNT];
         for (int index = 0; index < Unit.UNIT_COUNT; index++) {
-            unitLocations[index] = new Hashtable();
+            unitLocations[index] = new HashMap();
         }
         Player player = parent.getClient().getMyPlayer();
         Iterator units = player.getUnitIterator();
+
+        List colonies = player.getSettlements();
+        Collections.sort(colonies, parent.getClient().getClientOptions().getColonyComparator());
+        Iterator colonyIterator = colonies.iterator();
+        locationNames = new ArrayList();
+        locationNames.add(Messages.message("report.atSea"));
+        locationNames.add(Messages.message("report.onLand"));
+        locationNames.add(player.getEurope().toString());
+        while (colonyIterator.hasNext()) {
+            locationNames.add(((Colony) colonyIterator.next()).getName());
+        }
+
         while (units.hasNext()) {
             Unit unit = (Unit) units.next();
             int type = unit.getType();
@@ -172,6 +186,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
         int[] widths = new int[] {0, 5, 0, margin, 0, 5, 0, margin, 0, 5, 0};
         int[] heights = new int[] {0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0};
         reportPanel.setLayout(new HIGLayout(widths, heights));
+        HIGConstraints higConst = new HIGConstraints();
 
         int row = 1;
         reportPanel.add(buildUnitLabel(FREE_COLONIST,            1f), //ImageLibrary.FREE_COLONIST);
@@ -356,18 +371,18 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
                           higConst.rc(row, countColumn));
 
             row = 3;
-            List keyList = Collections.list(unitLocations[unit].keys());
-            Collections.sort(keyList);
-            Iterator keyIterator = keyList.iterator();
-            while (keyIterator.hasNext()) {
-                String name = (String) keyIterator.next();
-                JLabel colonyLabel = new JLabel(name);
-                colonyLabel.setForeground(Color.GRAY);
-                textPanel.add(colonyLabel, higConst.rc(row, colonyColumn));
-                JLabel countLabel = new JLabel(unitLocations[unit].get(name).toString());
-                countLabel.setForeground(Color.GRAY);
-                textPanel.add(countLabel, higConst.rc(row, countColumn));
-                row++;
+            Iterator locationIterator = locationNames.iterator();
+            while (locationIterator.hasNext()) {
+                String name = (String) locationIterator.next();
+                if (unitLocations[unit].get(name) != null) {
+                    JLabel colonyLabel = new JLabel(name);
+                    colonyLabel.setForeground(Color.GRAY);
+                    textPanel.add(colonyLabel, higConst.rc(row, colonyColumn));
+                    JLabel countLabel = new JLabel(unitLocations[unit].get(name).toString());
+                    countLabel.setForeground(Color.GRAY);
+                    textPanel.add(countLabel, higConst.rc(row, countColumn));
+                    row++;
+                }
             }
         }
         return textPanel;

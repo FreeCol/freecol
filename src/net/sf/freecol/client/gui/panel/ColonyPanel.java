@@ -20,7 +20,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.ComponentInputMap;
@@ -1847,7 +1849,9 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         public void initialize(Colony thisColony) {
             super.removeActionListener(nameBoxListener);
             removeAllItems();
-            Iterator colonyIterator = thisColony.getOwner().getColonyIterator();
+            List colonies = thisColony.getOwner().getSettlements();
+            Collections.sort(colonies, freeColClient.getClientOptions().getColonyComparator());
+            Iterator colonyIterator = colonies.iterator();
             while (colonyIterator.hasNext()) {
                 this.addItem((Colony) colonyIterator.next());
             }

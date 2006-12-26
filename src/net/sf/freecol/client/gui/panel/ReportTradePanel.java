@@ -2,7 +2,8 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Iterator;
 
 import javax.swing.JLabel;
@@ -98,11 +99,10 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
         reportPanel.removeAll();
         tradeReportPanel.removeAll();
 
-        Iterator colonyIterator = player.getColonyIterator();
-        ArrayList colonies = new ArrayList();
-        while (colonyIterator.hasNext()) {
-            colonies.add(colonyIterator.next());
-        }
+        //Iterator colonyIterator = player.getColonyIterator();
+        List colonies = player.getSettlements();
+        Collections.sort(colonies, parent.getClient().getClientOptions().getColonyComparator());
+
         int[] heights = new int[colonies.size() + extraRows];
         
         for (int h = 1; h < heights.length; h++) {
@@ -154,7 +154,7 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
             tradeReportPanel.add(currentLabel, higConst.rc(5, column));
         }
 
-        colonyIterator = colonies.iterator();
+        Iterator colonyIterator = colonies.iterator();
         int row = 7;
         while (colonyIterator.hasNext()) {
             Colony colony = (Colony) colonyIterator.next();
