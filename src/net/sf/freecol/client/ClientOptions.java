@@ -147,7 +147,7 @@ public class ClientOptions extends OptionMap {
     private static Comparator colonyAgeComparator = new Comparator<Colony>() {
         // ID should indicate age
         public int compare(Colony s1, Colony s2) {
-            return s1.getID().compareTo(s2.getID());
+            return s1.getIntegerID().compareTo(s2.getIntegerID());
         }
     };
 

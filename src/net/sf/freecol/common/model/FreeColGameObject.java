@@ -67,12 +67,7 @@ abstract public class FreeColGameObject {
 
         if (game != null) {
             //game.setFreeColGameObject(id, this);            
-            String tagName = "";
-            try {
-                Method m = getClass().getMethod("getXMLElementTagName", (Class[]) null);
-                tagName = (String) m.invoke((Object) null, (Object[]) null);
-            } catch (Exception e) {}
-            String nextID = tagName + ":" + game.getNextID();
+            String nextID = getRealXMLElementTagName() + ":" + game.getNextID();
             if (nextID != null) {
                 setID(nextID);
             }
@@ -472,6 +467,25 @@ abstract public class FreeColGameObject {
         return id;
     }
 
+
+    /**
+    * Gets the ID's integer part of this object.
+    *
+    * @return The unique ID of this object.
+    */
+    public Integer getIntegerID() {
+        String stringPart = getRealXMLElementTagName() + ":";
+        return new Integer(id.substring(stringPart.length()));
+    }
+
+    private String getRealXMLElementTagName() {
+        String tagName = "";
+        try {
+            Method m = getClass().getMethod("getXMLElementTagName", (Class[]) null);
+            tagName = (String) m.invoke((Object) null, (Object[]) null);
+        } catch (Exception e) {}
+        return tagName;
+    }
 
     /**
     * Sets the unique ID of this object. When setting a new ID to this object,
