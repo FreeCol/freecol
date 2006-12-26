@@ -22,7 +22,7 @@ public class ReportForeignAction extends MapboardAction {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    public static final String ID = ReportForeignAction.class.toString();
+    public static final String ID = "reportForeignAction";
     
     /**
      * Creates this action.

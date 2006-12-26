@@ -24,7 +24,7 @@ public class GotoAction extends MapboardAction {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    public static final String ID = GotoAction.class.toString();
+    public static final String ID = "gotoAction";
 
     /**
      * Creates this action.

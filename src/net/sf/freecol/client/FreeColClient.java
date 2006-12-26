@@ -194,6 +194,8 @@ public final class FreeColClient {
             file.mkdir();
         }
 
+        clientOptionsFile = new File(dir, "options.xml");
+
         dir += fileSeparator + "save";
         file = new File(dir);
         if (file.exists() && file.isFile()) {
@@ -202,8 +204,6 @@ public final class FreeColClient {
         } else if (!file.exists()) {
             file.mkdir();
         }
-
-        clientOptionsFile = new File(System.getProperty("user.home") + System.getProperty("file.separator") + ".freecol", "options.xml");
     }
 
 

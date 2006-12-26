@@ -22,7 +22,7 @@ public abstract class SelectableAction extends MapboardAction {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    public static final String ID = SelectableAction.class.toString();
+    public static final String ID = "selectableAction";
 
     protected boolean selected = false;
 

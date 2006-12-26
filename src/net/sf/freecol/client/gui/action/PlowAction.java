@@ -27,7 +27,7 @@ public class PlowAction extends MapboardAction {
     public static final String  REVISION = "$Revision$";
 
     
-    public static final String ID = PlowAction.class.toString();
+    public static final String ID = "plowAction";
     
     private boolean plow;
 

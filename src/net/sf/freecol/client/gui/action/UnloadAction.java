@@ -24,7 +24,7 @@ public class UnloadAction extends MapboardAction {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    public static final String ID = UnloadAction.class.toString();
+    public static final String ID = "unloadAction";
 
     /**
      * Creates this action.

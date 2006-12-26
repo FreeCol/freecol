@@ -22,7 +22,7 @@ public class DisplayGridAction extends SelectableAction {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    public static final String ID = DisplayGridAction.class.toString();
+    public static final String ID = "displayGridAction";
     
     /**
      * Creates this action.

@@ -23,7 +23,7 @@ public class ChatAction extends FreeColAction {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    public static final String ID = ChatAction.class.toString();
+    public static final String ID = "chatAction";
 
 
     /**
