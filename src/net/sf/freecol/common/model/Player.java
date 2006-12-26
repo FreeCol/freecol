@@ -112,8 +112,6 @@ public class Player extends FreeColGameObject {
     MEDIUM = 2,
     HARD = 3,
     VERY_HARD = 4;
-
-    private int difficulty = 2;
     
     /**
     * Contains booleans to see which tribes this player has met.
@@ -2207,7 +2205,6 @@ public class Player extends FreeColGameObject {
         out.writeAttribute("rebellionState", Integer.toString(rebellionState));
         out.writeAttribute("ai", Boolean.toString(ai));
         out.writeAttribute("tax", Integer.toString(tax));
-        out.writeAttribute("difficulty", Integer.toString(difficulty));
         out.writeAttribute("bellsBonus", Integer.toString(bellsBonus));
 
         int[] tensionArray = new int[tension.length];
@@ -2298,7 +2295,6 @@ public class Player extends FreeColGameObject {
         ai = (new Boolean(in.getAttributeValue(null, "ai"))).booleanValue();
         dead = (new Boolean(in.getAttributeValue(null, "dead"))).booleanValue();
         tax = Integer.parseInt(in.getAttributeValue(null, "tax"));
-        difficulty = Integer.parseInt(in.getAttributeValue(null, "difficulty"));
         rebellionState = Integer.parseInt(in.getAttributeValue(null, "rebellionState"));
         currentFather = Integer.parseInt(in.getAttributeValue(null, "currentFather"));
         crossesRequired = Integer.parseInt(in.getAttributeValue(null, "crossesRequired"));
@@ -2555,7 +2551,7 @@ public class Player extends FreeColGameObject {
      * @param typeOfGoods The type of goods.
      */
     public void setArrears(int typeOfGoods) {
-        arrears[typeOfGoods] = (difficulty + 3) * 100 * getGame().getMarket().paidForSale(typeOfGoods);
+        arrears[typeOfGoods] = (getDifficulty() + 3) * 100 * getGame().getMarket().paidForSale(typeOfGoods);
     }
 
     /**
@@ -2716,22 +2712,7 @@ public class Player extends FreeColGameObject {
      * @return The difficulty level.
      */
     public int getDifficulty() {
-        return difficulty;
-    }
-
-    /**
-     * Sets the difficulty level.
-     *
-     * @param value The difficulty level.
-     */
-    public void setDifficulty(int value) {
-        if ( value == VERY_EASY ||
-                value == EASY ||
-                value == MEDIUM ||
-                value == HARD ||
-                value == VERY_HARD ) {
-            difficulty = value;
-        }
+        return getGame().getGameOptions().getInteger(GameOptions.DIFFICULTY);
     }
 
 
