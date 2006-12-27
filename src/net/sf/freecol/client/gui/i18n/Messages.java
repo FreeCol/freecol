@@ -41,7 +41,7 @@ public final class Messages {
      */
     private static Messages  defaultMessages;
 
-    private final PropertyResourceBundle  resources;
+    private static PropertyResourceBundle  resources;
 
 
     /**
@@ -125,6 +125,10 @@ public final class Messages {
         String packageName = getClass().getName().substring(0, getClass().getName().lastIndexOf('.'));
         resources = (PropertyResourceBundle) ResourceBundle.getBundle(packageName + ".FreeColMessages", locale);
 
+    }
+
+    public static void setResources(PropertyResourceBundle bundle) {
+        resources = bundle;
     }
 
 

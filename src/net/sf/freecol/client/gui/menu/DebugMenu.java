@@ -4,7 +4,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.Iterator;
+import java.util.PropertyResourceBundle;
+
 
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
@@ -12,7 +16,9 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
+import javax.swing.filechooser.FileFilter;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
@@ -297,6 +303,38 @@ public class DebugMenu extends JMenu {
 				System.gc();
 			}
 		});
+
+		this.addSeparator();
+
+		final JMenuItem loadResource = new JMenuItem("Load resource");
+		loadResource.setOpaque(false);
+                //loadResource.setMnemonic(KeyEvent.VK_A);
+		//loadResource.setAccelerator(KeyStroke.getKeyStroke('A', InputEvent.CTRL_MASK | InputEvent.ALT_MASK));
+		this.add(loadResource);
+		loadResource.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+                            try {
+                                FileFilter ff = new FileFilter() {
+                                        public boolean accept(File f) {
+                                            return true;
+                                        }
+                                        public String getDescription() {
+                                            return "resource filter";
+                                        }
+                                        
+                                    };
+
+                                File resourceFile = freeColClient.getCanvas().showLoadDialog(FreeCol.getSaveDirectory(),
+                                                                                             new FileFilter[] { ff });
+                                FileInputStream stream = new FileInputStream(resourceFile);
+                                PropertyResourceBundle bundle = new PropertyResourceBundle(stream);
+                                Messages.setResources(bundle);
+                            } catch (Exception ex) {
+                                System.out.println("Failed to load resource bundle");
+                            }
+                        }
+		});
+
 
 	}
 
