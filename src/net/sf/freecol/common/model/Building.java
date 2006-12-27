@@ -699,7 +699,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             int goodsInputType = getGoodsInputType();
             int goodsOutputType = getGoodsOutputType();
 
-            if (getGoodsInput() == 0 && getMaximumGoodsInput() > 0) {
+            if (goodsInput == 0 && getMaximumGoodsInput() > 0) {
                 addModelMessage(this, "model.building.notEnoughInput", 
                                 new String[][] {{"%inputGoods%", Goods.getName(goodsInputType)},
                                                 {"%building%", getName()},

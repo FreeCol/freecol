@@ -2,6 +2,7 @@
 package net.sf.freecol.client.gui.option;
 
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -11,6 +12,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
+import net.sf.freecol.client.gui.action.ActionManager;
 
 import net.sf.freecol.client.gui.action.FreeColAction;
 import net.sf.freecol.common.option.BooleanOption;
@@ -44,7 +46,11 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
     * @param option The <code>OptionGroup</code> to make a user interface for.
     */
     public OptionGroupUI(OptionGroup option, boolean editable) {
-        setLayout(new FlowLayout(FlowLayout.LEFT, H_GAP, 5));
+        if (option instanceof ActionManager) {
+            setLayout(new GridLayout(0, 2, H_GAP, 5));
+        } else {
+            setLayout(new FlowLayout(FlowLayout.LEFT, H_GAP, 5));
+        }
 
         this.option = option;
 
