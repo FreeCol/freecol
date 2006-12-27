@@ -84,7 +84,9 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
                     JScrollPane scroll = new JScrollPane(c,
                             JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                             JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-                    scroll.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
+                    scroll.setBorder(BorderFactory.createEmptyBorder());
+                    c.setBorder(BorderFactory.createEmptyBorder(OptionGroupUI.H_GAP-5,
+                            OptionGroupUI.H_GAP, 0, OptionGroupUI.H_GAP));
                     c = scroll;
                 } else {
                     c.setBorder(BorderFactory.createEmptyBorder(OptionGroupUI.H_GAP-5,0,0,0));
