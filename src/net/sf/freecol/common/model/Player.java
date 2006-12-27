@@ -171,6 +171,7 @@ public class Player extends FreeColGameObject {
     /** True if player has been attacked by privateers. */
     private boolean         attackedByPrivateers = false;
     
+    private int             oldSoL;
     private int             crosses;
     private int             bells;
     /** Bells bonus granted by Thomas Paine and Thomas Jefferson. */
@@ -2139,18 +2140,15 @@ public class Player extends FreeColGameObject {
             if (crossesRequired != -1) {
                 updateCrossesRequired();
             }
-
-            int oldSoL = 0;
+            
             int newSoL = 0;
             int numberOfColonies = settlements.size();
             if (numberOfColonies > 1) {
                 Iterator iterator = getColonyIterator();
                 while (iterator.hasNext()) {
                     Colony colony = (Colony) iterator.next();
-                    oldSoL += colony.getOldSoL();
                     newSoL += colony.getSoL();
                 }
-                oldSoL = oldSoL / numberOfColonies;
                 newSoL = newSoL / numberOfColonies;
                 if (oldSoL/10 != newSoL/10) {
                     if (newSoL > oldSoL) {
@@ -2166,6 +2164,8 @@ public class Player extends FreeColGameObject {
                     }
                 }
             }
+            // remember SoL for check changes at next turn
+            oldSoL = newSoL;
         }
     }
 
@@ -2219,6 +2219,7 @@ public class Player extends FreeColGameObject {
             out.writeAttribute("currentFather", Integer.toString(currentFather));
             out.writeAttribute("crossesRequired", Integer.toString(crossesRequired));
             out.writeAttribute("attackedByPrivateers", Boolean.toString(attackedByPrivateers));
+            out.writeAttribute("oldSoL", Integer.toString(oldSoL));
             
             char[] fatherCharArray = new char[FoundingFather.FATHER_COUNT];
             for(int i = 0; i < fathers.length; i++) {
@@ -2284,6 +2285,13 @@ public class Player extends FreeColGameObject {
         gold = Integer.parseInt(in.getAttributeValue(null, "gold"));
         crosses = Integer.parseInt(in.getAttributeValue(null, "crosses"));
         bells = Integer.parseInt(in.getAttributeValue(null, "bells"));
+
+        final String oldSoLStr = in.getAttributeValue(null, "oldSoL");
+        if (oldSoLStr != null) {
+            oldSoL = Integer.parseInt(oldSoLStr);
+        } else {
+            oldSoL = 0;
+        }
         
         final String bellsBonusStr = in.getAttributeValue(null, "bellsBonus");
         if (bellsBonusStr != null) {

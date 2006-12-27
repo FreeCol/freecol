@@ -923,14 +923,6 @@ public final class Colony extends Settlement implements Location {
     public int getSoL() {
         return sonsOfLiberty;
     }
-
-    /**
-    * Returns the previous SoL membership of the colony.
-    * @return The previous SoL membership of the colony.
-    */
-    public int getOldSoL() {
-        return oldSonsOfLiberty;
-    }
  
     /**
      * Calculates the current SoL membership of the colony
@@ -947,9 +939,7 @@ public final class Colony extends Settlement implements Location {
         
         if (membership < 0) membership = 0;
         if (membership > 100) membership = 100;
-        oldSonsOfLiberty = sonsOfLiberty;
         sonsOfLiberty = membership;
-        oldTories = tories;
         tories = (units - ((units * sonsOfLiberty) / 100));
     }
 
@@ -1459,6 +1449,10 @@ public final class Colony extends Settlement implements Location {
                                 new Goods(Goods.BELLS));
             }
         }
+        // Remember current SoL and tories for check changes at the next turn
+        oldSonsOfLiberty = sonsOfLiberty;
+        oldTories = tories;
+        
         // TODO-LATER: REMOVE THIS WHEN THE AI CAN HANDLE PRODUCTION PENALTIES:
         if (getOwner().isAI()) {
             productionBonus = Math.max(0, bonus);
