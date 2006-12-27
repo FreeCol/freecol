@@ -91,7 +91,7 @@ public final class ImageLibrary extends ImageProvider {
      * types. Example: type:hardy pioneer, corresponding graphics:
      * hardy pioneer with tools and hardy pioneer without tools.
      */
-    private static final int FREE_COLONIST = 0,
+    public static final int FREE_COLONIST = 0,
                             EXPERT_FARMER = 1,
                             EXPERT_FISHERMAN = 2,
                             EXPERT_FUR_TRAPPER = 3,

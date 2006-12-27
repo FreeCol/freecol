@@ -3,6 +3,7 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.event.ActionListener;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Image;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -13,14 +14,17 @@ import java.util.Set;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -36,8 +40,7 @@ public final class ReportMilitaryPanel extends ReportPanel implements ActionList
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-
-    //private final ReportProductionPanel militaryReportPanel;
+    private final ImageLibrary library;
     private Canvas parent;
 
     /**
@@ -47,9 +50,7 @@ public final class ReportMilitaryPanel extends ReportPanel implements ActionList
     public ReportMilitaryPanel(Canvas parent) {
         super(parent, Messages.message("menuBar.report.military"));
         this.parent = parent;
-
-        //reportPanel.setLayout(new BoxLayout(reportPanel, BoxLayout.Y_AXIS));
-        //militaryReportPanel = new ReportProductionPanel(Goods.CROSSES, parent);
+        this.library = (ImageLibrary) parent.getImageProvider();
     }
 
     /**
@@ -104,7 +105,6 @@ public final class ReportMilitaryPanel extends ReportPanel implements ActionList
                         locations.put(locationName, unitList);
                     }
                     unitList.add(unit);
-                    //   unitCount[unit.getType()]++;
                 }
             }
         }
@@ -112,11 +112,37 @@ public final class ReportMilitaryPanel extends ReportPanel implements ActionList
         Set keySet = locations.keySet();
 
         int[] widths = new int[] {0, 12, 0};
-        int[] heights = new int[colonies.size()];
+        int[] heights = new int[colonies.size() + 2];
         int row = 1;
+
         int colonyColumn = 1;
         int unitColumn = 3;
+
         reportPanel.setLayout(new HIGLayout(widths, heights));
+        HIGConstraints higConst = new HIGConstraints();
+
+        Player refPlayer = player.getREFPlayer();
+        JLabel refLabel = new JLabel(refPlayer.getNationAsString());
+        refLabel.setForeground(Color.RED);
+        reportPanel.add(refLabel, higConst.rc(row, colonyColumn));
+
+        int[] ref = player.getMonarch().getREF();
+        int[] refUnitType = new int[] {
+            Monarch.MAN_OF_WAR, Monarch.ARTILLERY,
+            Monarch.DRAGOON, Monarch.INFANTRY };
+        int[] libraryUnitType = new int[] {
+            ImageLibrary.MAN_O_WAR, ImageLibrary.ARTILLERY,
+            ImageLibrary.KINGS_CAVALRY, ImageLibrary.KINGS_REGULAR };
+        JPanel refPanel = new JPanel();
+        for (int index = 0; index < refUnitType.length; index++) {
+            for (int count = 0; count < ref[refUnitType[index]]; count++) {
+                refPanel.add(buildUnitLabel(libraryUnitType[index], 0.66f));
+            }
+        }
+        reportPanel.add(refPanel, higConst.rc(row, unitColumn));
+
+
+        row += 2;
 
         colonyIterator = colonyNames.iterator();
         while (colonyIterator.hasNext()) {
@@ -144,5 +170,31 @@ public final class ReportMilitaryPanel extends ReportPanel implements ActionList
         }
 
     }
+
+    /**
+     * Builds the button for the given unit.
+     * @param unit
+     * @param unitIcon
+     * @param scale
+     */
+    private JLabel buildUnitLabel(int unitIcon, float scale) {
+
+        JLabel imageLabel = null;
+        if (unitIcon >= 0) {
+            ImageIcon icon = library.getUnitImageIcon(unitIcon);
+            if (scale != 1) {
+              Image image;
+              image = icon.getImage();
+              int width = (int) (scale * image.getWidth(this));
+              int height = (int) (scale * image.getHeight(this));
+              image = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+              icon = new ImageIcon(image);
+            }
+            imageLabel = new JLabel(icon);
+        }
+        return imageLabel;
+    }
+
+
 }
 
