@@ -39,7 +39,7 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
     /** How much space to leave between labels. */
     private final int columnSeparatorWidth = 5;
     /** How wide the margins should be. */
-    private final int marginWidth = 12;
+    private final int marginWidth = 0;
     /** The widths of the columns. */
     private final int[] widths = new int[columns];
     /** The heights of the rows. */
@@ -50,8 +50,6 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
     private final JLabel salesLabel;
     private final JLabel beforeTaxesLabel;
     private final JLabel afterTaxesLabel;
-    private final JScrollPane scrollPane;
-    private final JPanel tradeReportPanel;
     private final MatteBorder myBorder = new MatteBorder(0, 0, 1, 0, Color.BLACK);
 
     /**
@@ -74,16 +72,11 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
 
         for (int label = 0; label < goodsLabels.length; label++) {
             //goodsLabels[i] = new JLabel(parent.getImageProvider().getGoodsImageIcon(label));
-            widths[columnsPerLabel * label + 2] = columnSeparatorWidth;
-            widths[columnsPerLabel * label + 3] = 0;
+            widths[columnsPerLabel * label + extraColumns - 1] = columnSeparatorWidth;
+            widths[columnsPerLabel * label + extraColumns] = 0;
         }
 
         heights = null;
-
-        tradeReportPanel = new JPanel();
-        scrollPane = new JScrollPane(tradeReportPanel,
-                                     JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                                     JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     }
 
     /**
@@ -94,7 +87,6 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
         Market market = player.getGame().getMarket();
         // Display Panel
         reportPanel.removeAll();
-        tradeReportPanel.removeAll();
 
         //Iterator colonyIterator = player.getColonyIterator();
         List colonies = player.getSettlements();
@@ -110,23 +102,23 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
         heights[5] = marginWidth; //separator
         heights[heights.length - 1] = marginWidth;
 
-        tradeReportPanel.setLayout(new HIGLayout(widths, heights));
+        reportPanel.setLayout(new HIGLayout(widths, heights));
 
         //tradeReportPanel.add(priceLabel, higConst.rc(3, 2));
-        tradeReportPanel.add(salesLabel, higConst.rc(3, 2));
-        tradeReportPanel.add(beforeTaxesLabel, higConst.rc(4, 2));
-        tradeReportPanel.add(afterTaxesLabel, higConst.rc(5, 2));
+        reportPanel.add(salesLabel, higConst.rc(3, 2));
+        reportPanel.add(beforeTaxesLabel, higConst.rc(4, 2));
+        reportPanel.add(afterTaxesLabel, higConst.rc(5, 2));
 
         JLabel currentLabel;
         for (int goodsType = 0; goodsType < Goods.NUMBER_OF_TYPES; goodsType++) {
-            int column = columnsPerLabel * goodsType + 4;
+            int column = columnsPerLabel * goodsType + extraColumns + 1;
             int sales = player.getSales(goodsType);
             int beforeTaxes = player.getIncomeBeforeTaxes(goodsType);
             int afterTaxes = player.getIncomeAfterTaxes(goodsType);
             MarketLabel marketLabel = new MarketLabel(goodsType, market, parent);
             marketLabel.setVerticalTextPosition(JLabel.BOTTOM);
             marketLabel.setHorizontalTextPosition(JLabel.CENTER);
-            tradeReportPanel.add(marketLabel, higConst.rc(2, column));
+            reportPanel.add(marketLabel, higConst.rc(2, column));
 
             //            currentLabel = new JLabel(String.valueOf(market.paidForSale(goodsType)) + "/" +
             //                        String.valueOf(market.costToBuy(goodsType)), JLabel.TRAILING);
@@ -136,19 +128,19 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
             if (sales < 0) {
                 currentLabel.setForeground(Color.RED);
             }
-            tradeReportPanel.add(currentLabel, higConst.rc(3, column));
+            reportPanel.add(currentLabel, higConst.rc(3, column));
 
             currentLabel = new JLabel(String.valueOf(beforeTaxes), JLabel.TRAILING);
             if (beforeTaxes < 0) {
                 currentLabel.setForeground(Color.RED);
             }
-            tradeReportPanel.add(currentLabel, higConst.rc(4, column));
+            reportPanel.add(currentLabel, higConst.rc(4, column));
 
             currentLabel = new JLabel(String.valueOf(afterTaxes), JLabel.TRAILING);
             if (afterTaxes < 0) {
                 currentLabel.setForeground(Color.RED);
             }
-            tradeReportPanel.add(currentLabel, higConst.rc(5, column));
+            reportPanel.add(currentLabel, higConst.rc(5, column));
         }
 
         Iterator colonyIterator = colonies.iterator();
@@ -159,9 +151,9 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
             if (colony.getBuilding(Building.CUSTOM_HOUSE).isBuilt()) {
                 colonyLabel.setBorder(myBorder);
             }
-            tradeReportPanel.add(colonyLabel, higConst.rc(row, 2));
+            reportPanel.add(colonyLabel, higConst.rc(row, 2));
             for (int goodsType = 0; goodsType < Goods.NUMBER_OF_TYPES; goodsType++) {
-                int column = columnsPerLabel * goodsType + 4;
+                int column = columnsPerLabel * goodsType + extraColumns + 1;
                 int amount = colony.getGoodsCount(goodsType);
                 JLabel goodsLabel = new JLabel(String.valueOf(amount),
                                                JLabel.TRAILING);
@@ -173,12 +165,10 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
                 if (colony.getExports(goodsType)) {
                     goodsLabel.setBorder(myBorder);
                 }
-                tradeReportPanel.add(goodsLabel, higConst.rc(row, column));
+                reportPanel.add(goodsLabel, higConst.rc(row, column));
             }
             row++;
         }
-
-        reportPanel.add(tradeReportPanel);
     }
 }
 
