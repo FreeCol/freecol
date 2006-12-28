@@ -33,7 +33,6 @@ public final class ReportContinentalCongressPanel extends ReportPanel implements
     private final ReportProductionPanel continentalCongressReportPanel;
     private final JPanel summaryPanel;
     private final JPanel fatherPanel;
-    private Canvas parent;
 
     /**
      * The constructor that will add the items to this panel.
@@ -41,7 +40,6 @@ public final class ReportContinentalCongressPanel extends ReportPanel implements
      */
     public ReportContinentalCongressPanel(Canvas parent) {
         super(parent, title);
-        this.parent = parent;
 
         reportPanel.setLayout(new BoxLayout(reportPanel, BoxLayout.Y_AXIS));
 

@@ -3,6 +3,7 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.event.ActionListener;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.Image;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,7 +42,6 @@ public final class ReportMilitaryPanel extends ReportPanel implements ActionList
     public static final String  REVISION = "$Revision$";
 
     private final ImageLibrary library;
-    private Canvas parent;
 
     /**
      * The constructor that will add the items to this panel.
@@ -49,7 +49,6 @@ public final class ReportMilitaryPanel extends ReportPanel implements ActionList
      */
     public ReportMilitaryPanel(Canvas parent) {
         super(parent, Messages.message("menuBar.report.military"));
-        this.parent = parent;
         this.library = (ImageLibrary) parent.getImageProvider();
     }
 
@@ -133,7 +132,7 @@ public final class ReportMilitaryPanel extends ReportPanel implements ActionList
         int[] libraryUnitType = new int[] {
             ImageLibrary.MAN_O_WAR, ImageLibrary.ARTILLERY,
             ImageLibrary.KINGS_CAVALRY, ImageLibrary.KINGS_REGULAR };
-        JPanel refPanel = new JPanel();
+        JPanel refPanel = new JPanel(new GridLayout(0,7));
         for (int index = 0; index < refUnitType.length; index++) {
             for (int count = 0; count < ref[refUnitType[index]]; count++) {
                 refPanel.add(buildUnitLabel(libraryUnitType[index], 0.66f));
@@ -149,7 +148,7 @@ public final class ReportMilitaryPanel extends ReportPanel implements ActionList
             String colony = (String) colonyIterator.next();
             JLabel colonyLabel = new JLabel(colony);
             reportPanel.add(colonyLabel, higConst.rc(row, colonyColumn));
-            JPanel unitPanel = new JPanel();
+            JPanel unitPanel = new JPanel(new GridLayout(0, 8));
             List unitList = locations.get(colony);
             if (unitList == null) {
                 colonyLabel.setForeground(Color.GRAY);

@@ -36,7 +36,9 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 
 /**
@@ -182,7 +184,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     } else if (type.equals("declareIndependence")) {
                         reply = declareIndependence(connection, element);
                     } else if (type.equals("giveIndependence")) {
-                        reply = giveIndependence(connection, element);                                              
+                        reply = giveIndependence(connection, element);   
+                    } else if (type.equals("foreignAffairs")) {
+                        reply = foreignAffairs(connection, element);                                           
                     } else {
                         logger.warning("Unknown request from client " + element.getTagName());
                     }
@@ -2063,6 +2067,68 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
 
         return null;
     }    
+
+
+    /**
+     * Handles a "foreignAffairs"-message.
+     *
+     * @param connection The <code>Connection</code> the message was received on.
+     * @param element The element containing the request.
+     */
+    private Element foreignAffairs(Connection connection, Element element) {
+        Game game = getFreeColServer().getGame();
+        ServerPlayer player = getFreeColServer().getPlayer(connection);        
+
+        Element reply = Message.createNewRootElement("foreignAffairsReport");
+        Iterator enemyPlayerIterator = game.getPlayerIterator();
+        while (enemyPlayerIterator.hasNext()) {
+            ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
+
+            if (player.equals(enemyPlayer) || 
+                enemyPlayer.getConnection() == null ||
+                enemyPlayer.isIndian() ||
+                enemyPlayer.isREF()) {
+                continue;
+            }
+
+            Element enemyElement = reply.getOwnerDocument().createElement("opponent");
+
+            enemyElement.setAttribute("nation", String.valueOf(enemyPlayer.getNation()));
+
+            int numberOfColonies = enemyPlayer.getSettlements().size();
+            int numberOfUnits = 0;
+            int militaryStrength = 0;
+            int navalStrength = 0;
+            Iterator unitIterator = enemyPlayer.getUnitIterator();
+            while (unitIterator.hasNext()) {
+                Unit unit = (Unit) unitIterator.next();
+                numberOfUnits++;
+                if (unit.isNaval()) {
+                    navalStrength += unit.getOffensePower(unit);
+                } else {
+                    militaryStrength += unit.getOffensePower(unit);
+                }
+            }
+            enemyElement.setAttribute("numberOfColonies", String.valueOf(numberOfColonies));
+            enemyElement.setAttribute("numberOfUnits", String.valueOf(numberOfUnits));
+            enemyElement.setAttribute("militaryStrength", String.valueOf(militaryStrength));
+            enemyElement.setAttribute("navalStrength", String.valueOf(navalStrength));
+            enemyElement.setAttribute("stance", String.valueOf(enemyPlayer.getStance(player)));
+
+            if (player.hasFather(FoundingFather.JAN_DE_WITT)) {
+                enemyElement.setAttribute("SoL", String.valueOf(enemyPlayer.getSoL()));
+                enemyElement.setAttribute("foundingFathers", String.valueOf(enemyPlayer.getFatherCount()));
+                enemyElement.setAttribute("gold", String.valueOf(enemyPlayer.getGold()));
+                enemyElement.setAttribute("tax", String.valueOf(enemyPlayer.getTax()));
+            }
+            reply.appendChild(enemyElement);
+            
+        }
+
+        return reply;
+    }    
+
+
     
     /**
      * Handles a "setDestination"-message.

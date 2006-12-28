@@ -54,15 +54,12 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
     private final JPanel tradeReportPanel;
     private final MatteBorder myBorder = new MatteBorder(0, 0, 1, 0, Color.BLACK);
 
-    private Canvas parent;
-
     /**
      * The constructor that will add the items to this panel.
      * @param parent The parent of this panel.
      */
     public ReportTradePanel(Canvas parent) {
         super(parent, Messages.message("menuBar.report.trade"));
-        this.parent = parent;
         goodsLabels = new JLabel[Goods.NUMBER_OF_TYPES];
 
         //priceLabel = new JLabel(Messages.message("report.trade.prices"), JLabel.TRAILING);
