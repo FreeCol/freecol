@@ -1163,6 +1163,17 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             }
         }
     }
+    
+    /**
+     * Set movesLeft to 0 if has some spent moves and it's in a colony
+     * @see #add(Locatable)
+     * @see #remove(Locatable)
+     */
+    private void spendAllMoves() {
+        if (getTile() != null && getTile().getColony() != null &&
+                getMovesLeft() < getInitialMovesLeft())
+            setMovesLeft(0);
+    }
 
 
     /**
@@ -1177,15 +1188,13 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 }
 
                 unitContainer.addUnit((Unit) locatable);
-                if (getMovesLeft() < getInitialMovesLeft())
-                    setMovesLeft(0);
+                spendAllMoves();
             } else if (locatable instanceof Goods) {
                 goodsContainer.addGoods((Goods) locatable);
                 if (getSpaceLeft() < 0) {
                     throw new IllegalStateException("Not enough space for the given locatable!");
                 }
-                if (getMovesLeft() < getInitialMovesLeft())
-                    setMovesLeft(0);
+                spendAllMoves();
             } else {
                 logger.warning("Tried to add an unrecognized 'Locatable' to a unit.");
             }
@@ -1203,12 +1212,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         if (isCarrier()) {
             if (locatable instanceof Unit) {
                 unitContainer.removeUnit((Unit) locatable);
-                if (getMovesLeft() < getInitialMovesLeft())
-                    setMovesLeft(0);
+                spendAllMoves();
             } else if (locatable instanceof Goods) {
                 goodsContainer.removeGoods((Goods) locatable);
-                if (getMovesLeft() < getInitialMovesLeft())
-                    setMovesLeft(0);
+                spendAllMoves();
             } else {
                 logger.warning("Tried to remove an unrecognized 'Locatable' from a unit.");
             }
