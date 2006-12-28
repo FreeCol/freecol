@@ -13,6 +13,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Element;
 
+import net.sf.freecol.client.gui.i18n.Messages;
 
 /**
 * Represents a work location on a tile.
@@ -92,6 +93,19 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
      */
     public ColonyTile(Game game, String id) {
         super(game, id);
+    }
+
+    /**
+     * Returns the (non-unique) name of this <code>ColonyTile</code>.
+     * @return The name of this ColonyTile.
+     */
+    public String getLocationName() {
+        String name = getColony().getName();
+        if (isColonyCenterTile()) {
+            return name;
+        } else {
+            return Messages.message("nearLocation", new String[][] {{"%location%", name}});
+        }
     }
 
 

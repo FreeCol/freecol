@@ -27,6 +27,14 @@ public interface Location {
 
 
     /**
+     * Returns the name of this location.
+     *
+     * @return The name of this location.
+     */
+    public String getLocationName();
+
+
+    /**
     * Adds a <code>Locatable</code> to this Location.
     *
     * @param locatable The <code>Locatable</code> to add to this Location.
@@ -61,7 +69,7 @@ public interface Location {
     * Checks wether or not the specified locatable may be added to this
     * <code>Location</code>.
     *
-    * @param locatable The <code>Locatable</code> to test the addabillity of.
+    * @param locatable The <code>Locatable</code> to add.
     * @return The result.
     */
     public boolean canAdd(Locatable locatable);

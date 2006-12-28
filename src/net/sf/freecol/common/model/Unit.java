@@ -282,7 +282,14 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     public Unit(Game game, String id) {
         super(game, id);
     }
-    
+
+    /**
+     * Returns a name for this unit, as a location.
+     * @return A name for this unit, as a location.
+     */
+    public String getLocationName() {
+        return Messages.message("onBoard", new String[][] {{"%unit%", getName()}});
+    }
 
     /**
     * Returns the current amount of treasure in this unit.

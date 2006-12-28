@@ -981,6 +981,14 @@ public final class Colony extends Settlement implements Location {
         return name;
     }
 
+    /**
+     * Returns the name of this location.
+     *
+     * @return The name of this location.
+     */
+    public String getLocationName() {
+        return name;
+    }
 
     /**
     * Gets the production of food.

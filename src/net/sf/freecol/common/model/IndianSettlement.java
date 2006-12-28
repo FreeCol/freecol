@@ -12,6 +12,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.client.gui.i18n.Messages;
 
 import org.w3c.dom.Element;
 
@@ -248,6 +249,15 @@ public class IndianSettlement extends Settlement {
         missionary = null;
         convertProgress = 0;
     }
+
+    /**
+     * Returns a suitable (non-unique) name.
+     * @return The name of this settlement.
+     */
+    public String getLocationName() {
+        return Messages.message("indianSettlement", new String[][] {{"%nation%", getOwner().getNationAsString()}});
+    }
+
 
     /**
     * Modifies the alarm level towards the given player.

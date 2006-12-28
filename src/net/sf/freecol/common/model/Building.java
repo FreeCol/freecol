@@ -12,6 +12,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.gui.i18n.Messages;
 
 import org.w3c.dom.Element;
 
@@ -236,6 +237,15 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         return isBuilt()  &&  (level - 1) < buildingType.numberOfLevels()
             ? buildingType.level(level - 1).name
             : null;
+    }
+
+    /**
+     * Returns the name of this location.
+     *
+     * @return The name of this location.
+     */
+    public String getLocationName() {
+        return Messages.message("inLocation", new String[][] {{"%location%", getName()}});
     }
 
     /**

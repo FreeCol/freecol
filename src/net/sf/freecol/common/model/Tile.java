@@ -13,7 +13,9 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Map.CircleIterator;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.model.Colony;
 
 import org.w3c.dom.Element;
 
@@ -226,6 +228,29 @@ public final class Tile extends FreeColGameObject implements Location {
         }
 
         return "Unknown";
+    }
+
+    /**
+     * Returns the name of this location.
+     *
+     * @return The name of this location.
+     */
+    public String getLocationName() {
+        if (settlement == null) {
+            Settlement nearSettlement = null;
+            int radius = Math.max(getMap().getHeight(), getMap().getWidth()) / 2;
+            CircleIterator mapIterator = getMap().getCircleIterator(getPosition(), true, radius);
+            while (mapIterator.hasNext()) {
+                nearSettlement = getMap().getTile((Position) mapIterator.nextPosition()).getSettlement();
+                if (nearSettlement != null && nearSettlement instanceof Colony) {
+                    String name = ((Colony) nearSettlement).getName();
+                    return getName() + " (" + Messages.message("nearLocation", new String[][] {{"%location%", name}}) + ")";
+                }
+            }
+            return getName();
+        } else {
+            return settlement.getLocationName();
+        }
     }
 
 

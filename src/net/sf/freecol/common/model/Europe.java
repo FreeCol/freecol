@@ -404,6 +404,16 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         }
     }
 
+
+    /**
+     * Returns the name of this location.
+     *
+     * @return The name of this location.
+     */
+    public String getLocationName() {
+        return toString();
+    }
+
     /**
      * Returns a suitable name.
      */
