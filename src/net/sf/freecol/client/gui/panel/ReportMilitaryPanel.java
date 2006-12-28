@@ -11,7 +11,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -108,10 +107,9 @@ public final class ReportMilitaryPanel extends ReportPanel implements ActionList
             }
         }
 
-        Set keySet = locations.keySet();
-
         int[] widths = new int[] {0, 12, 0};
         int[] heights = new int[colonies.size() + 2];
+        heights[1] = 12;
         int row = 1;
 
         int colonyColumn = 1;
@@ -127,12 +125,14 @@ public final class ReportMilitaryPanel extends ReportPanel implements ActionList
 
         int[] ref = player.getMonarch().getREF();
         int[] refUnitType = new int[] {
-            Monarch.MAN_OF_WAR, Monarch.ARTILLERY,
-            Monarch.DRAGOON, Monarch.INFANTRY };
+            Monarch.ARTILLERY,
+            Monarch.DRAGOON,
+            Monarch.INFANTRY };
         int[] libraryUnitType = new int[] {
-            ImageLibrary.MAN_O_WAR, ImageLibrary.ARTILLERY,
-            ImageLibrary.KINGS_CAVALRY, ImageLibrary.KINGS_REGULAR };
-        JPanel refPanel = new JPanel(new GridLayout(0,7));
+            ImageLibrary.ARTILLERY,
+            ImageLibrary.KINGS_CAVALRY,
+            ImageLibrary.KINGS_REGULAR };
+        JPanel refPanel = new JPanel(new GridLayout(0,10));
         for (int index = 0; index < refUnitType.length; index++) {
             for (int count = 0; count < ref[refUnitType[index]]; count++) {
                 refPanel.add(buildUnitLabel(libraryUnitType[index], 0.66f));
@@ -148,7 +148,7 @@ public final class ReportMilitaryPanel extends ReportPanel implements ActionList
             String colony = (String) colonyIterator.next();
             JLabel colonyLabel = new JLabel(colony);
             reportPanel.add(colonyLabel, higConst.rc(row, colonyColumn));
-            JPanel unitPanel = new JPanel(new GridLayout(0, 8));
+            JPanel unitPanel = new JPanel(new GridLayout(0, 10));
             List unitList = locations.get(colony);
             if (unitList == null) {
                 colonyLabel.setForeground(Color.GRAY);

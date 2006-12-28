@@ -53,6 +53,7 @@ import net.sf.freecol.client.gui.panel.ReportForeignAffairPanel;
 import net.sf.freecol.client.gui.panel.ReportIndianPanel;
 import net.sf.freecol.client.gui.panel.ReportLabourPanel;
 import net.sf.freecol.client.gui.panel.ReportMilitaryPanel;
+import net.sf.freecol.client.gui.panel.ReportNavalPanel;
 import net.sf.freecol.client.gui.panel.ReportPanel;
 import net.sf.freecol.client.gui.panel.ReportReligiousPanel;
 import net.sf.freecol.client.gui.panel.ReportTradePanel;
@@ -180,7 +181,8 @@ public final class Canvas extends JLayeredPane {
     private final ReportReligiousPanel     reportReligiousPanel;
     private final ReportTradePanel         reportTradePanel;
     private final ReportLabourPanel        reportLabourPanel;
-    private final ReportMilitaryPanel        reportMilitaryPanel;
+    private final ReportMilitaryPanel      reportMilitaryPanel;
+    private final ReportNavalPanel         reportNavalPanel;
     private final ReportForeignAffairPanel reportForeignAffairPanel;
     private final ReportIndianPanel        reportIndianPanel;
     private final ReportContinentalCongressPanel reportContinentalCongressPanel;
@@ -237,6 +239,7 @@ public final class Canvas extends JLayeredPane {
         reportTradePanel = new ReportTradePanel(this);
         reportLabourPanel = new ReportLabourPanel(this);
         reportMilitaryPanel = new ReportMilitaryPanel(this);
+        reportNavalPanel = new ReportNavalPanel(this);
         reportForeignAffairPanel = new ReportForeignAffairPanel(this);
         reportIndianPanel = new ReportIndianPanel(this);
         reportContinentalCongressPanel = new ReportContinentalCongressPanel(this);
@@ -1203,6 +1206,8 @@ public final class Canvas extends JLayeredPane {
             reportPanel = reportTradePanel;
         } else if ("net.sf.freecol.client.gui.panel.ReportMilitaryPanel".equals(classname)) {
             reportPanel = reportMilitaryPanel;
+        } else if ("net.sf.freecol.client.gui.panel.ReportNavalPanel".equals(classname)) {
+            reportPanel = reportNavalPanel;
         } else {
             logger.warning("Request for Report panel could not be processed.  Name="+ classname );
         }

@@ -53,6 +53,7 @@ import net.sf.freecol.client.gui.action.ReportForeignAction;
 import net.sf.freecol.client.gui.action.ReportIndianAction;
 import net.sf.freecol.client.gui.action.ReportLabourAction;
 import net.sf.freecol.client.gui.action.ReportMilitaryAction;
+import net.sf.freecol.client.gui.action.ReportNavalAction;
 import net.sf.freecol.client.gui.action.ReportReligionAction;
 import net.sf.freecol.client.gui.action.ReportTradeAction;
 import net.sf.freecol.client.gui.action.SaveAction;
@@ -238,6 +239,7 @@ public class FreeColMenuBar extends JMenuBar {
         menu.add(getMenuItem(ReportIndianAction.ID));
         menu.add(getMenuItem(ReportContinentalCongressAction.ID));
         menu.add(getMenuItem(ReportMilitaryAction.ID));
+        menu.add(getMenuItem(ReportNavalAction.ID));
         
         reportsTradeMenuItem = getMenuItem(ReportTradeAction.ID); 
         

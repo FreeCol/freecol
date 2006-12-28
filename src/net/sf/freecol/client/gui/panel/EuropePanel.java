@@ -489,7 +489,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             if (newLandName == null) {
                 newLandName = freeColClient.getMyPlayer().getDefaultNewLandName();
             }
-            ImageIcon toAmericaImage = new ImageIcon(freeColClient.getGUI().createStringImage(toAmericaLabel, Messages.message("goingTo") + " " + newLandName, Color.WHITE, 200, TITLE_FONT_SIZE));
+            ImageIcon toAmericaImage = new ImageIcon(freeColClient.getGUI().createStringImage(toAmericaLabel, Messages.message("goingTo", new String[][] {{"%location%", newLandName}}), Color.WHITE, 200, TITLE_FONT_SIZE));
             toAmericaLabel.setIcon(toAmericaImage);
         }
     }
