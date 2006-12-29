@@ -4,7 +4,6 @@ import java.awt.event.ActionListener;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.awt.Image;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -12,17 +11,15 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Location;
@@ -42,20 +39,12 @@ public final class ReportMilitaryPanel extends ReportPanel implements ActionList
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    private final ImageLibrary library;
-    private static final Comparator unitTypeComparator = new Comparator<Unit> () {
-        public int compare(Unit unit1, Unit unit2) {
-            return unit2.getType() - unit1.getType();
-        }
-    };
-
     /**
      * The constructor that will add the items to this panel.
      * @param parent The parent of this panel.
      */
     public ReportMilitaryPanel(Canvas parent) {
         super(parent, Messages.message("menuBar.report.military"));
-        this.library = (ImageLibrary) parent.getImageProvider();
     }
 
     /**
@@ -156,7 +145,7 @@ public final class ReportMilitaryPanel extends ReportPanel implements ActionList
             if (unitList == null) {
                 colonyLabel.setForeground(Color.GRAY);
             } else {       
-                Collections.sort(unitList, unitTypeComparator);
+                Collections.sort(unitList, getUnitTypeComparator());
                 Iterator unitIterator = unitList.iterator();
                 while (unitIterator.hasNext()) {
                     Unit unit = (Unit) unitIterator.next();
@@ -168,31 +157,5 @@ public final class ReportMilitaryPanel extends ReportPanel implements ActionList
         }
 
     }
-
-    /**
-     * Builds the button for the given unit.
-     * @param unit
-     * @param unitIcon
-     * @param scale
-     */
-    private JLabel buildUnitLabel(int unitIcon, float scale) {
-
-        JLabel imageLabel = null;
-        if (unitIcon >= 0) {
-            ImageIcon icon = library.getUnitImageIcon(unitIcon);
-            if (scale != 1) {
-              Image image;
-              image = icon.getImage();
-              int width = (int) (scale * image.getWidth(this));
-              int height = (int) (scale * image.getHeight(this));
-              image = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-              icon = new ImageIcon(image);
-            }
-            imageLabel = new JLabel(icon);
-        }
-        return imageLabel;
-    }
-
-
 }
 

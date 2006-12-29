@@ -24,15 +24,12 @@ public final class ReportReligiousPanel extends ReportPanel implements ActionLis
 
     private final ReportProductionPanel religiousReportPanel;
 
-    private Canvas parent;
-
     /**
      * The constructor that will add the items to this panel.
      * @param parent The parent of this panel.
      */
     public ReportReligiousPanel(Canvas parent) {
         super(parent, Messages.message("menuBar.report.religion"));
-        this.parent = parent;
 
         reportPanel.setLayout(new BoxLayout(reportPanel, BoxLayout.Y_AXIS));
         religiousReportPanel = new ReportProductionPanel(Goods.CROSSES, parent);

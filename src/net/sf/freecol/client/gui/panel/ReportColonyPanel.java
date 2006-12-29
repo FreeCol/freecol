@@ -1,0 +1,126 @@
+package net.sf.freecol.client.gui.panel;
+
+import java.awt.event.ActionListener;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Unit;
+
+import cz.autel.dmi.*;
+
+/**
+ * This panel displays the Colony Report.
+ */
+public final class ReportColonyPanel extends ReportPanel implements ActionListener {
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
+    public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
+    public static final String  REVISION = "$Revision$";
+
+
+    /**
+     * The constructor that will add the items to this panel.
+     * @param parent The parent of this panel.
+     */
+    public ReportColonyPanel(Canvas parent) {
+        super(parent, Messages.message("menuBar.report.colony"));
+    }
+
+    /**
+     * Prepares this panel to be displayed.
+     */
+    public void initialize() {
+        Player player = parent.getClient().getMyPlayer();
+        List<Settlement> colonies = player.getSettlements();
+
+        // Display Panel
+        reportPanel.removeAll();
+
+        int rowsPerColony = 4;
+        int separator = 24;
+        int widths[] = new int[] {0, 12, 0};
+        int heights[] = new int[colonies.size() * rowsPerColony];
+        for (int i = 0; i < colonies.size(); i++) {
+            heights[i * rowsPerColony + 3] = separator;
+        }
+
+        reportPanel.setLayout(new HIGLayout(widths, heights));
+        HIGConstraints higConst = new HIGConstraints();
+
+        int row = 1;
+        int colonyColumn = 1;
+        int panelColumn = 3;
+        Collections.sort(colonies, parent.getClient().getClientOptions().getColonyComparator());
+        Iterator colonyIterator = colonies.iterator();
+        while (colonyIterator.hasNext()) {
+            Colony colony = (Colony) colonyIterator.next();
+
+            // colonyLabel
+            JLabel colonyLabel = new JLabel(colony.getName());
+            reportPanel.add(colonyLabel, higConst.rc(row, colonyColumn));
+
+            // units
+            JPanel unitPanel = new JPanel(new GridLayout(0, 10));
+            Iterator unitIterator = colony.getUnitIterator();
+            while (unitIterator.hasNext()) {
+                Unit unit = (Unit) unitIterator.next();
+                UnitLabel unitLabel = new UnitLabel(unit, parent, true, true);
+                unitPanel.add(unitLabel);
+            }
+            reportPanel.add(unitPanel, higConst.rc(row, panelColumn));
+            row++;
+            
+            // production
+            JPanel goodsPanel = new JPanel(new GridLayout(0, 10));
+            for (int goodsType = 0; goodsType < Goods.NUMBER_OF_ALL_TYPES; goodsType++) {
+                int newValue = colony.getProductionOf(goodsType);
+                if (newValue > 0) {
+                    Goods goods = new Goods(goodsType);
+                    goods.setAmount(newValue);
+                    GoodsLabel goodsLabel = new GoodsLabel(goods, parent);
+                    goodsLabel.setHorizontalAlignment(JLabel.LEADING);
+                    goodsPanel.add(goodsLabel);
+                }
+            }
+            reportPanel.add(goodsPanel, higConst.rc(row, panelColumn));
+            row++;
+
+            // buildings
+            JPanel buildingPanel = new JPanel(new GridLayout(0, 4));
+            int currentType = colony.getCurrentlyBuilding();
+            for (int buildingType = 0; buildingType < Building.NUMBER_OF_TYPES; buildingType++) {
+                Building building = colony.getBuilding(buildingType);
+                if (building.getLevel() != Building.NOT_BUILT) {
+                    buildingPanel.add(new JLabel(building.getName()));
+                } 
+                if (buildingType == currentType) {
+                    JLabel buildingLabel = new JLabel(building.getNextName());
+                    buildingLabel.setForeground(Color.GRAY);
+                    buildingPanel.add(buildingLabel);
+                }
+            }
+            reportPanel.add(buildingPanel, higConst.rc(row, panelColumn));
+            row += 2;
+        }
+
+
+    }
+}
+

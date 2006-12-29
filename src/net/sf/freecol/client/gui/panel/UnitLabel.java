@@ -60,6 +60,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
     private final Unit unit;
     private final Canvas parent;
     private boolean selected;
+    private boolean ignoreLocation;
 
     private InGameController inGameController;
 
@@ -76,6 +77,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
         selected = false;
 
         setSmall(false);
+        setIgnoreLocation(false);
 
         this.inGameController = parent.getClient().getInGameController();
     }
@@ -90,6 +92,22 @@ public final class UnitLabel extends JLabel implements ActionListener {
     public UnitLabel(Unit unit, Canvas parent, boolean isSmall) {
         this(unit, parent);
         setSmall(isSmall);
+        setIgnoreLocation(false);
+    }
+
+    
+    /**
+    * Initializes this JLabel with the given unit data.
+    * @param unit The Unit that this JLabel will visually represent.
+    * @param parent The parent that knows more than we do.
+    * @param isSmall The image will be smaller if set to <code>true</code>.
+    * @param ignoreLocation The image will not include production or
+    * state information if set to <code>true</code>.
+    */
+    public UnitLabel(Unit unit, Canvas parent, boolean isSmall, boolean ignoreLocation) {
+        this(unit, parent);
+        setSmall(isSmall);
+        setIgnoreLocation(ignoreLocation);
     }
 
     
@@ -117,6 +135,17 @@ public final class UnitLabel extends JLabel implements ActionListener {
     */
     public void setSelected(boolean b) {
         selected = b;
+    }
+
+
+    /**
+    * Sets whether or not this unit label should include production
+    * and state information.
+    * @param b Whether or not this unit label should include
+    * production and state information.
+    */
+    public void setIgnoreLocation(boolean b) {
+        ignoreLocation = b;
     }
 
 
@@ -159,6 +188,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
         }
 
         super.paintComponent(g);
+        if (ignoreLocation) return;
         
         if (getParent() instanceof ColonyPanel.OutsideColonyPanel ||
                 getParent() instanceof ColonyPanel.InPortPanel) {

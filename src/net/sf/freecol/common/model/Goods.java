@@ -67,6 +67,8 @@ public class Goods implements Locatable, Ownable {
                             CROSSES = 18,
                             HAMMERS = 19;
 
+    public static final int NUMBER_OF_ALL_TYPES = 20;
+
     private Game game;
     private Location location;
     private int type;

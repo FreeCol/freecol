@@ -141,7 +141,7 @@ public final class ReportProductionPanel extends JPanel {
         int toryCount = 0;
 
         Collections.sort(colonies, parent.getClient().getClientOptions().getColonyComparator());
-        Iterator colonyIterator = player.getColonyIterator();
+        Iterator colonyIterator = colonies.iterator();
         while (colonyIterator.hasNext()) {
             Colony colony = (Colony) colonyIterator.next();
 

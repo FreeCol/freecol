@@ -2,7 +2,6 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
 import java.awt.GridLayout;
-import java.awt.Image;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,7 +9,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -110,7 +108,6 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
                         
                             UNIT_GRAPHICS_COUNT = 60;
 
-    private final ImageLibrary library;
     
     private int[] unitCount;
     private HashMap<String, Integer>[] unitLocations;
@@ -122,7 +119,6 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
      */
     public ReportLabourPanel(Canvas parent) {
         super(parent, Messages.message("report.labour"));
-        this.library = (ImageLibrary) parent.getImageProvider();
     }
 
     /**
@@ -303,33 +299,6 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
                         higConst.rc(row, 7));
 
         reportPanel.doLayout();
-    }
-
-    /**
-     * Builds the button for the given unit.
-     * @param unit
-     * @param unitIcon
-     * @param scale
-     */
-    private JLabel buildUnitLabel(int unitIcon, float scale) {
-        //JPanel panel = new JPanel();
-        //panel.setOpaque(false);
-
-        JLabel imageLabel = null;
-        if (unitIcon >= 0) {
-            ImageIcon icon = library.getUnitImageIcon(unitIcon);
-            if (scale != 1) {
-              Image image;
-              image = icon.getImage();
-              int width = (int) (scale * image.getWidth(this));
-              int height = (int) (scale * image.getHeight(this));
-              image = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-              icon = new ImageIcon(image);
-            }
-            imageLabel = new JLabel(icon);
-            //panel.add(imageLabel);
-        }
-        return imageLabel;
     }
 
     private JPanel buildUnitReport(int unit) {

@@ -48,6 +48,7 @@ import net.sf.freecol.client.gui.panel.MapGeneratorOptionsDialog;
 import net.sf.freecol.client.gui.panel.MonarchPanel;
 import net.sf.freecol.client.gui.panel.NewPanel;
 import net.sf.freecol.client.gui.panel.QuitDialog;
+import net.sf.freecol.client.gui.panel.ReportColonyPanel;
 import net.sf.freecol.client.gui.panel.ReportContinentalCongressPanel;
 import net.sf.freecol.client.gui.panel.ReportForeignAffairPanel;
 import net.sf.freecol.client.gui.panel.ReportIndianPanel;
@@ -181,6 +182,7 @@ public final class Canvas extends JLayeredPane {
     private final ReportReligiousPanel     reportReligiousPanel;
     private final ReportTradePanel         reportTradePanel;
     private final ReportLabourPanel        reportLabourPanel;
+    private final ReportColonyPanel        reportColonyPanel;
     private final ReportMilitaryPanel      reportMilitaryPanel;
     private final ReportNavalPanel         reportNavalPanel;
     private final ReportForeignAffairPanel reportForeignAffairPanel;
@@ -238,6 +240,7 @@ public final class Canvas extends JLayeredPane {
         reportReligiousPanel = new ReportReligiousPanel(this);
         reportTradePanel = new ReportTradePanel(this);
         reportLabourPanel = new ReportLabourPanel(this);
+        reportColonyPanel = new ReportColonyPanel(this);
         reportMilitaryPanel = new ReportMilitaryPanel(this);
         reportNavalPanel = new ReportNavalPanel(this);
         reportForeignAffairPanel = new ReportForeignAffairPanel(this);
@@ -1208,6 +1211,8 @@ public final class Canvas extends JLayeredPane {
             reportPanel = reportMilitaryPanel;
         } else if ("net.sf.freecol.client.gui.panel.ReportNavalPanel".equals(classname)) {
             reportPanel = reportNavalPanel;
+        } else if ("net.sf.freecol.client.gui.panel.ReportColonyPanel".equals(classname)) {
+            reportPanel = reportColonyPanel;
         } else {
             logger.warning("Request for Report panel could not be processed.  Name="+ classname );
         }

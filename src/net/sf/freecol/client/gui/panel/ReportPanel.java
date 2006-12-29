@@ -3,10 +3,13 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.logging.Logger;
+import java.util.Comparator;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -15,7 +18,9 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Unit;
 
 /**
  * This panel displays a report.
@@ -34,6 +39,14 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
     private JButton ok;
     private JScrollPane scrollPane;
     
+    private static ImageLibrary library;
+
+    private static final Comparator unitTypeComparator = new Comparator<Unit> () {
+        public int compare(Unit unit1, Unit unit2) {
+            return unit2.getType() - unit1.getType();
+        }
+    };
+
     /**
      * The constructor that will add the items to this panel.
      * @param parent The parent of this panel.
@@ -42,7 +55,8 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
     public ReportPanel(Canvas parent, String title) {
         super(new FlowLayout(FlowLayout.CENTER, 1000, 10));
         this.parent = parent;
-        
+        this.library = (ImageLibrary) parent.getImageProvider();
+
         setLayout(new BorderLayout());
         
         header = new JLabel(title, JLabel.CENTER);
@@ -84,6 +98,39 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
      */
     public void requestFocus() {
         ok.requestFocus();
+    }
+
+
+    /**
+     * Returns a unit type comparator.
+     * @return A unit type comparator.
+     */
+    public Comparator getUnitTypeComparator() {
+        return unitTypeComparator;
+    }
+
+    /**
+     * Builds the button for the given unit.
+     * @param unit
+     * @param unitIcon
+     * @param scale
+     */
+    public JLabel buildUnitLabel(int unitIcon, float scale) {
+
+        JLabel imageLabel = null;
+        if (unitIcon >= 0) {
+            ImageIcon icon = library.getUnitImageIcon(unitIcon);
+            if (scale != 1) {
+              Image image;
+              image = icon.getImage();
+              int width = (int) (scale * image.getWidth(this));
+              int height = (int) (scale * image.getHeight(this));
+              image = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+              icon = new ImageIcon(image);
+            }
+            imageLabel = new JLabel(icon);
+        }
+        return imageLabel;
     }
 
     /**
