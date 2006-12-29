@@ -2084,8 +2084,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         while (enemyPlayerIterator.hasNext()) {
             ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
 
-            if (player.equals(enemyPlayer) || 
-                enemyPlayer.getConnection() == null ||
+            if (enemyPlayer.getConnection() == null ||
                 enemyPlayer.isIndian() ||
                 enemyPlayer.isREF()) {
                 continue;
@@ -2115,7 +2114,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             enemyElement.setAttribute("navalStrength", String.valueOf(navalStrength));
             enemyElement.setAttribute("stance", String.valueOf(enemyPlayer.getStance(player)));
 
-            if (player.hasFather(FoundingFather.JAN_DE_WITT)) {
+            if (player.equals(enemyPlayer) || 
+                player.hasFather(FoundingFather.JAN_DE_WITT)) {
                 enemyElement.setAttribute("SoL", String.valueOf(enemyPlayer.getSoL()));
                 enemyElement.setAttribute("foundingFathers", String.valueOf(enemyPlayer.getFatherCount()));
                 enemyElement.setAttribute("gold", String.valueOf(enemyPlayer.getGold()));
