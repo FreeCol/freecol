@@ -1359,24 +1359,14 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                         return null;
                     }
 
-                    if (g.getAmount() != newAmount) {
-                        g.setAmount(g.getAmount() - newAmount);
-                        g = new Goods(game, g.getLocation(), g.getType(), newAmount);
-                    } else {
-                        if (oldParent != null) {
-                            oldParent.remove(comp);
-                        }
-                    }
-
-                    if (!selectedUnit.getUnit().canAdd(g)) {
-                        if (oldParent != null) {
-                            oldParent.add(comp);
-                        }
+                    Goods goodsToAdd = new Goods(game, g.getLocation(), g.getType(), newAmount);
+                    if (!selectedUnit.getUnit().canAdd(goodsToAdd)) {
                         return null;
                     }
+                    g.setAmount(g.getAmount() - newAmount);
 
                     ((GoodsLabel) comp).setSmall(false);
-                    inGameController.loadCargo(g, selectedUnit.getUnit());
+                    inGameController.loadCargo(goodsToAdd, selectedUnit.getUnit());
                     colonyPanel.getWarehousePanel().revalidate();
 
                     reinitialize();
