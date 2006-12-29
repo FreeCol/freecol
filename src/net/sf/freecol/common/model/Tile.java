@@ -238,7 +238,7 @@ public final class Tile extends FreeColGameObject implements Location {
     public String getLocationName() {
         if (settlement == null) {
             Settlement nearSettlement = null;
-            int radius = Math.max(getMap().getHeight(), getMap().getWidth()) / 2;
+            int radius = 8; // more than 8 tiles away is no longer "near"
             CircleIterator mapIterator = getMap().getCircleIterator(getPosition(), true, radius);
             while (mapIterator.hasNext()) {
                 nearSettlement = getMap().getTile((Position) mapIterator.nextPosition()).getSettlement();

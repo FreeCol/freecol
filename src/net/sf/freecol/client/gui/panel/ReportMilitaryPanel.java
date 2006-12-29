@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -41,6 +43,11 @@ public final class ReportMilitaryPanel extends ReportPanel implements ActionList
     public static final String  REVISION = "$Revision$";
 
     private final ImageLibrary library;
+    private static final Comparator unitTypeComparator = new Comparator<Unit> () {
+        public int compare(Unit unit1, Unit unit2) {
+            return unit2.getType() - unit1.getType();
+        }
+    };
 
     /**
      * The constructor that will add the items to this panel.
@@ -65,6 +72,7 @@ public final class ReportMilitaryPanel extends ReportPanel implements ActionList
             colonyNames.add(((Colony) colonyIterator.next()).getName());
         }
 
+        ArrayList otherNames = new ArrayList();
 
         HashMap<String, List<Unit>> locations = new HashMap<String, List<Unit>>();
 
@@ -82,20 +90,11 @@ public final class ReportMilitaryPanel extends ReportPanel implements ActionList
 
                 Location location = unit.getLocation();
                 String locationName = null;
-
-                if (location instanceof WorkLocation) {
-                    locationName = ((WorkLocation) location).getColony().getName();
-                } else if (location instanceof Europe) {
-                    locationName = player.getEurope().toString();
-                } else if (location instanceof Tile &&
-                           ((Tile) location).getSettlement() != null) {
-                    locationName = ((Colony) ((Tile) location).getSettlement()).getName();
-                } else if (location instanceof Unit) {
-                    locationName = Messages.message("report.atSea");
+                if (unit.getDestination() != null) {
+                    locationName = Messages.message("goingTo", new String[][] {{"%location%", unit.getDestination().getLocationName()}});
                 } else {
-                    locationName = Messages.message("report.onLand");
-                }
-
+                    locationName = location.getLocationName();
+                } 
                 if (locationName != null) {
                     List unitList = locations.get(locationName);
                     if (unitList == null) {
@@ -103,12 +102,19 @@ public final class ReportMilitaryPanel extends ReportPanel implements ActionList
                         locations.put(locationName, unitList);
                     }
                     unitList.add(unit);
+                    if (!(colonyNames.contains(locationName) ||
+                          otherNames.contains(locationName))) {
+                        otherNames.add(locationName);
+                    }
                 }
             }
         }
 
+        Collections.sort(otherNames);
+        colonyNames.addAll(otherNames);
+
         int[] widths = new int[] {0, 12, 0};
-        int[] heights = new int[colonies.size() + 2];
+        int[] heights = new int[colonyNames.size() + 2];
         heights[1] = 12;
         int row = 1;
 
@@ -118,11 +124,8 @@ public final class ReportMilitaryPanel extends ReportPanel implements ActionList
         reportPanel.setLayout(new HIGLayout(widths, heights));
         HIGConstraints higConst = new HIGConstraints();
 
+        // REF
         Player refPlayer = player.getREFPlayer();
-        JLabel refLabel = new JLabel(refPlayer.getNationAsString());
-        refLabel.setForeground(Color.RED);
-        reportPanel.add(refLabel, higConst.rc(row, colonyColumn));
-
         int[] ref = player.getMonarch().getREF();
         int[] refUnitType = new int[] {
             Monarch.ARTILLERY,
@@ -132,14 +135,14 @@ public final class ReportMilitaryPanel extends ReportPanel implements ActionList
             ImageLibrary.ARTILLERY,
             ImageLibrary.KINGS_CAVALRY,
             ImageLibrary.KINGS_REGULAR };
-        JPanel refPanel = new JPanel(new GridLayout(0,10));
+        JPanel refPanel = new JPanel(new GridLayout(0, 12));
+        refPanel.setBorder(BorderFactory.createTitledBorder(refPlayer.getNationAsString()));
         for (int index = 0; index < refUnitType.length; index++) {
             for (int count = 0; count < ref[refUnitType[index]]; count++) {
                 refPanel.add(buildUnitLabel(libraryUnitType[index], 0.66f));
             }
         }
-        reportPanel.add(refPanel, higConst.rc(row, unitColumn));
-
+        reportPanel.add(refPanel, higConst.rcwh(row, colonyColumn, widths.length, 1));
 
         row += 2;
 
@@ -153,11 +156,7 @@ public final class ReportMilitaryPanel extends ReportPanel implements ActionList
             if (unitList == null) {
                 colonyLabel.setForeground(Color.GRAY);
             } else {       
-                Collections.sort(unitList, new Comparator<Unit> () {
-                    public int compare(Unit unit1, Unit unit2) {
-                        return unit2.getType() - unit1.getType();
-                    }
-                });
+                Collections.sort(unitList, unitTypeComparator);
                 Iterator unitIterator = unitList.iterator();
                 while (unitIterator.hasNext()) {
                     Unit unit = (Unit) unitIterator.next();

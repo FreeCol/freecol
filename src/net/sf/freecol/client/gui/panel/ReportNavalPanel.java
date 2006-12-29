@@ -11,8 +11,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -42,6 +42,11 @@ public final class ReportNavalPanel extends ReportPanel implements ActionListene
     public static final String  REVISION = "$Revision$";
 
     private final ImageLibrary library;
+    private static final Comparator unitTypeComparator = new Comparator<Unit> () {
+        public int compare(Unit unit1, Unit unit2) {
+            return unit2.getType() - unit1.getType();
+        }
+    };
 
     /**
      * The constructor that will add the items to this panel.
@@ -89,7 +94,7 @@ public final class ReportNavalPanel extends ReportPanel implements ActionListene
                 } else if (unit.getState() == Unit.TO_EUROPE) {
                     locationName = Messages.message("goingToEurope");
                 } else if (unit.getDestination() != null) {
-                    locationName = Messages.message("goingTo", new String[][] {{"%location%", unit.getDestination().getLocationName()}});
+                    locationName = Messages.message("sailingTo", new String[][] {{"%location%", unit.getDestination().getLocationName()}});
                 } else {
                     locationName = location.getLocationName();
                 } 
@@ -100,20 +105,19 @@ public final class ReportNavalPanel extends ReportPanel implements ActionListene
                         locations.put(locationName, unitList);
                     }
                     unitList.add(unit);
-                    if (!colonyNames.contains(locationName)) {
+                    if (!(colonyNames.contains(locationName) ||
+                          otherNames.contains(locationName))) {
                         otherNames.add(locationName);
                     }
                 }
             }
         }
 
-        Set keySet = locations.keySet();
-
         Collections.sort(otherNames);
         colonyNames.addAll(otherNames);
 
         int[] widths = new int[] {0, 12, 0};
-        int[] heights = new int[keySet.size() + 2];
+        int[] heights = new int[locations.keySet().size() + 2];
         heights[1] = 12;
         int row = 1;
 
@@ -123,17 +127,15 @@ public final class ReportNavalPanel extends ReportPanel implements ActionListene
         reportPanel.setLayout(new HIGLayout(widths, heights));
         HIGConstraints higConst = new HIGConstraints();
 
+        // REF
         Player refPlayer = player.getREFPlayer();
-        JLabel refLabel = new JLabel(refPlayer.getNationAsString());
-        refLabel.setForeground(Color.RED);
-        reportPanel.add(refLabel, higConst.rc(row, colonyColumn));
-
         int[] ref = player.getMonarch().getREF();
-        JPanel refPanel = new JPanel(new GridLayout(0,7));
+        JPanel refPanel = new JPanel(new GridLayout(0, 10));
+        refPanel.setBorder(BorderFactory.createTitledBorder(refPlayer.getNationAsString()));
         for (int count = 0; count < ref[Monarch.MAN_OF_WAR]; count++) {
             refPanel.add(buildUnitLabel(ImageLibrary.MAN_O_WAR, 0.66f));
         }
-        reportPanel.add(refPanel, higConst.rc(row, unitColumn));
+        reportPanel.add(refPanel, higConst.rcwh(row, colonyColumn, widths.length, 1));
 
         row += 2;
 
@@ -145,11 +147,7 @@ public final class ReportNavalPanel extends ReportPanel implements ActionListene
                 JLabel locationLabel = new JLabel(location);
                 reportPanel.add(locationLabel, higConst.rc(row, colonyColumn));
                 JPanel unitPanel = new JPanel(new GridLayout(0, 7));
-                Collections.sort(unitList, new Comparator<Unit> () {
-                    public int compare(Unit unit1, Unit unit2) {
-                        return unit2.getType() - unit1.getType();
-                    }
-                });
+                Collections.sort(unitList, unitTypeComparator);
                 Iterator unitIterator = unitList.iterator();
                 while (unitIterator.hasNext()) {
                     UnitLabel unitLabel = new UnitLabel((Unit) unitIterator.next(), parent, true);
