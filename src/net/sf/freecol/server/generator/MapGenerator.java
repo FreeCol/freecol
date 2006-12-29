@@ -113,10 +113,11 @@ public class MapGenerator {
         int maximumLength = Math.max(getMapGeneratorOptions().getWidth(), getMapGeneratorOptions().getHeight()) / 10;
         int number = getMapGeneratorOptions().getNumberOfMountainTiles();
         int counter = 0;
+        logger.info("Number of land tiles is " + getMapGeneratorOptions().getLand() +
+                    ", number of mountain tiles is " + number);
         logger.fine("Maximum length of mountain ranges is " + maximumLength);
-
-        while (counter < number) {
-            for (int tries = 0; tries < 100; tries++) {
+        for (int tries = 0; tries < 100; tries++) {
+            if (counter < number) {
                 Position p = getRandomLandPosition(map);
                 if (map.getTile(p).isLand()) {
                     int direction = random.nextInt(8);
