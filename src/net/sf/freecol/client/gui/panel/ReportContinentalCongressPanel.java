@@ -51,7 +51,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel implements
         fatherPanel = new JPanel();
         fatherPanel.setLayout(new GridLayout(0, 4));
 
-        continentalCongressReportPanel = new ReportProductionPanel(Goods.BELLS, parent);
+        continentalCongressReportPanel = new ReportProductionPanel(Goods.BELLS, parent, this);
     }
 
     /**

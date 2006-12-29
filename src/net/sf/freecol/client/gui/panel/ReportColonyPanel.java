@@ -1,5 +1,6 @@
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -12,6 +13,7 @@ import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -34,6 +36,7 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
+    private List<Settlement> colonies;
 
     /**
      * The constructor that will add the items to this panel.
@@ -48,7 +51,7 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
      */
     public void initialize() {
         Player player = parent.getClient().getMyPlayer();
-        List<Settlement> colonies = player.getSettlements();
+        colonies = player.getSettlements();
 
         // Display Panel
         reportPanel.removeAll();
@@ -67,14 +70,19 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
         int row = 1;
         int colonyColumn = 1;
         int panelColumn = 3;
+        int colonyIndex = 0;
         Collections.sort(colonies, parent.getClient().getClientOptions().getColonyComparator());
         Iterator colonyIterator = colonies.iterator();
         while (colonyIterator.hasNext()) {
             Colony colony = (Colony) colonyIterator.next();
 
             // colonyLabel
-            JLabel colonyLabel = new JLabel(colony.getName());
-            reportPanel.add(colonyLabel, higConst.rc(row, colonyColumn));
+            //JLabel colonyLabel = new JLabel(colony.getName());
+            //reportPanel.add(colonyLabel, higConst.rc(row, colonyColumn));
+            JButton colonyButton = new JButton(colony.getName());
+            colonyButton.setActionCommand(String.valueOf(colonyIndex));
+            colonyButton.addActionListener(this);
+            reportPanel.add(colonyButton, higConst.rc(row, colonyColumn));
 
             // units
             JPanel unitPanel = new JPanel(new GridLayout(0, 10));
@@ -118,9 +126,26 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
             }
             reportPanel.add(buildingPanel, higConst.rc(row, panelColumn));
             row += 2;
+            colonyIndex++;
         }
 
 
     }
+
+    /**
+     * This function analyses an event and calls the right methods to take
+     * care of the user's requests.
+     * @param event The incoming ActionEvent.
+     */
+    public void actionPerformed(ActionEvent event) {
+        String command = event.getActionCommand();
+        int action = Integer.valueOf(command).intValue();
+        if (action == OK) {
+            super.actionPerformed(event);
+        } else {
+            parent.showColonyPanel((Colony) colonies.get(action));
+        }
+    }
+
 }
 

@@ -31,7 +31,7 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
     public static final String  REVISION = "$Revision$";
     
     protected static final Logger logger = Logger.getLogger(ReportPanel.class.getName());
-    private static final int    OK = -1;
+    protected static final int    OK = -1;
 
     protected final Canvas parent;
     protected JPanel reportPanel;

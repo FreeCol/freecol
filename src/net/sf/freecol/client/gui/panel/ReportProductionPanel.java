@@ -1,6 +1,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.border.EmptyBorder;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -19,13 +21,14 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
 import cz.autel.dmi.*;
 
 /**
  * This panel displays the Production Report.
  */
-public final class ReportProductionPanel extends JPanel {
+public final class ReportProductionPanel extends JPanel implements ActionListener {
     public static final String  COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
@@ -38,20 +41,22 @@ public final class ReportProductionPanel extends JPanel {
     private final int marginWidth = 12;
     /** The widths of the columns. */
     private final int[] widths;
-
     /** The heights of the rows. */
     private final int[] heights;
 
     private Canvas parent;
+    private List<Settlement> colonies;
     private final int goodsType;
+    private final ReportPanel reportPanel;
 
     /**
      * The constructor that will add the items to this panel.
      * @param parent The parent of this panel.
      */
-    public ReportProductionPanel(int goodsType, Canvas parent) {
+    public ReportProductionPanel(int goodsType, Canvas parent, ReportPanel reportPanel) {
         this.goodsType = goodsType;
         this.parent = parent;
+        this.reportPanel = reportPanel;
 
         if (goodsType == Goods.BELLS) {
             widths = new int[] {0, columnSeparatorWidth, 0, columnSeparatorWidth,
@@ -82,7 +87,7 @@ public final class ReportProductionPanel extends JPanel {
         // Display Panel
         removeAll();
 
-        List colonies = player.getSettlements();
+        colonies = player.getSettlements();
         int numberOfColonies = colonies.size();
         int[] heights = new int[numberOfColonies + extraRows];
         
@@ -93,9 +98,11 @@ public final class ReportProductionPanel extends JPanel {
         heights[2] = 0;
         heights[3] = marginWidth;
 
+        /*
         for (int h = 4; h < heights.length; h++) {
             heights[h] = 0;
         }
+        */
 
         setLayout(new HIGLayout(widths, heights));
         HIGConstraints higConst = new HIGConstraints();
@@ -139,15 +146,17 @@ public final class ReportProductionPanel extends JPanel {
         int percentageCount = 0;
         int solCount = 0;
         int toryCount = 0;
-
+        int colonyIndex = 0;
         Collections.sort(colonies, parent.getClient().getClientOptions().getColonyComparator());
         Iterator colonyIterator = colonies.iterator();
         while (colonyIterator.hasNext()) {
             Colony colony = (Colony) colonyIterator.next();
 
-            // colonyLabel
-            JLabel colonyLabel = new JLabel(colony.getName());
-            add(colonyLabel, higConst.rc(row, colonyColumn));
+            // colonyButton
+            JButton colonyButton = new JButton(colony.getName());
+            colonyButton.setActionCommand(String.valueOf(colonyIndex));
+            colonyButton.addActionListener(this);
+            add(colonyButton, higConst.rc(row, colonyColumn));
 
             // production
             Goods goods = new Goods(goodsType);
@@ -201,7 +210,7 @@ public final class ReportProductionPanel extends JPanel {
             }
 
             row++;
-                
+            colonyIndex++;
         }
 
 
@@ -238,6 +247,21 @@ public final class ReportProductionPanel extends JPanel {
         }
 
 
+    }
+
+    /**
+     * This function analyses an event and calls the right methods to take
+     * care of the user's requests.
+     * @param event The incoming ActionEvent.
+     */
+    public void actionPerformed(ActionEvent event) {
+        String command = event.getActionCommand();
+        int action = Integer.valueOf(command).intValue();
+        if (action == ReportPanel.OK) {
+            reportPanel.actionPerformed(event);
+        } else {
+            parent.showColonyPanel((Colony) colonies.get(action));
+        }
     }
 }
 

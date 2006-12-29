@@ -32,7 +32,7 @@ public final class ReportReligiousPanel extends ReportPanel implements ActionLis
         super(parent, Messages.message("menuBar.report.religion"));
 
         reportPanel.setLayout(new BoxLayout(reportPanel, BoxLayout.Y_AXIS));
-        religiousReportPanel = new ReportProductionPanel(Goods.CROSSES, parent);
+        religiousReportPanel = new ReportProductionPanel(Goods.CROSSES, parent, this);
     }
 
     /**

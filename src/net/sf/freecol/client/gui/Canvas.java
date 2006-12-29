@@ -153,7 +153,7 @@ public final class Canvas extends JLayeredPane {
                                 MONARCH_LAYER = new Integer(DEFAULT_LAYER.intValue() + 1),
                                 TILE_LAYER = new Integer(DEFAULT_LAYER.intValue() + 1),
                                 INDIAN_SETTLEMENT_LAYER = DEFAULT_LAYER,
-                                COLONY_LAYER = DEFAULT_LAYER,
+                                COLONY_LAYER = new Integer(DEFAULT_LAYER.intValue() + 3),
                                 EUROPE_LAYER = DEFAULT_LAYER,
                                 EVENT_LAYER = new Integer(DEFAULT_LAYER.intValue() + 1),
                                 CHOOSE_FOUNDING_FATHER = new Integer(DEFAULT_LAYER.intValue() + 1);                                
