@@ -121,7 +121,6 @@ public final class Colony extends Settlement implements Location {
         bells = 0;
         sonsOfLiberty = 0;
         oldSonsOfLiberty = 0;
-        currentlyBuilding = Building.DOCK;
 
         Map map = game.getMap();
         int ownerNation = owner.getNation();
@@ -162,6 +161,11 @@ public final class Colony extends Settlement implements Location {
             workLocations.add(new Building(game, this, Building.CUSTOM_HOUSE, Building.NOT_BUILT));
             
         }
+        
+        if(landLocked)
+            currentlyBuilding = Building.WAREHOUSE;
+        else
+            currentlyBuilding = Building.DOCK;
     }
 
 
