@@ -140,7 +140,8 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
         locationNames = new ArrayList();
         locationNames.add(Messages.message("report.atSea"));
         locationNames.add(Messages.message("report.onLand"));
-        locationNames.add(player.getEurope().toString());
+        if (player.getEurope() != null)
+            locationNames.add(player.getEurope().toString());
         while (colonyIterator.hasNext()) {
             locationNames.add(((Colony) colonyIterator.next()).getName());
         }
