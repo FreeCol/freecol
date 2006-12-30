@@ -3,7 +3,6 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.GridLayout;
 
 import java.util.ArrayList;
@@ -11,8 +10,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -26,7 +23,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
 
-import cz.autel.dmi.*;
+import cz.autel.dmi.HIGLayout;
 
 /**
  * This panel displays the Colony Report.
@@ -65,7 +62,6 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
         }
 
         reportPanel.setLayout(new HIGLayout(widths, heights));
-        HIGConstraints higConst = new HIGConstraints();
 
         int row = 1;
         int colonyColumn = 1;
@@ -77,8 +73,6 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
             Colony colony = (Colony) colonyIterator.next();
 
             // colonyLabel
-            //JLabel colonyLabel = new JLabel(colony.getName());
-            //reportPanel.add(colonyLabel, higConst.rc(row, colonyColumn));
             JButton colonyButton = new JButton(colony.getName());
             colonyButton.setActionCommand(String.valueOf(colonyIndex));
             colonyButton.addActionListener(this);
@@ -86,7 +80,13 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
 
             // units
             JPanel unitPanel = new JPanel(new GridLayout(0, 10));
+            ArrayList<Unit> unitList = new ArrayList<Unit>();
             Iterator unitIterator = colony.getUnitIterator();
+            while (unitIterator.hasNext()) {
+                unitList.add((Unit) unitIterator.next());
+            }
+            Collections.sort(unitList, getUnitTypeComparator());
+            unitIterator = unitList.iterator();
             while (unitIterator.hasNext()) {
                 Unit unit = (Unit) unitIterator.next();
                 UnitLabel unitLabel = new UnitLabel(unit, parent, true, true);
