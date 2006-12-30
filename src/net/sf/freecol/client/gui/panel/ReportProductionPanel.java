@@ -3,17 +3,13 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.swing.border.EmptyBorder;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.border.MatteBorder;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -23,7 +19,9 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
-import cz.autel.dmi.*;
+
+import cz.autel.dmi.HIGConstraints;
+import cz.autel.dmi.HIGLayout;
 
 /**
  * This panel displays the Production Report.
@@ -43,6 +41,9 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
     private final int[] widths;
     /** The heights of the rows. */
     private final int[] heights;
+
+    private static final HIGConstraints higConst = new HIGConstraints();
+
 
     private Canvas parent;
     private List<Settlement> colonies;
@@ -105,7 +106,6 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
         */
 
         setLayout(new HIGLayout(widths, heights));
-        HIGConstraints higConst = new HIGConstraints();
 
         // labels
         add(new JLabel(Messages.message("Colony")),

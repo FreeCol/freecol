@@ -9,8 +9,6 @@ import java.util.Iterator;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.border.MatteBorder;
 
 import net.sf.freecol.client.gui.Canvas;
@@ -32,21 +30,21 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
     public static final String  REVISION = "$Revision$";
 
     /** How many colums are defined per label. */
-    private final int columnsPerLabel = 2;
+    private static final int columnsPerLabel = 2;
     /** How many additional rows are defined. */
-    private final int extraRows = 5; // labels and separators
+    private static final int extraRows = 5; // labels and separators
     /** How many additional columns are defined. */
-    private final int extraColumns = 1; // labels
+    private static final int extraColumns = 1; // labels
     /** How many columns are defined all together. */
-    private final int columns = columnsPerLabel * Goods.NUMBER_OF_TYPES + extraColumns;
+    private static final int columns = columnsPerLabel * Goods.NUMBER_OF_TYPES + extraColumns;
     /** How much space to leave between labels. */
-    private final int columnSeparatorWidth = 5;
+    private static final int columnSeparatorWidth = 5;
     /** How wide the margins should be. */
-    private final int marginWidth = 12;
+    private static final int marginWidth = 12;
     /** The widths of the columns. */
-    private final int[] widths = new int[columns];
+    private static final int[] widths = new int[columns];
     /** The heights of the rows. */
-    private final int[] heights;
+    private static int[] heights;
 
     private final JLabel salesLabel;
     private final JLabel beforeTaxesLabel;
@@ -88,7 +86,7 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
         colonies = player.getSettlements();
         Collections.sort(colonies, parent.getClient().getClientOptions().getColonyComparator());
 
-        int[] heights = new int[colonies.size() + extraRows];
+        heights = new int[colonies.size() + extraRows];
         int labelColumn = 1;
 
         heights[extraRows - 1] = marginWidth; //separator
