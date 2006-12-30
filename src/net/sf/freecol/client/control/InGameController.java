@@ -606,11 +606,11 @@ public final class InGameController implements NetworkConstants {
                 } else {
                     Tile target = map.getNeighbourOrNull(path.getDirection(), unit.getTile());
                     int moveCost = unit.getMoveCost(target);                
-                    if (moveCost > unit.getMovesLeft()
-                            && (target.getFirstUnit() == null
-                                    || target.getFirstUnit().getOwner() == unit.getOwner())
-                                    && (target.getSettlement() == null
-                                            || target.getSettlement().getOwner() == unit.getOwner())) {
+                    if (unit.getMovesLeft() == 0 || (moveCost > unit.getMovesLeft() &&
+                            (target.getFirstUnit() == null ||
+                                target.getFirstUnit().getOwner() == unit.getOwner()) &&
+                            (target.getSettlement() == null ||
+                                target.getSettlement().getOwner() == unit.getOwner()))) {
                         // we can't go there now, but we don't want to wake up        
                         unit.setMovesLeft(0);
                         nextActiveUnit();
@@ -1894,8 +1894,10 @@ public final class InGameController implements NetworkConstants {
                     logger.warning("Server gave an invalid reply to an learnSkillAtSettlement message");  
                 }
             }
+        } else if (unit.getDestination() != null) {
+            setDestination(unit, null);
         }
-
+        
         nextActiveUnit(unit.getTile());
     }
 
