@@ -2,18 +2,14 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.ActionListener;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -21,13 +17,10 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.WorkLocation;
 
 import cz.autel.dmi.*;
 
@@ -131,7 +124,7 @@ public final class ReportMilitaryPanel extends ReportPanel implements ActionList
                 refPanel.add(buildUnitLabel(libraryUnitType[index], 0.66f));
             }
         }
-        reportPanel.add(refPanel, higConst.rcwh(row, colonyColumn, widths.length, 1));
+        reportPanel.add(refPanel, higConst.rc(row, unitColumn));
 
         row += 2;
 
