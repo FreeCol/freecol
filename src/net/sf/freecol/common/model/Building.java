@@ -690,14 +690,14 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
                         student.setTrainingType(-1);
                         student.setTurnsOfTraining(0);
-                        addModelMessage(this, "model.unit.unitImproved",
+                        addModelMessage(getColony(), "model.unit.unitImproved",
                                         new String[][] {{"%oldName%", oldName},
                                                         {"%newName%", student.getName()},
                                                         {"%nation%", getOwner().getName()}},
                                         ModelMessage.UNIT_IMPROVED, student);
                     }
                 } else {
-                    addModelMessage(this, "model.building.noStudent",
+                    addModelMessage(getColony(), "model.building.noStudent",
                                     new String[][] {{"%teacher%", teacher.getName()},
                                                     {"%colony%", colony.getName()}},
                                     ModelMessage.WARNING, teacher);
@@ -710,7 +710,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             int goodsOutputType = getGoodsOutputType();
 
             if (goodsInput == 0 && getMaximumGoodsInput() > 0) {
-                addModelMessage(this, "model.building.notEnoughInput", 
+                addModelMessage(getColony(), "model.building.notEnoughInput", 
                                 new String[][] {{"%inputGoods%", Goods.getName(goodsInputType)},
                                                 {"%building%", getName()},
                                                 {"%colony%", colony.getName()}},
