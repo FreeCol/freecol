@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -104,9 +105,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
         while (colonyIterator.hasNext()) {
             colonyName = ((Colony) colonyIterator.next()).getName();
             colonyNames.add(colonyName);
-            //locations.put(colonyName, null);
         }
-        //locations.put(player.getEurope().getLocationName(), null);
 
         ArrayList<String> otherNames = new ArrayList<String>();
 
@@ -200,10 +199,14 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
                 }
             }
             refPanel.setBorder(BorderFactory.createTitledBorder(refPlayer.getNationAsString()));
-            add(refPanel, higConst.rc(row, unitColumn));
+            //add(refPanel, higConst.rc(row, unitColumn));
+            add(refPanel, higConst.rcwh(row, labelColumn, widths.length, 1));
         }
+        row++;
 
-        row += 2; // add separator
+        // add separator with strut
+        add(Box.createHorizontalStrut(500), higConst.rc(row, unitColumn));
+        row++;
 
         // colonies first, sorted according to user preferences
         Iterator<String> locationIterator = colonyNames.iterator();
