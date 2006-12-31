@@ -35,6 +35,7 @@ import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
@@ -95,12 +96,9 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     private final FreeColClient freeColClient;
     private InGameController inGameController;
 
-    //private final JLabel                    goldLabel;
     private final JLabel                    solLabel;
-    private final JLabel                    hammersLabel;
-    private final JLabel                    toolsLabel;
-    //private final JLabel                    colonyNameLabel;    // CHRIS
-
+    private final JProgressBar              hammersLabel;
+    private final JProgressBar              toolsLabel;
     private final ProductionPanel           productionPanel;
     private final BuildingBox               buildingBox;
     private final ColonyNameBox             nameBox;
@@ -188,9 +186,12 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         //goldLabel = new JLabel(Messages.message("goldTitle") + ": 0");
 
         solLabel = new JLabel(Messages.message("sonsOfLiberty") + ": 0%, " + Messages.message("tory") + ": 100%");
-        hammersLabel = new JLabel(Messages.message("model.goods.Hammers")+": 0/0");
-        toolsLabel = new JLabel(Messages.message("model.goods.Tools") + ": 0/0");
-
+        hammersLabel = new JProgressBar();
+        hammersLabel.setMinimum(0);
+        hammersLabel.setStringPainted(true);
+        toolsLabel = new JProgressBar();
+        toolsLabel.setMinimum(0);
+        toolsLabel.setStringPainted(true);
 
         buildingBox = new BuildingBox(this);
 
@@ -232,9 +233,9 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         inPortScroll.setBorder(new CompoundBorder(new TitledBorder(Messages.message("inPort")), eBorder));
         outsideColonyScroll.setBorder(new CompoundBorder(new TitledBorder(Messages.message("outsideColony")), eBorder));
 
-        buildingBox.setSize(265, 20);
-        hammersLabel.setSize(180, 20);  // was: 150,20  CHRIS
-        toolsLabel.setSize(150, 20);
+        buildingBox.setSize(207, 20);
+        hammersLabel.setSize(200, 20);  // was: 150,20  CHRIS
+        toolsLabel.setSize(200, 20);
         nameBox.setSize(400, 32);
 
         assignLocations(outsideColonyScroll, inPortScroll, cargoScroll, warehouseScroll, tilesScroll, buildingsScroll);
@@ -294,7 +295,6 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         add(outsideColonyLabel);
         add(inPortLabel);
         add(solLabel);
-        //add(goldLabel);
         add(tilesLabel);
         add(buildingsLabel);
         add(buildingBox);
@@ -331,15 +331,14 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         
         y+= 5;
         buildingBox.setLocation     (417, y);
-        hammersLabel.setLocation    (695, y);
+        hammersLabel.setLocation    (637, y);
 
-        y+= 20;
-        buyBuilding.setLocation     (550, y);
-        toolsLabel.setLocation      (695, y);
+        y+= 25;
+        buyBuilding.setLocation     (417, y);
+        toolsLabel.setLocation      (637, y);
 
-        y+= 10;
+        y+= 5;
         solLabel.setLocation        (15, y);
-        //goldLabel.setLocation       (265, y);
 
         y+= 30;
         inPortScroll.setLocation    (10, y);
@@ -531,21 +530,51 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     */
     private void updateProgressLabel() {
         if (colony.getCurrentlyBuilding() == Building.NONE) {
-            hammersLabel.setText("");
-            toolsLabel.setText("");
+            hammersLabel.setMaximum(0);
+            hammersLabel.setValue(0);
+            hammersLabel.setString("");
+            toolsLabel.setMaximum(0);
+            toolsLabel.setValue(0);
+            toolsLabel.setString("");
         } else {
-            final Building carpenter = colony.getBuildingForProducing( Goods.HAMMERS );
-            final int hammers = carpenter.getProductionNextTurn();
-            final String hammerDelta = (hammers == 0)?"":(hammers>0)?"+"+ hammers:String.valueOf(hammers);
-            final String hammerDisplay = Messages.message("model.goods.Hammers") + ": "+ colony.getHammers() + hammerDelta;
+            final int hammers = colony.getHammers();
+            final int tools = colony.getGoodsCount(Goods.TOOLS);
+            final int nextHammers = colony.getBuildingForProducing(Goods.HAMMERS).getProductionNextTurn();
+            final int nextTools = colony.getBuildingForProducing(Goods.TOOLS).getProductionNextTurn();
+            final String hammerDelta = (nextHammers > 0)? "+" + String.valueOf(nextHammers) : "";
+            final String toolDelta = (nextTools > 0)? "+" + String.valueOf(nextTools) : "";
+            final String hammerDisplay = Messages.message("model.goods.Hammers") + 
+                                         ": " + hammers + hammerDelta;
+            final String toolDisplay = Messages.message("model.goods.Tools") + 
+                                       ": " + tools + toolDelta;
+            int hammersNeeded = 0;
+            int toolsNeeded = 0;
             if (colony.getCurrentlyBuilding() < Colony.BUILDING_UNIT_ADDITION) {
-                hammersLabel.setText(hammerDisplay + "/" + colony.getBuilding(colony.getCurrentlyBuilding()).getNextHammers());
-                toolsLabel.setText(Messages.message("model.goods.Tools") + ": " + colony.getGoodsCount(Goods.TOOLS) + "/" + colony.getBuilding(colony.getCurrentlyBuilding()).getNextTools());
+                hammersNeeded = colony.getBuilding(colony.getCurrentlyBuilding()).getNextHammers();
+                toolsNeeded = colony.getBuilding(colony.getCurrentlyBuilding()).getNextTools();
             } else {
-                hammersLabel.setText(hammerDisplay + "/" + Unit.getNextHammers(colony.getCurrentlyBuilding() - Colony.BUILDING_UNIT_ADDITION));
-                toolsLabel.setText(Messages.message("model.goods.Tools") + ": " + colony.getGoodsCount(Goods.TOOLS) + "/" + Unit.getNextTools(colony.getCurrentlyBuilding() - Colony.BUILDING_UNIT_ADDITION));
+                hammersNeeded = Unit.getNextHammers(colony.getCurrentlyBuilding() - 
+                                                    Colony.BUILDING_UNIT_ADDITION);                
+                toolsNeeded = Unit.getNextTools(colony.getCurrentlyBuilding() -
+                                                Colony.BUILDING_UNIT_ADDITION);
             }
-            buyBuilding.setEnabled(colony.getCurrentlyBuilding() >= 0 && colony.getPriceForBuilding() <= freeColClient.getMyPlayer().getGold());
+            hammersNeeded = Math.max(hammersNeeded, 0);
+            hammersLabel.setMaximum(hammersNeeded);
+            hammersLabel.setValue(hammers);
+            hammersLabel.setString(hammerDisplay + "/" + hammersNeeded);
+
+            toolsNeeded = Math.max(toolsNeeded, 0);
+            if (toolsNeeded >= tools) {
+                toolsLabel.setMaximum(toolsNeeded);
+                toolsLabel.setValue(tools);
+            } else {
+                toolsLabel.setMaximum(100);
+                toolsLabel.setValue(100);
+            }
+            toolsLabel.setString(toolDisplay + "/" + toolsNeeded);
+
+            buyBuilding.setEnabled(colony.getCurrentlyBuilding() >= 0 &&
+                                   colony.getPriceForBuilding() <= freeColClient.getMyPlayer().getGold());
         }
     }
 
