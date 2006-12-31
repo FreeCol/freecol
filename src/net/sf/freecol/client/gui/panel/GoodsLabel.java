@@ -13,6 +13,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
@@ -118,8 +119,12 @@ public final class GoodsLabel extends JLabel implements ActionListener {
         if (location instanceof Ownable) {
             player = ((Ownable) location).getOwner();
         }
-        if (player == null || player.canTrade(goods) || (location instanceof Colony
-                && player.getGameOptions().getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT))) {
+        if (player == null ||
+            goods.getType() >= Goods.NUMBER_OF_TYPES ||
+            player.canTrade(goods) || 
+            (location instanceof Colony &&
+             player.getGameOptions().getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT) &&
+             ((Colony) location).getBuilding(Building.CUSTOM_HOUSE).getLevel() != Building.NOT_BUILT)) {
             setToolTipText(goods.getName());
             setEnabled(true);
         } else {
@@ -131,6 +136,7 @@ public final class GoodsLabel extends JLabel implements ActionListener {
                 && ((Colony) location).getWarehouseCapacity() < goods.getAmount()) {
             setForeground(Color.RED);
         } else if (location instanceof Colony && location != null &&
+                   goods.getType() < Goods.NUMBER_OF_TYPES &&
                    ((Colony) location).getExports(goods)) {
             setForeground(Color.GREEN);
         } else if (goods.getAmount() == 0) {

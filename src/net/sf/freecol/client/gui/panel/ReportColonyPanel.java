@@ -100,8 +100,8 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
             for (int goodsType = 0; goodsType < Goods.NUMBER_OF_ALL_TYPES; goodsType++) {
                 int newValue = colony.getProductionOf(goodsType);
                 if (newValue > 0) {
-                    Goods goods = new Goods(goodsType);
-                    goods.setAmount(newValue);
+                    Goods goods = new Goods(colony.getGame(), colony, goodsType, newValue);
+                    //goods.setAmount(newValue);
                     GoodsLabel goodsLabel = new GoodsLabel(goods, parent);
                     goodsLabel.setHorizontalAlignment(JLabel.LEADING);
                     goodsPanel.add(goodsLabel);
