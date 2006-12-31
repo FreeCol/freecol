@@ -124,6 +124,11 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
                     buildingPanel.add(buildingLabel);
                 }
             }
+            if (currentType >= Colony.BUILDING_UNIT_ADDITION) {
+                JLabel unitLabel = new JLabel(Unit.getName(currentType - Colony.BUILDING_UNIT_ADDITION));
+                unitLabel.setForeground(Color.GRAY);
+                buildingPanel.add(unitLabel);
+            }
             reportPanel.add(buildingPanel, higConst.rc(row, panelColumn));
             row += 2;
             colonyIndex++;
