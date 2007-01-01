@@ -211,7 +211,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
         buildingsScroll.setAutoscrolls(true);
 
-        buyBuilding.setSize(132, 20);
+        buyBuilding.setSize(207, 20);
         exitButton.setSize(110, 20);
         unloadButton.setSize(110, 20);
         outsideColonyScroll.setSize(204, 260);
@@ -221,8 +221,6 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         productionPanel.setSize(400, 35);
         tilesScroll.setSize(400, 225);
         buildingsScroll.setSize(424,225);
-        //goldLabel.setSize(100, 20);
-
         solLabel.setSize(400, 20);
 
         EtchedBorder eBorder = new EtchedBorder();
@@ -234,7 +232,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         outsideColonyScroll.setBorder(new CompoundBorder(new TitledBorder(Messages.message("outsideColony")), eBorder));
 
         buildingBox.setSize(207, 20);
-        hammersLabel.setSize(200, 20);  // was: 150,20  CHRIS
+        hammersLabel.setSize(200, 20);
         toolsLabel.setSize(200, 20);
         nameBox.setSize(400, 32);
 
