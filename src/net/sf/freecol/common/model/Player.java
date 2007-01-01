@@ -1498,7 +1498,8 @@ public class Player extends FreeColGameObject {
                     units.add(u);
                 }
             }
-            if (t.getSettlement() != null && t.getSettlement().getOwner().equals(this)) {
+            if (t.getSettlement() != null && t.getSettlement().getOwner() != null &&
+                    t.getSettlement().getOwner().equals(this)) {
                 Iterator unitIterator = t.getSettlement().getUnitIterator();
                 while (unitIterator.hasNext()) {
                     Unit u = (Unit) unitIterator.next();
