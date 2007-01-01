@@ -347,9 +347,11 @@ public class GoodsContainer extends FreeColGameObject {
                 continue;
             } else if (storedGoods[typeOfGoods] > limit ) {
                 // limit has been exceeded
+                int waste = storedGoods[typeOfGoods] - limit;
                 storedGoods[typeOfGoods] = limit;
-                addModelMessage(source, "model.building.warehouseOverfull",
+                addModelMessage(source, "model.building.warehouseWaste",
                                 new String [][] {{"%goods%", Goods.getName(typeOfGoods)},
+                                                 {"%waste%", String.valueOf(waste)},
                                                  {"%colony%", ((Colony) parent).getName()}},
                                 ModelMessage.WAREHOUSE_CAPACITY,
                                 new Goods(typeOfGoods));
