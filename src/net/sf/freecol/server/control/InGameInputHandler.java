@@ -22,6 +22,7 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension;
@@ -187,6 +188,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                         reply = giveIndependence(connection, element);   
                     } else if (type.equals("foreignAffairs")) {
                         reply = foreignAffairs(connection, element);                                           
+                    } else if (type.equals("getREFUnits")) {
+                        reply = getREFUnits(connection, element);                                           
                     } else {
                         logger.warning("Unknown request from client " + element.getTagName());
                     }
@@ -2130,6 +2133,59 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     }    
 
 
+    /**
+     * Handles a "getREFUnits"-message.
+     *
+     * @param connection The <code>Connection</code> the message was received on.
+     * @param element The element containing the request.
+     */
+    private Element getREFUnits(Connection connection, Element element) {
+        Game game = getFreeColServer().getGame();
+        ServerPlayer player = getFreeColServer().getPlayer(connection);        
+
+        Element reply = Message.createNewRootElement("REFUnits");
+
+        int artillery = 0;
+        int menOfWar = 0;
+        int dragoons = 0;
+        int infantry = 0;
+        // TODO: make this disappear
+        if (player.getMonarch() != null) {
+            int ref[] = player.getMonarch().getREF();
+            artillery = ref[Monarch.ARTILLERY];
+            menOfWar = ref[Monarch.MAN_OF_WAR];
+            dragoons = ref[Monarch.DRAGOON];
+            infantry = ref[Monarch.INFANTRY];
+        } else {
+            ServerPlayer enemyPlayer = (ServerPlayer) player.getREFPlayer();
+            Iterator unitIterator = enemyPlayer.getUnitIterator();
+            while (unitIterator.hasNext()) {
+                Unit unit = (Unit) unitIterator.next();
+                switch (unit.getType()) {
+                case Unit.ARTILLERY:
+                    artillery++;
+                    break;
+                case Unit.MAN_O_WAR:
+                    menOfWar++;
+                    break;
+                case Unit.KINGS_REGULAR:
+                    if (unit.isMounted()) {
+                        dragoons++;
+                    } else {
+                        infantry++;
+                    }
+                    break;
+                default:
+                    logger.warning("Unknown type of REF unit " + unit.getType());
+                }
+            }
+        }
+        reply.setAttribute("artillery", String.valueOf(artillery));
+        reply.setAttribute("menOfWar", String.valueOf(menOfWar));
+        reply.setAttribute("dragoons", String.valueOf(dragoons));
+        reply.setAttribute("infantry", String.valueOf(infantry));
+        return reply;
+    }
     
     /**
      * Handles a "setDestination"-message.

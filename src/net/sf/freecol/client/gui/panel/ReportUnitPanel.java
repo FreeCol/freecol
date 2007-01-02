@@ -25,6 +25,8 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
 
+import org.w3c.dom.Element;
+
 import cz.autel.dmi.HIGLayout;
 import cz.autel.dmi.HIGConstraints;
 
@@ -172,36 +174,33 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
         setLayout(new HIGLayout(widths, heights));
 
         // REF
-        if (player.getMonarch() != null) {
-            Player refPlayer = player.getREFPlayer();
-            int[] ref = player.getMonarch().getREF();
-            JPanel refPanel;
-            if (isNaval) {
-                refPanel = new JPanel(new GridLayout(0, 7));
-                for (int count = 0; count < ref[Monarch.MAN_OF_WAR]; count++) {
-                    refPanel.add(reportPanel.buildUnitLabel(ImageLibrary.MAN_O_WAR, 0.66f));
-                }
-            } else {
-                int[] refUnitType = new int[] {
-                    Monarch.ARTILLERY,
-                    Monarch.DRAGOON,
-                    Monarch.INFANTRY };
-                int[] libraryUnitType = new int[] {
-                    ImageLibrary.ARTILLERY,
-                    ImageLibrary.KINGS_CAVALRY,
-                    ImageLibrary.KINGS_REGULAR };
-                refPanel = new JPanel(new GridLayout(0, 12));
-                refPanel.setBorder(BorderFactory.createTitledBorder(refPlayer.getNationAsString()));
-                for (int index = 0; index < refUnitType.length; index++) {
-                    for (int count = 0; count < ref[refUnitType[index]]; count++) {
-                        refPanel.add(reportPanel.buildUnitLabel(libraryUnitType[index], 0.66f));
-                    }
+        Element refUnits = parent.getClient().getInGameController().getREFUnits();
+        int artillery = Integer.parseInt(refUnits.getAttribute("artillery"));
+        int menOfWar = Integer.parseInt(refUnits.getAttribute("menOfWar"));
+        int dragoons = Integer.parseInt(refUnits.getAttribute("dragoons"));
+        int infantry = Integer.parseInt(refUnits.getAttribute("infantry"));
+
+        JPanel refPanel;
+        if (isNaval) {
+            refPanel = new JPanel(new GridLayout(0, 7));
+            for (int count = 0; count < menOfWar; count++) {
+                refPanel.add(reportPanel.buildUnitLabel(ImageLibrary.MAN_O_WAR, 0.66f));
+            }
+        } else {
+            int[] refUnitCounts = new int[] {artillery, dragoons, infantry};
+            int[] libraryUnitType = new int[] {
+                ImageLibrary.ARTILLERY,
+                ImageLibrary.KINGS_CAVALRY,
+                ImageLibrary.KINGS_REGULAR };
+            refPanel = new JPanel(new GridLayout(0, 12));
+            for (int index = 0; index < refUnitCounts.length; index++) {
+                for (int count = 0; count < refUnitCounts[index]; count++) {
+                    refPanel.add(reportPanel.buildUnitLabel(libraryUnitType[index], 0.66f));
                 }
             }
-            refPanel.setBorder(BorderFactory.createTitledBorder(refPlayer.getNationAsString()));
-            //add(refPanel, higConst.rc(row, unitColumn));
-            add(refPanel, higConst.rcwh(row, labelColumn, widths.length, 1));
         }
+        refPanel.setBorder(BorderFactory.createTitledBorder(player.getREFPlayer().getNationAsString()));
+        add(refPanel, higConst.rcwh(row, labelColumn, widths.length, 1));
         row++;
 
         // add separator with strut

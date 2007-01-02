@@ -2409,6 +2409,19 @@ public final class InGameController implements NetworkConstants {
         return reply;
     }
         
+    /**
+     * Gathers information about the REF.
+     */
+    public Element getREFUnits() {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return null;
+        }
+
+        Element reply = freeColClient.getClient().ask(Message.createNewRootElement("getREFUnits"));
+        return reply;
+    }
+        
 
 
     /**
