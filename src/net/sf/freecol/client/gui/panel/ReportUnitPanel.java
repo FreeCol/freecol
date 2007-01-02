@@ -215,10 +215,12 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
         }
 
         // Europe next
-        if (locations.get(player.getEurope().getLocationName()) != null) {
-            handleLocation(player.getEurope().getLocationName(), true);
+        if (player.getEurope() != null) {
+            if (locations.get(player.getEurope().getLocationName()) != null) {
+                handleLocation(player.getEurope().getLocationName(), true);
+            }
+            otherNames.remove(player.getEurope().getLocationName());
         }
-        otherNames.remove(player.getEurope().getLocationName());
 
         // finally all other locations, sorted alphabetically
         Collections.sort(otherNames);
