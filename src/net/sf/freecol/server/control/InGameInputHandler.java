@@ -1116,9 +1116,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             // Just return the skill and wanted goods.
             reply.setAttribute("skill", Integer.toString(settlement.getLearnableSkill()));            
             settlement.updateWantedGoods();
-            reply.setAttribute("highlyWantedGoods", Integer.toString(settlement.getHighlyWantedGoods()));
-            reply.setAttribute("wantedGoods1", Integer.toString(settlement.getWantedGoods1()));
-            reply.setAttribute("wantedGoods2", Integer.toString(settlement.getWantedGoods2()));
+            int[] wantedGoods = settlement.getWantedGoods();
+            reply.setAttribute("highlyWantedGoods", Integer.toString(wantedGoods[0]));
+            reply.setAttribute("wantedGoods1", Integer.toString(wantedGoods[1]));
+            reply.setAttribute("wantedGoods2", Integer.toString(wantedGoods[2]));
 
             // Set the Tile.PlayerExploredTile attribute.
             settlement.getTile().updateIndianSettlementInformation(player);

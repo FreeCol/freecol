@@ -4,6 +4,8 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.util.Collections;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -67,6 +69,7 @@ public final class IndianSettlementPanel extends FreeColDialog implements Action
     * @param settlement The IndianSettlement whose information should be displayed.
     */
     public void initialize(IndianSettlement settlement) {
+
         switch (settlement.getLearnableSkill()) {
             case IndianSettlement.UNKNOWN:
                 skillLabel.setText(Messages.message("indianSettlement.skillUnknown"));
@@ -107,8 +110,11 @@ public final class IndianSettlementPanel extends FreeColDialog implements Action
             default:
                 logger.warning("Invalid learnable skill returned from settlement.");
         }
-        highlyWantedLabel.setText(Goods.getName(settlement.getHighlyWantedGoods()));
-        otherWantedLabel.setText(Goods.getName(settlement.getWantedGoods1()) + ", " + Goods.getName(settlement.getWantedGoods2()));
+        int[] wantedGoods = settlement.getWantedGoods(); 
+
+        highlyWantedLabel.setText(Goods.getName(wantedGoods[0]));
+        otherWantedLabel.setText(Goods.getName(wantedGoods[1]) + ", " +
+                                 Goods.getName(wantedGoods[2]));
         setSize(getPreferredSize());
     }
 

@@ -2,6 +2,8 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
@@ -87,9 +89,7 @@ public class IndianSettlement extends Settlement {
     */
     private int learnableSkill = UNKNOWN;
 
-    private int highlyWantedGoods = UNKNOWN,
-                wantedGoods1 = UNKNOWN,
-                wantedGoods2 = UNKNOWN;
+    private int[] wantedGoods = new int[] {UNKNOWN, UNKNOWN, UNKNOWN};
 
     private boolean isCapital,
                     isVisited; /* true if a European player has asked to speak with the chief. */
@@ -110,6 +110,12 @@ public class IndianSettlement extends Settlement {
     */
     private Tension[] alarm = new Tension[Player.NUMBER_OF_NATIONS];
 
+    // sort goods descending by price
+    private final Comparator wantedGoodsComparator = new Comparator<Goods>() {
+        public int compare(Goods goods1, Goods goods2) {
+            return getPrice(goods2) - getPrice(goods1);
+        }
+    };
 
 
     /**
@@ -123,8 +129,8 @@ public class IndianSettlement extends Settlement {
      * @param isCapital True if settlement is tribe's capital
      * @param learnableSkill The skill that can be learned by Europeans at this settlement.
      * @param highlyWantedGoods The goods that are very much wanted by the people from this settlement.
-     * @param wantedGoods1 Goods that wanted by the people from this settlement.
-     * @param wantedGoods2 Goods that wanted by the people from this settlement.
+     * @param wantedGoods[1] Goods that wanted by the people from this settlement.
+     * @param wantedGoods[2] Goods that wanted by the people from this settlement.
      * @param isVisited Indicates if any European scout has asked to speak with the chief.
      * @param missionary The missionary in this settlement (or null).
      * @exception IllegalArgumentException if an invalid tribe or kind is given
@@ -195,9 +201,9 @@ public class IndianSettlement extends Settlement {
 
         // The client doesn't know a lot at first.
         this.learnableSkill = UNKNOWN;
-        this.highlyWantedGoods = UNKNOWN;
-        this.wantedGoods1 = UNKNOWN;
-        this.wantedGoods2 = UNKNOWN;
+        this.wantedGoods[0] = UNKNOWN;
+        this.wantedGoods[1] = UNKNOWN;
+        this.wantedGoods[2] = UNKNOWN;
         isVisited = false;
         missionary = null;
         convertProgress = 0;
@@ -217,9 +223,9 @@ public class IndianSettlement extends Settlement {
 
         // The client doesn't know a lot at first.
         this.learnableSkill = UNKNOWN;
-        this.highlyWantedGoods = UNKNOWN;
-        this.wantedGoods1 = UNKNOWN;
-        this.wantedGoods2 = UNKNOWN;
+        this.wantedGoods[0] = UNKNOWN;
+        this.wantedGoods[1] = UNKNOWN;
+        this.wantedGoods[2] = UNKNOWN;
         isVisited = false;
         missionary = null;
         convertProgress = 0;
@@ -242,9 +248,9 @@ public class IndianSettlement extends Settlement {
         
         // The client doesn't know a lot at first.
         this.learnableSkill = UNKNOWN;
-        this.highlyWantedGoods = UNKNOWN;
-        this.wantedGoods1 = UNKNOWN;
-        this.wantedGoods2 = UNKNOWN;
+        this.wantedGoods[0] = UNKNOWN;
+        this.wantedGoods[1] = UNKNOWN;
+        this.wantedGoods[2] = UNKNOWN;
         isVisited = false;
         missionary = null;
         convertProgress = 0;
@@ -396,7 +402,7 @@ public class IndianSettlement extends Settlement {
     * @return This settlement's highly wanted goods.
     */
     public int getHighlyWantedGoods() {
-        return highlyWantedGoods;
+        return wantedGoods[0];
     }
 
 
@@ -405,7 +411,7 @@ public class IndianSettlement extends Settlement {
     * @return This settlement's wanted goods 1.
     */
     public int getWantedGoods1() {
-        return wantedGoods1;
+        return wantedGoods[1];
     }
 
 
@@ -414,7 +420,7 @@ public class IndianSettlement extends Settlement {
     * @return This settlement's wanted goods 2.
     */
     public int getWantedGoods2() {
-        return wantedGoods2;
+        return wantedGoods[2];
     }
 
 
@@ -451,32 +457,16 @@ public class IndianSettlement extends Settlement {
     }
 
 
-    /**
-    * Sets this settlement's highly wanted goods.
-    * @param goods This settlement's highly wanted goods.
-    */
-    public void setHighlyWantedGoods(int goods) {
-        highlyWantedGoods = goods;
+
+    public int[] getWantedGoods() {
+        return wantedGoods;
     }
 
-
-    /**
-    * Sets this settlement's wanted goods 1.
-    * @param goods This settlement's wanted goods 1.
-    */
-    public void setWantedGoods1(int goods) {
-        wantedGoods1 = goods;
+    public void setWantedGoods(int index, int type) {
+        if (0 <= index && index <= 2) {
+            wantedGoods[index] = type;
+        }
     }
-
-
-    /**
-    * Sets this settlement's wanted goods 2.
-    * @param goods This settlement's wanted goods 2.
-    */
-    public void setWantedGoods2(int goods) {
-        wantedGoods2 = goods;
-    }
-
 
     /**
     * Sets the learnable skill for this Indian settlement.
@@ -765,17 +755,16 @@ public class IndianSettlement extends Settlement {
         }
 
         // Bonus for top 3 types of goods:
-        if (type == highlyWantedGoods) {
+        if (type == wantedGoods[0]) {
             returnPrice = (returnPrice*12)/10;
-        } else if (type == wantedGoods1) {
+        } else if (type == wantedGoods[1]) {
             returnPrice = (returnPrice*11)/10;
-        } else if (type == wantedGoods2) {
+        } else if (type == wantedGoods[2]) {
             returnPrice = (returnPrice*105)/100;
         }
 
         return returnPrice;
     }
-
 
     /**
     * Gets the maximum possible production of the given type of goods.
@@ -798,9 +787,9 @@ public class IndianSettlement extends Settlement {
 
 
     /**
-    * Updates the variables {@link #getHighlyWantedGoods highlyWantedGoods},
-    * {@link #getWantedGoods1 wantedGoods1} and
-    * {@link #getWantedGoods2 wantedGoods2}.
+    * Updates the variables {@link #getHighlyWantedGoods wantedGoods[0]},
+    * {@link #getWantedGoods1 wantedGoods[1]} and
+    * {@link #getWantedGoods2 wantedGoods[2]}.
     *
     * <br><br>
     *
@@ -809,33 +798,24 @@ public class IndianSettlement extends Settlement {
     * is hidden from the clients.
     */
     public void updateWantedGoods() {
-        highlyWantedGoods = Goods.TRADE_GOODS;
-        wantedGoods1 = Goods.TOOLS;
-        wantedGoods2 = Goods.RUM;
-        int highlyWantedGoodsAmount = 0;
-        int wantedGoods1Amount = 0;
-        int wantedGoods2Amount = 0;
-
         /* TODO: Try the different types goods in "random" order 
          * (based on the numbers of units on this tile etc): */
-        for (int type=0; type<Goods.NUMBER_OF_TYPES; type++) {
-            if (type == Goods.MUSKETS || type == Goods.HORSES) {
-                continue;
-            }
-
-            int price = getPrice(type, 100);
-            if (price > highlyWantedGoodsAmount) {
-                wantedGoods2 = wantedGoods1;
-                wantedGoods1 = highlyWantedGoods;
-                highlyWantedGoods  = type;
-                highlyWantedGoodsAmount = price;
-            } else if (price > wantedGoods1Amount) {
-                wantedGoods2 = wantedGoods1;
-                wantedGoods1 = type;
-                wantedGoods1Amount = price;
-            } else if (price > wantedGoods2Amount) {
-                wantedGoods2 = type;
-                wantedGoods2Amount = price;
+        Goods[] goodsType = new Goods[Goods.NUMBER_OF_TYPES];
+        for (int type = 0; type < Goods.NUMBER_OF_TYPES; type++) {
+            goodsType[type] = new Goods(type);
+            goodsType[type].setAmount(100);
+        }
+        Arrays.sort(goodsType, wantedGoodsComparator);
+        int wantedIndex = 0;
+        for (int index = 0; index < goodsType.length; index++) {
+            int type = goodsType[index].getType();
+            if (type != Goods.HORSES && type != Goods.MUSKETS) {
+                if (wantedIndex < wantedGoods.length) {
+                    wantedGoods[wantedIndex] = type;
+                    wantedIndex++;
+                } else {
+                    break;
+                }
             }
         }
     }
@@ -1156,9 +1136,6 @@ public class IndianSettlement extends Settlement {
         }
 
         out.writeAttribute("learnableSkill", Integer.toString(learnableSkill));
-        out.writeAttribute("highlyWantedGoods", Integer.toString(highlyWantedGoods));
-        out.writeAttribute("wantedGoods1", Integer.toString(wantedGoods1));
-        out.writeAttribute("wantedGoods2", Integer.toString(wantedGoods2));
 
         if (showAll || player == getOwner()) {
             out.writeAttribute("convertProgress", Integer.toString(convertProgress));
@@ -1169,6 +1146,7 @@ public class IndianSettlement extends Settlement {
             tensionArray[i] = alarm[i].getValue();
         }
         toArrayElement("alarm", tensionArray, out);
+        toArrayElement("wantedGoods", wantedGoods, out);
 
         if (missionary != null) {
             out.writeStartElement("missionary");
@@ -1236,26 +1214,27 @@ public class IndianSettlement extends Settlement {
         } else {
             learnableSkill = UNKNOWN;
         }
-        
-        final String highlyWantedGoodsStr = in.getAttributeValue(null, "highlyWantedGoods");
-        if (highlyWantedGoodsStr != null) {
-            highlyWantedGoods = Integer.parseInt(highlyWantedGoodsStr);
+
+        // TODO: remove these as soon as there are no more old savegames floating around
+        final String wantedGoods0Str = in.getAttributeValue(null, "highlyWantedGoods");
+        if (wantedGoods0Str != null) {
+            wantedGoods[0] = Integer.parseInt(wantedGoods0Str);
         } else {
-            highlyWantedGoods = UNKNOWN;
+            wantedGoods[0] = UNKNOWN;
         }
         
         final String wantedGoods1Str = in.getAttributeValue(null, "wantedGoods1");
         if (wantedGoods1Str != null) {
-            wantedGoods1 = Integer.parseInt(wantedGoods1Str);
+            wantedGoods[1] = Integer.parseInt(wantedGoods1Str);
         } else {
-            wantedGoods1 = UNKNOWN;
+            wantedGoods[1] = UNKNOWN;
         }
         
         final String wantedGoods2Str = in.getAttributeValue(null, "wantedGoods2");
         if (wantedGoods2Str != null) {
-            wantedGoods2 = Integer.parseInt(wantedGoods2Str);
+            wantedGoods[2] = Integer.parseInt(wantedGoods2Str);
         } else {
-            wantedGoods2 = UNKNOWN;
+            wantedGoods[2] = UNKNOWN;
         }
         
         final String hasBeenVisitedStr = in.getAttributeValue(null, "hasBeenVisited");
@@ -1279,6 +1258,8 @@ public class IndianSettlement extends Settlement {
                 for (int i = 0; i < tensionArray.length; i++) {
                     alarm[i] = new Tension(tensionArray[i]);
                 }
+            } else if (in.getLocalName().equals("wantedGoods")) {
+                wantedGoods = readFromArrayElement("wantedGoods", in, new int[0]);
             } else if (in.getLocalName().equals("missionary")) {
                 in.nextTag();
                 missionary = (Unit) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));

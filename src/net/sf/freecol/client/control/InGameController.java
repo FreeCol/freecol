@@ -1934,9 +1934,9 @@ public final class InGameController implements NetworkConstants {
 
         if (reply.getTagName().equals("scoutIndianSettlementResult")) {
             settlement.setLearnableSkill(Integer.parseInt(reply.getAttribute("skill")));
-            settlement.setHighlyWantedGoods(Integer.parseInt(reply.getAttribute("highlyWantedGoods")));
-            settlement.setWantedGoods1(Integer.parseInt(reply.getAttribute("wantedGoods1")));
-            settlement.setWantedGoods2(Integer.parseInt(reply.getAttribute("wantedGoods2")));
+            settlement.setWantedGoods(0, Integer.parseInt(reply.getAttribute("highlyWantedGoods")));
+            settlement.setWantedGoods(1, Integer.parseInt(reply.getAttribute("wantedGoods1")));
+            settlement.setWantedGoods(2, Integer.parseInt(reply.getAttribute("wantedGoods2")));
         } else {
             logger.warning("Server gave an invalid reply to an askSkill message");
             return;
