@@ -147,6 +147,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     private int             treasureAmount;
 
     private int             workType; // What type of goods this unit produces in its occupation.
+    private int             experience;
 
     private int             turnsOfTraining = 0;
     private int             trainingType = -1;
@@ -236,6 +237,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         state = s;
         workLeft = -1;
         workType = Goods.FOOD;
+        experience = 0;
 
         this.movesLeft = getInitialMovesLeft();
         setHitpoints(getInitialHitpoints(getType()));       
@@ -586,6 +588,30 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         }
     }
 
+    /**
+    * Gets the experience of this <code>Unit</code> at its current
+    * workType.
+    *
+    * @return The experience of this <code>Unit</code> at its current
+    * workType.
+    * @see #modifyExperience
+    */
+    public int getExperience() {
+        return experience;
+    }
+
+    /**
+    * Modifies the experience of this <code>Unit</code> at its current
+    * workType.
+    *
+    * @param value The value by which to modify the experience of this
+    * <code>Unit</code>.
+    * @see #getExperience
+    */
+    public void modifyExperience(int value) {
+        experience += value;
+    }
+
 
      /**
      * Gets the type of goods this unit is producing in its current occupation.
@@ -607,7 +633,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         if (!Goods.isFarmedGoods(type)) {
             return;
         }
-        
+        if (workType != type) {
+            experience = 0;
+        }
         workType = type;
     }
 
@@ -3848,6 +3876,18 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         if (isUninitialized()) {
             logger.warning("Calling newTurn for an uninitialized object: " + getID());
         }
+        if (getType() == FREE_COLONIST && location instanceof ColonyTile) {
+            int random = getGame().getModelController().getRandom(getID() + "experience", 2000);
+            if (random < Math.min(experience, 200)) {
+                String oldName = getName();
+                setType(((ColonyTile) location).getExpertForProducing(workType));
+                addModelMessage(getTile().getColony(), "model.unit.experience",
+                            new String[][] {{"%oldName%", oldName},
+                                            {"%newName%", getName()},
+                                            {"%nation%", owner.getNationAsString()}},
+                            ModelMessage.UNIT_IMPROVED, this);
+            }
+        }
         movesLeft = getInitialMovesLeft();
         doAssignedWork();
     }
@@ -3892,6 +3932,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         out.writeAttribute("turnsOfTraining", Integer.toString(turnsOfTraining));
         out.writeAttribute("trainingType", Integer.toString(trainingType));
         out.writeAttribute("workType", Integer.toString(workType));
+        out.writeAttribute("experience", Integer.toString(experience));
         out.writeAttribute("treasureAmount", Integer.toString(treasureAmount));
         out.writeAttribute("hitpoints", Integer.toString(hitpoints));
         
@@ -4014,6 +4055,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         final String workTypeStr = in.getAttributeValue(null, "workType");
         if (workTypeStr != null) {
             workType = Integer.parseInt(workTypeStr);
+        }
+        
+        final String experienceStr = in.getAttributeValue(null, "experience");
+        if (experienceStr != null) {
+            experience = Integer.parseInt(experienceStr);
         }
         
         final String visibleGoodsCountStr = in.getAttributeValue(null, "visibleGoodsCount");

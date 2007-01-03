@@ -374,6 +374,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
                 //amount += colony.getProductionBonus();
                 //if (amount < 1) amount = 1;
                 colony.addGoods(getUnit().getWorkType(), amount);
+                unit.modifyExperience(amount);
             }
         } else {
             int amount1 = workTile.potential(Goods.FOOD);
