@@ -298,6 +298,7 @@ public final class Monarch extends FreeColGameObject {
         if (ref[INFANTRY] + ref[DRAGOON] + ref[ARTILLERY] >
             ref[MAN_OF_WAR] * 6) {
             units[MAN_OF_WAR] = 1;
+            ref[MAN_OF_WAR]++;
         } else {        
             int number = random.nextInt(3) + 1;
             int type = random.nextInt(3);
