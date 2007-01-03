@@ -68,11 +68,21 @@ public final class ReportContinentalCongressPanel extends ReportPanel implements
             JLabel currentFatherLabel = new JLabel(Messages.message(FoundingFather.getName(player.getCurrentFather())));
             currentFatherLabel.setToolTipText(Messages.message(FoundingFather.getDescription(player.getCurrentFather())));
             summaryPanel.add(currentFatherLabel, higConst.rc(1, 3));
-            JProgressBar progressBar = new JProgressBar(0, player.getTotalFoundingFatherCost());
-            progressBar.setValue(player.getBells());
-            progressBar.setString(String.valueOf(player.getBells()) + "+" +
-                                  productionPanel.getTotalProduction() +
-                                  "/" + player.getTotalFoundingFatherCost());
+            int bells = player.getBells();
+            int required = player.getTotalFoundingFatherCost();
+            int production = productionPanel.getTotalProduction();
+
+            JProgressBar progressBar = new JProgressBar(0, required);
+            progressBar.setValue(bells);
+            String display = String.valueOf(bells) + "+" + production + "/" + required;
+            if (production > 0) {
+                int eta = (required - bells) / production;
+                if ((required - bells) % production > 0) {
+                    eta++;
+                }
+                display += " (" + eta + " " + Messages.message("turns") + ")";
+            }
+            progressBar.setString(display);
             progressBar.setStringPainted(true);
             summaryPanel.add(progressBar);
         }

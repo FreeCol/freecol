@@ -49,11 +49,21 @@ public final class ReportReligiousPanel extends ReportPanel implements ActionLis
         
         JPanel summaryPanel = new JPanel();
         summaryPanel.add(new JLabel(Messages.message("crosses")));
-        JProgressBar progressBar = new JProgressBar(0, player.getCrossesRequired());
-        progressBar.setValue(player.getCrosses());
-        progressBar.setString(String.valueOf(player.getCrosses()) + "+" +
-                              religiousReportPanel.getTotalProduction() +
-                              "/" + player.getCrossesRequired());
+        int crosses = player.getCrosses();
+        int required = player.getCrossesRequired();
+        int production = religiousReportPanel.getTotalProduction();
+
+        JProgressBar progressBar = new JProgressBar(0, required);
+        progressBar.setValue(crosses);
+        String display = String.valueOf(crosses) + "+" + production + "/" + required;
+        if (production > 0) {
+            int eta = (required - crosses) / production;
+            if ((required - crosses) % production > 0) {
+                eta++;
+            }
+            display += " (" + eta + " " + Messages.message("turns") + ")";
+        }
+        progressBar.setString(display);        
         progressBar.setStringPainted(true);
         summaryPanel.add(progressBar);
 

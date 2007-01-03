@@ -539,12 +539,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             final int tools = colony.getGoodsCount(Goods.TOOLS);
             final int nextHammers = colony.getBuildingForProducing(Goods.HAMMERS).getProductionNextTurn();
             final int nextTools = colony.getBuildingForProducing(Goods.TOOLS).getProductionNextTurn();
-            final String hammerDelta = (nextHammers > 0)? "+" + String.valueOf(nextHammers) : "";
-            final String toolDelta = (nextTools > 0)? "+" + String.valueOf(nextTools) : "";
-            final String hammerDisplay = Messages.message("model.goods.Hammers") + 
-                                         ": " + hammers + hammerDelta;
-            final String toolDisplay = Messages.message("model.goods.Tools") + 
-                                       ": " + tools + toolDelta;
+
             int hammersNeeded = 0;
             int toolsNeeded = 0;
             if (colony.getCurrentlyBuilding() < Colony.BUILDING_UNIT_ADDITION) {
@@ -559,7 +554,6 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             hammersNeeded = Math.max(hammersNeeded, 0);
             hammersLabel.setMaximum(hammersNeeded);
             hammersLabel.setValue(hammers);
-            hammersLabel.setString(hammerDisplay + "/" + hammersNeeded);
 
             toolsNeeded = Math.max(toolsNeeded, 0);
             if (toolsNeeded >= tools) {
@@ -569,7 +563,33 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 toolsLabel.setMaximum(100);
                 toolsLabel.setValue(100);
             }
-            toolsLabel.setString(toolDisplay + "/" + toolsNeeded);
+
+            String hammerDisplay = Messages.message("model.goods.Hammers") + ": " + hammers;
+            if (nextHammers > 0) {
+                int eta = (hammersNeeded - hammers) / nextHammers;
+                if ((hammersNeeded - hammers) % nextHammers > 0) {
+                    eta++;
+                }
+                hammerDisplay += "+" + nextHammers + "/" + hammersNeeded +
+                                 " (" + eta + " " + Messages.message("turns") + ")";
+            } else {
+                hammerDisplay += "/" + hammersNeeded;
+            }
+            hammersLabel.setString(hammerDisplay);
+
+            String toolDisplay = Messages.message("model.goods.Tools") + ": " + tools;
+            if (nextTools > 0) {
+                int eta = (toolsNeeded - tools) / nextTools;
+                if ((toolsNeeded - tools) % nextTools > 0) {
+                    eta++;
+                }
+                toolDisplay += "+" + nextTools + "/" + toolsNeeded +
+                               " (" + eta + " " + Messages.message("turns") + ")";
+            } else {
+                toolDisplay += "/" + toolsNeeded;
+            }
+            toolsLabel.setString(toolDisplay);
+
 
             buyBuilding.setEnabled(colony.getCurrentlyBuilding() >= 0 &&
                                    colony.getPriceForBuilding() <= freeColClient.getMyPlayer().getGold());
