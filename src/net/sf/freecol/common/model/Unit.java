@@ -2910,6 +2910,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             if (getGoodsCount() > 0) {
                 modified_power -= ((base_power * getGoodsCount()) / 8); // -12.5% penalty for every unit of cargo.
             }
+            if (getType() == PRIVATEER && getOwner().hasFather(FoundingFather.FRANCIS_DRAKE)) {
+                modified_power += base_power / 2; // 50% bonus
+            }
             return modified_power;
         }
 
@@ -3017,7 +3020,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 modified_power -= ((base_power * getGoodsCount()) / 8); // -12.5% penalty for every unit of cargo.
             }
             if (getType() == PRIVATEER && getOwner().hasFather(FoundingFather.FRANCIS_DRAKE)) {
-                modified_power += (base_power * 3) / 2;
+                modified_power += base_power / 2; // 50% bonus
             }
             return modified_power;
         }
