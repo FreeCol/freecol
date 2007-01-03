@@ -1,17 +1,17 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.ActionListener;
-import java.awt.Dimension;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
+
+import cz.autel.dmi.HIGLayout;
 
 /**
  * This panel displays the Religious Report.
@@ -31,7 +31,9 @@ public final class ReportReligiousPanel extends ReportPanel implements ActionLis
     public ReportReligiousPanel(Canvas parent) {
         super(parent, Messages.message("menuBar.report.religion"));
 
-        reportPanel.setLayout(new BoxLayout(reportPanel, BoxLayout.Y_AXIS));
+        int[] widths = new int[] {0};
+        int[] heights = new int[] {0, 12, 0};
+        reportPanel.setLayout(new HIGLayout(widths, heights));
         religiousReportPanel = new ReportProductionPanel(Goods.CROSSES, parent, this);
     }
 
@@ -43,13 +45,20 @@ public final class ReportReligiousPanel extends ReportPanel implements ActionLis
 
         // Display Panel
         reportPanel.removeAll();
-
-        String summary = Messages.message("crosses") + ": " + player.getCrosses() + " / " + player.getCrossesRequired();
-        reportPanel.add(new JLabel(summary));
-        reportPanel.add(Box.createRigidArea(new Dimension(0, 24)));
-
         religiousReportPanel.initialize();
-        reportPanel.add(religiousReportPanel);
+        
+        JPanel summaryPanel = new JPanel();
+        summaryPanel.add(new JLabel(Messages.message("crosses")));
+        JProgressBar progressBar = new JProgressBar(0, player.getCrossesRequired());
+        progressBar.setValue(player.getCrosses());
+        progressBar.setString(String.valueOf(player.getCrosses()) + "+" +
+                              religiousReportPanel.getTotalProduction() +
+                              "/" + player.getCrossesRequired());
+        progressBar.setStringPainted(true);
+        summaryPanel.add(progressBar);
+
+        reportPanel.add(summaryPanel, higConst.rc(1, 1));
+        reportPanel.add(religiousReportPanel, higConst.rc(3, 1));
     }
 }
 

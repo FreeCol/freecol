@@ -49,6 +49,7 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
     private List<Settlement> colonies;
     private final int goodsType;
     private final ReportPanel reportPanel;
+    private int totalProduction;
 
     /**
      * The constructor that will add the items to this panel.
@@ -68,6 +69,7 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
             widths = new int[] {0, columnSeparatorWidth, 0, columnSeparatorWidth, 0};
         }
         heights = null;
+        totalProduction = 0;
     }
 
     /**
@@ -138,7 +140,7 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
 
 
         int row = 5;
-        int totalProduction = 0;
+        totalProduction = 0;
         int totalUnits = 0;
 
         int pressCount = 0;
@@ -213,7 +215,6 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
             colonyIndex++;
         }
 
-
         row = 3;
         // summary
         JLabel allColonies = new JLabel(Messages.message("report.allColonies", new String[][] {{"%number%", String.valueOf(numberOfColonies)}}));
@@ -263,5 +264,10 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
             parent.showColonyPanel((Colony) colonies.get(action));
         }
     }
+
+    public int getTotalProduction() {
+        return totalProduction;
+    }
+
 }
 

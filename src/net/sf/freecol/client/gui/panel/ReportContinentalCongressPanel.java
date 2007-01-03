@@ -1,23 +1,20 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.ActionListener;
-import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.GridLayout;
 
 import javax.swing.BorderFactory;
-import javax.swing.border.EmptyBorder;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Player;
-import cz.autel.dmi.*;
+
+import cz.autel.dmi.HIGLayout;
 
 /**
  * This panel displays the ContinentalCongress Report.
@@ -30,7 +27,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel implements
     static final String title = Messages.message("report.continentalCongress.title");
     static final String none = Messages.message("report.continentalCongress.none");
 
-    private final ReportProductionPanel continentalCongressReportPanel;
+    private final ReportProductionPanel productionPanel;
     private final JPanel summaryPanel;
     private final JPanel fatherPanel;
 
@@ -41,17 +38,13 @@ public final class ReportContinentalCongressPanel extends ReportPanel implements
     public ReportContinentalCongressPanel(Canvas parent) {
         super(parent, title);
 
-        reportPanel.setLayout(new BoxLayout(reportPanel, BoxLayout.Y_AXIS));
+        int[] widths = {0};
+        int[] heights = {0, 12, 0, 12, 0};
+        reportPanel.setLayout(new HIGLayout(widths, heights));
 
         summaryPanel = new JPanel();
-        int[] widths = {0, 12, 0};
-        int[] heights = {0, 0, 0};
-        summaryPanel.setLayout(new HIGLayout(widths, heights));
-
-        fatherPanel = new JPanel();
-        fatherPanel.setLayout(new GridLayout(0, 4));
-
-        continentalCongressReportPanel = new ReportProductionPanel(Goods.BELLS, parent, this);
+        fatherPanel = new JPanel(new GridLayout(0, 4));
+        productionPanel = new ReportProductionPanel(Goods.BELLS, parent, this);
     }
 
     /**
@@ -61,11 +54,10 @@ public final class ReportContinentalCongressPanel extends ReportPanel implements
         Player player = parent.getClient().getMyPlayer();
 
         // Display Panel
+        productionPanel.initialize();
         summaryPanel.removeAll();
         fatherPanel.removeAll();
         reportPanel.removeAll();
-
-        HIGConstraints higConst = new HIGConstraints();
 
         // summary
         summaryPanel.add(new JLabel(Messages.message("report.continentalCongress.recruiting")),
@@ -76,25 +68,14 @@ public final class ReportContinentalCongressPanel extends ReportPanel implements
             JLabel currentFatherLabel = new JLabel(Messages.message(FoundingFather.getName(player.getCurrentFather())));
             currentFatherLabel.setToolTipText(Messages.message(FoundingFather.getDescription(player.getCurrentFather())));
             summaryPanel.add(currentFatherLabel, higConst.rc(1, 3));
+            JProgressBar progressBar = new JProgressBar(0, player.getTotalFoundingFatherCost());
+            progressBar.setValue(player.getBells());
+            progressBar.setString(String.valueOf(player.getBells()) + "+" +
+                                  productionPanel.getTotalProduction() +
+                                  "/" + player.getTotalFoundingFatherCost());
+            progressBar.setStringPainted(true);
+            summaryPanel.add(progressBar);
         }
-        summaryPanel.add(new JLabel(Messages.message("report.continentalCongress.bellsCurrent")),
-                         higConst.rc(2, 1));
-        Goods current = new Goods(Goods.BELLS);
-        current.setAmount(player.getBells());
-        GoodsLabel currentLabel = new GoodsLabel(current, parent);
-        currentLabel.setHorizontalAlignment(JLabel.LEADING);
-        summaryPanel.add(currentLabel, higConst.rc(2, 3));
-        summaryPanel.add(new JLabel(Messages.message("report.continentalCongress.bellsRequired")),
-                         higConst.rc(3, 1));
-        Goods total = new Goods(Goods.BELLS);
-        total.setAmount(player.getTotalFoundingFatherCost());
-        GoodsLabel totalLabel = new GoodsLabel(total, parent);
-        totalLabel.setHorizontalAlignment(JLabel.LEADING);
-        summaryPanel.add(totalLabel, higConst.rc(3, 3));
-        summaryPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        reportPanel.add(summaryPanel);
-        reportPanel.add(Box.createRigidArea(new Dimension(0, 24)));
 
         // founding fathers
         if (player.getFatherCount() < 1) {
@@ -112,15 +93,10 @@ public final class ReportContinentalCongressPanel extends ReportPanel implements
             }
         }
         fatherPanel.setBorder(BorderFactory.createTitledBorder(player.getNationAsString() + " " + title));
-        fatherPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        reportPanel.add(fatherPanel);
-        reportPanel.add(Box.createRigidArea(new Dimension(0, 24)));
 
-        // production per colony
-        continentalCongressReportPanel.initialize();
-        continentalCongressReportPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        reportPanel.add(continentalCongressReportPanel);
+        reportPanel.add(summaryPanel, higConst.rc(1, 1));
+        reportPanel.add(fatherPanel, higConst.rc(3, 1));
+        reportPanel.add(productionPanel, higConst.rc(5, 1));
     }
 }
 
