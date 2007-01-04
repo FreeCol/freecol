@@ -377,11 +377,19 @@ public class MapGenerator {
                     case Tile.MARSH:
                         return IndianSettlement.EXPERT_ORE_MINER;
                     case Tile.SWAMP:
-                        return IndianSettlement.MASTER_TOBACCO_PLANTER;
+                        if (rand == 0) {
+                            return IndianSettlement.MASTER_TOBACCO_PLANTER;
+                        } else {
+                            return IndianSettlement.MASTER_SUGAR_PLANTER;
+                        }
                     case Tile.DESERT:
                         return IndianSettlement.SEASONED_SCOUT;
                     case Tile.TUNDRA:
-                        return (rand==0 ? IndianSettlement.EXPERT_SILVER_MINER : IndianSettlement.EXPERT_ORE_MINER);
+                        if (rand == 0) {
+                            return IndianSettlement.EXPERT_SILVER_MINER;
+                        } else {
+                            return IndianSettlement.EXPERT_ORE_MINER;
+                        }
                     case Tile.ARCTIC:
                     case Tile.OCEAN:
                         return IndianSettlement.EXPERT_FISHERMAN;
@@ -435,11 +443,19 @@ public class MapGenerator {
             case Tile.MARSH:
                 return IndianSettlement.EXPERT_ORE_MINER;
             case Tile.SWAMP:
-                return IndianSettlement.MASTER_TOBACCO_PLANTER;
+                if (rand == 0) {
+                    return IndianSettlement.MASTER_TOBACCO_PLANTER;
+                } else {
+                    return IndianSettlement.MASTER_SUGAR_PLANTER;
+                }
             case Tile.DESERT:
                 return IndianSettlement.SEASONED_SCOUT;
             case Tile.TUNDRA:
-                return (rand==0 ? IndianSettlement.EXPERT_SILVER_MINER : IndianSettlement.EXPERT_ORE_MINER);
+                if (rand == 0) {
+                    return IndianSettlement.EXPERT_SILVER_MINER;
+                } else {
+                    return IndianSettlement.EXPERT_ORE_MINER;
+                }
             case Tile.ARCTIC:
             case Tile.OCEAN:
                 return IndianSettlement.EXPERT_FISHERMAN;
