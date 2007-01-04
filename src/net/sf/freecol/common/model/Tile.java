@@ -1170,19 +1170,22 @@ public final class Tile extends FreeColGameObject implements Location {
             break;
         default:
             if (tileType == OCEAN) {
-                int landCount = 0;
-                Iterator tileIterator = getMap().getAdjacentIterator(getPosition());
-                while (tileIterator.hasNext()) {
-                    if (getMap().getTile((Position) tileIterator.next()).isLand()) {
-                        landCount++;
+                basepotential = potentialtable[tileType][goods][0];
+                
+                if(goods == Goods.FOOD){
+                    int landCount = 0;
+                    Iterator tileIterator = getMap().getAdjacentIterator(getPosition());
+                    while (tileIterator.hasNext()) {
+                        if (getMap().getTile((Position) tileIterator.next()).isLand()) {
+                            landCount++;
+                        }
                     }
-                }
-                if (landCount > 5) {
-                    basepotential = 6;
-                } else if (landCount > 3) {
-                    basepotential = 4;
-                } else {
-                    basepotential = 2;
+                
+                    if (landCount > 5) {
+                        basepotential += 2;
+                    } else if (landCount <= 3) {
+                        basepotential -= 2;
+                    }
                 }
             } else {
                 basepotential = potentialtable[tileType][goods][(forested ? 1 : 0)];
