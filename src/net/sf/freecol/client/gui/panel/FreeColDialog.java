@@ -623,7 +623,7 @@ public class FreeColDialog extends FreeColPanel {
 
         final FreeColDialog missionaryDialog = new FreeColDialog() {
             public void requestFocus() {
-                cancel.requestFocus();
+                establishOrHeresy.requestFocus();
             }
         };
 
@@ -667,6 +667,7 @@ public class FreeColDialog extends FreeColPanel {
         missionaryDialog.add(cancel, higConst.rc(10, 3));
 
         missionaryDialog.setSize(missionaryDialog.getPreferredSize());
+        missionaryDialog.setCancelComponent(cancel);
 
         return missionaryDialog;
     }
