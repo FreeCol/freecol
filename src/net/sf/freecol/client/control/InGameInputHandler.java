@@ -263,6 +263,26 @@ public final class InGameInputHandler extends InputHandler {
                 u.readFromXMLElement(unitElement);
             }
             final Unit unit = u;
+            
+            if (opponentMoveElement.hasAttribute("inUnit")) {
+                String inUnitID = opponentMoveElement.getAttribute("inUnit");
+                Unit location = (Unit) game.getFreeColGameObject(inUnitID);
+                
+                NodeList units = opponentMoveElement.getElementsByTagName(Unit.getXMLElementTagName());
+                Element locationElement = null;
+                for (int i=0; i<units.getLength() && locationElement == null; i++) {
+                    Element element = (Element) units.item(i);
+                    if (element.getAttribute("ID").equals(inUnitID))
+                        locationElement = element;
+                }
+                if (locationElement != null) {
+                    if (location == null) {
+                        location = new Unit(game, locationElement);
+                    } else {
+                        location.readFromXMLElement(locationElement);
+                    }
+                }
+            }
 
             if (game.getFreeColGameObject(tileID) == null) {
                 logger.warning("Could not find tile with id: " + tileID);
