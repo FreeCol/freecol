@@ -120,13 +120,13 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         String label = tile.getName();
         
         if(tile.hasRiver())
-            label += "/River";
+            label += "/"+ Messages.message("river");
         
         if(tile.hasRoad())
-            label += "/Road";
+            label += "/"+ Messages.message("road");
         
         if(tile.isPlowed())
-            label += "/Plowed";
+            label += "/"+ Messages.message("plowed");
         
         return label;
     }
