@@ -72,7 +72,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
     public UnitLabel(Unit unit, Canvas parent) {
         super(parent.getImageProvider().getUnitImageIcon(parent.getImageProvider().getUnitGraphicsType(unit)));
         this.unit = unit;
-        setToolTipText(unit.getName());
+        setDescriptionLabel(unit.getName());
         this.parent = parent;
         selected = false;
 
@@ -170,17 +170,42 @@ public final class UnitLabel extends JLabel implements ActionListener {
         }
 
     }
-
+    
+    /**
+     * Gets the description label.
+     * 
+     * The description label is a tooltip with the
+     *unit name and description of the terrain its on
+     *if applicable
+     ** @return This UnitLabel's description label.
+     */
+    public String getDescriptionLabel(){
+        return getToolTipText();
+    }
+    
+    /**
+     * Sets the description label.
+     * 
+     * The description label is a tooltip with the
+     *unit name and description of the terrain its on
+     *if applicable
+     * @param label The string to set the label to.
+     */
+    public void setDescriptionLabel(String label){
+        setToolTipText(label);
+        
+    }
 
     /**
     * Paints this UnitLabel.
     * @param g The graphics context in which to do the painting.
     */
     public void paintComponent(Graphics g) {
-        if (!getToolTipText().equals(unit.getName())) {
+        
+        if (getToolTipText() == null) {
             setToolTipText(unit.getName());
         }
-
+        
         if (selected || !unit.isCarrier()) {
             setEnabled(true);
         } else {

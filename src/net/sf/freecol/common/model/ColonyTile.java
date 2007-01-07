@@ -107,6 +107,29 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
             return Messages.message("nearLocation", new String[][] {{"%location%", name}});
         }
     }
+    
+    /**
+     *  Returns a description of the tile, with the name of the tile
+     *and any improvements made to it (road/plow)
+     * @return The description label for this tile
+     */
+    public String getLabel() {
+        
+        Tile tile = getWorkTile();
+        
+        String label = tile.getName();
+        
+        if(tile.hasRiver())
+            label += "/River";
+        
+        if(tile.hasRoad())
+            label += "/Road";
+        
+        if(tile.isPlowed())
+            label += "/Plowed";
+        
+        return label;
+    }
 
 
     /**

@@ -1504,6 +1504,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             for (int x=0; x<3; x++) {
                 for (int y=0; y<3; y++) {
                     gui.displayColonyTile((Graphics2D) g, game.getMap(), colony.getTile(x, y), ((2-x)+y)*lib.getTerrainImageWidth(1)/2, (x+y)*lib.getTerrainImageHeight(1)/2, colony);
+                    
                 }
             }
         }
@@ -1523,6 +1524,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 this.y = y;
 
                 setOpaque(false);
+                
+                updateDescriptionLabel();
 
                 if (colonyTile.getUnit() != null) {
                     Unit unit = colonyTile.getUnit();
@@ -1530,8 +1533,10 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                     UnitLabel unitLabel = new UnitLabel(unit, parent);
                     unitLabel.setTransferHandler(defaultTransferHandler);
                     unitLabel.addMouseListener(pressListener);
-
+                    
                     add(unitLabel);
+                    
+                    updateDescriptionLabel(unitLabel,true);
                 }
 
                 ImageLibrary lib = parent.getGUI().getImageLibrary();
@@ -1561,13 +1566,52 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 // Size and position:
                 setSize(lib.getTerrainImageWidth(1), lib.getTerrainImageHeight(1));
                 setLocation(((2-x)+y)*lib.getTerrainImageWidth(1)/2, (x+y)*lib.getTerrainImageHeight(1)/2);
+                
+                
             }
 
 
             public void paintComponent(Graphics g) {
 
             }
-
+            
+            /**
+             * Updates the description label
+             * The description label is a tooltip with the
+             *terrain type, road and plow indicator if any
+             *
+             * If a unit is on it update the tooltip of it instead 
+             */
+            private void updateDescriptionLabel() {
+                updateDescriptionLabel(null,false);
+            }
+            
+            
+            /**
+             * Updates the description label
+             * The description label is a tooltip with the
+             *terrain type, road and plow indicator if any
+             *
+             * If a unit is on it update the tooltip of it instead 
+             */
+            private void updateDescriptionLabel(UnitLabel unit, boolean toAdd) {
+                String tileDescription = this.colonyTile.getLabel();
+                
+                if(unit == null){
+                    setToolTipText(tileDescription);
+                }
+                else{
+                    String unitDescription = unit.getUnit().getName();
+                    if(toAdd){
+                        unitDescription = tileDescription + " [" + unitDescription + "]";
+                    }
+                    unit.setDescriptionLabel(unitDescription);
+                }
+            }
+            
+            public ColonyTile getColonyTile(){
+                return colonyTile;
+            }
 
             /**
             * Adds a component to this CargoPanel and makes sure that the unit
@@ -1621,7 +1665,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
                         if (colonyTile.canAdd(unit)) {
                             oldParent.remove(comp);
-
+                            
                             inGameController.work(unit, colonyTile);
 
                             // check whether worktype is suitable
@@ -1630,11 +1674,16 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                                 inGameController.changeWorkType(unit, workType);
                             }
                             
+                            updateDescriptionLabel((UnitLabel) comp,true);
+                            
                             updateBuildingBox();
                             updateWarehouse();
                             updateBuildingsPanel();
 
                             ((UnitLabel) comp).setSmall(false);
+                            
+                            
+                            
                             colonyPanel.updateSoLLabel();
                         } else {
                             return null;
@@ -1657,6 +1706,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             public void remove(Component comp) {
                 if (comp instanceof UnitLabel) {
                     ((UnitLabel) comp).setSmall(false);
+                    updateDescriptionLabel((UnitLabel) comp,false);
                 }
                 super.remove(comp);
             }
