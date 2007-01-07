@@ -142,6 +142,9 @@ public class IndianDemandMission extends Mission {
                 } else {
                     demandElement.appendChild(goods.toXMLElement(null, demandElement.getOwnerDocument()));
                 }
+                if (!unit.isVisibleTo(enemy)) {
+                    demandElement.appendChild(unit.toXMLElement(enemy, demandElement.getOwnerDocument()));
+                }
 
                 Element reply;
                 try {

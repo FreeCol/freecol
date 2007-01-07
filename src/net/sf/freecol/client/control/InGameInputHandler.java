@@ -623,6 +623,15 @@ public final class InGameInputHandler extends InputHandler {
         int gold = 0;
         Goods goods = null;
         boolean accepted;
+        
+        Element unitElement = Message.getChildElement(element, Unit.getXMLElementTagName());
+        if (unitElement != null) {
+            if (unit == null) {
+                unit = new Unit(game, unitElement);
+            } else {
+                unit.readFromXMLElement(unitElement);
+            }
+        }
 
         Element goodsElement = Message.getChildElement(element, Goods.getXMLElementTagName());
         if (goodsElement == null) {
