@@ -198,7 +198,6 @@ public final class FreeColServer {
             server.start();
         } catch (IOException e) {
             logger.warning("Exception while starting server: " + e);
-            server.shutdown();
             throw e;
         }
         try {
