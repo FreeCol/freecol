@@ -1,9 +1,11 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -16,6 +18,8 @@ import java.awt.event.MouseListener;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
+import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.ComponentInputMap;
 import javax.swing.ImageIcon;
 import javax.swing.InputMap;
@@ -25,6 +29,7 @@ import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
@@ -42,6 +47,8 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 
+import cz.autel.dmi.HIGConstraints;
+import cz.autel.dmi.HIGLayout;
 
 /**
  * This is a panel for the Europe display. It shows the ships in Europe and
@@ -86,7 +93,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
 
     private JButton exitButton;
     
-
+    private HIGConstraints higConst = new HIGConstraints();
 
 
 
@@ -1148,9 +1155,13 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             setFocusCycleRoot(true);
             ActionListener actionListener = this;
 
-            JLabel  question = new MessageLabel( "clickAnIndividual" ),
-                    question2 = new MessageLabel( "recruitThem" ),
-                    priceLabel = new MessageLabel( "theirPrice" );
+            JTextArea question = new JTextArea(Messages.message("recruitDialog.clickOn"));
+            question.setOpaque(false);
+            question.setLineWrap(true);
+            question.setWrapStyleWord(true);
+            question.setFont(new Font("Dialog", Font.BOLD, 12));
+
+            JLabel  priceLabel = new MessageLabel( "theirPrice" );
             cancel = new JButton( Messages.message("cancel") );
             setCancelComponent(cancel);
 
@@ -1160,26 +1171,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             person3 = new JButton();
 
             initialize();
-
-            question.setSize(300, 20);
-            question2.setSize(300, 20);
-            priceLabel.setSize(80, 20);
-            price.setSize(60, 20);
-            person1.setSize(200, 20);
-            person2.setSize(200, 20);
-            person3.setSize(200, 20);
-            cancel.setSize(80, 20);
-
-            question.setLocation(10, 10);
-            question2.setLocation(10, 30);
-            priceLabel.setLocation(10, 55);
-            price.setLocation(95, 55);
-            person1.setLocation(60, 90);
-            person2.setLocation(60, 115);
-            person3.setLocation(60, 140);
-            cancel.setLocation(120, 175);
-
-            setLayout(null);
+            setLayout(new HIGLayout(new int[] {280}, new int[] {0, 10, 0, 10, 0}));
 
             person1.setActionCommand(String.valueOf(RECRUIT_1));
             person2.setActionCommand(String.valueOf(RECRUIT_2));
@@ -1191,23 +1183,24 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             person3.addActionListener(actionListener);
             cancel.addActionListener(actionListener);
 
-            add(question);
-            add(question2);
-            add(priceLabel);
-            add(price);
-            add(person1);
-            add(person2);
-            add(person3);
-            add(cancel);
+            int[] widths = new int[] {0, 12, 100};
+            int[] heights = new int[] {0, 12, 0, 0, 0};
+            JPanel recruitPanel = new JPanel(new HIGLayout(widths, heights));
 
-            try {
-                BevelBorder border = new BevelBorder(BevelBorder.RAISED);
-                setBorder(border);
-            }
-            catch(Exception e) {
-            }
+            recruitPanel.add(priceLabel, higConst.rc(1, 1));
+            recruitPanel.add(price, higConst.rc(1, 3));
+            recruitPanel.add(person1, higConst.rcwh(3, 1, 3, 1));
+            recruitPanel.add(person2, higConst.rcwh(4, 1, 3, 1));
+            recruitPanel.add(person3, higConst.rcwh(5, 1, 3, 1));
 
-            setSize(320, 205);
+            add(question, higConst.rc(1, 1));
+            add(recruitPanel, higConst.rc(3, 1));
+            add(cancel, higConst.rc(5, 1));
+
+            setBorder(BorderFactory.createCompoundBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED),
+                                                         BorderFactory.createEmptyBorder(20, 20, 20, 20)));
+
+            setSize(320, 215);
         }
 
 
@@ -1332,59 +1325,30 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         */
         public PurchaseDialog() {
             setFocusCycleRoot(true);
+            setLayout(new HIGLayout(new int[] {280}, new int[] {0, 10, 0, 10, 0}));
             ActionListener actionListener = this;
 
-            JLabel  question = new JLabel("Click one of the following items to"),
-                    question2 = new JLabel("purchase them."),
-                    caravelLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.CARAVEL))),
+            JPanel purchasePanel = new JPanel();
+            JTextArea question = new JTextArea(Messages.message("purchaseDialog.clickOn"));
+            question.setOpaque(false);
+            question.setLineWrap(true);
+            question.setWrapStyleWord(true);
+            question.setFont(new Font("Dialog", Font.BOLD, 12));
+
+            JLabel  caravelLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.CARAVEL))),
                     merchantmanLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.MERCHANTMAN))),
                     galleonLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.GALLEON))),
                     privateerLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.PRIVATEER))),
                     frigateLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.FRIGATE)));
-            cancel = new JButton("Cancel");
+            cancel = new JButton(Messages.message("cancel"));
             setCancelComponent(cancel);
-
+            
             artilleryButton = new JButton(Unit.getName(Unit.ARTILLERY));
             caravelButton = new JButton(Unit.getName(Unit.CARAVEL));
             merchantmanButton = new JButton(Unit.getName(Unit.MERCHANTMAN));
             galleonButton = new JButton(Unit.getName(Unit.GALLEON));
             privateerButton = new JButton(Unit.getName(Unit.PRIVATEER));
             frigateButton = new JButton(Unit.getName(Unit.FRIGATE));
-
-            question.setSize(300, 20);
-            question2.setSize(300, 20);
-            artilleryLabel.setSize(40, 20);
-            caravelLabel.setSize(40, 20);
-            merchantmanLabel.setSize(40, 20);
-            galleonLabel.setSize(40, 20);
-            privateerLabel.setSize(40, 20);
-            frigateLabel.setSize(40, 20);
-            cancel.setSize(80, 20);
-            artilleryButton.setSize(200, 20);
-            caravelButton.setSize(200, 20);
-            merchantmanButton.setSize(200, 20);
-            galleonButton.setSize(200, 20);
-            privateerButton.setSize(200, 20);
-            frigateButton.setSize(200, 20);
-
-            question.setLocation(10, 10);
-            question2.setLocation(10, 30);
-            artilleryLabel.setLocation(245, 65);
-            caravelLabel.setLocation(245, 90);
-            merchantmanLabel.setLocation(245, 115);
-            galleonLabel.setLocation(245, 140);
-            privateerLabel.setLocation(245, 165);
-            frigateLabel.setLocation(245, 190);
-            cancel.setLocation(120, 225);
-            artilleryButton.setLocation(35, 65);
-            caravelButton.setLocation(35, 90);
-            merchantmanButton.setLocation(35, 115);
-            galleonButton.setLocation(35, 140);
-            privateerButton.setLocation(35, 165);
-            frigateButton.setLocation(35, 190);
-
-            setLayout(null);
-
             cancel.setActionCommand(String.valueOf(PURCHASE_CANCEL));
             artilleryButton.setActionCommand(String.valueOf(PURCHASE_ARTILLERY));
             caravelButton.setActionCommand(String.valueOf(PURCHASE_CARAVEL));
@@ -1401,28 +1365,40 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             privateerButton.addActionListener(actionListener);
             frigateButton.addActionListener(actionListener);
 
-            add(question);
-            add(question2);
-            add(artilleryLabel);
-            add(caravelLabel);
-            add(merchantmanLabel);
-            add(galleonLabel);
-            add(privateerLabel);
-            add(frigateLabel);
-            add(cancel);
-            add(artilleryButton);
-            add(caravelButton);
-            add(merchantmanButton);
-            add(galleonButton);
-            add(privateerButton);
-            add(frigateButton);
+            int[] widths = new int[] {0, 12, 0};
+            int[] heights = new int[9];
+            int buttonColumn = 1;
+            int labelColumn = 3;
+            purchasePanel.setLayout(new HIGLayout(widths, heights));
 
-            try {
-                BevelBorder border = new BevelBorder(BevelBorder.RAISED);
-                setBorder(border);
-            } catch(Exception e) {}
+            int row = 1;
+            purchasePanel.add(artilleryButton, higConst.rc(row, buttonColumn));
+            purchasePanel.add(artilleryLabel, higConst.rc(row, labelColumn));
+            row++;
+            purchasePanel.add(caravelButton, higConst.rc(row, buttonColumn));
+            purchasePanel.add(caravelLabel, higConst.rc(row, labelColumn));
+            row++;
+            purchasePanel.add(merchantmanButton, higConst.rc(row, buttonColumn));
+            purchasePanel.add(merchantmanLabel, higConst.rc(row, labelColumn));
+            row++;
+            purchasePanel.add(galleonButton, higConst.rc(row, buttonColumn));
+            purchasePanel.add(galleonLabel, higConst.rc(row, labelColumn));
+            row++;
+            purchasePanel.add(privateerButton, higConst.rc(row, buttonColumn));
+            purchasePanel.add(privateerLabel, higConst.rc(row, labelColumn));
+            row++;
+            purchasePanel.add(frigateButton, higConst.rc(row, buttonColumn));
+            purchasePanel.add(frigateLabel, higConst.rc(row, labelColumn));
+            row++;
 
-            setSize(320, 255);
+            add(question, higConst.rc(1, 1));
+            add(purchasePanel, higConst.rc(3, 1));
+            add(cancel, higConst.rc(5, 1));
+
+            setBorder(BorderFactory.createCompoundBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED),
+                                                         BorderFactory.createEmptyBorder(20, 20, 20, 20)));
+            
+            setSize(320, 265);
         }
 
 
@@ -1608,10 +1584,16 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             setFocusCycleRoot(true);
 
             ActionListener actionListener = this;
+            setLayout(new HIGLayout(new int[] {280}, new int[] {0, 10, 0, 10, 0}));
 
-            JLabel  question = new JLabel(Messages.message("clickOneOfTheFollowingIndividuals")),
-                    question2 = new JLabel(Messages.message("trainThem")),
-                    expertOreMinerLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.EXPERT_ORE_MINER))),
+
+            JTextArea question = new JTextArea(Messages.message("trainDialog.clickOn"));
+            question.setOpaque(false);
+            question.setLineWrap(true);
+            question.setWrapStyleWord(true);
+            question.setFont(new Font("Dialog", Font.BOLD, 12));
+
+            JLabel  expertOreMinerLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.EXPERT_ORE_MINER))),
                     expertLumberJackLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.EXPERT_LUMBER_JACK))),
                     masterGunsmithLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.MASTER_GUNSMITH))),
                     expertSilverMinerLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.EXPERT_SILVER_MINER))),
@@ -1648,84 +1630,6 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             firebrandPreacherButton = new JButton(Unit.getName(Unit.FIREBRAND_PREACHER));
             elderStatesmanButton = new JButton(Unit.getName(Unit.ELDER_STATESMAN));
             veteranSoldierButton = new JButton(Unit.getName(Unit.VETERAN_SOLDIER));
-
-            question.setSize(300, 20);
-            question2.setSize(300, 20);
-            expertOreMinerLabel.setSize(40, 20);
-            expertLumberJackLabel.setSize(40, 20);
-            masterGunsmithLabel.setSize(40, 20);
-            expertSilverMinerLabel.setSize(40, 20);
-            masterFurTraderLabel.setSize(40, 20);
-            masterCarpenterLabel.setSize(40, 20);
-            expertFishermanLabel.setSize(40, 20);
-            masterBlacksmithLabel.setSize(40, 20);
-            expertFarmerLabel.setSize(40, 20);
-            masterDistillerLabel.setSize(40, 20);
-            hardyPioneerLabel.setSize(40, 20);
-            masterTobacconistLabel.setSize(40, 20);
-            masterWeaverLabel.setSize(40, 20);
-            jesuitMissionaryLabel.setSize(40, 20);
-            firebrandPreacherLabel.setSize(40, 20);
-            elderStatesmanLabel.setSize(40, 20);
-            veteranSoldierLabel.setSize(40, 20);
-            cancel.setSize(80, 20);
-            expertOreMinerButton.setSize(200, 20);
-            expertLumberJackButton.setSize(200, 20);
-            masterGunsmithButton.setSize(200, 20);
-            expertSilverMinerButton.setSize(200, 20);
-            masterFurTraderButton.setSize(200, 20);
-            masterCarpenterButton.setSize(200, 20);
-            expertFishermanButton.setSize(200, 20);
-            masterBlacksmithButton.setSize(200, 20);
-            expertFarmerButton.setSize(200, 20);
-            masterDistillerButton.setSize(200, 20);
-            hardyPioneerButton.setSize(200, 20);
-            masterTobacconistButton.setSize(200, 20);
-            masterWeaverButton.setSize(200, 20);
-            jesuitMissionaryButton.setSize(200, 20);
-            firebrandPreacherButton.setSize(200, 20);
-            elderStatesmanButton.setSize(200, 20);
-            veteranSoldierButton.setSize(200, 20);
-
-            question.setLocation(10, 10);
-            question2.setLocation(10, 30);
-            expertOreMinerLabel.setLocation(245, 65);
-            expertLumberJackLabel.setLocation(245, 90);
-            masterGunsmithLabel.setLocation(245, 115);
-            expertSilverMinerLabel.setLocation(245, 140);
-            masterFurTraderLabel.setLocation(245, 165);
-            masterCarpenterLabel.setLocation(245, 190);
-            expertFishermanLabel.setLocation(245, 215);
-            masterBlacksmithLabel.setLocation(245, 240);
-            expertFarmerLabel.setLocation(245, 265);
-            masterDistillerLabel.setLocation(245, 290);
-            hardyPioneerLabel.setLocation(245, 315);
-            masterTobacconistLabel.setLocation(245, 340);
-            masterWeaverLabel.setLocation(245, 365);
-            jesuitMissionaryLabel.setLocation(245, 390);
-            firebrandPreacherLabel.setLocation(245, 415);
-            elderStatesmanLabel.setLocation(245, 440);
-            veteranSoldierLabel.setLocation(245, 465);
-            cancel.setLocation(120, 500);
-            expertOreMinerButton.setLocation(35, 65);
-            expertLumberJackButton.setLocation(35, 90);
-            masterGunsmithButton.setLocation(35, 115);
-            expertSilverMinerButton.setLocation(35, 140);
-            masterFurTraderButton.setLocation(35, 165);
-            masterCarpenterButton.setLocation(35, 190);
-            expertFishermanButton.setLocation(35, 215);
-            masterBlacksmithButton.setLocation(35, 240);
-            expertFarmerButton.setLocation(35, 265);
-            masterDistillerButton.setLocation(35, 290);
-            hardyPioneerButton.setLocation(35, 315);
-            masterTobacconistButton.setLocation(35, 340);
-            masterWeaverButton.setLocation(35, 365);
-            jesuitMissionaryButton.setLocation(35, 390);
-            firebrandPreacherButton.setLocation(35, 415);
-            elderStatesmanButton.setLocation(35, 440);
-            veteranSoldierButton.setLocation(35, 465);
-
-            setLayout(null);
 
             cancel.setActionCommand(String.valueOf(TRAIN_CANCEL));
             expertOreMinerButton.setActionCommand(String.valueOf(TRAIN_EXPERT_ORE_MINER));
@@ -1765,50 +1669,72 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             elderStatesmanButton.addActionListener(actionListener);
             veteranSoldierButton.addActionListener(actionListener);
 
-            add(question);
-            add(question2);
-            add(expertOreMinerLabel);
-            add(expertLumberJackLabel);
-            add(masterGunsmithLabel);
-            add(expertSilverMinerLabel);
-            add(masterFurTraderLabel);
-            add(masterCarpenterLabel);
-            add(expertFishermanLabel);
-            add(masterBlacksmithLabel);
-            add(expertFarmerLabel);
-            add(masterDistillerLabel);
-            add(hardyPioneerLabel);
-            add(masterTobacconistLabel);
-            add(masterWeaverLabel);
-            add(jesuitMissionaryLabel);
-            add(firebrandPreacherLabel);
-            add(elderStatesmanLabel);
-            add(veteranSoldierLabel);
-            add(cancel);
-            add(expertOreMinerButton);
-            add(expertLumberJackButton);
-            add(masterGunsmithButton);
-            add(expertSilverMinerButton);
-            add(masterFurTraderButton);
-            add(masterCarpenterButton);
-            add(expertFishermanButton);
-            add(masterBlacksmithButton);
-            add(expertFarmerButton);
-            add(masterDistillerButton);
-            add(hardyPioneerButton);
-            add(masterTobacconistButton);
-            add(masterWeaverButton);
-            add(jesuitMissionaryButton);
-            add(firebrandPreacherButton);
-            add(elderStatesmanButton);
-            add(veteranSoldierButton);
+            int[] widths = new int[] {0, 12, 0};
+            int[] heights = new int[18];
+            int row = 1;
+            int labelColumn = 1;
+            int buttonColumn = 3;
+            JPanel trainPanel = new JPanel(new HIGLayout(widths, heights));
 
-            try {
-                BevelBorder border = new BevelBorder(BevelBorder.RAISED);
-                setBorder(border);
-            } catch(Exception e) {}
+            trainPanel.add(expertOreMinerLabel, higConst.rc(row, labelColumn));
+            trainPanel.add(expertOreMinerButton, higConst.rc(row, buttonColumn));
+            row++;
+            trainPanel.add(expertLumberJackLabel, higConst.rc(row, labelColumn));
+            trainPanel.add(expertLumberJackButton, higConst.rc(row, buttonColumn));
+            row++;
+            trainPanel.add(masterGunsmithLabel, higConst.rc(row, labelColumn));
+            trainPanel.add(masterGunsmithButton, higConst.rc(row, buttonColumn));
+            row++;
+            trainPanel.add(expertSilverMinerLabel, higConst.rc(row, labelColumn));
+            trainPanel.add(expertSilverMinerButton, higConst.rc(row, buttonColumn));
+            row++;
+            trainPanel.add(masterFurTraderLabel, higConst.rc(row, labelColumn));
+            trainPanel.add(masterFurTraderButton, higConst.rc(row, buttonColumn));
+            row++;
+            trainPanel.add(masterCarpenterLabel, higConst.rc(row, labelColumn));
+            trainPanel.add(masterCarpenterButton, higConst.rc(row, buttonColumn));
+            row++;
+            trainPanel.add(expertFishermanLabel, higConst.rc(row, labelColumn));
+            trainPanel.add(expertFishermanButton, higConst.rc(row, buttonColumn));
+            row++;
+            trainPanel.add(masterBlacksmithLabel, higConst.rc(row, labelColumn));
+            trainPanel.add(masterBlacksmithButton, higConst.rc(row, buttonColumn));
+            row++;
+            trainPanel.add(expertFarmerLabel, higConst.rc(row, labelColumn));
+            trainPanel.add(expertFarmerButton, higConst.rc(row, buttonColumn));
+            row++;
+            trainPanel.add(masterDistillerLabel, higConst.rc(row, labelColumn));
+            trainPanel.add(masterDistillerButton, higConst.rc(row, buttonColumn));
+            row++;
+            trainPanel.add(hardyPioneerLabel, higConst.rc(row, labelColumn));
+            trainPanel.add(hardyPioneerButton, higConst.rc(row, buttonColumn));
+            row++;
+            trainPanel.add(masterTobacconistLabel, higConst.rc(row, labelColumn));
+            trainPanel.add(masterTobacconistButton, higConst.rc(row, buttonColumn));
+            row++;
+            trainPanel.add(masterWeaverLabel, higConst.rc(row, labelColumn));
+            trainPanel.add(masterWeaverButton, higConst.rc(row, buttonColumn));
+            row++;
+            trainPanel.add(jesuitMissionaryLabel, higConst.rc(row, labelColumn));
+            trainPanel.add(jesuitMissionaryButton, higConst.rc(row, buttonColumn));
+            row++;
+            trainPanel.add(firebrandPreacherLabel, higConst.rc(row, labelColumn));
+            trainPanel.add(firebrandPreacherButton, higConst.rc(row, buttonColumn));
+            row++;
+            trainPanel.add(elderStatesmanLabel, higConst.rc(row, labelColumn));
+            trainPanel.add(elderStatesmanButton, higConst.rc(row, buttonColumn));
+            row++;
+            trainPanel.add(veteranSoldierLabel, higConst.rc(row, labelColumn));
+            trainPanel.add(veteranSoldierButton, higConst.rc(row, buttonColumn));
 
-            setSize(320, 530);
+            add(question, higConst.rc(1, 1));
+            add(trainPanel, higConst.rc(3, 1));
+            add(cancel, higConst.rc(5, 1));
+
+            setBorder(BorderFactory.createCompoundBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED),
+                                                         BorderFactory.createEmptyBorder(20, 20, 20, 20)));
+
+            setSize(320, 540);
         }
 
 
