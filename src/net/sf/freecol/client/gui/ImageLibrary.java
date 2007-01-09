@@ -1122,7 +1122,22 @@ public final class ImageLibrary extends ImageProvider {
      * @return The graphics that will represent the given unit.
      */
     public int getUnitGraphicsType(Unit unit) {
-        switch (unit.getType()) {
+        return getUnitGraphicsType(unit.getType(), unit.isArmed(), unit.isMounted(),
+                                   unit.getNumberOfTools(), unit.isMissionary());
+    }
+
+    /**
+     * Returns the graphics that will represent the given unit.
+     * @param type The type of unit whose graphics type is needed.
+     * @param armed Whether the unit is armed.
+     * @param mounted Whether the unit is mounted.
+     * @param numberOfTools The number of tools this unit has.
+     * @param missionary Whether the unit is missionary.
+     * @return The graphics that will represent the given unit.
+     */
+    public static int getUnitGraphicsType(int type, boolean armed, boolean mounted,
+                                          int numberOfTools, boolean missionary) {
+        switch (type) {
             case Unit.FREE_COLONIST:
             case Unit.EXPERT_FARMER:
             case Unit.EXPERT_FISHERMAN:
@@ -1142,150 +1157,150 @@ public final class ImageLibrary extends ImageProvider {
             case Unit.MASTER_FUR_TRADER:
             case Unit.MASTER_BLACKSMITH:
             case Unit.MASTER_GUNSMITH:
-                if (unit.isArmed() && unit.isMounted()) {
+                if (armed && mounted) {
                     return DRAGOON;
-                } else if (unit.isArmed()) {
+                } else if (armed) {
                     return SOLDIER;
-                } else if (unit.isMounted()) {
+                } else if (mounted) {
                     return UNARMED_DRAGOON;
-                } else if (unit.getNumberOfTools() > 0) {
+                } else if (numberOfTools > 0) {
                     return FREE_COLONIST_WITH_TOOLS;
-                } else if (unit.isMissionary()) {
+                } else if (missionary) {
                     return MISSIONARY_FREE_COLONIST;
                 } else {
                     // The ints representing the types are exactly the same
                     // as the ints representing the graphics. This is only the
                     // case for these units and it may change at ANY time.
-                    return unit.getType();
+                    return type;
                 }
             case Unit.SEASONED_SCOUT:
-                if (unit.isArmed() && unit.isMounted()) {
+                if (armed && mounted) {
                     return DRAGOON;
-                } else if (unit.isArmed()) {
+                } else if (armed) {
                     return SOLDIER;
-                } else if (unit.isMounted()) {
+                } else if (mounted) {
                     return SEASONED_SCOUT_MOUNTED;
-                } else if (unit.getNumberOfTools() > 0) {
+                } else if (numberOfTools > 0) {
                     return FREE_COLONIST_WITH_TOOLS;
-                } else if (unit.isMissionary()) {
+                } else if (missionary) {
                     return MISSIONARY_FREE_COLONIST;
                 } else {
                     return SEASONED_SCOUT_NOT_MOUNTED;
                 }
             case Unit.HARDY_PIONEER:
-                if (unit.isArmed() && unit.isMounted()) {
+                if (armed && mounted) {
                     return DRAGOON;
-                } else if (unit.isArmed()) {
+                } else if (armed) {
                     return SOLDIER;
-                } else if (unit.isMounted()) {
+                } else if (mounted) {
                     return UNARMED_DRAGOON;
-                } else if (unit.getNumberOfTools() > 0) {
+                } else if (numberOfTools > 0) {
                     return HARDY_PIONEER_WITH_TOOLS;
-                } else if (unit.isMissionary()) {
+                } else if (missionary) {
                     return MISSIONARY_FREE_COLONIST;
                 } else {
                     return HARDY_PIONEER_NO_TOOLS;
                 }
             case Unit.VETERAN_SOLDIER:
-                if (unit.isArmed() && unit.isMounted()) {
+                if (armed && mounted) {
                     return VETERAN_DRAGOON;
-                } else if (unit.isArmed()) {
+                } else if (armed) {
                     return VETERAN_SOLDIER;
-                } else if (unit.isMounted()) {
+                } else if (mounted) {
                     return UNARMED_VETERAN_DRAGOON;
-                } else if (unit.getNumberOfTools() > 0) {
+                } else if (numberOfTools > 0) {
                     return FREE_COLONIST_WITH_TOOLS;
-                } else if (unit.isMissionary()) {
+                } else if (missionary) {
                     return MISSIONARY_FREE_COLONIST;
                 } else {
                     return UNARMED_VETERAN_SOLDIER;
                 }
             case Unit.JESUIT_MISSIONARY:
-                if (unit.isArmed() && unit.isMounted()) {
+                if (armed && mounted) {
                     return DRAGOON;
-                } else if (unit.isArmed()) {
+                } else if (armed) {
                     return SOLDIER;
-                } else if (unit.isMounted()) {
+                } else if (mounted) {
                     return UNARMED_DRAGOON;
-                } else if (unit.getNumberOfTools() > 0) {
+                } else if (numberOfTools > 0) {
                     return FREE_COLONIST_WITH_TOOLS;
-                } else if (unit.isMissionary()) {
+                } else if (missionary) {
                     return JESUIT_MISSIONARY;
                 } else {
                     return JESUIT_MISSIONARY_NO_CROSS;
                 }
             case Unit.INDENTURED_SERVANT:
-                if (unit.isArmed() && unit.isMounted()) {
+                if (armed && mounted) {
                     return DRAGOON;
-                } else if (unit.isArmed()) {
+                } else if (armed) {
                     return SOLDIER;
-                } else if (unit.isMounted()) {
+                } else if (mounted) {
                     return UNARMED_DRAGOON;
-                } else if (unit.getNumberOfTools() > 0) {
+                } else if (numberOfTools > 0) {
                     return FREE_COLONIST_WITH_TOOLS;
-                } else if (unit.isMissionary()) {
+                } else if (missionary) {
                     return MISSIONARY_FREE_COLONIST;
                 } else {
                     return INDENTURED_SERVANT;
                 }
             case Unit.PETTY_CRIMINAL:
-                if (unit.isArmed() && unit.isMounted()) {
+                if (armed && mounted) {
                     return DRAGOON;
-                } else if (unit.isArmed()) {
+                } else if (armed) {
                     return SOLDIER;
-                } else if (unit.isMounted()) {
+                } else if (mounted) {
                     return UNARMED_DRAGOON;
-                } else if (unit.getNumberOfTools() > 0) {
+                } else if (numberOfTools > 0) {
                     return FREE_COLONIST_WITH_TOOLS;
-                } else if (unit.isMissionary()) {
+                } else if (missionary) {
                     return MISSIONARY_FREE_COLONIST;
                 } else {
                     return PETTY_CRIMINAL;
                 }
             case Unit.INDIAN_CONVERT:
-                if (unit.isArmed() && unit.isMounted()) {
+                if (armed && mounted) {
                     return DRAGOON;
-                } else if (unit.isArmed()) {
+                } else if (armed) {
                     return SOLDIER;
-                } else if (unit.isMounted()) {
+                } else if (mounted) {
                     return UNARMED_DRAGOON;
-                } else if (unit.getNumberOfTools() > 0) {
+                } else if (numberOfTools > 0) {
                     return FREE_COLONIST_WITH_TOOLS;
-                } else if (unit.isMissionary()) {
+                } else if (missionary) {
                     return MISSIONARY_FREE_COLONIST;
                 } else {
                     return INDIAN_CONVERT;
                 }
             case Unit.BRAVE:
-                if (unit.isArmed() && unit.isMounted()) {
+                if (armed && mounted) {
                     return INDIAN_DRAGOON;
-                } else if (unit.isArmed()) {
+                } else if (armed) {
                     return ARMED_BRAVE;
-                } else if (unit.isMounted()) {
+                } else if (mounted) {
                     return MOUNTED_BRAVE;
                 } else {
                     return BRAVE;
                 }
             case Unit.COLONIAL_REGULAR:
-                if (unit.isArmed() && unit.isMounted()) {
+                if (armed && mounted) {
                     return COLONIAL_CAVALRY;
-                } else if (unit.isArmed()) {
+                } else if (armed) {
                     return COLONIAL_REGULAR;
-                } else if (unit.isMounted()) {
+                } else if (mounted) {
                     return UNARMED_COLONIAL_CAVALRY;
-                } else if (unit.getNumberOfTools() > 0) {
+                } else if (numberOfTools > 0) {
                     return FREE_COLONIST_WITH_TOOLS;
-                } else if (unit.isMissionary()) {
+                } else if (missionary) {
                     return MISSIONARY_FREE_COLONIST;
                 } else {
                     return UNARMED_COLONIAL_REGULAR;
                 }
             case Unit.KINGS_REGULAR:
-                if (unit.isArmed() && unit.isMounted()) {
+                if (armed && mounted) {
                     return KINGS_CAVALRY;
-                } else if (unit.isArmed()) {
+                } else if (armed) {
                     return KINGS_REGULAR;
-                } else if (unit.isMounted()) {
+                } else if (mounted) {
                     return UNARMED_KINGS_CAVALRY;
                 } else {
                     return UNARMED_KINGS_REGULAR;
