@@ -16,7 +16,15 @@ import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
 
+/**
+ * Implements a simple progress bar suitable for use with
+ * FreeCol. Unlike JProgressBar, it also displays the expected
+ * increase next turn as well as the estimated time until completion.
+ */
 public class FreeColProgressBar extends JPanel {
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
+    public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
+    public static final String  REVISION = "$Revision$";
 
     private static final Color PRIMARY_1 = new Color(122, 109, 82),
                                BG_COLOR_SELECT = new Color(255, 244, 195),
@@ -25,10 +33,15 @@ public class FreeColProgressBar extends JPanel {
                                DISABLED_COLOR = new Color(166, 144, 95),
                                BG_COLOR = new Color(216, 194, 145);
 
+    // The minimum value of the progress bar
     private int min = 0;
+    // The minimum value of the progress bar
     private int max = 100;
+    // The current value of the progress bar
     private int value = 0;
+    // The expected increase next turn
     private int step = 0;
+
     private int iconWidth;
     private int iconHeight = 16;
 
@@ -41,14 +54,38 @@ public class FreeColProgressBar extends JPanel {
     private final Canvas parent;
     private Image image;
 
-    public FreeColProgressBar(Canvas parent, int goodsType) {
+
+    /**
+     * Creates a new <code>FreeColProgressBar</code> instance.
+     *
+     * @param parent a <code>Canvas</code> value
+     * @param goodsType the type of goods produced
+     */    public FreeColProgressBar(Canvas parent, int goodsType) {
         this(parent, goodsType, 0, 100, 0, 0);
     }
 
-    public FreeColProgressBar(Canvas parent, int goodsType, int min, int max) {
+
+    /**
+     * Creates a new <code>FreeColProgressBar</code> instance.
+     *
+     * @param parent a <code>Canvas</code> value
+     * @param goodsType the type of goods produced
+     * @param min the minimum value of the progress bar
+     * @param max the maximum value of the progress bar
+     */    public FreeColProgressBar(Canvas parent, int goodsType, int min, int max) {
         this(parent, goodsType, min, max, 0, 0);
     }
 
+    /**
+     * Creates a new <code>FreeColProgressBar</code> instance.
+     *
+     * @param parent a <code>Canvas</code> value
+     * @param goodsType the type of goods produced
+     * @param min the minimum value of the progress bar
+     * @param max the maximum value of the progress bar
+     * @param value the current value of the progress bar
+     * @param step the expected increase next turn
+     */
     public FreeColProgressBar(Canvas parent, int goodsType, int min, int max, int value, int step) {
         this.parent = parent;
         this.goodsType = goodsType;
@@ -66,15 +103,30 @@ public class FreeColProgressBar extends JPanel {
     }
 
 
+    /**
+     * Upate the data of the progress bar.
+     *
+     * @param value the current value of the progress bar
+     * @param step the expected increase next turn
+     */
     public void update(int value, int step) {
         update(min, max, value, step);
     }
 
+    /**
+     * Upate the data of the progress bar.
+     *
+     * @param min the minimum value of the progress bar
+     * @param max the maximum value of the progress bar
+     * @param value the current value of the progress bar
+     * @param step the expected increase next turn
+     */
     public void update(int min, int max, int value, int step) {
         this.min = min;
         this.max = max;
         this.value = value;
         this.step = step;
+        repaint();
     }
 
     protected void paintComponent(Graphics g) {
