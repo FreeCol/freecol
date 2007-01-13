@@ -97,8 +97,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     private InGameController inGameController;
 
     private final JLabel                    solLabel;
-    private final JProgressBar              hammersLabel;
-    private final JProgressBar              toolsLabel;
+    private final FreeColProgressBar        hammersLabel;
+    private final FreeColProgressBar        toolsLabel;
     private final ProductionPanel           productionPanel;
     private final BuildingBox               buildingBox;
     private final ColonyNameBox             nameBox;
@@ -183,15 +183,9 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         cargoPanel.setLayout(new GridLayout(1 , 0));
         warehousePanel.setLayout(new GridLayout(2 , 8));
 
-        //goldLabel = new JLabel(Messages.message("goldTitle") + ": 0");
-
         solLabel = new JLabel(Messages.message("sonsOfLiberty") + ": 0%, " + Messages.message("tory") + ": 100%");
-        hammersLabel = new JProgressBar();
-        hammersLabel.setMinimum(0);
-        hammersLabel.setStringPainted(true);
-        toolsLabel = new JProgressBar();
-        toolsLabel.setMinimum(0);
-        toolsLabel.setStringPainted(true);
+        hammersLabel = new FreeColProgressBar(parent, Goods.HAMMERS);
+        toolsLabel = new FreeColProgressBar(parent, Goods.TOOLS);
 
         buildingBox = new BuildingBox(this);
 
@@ -528,12 +522,14 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     */
     private void updateProgressLabel() {
         if (colony.getCurrentlyBuilding() == Building.NONE) {
-            hammersLabel.setMaximum(0);
-            hammersLabel.setValue(0);
-            hammersLabel.setString("");
-            toolsLabel.setMaximum(0);
-            toolsLabel.setValue(0);
-            toolsLabel.setString("");
+            hammersLabel.update(0, 0);
+            toolsLabel.update(0, 0);
+            //hammersLabel.setMaximum(0);
+            //hammersLabel.setValue(0);
+            //hammersLabel.setString("");
+            //toolsLabel.setMaximum(0);
+            //toolsLabel.setValue(0);
+            //toolsLabel.setString("");
         } else {
             final int hammers = colony.getHammers();
             final int tools = colony.getGoodsCount(Goods.TOOLS);
@@ -552,10 +548,11 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                                                 Colony.BUILDING_UNIT_ADDITION);
             }
             hammersNeeded = Math.max(hammersNeeded, 0);
-            hammersLabel.setMaximum(hammersNeeded);
-            hammersLabel.setValue(hammers);
+            //hammersLabel.setMaximum(hammersNeeded);
+            //hammersLabel.setValue(hammers);
 
             toolsNeeded = Math.max(toolsNeeded, 0);
+            /*
             if (toolsNeeded >= tools) {
                 toolsLabel.setMaximum(toolsNeeded);
                 toolsLabel.setValue(tools);
@@ -563,7 +560,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 toolsLabel.setMaximum(100);
                 toolsLabel.setValue(100);
             }
-
+            
             String hammerDisplay = Messages.message("model.goods.Hammers") + ": " + hammers;
             if (nextHammers > 0) {
                 int eta = (hammersNeeded - hammers) / nextHammers;
@@ -575,8 +572,12 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
             } else {
                 hammerDisplay += "/" + hammersNeeded;
             }
-            hammersLabel.setString(hammerDisplay);
+            */
+            //hammersLabel.setString(hammerDisplay);
+            //hammersLabel.setGoodsType(Goods.HAMMERS);
+            hammersLabel.update(0, hammersNeeded, hammers, nextHammers);
 
+            /*
             String toolDisplay = Messages.message("model.goods.Tools") + ": " + tools;
             if (nextTools > 0) {
                 int eta = (toolsNeeded - tools) / nextTools;
@@ -589,7 +590,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                 toolDisplay += "/" + toolsNeeded;
             }
             toolsLabel.setString(toolDisplay);
-
+            */
+            toolsLabel.update(0, toolsNeeded, tools, nextTools);
 
             buyBuilding.setEnabled(colony.getCurrentlyBuilding() >= 0 &&
                                    colony.getPriceForBuilding() <= freeColClient.getMyPlayer().getGold());

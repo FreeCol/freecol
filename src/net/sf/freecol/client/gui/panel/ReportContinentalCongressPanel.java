@@ -72,18 +72,8 @@ public final class ReportContinentalCongressPanel extends ReportPanel implements
             int required = player.getTotalFoundingFatherCost();
             int production = productionPanel.getTotalProduction();
 
-            JProgressBar progressBar = new JProgressBar(0, required);
-            progressBar.setValue(bells);
-            String display = String.valueOf(bells) + "+" + production + "/" + required;
-            if (production > 0) {
-                int eta = (required - bells) / production;
-                if ((required - bells) % production > 0) {
-                    eta++;
-                }
-                display += " (" + eta + " " + Messages.message("turns") + ")";
-            }
-            progressBar.setString(display);
-            progressBar.setStringPainted(true);
+            FreeColProgressBar progressBar = new FreeColProgressBar(parent, Goods.BELLS);
+            progressBar.update(0, required, bells, production);
             summaryPanel.add(progressBar);
         }
 

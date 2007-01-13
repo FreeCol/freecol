@@ -53,18 +53,8 @@ public final class ReportReligiousPanel extends ReportPanel implements ActionLis
         int required = player.getCrossesRequired();
         int production = religiousReportPanel.getTotalProduction();
 
-        JProgressBar progressBar = new JProgressBar(0, required);
-        progressBar.setValue(crosses);
-        String display = String.valueOf(crosses) + "+" + production + "/" + required;
-        if (production > 0) {
-            int eta = (required - crosses) / production;
-            if ((required - crosses) % production > 0) {
-                eta++;
-            }
-            display += " (" + eta + " " + Messages.message("turns") + ")";
-        }
-        progressBar.setString(display);        
-        progressBar.setStringPainted(true);
+        FreeColProgressBar progressBar = new FreeColProgressBar(parent, Goods.CROSSES);
+        progressBar.update(0, required, crosses, production);
         summaryPanel.add(progressBar);
 
         reportPanel.add(summaryPanel, higConst.rc(1, 1));
