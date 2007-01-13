@@ -35,7 +35,6 @@ import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
@@ -71,7 +70,7 @@ import net.sf.freecol.common.model.Unit;
  * colony, the buildings and much more.
  */
 public final class ColonyPanel extends JLayeredPane implements ActionListener {
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
@@ -522,14 +521,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     */
     private void updateProgressLabel() {
         if (colony.getCurrentlyBuilding() == Building.NONE) {
-            hammersLabel.update(0, 0);
-            toolsLabel.update(0, 0);
-            //hammersLabel.setMaximum(0);
-            //hammersLabel.setValue(0);
-            //hammersLabel.setString("");
-            //toolsLabel.setMaximum(0);
-            //toolsLabel.setValue(0);
-            //toolsLabel.setString("");
+            hammersLabel.update(0, 0, 0, 0);
+            toolsLabel.update(0, 0, 0, 0);
         } else {
             final int hammers = colony.getHammers();
             final int tools = colony.getGoodsCount(Goods.TOOLS);
@@ -548,49 +541,9 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                                                 Colony.BUILDING_UNIT_ADDITION);
             }
             hammersNeeded = Math.max(hammersNeeded, 0);
-            //hammersLabel.setMaximum(hammersNeeded);
-            //hammersLabel.setValue(hammers);
-
             toolsNeeded = Math.max(toolsNeeded, 0);
-            /*
-            if (toolsNeeded >= tools) {
-                toolsLabel.setMaximum(toolsNeeded);
-                toolsLabel.setValue(tools);
-            } else {
-                toolsLabel.setMaximum(100);
-                toolsLabel.setValue(100);
-            }
-            
-            String hammerDisplay = Messages.message("model.goods.Hammers") + ": " + hammers;
-            if (nextHammers > 0) {
-                int eta = (hammersNeeded - hammers) / nextHammers;
-                if ((hammersNeeded - hammers) % nextHammers > 0) {
-                    eta++;
-                }
-                hammerDisplay += "+" + nextHammers + "/" + hammersNeeded +
-                                 " (" + eta + " " + Messages.message("turns") + ")";
-            } else {
-                hammerDisplay += "/" + hammersNeeded;
-            }
-            */
-            //hammersLabel.setString(hammerDisplay);
-            //hammersLabel.setGoodsType(Goods.HAMMERS);
-            hammersLabel.update(0, hammersNeeded, hammers, nextHammers);
 
-            /*
-            String toolDisplay = Messages.message("model.goods.Tools") + ": " + tools;
-            if (nextTools > 0) {
-                int eta = (toolsNeeded - tools) / nextTools;
-                if ((toolsNeeded - tools) % nextTools > 0) {
-                    eta++;
-                }
-                toolDisplay += "+" + nextTools + "/" + toolsNeeded +
-                               " (" + eta + " " + Messages.message("turns") + ")";
-            } else {
-                toolDisplay += "/" + toolsNeeded;
-            }
-            toolsLabel.setString(toolDisplay);
-            */
+            hammersLabel.update(0, hammersNeeded, hammers, nextHammers);
             toolsLabel.update(0, toolsNeeded, tools, nextTools);
 
             buyBuilding.setEnabled(colony.getCurrentlyBuilding() >= 0 &&

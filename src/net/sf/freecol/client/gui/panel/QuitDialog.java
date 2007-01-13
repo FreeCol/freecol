@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import net.sf.freecol.client.gui.Canvas;
@@ -39,26 +40,14 @@ public final class QuitDialog extends FreeColDialog implements ActionListener {
     public QuitDialog(Canvas parent) {
         this.parent = parent;
 
-        int[] w = {0, 0, 0};
-        int[] h = {0, 10, 0};
-        HIGLayout l = new HIGLayout(w,h);
-        l.setColumnWeight(2, 1);
-        setLayout(l);
+        int[] widths = {0};
+        int[] heights = {0, margin, 0};
+        setLayout(new HIGLayout(widths, heights));
 
         cancel = new JButton( Messages.message("no") );
         JLabel qLabel = new JLabel( Messages.message("areYouSureYouWantToQuit") );
         qLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-//        qLabel.setSize(200, 20);
-//        ok.setSize(60, 20);
-//        cancel.setSize(60, 20);
-
-//        qLabel.setLocation(10, 10);
-//        ok.setLocation(30, 40);
-//        cancel.setLocation(130, 40);
-
-//        setLayout(null);
-        
         ok.setActionCommand(String.valueOf(OK));
         cancel.setActionCommand(String.valueOf(CANCEL));
         
@@ -73,20 +62,13 @@ public final class QuitDialog extends FreeColDialog implements ActionListener {
 
         setCancelComponent(cancel);
 
-        add(qLabel, higConst.rcwh(1,1, 3,1));
-        higConst.setVCorrection(0,-4);
-        add(ok, higConst.rc(3,1));
-        add(cancel, higConst.rc(3,3));
-        higConst.clearCorrection();
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(ok);
+        buttonPanel.add(cancel);
+        add(qLabel, higConst.rc(1, 1));
+        add(buttonPanel, higConst.rc(3, 1));
 
-//        try {
-//            BevelBorder border = new BevelBorder(BevelBorder.RAISED);
-//            setBorder(border);
-//        }
-//        catch(Exception e) {
-//        }
-
-        setSize(220, 70);
+        setSize(getPreferredSize());
     }
     
     public void requestFocus() {

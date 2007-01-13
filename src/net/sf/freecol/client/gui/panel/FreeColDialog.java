@@ -7,8 +7,10 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.MenuComponent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -18,11 +20,13 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.text.BreakIterator;
+import java.util.ArrayList;
 import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -30,8 +34,10 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
@@ -71,18 +77,57 @@ public class FreeColDialog extends FreeColPanel {
     // Wether or not the user have made the choice.
     private boolean responseGiven = false;
 
+    // Font to use for text areas
+    protected static final Font defaultFont = new Font("Dialog", Font.BOLD, 12);
 
+    // How many columns (em-widths) to use in the text area
+    protected static final int columns = 20;
 
+    // The margin to use for HIGLayout
+    protected static final int margin = 12;
 
     /**
     * Default constructor.
     */
     public FreeColDialog() {
         super();
+
+        Image menuborderN = (Image) UIManager.get("menuborder.n.image");
+        Image menuborderNW = (Image) UIManager.get("menuborder.nw.image");
+        Image menuborderNE = (Image) UIManager.get("menuborder.ne.image");
+        Image menuborderW = (Image) UIManager.get("menuborder.w.image");
+        Image menuborderE = (Image) UIManager.get("menuborder.e.image");
+        Image menuborderS = (Image) UIManager.get("menuborder.s.image");
+        Image menuborderSW = (Image) UIManager.get("menuborder.sw.image");
+        Image menuborderSE = (Image) UIManager.get("menuborder.se.image");
+        Image menuborderShadowSW = (Image) UIManager.get("menuborder.shadow.sw.image");
+        Image menuborderShadowS = (Image) UIManager.get("menuborder.shadow.s.image");
+        Image menuborderShadowSE = (Image) UIManager.get("menuborder.shadow.se.image");
+        final FreeColImageBorder imageBorder = new FreeColImageBorder(menuborderN, menuborderW, menuborderS, menuborderE, menuborderNW, menuborderNE, menuborderSW, menuborderSE);
+        setBorder(BorderFactory.createCompoundBorder(imageBorder, BorderFactory.createEmptyBorder(margin, margin, margin, margin)));
+        
+
     }
 
-
-
+    /**
+     * Returns a text area with standard settings suitable for use in
+     * FreeCol dialogs.
+     *
+     * @param text The text to display in the text area.
+     * @return a text area with standard settings suitable for use in
+     * FreeCol dialogs.
+     */
+    public static JTextArea getDefaultTextArea(String text) {
+        JTextArea textArea = new JTextArea(text);
+        textArea.setColumns(columns);
+        textArea.setOpaque(false);
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        textArea.setFont(defaultFont);
+        // necessary because of resizing
+        textArea.setSize(textArea.getPreferredSize());
+        return textArea;
+    }
 
     /**
     * Sets the <code>response</code> and wakes up any thread waiting for this information.
@@ -218,21 +263,20 @@ public class FreeColDialog extends FreeColPanel {
             }
         });
 
-        informationDialog.setLayout(new BorderLayout(10, 10));
-        JLabel textLabel = new JLabel(text);
-        int width = textLabel.getMinimumSize().width;
+        JTextArea textLabel = getDefaultTextArea(text);
 
         if (image == null) {
-            informationDialog.add(textLabel, BorderLayout.CENTER);
+            informationDialog.setLayout(new HIGLayout(new int[] {0}, new int[] {0, margin, 0}));
+            informationDialog.add(textLabel, higConst.rc(1, 1));
+            informationDialog.add(okButton, higConst.rc(3, 1));
         } else {
-            JLabel imageLabel = new JLabel(image);
-            informationDialog.add(imageLabel, BorderLayout.LINE_START);
-            informationDialog.add(textLabel, BorderLayout.LINE_END);
+            informationDialog.setLayout(new HIGLayout(new int[] {0, margin, 0}, new int[] {0, margin, 0}));
+            informationDialog.add(new JLabel(image), higConst.rc(1, 1));
+            informationDialog.add(textLabel, higConst.rc(1, 3));
+            informationDialog.add(okButton, higConst.rcwh(3, 1, 3, 1));
         }
-        informationDialog.add(okButton, BorderLayout.PAGE_END);
 
-        informationDialog.setSize(width + 20, textLabel.getMinimumSize().height +
-                                  okButton.getMinimumSize().height + 40);
+        informationDialog.setSize(informationDialog.getPreferredSize());
 
         informationDialog.setCancelComponent(okButton);
 
@@ -250,18 +294,19 @@ public class FreeColDialog extends FreeColPanel {
     */
     public static FreeColDialog createInformationDialog(String[] texts, ImageIcon[] images) {
 
-        int margin = 10;
-        int[] widths = {margin, 0, 10, 0, margin};
-        int[] heights = new int[texts.length + 4];
-        heights[0] = margin;
+        int[] widths = {0, margin, 0};
+        int[] heights = new int[2 * texts.length + 1];
+        int imageColumn = 1;
+        int textColumn = 3;
 
-        for (int i = 0; i < texts.length; i++) {
-            // add one to index because of margin
-            heights[i+1] = 0;
+        for (int index = 0; index < texts.length; index++) {
+            heights[2 * index + 1] = margin;
         }
-        heights[texts.length + 1] = 10;
-        heights[texts.length + 2] = 0;
-        heights[texts.length + 3] = margin;
+
+        if (images == null) {
+            widths = new int[] {0};
+            textColumn = 1;
+        }
 
         final JButton theButton = new JButton(Messages.message("ok"));
         final FreeColDialog informationDialog = new FreeColDialog() {
@@ -279,19 +324,16 @@ public class FreeColDialog extends FreeColPanel {
             }
         });
 
+        int row = 1;
         for (int i = 0; i < texts.length; i++) {
-            // add two to index because HIGLayout starts at one and
-            // there is a margin
-            int row = i + 2;
-            if (images[i] != null) {
-                informationDialog.add(new JLabel(images[i]), higConst.rc(row, 2));
+            if (images != null && images[i] != null) {
+                informationDialog.add(new JLabel(images[i]), higConst.rc(row, imageColumn));
             }
-            informationDialog.add(new JLabel("<html><body><p>" + texts[i] + "</body></html>"),
-                                  higConst.rc(row, 4));
+            informationDialog.add(getDefaultTextArea(texts[i]), higConst.rc(row, textColumn));
+            row += 2;
         }
-        int buttonRow = texts.length + 3;
-        informationDialog.add(theButton, higConst.rcwh(buttonRow, 2, 3, 1));
 
+        informationDialog.add(theButton, higConst.rcwh(row, imageColumn, widths.length, 1));
         informationDialog.setSize(informationDialog.getPreferredSize());
 
         return informationDialog;
@@ -386,7 +428,7 @@ public class FreeColDialog extends FreeColPanel {
     * @return The <code>FreeColDialog</code>.
     */
     public static FreeColDialog createConfirmDialog(String text, String okText, String cancelText) {
-        return createConfirmDialog(new String[] {text}, new ImageIcon[] {null}, okText, cancelText);
+        return createConfirmDialog(new String[] {text}, null, okText, cancelText);
     }
 
     public static FreeColDialog createConfirmDialog(String[] texts, ImageIcon[] images, String okText, String cancelText) {
@@ -404,38 +446,31 @@ public class FreeColDialog extends FreeColPanel {
         };
 
         int margin = 10;
-        int[] widths = {margin, 0, 10, 0, margin};
-        int[] heights = new int[texts.length + 4];
-        int buttonsWidth = -widths[3];
-        heights[0] = margin;
+        int[] widths = {0, margin, 0};
+        int[] heights = new int[2 * texts.length + 1];
+        int imageColumn = 1;
+        int textColumn = 3;
 
-        for (int i = 0; i < texts.length; i++) {
-            // add one to index because of margin
-            heights[i+1] = 0;
+        for (int index = 0; index < texts.length; index++) {
+            heights[2 * index + 1] = margin;
         }
-        heights[texts.length + 1] = 10;
-        heights[texts.length + 2] = 0;
-        heights[texts.length + 3] = margin;
 
-        HIGLayout layout = new HIGLayout(widths, heights);
-        confirmDialog.setLayout(layout);
+        if (images == null) {
+            widths = new int[] {0};
+            textColumn = 1;
+        }
 
-        int maxImageWidth = 0;
-        int maxTextWidth = 0;
+        confirmDialog.setLayout(new HIGLayout(widths, heights));
+
+        int row = 1;
         for (int i = 0; i < texts.length; i++) {
-            // add two to index because HIGLayout starts at one and
-            // there is a margin
-            int row = i + 2;
-            if (images[i] != null) {
+            if (images != null && images[i] != null) {
                 JLabel image = new JLabel(images[i]);
-                confirmDialog.add(image, higConst.rc(row, 2));
-                maxImageWidth = Math.max(maxImageWidth, image.getPreferredSize().width);
+                confirmDialog.add(image, higConst.rc(row, imageColumn));
             }
-            JLabel text = new JLabel("<html><body><p>" + texts[i] + "</body></html>");
-            confirmDialog.add(text, higConst.rc(row, 4));
-            maxTextWidth = Math.max(maxTextWidth, text.getPreferredSize().width);
+            confirmDialog.add(getDefaultTextArea(texts[i]), higConst.rc(row, textColumn));
+            row += 2;
         }
-        buttonsWidth -= maxImageWidth;
 
         // decide on some mnemonics for the actions
         char  okButtonMnemonic = '\0';
@@ -492,16 +527,10 @@ public class FreeColDialog extends FreeColPanel {
         buttonPanel.setOpaque(false);
         buttonPanel.add( okButton );
         buttonPanel.add( new JButton(cancelAction) );
-        buttonsWidth += buttonPanel.getPreferredSize().width;
 
         // finish building the dialog
-        //confirmDialog.setLayout( new BorderLayout() );
-        //confirmDialog.add( labelPanel, BorderLayout.CENTER );
-        //confirmDialog.add( buttonPanel, BorderLayout.SOUTH );
-        int buttonRow = texts.length + 3;
-        confirmDialog.add(buttonPanel, higConst.rcwh(buttonRow, 2, 3, 1));
-        layout.setPreferredColumnWidth(4, Math.max(buttonsWidth, maxTextWidth));
-        confirmDialog.setSize( confirmDialog.getPreferredSize() );
+        confirmDialog.add(buttonPanel, higConst.rcwh(row, imageColumn, widths.length, 1));
+        confirmDialog.setSize(confirmDialog.getPreferredSize());
         confirmDialog.setCancelComponent( new JButton(cancelAction) );
 
         return confirmDialog;
@@ -531,14 +560,14 @@ public class FreeColDialog extends FreeColPanel {
         }
         String [][] data = new String [][] {
             {"%replace_skill%", skillName},
-            {"%replace_good1%", Goods.getName(settlement.getHighlyWantedGoods()).toLowerCase()},
-            {"%replace_good2%", Goods.getName(settlement.getWantedGoods1()).toLowerCase()},
-            {"%replace_good3%", Goods.getName(settlement.getWantedGoods2()).toLowerCase()}};
+            {"%replace_good1%", Goods.getName(settlement.getHighlyWantedGoods())},
+            {"%replace_good2%", Goods.getName(settlement.getWantedGoods1())},
+            {"%replace_good3%", Goods.getName(settlement.getWantedGoods2())}};
     
         String mainText = Messages.message(messageID, data);
 
-        final JLabel intro = new WrapLabel(introText, 300);
-        final JLabel question = new WrapLabel(mainText, 300);
+        final JTextArea intro = getDefaultTextArea(introText);
+        final JTextArea question = getDefaultTextArea(mainText);
         final JButton speak = new JButton(Messages.message("scoutSettlement.speak")),
                 demand = new JButton(Messages.message("scoutSettlement.tribute")),
                 attack = new JButton(Messages.message("scoutSettlement.attack")),
@@ -550,13 +579,14 @@ public class FreeColDialog extends FreeColPanel {
             }
         };
 
-        int[] w1 = {10, 300, 10};
-        int[] h1 = {10, 0, 10, 0, 10, 20, 10, 20, 10, 20, 10, 20, 10};
+        int[] widths = {0};
+        int[] heights = new int[11];
+        for (int index = 0; index < 5; index++) {
+            heights[2 * index + 1] = margin;
+        }
+        int textColumn = 1;
 
-        HIGLayout layout = new HIGLayout(w1, h1);
-        //higConst.clearCorrection();
-        //layout.setRowWeight(2,1);
-        scoutDialog.setLayout(layout);
+        scoutDialog.setLayout(new HIGLayout(widths, heights));
 
         speak.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
@@ -579,12 +609,18 @@ public class FreeColDialog extends FreeColPanel {
             }
         });
 
-        scoutDialog.add(intro, higConst.rc(2, 2));
-        scoutDialog.add(question, higConst.rc(4, 2));
-        scoutDialog.add(speak, higConst.rc(6, 2));
-        scoutDialog.add(demand, higConst.rc(8, 2));
-        scoutDialog.add(attack, higConst.rc(10, 2));
-        scoutDialog.add(cancel, higConst.rc(12, 2));
+        int row = 1;
+        scoutDialog.add(intro, higConst.rc(row, textColumn));
+        row += 2;
+        scoutDialog.add(question, higConst.rc(row, textColumn));
+        row += 2;
+        scoutDialog.add(speak, higConst.rc(row, textColumn));
+        row += 2;
+        scoutDialog.add(demand, higConst.rc(row, textColumn));
+        row += 2;
+        scoutDialog.add(attack, higConst.rc(row, textColumn));
+        row += 2;
+        scoutDialog.add(cancel, higConst.rc(row, textColumn));
 
         scoutDialog.setSize(scoutDialog.getPreferredSize());
         scoutDialog.setCancelComponent(cancel);
@@ -604,12 +640,14 @@ public class FreeColDialog extends FreeColPanel {
     * @return The FreeColDialog that asks the question to the user.
     */
     public static FreeColDialog createUseMissionaryDialog(IndianSettlement settlement, Player player) {
+
         String introText = Messages.message(settlement.getAlarmLevelMessage(player),
                                         new String [][] {{"%nation%", settlement.getOwner().getNationAsString()}});
         String mainText = Messages.message("missionarySettlement.question");
 
-        final JLabel intro = new WrapLabel(introText, 260);
-        final JLabel main = new WrapLabel(mainText, 260);
+        JTextArea intro = getDefaultTextArea(introText);
+        JTextArea main = getDefaultTextArea(mainText);
+
         final JButton establishOrHeresy = new JButton(),
                 incite = new JButton(Messages.message("missionarySettlement.incite")),
                 cancel = new JButton(Messages.message("missionarySettlement.cancel"));
@@ -627,12 +665,14 @@ public class FreeColDialog extends FreeColPanel {
             }
         };
 
-        int[] w1 = {10, 30, 200, 30, 10};
-        int[] h1 = {10, 0, 10, 0, 10, 20, 10, 20, 10, 20, 10};
-        HIGLayout layout = new HIGLayout(w1, h1);
-        higConst.clearCorrection();
-        layout.setRowWeight(2,1);
-        missionaryDialog.setLayout(layout);
+        int[] widths = {0};
+        int[] heights = new int[9];
+        for (int index = 0; index < 4; index++) {
+            heights[2 * index + 1] = margin;
+        }
+        int textColumn = 1;
+
+        missionaryDialog.setLayout(new HIGLayout(widths, heights));
 
         if (settlement.getMissionary() == null) {
             establishOrHeresy.addActionListener(new ActionListener() {
@@ -660,11 +700,16 @@ public class FreeColDialog extends FreeColPanel {
             }
         });
 
-        missionaryDialog.add(intro, higConst.rcwh(2, 2, 3, 1));
-        missionaryDialog.add(main, higConst.rcwh(4, 2, 3, 1));
-        missionaryDialog.add(establishOrHeresy, higConst.rc(6, 3));
-        missionaryDialog.add(incite, higConst.rc(8, 3));
-        missionaryDialog.add(cancel, higConst.rc(10, 3));
+        int row = 1;
+        missionaryDialog.add(intro, higConst.rc(row, textColumn));
+        row += 2;
+        missionaryDialog.add(main, higConst.rc(row, textColumn));
+        row += 2;
+        missionaryDialog.add(establishOrHeresy, higConst.rc(row, textColumn));
+        row += 2;
+        missionaryDialog.add(incite, higConst.rc(row, textColumn));
+        row += 2;
+        missionaryDialog.add(cancel, higConst.rc(row, textColumn));
 
         missionaryDialog.setSize(missionaryDialog.getPreferredSize());
         missionaryDialog.setCancelComponent(cancel);
@@ -684,21 +729,17 @@ public class FreeColDialog extends FreeColPanel {
     *
     * @return The FreeColDialog that asks the question to the user.
     */
-    public static FreeColDialog createInciteDialog(Vector allPlayers, Player thisUser) {
+    public static FreeColDialog createInciteDialog(Vector<Player> allPlayers, Player thisUser) {
         String mainText = Messages.message("missionarySettlement.inciteQuestion");
 
-        final JLabel question = new WrapLabel(mainText, 260);
-        final JButton[] players = new JButton[allPlayers.size() - 1];
+        final JTextArea question = getDefaultTextArea(mainText);
+        ArrayList<Player> players = new ArrayList<Player>();
         final JButton cancel = new JButton(Messages.message("missionarySettlement.cancel"));
 
-        int arrayIndex = 0;
-        for (int i = 0; i < allPlayers.size(); i++) {
-            Player p = (Player)allPlayers.get(i);
-            if (p.equals(thisUser)) {
-                continue;
+        for (Player p : allPlayers) {
+            if (!(p.equals(thisUser) || p.isREF())) {
+                players.add(p);
             }
-            players[arrayIndex] = new JButton(p.getName() + " (" + p.getNationAsString() + ")");
-            arrayIndex++;
         }
 
         final FreeColDialog inciteDialog = new FreeColDialog() {
@@ -707,47 +748,36 @@ public class FreeColDialog extends FreeColPanel {
             }
         };
 
-        int[] w1 = {10, 30, 200, 30, 10};
-        int[] h1 = new int[3 + allPlayers.size() * 2];
-
-        // h1 = {10, 0, 10, 20, 10, 20, 10, 20, 10, ...};
-        h1[0] = 10;
-        h1[1] = 0;
-        h1[2] = 10;
-        for (int i = 3; i < h1.length; i += 2) {
-            h1[i] = 20;
-            h1[i + 1] = 10;
+        int[] widths = {0};
+        int[] heights = new int[2 * players.size() + 3];
+        for (int index = 0; index <= players.size(); index++) {
+            heights[2 * index + 1] = margin;
         }
 
-        HIGLayout layout = new HIGLayout(w1, h1);
-        higConst.clearCorrection();
-        layout.setRowWeight(2,1);
-        inciteDialog.setLayout(layout);
+        inciteDialog.setLayout(new HIGLayout(widths, heights));
 
-        arrayIndex = 0;
-        for (int i = 0; i < allPlayers.size(); i++) {
-            final Player p = (Player)allPlayers.get(i);
-            if (p.equals(thisUser)) {
-                continue;
-            }
-            players[arrayIndex].addActionListener(new ActionListener() {
+        int textColumn = 1;
+        int row = 1;
+        inciteDialog.add(question, higConst.rc(row, textColumn));
+        row += 2;
+
+        for (final Player p : players) {
+            JButton button = new JButton(p.getNationAsString());
+            button.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
                     inciteDialog.setResponse(p);
                 }
             });
-            arrayIndex++;
+            inciteDialog.add(button, higConst.rc(row, textColumn));
+            row += 2;
         }
+
         cancel.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 inciteDialog.setResponse(null);
             }
         });
-
-        inciteDialog.add(question, higConst.rcwh(2, 2, 3, 1));
-        for (int i = 0; i < players.length; i++) {
-            inciteDialog.add(players[i], higConst.rc(4 + i * 2, 3));
-        }
-        inciteDialog.add(cancel, higConst.rc(4 + players.length * 2, 3));
+        inciteDialog.add(cancel, higConst.rc(row, textColumn));
 
         inciteDialog.setSize(inciteDialog.getPreferredSize());
 
@@ -775,17 +805,31 @@ public class FreeColDialog extends FreeColPanel {
             }
         };
 
-        inputDialog.setLayout(new GridLayout(3, 1, 10,10));
+        int[] widths = {0};
+        int[] heights = {0, margin, 0, margin, 0};
+        inputDialog.setLayout(new HIGLayout(widths, heights));
 
-        inputDialog.setBorder(new CompoundBorder(inputDialog.getBorder(), new EmptyBorder(3,10,10,10)));
-
-        JPanel buttons = new JPanel(new GridLayout(1, 2,10,10));
+        JPanel buttons = new JPanel();
+        buttons.setOpaque(false);
 
         JButton okButton = new JButton(okText);
+        okButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                inputDialog.setResponse(input.getText());
+            }
+        });
+        buttons.add(okButton);
+        inputDialog.setCancelComponent(okButton);
 
-        JButton cancelButton = null;
         if (cancelText != null) {
-            cancelButton = new JButton(cancelText);
+            JButton cancelButton = new JButton(cancelText);
+            cancelButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    inputDialog.setResponse(null);
+                }
+            });
+            buttons.add(cancelButton);
+            inputDialog.setCancelComponent(cancelButton);
         }
 
         input.addActionListener(new ActionListener() {
@@ -794,39 +838,16 @@ public class FreeColDialog extends FreeColPanel {
             }
         });
 
-        okButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                inputDialog.setResponse(input.getText());
-            }
-        });
+        int row = 1;
+        int textColumn = 1;
 
-        if (cancelButton != null) {
-            cancelButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
-                    inputDialog.setResponse(null);
-                }
-            });
-        }
-
-        buttons.add(okButton);
-
-        if (cancelButton != null) {
-            buttons.add(cancelButton);
-        }
-
-        inputDialog.add(new JLabel(text));
-        inputDialog.add(input);
-        inputDialog.add(buttons);
+        inputDialog.add(getDefaultTextArea(text), higConst.rc(row, textColumn));
+        row += 2;
+        inputDialog.add(input, higConst.rc(row, textColumn));
+        row += 2;
+        inputDialog.add(buttons, higConst.rc(row, textColumn));
 
         inputDialog.setSize(inputDialog.getPreferredSize());
-
-        buttons.setOpaque(false);
-
-        if (cancelButton != null) {
-            inputDialog.setCancelComponent(cancelButton);
-        } else {
-            inputDialog.setCancelComponent(okButton);
-        }
 
         return inputDialog;
     }
@@ -986,59 +1007,4 @@ public class FreeColDialog extends FreeColPanel {
         }
     }
 
-    static final class WrapLabel extends JLabel {
-        public WrapLabel() {
-            super();
-        }
-        
-        public WrapLabel(Icon image) {
-            super(image);
-        }
-        
-        public WrapLabel(Icon image, int horizontalAlignment) {
-            super(image, horizontalAlignment);
-        }
-            
-        public WrapLabel(String text, int maxWidth) {
-            setText(text, maxWidth);
-        }
-        
-        public WrapLabel(String text, int maxWidth, Icon icon, int horizontalAlignment) {
-            super(icon, horizontalAlignment);
-            setText(text, maxWidth);
-        }
-        
-        public WrapLabel(String text, int maxWidth, int horizontalAlignment) {
-            setText(text, maxWidth);
-            setHorizontalAlignment(horizontalAlignment);
-        }
-            
-        public void setText(String text, int maxWidth) {
-            FontMetrics fm = getFontMetrics(getFont());
-
-            BreakIterator boundary = BreakIterator.getWordInstance();
-            boundary.setText(text);
-
-            StringBuffer trial = new StringBuffer();
-            StringBuffer real = new StringBuffer("<html><body><p>");
-
-            int lines = 1;
-            int start = boundary.first();
-            for (int end = boundary.next(); end != BreakIterator.DONE;
-                    start = end, end = boundary.next()) {
-                    String word = text.substring(start,end);
-                    trial.append(word);
-                    int trialWidth = fm.stringWidth(trial.toString());
-                    if (trialWidth > maxWidth) {
-                            trial = new StringBuffer(word);
-                            lines++;
-                    }
-                    real.append(word);
-            }
-            real.append("</p></body></html>");
-
-            setText(real.toString());
-            setPreferredSize(new Dimension(maxWidth, fm.getHeight() * lines));
-        }
-    }
 }

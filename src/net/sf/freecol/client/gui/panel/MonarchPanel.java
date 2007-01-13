@@ -2,10 +2,7 @@
 package net.sf.freecol.client.gui.panel;
 
 
-import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -16,6 +13,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 
@@ -23,13 +21,14 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Monarch;
 
+import cz.autel.dmi.HIGLayout;
 
 /**
  * This panel is used to show information about a tile.
  */
 public final class MonarchPanel extends FreeColDialog implements ActionListener {
 
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
@@ -42,10 +41,10 @@ public final class MonarchPanel extends FreeColDialog implements ActionListener 
     private final JLabel header;
     private final JLabel imageLabel;
 
-    private final JLabel textLabel;
+    private JTextArea textArea;
     private final JButton okButton;
     private final JButton cancelButton;
-    private final JPanel buttonPanel;
+    private JPanel buttonPanel;
     
     /**
     * The constructor that will add the items to this panel.
@@ -54,23 +53,14 @@ public final class MonarchPanel extends FreeColDialog implements ActionListener 
     public MonarchPanel(Canvas parent) {
         canvas = parent;
 
-        setLayout(new BorderLayout());
-        
         header = new JLabel("", SwingConstants.CENTER);
         header.setFont(((Font) UIManager.get("HeaderFont")).deriveFont(0, 36));
         header.setText(Messages.message("aMessageFromTheCrown"));
-        
         header.setAlignmentX(Component.CENTER_ALIGNMENT);
-        add(header, BorderLayout.PAGE_START);
 
         imageLabel = new JLabel();
         Image image = (Image) UIManager.get("MonarchImage");
         imageLabel.setIcon(new ImageIcon(image));
-        add(imageLabel, BorderLayout.LINE_START);
-
-        textLabel = new JLabel("", SwingConstants.CENTER);
-        textLabel.setPreferredSize(new Dimension(180, 380));
-        add(textLabel, BorderLayout.LINE_END);
 
         okButton = new JButton(Messages.message("ok"));
         okButton.setActionCommand(String.valueOf(OK));
@@ -82,11 +72,6 @@ public final class MonarchPanel extends FreeColDialog implements ActionListener 
         cancelButton.addActionListener(this);
         cancelButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        buttonPanel = new JPanel();
-        buttonPanel.setLayout(new FlowLayout());
-        add(buttonPanel, BorderLayout.PAGE_END);
-        
-        setSize(450, 450);
     }
 
 
@@ -103,8 +88,19 @@ public final class MonarchPanel extends FreeColDialog implements ActionListener 
     * @param replace The data to be used when displaying i18n-strings.
     */
     public void initialize(int action, String[][] replace) {
-        buttonPanel.remove(okButton);
-        buttonPanel.remove(cancelButton);
+
+        int[] widths = {0, margin, 0};
+        int[] heights = {0, margin, 0, margin, 0};
+        setLayout(new HIGLayout(widths, heights));
+        
+        int row = 1;
+        int imageColumn = 1;
+        int textColumn = 3;
+        add(header, higConst.rcwh(row, imageColumn, widths.length, 1));
+        row += 2;
+
+        add(imageLabel, higConst.rc(row, imageColumn));
+
         String messageID;
         String okText = "ok";
         String cancelText = null;
@@ -139,15 +135,21 @@ public final class MonarchPanel extends FreeColDialog implements ActionListener 
         default:
             messageID = "Unknown monarch action: " + action;
         }
-        textLabel.setText("<html><body><p>" + 
-                          Messages.message(messageID, replace) +
-                          "</p></body></html>");
+
+        textArea = getDefaultTextArea(Messages.message(messageID, replace));
+        add(textArea, higConst.rc(row, textColumn));
+        row += 2;
+
+        buttonPanel = new JPanel();
         okButton.setText(Messages.message(okText));
         buttonPanel.add(okButton);
         if (cancelText != null) {
             cancelButton.setText(Messages.message(cancelText));
             buttonPanel.add(cancelButton);
         }
+        add(buttonPanel, higConst.rcwh(row, imageColumn, widths.length, 1));
+        
+        setSize(getPreferredSize());
     }
 
 
