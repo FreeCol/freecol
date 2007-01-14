@@ -19,7 +19,7 @@ import net.sf.freecol.client.gui.Canvas;
  * presses enter in the textfield.
  */
 public final class ChatPanel extends FreeColPanel implements ActionListener {
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
@@ -48,13 +48,7 @@ public final class ChatPanel extends FreeColPanel implements ActionListener {
 
         JLabel label = new JLabel("Message: ");
 
-        field = new JTextField("");
-
-        /*label.setSize(65, 20);
-        field.setSize(355, 20);
-
-        label.setLocation(10, 10);
-        field.setLocation(85, 10);*/
+        field = new JTextField("", 40);
 
         setLayout(new BorderLayout(10, 10));
 
@@ -69,7 +63,7 @@ public final class ChatPanel extends FreeColPanel implements ActionListener {
         label.setFocusable(false);
         field.setFocusable(true);
 
-        setSize(450, 40);
+        setSize(getPreferredSize());
     }
 
     

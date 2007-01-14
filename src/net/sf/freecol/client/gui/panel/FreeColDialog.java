@@ -57,7 +57,7 @@ import cz.autel.dmi.HIGLayout;
 public class FreeColDialog extends FreeColPanel {
     private static final Logger logger = Logger.getLogger(FreeColDialog.class.getName());
 
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
@@ -77,36 +77,11 @@ public class FreeColDialog extends FreeColPanel {
     // Wether or not the user have made the choice.
     private boolean responseGiven = false;
 
-    // Font to use for text areas
-    protected static final Font defaultFont = new Font("Dialog", Font.BOLD, 12);
-
-    // How many columns (em-widths) to use in the text area
-    protected static final int columns = 20;
-
-    // The margin to use for HIGLayout
-    protected static final int margin = 12;
-
     /**
     * Default constructor.
     */
     public FreeColDialog() {
         super();
-
-        Image menuborderN = (Image) UIManager.get("menuborder.n.image");
-        Image menuborderNW = (Image) UIManager.get("menuborder.nw.image");
-        Image menuborderNE = (Image) UIManager.get("menuborder.ne.image");
-        Image menuborderW = (Image) UIManager.get("menuborder.w.image");
-        Image menuborderE = (Image) UIManager.get("menuborder.e.image");
-        Image menuborderS = (Image) UIManager.get("menuborder.s.image");
-        Image menuborderSW = (Image) UIManager.get("menuborder.sw.image");
-        Image menuborderSE = (Image) UIManager.get("menuborder.se.image");
-        Image menuborderShadowSW = (Image) UIManager.get("menuborder.shadow.sw.image");
-        Image menuborderShadowS = (Image) UIManager.get("menuborder.shadow.s.image");
-        Image menuborderShadowSE = (Image) UIManager.get("menuborder.shadow.se.image");
-        final FreeColImageBorder imageBorder = new FreeColImageBorder(menuborderN, menuborderW, menuborderS, menuborderE, menuborderNW, menuborderNE, menuborderSW, menuborderSE);
-        setBorder(BorderFactory.createCompoundBorder(imageBorder, BorderFactory.createEmptyBorder(margin, margin, margin, margin)));
-        
-
     }
 
     /**

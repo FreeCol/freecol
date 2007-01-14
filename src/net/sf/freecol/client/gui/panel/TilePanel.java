@@ -136,12 +136,12 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
                 labels[i].setText(String.valueOf(tile.potential(goods[i])));
                 goodsPanel.add(labels[i]);
             }
-            setSize(450, 120);
         } else {
             fishLabel.setText(String.valueOf(tile.potential(Goods.FOOD)));
             goodsPanel.add(fishLabel);
-            setSize(150, 120);
         }
+        setSize(getPreferredSize());
+
     }
 
 

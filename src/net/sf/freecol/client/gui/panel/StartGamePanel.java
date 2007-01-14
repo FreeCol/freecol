@@ -32,12 +32,14 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.option.SelectOption;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
 
+import cz.autel.dmi.HIGLayout;
+
 /**
-* The panel where you choose your nation and color and connected players are shown.
-*/
+ * The panel where you choose your nation and color and connected players are shown.
+ */
 public final class StartGamePanel extends FreeColPanel implements ActionListener {
 
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
@@ -51,12 +53,6 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
                                 GAME_OPTIONS = 5,
                                 MAP_GENERATOR_OPTIONS = 6;
 
-    private final String[]  mapSizes = { Messages.message("small"),
-                                         Messages.message("medium"),
-                                         Messages.message("large"),
-                                         Messages.message("veryLarge"),
-                                         Messages.message("huge"),
-                                        };
     private final String[]  colors = { Messages.message("black"),
                                        Messages.message("blue"),
                                        Messages.message("cyan"),
@@ -76,15 +72,9 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
     private Player              thisPlayer;
     private boolean             singlePlayerGame;
 
-    private final JComboBox     mapSize;
-    private final JCheckBox     readyBox;
-
-
-
+    private final JCheckBox         readyBox;
     private final JTextField        chat;
     private final JTextArea         chatArea;
-    private final JPanel            optionsPanel,
-                                    chatPanel;
     private final JTable            table;
     private final PlayersTableModel tableModel;
 
@@ -103,24 +93,20 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         this.freeColClient = freeColClient;
 
         JButton     cancel = new JButton( Messages.message("cancel") );
-        JLabel      mapSizeLabel = new JLabel( Messages.message("mapSize") );
-        JScrollPane chatScroll,
-                    tableScroll;
+
+        JScrollPane chatScroll, tableScroll;
 
         setCancelComponent(cancel);
 
         start = new JButton(Messages.message("startGame") );
         gameOptions = new JButton(Messages.message("gameOptions"));
         mapGeneratorOptions = new JButton(Messages.message("mapGeneratorOptions"));
-
-        optionsPanel = new JPanel();
         readyBox = new JCheckBox(Messages.message("iAmReady"));
-        mapSize = new JComboBox(mapSizes);
 
-        chatPanel = new JPanel();
         chat = new JTextField();
         chatArea = new JTextArea();
-        chatScroll = new JScrollPane(chatArea, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        chatScroll = new JScrollPane(chatArea, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, 
+                                     ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         tableModel = new PlayersTableModel(freeColClient, freeColClient.getPreGameController());
         table = new JTable(tableModel);
 
@@ -144,47 +130,39 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         tableScroll.getViewport().setOpaque(false);
         tableScroll.getColumnHeader().setOpaque(false);
 
-        mapSizeLabel.setSize(mapSizeLabel.getPreferredSize().width, 20);
-        mapSize.setSize(65, 20);
-        optionsPanel.setSize(230, 380);
-        start.setSize(110, 20);
-        cancel.setSize(110, 20);
-        readyBox.setSize(90, 20);
-        chat.setSize(260, 20);
-        chatScroll.setSize(260, 110);
-        tableScroll.setSize(260, 170);
-        chatPanel.setSize(270, 160);
-        gameOptions.setSize(200, 20);
-        mapGeneratorOptions.setSize(200, 20);
 
-        mapSizeLabel.setLocation(10, 20);
-        mapSize.setLocation(mapSizeLabel.getX() + mapSizeLabel.getWidth() + 10, 20);
-        optionsPanel.setLocation(285, 5);
-        start.setLocation(15, 370);
-        cancel.setLocation(155, 370);
-        readyBox.setLocation(90, 335);
-        chat.setLocation(10, 130);
-        chatScroll.setLocation(10, 10);
-        tableScroll.setLocation(10, 10);
-        chatPanel.setLocation(0, 180);
-        gameOptions.setLocation(15, 345);
-        mapGeneratorOptions.setLocation(15, 315);
+        int[] widths = {300, margin, 300};
+        int[] heights = {200, margin, 0, margin, 0, margin, 0, margin, 0};
+        setLayout(new HIGLayout(widths, heights));
 
-        mapSize.setSize(230 - mapSize.getX() - 10, 20);
-        setLayout(null);
-        optionsPanel.setLayout(null);
-        chatPanel.setLayout(null);
+        int row = 1;
+        int leftColumn = 1;
+        int rightColumn = 3;
 
-        mapSize.setActionCommand(String.valueOf(MAPSIZE));
+        add(tableScroll, higConst.rc(row, leftColumn));
+        add(chatScroll, higConst.rcwh(row, rightColumn, 1, 3));
+        row += 2;
+
+        add(mapGeneratorOptions, higConst.rc(row, leftColumn));
+        row += 2;
+
+        add(gameOptions, higConst.rc(row, leftColumn));
+        add(chat, higConst.rc(row, rightColumn));
+        row += 2;
+        
+        add(readyBox, higConst.rc(row, leftColumn));
+        row += 2;
+
+        add(start, higConst.rc(row, leftColumn, "r"));
+        add(cancel, higConst.rc(row, rightColumn, "l"));
+
         start.setActionCommand(String.valueOf(START));
         cancel.setActionCommand(String.valueOf(CANCEL));
         readyBox.setActionCommand(String.valueOf(READY));
         gameOptions.setActionCommand(String.valueOf(GAME_OPTIONS));
         mapGeneratorOptions.setActionCommand(String.valueOf(MAP_GENERATOR_OPTIONS));
-
         chat.setActionCommand(String.valueOf(CHAT));
 
-        mapSize.addActionListener(this);
         start.addActionListener(this);
         cancel.addActionListener(this);
         readyBox.addActionListener(this);
@@ -192,39 +170,12 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         gameOptions.addActionListener(this);
         mapGeneratorOptions.addActionListener(this);
 
-        // if I'm not an admin
-        // start.setEnabled(false);
-
         chatArea.setEditable(false);
         chatArea.setLineWrap(true);
         chatArea.setWrapStyleWord(true);
 
-        // Disable while not implemented.
-        //mapSizeLabel.setEnabled(false);
-        //mapSize.setEnabled(false);
-        
-        chatPanel.setOpaque(false);
+        setSize(getPreferredSize());
 
-        optionsPanel.add(mapSize);
-        optionsPanel.add(mapSizeLabel);
-        optionsPanel.add(gameOptions);
-        optionsPanel.add(mapGeneratorOptions);
-        add(optionsPanel);
-        add(start);
-        add(cancel);
-        add(readyBox);
-        add(tableScroll);
-
-        chatPanel.add(chat);
-        chatPanel.add(chatScroll);
-        add(chatPanel);
-
-        try {
-            TitledBorder border2 = new TitledBorder(Messages.message("options"));
-            optionsPanel.setBorder(border2);
-        } catch(Exception e) {}
-
-        setSize(525, 400);
     }
 
 
@@ -268,18 +219,8 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
 
         setEnabled(true);
         
-        updateMapGeneratorOptions();
     }
 
-    /**
-     * Updates the map generator options displayed
-     * on this panel.
-     */
-    public void updateMapGeneratorOptions() {
-        SelectOption o = (SelectOption) freeColClient.getPreGameController().getMapGeneratorOptions().getObject(MapGeneratorOptions.MAP_SIZE);
-        mapSize.setSelectedIndex(o.getValue());
-    }
-    
     /**
      * Updates the game options displayed
      * on this panel.
@@ -302,16 +243,6 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
             components[i].setEnabled(enabled);
         }
 
-        components = optionsPanel.getComponents();
-        for (int i = 0; i < components.length; i++) {
-            components[i].setEnabled(enabled && freeColClient.isAdmin());
-        }
-
-        components = chatPanel.getComponents();
-        for (int i = 0; i < components.length; i++) {
-            components[i].setEnabled(enabled);
-        }
-
         if (singlePlayerGame && enabled) {
             readyBox.setEnabled(false);
         }
@@ -322,7 +253,6 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
             start.setEnabled(freeColClient.isAdmin());
         }
         
-        mapGeneratorOptions.setEnabled(enabled);
         gameOptions.setEnabled(enabled);
     }
 
@@ -351,11 +281,6 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
                     parent.remove(this);
                     //parent.showMainPanel();
                     parent.showNewGamePanel();
-                    break;
-                case MAPSIZE:
-                    SelectOption o = (SelectOption) freeColClient.getPreGameController().getMapGeneratorOptions().getObject(MapGeneratorOptions.MAP_SIZE);
-                    o.setValue(mapSize.getSelectedIndex());
-                    freeColClient.getPreGameController().sendMapGeneratorOptions();
                     break;
                 case READY:
                     freeColClient.getPreGameController().setReady(readyBox.isSelected());
