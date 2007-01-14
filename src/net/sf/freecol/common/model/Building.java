@@ -484,7 +484,19 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * @see ColonyTile#getExpertForProducing
      */
     public int getExpertUnitType() {
-        switch (getType()) {
+        return getExpertUnitType(getType());
+    }
+
+    /**
+     * Returns the unit type being an expert in this <code>Building</code>.
+     *
+     * @param type The type of building.
+     * @return The {@link Unit#getType unit type}.
+     * @see Unit#getExpertWorkType
+     * @see ColonyTile#getExpertForProducing
+     */
+    public static int getExpertUnitType(int type) {
+        switch (type) {
             case TOWN_HALL:     return Unit.ELDER_STATESMAN;
             case CARPENTER:     return Unit.MASTER_CARPENTER;
             case BLACKSMITH:    return Unit.MASTER_BLACKSMITH;
@@ -747,6 +759,19 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      *      goods production by this <code>Building</code>.
      */
     public int getGoodsOutputType() {
+        return getGoodsOutputType(getType());
+    }
+    
+    /**
+     * Returns the type of goods this <code>Building</code>
+     * produces.
+     * 
+     * @param type The type of building.
+     * @return The type of goods this <code>Building</code>
+     *      produces or <code>-1</code> if there is no
+     *      goods production by this <code>Building</code>.
+     */
+    public static int getGoodsOutputType(int type) {
         switch(type) {
             case BLACKSMITH:    return Goods.TOOLS;
             case TOBACCONIST:   return Goods.CIGARS;
@@ -770,6 +795,19 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      *      {@link #getGoodsOutputType output}.
      */
     public int getGoodsInputType() {
+        return getGoodsInputType(getType());
+    }
+
+    /**
+     * Returns the type of goods this building needs for
+     * input. 
+     * 
+     * @param type The type of building.
+     * @return The type of goods this <code>Building</code>
+     *      requires as input in order to produce it's
+     *      {@link #getGoodsOutputType output}.
+     */
+    public static int getGoodsInputType(int type) {
         switch(type) {
             case BLACKSMITH:
                 return Goods.ORE;

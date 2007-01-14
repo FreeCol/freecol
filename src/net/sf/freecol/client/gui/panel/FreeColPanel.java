@@ -16,6 +16,7 @@ import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -88,6 +89,28 @@ public class FreeColPanel extends JPanel {
         addMouseListener(new MouseAdapter() {});
     }
 
+
+
+    /**
+     * Returns a text area with standard settings suitable for use in
+     * FreeCol dialogs.
+     *
+     * @param text The text to display in the text area.
+     * @return a text area with standard settings suitable for use in
+     * FreeCol dialogs.
+     */
+    public static JTextArea getDefaultTextArea(String text) {
+        JTextArea textArea = new JTextArea(text);
+        textArea.setColumns(columns);
+        textArea.setOpaque(false);
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        textArea.setFocusable(false);
+        textArea.setFont(defaultFont);
+        // necessary because of resizing
+        textArea.setSize(textArea.getPreferredSize());
+        return textArea;
+    }
 
     public void setCancelComponent(AbstractButton c) {
         if (c == null) {

@@ -16,14 +16,14 @@ public final class BuildingType
     public static final  String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final  String  REVISION = "$Revision$";
 
-    private final  List  levelList;
+    private final  List<Level>  levelList;
 
 
     // ----------------------------------------------------------- constructors
 
     public BuildingType() {
 
-        levelList = new ArrayList();
+        levelList = new ArrayList<Level>();
     }
 
 
@@ -43,6 +43,10 @@ public final class BuildingType
         Xml.forEachChild( xml, method );
     }
 
+
+    public List<Level> getLevels() {
+        return levelList;
+    }
 
     public int numberOfLevels() {
 

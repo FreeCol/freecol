@@ -33,14 +33,16 @@ import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitType;
 
+import cz.autel.dmi.HIGLayout;
 
 /**
 * This panel displays the Colopedia.
 */
 public final class ColopediaPanel extends FreeColPanel implements ActionListener {
 
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
     
@@ -70,80 +72,6 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         {"CustomHouse", null, null}
     };
 
-    // This is copied from net.sf.freecol.client.gui.ImageLibrary where it is private 
-    private static final int FREE_COLONIST = 0,
-                            EXPERT_FARMER = 1,
-                            EXPERT_FISHERMAN = 2,
-                            EXPERT_FUR_TRAPPER = 3,
-                            EXPERT_SILVER_MINER = 4,
-                            EXPERT_LUMBER_JACK = 5,
-                            EXPERT_ORE_MINER = 6,
-                            MASTER_SUGAR_PLANTER = 7,
-                            MASTER_COTTON_PLANTER = 8,
-                            MASTER_TOBACCO_PLANTER = 9,
-
-                            FIREBRAND_PREACHER = 10,
-                            ELDER_STATESMAN = 11,
-                        
-                            MASTER_CARPENTER = 12,
-                            MASTER_DISTILLER = 13,
-                            MASTER_WEAVER = 14,
-                            MASTER_TOBACCONIST = 15,
-                            MASTER_FUR_TRADER = 16,
-                            MASTER_BLACKSMITH = 17,
-                            MASTER_GUNSMITH = 18,
-                        
-                            SEASONED_SCOUT_NOT_MOUNTED = 19,
-                            HARDY_PIONEER_NO_TOOLS = 20,
-                            UNARMED_VETERAN_SOLDIER = 21,
-                            JESUIT_MISSIONARY = 22,
-                            MISSIONARY_FREE_COLONIST = 23,
-                        
-                            SEASONED_SCOUT_MOUNTED = 24,
-                            HARDY_PIONEER_WITH_TOOLS = 25,
-                            FREE_COLONIST_WITH_TOOLS = 26,
-                            INDENTURED_SERVANT = 27,
-                            PETTY_CRIMINAL = 28,
-
-                            INDIAN_CONVERT = 29,
-                            BRAVE = 30,
-                        
-                            UNARMED_COLONIAL_REGULAR = 31,
-                            UNARMED_KINGS_REGULAR = 32,
-                        
-                            SOLDIER = 33,
-                            VETERAN_SOLDIER = 34,
-                            COLONIAL_REGULAR = 35,
-                            KINGS_REGULAR = 36,
-                            UNARMED_DRAGOON = 37,
-                            UNARMED_VETERAN_DRAGOON = 38,
-                            UNARMED_COLONIAL_CAVALRY = 39,
-                            UNARMED_KINGS_CAVALRY = 40,
-                            DRAGOON = 41,
-                            VETERAN_DRAGOON = 42,
-                            COLONIAL_CAVALRY = 43,
-                            KINGS_CAVALRY = 44,
-                        
-                            ARMED_BRAVE = 45,
-                            MOUNTED_BRAVE = 46,
-                            INDIAN_DRAGOON = 47,
-                        
-                            CARAVEL = 48,
-                            FRIGATE = 49,
-                            GALLEON = 50,
-                            MAN_O_WAR = 51,
-                            MERCHANTMAN = 52,
-                            PRIVATEER = 53,
-                        
-                            ARTILLERY = 54,
-                            DAMAGED_ARTILLERY = 55,
-                            TREASURE_TRAIN = 56,
-                            WAGON_TRAIN = 57,
-                        
-                            MILKMAID = 58,
-                            JESUIT_MISSIONARY_NO_CROSS = 59,
-                        
-                            UNIT_GRAPHICS_COUNT = 60;
 
     private static final Logger logger = Logger.getLogger(ColopediaPanel.class.getName());
     private static final int    OK = -1;
@@ -175,7 +103,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
 
         listPanel = new JPanel();
         listPanel.setOpaque(false);
-        listPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
+        //listPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
         add(listPanel, BorderLayout.WEST);
 
         detailPanel = new JPanel();
@@ -260,23 +188,23 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      */
     private void buildUnitList() {
         listPanel.setLayout(new GridLayout(8, 2));
-        buildUnitButton(Unit.FREE_COLONIST,      FREE_COLONIST,      .5f); //ImageLibrary.FREE_COLONIST);
-        buildUnitButton(Unit.INDENTURED_SERVANT, INDENTURED_SERVANT, .5f); //ImageLibrary.INDENTURED_SERVANT);
-        buildUnitButton(Unit.PETTY_CRIMINAL,     PETTY_CRIMINAL,     .5f); //ImageLibrary.PETTY_CRIMINAL);
-        buildUnitButton(Unit.INDIAN_CONVERT,     INDIAN_CONVERT,     .5f); //ImageLibrary.INDIAN_CONVERT);
-        buildUnitButton(Unit.BRAVE,              BRAVE,              .5f); //ImageLibrary.BRAVE);
-        buildUnitButton(Unit.COLONIAL_REGULAR,   COLONIAL_REGULAR,   .5f); //ImageLibrary.COLONIAL_REGULAR);
-        buildUnitButton(Unit.KINGS_REGULAR,      KINGS_REGULAR,      .5f); //ImageLibrary.KINGS_REGULAR);
-        buildUnitButton(Unit.CARAVEL,            CARAVEL,            .5f); //ImageLibrary.CARAVEL);
-        buildUnitButton(Unit.FRIGATE,            FRIGATE,            .5f); //ImageLibrary.FRIGATE);
-        buildUnitButton(Unit.GALLEON,            GALLEON,            .5f); //ImageLibrary.GALLEON);
-        buildUnitButton(Unit.MAN_O_WAR,          MAN_O_WAR,          .5f); //ImageLibrary.MAN_O_WAR);
-        buildUnitButton(Unit.MERCHANTMAN,        MERCHANTMAN,        .5f); //ImageLibrary.MERCHANTMAN);
-        buildUnitButton(Unit.PRIVATEER,          PRIVATEER,          .5f); //ImageLibrary.PRIVATEER);
-        buildUnitButton(Unit.ARTILLERY,          ARTILLERY,          .5f); //ImageLibrary.ARTILLERY);
-        buildUnitButton(Unit.TREASURE_TRAIN,     TREASURE_TRAIN,     .5f); //ImageLibrary.TREASURE_TRAIN);
-        buildUnitButton(Unit.WAGON_TRAIN,        WAGON_TRAIN,        .5f); //ImageLibrary.WAGON_TRAIN);
-//        buildUnitButton(Unit.MILKMAID,           MILKMAID,           .5f); //ImageLibrary.MILKMAID);
+        buildUnitButton(Unit.FREE_COLONIST, .5f);
+        buildUnitButton(Unit.INDENTURED_SERVANT, .5f);
+        buildUnitButton(Unit.PETTY_CRIMINAL, .5f);
+        buildUnitButton(Unit.INDIAN_CONVERT, .5f);
+        buildUnitButton(Unit.BRAVE, .5f);
+        buildUnitButton(Unit.COLONIAL_REGULAR, .5f);
+        buildUnitButton(Unit.KINGS_REGULAR, .5f);
+        buildUnitButton(Unit.CARAVEL, .5f);
+        buildUnitButton(Unit.FRIGATE, .5f);
+        buildUnitButton(Unit.GALLEON, .5f);
+        buildUnitButton(Unit.MAN_O_WAR, .5f);
+        buildUnitButton(Unit.MERCHANTMAN, .5f);
+        buildUnitButton(Unit.PRIVATEER, .5f);
+        buildUnitButton(Unit.ARTILLERY, .5f);
+        buildUnitButton(Unit.TREASURE_TRAIN, .5f);
+        buildUnitButton(Unit.WAGON_TRAIN, .5f);
+//        buildUnitButton(Unit.MILKMAID, .5f);
     }
 
     /**
@@ -307,28 +235,13 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      */
     private void buildSkillsList() {
         listPanel.setLayout(new GridLayout(11, 2));
-        buildUnitButton(Unit.EXPERT_FARMER,          EXPERT_FARMER,            .5f); //ImageLibrary.EXPERT_FARMER);
-        buildUnitButton(Unit.EXPERT_FISHERMAN,       EXPERT_FISHERMAN,         .5f); //ImageLibrary.EXPERT_FISHERMAN);
-        buildUnitButton(Unit.EXPERT_FUR_TRAPPER,     EXPERT_FUR_TRAPPER,       .5f); //ImageLibrary.EXPERT_FUR_TRAPPER);
-        buildUnitButton(Unit.EXPERT_SILVER_MINER,    EXPERT_SILVER_MINER,      .5f); //ImageLibrary.EXPERT_SILVER_MINER);
-        buildUnitButton(Unit.EXPERT_LUMBER_JACK,     EXPERT_LUMBER_JACK,       .5f); //ImageLibrary.EXPERT_LUMBER_JACK);
-        buildUnitButton(Unit.EXPERT_ORE_MINER,       EXPERT_ORE_MINER,         .5f); //ImageLibrary.EXPERT_ORE_MINER);
-        buildUnitButton(Unit.MASTER_SUGAR_PLANTER,   MASTER_SUGAR_PLANTER,     .5f); //ImageLibrary.MASTER_SUGAR_PLANTER);
-        buildUnitButton(Unit.MASTER_COTTON_PLANTER,  MASTER_COTTON_PLANTER,    .5f); //ImageLibrary.MASTER_COTTON_PLANTER);
-        buildUnitButton(Unit.MASTER_TOBACCO_PLANTER, MASTER_TOBACCO_PLANTER,   .5f); //ImageLibrary.MASTER_TOBACCO_PLANTER);
-        buildUnitButton(Unit.FIREBRAND_PREACHER,     FIREBRAND_PREACHER,       .5f); //ImageLibrary.FIREBRAND_PREACHER);
-        buildUnitButton(Unit.ELDER_STATESMAN,        ELDER_STATESMAN,          .5f); //ImageLibrary.ELDER_STATESMAN);
-        buildUnitButton(Unit.MASTER_CARPENTER,       MASTER_CARPENTER,         .5f); //ImageLibrary.MASTER_CARPENTER);
-        buildUnitButton(Unit.MASTER_DISTILLER,       MASTER_DISTILLER,         .5f); //ImageLibrary.MASTER_DISTILLER);
-        buildUnitButton(Unit.MASTER_WEAVER,          MASTER_WEAVER,            .5f); //ImageLibrary.MASTER_WEAVER);
-        buildUnitButton(Unit.MASTER_TOBACCONIST,     MASTER_TOBACCONIST,       .5f); //ImageLibrary.MASTER_TOBACCONIST);
-        buildUnitButton(Unit.MASTER_FUR_TRADER,      MASTER_FUR_TRADER,        .5f); //ImageLibrary.MASTER_FUR_TRADER);
-        buildUnitButton(Unit.MASTER_BLACKSMITH,      MASTER_BLACKSMITH,        .5f); //ImageLibrary.MASTER_BLACKSMITH);
-        buildUnitButton(Unit.MASTER_GUNSMITH,        MASTER_GUNSMITH,          .5f); //ImageLibrary.MASTER_GUNSMITH);
-        buildUnitButton(Unit.SEASONED_SCOUT,         SEASONED_SCOUT_MOUNTED,   .5f); //ImageLibrary.SEASONED_SCOUT_MOUNTED);
-        buildUnitButton(Unit.HARDY_PIONEER,          HARDY_PIONEER_WITH_TOOLS, .5f); //ImageLibrary.HARDY_PIONEER_WITH_TOOLS);
-        buildUnitButton(Unit.VETERAN_SOLDIER,        VETERAN_SOLDIER,          .5f); //ImageLibrary.VETERAN_SOLDIER);
-        buildUnitButton(Unit.JESUIT_MISSIONARY,      JESUIT_MISSIONARY,        .5f); //ImageLibrary.JESUIT_MISSIONARY);
+        int numberOfTypes = FreeCol.specification.numberOfUnitTypes();
+        for (int type = 0; type < numberOfTypes; type++) {
+            UnitType unitType = FreeCol.specification.unitType(type);
+            if (unitType.skill > 0) {
+                buildUnitButton(type, 0.5f);
+            }
+        }
     }
 
     /**
@@ -336,43 +249,17 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      */
     private void buildBuildingList() {
         listPanel.setLayout(new GridLayout(19, 2));
-        buildBuildingButton(Building.TOWN_HALL,      Building.HOUSE);
-        buildBuildingButton(Building.CARPENTER,      Building.HOUSE);
-        buildBuildingButton(Building.CARPENTER,      Building.SHOP);
-        buildBuildingButton(Building.BLACKSMITH,     Building.HOUSE);
-        buildBuildingButton(Building.BLACKSMITH,     Building.SHOP);
-        buildBuildingButton(Building.BLACKSMITH,     Building.FACTORY);
-        buildBuildingButton(Building.TOBACCONIST,    Building.HOUSE);
-        buildBuildingButton(Building.TOBACCONIST,    Building.SHOP);
-        buildBuildingButton(Building.TOBACCONIST,    Building.FACTORY);
-        buildBuildingButton(Building.WEAVER,         Building.HOUSE);
-        buildBuildingButton(Building.WEAVER,         Building.SHOP);
-        buildBuildingButton(Building.WEAVER,         Building.FACTORY);
-        buildBuildingButton(Building.DISTILLER,      Building.HOUSE);
-        buildBuildingButton(Building.DISTILLER,      Building.SHOP);
-        buildBuildingButton(Building.DISTILLER,      Building.FACTORY);
-        buildBuildingButton(Building.FUR_TRADER,     Building.HOUSE);
-        buildBuildingButton(Building.FUR_TRADER,     Building.SHOP);
-        buildBuildingButton(Building.FUR_TRADER,     Building.FACTORY);
-        buildBuildingButton(Building.SCHOOLHOUSE,    Building.HOUSE);
-        buildBuildingButton(Building.SCHOOLHOUSE,    Building.SHOP);
-        buildBuildingButton(Building.SCHOOLHOUSE,    Building.FACTORY);
-        buildBuildingButton(Building.ARMORY,         Building.HOUSE);
-        buildBuildingButton(Building.ARMORY,         Building.SHOP);
-        buildBuildingButton(Building.CHURCH,         Building.HOUSE);
-        buildBuildingButton(Building.CHURCH,         Building.SHOP);
-        buildBuildingButton(Building.STOCKADE,       Building.HOUSE);
-        buildBuildingButton(Building.STOCKADE,       Building.SHOP);
-        buildBuildingButton(Building.STOCKADE,       Building.FACTORY);
-        buildBuildingButton(Building.WAREHOUSE,      Building.HOUSE);
-        buildBuildingButton(Building.WAREHOUSE,      Building.SHOP);
-        buildBuildingButton(Building.STABLES,        Building.HOUSE);
-        buildBuildingButton(Building.DOCK,           Building.HOUSE);
-        buildBuildingButton(Building.DOCK,           Building.SHOP);
-        buildBuildingButton(Building.DOCK,           Building.FACTORY);
-        buildBuildingButton(Building.PRINTING_PRESS, Building.HOUSE);
-        buildBuildingButton(Building.PRINTING_PRESS, Building.SHOP);
-        buildBuildingButton(Building.CUSTOM_HOUSE,   Building.HOUSE);
+        int numberOfTypes = FreeCol.specification.numberOfBuildingTypes();
+        for (int type = 0; type < numberOfTypes; type++) {
+            BuildingType buildingType = FreeCol.specification.buildingType(type);
+            for (int level = 0; level < buildingType.numberOfLevels(); level++) {
+                BuildingType.Level buildingLevel = buildingType.level(level);
+                JButton button = new JButton(buildingLevel.name);
+                button.setActionCommand(String.valueOf(((type << 2) | (level))));
+                button.addActionListener(this);
+                listPanel.add(button);
+            }
+        }
     }
 
     /**
@@ -413,7 +300,12 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * @param unit
      * @param unitIcon
      */
-    private void buildUnitButton(int unit, int unitIcon, float scale) {
+    private void buildUnitButton(int unit, float scale) {
+        int tools = 0;
+        if (unit == Unit.HARDY_PIONEER) {
+            tools = 100;
+        }
+        int unitIcon = library.getUnitGraphicsType(unit, false, false, tools, false);
         String name = Unit.getName(unit);
         JButton button;
         if (unitIcon >= 0) {
@@ -459,6 +351,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * @param building
      * @param level
      */
+    /*
     private void buildBuildingButton(int building, int level) {
         String name = Messages.message("colopedia.buildings.name." + buildingCalls[building][level-1]);
         JButton button = new JButton(name);
@@ -466,6 +359,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         button.addActionListener(this);
         listPanel.add(button);
     }
+    */
 
     /**
      * Builds the button for the given founding father.
@@ -624,88 +518,26 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      */
     private void buildBuildingDetail(int action) {
         detailPanel.removeAll();
-        detailPanel.setLayout(new FlowLayout());
+        detailPanel.repaint();
+
+        int[] widths = {0, 3 * margin, 0};
+        int[] heights = new int[15];
+        for (int index = 0; index < 7; index++) {
+            heights[2 * index + 1] = margin;
+        }
+        int row = 1;
+        int leftColumn = 1;
+        int rightColumn = 3;
+        detailPanel.setLayout(new HIGLayout(widths, heights));
 
         int building = action >> 2;
         int level = (action & 0x03);
-      
-        int[] buildingSpecialist = {
-            Unit.ELDER_STATESMAN,       // Town hall
-            Unit.MASTER_CARPENTER,      // Carpenter's house, Lumber mill
-            Unit.MASTER_BLACKSMITH,     // Blacksmith's house, Blacksmith's shop, Iron works
-            Unit.MASTER_TOBACCONIST,    // Tobacconist's house, Tobacconist's shop, Cigar factory
-            Unit.MASTER_WEAVER,         // Weaver's house, Weaver's shop, Textile mill
-            Unit.MASTER_DISTILLER,      // Distiller's house, Rum distillery, Rum factory
-            Unit.MASTER_FUR_TRADER,     // Fur trader's house, Fur trading post, Fur factory
-            -1,                         // Schoolhouse, College, University
-            Unit.MASTER_GUNSMITH,       // Armory, Magazine, Arsenal
-            Unit.FIREBRAND_PREACHER,    // Church, Cathedral
-            -1,                         // Stockade, Fort, Fortress
-            -1,                         // Warehouse, Warehouse expansion
-            -1,                         // Stables
-            -1,                         // Docks, Drydock, Shipyard
-            -1,                         // Printing press, Newspaper
-            -1                          // Custom house
-        };
 
-        int[] buildingSpecialistIcon = {
-            ELDER_STATESMAN,            // Town hall
-            MASTER_CARPENTER,           // Carpenter's house, Lumber mill
-            MASTER_BLACKSMITH,          // Blacksmith's house, Blacksmith's shop, Iron works
-            MASTER_TOBACCONIST,         // Tobacconist's house, Tobacconist's shop, Cigar factory
-            MASTER_WEAVER,              // Weaver's house, Weaver's shop, Textile mill
-            MASTER_DISTILLER,           // Distiller's house, Rum distillery, Rum factory
-            MASTER_FUR_TRADER,          // Fur trader's house, Fur trading post, Fur factory
-            -1,                         // Schoolhouse, College, University
-            MASTER_GUNSMITH,            // Armory, Magazine, Arsenal
-            FIREBRAND_PREACHER,         // Church, Cathedral
-            -1,                         // Stockade, Fort, Fortress
-            -1,                         // Warehouse, Warehouse expansion
-            -1,                         // Stables
-            -1,                         // Docks, Drydock, Shipyard
-            -1,                         // Printing press, Newspaper
-            -1                          // Custom house
-        };
+        BuildingType buildingType = FreeCol.specification.buildingType(building);
+        BuildingType.Level buildingLevel = buildingType.level(level);
 
-        int[] buildingNeeds = {
-            -1,                         // Town hall
-            ImageLibrary.GOODS_LUMBER,  // Carpenter's house, Lumber mill
-            ImageLibrary.GOODS_ORE,     // Blacksmith's house, Blacksmith's shop, Iron works
-            ImageLibrary.GOODS_TOBACCO, // Tobacconist's house, Tobacconist's shop, Cigar factory
-            ImageLibrary.GOODS_COTTON,  // Weaver's house, Weaver's shop, Textile mill
-            ImageLibrary.GOODS_SUGAR,   // Distiller's house, Rum distillery, Rum factory
-            ImageLibrary.GOODS_FURS,    // Fur trader's house, Fur trading post, Fur factory
-            -1,                         // Schoolhouse, College, University
-            ImageLibrary.GOODS_TOOLS,   // Armory, Magazine, Arsenal
-            -1,                         // Church, Cathedral
-            -1,                         // Stockade, Fort, Fortress
-            -1,                         // Warehouse, Warehouse expansion
-            -1,                         // Stables
-            -1,                         // Docks, Drydock, Shipyard
-            -1,                         // Printing press, Newspaper
-            -1                          // Custom house
-        };
-        
-        int[] buildingProduces = {
-            ImageLibrary.GOODS_BELLS,   // Town hall
-            ImageLibrary.GOODS_HAMMERS, // Carpenter's house, Lumber mill
-            ImageLibrary.GOODS_TOOLS,   // Blacksmith's house, Blacksmith's shop, Iron works
-            ImageLibrary.GOODS_CIGARS,  // Tobacconist's house, Tobacconist's shop, Cigar factory
-            ImageLibrary.GOODS_CLOTH,   // Weaver's house, Weaver's shop, Textile mill
-            ImageLibrary.GOODS_RUM,     // Distiller's house, Rum distillery, Rum factory
-            ImageLibrary.GOODS_COATS,   // Fur trader's house, Fur trading post, Fur factory
-            -1,                         // Schoolhouse, College, University
-            ImageLibrary.GOODS_MUSKETS, // Armory, Magazine, Arsenal
-            ImageLibrary.GOODS_CROSSES, // Church, Cathedral
-            -1,                         // Stockade, Fort, Fortress
-            -1,                         // Warehouse, Warehouse expansion
-            -1,                         // Stables
-            -1,                         // Docks, Drydock, Shipyard
-            -1,                         // Printing press, Newspaper
-            -1                          // Custom house
-        };
-
-        int[][] buildingUpkeep = {
+        /** don't need this at the moment
+            int[][] buildingUpkeep = {
             {0, -1, -1},                // Town hall
             {0, 10, -1},                // Carpenter's house, Lumber mill
             {0, 5, 15},                 // Blacksmith's house, Blacksmith's shop, Iron works
@@ -722,31 +554,23 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             {5, 10, 15},                // Docks, Drydock, Shipyard
             {5, 10, -1},                // Printing press, Newspaper
             {15, -1, -1}                // Custom house
-        };
+            };
+        */
 
-        JLabel name = new JLabel(Messages.message("colopedia.buildings.name." + buildingCalls[building][level]), SwingConstants.CENTER);
+        JLabel name = new JLabel(buildingLevel.name, SwingConstants.CENTER);
         name.setFont(((Font) UIManager.get("HeaderFont")).deriveFont(0, 24));
         name.setPreferredSize(new Dimension(detailPanel.getWidth(), 50));
-        detailPanel.add(name);
+        detailPanel.add(name, higConst.rcwh(row, leftColumn, widths.length, 1));
+        row += 2;
 
-        JPanel overview = new JPanel();
-        overview.setLayout(new GridLayout(8,2));
-        // Requires - prerequisit to build
-        overview.add(new JLabel(Messages.message("colopedia.buildings.requires")));
-        JTextArea requires = new JTextArea();
-        requires.setBorder(null);
-        requires.setOpaque(false);
-        requires.setLineWrap(true);
-        requires.setEditable(false);
-        requires.setWrapStyleWord(true);
-        requires.setFocusable(false);
-        requires.setFont(requires.getFont().deriveFont(Font.BOLD));
-        BuildingType  buildingType = FreeCol.specification.buildingType( building );
-        BuildingType.Level  buildingLevel = level < buildingType.numberOfLevels() ? buildingType.level(level) : null;
-        String requiresText = (buildingLevel != null ? buildingLevel.populationRequired : -1) + " colonists";
+        // Requires - prerequisites to build
+        String requiresText = "";
+        if (buildingLevel.populationRequired > 0) {
+            requiresText += String.valueOf(buildingLevel.populationRequired) + " " +
+                            Messages.message("colonists");
+        }
         if (level > 0) {
-          requiresText = requiresText + "\n" +
-                         Messages.message("colopedia.buildings.name." + buildingCalls[building][level-1]);
+          requiresText += "\n" + buildingType.level(level - 1).name;
         }
         if (level > 1 && (building==Building.BLACKSMITH ||
                           building==Building.TOBACCONIST ||
@@ -754,66 +578,79 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
                           building==Building.DISTILLER ||
                           building==Building.FUR_TRADER ||
                           building==Building.ARMORY)) {
-            requiresText = requiresText + "\n" + Messages.message(FoundingFather.getName(FoundingFather.ADAM_SMITH)) + " in congress";
+            requiresText += "\n" + Messages.message(FoundingFather.getName(FoundingFather.ADAM_SMITH));
         }
         if (building==Building.CUSTOM_HOUSE) {
-            requiresText = requiresText + "\n" + Messages.message(FoundingFather.getName(FoundingFather.PETER_STUYVESANT)) + " in congress";
+            requiresText += "\n" + Messages.message(FoundingFather.getName(FoundingFather.PETER_STUYVESANT));
         }
-        requires.setText(requiresText);
-        overview.add(requires);
+
+        JTextArea requires = getDefaultTextArea(requiresText);
+        detailPanel.add(new JLabel(Messages.message("colopedia.buildings.requires")),
+                        higConst.rc(row, leftColumn, "tl"));
+        detailPanel.add(requires, higConst.rc(row, rightColumn));
+        row += 2;
+
         // Costs to build - Hammers & Tools
-        overview.add(new JLabel(Messages.message("colopedia.buildings.cost")));
         JPanel costs = new JPanel();
+        costs.setOpaque(false);
         costs.setLayout(new FlowLayout(FlowLayout.LEFT));
         costs.add(new JLabel(Integer.toString(buildingLevel != null ? buildingLevel.hammersRequired : -1), library.getGoodsImageIcon(ImageLibrary.GOODS_HAMMERS), SwingConstants.LEFT));
         costs.add(new JLabel(Integer.toString(buildingLevel != null ? buildingLevel.toolsRequired : -1), library.getGoodsImageIcon(ImageLibrary.GOODS_TOOLS), SwingConstants.LEFT));
-        overview.add(costs);
-        // Specialist
-        overview.add(new JLabel(Messages.message("colopedia.buildings.specialist")));
-        overview.add(buildingSpecialist[building]>=0 ? new JLabel(Unit.getName(buildingSpecialist[building]), library.getUnitImageIcon(buildingSpecialistIcon[building]), SwingConstants.LEFT) : new JLabel());
-        // Production - Needs & Produces
-        overview.add(new JLabel(Messages.message("colopedia.buildings.production")));
-        JPanel production = new JPanel();
-        production.setLayout(new FlowLayout(FlowLayout.LEFT));
-        if (buildingNeeds[building] >= 0) {
-            JLabel label = new JLabel(Messages.message("colopedia.buildings.needs"), library.getGoodsImageIcon(buildingNeeds[building]), SwingConstants.LEADING);
-            label.setHorizontalTextPosition(SwingConstants.LEADING);
-            production.add(label);
-        }
-        if (buildingProduces[building] >= 0) {
-            JLabel label = new JLabel(Messages.message("colopedia.buildings.produces"), library.getGoodsImageIcon(buildingProduces[building]), SwingConstants.LEADING);
-            label.setHorizontalTextPosition(SwingConstants.LEADING);
-            production.add(label);
-        }
-        overview.add(production);
-        // Upkeep
-        overview.add(new JLabel(Messages.message("colopedia.buildings.upkeep")));
-        overview.add(new JLabel(Integer.toString(buildingUpkeep[building][level])));
-        // Notes
-        overview.add(new JLabel(Messages.message("colopedia.buildings.notes")));
-        JTextArea notes = new JTextArea();
-        notes.setBorder(null);
-        notes.setOpaque(false);
-        notes.setLineWrap(true);
-        notes.setEditable(false);
-        notes.setWrapStyleWord(true);
-        notes.setFocusable(false);
-        notes.setFont(requires.getFont().deriveFont(Font.BOLD));
-        notes.setText(Messages.message("colopedia.buildings.notes." + buildingCalls[building][level]));
-        notes.setSize(detailPanel.getWidth()/2, super.getPreferredSize().height);
-        overview.add(notes);
-        detailPanel.add(overview);
+        detailPanel.add(new JLabel(Messages.message("colopedia.buildings.cost")),
+                        higConst.rc(row, leftColumn));
+        detailPanel.add(costs, higConst.rc(row, rightColumn));
+        row += 2;
 
-        JTextArea description = new JTextArea();
-        description.setBorder(null);
-        description.setOpaque(false);
-        description.setLineWrap(true);
-        description.setEditable(false);
-        description.setWrapStyleWord(true);
-        description.setFocusable(false);
-        description.setText("");
-        description.setSize(detailPanel.getWidth(), super.getPreferredSize().height);
-        detailPanel.add(description);
+        // Specialist
+        JLabel specialist = new JLabel();
+        int unitType = Building.getExpertUnitType(building);
+        if (unitType >= 0) {
+            int graphicsType = library.getUnitGraphicsType(unitType, false, false, 0, false);
+            specialist.setIcon(library.getUnitImageIcon(graphicsType));
+            specialist.setText(Unit.getName(unitType));
+            specialist.setHorizontalAlignment(SwingConstants.LEFT);
+        }
+        detailPanel.add(new JLabel(Messages.message("colopedia.buildings.specialist")),
+                     higConst.rc(row, leftColumn));
+        detailPanel.add(specialist, higConst.rc(row, rightColumn));
+        row += 2;
+
+        // Production - Needs & Produces
+        JPanel production = new JPanel();
+        production.setOpaque(false);
+        production.setLayout(new FlowLayout(FlowLayout.LEFT));
+        int inputType = Building.getGoodsInputType(building);
+        if (inputType >= 0) {
+            JLabel label = new JLabel(Messages.message("colopedia.buildings.needs"),
+                                      library.getGoodsImageIcon(inputType),
+                                      SwingConstants.LEADING);
+            label.setHorizontalTextPosition(SwingConstants.LEADING);
+            production.add(label);
+        }
+        int outputType = Building.getGoodsOutputType(building);
+        if (outputType >= 0) {
+            JLabel label = new JLabel(Messages.message("colopedia.buildings.produces"),
+                                      library.getGoodsImageIcon(outputType),
+                                      SwingConstants.LEADING);
+            label.setHorizontalTextPosition(SwingConstants.LEADING);
+            production.add(label);
+        }
+        detailPanel.add(new JLabel(Messages.message("colopedia.buildings.production")),
+                     higConst.rc(row, leftColumn));
+        detailPanel.add(production, higConst.rc(row, rightColumn));
+        row += 2;
+
+        // Upkeep
+        //detailPanel.add(new JLabel(Messages.message("colopedia.buildings.upkeep")));
+        //detailPanel.add(new JLabel(Integer.toString(buildingUpkeep[building][level])));
+
+        // Notes
+        JTextArea notes = getDefaultTextArea(Messages.message("colopedia.buildings.notes." + 
+                                                              buildingCalls[building][level]));
+
+        detailPanel.add(new JLabel(Messages.message("colopedia.buildings.notes")),
+                     higConst.rc(row, leftColumn, "tl"));
+        detailPanel.add(notes, higConst.rc(row, rightColumn));
 
         detailPanel.doLayout();
     }
@@ -824,6 +661,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      */
     private void buildFatherDetail(int foundingFather) {
         detailPanel.removeAll();
+        detailPanel.repaint();
         detailPanel.setLayout(new FlowLayout());
 
         JLabel name = new JLabel(Messages.message(FoundingFather.getName(foundingFather)), SwingConstants.CENTER);
@@ -858,17 +696,13 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         }
         detailPanel.add(imageLabel);
 
-        JTextArea description = new JTextArea();
-        description.setBorder(null);
-        description.setOpaque(false);
-        description.setLineWrap(true);
-        description.setEditable(false);
-        description.setWrapStyleWord(true);
-        description.setFocusable(false);
-        description.setText(Messages.message(FoundingFather.getDescription(foundingFather)) +
-                            "\n\n" + "[" + Messages.message(FoundingFather.getBirthAndDeath(foundingFather)) +
-                            "] " + Messages.message(FoundingFather.getText(foundingFather)));
-        description.setSize(detailPanel.getWidth(), super.getPreferredSize().height);
+        String text = Messages.message(FoundingFather.getDescription(foundingFather)) +
+                      "\n\n" + "[" + Messages.message(FoundingFather.getBirthAndDeath(foundingFather)) +
+                      "] " + Messages.message(FoundingFather.getText(foundingFather));
+        JTextArea description = getDefaultTextArea(text);
+        description.setColumns(32);
+        description.setSize(description.getPreferredSize());
+        //description.setSize(detailPanel.getWidth(), super.getPreferredSize().height);
         detailPanel.add(description);
         
         detailPanel.doLayout();

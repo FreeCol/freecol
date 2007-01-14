@@ -25,14 +25,14 @@ import org.w3c.dom.Node;
  */
 public final class Specification {
 
-    public static final  String  COPYRIGHT = "Copyright (C) 2006 The FreeCol Team";
+    public static final  String  COPYRIGHT = "Copyright (C) 2006-2007 The FreeCol Team";
     public static final  String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final  String  REVISION = "$Revision$";
 
-    private final  List  buildingTypeList;
-    private final  List  tileTypeList;
-    private final  List  goodsTypeList;
-    private final  List  unitTypeList;
+    private final  List<BuildingType>  buildingTypeList;
+    private final  List<TileType>      tileTypeList;
+    private final  List<GoodsType>     goodsTypeList;
+    private final  List<UnitType>      unitTypeList;
 
 
     // ----------------------------------------------------------- constructors
@@ -132,6 +132,23 @@ public final class Specification {
 
 
     // ------------------------------------------------------------ API methods
+
+    public List<BuildingType> getBuildingTypes() {
+        return buildingTypeList;
+    }
+
+    public List<TileType> getTileTypes() {
+        return tileTypeList;
+    }
+
+    public List<GoodsType> getGoodsTypes() {
+        return goodsTypeList;
+    }
+
+    public List<UnitType> getUnitTypes() {
+        return unitTypeList;
+    }
+
 
     public int numberOfBuildingTypes() {
 

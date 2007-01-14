@@ -83,27 +83,6 @@ public class FreeColDialog extends FreeColPanel {
     public FreeColDialog() {
         super();
     }
-
-    /**
-     * Returns a text area with standard settings suitable for use in
-     * FreeCol dialogs.
-     *
-     * @param text The text to display in the text area.
-     * @return a text area with standard settings suitable for use in
-     * FreeCol dialogs.
-     */
-    public static JTextArea getDefaultTextArea(String text) {
-        JTextArea textArea = new JTextArea(text);
-        textArea.setColumns(columns);
-        textArea.setOpaque(false);
-        textArea.setLineWrap(true);
-        textArea.setWrapStyleWord(true);
-        textArea.setFont(defaultFont);
-        // necessary because of resizing
-        textArea.setSize(textArea.getPreferredSize());
-        return textArea;
-    }
-
     /**
     * Sets the <code>response</code> and wakes up any thread waiting for this information.
     *
