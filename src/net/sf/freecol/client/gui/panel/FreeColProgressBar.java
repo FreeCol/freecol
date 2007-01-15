@@ -182,7 +182,11 @@ public class FreeColProgressBar extends JPanel {
 
         String progressString = String.valueOf(value) + "+" + step + "/" + max;
         if (step > 0 && max > value) {
-            progressString += " (" + (max - value) / step + " " + 
+            int turns = (max - value) / step;
+            if ((max - value) % step > 0) {
+                turns++;
+            }
+            progressString += " (" + turns + " " + 
                               Messages.message("turns") + ")";
         }
 
