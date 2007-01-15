@@ -33,7 +33,7 @@ import net.sf.freecol.common.model.Unit;
 public final class ImageLibrary extends ImageProvider {
     private static final Logger logger = Logger.getLogger(ImageLibrary.class.getName());
 
-    public static final String COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
+    public static final String COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String REVISION = "$Revision$";
 
@@ -73,7 +73,8 @@ public final class ImageLibrary extends ImageProvider {
                             LAND_NORTH_EAST = 7,    // border tile, some 'land' can be found in north-east of this tile
                             LAND_CENTER = 8;        // ordinary tile, filled entirely with 'land'
 
-    public static final int BONUS_SILVER = 0,
+    public static final int BONUS_NONE = -1,
+                            BONUS_SILVER = 0,
                             BONUS_FOOD = 1,
                             BONUS_TOBACCO = 2,
                             BONUS_COTTON = 3,
@@ -255,22 +256,25 @@ public final class ImageLibrary extends ImageProvider {
     /**
      * A Vector of Image objects.
      */
-    private Vector units, // Holds ImageIcon objects
-                   terrain1, // Holds Vectors that hold ImageIcon objects
-                   terrain2, // Holds Vectors that hold ImageIcon objects
-                   forests, // Holds ImageIcon objects
-                   rivers, // Holds ImageIcon objects
-                   misc, // Holds ImageIcon objects
-                   colonies, //Holds ImageIcon objects
-                   indians, //Holds ImageIcon objects
-                   goods, //Holds ImageIcon objects
-                   bonus, //Holds ImageIcon objects
-                   ui; // Holds ImageIcon objects
+    private Vector<ImageIcon> units, // Holds ImageIcon objects
+        forests, // Holds ImageIcon objects
+        rivers, // Holds ImageIcon objects
+        misc, // Holds ImageIcon objects
+        colonies, //Holds ImageIcon objects
+        indians, //Holds ImageIcon objects
+        goods, //Holds ImageIcon objects
+        bonus, //Holds ImageIcon objects
+        ui; // Holds ImageIcon objects
+
+    private Vector<Vector<ImageIcon>> terrain1,
+        terrain2;
+
+
     private Vector[] unitButtons; //Holds the unit-order buttons
     private Image[] alarmChips;
-    private Hashtable colorChips;  // Color is key, BufferedImage is value
-    private Hashtable missionChips;  // Color is key, BufferedImage is value
-    private Hashtable expertMissionChips;  // Color is key, BufferedImage is value
+    private Hashtable<Color, BufferedImage> colorChips;
+    private Hashtable<Color, BufferedImage> missionChips;
+    private Hashtable<Color, BufferedImage> expertMissionChips;
 
     /**
      * The constructor to use.
@@ -327,9 +331,9 @@ public final class ImageLibrary extends ImageProvider {
         loadBonus(gc, resourceLocator, doLookup);
 
         alarmChips = new Image[Tension.NUMBER_OF_LEVELS];
-        colorChips = new Hashtable();
-        missionChips = new Hashtable();
-        expertMissionChips = new Hashtable();
+        colorChips = new Hashtable<Color, BufferedImage>();
+        missionChips = new Hashtable<Color, BufferedImage>();
+        expertMissionChips = new Hashtable<Color, BufferedImage>();
     }
 
     /**
@@ -752,23 +756,28 @@ public final class ImageLibrary extends ImageProvider {
      * @return the bonus-image for the given tile.
      */
     public Image getBonusImage(Tile tile) {
-        if (tile.getAddition() == Tile.ADD_MOUNTAINS) {
-            return ((ImageIcon) bonus.get(BONUS_SILVER)).getImage();
-        } else if (tile.getAddition() == Tile.ADD_HILLS) {
-            return ((ImageIcon) bonus.get(BONUS_ORE)).getImage();
-        } else if (tile.isForested()) {
-            if (tile.getType() == Tile.GRASSLANDS || tile.getType() == Tile.SAVANNAH) {
-                return ((ImageIcon) bonus.get(BONUS_LUMBER)).getImage();
+        int imageType = getBonusImageType(tile.getType(), tile.getAddition(), tile.isForested());
+        return bonus.get(imageType).getImage();
+    }
+
+    public static int getBonusImageType(int type, int addition, boolean forested) {
+        if (addition == Tile.ADD_MOUNTAINS) {
+            return BONUS_SILVER;
+        } else if (addition == Tile.ADD_HILLS) {
+            return BONUS_ORE;
+        } else if (forested) {
+            if (type == Tile.GRASSLANDS || type == Tile.SAVANNAH) {
+                return BONUS_LUMBER;
             } else {
-                return ((ImageIcon) bonus.get(BONUS_FURS)).getImage();
+                return BONUS_FURS;
             }
-        } else if (tile.getType() <= 4) {
-            return ((ImageIcon) bonus.get(tile.getType())).getImage();
-        } else if (tile.getType() == Tile.OCEAN) {
-            return ((ImageIcon) bonus.get(BONUS_FISH)).getImage();
+        } else if (type <= 4) {
+            return type;
+        } else if (type == Tile.OCEAN) {
+            return BONUS_FISH;
         } else {
-            logger.warning("No bonus graphics for:" + tile.getName());
-            return null;
+            logger.warning("No bonus graphics for tile type " + type);
+            return BONUS_NONE;
         }
     }
 

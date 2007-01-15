@@ -59,6 +59,26 @@ public final class Tile extends FreeColGameObject implements Location {
                             CLAIM_VISITED = 1,
                             CLAIM_CLAIMED = 2;
 
+    // Please someone tell me they want to put this data into a separate file... -sjm
+    // Twelve tile types, sixteen goods types, and forested/unforested.
+    public static final int[][][] potentialtable = {
+        // Food Sugar Tobacco Cotton  Furs   Wood   Ore   Silver
+        {{0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Unexp
+        {{5,3}, {0,0}, {0,0}, {2,1}, {0,3}, {0,6}, {1,0}, {0,0}}, // Plains
+        {{3,2}, {0,0}, {3,1}, {0,0}, {0,2}, {0,4}, {0,0}, {0,0}}, // Grasslands
+        {{3,2}, {0,0}, {0,0}, {3,1}, {0,2}, {0,6}, {0,0}, {0,0}}, // Prairie
+        {{4,3}, {3,1}, {0,0}, {0,0}, {0,2}, {0,4}, {0,0}, {0,0}}, // Savannah
+        {{3,2}, {0,0}, {0,0}, {0,0}, {0,2}, {0,4}, {2,1}, {0,0}}, // Marsh
+        {{3,2}, {2,1}, {2,1}, {0,0}, {0,1}, {0,4}, {2,1}, {0,0}}, // Swamp
+        {{2,2}, {0,0}, {0,0}, {1,1}, {0,2}, {0,2}, {2,1}, {0,0}}, // Desert
+        {{3,2}, {0,0}, {0,0}, {0,0}, {0,3}, {0,4}, {2,1}, {0,0}}, // Tundra
+        {{0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Arctic
+        {{4,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Ocean
+        {{4,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // High seas
+        {{2,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {4,0}, {0,0}}, // Hills
+        {{0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {3,0}, {1,0}}  // Mountains
+    };
+
     private boolean road,
                     plowed,
                     forested,
@@ -1139,26 +1159,6 @@ public final class Tile extends FreeColGameObject implements Location {
         if (!Goods.isFarmedGoods(goods)) {
             return 0;
         }
-
-        // Please someone tell me they want to put this data into a separate file... -sjm
-        // Twelve tile types, sixteen goods types, and forested/unforested.
-        int[][][] potentialtable = {
-            // Food Sugar Tobacco Cotton  Furs   Wood   Ore   Silver
-            {{0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Unexp
-            {{5,3}, {0,0}, {0,0}, {2,1}, {0,3}, {0,6}, {1,0}, {0,0}}, // Plains
-            {{3,2}, {0,0}, {3,1}, {0,0}, {0,2}, {0,4}, {0,0}, {0,0}}, // Grasslands
-            {{3,2}, {0,0}, {0,0}, {3,1}, {0,2}, {0,6}, {0,0}, {0,0}}, // Prairie
-            {{4,3}, {3,1}, {0,0}, {0,0}, {0,2}, {0,4}, {0,0}, {0,0}}, // Savannah
-            {{3,2}, {0,0}, {0,0}, {0,0}, {0,2}, {0,4}, {2,1}, {0,0}}, // Marsh
-            {{3,2}, {2,1}, {2,1}, {0,0}, {0,1}, {0,4}, {2,1}, {0,0}}, // Swamp
-            {{2,2}, {0,0}, {0,0}, {1,1}, {0,2}, {0,2}, {2,1}, {0,0}}, // Desert
-            {{3,2}, {0,0}, {0,0}, {0,0}, {0,3}, {0,4}, {2,1}, {0,0}}, // Tundra
-            {{0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Arctic
-            {{4,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Ocean
-            {{4,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // High seas
-            {{2,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {4,0}, {0,0}}, // Hills
-            {{0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {3,0}, {1,0}}  // Mountains
-        };
 
         int basepotential = 0;
         switch (addition_type) {

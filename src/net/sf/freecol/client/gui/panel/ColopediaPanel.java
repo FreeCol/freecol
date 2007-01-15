@@ -7,8 +7,11 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.Transparency;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -78,6 +81,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
 
     private final Canvas parent;
     private final ImageLibrary library;
+    private final GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
     private JLabel header;
     private JPanel listPanel;
     private JPanel detailPanel;
@@ -152,7 +156,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
                 break;
         }
         detailPanel.removeAll();
-        detailPanel.doLayout();
+        detailPanel.validate();
     }
 
     /**
@@ -166,21 +170,20 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * Builds the buttons for all the terrains.
      */
     private void buildTerrainList() {
-        listPanel.setLayout(new GridLayout(7, 2));
-        buildTerrainButton(Tile.PLAINS);
-        buildTerrainButton(Tile.GRASSLANDS);
-        buildTerrainButton(Tile.PRAIRIE);
-        buildTerrainButton(Tile.SAVANNAH);
-        buildTerrainButton(Tile.MARSH);
-        buildTerrainButton(Tile.SWAMP);
-        buildTerrainButton(Tile.DESERT);
-        buildTerrainButton(Tile.TUNDRA);
-        buildTerrainButton(Tile.ARCTIC);
-        buildTerrainButton(Tile.OCEAN);
-        buildTerrainButton(Tile.HIGH_SEAS);
-        buildTerrainButton(Messages.message("forest"),    ImageLibrary.FOREST);
-        buildTerrainButton(Messages.message("hills"),     ImageLibrary.HILLS);
-        buildTerrainButton(Messages.message("mountains"), ImageLibrary.MOUNTAINS);
+        listPanel.setLayout(new GridLayout(0, 4));
+        int numberOfTypes = FreeCol.specification.numberOfTileTypes();
+        // type zero is unexplored
+        for (int type = 1; type < Tile.ARCTIC; type++) {
+            buildTerrainButton(type, false);
+            buildTerrainButton(type, true);
+        }
+        buildTerrainButton(Tile.ARCTIC, false);
+        buildTerrainButton(ImageLibrary.HILLS, false);
+        buildTerrainButton(ImageLibrary.MOUNTAINS, false);
+        listPanel.add(new JLabel());
+        buildTerrainButton(Tile.OCEAN, false);
+        buildTerrainButton(Tile.HIGH_SEAS, false);
+
     }
 
     /**
@@ -274,26 +277,42 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
 
     /**
      * Builds the button for the given terrain.
-     * @param name
-     * @param terrain
+     * @param terrain the type of terrain
+     * @param forested whether it is forested
      */
-    private void buildTerrainButton(String name, int terrain) {
-        ImageIcon icon = new ImageIcon(library.getTerrainImage(terrain, 0, 0));
-        JButton button = new JButton(name, icon);
-        button.setHorizontalAlignment(SwingConstants.LEFT);
-        button.setActionCommand(String.valueOf(terrain));
+    private void buildTerrainButton(int terrain, boolean forested) {
+        Image scaledImage = getTerrainImage(terrain, forested, 0.5f);
+        ImageIcon icon = new ImageIcon(scaledImage);
+        JButton button = new JButton(icon);
+        button.setVerticalTextPosition(SwingConstants.BOTTOM);
+        button.setHorizontalTextPosition(SwingConstants.CENTER);
+        button.setActionCommand(String.valueOf(terrain * 2 + (forested? 1: 0)));
         button.addActionListener(this);
         listPanel.add(button);
     }
 
-    private void buildTerrainButton(int terrain) {
-        ImageIcon icon = new ImageIcon(library.getTerrainImage(terrain, 0, 0));
-        JButton button = new JButton(FreeCol.specification.tileType(terrain).name, icon);
-        button.setHorizontalAlignment(SwingConstants.LEFT);
-        button.setActionCommand(String.valueOf(terrain));
-        button.addActionListener(this);
-        listPanel.add(button);
+    public Image getTerrainImage(int terrain, boolean forested, float scale) {
+        Image terrainImage = library.getTerrainImage(terrain, 0, 0);
+        int width = terrainImage.getWidth(this);
+        int height = terrainImage.getHeight(this);
+        if (terrain > Tile.UNEXPLORED && terrain < Tile.ARCTIC && forested) {
+            BufferedImage compositeImage = gc.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
+            Graphics2D g = compositeImage.createGraphics();
+            g.drawImage(terrainImage, 0, 0, null);
+            g.drawImage(library.getForestImage(terrain), 0, 0, null);
+            g.dispose();
+            terrainImage = compositeImage;
+        }
+        if (scale == 1f) {
+            return terrainImage;
+        } else {
+            return terrainImage.getScaledInstance((int) (width * scale), 
+                                                  (int) (height * scale),
+                                                  Image.SCALE_SMOOTH);
+        }
     }
+        
+
 
     /**
      * Builds the button for the given unit.
@@ -379,81 +398,88 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      */
     private void buildTerrainDetail(int terrain) {
         detailPanel.removeAll();
-        detailPanel.setLayout(new FlowLayout());
+        repaint();
 
-        JLabel name = new JLabel("Terrain", SwingConstants.CENTER);
-        name.setFont(((Font) UIManager.get("HeaderFont")).deriveFont(0, 24));
-        name.setPreferredSize(new Dimension(detailPanel.getWidth(), 50));
-        detailPanel.add(name);
+        int[] widths = {0, 3 * margin, 0};
+        int[] heights = new int[9];
+        for (int index = 0; index < 4; index++) {
+            heights[2 * index + 1] = margin;
+        }
+        detailPanel.setLayout(new HIGLayout(widths, heights));
+        int row = 1;
+        int leftColumn = 1;
+        int rightColumn = 3;
 
-        Image terrainImage = library.getTerrainImage(terrain, 0, 0);
-        ImageIcon icon = new ImageIcon(terrainImage);
-        JLabel imageLabel = new JLabel(icon);
-        detailPanel.add(imageLabel);
+        int type = terrain / 2;
+        int productionIndex = type; 
+        boolean forested = (terrain % 2 == 1);
+        int addition = Tile.ADD_NONE;
+        String name = null;
+
+        switch(type) {
+        case ImageLibrary.HILLS:
+            name = Messages.message("hills");
+            addition = Tile.ADD_HILLS;
+            productionIndex = 12;
+            break;
+        case ImageLibrary.MOUNTAINS:
+            name = Messages.message("mountains");
+            addition = Tile.ADD_MOUNTAINS;
+            productionIndex = 13;
+            break;
+        default:
+            if (forested) {
+                name = FreeCol.specification.tileType(type).whenForested.name;
+            } else {
+                name = FreeCol.specification.tileType(type).name;
+            }
+        }
+
+        JLabel nameLabel = new JLabel(name, SwingConstants.CENTER);
+        nameLabel.setFont(((Font) UIManager.get("HeaderFont")).deriveFont(0, 24));
+        detailPanel.add(nameLabel, higConst.rcwh(row, leftColumn, widths.length, 1));
+        row += 2;
+
+        detailPanel.add(new JLabel(Messages.message("colopedia.terrain.terrainImage")),
+                        higConst.rc(row, leftColumn));
+        Image terrainImage = getTerrainImage(type, forested, 1f);
+        detailPanel.add(new JLabel(new ImageIcon(terrainImage)),
+                        higConst.rc(row, rightColumn));
+        row += 2;
         
-        int tileWidth = library.getTerrainImageWidth(0);
-        int tileHeight = library.getTerrainImageHeight(0);
-        BufferedImage terrainImage2 = new BufferedImage(tileWidth,
-                                                        tileHeight,
-                                                        BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = terrainImage2.createGraphics();
-        g.drawImage(terrainImage, 0, 0, null);
-        Image bonusImage = library.getBonusImageIcon(0).getImage();
-        g.drawImage(bonusImage, tileWidth/2 - bonusImage.getWidth(null)/2, tileHeight/2 - bonusImage.getHeight(null)/2, null);
+        detailPanel.add(new JLabel(Messages.message("colopedia.terrain.resource")),
+                        higConst.rc(row, leftColumn));
+        int bonusType = library.getBonusImageType(type, addition, forested);
+        if (bonusType >= 0) {
+            ImageIcon bonusIcon = library.getBonusImageIcon(bonusType);
+            detailPanel.add(new JLabel(bonusIcon), higConst.rc(row, rightColumn));
+        }
+        row += 2;
 
-        JTextArea description = new JTextArea();
-        description.setBorder(null);
-        description.setOpaque(false);
-        description.setLineWrap(true);
-        description.setEditable(false);
-        description.setWrapStyleWord(true);
-        description.setFocusable(false);
-        //TODO
-        description.setText("Production Values");
-        description.setSize(detailPanel.getWidth(), super.getPreferredSize().height);
-        detailPanel.add(description);
-        
-        int[][][] potentialtable = {
-             // Food    Sugar  Tobac  Cotton Furs   Wood   Ore    Silver Horses Rum    Cigars Cloth  Coats  T.G.   Tools  Musket
-                {{0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Unexp
-                {{5,3}, {0,0}, {0,0}, {2,1}, {0,3}, {0,6}, {1,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Plains
-                {{3,2}, {0,0}, {3,1}, {0,0}, {0,2}, {0,4}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Grasslands
-                {{3,2}, {0,0}, {0,0}, {3,1}, {0,2}, {0,6}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Prairie
-                {{4,3}, {3,1}, {0,0}, {0,0}, {0,2}, {0,4}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Savannah
-                {{3,2}, {0,0}, {0,0}, {0,0}, {0,2}, {0,4}, {2,1}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Marsh
-                {{3,2}, {2,1}, {2,1}, {0,0}, {0,1}, {0,4}, {2,1}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Swamp
-                {{2,2}, {0,0}, {0,0}, {1,1}, {0,2}, {0,2}, {2,1}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Desert
-                {{3,2}, {0,0}, {0,0}, {0,0}, {0,3}, {0,4}, {2,1}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Tundra
-                {{0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Arctic
-                {{4,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Ocean
-                {{4,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // High seas
-                {{2,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {4,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}, // Hills
-                {{0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {3,0}, {1,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}}  // Mountains
-            };
+        detailPanel.add(new JLabel(Messages.message("colopedia.terrain.production")),
+                        higConst.rc(row, leftColumn));
+        JPanel goodsPanel = new JPanel(new GridLayout(2, 4, margin, 0));
+        goodsPanel.setOpaque(false);
+        if (type == Tile.OCEAN || type == Tile.HIGH_SEAS) {
+            JLabel goodsLabel =  new JLabel(library.getGoodsImageIcon(Goods.FISH));
+            goodsLabel.setText(String.valueOf(Tile.potentialtable[type][Goods.FOOD][0]));
+            detailPanel.add(goodsLabel, higConst.rc(row, rightColumn));
+        } else {
+            for (int index = 0; index < Goods.NUMBER_OF_TYPES; index++) {
+                if (Goods.isFarmedGoods(index)) {
+                    JLabel goodsLabel = new JLabel(library.getGoodsImageIcon(index));
+                    goodsLabel.setText(String.valueOf(Tile.potentialtable[productionIndex][index][(forested ? 1 : 0)]));
+                    goodsPanel.add(goodsLabel);
+                }
+            }
+            detailPanel.add(goodsPanel, higConst.rc(row, rightColumn));
+        }
+        row += 2;
 
-        JPanel production = new JPanel();
-        production.setLayout(new GridLayout(2,8));
-        production.add(new JLabel(library.getGoodsImageIcon(ImageLibrary.GOODS_FOOD)));
-        production.add(new JLabel(library.getGoodsImageIcon(ImageLibrary.GOODS_SUGAR)));
-        production.add(new JLabel(library.getGoodsImageIcon(ImageLibrary.GOODS_TOBACCO)));
-        production.add(new JLabel(library.getGoodsImageIcon(ImageLibrary.GOODS_COTTON)));
-        production.add(new JLabel(library.getGoodsImageIcon(ImageLibrary.GOODS_FURS)));
-        production.add(new JLabel(library.getGoodsImageIcon(ImageLibrary.GOODS_LUMBER)));
-        production.add(new JLabel(library.getGoodsImageIcon(ImageLibrary.GOODS_ORE)));
-        production.add(new JLabel(library.getGoodsImageIcon(ImageLibrary.GOODS_SILVER)));
-//        production.add(new JLabel(library.getGoodsImageIcon(ImageLibrary.GOODS_FISH)));
-        production.add(new JLabel(potentialtable[terrain][0][0] + "/" + potentialtable[terrain][0][1]));
-        production.add(new JLabel(potentialtable[terrain][1][0] + "/" + potentialtable[terrain][1][1]));
-        production.add(new JLabel(potentialtable[terrain][2][0] + "/" + potentialtable[terrain][2][1]));
-        production.add(new JLabel(potentialtable[terrain][3][0] + "/" + potentialtable[terrain][3][1]));
-        production.add(new JLabel(potentialtable[terrain][4][0] + "/" + potentialtable[terrain][4][1]));
-        production.add(new JLabel(potentialtable[terrain][5][0] + "/" + potentialtable[terrain][5][1]));
-        production.add(new JLabel(potentialtable[terrain][6][0] + "/" + potentialtable[terrain][6][1]));
-        production.add(new JLabel(potentialtable[terrain][7][0] + "/" + potentialtable[terrain][7][1]));
-//        production.add(new JLabel(potentialtable[terrain][0][0] + "/" + potentialtable[terrain][0][1]));
-        detailPanel.add(production);
-        
-        detailPanel.doLayout();
+        detailPanel.add(new JLabel(Messages.message("colopedia.terrain.description")), 
+                        higConst.rc(row, leftColumn));
+
+        detailPanel.validate();
     }
     
     /**
@@ -481,7 +507,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         description.setSize(detailPanel.getWidth(), super.getPreferredSize().height);
         detailPanel.add(description);
 
-        detailPanel.doLayout();
+        detailPanel.validate();
     }
 
     /**
@@ -509,7 +535,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         description.setSize(detailPanel.getWidth(), super.getPreferredSize().height);
         detailPanel.add(description);
 
-        detailPanel.doLayout();
+        detailPanel.validate();
     }
 
     /**
@@ -652,7 +678,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
                      higConst.rc(row, leftColumn, "tl"));
         detailPanel.add(notes, higConst.rc(row, rightColumn));
 
-        detailPanel.doLayout();
+        detailPanel.validate();
     }
 
     /**
@@ -705,7 +731,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         //description.setSize(detailPanel.getWidth(), super.getPreferredSize().height);
         detailPanel.add(description);
         
-        detailPanel.doLayout();
+        detailPanel.validate();
     }
 
     /**
