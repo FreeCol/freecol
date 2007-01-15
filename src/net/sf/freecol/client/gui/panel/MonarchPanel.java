@@ -88,6 +88,7 @@ public final class MonarchPanel extends FreeColDialog implements ActionListener 
     * @param replace The data to be used when displaying i18n-strings.
     */
     public void initialize(int action, String[][] replace) {
+        removeAll();
 
         int[] widths = {0, margin, 0};
         int[] heights = {0, margin, 0, margin, 0};
