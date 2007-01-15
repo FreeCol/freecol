@@ -843,10 +843,18 @@ public final class InGameInputHandler extends InputHandler {
 
             // JACOB_FUGGER does not protect against new boycotts
             freeColClient.getMyPlayer().setArrears(goods);
+
+            String message;
+            if (goods.getType() == Goods.HORSES) {
+                message = "model.monarch.bostonTeaParty.horses";
+            } else if (colony.isLandLocked()) {
+                message = "model.monarch.bostonTeaParty.landLocked";
+            } else {
+                message = "model.monarch.bostonTeaParty.harbour";
+            }
         
             freeColClient.getCanvas().
-                showModelMessage(new ModelMessage(colony,
-                                                  "model.monarch.bostonTeaParty",
+                showModelMessage(new ModelMessage(colony, message,                            
                                                   new String [][] {{"%colony%", colony.getName()},
                                                                    {"%amount%", String.valueOf(goods.getAmount())},
                                                                    {"%goods%", goods.getName()}},
