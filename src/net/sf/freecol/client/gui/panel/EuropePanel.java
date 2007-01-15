@@ -1142,36 +1142,30 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                                  RECRUIT_2 = 2,
                                  RECRUIT_3 = 3;
 
-        private final JLabel    price;
-        private final JButton   person1,
-                                person2,
-                                person3;
+        private final JLabel price;
+        private final JButton person1,
+                              person2,
+                              person3;
         private final JButton cancel;
+        private final JTextArea question;
+
 
         /**
         * The constructor to use.
         */
         public RecruitDialog() {
+            super();
             setFocusCycleRoot(true);
             ActionListener actionListener = this;
 
-            JTextArea question = new JTextArea(Messages.message("recruitDialog.clickOn"));
-            question.setOpaque(false);
-            question.setLineWrap(true);
-            question.setWrapStyleWord(true);
-            question.setFont(new Font("Dialog", Font.BOLD, 12));
-
-            JLabel  priceLabel = new MessageLabel( "theirPrice" );
             cancel = new JButton( Messages.message("cancel") );
             setCancelComponent(cancel);
 
+            question = getDefaultTextArea(Messages.message("recruitDialog.clickOn"));
             price = new JLabel();
             person1 = new JButton();
             person2 = new JButton();
             person3 = new JButton();
-
-            initialize();
-            setLayout(new HIGLayout(new int[] {280}, new int[] {0, 10, 0, 10, 0}));
 
             person1.setActionCommand(String.valueOf(RECRUIT_1));
             person2.setActionCommand(String.valueOf(RECRUIT_2));
@@ -1183,24 +1177,8 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             person3.addActionListener(actionListener);
             cancel.addActionListener(actionListener);
 
-            int[] widths = new int[] {0, 12, 100};
-            int[] heights = new int[] {0, 12, 0, 0, 0};
-            JPanel recruitPanel = new JPanel(new HIGLayout(widths, heights));
+            initialize();
 
-            recruitPanel.add(priceLabel, higConst.rc(1, 1));
-            recruitPanel.add(price, higConst.rc(1, 3));
-            recruitPanel.add(person1, higConst.rcwh(3, 1, 3, 1));
-            recruitPanel.add(person2, higConst.rcwh(4, 1, 3, 1));
-            recruitPanel.add(person3, higConst.rcwh(5, 1, 3, 1));
-
-            add(question, higConst.rc(1, 1));
-            add(recruitPanel, higConst.rc(3, 1));
-            add(cancel, higConst.rc(5, 1));
-
-            setBorder(BorderFactory.createCompoundBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED),
-                                                         BorderFactory.createEmptyBorder(20, 20, 20, 20)));
-
-            setSize(320, 215);
         }
 
 
@@ -1213,15 +1191,15 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         * Updates this panel's labels so that the information it displays is up to date.
         */
         public void initialize() {
+            int recruitPrice = 0;
             if ((game != null) && (freeColClient.getMyPlayer() != null)) {
-                price.setText(Integer.toString(freeColClient.getMyPlayer().getRecruitPrice()) + " " + Messages.message("gold"));
+                recruitPrice = freeColClient.getMyPlayer().getRecruitPrice();
 
                 person1.setText(Unit.getName(europe.getRecruitable(1)));
                 person2.setText(Unit.getName(europe.getRecruitable(2)));
                 person3.setText(Unit.getName(europe.getRecruitable(3)));
 
-
-                if (freeColClient.getMyPlayer().getRecruitPrice() > freeColClient.getMyPlayer().getGold()) {
+                if (recruitPrice > freeColClient.getMyPlayer().getGold()) {
                     person1.setEnabled(false);
                     person2.setEnabled(false);
                     person3.setEnabled(false);
@@ -1231,6 +1209,31 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
                     person3.setEnabled(true);
                 }
             }
+
+            price.setText(Messages.message("recruitDialog.price", 
+                                           new String[][] {{"%amount%", String.valueOf(recruitPrice)}}));
+
+            int[] widths = new int[] {0};
+            int[] heights = new int[11];
+            for (int index = 0; index < 5; index++) {
+                heights[2 * index + 1] = margin;
+            }
+            setLayout(new HIGLayout(widths, heights));
+            int row = 1;
+
+            add(question, higConst.rc(row, 1));
+            row += 2;
+            add(price, higConst.rc(row, 1));
+            row += 2;
+            add(person1, higConst.rc(row, 1));
+            row += 2;
+            add(person2, higConst.rc(row, 1));
+            row += 2;
+            add(person3, higConst.rc(row, 1));
+            row += 2;
+            add(cancel, higConst.rc(row, 1));
+
+            setSize(getPreferredSize());
         }
 
 
@@ -1324,16 +1327,12 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
         * The constructor to use.
         */
         public PurchaseDialog() {
+            super();
             setFocusCycleRoot(true);
-            setLayout(new HIGLayout(new int[] {280}, new int[] {0, 10, 0, 10, 0}));
             ActionListener actionListener = this;
+            setLayout(new HIGLayout(new int[] {0}, new int[] {0, margin, 0, margin, 0}));
 
-            JPanel purchasePanel = new JPanel();
-            JTextArea question = new JTextArea(Messages.message("purchaseDialog.clickOn"));
-            question.setOpaque(false);
-            question.setLineWrap(true);
-            question.setWrapStyleWord(true);
-            question.setFont(new Font("Dialog", Font.BOLD, 12));
+            JTextArea question = getDefaultTextArea(Messages.message("purchaseDialog.clickOn"));
 
             JLabel  caravelLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.CARAVEL))),
                     merchantmanLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.MERCHANTMAN))),
@@ -1365,40 +1364,41 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             privateerButton.addActionListener(actionListener);
             frigateButton.addActionListener(actionListener);
 
-            int[] widths = new int[] {0, 12, 0};
-            int[] heights = new int[9];
+            int[] widths = new int[] {0, margin, 0};
+            int[] heights = new int[11];
+            for (int index = 0; index < 5; index++) {
+                heights[2 * index + 1] = margin;
+            }
             int buttonColumn = 1;
             int labelColumn = 3;
+
+            JPanel purchasePanel = new JPanel();
             purchasePanel.setLayout(new HIGLayout(widths, heights));
 
             int row = 1;
             purchasePanel.add(artilleryButton, higConst.rc(row, buttonColumn));
             purchasePanel.add(artilleryLabel, higConst.rc(row, labelColumn));
-            row++;
+            row += 2;
             purchasePanel.add(caravelButton, higConst.rc(row, buttonColumn));
             purchasePanel.add(caravelLabel, higConst.rc(row, labelColumn));
-            row++;
+            row += 2;
             purchasePanel.add(merchantmanButton, higConst.rc(row, buttonColumn));
             purchasePanel.add(merchantmanLabel, higConst.rc(row, labelColumn));
-            row++;
+            row += 2;
             purchasePanel.add(galleonButton, higConst.rc(row, buttonColumn));
             purchasePanel.add(galleonLabel, higConst.rc(row, labelColumn));
-            row++;
+            row += 2;
             purchasePanel.add(privateerButton, higConst.rc(row, buttonColumn));
             purchasePanel.add(privateerLabel, higConst.rc(row, labelColumn));
-            row++;
+            row += 2;
             purchasePanel.add(frigateButton, higConst.rc(row, buttonColumn));
             purchasePanel.add(frigateLabel, higConst.rc(row, labelColumn));
-            row++;
 
             add(question, higConst.rc(1, 1));
-            add(purchasePanel, higConst.rc(3, 1));
+            add(purchasePanel, higConst.rc(3, 1, ""));
             add(cancel, higConst.rc(5, 1));
 
-            setBorder(BorderFactory.createCompoundBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED),
-                                                         BorderFactory.createEmptyBorder(20, 20, 20, 20)));
-            
-            setSize(320, 265);
+            setSize(getPreferredSize());
         }
 
 
@@ -1584,14 +1584,10 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             setFocusCycleRoot(true);
 
             ActionListener actionListener = this;
-            setLayout(new HIGLayout(new int[] {280}, new int[] {0, 10, 0, 10, 0}));
+            setLayout(new HIGLayout(new int[] {0}, new int[] {0, margin, 0, margin, 0}));
 
 
-            JTextArea question = new JTextArea(Messages.message("trainDialog.clickOn"));
-            question.setOpaque(false);
-            question.setLineWrap(true);
-            question.setWrapStyleWord(true);
-            question.setFont(new Font("Dialog", Font.BOLD, 12));
+            JTextArea question = getDefaultTextArea(Messages.message("trainDialog.clickOn"));
 
             JLabel  expertOreMinerLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.EXPERT_ORE_MINER))),
                     expertLumberJackLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.EXPERT_LUMBER_JACK))),
@@ -1731,10 +1727,7 @@ public final class EuropePanel extends JLayeredPane implements ActionListener {
             add(trainPanel, higConst.rc(3, 1));
             add(cancel, higConst.rc(5, 1));
 
-            setBorder(BorderFactory.createCompoundBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED),
-                                                         BorderFactory.createEmptyBorder(20, 20, 20, 20)));
-
-            setSize(320, 540);
+            setSize(getPreferredSize());
         }
 
 
