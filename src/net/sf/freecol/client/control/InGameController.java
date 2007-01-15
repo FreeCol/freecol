@@ -575,13 +575,9 @@ public final class InGameController implements NetworkConstants {
                 reallyMove(unit, path.getDirection());
                 break;
             case Unit.EXPLORE_LOST_CITY_RUMOUR:
-                if (canvas.showConfirmDialog("exploreLostCityRumour.text",
-                                             "exploreLostCityRumour.yes",
-                                             "exploreLostCityRumour.no")) {
-                    reallyMove(unit, path.getDirection());
-                    if (unit.isDisposed())
-                        return;
-                }
+                exploreLostCityRumour(unit, path.getDirection());
+                if (unit.isDisposed())
+                    return;
                 break;
             case Unit.MOVE_HIGH_SEAS:
                 if (destination instanceof Europe) {
@@ -700,11 +696,7 @@ public final class InGameController implements NetworkConstants {
             case Unit.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS:
                                         tradeWithSettlement(unit, direction); break;
             case Unit.EXPLORE_LOST_CITY_RUMOUR:
-                if (canvas.showConfirmDialog("exploreLostCityRumour.text",
-                                             "exploreLostCityRumour.yes",
-                                             "exploreLostCityRumour.no")) {
-                    reallyMove(unit, direction);
-                }
+                exploreLostCityRumour(unit, direction);
                 break;
             case Unit.ILLEGAL_MOVE:     freeColClient.playSound(SfxLibrary.ILLEGAL_MOVE); break;
             default:                    throw new RuntimeException("unrecognised move: " + move);
@@ -724,6 +716,19 @@ public final class InGameController implements NetworkConstants {
         nextModelMessage();   
     }
 
+    /**
+     * Ask for explore a lost city rumour, and move unit if player accepts
+     *
+     * @param unit The unit to be moved.
+     * @param direction The direction in which to move the Unit.
+     */
+    private void exploreLostCityRumour(Unit unit, int direction) {
+        if (freeColClient.getCanvas().showConfirmDialog("exploreLostCityRumour.text",
+                                     "exploreLostCityRumour.yes",
+                                     "exploreLostCityRumour.no")) {
+            reallyMove(unit, direction);
+        }
+    }
 
     /**
     * Buys the given land from the indians.
@@ -1162,7 +1167,11 @@ public final class InGameController implements NetworkConstants {
                 Unit u = (Unit) unitIterator.next();
 
                 if ((u.getState() == Unit.ACTIVE) && u.getMovesLeft() > 0) {
-                    reallyMove(u, direction);
+                    if (destinationTile.hasLostCityRumour()) {
+                        exploreLostCityRumour(u, direction);
+                    } else {
+                        reallyMove(u, direction);
+                    }
                     return;
                 }
             }
