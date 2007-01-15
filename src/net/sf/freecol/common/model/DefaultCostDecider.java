@@ -46,50 +46,48 @@ public class DefaultCostDecider implements CostDecider {
             // Not allowed to move a land unit on water:
             return ILLEGAL_MOVE;
         } else {
-            int mc = newTile.getMoveCost(oldTile);
+            int mc = unit.getMoveCost(oldTile, newTile, ml);
+            int moveType = unit.getMoveType(oldTile, newTile, ml);
             
-            if (newTile.getDefendingUnit(unit) != null
+            if (newTile.getSettlement() != null
+                    && newTile.getSettlement().getOwner() != unit.getOwner()) {
+                // A settlement is blocking the path:   
+                switch (moveType) {
+                    case Unit.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS:
+                    case Unit.ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST:
+                    case Unit.ENTER_INDIAN_VILLAGE_WITH_MISSIONARY:
+                    case Unit.ENTER_INDIAN_VILLAGE_WITH_SCOUT:
+                    case Unit.ENTER_FOREIGN_COLONY_WITH_SCOUT:
+                    case Unit.ATTACK:
+                        if (unit.getDestination() == null ||
+                                unit.getDestination().getTile() != newTile) {
+                            movesLeft = 0;
+                            return ml + unit.getInitialMovesLeft() * 5;
+                        }
+                        break;
+                    case Unit.ILLEGAL_MOVE:
+                        if (ml > 0) {
+                            movesLeft = 0;
+                            return ml + unit.getInitialMovesLeft() * 5;
+                        }
+                        break;
+                }
+            } else if (newTile.getDefendingUnit(unit) != null
                     && newTile.getDefendingUnit(unit).getOwner() != unit.getOwner()) {
                 // A unit is blocking the path:                
+                if (moveType != Unit.ATTACK || unit.getDestination() == null ||
+                        unit.getDestination().getTile() != newTile)
+                    mc += Math.max(0, 20 - turns * 4);
+            } else if (newTile.isLand() && newTile.getFirstUnit() != null &&
+                    newTile.getFirstUnit().isNaval() &&
+                    newTile.getFirstUnit().getOwner() != unit.getOwner()) {
+                // An enemy ship in land tile without a settlement is blocking the path:                
                 mc += Math.max(0, 20 - turns * 4); 
             }
 
-            if (newTile.getSettlement() != null
-                    && newTile.getSettlement().getOwner() != unit.getOwner()) {
-                // A settlement is blocking the path:
-                movesLeft = 0;
-                return ml + unit.getInitialMovesLeft() * 5;
-                
-                /* 
-                 * This cannot be done in the CostDecider because the AI needs
-                 * to determine the cost when searching for a target. Making
-                 * this move illegal effectivly makes it impossible for
-                 * the AI to attack settlements:
-                 */
-                //return ILLEGAL_MOVE;
-            } else if (mc - 2 <= movesLeft && getMovesLeft() != 0) {
-                // Normal move: Using -2 in order to make 1/3 and 2/3 move count as 3/3.
-                if (mc <= movesLeft) {
-                    /*if ((unit.isNaval() || unit.getType() == Unit.WAGON_TRAIN) &&
-                            newTile.getSettlement() != null) {
-                        // A ship or wagon entering in a colony
-                        movesLeft = 0;
-                        return ml;
-                    } else */if (unit.isNaval() && oldTile.isLand() && oldTile.getSettlement() == null) {
-                        // Ship on land due to it was in a colony which was abandoned
-                        movesLeft = 0;
-                        return ml;
-                    } else {
-                        movesLeft -= mc;
-                        return mc;
-                    }
-                } else {
-                    movesLeft = 0;
-                    return ml;
-                }
-            } else if (movesLeft + 2 >= unit.getInitialMovesLeft()) {
-                movesLeft = 0;
-                return ml;
+            if (mc <= ml) {
+                movesLeft -= mc;
+                return mc;
             } else {
                 // This move takes an extra turn to complete:
                 mc = getCost(unit, oldTile, newTile, unit.getInitialMovesLeft(), turns+1);

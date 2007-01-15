@@ -697,7 +697,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         if (getTile() == null) {
             logger.warning("getTile() == null for " + getName() + " at location: " + getLocation());
         }
-        return getGame().getMap().findPath(this, getTile(), end);
+        Location dest = getDestination();
+        setDestination(end);
+        PathNode path = getGame().getMap().findPath(this, getTile(), end);
+        setDestination(dest);
+        return path;
     }
     
     
@@ -743,7 +747,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         return Integer.MAX_VALUE;
     }
 
-
     /**
     * Gets the cost of moving this <code>Unit</code> onto the given <code>Tile</code>.
     * A call to {@link #getMoveType(Tile)} will return <code>ILLEGAL_MOVE</code>, if {@link #getMoveCost}
@@ -754,21 +757,36 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     * @see Tile#getMoveCost
     */
     public int getMoveCost(Tile target) {
+        return getMoveCost(getTile(), target, getMovesLeft());
+    }
+
+    /**
+    * Gets the cost of moving this <code>Unit</code> from the given <code>Tile</code>
+    * onto the given <code>Tile</code>.
+    * A call to {@link #getMoveType(Tile, Tile)} will return <code>ILLEGAL_MOVE</code>, if {@link #getMoveCost}
+    * returns a move cost larger than the {@link #getMovesLeft moves left}.
+    *
+    * @param from The <code>Tile</code> this <code>Unit</code> will move from.
+    * @param target The <code>Tile</code> this <code>Unit</code> will move onto.
+    * @param ml The amount of moves this Unit has left.
+    * @return The cost of moving this unit onto the given <code>Tile</code>.
+    * @see Tile#getMoveCost
+    */
+    public int getMoveCost(Tile from, Tile target, int ml) {
         // Remember to also change map.findPath(...) if you change anything here.
 
-        int cost = target.getMoveCost(getTile());
+        int cost = target.getMoveCost(from);
         
         // Using +2 in order to make 1/3 and 2/3 move count as 3/3, only when getMovesLeft > 0
-        if (cost > getMovesLeft()) {
-            if ((getMovesLeft() + 2 >= getInitialMovesLeft() || cost <= getMovesLeft() + 2)
-                    && getMovesLeft() != 0) {
-                return getMovesLeft();
+        if (cost > ml) {
+            if ((ml + 2 >= getInitialMovesLeft() || cost <= ml + 2) && ml != 0) {
+                return ml;
             }
 
             return cost;
-        } else if (isNaval() && getTile().isLand() && getTile().getSettlement() == null) {
+        } else if (isNaval() && from.isLand() && from.getSettlement() == null) {
             // Ship on land due to it was in a colony which was abandoned
-            return getMovesLeft();
+            return ml;
         } else {
             return cost;
         }
@@ -817,29 +835,45 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      *         when there are no moves left.
      */
     public int getMoveType(Tile target) {
-        if (getTile() == null) {
-            throw new IllegalStateException("getTile() == null");
+        return getMoveType(getTile(), target, getMovesLeft());
+    }
+    
+    /**
+     * Gets the type of a move that is made when moving to the
+     * specified <code>Tile</code> from the specified <code>Tile</code>.
+     *
+     * @param target The origin tile of the move
+     * @param target The target tile of the move
+     * @param ml The amount of moves this Unit has left
+     * @return The move type. Notice: <code>Unit.ILLEGAL_MOVE</code>
+     *         when there are no moves left.
+     */
+    public int getMoveType(Tile from, Tile target, int ml) {
+        if (from == null) {
+            throw new IllegalStateException("from == null");
         } else if (isUnderRepair()) {
             return ILLEGAL_MOVE;
-        } else if (getMovesLeft() <= 0) {
+        } else if (ml <= 0) {
             return ILLEGAL_MOVE;
         } else {
             if (isNaval()) {
-                return getNavalMoveType(target);
+                return getNavalMoveType(from, target, ml);
             }
-            return getLandMoveType(target);
+            return getLandMoveType(from, target, ml);
         }
     }
 
     /**
      * Gets the type of a move that is made when moving to the
-     * specified <code>Tile</code> from the current one.
+     * specified <code>Tile</code> from the specified <code>Tile</code>.
      *
+     * @param target The origin tile of the move
      * @param target The target tile of the move
+     * @param ml The amount of moves this Unit has left
      * @return The move type. Notice: <code>Unit.ILLEGAL_MOVE</code>
      *         when there are no moves left.
      */
-    private int getNavalMoveType(Tile target) {
+    private int getNavalMoveType(Tile from, Tile target, int ml) {
         if (target == null) { // TODO: do not allow "MOVE_HIGH_SEAS" north and south.
             if (getOwner().canMoveToEurope()) {
                 return MOVE_HIGH_SEAS;
@@ -898,13 +932,15 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
     /**
      * Gets the type of a move that is made when moving to the
-     * specified <code>Tile</code> from the current one.
+     * specified <code>Tile</code> from the specified <code>Tile</code>.
      *
+     * @param target The origin tile of the move
      * @param target The target tile of the move
+     * @param ml The amount of moves this Unit has left
      * @return The move type. Notice: <code>Unit.ILLEGAL_MOVE</code>
      *         when there are no moves left.
      */
-    private int getLandMoveType(Tile target) {
+    private int getLandMoveType(Tile from, Tile target, int ml) {
         if (target == null) {
             // only naval units are allowed to do this
             logger.fine("Trying to enter null tile with land unit " + getName());
@@ -919,7 +955,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                     return MOVE;
                 } else if (canTradeWith(settlement)) {
                     return ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS;
-                } else if (!getTile().isLand()) {
+                } else if (!from.isLand()) {
                     logger.fine("Trying to disembark into foreign colony with " +
                             getName());
                     return ILLEGAL_MOVE;
@@ -951,7 +987,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 }
             } else if (target.getDefendingUnit(this) != null &&
                        target.getDefendingUnit(this).getOwner() != getOwner()) {
-                if (getTile().isLand()) {
+                if (from.isLand()) {
                     if (isOffensiveUnit()) {
                         return ATTACK;
                     } else {
@@ -966,7 +1002,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                        target.getFirstUnit().getOwner() != getOwner()) {
                 // An enemy ship in land tile without a settlement
                 return ILLEGAL_MOVE;
-            } else if (getMoveCost(target) > getMovesLeft()) {
+            } else if (getMoveCost(from, target, ml) > ml) {
                 return ILLEGAL_MOVE;
             } else if (target.hasLostCityRumour()) {
                 return EXPLORE_LOST_CITY_RUMOUR;
