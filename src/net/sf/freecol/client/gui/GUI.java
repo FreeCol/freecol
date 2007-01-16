@@ -1774,16 +1774,25 @@ public final class GUI {
                     g.drawImage(lib.getColonyImage(type), x + (lib.getTerrainImageWidth(tile.getType()) - lib.getColonyImageWidth(type)) / 2, y + (lib.getTerrainImageHeight(tile.getType()) - lib.getColonyImageHeight(type)) / 2, null);
 
                     String populationString = Integer.toString(((Colony)settlement).getUnitCount());
-                    Color theColor = Color.WHITE;
+                    Color theColor = null;
 
-                    int sol = ((Colony)settlement).getSoL();
-
-                    if (sol >= 100) {
-                        theColor = Color.BLUE;
-                    } else if (sol >= 50) {
-                        theColor = Color.GREEN;
-                    } else if (((Colony)settlement).getProductionBonus() < 0) {
-                        theColor = Color.RED;
+                    int bonus = ((Colony)settlement).getProductionBonus();
+                    switch (bonus) {
+                        case 2:
+                            theColor = Color.BLUE;
+                            break;
+                        case 1:
+                            theColor = Color.GREEN;
+                            break;
+                        case -1:
+                            theColor = Color.ORANGE;
+                            break;
+                        case -2:
+                            theColor = Color.RED;
+                            break;
+                        default:
+                            theColor = Color.WHITE;
+                            break;
                     }
 
                     BufferedImage stringImage = createStringImage(g, populationString, theColor, lib.getTerrainImageWidth(tile.getType()), 12);
