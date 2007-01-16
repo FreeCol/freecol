@@ -496,9 +496,9 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     * Updates the SoL membership label.
     */
     private void updateSoLLabel() {
-        solLabel.setText(Messages.message("sonsOfLiberty") + ": " + colony.getSoL() + "% (" + ((colony.getUnitCount() * colony.getSoL()) / 100) +
+        solLabel.setText(Messages.message("sonsOfLiberty") + ": " + colony.getSoL() + "% (" + colony.getMembers() +
                          "), " + Messages.message("tory") + ": " + colony.getTory() + "% (" +
-                         (colony.getUnitCount() - ((colony.getUnitCount() * colony.getSoL()) / 100)) + ")");
+                         (colony.getUnitCount() - colony.getMembers()) + ")");
     }
 
 

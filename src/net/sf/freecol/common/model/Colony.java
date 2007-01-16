@@ -881,10 +881,7 @@ public final class Colony extends Settlement implements Location {
     * @param amount The number of bells to add.
     */
     public void addBells(int amount) {
-        // Update "updateSoL(int)" and "addBells(int") if this formula gets changed:
-        int members = bells / (BELLS_PER_REBEL * getUnitCount());
-        
-        if (members <= getUnitCount() + 1) {
+        if (getMembers() <= getUnitCount() + 1) {
             bells += amount;
         }
         
@@ -938,13 +935,20 @@ public final class Colony extends Settlement implements Location {
             return;
         }              
         
-        // Update "addSol(int)" and "addBells(int") if this formula gets changed:
+        // Update "addSol(int)" and "getMembers()" if this formula gets changed:
         int membership = (bells * 100) / (BELLS_PER_REBEL * getUnitCount());
         
         if (membership < 0) membership = 0;
         if (membership > 100) membership = 100;
         sonsOfLiberty = membership;
-        tories = (units - ((units * sonsOfLiberty) / 100));
+        tories = (units - getMembers());
+    }
+    
+    /**
+     * Return the number of sons of liberty
+     */
+    public int getMembers() {
+        return bells / BELLS_PER_REBEL;
     }
 
     
