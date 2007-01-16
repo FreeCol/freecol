@@ -133,7 +133,7 @@
     <goods-type ref="trade-goods" name="model.goods.TradeGoods" is-farmed="no" />
     <goods-type ref="tools"       name="model.goods.Tools"      is-farmed="no" made-from="ore" />
     <goods-type ref="muskets"     name="model.goods.Muskets"    is-farmed="no" made-from="tools" />
-    <goods-type ref="fish"        name="model.goods.Fish"       is-farmed="no" />
+    <goods-type ref="fish"        name="model.goods.Fish"       is-farmed="yes" />
     <goods-type ref="bells"       name="model.goods.Bells"      is-farmed="no" />
     <goods-type ref="crosses"     name="model.goods.Crosses"    is-farmed="no" />
     <goods-type ref="hammers"     name="model.goods.Hammers"    is-farmed="no" made-from="lumber" />
