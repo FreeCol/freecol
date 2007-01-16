@@ -79,8 +79,6 @@ public final class LoadingSavegameDialog extends FreeColDialog implements Action
         FreeColPanel.enterPressesWhenFocused(ok);
         setCancelComponent(cancel);
 
-        setSize(320, 275);
-        
         // Header:
         header = new JLabel(Messages.message("LoadingSavegame.title"), JLabel.CENTER);
         header.setFont(((Font) UIManager.get("HeaderFont")).deriveFont(0, 32));
@@ -120,6 +118,9 @@ public final class LoadingSavegameDialog extends FreeColDialog implements Action
 
         // Buttons:
         add(buttons, BorderLayout.SOUTH);
+
+        setSize(getPreferredSize());
+        
     }
 
     public boolean isSingleplayer() {
