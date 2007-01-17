@@ -13,6 +13,7 @@ public final class TileType
     public static final  String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final  String  REVISION = "$Revision$";
 
+    public  String    id;
     public  String    name;
     public  int       basicMoveCost;
     public  int       defenceBonus;
@@ -21,6 +22,7 @@ public final class TileType
 
     public void readFromXmlElement( Node tileTypeXml ) {
 
+        id = Xml.attribute( tileTypeXml, "name" );
         name = Xml.messageAttribute( tileTypeXml, "name" );
         basicMoveCost = Xml.intAttribute(tileTypeXml, "basic-move-cost");
         defenceBonus = Xml.intAttribute(tileTypeXml, "defence-bonus");

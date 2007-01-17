@@ -39,10 +39,10 @@ public final class Specification {
 
     public Specification() {
 
-        buildingTypeList = new ArrayList();
-        tileTypeList = new ArrayList();
-        goodsTypeList = new ArrayList();
-        unitTypeList = new ArrayList();
+        buildingTypeList = new ArrayList<BuildingType>();
+        tileTypeList = new ArrayList<TileType>();
+        goodsTypeList = new ArrayList<GoodsType>();
+        unitTypeList = new ArrayList<UnitType>();
 
         InputStream  in = Specification.class.getResourceAsStream( "specification.xml" );
         Document  specificationDocument = Xml.documentFrom( in );

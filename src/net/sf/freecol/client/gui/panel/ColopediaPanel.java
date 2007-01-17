@@ -414,23 +414,28 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         int productionIndex = type; 
         boolean forested = (terrain % 2 == 1);
         int addition = Tile.ADD_NONE;
+        String id = null;
         String name = null;
 
         switch(type) {
         case ImageLibrary.HILLS:
+            id = "hills";
             name = Messages.message("hills");
             addition = Tile.ADD_HILLS;
             productionIndex = 12;
             break;
         case ImageLibrary.MOUNTAINS:
+            id = "mountains";
             name = Messages.message("mountains");
             addition = Tile.ADD_MOUNTAINS;
             productionIndex = 13;
             break;
         default:
             if (forested) {
+                id = FreeCol.specification.tileType(type).whenForested.id;
                 name = FreeCol.specification.tileType(type).whenForested.name;
             } else {
+                id = FreeCol.specification.tileType(type).id;
                 name = FreeCol.specification.tileType(type).name;
             }
         }
@@ -477,7 +482,10 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         row += 2;
 
         detailPanel.add(new JLabel(Messages.message("colopedia.terrain.description")), 
-                        higConst.rc(row, leftColumn));
+                        higConst.rc(row, leftColumn, "tl"));
+        String key = "colopedia.terrain." + id + ".description";
+        detailPanel.add(getDefaultTextArea(Messages.message(key)),
+                        higConst.rc(row, rightColumn));
 
         detailPanel.validate();
     }
