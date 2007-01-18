@@ -28,6 +28,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoalDecider;
 import net.sf.freecol.common.model.Goods;
@@ -35,6 +36,8 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.ModelMessage;
+import net.sf.freecol.common.model.Nameable;
+import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
@@ -245,6 +248,29 @@ public final class InGameController implements NetworkConstants {
             nextActiveUnit();
         }        
     }
+
+    /**
+     * Renames a <code>Renameable</code>.
+     *
+     * @param object The object to rename.
+     */
+    public void rename(Nameable object) {
+        if (!(object instanceof Ownable) ||
+            ((Ownable) object).getOwner() != freeColClient.getMyPlayer()) {
+            return;
+        }
+
+        String name = freeColClient.getCanvas().showInputDialog("renameColony.text", 
+               object.getName(), "renameColony.yes", "renameColony.no");
+        if (name != null) {
+            object.setName(name);
+            Element renameElement = Message.createNewRootElement("rename");
+            renameElement.setAttribute("nameable", ((FreeColGameObject) object).getID());
+            renameElement.setAttribute("name", name);
+            freeColClient.getClient().sendAndWait(renameElement);
+        }
+    }
+            
 
 
     /**

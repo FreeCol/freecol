@@ -48,5 +48,5 @@ public interface Locatable {
     * Returns the name of this <code>Locatable</code>.
     * @return The name.
     */
-    public String getName();
+    //    public String getName();
 }

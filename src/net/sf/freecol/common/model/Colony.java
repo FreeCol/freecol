@@ -11,6 +11,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.FreeCol;
+
 import org.w3c.dom.Element;
 
 
@@ -19,7 +21,7 @@ import org.w3c.dom.Element;
 * The latter represents the tiles around the <code>Colony</code> where working is
 * possible.
 */
-public final class Colony extends Settlement implements Location {
+public final class Colony extends Settlement implements Location, Nameable {
 
     private static final Logger logger = Logger.getLogger(Colony.class.getName());
 
@@ -34,7 +36,7 @@ public final class Colony extends Settlement implements Location {
     private String name;
 
     /** Places a unit may work. Either a <code>Building</code> or a <code>ColonyTile</code>. */
-    private ArrayList workLocations = new ArrayList();
+    private ArrayList<WorkLocation> workLocations = new ArrayList<WorkLocation>();
 
     private boolean[] exports;
     
@@ -142,7 +144,17 @@ public final class Colony extends Settlement implements Location {
         if (initializeWorkLocations) {
             workLocations.add(new ColonyTile(game, this, tile));
 
+            int numberOfTypes = FreeCol.specification.numberOfBuildingTypes();
+            for (int type = 0; type < numberOfTypes; type++) {
+                BuildingType buildingType = FreeCol.specification.buildingType(type);
+                if (buildingType.level(0).hammersRequired > 0) {
+                    workLocations.add(new Building(game, this, type, Building.NOT_BUILT));
+                } else {
+                    workLocations.add(new Building(game, this, type, Building.HOUSE));
+                }
+            }
             // place building with workplaces at the beginning
+            /*
             workLocations.add(new Building(game, this, Building.TOWN_HALL, Building.HOUSE));
             workLocations.add(new Building(game, this, Building.CARPENTER, Building.HOUSE));
             workLocations.add(new Building(game, this, Building.BLACKSMITH, Building.HOUSE));
@@ -159,7 +171,7 @@ public final class Colony extends Settlement implements Location {
             workLocations.add(new Building(game, this, Building.STABLES, Building.NOT_BUILT));
             workLocations.add(new Building(game, this, Building.PRINTING_PRESS, Building.NOT_BUILT));
             workLocations.add(new Building(game, this, Building.CUSTOM_HOUSE, Building.NOT_BUILT));
-            
+            */
         }
         
         if(landLocked)
@@ -387,7 +399,7 @@ public final class Colony extends Settlement implements Location {
     * @return The <code>Iterator</code>.
     * @see WorkLocation
     */
-    public Iterator getWorkLocationIterator() {
+    public Iterator<WorkLocation> getWorkLocationIterator() {
         return workLocations.iterator();
     }
 
@@ -398,15 +410,12 @@ public final class Colony extends Settlement implements Location {
     * @return The <code>Iterator</code>.
     * @see Building
     */
-    public Iterator getBuildingIterator() {
-        ArrayList b = new ArrayList();
+    public Iterator<Building> getBuildingIterator() {
+        ArrayList<Building> b = new ArrayList<Building>();
 
-        Iterator w = getWorkLocationIterator();
-        while (w.hasNext()) {
-            Object o = w.next();
-
-            if (o instanceof Building) {
-                b.add(o);
+        for (WorkLocation location : workLocations) {
+            if (location instanceof Building) {
+                b.add((Building) location);
             }
         }
 
@@ -420,15 +429,12 @@ public final class Colony extends Settlement implements Location {
     * @return The <code>Iterator</code>.
     * @see ColonyTile
     */
-    public Iterator getColonyTileIterator() {
-        ArrayList b = new ArrayList();
+    public Iterator<ColonyTile> getColonyTileIterator() {
+        ArrayList<ColonyTile> b = new ArrayList<ColonyTile>();
 
-        Iterator w = getWorkLocationIterator();
-        while (w.hasNext()) {
-            Object o = w.next();
-
-            if (o instanceof ColonyTile) {
-                b.add(o);
+        for (WorkLocation location : workLocations) {
+            if (location instanceof ColonyTile) {
+                b.add((ColonyTile) location);
             }
         }
 
@@ -644,8 +650,8 @@ public final class Colony extends Settlement implements Location {
     }
 
 
-    public Iterator getUnitIterator() {
-        ArrayList units = new ArrayList();
+    public Iterator<Unit> getUnitIterator() {
+        ArrayList<Unit> units = new ArrayList<Unit>();
 
         Iterator wli = getWorkLocationIterator();
         while (wli.hasNext()) {
@@ -655,7 +661,7 @@ public final class Colony extends Settlement implements Location {
             while (unitIterator.hasNext()) {
                 Object o = unitIterator.next();
                 if (o != null) {
-                    units.add(o);
+                    units.add((Unit) o);
                 }
             }
         }
@@ -663,7 +669,7 @@ public final class Colony extends Settlement implements Location {
         return units.iterator();
     }
 
-    public Iterator getGoodsIterator() {
+    public Iterator<Goods> getGoodsIterator() {
         return goodsContainer.getGoodsIterator();
     }
 
@@ -674,7 +680,7 @@ public final class Colony extends Settlement implements Location {
     *
     * @return The <code>Iterator</code>.
     */
-    public Iterator getCompactGoodsIterator() {
+    public Iterator<Goods> getCompactGoodsIterator() {
         return goodsContainer.getCompactGoodsIterator();
     }
 
@@ -987,6 +993,16 @@ public final class Colony extends Settlement implements Location {
     */
     public String getName() {
         return name;
+    }
+
+
+    /**
+    * Sets the name of this <code>Colony</code>.
+    *
+    * @param name The new name of this Colony.
+    */
+    public void setName(String newName) {
+        this.name = newName;
     }
 
     /**

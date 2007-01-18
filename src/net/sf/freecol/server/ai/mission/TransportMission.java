@@ -216,16 +216,16 @@ public class TransportMission extends Mission {
         
         if (newDestination == null) {
             if (newTransportable instanceof AIGoods) {
-                logger.warning("No destination for goods: " + newTransportable.getTransportLocatable().getName());
+                logger.warning("No destination for goods: " + newTransportable.getTransportLocatable().toString());
                 return;
             } else {
-                logger.warning("No destination for: " + newTransportable.getTransportLocatable().getName());
+                logger.warning("No destination for: " + newTransportable.getTransportLocatable().toString());
                 return;
             }
         }
             
         if (newSource == null && !isCarrying(newTransportable)) {
-            logger.warning("No source for: " + newTransportable.getTransportLocatable().getName());
+            logger.warning("No source for: " + newTransportable.getTransportLocatable().toString());
             return;
         }
 
@@ -1165,7 +1165,7 @@ public class TransportMission extends Mission {
         while (it.hasNext()) {
             Transportable t = (Transportable) it.next();
             Locatable l = t.getTransportLocatable();            
-            sb.append(l.getName());
+            sb.append(l.toString());
             sb.append("<br>");
         }
         sb.append("</body></html>");        

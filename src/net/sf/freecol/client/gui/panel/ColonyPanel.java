@@ -89,7 +89,8 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
     private static final int    EXIT = 0,
                                 BUY_BUILDING = 1,
-                                UNLOAD = 2;
+                                UNLOAD = 2,
+                                RENAME = 3;
 
     private final Canvas  parent;
     private final FreeColClient freeColClient;
@@ -119,6 +120,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     private JButton exitButton = new JButton(Messages.message("close"));
     private JButton buyBuilding = new JButton(Messages.message("buyBuilding"));
     private JButton unloadButton = new JButton(Messages.message("unload"));
+    private JButton renameButton = new JButton(Messages.message("rename"));
 
 
 
@@ -207,6 +209,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         buyBuilding.setSize(207, 20);
         exitButton.setSize(110, 20);
         unloadButton.setSize(110, 20);
+        renameButton.setSize(110, 20);
         outsideColonyScroll.setSize(204, 260);
         inPortScroll.setSize(250, 120);
         cargoScroll.setSize(365, 120);
@@ -234,10 +237,12 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         buyBuilding.setActionCommand(String.valueOf(BUY_BUILDING));
         exitButton.setActionCommand(String.valueOf(EXIT));
         unloadButton.setActionCommand(String.valueOf(UNLOAD));
+        renameButton.setActionCommand(String.valueOf(RENAME));
 
         buyBuilding.addActionListener(this);
         exitButton.addActionListener(this);
         unloadButton.addActionListener(this);
+        renameButton.addActionListener(this);
 
         setContents(outsideColonyScroll, inPortScroll, cargoScroll, warehouseScroll, tilesScroll, buildingsScroll, outsideColonyLabel, inPortLabel, tilesLabel, buildingsLabel);
 
@@ -276,6 +281,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
         setLayout(null);
         add(exitButton);
         add(unloadButton);
+        add(renameButton);
         add(outsideColonyScroll);
         add(inPortScroll);
         add(cargoScroll);
@@ -341,6 +347,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
         y+= 150;
         unloadButton.setLocation    (10, y);
+        renameButton.setLocation    (417, y);
         exitButton.setLocation      (730, y);
 
     }
@@ -610,6 +617,10 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
                     break;
                 case UNLOAD:
                     unload();
+                    break;
+                case RENAME:
+                    freeColClient.getInGameController().rename(colony);
+                    nameBox.initialize(colony);
                     break;
                 default:
                     logger.warning("Invalid action");

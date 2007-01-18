@@ -29,7 +29,7 @@ import org.w3c.dom.Element;
 * Every <code>Unit</code> is owned by a {@link Player} and has a
 * {@link Location}.
 */
-public class Unit extends FreeColGameObject implements Location, Locatable, Ownable {
+public class Unit extends FreeColGameObject implements Location, Locatable, Ownable, Nameable {
 
     public static final  String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final  String  LICENSE   = "http://www.gnu.org/licenses/gpl.html";
@@ -151,6 +151,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
     private int             turnsOfTraining = 0;
     private int             trainingType = -1;
+
+    /** The individual name of this unit, not of the unit type. */
+    private String          name = null;
 
     /**
      * The amount of goods carried by this unit.
@@ -2044,6 +2047,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     * @throws IllegalArgumentException
     */
     public String getName() {
+        if (name != null) {
+            return name;
+        }
         String name = "";
         boolean addP = false;
 
@@ -2103,6 +2109,14 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         return name;
     }
 
+    /**
+     * Set the <code>Name</code> value.
+     *
+     * @param newName The new Name value.
+     */
+    public void setName(String newName) {
+        this.name = newName;
+    }
 
     /**
     * Returns the name of a unit type in a human readable format. The return

@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
 * various defaults for the player. One example of this is the
 * {@link #getEntryLocation entry location}.
 */
-public class Player extends FreeColGameObject {
+public class Player extends FreeColGameObject implements Nameable {
     private static final Logger logger = Logger.getLogger(Player.class.getName());
     
     public static final String  COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
@@ -1314,6 +1314,16 @@ public class Player extends FreeColGameObject {
     public String getName() {
         return name;
     }
+
+    /**
+     * Set the <code>Name</code> value.
+     *
+     * @param newName The new Name value.
+     */
+    public void setName(String newName) {
+        this.name = newName;
+    }
+
 
 
     /**

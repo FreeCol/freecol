@@ -23,6 +23,8 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Monarch;
+import net.sf.freecol.common.model.Nameable;
+import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension;
@@ -190,6 +192,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                         reply = foreignAffairs(connection, element);                                           
                     } else if (type.equals("getREFUnits")) {
                         reply = getREFUnits(connection, element);                                           
+                    } else if (type.equals("rename")) {
+                        reply = rename(connection, element);
                     } else {
                         logger.warning("Unknown request from client " + element.getTagName());
                     }
@@ -2214,6 +2218,27 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         
         unit.setDestination(destination);
+
+        return null;
+    } 
+    
+    /**
+     * Handles a "rename"-message.
+     *
+     * @param connection The <code>Connection</code> the message was received on.
+     * @param element The element containing the request.
+     */
+    private Element rename(Connection connection, Element element) {
+        Game game = getFreeColServer().getGame();
+        ServerPlayer player = getFreeColServer().getPlayer(connection);                
+        Nameable object = (Nameable) game.getFreeColGameObject(element.getAttribute("nameable"));
+        
+        if (!(object instanceof Ownable) ||
+            ((Ownable)object).getOwner() != player) {
+            throw new IllegalStateException("Not the owner of the nameable.");
+        }
+        
+        object.setName(element.getAttribute("name"));
 
         return null;
     } 

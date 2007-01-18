@@ -26,7 +26,7 @@ import org.w3c.dom.Element;
 *
 * @see Map
 */
-public final class Tile extends FreeColGameObject implements Location {
+public final class Tile extends FreeColGameObject implements Location, Nameable {
     private static final Logger logger = Logger.getLogger(Tile.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
@@ -249,6 +249,16 @@ public final class Tile extends FreeColGameObject implements Location {
 
         return "Unknown";
     }
+
+    /**
+     * Set the <code>Name</code> value.
+     *
+     * @param newName The new Name value.
+     */
+    public void setName(String newName) {
+        //this.name = newName;
+    }
+
 
     /**
      * Returns the name of this location.
