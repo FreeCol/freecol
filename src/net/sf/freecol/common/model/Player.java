@@ -2453,7 +2453,7 @@ public class Player extends FreeColGameObject implements Nameable {
             } else if (chance < 62) {
                 return Unit.FREE_COLONIST;
             } else {
-                // Make sure random is a number from 0 to 17:
+                // Make sure random is a number from 0 to 18:
                 random = ((chance - 62) / 2);
             }
         }

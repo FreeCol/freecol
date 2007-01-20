@@ -386,7 +386,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
                         }
                     } else {
                         nearbyTileIsOcean = true;
-                        value += tile.potential(Goods.FISH);
+                        value += tile.potential(Goods.FOOD);
                     }
                     if (tile.hasBonus()) {
                         value += 20;
