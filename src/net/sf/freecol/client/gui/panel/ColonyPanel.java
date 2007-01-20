@@ -32,7 +32,6 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-//import javax.swing.JLayeredPane;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -63,6 +62,8 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+
+import cz.autel.dmi.HIGLayout;
 
 
 /**
@@ -130,9 +131,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
      * @param freeColClient The main controller object for the client.
      */
     public ColonyPanel(Canvas parent, FreeColClient freeColClient) {
-        final int windowHeight = 630;
-        final int windowWidth  = 850;
-
         this.parent = parent;
         this.freeColClient = freeColClient;
         this.inGameController = freeColClient.getInGameController();
@@ -158,13 +156,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         warehousePanel = new WarehousePanel(this);
         tilePanel = new TilePanel(this);
         buildingsPanel = new BuildingsPanel(this);
-
-        productionPanel.setBackground(Color.WHITE);
-        outsideColonyPanel.setBackground(Color.WHITE);
-        inPortPanel.setBackground(Color.WHITE);
-        cargoPanel.setBackground(Color.WHITE);
-        warehousePanel.setBackground(Color.WHITE);
-        buildingsPanel.setBackground(Color.WHITE);
 
         defaultTransferHandler = new DefaultTransferHandler(parent, this);
         outsideColonyPanel.setTransferHandler(defaultTransferHandler);
@@ -206,19 +197,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
         buildingsScroll.setAutoscrolls(true);
 
-        buyBuilding.setSize(207, 20);
-        exitButton.setSize(110, 20);
-        unloadButton.setSize(110, 20);
-        renameButton.setSize(110, 20);
-        outsideColonyScroll.setSize(204, 260);
-        inPortScroll.setSize(250, 120);
-        cargoScroll.setSize(365, 120);
-        warehouseScroll.setSize(620, 140);
-        productionPanel.setSize(400, 35);
-        tilesScroll.setSize(400, 225);
-        buildingsScroll.setSize(424,225);
-        solLabel.setSize(400, 20);
-
         EtchedBorder eBorder = new EtchedBorder();
         tilesScroll.setBorder(new CompoundBorder(new TitledBorder(Messages.message("surroundingArea")), new BevelBorder(BevelBorder.LOWERED)));
         buildingsScroll.setBorder(new CompoundBorder(new TitledBorder(Messages.message("buildings")), eBorder));
@@ -226,13 +204,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         cargoScroll.setBorder(new CompoundBorder(cargoBorder = new TitledBorder(Messages.message("cargoOnShip")), eBorder));
         inPortScroll.setBorder(new CompoundBorder(new TitledBorder(Messages.message("inPort")), eBorder));
         outsideColonyScroll.setBorder(new CompoundBorder(new TitledBorder(Messages.message("outsideColony")), eBorder));
-
-        buildingBox.setSize(207, 20);
-        hammersLabel.setSize(200, 20);
-        toolsLabel.setSize(200, 20);
-        nameBox.setSize(400, 32);
-
-        assignLocations(outsideColonyScroll, inPortScroll, cargoScroll, warehouseScroll, tilesScroll, buildingsScroll);
 
         buyBuilding.setActionCommand(String.valueOf(BUY_BUILDING));
         exitButton.setActionCommand(String.valueOf(EXIT));
@@ -244,107 +215,46 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         unloadButton.addActionListener(this);
         renameButton.addActionListener(this);
 
-        setContents(outsideColonyScroll, inPortScroll, cargoScroll, warehouseScroll, tilesScroll, buildingsScroll, outsideColonyLabel, inPortLabel, tilesLabel, buildingsLabel);
-
-
-        setSize(windowWidth, windowHeight); // was: 850,600  CHRIS
-
         selectedUnit = null;
 
         // See the message of Ulf Onnen for more information about the presence of this fake mouse listener.
         addMouseListener(new MouseAdapter() {});
-    }
 
 
+        int[] widths = {250, margin, 138, margin, 215, margin, 204};
+        int[] heights = {0, margin, 225, margin, 8, // extra space for production panel
+                         -8, // same size as tools label
+                         margin, -6, // same size as hammers label
+                         margin, 120, margin, 140, margin, 0, margin // extra margin, necessary, but why?
+        };
+        setLayout(new HIGLayout(widths, heights));
 
+        int row = 1;
+        add(nameBox, higConst.rcwh(row, 1, 7, 1, ""));
+        row += 2;
+        add(tilesScroll, higConst.rcwh(row, 1, 3, 1));
+        add(buildingsScroll, higConst.rcwh(row, 5, 3, 1));
+        row += 2;
+        add(productionPanel, higConst.rcwh(row, 1, 3, 2));
+        row += 1;
+        add(buildingBox, higConst.rc(row, 5));
+        add(hammersLabel, higConst.rc(row, 7));
+        row += 2;
+        add(solLabel, higConst.rcwh(row, 1, 3, 1));
+        add(buyBuilding, higConst.rc(row, 5));
+        add(toolsLabel, higConst.rc(row, 7));
+        row += 2;
+        add(inPortScroll, higConst.rc(row, 1));
+        add(cargoScroll, higConst.rcwh(row, 3, 3, 1));
+        add(outsideColonyScroll, higConst.rcwh(row, 7, 1, 3));
+        row += 2;
+        add(warehouseScroll, higConst.rcwh(row, 1, 5, 1));
+        row += 2;
+        add(unloadButton, higConst.rc(row, 1, "l"));
+        add(renameButton, higConst.rc(row, 5, "l"));
+        add(exitButton, higConst.rc(row, 7, "r"));
 
-    /**
-     *
-     * @param outsideColonyScroll
-     * @param inPortScroll
-     * @param cargoScroll
-     * @param warehouseScroll
-     * @param tilesScroll
-     * @param buildingsScroll
-     * @param outsideColonyLabel
-     * @param inPortLabel
-     * @param tilesLabel
-     * @param buildingsLabel
-     * 
-     * @date Oct 3, 2005 1:26:56 AM by chris
-     */
-    private void setContents(JScrollPane outsideColonyScroll, JScrollPane inPortScroll, JScrollPane cargoScroll, JScrollPane warehouseScroll, JScrollPane tilesScroll, JScrollPane buildingsScroll, JLabel outsideColonyLabel, JLabel inPortLabel, JLabel tilesLabel, JLabel buildingsLabel) {
-        setLayout(null);
-        add(exitButton);
-        add(unloadButton);
-        add(renameButton);
-        add(outsideColonyScroll);
-        add(inPortScroll);
-        add(cargoScroll);
-        add(warehouseScroll);
-        add(productionPanel);
-        add(tilesScroll);
-        add(buildingsScroll);
-        add(outsideColonyLabel);
-        add(inPortLabel);
-        add(solLabel);
-        add(tilesLabel);
-        add(buildingsLabel);
-        add(buildingBox);
-        add(hammersLabel);
-        add(toolsLabel);
-        add(buyBuilding);
-        add(nameBox);
-    }
-
-
-
-
-    /**
-     *
-     * @param outsideColonyScroll
-     * @param inPortScroll
-     * @param cargoScroll
-     * @param warehouseScroll
-     * @param tilesScroll
-     * @param buildingsScroll
-     * 
-     * @date Oct 3, 2005 1:23:22 AM by CHRIS
-     */
-    private void assignLocations(JScrollPane outsideColonyScroll, JScrollPane inPortScroll, JScrollPane cargoScroll, JScrollPane warehouseScroll, JScrollPane tilesScroll, JScrollPane buildingsScroll) {
-        int y = 10;
-        nameBox.setLocation(225, y);
-        
-        y+= 30;
-        tilesScroll.setLocation     (10, y);
-        buildingsScroll.setLocation (415, y);
-        
-        y+= 225;
-        productionPanel.setLocation (10, y);
-        
-        y+= 5;
-        buildingBox.setLocation     (417, y);
-        hammersLabel.setLocation    (637, y);
-
-        y+= 25;
-        buyBuilding.setLocation     (417, y);
-        toolsLabel.setLocation      (637, y);
-
-        y+= 5;
-        solLabel.setLocation        (15, y);
-
-        y+= 30;
-        inPortScroll.setLocation    (10, y);
-        cargoScroll.setLocation     (265, y);
-        outsideColonyScroll.setLocation(635, y);
-        
-        y+= 120;
-        warehouseScroll.setLocation (10, y);
-
-        y+= 150;
-        unloadButton.setLocation    (10, y);
-        renameButton.setLocation    (417, y);
-        exitButton.setLocation      (730, y);
+        setSize(getPreferredSize());
 
     }
 
@@ -459,16 +369,12 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
         tilePanel.initialize();
 
-        //goldLabel.setText(Messages.message("goldTitle") + ": " + freeColClient.getMyPlayer().getGold());
-
         buildingBox.initialize();
         nameBox.initialize(colony);
 
         updateSoLLabel();
         updateProgressLabel();
 
-        //ImageIcon imageIcon = new ImageIcon(freeColClient.getGUI().createStringImage(colonyNameLabel, colony.getName(), colony.getOwner().getColor(), 200, 24));
-        //this.colonyNameLabel.setIcon(imageIcon);
     }
 
 
@@ -603,7 +509,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             switch (Integer.valueOf(command).intValue()) {
                 case BUY_BUILDING:
                     freeColClient.getInGameController().payForBuilding(colony);
-                    //updateProgressLabel();
                     reinitialize();                    
                     freeColClient.getCanvas().updateGoldLabel();
                     requestFocus();
@@ -626,7 +531,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         }
     }
 
-
+    /**
+     * Unloads all goods and units from the carrier currently
+     * selected.
+     */
     private void unload() { 
         Unit unit = getSelectedUnit();
         if (unit != null && unit.isCarrier()) {
@@ -1439,6 +1347,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             this.colonyPanel = colonyPanel;
             setBackground(Color.BLACK);
             //setOpaque(false);
+            setBorder(null);
             setLayout(null);
         }
 
