@@ -2201,8 +2201,9 @@ public final class InGameController implements NetworkConstants {
         Player myPlayer = freeColClient.getMyPlayer();
         Europe europe = myPlayer.getEurope();
 
-        if (unitType != Unit.ARTILLERY && myPlayer.getGold() < Unit.getPrice(unitType) ||
-                myPlayer.getGold() < europe.getArtilleryPrice()) {
+        if ((unitType != Unit.ARTILLERY && myPlayer.getGold() < Unit.getPrice(unitType)) ||
+            (unitType == Unit.ARTILLERY && myPlayer.getGold() < europe.getArtilleryPrice())) {
+            System.out.println("Price: " + Unit.getPrice(unitType) + ", Gold: " + myPlayer.getGold());
             canvas.errorMessage("notEnoughGold");
             return;
         }

@@ -32,7 +32,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JLayeredPane;
+//import javax.swing.JLayeredPane;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -69,7 +69,7 @@ import net.sf.freecol.common.model.Unit;
  * This is a panel for the Colony display. It shows the units that are working in the
  * colony, the buildings and much more.
  */
-public final class ColonyPanel extends JLayeredPane implements ActionListener {
+public final class ColonyPanel extends FreeColPanel implements ActionListener {
     public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
@@ -246,10 +246,6 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
 
         setContents(outsideColonyScroll, inPortScroll, cargoScroll, warehouseScroll, tilesScroll, buildingsScroll, outsideColonyLabel, inPortLabel, tilesLabel, buildingsLabel);
 
-        try {
-            BevelBorder border = new BevelBorder(BevelBorder.RAISED);
-            setBorder(border);
-        } catch(Exception e) {}
 
         setSize(windowWidth, windowHeight); // was: 850,600  CHRIS
 
@@ -1432,7 +1428,7 @@ public final class ColonyPanel extends JLayeredPane implements ActionListener {
     /**
     * A panel that displays the tiles in the immediate area around the colony.
     */
-    public final class TilePanel extends JLayeredPane {
+    public final class TilePanel extends FreeColPanel {
         private final ColonyPanel colonyPanel;
 
         /**

@@ -28,7 +28,7 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JLayeredPane;
+//import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.TransferHandler;
 
@@ -51,14 +51,14 @@ public final class DefaultTransferHandler extends TransferHandler {
     public static final DataFlavor flavor = new DataFlavor(ImageSelection.class, "ImageSelection");
 
     private final Canvas canvas;
-    private final JLayeredPane parentPanel;
+    private final FreeColPanel parentPanel;
 
     /**
     * The constructor to use.
     * @param canvas The <code>Canvas</code>.
     * @param parentPanel The layered pane that holds all kinds of information.
     */
-    public DefaultTransferHandler(Canvas canvas, JLayeredPane parentPanel) {
+    public DefaultTransferHandler(Canvas canvas, FreeColPanel parentPanel) {
         this.canvas = canvas;
         this.parentPanel = parentPanel;
     }

@@ -47,7 +47,9 @@ import net.sf.freecol.client.gui.panel.MainPanel;
 import net.sf.freecol.client.gui.panel.MapGeneratorOptionsDialog;
 import net.sf.freecol.client.gui.panel.MonarchPanel;
 import net.sf.freecol.client.gui.panel.NewPanel;
+import net.sf.freecol.client.gui.panel.PurchaseDialog;
 import net.sf.freecol.client.gui.panel.QuitDialog;
+import net.sf.freecol.client.gui.panel.RecruitDialog;
 import net.sf.freecol.client.gui.panel.ReportColonyPanel;
 import net.sf.freecol.client.gui.panel.ReportContinentalCongressPanel;
 import net.sf.freecol.client.gui.panel.ReportForeignAffairPanel;
@@ -62,6 +64,7 @@ import net.sf.freecol.client.gui.panel.ServerListPanel;
 import net.sf.freecol.client.gui.panel.StartGamePanel;
 import net.sf.freecol.client.gui.panel.StatusPanel;
 import net.sf.freecol.client.gui.panel.TilePanel;
+import net.sf.freecol.client.gui.panel.TrainDialog;
 import net.sf.freecol.client.gui.panel.VictoryPanel;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
@@ -170,6 +173,9 @@ public final class Canvas extends JLayeredPane {
     private final TilePanel         tilePanel;
     private final MonarchPanel      monarchPanel;
     private final EuropePanel       europePanel;
+    private final RecruitDialog             recruitDialog;
+    private final PurchaseDialog            purchaseDialog;
+    private final TrainDialog               trainDialog;
     private final StatusPanel       statusPanel;
     private final ChatPanel         chatPanel;
     private final GUI               gui;
@@ -229,6 +235,9 @@ public final class Canvas extends JLayeredPane {
         declarationDialog = new DeclarationDialog(this, freeColClient);
 
         europePanel = new EuropePanel(this, freeColClient, freeColClient.getInGameController());
+        recruitDialog = new RecruitDialog(this);
+        purchaseDialog = new PurchaseDialog(this);
+        trainDialog = new TrainDialog(this);
         statusPanel = new StatusPanel(this);
 
         chatPanel = new ChatPanel(this, freeColClient);
@@ -1307,6 +1316,68 @@ public final class Canvas extends JLayeredPane {
             europePanel.requestFocus();
         }
     }
+
+    /**
+    * Displays the <code>RecruitDialog</code>. Does not return from this
+    * method before the panel is closed.
+    */
+    public boolean showRecruitDialog() {
+        recruitDialog.initialize();
+        addCentered(recruitDialog, INPUT_LAYER);
+
+        recruitDialog.requestFocus();
+
+        boolean response = recruitDialog.getResponseBoolean();
+
+        remove(recruitDialog);
+        setEnabled(true);
+
+        return response;
+    }
+
+
+
+
+    /**
+    * Displays the <code>PurchaseDialog</code>. Does not return from this
+    * method before the panel is closed.
+    */
+    public int showPurchaseDialog() {
+        purchaseDialog.initialize();
+        addCentered(purchaseDialog, INPUT_LAYER);
+
+        purchaseDialog.requestFocus();
+
+        int response = purchaseDialog.getResponseInt();
+
+        remove(purchaseDialog);
+        setEnabled(true);
+
+        return response;
+
+    }
+
+
+
+
+    /**
+    * Displays the <code>TrainDialog</code>. Does not return from this
+    * method before the panel is closed.
+    */
+    public boolean showTrainDialog() {
+        trainDialog.initialize();
+        addCentered(trainDialog, INPUT_LAYER);
+
+        trainDialog.requestFocus();
+
+        boolean response = trainDialog.getResponseBoolean();
+
+        remove(trainDialog);
+        setEnabled(true);
+
+        return response;
+    }
+
 
 
     /**

@@ -6,7 +6,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JComponent;
-import javax.swing.JLayeredPane;
+//import javax.swing.JLayeredPane;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.TransferHandler;
@@ -33,14 +33,14 @@ public final class DragListener extends MouseAdapter {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
     
-    private final JLayeredPane parentPanel;
+    private final FreeColPanel parentPanel;
 
     /**
     * The constructor to use.
     * @param parentPanel The layered pane that contains the components to which a
     * DragListener might be attached.
     */
-    public DragListener(JLayeredPane parentPanel) {
+    public DragListener(FreeColPanel parentPanel) {
         this.parentPanel = parentPanel;
     }
     

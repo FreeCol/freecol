@@ -91,7 +91,7 @@ public class FreeColDialog extends FreeColPanel {
     public synchronized void setResponse(Object response) {
         this.response = response;
         responseGiven = true;
-        logger.info("Response has been set.");
+        logger.info("Response has been set to " + response);
         notifyAll();
     }
 
@@ -103,7 +103,7 @@ public class FreeColDialog extends FreeColPanel {
     * @return The object as set by {@link #setResponse}.
     */
     public synchronized Object getResponse() {
-        // Wait the thread until 'response' is availeble. Notice that we have to process
+        // Wait the thread until 'response' is available. Notice that we have to process
         // the events manually if the current thread is the Event Dispatch Thread (EDT).
 
         try {
