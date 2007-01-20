@@ -48,6 +48,7 @@ import net.sf.freecol.client.gui.action.PlowAction;
 import net.sf.freecol.client.gui.action.PreferencesAction;
 import net.sf.freecol.client.gui.action.QuitAction;
 import net.sf.freecol.client.gui.action.ReconnectAction;
+import net.sf.freecol.client.gui.action.RenameAction;
 import net.sf.freecol.client.gui.action.ReportColonyAction;
 import net.sf.freecol.client.gui.action.ReportContinentalCongressAction;
 import net.sf.freecol.client.gui.action.ReportForeignAction;
@@ -222,6 +223,7 @@ public class FreeColMenuBar extends JMenuBar {
         
         menu.addSeparator();
 
+        menu.add(getMenuItem(RenameAction.ID));
         menu.add(getMenuItem(DisbandUnitAction.ID));
         
         add(menu);        

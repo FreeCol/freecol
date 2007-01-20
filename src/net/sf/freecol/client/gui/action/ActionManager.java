@@ -60,6 +60,7 @@ public class ActionManager extends OptionGroup {
         add(new PreferencesAction(freeColClient));
         add(new PlowAction(freeColClient));
         add(new ReconnectAction(freeColClient));
+        add(new RenameAction(freeColClient));
         add(new ReportContinentalCongressAction(freeColClient));
         add(new ReportForeignAction(freeColClient));
         add(new ReportIndianAction(freeColClient));        

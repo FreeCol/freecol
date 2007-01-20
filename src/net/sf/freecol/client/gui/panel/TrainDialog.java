@@ -109,7 +109,7 @@ public final class TrainDialog extends FreeColDialog implements ActionListener{
 
         add(question, higConst.rc(1, 1));
         add(trainPanel, higConst.rc(3, 1));
-        add(cancel, higConst.rc(5, 1));
+        add(cancel, higConst.rc(5, 1, ""));
 
         setSize(getPreferredSize());
 

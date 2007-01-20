@@ -311,7 +311,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         inPortPanel.removeAll();
         tilePanel.removeAll();
 
-
         //
         // Units outside the colony:
         //
@@ -349,6 +348,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             setSelectedUnitLabel(preSelectedUnitLabel);
         }
 
+        updateUnloadButton();
 
         //
         // Warehouse panel:
@@ -383,6 +383,22 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             initialize(colony, game, selectedUnit.getUnit());
         } else {
             initialize(colony, game, null);
+        }
+    }
+
+
+    /**
+     * Enables the unload button if the currently selected unit is a
+     * carrier with some cargo.
+     */
+    private void updateUnloadButton() {
+        unloadButton.setEnabled(false);
+        if (selectedUnit != null) {
+            Unit unit = selectedUnit.getUnit();
+            if (unit != null && unit.isCarrier() &&
+                unit.getSpaceLeft() < unit.getInitialSpaceLeft()) {
+                unloadButton.setEnabled(true);
+            }
         }
     }
 
@@ -559,6 +575,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 refresh();
             }
         }
+        unloadButton.setEnabled(false);
     }
 
     /**
@@ -613,6 +630,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 break;
             }
         }
+        updateUnloadButton();
     }
 
 
@@ -630,6 +648,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             updateCargoPanel();
             updateCargoLabel();
         }
+        updateUnloadButton();
         cargoPanel.revalidate();
         refresh();
     }
