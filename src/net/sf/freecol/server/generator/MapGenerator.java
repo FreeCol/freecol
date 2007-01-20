@@ -8,6 +8,7 @@ import java.util.Random;
 import java.util.Vector;
 import java.util.logging.Logger;
 
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
@@ -588,6 +589,7 @@ public class MapGenerator {
             int soldierUnitType = (player.getNation() == ServerPlayer.SPANISH) ? Unit.VETERAN_SOLDIER : Unit.FREE_COLONIST;
 
             Unit unit1 = new Unit(game, startTile, player, navalUnitType, Unit.ACTIVE);
+            unit1.setName(Messages.message("shipName." + player.getNation() + ".0"));
             Unit unit2 = new Unit(game, unit1, player, pioneerUnitType, Unit.SENTRY, false, false, 100, false);
             Unit unit3 = new Unit(game, unit1, player, soldierUnitType, Unit.SENTRY, true, false, 0, false);
 

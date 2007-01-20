@@ -3972,6 +3972,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         out.writeStartElement(getXMLElementTagName());
 
         out.writeAttribute("ID", getID());
+        out.writeAttribute("name", getName());
         out.writeAttribute("type", Integer.toString(type));
         out.writeAttribute("armed", Boolean.toString(armed));
         out.writeAttribute("mounted", Boolean.toString(mounted));
@@ -4037,6 +4038,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setID(in.getAttributeValue(null, "ID"));
 
+        setName(in.getAttributeValue(null, "name"));
         type = Integer.parseInt(in.getAttributeValue(null, "type"));
         unitType = FreeCol.specification.unitType( type );
         armed = Boolean.valueOf(in.getAttributeValue(null, "armed")).booleanValue();
