@@ -17,6 +17,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Player;
@@ -73,6 +74,8 @@ public final class TrainDialog extends FreeColDialog implements ActionListener{
         this.inGameController = freeColClient.getInGameController();
         setFocusCycleRoot(true);
 
+        ImageLibrary library = (ImageLibrary) parent.getImageProvider();
+
         int numberOfTypes = FreeCol.specification.numberOfUnitTypes();
         for (int type = 0; type < numberOfTypes; type++) {
             UnitType unitType = FreeCol.specification.unitType(type);
@@ -84,30 +87,49 @@ public final class TrainDialog extends FreeColDialog implements ActionListener{
         
         setLayout(new HIGLayout(new int[] {0}, new int[] {0, margin, 0, margin, 0}));
 
-        int[] widths = new int[] {0, margin, 0};
-        int[] heights = new int[trainableUnits.size()];
-        int row = 1;
-        int labelColumn = 1;
-        int buttonColumn = 3;
-        JPanel trainPanel = new JPanel(new HIGLayout(widths, heights));
-
-        for (NumberedUnitType unitType : trainableUnits) {
-            JButton newButton = new JButton(unitType.type.name);
-            newButton.setActionCommand(String.valueOf(unitType.index));
-            newButton.addActionListener(this);
-            buttons.add(newButton);
-            trainPanel.add(new JLabel(String.valueOf(unitType.type.price)),
-                           higConst.rc(row, labelColumn));
-            trainPanel.add(newButton, higConst.rc(row, buttonColumn));
-            row++;
+        int rows = trainableUnits.size();
+        if (rows % 2 == 0) {
+            rows--;
         }
 
-        JTextArea question = getDefaultTextArea(Messages.message("trainDialog.clickOn"));
+        int[] widths = new int[] {0, margin, 0, margin, 0, margin, 0};
+        int[] heights = new int[rows];
+        
+        for (int index = 0; index < rows/2; index++) {
+            heights[2 * index + 1] = margin;
+        }
+
+        int[] labelColumn = {1, 5};
+        int[] buttonColumn = {3, 7};
+        JPanel trainPanel = new JPanel(new HIGLayout(widths, heights));
+
+        int row = 1;
+        int counter = 0;
+        for (NumberedUnitType unitType : trainableUnits) {
+            int graphicsType = library.getUnitGraphicsType(unitType.index, false, false, 0, false);
+            JButton newButton = new JButton(unitType.type.name,
+                                            library.getScaledUnitImageIcon(graphicsType, 0.66f));
+            newButton.setActionCommand(String.valueOf(unitType.index));
+            newButton.addActionListener(this);
+            newButton.setIconTextGap(margin);
+            buttons.add(newButton);
+            trainPanel.add(new JLabel(String.valueOf(unitType.type.price)),
+                           higConst.rc(row, labelColumn[counter]));
+            trainPanel.add(newButton, higConst.rc(row, buttonColumn[counter]));
+            if (counter == 1) {
+                counter = 0;
+                row += 2;
+            } else {
+                counter = 1;
+            }
+        }
+
+        JLabel question = new JLabel(Messages.message("trainDialog.clickOn"));
 
         cancel.setActionCommand(String.valueOf(TRAIN_CANCEL));
         cancel.addActionListener(this);
 
-        add(question, higConst.rc(1, 1));
+        add(question, higConst.rc(1, 1, ""));
         add(trainPanel, higConst.rc(3, 1));
         add(cancel, higConst.rc(5, 1, ""));
 

@@ -809,6 +809,29 @@ public final class ImageLibrary extends ImageProvider {
     }
 
     /**
+     * Returns the scaled unit-ImageIcon at the given index.
+     * @param index The index of the unit-ImageIcon to return.
+     * @param scale The scale of the unit-ImageIcon to return.
+     * @return The unit-ImageIcon at the given index.
+     */
+    public ImageIcon getScaledUnitImageIcon(int index, float scale) {
+        if (index >= 0) {
+            ImageIcon icon = getUnitImageIcon(index);
+            if (scale != 1) {
+                Image image;
+                image = icon.getImage();
+                int width = (int) (scale * image.getWidth(null));
+                int height = (int) (scale * image.getHeight(null));
+                image = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+                icon = new ImageIcon(image);
+            }
+            return icon;
+        }
+        return null;
+    }
+
+
+    /**
      * Returns the terrain-image at the given index.
      * @param index The index of the terrain-image to return.
      * @param x The x-coordinate of the location of the tile that is being drawn.

@@ -116,21 +116,7 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
      * @param scale
      */
     public JLabel buildUnitLabel(int unitIcon, float scale) {
-
-        JLabel imageLabel = null;
-        if (unitIcon >= 0) {
-            ImageIcon icon = library.getUnitImageIcon(unitIcon);
-            if (scale != 1) {
-              Image image;
-              image = icon.getImage();
-              int width = (int) (scale * image.getWidth(this));
-              int height = (int) (scale * image.getHeight(this));
-              image = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-              icon = new ImageIcon(image);
-            }
-            imageLabel = new JLabel(icon);
-        }
-        return imageLabel;
+        return new JLabel(library.getScaledUnitImageIcon(unitIcon, scale));
     }
 
     /**

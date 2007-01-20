@@ -2220,6 +2220,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         this.hitpoints = hitpoints;
         if (hitpoints >= getInitialHitpoints(getType()) && getState() == FORTIFIED) {
             setState(ACTIVE);
+            addModelMessage(this, "model.unit.shipRepaired", 
+                            new String [][] {{"%ship%", getName()},
+                                             {"%repairLocation%", getLocation().getLocationName()}},
+                            ModelMessage.DEFAULT, this);
         }
     }
 
@@ -3286,9 +3290,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         } else if (getType() == ARTILLERY) {
             messageID = "model.unit.artilleryDamaged";
             setType(DAMAGED_ARTILLERY);
-        } else if (getType() == DAMAGED_ARTILLERY ||
-		   getType() == WAGON_TRAIN ||
-		   getType() == TREASURE_TRAIN) {
+        } else if (getType() == DAMAGED_ARTILLERY) {
             messageID = "model.unit.unitDestroyed";
             type = ModelMessage.UNIT_LOST;
             dispose();
@@ -3324,7 +3326,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 enemyUnit.setArmed(true, true);
             }
         } else {
-            // civilians
+            // civilians, wagon trains and treasure trains
             if (enemyUnit.getOwner().isEuropean()) {
                 // this unit is captured, don't show old owner's messages to new owner
                 Iterator i = getGame().getModelMessageIterator(getOwner());
