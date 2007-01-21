@@ -55,73 +55,138 @@ public final class CanvasKeyListener implements KeyListener {
 
         if (e.getModifiers() != 0) {
             return;
-        }
+        }        
 
-        switch(e.getKeyCode()) {
-            case KeyEvent.VK_ESCAPE:
-                //main menu
-                break;
-            case KeyEvent.VK_NUMPAD1:
-            case KeyEvent.VK_END:
-                inGameController.moveActiveUnit(Map.SW);
-                break;
-            case KeyEvent.VK_NUMPAD2:
-            case KeyEvent.VK_KP_DOWN:
-            case KeyEvent.VK_DOWN:
-                inGameController.moveActiveUnit(Map.S);
-                break;
-            case KeyEvent.VK_NUMPAD3:
-            case KeyEvent.VK_PAGE_DOWN:
-                inGameController.moveActiveUnit(Map.SE);
-                break;
-            case KeyEvent.VK_NUMPAD4:
-            case KeyEvent.VK_KP_LEFT:
-            case KeyEvent.VK_LEFT:
-                inGameController.moveActiveUnit(Map.W);
-                break;
-            case KeyEvent.VK_NUMPAD5:
-            case KeyEvent.VK_C:
-                inGameController.centerActiveUnit();
-                break;
-            case KeyEvent.VK_NUMPAD6:
-            case KeyEvent.VK_KP_RIGHT:
-            case KeyEvent.VK_RIGHT:
-                inGameController.moveActiveUnit(Map.E);
-                break;
-            case KeyEvent.VK_NUMPAD7:
-            case KeyEvent.VK_HOME:
-                inGameController.moveActiveUnit(Map.NW);
-                break;
-            case KeyEvent.VK_NUMPAD8:
-            case KeyEvent.VK_KP_UP:
-            case KeyEvent.VK_UP:
-                inGameController.moveActiveUnit(Map.N);
-                break;
-            case KeyEvent.VK_NUMPAD9:
-            case KeyEvent.VK_PAGE_UP:
-                inGameController.moveActiveUnit(Map.NE);
-                break;
-            case KeyEvent.VK_S:
-                /*
-                if (parent.getGUI().getActiveUnit() != null) {
-                    parent.getClient().getInGameController().changeState(parent.getGUI().getActiveUnit(), Unit.SENTRY);
-                }
-                */
-                break;
-            case KeyEvent.VK_PLUS:
-            case KeyEvent.VK_EQUALS:
-                //mapControls.zoomIn();
-                //parent.refresh();
-                break;
-            case KeyEvent.VK_MINUS:
-            case KeyEvent.VK_UNDERSCORE:
-                //mapControls.zoomOut();
-                //parent.refresh();
-                break;
-            default:
-                logger.info("The typed key (" + e.getKeyCode() + ") doesn't have a function yet.");
+        if(parent.getGUI().getViewMode().getView() == ViewMode.MOVE_UNITS_MODE){
+            switch(e.getKeyCode()) {
+                case KeyEvent.VK_ESCAPE:
+                    //main menu
+                    break;
+                case KeyEvent.VK_NUMPAD1:
+                case KeyEvent.VK_END:
+                    inGameController.moveActiveUnit(Map.SW);
+                    break;
+                case KeyEvent.VK_NUMPAD2:
+                case KeyEvent.VK_KP_DOWN:
+                case KeyEvent.VK_DOWN:
+                    inGameController.moveActiveUnit(Map.S);
+                    break;
+                case KeyEvent.VK_NUMPAD3:
+                case KeyEvent.VK_PAGE_DOWN:
+                    inGameController.moveActiveUnit(Map.SE);
+                    break;
+                case KeyEvent.VK_NUMPAD4:
+                case KeyEvent.VK_KP_LEFT:
+                case KeyEvent.VK_LEFT:
+                    inGameController.moveActiveUnit(Map.W);
+                    break;
+                case KeyEvent.VK_NUMPAD5:
+                case KeyEvent.VK_C:
+                    inGameController.centerActiveUnit();
+                    break;
+                case KeyEvent.VK_NUMPAD6:
+                case KeyEvent.VK_KP_RIGHT:
+                case KeyEvent.VK_RIGHT:
+                    inGameController.moveActiveUnit(Map.E);
+                    break;
+                case KeyEvent.VK_NUMPAD7:
+                case KeyEvent.VK_HOME:
+                    inGameController.moveActiveUnit(Map.NW);
+                    break;
+                case KeyEvent.VK_NUMPAD8:
+                case KeyEvent.VK_KP_UP:
+                case KeyEvent.VK_UP:
+                    inGameController.moveActiveUnit(Map.N);
+                    break;
+                case KeyEvent.VK_NUMPAD9:
+                case KeyEvent.VK_PAGE_UP:
+                    inGameController.moveActiveUnit(Map.NE);
+                    break;
+                case KeyEvent.VK_S:
+                    /*
+                    if (parent.getGUI().getActiveUnit() != null) {
+                        parent.getClient().getInGameController().changeState(parent.getGUI().getActiveUnit(), Unit.SENTRY);
+                    }
+                     */
+                    break;
+                case KeyEvent.VK_PLUS:
+                case KeyEvent.VK_EQUALS:
+                    //mapControls.zoomIn();
+                    //parent.refresh();
+                    break;
+                case KeyEvent.VK_MINUS:
+                case KeyEvent.VK_UNDERSCORE:
+                    //mapControls.zoomOut();
+                    //parent.refresh();
+                    break;
+                default:
+                    logger.info("The typed key (" + e.getKeyCode() + ") doesn't have a function yet.");
+            }
+        } else if(parent.getGUI().getViewMode().getView() == ViewMode.VIEW_TERRAIN_MODE){
+            switch(e.getKeyCode()) {
+                case KeyEvent.VK_ESCAPE:
+                    //main menu
+                    break;
+                case KeyEvent.VK_NUMPAD1:
+                case KeyEvent.VK_END:
+                    parent.getGUI().moveTileCursor(Map.SW);
+                	break;
+            	case KeyEvent.VK_NUMPAD2:
+            	case KeyEvent.VK_KP_DOWN:
+            	case KeyEvent.VK_DOWN:
+                    parent.getGUI().moveTileCursor(Map.S);
+                	break;
+            	case KeyEvent.VK_NUMPAD3:
+            	case KeyEvent.VK_PAGE_DOWN:
+                    parent.getGUI().moveTileCursor(Map.SE);
+                	break;
+            	case KeyEvent.VK_NUMPAD4:
+            	case KeyEvent.VK_KP_LEFT:
+            	case KeyEvent.VK_LEFT:
+                    parent.getGUI().moveTileCursor(Map.W);
+            	    break;
+            	case KeyEvent.VK_NUMPAD5:
+            	case KeyEvent.VK_C:
+            	    inGameController.centerActiveUnit();
+            	    break;
+            	case KeyEvent.VK_NUMPAD6:
+            	case KeyEvent.VK_KP_RIGHT:
+            	case KeyEvent.VK_RIGHT:
+                    parent.getGUI().moveTileCursor(Map.E);
+            	    break;
+            	case KeyEvent.VK_NUMPAD7:
+            	case KeyEvent.VK_HOME:
+                    parent.getGUI().moveTileCursor(Map.NW);
+            	    break;
+            	case KeyEvent.VK_NUMPAD8:
+            	case KeyEvent.VK_KP_UP:
+            	case KeyEvent.VK_UP:
+                    parent.getGUI().moveTileCursor(Map.N);
+            	    break;
+            	case KeyEvent.VK_NUMPAD9:
+            	case KeyEvent.VK_PAGE_UP:
+                    parent.getGUI().moveTileCursor(Map.NE);
+            	    break;
+                case KeyEvent.VK_SPACE:
+                    Cursor cursor = parent.getGUI().getCursor();
+                    parent.showTilePopup(parent.getGUI().getSelectedTile(),cursor.getCanvasX(),cursor.getCanvasY());
+                    break;
+            	case KeyEvent.VK_PLUS:
+            	case KeyEvent.VK_EQUALS:
+            	    //mapControls.zoomIn();
+            	    //parent.refresh();
+            	    break;
+            	case KeyEvent.VK_MINUS:
+            	case KeyEvent.VK_UNDERSCORE:
+            	    //mapControls.zoomOut();
+            	    //parent.refresh();
+            	    break;
+            	default:
+            	    logger.info("The typed key (" + e.getKeyCode() + ") doesn't have a function yet.");
+            }        	
         }
     }
+    
 
     
     /**
@@ -131,6 +196,11 @@ public final class CanvasKeyListener implements KeyListener {
     public void keyReleased(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
             parent.getGUI().setDragPath(null);
+        }
+        
+        if (e.isShiftDown() && e.isControlDown() && e.getKeyCode() == KeyEvent.VK_V) {
+        	parent.getGUI().getViewMode().toggleViewMode();
+            return;
         }
     }
     

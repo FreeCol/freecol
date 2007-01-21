@@ -4,7 +4,6 @@ package net.sf.freecol.client.gui;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Composite;
-import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -64,7 +63,9 @@ public final class GUI {
     private final FreeColClient freeColClient;
     private final Rectangle bounds;
     private final ImageLibrary lib;
-    private boolean cursor;
+    private Cursor cursor;
+    private ViewMode viewMode;
+    
 
     /** Indicates if the game has started, has nothing to do with whether or not the
         client is logged in. */
@@ -158,7 +159,7 @@ public final class GUI {
         this.bounds = bounds;
         this.lib = lib;
 
-        cursor = true;
+        cursor = new net.sf.freecol.client.gui.Cursor();
 
         tileHeight = lib.getTerrainImageHeight(0);
         tileWidth = lib.getTerrainImageWidth(0);
@@ -180,44 +181,52 @@ public final class GUI {
         logger.info("GUI created.");
 
         messages = new Vector(MESSAGE_COUNT);
+        
+        viewMode = new ViewMode(this);
+        logger.warning("Starting in Move Units View Mode");
     }
-
+    
+    /**
+     *  Get the <code>View Mode</code> object
+     */
+    public ViewMode getViewMode(){
+        return viewMode;
+    }
+    
     /**
      * Starts the unit-selection-cursor blinking animation.
      */
     public void startCursorBlinking() {
-        final int delay = 500; // Milliseconds
-        final FreeColClient theFreeColClient = freeColClient;
+        
+        final FreeColClient theFreeColClient = freeColClient; 
         ActionListener taskPerformer = new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                setCursor(!hasCursor());
-  
                 if (getActiveUnit() != null && getActiveUnit().getTile() != null) {
                     //freeColClient.getCanvas().repaint(0, 0, getWidth(), getHeight());
-                    freeColClient.getCanvas().refreshTile(getActiveUnit().getTile());            
+                    theFreeColClient.getCanvas().refreshTile(getActiveUnit().getTile());            
                 }               
             }
         };
-        Timer timer = new Timer(delay, taskPerformer);  
-        timer.start();
-    }    
+        
+        cursor.addActionListener(taskPerformer);
+        
+        cursor.startBlinking();
+    }
     
-    /**
-     * Checks if the unit selection cursor is currently being displayed.
-     * @return <code>true</code> if the cursor is currently being displayed
-     *      and <code>false</code> otherwise.
-     */
-    public boolean hasCursor() {
+    public Cursor getCursor(){
         return cursor;
     }
     
-    
-    /**
-    * Sets that the unit selection cursor should be displayed.
-    * @param cursor Use <code>true</code> to enable the cursor.
-    */
-    public void setCursor(boolean cursor) {
-        this.cursor = cursor;
+    public void moveTileCursor(int direction){
+        Tile selectedTile = freeColClient.getGame().getMap().getTileOrNull(getSelectedTile());
+        if(selectedTile != null){   
+            Tile newTile = freeColClient.getGame().getMap().getNeighbourOrNull(direction,selectedTile);
+            if(newTile != null)
+                setSelectedTile(newTile.getPosition());
+        }
+        else{
+            logger.warning("selectedTile is null");
+        }
     }
 
     /**
@@ -268,7 +277,7 @@ public final class GUI {
 
         this.selectedTile = selectedTile;
 
-        if (selectedTile != null) {
+        if (viewMode.getView() == ViewMode.MOVE_UNITS_MODE) {
             if (activeUnit == null ||
                 (activeUnit.getTile() != null &&
                  !activeUnit.getTile().getPosition().equals(selectedTile))) {
@@ -298,20 +307,20 @@ public final class GUI {
                 } else {
                     setFocus(selectedTile);
                 }
-            } 
+            }
+        }
 
-            // Check if the gui needs to reposition:
-            if (!onScreen(selectedTile)
-                    || freeColClient.getClientOptions().getBoolean(ClientOptions.ALWAYS_CENTER)) {
+        // Check if the gui needs to reposition:
+        if (!onScreen(selectedTile)
+           || freeColClient.getClientOptions().getBoolean(ClientOptions.ALWAYS_CENTER)) {
                 setFocus(selectedTile);
-            } else {
-                if (oldPosition != null) {
-                    freeColClient.getCanvas().refreshTile(oldPosition);
-                }
+        } else {
+            if (oldPosition != null) {
+                freeColClient.getCanvas().refreshTile(oldPosition);
+            }
 
-                if (selectedTile != null) {
-                    freeColClient.getCanvas().refreshTile(selectedTile);
-                }
+            if (selectedTile != null) {
+                freeColClient.getCanvas().refreshTile(selectedTile);
             }
         }
     }
@@ -429,6 +438,10 @@ public final class GUI {
 
         //TODO: update only within the bounds of InfoPanel
         freeColClient.getCanvas().repaint(0, 0, getWidth(), getHeight());
+        
+        // The user activated a unit
+        if(viewMode.getView() == ViewMode.VIEW_TERRAIN_MODE && activeUnit != null)
+            viewMode.changeViewMode(ViewMode.MOVE_UNITS_MODE);
 
         //if (activeUnit != null && !activeUnit.getTile().getPosition().equals(selectedTile)) {
         if (activeUnit != null) {
@@ -902,8 +915,15 @@ public final class GUI {
             // Column per column; start at the left side to display the tiles.
             for (int tileX = clipLeftCol; tileX <= clipRightCol; tileX++) {
                 if (map.isValid(tileX, tileY)) {
+                    
+                    Tile tile = map.getTile(tileX, tileY);
+                	
                     // Display the Tile overlays:
-                    displayTileOverlays(g, map, map.getTile(tileX, tileY), xx, yy, true);
+                    displayTileOverlays(g, map, tile, xx, yy, true);
+                    
+                    if(viewMode.displayTileCursor(tile,xx,yy)){
+                        drawCursor(g, xx, yy);
+                    }
                 }
                 xx += tileWidth;
             }
@@ -1917,7 +1937,7 @@ public final class GUI {
     * Starts a drag operation on the mapboard.
     */
     public void startDrag() {
-        freeColClient.getCanvas().setCursor((Cursor) UIManager.get("cursor.go"));
+        freeColClient.getCanvas().setCursor((java.awt.Cursor) UIManager.get("cursor.go"));
         setDragPath(null);
         dragStarted = true;
     }
@@ -2040,8 +2060,8 @@ public final class GUI {
         try {
             // Draw the 'selected unit' image if needed.
             //if ((unit == getActiveUnit()) && cursor) {
-            if ((unit == getActiveUnit()) && (cursor || (activeUnit.getMovesLeft() == 0))) {
-                g.drawImage(lib.getMiscImage(ImageLibrary.UNIT_SELECT), x, y, null);
+            if (viewMode.displayUnitCursor(unit,x,y)) {
+            	drawCursor(g,x,y);
             }
 
             // Draw the unit.
@@ -2087,6 +2107,10 @@ public final class GUI {
                 g.drawString(debuggingInfo, x , y+25);
             }
         }
+    }
+    
+    private void drawCursor(Graphics2D g, int x, int y) {
+    	g.drawImage(lib.getMiscImage(ImageLibrary.UNIT_SELECT), x, y, null);
     }
 
 
