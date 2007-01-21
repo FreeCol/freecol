@@ -3860,13 +3860,14 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 }
                 break;
             case INDIAN_CONVERT:
-                if ((goodsType == Goods.FOOD)
-                        || (goodsType == Goods.SUGAR)
-                        || (goodsType == Goods.COTTON)
-                        || (goodsType == Goods.TOBACCO)
-                        || (goodsType == Goods.FURS)
-                        || (goodsType == Goods.ORE
-                        || (goodsType == Goods.SILVER))) {
+                if ((goodsType == Goods.FOOD
+                        || goodsType == Goods.SUGAR
+                        || goodsType == Goods.COTTON
+                        || goodsType == Goods.TOBACCO
+                        || goodsType == Goods.FURS
+                        || goodsType == Goods.ORE
+                        || goodsType == Goods.SILVER)
+                        && base > 0) {
                     base += 1;
                 }
                 break;
