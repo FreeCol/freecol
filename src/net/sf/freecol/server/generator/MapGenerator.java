@@ -357,12 +357,12 @@ public class MapGenerator {
     */
     private int generateSkillForLocation(Map map, Tile tile) {
         int rand = random.nextInt(2);
+        int[] potentials = new int[Goods.HORSES];
 
         Iterator iter = map.getAdjacentIterator(tile.getPosition());
         while (iter.hasNext()) {
             Map.Position p = (Map.Position)iter.next();
             Tile t = map.getTile(p);
-            int[] potentials = new int[Goods.HORSES];
 
             if (t.hasBonus()) {
                 if (t.getAddition() == Tile.ADD_HILLS) {
@@ -425,38 +425,38 @@ public class MapGenerator {
                     potentials[goodsType] += t.potential(goodsType);
                 }
             }
+        }
 
-            int counter = 0;
-            for (int goodsType = Goods.FOOD; goodsType < Goods.HORSES; goodsType++) {
-                counter += potentials[goodsType];
-                potentials[goodsType] = counter;
-            }
-            int newRand = random.nextInt(counter);
-            for (int goodsType = Goods.FOOD; goodsType < Goods.HORSES; goodsType++) {
-                if (newRand < potentials[goodsType]) {
-                    switch (goodsType) {
-                    case Goods.FOOD:
-                        return IndianSettlement.EXPERT_FARMER;
-                    case Goods.SUGAR:
-                        return IndianSettlement.MASTER_SUGAR_PLANTER;
-                    case Goods.TOBACCO:
-                        return IndianSettlement.MASTER_TOBACCO_PLANTER;
-                    case Goods.COTTON:
-                        return IndianSettlement.MASTER_COTTON_PLANTER;
-                    case Goods.FURS:
-                        return IndianSettlement.EXPERT_FUR_TRAPPER;
-                    case Goods.LUMBER:
-                        return IndianSettlement.EXPERT_LUMBER_JACK;
-                    case Goods.ORE:
-                        return IndianSettlement.EXPERT_ORE_MINER;
-                    case Goods.SILVER:
-                        return IndianSettlement.EXPERT_SILVER_MINER;
-                    default:
-                        return IndianSettlement.SEASONED_SCOUT;
-                    }
+        int counter = 0;
+        for (int goodsType = Goods.FOOD; goodsType < Goods.HORSES; goodsType++) {
+            counter += potentials[goodsType];
+            potentials[goodsType] = counter;
+        }
+        int newRand = random.nextInt(counter);
+        for (int goodsType = Goods.FOOD; goodsType < Goods.HORSES; goodsType++) {
+            if (newRand < potentials[goodsType]) {
+                switch (goodsType) {
+                case Goods.FOOD:
+                    return IndianSettlement.EXPERT_FARMER;
+                case Goods.SUGAR:
+                    return IndianSettlement.MASTER_SUGAR_PLANTER;
+                case Goods.TOBACCO:
+                    return IndianSettlement.MASTER_TOBACCO_PLANTER;
+                case Goods.COTTON:
+                    return IndianSettlement.MASTER_COTTON_PLANTER;
+                case Goods.FURS:
+                    return IndianSettlement.EXPERT_FUR_TRAPPER;
+                case Goods.LUMBER:
+                    return IndianSettlement.EXPERT_LUMBER_JACK;
+                case Goods.ORE:
+                    return IndianSettlement.EXPERT_ORE_MINER;
+                case Goods.SILVER:
+                    return IndianSettlement.EXPERT_SILVER_MINER;
+                default:
+                    return IndianSettlement.SEASONED_SCOUT;
                 }
-
             }
+
         }
         return IndianSettlement.SEASONED_SCOUT;   
     }
