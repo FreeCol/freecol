@@ -808,7 +808,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
     */
     public void setForested(boolean value) {
         forested = value;
-        bonus = false;
+        //bonus = false;
         updatePlayerExploredTiles();
     }
 

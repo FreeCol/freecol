@@ -227,6 +227,7 @@ public final class InfoPanel extends FreeColPanel {
                     while (goodsIterator.hasNext()) {
                         Goods goods = (Goods) goodsIterator.next();
                         JLabel goodsLabel = new JLabel(library.getScaledGoodsImageIcon(goods.getType(), 0.66f));
+                        goodsLabel.setToolTipText(String.valueOf(goods.getAmount()) + " " + goods.getName());
                         unitCargoPanel.add(goodsLabel, higConst.rc(row, counter));
                         if (counter == 4) {
                             row++;
@@ -240,6 +241,7 @@ public final class InfoPanel extends FreeColPanel {
                         Unit unit = (Unit) unitIterator.next();
                         int graphicsType = library.getUnitGraphicsType(unit);
                         JLabel unitLabel = new JLabel(library.getScaledUnitImageIcon(graphicsType, 0.5f));
+                        unitLabel.setToolTipText(unit.getName());
                         unitCargoPanel.add(unitLabel, higConst.rc(row, counter));
                         if (counter == 4) {
                             row++;

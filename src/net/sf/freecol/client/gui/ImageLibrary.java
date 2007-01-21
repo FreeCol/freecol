@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
+import java.awt.Transparency;
 import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -757,7 +758,11 @@ public final class ImageLibrary extends ImageProvider {
      */
     public Image getBonusImage(Tile tile) {
         int imageType = getBonusImageType(tile.getType(), tile.getAddition(), tile.isForested());
-        return bonus.get(imageType).getImage();
+        if (imageType == BONUS_NONE) {
+            return null;
+        } else {
+            return bonus.get(imageType).getImage();
+        }
     }
 
     public static int getBonusImageType(int type, int addition, boolean forested) {
@@ -830,6 +835,35 @@ public final class ImageLibrary extends ImageProvider {
         return null;
     }
 
+
+    /**
+     * Returns the scaled terrain-image at the given index (and position 0, 0).
+     * @param index The index of the terrain-image to return.
+     * @param forested Whether the image should be forested.
+     * @param scale The scale of the terrain image to return.
+     * @return The terrain-image at the given index.
+     */
+    public Image getScaledTerrainImage(int index, boolean forested, float scale) {
+        GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+        Image terrainImage = getTerrainImage(index, 0, 0);
+        int width = getTerrainImageWidth(index);
+        int height = getTerrainImageHeight(index);
+        if (index > Tile.UNEXPLORED && index < Tile.ARCTIC && forested) {
+            BufferedImage compositeImage = gc.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
+            Graphics2D g = compositeImage.createGraphics();
+            g.drawImage(terrainImage, 0, 0, null);
+            g.drawImage(getForestImage(index), 0, 0, null);
+            g.dispose();
+            terrainImage = compositeImage;
+        }
+        if (scale == 1f) {
+            return terrainImage;
+        } else {
+            return terrainImage.getScaledInstance((int) (width * scale), 
+                                                  (int) (height * scale),
+                                                  Image.SCALE_SMOOTH);
+        }
+    }
 
     /**
      * Returns the terrain-image at the given index.

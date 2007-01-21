@@ -143,9 +143,6 @@ public class MapGenerator {
                                     } else if (r > 2) {
                                         t.setAddition(Tile.ADD_HILLS);
                                     }
-                                    if (random.nextInt(100) < getMapGeneratorOptions().getPercentageOfBonusTiles()) {
-                                        t.setBonus(true);
-                                    }
                                 }
                             }
                         }
@@ -170,7 +167,8 @@ public class MapGenerator {
 
         for (int i = 0; i < number; i++) {
             for (int tries=0; tries<100; tries++) {
-                Position p = new Position(random.nextInt(getMapGeneratorOptions().getWidth()), random.nextInt(getMapGeneratorOptions().getHeight()));
+                Position p = new Position(random.nextInt(getMapGeneratorOptions().getWidth()), 
+                                          random.nextInt(getMapGeneratorOptions().getHeight()));
                 Tile t = map.getTile(p);
                 if (map.getTile(p).isLand()
                         && !t.hasLostCityRumour()
@@ -320,6 +318,7 @@ public class MapGenerator {
                     tile, tribe, kind, capital,
                     generateSkillForLocation(map, map.getTile(position)),
                     false, null);
+        logger.fine("Generated skill: " + Unit.getName(settlement.getLearnableSkill()));
 
         tile.setSettlement(settlement);
         
@@ -363,10 +362,33 @@ public class MapGenerator {
         while (iter.hasNext()) {
             Map.Position p = (Map.Position)iter.next();
             Tile t = map.getTile(p);
+            int[] potentials = new int[Goods.HORSES];
 
-            // has bonus but no forest
-            if (!t.isForested() && t.hasBonus() && t.getAddition()<=Tile.ADD_RIVER_MAJOR) {
-                switch (t.getType()) {
+            if (t.hasBonus()) {
+                if (t.getAddition() == Tile.ADD_HILLS) {
+                    return IndianSettlement.EXPERT_ORE_MINER;
+                } else if (t.getAddition() == Tile.ADD_MOUNTAINS) {
+                    return IndianSettlement.EXPERT_SILVER_MINER;
+                } else if (t.isForested()) {
+                    switch (t.getType()) {
+                    case Tile.PLAINS:
+                    case Tile.PRAIRIE:
+                    case Tile.TUNDRA:
+                        return IndianSettlement.EXPERT_FUR_TRAPPER;
+                    case Tile.GRASSLANDS:
+                    case Tile.SAVANNAH:
+                        return IndianSettlement.EXPERT_LUMBER_JACK;
+                    case Tile.MARSH:
+                        return (rand==0 ? IndianSettlement.EXPERT_SILVER_MINER : IndianSettlement.EXPERT_ORE_MINER);
+                    case Tile.SWAMP:
+                        return (rand==0 ? IndianSettlement.EXPERT_SILVER_MINER : IndianSettlement.EXPERT_ORE_MINER);
+                    case Tile.DESERT:
+                        return (rand==0 ? IndianSettlement.EXPERT_LUMBER_JACK : IndianSettlement.EXPERT_FARMER);
+                    default:
+                        throw new IllegalArgumentException("Invalid tile provided: Tile type is invalid");
+                    }
+                } else {
+                    switch (t.getType()) {
                     case Tile.PLAINS:
                         return IndianSettlement.MASTER_COTTON_PLANTER;
                     case Tile.GRASSLANDS:
@@ -396,73 +418,47 @@ public class MapGenerator {
                         return IndianSettlement.EXPERT_FISHERMAN;
                     default:
                         throw new IllegalArgumentException("Invalid tile provided: Tile type is invalid");
+                    }
+                }
+            } else {
+                for (int goodsType = Goods.FOOD; goodsType < Goods.HORSES; goodsType++) {
+                    potentials[goodsType] += t.potential(goodsType);
                 }
             }
-            // has bonus and forest
-            else if (t.isForested() && t.hasBonus() && t.getAddition()<=Tile.ADD_RIVER_MAJOR) {
-                switch (t.getType()) {
-                    case Tile.PLAINS:
-                    case Tile.PRAIRIE:
-                    case Tile.TUNDRA:
-                        return IndianSettlement.EXPERT_FUR_TRAPPER;
-                    case Tile.GRASSLANDS:
-                    case Tile.SAVANNAH:
-                        return IndianSettlement.EXPERT_LUMBER_JACK;
-                    case Tile.MARSH:
-                        return (rand==0 ? IndianSettlement.EXPERT_SILVER_MINER : IndianSettlement.EXPERT_ORE_MINER);
-                    case Tile.SWAMP:
-                        return (rand==0 ? IndianSettlement.EXPERT_SILVER_MINER : IndianSettlement.EXPERT_ORE_MINER);
-                    case Tile.DESERT:
-                        return (rand==0 ? IndianSettlement.EXPERT_LUMBER_JACK : IndianSettlement.EXPERT_FARMER);
-                    default:
-                        throw new IllegalArgumentException("Invalid tile provided: Tile type is invalid");
-                }
-            }
-            // is hills
-            else if (t.hasBonus() && t.getAddition() == Tile.ADD_HILLS) {
-                return IndianSettlement.EXPERT_ORE_MINER;
-            }
-            // has mountains
-            else if (t.hasBonus() && t.getAddition() == Tile.ADD_MOUNTAINS) {
-                if(t.hasBonus())
-                    return IndianSettlement.EXPERT_SILVER_MINER;
-                else
-                    return (rand==0 ? IndianSettlement.EXPERT_ORE_MINER : IndianSettlement.EXPERT_SILVER_MINER);
-            }
-        }
 
-        // has no bonuses so use base tile
-        switch (tile.getType()) {
-            case Tile.PLAINS:
-                return IndianSettlement.MASTER_COTTON_PLANTER;
-            case Tile.GRASSLANDS:
-                return IndianSettlement.MASTER_TOBACCO_PLANTER;
-            case Tile.PRAIRIE:
-                return IndianSettlement.MASTER_COTTON_PLANTER;
-            case Tile.SAVANNAH:
-                return IndianSettlement.MASTER_SUGAR_PLANTER;
-            case Tile.MARSH:
-                return IndianSettlement.EXPERT_ORE_MINER;
-            case Tile.SWAMP:
-                if (rand == 0) {
-                    return IndianSettlement.MASTER_TOBACCO_PLANTER;
-                } else {
-                    return IndianSettlement.MASTER_SUGAR_PLANTER;
+            int counter = 0;
+            for (int goodsType = Goods.FOOD; goodsType < Goods.HORSES; goodsType++) {
+                counter += potentials[goodsType];
+                potentials[goodsType] = counter;
+            }
+            int newRand = random.nextInt(counter);
+            for (int goodsType = Goods.FOOD; goodsType < Goods.HORSES; goodsType++) {
+                if (newRand < potentials[goodsType]) {
+                    switch (goodsType) {
+                    case Goods.FOOD:
+                        return IndianSettlement.EXPERT_FARMER;
+                    case Goods.SUGAR:
+                        return IndianSettlement.MASTER_SUGAR_PLANTER;
+                    case Goods.TOBACCO:
+                        return IndianSettlement.MASTER_TOBACCO_PLANTER;
+                    case Goods.COTTON:
+                        return IndianSettlement.MASTER_COTTON_PLANTER;
+                    case Goods.FURS:
+                        return IndianSettlement.EXPERT_FUR_TRAPPER;
+                    case Goods.LUMBER:
+                        return IndianSettlement.EXPERT_LUMBER_JACK;
+                    case Goods.ORE:
+                        return IndianSettlement.EXPERT_ORE_MINER;
+                    case Goods.SILVER:
+                        return IndianSettlement.EXPERT_SILVER_MINER;
+                    default:
+                        return IndianSettlement.SEASONED_SCOUT;
+                    }
                 }
-            case Tile.DESERT:
-                return IndianSettlement.SEASONED_SCOUT;
-            case Tile.TUNDRA:
-                if (rand == 0) {
-                    return IndianSettlement.EXPERT_SILVER_MINER;
-                } else {
-                    return IndianSettlement.EXPERT_ORE_MINER;
-                }
-            case Tile.ARCTIC:
-            case Tile.OCEAN:
-                return IndianSettlement.EXPERT_FISHERMAN;
-            default:
-                throw new IllegalArgumentException("Invalid tile provided: Tile type is invalid");
+
+            }
         }
+        return IndianSettlement.SEASONED_SCOUT;   
     }
 
 
@@ -807,7 +803,8 @@ public class MapGenerator {
                         if ((t.getType() != Tile.ARCTIC) && 
                             (tileType.nextInt(100) < getMapGeneratorOptions().getPercentageOfForests())) {
                             t.setForested(true);
-                        } else if ((t.getType() != Tile.ARCTIC) && (t.getType() != Tile.TUNDRA)) {
+                            //} else if ((t.getType() != Tile.ARCTIC) && (t.getType() != Tile.TUNDRA)) {
+                        } else if (t.getType() != Tile.ARCTIC) {
                             int k = tileType.nextInt(16);
                             if (k < 1) {
                                 t.setAddition(Tile.ADD_MOUNTAINS);
@@ -817,10 +814,7 @@ public class MapGenerator {
                         }
 
                         // Terrain bonus:
-                        if (tileType.nextInt(100) < getMapGeneratorOptions().getPercentageOfBonusTiles() && 
-                            (t.getType() != Tile.ARCTIC && (t.getType() != Tile.TUNDRA || t.isForested())
-                                && t.getType() != Tile.HIGH_SEAS && t.getType() != Tile.DESERT && t.getType() != Tile.MARSH
-                                && t.getType() != Tile.SWAMP || t.getAddition() == Tile.ADD_MOUNTAINS || t.getAddition() == Tile.ADD_HILLS)) {
+                        if (tileType.nextInt(100) < getMapGeneratorOptions().getPercentageOfBonusTiles()) {
                             t.setBonus(true);
                         }
                     } else {

@@ -1206,6 +1206,10 @@ public final class GUI {
      * @return The image that was created.
      */
     private BufferedImage createStringImage(JComponent c, Graphics g, String nameString, Color color, int maxWidth, int preferredFontSize) {        
+        if (color == null) {
+            logger.warning("createStringImage called with color null");
+            color = Color.WHITE;
+        }
         Font nameFont = (c != null) ? c.getFont() : g.getFont();
         FontMetrics nameFontMetrics = (c != null) ? c.getFontMetrics(nameFont) : g.getFontMetrics(nameFont);
         BufferedImage bi = null;

@@ -281,7 +281,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * @param forested whether it is forested
      */
     private void buildTerrainButton(int terrain, boolean forested) {
-        Image scaledImage = getTerrainImage(terrain, forested, 0.5f);
+        Image scaledImage = library.getScaledTerrainImage(terrain, forested, 0.5f);
         ImageIcon icon = new ImageIcon(scaledImage);
         JButton button = new JButton(icon);
         button.setVerticalTextPosition(SwingConstants.BOTTOM);
@@ -290,29 +290,6 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         button.addActionListener(this);
         listPanel.add(button);
     }
-
-    public Image getTerrainImage(int terrain, boolean forested, float scale) {
-        Image terrainImage = library.getTerrainImage(terrain, 0, 0);
-        int width = terrainImage.getWidth(this);
-        int height = terrainImage.getHeight(this);
-        if (terrain > Tile.UNEXPLORED && terrain < Tile.ARCTIC && forested) {
-            BufferedImage compositeImage = gc.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
-            Graphics2D g = compositeImage.createGraphics();
-            g.drawImage(terrainImage, 0, 0, null);
-            g.drawImage(library.getForestImage(terrain), 0, 0, null);
-            g.dispose();
-            terrainImage = compositeImage;
-        }
-        if (scale == 1f) {
-            return terrainImage;
-        } else {
-            return terrainImage.getScaledInstance((int) (width * scale), 
-                                                  (int) (height * scale),
-                                                  Image.SCALE_SMOOTH);
-        }
-    }
-        
-
 
     /**
      * Builds the button for the given unit.
@@ -328,15 +305,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         String name = Unit.getName(unit);
         JButton button;
         if (unitIcon >= 0) {
-            ImageIcon icon = library.getUnitImageIcon(unitIcon);
-            if (scale != 1) {
-              Image image;
-              image = icon.getImage();
-              int width = (int) (scale * image.getWidth(this));
-              int height = (int) (scale * image.getHeight(this));
-              image = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-              icon = new ImageIcon(image);
-            }
+            ImageIcon icon = library.getScaledUnitImageIcon(unitIcon, scale);
             button = new JButton(name, icon);
             button.setVerticalAlignment(SwingConstants.TOP);
             button.setVerticalTextPosition(SwingConstants.TOP);
@@ -447,7 +416,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
 
         detailPanel.add(new JLabel(Messages.message("colopedia.terrain.terrainImage")),
                         higConst.rc(row, leftColumn));
-        Image terrainImage = getTerrainImage(type, forested, 1f);
+        Image terrainImage = library.getScaledTerrainImage(type, forested, 1f);
         detailPanel.add(new JLabel(new ImageIcon(terrainImage)),
                         higConst.rc(row, rightColumn));
         row += 2;
