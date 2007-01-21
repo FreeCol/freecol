@@ -1198,6 +1198,19 @@ public final class Canvas extends JLayeredPane {
 
 
     /**
+     * Shows a panel displaying Colopedia Information.
+     * @param type The type of colopedia panel to display.
+     * @param action The details to display.
+     */
+    public void showColopediaPanel(int type, int action) {
+        colopediaPanel.initialize(type, action);
+        setEnabled(false);
+        addCentered(colopediaPanel, COLOPEDIA_LAYER);
+        colopediaPanel.requestFocus();
+    }
+
+
+    /**
      * Shows a report panel.
      * @param classname The class name of the report panel
      *      to be displayed.

@@ -49,6 +49,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
     
+    public static final int NO_DETAILS = -1;
     public static final int COLOPEDIA_TERRAIN = 0;
     public static final int COLOPEDIA_UNIT    = 1;
     public static final int COLOPEDIA_GOODS   = 2;
@@ -131,31 +132,58 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * @param type - the panel type
      */
     public void initialize(int type) {
+        initialize(type, NO_DETAILS);
+    }
+
+    /**
+     * Prepares this panel to be displayed.
+     * @param type - the panel type
+     * @param action - the details
+     */
+    public void initialize(int type, int action) {
         this.type = type;
         listPanel.removeAll();
+        detailPanel.removeAll();
         switch (type) {
             case COLOPEDIA_TERRAIN:
                 buildTerrainList();
+                if (action != NO_DETAILS) {
+                    buildTerrainDetail(action);
+                }
                 break;
             case COLOPEDIA_UNIT:
                 buildUnitList();
+                if (action != NO_DETAILS) {
+                    buildUnitDetail(action);
+                }
                 break;
             case COLOPEDIA_GOODS:
                 buildGoodsList();
+                if (action != NO_DETAILS) {
+                    buildGoodsDetail(action);
+                }
                 break;
             case COLOPEDIA_SKILLS:
                 buildSkillsList();
+                if (action != NO_DETAILS) {
+                    //buildSkillsDetail(action);
+                }
                 break;
             case COLOPEDIA_BUILDING:
                 buildBuildingList();
+                if (action != NO_DETAILS) {
+                    buildBuildingDetail(action);
+                }
                 break;
             case COLOPEDIA_FATHER:
                 buildFatherList();
+                if (action != NO_DETAILS) {
+                    buildFatherDetail(action);
+                }
                 break;
             default:
                 break;
         }
-        detailPanel.removeAll();
         detailPanel.validate();
     }
 
