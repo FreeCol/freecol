@@ -948,6 +948,28 @@ public final class ImageLibrary extends ImageProvider {
     }
 
     /**
+     * Returns the scaled goods-ImageIcon at the given index.
+     * @param index The index of the goods-ImageIcon to return.
+     * @param scale The scale of the goods-ImageIcon to return.
+     * @return The goods-ImageIcon at the given index.
+     */
+    public ImageIcon getScaledGoodsImageIcon(int index, float scale) {
+        if (index >= 0) {
+            ImageIcon icon = getGoodsImageIcon(index);
+            if (scale != 1) {
+                Image image;
+                image = icon.getImage();
+                int width = (int) (scale * image.getWidth(null));
+                int height = (int) (scale * image.getHeight(null));
+                image = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+                icon = new ImageIcon(image);
+            }
+            return icon;
+        }
+        return null;
+    }
+
+    /**
      * Returns the colony image at the given index.
      * @param index The index of the image to return.
      * @return The image pointer

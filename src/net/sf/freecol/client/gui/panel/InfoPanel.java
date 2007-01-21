@@ -8,18 +8,23 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Iterator;
 import java.util.logging.Logger;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Unit;
 
+import cz.autel.dmi.HIGLayout;
 
 /**
  * This is the panel that shows more details about the currently selected unit
@@ -27,7 +32,7 @@ import net.sf.freecol.common.model.Unit;
  * and stuff like that.
  */
 public final class InfoPanel extends FreeColPanel {
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
@@ -38,11 +43,9 @@ public final class InfoPanel extends FreeColPanel {
 
     private final FreeColClient freeColClient;
     private final Game          game;
-    private final ImageProvider imageProvider;
+    private final ImageLibrary  library;
     private final EndTurnPanel  endTurnPanel = new EndTurnPanel();
-    private final UnitInfoPanel unitInfoPanel = new UnitInfoPanel();
-
-
+    private final UnitInfoPanel unitInfoPanel;
     
 
     /**
@@ -57,8 +60,9 @@ public final class InfoPanel extends FreeColPanel {
     public InfoPanel(FreeColClient freeColClient, Game game, ImageProvider imageProvider) {
         this.freeColClient = freeColClient;
         this.game = game;
-        this.imageProvider = imageProvider;
+        this.library = (ImageLibrary) imageProvider;
 
+        unitInfoPanel = new UnitInfoPanel();
         setLayout(null);
 
         int internalPanelTop = 0;
@@ -142,42 +146,26 @@ public final class InfoPanel extends FreeColPanel {
         private final JLabel    unitLabel,
                                 unitNameLabel,
                                 unitMovesLabel,
-                                unitToolsLabel;
+                                unitToolsLabel,
+                                goldLabel;
+        private final JPanel unitCargoPanel,
+                             labelPanel;
         private Unit unit;
+
+        private final int[] widths = {0, 0, 0, 0};
+        private final int[] heights = {0, 0};
 
         public UnitInfoPanel() {
             super(null);
-/*
-            unitLabel = new JLabel();
-            unitNameLabel = new JLabel();
-            unitMovesLabel = new JLabel();
-            unitToolsLabel = new JLabel();
 
-            unitLabel.setSize(118, 96);
-            unitNameLabel.setSize(116, 20);
-            unitMovesLabel.setSize(116, 20);
-            unitToolsLabel.setSize(116, 20);
+            Image tools = library.getGoodsImageIcon(Goods.TOOLS).getImage();
+            ImageIcon toolsIcon = new ImageIcon(tools.getScaledInstance(tools.getWidth(null) * 2/3,
+                                                                        tools.getHeight(null) * 2/3,
+                                                                        Image.SCALE_SMOOTH));
+            unitToolsLabel = new JLabel(toolsIcon);            
 
-            unitLabel.setLocation(10, 4);
-            unitNameLabel.setLocation(130, 15);
-            unitMovesLabel.setLocation(130, 40);
-            unitToolsLabel.setLocation(130, 65);
-
-            setLayout(null);
-
-            add(unitLabel);
-            add(unitNameLabel);
-            add(unitMovesLabel);
-            add(unitToolsLabel);
-
-            unitLabel.setFocusable(false);
-            unitNameLabel.setFocusable(false);
-            unitMovesLabel.setFocusable(false);
-            unitToolsLabel.setFocusable(false);
-
-            setSize(226, 100);
-            setOpaque(false);
-            */
+            unitCargoPanel = new JPanel(new HIGLayout(widths, heights));
+            unitCargoPanel.setOpaque(false);
 
             JPanel picturePanel = new JPanel(new BorderLayout());
             picturePanel.setOpaque(false);
@@ -189,20 +177,25 @@ public final class InfoPanel extends FreeColPanel {
             picturePanel.add(unitLabel, BorderLayout.CENTER);
             add(picturePanel);
 
-            JPanel labelPanel = new JPanel(new GridLayout(3, 1, 10, 10));
+            int[] widths = {0};
+            int[] heights = {0, 0, 0};
+            labelPanel = new JPanel(new HIGLayout(widths, heights));
             labelPanel.setOpaque(false);
+
             unitNameLabel = new JLabel();
             unitMovesLabel = new JLabel();
-            unitToolsLabel = new JLabel();
-            labelPanel.add(unitNameLabel);
-            labelPanel.add(unitMovesLabel);
-            labelPanel.add(unitToolsLabel);
+            goldLabel = new JLabel();
+
+            labelPanel.add(unitNameLabel, higConst.rc(1, 1));
+            labelPanel.add(unitMovesLabel, higConst.rc(2, 1));
+            labelPanel.add(unitCargoPanel, higConst.rc(3, 1));
+
             unitLabel.setFocusable(false);
             unitNameLabel.setFocusable(false);
             unitMovesLabel.setFocusable(false);
             unitToolsLabel.setFocusable(false);
-            labelPanel.setSize(130, 60);
-            labelPanel.setLocation(100, (100-labelPanel.getHeight())/2);
+            labelPanel.setSize(130, 100);
+            labelPanel.setLocation(100, 10);//(100-labelPanel.getHeight())/2);
             add(labelPanel);
 
             setSize(226, 100);
@@ -215,25 +208,52 @@ public final class InfoPanel extends FreeColPanel {
         * @param graphics The Graphics context in which to draw this component.
         */
         public void paintComponent(Graphics graphics) {
-            //Unit unit = freeColClient.getGUI().getActiveUnit();
+            unitCargoPanel.removeAll();
             if (unit != null) {
-                unitLabel.setIcon(imageProvider.getUnitImageIcon(imageProvider.getUnitGraphicsType(unit)));
                 unitNameLabel.setText(unit.getName());
-                unitMovesLabel.setText(Messages.message("moves") + unit.getMovesAsString());
+                unitLabel.setIcon(library.getUnitImageIcon(library.getUnitGraphicsType(unit)));
+                unitMovesLabel.setText(Messages.message("moves") + " " + unit.getMovesAsString());
                 if (unit.isPioneer()) {
-                    unitToolsLabel.setText("Tools: " + unit.getNumberOfTools());
+                    unitToolsLabel.setText(String.valueOf(unit.getNumberOfTools()));
+                    unitCargoPanel.add(unitToolsLabel, higConst.rc(1, 1));
                 } else if (unit.getType() == Unit.TREASURE_TRAIN) {
-                    unitToolsLabel.setText("Gold: " + unit.getTreasureAmount());
-                } else {
-                    unitToolsLabel.setText("");
+                    goldLabel.setText(unit.getTreasureAmount() + " " +
+                                      Messages.message("gold"));
+                    unitCargoPanel.add(goldLabel, higConst.rc(1, 1));
+                } else if (unit.isCarrier()) {
+                    int counter = 1;
+                    int row = 1;
+                    Iterator goodsIterator = unit.getGoodsIterator();
+                    while (goodsIterator.hasNext()) {
+                        Goods goods = (Goods) goodsIterator.next();
+                        JLabel goodsLabel = new JLabel(library.getScaledGoodsImageIcon(goods.getType(), 0.66f));
+                        unitCargoPanel.add(goodsLabel, higConst.rc(row, counter));
+                        if (counter == 4) {
+                            row++;
+                            counter = 1;
+                        } else {
+                            counter++;
+                        }
+                    }
+                    Iterator unitIterator = unit.getUnitIterator();
+                    while (unitIterator.hasNext()) {
+                        Unit unit = (Unit) unitIterator.next();
+                        int graphicsType = library.getUnitGraphicsType(unit);
+                        JLabel unitLabel = new JLabel(library.getScaledUnitImageIcon(graphicsType, 0.5f));
+                        unitCargoPanel.add(unitLabel, higConst.rc(row, counter));
+                        if (counter == 4) {
+                            row++;
+                            counter = 1;
+                        } else {
+                            counter++;
+                        }
+                    }                    
+                    unitCargoPanel.validate();
                 }
             } else {
                 unitLabel.setIcon(null);
-                unitNameLabel.setText("");
-                unitMovesLabel.setText("");
-                unitToolsLabel.setText("");
             }
-
+            labelPanel.validate();
             super.paintComponent(graphics);
         }
 
