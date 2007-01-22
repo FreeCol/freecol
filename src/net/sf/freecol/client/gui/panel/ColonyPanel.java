@@ -1705,9 +1705,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 int unitID = ((Integer) buildableUnitIterator.next()).intValue();
 
                 String theText = new String(Unit.getName(unitID) +
-                    " (" + Unit.getNextHammers(unitID) + " hammers");
+                    " (" + Unit.getNextHammers(unitID) + " " + Messages.message("model.goods.Hammers"));
                 if (Unit.getNextTools(unitID) > 0) {
-                    theText += ", " + Integer.toString(Unit.getNextTools(unitID)) + " tools";
+                    theText += ", " + Integer.toString(Unit.getNextTools(unitID)) + " " +
+                    Messages.message("model.goods.Tools");
                 }
 
                 theText += ")";
