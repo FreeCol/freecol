@@ -17,6 +17,7 @@ public final class UnitType
 
     private static final  int  UNDEFINED = Integer.MIN_VALUE;
 
+    public  String     id;
     public  String     name;
     public  int        offence;
     public  int        defence;
@@ -30,6 +31,7 @@ public final class UnitType
 
     public void readFromXmlElement( Node xml, Map goodsTypeByRef ) {
 
+        id = Xml.attribute( xml, "name" );
         name = Xml.messageAttribute( xml, "name" );
         offence = Xml.intAttribute( xml, "offence" );
         defence = Xml.intAttribute( xml, "defence" );

@@ -493,28 +493,73 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      */
     private void buildUnitDetail(int unit) {
         detailPanel.removeAll();
-        detailPanel.setLayout(new FlowLayout());
+        detailPanel.repaint();
 
+        UnitType type = FreeCol.specification.unitType(unit);
+        String price = "";
+        if (type.id.equals("model.unit.artillery")) {
+            price = String.valueOf(parent.getClient().getMyPlayer().getEurope().getArtilleryPrice());
+        } else if (type.price > 0) {
+            price = String.valueOf(type.price);
+        }
+        String hammersRequired = "";
+        if (type.hammersRequired > 0) {
+            hammersRequired = String.valueOf(type.hammersRequired);
+        }
+        String toolsRequired = "";
+        if (type.toolsRequired > 0) {
+            toolsRequired = String.valueOf(type.toolsRequired);
+        }
+        
+        int[] widths = {0, 3 * margin, 0};
+        int[] heights = new int[15];
+        for (int index = 0; index < 7; index++) {
+            heights[2 * index + 1] = margin;
+        }
+        int labelColumn = 1;
+        int valueColumn = 3;
+        detailPanel.setLayout(new HIGLayout(widths, heights));
+
+        int row = 1;
         JLabel name = new JLabel(Unit.getName(unit), SwingConstants.CENTER);
         name.setFont(((Font) UIManager.get("HeaderFont")).deriveFont(0, 24));
         name.setPreferredSize(new Dimension(detailPanel.getWidth(), 50));
-        detailPanel.add(name);
+        detailPanel.add(name, higConst.rcwh(row, labelColumn, widths.length, 1));
+        row += 2;
 
-        JTextArea description = new JTextArea();
-        description.setBorder(null);
-        description.setOpaque(false);
-        description.setLineWrap(true);
-        description.setEditable(false);
-        description.setWrapStyleWord(true);
-        description.setFocusable(false);
-        //TODO
-        description.setText("");
-        description.setSize(detailPanel.getWidth(), super.getPreferredSize().height);
-        detailPanel.add(description);
+        detailPanel.add(new JLabel(Messages.message("colopedia.unit.offensivePower")),
+                        higConst.rc(row, labelColumn));
+        detailPanel.add(new JLabel(String.valueOf(type.offence)),
+                        higConst.rc(row, valueColumn, "r"));
+        row += 2;
+        detailPanel.add(new JLabel(Messages.message("colopedia.unit.defensivePower")),
+                        higConst.rc(row, labelColumn));
+        detailPanel.add(new JLabel(String.valueOf(type.defence)),
+                        higConst.rc(row, valueColumn, "r"));
+        row += 2;
+        detailPanel.add(new JLabel(Messages.message("colopedia.unit.price")),
+                        higConst.rc(row, labelColumn));
+        detailPanel.add(new JLabel(price),
+                        higConst.rc(row, valueColumn, "r"));
+        row += 2;
+        detailPanel.add(new JLabel(Messages.message("colopedia.unit.hammersRequired")),
+                        higConst.rc(row, labelColumn));
+        detailPanel.add(new JLabel(hammersRequired),
+                        higConst.rc(row, valueColumn, "r"));
+        row += 2;
+        detailPanel.add(new JLabel(Messages.message("colopedia.unit.toolsRequired")),
+                        higConst.rc(row, labelColumn));
+        detailPanel.add(new JLabel(toolsRequired),
+                        higConst.rc(row, valueColumn, "r"));
+        row += 2;
+        detailPanel.add(new JLabel(Messages.message("colopedia.unit.description")),
+                        higConst.rc(row, labelColumn));
+        detailPanel.add(getDefaultTextArea(Messages.message(type.id + ".description")),
+                        higConst.rc(row, valueColumn));
 
         detailPanel.validate();
     }
-
+    
     /**
      * Builds the details panel for the given goods.
      * @param goods
@@ -536,7 +581,6 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         description.setWrapStyleWord(true);
         description.setFocusable(false);
         //TODO
-        description.setText("");
         description.setSize(detailPanel.getWidth(), super.getPreferredSize().height);
         detailPanel.add(description);
 
