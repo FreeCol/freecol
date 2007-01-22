@@ -104,8 +104,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 } else if (freeColServer.getGame().getCurrentPlayer().equals(freeColServer.getPlayer(connection))) {                    
                     if (type.equals("move")) {
                         reply = move(connection, element);
-                        //} else if (type.equals("explore")) {
-                        //reply = explore(connection, element);
                     } else if (type.equals("askSkill")) {
                         reply = askSkill(connection, element);
                     } else if (type.equals("attack")) {
@@ -122,6 +120,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                         reply = missionaryAtSettlement(connection, element);
                     } else if (type.equals("inciteAtSettlement")) {
                         reply = inciteAtSettlement(connection, element);
+                    } else if (type.equals("armedUnitDemandTribute")) {
+                        reply = armedUnitDemandTribute(connection, element);
                     } else if (type.equals("leaveShip")) {
                         reply = leaveShip(connection, element);
                     } else if (type.equals("loadCargo")) {
@@ -1181,22 +1181,75 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 reply.setAttribute("result", "nothing");
             }
         } else if (action.equals("tribute")) {
-            // TODO: the AI needs to determine whether or not we want to pay and how much.
-            double random = Math.random();
-            if (random < 0.5 && settlement.getOwner().getGold() >= 100) {
-                reply.setAttribute("result", "agree");
-                reply.setAttribute("amount", "100");
-                settlement.getOwner().modifyGold(-100);
-                player.modifyGold(100);
-            } else {
-                reply.setAttribute("result", "disagree");
-            }
-            settlement.getOwner().modifyTension(player, Tension.TENSION_ADD_MINOR);
+            demandTribute(settlement, player, reply);
         }
 
         return reply;
     }
 
+    /**
+    * Handles a "armedUnitDemandTribute"-message from a client.
+    *
+    * @param connection The connection the message came from.
+    * @param element The element containing the request.
+    */
+    private Element armedUnitDemandTribute(Connection connection, Element element) {
+        FreeColServer freeColServer = getFreeColServer();
+        Game game = freeColServer.getGame();
+        ServerPlayer player = freeColServer.getPlayer(connection);
+
+
+        // Get parameters:
+        Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
+        int direction = Integer.parseInt(element.getAttribute("direction"));
+
+
+        // Test the parameters:
+        if (unit == null) {
+            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: " + element.getAttribute("unit"));
+        }
+
+        if (unit.getTile() == null) {
+            throw new IllegalArgumentException("'Unit' is not on the map: " + unit.toString());
+        }
+
+        if (unit.getOwner() != player) {
+            throw new IllegalStateException("Not your unit!");
+        }
+
+        Tile oldTile = unit.getTile();
+        Tile newTile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
+
+        if (newTile == null) {
+            throw new IllegalArgumentException("Could not find tile in direction " + direction + " from unit with ID " + element.getAttribute("unit"));
+        }
+
+        IndianSettlement settlement = (IndianSettlement) newTile.getSettlement();
+        Element reply = Message.createNewRootElement("armedUnitDemandTributeResult");
+        demandTribute(settlement, player, reply);
+        return reply;
+    }
+    
+    /**
+     * Demands a tribute to an <code>IndianSettlement</code>
+     *
+     * @param settlement The <code>IndianSettlement</code> whom demand the tribute to
+     * @param player The <code>Player</code> which demands the tribute
+     * @param reply The element to add the result
+     */
+    private void demandTribute(IndianSettlement settlement, Player player, Element reply) {
+        // TODO: the AI needs to determine whether or not we want to pay and how much.
+        double random = Math.random();
+        if (random < 0.5 && settlement.getOwner().getGold() >= 100) {
+            reply.setAttribute("result", "agree");
+            reply.setAttribute("amount", "100");
+            settlement.getOwner().modifyGold(-100);
+            player.modifyGold(100);
+        } else {
+            reply.setAttribute("result", "disagree");
+        }
+        settlement.getOwner().modifyTension(player, Tension.TENSION_ADD_MINOR);
+    }
 
     /**
     * Handles a "missionaryAtSettlement"-message from a client.

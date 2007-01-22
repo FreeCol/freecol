@@ -1026,8 +1026,8 @@ public final class InGameController implements NetworkConstants {
 
 
     /**
-    * Performs an attack in a specified direction. Note that the server
-    * handles the attack calculations here.
+    * Ask for attack or demand a tribute when attacking an indian settlement,
+    * attack in other cases
     *
     * @param unit The unit to perform the attack.
     * @param direction The direction in which to attack.
@@ -1038,12 +1038,68 @@ public final class InGameController implements NetworkConstants {
             return;
         }
         
+        Canvas canvas = freeColClient.getCanvas();
+        Map map = freeColClient.getGame().getMap();
+        Tile target = map.getNeighbourOrNull(direction, unit.getTile());
+        if (target.getSettlement() != null && target.getSettlement() instanceof IndianSettlement
+                && unit.isArmed()) {
+            IndianSettlement settlement = (IndianSettlement) target.getSettlement();
+            int userAction = canvas.showArmedUnitIndianSettlementDialog(settlement);
+            Element reply;
+
+            switch (userAction) {
+                case FreeColDialog.SCOUT_INDIAN_SETTLEMENT_ATTACK:
+                    reallyAttack(unit, direction);
+                    return;
+                case FreeColDialog.SCOUT_INDIAN_SETTLEMENT_CANCEL:
+                    return;
+                case FreeColDialog.SCOUT_INDIAN_SETTLEMENT_TRIBUTE:
+                    Element demandMessage = Message.createNewRootElement("armedUnitDemandTribute");
+                    demandMessage.setAttribute("unit", unit.getID());
+                    demandMessage.setAttribute("direction", Integer.toString(direction));
+                    reply = freeColClient.getClient().ask(demandMessage);
+                    break;
+                default:
+                    logger.warning("Incorrect response returned from Canvas.showArmedUnitIndianSettlementDialog()");
+                    return;
+            }         
+            
+            if (reply.getTagName().equals("armedUnitDemandTributeResult")) {
+                String result = reply.getAttribute("result");
+                if (result.equals("agree")) {
+                    String amount = reply.getAttribute("amount");
+                    unit.getOwner().modifyGold(Integer.parseInt(amount));
+                    freeColClient.getCanvas().updateGoldLabel();
+                    canvas.showInformationMessage("scoutSettlement.tributeAgree", new String[][] {{"%replace%", amount}});
+                } else if (result.equals("disagree")) {
+                    canvas.showInformationMessage("scoutSettlement.tributeDisagree");
+                }
+            } else {
+                logger.warning("Server gave an invalid reply to an armedUnitDemandTribute message");
+                return;
+            }
+
+            nextActiveUnit(unit.getTile());
+        } else {
+            reallyAttack(unit, direction);
+            return;
+        }
+    }
+    
+    /**
+    * Performs an attack in a specified direction. Note that the server
+    * handles the attack calculations here.
+    *
+    * @param unit The unit to perform the attack.
+    * @param direction The direction in which to attack.
+    */
+    private void reallyAttack(Unit unit, int direction) {
         Client client = freeColClient.getClient();
         Canvas canvas = freeColClient.getCanvas();
         Game game = freeColClient.getGame();
         Map map = game.getMap();
         Player enemy;
-        Tile target = game.getMap().getNeighbourOrNull(direction, unit.getTile());
+        Tile target = map.getNeighbourOrNull(direction, unit.getTile());
         Unit defender = target.getDefendingUnit(unit);
         if (defender == null) {
             enemy = target.getSettlement().getOwner();
@@ -1996,7 +2052,7 @@ public final class InGameController implements NetworkConstants {
                 // If it wants to attack then it can and it will need some moves to do it.
                 unit.setMovesLeft(1);
                 client.sendAndWait(scoutMessage);
-                attack(unit, direction);
+                reallyAttack(unit, direction);
                 return;
             case FreeColDialog.SCOUT_INDIAN_SETTLEMENT_CANCEL:
                 scoutMessage.setAttribute("action", "cancel");
@@ -2050,7 +2106,7 @@ public final class InGameController implements NetworkConstants {
                 canvas.showInformationMessage("scoutSettlement.tributeDisagree");
             }
         } else {
-            logger.warning("Server gave an invalid reply to an askSkill message");
+            logger.warning("Server gave an invalid reply to an scoutIndianSettlement message");
             return;
         }
 

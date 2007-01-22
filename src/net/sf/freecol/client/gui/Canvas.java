@@ -140,6 +140,7 @@ public final class Canvas extends JLayeredPane {
                                 LOADING_SAVEGAME_LAYER = new Integer(DEFAULT_LAYER.intValue() + 11),
                                 LOAD_LAYER = new Integer(DEFAULT_LAYER.intValue() + 10),
                                 SAVE_LAYER = new Integer(DEFAULT_LAYER.intValue() + 10),
+                                ARMED_UNIT_INDIAN_SETTLEMENT_LAYER = new Integer(DEFAULT_LAYER.intValue() + 9),
                                 SCOUT_INDIAN_SETTLEMENT_LAYER = new Integer(DEFAULT_LAYER.intValue() + 9),
                                 USE_MISSIONARY_LAYER = new Integer(DEFAULT_LAYER.intValue() + 9),
                                 INCITE_LAYER = new Integer(DEFAULT_LAYER.intValue() + 9),
@@ -963,6 +964,28 @@ public final class Canvas extends JLayeredPane {
         int response = scoutDialog.getResponseInt();
 
         remove(scoutDialog);
+
+        return response;
+    }
+
+    /**
+    * Displays a dialog that asks the user what he wants to do with his armed unit
+    * in the indian settlement.
+    *
+    * @param settlement The indian settlement that is going to be attacked or demanded.
+    *
+    * @return FreeColDialog.SCOUT_INDIAN_SETTLEMENT_CANCEL if the action was cancelled,
+    *         FreeColDialog.SCOUT_INDIAN_SETTLEMENT_TRIBUTE if he wants to demand tribute,
+    *         FreeColDialog.SCOUT_INDIAN_SETTLEMENT_ATTACK if he wants to attack the settlement.
+    */
+    public int showArmedUnitIndianSettlementDialog(IndianSettlement settlement) {
+        FreeColDialog armedUnitDialog = FreeColDialog.createArmedUnitIndianSettlementDialog(settlement, freeColClient.getMyPlayer());
+        addCentered(armedUnitDialog, ARMED_UNIT_INDIAN_SETTLEMENT_LAYER);
+        armedUnitDialog.requestFocus();
+
+        int response = armedUnitDialog.getResponseInt();
+
+        remove(armedUnitDialog);
 
         return response;
     }

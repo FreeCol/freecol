@@ -582,6 +582,69 @@ public class FreeColDialog extends FreeColPanel {
         return scoutDialog;
     }
 
+    /**
+    * Creates a dialog that asks the user what he wants to do with his scout in the indian
+    * settlement. Options are: speak with chief, demand tribute, attack or cancel.
+    * The possible responses are integers that are defined in this class as finals.
+    *
+    * @param settlement The indian settlement that is being scouted.
+    * @param player The player to create the dialog for.
+    * @return The FreeColDialog that asks the question to the user.
+    */
+    public static FreeColDialog createArmedUnitIndianSettlementDialog(IndianSettlement settlement, Player player) {
+        String introText = Messages.message(settlement.getAlarmLevelMessage(player),
+                                            new String [][] {{"%nation%", settlement.getOwner().getNationAsString()}});
+        final JTextArea intro = getDefaultTextArea(introText);
+        final JButton attack = new JButton(Messages.message("scoutSettlement.attack")),
+                demand = new JButton(Messages.message("scoutSettlement.tribute")),
+                cancel = new JButton(Messages.message("scoutSettlement.cancel"));
+
+        final FreeColDialog armedUnitDialog = new FreeColDialog() {
+            public void requestFocus() {
+                attack.requestFocus();
+            }
+        };
+
+        int[] widths = {0};
+        int[] heights = new int[11];
+        for (int index = 0; index < 5; index++) {
+            heights[2 * index + 1] = margin;
+        }
+        int textColumn = 1;
+
+        armedUnitDialog.setLayout(new HIGLayout(widths, heights));
+
+        demand.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                armedUnitDialog.setResponse(new Integer(SCOUT_INDIAN_SETTLEMENT_TRIBUTE));
+            }
+        });
+        attack.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                armedUnitDialog.setResponse(new Integer(SCOUT_INDIAN_SETTLEMENT_ATTACK));
+            }
+        });
+        cancel.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                armedUnitDialog.setResponse(new Integer(SCOUT_INDIAN_SETTLEMENT_CANCEL));
+            }
+        });
+
+        int row = 1;
+        armedUnitDialog.add(intro, higConst.rc(row, textColumn));
+        row += 2;
+        armedUnitDialog.add(attack, higConst.rc(row, textColumn));
+        row += 2;
+        armedUnitDialog.add(demand, higConst.rc(row, textColumn));
+        row += 2;
+        armedUnitDialog.add(cancel, higConst.rc(row, textColumn));
+
+        armedUnitDialog.setSize(armedUnitDialog.getPreferredSize());
+        armedUnitDialog.setCancelComponent(cancel);
+
+        return armedUnitDialog;
+    }
+
 
     /**
     * Creates a dialog that asks the user what he wants to do with his missionary in the indian
