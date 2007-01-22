@@ -3991,7 +3991,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         out.writeStartElement(getXMLElementTagName());
 
         out.writeAttribute("ID", getID());
-        out.writeAttribute("name", getName());
+        if (name != null) {
+            out.writeAttribute("name", name);
+        }
         out.writeAttribute("type", Integer.toString(type));
         out.writeAttribute("armed", Boolean.toString(armed));
         out.writeAttribute("mounted", Boolean.toString(mounted));
