@@ -45,14 +45,15 @@ public class UnloadAction extends MapboardAction {
     /**
      * Checks if this action should be enabled.
      * 
-     * @return <code>true</code> if the player has access to Europe.
+     * @return <code>true</code> if there is a carrier active
      */
-    protected boolean shouldBeEnabled() { 
+    protected boolean shouldBeEnabled() {
+        if (!super.shouldBeEnabled()) return false;
         GUI gui = getFreeColClient().getGUI();
         if (gui == null) return false;
    	
     	Unit unit = getFreeColClient().getGUI().getActiveUnit();
-        return (unit != null && unit.isCarrier());
+        return (unit != null && unit.isCarrier() && unit.canUnload());
     }    
     
     /**
