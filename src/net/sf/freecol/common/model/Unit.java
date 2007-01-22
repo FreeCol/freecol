@@ -1216,6 +1216,22 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
         setState(ACTIVE);
     }
+    
+    /**
+    * Checks wether or not the unit can unload the cargo
+    *
+    * @return The result.
+    */
+    public boolean canUnload() {
+        Location l = getLocation();
+        if (l instanceof Europe && getState() != TO_EUROPE && getState() != TO_AMERICA) {
+            return true;
+        } else if (getTile().getSettlement() != null && getTile().getSettlement() instanceof Colony) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
 
     /**
