@@ -1043,7 +1043,8 @@ public class AIPlayer extends AIObject {
                 }
                 if (chosenOne != null) {
                     // Check that the colony can be reached:
-                    PathNode pn = getGame().getMap().findPath(chosenOne.getUnit(), indianSettlement.getTile(), target.getTile());
+                    
+                    PathNode pn = chosenOne.getUnit().findPath(indianSettlement.getTile(), target.getTile());
                     if (pn != null && pn.getTotalTurns() <= MAX_DISTANCE_TO_BRING_GIFT) {
                         chosenOne.setMission(new IndianBringGiftMission(getAIMain(), chosenOne, target));
                     }
@@ -1118,9 +1119,7 @@ public class AIPlayer extends AIObject {
                 }
                 if (chosenOne != null) {
                     // Check that the colony can be reached:
-                    PathNode pn = getGame().getMap().findPath(chosenOne.getUnit(),
-                            indianSettlement.getTile(),
-                            target.getTile());
+                    PathNode pn = chosenOne.getUnit().findPath(indianSettlement.getTile(), target.getTile());
                     if (pn != null && pn.getTotalTurns() <= MAX_DISTANCE_TO_MAKE_DEMANDS) {
                         // Make it less probable that nice players get targeted for a demand misson:
                         Player tp = target.getOwner();                        

@@ -713,7 +713,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     * @return A <code>PathNode</code> for the first tile in the path.
     * @see #findPath(Tile)
     */
-    private PathNode findPath(Tile start, Tile end) {
+    public PathNode findPath(Tile start, Tile end) {
         Location dest = getDestination();
         setDestination(end);
         PathNode path = getGame().getMap().findPath(this, start, end);
