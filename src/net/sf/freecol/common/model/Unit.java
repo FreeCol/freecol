@@ -700,9 +700,23 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         if (getTile() == null) {
             logger.warning("getTile() == null for " + getName() + " at location: " + getLocation());
         }
+        return findPath(getTile(), end);
+    }
+    
+    /**
+    * Finds a shortest path from the current <code>Tile</code>
+    * to the one specified. Only paths on water are allowed if
+    * <code>isNaval()</code> and only paths on land if not.
+    *
+    * @param start The <code>Tile</code> in which the path starts.
+    * @param end The <code>Tile</code> in which the path ends.
+    * @return A <code>PathNode</code> for the first tile in the path.
+    * @see #findPath(Tile)
+    */
+    private PathNode findPath(Tile start, Tile end) {
         Location dest = getDestination();
         setDestination(end);
-        PathNode path = getGame().getMap().findPath(this, getTile(), end);
+        PathNode path = getGame().getMap().findPath(this, start, end);
         setDestination(dest);
         return path;
     }
@@ -737,12 +751,15 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         }
 
         if (getLocation() instanceof Unit) {
+            Location dest = getDestination();
+            setDestination(end);
             PathNode p = getGame().getMap().findPath(this, start, end, (Unit) getLocation());
+            setDestination(dest);
             if (p != null) {
                 return p.getTotalTurns();
             }
         }
-        PathNode p = getGame().getMap().findPath(this, start, end);
+        PathNode p = findPath(start, end);
         if (p != null) {
             return p.getTotalTurns();
         }
