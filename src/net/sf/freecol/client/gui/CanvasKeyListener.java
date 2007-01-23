@@ -170,11 +170,6 @@ public final class CanvasKeyListener implements KeyListener {
         if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
             parent.getGUI().setDragPath(null);
         }
-        
-        if (e.isShiftDown() && e.isControlDown() && e.getKeyCode() == KeyEvent.VK_V) {
-        	parent.getGUI().getViewMode().toggleViewMode();
-            return;
-        }
     }
     
     /**

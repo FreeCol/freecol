@@ -62,6 +62,7 @@ import net.sf.freecol.client.gui.action.SaveAction;
 import net.sf.freecol.client.gui.action.SelectableAction;
 import net.sf.freecol.client.gui.action.SentryAction;
 import net.sf.freecol.client.gui.action.SkipUnitAction;
+import net.sf.freecol.client.gui.action.ToggleViewModeAction;
 import net.sf.freecol.client.gui.action.UnloadAction;
 import net.sf.freecol.client.gui.action.WaitAction;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -190,6 +191,7 @@ public class FreeColMenuBar extends JMenuBar {
         menu.add(getCheckBoxMenuItem(MapControlsAction.ID));
         menu.add(getCheckBoxMenuItem(DisplayTileNamesAction.ID));
         menu.add(getCheckBoxMenuItem(DisplayGridAction.ID));
+        menu.add(getMenuItem(ToggleViewModeAction.ID));
 
         menu.addSeparator();
 
