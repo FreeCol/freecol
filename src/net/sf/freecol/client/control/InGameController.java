@@ -1843,7 +1843,7 @@ public final class InGameController implements NetworkConstants {
         unit.setState(state);
 
         if (!freeColClient.getCanvas().getColonyPanel().isShowing() &&
-                unit.getMovesLeft() == 0) {
+                (unit.getMovesLeft() == 0 || unit.getState() == Unit.SENTRY)) {
             nextActiveUnit();
         } else {
             freeColClient.getCanvas().refresh();

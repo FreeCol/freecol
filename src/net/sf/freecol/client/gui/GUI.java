@@ -2070,7 +2070,14 @@ public final class GUI {
 
             // Draw the unit.
             int type = lib.getUnitGraphicsType(unit);
-            g.drawImage(lib.getUnitImage(type), (x + tileWidth / 2) - lib.getUnitImageWidth(type) / 2, (y + tileHeight / 2) - lib.getUnitImageHeight(type) / 2 - UNIT_OFFSET, null);
+            Image image = lib.getUnitImage(type);
+            
+            // If unit is sentry, draw in grayscale
+            if (unit.getState() == Unit.SENTRY) {
+                image = lib.convertToGrayscale(image, g.getRenderingHints());
+            }
+            
+            g.drawImage(image, (x + tileWidth / 2) - lib.getUnitImageWidth(type) / 2, (y + tileHeight / 2) - lib.getUnitImageHeight(type) / 2 - UNIT_OFFSET, null);
 
             // Draw an occupation and nation indicator.
             displayOccupationIndicator(g, unit, x + STATE_OFFSET_X, y);

@@ -12,6 +12,7 @@ import net.sf.freecol.client.gui.action.BuildRoadAction;
 import net.sf.freecol.client.gui.action.DisbandUnitAction;
 import net.sf.freecol.client.gui.action.FortifyAction;
 import net.sf.freecol.client.gui.action.PlowAction;
+import net.sf.freecol.client.gui.action.SentryAction;
 import net.sf.freecol.client.gui.action.SkipUnitAction;
 import net.sf.freecol.client.gui.action.WaitAction;
 
@@ -64,6 +65,7 @@ public final class MapControls {
         unitButton = new UnitButton[] {
             new UnitButton(am.getFreeColAction(WaitAction.ID)),
             new UnitButton(am.getFreeColAction(SkipUnitAction.ID)),
+            new UnitButton(am.getFreeColAction(SentryAction.ID)),
             new UnitButton(am.getFreeColAction(FortifyAction.ID)),
             new UnitButton(am.getFreeColAction(PlowAction.ID)),
             new UnitButton(am.getFreeColAction(BuildRoadAction.ID)),

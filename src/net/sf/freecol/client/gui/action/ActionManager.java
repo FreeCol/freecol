@@ -71,6 +71,7 @@ public class ActionManager extends OptionGroup {
         add(new ReportReligionAction(freeColClient));
         add(new ReportTradeAction(freeColClient));        
         add(new SaveAction(freeColClient));
+        add(new SentryAction(freeColClient));
         add(new SkipUnitAction(freeColClient));
         add(new UnloadAction(freeColClient));
         add(new WaitAction(freeColClient));

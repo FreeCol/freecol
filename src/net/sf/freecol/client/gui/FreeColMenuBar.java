@@ -60,6 +60,7 @@ import net.sf.freecol.client.gui.action.ReportReligionAction;
 import net.sf.freecol.client.gui.action.ReportTradeAction;
 import net.sf.freecol.client.gui.action.SaveAction;
 import net.sf.freecol.client.gui.action.SelectableAction;
+import net.sf.freecol.client.gui.action.SentryAction;
 import net.sf.freecol.client.gui.action.SkipUnitAction;
 import net.sf.freecol.client.gui.action.UnloadAction;
 import net.sf.freecol.client.gui.action.WaitAction;
@@ -204,6 +205,7 @@ public class FreeColMenuBar extends JMenuBar {
         menu.setMnemonic(KeyEvent.VK_O);
 
         menu.add(getMenuItem(WaitAction.ID));
+        menu.add(getMenuItem(SentryAction.ID));
         menu.add(getMenuItem(FortifyAction.ID));
         menu.add(getMenuItem(GotoAction.ID));
         

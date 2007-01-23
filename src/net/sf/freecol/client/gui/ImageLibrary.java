@@ -6,9 +6,12 @@ import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
+import java.awt.RenderingHints;
 import java.awt.Transparency;
+import java.awt.color.ColorSpace;
 import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorConvertOp;
 import java.io.File;
 import java.net.URL;
 import java.util.Hashtable;
@@ -795,6 +798,17 @@ public final class ImageLibrary extends ImageProvider {
       return (ImageIcon) bonus.get(index);
     }
 
+    public Image convertToGrayscale(Image image, RenderingHints hints) {
+        int width = image.getWidth(null);
+        int height = image.getHeight(null);
+
+        ColorConvertOp filter = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), hints);
+        BufferedImage srcImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage dstImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        srcImage.createGraphics().drawImage(image, 0, 0, null);
+        return filter.filter(srcImage, dstImage);
+    }
+    
     /**
      * Returns the unit-image at the given index.
      * @param index The index of the unit-image to return.

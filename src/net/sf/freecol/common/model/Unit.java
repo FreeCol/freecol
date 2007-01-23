@@ -1160,13 +1160,31 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
         if (newTile != null) {
             setLocation(newTile);
+            activeAdjacentSentryUnits(newTile);
         } else {
             throw new IllegalStateException("Illegal move requested!");
         }
         setMovesLeft(getMovesLeft() - moveCost);
     }
 
-
+    /**
+     * Active units with sentry state wich are adjacent to a specified tile
+     *
+     * @param tile The tile to iterate over adjacent tiles.
+     */
+    public void activeAdjacentSentryUnits(Tile tile) {
+        Map map = getGame().getMap();
+        Iterator it = map.getAdjacentIterator(tile.getPosition());
+        while(it.hasNext()) {
+            Iterator unitIt = map.getTile((Position) it.next()).getUnitIterator();
+            while (unitIt.hasNext()) {
+                Unit unit = (Unit) unitIt.next();
+                if (unit.getState() == Unit.SENTRY) {
+                    unit.setState(Unit.ACTIVE);
+                }
+            }
+        }
+    }
 
     /**
     * Embarks this unit onto the specified unit.
@@ -2426,10 +2444,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 break;
             case SENTRY:
                 workLeft = -1;
-                // Make sure we don't lose our movepoints if we're on a ship -sjm
-                if (location instanceof Tile) {
-                    movesLeft = 0;
-                }
                 break;
             case FORTIFIED:
                 workLeft = -1;
