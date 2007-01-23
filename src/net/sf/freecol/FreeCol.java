@@ -5,6 +5,7 @@ import java.awt.Rectangle;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Handler;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
@@ -66,7 +67,7 @@ public final class FreeCol {
     
     private static File savegameFile = null;
 
-
+    private static Level logLevel = Level.INFO;
 
     private FreeCol() {}
 
@@ -110,6 +111,11 @@ public final class FreeCol {
 
         try {
             baseLogger.addHandler(new DefaultHandler());
+            if (inDebugMode) {
+                logLevel = Level.FINEST;
+            } 
+            Logger freecolLogger = Logger.getLogger("net.sf.freecol");
+            freecolLogger.setLevel(logLevel);
         } catch (FreeColException e) {
             e.printStackTrace();
         }
@@ -273,6 +279,20 @@ public final class FreeCol {
                     // append a file separator to the data folder if necessary
                     if ( ! dataFolder.endsWith(FILE_SEP)) {
                         dataFolder += FILE_SEP;
+                    }
+                } else {
+                    printUsage();
+                    System.exit(0);
+                }
+            } else if (args[i].equals("--log-level")) {
+                i++;
+                if (i < args.length) {
+                    String logLevelString = args[i].toUpperCase();
+                    try {
+                        logLevel = Level.parse(logLevelString);
+                    } catch (IllegalArgumentException e) {
+                        printUsage();
+                        System.exit(1);
                     }
                 } else {
                     printUsage();

@@ -1243,6 +1243,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         Location l = getLocation();
         if (l instanceof Europe && getState() != TO_EUROPE && getState() != TO_AMERICA) {
             return true;
+        } else if (getTile() == null) {
+            // this should not happen, but it does
+            return false;
         } else if (getTile().getSettlement() != null && getTile().getSettlement() instanceof Colony) {
             return true;
         } else {
@@ -1822,6 +1825,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     * @param b <i>true</i> if the unit should be a missionary and <i>false</i> otherwise.
     */
     public void setMissionary(boolean b) {
+        logger.finest(getID() + ": Entering method setMissionary with param " + b);
         setMovesLeft(0);
 
         if (b) {
