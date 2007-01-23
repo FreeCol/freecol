@@ -102,23 +102,6 @@ public final class CanvasKeyListener implements KeyListener {
                 case KeyEvent.VK_PAGE_UP:
                     inGameController.moveActiveUnit(Map.NE);
                     break;
-                case KeyEvent.VK_S:
-                    /*
-                    if (parent.getGUI().getActiveUnit() != null) {
-                        parent.getClient().getInGameController().changeState(parent.getGUI().getActiveUnit(), Unit.SENTRY);
-                    }
-                     */
-                    break;
-                case KeyEvent.VK_PLUS:
-                case KeyEvent.VK_EQUALS:
-                    //mapControls.zoomIn();
-                    //parent.refresh();
-                    break;
-                case KeyEvent.VK_MINUS:
-                case KeyEvent.VK_UNDERSCORE:
-                    //mapControls.zoomOut();
-                    //parent.refresh();
-                    break;
                 default:
                     logger.info("The typed key (" + e.getKeyCode() + ") doesn't have a function yet.");
             }
@@ -171,16 +154,6 @@ public final class CanvasKeyListener implements KeyListener {
                     Cursor cursor = parent.getGUI().getCursor();
                     parent.showTilePopup(parent.getGUI().getSelectedTile(),cursor.getCanvasX(),cursor.getCanvasY());
                     break;
-            	case KeyEvent.VK_PLUS:
-            	case KeyEvent.VK_EQUALS:
-            	    //mapControls.zoomIn();
-            	    //parent.refresh();
-            	    break;
-            	case KeyEvent.VK_MINUS:
-            	case KeyEvent.VK_UNDERSCORE:
-            	    //mapControls.zoomOut();
-            	    //parent.refresh();
-            	    break;
             	default:
             	    logger.info("The typed key (" + e.getKeyCode() + ") doesn't have a function yet.");
             }        	

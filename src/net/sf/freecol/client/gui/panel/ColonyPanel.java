@@ -329,7 +329,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             unitLabel.setTransferHandler(defaultTransferHandler);
             unitLabel.addMouseListener(pressListener);
 
-            //if (((unit.getState() == Unit.ACTIVE) || (unit.getState() == Unit.SENTRY)) && (!unit.isNaval())) {
             if (!unit.isCarrier()) {
                 outsideColonyPanel.add(unitLabel, false);
             } else {
