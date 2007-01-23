@@ -363,7 +363,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         int required = owner.getCrossesRequired();
         int crosses = owner.getCrosses();
         int difference = Math.max(required - crosses, 0);
-        return Math.min((recruitPrice * difference) / required, 600);
+        return (recruitPrice * difference) / required;
     }
 
     private void incrementRecruitPrice() {
