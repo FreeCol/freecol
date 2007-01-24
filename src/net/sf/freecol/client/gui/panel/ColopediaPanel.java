@@ -512,8 +512,8 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         }
         
         int[] widths = {0, 3 * margin, 0};
-        int[] heights = new int[15];
-        for (int index = 0; index < 7; index++) {
+        int[] heights = new int[17];
+        for (int index = 0; index < 8; index++) {
             heights[2 * index + 1] = margin;
         }
         int labelColumn = 1;
@@ -535,6 +535,11 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         detailPanel.add(new JLabel(Messages.message("colopedia.unit.defensivePower")),
                         higConst.rc(row, labelColumn));
         detailPanel.add(new JLabel(String.valueOf(type.defence)),
+                        higConst.rc(row, valueColumn, "r"));
+        row += 2;
+        detailPanel.add(new JLabel(Messages.message("colopedia.unit.skill")),
+                        higConst.rc(row, labelColumn));
+        detailPanel.add(new JLabel(String.valueOf(String.valueOf(type.skill))),
                         higConst.rc(row, valueColumn, "r"));
         row += 2;
         detailPanel.add(new JLabel(Messages.message("colopedia.unit.price")),

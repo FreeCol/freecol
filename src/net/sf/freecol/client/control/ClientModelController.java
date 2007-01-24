@@ -63,7 +63,7 @@ public class ClientModelController implements ModelController {
         getRandomElement.setAttribute("taskID", taskID);
         getRandomElement.setAttribute("n", Integer.toString(n));
 
-        logger.info("Waiting for the server to reply...");
+        logger.info("TaskID is " + taskID + " Waiting for the server to reply...");
         Element reply = client.ask(getRandomElement);
         logger.info("Reply received from server.");
 

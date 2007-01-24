@@ -2755,6 +2755,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     * This method does all the work.
     */
     public void doAssignedWork() {
+        logger.finest("Entering method doAssignedWork.");
         if (workLeft > 0) {
             workLeft--;
             
@@ -2826,7 +2827,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                             }
                             getTile().setForested(false);
                             // TODO: check map generator options
+                            logger.finest("Checking for bonus on cleared land");
                             if (getGame().getModelController().getRandom(getID() + "doAssignedWork:plow", 10) == 0) {
+                                logger.finest("Received bonus on cleared land");
                                 getTile().setBonus(true);
                             }
                         } else {
@@ -3984,10 +3987,13 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             logger.warning("Calling newTurn for an uninitialized object: " + getID());
         }
         if (getType() == FREE_COLONIST && location instanceof ColonyTile) {
+            logger.finest("About to call getRandom for experience");
             int random = getGame().getModelController().getRandom(getID() + "experience", 2000);
             if (random < Math.min(experience, 200)) {
+                logger.finest("About to change type of unit.");
                 String oldName = getName();
                 setType(((ColonyTile) location).getExpertForProducing(workType));
+                logger.finest("About to add model message.");
                 addModelMessage(getTile().getColony(), "model.unit.experience",
                             new String[][] {{"%oldName%", oldName},
                                             {"%newName%", getName()},
@@ -3995,6 +4001,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                             ModelMessage.UNIT_IMPROVED, this);
             }
         }
+        logger.finest("About to change moves left.");
         movesLeft = getInitialMovesLeft();
         doAssignedWork();
     }

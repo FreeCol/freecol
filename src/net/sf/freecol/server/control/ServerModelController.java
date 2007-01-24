@@ -69,7 +69,7 @@ public class ServerModelController implements ModelController {
     public synchronized int getRandom(String taskID, int n) {
         String extendedTaskID = taskID + Integer.toString(freeColServer.getGame().getTurn().getNumber());
 
-        logger.info("Entering getRandom");
+        logger.info("Entering getRandom with taskID " + taskID);
 
         if (taskRegister.containsKey(extendedTaskID)) {
             //return ((Integer) taskRegister.remove(extendedTaskID)).intValue();

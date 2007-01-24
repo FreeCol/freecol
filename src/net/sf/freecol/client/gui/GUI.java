@@ -326,6 +326,28 @@ public final class GUI {
     }
 
 
+    public void showColonyPanel(Position selectedTile) {
+        Game gameData = freeColClient.getGame();
+
+        if (selectedTile != null && !gameData.getMap().isValid(selectedTile)) {
+            return;
+        }
+
+        if (viewMode.getView() == ViewMode.MOVE_UNITS_MODE) {
+            Tile t = gameData.getMap().getTile(selectedTile);
+            if (t != null && t.getSettlement() != null && t.getSettlement() instanceof Colony
+                && t.getSettlement().getOwner().equals(freeColClient.getMyPlayer())) {
+                
+                setFocus(selectedTile);
+                
+                freeColClient.getCanvas().showColonyPanel((Colony) t.getSettlement());
+                return;
+            }
+        }
+    }
+
+
+
     /**
     * Gets the unit that should be displayed on the given tile.
     *
