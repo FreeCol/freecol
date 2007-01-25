@@ -133,6 +133,7 @@ public final class GUI {
     MESSAGE_AGE = 30000; // The amount of time before a message gets deleted (in milliseconds).
 
     private boolean displayTileNames = false;
+    private boolean displayTileOwners = false;
     private boolean displayGrid = false;
     private GeneralPath gridPath = null;
 
@@ -143,6 +144,7 @@ public final class GUI {
     public boolean displayCoordinates = false;
     public boolean displayColonyValue = false;
     public Player displayColonyValuePlayer = null;
+
     public boolean debugShowMission = false;
     public boolean debugShowMissionInfo = false;
 
@@ -2035,6 +2037,28 @@ public final class GUI {
                 */
             }
         }
+        
+        if (displayTileOwners && tile.getNationOwner() != Player.NO_NATION) {
+            String tileOwner = Player.getNationAsString(tile.getNationOwner());
+            g.setColor(Color.BLACK);
+            int b = getBreakingPoint(tileOwner);
+            if (b == -1) {
+                g.drawString(tileOwner, x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(tileOwner))/2, y + (lib.getTerrainImageHeight(tile.getType())/2));
+                /* Takes to much resources:
+                BufferedImage stringImage = createStringImage(g, tileOwner, Color.BLACK, lib.getTerrainImageWidth(tile.getType()), 10);
+                g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType())/2 - stringImage.getHeight()/2, null);
+                */
+            } else {
+                g.drawString(tileOwner.substring(0, b), x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(tileOwner.substring(0, b)))/2, y + lib.getTerrainImageHeight(tile.getType())/2 - (g.getFontMetrics().getAscent()*2)/3);
+                g.drawString(tileOwner.substring(b+1), x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(tileOwner.substring(b+1)))/2, y + lib.getTerrainImageHeight(tile.getType())/2 + (g.getFontMetrics().getAscent()*2)/3);
+                /* Takes to much resources:
+                BufferedImage stringImage = createStringImage(g, tileOwner.substring(0, b), Color.BLACK, lib.getTerrainImageWidth(tile.getType()), 10);
+                g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType())/2 - (stringImage.getHeight()) - 5, null);
+                stringImage = createStringImage(g, tileOwner.substring(b+1), Color.BLACK, lib.getTerrainImageWidth(tile.getType()), 10);
+                g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType())/2 - 5, null);
+                */
+            }
+        }
 
         /*
         if (tile.getPosition().equals(selectedTile)) {
@@ -2118,6 +2142,16 @@ public final class GUI {
     */
     public void setDisplayTileNames(boolean displayTileNames) {
         this.displayTileNames = displayTileNames;
+    }
+
+
+    /**
+    * If set to <i>true</i> then tile owners are drawn on the map.
+    * @param displayTileOwners <code>true</code> if the tile owners
+    *       should be displayed and <code>false</code> otherwise.
+    */
+    public void setDisplayTileOwners(boolean displayTileOwners) {
+        this.displayTileOwners = displayTileOwners;
     }
 
 

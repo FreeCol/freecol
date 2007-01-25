@@ -35,6 +35,7 @@ import net.sf.freecol.client.gui.action.DeclareIndependenceAction;
 import net.sf.freecol.client.gui.action.DisbandUnitAction;
 import net.sf.freecol.client.gui.action.DisplayGridAction;
 import net.sf.freecol.client.gui.action.DisplayTileNamesAction;
+import net.sf.freecol.client.gui.action.DisplayTileOwnersAction;
 import net.sf.freecol.client.gui.action.EndTurnAction;
 import net.sf.freecol.client.gui.action.EuropeAction;
 import net.sf.freecol.client.gui.action.ExecuteGotoOrdersAction;
@@ -75,9 +76,9 @@ import net.sf.freecol.client.gui.panel.FreeColImageBorder;
 * @see Canvas#setJMenuBar
 */
 public class FreeColMenuBar extends JMenuBar {
-	private static final Logger logger = Logger.getLogger(FreeColMenuBar.class.getName());
+    private static final Logger logger = Logger.getLogger(FreeColMenuBar.class.getName());
 	
-	public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
@@ -190,6 +191,7 @@ public class FreeColMenuBar extends JMenuBar {
        
         menu.add(getCheckBoxMenuItem(MapControlsAction.ID));
         menu.add(getCheckBoxMenuItem(DisplayTileNamesAction.ID));
+        menu.add(getCheckBoxMenuItem(DisplayTileOwnersAction.ID));
         menu.add(getCheckBoxMenuItem(DisplayGridAction.ID));
         menu.add(getMenuItem(ToggleViewModeAction.ID));
 
