@@ -297,6 +297,24 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     }
 
     /**
+     * Get the <code>UnitType</code> value.
+     *
+     * @return an <code>UnitType</code> value
+     */
+    public final UnitType getUnitType() {
+        return unitType;
+    }
+
+    /**
+     * Set the <code>UnitType</code> value.
+     *
+     * @param newUnitType The new UnitType value.
+     */
+    public final void setUnitType(final UnitType newUnitType) {
+        this.unitType = newUnitType;
+    }
+
+    /**
     * Returns the current amount of treasure in this unit.
     * Should be type of TREASURE_TRAIN.
     * @return The amount of treasure.

@@ -1137,6 +1137,11 @@ public final class InGameController implements NetworkConstants {
 		return;
 	    }
 	}
+
+        if (freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_PRECOMBAT) &&
+            !canvas.showPreCombatDialog(unit, defender)) {
+            return;
+        }
         
         if (unit.getType() == Unit.ARTILLERY || unit.getType() == Unit.DAMAGED_ARTILLERY || unit.isNaval()) {
             freeColClient.playSound(SfxLibrary.ARTILLERY);

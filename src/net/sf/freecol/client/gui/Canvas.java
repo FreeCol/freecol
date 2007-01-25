@@ -703,6 +703,19 @@ public final class Canvas extends JLayeredPane {
         return response;
     }
 
+    public boolean showPreCombatDialog(Unit attacker, Unit defender) {
+
+        FreeColDialog preCombatDialog = FreeColDialog.createPreCombatDialog(attacker, defender, this);
+        addCentered(preCombatDialog, CONFIRM_LAYER);
+        preCombatDialog.requestFocus();
+
+        boolean response = preCombatDialog.getResponseBoolean();
+
+        remove(preCombatDialog);
+
+        return response;
+    }
+
     /**
     * Displays a dialog with a text and a ok/cancel option.
     *

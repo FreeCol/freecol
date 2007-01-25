@@ -82,6 +82,7 @@ public class ClientOptions extends OptionMap {
     public static final String SHOW_LOST_CITY_RUMOURS = "guiShowLostCityRumours";
     public static final String SHOW_MISSING_GOODS = "guiShowMissingGoods";
     public static final String SHOW_COLONY_WARNINGS = "guiShowColonyWarnings";
+    public static final String SHOW_PRECOMBAT = "guiShowPreCombat";
     
     /**
      * Use default values for savegames instead of displaying a dialog.
@@ -304,6 +305,10 @@ public class ClientOptions extends OptionMap {
         messagesGroup.add(new BooleanOption(SHOW_COLONY_WARNINGS,
                                        "clientOptions.gui." + SHOW_COLONY_WARNINGS + ".name",
                                        "clientOptions.gui." + SHOW_COLONY_WARNINGS + ".shortDescription",
+                                       true));
+        messagesGroup.add(new BooleanOption(SHOW_PRECOMBAT,
+                                       "clientOptions.gui." + SHOW_PRECOMBAT + ".name",
+                                       "clientOptions.gui." + SHOW_PRECOMBAT + ".shortDescription",
                                        true));
         add(messagesGroup);
         

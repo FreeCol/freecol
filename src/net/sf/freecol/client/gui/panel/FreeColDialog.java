@@ -42,9 +42,12 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
 
+import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.UnitLabel;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import cz.autel.dmi.HIGLayout;
@@ -293,6 +296,115 @@ public class FreeColDialog extends FreeColPanel {
         return informationDialog;
     }
 
+
+    public static FreeColDialog createPreCombatDialog(Unit attacker, Unit defender, Canvas parent) {
+
+        ArrayList<Modifier> offense = Modifier.getOffensiveModifiers(attacker, defender);
+        ArrayList<Modifier> defense = Modifier.getDefensiveModifiers(attacker, defender);
+
+        int number = Math.max(offense.size(), defense.size());
+
+        int[] widths = {-5, margin, -7, 3 * margin, -1, margin, -3};
+        int[] heights = new int[2 * number + 5];
+        int labelColumn = 1;
+        int valueColumn = 3;
+
+        for (int index = 0; index < number + 2; index++) {
+            heights[2 * index + 1] = margin;
+        }
+
+
+        final JButton okButton = new JButton();
+        final FreeColDialog preCombatDialog = new FreeColDialog() {
+            public void requestFocus() {
+                okButton.requestFocus();
+            }
+        };
+
+        Action okAction = new AbstractAction(Messages.message("ok")) {
+            public void actionPerformed( ActionEvent event ) {
+                preCombatDialog.setResponse( Boolean.TRUE );
+            }
+        };
+        okButton.setAction(okAction);
+
+        Action  cancelAction = new AbstractAction(Messages.message("cancel")) {
+            public void actionPerformed( ActionEvent event ) {
+                preCombatDialog.setResponse( Boolean.FALSE );
+            }
+        };
+        final JButton cancelButton = new JButton(cancelAction);
+
+
+        preCombatDialog.setLayout(new HIGLayout(widths, heights));
+
+        okButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                preCombatDialog.setResponse(false);
+            }
+        });
+
+        int row = 1;
+        preCombatDialog.add(new JLabel(Messages.message("modifiers.attacker")),
+                            higConst.rcwh(row, labelColumn, 3, 1));
+        row += 2;
+        preCombatDialog.add(new UnitLabel(attacker, parent),
+                            higConst.rcwh(row, labelColumn, 3, 1));
+        row += 2;
+        for (int index = 0; index < offense.size(); index++) {
+            Modifier modifier = offense.get(index);
+            preCombatDialog.add(new JLabel(Messages.message(modifier.id)), 
+                                higConst.rc(row, labelColumn));
+            String value;
+            if (modifier.addend == 0 && modifier.numerator != 0) {
+                value = String.valueOf(modifier.numerator) + "/" + 
+                        String.valueOf(modifier.denominator);
+            } else {
+                value = String.valueOf(modifier.addend);
+            }
+            preCombatDialog.add(new JLabel(value),
+                                higConst.rc(row, valueColumn, "r"));
+            row += 2;
+        }
+
+        row = 1;
+        labelColumn = 5;
+        valueColumn = 7;
+        preCombatDialog.add(new JLabel(Messages.message("modifiers.defender")),
+                            higConst.rcwh(row, labelColumn, 3, 1));
+        row += 2;
+        if (defender != null) {
+            preCombatDialog.add(new UnitLabel(defender, parent),
+                                higConst.rcwh(row, labelColumn, 3, 1));
+        }
+        row += 2;
+        for (int index = 0; index < defense.size(); index++) {
+            Modifier modifier = defense.get(index);
+            preCombatDialog.add(new JLabel(Messages.message(modifier.id)), 
+                                higConst.rc(row, labelColumn));
+            String value;
+            if (modifier.addend == 0) {
+                value = String.valueOf(modifier.numerator) + "/" + 
+                        String.valueOf(modifier.denominator);
+            } else {
+                value = String.valueOf(modifier.addend);
+            }
+            preCombatDialog.add(new JLabel(value),
+                                higConst.rc(row, valueColumn, "r"));
+            row += 2;
+        }
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(okButton);
+        buttonPanel.add(cancelButton);
+        preCombatDialog.add(buttonPanel, 
+                            higConst.rcwh(heights.length, 1, widths.length, 1));
+        preCombatDialog.setSize(preCombatDialog.getPreferredSize());
+
+        return preCombatDialog;
+    }
+
+    
 
     /**
     * Creates a new <code>FreeColDialog</code> with a text and a cancel-button,
