@@ -1,5 +1,7 @@
 package net.sf.freecol.client.gui;
 
+
+
 import java.awt.Dimension;
 import java.awt.Point;
 import java.io.BufferedReader;
@@ -10,6 +12,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.StringTokenizer;
+
+
 
 /**
  * Represents the data within a Font Animation File.
@@ -33,9 +37,8 @@ public class FAFile {
      * @throws IOException gets thrown if the data is invalid. 
      */
     public FAFile(InputStream is) throws IOException {
-        load(is);
+        load(new CREatingInputStream(is));
     }
-    
     
     /**
      * Gets the <code>Dimension</code> of the given
@@ -51,35 +54,36 @@ public class FAFile {
         }
 
         int width = 0;
-        
         for (int i=0; i<text.length(); i++) {
             FALetter fl = getLetter(text.charAt(i));
             width += fl.advance;
         }
-        
+
         int firstMinX = Integer.MAX_VALUE;
         FALetter letter = getLetter(text.charAt(0));
         for (int i=0; i<letter.points.length; i++) {
-            Point p = (Point) letter.points[i];
+            Point p = letter.points[i];
             if (p.x < firstMinX) {
                 firstMinX = p.x;
             }
         }  
-        width += firstMinX;
 
+        width += firstMinX;
         int lastMaxX = 0;
         letter = getLetter(text.charAt(text.length()-1));
+
         for (int i=0; i<letter.points.length; i++) {
-            Point p = (Point) letter.points[i];
+            Point p = letter.points[i];
             if (p.x > lastMaxX) {
                 lastMaxX = p.x;
             }
         }        
+
         width += lastMaxX;        
-        
+
         return new Dimension(width, maxHeight);
     }
-    
+
     /**
      * Gets the points to display the given text as an
      * animation.
@@ -93,9 +97,7 @@ public class FAFile {
         if (fn != null) {
             return fn.points;
         }
-
         List points = new ArrayList();
-
         int x = 0;
         for (int i=0; i<text.length(); i++) {
             FALetter fl = getLetter(text.charAt(i));
@@ -103,23 +105,23 @@ public class FAFile {
                 Point p = fl.points[j];
                 points.add(new Point(p.x + x, p.y));
             }
+
             x += fl.advance;
         }
-        
         return (Point[]) points.toArray(new Point[0]);
     }
 
     private void load(InputStream is) throws IOException {
         letters.clear();
-        
+
         BufferedReader in = new BufferedReader(new InputStreamReader(is));
         if (!in.readLine().startsWith("FontAnimationFile")) {
             throw new IllegalStateException("Not a FAF");
         }
-        
+
         StringTokenizer st = new StringTokenizer(in.readLine());
         maxHeight = Integer.parseInt(st.nextToken());
-        
+
         String line = in.readLine();
         while (!line.startsWith("[Chars]") && line != null) {
             String name = line;
@@ -141,7 +143,7 @@ public class FAFile {
             for (int i=0; i<numberOfPoints; i++) {
                 ys[i] = Integer.parseInt(st.nextToken());               
             }   
-            
+
             FAName newLetter = new FAName();
             newLetter.name = name;
             newLetter.width = width;
@@ -151,9 +153,9 @@ public class FAFile {
                 newLetter.points[i] = new Point(xs[i], ys[i]);                
             }                       
             letters.put(name, newLetter);
-            
             line = in.readLine();
         }
+
         line = in.readLine();
         while (line != null) {
             st = new StringTokenizer(line.substring(1));
@@ -162,7 +164,6 @@ public class FAFile {
             int numberOfPoints = Integer.parseInt(st.nextToken());
             int[] xs = new int[numberOfPoints];
             int[] ys = new int[numberOfPoints];
-
             line = in.readLine();
             st = new StringTokenizer(line);
             for (int i=0; i<numberOfPoints; i++) {
@@ -174,21 +175,19 @@ public class FAFile {
             for (int i=0; i<numberOfPoints; i++) {
                 ys[i] = Integer.parseInt(st.nextToken());               
             }   
-            
+
             FALetter newLetter = new FALetter();
             newLetter.letter = letter;
             newLetter.advance = advance;
             newLetter.points = new Point[numberOfPoints];
-            
             for (int i=0; i<numberOfPoints; i++) {
                 newLetter.points[i] = new Point(xs[i], ys[i]);                
             }           
-            
             letters.put(new Character(letter), newLetter);
-            
             line = in.readLine();
         }
     }
+
 
     private FALetter getLetter(char letter) {
         return (FALetter) letters.get(new Character(letter));
@@ -198,15 +197,50 @@ public class FAFile {
         return (FAName) letters.get(name);
     }
 
-    private class FALetter {
+    private static class FALetter {
         public char letter;
         public Point[] points;
         public int advance;
     }
-    private class FAName {
+
+    private static class FAName {
         public String name;
         public Point[] points;
         public int width;
         public int height;
     }
+
+    /**
+     * This utility class removes all CR:s from an {@link InputStream}.
+     * It is not particularly efficient and is intended as a temporary
+     * workaround.
+     */
+    private static class CREatingInputStream extends InputStream {
+        /**
+         * Constructor.
+         * 
+         * @param in The input stream to wrap.
+         */
+        CREatingInputStream(InputStream in) {
+            this.in = in;
+        }
+        
+        /**
+         * Read a character, override to eat all CR:s.
+         * 
+         * @return next character or -1 on end of file.
+         * @throws IOException if wrapped stream throws it.
+         */
+        @Override
+        public int read() throws IOException {
+            int c;
+            do {
+                c = this.in.read();
+            } while(c == '\r');
+            return c;
+        }
+        
+        private final InputStream in;
+    }
 }
+
