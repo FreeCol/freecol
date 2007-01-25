@@ -6,6 +6,7 @@ import javax.swing.JComponent;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ViewMode;
 import net.sf.freecol.client.gui.action.ActionManager;
 import net.sf.freecol.client.gui.action.BuildColonyAction;
 import net.sf.freecol.client.gui.action.BuildRoadAction;
@@ -15,6 +16,7 @@ import net.sf.freecol.client.gui.action.PlowAction;
 import net.sf.freecol.client.gui.action.SentryAction;
 import net.sf.freecol.client.gui.action.SkipUnitAction;
 import net.sf.freecol.client.gui.action.WaitAction;
+import net.sf.freecol.common.model.Tile;
 
 
 /**
@@ -177,8 +179,22 @@ public final class MapControls {
     * Updates this <code>MapControls</code>.
     */
     public void update() {
-        if (infoPanel.getUnit() != freeColClient.getGUI().getActiveUnit()) {
-            infoPanel.update(freeColClient.getGUI().getActiveUnit());
+        GUI gui = freeColClient.getGUI();
+        int viewMode = gui.getViewMode().getView();
+        switch (viewMode) {
+            case ViewMode.MOVE_UNITS_MODE:
+                if (infoPanel.getUnit() != gui.getActiveUnit()) {
+                    infoPanel.update(gui.getActiveUnit());
+                }
+                break;
+            case ViewMode.VIEW_TERRAIN_MODE:
+                if (gui.getSelectedTile() != null) {
+                    Tile selectedTile = freeColClient.getGame().getMap().getTile(gui.getSelectedTile());
+                    if (infoPanel.getTile() != selectedTile) {
+                        infoPanel.update(selectedTile);
+                    }
+                }
+                break;
         }
     }
 }

@@ -63,6 +63,7 @@ public class ViewMode {
         if(currentMode == ViewMode.VIEW_TERRAIN_MODE){
             
             Position selectedTilePos = gui.getSelectedTile();
+            if (selectedTilePos == null) return false;
             
             if(selectedTilePos.getX() == tile.getX() && selectedTilePos.getY() == tile.getY()){
                 Cursor cursor = gui.getCursor();

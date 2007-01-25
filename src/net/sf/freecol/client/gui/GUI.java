@@ -309,6 +309,12 @@ public final class GUI {
                 }
             }
         }
+        
+        freeColClient.getActionManager().update();
+        freeColClient.getCanvas().updateJMenuBar();
+
+        //TODO: update only within the bounds of InfoPanel
+        freeColClient.getCanvas().repaint(0, 0, getWidth(), getHeight());
 
         // Check if the gui needs to reposition:
         if (!onScreen(selectedTile)
@@ -455,12 +461,6 @@ public final class GUI {
             }
         }
 
-        freeColClient.getActionManager().update();
-        freeColClient.getCanvas().updateJMenuBar();
-
-        //TODO: update only within the bounds of InfoPanel
-        freeColClient.getCanvas().repaint(0, 0, getWidth(), getHeight());
-        
         // The user activated a unit
         if(viewMode.getView() == ViewMode.VIEW_TERRAIN_MODE && activeUnit != null)
             viewMode.changeViewMode(ViewMode.MOVE_UNITS_MODE);
@@ -468,6 +468,12 @@ public final class GUI {
         //if (activeUnit != null && !activeUnit.getTile().getPosition().equals(selectedTile)) {
         if (activeUnit != null) {
             setSelectedTile(activeUnit.getTile().getPosition());
+        } else {
+            freeColClient.getActionManager().update();
+            freeColClient.getCanvas().updateJMenuBar();
+
+            //TODO: update only within the bounds of InfoPanel
+            freeColClient.getCanvas().repaint(0, 0, getWidth(), getHeight());
         }
     }
 
@@ -1594,6 +1600,27 @@ public final class GUI {
 
     /**
      * Displays the given Tile onto the given Graphics2D object at the
+     * location specified by the coordinates. Draws the terrain and
+     * improvements. Doesn't draw settlements, lost city rumours, fog
+     * of war, optional values neither units.
+     *
+     * <br><br>The same as calling <code>displayTile(g, map, tile, x, y, true);</code>.
+     * @param g The Graphics2D object on which to draw the Tile.
+     * @param map The map.
+     * @param tile The Tile to draw.
+     * @param x The x-coordinate of the location where to draw the Tile
+     * (in pixels).
+     * @param y The y-coordinate of the location where to draw the Tile
+     * (in pixels).
+     */
+    public void displayTerrain(Graphics2D g, Map map, Tile tile, int x, int y) {
+        displayBaseTile(g, map, tile, x, y, true);
+        displayAdditionsAndImprovements(g, map, tile, x, y);
+        displayUnexploredBorders(g, map, tile, x, y);
+    }
+
+    /**
+     * Displays the given Tile onto the given Graphics2D object at the
      * location specified by the coordinates. Everything located on the
      * Tile will also be drawn except for units because their image can
      * be larger than a Tile.
@@ -1633,9 +1660,7 @@ public final class GUI {
 
     /**
      * Displays the given Tile onto the given Graphics2D object at the
-     * location specified by the coordinates. Everything located on the
-     * Tile will also be drawn except for units because their image can
-     * be larger than a Tile.
+     * location specified by the coordinates. Only base terrain will be drawn.
      * @param g The Graphics2D object on which to draw the Tile.
      * @param map The map.
      * @param tile The Tile to draw.
@@ -1704,6 +1729,27 @@ public final class GUI {
      *        unexplored terrain.
      */
     private void displayTileOverlays(Graphics2D g, Map map, Tile tile, int x, int y, boolean drawUnexploredBorders) {  
+        displayAdditionsAndImprovements(g, map, tile, x, y);
+        displaySettlement(g, map, tile, x, y);
+        displayFogOfWar(g, map, tile, x, y);
+        if (drawUnexploredBorders)
+            displayUnexploredBorders(g, map, tile, x, y);
+        displayOptionalValues(g, map, tile, x, y);
+    }
+
+    /**
+     * Displays the given Tile onto the given Graphics2D object at the
+     * location specified by the coordinates. Addtions and improvements to
+     * Tile will be drawn.
+     * @param g The Graphics2D object on which to draw the Tile.
+     * @param map The map.
+     * @param tile The Tile to draw.
+     * @param x The x-coordinate of the location where to draw the Tile
+     * (in pixels).
+     * @param y The y-coordinate of the location where to draw the Tile
+     * (in pixels).
+     */
+    private void displayAdditionsAndImprovements(Graphics2D g, Map map, Tile tile, int x, int y) {  
         Map.Position pos = new Map.Position(tile.getX(), tile.getY());
 
         if (!tile.isExplored()) {
@@ -1809,7 +1855,23 @@ public final class GUI {
                     drawRoad(g, seed, x + tileWidth/2, y + tileHeight/2 - 10, x + tileWidth/2, y + tileHeight/2 + 10);
                 }
             }
+        }
+    }
 
+    /**
+     * Displays the given Tile onto the given Graphics2D object at the
+     * location specified by the coordinates. Settlements and Lost City
+     * Rumours will be shown.
+     * @param g The Graphics2D object on which to draw the Tile.
+     * @param map The map.
+     * @param tile The Tile to draw.
+     * @param x The x-coordinate of the location where to draw the Tile
+     * (in pixels).
+     * @param y The y-coordinate of the location where to draw the Tile
+     * (in pixels).
+     */
+    private void displaySettlement(Graphics2D g, Map map, Tile tile, int x, int y) {  
+        if (tile.isExplored()) {
             Settlement settlement = tile.getSettlement();
 
             if (settlement != null) {
@@ -1875,7 +1937,22 @@ public final class GUI {
                 g.drawImage(lib.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR),
                             x + RUMOUR_OFFSET_X, y + RUMOUR_OFFSET_Y, null);
             }
+        }
+    }
 
+    /**
+     * Displays the given Tile onto the given Graphics2D object at the
+     * location specified by the coordinates. Fog of war will be drawn.
+     * @param g The Graphics2D object on which to draw the Tile.
+     * @param map The map.
+     * @param tile The Tile to draw.
+     * @param x The x-coordinate of the location where to draw the Tile
+     * (in pixels).
+     * @param y The y-coordinate of the location where to draw the Tile
+     * (in pixels).
+     */
+    private void displayFogOfWar(Graphics2D g, Map map, Tile tile, int x, int y) {  
+        if (tile.isExplored()) {
             final boolean displayFogOfWar = freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_FOG_OF_WAR);
             if (displayFogOfWar && !freeColClient.getMyPlayer().canSee(tile)) {
                 g.setColor(Color.BLACK);
@@ -1887,23 +1964,56 @@ public final class GUI {
                 g.fill(pol);
                 g.setComposite(oldComposite);
             }
+        }
+    }
 
-            if (drawUnexploredBorders) {
-                for (int i = 3; i < 6; i++) {
-                    Map.Position p = map.getAdjacent(pos, i);
-                    if (map.isValid(p)) {
-                        Tile borderingTile = map.getTile(p);
+    /**
+     * Displays the given Tile onto the given Graphics2D object at the
+     * location specified by the coordinates. Borders next to unexplored
+     * tiles will be drawn differently.
+     * @param g The Graphics2D object on which to draw the Tile.
+     * @param map The map.
+     * @param tile The Tile to draw.
+     * @param x The x-coordinate of the location where to draw the Tile
+     * (in pixels).
+     * @param y The y-coordinate of the location where to draw the Tile
+     * (in pixels).
+     * @param drawUnexploredBorders If true; draws border between explored and
+     *        unexplored terrain.
+     */
+    private void displayUnexploredBorders(Graphics2D g, Map map, Tile tile, int x, int y) {  
+        Map.Position pos = new Map.Position(tile.getX(), tile.getY());
 
-                        if (borderingTile.isExplored()){
-                            continue;
-                        }
+        if (tile.isExplored()) {
+            for (int i = 3; i < 6; i++) {
+                Map.Position p = map.getAdjacent(pos, i);
+                if (map.isValid(p)) {
+                    Tile borderingTile = map.getTile(p);
 
-                        g.drawImage(lib.getTerrainImage(borderingTile.getType(), i, tile.getX(), tile.getY()), x, y, null);
+                    if (borderingTile.isExplored()){
+                        continue;
                     }
+
+                    g.drawImage(lib.getTerrainImage(borderingTile.getType(), i, tile.getX(), tile.getY()), x, y, null);
                 }
             }
         }
+    }
 
+
+    /**
+     * Displays the given Tile onto the given Graphics2D object at the
+     * location specified by the coordinates. Show tile names, coordinates
+     * and colony values.
+     * @param g The Graphics2D object on which to draw the Tile.
+     * @param map The map.
+     * @param tile The Tile to draw.
+     * @param x The x-coordinate of the location where to draw the Tile
+     * (in pixels).
+     * @param y The y-coordinate of the location where to draw the Tile
+     * (in pixels).
+     */
+    private void displayOptionalValues(Graphics2D g, Map map, Tile tile, int x, int y) {  
         if (displayTileNames) {
             String tileName = tile.getName();
             g.setColor(Color.BLACK);

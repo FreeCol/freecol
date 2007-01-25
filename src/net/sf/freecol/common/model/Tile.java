@@ -246,7 +246,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
             TileType  t = FreeCol.specification.tileType( type );
             return forested ? t.whenForested.name : t.name;
         }
-
+        
         return "Unknown";
     }
 

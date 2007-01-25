@@ -8,6 +8,7 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
@@ -19,9 +20,12 @@ import javax.swing.UIManager;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.ViewMode;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 
 import cz.autel.dmi.HIGLayout;
@@ -46,6 +50,7 @@ public final class InfoPanel extends FreeColPanel {
     private final ImageLibrary  library;
     private final EndTurnPanel  endTurnPanel = new EndTurnPanel();
     private final UnitInfoPanel unitInfoPanel;
+    private final TileInfoPanel tileInfoPanel = new TileInfoPanel();
     
 
     /**
@@ -78,18 +83,20 @@ public final class InfoPanel extends FreeColPanel {
             internalPanelHeight = 100;
         }
 
-        unitInfoPanel.setVisible(false);
-        endTurnPanel.setVisible(false);
-
-        unitInfoPanel.setLocation((getWidth()-unitInfoPanel.getWidth())/2,
-                                  internalPanelTop + (internalPanelHeight-unitInfoPanel.getHeight())/2);
-        endTurnPanel.setLocation((getWidth()-endTurnPanel.getWidth())/2,
-                                  internalPanelTop + (internalPanelHeight-endTurnPanel.getHeight())/2);
-
-        add(unitInfoPanel);
-        add(endTurnPanel);
+        add(unitInfoPanel, internalPanelTop, internalPanelHeight);
+        add(endTurnPanel, internalPanelTop, internalPanelHeight);
+        add(tileInfoPanel, internalPanelTop, internalPanelHeight);
     }
 
+    /**
+     * Adds a panel to show information
+     */
+    private void add(JPanel panel, int internalPanelTop, int internalPanelHeight) {
+        panel.setVisible(false);
+        panel.setLocation((getWidth()-panel.getWidth())/2,
+                internalPanelTop + (internalPanelHeight-panel.getHeight())/2);
+        add(panel);
+    }
 
 
     /**
@@ -98,6 +105,14 @@ public final class InfoPanel extends FreeColPanel {
     */
     public void update(Unit unit) {
         unitInfoPanel.update(unit);
+    }
+
+    /**
+    * Updates this <code>InfoPanel</code>.
+    * @param tile The displayed tile (or null if none)
+    */
+    public void update(Tile tile) {
+        tileInfoPanel.update(tile);
     }
 
 
@@ -111,22 +126,43 @@ public final class InfoPanel extends FreeColPanel {
         return unitInfoPanel.getUnit();
     }
 
+    /**
+    * Gets the <code>Tile</code> in which this <code>InfoPanel</code> is
+    * displaying information about.
+    *
+    * @return The <code>Tile</code> or <i>null</i> if no <code>Tile</code> applies.
+    */
+    public Tile getTile() {
+        return tileInfoPanel.getTile();
+    }
+
 
     /**
     * Paints this component.
     * @param graphics The Graphics context in which to draw this component.
     */
     public void paintComponent(Graphics graphics) {
-        if (unitInfoPanel.getUnit() != null) {
-            if (!unitInfoPanel.isVisible()) {
-                unitInfoPanel.setVisible(true);
-                endTurnPanel.setVisible(false);
-            }
-        } else if (!freeColClient.getMyPlayer().hasNextActiveUnit()) {
-            if (!endTurnPanel.isVisible()) {
-                endTurnPanel.setVisible(true);
+        int viewMode = freeColClient.getGUI().getViewMode().getView();
+        switch (viewMode) {
+            case ViewMode.MOVE_UNITS_MODE:
+                if (unitInfoPanel.getUnit() != null) {
+                    if (!unitInfoPanel.isVisible()) {
+                        unitInfoPanel.setVisible(true);
+                        endTurnPanel.setVisible(false);
+                    }
+                } else if (!freeColClient.getMyPlayer().hasNextActiveUnit()) {
+                    if (!endTurnPanel.isVisible()) {
+                        endTurnPanel.setVisible(true);
+                        unitInfoPanel.setVisible(false);
+                    }
+                }
+                tileInfoPanel.setVisible(false);
+                break;
+            case ViewMode.VIEW_TERRAIN_MODE:
                 unitInfoPanel.setVisible(false);
-            }
+                endTurnPanel.setVisible(false);
+                tileInfoPanel.setVisible(true);
+                break;
         }
 
         Image skin = (Image) UIManager.get("InfoPanel.skin");
@@ -137,6 +173,127 @@ public final class InfoPanel extends FreeColPanel {
         super.paintComponent(graphics);
     }
 
+    /**
+    * Panel for displaying <code>Tile</code>-information.
+    */
+    public class TileInfoPanel extends JPanel {
+
+        private final JLabel    tileLabel,
+                                tileNameLabel,
+                                bonusLabel,
+                                riverLabel,
+                                roadLabel,
+                                plowLabel,
+                                ownerLabel;
+        private final JPanel picturePanel,
+                             labelPanel;
+        private Tile tile;
+
+        public TileInfoPanel() {
+            super(null);
+
+            picturePanel = new JPanel(new BorderLayout());
+            picturePanel.setOpaque(false);
+            picturePanel.setSize(130, 100);
+            picturePanel.setLocation(0, 0);
+            tileLabel = new JLabel();
+            tileLabel.setHorizontalAlignment(JLabel.CENTER);
+            tileLabel.setVerticalAlignment(JLabel.CENTER);
+            picturePanel.add(tileLabel, BorderLayout.CENTER);
+            //tileNameLabel = new JLabel();
+            //picturePanel.add(tileNameLabel, BorderLayout.SOUTH);
+            add(picturePanel);
+
+            
+            int[] widths = {0};
+            int[] heights = {0, 0, 0, 0};
+            labelPanel = new JPanel(new HIGLayout(widths, heights));
+            labelPanel.setOpaque(false);
+            
+            tileNameLabel = new JLabel();
+            bonusLabel = new JLabel();
+            riverLabel = new JLabel(Messages.message("river"));
+            roadLabel = new JLabel(Messages.message("road"));
+            plowLabel = new JLabel(Messages.message("plowed"));
+            ownerLabel = new JLabel();
+
+            tileLabel.setFocusable(false);
+            tileNameLabel.setFocusable(false);
+            bonusLabel.setFocusable(false);
+            roadLabel.setFocusable(false);
+            riverLabel.setFocusable(false);
+            plowLabel.setFocusable(false);
+            ownerLabel.setFocusable(false);
+            labelPanel.setSize(100, 100);
+            labelPanel.setLocation(130, 10);//(100-labelPanel.getHeight())/2);
+            add(labelPanel);
+            
+
+            setSize(226, 100);
+            setOpaque(false);
+        }
+
+
+        /**
+        * Paints this component.
+        * @param graphics The Graphics context in which to draw this component.
+        */
+        public void paintComponent(Graphics graphics) {
+            if (tile != null) {
+                tileNameLabel.setText(tile.getName());
+                labelPanel.removeAll();
+                labelPanel.add(tileNameLabel, higConst.rc(1, 1));
+                int row = 2;
+                if (tile.hasRiver()) {
+                    labelPanel.add(riverLabel, higConst.rc(row, 1));
+                    row++;
+                }
+                if (tile.hasRoad()) {
+                    labelPanel.add(roadLabel, higConst.rc(row, 1));
+                    row++;
+                }
+                if (tile.isPlowed()) {
+                    labelPanel.add(plowLabel, higConst.rc(row, 1));
+                    row++;
+                }
+                if (tile.getNationOwner() != Player.NO_NATION) {
+                    ownerLabel.setText(Player.getNationAsString(tile.getNationOwner()));
+                    labelPanel.add(ownerLabel, higConst.rc(row, 1));
+                }
+                
+                int width = library.getTerrainImageWidth(tile.getType());
+                int height = library.getTerrainImageHeight(tile.getType());
+                BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+                freeColClient.getGUI().displayTerrain(image.createGraphics(),
+                        freeColClient.getGame().getMap(), tile, 0, 0);
+                tileLabel.setIcon(new ImageIcon(image));
+            } else {
+                tileLabel.setIcon(null);
+            }
+            labelPanel.validate();
+            super.paintComponent(graphics);
+        }
+
+
+        /**
+        * Updates this <code>InfoPanel</code>.
+        * @param tile The displayed tile (or null if none)
+        */
+        public void update(Tile tile) {
+            this.tile = tile;
+        }
+
+
+        /**
+        * Gets the <code>Tile</code> in which this <code>InfoPanel</code> is
+        * displaying information about.
+        *
+        * @return The <code>Tile</code> or <i>null</i> if no <code>Tile</code> applies.
+        */
+        public Tile getTile() {
+            return tile;
+        }
+    }
 
     /**
     * Panel for displaying <code>Unit</code>-information.
