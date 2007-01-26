@@ -1129,16 +1129,11 @@ public class IndianSettlement extends Settlement {
             if (!ownedUnitsString.equals("")) {
                 out.writeAttribute("ownedUnits", ownedUnitsString);
             }
-        }
 
-        if (showAll || player == getOwner()) {
             out.writeAttribute("hasBeenVisited", Boolean.toString(isVisited));
-        }
-
-        out.writeAttribute("learnableSkill", Integer.toString(learnableSkill));
-
-        if (showAll || player == getOwner()) {
             out.writeAttribute("convertProgress", Integer.toString(convertProgress));
+            out.writeAttribute("learnableSkill", Integer.toString(learnableSkill));
+            toArrayElement("wantedGoods", wantedGoods, out);
         }
         
         int[] tensionArray = new int[alarm.length];
@@ -1146,7 +1141,6 @@ public class IndianSettlement extends Settlement {
             tensionArray[i] = alarm[i].getValue();
         }
         toArrayElement("alarm", tensionArray, out);
-        toArrayElement("wantedGoods", wantedGoods, out);
 
         if (missionary != null) {
             out.writeStartElement("missionary");
