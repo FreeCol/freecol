@@ -1959,8 +1959,8 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
             return wantedGoods1;
         }
 
-        public void setWantedGoods2(int wantedGoods1) {
-            this.wantedGoods1 = wantedGoods1;
+        public void setWantedGoods2(int wantedGoods2) {
+            this.wantedGoods2 = wantedGoods2;
         }
         
         public int getWantedGoods2() {
