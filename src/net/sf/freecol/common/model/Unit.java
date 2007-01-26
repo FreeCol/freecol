@@ -184,7 +184,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     * @param type The type of the unit.
     */
     public Unit(Game game, Player owner, int type) {
-        this(game, null, owner, type, isCarrier(type)?ACTIVE:SENTRY);
+        this(game, null, owner, type, ACTIVE);//isCarrier(type)?ACTIVE:SENTRY);
     }
 
 
