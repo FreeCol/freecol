@@ -702,6 +702,7 @@ public final class InGameInputHandler extends InputHandler {
                 int amount = new Integer(element.getAttribute("amount")).intValue();
                 freeColClient.getMyPlayer().setTax(amount);
                 reply.setAttribute("accepted", String.valueOf(true));
+                freeColClient.getCanvas().updateJMenuBar();
             } else {
                 reply.setAttribute("accepted", String.valueOf(false));
                 
