@@ -298,6 +298,12 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
             Ownable o = (Ownable) freeColClient.getFreeColServer().getGame().getFreeColGameObject(id);
             Player mp = (Player) freeColClient.getFreeColServer().getGame().getFreeColGameObject(freeColClient.getMyPlayer().getID());
             o.setOwner(mp);
+            if (o instanceof Unit) {
+                Iterator it = ((Unit) o).getUnitIterator();
+                while (it.hasNext()) {
+                    ((Unit) it.next()).setOwner(mp);
+                }
+            }
             if (o instanceof Location) {
                 freeColClient.getFreeColServer().getModelController().update(((Location) o).getTile());
             } else if (o instanceof Locatable) {
