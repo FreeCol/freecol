@@ -592,7 +592,7 @@ public final class InGameController implements NetworkConstants {
         if (path == null) {
             canvas.showInformationMessage("selectDestination.failed",
                     new String [][] {{"%destination%",
-                        ((Location) destination).toString()}});
+                         destination.toString()}});
             setDestination(unit, null);
             return;
         }   

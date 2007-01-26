@@ -274,7 +274,7 @@ public final class ImageLibrary extends ImageProvider {
         terrain2;
 
 
-    private Vector[] unitButtons; //Holds the unit-order buttons
+    private Vector<ImageIcon>[] unitButtons; //Holds the unit-order buttons
     private Image[] alarmChips;
     private Hashtable<Color, BufferedImage> colorChips;
     private Hashtable<Color, BufferedImage> missionChips;
@@ -520,7 +520,7 @@ public final class ImageLibrary extends ImageProvider {
     private void loadUnitButtons(GraphicsConfiguration gc, Class resourceLocator, boolean doLookup) throws FreeColException {
         unitButtons = new Vector[4];
         for(int i = 0; i < 4; i++) {
-            unitButtons[i] = new Vector(UNIT_BUTTON_COUNT);
+            unitButtons[i] = new Vector<ImageIcon>(UNIT_BUTTON_COUNT);
         }
 
         for(int i = 0; i < 4; i++) {
@@ -795,7 +795,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return The bonus-ImageIcon at the given index.
      */
     public ImageIcon getBonusImageIcon(int index) {
-      return (ImageIcon) bonus.get(index);
+      return bonus.get(index);
     }
 
     public Image convertToGrayscale(Image image, RenderingHints hints) {
@@ -815,7 +815,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return The unit-image at the given index.
      */
     public Image getUnitImage(int index) {
-        return ((ImageIcon) units.get(index)).getImage();
+        return units.get(index).getImage();
     }
 
     /**
@@ -824,7 +824,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return The unit-ImageIcon at the given index.
      */
     public ImageIcon getUnitImageIcon(int index) {
-        return (ImageIcon) units.get(index);
+        return units.get(index);
     }
 
     /**
@@ -928,7 +928,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return The image at the given index.
      */
     public Image getRiverImage(int index) {
-        return ((ImageIcon) rivers.get(index)).getImage();
+        return rivers.get(index).getImage();
     }
 
     /**
@@ -937,7 +937,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return The image at the given index.
      */
     public Image getForestImage(int index) {
-        return ((ImageIcon) forests.get(index)).getImage();
+        return forests.get(index).getImage();
     }
 
     /**
@@ -946,7 +946,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return The image at the given index.
      */
     public Image getMiscImage(int index) {
-        return ((ImageIcon) misc.get(index)).getImage();
+        return misc.get(index).getImage();
     }
 
     /**
@@ -955,7 +955,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return The image at the given index.
      */
     public ImageIcon getMiscImageIcon(int index) {
-        return (ImageIcon) misc.get(index);
+        return misc.get(index);
     }
 
     /**
@@ -965,7 +965,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return The image pointer
      */
     public ImageIcon getUnitButtonImageIcon(int index, int state) {
-        return (ImageIcon) unitButtons[state].get(index);
+        return unitButtons[state].get(index);
     }
 
     /**
@@ -974,7 +974,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return The image pointer
      */
     public Image getIndianSettlementImage(int index) {
-        return ((ImageIcon) indians.get(index)).getImage();
+        return indians.get(index).getImage();
     }
 
     /**
@@ -983,7 +983,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return The goods-image at the given index.
      */
     public Image getGoodsImage(int index) {
-        return ((ImageIcon) goods.get(index)).getImage();
+        return goods.get(index).getImage();
     }
 
     /**
@@ -992,7 +992,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return The goods-image at the given index.
      */
     public ImageIcon getGoodsImageIcon(int index) {
-        return ((ImageIcon) goods.get(index));
+        return goods.get(index);
     }
 
     /**
@@ -1023,7 +1023,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return The image pointer
      */
     public Image getColonyImage(int index) {
-        return ((ImageIcon) colonies.get(index)).getImage();
+        return colonies.get(index).getImage();
     }
 
 
@@ -1033,11 +1033,11 @@ public final class ImageLibrary extends ImageProvider {
      * @return The color chip with the given color.
      */
     public Image getColorChip(Color color) {
-        Image colorChip = (Image) colorChips.get(color);
+        Image colorChip = colorChips.get(color);
         if (colorChip == null) {
             GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
             loadColorChip(gc, color);
-            colorChip = (Image) colorChips.get(color);
+            colorChip = colorChips.get(color);
         }
         return colorChip;
     }
@@ -1051,10 +1051,10 @@ public final class ImageLibrary extends ImageProvider {
     public Image getMissionChip(Color color, boolean expertMission) {
         Image missionChip;
         if (expertMission) {
-            missionChip = (Image)expertMissionChips.get(color);
+            missionChip = expertMissionChips.get(color);
         }
         else {
-            missionChip = (Image)missionChips.get(color);
+            missionChip = missionChips.get(color);
         }
 
         if (missionChip == null) {
@@ -1062,10 +1062,10 @@ public final class ImageLibrary extends ImageProvider {
             loadMissionChip(gc, color, expertMission);
 
             if (expertMission) {
-                missionChip = (Image)expertMissionChips.get(color);
+                missionChip = expertMissionChips.get(color);
             }
             else {
-                missionChip = (Image)missionChips.get(color);
+                missionChip = missionChips.get(color);
             }
         }
         return missionChip;
@@ -1111,7 +1111,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return The width of the Colony-image at the given index.
      */
     public int getColonyImageWidth(int index) {
-        return ((ImageIcon) colonies.get(index)).getIconWidth();
+        return colonies.get(index).getIconWidth();
     }
 
     /**
@@ -1120,7 +1120,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return The height of the Colony-image at the given index.
      */
     public int getColonyImageHeight(int index) {
-        return ((ImageIcon) colonies.get(index)).getIconHeight();
+        return colonies.get(index).getIconHeight();
     }
 
     /**
@@ -1129,7 +1129,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return The width of the IndianSettlement-image at the given index.
      */
     public int getIndianSettlementImageWidth(int index) {
-        return ((ImageIcon) indians.get(index)).getIconWidth();
+        return indians.get(index).getIconWidth();
     }
 
     /**
@@ -1138,7 +1138,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return The height of the IndianSettlement-image at the given index.
      */
     public int getIndianSettlementImageHeight(int index) {
-        return ((ImageIcon) indians.get(index)).getIconHeight();
+        return indians.get(index).getIconHeight();
     }
 
     /**
@@ -1147,7 +1147,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return The width of the unit-image at the given index.
      */
     public int getUnitImageWidth(int index) {
-        return ((ImageIcon) units.get(index)).getIconWidth();
+        return units.get(index).getIconWidth();
     }
 
     /**
@@ -1156,7 +1156,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return The height of the unit-image at the given index.
      */
     public int getUnitImageHeight(int index) {
-        return ((ImageIcon) units.get(index)).getIconHeight();
+        return units.get(index).getIconHeight();
     }
 
 

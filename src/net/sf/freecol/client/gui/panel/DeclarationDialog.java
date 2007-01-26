@@ -288,7 +288,7 @@ public final class DeclarationDialog extends FreeColDialog {
             ((Graphics2D) g).setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.75f));
             
             for (int i=0; i<counter; i++) {
-                Point p = (Point) points[i];
+                Point p = points[i];
                 g.drawLine((int) p.getX(), (int) p.getY(), (int) p.getX(), (int) p.getY());
             }
         }        

@@ -75,7 +75,7 @@ public final class IntegerOptionUI extends JPanel implements OptionUpdater, Prop
      */
     public void propertyChange(PropertyChangeEvent event) {
         if (event.getPropertyName().equals("value")) {
-            spinner.setValue((Integer) event.getNewValue());
+            spinner.setValue(event.getNewValue());
         }
     }
     

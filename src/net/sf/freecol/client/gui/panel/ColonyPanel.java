@@ -1830,7 +1830,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             Collections.sort(colonies, freeColClient.getClientOptions().getColonyComparator());
             Iterator colonyIterator = colonies.iterator();
             while (colonyIterator.hasNext()) {
-                this.addItem((Colony) colonyIterator.next());
+                this.addItem(colonyIterator.next());
             }
             this.setSelectedItem(thisColony);
             super.addActionListener(nameBoxListener);
