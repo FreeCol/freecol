@@ -1386,8 +1386,12 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
             }
         }
         
-        if (nationOwner != Player.NO_NATION && (showAll || player.canSee(this))) {
-            out.writeAttribute("nationOwner", Integer.toString(nationOwner));
+        if (nationOwner != Player.NO_NATION) {
+            if (showAll || player.canSee(this)) {
+                out.writeAttribute("nationOwner", Integer.toString(nationOwner));
+            } else if (pet != null) {
+                out.writeAttribute("nationOwner", Integer.toString(pet.getNationOwner()));
+            }
         }
 
         if ((showAll || player.canSee(this)) && (owner != null)) {
@@ -1702,6 +1706,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
         playerExploredTiles[nation].setForested(forested);
         playerExploredTiles[nation].setBonus(bonus);
         playerExploredTiles[nation].setLostCityRumour(lostCityRumour);
+        playerExploredTiles[nation].setNationOwner(nationOwner);
         
         if (getColony() != null) {
             playerExploredTiles[nation].setColonyUnitCount(getSettlement().getUnitCount());
@@ -1825,6 +1830,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
                         plowed,
                         forested,
                         bonus;
+        private int nationOwner;
 
         // Colony data:
         private int     colonyUnitCount = 0,
@@ -1929,6 +1935,14 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
             return skill;
         }
 
+        public void setNationOwner(int nationOwner) {
+            this.nationOwner = nationOwner;
+        }
+
+        public int getNationOwner() {
+            return nationOwner;
+        }
+
         public void setHighlyWantedGoods(int highlyWantedGoods) {
             this.highlyWantedGoods = highlyWantedGoods;
         }
@@ -2024,6 +2038,9 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
             if (theTile.hasLostCityRumour()) {
                 out.writeAttribute("lostCityRumour", Boolean.toString(lostCityRumour));
             }
+            if (theTile.getNationOwner() != nationOwner) {
+                out.writeAttribute("nationOwner", Integer.toString(nationOwner));
+            }
             if (colonyUnitCount != 0) {
                 out.writeAttribute("colonyUnitCount", Integer.toString(colonyUnitCount));
                 out.writeAttribute("colonyStockadeLevel", Integer.toString(colonyStockadeLevel));
@@ -2093,6 +2110,13 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
                 lostCityRumour = Boolean.valueOf(lostCityRumourStr).booleanValue();
             } else {
                 lostCityRumour = theTile.hasLostCityRumour();
+            }
+
+            final String nationOwnerStr = in.getAttributeValue(null, "nationOwner");
+            if (nationOwnerStr != null) {
+                nationOwner = Integer.parseInt(nationOwnerStr);
+            } else {
+                nationOwner = theTile.getNationOwner();
             }
 
             final String colonyUnitCountStr = in.getAttributeValue(null, "colonyUnitCount");
