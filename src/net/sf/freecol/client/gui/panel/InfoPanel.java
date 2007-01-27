@@ -244,7 +244,12 @@ public final class InfoPanel extends FreeColPanel {
                 labelPanel.removeAll();
                 labelPanel.add(tileNameLabel, higConst.rc(1, 1));
                 int row = 2;
-                if (tile.hasRiver()) {
+                if (tile.getAddition() == Tile.ADD_RIVER_MINOR) {
+                    riverLabel.setText(Messages.message("minorRiver"));
+                    labelPanel.add(riverLabel, higConst.rc(row, 1));
+                    row++;
+                } else if (tile.getAddition() == Tile.ADD_RIVER_MAJOR) {
+                    riverLabel.setText(Messages.message("majorRiver"));
                     labelPanel.add(riverLabel, higConst.rc(row, 1));
                     row++;
                 }
