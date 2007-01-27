@@ -1139,7 +1139,7 @@ public final class InGameController implements NetworkConstants {
 	}
 
         if (freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_PRECOMBAT) &&
-            !canvas.showPreCombatDialog(unit, defender)) {
+            !canvas.showPreCombatDialog(unit, defender, target.getSettlement())) {
             return;
         }
         

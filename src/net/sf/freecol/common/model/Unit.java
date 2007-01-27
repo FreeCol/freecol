@@ -3383,7 +3383,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 if (enemyUnit.getType() == BRAVE && greatDemote) {
                     addModelMessage(this, "model.unit.braveMounted",
                                     new String [][] {{"%nation%", enemyUnit.getOwner().getNationAsString()}},
-                                    ModelMessage.FOREIGN_DIPLOMACY, enemyUnit);
+                                    ModelMessage.FOREIGN_DIPLOMACY);
                     enemyUnit.setMounted(true, true);
                 }
             } else {
@@ -3398,7 +3398,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             if (enemyUnit.getType() == BRAVE && greatDemote) {
                 addModelMessage(this, "model.unit.braveArmed",
                                 new String [][] {{"%nation%", enemyUnit.getOwner().getNationAsString()}},
-                                ModelMessage.FOREIGN_DIPLOMACY, enemyUnit);
+                                ModelMessage.FOREIGN_DIPLOMACY);
                 enemyUnit.setArmed(true, true);
             }
         } else {

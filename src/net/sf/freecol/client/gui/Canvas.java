@@ -703,9 +703,17 @@ public final class Canvas extends JLayeredPane {
         return response;
     }
 
-    public boolean showPreCombatDialog(Unit attacker, Unit defender) {
+    /**
+     * Displays the <code>showPreCombatDialog</code>.
+     *
+     * @param attacker an <code>Unit</code> value
+     * @param defender an <code>Unit</code> value
+     * @param settlement a <code>Settlement</code> value
+     * @return a <code>boolean</code> value
+     */
+    public boolean showPreCombatDialog(Unit attacker, Unit defender, Settlement settlement) {
 
-        FreeColDialog preCombatDialog = FreeColDialog.createPreCombatDialog(attacker, defender, this);
+        FreeColDialog preCombatDialog = FreeColDialog.createPreCombatDialog(attacker, defender, settlement, this);
         addCentered(preCombatDialog, CONFIRM_LAYER);
         preCombatDialog.requestFocus();
 
@@ -715,6 +723,7 @@ public final class Canvas extends JLayeredPane {
 
         return response;
     }
+
 
     /**
     * Displays a dialog with a text and a ok/cancel option.

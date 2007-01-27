@@ -3,6 +3,7 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.AWTEvent;
 import java.awt.ActiveEvent;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -45,10 +46,12 @@ import javax.swing.filechooser.FileFilter;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.UnitLabel;
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
 import cz.autel.dmi.HIGLayout;
 
@@ -297,20 +300,33 @@ public class FreeColDialog extends FreeColPanel {
     }
 
 
-    public static FreeColDialog createPreCombatDialog(Unit attacker, Unit defender, Canvas parent) {
+    public static FreeColDialog createPreCombatDialog(Unit attacker, Unit defender,
+                                                      Settlement settlement, Canvas parent) {
 
         ArrayList<Modifier> offense = Modifier.getOffensiveModifiers(attacker, defender);
-        ArrayList<Modifier> defense = Modifier.getDefensiveModifiers(attacker, defender);
+        ArrayList<Modifier> defense = new ArrayList<Modifier>();
+        if (defender == null && settlement != null) {
+            Modifier settlementModifier = Modifier.getSettlementModifier(attacker, settlement);
+            defense.add(new Modifier("modifiers.baseDefense", Integer.MIN_VALUE));
+            defense.add(settlementModifier);
+            defense.add(new Modifier("modifiers.finalResult", Integer.MIN_VALUE));
+        } else {
+            defense = Modifier.getDefensiveModifiers(attacker, defender);
+        }
 
-        int number = Math.max(offense.size(), defense.size());
+        int numberOfModifiers = Math.max(offense.size(), defense.size());
+        int extraRows = 3; // title, icon, buttons
+        int numberOfRows = 2 * (numberOfModifiers + extraRows) - 1;
 
         int[] widths = {-5, margin, -7, 3 * margin, -1, margin, -3};
-        int[] heights = new int[2 * number + 5];
-        int labelColumn = 1;
-        int valueColumn = 3;
+        int[] heights = new int[numberOfRows];
+        int offenseLabelColumn = 1;
+        int offenseValueColumn = 3;
+        int defenseLabelColumn = 5;
+        int defenseValueColumn = 7;
 
-        for (int index = 0; index < number + 2; index++) {
-            heights[2 * index + 1] = margin;
+        for (int index = 1; index < numberOfRows; index += 2) {
+            heights[index] = margin;
         }
 
 
@@ -344,57 +360,99 @@ public class FreeColDialog extends FreeColPanel {
             }
         });
 
+        Modifier modifier;
         int row = 1;
-        preCombatDialog.add(new JLabel(Messages.message("modifiers.attacker")),
-                            higConst.rcwh(row, labelColumn, 3, 1));
+
+        String attackerName = attacker.getOwner().getNationAsString() + " " +
+                              attacker.getName();
+        preCombatDialog.add(new JLabel(attackerName),
+                            higConst.rcwh(row, offenseLabelColumn, 3, 1));
         row += 2;
         preCombatDialog.add(new UnitLabel(attacker, parent),
-                            higConst.rcwh(row, labelColumn, 3, 1));
+                            higConst.rcwh(row, offenseLabelColumn, 3, 1));
         row += 2;
-        for (int index = 0; index < offense.size(); index++) {
-            Modifier modifier = offense.get(index);
+        for (int index = 0; index < offense.size() - 1; index++) {
+            modifier = offense.get(index);
             preCombatDialog.add(new JLabel(Messages.message(modifier.id)), 
-                                higConst.rc(row, labelColumn));
-            String value;
-            if (modifier.addend == 0 && modifier.numerator != 0) {
-                value = String.valueOf(modifier.numerator) + "/" + 
-                        String.valueOf(modifier.denominator);
-            } else {
-                value = String.valueOf(modifier.addend);
-            }
-            preCombatDialog.add(new JLabel(value),
-                                higConst.rc(row, valueColumn, "r"));
+                                higConst.rc(row, offenseLabelColumn));
+            preCombatDialog.add(new JLabel(modifier.getFormattedResult()),
+                                higConst.rc(row, offenseValueColumn, "r"));
             row += 2;
         }
+        int finalResultRow = row;
 
         row = 1;
-        labelColumn = 5;
-        valueColumn = 7;
-        preCombatDialog.add(new JLabel(Messages.message("modifiers.defender")),
-                            higConst.rcwh(row, labelColumn, 3, 1));
-        row += 2;
         if (defender != null) {
+            String defenderName = defender.getOwner().getNationAsString() + " " +
+                                  defender.getName();
+            preCombatDialog.add(new JLabel(defenderName),
+                                higConst.rcwh(row, defenseLabelColumn, 3, 1));
+            row += 2;
             preCombatDialog.add(new UnitLabel(defender, parent),
-                                higConst.rcwh(row, labelColumn, 3, 1));
-        }
-        row += 2;
-        for (int index = 0; index < defense.size(); index++) {
-            Modifier modifier = defense.get(index);
-            preCombatDialog.add(new JLabel(Messages.message(modifier.id)), 
-                                higConst.rc(row, labelColumn));
-            String value;
-            if (modifier.addend == 0) {
-                value = String.valueOf(modifier.numerator) + "/" + 
-                        String.valueOf(modifier.denominator);
+                                higConst.rcwh(row, defenseLabelColumn, 3, 1));
+            row += 2;
+        } else {
+            String defenderName;
+            if (settlement instanceof Colony) {
+                defenderName = ((Colony) settlement).getName();
             } else {
-                value = String.valueOf(modifier.addend);
+                defenderName = Messages.message("indianSettlement", 
+                                                new String[][] {{"%nation%", 
+                                                                 settlement.getOwner().getNationAsString()}});
             }
-            preCombatDialog.add(new JLabel(value),
-                                higConst.rc(row, valueColumn, "r"));
+            preCombatDialog.add(new JLabel(defenderName),
+                                higConst.rcwh(row, defenseLabelColumn, 3, 1));
+            row += 2;
+            preCombatDialog.add(new JLabel(parent.getImageIcon(settlement)),
+                                higConst.rcwh(row, defenseLabelColumn, 3, 1));
             row += 2;
         }
+        for (int index = 0; index < defense.size() - 1; index++) {
+            modifier = defense.get(index);
+            preCombatDialog.add(new JLabel(Messages.message(modifier.id)), 
+                                higConst.rc(row, defenseLabelColumn));
+            preCombatDialog.add(new JLabel(modifier.getFormattedResult()),
+                                higConst.rc(row, defenseValueColumn, "r"));
+            row += 2;
+        }
+        if (row < finalResultRow) {
+            row = finalResultRow;
+        }
+
+        Font bigFont = preCombatDialog.getFont().deriveFont(Font.BOLD, 20f);
+        Color attackerColor = attacker.getOwner().getColor();
+        modifier = offense.get(offense.size() - 1);
+        JLabel finalOffenseLabel = new JLabel(Messages.message(modifier.id));
+        finalOffenseLabel.setForeground(attackerColor);
+        finalOffenseLabel.setFont(bigFont);
+        preCombatDialog.add(finalOffenseLabel,
+                            higConst.rc(row, offenseLabelColumn));
+        JLabel finalOffenseResult = new JLabel(modifier.getFormattedResult());
+        finalOffenseResult.setForeground(attackerColor);
+        finalOffenseResult.setFont(bigFont);
+        preCombatDialog.add(finalOffenseResult,
+                            higConst.rc(row, offenseValueColumn, "r"));
+
+        Color defenderColor;
+        if (defender != null) {
+            defenderColor = defender.getOwner().getColor();
+        } else {
+            defenderColor = settlement.getOwner().getColor();
+        }
+        modifier = defense.get(defense.size() - 1);
+        JLabel finalDefenseLabel = new JLabel(Messages.message(modifier.id));
+        finalDefenseLabel.setForeground(defenderColor);
+        finalDefenseLabel.setFont(bigFont);
+        preCombatDialog.add(finalDefenseLabel,
+                            higConst.rc(row, defenseLabelColumn));
+        JLabel finalDefenseResult = new JLabel(modifier.getFormattedResult());
+        finalDefenseResult.setForeground(defenderColor);
+        finalDefenseResult.setFont(bigFont);
+        preCombatDialog.add(finalDefenseResult,
+                            higConst.rc(row, defenseValueColumn, "r"));
 
         JPanel buttonPanel = new JPanel();
+        buttonPanel.setOpaque(false);
         buttonPanel.add(okButton);
         buttonPanel.add(cancelButton);
         preCombatDialog.add(buttonPanel, 
