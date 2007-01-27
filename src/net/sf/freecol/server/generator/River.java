@@ -112,7 +112,6 @@ public class River {
         
         boolean found = false;
         Section section = null;
-        int lastDirection = -1;
         
         Iterator sectionIterator = sections.iterator();
         while (sectionIterator.hasNext()) {
@@ -125,7 +124,6 @@ public class River {
                 section.grow();
                 found = true;
             }
-            lastDirection = section.direction;
         }
         drawToMap();
         if (nextRiver != null) {
@@ -174,7 +172,7 @@ public class River {
     public boolean contains(Map.Position p) {
         Iterator sectionIterator = sections.iterator();
         while (sectionIterator.hasNext()) {
-            Map.Position q = (Map.Position) ((Section) sectionIterator.next()).position;
+            Map.Position q = ((Section) sectionIterator.next()).position;
             if (p.equals(q)) {
                 return true;
             }
