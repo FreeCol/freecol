@@ -648,7 +648,7 @@ public final class InGameController implements NetworkConstants {
                         nextActiveUnit();
                         return;
                     } else {           
-                        setDestination(unit, null);
+                        // Active unit to show path and permit to move it manually
                         freeColClient.getGUI().setActiveUnit(unit);
                         return;
                     }
@@ -1859,8 +1859,9 @@ public final class InGameController implements NetworkConstants {
 
 
     /**
-    * Clears the orders of the given <code>Unit</code>.
-    * The orders are cleared by making the unit {@link Unit#ACTIVE}.
+    * Clears the orders of the given <code>Unit</code>
+    * The orders are cleared by making the unit {@link Unit#ACTIVE} and
+    * setting a null destination
     *
     * @param unit The <code>Unit</code>.
     */
@@ -1876,7 +1877,7 @@ public final class InGameController implements NetworkConstants {
         /* report to server, in order not to restore destination
          * if it's received in a update message
          */
-        setDestination(unit, null);
+        clearGotoOrders(unit);
         changeState(unit, Unit.ACTIVE);
     }
 
@@ -1894,7 +1895,8 @@ public final class InGameController implements NetworkConstants {
         /* report to server, in order not to restore destination
          * if it's received in a update message
          */
-        setDestination(unit, null);
+        if (unit.getDestination() != null)
+            setDestination(unit, null);
     }
 
     /**

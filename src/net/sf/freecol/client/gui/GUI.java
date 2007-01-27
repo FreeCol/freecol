@@ -34,6 +34,7 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -78,6 +79,7 @@ public final class GUI {
     private Unit activeUnit;
 
     /** A path to be displayed on the map. */
+    private PathNode currentPath;
     private PathNode dragPath = null;
     private boolean dragStarted = false;
 
@@ -295,19 +297,16 @@ public final class GUI {
 
                 Unit unitInFront = getUnitInFront(gameData.getMap().getTile(selectedTile));
                 if (unitInFront != null) {
-                    // Because of the following comment from somewhere else I've put the end in comment -FV
-                    // The user might what to check the status of a unit - SG
-                    if (unitInFront != activeUnit /*&& unitInFront.getMovesLeft() > 0*/) {
-                        // Clear goto order when unit is activated
-                        if (clearGoToOrders && unitInFront.getDestination() != null) {
-                            freeColClient.getInGameController().clearOrders(unitInFront);
-                        }
-                        setActiveUnit(unitInFront);
-                    } else {
-                        freeColClient.getInGameController().clearOrders(unitInFront);
-                    }
+                    setActiveUnit(unitInFront);
                 } else {
                     setFocus(selectedTile);
+                }
+            } else if (activeUnit.getTile() != null &&
+                    activeUnit.getTile().getPosition().equals(selectedTile)) {
+                // Clear goto order when unit is already active
+                if (clearGoToOrders && activeUnit.getDestination() != null) {
+                    freeColClient.getInGameController().clearGotoOrders(activeUnit);
+                    updateDragPathForActiveUnit();
                 }
             }
         }
@@ -455,12 +454,14 @@ public final class GUI {
             if (freeColClient.getGame().getCurrentPlayer() == freeColClient.getMyPlayer()) {
                 if (activeUnit.getState() != Unit.ACTIVE) {
                     freeColClient.getInGameController().clearOrders(activeUnit);
+                    updateDragPathForActiveUnit();
                 }
             } else {
-                if (activeUnit.getDestination() != null) {
-                    freeColClient.getInGameController().clearGotoOrders(activeUnit);
-                }
+                freeColClient.getInGameController().clearGotoOrders(activeUnit);
+                updateDragPathForActiveUnit();
             }
+        } else {
+            updateDragPathForActiveUnit();
         }
 
         // The user activated a unit
@@ -816,6 +817,55 @@ public final class GUI {
         }
     }
 
+    
+    private void displayDragPath(Graphics2D g, PathNode dragPath) {
+        if (dragPath != null) {
+            PathNode temp = dragPath;
+            while (temp != null) {
+                Point p = getTilePosition(temp.getTile());
+                if (p != null) {
+                    Tile tile = temp.getTile();
+                    Image image;
+                    final Color textColor; 
+                    if (temp.getTurns() == 0) {
+                        g.setColor(Color.GREEN);                        
+                        image = getPathImage(activeUnit);
+                        if (activeUnit != null 
+                                && tile.isExplored()
+                                && activeUnit.isNaval()
+                                && tile.isLand() 
+                                && (tile.getColony() == null || tile.getColony().getOwner() != activeUnit.getOwner())) {
+                            image = getPathImage(activeUnit.getFirstUnit());
+                        }
+                        textColor = Color.BLACK;
+                    } else {
+                        g.setColor(Color.RED);
+                        image = getPathNextTurnImage(activeUnit);
+                        if (activeUnit != null
+                                && tile.isExplored()
+                                && activeUnit.isNaval()
+                                && tile.isLand() 
+                                && (tile.getColony() == null || tile.getColony().getOwner() != activeUnit.getOwner())) {
+                            image = getPathNextTurnImage(activeUnit.getFirstUnit());
+                        }
+                        textColor = Color.WHITE;
+                    }                
+                    if (image != null) {
+                        g.drawImage(image, p.x + (tileWidth - image.getWidth(null))/2, p.y + (tileHeight - image.getHeight(null))/2, null);
+                    } else {
+                        g.fillOval(p.x + tileWidth/2, p.y + tileHeight/2, 10, 10);
+                        g.setColor(Color.BLACK);
+                        g.drawOval(p.x + tileWidth/2, p.y + tileHeight/2, 10, 10);
+                    }                
+                    if (temp.getTurns() > 0) {
+                        BufferedImage stringImage = createStringImage(g, Integer.toString(temp.getTurns()), textColor, tileWidth, 12);
+                        g.drawImage(stringImage, p.x + (tileWidth - stringImage.getWidth(null))/2, p.y + (tileHeight - stringImage.getHeight()) / 2, null);
+                    }
+                }                    
+                temp = temp.next;
+            }
+        }
+    }
 
     /**
      * Displays the Map onto the given Graphics2D object. The Tile at
@@ -1036,53 +1086,9 @@ public final class GUI {
         Display drag-and-drop path
         */
 
-        if (dragPath != null) {
-            PathNode temp = dragPath;
-            while (temp != null) {
-                Point p = getTilePosition(temp.getTile());
-                if (p != null) {
-                    Tile tile = temp.getTile();
-                    Image image;
-                    final Color textColor; 
-                    if (temp.getTurns() == 0) {
-                        g.setColor(Color.GREEN);                        
-                        image = getPathImage(activeUnit);
-                        if (activeUnit != null 
-                                && tile.isExplored()
-                                && activeUnit.isNaval()
-                                && tile.isLand() 
-                                && (tile.getColony() == null || tile.getColony().getOwner() != activeUnit.getOwner())) {
-                            image = getPathImage(activeUnit.getFirstUnit());
-                        }
-                        textColor = Color.BLACK;
-                    } else {
-                        g.setColor(Color.RED);
-                        image = getPathNextTurnImage(activeUnit);
-                        if (activeUnit != null
-                                && tile.isExplored()
-                                && activeUnit.isNaval()
-                                && tile.isLand() 
-                                && (tile.getColony() == null || tile.getColony().getOwner() != activeUnit.getOwner())) {
-                            image = getPathNextTurnImage(activeUnit.getFirstUnit());
-                        }
-                        textColor = Color.WHITE;
-                    }                
-                    if (image != null) {
-                        g.drawImage(image, p.x + (tileWidth - image.getWidth(null))/2, p.y + (tileHeight - image.getHeight(null))/2, null);
-                    } else {
-                        g.fillOval(p.x + tileWidth/2, p.y + tileHeight/2, 10, 10);
-                        g.setColor(Color.BLACK);
-                        g.drawOval(p.x + tileWidth/2, p.y + tileHeight/2, 10, 10);
-                    }                
-                    if (temp.getTurns() > 0) {
-                        BufferedImage stringImage = createStringImage(g, Integer.toString(temp.getTurns()), textColor, tileWidth, 12);
-                        g.drawImage(stringImage, p.x + (tileWidth - stringImage.getWidth(null))/2, p.y + (tileHeight - stringImage.getHeight()) / 2, null);
-                    }
-                }                    
-                temp = temp.next;
-            }
-        }
-
+        displayDragPath(g, currentPath);
+        displayDragPath(g, dragPath);
+        
         /*
         PART 5
         ======
@@ -2089,6 +2095,7 @@ public final class GUI {
     public void stopDrag() {
         freeColClient.getCanvas().setCursor(null);
         setDragPath(null);
+        updateDragPathForActiveUnit();
         dragStarted = false;
     }
 
@@ -2111,6 +2118,21 @@ public final class GUI {
         return dragStarted;
     }
 
+
+    /**
+    * Sets the path of the active unit to display it.
+    */
+    public void updateDragPathForActiveUnit() {
+        if (activeUnit == null || activeUnit.getDestination() == null) {
+            currentPath = null;
+        } else {
+            if (activeUnit.getDestination() instanceof Europe) {
+                currentPath = freeColClient.getGame().getMap().findPathToEurope(activeUnit, activeUnit.getTile());
+            } else {
+                currentPath = activeUnit.findPath(activeUnit.getDestination().getTile());
+            }
+        }
+    }
 
     /**
     * Sets the path to be drawn on the map.
