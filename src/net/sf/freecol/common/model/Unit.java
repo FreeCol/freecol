@@ -2188,7 +2188,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * @param newName The new Name value.
      */
     public void setName(String newName) {
-        this.name = newName;
+        if (name != null && name.equals("")) {
+            this.name = null;
+        } else {
+            this.name = newName;
+        }
     }
 
     /**
