@@ -2500,7 +2500,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                     workLeft = 4 - workLeft;
                 }
                 if (getOwner().hasFather(FoundingFather.FERDINAND_MAGELLAN)) {
-                    workLeft = workLeft/2;
+                    workLeft = workLeft--;
                 }
                 break;
             case TO_AMERICA:
@@ -2511,7 +2511,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                     workLeft = 4 - workLeft;
                 }
                 if (getOwner().hasFather(FoundingFather.FERDINAND_MAGELLAN)) {
-                    workLeft = workLeft/2;
+                    workLeft = workLeft--;
                 }
                 break;
             default:
