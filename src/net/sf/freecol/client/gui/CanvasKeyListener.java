@@ -151,7 +151,7 @@ public final class CanvasKeyListener implements KeyListener {
                     parent.getGUI().moveTileCursor(Map.NE);
             	    break;
                 case KeyEvent.VK_SPACE:
-                    Cursor cursor = parent.getGUI().getCursor();
+                    TerrainCursor cursor = parent.getGUI().getCursor();
                     parent.showTilePopup(parent.getGUI().getSelectedTile(),cursor.getCanvasX(),cursor.getCanvasY());
                     break;
             	default:

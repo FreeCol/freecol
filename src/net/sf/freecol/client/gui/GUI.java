@@ -64,7 +64,7 @@ public final class GUI {
     private final FreeColClient freeColClient;
     private final Rectangle bounds;
     private final ImageLibrary lib;
-    private Cursor cursor;
+    private TerrainCursor cursor;
     private ViewMode viewMode;
     
 
@@ -163,7 +163,7 @@ public final class GUI {
         this.bounds = bounds;
         this.lib = lib;
 
-        cursor = new net.sf.freecol.client.gui.Cursor();
+        cursor = new net.sf.freecol.client.gui.TerrainCursor();
 
         tileHeight = lib.getTerrainImageHeight(0);
         tileWidth = lib.getTerrainImageWidth(0);
@@ -217,7 +217,7 @@ public final class GUI {
         cursor.startBlinking();
     }
     
-    public Cursor getCursor(){
+    public TerrainCursor getCursor(){
         return cursor;
     }
     

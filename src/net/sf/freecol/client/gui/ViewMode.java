@@ -66,7 +66,7 @@ public class ViewMode {
             if (selectedTilePos == null) return false;
             
             if(selectedTilePos.getX() == tile.getX() && selectedTilePos.getY() == tile.getY()){
-                Cursor cursor = gui.getCursor();
+                TerrainCursor cursor = gui.getCursor();
                 cursor.setTile(tile);
                 cursor.setCanvasPos(canvasX,canvasY);
                 return true;
@@ -79,7 +79,7 @@ public class ViewMode {
     public boolean displayUnitCursor(Unit unit, int canvasX, int canvasY){
       if( currentMode == ViewMode.MOVE_UNITS_MODE){
           
-          Cursor cursor = gui.getCursor();
+          TerrainCursor cursor = gui.getCursor();
           
           if( (unit == gui.getActiveUnit()) && (cursor.isActive() || (unit.getMovesLeft() == 0)) ) {
               cursor.setTile(unit.getTile());
