@@ -91,7 +91,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
 
             if (locationName != null) {
                 if (unitLocations[type].containsKey(locationName)) {
-                    int oldValue = ((Integer) unitLocations[type].get(locationName)).intValue();
+                    int oldValue = unitLocations[type].get(locationName).intValue();
                     unitLocations[type].put(locationName, new Integer(oldValue + 1));
                 } else {
                     unitLocations[type].put(locationName, new Integer(1));

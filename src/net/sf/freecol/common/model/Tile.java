@@ -271,7 +271,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
             int radius = 8; // more than 8 tiles away is no longer "near"
             CircleIterator mapIterator = getMap().getCircleIterator(getPosition(), true, radius);
             while (mapIterator.hasNext()) {
-                nearSettlement = getMap().getTile((Position) mapIterator.nextPosition()).getSettlement();
+                nearSettlement = getMap().getTile(mapIterator.nextPosition()).getSettlement();
                 if (nearSettlement != null && nearSettlement instanceof Colony) {
                     String name = ((Colony) nearSettlement).getName();
                     return getName() + " (" + Messages.message("nearLocation", new String[][] {{"%location%", name}}) + ")";

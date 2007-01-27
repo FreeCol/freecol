@@ -125,7 +125,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
 
         Iterator<Unit> units = player.getUnitIterator();
         while (units.hasNext()) {
-            Unit unit = (Unit) units.next();
+            Unit unit = units.next();
             int type = unit.getType();
             String locationName = null;
 
@@ -210,7 +210,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
         // colonies first, sorted according to user preferences
         Iterator<String> locationIterator = colonyNames.iterator();
         while (locationIterator.hasNext()) {
-            handleLocation((String) locationIterator.next(), true);
+            handleLocation(locationIterator.next(), true);
         }
 
         // Europe next
@@ -225,7 +225,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
         Collections.sort(otherNames);
         locationIterator = otherNames.iterator();
         while (locationIterator.hasNext()) {
-            handleLocation((String) locationIterator.next(), false);
+            handleLocation(locationIterator.next(), false);
         }
 
     }
@@ -247,7 +247,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
                 Collections.sort(unitList, reportPanel.getUnitTypeComparator());
                 Iterator<Unit> unitIterator = unitList.iterator();
                 while (unitIterator.hasNext()) {
-                    UnitLabel unitLabel = new UnitLabel((Unit) unitIterator.next(), parent, true);
+                    UnitLabel unitLabel = new UnitLabel(unitIterator.next(), parent, true);
                     // this is necessary because UnitLabel deselects carriers
                     unitLabel.setSelected(true);
                     unitPanel.add(unitLabel);

@@ -158,7 +158,7 @@ public final class Specification {
 
     public BuildingType buildingType( int buildingTypeIndex ) {
 
-        return (BuildingType) buildingTypeList.get( buildingTypeIndex );
+        return buildingTypeList.get( buildingTypeIndex );
     }
 
 
@@ -170,7 +170,7 @@ public final class Specification {
 
     public TileType tileType( int tileTypeIndex ) {
 
-        return (TileType) tileTypeList.get( tileTypeIndex );
+        return tileTypeList.get( tileTypeIndex );
     }
 
 
@@ -182,7 +182,7 @@ public final class Specification {
 
     public GoodsType goodsType( int goodsTypeIndex ) {
 
-        return (GoodsType) goodsTypeList.get( goodsTypeIndex );
+        return goodsTypeList.get( goodsTypeIndex );
     }
 
 
@@ -194,7 +194,7 @@ public final class Specification {
 
     public UnitType unitType( int unitTypeIndex ) {
 
-        return (UnitType) unitTypeList.get( unitTypeIndex );
+        return unitTypeList.get( unitTypeIndex );
     }
 
 

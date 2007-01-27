@@ -225,7 +225,7 @@ public class UnitContainer extends FreeColGameObject {
     * Disposes all units in this <code>UnitContainer</code>.
     */
     public void disposeAllUnits() {
-        Iterator it = ((List) ((ArrayList) units).clone()).iterator();
+        Iterator it = ((List) units.clone()).iterator();
         while (it.hasNext()) {
             ((Unit) it.next()).dispose();
         }

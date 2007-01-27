@@ -265,7 +265,7 @@ public class MapGenerator {
                             bestTribe = t;
                         }
                     }
-                    IndianSettlement is = placeIndianSettlement((Player) players.get(bestTribe+4), bestTribe, false, candidate.getPosition(), map, players);
+                    IndianSettlement is = placeIndianSettlement(players.get(bestTribe+4), bestTribe, false, candidate.getPosition(), map, players);
                     if (capitalCandidate == null
                             || random.nextInt(width+height) == 1) {
                         capitalCandidate[bestTribe] = is; 

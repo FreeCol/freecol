@@ -56,7 +56,7 @@ public final class BuildingType
 
     public Level level( int levelIndex ) {
 
-        return (Level) levelList.get( levelIndex );
+        return levelList.get( levelIndex );
     }
 
 
