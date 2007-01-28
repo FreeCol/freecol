@@ -105,22 +105,26 @@ public class UnitContainer extends FreeColGameObject {
             units.add(unit);
         }
     }
-
+    
+    /**
+    * Adds a <code>Unit</code> to this containter at <code>index</code>.
+    * @param index the position in the List
+    * @param unit The Unit to add to this container.
+     */
+    public void addUnit(int index,Unit unit) {
+        if (!units.contains(unit)) {
+        	units.add(index,unit);
+        }
+    }
     
     /**
     * Removes a Unit from this containter.
     *
     * @param u The Unit to remove from this container.
-    * @return the unit that has been removed from this container.
+    * @return true if the unit has been removed from this container.
     */
-    public Unit removeUnit(Unit u) {
-        int index = units.indexOf(u);
-
-        if (index != -1) {
-            return (Unit) units.remove(index);
-        } else {
-            return null;
-        }
+    public boolean removeUnit(Unit u) {
+            return units.remove(u);
     }
 
 

@@ -2757,10 +2757,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     * @param u The unit to move to the front.
     */
     public void moveToFront(Unit u) {
-            //TODO: Implement this feature.
-        /*if (isCarrier() && removeUnit(u)) {
-            units.add(0, u);
-        }*/
+        if (isCarrier()==true && unitContainer.removeUnit(u)) {
+       	    unitContainer.addUnit(0, u);
+        }
     }
 
 
