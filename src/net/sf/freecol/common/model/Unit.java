@@ -2123,10 +2123,14 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         if (name != null) {
             return name;
         }
+
         String name = "";
         boolean addP = false;
 
-        if (isPioneer() && getType() != HARDY_PIONEER) {
+        if (getType() == TREASURE_TRAIN) {
+            return getName(TREASURE_TRAIN) + " (" + getTreasureAmount() + " " +
+                   Messages.message("gold") + ")";
+        } else if (isPioneer() && getType() != HARDY_PIONEER) {
             name = Messages.message("model.unit.pioneer") + " (";
             addP = true;
         } else if (isArmed() && getType() != KINGS_REGULAR && getType() != COLONIAL_REGULAR && getType() != BRAVE && getType() != VETERAN_SOLDIER) {
@@ -2757,7 +2761,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     * @param u The unit to move to the front.
     */
     public void moveToFront(Unit u) {
-        if (isCarrier()==true && unitContainer.removeUnit(u)) {
+        if (isCarrier() && unitContainer.removeUnit(u)) {
        	    unitContainer.addUnit(0, u);
         }
     }

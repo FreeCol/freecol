@@ -1398,7 +1398,9 @@ public final class Colony extends Settlement implements Location, Nameable {
         }                
         
         // Throw away goods there is no room for.
-        goodsContainer.cleanAndReport(getWarehouseCapacity(), new int [] {200, 100});
+        goodsContainer.cleanAndReport(getWarehouseCapacity(), 
+                                      getWarehouseCapacity() / 10,
+                                      getWarehouseCapacity() * 9 / 10);
         
         // Remove bells:
         bells -= Math.max(0, getUnitCount() - 2);

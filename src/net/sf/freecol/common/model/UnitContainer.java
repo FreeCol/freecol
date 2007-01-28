@@ -111,9 +111,9 @@ public class UnitContainer extends FreeColGameObject {
     * @param index the position in the List
     * @param unit The Unit to add to this container.
      */
-    public void addUnit(int index,Unit unit) {
+    public void addUnit(int index, Unit unit) {
         if (!units.contains(unit)) {
-        	units.add(index,unit);
+            units.add(index, unit);
         }
     }
     

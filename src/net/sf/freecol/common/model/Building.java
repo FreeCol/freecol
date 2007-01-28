@@ -715,7 +715,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
                         addModelMessage(getColony(), "model.unit.unitImproved",
                                         new String[][] {{"%oldName%", oldName},
                                                         {"%newName%", student.getName()},
-                                                        {"%nation%", getOwner().getName()}},
+                                                        {"%nation%", getOwner().getNationAsString()}},
                                         ModelMessage.UNIT_IMPROVED, student);
                     }
                 } else {

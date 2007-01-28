@@ -335,9 +335,10 @@ public class GoodsContainer extends FreeColGameObject {
      * Note: The levels should be in descending order.
      *
      * @param limit The capacity of this <code>GoodsContainer</code>.
-     * @param levels An array of level to report about (probably {200, 100}).
+     * @param low The lowest level not to warn about.
+     * @param high The highest level not to warn about.
      */
-    public void cleanAndReport(int limit, int[] levels) {
+    public void cleanAndReport(int limit, int low, int high) {
 
         FreeColGameObject source = (FreeColGameObject) parent;
         
@@ -363,21 +364,22 @@ public class GoodsContainer extends FreeColGameObject {
                                                  {"%colony%", ((Colony) parent).getName()}},
                                 ModelMessage.WAREHOUSE_CAPACITY,
                                 new Goods(typeOfGoods));
-            } else {
-                // check whether certain levels have been exceeded
-                for (int level = 0; level < levels.length; level++) {
-                    if (storedGoods[typeOfGoods] > levels[level] &&
-                        oldStoredGoods[typeOfGoods] <= levels[level]) {
-                        addModelMessage(source, "model.building.warehouseFull",
-                                        new String [][] {{"%goods%", Goods.getName(typeOfGoods)},
-                                                         {"%level%", String.valueOf(levels[level])},
-                                                         {"%colony%", ((Colony) parent).getName()}},
-                                        ModelMessage.WAREHOUSE_CAPACITY,
+            } else if (storedGoods[typeOfGoods] > high &&
+                       oldStoredGoods[typeOfGoods] <= high) {
+                addModelMessage(source, "model.building.warehouseFull",
+                                new String [][] {{"%goods%", Goods.getName(typeOfGoods)},
+                                                 {"%level%", String.valueOf(high)},
+                                                 {"%colony%", ((Colony) parent).getName()}},
+                                ModelMessage.WAREHOUSE_CAPACITY,
                                 new Goods(typeOfGoods));
-                        // don't report on more than one level
-                        break;
-                    }
-                }
+            } else if (storedGoods[typeOfGoods] < low &&
+                       oldStoredGoods[typeOfGoods] >= low) {
+                addModelMessage(source, "model.building.warehouseEmpty",
+                                new String [][] {{"%goods%", Goods.getName(typeOfGoods)},
+                                                 {"%level%", String.valueOf(low)},
+                                                 {"%colony%", ((Colony) parent).getName()}},
+                                ModelMessage.WAREHOUSE_CAPACITY,
+                                new Goods(typeOfGoods));
             }
         }
 
