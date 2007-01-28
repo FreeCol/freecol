@@ -368,7 +368,7 @@ public class FreeColDialog extends FreeColPanel {
         preCombatDialog.add(new JLabel(attackerName),
                             higConst.rcwh(row, offenseLabelColumn, 3, 1));
         row += 2;
-        preCombatDialog.add(new UnitLabel(attacker, parent),
+        preCombatDialog.add(new UnitLabel(attacker, parent, false, true),
                             higConst.rcwh(row, offenseLabelColumn, 3, 1));
         row += 2;
         for (int index = 0; index < offense.size() - 1; index++) {
@@ -388,7 +388,7 @@ public class FreeColDialog extends FreeColPanel {
             preCombatDialog.add(new JLabel(defenderName),
                                 higConst.rcwh(row, defenseLabelColumn, 3, 1));
             row += 2;
-            preCombatDialog.add(new UnitLabel(defender, parent),
+            preCombatDialog.add(new UnitLabel(defender, parent, false, true),
                                 higConst.rcwh(row, defenseLabelColumn, 3, 1));
             row += 2;
         } else {

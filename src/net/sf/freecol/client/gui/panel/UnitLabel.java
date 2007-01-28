@@ -206,7 +206,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
             setToolTipText(unit.getName());
         }
         
-        if (selected || (!unit.isCarrier() && unit.getState() != Unit.SENTRY)) {
+        if (ignoreLocation || selected || (!unit.isCarrier() && unit.getState() != Unit.SENTRY)) {
             setEnabled(true);
         } else {
             setEnabled(false);
