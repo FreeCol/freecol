@@ -3,6 +3,7 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
 import java.awt.Image;
+import java.awt.RenderingHints;
 
 import javax.swing.ImageIcon;
 
@@ -15,13 +16,13 @@ public abstract class ImageProvider {
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
-    
+
     /**
-    * Should return the Image of the Unit with the given type.
-    * @param type The type of the Unit of which we need the Image.
-    * @return The Image of the Unit with the given type.
-    */
-    public abstract Image getUnitImage(int type);
+     * Converts an image to grayscale
+     * @param hints Used to control the color conversion, it can be null
+     * @return The image in grayscale
+     */
+    public abstract Image convertToGrayscale(Image image, RenderingHints hints);
     
     /**
     * Should return the Image of the terrain with the given type.
@@ -59,6 +60,13 @@ public abstract class ImageProvider {
     * @return The Image of the color chip with the given color.
     */
     public abstract Image getColorChip(Color color);
+    
+    /**
+     * Returns the unit-image at the given index.
+     * @param index The index of the unit-image to return.
+     * @return The unit-image at the given index.
+     */
+    public abstract Image getUnitImage(int index);
     
     /**
     * Should return the ImageIcon of the Unit with the given type.

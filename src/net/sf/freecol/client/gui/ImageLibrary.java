@@ -798,6 +798,11 @@ public final class ImageLibrary extends ImageProvider {
       return bonus.get(index);
     }
 
+    /**
+     * Converts an image to grayscale
+     * @param hints Used to control the color conversion, it can be null
+     * @return The image in grayscale
+     */
     public Image convertToGrayscale(Image image, RenderingHints hints) {
         int width = image.getWidth(null);
         int height = image.getHeight(null);

@@ -70,7 +70,10 @@ public final class UnitLabel extends JLabel implements ActionListener {
     * @param parent The parent that knows more than we do.
     */
     public UnitLabel(Unit unit, Canvas parent) {
-        super(parent.getImageProvider().getUnitImageIcon(parent.getImageProvider().getUnitGraphicsType(unit)));
+        ImageProvider lib = parent.getImageProvider();
+        ImageIcon icon = lib.getUnitImageIcon(lib.getUnitGraphicsType(unit));
+        setIcon(icon);
+        setDisabledIcon(new ImageIcon(lib.convertToGrayscale(icon.getImage(), null)));
         this.unit = unit;
         setDescriptionLabel(unit.getName());
         this.parent = parent;
