@@ -4,6 +4,7 @@
 \newcommand{\Building}[1]{\index{#1}\index{Buildings!#1}\hypertarget{#1}{\textbf{#1}}}
 \newcommand{\Father}[1]{\index{#1}\index{Founding Fathers!#1}\hypertarget{#1}{\textbf{#1}}}
 \newcommand{\FFather}[2]{\index{#2}\index{Founding Fathers!#2}\hypertarget{#1}{\textbf{#2}}}
+\newcommand{\Report}[1]{\index{#1}\index{Reports!#1}\hypertarget{#1}{\textbf{#1}}}
 \newcommand{\Concept}[1]{\index{#1}\hypertarget{#1}{\textbf{#1}}}
 \newcommand{\Wikipedia}[1]{\href{http://en.wikipedia.org/wiki/#1}%
 {\includegraphics[scale=0.6]{images/wikipedia.png}}}
@@ -17,7 +18,7 @@
 
 \begin{document}
 \author{\href{http://freecol.sourceforge.net/index.php?section=8}{The FreeCol Team}}
-\title{FreeCol Documentation\\User Guide for Version v0.5.3}
+\title{FreeCol Documentation\\User Guide for Version v0.6.0}
 \maketitle{}
 
 \tableofcontents
@@ -112,22 +113,180 @@ providing a strong governmental system.
 \hypertarget{Installation}{\section{Installation}}
 
 To compile FreeCol you'll need Java and the Ant build system. FreeCol
-is known to work with Sun's Java 1.4 and 5, but not with projects
-based on GNU Classpath, as some font handling classes used by FreeCol
-have not yet been implemented. Ant can be found at \href{Ant
-homepage}{http://ant.apache.org/}.
+is known to work with Sun's Java 5, but not with projects based on GNU
+Classpath, as some font handling classes used by FreeCol have not yet
+been implemented. Ant can be found at \href{Ant
+homepage}{http://ant.apache.org/}. FreeCol requires at least 128 MB
+memory.
 
 When these are installed, go to the root directory of FreeCol and type
 \verb$ant$ to build a JAR file containing the game. The game is
-started using the command \verb$java -Xmx256M -jar FreeCol.jar$.  If
-something goes wrong, send a bug report at the
+started using the command \verb$java -Xmx128M -jar FreeCol.jar$.  If
+something goes wrong, leave a bug report at the
 \href{http://sourceforge.net/projects/freecol}{SourceForge page of
 FreeCol}.
 
 \hypertarget{Interface}{\section{Interface}}
 
-This section will provide information about the keyboard shortcuts and
-the different actions that can be used in the game.
+This section will provide information about various interface
+elements, as well as the keyboard shortcuts and the different actions
+that can be used in the game.
+
+\hypertarget{Starting the game}{\subsection{Starting the game}}
+
+\hypertarget{Command line options}{\subsubsection{Command line options}}
+
+First of all, you need to pass the Java Virtual Machine some arguments
+that tell it how much memory to allocate and which jar file to open.
+These are the arguments \verb$-Xmx128M$ and \verb$-jar FreeCol.jar$,
+respectively. You can allocate more than 128 MB, if you like, but no
+less. Refer to the manual of your Java Virtual Machine for details.
+
+There are many other Java options, but you probably won't need to
+change the default settings. FreeCol is developed in English, but it
+includes translations into German, French, Spanish and Hungarian. Java
+will automatically select the translation for your locale, if
+available, and English otherwise. If you should wish to select a
+language other than that associated with your locale, however, you can
+do so by setting the system property values \verb$user.language$ and
+\verb$user.country$ to the appropriate
+\href{http://www.loc.gov/standards/iso639-2/php/code_list.php}{ISO
+639} and
+\href{http://www.iso.ch/iso/en/prods-services/iso3166ma/02iso-3166-code-lists/index.html}{ISO
+3166} values. 
+
+To use the French translation on a machine with a German locale, for
+example, you need to specify \verb$-Duser.language=fr -Duser.country=FR$. 
+You can also use environment variables to override
+the locale, if your operating system supports that. To use the French
+translation on a Linux system with a German locale, you could start
+FreeCol like this, for example: \verb$LANG=fr_FR java -Xmx128M -jar FreeCol.jar$.
+
+In addition to these general Java options, FreeCol also provides
+several specific command line options:
+
+\begin{itemize}
+\item\verb$--freecol-data DIR$ Specify the directory that contains
+FreeCol's data files. In general, you will not need to use this, as
+the jar file contains all the necessary data files.
+\item\verb$--windowed[[=]WIDTHxHEIGHT]$ Run FreeCol in windowed mode
+instead of full screen mode and set the window width and height. You
+will need this if your window manager does not (correctly support)
+FreeCol's full screen mode. If you use Linux, for example, you should
+set the window width to the width of your screen, but probably set the
+window height slightly lower than the height of your screen, in order
+to leave space for the menu bar, dock etc.
+\item\verb$--load-savegame SAVEGAME_FILE$ Load the given
+savegame. This is particularly useful in combination with the client
+option \hyperlink{show savegame settings}{show savegame settings}.
+\item\verb$--no-sound$ Run FreeCol without sound. Note that the game
+does not yet contain any music, so the only sounds you will hear will
+be special effects.
+\item\verb$--usage$ Display the help screen.
+\item\verb$--version$ Display the version number.
+\item\verb$--server PORT$ Start a stand-alone server on the specifed
+port. If you don't know what that means, you will not need the option.
+\item\verb$--server-help$ Display a help screen for the more advanced
+server options.
+\end{itemize}
+
+There are several other options that you will probably only be
+intersted in if you are a developer:
+
+\begin{itemize}
+\item\verb$--no-java-check$ Skip the java version check.
+\item\verb$--no-memory-check$ Skip the memory check.
+\item\verb$--log-level LEVEL$ Set the java log level.
+\item\verb$--debug$ Start the game in debugging mode.
+\end{itemize}
+
+
+\hypertarget{Game setup}{\subsubsection{Game setup}}
+
+FreeCol is a client-server game. The game server takes care of the
+game play, and the client provides the graphical user interface. One
+or several clients can connect to the game server via the network. In
+the case of a single-player game, all other players are handled by the
+game server. At the moment, however, your client uses a network
+connection even if the server is running on the same computer.
+
+
+\hypertarget{Client options}{\subsection{Client options}}
+
+The client options panel allows you to customize how your client
+displays the game objects and how it handles some tasks such as
+auto-saving.
+
+First, we have general display options:
+
+\begin{itemize}
+\item The minimum number of goods to display with a counter. If you
+accept the default setting of seven, for example, six hammers will be
+diplayed without a number, and seven hammers will be displayed with
+the number \verb$7$ on top. Note that many panels only show a single
+item with a number next to it or below it anyway.
+\item The maximum number of goods to display. If you accept the
+default setting of seven, then no more than seven items will be
+displayed, even if the corresponding counter tells you that these
+seven items represent a far larger amount.
+\item Whether to center on the active unit always.
+\item Whether to display the Fog of War.
+\item Whether to scroll the map when dragging with the mouse.
+\item Whether to sort your colonies by name, age, position, size or
+Sons of Liberty membership. Since name, age and position are unique,
+these keys impose a total order, whereas size and Sons of Liberty
+membership do not. In the case of size, the Sons of Liberty membership
+is used as a secondary key, and vice versa.
+\end{itemize}
+
+Next, we have message display options: You can choose whether to group
+messages by type, by source, or not at all. The source of the message
+is a game object, typically a colony or unit, and the type of the
+message is either the default type, which is always displayed, or one
+of the following types, which can be turned off:
+
+\begin{itemize}
+\item Warning messages. These are important and should generally not
+be turned off.
+\item Messages about the Sons of Liberty membership in your colonies.
+\item Messages about the efficiency of the government in your
+colonies. The efficiency of the government influences the production
+of all types of goods.
+\item Messages about the number of goods in your colonies'
+warehouses. 
+\item Messages about units improving through experience, education or
+promotion after a battle won.
+\item Messages about units being demoted after a battle lost.
+\item Messages about new units, such as colonists born in your
+colonies.
+\item Messages about units lost in battle, missing in action or dead
+of starvation.
+\item Messages about the completion of buildings in your colonies.
+\item Foreign diplomatic messages about the declaration of wars and
+signing of peace treaties.
+\item Messages about the prices of goods in Europe changing.
+\item Warnings about the suitability of prospective colony
+sites. These messages are particularly useful for new players. Turn
+them on if you are unsure where to establish your colonies.
+\item Messages about the factors that influence combat. Turn them on
+to learn more about things like the terrain bonus, the ambush bonus,
+or the ``artillery in the open'' penalty.
+\end{itemize}
+
+Finally, there are the savegame settings:
+
+\begin{itemize}
+\item Whether to \hypertarget{show savegame settings}{show savegame
+settings} always, only when starting multi-player games, or
+never. These settings include the name, address and port of the game
+server you wish to connect to. If you only play single-player games,
+you can choose the option ``never''.
+\item After how many terms you want the client to create an auto-save
+file. If you select \verb$0$, then the client will never create
+auto-save files.
+\end{itemize}
+
+
 
 \hypertarget{The main screen}{\subsection{The main screen}}
 
@@ -145,6 +304,110 @@ right corner, the order buttons between the minimap and the info
 panel, and the main map in the background. The units, colonies, and so
 forth can be seen on the main map. They are also represented as
 coloured dots on the minimap.
+
+\hypertarget{The menubar}{\subsubsection{The menubar}}
+
+The menubar obviously contains the menu. It contains the submenus
+Game, View, Orders, Report and Colopedia, at the left hand of the
+screen, as well as a status area at the right hand of the screen. The
+status area tells you about the amount of gold you possess, your
+current tax rate and the current turn.
+
+The Game menu allows you to:
+
+\begin{itemize}
+\item start a new game 
+\item open a savegame
+\item save the current game
+\item change your preferences
+\item reconnect to the server
+\item chat with another player
+\item declare independence
+\item end your turn
+\item quit
+\end{itemize}
+
+The View menu allows you to:
+
+\begin{itemize}
+\item turn the minimap and the info panel on or off
+\item turn the display of tile names on or off
+\item turn the display of tile owners on or off
+\item turn the map grid on or off
+\item switch between the unit view and the terrain view
+\item switch to the Europe panel
+\end{itemize}
+
+The Orders menu enables you to give orders to the currently
+selected unit:
+
+\begin{itemize}
+\item wait until other units have moved
+\item switch to sentry mode
+\item fortify
+\item go to a destination you select
+\item build a colony
+\item plow the tile the unit is on
+\item build a road on the tile the unit is on
+\item unload all goods and units on board
+\item continue towards a selected destination
+\item skip this turn
+\item switch to a different unit on the same tile
+\item forget current orders
+\item change the unit's name
+\item disband the unit
+\end{itemize}
+
+Note that not all orders are available at all times. The unload order
+is only available if the unit is a carrier and is in a colony, for
+example, and the build colony order is only available if the unit is
+able to build colonies and the tile it is on will support a colony.
+
+The Reports menu provides access to various reports on the current
+state of your colonies:
+
+\begin{itemize}
+\item The \Report{Religious Advisor} tells you how many crosses your
+colonies produce, and how many crosses are required in order to
+recruit the next emigrant in Europe.
+\item The \Report{Labour Advisor} tells you which types of colonists
+have emigrated to the New World or are waiting in Europe. If you can
+not remember where you sent your only Expert Ore Miner, for example,
+you can use this report to locate him.
+\item The \Report{Colony Advisor} tells you which units are present in
+each of your colonies, what each colony is producing, which buildings
+have already been built, and which building is currently being built.
+\item The \Report{Foreign Affairs Advisor} tells you about your
+relations with foreign powers, the number of colonies and units they
+possess, as well as their relative naval and military strength. As
+soon as \hyperlink{Jan de Witt}{Jan de Witt} has joined the
+\hyperlink{Continental Congress}{Continental Congress}, you are also
+informed about the amount of gold, the number of Founding Fathers, the
+current tax and the current Sons of Liberty membership of your
+opponents.
+\item The \Report{Indian Advisor} tells you about your relations with
+the various Indian nations, and the number of settlements they
+possess.
+\item The \Report{Continental Congress Advisor} tells you which
+Founding Fathers are already present in the \hyperlink{Continental
+Congress}{Continental Congress} and which Founding Father is currently
+being elected. It also tells you how many Liberty Bells each of your
+colonies is producing, and whether they have already built the
+\hyperlink{Printing Press}{Printing Press} and the
+\hyperlink{Newspaper}{Newspaper}.
+\item The \Report{Military Advisor} informs you of the deployment of
+your military units, as well as the strength of the \hyperlink{Royal
+Expeditionary Force}{Royal Expeditionary Force}.
+\item The \Report{Naval Advisor} informs you of the whereabouts of
+your naval units, as well as the strength of the \hyperlink{Royal
+Expeditionary Force}{Royal Expeditionary Force}.
+\item The \Report{Trade Advisor} details the current market prices of
+all goods, the profits before and after taxes you have made, as well
+as the amount of goods present in each of your colonies. Colonies that
+have already built the \hyperlink{Custom House}{Custom House} are
+highlighted, as are all goods that are currently being automatically
+exported from these colonies.
+\end{itemize}
 
 If a unit is selected, further information about that unit is
 displayed in the info panel, otherwise the info panel contains the end
@@ -372,7 +635,7 @@ for Ore and a lesser amount of Silver. The \Terrain{Mountains} are
 unsuitable for agriculture, but yield some Ore and Silver.
 \Terrain{Arctic} tiles are the least useful type of terrain, as they
 produce nothing at all. Terrain types that produce no Grain, such as
-the Mountains and Artic types, can not support colonies.
+the Mountains and Arctic types, can not support colonies.
 
 The New World is also irrigated by minor and major rivers. The
 prouction of most types of \hyperlink{Goods}{Goods} is increased by
@@ -1342,11 +1605,10 @@ a member of the Continental Congress, all missionaries function as
 experts. \Wikipedia{Jean_de_Brebeuf}
 
 \FFather{Juan de Sepulveda}{Juan Gin\'es de Sep\'ulveda} (1781--1872) 
-was a Spanish missionary who traveled throughout the Indies converting
-the Natives to Catholicism and speaking out against their harsh
-treatment by Spain. The election of Juan de Sepulveda to the
-Continental Congress increases the chance that a subjugated Indian
-settlement will ``convert'' and join a
+was a Spanish theologian who spoke out for the conquest of Indian
+lands and forced evangelization of the natives. The election of Juan
+de Sepulveda to the Continental Congress increases the chance that a
+subjugated Indian settlement will ``convert'' and join a
 colony. \Wikipedia{Juan_Gines_de_Sepulveda}
 
 \FFather{Bartolome de las Casas}{Bartolom\'e de las Casas}
