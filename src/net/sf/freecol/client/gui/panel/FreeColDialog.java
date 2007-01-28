@@ -568,15 +568,16 @@ public class FreeColDialog extends FreeColPanel {
                 okButton.requestFocus();
             }
         };
+        confirmDialog.setLayout(new HIGLayout(new int[] {0}, new int[] {0, margin, 0}));
 
         int margin = 10;
         int[] widths = {0, margin, 0};
-        int[] heights = new int[2 * texts.length + 1];
+        int[] heights = new int[2 * texts.length - 1];
         int imageColumn = 1;
         int textColumn = 3;
 
-        for (int index = 0; index < texts.length; index++) {
-            heights[2 * index + 1] = margin;
+        for (int index = 1; index < heights.length; index += 2) {
+            heights[index] = margin;
         }
 
         if (images == null) {
@@ -584,15 +585,15 @@ public class FreeColDialog extends FreeColPanel {
             textColumn = 1;
         }
 
-        confirmDialog.setLayout(new HIGLayout(widths, heights));
+        JPanel mainPanel = new JPanel(new HIGLayout(widths, heights));
 
         int row = 1;
         for (int i = 0; i < texts.length; i++) {
             if (images != null && images[i] != null) {
                 JLabel image = new JLabel(images[i]);
-                confirmDialog.add(image, higConst.rc(row, imageColumn));
+                mainPanel.add(image, higConst.rc(row, imageColumn));
             }
-            confirmDialog.add(getDefaultTextArea(texts[i]), higConst.rc(row, textColumn));
+            mainPanel.add(getDefaultTextArea(texts[i]), higConst.rc(row, textColumn));
             row += 2;
         }
 
@@ -647,15 +648,17 @@ public class FreeColDialog extends FreeColPanel {
         cancelAction.putValue( Action.MNEMONIC_KEY, new Integer(cancelButtonMnemonic) );
 
         // build the button panel
+        JButton cancelButton = new JButton(cancelAction);
         JPanel buttonPanel = new JPanel( new FlowLayout(FlowLayout.CENTER) );
         buttonPanel.setOpaque(false);
-        buttonPanel.add( okButton );
-        buttonPanel.add( new JButton(cancelAction) );
+        buttonPanel.add(okButton);
+        buttonPanel.add(cancelButton);
 
         // finish building the dialog
-        confirmDialog.add(buttonPanel, higConst.rcwh(row, imageColumn, widths.length, 1));
+        confirmDialog.add(mainPanel, higConst.rc(1, 1));
+        confirmDialog.add(buttonPanel, higConst.rc(3, 1));
         confirmDialog.setSize(confirmDialog.getPreferredSize());
-        confirmDialog.setCancelComponent( new JButton(cancelAction) );
+        confirmDialog.setCancelComponent(cancelButton);
 
         return confirmDialog;
     }
