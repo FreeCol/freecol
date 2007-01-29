@@ -66,7 +66,7 @@ public final class DragListener extends MouseAdapter {
                     menuItem = new JMenuItem( Messages.message("activateUnit") );
                     menuItem.setActionCommand(String.valueOf(UnitLabel.ACTIVATE_UNIT));
                     menuItem.addActionListener(unitLabel);
-                    menuItem.setEnabled(tempUnit.getState() != Unit.ACTIVE);
+                    menuItem.setEnabled(true);
                     menu.add(menuItem);
                     
                     menuItem = new JMenuItem( Messages.message("fortifyUnit") );
@@ -140,7 +140,7 @@ public final class DragListener extends MouseAdapter {
 
 
                 if (tempUnit.isColonist()) {
-                    if (!tempUnit.isPioneer() && !tempUnit.isMissionary() && tempUnit.canBeArmed()) {
+                    if (tempUnit.canBeArmed()) {
                         if (tempUnit.isArmed()) {
                             menuItem = new JMenuItem( Messages.message("disarm") ,
                                               unitLabel.getCanvas().getImageProvider().getGoodsImageIcon(ImageLibrary.GOODS_MUSKETS));
@@ -158,7 +158,7 @@ public final class DragListener extends MouseAdapter {
                         menu.add(menuItem);
                     }
 
-                    if (!tempUnit.isPioneer() && !tempUnit.isMissionary() && tempUnit.canBeMounted()) {
+                    if (tempUnit.canBeMounted()) {
                         if (tempUnit.isMounted()) {
                             menuItem = new JMenuItem( Messages.message("removeHorses") ,
                                               unitLabel.getCanvas().getImageProvider().getGoodsImageIcon(ImageLibrary.GOODS_HORSES));
@@ -176,7 +176,7 @@ public final class DragListener extends MouseAdapter {
                         menu.add(menuItem);
                     }
 
-                    if (!tempUnit.isArmed() && !tempUnit.isMounted() && !tempUnit.isMissionary() && tempUnit.canBeEquippedWithTools()) {
+                    if (tempUnit.canBeEquippedWithTools()) {
                         if (tempUnit.isPioneer()) {
                             menuItem = new JMenuItem( Messages.message("removeTools") ,
                                               unitLabel.getCanvas().getImageProvider().getGoodsImageIcon(ImageLibrary.GOODS_TOOLS));
@@ -206,7 +206,7 @@ public final class DragListener extends MouseAdapter {
                         menu.add(menuItem);
                     }
 
-                    if (!tempUnit.isArmed() && !tempUnit.isMounted() && !tempUnit.isPioneer() && tempUnit.canBeDressedAsMissionary()) {
+                    if (tempUnit.canBeDressedAsMissionary()) {
 
                         if (tempUnit.isMissionary()) {
                             menuItem = new JMenuItem( Messages.message("cancelMissionaryStatus") ,
