@@ -80,6 +80,7 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
 
             // units
             JPanel unitPanel = new JPanel(new GridLayout(0, 10));
+            unitPanel.setOpaque(false);
             ArrayList<Unit> unitList = new ArrayList<Unit>();
             Iterator unitIterator = colony.getUnitIterator();
             while (unitIterator.hasNext()) {
@@ -97,6 +98,7 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
             
             // production
             JPanel goodsPanel = new JPanel(new GridLayout(0, 10));
+            goodsPanel.setOpaque(false);
             for (int goodsType = 0; goodsType < Goods.NUMBER_OF_ALL_TYPES; goodsType++) {
                 int newValue = colony.getProductionOf(goodsType);
                 if (newValue > 0) {
@@ -111,7 +113,8 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
             row++;
 
             // buildings
-            JPanel buildingPanel = new JPanel(new GridLayout(0, 4));
+            JPanel buildingPanel = new JPanel(new GridLayout(0, 4, 12, 0));
+            buildingPanel.setOpaque(false);
             int currentType = colony.getCurrentlyBuilding();
             for (int buildingType = 0; buildingType < Building.NUMBER_OF_TYPES; buildingType++) {
                 Building building = colony.getBuilding(buildingType);

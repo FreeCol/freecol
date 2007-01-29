@@ -43,7 +43,9 @@ public final class ReportContinentalCongressPanel extends ReportPanel implements
         reportPanel.setLayout(new HIGLayout(widths, heights));
 
         summaryPanel = new JPanel();
+        summaryPanel.setOpaque(false);
         fatherPanel = new JPanel(new GridLayout(0, 4));
+        fatherPanel.setOpaque(false);
         productionPanel = new ReportProductionPanel(Goods.BELLS, parent, this);
     }
 

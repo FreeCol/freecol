@@ -90,6 +90,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
         this.parent = parent;
         this.reportPanel = reportPanel;
         heights = null;
+        setOpaque(false);
     }
 
     /**
@@ -182,7 +183,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
 
         JPanel refPanel;
         if (isNaval) {
-            refPanel = new JPanel(new GridLayout(0, 7));
+            refPanel = new JPanel(new GridLayout(0, 6));
             for (int count = 0; count < menOfWar; count++) {
                 refPanel.add(reportPanel.buildUnitLabel(ImageLibrary.MAN_O_WAR, 0.66f));
             }
@@ -199,6 +200,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
                 }
             }
         }
+        refPanel.setOpaque(false);
         refPanel.setBorder(BorderFactory.createTitledBorder(player.getREFPlayer().getNationAsString()));
         add(refPanel, higConst.rcwh(row, labelColumn, widths.length, 1));
         row++;
@@ -244,6 +246,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
             }
             if (unitList != null) {
                 JPanel unitPanel = new JPanel(new GridLayout(0, 7));
+                unitPanel.setOpaque(false);
                 Collections.sort(unitList, reportPanel.getUnitTypeComparator());
                 Iterator<Unit> unitIterator = unitList.iterator();
                 while (unitIterator.hasNext()) {

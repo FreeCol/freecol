@@ -48,6 +48,7 @@ public final class ReportReligiousPanel extends ReportPanel implements ActionLis
         religiousReportPanel.initialize();
         
         JPanel summaryPanel = new JPanel();
+        summaryPanel.setOpaque(false);
         summaryPanel.add(new JLabel(Messages.message("crosses")));
         int crosses = player.getCrosses();
         int required = player.getCrossesRequired();

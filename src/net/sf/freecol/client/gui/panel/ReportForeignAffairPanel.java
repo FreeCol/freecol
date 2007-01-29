@@ -54,8 +54,8 @@ public final class ReportForeignAffairPanel extends ReportPanel implements Actio
         int number = report.getChildNodes().getLength();
         for (int i = 0; i < number; i++) {
             Element enemyElement = (Element) report.getChildNodes().item(i);
-            JPanel enemyPanel = new JPanel();
-            enemyPanel.setLayout(new HIGLayout(widths, heights));
+            JPanel enemyPanel = new JPanel(new HIGLayout(widths, heights));
+            enemyPanel.setOpaque(false);
             int row = 1;
             int nationID = Integer.parseInt(enemyElement.getAttribute("nation"));
             enemyPanel.add(new JLabel(Player.getNationAsString(nationID)), 

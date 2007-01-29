@@ -70,6 +70,7 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
         }
         heights = null;
         totalProduction = 0;
+        setOpaque(false);
     }
 
     /**
@@ -173,6 +174,7 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
             Building building = colony.getBuildingForProducing(goodsType);
             if (building != null) {
                 JPanel unitPanel = new JPanel();
+                unitPanel.setOpaque(false);
                 Iterator unitIterator = building.getUnitIterator();
                 while (unitIterator.hasNext()) {
                     Unit unit = (Unit) unitIterator.next();
