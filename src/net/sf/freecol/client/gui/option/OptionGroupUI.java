@@ -46,11 +46,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
     * @param option The <code>OptionGroup</code> to make a user interface for.
     */
     public OptionGroupUI(OptionGroup option, boolean editable) {
-        if (option instanceof ActionManager) {
-            setLayout(new GridLayout(0, 2, H_GAP, 5));
-        } else {
-            setLayout(new FlowLayout(FlowLayout.LEFT, H_GAP, 5));
-        }
+        setLayout(new GridLayout(0, 2, H_GAP, 5));
 
         this.option = option;
 
