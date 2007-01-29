@@ -71,9 +71,9 @@ public final class UnitLabel extends JLabel implements ActionListener {
     */
     public UnitLabel(Unit unit, Canvas parent) {
         ImageProvider lib = parent.getImageProvider();
-        ImageIcon icon = lib.getUnitImageIcon(lib.getUnitGraphicsType(unit));
-        setIcon(icon);
-        setDisabledIcon(new ImageIcon(lib.convertToGrayscale(icon.getImage(), null)));
+        int type = lib.getUnitGraphicsType(unit);
+        setIcon(lib.getUnitImageIcon(type));
+        setDisabledIcon(lib.getUnitImageIcon(type, true));
         this.unit = unit;
         setDescriptionLabel(unit.getName());
         this.parent = parent;

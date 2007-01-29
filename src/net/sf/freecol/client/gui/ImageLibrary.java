@@ -6,7 +6,6 @@ import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
-import java.awt.RenderingHints;
 import java.awt.Transparency;
 import java.awt.color.ColorSpace;
 import java.awt.geom.GeneralPath;
@@ -261,6 +260,7 @@ public final class ImageLibrary extends ImageProvider {
      * A Vector of Image objects.
      */
     private Vector<ImageIcon> units, // Holds ImageIcon objects
+        unitsGrayscale, // Holds ImageIcon objects of units in grayscale
         forests, // Holds ImageIcon objects
         rivers, // Holds ImageIcon objects
         misc, // Holds ImageIcon objects
@@ -378,10 +378,12 @@ public final class ImageLibrary extends ImageProvider {
      */
     private void loadUnits(GraphicsConfiguration gc, Class resourceLocator, boolean doLookup) throws FreeColException {
         units = new Vector(UNIT_GRAPHICS_COUNT);
-
+        unitsGrayscale = new Vector(UNIT_GRAPHICS_COUNT);
+        
         for (int i = 0; i < UNIT_GRAPHICS_COUNT; i++) {
             String filePath = dataDirectory + path + unitsDirectory + unitsName + i + extension;
             units.add(findImage(filePath, resourceLocator, doLookup));
+            unitsGrayscale.add(convertToGrayscale(units.get(i).getImage()));
         }
 
         /*
@@ -800,18 +802,17 @@ public final class ImageLibrary extends ImageProvider {
 
     /**
      * Converts an image to grayscale
-     * @param hints Used to control the color conversion, it can be null
+     * @param image Source image to convert
      * @return The image in grayscale
      */
-    public Image convertToGrayscale(Image image, RenderingHints hints) {
+    private ImageIcon convertToGrayscale(Image image) {
         int width = image.getWidth(null);
         int height = image.getHeight(null);
 
-        ColorConvertOp filter = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), hints);
+        ColorConvertOp filter = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
         BufferedImage srcImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        BufferedImage dstImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         srcImage.createGraphics().drawImage(image, 0, 0, null);
-        return filter.filter(srcImage, dstImage);
+        return new ImageIcon(filter.filter(srcImage, null));
     }
     
     /**
@@ -820,7 +821,17 @@ public final class ImageLibrary extends ImageProvider {
      * @return The unit-image at the given index.
      */
     public Image getUnitImage(int index) {
-        return units.get(index).getImage();
+        return getUnitImage(index, false);
+    }
+    
+    /**
+     * Returns the unit-image at the given index.
+     * @param index The index of the unit-image to return.
+     * @param grayscale If <code>true</code> return the image in grayscale
+     * @return The unit-image at the given index.
+     */
+    public Image getUnitImage(int index, boolean grayscale) {
+        return getUnitImageIcon(index, grayscale).getImage();
     }
 
     /**
@@ -829,7 +840,19 @@ public final class ImageLibrary extends ImageProvider {
      * @return The unit-ImageIcon at the given index.
      */
     public ImageIcon getUnitImageIcon(int index) {
-        return units.get(index);
+        return getUnitImageIcon(index, false);
+    }
+
+    /**
+     * Returns the unit-ImageIcon at the given index.
+     * @param index The index of the unit-ImageIcon to return.
+     * @return The unit-ImageIcon at the given index.
+     */
+    public ImageIcon getUnitImageIcon(int index, boolean grayscale) {
+        if (grayscale)
+            return unitsGrayscale.get(index);
+        else
+            return units.get(index);
     }
 
     /**

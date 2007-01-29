@@ -16,13 +16,6 @@ public abstract class ImageProvider {
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
-
-    /**
-     * Converts an image to grayscale
-     * @param hints Used to control the color conversion, it can be null
-     * @return The image in grayscale
-     */
-    public abstract Image convertToGrayscale(Image image, RenderingHints hints);
     
     /**
     * Should return the Image of the terrain with the given type.
@@ -69,11 +62,27 @@ public abstract class ImageProvider {
     public abstract Image getUnitImage(int index);
     
     /**
+     * Returns the unit-image at the given index.
+     * @param index The index of the unit-image to return.
+     * @param grayscale If <code>true</code> return the image in grayscale
+     * @return The unit-image at the given index.
+     */
+    public abstract Image getUnitImage(int index, boolean grayscale);
+
+    /**
+     * Returns the unit-ImageIcon at the given index.
+     * @param index The index of the unit-ImageIcon to return.
+     * @return The unit-ImageIcon at the given index.
+     */
+    public abstract ImageIcon getUnitImageIcon(int type);
+    
+    /**
     * Should return the ImageIcon of the Unit with the given type.
     * @param type The type of the Unit of which we need the ImageIcon.
+    * @param grayscale If <code>true</code> return the image in grayscale
     * @return The ImageIcon of the Unit with the given type.
     */
-    public abstract ImageIcon getUnitImageIcon(int type);
+    public abstract ImageIcon getUnitImageIcon(int type, boolean grayscale);
     
     /**
     * Should return the ImageIcon of the Unit Button with the given index.

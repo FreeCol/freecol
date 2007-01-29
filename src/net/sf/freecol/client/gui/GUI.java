@@ -2258,12 +2258,8 @@ public final class GUI {
 
             // Draw the unit.
             int type = lib.getUnitGraphicsType(unit);
-            Image image = lib.getUnitImage(type);
-            
             // If unit is sentry, draw in grayscale
-            if (unit.getState() == Unit.SENTRY) {
-                image = lib.convertToGrayscale(image, g.getRenderingHints());
-            }
+            Image image = lib.getUnitImage(type, unit.getState() == Unit.SENTRY);
             
             g.drawImage(image, (x + tileWidth / 2) - lib.getUnitImageWidth(type) / 2, (y + tileHeight / 2) - lib.getUnitImageHeight(type) / 2 - UNIT_OFFSET, null);
 
