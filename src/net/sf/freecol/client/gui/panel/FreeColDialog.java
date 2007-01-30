@@ -585,7 +585,9 @@ public class FreeColDialog extends FreeColPanel {
             textColumn = 1;
         }
 
-        JPanel mainPanel = new JPanel(new HIGLayout(widths, heights));
+        HIGLayout layout = new HIGLayout(widths, heights);
+        layout.setColumnWeight(textColumn, 1);
+        JPanel mainPanel = new JPanel(layout);
 
         int row = 1;
         for (int i = 0; i < texts.length; i++) {

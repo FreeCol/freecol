@@ -2666,7 +2666,7 @@ public final class InGameController implements NetworkConstants {
     public void nextModelMessage() {
         Canvas  canvas = freeColClient.getCanvas();
 
-        List  messageList = new ArrayList();
+        ArrayList<ModelMessage> messageList = new ArrayList<ModelMessage>();
 
         /* look through all available messages and deliver to the canvas all
          * messages with a source the same as the first message.  flag all
@@ -2676,7 +2676,12 @@ public final class InGameController implements NetworkConstants {
               i.hasNext(); ) {
 
             ModelMessage  message = (ModelMessage) i.next();
+            if (shouldAllowMessage(message)) {
+                messageList.add(message);
+            }
+            message.setBeenDisplayed(true);
 
+            /*
             // if this is the first message..
             if ( null == deliveringFromSource ) {
                 deliveringFromSource = message.getSource();
@@ -2696,12 +2701,13 @@ public final class InGameController implements NetworkConstants {
                     }
                 }
             }
+            */
         }
-
-        if ( ! messageList.isEmpty() ) {
-
-            ModelMessage[]  store = new ModelMessage[ messageList.size() ];
-            canvas.showModelMessages( (ModelMessage[]) messageList.toArray(store) );
+        if (messageList.size() > 1) {
+            //ModelMessage[]  store = new ModelMessage[ messageList.size() ];
+            canvas.showTurnReport(messageList);
+        } else if (messageList.size() == 1) {
+            canvas.showModelMessage(messageList.get(0));
         }
         
         freeColClient.getActionManager().update();

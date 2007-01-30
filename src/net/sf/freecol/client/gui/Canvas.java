@@ -60,6 +60,7 @@ import net.sf.freecol.client.gui.panel.ReportNavalPanel;
 import net.sf.freecol.client.gui.panel.ReportPanel;
 import net.sf.freecol.client.gui.panel.ReportReligiousPanel;
 import net.sf.freecol.client.gui.panel.ReportTradePanel;
+import net.sf.freecol.client.gui.panel.ReportTurnPanel;
 import net.sf.freecol.client.gui.panel.ServerListPanel;
 import net.sf.freecol.client.gui.panel.StartGamePanel;
 import net.sf.freecol.client.gui.panel.StatusPanel;
@@ -188,6 +189,7 @@ public final class Canvas extends JLayeredPane {
     private final ColopediaPanel    colopediaPanel;
     private final ReportReligiousPanel     reportReligiousPanel;
     private final ReportTradePanel         reportTradePanel;
+    private final ReportTurnPanel          reportTurnPanel;
     private final ReportLabourPanel        reportLabourPanel;
     private final ReportColonyPanel        reportColonyPanel;
     private final ReportMilitaryPanel      reportMilitaryPanel;
@@ -249,6 +251,7 @@ public final class Canvas extends JLayeredPane {
         colopediaPanel = new ColopediaPanel(this);
         reportReligiousPanel = new ReportReligiousPanel(this);
         reportTradePanel = new ReportTradePanel(this);
+        reportTurnPanel = new ReportTurnPanel(this);
         reportLabourPanel = new ReportLabourPanel(this);
         reportColonyPanel = new ReportColonyPanel(this);
         reportMilitaryPanel = new ReportMilitaryPanel(this);
@@ -520,6 +523,19 @@ public final class Canvas extends JLayeredPane {
         }
     }
     */
+
+    /**
+     * Displays all model messages for the current turn.
+     *
+     * @param messages A list of messages to display.
+     */
+    public void showTurnReport(ArrayList<ModelMessage> messages) {
+        reportTurnPanel.initialize(messages);
+        setEnabled(false);
+        addCentered(reportTurnPanel, REPORT_LAYER);
+        reportTurnPanel.requestFocus();
+    }
+
 
     /**
      * Displays a single ModelMessage.
