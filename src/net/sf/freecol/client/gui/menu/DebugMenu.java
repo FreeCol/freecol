@@ -1,5 +1,6 @@
 package net.sf.freecol.client.gui.menu;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -216,7 +217,8 @@ public class DebugMenu extends JMenu {
 		final JMenuItem useAI = new JMenuItem("Use AI");
 		useAI.setOpaque(false);
 		useAI.setMnemonic(KeyEvent.VK_A);
-		useAI.setAccelerator(KeyStroke.getKeyStroke('A', InputEvent.CTRL_MASK | InputEvent.ALT_MASK));
+		useAI.setAccelerator(KeyStroke.getKeyStroke('A',
+                        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.ALT_MASK));
 		this.add(useAI);
 		useAI.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -236,7 +238,8 @@ public class DebugMenu extends JMenu {
 		final JMenuItem compareMaps = new JMenuItem(Messages.message("menuBar.debug.compareMaps"));
 		compareMaps.setOpaque(false);
 		compareMaps.setMnemonic(KeyEvent.VK_C);
-		compareMaps.setAccelerator(KeyStroke.getKeyStroke('C', InputEvent.CTRL_MASK | InputEvent.ALT_MASK));
+		compareMaps.setAccelerator(KeyStroke.getKeyStroke('C',
+                        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.ALT_MASK));
 		this.add(compareMaps);
 		compareMaps.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -309,7 +312,7 @@ public class DebugMenu extends JMenu {
 		final JMenuItem loadResource = new JMenuItem("Load resource");
 		loadResource.setOpaque(false);
                 //loadResource.setMnemonic(KeyEvent.VK_A);
-		//loadResource.setAccelerator(KeyStroke.getKeyStroke('A', InputEvent.CTRL_MASK | InputEvent.ALT_MASK));
+		//loadResource.setAccelerator(KeyStroke.getKeyStroke('A', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) | InputEvent.ALT_MASK));
 		this.add(loadResource);
 		loadResource.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

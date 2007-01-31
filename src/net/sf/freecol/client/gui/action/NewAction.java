@@ -2,6 +2,7 @@
 
 package net.sf.freecol.client.gui.action;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.util.logging.Logger;
@@ -28,7 +29,8 @@ public class NewAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     NewAction(FreeColClient freeColClient) {
-    	super(freeColClient, "menuBar.game.new", null, KeyStroke.getKeyStroke('N', InputEvent.CTRL_MASK));        
+    	super(freeColClient, "menuBar.game.new", null,
+                KeyStroke.getKeyStroke('N', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
     }
     
     /**

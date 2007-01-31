@@ -2,6 +2,7 @@
 
 package net.sf.freecol.client.gui.action;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -31,7 +32,8 @@ public class PreferencesAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     PreferencesAction(FreeColClient freeColClient) {
-    	super(freeColClient, "menuBar.game.preferences", null, KeyStroke.getKeyStroke('P', InputEvent.CTRL_MASK));        
+    	super(freeColClient, "menuBar.game.preferences", null,
+                KeyStroke.getKeyStroke('P', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
     }
     
     /**

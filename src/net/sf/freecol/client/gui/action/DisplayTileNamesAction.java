@@ -2,6 +2,7 @@
 
 package net.sf.freecol.client.gui.action;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.util.logging.Logger;
@@ -29,7 +30,8 @@ public class DisplayTileNamesAction extends SelectableAction {
      * @param freeColClient The main controller object for the client.
      */
     DisplayTileNamesAction(FreeColClient freeColClient) {
-    	super(freeColClient, "menuBar.view.displayTileNames", null, KeyStroke.getKeyStroke('D', InputEvent.CTRL_MASK));        
+    	super(freeColClient, "menuBar.view.displayTileNames", null,
+                KeyStroke.getKeyStroke('D', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
     }
     
     /**

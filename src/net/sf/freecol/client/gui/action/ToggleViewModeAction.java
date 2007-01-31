@@ -1,6 +1,7 @@
 
 package net.sf.freecol.client.gui.action;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -31,7 +32,7 @@ public class ToggleViewModeAction extends MapboardAction {
      */
     ToggleViewModeAction(FreeColClient freeColClient) {
     	super(freeColClient, "menuBar.view.toggle", null,
-                KeyStroke.getKeyStroke('V', InputEvent.CTRL_DOWN_MASK|InputEvent.SHIFT_DOWN_MASK));
+                KeyStroke.getKeyStroke('V', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()|InputEvent.SHIFT_MASK));
     }
 
     /**

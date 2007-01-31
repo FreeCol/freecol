@@ -1,6 +1,7 @@
 
 package net.sf.freecol.client.gui.action;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.util.logging.Logger;
@@ -28,7 +29,8 @@ public class DisplayTileOwnersAction extends SelectableAction {
      * @param freeColClient The main controller object for the client.
      */
     DisplayTileOwnersAction(FreeColClient freeColClient) {
-    	super(freeColClient, "menuBar.view.displayTileOwners", null, KeyStroke.getKeyStroke('W', InputEvent.CTRL_MASK));        
+    	super(freeColClient, "menuBar.view.displayTileOwners", null,
+                KeyStroke.getKeyStroke('W', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
     }
     
     /**

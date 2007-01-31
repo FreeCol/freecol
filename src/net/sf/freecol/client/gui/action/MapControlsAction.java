@@ -2,6 +2,7 @@
 
 package net.sf.freecol.client.gui.action;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -36,7 +37,8 @@ public class MapControlsAction extends SelectableAction {
      * @param freeColClient The main controller object for the client.
      */
     MapControlsAction(FreeColClient freeColClient) {
-    	super(freeColClient, "menuBar.view.mapControls", null, KeyStroke.getKeyStroke('M', InputEvent.CTRL_MASK));
+    	super(freeColClient, "menuBar.view.mapControls", null,
+                KeyStroke.getKeyStroke('M', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
     	
     	setSelected(true);
     }

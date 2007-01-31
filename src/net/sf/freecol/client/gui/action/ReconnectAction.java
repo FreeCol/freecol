@@ -2,6 +2,7 @@
 
 package net.sf.freecol.client.gui.action;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -31,7 +32,8 @@ public class ReconnectAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     ReconnectAction(FreeColClient freeColClient) {
-    	super(freeColClient, "menuBar.game.reconnect", null, KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_MASK));        
+    	super(freeColClient, "menuBar.game.reconnect", null,
+                KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
     }
     
     /**

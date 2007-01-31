@@ -2,6 +2,7 @@
 
 package net.sf.freecol.client.gui.action;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -31,7 +32,8 @@ public class QuitAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     QuitAction(FreeColClient freeColClient) {
-    	super(freeColClient, "menuBar.game.quit", null, KeyStroke.getKeyStroke('Q', InputEvent.CTRL_MASK));
+    	super(freeColClient, "menuBar.game.quit", null,
+                KeyStroke.getKeyStroke('Q', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         putValue(BUTTON_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_WAIT, 0));
         putValue(BUTTON_ROLLOVER_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_WAIT, 1));
         putValue(BUTTON_PRESSED_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_WAIT, 2));

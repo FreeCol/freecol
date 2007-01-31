@@ -212,65 +212,9 @@ public abstract class FreeColAction extends AbstractAction implements Option {
      *         as a parameter to <code>getAWTKeyStroke(String)</code>.
      */
     public static String getKeyStrokeText(KeyStroke keyStroke) {
-        /* 
-         * AWTKeyStroke.toString() should be used instead of this method,
-         * if we choose to require java 1.5.
-         */
-         
         if (keyStroke == null) {
             return "";
-        }
-
-        StringBuffer buf = new StringBuffer();
-
-        // Add modifiers:
-        int modifiers = keyStroke.getModifiers();
-        if ((modifiers & InputEvent.SHIFT_DOWN_MASK) != 0 ) {
-            buf.append("shift ");
-        }
-        if ((modifiers & InputEvent.CTRL_DOWN_MASK) != 0 ) {
-            buf.append("ctrl ");
-        }
-        if ((modifiers & InputEvent.META_DOWN_MASK) != 0 ) {
-            buf.append("meta ");
-        }
-        if ((modifiers & InputEvent.ALT_DOWN_MASK) != 0 ) {
-            buf.append("alt ");
-        }
-        if ((modifiers & InputEvent.ALT_GRAPH_DOWN_MASK) != 0 ) {
-            buf.append("altGraph ");
-        }
-        if ((modifiers & InputEvent.BUTTON1_DOWN_MASK) != 0 ) {
-            buf.append("button1 ");
-        }
-        if ((modifiers & InputEvent.BUTTON2_DOWN_MASK) != 0 ) {
-            buf.append("button2 ");
-        }
-        if ((modifiers & InputEvent.BUTTON3_DOWN_MASK) != 0 ) {
-            buf.append("button3 ");
-        }
-        
-        if (keyStroke.getKeyCode() == KeyEvent.VK_UNDEFINED) {
-            buf.append("typed " + keyStroke.getKeyChar());
-        } else {
-            buf.append(keyStroke.getKeyEventType() == KeyEvent.KEY_PRESSED ? "pressed" : "released"); 
-            buf.append(" ");
-
-            int em = Modifier.PUBLIC | Modifier.STATIC | Modifier.FINAL;
-            Field[] fields = KeyEvent.class.getDeclaredFields();
-            for (int i = 0; i < fields.length; i++) {
-                try {
-                    if (fields[i].getModifiers() == em 
-                            && fields[i].getType() == Integer.TYPE
-                            && fields[i].getName().startsWith("VK_") 
-                            && fields[i].getInt(KeyEvent.class) == keyStroke.getKeyCode()) {
-                        buf.append(fields[i].getName().substring(3));
-                    }                   
-                } catch (IllegalAccessException e) {}
-            }
-        }
-        
-        return buf.toString();
+        } else return keyStroke.toString();
     }
 
     /**
