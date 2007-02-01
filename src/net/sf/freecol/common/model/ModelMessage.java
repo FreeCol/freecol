@@ -4,6 +4,7 @@ package net.sf.freecol.common.model;
 
 import java.util.Arrays;
 
+import net.sf.freecol.client.gui.i18n.Messages;
 
 /**
 * Contains a message about a change in the model.
@@ -186,6 +187,45 @@ public class ModelMessage {
         return type;
 
     }
+
+
+    public String getTypeName() {
+        switch (type) {
+        case WARNING:
+            return Messages.message("model.message.warning");
+        case SONS_OF_LIBERTY:
+            return Messages.message("model.message.sonsOfLiberty");
+        case GOVERNMENT_EFFICIENCY:
+            return Messages.message("model.message.governmentEfficiency");
+        case WAREHOUSE_CAPACITY:
+            return Messages.message("model.message.warehouseCapacity");
+        case UNIT_IMPROVED:
+            return Messages.message("model.message.unitImproved");
+        case UNIT_DEMOTED:
+            return Messages.message("model.message.unitDemoted");
+        case UNIT_LOST:
+            return Messages.message("model.message.unitLost");
+        case UNIT_ADDED:
+            return Messages.message("model.message.unitAdded");
+        case BUILDING_COMPLETED:
+            return Messages.message("model.message.buildingCompleted");
+        case FOREIGN_DIPLOMACY:
+            return Messages.message("model.message.foreignDiplomacy");
+        case MARKET_PRICES:
+            return Messages.message("model.message.marketPrices");
+        case LOST_CITY_RUMOUR:
+            return Messages.message("model.message.lostCityRumour");
+        case GIFT_GOODS:
+            return Messages.message("model.message.giftGoods");
+        case MISSING_GOODS:
+            return Messages.message("model.message.missingGoods");
+        case DEFAULT:
+        default:
+            return Messages.message("model.message.default");
+        }
+    }
+
+
     /**
      * Gets the Object to display.
      * @return The Object to display.

@@ -414,6 +414,16 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         return toString();
     }
 
+
+    /**
+     * Returns the name of the owner's home port.
+     *
+     * @return The name of this location.
+     */
+    public String getName() {
+        return toString();
+    }
+
     /**
      * Returns a suitable name.
      */

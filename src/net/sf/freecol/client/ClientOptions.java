@@ -5,6 +5,11 @@ import java.util.Comparator;
 
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.ModelMessage;
+import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.OptionGroup;
@@ -62,6 +67,9 @@ public class ClientOptions extends OptionMap {
      * @see net.sf.freecol.common.model.ModelMessage
      */
     public static final String MESSAGES_GROUP_BY = "guiMessagesGroupBy";
+    public static final int MESSAGES_GROUP_BY_NOTHING = 0;
+    public static final int MESSAGES_GROUP_BY_TYPE = 1;
+    public static final int MESSAGES_GROUP_BY_SOURCE = 2;
 
     /**
      * Used by GUI, this defines whether SoL messages will be displayed.
@@ -195,6 +203,57 @@ public class ClientOptions extends OptionMap {
     };
 
 
+    private Comparator messageSourceComparator = new Comparator<ModelMessage>() {
+        // sort according to message source
+        public int compare(ModelMessage message1, ModelMessage message2) {
+            Object source1 = message1.getSource();
+            Object source2 = message2.getSource();
+            if (source1 == source2) {
+                return messageTypeComparator.compare(message1, message2);
+            }
+            int base = getClassIndex(source1) - getClassIndex(source2);
+            if (base == 0) {
+                if (source1 instanceof Colony) {
+                    return getColonyComparator().compare((Colony) source1, (Colony) source2);
+                } else if (source1 instanceof FreeColGameObject) {
+                    return ((FreeColGameObject) source1).getIntegerID() -
+                           ((FreeColGameObject) source2).getIntegerID();
+                } 
+            }
+            return base;
+        }
+
+        private int getClassIndex(Object object) {
+            if (object instanceof Player) {
+                return 10;
+            } else if (object instanceof Colony) {
+                return 20;
+            } else if (object instanceof Europe) {
+                return 30;
+            } else if (object instanceof Unit) {
+                return 40;
+            } else if (object instanceof FreeColGameObject) {
+                return 50;
+            } else {
+                return 1000;
+            }
+        }
+
+    }; 
+
+
+    private Comparator messageTypeComparator = new Comparator<ModelMessage>() {
+        // sort according to message type
+        public int compare(ModelMessage message1, ModelMessage message2) {
+            int dtype = message1.getType() - message2.getType();
+            if (dtype == 0 && message1.getSource() != message2.getSource()) {
+                return messageSourceComparator.compare(message1, message2);
+            } else {
+                return dtype;
+            }
+        }
+    };
+
     
     /**
     * Creates a new <code>ClientOptions</code>.
@@ -326,7 +385,7 @@ public class ClientOptions extends OptionMap {
     }
 
 
-    public Comparator getColonyComparator() {
+    public Comparator<Colony> getColonyComparator() {
         switch(getInteger(COLONY_COMPARATOR)) {
         case COLONY_COMPARATOR_AGE:
             return colonyAgeComparator;
@@ -344,6 +403,16 @@ public class ClientOptions extends OptionMap {
     }
 
 
+    public Comparator<ModelMessage> getModelMessageComparator() {
+        switch (getInteger(MESSAGES_GROUP_BY)) {
+        case MESSAGES_GROUP_BY_SOURCE:
+            return messageSourceComparator;
+        case MESSAGES_GROUP_BY_TYPE:
+            return messageTypeComparator;
+        default:
+            return null;
+        }
+    }
 
 
     /**

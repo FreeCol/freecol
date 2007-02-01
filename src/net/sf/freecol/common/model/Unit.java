@@ -418,7 +418,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             int value = ((IndianSettlement) settlement).getPrice(goods) / 100;
             settlement.getOwner().modifyTension(getOwner(), -value);
         } else {
-            addModelMessage(settlement.getOwner(), "model.unit.gift",
+            addModelMessage(settlement, "model.unit.gift",
                             new String[][] {{"%player%", getOwner().getNationAsString()},
                                             {"%type%", Goods.getName(type)},
                                             {"%amount%", Integer.toString(amount)},
