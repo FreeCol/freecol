@@ -1,5 +1,6 @@
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.Font;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.MissingResourceException;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JTextArea;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.gui.Canvas;
@@ -66,7 +68,9 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
                        message.getType() != type) {
                 type = message.getType();
                 images.add(new JLabel());
-                texts.add(getDefaultTextArea(message.getTypeName()));
+                JLabel headline = new JLabel(message.getTypeName());
+                headline.setFont(headline.getFont().deriveFont(Font.BOLD, 16f));
+                texts.add(headline);
             }
             if (message.getDisplay() == null) {
                 images.add(new JLabel());
@@ -76,13 +80,18 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
             try {
                 String text = Messages.message(message.getMessageID(),
                                                message.getData());
-                texts.add(getDefaultTextArea(text));
+                JTextArea textArea = new JTextArea(text);
+                textArea.setColumns(50);
+                textArea.setOpaque(false);
+                textArea.setLineWrap(true);
+                textArea.setWrapStyleWord(true);
+                textArea.setFocusable(false);
+                textArea.setFont(defaultFont);
+                texts.add(textArea);
             } catch (MissingResourceException e) {
                 logger.warning("could not find message with id: " + message.getMessageID() + ".");
             }
         }
-
-        //Player player = parent.getClient().getMyPlayer();
 
         // Display Panel
         reportPanel.removeAll();
@@ -108,44 +117,6 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
                             higConst.rc(row, textColumn, "l"));
             row += 2;
         }
-
-        // source should be the same for all messages
-        /*
-        FreeColGameObject source = modelMessages[0].getSource();
-        if ((source instanceof Europe && !europePanel.isShowing()) ||
-            (source instanceof Colony || source instanceof WorkLocation) && 
-            !colonyPanel.isShowing()) {
-
-            FreeColDialog confirmDialog = FreeColDialog.createConfirmDialog(messageText, messageIcon, okText, cancelText);
-            addCentered(confirmDialog, MODEL_MESSAGE_LAYER);
-            confirmDialog.requestFocus();
-
-            if (!confirmDialog.getResponseBoolean()) {
-                remove(confirmDialog);
-                if (source instanceof Europe) {
-                    showEuropePanel();
-                } else if (source instanceof Colony) {
-                    showColonyPanel((Colony) source);
-                } else if (source instanceof WorkLocation) {
-                    showColonyPanel(((WorkLocation) source).getColony());
-                }
-            } else {
-                remove(confirmDialog);
-                if (!getColonyPanel().isShowing() && !getEuropePanel().isShowing())
-                    freeColClient.getInGameController().nextModelMessage();
-            }
-        } else {
-            FreeColDialog informationDialog = FreeColDialog.createInformationDialog(messageText, messageIcon);
-            addCentered(informationDialog, MODEL_MESSAGE_LAYER);
-            informationDialog.requestFocus();
-
-            informationDialog.getResponse();
-            remove(informationDialog);
-
-            if (!getColonyPanel().isShowing() && !getEuropePanel().isShowing())
-                freeColClient.getInGameController().nextModelMessage();
-        }
-        */
     }
 
     private JComponent getHeadline(Object source) {
@@ -160,17 +131,29 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
         } else if (source instanceof Europe) {
             Europe europe = (Europe) source;
             JButton button = new JButton(europe.getName());
-            button.setAction(parent.getClient().getActionManager().getFreeColAction("europeAction"));
+            button.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent event) {
+                        parent.showEuropePanel();
+                    }
+                });
             headline = button;
         } else if (source instanceof Market) {
             Europe europe = parent.getClient().getMyPlayer().getEurope();
-            JButton button = new JButton(europe.getName());
-            button.setAction(parent.getClient().getActionManager().getFreeColAction("europeAction"));
+            JButton button = new JButton(Messages.message("model.message.marketPrices"));
+            button.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent event) {
+                        parent.showEuropePanel();
+                    }
+                });
             headline = button;
         } else if (source instanceof Colony) {
-            Colony colony = (Colony) source;
+            final Colony colony = (Colony) source;
             JButton button = new JButton(colony.getName());
-            //button.setAction(parent.getClient().getActionManager().getFreeColAction("colonyAction"));
+            button.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent event) {
+                        parent.showColonyPanel(colony);
+                    }
+                });
             headline = button;
         } else if (source instanceof Unit) {
             headline = new JLabel(((Unit) source).getName());

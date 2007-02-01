@@ -1286,6 +1286,8 @@ public final class Canvas extends JLayeredPane {
             reportPanel = reportForeignAffairPanel;
         } else if ("net.sf.freecol.client.gui.panel.ReportIndianPanel".equals(classname)) {
             reportPanel = reportIndianPanel;
+        } else if ("net.sf.freecol.client.gui.panel.ReportTurnPanel".equals(classname)) {
+            reportPanel = reportTurnPanel;
         } else if ("net.sf.freecol.client.gui.panel.ReportContinentalCongressPanel".equals(classname)) {
             reportPanel = reportContinentalCongressPanel;
         } else if ("net.sf.freecol.client.gui.panel.ReportTradePanel".equals(classname)) {
