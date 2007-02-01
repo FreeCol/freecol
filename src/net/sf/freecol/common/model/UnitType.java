@@ -15,7 +15,7 @@ public final class UnitType
     public static final  String  LICENSE   = "http://www.gnu.org/licenses/gpl.html";
     public static final  String  REVISION  = "$Revision$";
 
-    private static final  int  UNDEFINED = Integer.MIN_VALUE;
+    public static final  int  UNDEFINED = Integer.MIN_VALUE;
 
     public  String     id;
     public  String     name;

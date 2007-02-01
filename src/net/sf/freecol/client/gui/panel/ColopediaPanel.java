@@ -510,7 +510,10 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         if (type.toolsRequired > 0) {
             toolsRequired = String.valueOf(type.toolsRequired);
         }
-        
+        String skill = "";
+        if (type.skill != UnitType.UNDEFINED) {
+            skill = String.valueOf(type.skill);
+        }
         int[] widths = {0, 3 * margin, 0};
         int[] heights = new int[17];
         for (int index = 0; index < 8; index++) {
@@ -539,7 +542,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         row += 2;
         detailPanel.add(new JLabel(Messages.message("colopedia.unit.skill")),
                         higConst.rc(row, labelColumn));
-        detailPanel.add(new JLabel(String.valueOf(String.valueOf(type.skill))),
+        detailPanel.add(new JLabel(skill),
                         higConst.rc(row, valueColumn, "r"));
         row += 2;
         detailPanel.add(new JLabel(Messages.message("colopedia.unit.price")),
