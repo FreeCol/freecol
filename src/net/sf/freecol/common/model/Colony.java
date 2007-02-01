@@ -761,13 +761,26 @@ public final class Colony extends Settlement implements Location, Nameable {
 
 
     /**
-    * Gets the <code>Unit</code> that is currently defending this <code>Colony</code>.
-    * @return The <code>Unit</code> that has been choosen to defend this colony.
+    * Gets the <code>Unit</code> that is currently defending this
+    * <code>Colony</code>. Note that the colony will normally be
+    * defended by units outside of the colony (@see
+    * Tile#getDefendingUnit).
+    * @return The <code>Unit</code> that has been choosen to defend
+    * this colony.
     */
     public Unit getDefendingUnit() {
         Iterator ui = getUnitIterator();
         if (ui.hasNext()) {
-            return (Unit) ui.next();
+            Unit defender = (Unit) ui.next();
+            if (getOwner().hasFather(FoundingFather.PAUL_REVERE)) {
+                if (getGoodsCount(Goods.MUSKETS) >= 50) {
+                    defender.setArmed(true);
+                }
+                if (getGoodsCount(Goods.HORSES) >= 50) {
+                    defender.setMounted(true);
+                }
+            }
+            return defender;
         }
 
         return null;
