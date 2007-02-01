@@ -385,7 +385,7 @@ public class ClientOptions extends OptionMap {
     }
 
 
-    public Comparator<Colony> getColonyComparator() {
+    public Comparator getColonyComparator() {
         switch(getInteger(COLONY_COMPARATOR)) {
         case COLONY_COMPARATOR_AGE:
             return colonyAgeComparator;
