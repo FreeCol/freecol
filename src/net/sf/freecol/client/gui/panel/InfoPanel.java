@@ -307,6 +307,7 @@ public final class InfoPanel extends FreeColPanel {
 
         private final JLabel    unitLabel,
                                 unitNameLabel,
+                                unitTypeLabel,
                                 unitMovesLabel,
                                 unitToolsLabel,
                                 goldLabel;
@@ -340,20 +341,23 @@ public final class InfoPanel extends FreeColPanel {
             add(picturePanel);
 
             int[] widths = {0};
-            int[] heights = {0, 0, 0};
+            int[] heights = {0, 0, 0, 0};
             labelPanel = new JPanel(new HIGLayout(widths, heights));
             labelPanel.setOpaque(false);
 
             unitNameLabel = new JLabel();
             unitMovesLabel = new JLabel();
+            unitTypeLabel = new JLabel();
             goldLabel = new JLabel();
 
             labelPanel.add(unitNameLabel, higConst.rc(1, 1));
-            labelPanel.add(unitMovesLabel, higConst.rc(2, 1));
-            labelPanel.add(unitCargoPanel, higConst.rc(3, 1));
+            labelPanel.add(unitTypeLabel, higConst.rc(2, 1));
+            labelPanel.add(unitMovesLabel, higConst.rc(3, 1));
+            labelPanel.add(unitCargoPanel, higConst.rc(4, 1));
 
             unitLabel.setFocusable(false);
             unitNameLabel.setFocusable(false);
+            unitTypeLabel.setFocusable(false);
             unitMovesLabel.setFocusable(false);
             unitToolsLabel.setFocusable(false);
             labelPanel.setSize(130, 100);
@@ -372,7 +376,15 @@ public final class InfoPanel extends FreeColPanel {
         public void paintComponent(Graphics graphics) {
             unitCargoPanel.removeAll();
             if (unit != null) {
-                unitNameLabel.setText(unit.getName());
+                String name = unit.getName();
+                int index = name.indexOf(" (");
+                if (index < 0) {
+                    unitNameLabel.setText(name);
+                    unitTypeLabel.setText(null);
+                } else {
+                    unitNameLabel.setText(name.substring(0, index));
+                    unitTypeLabel.setText(name.substring(index + 1));
+                }
                 unitLabel.setIcon(library.getUnitImageIcon(library.getUnitGraphicsType(unit)));
                 unitMovesLabel.setText(Messages.message("moves") + " " + unit.getMovesAsString());
                 if (unit.isPioneer()) {
