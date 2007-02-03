@@ -35,6 +35,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Nameable;
 import net.sf.freecol.common.model.Ownable;
@@ -2668,43 +2669,24 @@ public final class InGameController implements NetworkConstants {
 
         ArrayList<ModelMessage> messageList = new ArrayList<ModelMessage>();
 
-        /* look through all available messages and deliver to the canvas all
-         * messages with a source the same as the first message.  flag all
-         * messages delivered as "beenDisplayed".  ignore duplicate messages */
-        Object  deliveringFromSource = null;
         for ( Iterator i = freeColClient.getGame().getModelMessageIterator(freeColClient.getMyPlayer());
               i.hasNext(); ) {
 
             ModelMessage  message = (ModelMessage) i.next();
             if (shouldAllowMessage(message)) {
+                // move Market messages to Europe. TODO: move this to
+                // the Market class as soon as all players have their
+                // own market
+                if (message.getSource() instanceof Market) {
+                    message.setSource(freeColClient.getMyPlayer().getEurope());
+                }
                 messageList.add(message);
             }
+            // flag all messages delivered as "beenDisplayed". 
             message.setBeenDisplayed(true);
-
-            /*
-            // if this is the first message..
-            if ( null == deliveringFromSource ) {
-                deliveringFromSource = message.getSource();
-            }
-
-            // if this message is from the same source as the first message..
-            if ( deliveringFromSource == message.getSource() ) {
-
-                message.setBeenDisplayed( true );
-
-                // if this message is NOT a duplicate
-                if ( -1 == messageList.indexOf(message) ) {
-
-                    if ( shouldAllowMessage(message) ) {
-
-                        messageList.add( message );
-                    }
-                }
-            }
-            */
         }
+
         if (messageList.size() > 1) {
-            //ModelMessage[]  store = new ModelMessage[ messageList.size() ];
             canvas.showTurnReport(messageList);
         } else if (messageList.size() == 1) {
             canvas.showModelMessage(messageList.get(0));

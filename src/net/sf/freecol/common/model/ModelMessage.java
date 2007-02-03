@@ -32,7 +32,9 @@ public class ModelMessage {
     public static final int GIFT_GOODS = 13;
     public static final int MISSING_GOODS = 14;
 
-    private final FreeColGameObject source;
+    // TODO: make this final again, as soon as all players have their
+    // own market
+    private FreeColGameObject source;
     private final Object display;
     private final int type;
     private final String messageID;
@@ -158,6 +160,11 @@ public class ModelMessage {
     */
     public FreeColGameObject getSource() {
         return source;
+    }
+
+    // TODO: remove this as soon as all players have their own market
+    public void setSource(FreeColGameObject object) {
+        this.source = object;
     }
     
     
