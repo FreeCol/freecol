@@ -12,6 +12,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
@@ -20,6 +21,7 @@ import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 
+import cz.autel.dmi.HIGLayout;
 
 /**
 * A panel filled with 'new game' items.
@@ -46,6 +48,10 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                                 join,
                                 start,
                                 meta;
+    private final JPanel        namePanel,
+                                joinServerPanel,
+                                startServerPanel,
+                                buttonPanel;
     private final JLabel        ipLabel,
                                 port1Label,
                                 port2Label;
@@ -79,6 +85,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         port2Label = new JLabel( Messages.message("startServerOnPort") );
         publicServer = new JCheckBox( Messages.message("publicServer") );
         name = new JTextField( System.getProperty("user.name", Messages.message("defaultPlayerName")) );
+        name.setColumns(30);
         server = new JTextField("127.0.0.1");
         port1 = new JTextField("3541");
         port2 = new JTextField("3541");
@@ -87,59 +94,61 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         start = new JRadioButton(Messages.message("startMultiplayerGame"), false);
         meta = new JRadioButton( Messages.message("getServerList") + " (" + FreeCol.META_SERVER_ADDRESS + ")", false);
 
+        namePanel = new JPanel();
+        namePanel.setOpaque(false);
+        namePanel.add(nameLabel);
+        namePanel.add(name);
+
+        joinServerPanel = new JPanel();
+        joinServerPanel.setOpaque(false);
+        joinServerPanel.add(ipLabel);
+        joinServerPanel.add(server);
+        joinServerPanel.add(port1Label);
+        joinServerPanel.add(port1);
+
+        startServerPanel = new JPanel();
+        startServerPanel.setOpaque(false);
+        startServerPanel.add(port2Label);
+        startServerPanel.add(port2);
+
+        buttonPanel = new JPanel();
+        buttonPanel.setOpaque(false);
+        buttonPanel.add(ok);
+        buttonPanel.add(cancel);
+
         group.add(single);
         group.add(join);
         group.add(start);
         group.add(meta);
 
-        nameLabel.setSize(nameLabel.getPreferredSize().width, 20);
-        ok.setSize(110, 20);
-        cancel.setSize(110, 20);
-        single.setSize(320, 20);
-        join.setSize(320, 20);
-        ipLabel.setSize(40, 20);
-        server.setSize(80, 20);
-        port1Label.setSize(40, 20);
-        port1.setSize(40, 20);
-        start.setSize(320, 20);
-        port2Label.setSize(port2Label.getPreferredSize().width, 20);
-        publicServer.setSize(300, 20);
-        port2.setSize(40, 20);
-        meta.setSize(320, 20);
+        int numberOfRows = 9;
+        int[] widths = {0};
+        int[] heights = new int[2 * numberOfRows - 1];
+        for (int index = 1; index < heights.length; index += 2) {
+            heights[index] = margin;
+        }
+        int column = 1;
+        setLayout(new HIGLayout(widths, heights));
 
-        /*
-        name.setLocation(60, 10);
-        nameLabel.setLocation(10, 10);
-        ok.setLocation(30, 195);
-        cancel.setLocation(150, 195);
-        single.setLocation(10, 45);
-        join.setLocation(10, 70);
-        ipLabel.setLocation(30, 95);
-        server.setLocation(70, 95);
-        port1Label.setLocation(155, 95);
-        port1.setLocation(195, 95);
-        start.setLocation(10, 130);
-        port2Label.setLocation(55, 155);
-        port2.setLocation(195, 155);
-        */
-        nameLabel.setLocation(10, 10);
-        name.setLocation(nameLabel.getX() + nameLabel.getWidth() + 10, 10);
-        ok.setLocation(30, 240);
-        cancel.setLocation(200, 240);
-        single.setLocation(10, 45);
-        meta.setLocation(10, 70);
-        join.setLocation(10, 95);
-        ipLabel.setLocation(30, 120);
-        server.setLocation(70, 120);
-        port1Label.setLocation(155, 120);
-        port1.setLocation(195, 120);
-        start.setLocation(10, 155);
-        port2Label.setLocation(30, 180);
-        publicServer.setLocation(30, 200);
-        port2.setLocation(port2Label.getX() + port2Label.getWidth() + 10, 180);
+        int row = 1;
+        add(namePanel, higConst.rc(row, column));
+        row += 2;
+        add(single, higConst.rc(row, column));
+        row += 2;
+        add(meta, higConst.rc(row, column));
+        row += 2;
+        add(join, higConst.rc(row, column));
+        row += 2;
+        add(joinServerPanel, higConst.rc(row, column, "l"));
+        row += 2;
+        add(start, higConst.rc(row, column));
+        row += 2;
+        add(startServerPanel, higConst.rc(row, column, "l"));
+        row += 2;
+        add(publicServer, higConst.rc(row, column));
+        row += 2;
+        add(buttonPanel, higConst.rc(row, column));
 
-        name.setSize(340 - name.getX() - 20, 20);
-        setLayout(null);
 
         ok.setActionCommand(String.valueOf(OK));
         cancel.setActionCommand(String.valueOf(CANCEL));
@@ -163,23 +172,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         publicServer.setEnabled(false);
         port2.setEnabled(false);
 
-        add(name);
-        add(nameLabel);
-        add(ok);
-        add(cancel);
-        add(single);
-        add(join);
-        add(ipLabel);
-        add(server);
-        add(port1Label);
-        add(port1);
-        add(start);
-        add(port2Label);
-        add(port2);
-        add(meta);
-        add(publicServer);
-
-        setSize(340, 280);
+        setSize(getPreferredSize());
     }
 
 
