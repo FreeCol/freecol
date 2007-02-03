@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Map;
@@ -84,14 +85,55 @@ public final class PreGameController extends Controller {
             }
 
             DummyConnection theConnection = new DummyConnection(freeColServer.getInGameInputHandler());
-
-            String name;
-            if (!Player.isEuropean(i)) {
-                name = "Indian_" + Integer.toString(i - 3);
-            } else if (!Player.isREF(i)) {
-                name = "European_" + Integer.toString(i);
-            } else {
-                name = "REF_" + Integer.toString(i - 12);
+            String name = null;
+            switch (i) {
+            case 0:
+                name = Messages.message("model.nation.Dutch.ruler");
+                break;
+            case 1:
+                name = Messages.message("model.nation.English.ruler");
+                break;
+            case 2:
+                name = Messages.message("model.nation.French.ruler");
+                break;
+            case 3:
+                name = Messages.message("model.nation.Spanish.ruler");
+                break;
+            case 4:
+                name = Messages.message("model.nation.Inca.ruler");
+                break;
+            case 5:
+                name = Messages.message("model.nation.Aztec.ruler");
+                break;
+            case 6:
+                name = Messages.message("model.nation.Arawak.ruler");
+                break;
+            case 7:
+                name = Messages.message("model.nation.Cherokee.ruler");
+                break;
+            case 8:
+                name = Messages.message("model.nation.Iroquois.ruler");
+                break;
+            case 9:
+                name = Messages.message("model.nation.Sioux.ruler");
+                break;
+            case 10:
+                name = Messages.message("model.nation.Apache.ruler");
+                break;
+            case 11:
+                name = Messages.message("model.nation.Tupi.ruler");
+                break;
+            case 12:
+                name = Messages.message("model.nation.refDutch.ruler");
+                break;
+            case 13:
+                name = Messages.message("model.nation.refEnglish.ruler");
+                break;
+            case 14:
+                name = Messages.message("model.nation.refFrench.ruler");
+                break;
+            case 15:
+                name = Messages.message("model.nation.refSpanish.ruler");
             }
 
             ServerPlayer aiPlayer = new ServerPlayer(game,
