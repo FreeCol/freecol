@@ -203,12 +203,36 @@ intersted in if you are a developer:
 
 \hypertarget{Game setup}{\subsubsection{Game setup}}
 
+If you start FreeCol without command line options, the game will first
+open a dialog that allows you to start a new game, to open a saved
+game, to set various options, and to quit.
+
+If you decide to start a new game, you will be presented with another
+dialog, which enables you to start a single-player game, to retrieve a
+list of servers from \verb$meta.freecol.org$\index{meta.freecol.org},
+to join a \Concept{multi-player game}, or to start a new multi-player
+game.
+
+If you wish to join a multi-player game, you must enter the
+\Concept{IP address} of a server that is running a FreeCol game as
+well as the port it is running on. The default port is
+$3541$\index{port 3541}. If you wish to start a multi-player game,
+then the IP address of the server will be that of your computer, but
+you must still select a port to run the server on. Again, the default
+port is $3541$. You must also decide whether you want to run a public
+server or a private server. By default, you start a private game.
+
 FreeCol is a client-server game. The game server takes care of the
-game play, and the client provides the graphical user interface. One
+game logic, and the client provides the graphical user interface. One
 or several clients can connect to the game server via the network. In
 the case of a single-player game, all other players are handled by the
 game server. At the moment, however, your client uses a network
 connection even if the server is running on the same computer.
+
+This means that you can only run FreeCol if you have the necessary
+privileges to bind an unprivileged port. If you use a
+\Concept{firewall} that blocks the port you wish to use, you will need
+to configure your firewall accordingly.
 
 
 \hypertarget{Client options}{\subsection{Client options}}
