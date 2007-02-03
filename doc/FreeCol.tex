@@ -216,11 +216,18 @@ game.
 If you wish to join a multi-player game, you must enter the
 \Concept{IP address} of a server that is running a FreeCol game as
 well as the port it is running on. The default port is
-$3541$\index{port 3541}. If you wish to start a multi-player game,
+$3541$\index{Port 3541}. If you wish to start a multi-player game,
 then the IP address of the server will be that of your computer, but
 you must still select a port to run the server on. Again, the default
 port is $3541$. You must also decide whether you want to run a public
 server or a private server. By default, you start a private game.
+
+If you choose to retrieve a list of running games from the metaserver,
+your computer will attempt to establish a connection to
+\verb$meta.freecol.org$, port $3540$\index{Port 3540}. You will be
+presented with a list of games, from which you can select one to
+connect to. Please note that the list will frequently be empty, since
+not that many public multi-player games are being run.
 
 FreeCol is a client-server game. The game server takes care of the
 game logic, and the client provides the graphical user interface. One
@@ -231,8 +238,12 @@ connection even if the server is running on the same computer.
 
 This means that you can only run FreeCol if you have the necessary
 privileges to bind an unprivileged port. If you use a
-\Concept{firewall} that blocks the port you wish to use, you will need
-to configure your firewall accordingly.
+\Concept{personal firewall} that blocks the port you wish to use, you
+will need to configure your firewall accordingly. If you wish to
+retrieve a list of games from the metaserver, you also need to
+configure your firewall to permit connections to that server, port
+$3540$. In order to connect to a server, your client also needs to
+bind a port. Which port depends on the operating system you use.
 
 
 \hypertarget{Client options}{\subsection{Client options}}
