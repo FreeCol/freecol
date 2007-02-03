@@ -18,6 +18,7 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Monarch;
 
@@ -36,7 +37,7 @@ public final class MonarchPanel extends FreeColDialog implements ActionListener 
 
     private static final int OK = 0;
     private static final int CANCEL = 1;
-    private final Canvas canvas;
+    private final Canvas parent;
 
     private final JLabel header;
     private final JLabel imageLabel;
@@ -44,14 +45,14 @@ public final class MonarchPanel extends FreeColDialog implements ActionListener 
     private JTextArea textArea;
     private final JButton okButton;
     private final JButton cancelButton;
-    private JPanel buttonPanel;
+
     
     /**
     * The constructor that will add the items to this panel.
     * @param parent The parent panel.
     */
     public MonarchPanel(Canvas parent) {
-        canvas = parent;
+        this.parent = parent;
 
         header = new JLabel("", SwingConstants.CENTER);
         header.setFont(((Font) UIManager.get("HeaderFont")).deriveFont(0, 36));
@@ -59,8 +60,6 @@ public final class MonarchPanel extends FreeColDialog implements ActionListener 
         header.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         imageLabel = new JLabel();
-        Image image = (Image) UIManager.get("MonarchImage");
-        imageLabel.setIcon(new ImageIcon(image));
 
         okButton = new JButton(Messages.message("ok"));
         okButton.setActionCommand(String.valueOf(OK));
@@ -90,7 +89,10 @@ public final class MonarchPanel extends FreeColDialog implements ActionListener 
     public void initialize(int action, String[][] replace) {
         removeAll();
 
-        int[] widths = {0, margin, 0};
+        int nation = parent.getClient().getMyPlayer().getNation();
+        imageLabel.setIcon(parent.getGUI().getImageLibrary().getMonarchImageIcon(nation));
+
+        int[] widths = {-3, 3 * margin, -1};
         int[] heights = {0, margin, 0, margin, 0};
         setLayout(new HIGLayout(widths, heights));
         
@@ -100,7 +102,7 @@ public final class MonarchPanel extends FreeColDialog implements ActionListener 
         add(header, higConst.rcwh(row, imageColumn, widths.length, 1));
         row += 2;
 
-        add(imageLabel, higConst.rc(row, imageColumn));
+        add(imageLabel, higConst.rc(row, imageColumn, "r"));
 
         String messageID;
         String okText = "ok";
@@ -141,14 +143,15 @@ public final class MonarchPanel extends FreeColDialog implements ActionListener 
         add(textArea, higConst.rc(row, textColumn));
         row += 2;
 
-        buttonPanel = new JPanel();
         okButton.setText(Messages.message(okText));
-        buttonPanel.add(okButton);
-        if (cancelText != null) {
+
+        if (cancelText == null) {
+            add(okButton, higConst.rcwh(row, imageColumn, widths.length, 1, ""));
+        } else {
             cancelButton.setText(Messages.message(cancelText));
-            buttonPanel.add(cancelButton);
+            add(okButton, higConst.rc(row, imageColumn, "r"));
+            add(cancelButton, higConst.rc(row, textColumn, "l"));
         }
-        add(buttonPanel, higConst.rcwh(row, imageColumn, widths.length, 1));
         
         setSize(getPreferredSize());
     }

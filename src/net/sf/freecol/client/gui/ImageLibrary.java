@@ -88,6 +88,8 @@ public final class ImageLibrary extends ImageProvider {
                             BONUS_LUMBER = 8,
                             BONUS_COUNT = 9;
 
+    public static final int MONARCH_COUNT = 4;
+
     /**
      * These finals represent the unit graphics that are available.
      * It's important to note the difference between these finals and
@@ -253,6 +255,8 @@ public final class ImageLibrary extends ImageProvider {
                                 goodsName = new String("Goods"),
                                 bonusDirectory = new String("bonus/"),
                                 bonusName = new String("Bonus"),
+                                monarchDirectory = new String("monarch/"),
+                                monarchName = new String("Monarch"),
                                 extension = new String(".png");
     private final String dataDirectory;
 
@@ -268,6 +272,7 @@ public final class ImageLibrary extends ImageProvider {
         indians, //Holds ImageIcon objects
         goods, //Holds ImageIcon objects
         bonus, //Holds ImageIcon objects
+        monarch, //Holds ImageIcon objects
         ui; // Holds ImageIcon objects
 
     private Vector<Vector<ImageIcon>> terrain1,
@@ -333,6 +338,7 @@ public final class ImageLibrary extends ImageProvider {
         loadIndians(gc, resourceLocator, doLookup);
         loadGoods(gc, resourceLocator, doLookup);
         loadBonus(gc, resourceLocator, doLookup);
+        loadMonarch(gc, resourceLocator, doLookup);
 
         alarmChips = new Image[Tension.NUMBER_OF_LEVELS];
         colorChips = new Hashtable<Color, BufferedImage>();
@@ -642,6 +648,26 @@ public final class ImageLibrary extends ImageProvider {
         }
     }
 
+     /**
+     * Loads the monarch-images from file into memory.
+     * @param gc The GraphicsConfiguration is needed to create images
+     * that are compatible with the local environment.
+     * @param resourceLocator The class that is used to locate data files.
+     * @param doLookup Must be set to 'false' if the path to the image files
+     * has been manually provided by the user. If set to 'true' then a
+     * lookup will be done to search for image files from net.sf.freecol,
+     * in this case the images need to be placed in net/sf/freecol/images.
+     * @throws FreeColException If one of the data files could not be found.
+     */
+    private void loadMonarch(GraphicsConfiguration gc, Class resourceLocator, boolean doLookup) throws FreeColException {
+        monarch = new Vector(MONARCH_COUNT);
+
+        for (int i = 0; i < MONARCH_COUNT; i++) {
+            String filePath = dataDirectory + path + monarchDirectory + monarchName + i + extension;
+            monarch.add(findImage(filePath, resourceLocator, doLookup));
+        }
+    }
+
 
     /**
      * Generates a color chip image and stores it in memory.
@@ -755,6 +781,24 @@ public final class ImageLibrary extends ImageProvider {
         alarmChips[alarm] = tempImage;
     }
 
+
+    /**
+     * Returns the monarch-image for the given tile.
+     * @param nation The nation this monarch rules.
+     * @return the monarch-image for the given nation.
+     */
+    public Image getMonarchImage(int nation) {
+        return monarch.get(nation).getImage();
+    }
+
+    /**
+     * Returns the monarch-image icon for the given tile.
+     * @param nation The nation this monarch rules.
+     * @return the monarch-image for the given nation.
+     */
+    public ImageIcon getMonarchImageIcon(int nation) {
+        return monarch.get(nation);
+    }
 
     /**
      * Returns the bonus-image for the given tile.

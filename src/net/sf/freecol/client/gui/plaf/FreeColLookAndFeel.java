@@ -204,7 +204,6 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
                 {"CanvasBackgroundImage", "bg_map1.jpg"},
                 {"EuropeBackgroundImage", "bg_europe.jpg"},
                 {"TitleImage", "freecol2.png"},
-                {"MonarchImage", "monarch.png"},
                 {"EventImage.firstLanding", "landing.png"},
                 {"EventImage.meetingNatives", "meet_natives.png"},
                 {"EventImage.meetingEuropeans", "meet_europeans.png"},
