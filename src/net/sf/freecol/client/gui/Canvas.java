@@ -251,7 +251,7 @@ public final class Canvas extends JLayeredPane {
         colopediaPanel = new ColopediaPanel(this);
         reportReligiousPanel = new ReportReligiousPanel(this);
         reportTradePanel = new ReportTradePanel(this);
-        reportTurnPanel = new ReportTurnPanel(this);
+        reportTurnPanel = new ReportTurnPanel(this, freeColClient);
         reportLabourPanel = new ReportLabourPanel(this);
         reportColonyPanel = new ReportColonyPanel(this);
         reportMilitaryPanel = new ReportMilitaryPanel(this);

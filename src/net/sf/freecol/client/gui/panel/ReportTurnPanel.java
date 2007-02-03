@@ -14,6 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JTextArea;
 
 import net.sf.freecol.client.ClientOptions;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
@@ -34,14 +35,16 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
+    private final FreeColClient freeColClient;
 
     /**
      * The constructor that will add the items to this panel.
      * @param parent The parent of this panel.
+     * @param freeColClient The main controller object for the client.
      */
-    public ReportTurnPanel(Canvas parent) {
+    public ReportTurnPanel(Canvas parent, FreeColClient freeColClient) {
         super(parent, Messages.message("menuBar.report.turn"));
-
+        this.freeColClient = freeColClient;
     }
 
     /**
@@ -56,14 +59,16 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
         int groupBy = parent.getClient().getClientOptions().getInteger(ClientOptions.MESSAGES_GROUP_BY);
         ArrayList<JLabel> images = new ArrayList<JLabel>();
         ArrayList<JComponent> texts = new ArrayList<JComponent>();
+        ArrayList<JButton> buttons = new ArrayList<JButton>();
         Object source = this;
         int type = -1;
-        for (ModelMessage message : messages) {
+        for (final ModelMessage message : messages) {
             if (groupBy == ClientOptions.MESSAGES_GROUP_BY_SOURCE &&
                 message.getSource() != source) {
                 source = message.getSource();
                 images.add(new JLabel());
                 texts.add(getHeadline(source));
+                buttons.add(null);
             } else if (groupBy == ClientOptions.MESSAGES_GROUP_BY_TYPE &&
                        message.getType() != type) {
                 type = message.getType();
@@ -71,16 +76,18 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
                 JLabel headline = new JLabel(message.getTypeName());
                 headline.setFont(headline.getFont().deriveFont(Font.BOLD, 16f));
                 texts.add(headline);
+                buttons.add(null);
             }
-            if (message.getDisplay() == null) {
-                images.add(new JLabel());
-            } else {
-                images.add(new JLabel(parent.getImageIcon(message.getDisplay())));
+            final JLabel label = new JLabel();
+            if (message.getDisplay() != null) {
+                label.setIcon(parent.getImageIcon(message.getDisplay()));
             }
+            images.add(label);
+            final JTextArea textArea = new JTextArea();
             try {
                 String text = Messages.message(message.getMessageID(),
                                                message.getData());
-                JTextArea textArea = new JTextArea(text);
+                textArea.setText(text);
                 textArea.setColumns(50);
                 textArea.setOpaque(false);
                 textArea.setLineWrap(true);
@@ -91,15 +98,31 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
             } catch (MissingResourceException e) {
                 logger.warning("could not find message with id: " + message.getMessageID() + ".");
             }
+            if (message.getType() == ModelMessage.WAREHOUSE_CAPACITY) {
+                JButton button = new JButton(Messages.message("model.message.ignore"));
+                button.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent event) {
+                            boolean flag = label.isEnabled();
+                            freeColClient.getInGameController().ignoreMessage(message, flag);
+                            textArea.setEnabled(!flag);
+                            label.setEnabled(!flag);
+                        }
+                    });
+                buttons.add(button);
+            } else {
+                buttons.add(null);
+            }
+
         }
 
         // Display Panel
         reportPanel.removeAll();
 
-        int[] widths = new int[] {0, margin, 0};
+        int[] widths = new int[] {0, margin, 0, margin, 0};
         int[] heights = new int[2 * texts.size() - 1];
         int imageColumn = 1;
         int textColumn = 3;
+        int buttonColumn = 5;
 
         for (int index = 1; index < heights.length; index += 2) {
             heights[index] = margin;
@@ -115,6 +138,10 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
                             higConst.rc(row, imageColumn));
             reportPanel.add(texts.get(index),
                             higConst.rc(row, textColumn, "l"));
+            if (buttons.get(index) != null) {
+                reportPanel.add(buttons.get(index),
+                                higConst.rc(row, buttonColumn));
+            }
             row += 2;
         }
     }

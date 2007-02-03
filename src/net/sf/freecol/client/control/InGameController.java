@@ -5,8 +5,10 @@ package net.sf.freecol.client.control;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
@@ -65,6 +67,7 @@ public final class InGameController implements NetworkConstants {
 
     private final FreeColClient freeColClient;
 
+
     /**
      * Sets that the turn will be ended when all going-to units have been moved.
      */
@@ -74,6 +77,11 @@ public final class InGameController implements NetworkConstants {
      * Sets that all going-to orders should be executed.
      */
     private boolean executeGoto = false;
+
+    /**
+     * A hash map of messages to be ignored.
+     */
+    private HashMap<String, Integer> messagesToIgnore = new HashMap<String, Integer>();
 
 
     /**
@@ -2661,29 +2669,84 @@ public final class InGameController implements NetworkConstants {
 
 
     /**
+     * Ignore this ModelMessage from now on until it is not generated
+     * in a turn.
+     *
+     * @param message a <code>ModelMessage</code> value
+     * @param flag whether to ignore the ModelMessage or not
+     */
+    public void ignoreMessage(ModelMessage message, boolean flag) {
+        String key = message.getSource().getID();
+        for (String[] replacement : message.getData()) {
+            if (replacement[0].equals("%goods%")) {
+                key += replacement[1];
+                break;
+            }
+        }
+        if (flag) {
+            logger.finer("Ignore model message with key " + key);
+            messagesToIgnore.put(key, new Integer(freeColClient.getGame().getTurn().getNumber()));
+        } else {
+            logger.finer("Removing model message with key " + key +
+                         " from ignored messages.");
+            messagesToIgnore.remove(key);
+        }
+    }
+
+    /**
     * Displays the next <code>ModelMessage</code>.
     * @see net.sf.freecol.common.model.ModelMessage ModelMessage
     */
     public void nextModelMessage() {
         Canvas  canvas = freeColClient.getCanvas();
+        int thisTurn = freeColClient.getGame().getTurn().getNumber();
 
         ArrayList<ModelMessage> messageList = new ArrayList<ModelMessage>();
 
         for ( Iterator i = freeColClient.getGame().getModelMessageIterator(freeColClient.getMyPlayer());
               i.hasNext(); ) {
 
-            ModelMessage  message = (ModelMessage) i.next();
+            ModelMessage message = (ModelMessage) i.next();
             if (shouldAllowMessage(message)) {
-                // move Market messages to Europe. TODO: move this to
-                // the Market class as soon as all players have their
-                // own market
-                if (message.getSource() instanceof Market) {
-                    message.setSource(freeColClient.getMyPlayer().getEurope());
+                if (message.getType() == ModelMessage.WAREHOUSE_CAPACITY) {
+                    String key = message.getSource().getID();
+                    for (String[] replacement : message.getData()) {
+                        if (replacement[0].equals("%goods%")) {
+                            key += replacement[1];
+                            break;
+                        }
+                    }
+
+                    Integer turn = messagesToIgnore.get(key);
+                    if (turn != null &&
+                        turn.intValue() == thisTurn - 1) {
+                        logger.finer("Ignoring model message with key " + key);
+                        messagesToIgnore.put(key, new Integer(thisTurn));
+                        message.setBeenDisplayed(true);
+                        continue;
+                    }
                 }
-                messageList.add(message);
             }
+
+            // the Market class as soon as all players have their own
+            // market
+            if (message.getSource() instanceof Market) {
+                message.setSource(freeColClient.getMyPlayer().getEurope());
+            }
+            messageList.add(message);
+
             // flag all messages delivered as "beenDisplayed". 
             message.setBeenDisplayed(true);
+        }
+
+        Iterator mapIterator = messagesToIgnore.entrySet().iterator();
+        while (mapIterator.hasNext()) {
+            java.util.Map.Entry entry = (java.util.Map.Entry) mapIterator.next();
+            if (((Integer) entry.getValue()).intValue() < thisTurn - 1) {
+                logger.finer("Removing old model message with key " + entry.getKey() +
+                             " from ignored messages.");
+                mapIterator.remove();
+            }
         }
 
         if (messageList.size() > 1) {
