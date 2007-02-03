@@ -55,8 +55,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    public static Random attackCalculator;
-    public static final Random random = new Random();
+    private static Random attackCalculator;
+    private static final Random random = new Random();
 
 
     /**
