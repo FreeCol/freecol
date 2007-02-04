@@ -2725,15 +2725,13 @@ public final class InGameController implements NetworkConstants {
                         message.setBeenDisplayed(true);
                         continue;
                     }
+                } else if (message.getSource() instanceof Market) {
+                    // TODO: remove as soon as all players have their
+                    // own market
+                    message.setSource(freeColClient.getMyPlayer().getEurope());
                 }
+                messageList.add(message);
             }
-
-            // the Market class as soon as all players have their own
-            // market
-            if (message.getSource() instanceof Market) {
-                message.setSource(freeColClient.getMyPlayer().getEurope());
-            }
-            messageList.add(message);
 
             // flag all messages delivered as "beenDisplayed". 
             message.setBeenDisplayed(true);

@@ -385,6 +385,11 @@ public class ClientOptions extends OptionMap {
     }
 
 
+    /**
+     * Return the client's preferred comparator for colonies.
+     *
+     * @return a <code>Comparator</code> value
+     */
     public Comparator getColonyComparator() {
         switch(getInteger(COLONY_COMPARATOR)) {
         case COLONY_COMPARATOR_AGE:
@@ -403,12 +408,55 @@ public class ClientOptions extends OptionMap {
     }
 
 
+    /**
+     * Return the client's preferred comparator for ModelMessages.
+     *
+     * @return a <code>Comparator</code> value
+     */
     public Comparator<ModelMessage> getModelMessageComparator() {
         switch (getInteger(MESSAGES_GROUP_BY)) {
         case MESSAGES_GROUP_BY_SOURCE:
             return messageSourceComparator;
         case MESSAGES_GROUP_BY_TYPE:
             return messageTypeComparator;
+        default:
+            return null;
+        }
+    }
+
+    /**
+     * Returns the boolean option associated with a ModelMessage.
+     *
+     * @param message a <code>ModelMessage</code> value
+     * @return a <code>BooleanOption</code> value
+     */
+    public BooleanOption getBooleanOption(ModelMessage message) {
+        switch (message.getType()) {
+        case ModelMessage.WARNING:
+            return (BooleanOption) getObject(ClientOptions.SHOW_WARNING);
+        case ModelMessage.SONS_OF_LIBERTY:
+            return (BooleanOption) getObject(ClientOptions.SHOW_SONS_OF_LIBERTY);
+        case ModelMessage.GOVERNMENT_EFFICIENCY:
+            return (BooleanOption) getObject(ClientOptions.SHOW_GOVERNMENT_EFFICIENCY);
+        case ModelMessage.WAREHOUSE_CAPACITY:
+            return (BooleanOption) getObject(ClientOptions.SHOW_WAREHOUSE_CAPACITY);
+        case ModelMessage.UNIT_IMPROVED:
+            return (BooleanOption) getObject(ClientOptions.SHOW_UNIT_IMPROVED);
+        case ModelMessage.UNIT_DEMOTED:
+            return (BooleanOption) getObject(ClientOptions.SHOW_UNIT_DEMOTED);
+        case ModelMessage.UNIT_LOST:
+            return (BooleanOption) getObject(ClientOptions.SHOW_UNIT_LOST);
+        case ModelMessage.UNIT_ADDED:
+            return (BooleanOption) getObject(ClientOptions.SHOW_UNIT_ADDED);
+        case ModelMessage.BUILDING_COMPLETED:
+            return (BooleanOption) getObject(ClientOptions.SHOW_BUILDING_COMPLETED);
+        case ModelMessage.FOREIGN_DIPLOMACY:
+            return (BooleanOption) getObject(ClientOptions.SHOW_FOREIGN_DIPLOMACY);
+        case ModelMessage.MARKET_PRICES:
+            return (BooleanOption) getObject(ClientOptions.SHOW_MARKET_PRICES);
+        case ModelMessage.MISSING_GOODS:
+            return (BooleanOption) getObject(ClientOptions.SHOW_MISSING_GOODS);
+        case ModelMessage.DEFAULT:
         default:
             return null;
         }
