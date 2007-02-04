@@ -1891,7 +1891,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     * @return 'true' if this colonist is dressed as a missionary, 'false' otherwise.
     */
     public boolean isMissionary() {
-        return missionary;
+        return missionary || getType() == JESUIT_MISSIONARY;
     }
 
 
