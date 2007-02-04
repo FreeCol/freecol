@@ -2,24 +2,13 @@
 package net.sf.freecol.server.control;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Random;
-import java.util.Vector;
+import java.util.*;
 import java.util.logging.Logger;
-
-import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.ModelController;
-import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.*;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
-
 import org.w3c.dom.Element;
 
 
@@ -33,13 +22,10 @@ public class ServerModelController implements ModelController {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    /** The number of turns before a <code>TaskEntry</code> is removed. */
-    private static final int TASK_ENTRY_TIME_OUT = 5;
-
     private final FreeColServer freeColServer;
 
-    private HashMap taskRegister = new HashMap();
-    private final Random random = new Random();
+    private final HashMap<String, TaskEntry> taskRegister =
+        new HashMap<String, TaskEntry>();
 
 
     /**
@@ -68,18 +54,14 @@ public class ServerModelController implements ModelController {
     */
     public synchronized int getRandom(String taskID, int n) {
         String extendedTaskID = taskID + Integer.toString(freeColServer.getGame().getTurn().getNumber());
-
         logger.info("Entering getRandom with taskID " + taskID);
-
         if (taskRegister.containsKey(extendedTaskID)) {
-            //return ((Integer) taskRegister.remove(extendedTaskID)).intValue();
-            return ((Integer) ((TaskEntry) taskRegister.get(extendedTaskID)).entry).intValue();
+            return ((Integer) taskRegister.get(extendedTaskID).entry).intValue();
         } else {
-            int value = random.nextInt(n);
+            int value = this.freeColServer.getPseudoRandom().nextInt(n);
             taskRegister.put(extendedTaskID, new TaskEntry(extendedTaskID, freeColServer.getGame().getTurn().getNumber(), true, new Integer(value)));
             return value;
         }
-
     }
 
 
@@ -88,25 +70,24 @@ public class ServerModelController implements ModelController {
     */
     public synchronized void clearTaskRegister() {
         int currentTurn = freeColServer.getGame().getTurn().getNumber();
-
-        String log = null;
-        Iterator it = taskRegister.values().iterator();
-        while (it.hasNext()) {
-            TaskEntry te = (TaskEntry) it.next();
-            if (te.createdTurn + TASK_ENTRY_TIME_OUT < currentTurn) {
+        List<String> idsToRemove = new ArrayList<String>();
+        for(TaskEntry te : taskRegister.values()) {
+            if (te.hasExpired(currentTurn)) {
                 if (!te.secure) {
                     logger.warning("Possibly a cheating attempt.");
                 }
-                it.remove();
-                if (log == null) {
-                    log = "Clearing the task register. Removing the following items: ";
-                }
-                log += te.taskID + " ";
+                idsToRemove.add(te.taskID);
             }
         }
-
-        if (log != null) {
-            logger.info(log);
+        if (!idsToRemove.isEmpty()) {
+            StringBuffer sb = new StringBuffer();
+            sb.append("Clearing the task register. Removing the following items:");
+            for(String id : idsToRemove) {
+                taskRegister.remove(id);
+                sb.append(" ");
+                sb.append(id);
+            }
+            logger.info(sb.toString());
         }
     }
 
@@ -165,7 +146,7 @@ public class ServerModelController implements ModelController {
         logger.info("Entering createUnit.");
 
         if (taskRegister.containsKey(extendedTaskID)) {
-            taskEntry = (TaskEntry) taskRegister.get(extendedTaskID);
+            taskEntry = taskRegister.get(extendedTaskID);
             unit = (Unit) taskEntry.entry;
 
             if (unit.getLocation().getTile() != location.getTile() || unit.getOwner() != owner || unit.getType() != type) {
@@ -210,7 +191,7 @@ public class ServerModelController implements ModelController {
         String taskID = unit.getID() + Integer.toString(freeColServer.getGame().getTurn().getNumber());
 
         if (taskRegister.containsKey(taskID)) {
-            entryLocation = (Location) ((TaskEntry) taskRegister.get(taskID)).entry;
+            entryLocation = (Location) taskRegister.get(taskID).entry;
 
             //taskRegister.remove(taskID);
         } else {
@@ -372,18 +353,33 @@ public class ServerModelController implements ModelController {
     /**
     * A single entry in the task register.
     */
-    private class TaskEntry {
-        String taskID;
-        int createdTurn;
+    private static class TaskEntry {
+        final String taskID;
+        final int createdTurn;
+        final Object entry;
         boolean secure;
-        Object entry;
-
+        
         TaskEntry(String taskID, int createdTurn, boolean secure, Object entry) {
             this.taskID = taskID;
             this.createdTurn = createdTurn;
             this.secure = secure;
             this.entry = entry;
         }
+
+        synchronized void setSecure(boolean secure) {
+            this.secure = secure;
+        }
+        
+        synchronized boolean isSecure() {
+            return this.secure;
+        }
+        
+        boolean hasExpired(int currentTurn) {
+            return createdTurn + TASK_ENTRY_TIME_OUT < currentTurn;
+        }
+
+        /** The number of turns before a <code>TaskEntry</code> has expired. */
+        private static final int TASK_ENTRY_TIME_OUT = 5;
     }
 }
 
