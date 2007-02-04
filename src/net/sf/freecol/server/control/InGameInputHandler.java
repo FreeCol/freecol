@@ -55,20 +55,13 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    private static Random attackCalculator;
-    private static final Random random = new Random();
-
-
     /**
     * The constructor to use.
     * @param freeColServer The main server object.
     */
     public InGameInputHandler(FreeColServer freeColServer) {
         super(freeColServer);
-        attackCalculator = new Random();
     }
-
-
 
     /**
     * Handles a network message.
@@ -84,6 +77,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         String type = element.getTagName();
 
         try {
+            // TODO (Erik): use a hash dispatch table instead of if-else code
+            // The class that implements the actions can know if the
+            // action is supported out-of-turn or not.
             if (element != null) {
                 // The first messages you see here are the ones that are supported even
                 // though it is NOT the sender's turn:
@@ -456,7 +452,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param unit The <code>Unit</code> exploring the lost city rumour.
      * @param player The <code>ServerPlayer</code> to send a message to.
      */
-    private static void exploreLostCityRumour(Tile tile, Unit unit, ServerPlayer player) {
+    private void exploreLostCityRumour(Tile tile, Unit unit, ServerPlayer player) {
 
         Game game = unit.getGame();
         //Player player = unit.getOwner();
@@ -524,7 +520,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
 
         int rumour = LostCityRumour.NO_SUCH_RUMOUR;
-        int randomInt = random.nextInt(accumulator);
+        int randomInt = getPseudoRandom().nextInt(accumulator);
 
         for (int j = start; j < LostCityRumour.NUMBER_OF_RUMOURS; j++) {
             if (randomInt < probability[j]) {
@@ -552,7 +548,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             unit.setType(Unit.SEASONED_SCOUT);
             break;
         case LostCityRumour.TRIBAL_CHIEF:
-            int amount = attackCalculator.nextInt(dx * 10) + dx * 5;
+            int amount = getPseudoRandom().nextInt(dx * 10) + dx * 5;
             player.modifyGold(amount);
             rumourElement.setAttribute("amount", Integer.toString(amount));
             break;
@@ -562,7 +558,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             rumourElement.appendChild(newUnit.toXMLElement(player, rumourElement.getOwnerDocument()));
             break;
         case LostCityRumour.TREASURE_TRAIN:
-            int treasure = attackCalculator.nextInt(dx * 600) + dx * 300;
+            int treasure = getPseudoRandom().nextInt(dx * 600) + dx * 300;
             newUnit = new Unit(game, tile, player, Unit.TREASURE_TRAIN, Unit.ACTIVE);
             newUnit.setTreasureAmount(treasure);
             unit.getTile().add(newUnit);
@@ -865,7 +861,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         int attackPower = unit.getOffensePower(defender);
         int totalProbability = attackPower + defender.getDefensePower(unit);
         int result;
-        int r = attackCalculator.nextInt(totalProbability+1);
+        int r = getPseudoRandom().nextInt(totalProbability+1);
         if (r > attackPower) {
             result = Unit.ATTACK_LOSS;
         } else if(r == attackPower) {
@@ -880,7 +876,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
 
         if (result == Unit.ATTACK_WIN) {
             int diff = defender.getDefensePower(unit)*2-attackPower;
-            int r2 = attackCalculator.nextInt((diff<3) ? 3 : diff);
+            int r2 = getPseudoRandom().nextInt((diff<3) ? 3 : diff);
 
             if (r2 == 0) {
                 result = Unit.ATTACK_GREAT_WIN;
@@ -891,7 +887,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
 
         if (result == Unit.ATTACK_LOSS) {
             int diff = attackPower*2-defender.getDefensePower(unit);
-            int r2 = attackCalculator.nextInt((diff<3) ? 3 : diff);
+            int r2 = getPseudoRandom().nextInt((diff<3) ? 3 : diff);
 
             if (r2 == 0) {
                 result = Unit.ATTACK_GREAT_LOSS;
@@ -2618,7 +2614,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
     }
 
-
     private void sendErrorToAll(String message, Player player) {
         Game game = getFreeColServer().getGame();
 
@@ -2640,5 +2635,4 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             }
         }
     }
-
 }

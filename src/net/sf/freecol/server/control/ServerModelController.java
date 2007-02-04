@@ -4,6 +4,7 @@ package net.sf.freecol.server.control;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Logger;
+import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.*;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
@@ -58,10 +59,20 @@ public class ServerModelController implements ModelController {
         if (taskRegister.containsKey(extendedTaskID)) {
             return ((Integer) taskRegister.get(extendedTaskID).entry).intValue();
         } else {
-            int value = this.freeColServer.getPseudoRandom().nextInt(n);
+            int value = getPseudoRandom().nextInt(n);
             taskRegister.put(extendedTaskID, new TaskEntry(extendedTaskID, freeColServer.getGame().getTurn().getNumber(), true, new Integer(value)));
             return value;
         }
+    }
+
+
+    /**
+     * Get random number generator.
+     * 
+     * @return random number generator.
+     */
+    protected PseudoRandom getPseudoRandom() {
+        return this.freeColServer.getPseudoRandom();
     }
 
 

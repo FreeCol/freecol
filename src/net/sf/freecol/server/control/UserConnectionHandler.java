@@ -1,4 +1,3 @@
-
 package net.sf.freecol.server.control;
 
 import java.io.IOException;
@@ -21,9 +20,6 @@ import net.sf.freecol.server.networking.Server;
 
 import org.w3c.dom.Element;
 
-
-
-
 /**
 * Handles a new client connection. {@link PreGameInputHandler} is set
 * as the message handler when the client has successfully logged on.
@@ -35,9 +31,7 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    private FreeColServer freeColServer;
-
-
+    private final FreeColServer freeColServer;
 
     /**
     * The constructor to use.
@@ -46,10 +40,6 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
     public UserConnectionHandler(FreeColServer freeColServer) {
         this.freeColServer = freeColServer;
     }
-
-
-
-
 
     /**
     * Handles a network message.

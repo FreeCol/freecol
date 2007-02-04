@@ -19,30 +19,21 @@ public final class InGameController extends Controller {
     public static final String COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String REVISION = "$Revision$";
-    private Random random = new Random();
     public int debugOnlyAITurns = 0;
 
     /**
-     * 
      * The constructor to use.
      * 
-     * @param freeColServer
-     *            The main server object.
-     * 
+     * @param freeColServer The main server object.
      */
     public InGameController(FreeColServer freeColServer) {
         super(freeColServer);
     }
 
     /**
-     * 
      * Ends the turn of the given player.
      * 
-     * 
-     * 
-     * @param player
-     *            The player to end the turn of.
-     * 
+     * @param player The player to end the turn of.
      */
     public void endTurn(ServerPlayer player) {
         FreeColServer freeColServer = getFreeColServer();
@@ -98,8 +89,8 @@ public final class InGameController extends Controller {
             try {
                 Market market = game.getMarket();
                 // make random change to the market
-                market.add(random.nextInt(Goods.NUMBER_OF_TYPES), (50 - random
-                        .nextInt(71)));
+                market.add(getPseudoRandom().nextInt(Goods.NUMBER_OF_TYPES),
+                        (50 - getPseudoRandom().nextInt(71)));
                 Element updateElement = Message.createNewRootElement("update");
                 updateElement.appendChild(game.getMarket().toXMLElement(
                         nextPlayer, updateElement.getOwnerDocument()));
@@ -175,17 +166,11 @@ public final class InGameController extends Controller {
      * 
      * Returns an <code>int[]</code> with the size of
      * {@link FoundingFather#TYPE_COUNT},
-     * 
      * containing random founding fathers (not including the founding fathers
-     * 
      * the player has already) of each type.
      * 
-     * 
-     * 
-     * @param player
-     *            The <code>Player</code> that should pick a founding father
-     *            from this list.
-     * 
+     * @param player The <code>Player</code> that should pick a founding
+     *            father from this list.
      */
     private int[] getRandomFoundingFathers(Player player) {
         Game game = getFreeColServer().getGame();
@@ -201,7 +186,7 @@ public final class InGameController extends Controller {
             if (weightSum == 0) {
                 randomFoundingFathers[i] = -1;
             } else {
-                int r = random.nextInt(weightSum) + 1;
+                int r = getPseudoRandom().nextInt(weightSum) + 1;
                 weightSum = 0;
                 for (int j = 0; j < FoundingFather.FATHER_COUNT; j++) {
                     if (!player.hasFather(j) && FoundingFather.getType(j) == i) {
@@ -219,13 +204,10 @@ public final class InGameController extends Controller {
     }
 
     /**
-     * 
      * Checks if anybody has won the game and returns that player.
      * 
      * @return The <code>Player</code> who have won the game or <i>null</i>
-     * 
      * if the game is not finished.
-     * 
      */
     private Player checkForWinner() {
         Game game = getFreeColServer().getGame();
@@ -282,16 +264,10 @@ public final class InGameController extends Controller {
     }
 
     /**
-     * 
      * Checks if the given player has died.
      * 
-     * 
-     * 
-     * @param player
-     *            The <code>Player</code>.
-     * 
+     * @param player The <code>Player</code>.
      * @return <i>true</i> if this player should die.
-     * 
      */
     private boolean checkForDeath(Player player) {
         // Die if: (No colonies or units on map) && ((After 20 turns) || (Cannot
@@ -346,8 +322,7 @@ public final class InGameController extends Controller {
      * 
      * 
      * 
-     * @param player
-     *            The server player.
+     * @param player The server player.
      * 
      */
     private void monarchAction(ServerPlayer player) {
