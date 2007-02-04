@@ -17,11 +17,13 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 
+import cz.autel.dmi.HIGLayout;
+
 /**
 * This panel gets displayed to the player who have won the game.
 */
 public final class VictoryPanel extends FreeColPanel implements ActionListener {
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
     
@@ -33,43 +35,47 @@ public final class VictoryPanel extends FreeColPanel implements ActionListener {
     private JButton         ok = new JButton(Messages.message("victory.yes"));
 
 
-
-
     /**
     * The constructor that will add the items to this panel.
     * @param parent The parent of this panel.
     * @param freeColClient The main controller object for the client
     */
     public VictoryPanel(Canvas parent, FreeColClient freeColClient) {
-        super(new FlowLayout(FlowLayout.CENTER, 1000, 10));
         this.parent = parent;
         this.freeColClient = freeColClient;
+
+        int[] widths = {0};
+        int[] heights = {0, margin, 0, margin, 0};
         
+        setLayout(new HIGLayout(widths, heights));
         setCancelComponent(ok);
 
         JLabel victoryLabel = new JLabel(Messages.message("victory.text"));
         Font font = (Font) UIManager.get("HeaderFont");
         victoryLabel.setFont(font.deriveFont(0, 48));
-        add(victoryLabel);
 
         Image tempImage = (Image) UIManager.get("VictoryImage");
         JLabel imageLabel;
         
         if (tempImage != null) {
             imageLabel = new JLabel(new ImageIcon(tempImage));
-            add(imageLabel);
         } else {
             imageLabel = new JLabel("");
         }
 
-        add(ok);
+        int row = 1;
+        int column = 1;
+                  
+        add(victoryLabel, higConst.rc(row, column));
+        row += 2;
+        add(imageLabel, higConst.rc(row, column));
+        row += 2;
+        add(ok, higConst.rc(row, column));
 
         ok.setActionCommand(String.valueOf(OK));
         ok.addActionListener(this);
 
-        setSize(victoryLabel.getPreferredSize().width + 20, victoryLabel.getPreferredSize().height +
-                                                            imageLabel.getPreferredSize().height +
-                                                            ok.getPreferredSize().height + 50);
+        setSize(getPreferredSize());
     }
 
     

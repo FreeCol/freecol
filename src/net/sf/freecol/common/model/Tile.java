@@ -107,6 +107,8 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
 
     private UnitContainer unitContainer;
 
+    // the number of adjacent land tiles, if this is an ocean tile
+    private int landCount = Integer.MIN_VALUE;
 
     /**
     * Indicates which colony or Indian settlement that owns this tile ('null' indicates no owner).
@@ -700,13 +702,43 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
         updatePlayerExploredTiles();
     }
 
+    /**
+     * Returns the type of river on this tile.
+     *
+     * @return an <code>int</code> value
+     */
     public int getRiver() {
         return this.river;
     }
 
+    /**
+     * Adds a river to this tile.
+     *
+     * @param addition an <code>int</code> value
+     * @param river an <code>int</code> value
+     */
     public void addRiver(int addition, int river) {
         setAddition(addition);
         this.river = river;
+    }
+
+
+    /**
+     * Return the number of land tiles adjacent to this one.
+     *
+     * @return an <code>int</code> value
+     */
+    public int getLandCount() {
+        if (landCount < 0) {
+            landCount = 0;
+            Iterator tileIterator = getMap().getAdjacentIterator(getPosition());
+            while (tileIterator.hasNext()) {
+                if (getMap().getTile((Position) tileIterator.next()).isLand()) {
+                    landCount++;
+                }
+            }
+        }
+        return landCount;
     }
 
 
@@ -1182,18 +1214,10 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
             if (tileType == OCEAN) {
                 basepotential = potentialtable[tileType][goods][0];
                 
-                if(goods == Goods.FOOD){
-                    int landCount = 0;
-                    Iterator tileIterator = getMap().getAdjacentIterator(getPosition());
-                    while (tileIterator.hasNext()) {
-                        if (getMap().getTile((Position) tileIterator.next()).isLand()) {
-                            landCount++;
-                        }
-                    }
-                
-                    if (landCount > 5) {
+                if (goods == Goods.FOOD){
+                    if (getLandCount() > 5) {
                         basepotential += 2;
-                    } else if (landCount <= 3) {
+                    } else if (getLandCount() <= 3) {
                         basepotential -= 2;
                     }
                 }
