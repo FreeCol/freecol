@@ -214,7 +214,7 @@ public class ClientOptions extends OptionMap {
             int base = getClassIndex(source1) - getClassIndex(source2);
             if (base == 0) {
                 if (source1 instanceof Colony) {
-                    return getColonyComparator().compare((Colony) source1, (Colony) source2);
+                    return getColonyComparator().compare(source1, source2);
                 } else if (source1 instanceof FreeColGameObject) {
                     return ((FreeColGameObject) source1).getIntegerID() -
                            ((FreeColGameObject) source2).getIntegerID();
