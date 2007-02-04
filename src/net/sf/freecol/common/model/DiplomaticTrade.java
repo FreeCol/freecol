@@ -5,13 +5,20 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.FreeCol;
+
 
 /**
  * The class <code>DiplomaticTrade</code> represents an offer one
  * player can make another.
  *
  */
-public class DiplomaticTrade {
+public class DiplomaticTrade extends PersistentObject {
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final String  LICENSE   = "http://www.gnu.org/licenses/gpl.html";
@@ -19,6 +26,12 @@ public class DiplomaticTrade {
 
     // the individual items the trade consists of
     private ArrayList<TradeItem> items = new ArrayList<TradeItem>();
+
+    private final Game game;
+
+    public DiplomaticTrade(Game game) {
+        this.game = game;
+    }
 
     /**
      * Add a TradeItem to the DiplomaticTrade.
@@ -48,17 +61,57 @@ public class DiplomaticTrade {
     }
 
     /**
+     * Initialize this object from an XML-representation of this object.
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    }
+
+
+    /**
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     * 
+     * <br><br>
+     * 
+     * Only attributes visible to the given <code>Player</code> will 
+     * be added to that representation if <code>showAll</code> is
+     * set to <code>false</code>.
+     *  
+     * @param out The target stream.
+     * @param player The <code>Player</code> this XML-representation 
+     *      should be made for, or <code>null</code> if
+     *      <code>showAll == true</code>.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    public void toXML(XMLStreamWriter out, Player player) throws XMLStreamException {
+    }
+    
+
+    /**
+     * Gets the tag name of the root element representing this object.
+     * @return "goods".
+     */
+    public String getXMLElementTagName() {
+        return "diplomaticTrade";
+    }
+
+
+    /**
      * One of the items a DiplomaticTrade consists of.
      *
      */
-    public abstract class TradeItem {
+    public abstract class TradeItem extends PersistentObject {
     
         // the ID, used to get a name, etc.
-        protected final String ID;
+        protected String ID;
         // the player offering something
-        protected final Player source;
+        protected Player source;
         // the player who is to receive something
-        protected final Player destination;
+        protected Player destination;
         
         /**
          * Creates a new <code>TradeItem</code> instance.
@@ -86,6 +139,44 @@ public class DiplomaticTrade {
          */
         public abstract void makeTrade();
 
+        /**
+         * Initialize this object from an XML-representation of this object.
+         * @param in The input stream with the XML.
+         * @throws XMLStreamException if a problem was encountered
+         *      during parsing.
+         */
+        protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+            this.ID = in.getAttributeValue(null, "ID");
+            String sourceID = in.getAttributeValue(null, "source");
+            this.source = (Player) game.getFreeColGameObject(sourceID);
+            String destinationID = in.getAttributeValue(null, "destination");
+            this.destination = (Player) game.getFreeColGameObject(destinationID);
+        }
+
+        /**
+         * This method writes an XML-representation of this object to
+         * the given stream.
+         * 
+         * <br><br>
+         * 
+         * Only attributes visible to the given <code>Player</code> will 
+         * be added to that representation if <code>showAll</code> is
+         * set to <code>false</code>.
+         *  
+         * @param out The target stream.
+         * @param player The <code>Player</code> this XML-representation 
+         *      should be made for, or <code>null</code> if
+         *      <code>showAll == true</code>.
+         * @throws XMLStreamException if there are any problems writing
+         *      to the stream.
+         */
+        public void toXML(XMLStreamWriter out, Player player) throws XMLStreamException {
+            out.writeAttribute("ID", this.ID);
+            out.writeAttribute("source", this.source.getID());
+            out.writeAttribute("destination", this.destination.getID());
+        }
+    
+
     }
 
     public class GoldTradeItem extends TradeItem {
@@ -104,6 +195,51 @@ public class DiplomaticTrade {
         public void makeTrade() {
             source.modifyGold(-gold);
             destination.modifyGold(gold);
+        }
+
+
+        /**
+         * Initialize this object from an XML-representation of this object.
+         * @param in The input stream with the XML.
+         * @throws XMLStreamException if a problem was encountered
+         *      during parsing.
+         */
+        protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+            super.readFromXMLImpl(in);
+            this.gold = Integer.parseInt(in.getAttributeValue(null, "gold"));
+            in.nextTag();
+        }
+
+        /**
+         * This method writes an XML-representation of this object to
+         * the given stream.
+         * 
+         * <br><br>
+         * 
+         * Only attributes visible to the given <code>Player</code> will 
+         * be added to that representation if <code>showAll</code> is
+         * set to <code>false</code>.
+         *  
+         * @param out The target stream.
+         * @param player The <code>Player</code> this XML-representation 
+         *      should be made for, or <code>null</code> if
+         *      <code>showAll == true</code>.
+         * @throws XMLStreamException if there are any problems writing
+         *      to the stream.
+         */
+        public void toXML(XMLStreamWriter out, Player player) throws XMLStreamException {
+            out.writeStartElement(getXMLElementTagName());
+            super.toXML(out, player);
+            out.writeAttribute("gold", Integer.toString(this.gold));
+            out.writeEndElement();
+        }
+    
+        /**
+         * Gets the tag name of the root element representing this object.
+         * @return "goods".
+         */
+        public String getXMLElementTagName() {
+            return "goldTradeItem";
         }
 
     }
@@ -127,6 +263,51 @@ public class DiplomaticTrade {
         public void makeTrade() {
             source.setStance(destination, stance);
             destination.setStance(source, stance);
+        }
+
+
+        /**
+         * Initialize this object from an XML-representation of this object.
+         * @param in The input stream with the XML.
+         * @throws XMLStreamException if a problem was encountered
+         *      during parsing.
+         */
+        protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+            super.readFromXMLImpl(in);
+            this.stance = Integer.parseInt(in.getAttributeValue(null, "stance"));
+            in.nextTag();
+        }
+
+        /**
+         * This method writes an XML-representation of this object to
+         * the given stream.
+         * 
+         * <br><br>
+         * 
+         * Only attributes visible to the given <code>Player</code> will 
+         * be added to that representation if <code>showAll</code> is
+         * set to <code>false</code>.
+         *  
+         * @param out The target stream.
+         * @param player The <code>Player</code> this XML-representation 
+         *      should be made for, or <code>null</code> if
+         *      <code>showAll == true</code>.
+         * @throws XMLStreamException if there are any problems writing
+         *      to the stream.
+         */
+        public void toXML(XMLStreamWriter out, Player player) throws XMLStreamException {
+            out.writeStartElement(getXMLElementTagName());
+            super.toXML(out, player);
+            out.writeAttribute("stance", Integer.toString(this.stance));
+            out.writeEndElement();
+        }
+    
+        /**
+         * Gets the tag name of the root element representing this object.
+         * @return "goods".
+         */
+        public String getXMLElementTagName() {
+            return "stanceTradeItem";
         }
 
     }
@@ -155,11 +336,60 @@ public class DiplomaticTrade {
             } else {
                 return false;
             }
+
         }
 
         public void makeTrade() {
             goods.getLocation().remove(goods);
             settlement.add(goods);
+        }
+
+        /**
+         * Initialize this object from an XML-representation of this object.
+         * @param in The input stream with the XML.
+         * @throws XMLStreamException if a problem was encountered
+         *      during parsing.
+         */
+        protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+            super.readFromXMLImpl(in);
+            while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                if (in.getLocalName().equals(Goods.getXMLElementTagName())) {
+                    this.goods = new Goods(game, in);
+                }
+            }
+            in.nextTag();
+        }
+
+        /**
+         * This method writes an XML-representation of this object to
+         * the given stream.
+         * 
+         * <br><br>
+         * 
+         * Only attributes visible to the given <code>Player</code> will 
+         * be added to that representation if <code>showAll</code> is
+         * set to <code>false</code>.
+         *  
+         * @param out The target stream.
+         * @param player The <code>Player</code> this XML-representation 
+         *      should be made for, or <code>null</code> if
+         *      <code>showAll == true</code>.
+         * @throws XMLStreamException if there are any problems writing
+         *      to the stream.
+         */
+        public void toXML(XMLStreamWriter out, Player player) throws XMLStreamException {
+            out.writeStartElement(getXMLElementTagName());
+            super.toXML(out, player);
+            this.goods.toXML(out, player);
+            out.writeEndElement();
+        }
+    
+        /**
+         * Gets the tag name of the root element representing this object.
+         * @return "goods".
+         */
+        public String getXMLElementTagName() {
+            return "goodsTradeItem";
         }
 
     }
@@ -182,6 +412,51 @@ public class DiplomaticTrade {
             colony.setOwner(destination);
         }
 
+        /**
+         * Initialize this object from an XML-representation of this object.
+         * @param in The input stream with the XML.
+         * @throws XMLStreamException if a problem was encountered
+         *      during parsing.
+         */
+        protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+            super.readFromXMLImpl(in);
+            String colonyID = in.getAttributeValue(null, "colony");
+            this.colony = (Colony) game.getFreeColGameObject(colonyID);
+            in.nextTag();
+        }
+
+        /**
+         * This method writes an XML-representation of this object to
+         * the given stream.
+         * 
+         * <br><br>
+         * 
+         * Only attributes visible to the given <code>Player</code> will 
+         * be added to that representation if <code>showAll</code> is
+         * set to <code>false</code>.
+         *  
+         * @param out The target stream.
+         * @param player The <code>Player</code> this XML-representation 
+         *      should be made for, or <code>null</code> if
+         *      <code>showAll == true</code>.
+         * @throws XMLStreamException if there are any problems writing
+         *      to the stream.
+         */
+        public void toXML(XMLStreamWriter out, Player player) throws XMLStreamException {
+            out.writeStartElement(getXMLElementTagName());
+            super.toXML(out, player);
+            out.writeAttribute("colony", this.colony.getID());
+            out.writeEndElement();
+        }
+    
+        /**
+         * Gets the tag name of the root element representing this object.
+         * @return "goods".
+         */
+        public String getXMLElementTagName() {
+            return "colonyTradeItem";
+        }
+
     }
 
     public class UnitTradeItem extends TradeItem {
@@ -199,6 +474,52 @@ public class DiplomaticTrade {
 
         public void makeTrade() {
             unit.setOwner(destination);
+        }
+
+
+        /**
+         * Initialize this object from an XML-representation of this object.
+         * @param in The input stream with the XML.
+         * @throws XMLStreamException if a problem was encountered
+         *      during parsing.
+         */
+        protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+            super.readFromXMLImpl(in);
+            String unitID = in.getAttributeValue(null, "unit");
+            this.unit = (Unit) game.getFreeColGameObject(unitID);
+            in.nextTag();
+        }
+
+        /**
+         * This method writes an XML-representation of this object to
+         * the given stream.
+         * 
+         * <br><br>
+         * 
+         * Only attributes visible to the given <code>Player</code> will 
+         * be added to that representation if <code>showAll</code> is
+         * set to <code>false</code>.
+         *  
+         * @param out The target stream.
+         * @param player The <code>Player</code> this XML-representation 
+         *      should be made for, or <code>null</code> if
+         *      <code>showAll == true</code>.
+         * @throws XMLStreamException if there are any problems writing
+         *      to the stream.
+         */
+        public void toXML(XMLStreamWriter out, Player player) throws XMLStreamException {
+            out.writeStartElement(getXMLElementTagName());
+            super.toXML(out, player);
+            out.writeAttribute("unit", this.unit.getID());
+            out.writeEndElement();
+        }
+    
+        /**
+         * Gets the tag name of the root element representing this object.
+         * @return "goods".
+         */
+        public String getXMLElementTagName() {
+            return "unitTradeItem";
         }
 
     }
