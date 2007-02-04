@@ -16,7 +16,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Element;
 
-
 /**
 * The main component of the game model.
 *
@@ -85,6 +84,7 @@ public class Game extends FreeColGameObject {
     * @param modelController A controller object the model can
     *       use to make actions not allowed from the model
     *       (generate random numbers etc).
+    * @see net.sf.freecol.server.FreeColServer#FreeColServer(boolean, boolean, int, String)
     */
     public Game(ModelController modelController) {
         super(null);
@@ -113,6 +113,7 @@ public class Game extends FreeColGameObject {
     * @param fcgos A list of <code>FreeColGameObject</code>s to
     *       be added to this <code>Game</code>.
     * @throws XMLStreamException if an error occured during parsing.
+    * @see net.sf.freecol.server.FreeColServer#loadGame(File)
     */
     public Game(FreeColGameObjectListener freeColGameObjectListener, ModelController modelController, XMLStreamReader in, FreeColGameObject[] fcgos) throws XMLStreamException {
         super(null, in);
@@ -136,9 +137,11 @@ public class Game extends FreeColGameObject {
     }
 
     
-    /**
+    /*
      * Initiate a new <code>Game</code> with information from
      * a saved game.
+     * 
+     * Currently not used, commented.
      * 
      * @param freeColGameObjectListener A listener that should be 
      *       monitoring this <code>Game</code>.
@@ -149,7 +152,7 @@ public class Game extends FreeColGameObject {
      *       be added to this <code>Game</code>.
      * @param e An XML-element that will be used to initialize
      *      this object.
-     */
+     *
      public Game(FreeColGameObjectListener freeColGameObjectListener, ModelController modelController, Element e, FreeColGameObject[] fcgos){
          super(null, e);
 
@@ -170,18 +173,21 @@ public class Game extends FreeColGameObject {
 
          readFromXMLElement(e);
      }
+     */
 
-    /**
+    /*
     * Initiate a new <code>Game</code> object from a <code>Element</code>
     * in a DOM-parsed XML-tree.
+    * 
+    * Currently not used, commented.
     * 
     * @param modelController A controller object the model can
     *       use to make actions not allowed from the model
     *       (generate random numbers etc).
     * @param viewOwnerUsername The username of the owner of this view of the game.
     * @param e An XML-element that will be used to initialize
-     *      this object.
-    */
+    *      this object.
+    *
     public Game(ModelController modelController, Element e, String viewOwnerUsername){
         super(null, e);
 
@@ -190,10 +196,14 @@ public class Game extends FreeColGameObject {
         readFromXMLElement(e);
         this.viewOwner = getPlayerByName(viewOwnerUsername);
     }
+    */
 
     /**
      * Initiate a new <code>Game</code> object from an
      * XML-representation.
+     * <p>
+     * Note that this is used on the client side; the game is really a
+     * partial view of the server-side game.
      * 
      * @param modelController A controller object the model can
      *       use to make actions not allowed from the model
@@ -201,6 +211,7 @@ public class Game extends FreeColGameObject {
      * @param in The XML stream to read the data from.
      * @param viewOwnerUsername The username of the owner of this view of the game.
      * @throws XMLStreamException if an error occured during parsing.
+     * @see net.sf.freecol.client.control.ConnectController#login(String, String, int)
      */
      public Game(ModelController modelController, XMLStreamReader in, String viewOwnerUsername) throws XMLStreamException {
          super(null, in);
