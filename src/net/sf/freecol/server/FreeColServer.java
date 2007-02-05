@@ -784,6 +784,16 @@ public final class FreeColServer {
     public PseudoRandom getPseudoRandom() {
         return _pseudoRandom;
     }
+    
+    /**
+     * Get multiple random numbers.
+     * 
+     * @param size The size of the returned array.
+     * @return array with random numbers.
+     */
+    public int [] getRandomNumbers(int n) {
+        return _pseudoRandom.getRandomNumbers(n);
+    }
 
     /**
      * This class provides pseudo-random numbers. It is used on the server side.
@@ -822,10 +832,10 @@ public final class FreeColServer {
          * @param size The size of the returned array.
          * @return array with random numbers.
          */
-        public synchronized long [] getRandomNumbers(int size) {
-            long [] numbers = new long[size];
+        public synchronized int [] getRandomNumbers(int size) {
+            int [] numbers = new int[size];
             for(int i = 0; i < size; i++) {
-                numbers[i] = _random.nextLong();
+                numbers[i] = _random.nextInt();
             }
             return numbers;
         }
@@ -839,7 +849,7 @@ public final class FreeColServer {
         public synchronized void setSeed(long seed) {
             _random.setSeed(seed);
         }
-
+        
         private final Random _random;
     }
 }

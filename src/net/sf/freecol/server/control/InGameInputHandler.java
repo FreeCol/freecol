@@ -1,47 +1,16 @@
-
 package net.sf.freecol.server.control;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.*;
 import java.util.Iterator;
-import java.util.Random;
 import java.util.Vector;
 import java.util.logging.Logger;
-
-import net.sf.freecol.common.model.Building;
-import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.ColonyTile;
-import net.sf.freecol.common.model.Europe;
-import net.sf.freecol.common.model.FoundingFather;
-import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.GameOptions;
-import net.sf.freecol.common.model.Goods;
-import net.sf.freecol.common.model.GoodsContainer;
-import net.sf.freecol.common.model.IndianSettlement;
-import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.LostCityRumour;
-import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Monarch;
-import net.sf.freecol.common.model.Nameable;
-import net.sf.freecol.common.model.Ownable;
-import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Settlement;
-import net.sf.freecol.common.model.Tension;
-import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.WorkLocation;
+import net.sf.freecol.common.model.*;
 import net.sf.freecol.common.model.Map.Position;
-import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.Message;
-import net.sf.freecol.common.networking.NetworkConstants;
+import net.sf.freecol.common.networking.*;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
-
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 
 /**
@@ -89,6 +58,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     reply = createUnit(connection, element);
                 } else if (type.equals("getRandom")) {
                     reply = getRandom(connection, element);
+                } else if(type.equals("getRandomNumbers")) {
+                    reply = getRandomNumbers(connection, element);
                 } else if (type.equals("getVacantEntryLocation")) {
                     reply = getVacantEntryLocation(connection, element);
                 } else if (type.equals("disconnect")) {

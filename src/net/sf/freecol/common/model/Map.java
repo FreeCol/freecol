@@ -2,21 +2,11 @@
 package net.sf.freecol.common.model;
 
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.PriorityQueue;
-import java.util.Vector;
+import java.util.*;
 import java.util.logging.Logger;
-
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
-
+import javax.xml.stream.*;
 import net.sf.freecol.common.FreeColException;
-
+import net.sf.freecol.common.PseudoRandom;
 import org.w3c.dom.Element;
 
 
@@ -1014,13 +1004,15 @@ public class Map extends FreeColGameObject {
     * @return The array.
     */
     public int[] getRandomDirectionArray() {
+        PseudoRandom random = getGame().getModelController().getPseudoRandom();
+        
         int[] directions = new int[8];
         for (int i=0; i<directions.length; i++) {
             directions[i] = i;
         }
         for (int i=0; i<directions.length; i++) {
-            int r1 = (int) (Math.random() * 8);
-            int r2 = (int) (Math.random() * 8);
+            int r1 = random.nextInt(8);
+            int r2 = random.nextInt(8);
             int temp = directions[r1];
             directions[r1] = directions[r2];
             directions[r2] = temp;

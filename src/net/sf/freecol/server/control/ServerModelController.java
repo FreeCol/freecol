@@ -71,7 +71,7 @@ public class ServerModelController implements ModelController {
      * 
      * @return random number generator.
      */
-    protected PseudoRandom getPseudoRandom() {
+    public PseudoRandom getPseudoRandom() {
         return this.freeColServer.getPseudoRandom();
     }
 

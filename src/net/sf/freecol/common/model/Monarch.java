@@ -1,14 +1,9 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.Random;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
-
+import javax.xml.stream.*;
 import net.sf.freecol.client.gui.i18n.Messages;
-
+import net.sf.freecol.common.PseudoRandom;
 import org.w3c.dom.Element;
 
 /**
@@ -61,8 +56,6 @@ public final class Monarch extends FreeColGameObject {
     /** Whether a frigate has been provided. */
     // Setting this to true here disables the action completely.
     private boolean supportSea = true;
-    
-    public static final Random random = new Random();
 
     /** 
      * Constructor. 
@@ -221,7 +214,7 @@ public final class Monarch extends FreeColGameObject {
             probability[k] = accumulator;
         }
         
-        int randomInt = random.nextInt(accumulator);
+        int randomInt = getGame().getModelController().getPseudoRandom().nextInt(accumulator);
         
         for (int action = 0; action < NUMBER_OF_ACTIONS; action++) {
             if (randomInt < probability[action]) {
@@ -251,7 +244,7 @@ public final class Monarch extends FreeColGameObject {
         int turn = getGame().getTurn().getNumber();
         int adjustment = (6 - player.getDifficulty()) * 10; // 20-60
         // later in the game, the taxes will increase by more
-        int increase = random.nextInt(5 + turn/adjustment) + 1;
+        int increase = getGame().getModelController().getPseudoRandom().nextInt(5 + turn/adjustment) + 1;
         int newTax = player.getTax() + increase;
         return Math.min(newTax, MAXIMUM_TAX_RATE);            
     }
@@ -267,7 +260,7 @@ public final class Monarch extends FreeColGameObject {
         int gold = player.getGold();
         int price = 0;
         for (int i = 0; i < 6; i++) {
-            int type = random.nextInt(NUMBER_OF_TYPES);
+            int type = getGame().getModelController().getPseudoRandom().nextInt(NUMBER_OF_TYPES);
             if (type > ARTILLERY) {
                 break;
             }
@@ -300,9 +293,9 @@ public final class Monarch extends FreeColGameObject {
             units[MAN_OF_WAR] = 1;
             ref[MAN_OF_WAR]++;
         } else {        
+            PseudoRandom random = getGame().getModelController().getPseudoRandom();
             int number = random.nextInt(3) + 1;
-            int type = random.nextInt(3);
-            
+            int type = random.nextInt(3);            
             units[type] = number;
             ref[type] += number;
         }
@@ -416,7 +409,7 @@ public final class Monarch extends FreeColGameObject {
      * @return The enemy nation.
      */
     public int declareWar() {
-        int offset = random.nextInt(Player.NUMBER_OF_NATIONS);
+        int offset = getGame().getModelController().getPseudoRandom().nextInt(Player.NUMBER_OF_NATIONS);
         for (int i = 0; i < Player.NUMBER_OF_NATIONS; i++) {
             int nation = (i + offset) % Player.NUMBER_OF_NATIONS;
             if (nation == player.getNation()) {

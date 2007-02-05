@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.networking.Client;
+import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelController;
@@ -175,5 +176,15 @@ public class ClientModelController implements ModelController {
      */    
     public void update(Tile tile) {
         // Nothing to do on the client side.
+    }
+
+
+    /**
+     * Get the pseudo-random number generator provided by the client.
+     * 
+     * @return random number generator.
+     */
+    public PseudoRandom getPseudoRandom() {
+        return freeColClient.getPseudoRandom();
     }
 }

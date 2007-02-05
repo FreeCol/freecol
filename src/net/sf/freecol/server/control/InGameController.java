@@ -2,7 +2,6 @@ package net.sf.freecol.server.control;
 
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.Random;
 import java.util.logging.Logger;
 import net.sf.freecol.common.model.*;
 import net.sf.freecol.common.networking.Message;

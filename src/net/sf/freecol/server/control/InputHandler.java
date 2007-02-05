@@ -2,6 +2,7 @@ package net.sf.freecol.server.control;
 
 import java.io.IOException;
 import java.util.logging.Logger;
+import net.sf.freecol.common.networking.*;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.server.FreeColServer;
@@ -65,7 +66,7 @@ public abstract class InputHandler extends FreeColServerHolder implements
             Element disconnectElement) {
         // The player should be logged out by now, but just in case:
         FreeColServer fcs = getFreeColServer();
-        if(fcs == null) {
+        if (fcs == null) {
             logger.warning("FreeColServer null!");
             return null;
         }
@@ -82,5 +83,33 @@ public abstract class InputHandler extends FreeColServerHolder implements
         }
         fcs.getServer().removeConnection(connection);
         return null;
+    }
+
+    /**
+     * Handles a &quot;getRandomNumbers&quot;-message.
+     * 
+     * @param connection The <code>Connection</code> the message was received
+     *            on.
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *            holds all the information.
+     * @return reply.
+     */
+    protected Element getRandomNumbers(Connection conn, Element element) {
+        StringBuffer sb = new StringBuffer();
+        FreeColServer fcs = getFreeColServer();
+        if (fcs != null) {
+            int[] numbers = fcs.getRandomNumbers(Integer.parseInt(element
+                    .getAttribute("n")));
+            for (int i = 0; i < numbers.length; i++) {
+                if (i > 0) {
+                    sb.append(",");
+                }
+                sb.append(String.valueOf(numbers[i]));
+            }
+        }
+        Element reply = Message
+                .createNewRootElement("getRandomNumbersConfirmed");
+        reply.setAttribute("result", sb.toString());
+        return reply;
     }
 }

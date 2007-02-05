@@ -70,6 +70,8 @@ public final class PreGameInputHandler extends InputHandler {
                 reply = chat(connection, element);
             } else if (type.equals("disconnect")) {
                 reply = disconnect(connection, element);
+            } else if(type.equals("getRandomNumbers")) {
+                reply = getRandomNumbers(connection, element);
             }
         }
 

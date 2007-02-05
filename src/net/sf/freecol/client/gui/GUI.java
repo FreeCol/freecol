@@ -83,9 +83,6 @@ public final class GUI {
     private PathNode dragPath = null;
     private boolean dragStarted = false;
 
-    /** This <code>Random</code>-object should only be used by {@link #drawRoad}. */
-    private Random roadRandom = new Random();
-
     // Helper variables for displaying the map.
     private final int tileHeight,
     tileWidth,
@@ -1490,7 +1487,7 @@ public final class GUI {
     public void drawRoad(Graphics2D g, long seed, int x1, int y1, int x2, int y2) {
         final int MAX_CORR = 4;
         Color oldColor = g.getColor();
-        roadRandom.setSeed(seed);
+        Random roadRandom = new Random(seed);
 
         int i = Math.max(Math.abs(x2-x1), Math.abs(y2-y1));
         int baseX = x1;

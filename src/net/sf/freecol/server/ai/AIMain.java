@@ -1,39 +1,19 @@
 
 package net.sf.freecol.server.ai;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Random;
 import java.util.logging.Logger;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
+import javax.xml.parsers.*;
+import javax.xml.stream.*;
+import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-
-import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.FreeColGameObject;
-import net.sf.freecol.common.model.FreeColGameObjectListener;
-import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.PseudoRandom;
+import net.sf.freecol.common.model.*;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
@@ -51,7 +31,6 @@ public class AIMain implements FreeColGameObjectListener {
     public static final String  REVISION = "$Revision$";
 
     private FreeColServer freeColServer;
-    private Random random = new Random();
     private int nextID = 1;
 
     /**
@@ -169,12 +148,12 @@ public class AIMain implements FreeColGameObjectListener {
 
 
     /**
-    * Returns an instance of the class <code>Random</code>. It that can be
+    * Returns an instance of <code>PseudoRandom</code>. It that can be
     * used to generate random numbers.
-    * @return The instance of <code>Random</code>.
+    * @return The instance of <code>PseudoRandom</code>.
     */
-    public Random getRandom() {
-        return random;
+    public PseudoRandom getRandom() {
+        return freeColServer.getPseudoRandom();
     }
 
 

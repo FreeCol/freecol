@@ -1,24 +1,10 @@
 package net.sf.freecol.server.generator;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Random;
-import java.util.Vector;
+import java.util.*;
 import java.util.logging.Logger;
-
-import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.model.Building;
-import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.ColonyTile;
-import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Goods;
-import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.PseudoRandom;
+import net.sf.freecol.common.model.*;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.server.model.ServerPlayer;
 
@@ -52,8 +38,8 @@ public class MapGenerator {
     
     private final static int NUM_STARTING_LOCATIONS = 4;
 
-    private Random random = new Random();
     private final Game game;
+    private final PseudoRandom random;
     private final MapGeneratorOptions mapGeneratorOptions;
 
     /**
@@ -66,6 +52,7 @@ public class MapGenerator {
     public MapGenerator(Game game) {
         this.game = game;
         this.mapGeneratorOptions = new MapGeneratorOptions();
+        this.random = game.getModelController().getPseudoRandom();
     }
 
 
@@ -735,7 +722,7 @@ public class MapGenerator {
 
         private boolean[][] landMap;
 
-        private Random tileType;
+        private final PseudoRandom tileType;
 
 
         /**
@@ -748,6 +735,7 @@ public class MapGenerator {
         */
         TerrainGenerator(boolean[][] landMap) {
             this.landMap = landMap;
+            this.tileType = random;
         }
 
 
@@ -758,7 +746,7 @@ public class MapGenerator {
         *        the y-axis and 0% is on the top/bottom of the map.
         */
         private int getRandomTileType(int percent) {
-            int thisValue = Math.max(((percent - tileType.nextInt(20) - 1)) / 10, 0);
+            int thisValue = Math.max(((percent - random.nextInt(20) - 1)) / 10, 0);
     
             int minWoD = 0;
             int maxWoD = 99;
@@ -791,7 +779,6 @@ public class MapGenerator {
         */
         public Map createMap() {
             Vector<Vector<Tile>> columns = new Vector<Vector<Tile>>(getMapGeneratorOptions().getWidth());
-            tileType = new Random();
             for (int i = 0; i < getMapGeneratorOptions().getWidth(); i++) {
                 Vector<Tile> v = new Vector<Tile>(getMapGeneratorOptions().getHeight());
                 for (int j = 0; j < getMapGeneratorOptions().getHeight(); j++) {

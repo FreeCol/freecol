@@ -1,12 +1,8 @@
 package net.sf.freecol.server.generator;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.logging.Logger;
-
+import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
 
@@ -21,12 +17,6 @@ public class River {
     public static final String  COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
-
-
-    /**
-     * Random number generator.
-     */
-    private static Random random = new Random();
 
     /**
      * Directions a river may flow in.
@@ -73,7 +63,6 @@ public class River {
      * @param riverMap A hashtable of position-river pairs.
      */
     public River(Map map, Hashtable riverMap) {
-
         this.map = map;
         this.riverMap = riverMap;
         logger.fine("Starting new river");
@@ -305,6 +294,8 @@ public class River {
     private int newDirection(int index, int currentDirection) {
         int offset = 0;
         if (index < 0 || index > 2) {
+            PseudoRandom random =
+                map.getGame().getModelController().getPseudoRandom();
             offset = change[random.nextInt(3)];
         } else {
             offset = change[index];
