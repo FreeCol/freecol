@@ -1,22 +1,47 @@
 package net.sf.freecol.server;
 
 import java.awt.Color;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.security.SecureRandom;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.Vector;
 import java.util.logging.Logger;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
-import javax.xml.stream.*;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.PseudoRandom;
-import net.sf.freecol.common.model.*;
+import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIInGameInputHandler;
 import net.sf.freecol.server.ai.AIMain;
-import net.sf.freecol.server.control.*;
+import net.sf.freecol.server.control.Controller;
+import net.sf.freecol.server.control.InGameController;
+import net.sf.freecol.server.control.InGameInputHandler;
+import net.sf.freecol.server.control.PreGameController;
+import net.sf.freecol.server.control.PreGameInputHandler;
+import net.sf.freecol.server.control.ServerModelController;
+import net.sf.freecol.server.control.UserConnectionHandler;
 import net.sf.freecol.server.generator.MapGenerator;
 import net.sf.freecol.server.model.ServerModelObject;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -34,37 +59,60 @@ import org.w3c.dom.Element;
  */
 public final class FreeColServer {
     public static final String COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
+
     public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
+
     public static final String REVISION = "$Revision$";
-    private static Logger logger = Logger.getLogger(FreeColServer.class
-            .getName());
+
+    private static Logger logger = Logger.getLogger(FreeColServer.class.getName());
+
     private static final boolean DISABLE_SAVEGAME_COMPRESSION = true;
+
     private static final int META_SERVER_UPDATE_INTERVAL = 60000;
+
     /** Constant for storing the state of the game. */
     public static final int STARTING_GAME = 0, IN_GAME = 1, ENDING_GAME = 2;
+
     /** Stores the current state of the game. */
     private int gameState = STARTING_GAME;
+
     // Networking:
     private Server server;
+
     // Control:
     private UserConnectionHandler userConnectionHandler;
+
     private PreGameController preGameController;
+
     private PreGameInputHandler preGameInputHandler;
+
     private InGameInputHandler inGameInputHandler;
+
     private ServerModelController modelController;
+
     private InGameController inGameController;
+
     private Game game;
+
     private AIMain aiMain;
+
     private MapGenerator mapGenerator;
+
     private boolean singleplayer;
+
     // The username of the player owning this server.
     private String owner;
+
     private boolean publicServer = false;
+
     private final int port;
+
     /** The name of this server. */
     private String name;
+
     /** The provider for random numbers */
     private final ServerPseudoRandom _pseudoRandom = new ServerPseudoRandom();
+
 
     /**
      * Starts a new server in a specified mode and with a specified port.
@@ -85,8 +133,7 @@ public final class FreeColServer {
      *             will be logged by this class).
      * 
      */
-    public FreeColServer(boolean publicServer, boolean singleplayer, int port,
-            String name) throws IOException {
+    public FreeColServer(boolean publicServer, boolean singleplayer, int port, String name) throws IOException {
         this.publicServer = publicServer;
         this.singleplayer = singleplayer;
         this.port = port;
@@ -132,8 +179,8 @@ public final class FreeColServer {
      * 
      * @throws FreeColException if the savegame could not be loaded.
      */
-    public FreeColServer(File file, boolean publicServer, boolean singleplayer,
-            int port, String name) throws IOException, FreeColException {
+    public FreeColServer(File file, boolean publicServer, boolean singleplayer, int port, String name)
+            throws IOException, FreeColException {
         this.publicServer = publicServer;
         this.singleplayer = singleplayer;
         this.port = port;
@@ -192,23 +239,18 @@ public final class FreeColServer {
      */
     public void enterRevengeMode(String username) {
         if (!singleplayer) {
-            throw new IllegalStateException(
-                    "Cannot enter revenge mode when not singleplayer.");
+            throw new IllegalStateException("Cannot enter revenge mode when not singleplayer.");
         }
-        final ServerPlayer p = (ServerPlayer) getGame().getPlayerByName(
-                username);
+        final ServerPlayer p = (ServerPlayer) getGame().getPlayerByName(username);
         synchronized (p) {
-            Unit theFlyingDutchman = new Unit(game, p.getEntryLocation(), p,
-                    Unit.FLYING_DUTCHMAN, Unit.ACTIVE);
+            Unit theFlyingDutchman = new Unit(game, p.getEntryLocation(), p, Unit.FLYING_DUTCHMAN, Unit.ACTIVE);
             new Unit(game, theFlyingDutchman, p, Unit.REVENGER, Unit.SENTRY);
             p.setDead(false);
             p.setColor(Color.BLACK);
             Element updateElement = Message.createNewRootElement("update");
-            updateElement
-                    .appendChild(((FreeColGameObject) p.getEntryLocation())
-                            .toXMLElement(p, updateElement.getOwnerDocument()));
-            updateElement.appendChild(p.toXMLElement(p, updateElement
+            updateElement.appendChild(((FreeColGameObject) p.getEntryLocation()).toXMLElement(p, updateElement
                     .getOwnerDocument()));
+            updateElement.appendChild(p.toXMLElement(p, updateElement.getOwnerDocument()));
             try {
                 p.getConnection().send(updateElement);
             } catch (IOException e) {
@@ -266,8 +308,7 @@ public final class FreeColServer {
         }
         Connection mc;
         try {
-            mc = new Connection(FreeCol.META_SERVER_ADDRESS,
-                    FreeCol.META_SERVER_PORT, null);
+            mc = new Connection(FreeCol.META_SERVER_ADDRESS, FreeCol.META_SERVER_PORT, null);
         } catch (IOException e) {
             logger.warning("Could not connect to meta-server.");
             return;
@@ -283,23 +324,18 @@ public final class FreeColServer {
             if (name != null) {
                 element.setAttribute("name", name);
             } else {
-                element.setAttribute("name", mc.getSocket().getLocalAddress()
-                        .getHostAddress()
-                        + ":" + Integer.toString(port));
+                element.setAttribute("name", mc.getSocket().getLocalAddress().getHostAddress() + ":"
+                        + Integer.toString(port));
             }
             element.setAttribute("port", Integer.toString(port));
-            element.setAttribute("slotsAvailable", Integer
-                    .toString(getSlotsAvailable()));
-            element.setAttribute("currentlyPlaying", Integer
-                    .toString(getNumberOfLivingHumanPlayers()));
-            element.setAttribute("isGameStarted", Boolean
-                    .toString(gameState != STARTING_GAME));
+            element.setAttribute("slotsAvailable", Integer.toString(getSlotsAvailable()));
+            element.setAttribute("currentlyPlaying", Integer.toString(getNumberOfLivingHumanPlayers()));
+            element.setAttribute("isGameStarted", Boolean.toString(gameState != STARTING_GAME));
             element.setAttribute("version", FreeCol.getVersion());
             element.setAttribute("gameState", Integer.toString(getGameState()));
             mc.send(element);
         } catch (IOException e) {
-            logger
-                    .warning("Network error while communicating with the meta-server.");
+            logger.warning("Network error while communicating with the meta-server.");
             return;
         } finally {
             try {
@@ -322,8 +358,7 @@ public final class FreeColServer {
         }
         Connection mc;
         try {
-            mc = new Connection(FreeCol.META_SERVER_ADDRESS,
-                    FreeCol.META_SERVER_PORT, null);
+            mc = new Connection(FreeCol.META_SERVER_ADDRESS, FreeCol.META_SERVER_PORT, null);
         } catch (IOException e) {
             logger.warning("Could not connect to meta-server.");
             return;
@@ -333,8 +368,7 @@ public final class FreeColServer {
             element.setAttribute("port", Integer.toString(port));
             mc.send(element);
         } catch (IOException e) {
-            logger
-                    .warning("Network error while communicating with the meta-server.");
+            logger.warning("Network error while communicating with the meta-server.");
             return;
         } finally {
             try {
@@ -377,8 +411,7 @@ public final class FreeColServer {
         Vector players = game.getPlayers();
         int n = 0;
         for (int i = 0; i < players.size(); i++) {
-            if (!((ServerPlayer) players.get(i)).isAI()
-                    && !((ServerPlayer) players.get(i)).isDead()
+            if (!((ServerPlayer) players.get(i)).isAI() && !((ServerPlayer) players.get(i)).isDead()
                     && ((ServerPlayer) players.get(i)).isConnected()) {
                 n++;
             }
@@ -415,8 +448,7 @@ public final class FreeColServer {
                 xsw = xof.createXMLStreamWriter(new FileOutputStream(file));
             } else {
                 // Compression
-                xsw = xof.createXMLStreamWriter(new DeflaterOutputStream(
-                        new FileOutputStream(file)));
+                xsw = xof.createXMLStreamWriter(new DeflaterOutputStream(new FileOutputStream(file)));
             }
             xsw.writeStartDocument();
             xsw.writeStartElement("savedGame");
@@ -429,8 +461,7 @@ public final class FreeColServer {
             xsw.writeStartElement("serverObjects");
             Iterator fcgoIterator = game.getFreeColGameObjectIterator();
             while (fcgoIterator.hasNext()) {
-                FreeColGameObject fcgo = (FreeColGameObject) fcgoIterator
-                        .next();
+                FreeColGameObject fcgo = (FreeColGameObject) fcgoIterator.next();
                 if (fcgo instanceof ServerModelObject) {
                     ((ServerModelObject) fcgo).toServerAdditionElement(xsw);
                 }
@@ -467,8 +498,7 @@ public final class FreeColServer {
      *                <code>XMLStreamException</code> have been thrown by the
      *                parser.
      */
-    public static XMLStreamReader createXMLStreamReader(File file)
-            throws IOException {
+    public static XMLStreamReader createXMLStreamReader(File file) throws IOException {
         InputStream in = new BufferedInputStream(new FileInputStream(file));
         // Automatically detect compression:
         in.mark(10);
@@ -518,26 +548,20 @@ public final class FreeColServer {
                     // Reads the ServerAdditionObjects:
                     serverObjects = new ArrayList();
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        if (xsr.getLocalName().equals(
-                                ServerPlayer
-                                        .getServerAdditionXMLElementTagName())) {
+                        if (xsr.getLocalName().equals(ServerPlayer.getServerAdditionXMLElementTagName())) {
                             serverObjects.add(new ServerPlayer(xsr));
                         } else {
-                            throw new XMLStreamException("Unknown tag: "
-                                    + xsr.getLocalName());
+                            throw new XMLStreamException("Unknown tag: " + xsr.getLocalName());
                         }
                     }
-                } else if (xsr.getLocalName().equals(
-                        Game.getXMLElementTagName())) {
+                } else if (xsr.getLocalName().equals(Game.getXMLElementTagName())) {
                     // Read the game model:
-                    game = new Game(null, getModelController(), xsr,
-                            (FreeColGameObject[]) serverObjects
-                                    .toArray(new FreeColGameObject[0]));
+                    game = new Game(null, getModelController(), xsr, (FreeColGameObject[]) serverObjects
+                            .toArray(new FreeColGameObject[0]));
                     game.setCurrentPlayer(null);
                     gameState = IN_GAME;
                     game.checkIntegrity();
-                } else if (xsr.getLocalName().equals(
-                        AIMain.getXMLElementTagName())) {
+                } else if (xsr.getLocalName().equals(AIMain.getXMLElementTagName())) {
                     if (doNotLoadAI) {
                         aiMain = new AIMain(this);
                         game.setFreeColGameObjectListener(aiMain);
@@ -551,8 +575,7 @@ public final class FreeColServer {
                     }
                     game.setFreeColGameObjectListener(aiMain);
                 } else {
-                    throw new XMLStreamException("Unknown tag: "
-                            + xsr.getLocalName());
+                    throw new XMLStreamException("Unknown tag: " + xsr.getLocalName());
                 }
             }
             if (aiMain == null) {
@@ -564,10 +587,8 @@ public final class FreeColServer {
             while (playerIterator.hasNext()) {
                 ServerPlayer player = (ServerPlayer) playerIterator.next();
                 if (player.isAI()) {
-                    DummyConnection theConnection = new DummyConnection(
-                            getInGameInputHandler());
-                    DummyConnection aiConnection = new DummyConnection(
-                            new AIInGameInputHandler(this, player, aiMain));
+                    DummyConnection theConnection = new DummyConnection(getInGameInputHandler());
+                    DummyConnection aiConnection = new DummyConnection(new AIInGameInputHandler(this, player, aiMain));
                     aiConnection.setOutgoingMessageHandler(theConnection);
                     theConnection.setOutgoingMessageHandler(aiConnection);
                     getServer().addConnection(theConnection, -1);
@@ -775,7 +796,7 @@ public final class FreeColServer {
     public Server getServer() {
         return server;
     }
-    
+
     /**
      * Get the common pseudo random number generator for the server.
      * 
@@ -784,16 +805,17 @@ public final class FreeColServer {
     public PseudoRandom getPseudoRandom() {
         return _pseudoRandom;
     }
-    
+
     /**
      * Get multiple random numbers.
      * 
      * @param size The size of the returned array.
      * @return array with random numbers.
      */
-    public int [] getRandomNumbers(int n) {
+    public int[] getRandomNumbers(int n) {
         return _pseudoRandom.getRandomNumbers(n);
     }
+
 
     /**
      * This class provides pseudo-random numbers. It is used on the server side.
@@ -802,6 +824,9 @@ public final class FreeColServer {
      * and server-side implementations, move this to the server-side class.
      */
     private static class ServerPseudoRandom implements PseudoRandom {
+        private final Random _random;
+
+
         /**
          * Create a new random number generator with a random seed.
          * <p>
@@ -824,17 +849,17 @@ public final class FreeColServer {
         public synchronized int nextInt(int n) {
             return _random.nextInt(n);
         }
-        
+
         /**
-         * Get multiple random numbers. This can be used on the client side
-         * in order to reduce the number of round-trips to the server side.
+         * Get multiple random numbers. This can be used on the client side in
+         * order to reduce the number of round-trips to the server side.
          * 
          * @param size The size of the returned array.
          * @return array with random numbers.
          */
-        public synchronized int [] getRandomNumbers(int size) {
-            int [] numbers = new int[size];
-            for(int i = 0; i < size; i++) {
+        public synchronized int[] getRandomNumbers(int size) {
+            int[] numbers = new int[size];
+            for (int i = 0; i < size; i++) {
                 numbers[i] = _random.nextInt();
             }
             return numbers;
@@ -849,7 +874,5 @@ public final class FreeColServer {
         public synchronized void setSeed(long seed) {
             _random.setSeed(seed);
         }
-        
-        private final Random _random;
     }
 }
