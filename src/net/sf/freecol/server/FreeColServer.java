@@ -2,11 +2,15 @@ package net.sf.freecol.server;
 
 import java.awt.Color;
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.security.SecureRandom;
@@ -457,6 +461,7 @@ public final class FreeColServer {
             xsw.writeAttribute("publicServer", Boolean.toString(publicServer));
             xsw.writeAttribute("singleplayer", Boolean.toString(singleplayer));
             xsw.writeAttribute("version", Message.getFreeColProtocolVersion());
+            xsw.writeAttribute("randomState", _pseudoRandom.getState());
             // Add server side model information:
             xsw.writeStartElement("serverObjects");
             Iterator fcgoIterator = game.getFreeColGameObjectIterator();
@@ -539,6 +544,14 @@ public final class FreeColServer {
             final String version = xsr.getAttributeValue(null, "version");
             if (!Message.getFreeColProtocolVersion().equals(version)) {
                 throw new FreeColException("incompatibleVersions");
+            }
+            String randomState = xsr.getAttributeValue(null, "randomState");
+            if (randomState != null && randomState.length() > 0) {
+                try {
+                    _pseudoRandom.restoreState(randomState);
+                } catch (IOException e) {
+                    logger.warning("Failed to restore random state, ignoring!");
+                }
             }
             final String owner = xsr.getAttributeValue(null, "owner");
             ArrayList serverObjects = null;
@@ -824,7 +837,9 @@ public final class FreeColServer {
      * and server-side implementations, move this to the server-side class.
      */
     private static class ServerPseudoRandom implements PseudoRandom {
-        private final Random _random;
+        private static final String HEX_DIGITS = "0123456789ABCDEF";
+
+        private Random _random;
 
 
         /**
@@ -866,13 +881,52 @@ public final class FreeColServer {
         }
 
         /**
-         * Set a new seed for random numbers. This is guaranteed to give a
-         * repeatable series of random numbers.
+         * Get the internal state of the random provider as a string.
+         * <p>
+         * It would have been more convenient to simply return the current seed,
+         * but unfortunately it is private.
          * 
-         * @param seed The new seed.
+         * @return state.
          */
-        public synchronized void setSeed(long seed) {
-            _random.setSeed(seed);
+        public synchronized String getState() {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            try {
+                ObjectOutputStream oos = new ObjectOutputStream(bos);
+                oos.writeObject(_random);
+                oos.flush();
+            } catch (IOException e) {
+                throw new IllegalStateException("IO exception in memory!?!", e);
+            }
+            byte[] bytes = bos.toByteArray();
+            StringBuffer sb = new StringBuffer(bytes.length * 2);
+            for (byte b : bytes) {
+                sb.append(HEX_DIGITS.charAt((b >> 4) & 0x0F));
+                sb.append(HEX_DIGITS.charAt(b & 0x0F));
+            }
+            return sb.toString();
+        }
+
+        /**
+         * Restore a previously saved state.
+         * 
+         * @param state The saved state (@see #getState()).
+         * @throws IOException if unable to restore state.
+         */
+        public synchronized void restoreState(String state) throws IOException {
+            byte[] bytes = new byte[state.length() / 2];
+            int pos = 0;
+            for (int i = 0; i < bytes.length; i++) {
+                bytes[i] = (byte) HEX_DIGITS.indexOf(state.charAt(pos++));
+                bytes[i] <<= 4;
+                bytes[i] |= (byte) HEX_DIGITS.indexOf(state.charAt(pos++));
+            }
+            ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+            ObjectInputStream ois = new ObjectInputStream(bis);
+            try {
+                _random = (Random) ois.readObject();
+            } catch (ClassNotFoundException e) {
+                throw new IOException("Failed to restore random!");
+            }
         }
     }
 }
