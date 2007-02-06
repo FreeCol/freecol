@@ -7,6 +7,7 @@ import javax.swing.SwingUtilities;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -310,12 +311,9 @@ public final class InGameInputHandler extends InputHandler {
     private Element opponentAttack(Element opponentAttackElement) {
         Game game = getFreeColClient().getGame();
         Unit unit = (Unit) game.getFreeColGameObject(opponentAttackElement.getAttribute("unit"));
+        Colony colony = (Colony) game.getFreeColGameObject(opponentAttackElement.getAttribute("colony"));
+        Building building = (Building) game.getFreeColGameObject(opponentAttackElement.getAttribute("building"));
         Unit defender = (Unit) game.getFreeColGameObject(opponentAttackElement.getAttribute("defender"));
-
-        if (unit == null && defender == null) {
-            logger.warning("Both \"unit\" and \"defender\" is \"null\"!");
-            throw new NullPointerException();
-        }
 
         // For later use: int direction = Integer.parseInt(opponentAttackElement.getAttribute("direction"));
         int result = Integer.parseInt(opponentAttackElement.getAttribute("result"));
@@ -369,9 +367,9 @@ public final class InGameInputHandler extends InputHandler {
             }
         }
 
-        if (unit == null) {
-            logger.warning("unit == null");
-            throw new NullPointerException("unit == null");
+        if (unit == null && colony == null) {
+            logger.warning("unit == null && colony == null");
+            throw new NullPointerException("unit == null && colony == null");
         }
 
         if (defender == null) {
@@ -385,26 +383,53 @@ public final class InGameInputHandler extends InputHandler {
         switch (result) {
         case Unit.ATTACK_EVADES:
             if (unit.isNaval()) {
-                canvas.showInformationMessage("model.unit.shipEvaded",
-                                              new String [][] {{"%ship%", defender.getName()},
-                                                               {"%nation%",
-                                                                defender.getOwner().getNationAsString()}});
+                if (colony == null) {
+                    canvas.showInformationMessage("model.unit.shipEvaded",
+                                                  new String [][] {{"%ship%", defender.getName()},
+                                                                   {"%nation%",
+                                                                    defender.getOwner().getNationAsString()}});
+                } else {
+                    canvas.showInformationMessage("model.unit.shipEvadedBombardment",
+                                                  new String [][] {{"%colony%", colony.getName()},
+                                                                   {"%building%", building.getName()},
+                                                                   {"%ship%", defender.getName()},
+                                                                   {"%nation%",
+                                                                    defender.getOwner().getNationAsString()}});
+                }
             }
             break;
         case Unit.ATTACK_LOSS:
             if (unit.isNaval()) {
-                canvas.showInformationMessage("model.unit.enemyShipDamaged",
-                                              new String [][] {{"%ship%", unit.getName()},
-                                                               {"%nation%",
-                                                                unit.getOwner().getNationAsString()}});
+                if (colony == null) {
+                    canvas.showInformationMessage("model.unit.enemyShipDamaged",
+                                                  new String [][] {{"%ship%", unit.getName()},
+                                                                   {"%nation%",
+                                                                    unit.getOwner().getNationAsString()}});
+                } else {
+                    canvas.showInformationMessage("model.unit.enemyShipDamagedByBombardment",
+                                                  new String [][] {{"%colony%", colony.getName()},
+                                                                   {"%building%", building.getName()},
+                                                                   {"%ship%", unit.getName()},
+                                                                   {"%nation%",
+                                                                    unit.getOwner().getNationAsString()}});
+                }
             }
             break;
         case Unit.ATTACK_GREAT_LOSS:
             if (unit.isNaval()) {
-                canvas.showInformationMessage("model.unit.shipSunk",
-                                              new String [][] {{"%ship%", unit.getName()},
-                                                               {"%nation%",
-                                                                unit.getOwner().getNationAsString()}});
+                if (colony == null) {
+                    canvas.showInformationMessage("model.unit.shipSunk",
+                                                  new String [][] {{"%ship%", unit.getName()},
+                                                                   {"%nation%",
+                                                                    unit.getOwner().getNationAsString()}});
+                } else {
+                    canvas.showInformationMessage("model.unit.shipSunkByBombardment",
+                                                  new String [][] {{"%colony%", colony.getName()},
+                                                                   {"%building%", building.getName()},
+                                                                   {"%ship%", unit.getName()},
+                                                                   {"%nation%",
+                                                                    unit.getOwner().getNationAsString()}});
+                }
             }
             break;
         }

@@ -1321,6 +1321,58 @@ public final class Colony extends Settlement implements Location, Nameable {
 
 
     /**
+     * Bombard a unit with the given outcome.
+     *
+     * @param defender The <code>Unit</code> defending against bombardment.
+     * @param result The result of the bombardment.
+     */
+    public void bombard(Unit defender, int result) {
+        if (defender == null) {
+            throw new NullPointerException();
+        }
+
+        Building building = getBuilding(Building.STOCKADE);
+        switch (result) {
+        case Unit.ATTACK_EVADES:
+            // send message to both parties
+            addModelMessage(this, "model.unit.shipEvadedBombardment",
+                            new String [][] {{"%colony%", getName()},
+                                             {"%building%", building.getName()},
+                                             {"%ship%", defender.getName()},
+                                             {"%nation%", defender.getOwner().getNationAsString()}},
+                            ModelMessage.DEFAULT, this);
+            addModelMessage(defender, "model.unit.shipEvadedBombardment",
+                            new String [][] {{"%colony%", getName()},
+                                             {"%building%", building.getName()},
+                                             {"%ship%", defender.getName()},
+                                             {"%nation%", defender.getOwner().getNationAsString()}},
+                            ModelMessage.DEFAULT, this);
+            break;
+        case Unit.ATTACK_WIN:
+            defender.shipDamaged(this, building);
+            addModelMessage(this, "model.unit.enemyShipDamagedByBombardment",
+                            new String [][] {{"%colony%", getName()},
+                                             {"%building%", building.getName()},
+                                             {"%ship%", defender.getName()},
+                                             {"%nation%", defender.getOwner().getNationAsString()}},
+                            ModelMessage.UNIT_DEMOTED);
+            break;
+        case Unit.ATTACK_GREAT_WIN:
+            defender.shipSunk(this, building);
+            addModelMessage(this, "model.unit.shipSunkByBombardment",
+                            new String [][] {{"%colony%", getName()},
+                                             {"%building%", building.getName()},
+                                             {"%ship%", defender.getName()},
+                                             {"%nation%", defender.getOwner().getNationAsString()}},
+                            ModelMessage.UNIT_DEMOTED);
+            break;
+        default:
+            logger.warning("Illegal result of bombardment!");
+            throw new IllegalArgumentException("Illegal result of bombardment!");
+        }
+    }
+
+    /**
     * Returns a random unit from this colony.
     *
     * At this moment, this method always returns the first unit

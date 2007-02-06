@@ -75,6 +75,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                         reply = askSkill(connection, element);
                     } else if (type.equals("attack")) {
                         reply = attack(connection, element);
+                    } else if (type.equals("bombard")) {
+                        reply = bombard(connection, element);
                     } else if (type.equals("embark")) {
                         reply = embark(connection, element);
                     } else if (type.equals("boardShip")) {
@@ -817,6 +819,141 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
 
 
     /**
+    * Handles an "bombard"-message from a client.
+    *
+    * @param connection The connection the message came from.
+    * @param attackElement The element containing the request.
+    * @exception IllegalArgumentException If the data format of the message is invalid.
+    * @exception IllegalStateException If the request is not accepted by the model.
+    *
+    */
+    private Element bombard(Connection connection, Element bombardElement) {
+        FreeColServer freeColServer = getFreeColServer();
+        Game game = freeColServer.getGame();
+        ServerPlayer player = freeColServer.getPlayer(connection);
+
+        // Get parameters:
+        Colony colony = (Colony) game.getFreeColGameObject(bombardElement.getAttribute("colony"));
+        int direction = Integer.parseInt(bombardElement.getAttribute("direction"));
+
+        // Test the parameters:
+        if (colony == null) {
+            throw new IllegalArgumentException("Could not find 'Colony' with specified ID: " + 
+                                               bombardElement.getAttribute("colony"));
+        }
+
+        if (colony.getTile() == null) {
+            throw new IllegalArgumentException("'Colony' is not on the map: " + colony.getName());
+        }
+
+        if (colony.getOwner() != player) {
+            throw new IllegalStateException("Not your colony!");
+        }
+
+        Tile oldTile = colony.getTile();
+        Tile newTile = game.getMap().getNeighbourOrNull(direction, colony.getTile());
+
+        if (newTile == null) {
+            throw new IllegalArgumentException("Could not find tile in direction " + direction +
+                                               " from colony with ID " + bombardElement.getAttribute("colony"));
+        }
+
+        Building stockade = colony.getBuilding(Building.STOCKADE);
+        if (stockade.getLevel() < Building.SHOP) {
+            throw new IllegalArgumentException("No fort or fortress in colony " + colony.getName());
+        }
+
+        Unit attacker = null;
+        Iterator unitIterator = colony.getTile().getUnitIterator();
+        while (unitIterator.hasNext()) {
+            Unit possibleAttacker = (Unit) unitIterator.next();
+            if (possibleAttacker.getType() == Unit.ARTILLERY) {
+                attacker = possibleAttacker;
+                break;
+            } else if (possibleAttacker.getType() == Unit.DAMAGED_ARTILLERY) {
+                attacker = possibleAttacker;
+            }
+        }
+        if (attacker == null) {
+            logger.warning("No artillery for bombardment in colony " + colony.getName());
+            return null;
+        }
+        
+        Unit defender = null;
+        unitIterator = newTile.getUnitIterator();
+        while (unitIterator.hasNext()) {
+            Unit possibleDefender = (Unit) unitIterator.next();
+            if (player.getStance(possibleDefender.getOwner()) == Player.WAR) {
+                defender = newTile.getDefendingUnit(attacker);
+                break;
+            } else if (possibleDefender.getType() == Unit.PRIVATEER) {
+                defender = possibleDefender;
+                break;
+            }
+        }
+            
+        if (defender == null) {
+            throw new IllegalStateException("Nothing to attack in direction " +
+                                            direction + " from colony with ID " +
+                                            bombardElement.getAttribute("colony"));
+        }
+
+        int result = generateBombardResult(colony, defender);
+        int plunderGold = -1;
+
+        // Inform the players (other then the player attacking) about the attack:
+        Iterator enemyPlayerIterator = game.getPlayerIterator();
+        while (enemyPlayerIterator.hasNext()) {
+            ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
+
+            if (player.equals(enemyPlayer) || enemyPlayer.getConnection() == null) {
+                continue;
+            }
+
+            Element opponentAttackElement = Message.createNewRootElement("opponentAttack");
+            if (defender.isVisibleTo(enemyPlayer)) {
+                opponentAttackElement.setAttribute("direction", Integer.toString(direction));
+                opponentAttackElement.setAttribute("result", Integer.toString(result));
+                opponentAttackElement.setAttribute("plunderGold", Integer.toString(plunderGold));
+                opponentAttackElement.setAttribute("colony", colony.getID());
+                opponentAttackElement.setAttribute("building", stockade.getID());
+                opponentAttackElement.setAttribute("defender", defender.getID());
+            
+                if (!defender.isVisibleTo(enemyPlayer)) {
+                    opponentAttackElement.setAttribute("update", "defender");
+                    if (!enemyPlayer.canSee(defender.getTile())) {
+                        enemyPlayer.setExplored(defender.getTile());
+                        opponentAttackElement.appendChild(defender.getTile().toXMLElement(enemyPlayer, opponentAttackElement.getOwnerDocument()));
+                    }
+                    opponentAttackElement.appendChild(defender.toXMLElement(enemyPlayer, opponentAttackElement.getOwnerDocument()));
+                }
+                
+                try {
+                    enemyPlayer.getConnection().send(opponentAttackElement);
+                } catch (IOException e) {
+                    logger.warning("Could not send message to: " +
+                                   enemyPlayer.getName() + " with connection " +
+                                   enemyPlayer.getConnection());
+                }
+            }
+        }
+
+
+        // Create the reply for the attacking player:
+        Element reply = Message.createNewRootElement("attackResult");
+        reply.setAttribute("result", Integer.toString(result));
+        reply.setAttribute("plunderGold", Integer.toString(plunderGold));
+
+        if (!defender.isVisibleTo(player)) {
+            reply.appendChild(defender.toXMLElement(player, reply.getOwnerDocument()));
+        }
+
+        colony.bombard(defender, result);
+        return reply;
+    }
+
+
+    /**
      * Generates a result of an attack.
      * 
      * @param unit The <code>Unit</code> attacking.
@@ -873,6 +1010,57 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 || defender.getTile().getColony() != null && !defender.isArmed() && !defender.isMounted() && defender.getType() != Unit.ARTILLERY
                 && defender.getType() != Unit.DAMAGED_ARTILLERY)) {
             result = Unit.ATTACK_DONE_SETTLEMENT;
+        }
+
+        return result;
+    }
+
+    /**
+     * Generates a result of a bombardment.
+     * 
+     * @param colony The <code>Colony</code> bombarding.
+     * @param defender The defending unit.
+     * @return The result: {@link Unit#ATTACK_GREAT_LOSS},
+     *      {@link Unit#ATTACK_LOSS}, 
+     *      {@link Unit#ATTACK_EVADES},
+     */
+    private int generateBombardResult(Colony colony, Unit defender) {
+        int attackPower = 0;
+        Unit attacker = null;
+        Iterator unitIterator = colony.getTile().getUnitIterator();
+        while (unitIterator.hasNext()) {
+            Unit unit = (Unit) unitIterator.next();
+            switch (unit.getType()) {
+            case Unit.ARTILLERY:
+                attacker = unit;
+                attackPower += unit.getOffensePower(defender);
+                break;
+            case Unit.DAMAGED_ARTILLERY:
+                if (attacker == null) {
+                    attacker = unit;
+                }
+                attackPower += unit.getOffensePower(defender);
+            default:
+            }
+        }
+        if (attackPower > 48) {
+            attackPower = 48;
+        }
+
+        int totalProbability = attackPower + defender.getDefensePower(attacker);
+        int result;
+        int r = getPseudoRandom().nextInt(totalProbability+1);
+        if (r < attackPower) {
+            int diff = defender.getDefensePower(attacker)*2-attackPower;
+            int r2 = getPseudoRandom().nextInt((diff<3) ? 3 : diff);
+
+            if (r2 == 0) {
+                result = Unit.ATTACK_GREAT_WIN;
+            } else {
+                result = Unit.ATTACK_WIN;
+            }
+        } else {
+            result = Unit.ATTACK_EVADES;
         }
 
         return result;

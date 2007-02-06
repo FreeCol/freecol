@@ -3312,17 +3312,40 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * location.
      */
     public void shipDamaged() {
+        shipDamaged(null, null);
+    }
+
+
+    /**
+     * Sets the damage to this ship and sends it to its repair
+     * location.
+     * @param colony The colony that opened fire on this unit.
+     * @param building The building that opened fire on this unit.
+     */
+    public void shipDamaged(Colony colony, Building building) {
         String nation = owner.getNationAsString();
         Location repairLocation = getOwner().getRepairLocation(this);
-        String repairLocationName = Messages.message("menuBar.view.europe");
+        String repairLocationName = repairLocation.getLocationName();
+        /*
         if (repairLocation instanceof Colony) {
             repairLocationName = ((Colony) repairLocation).getName();
         }
-        addModelMessage(this, "model.unit.shipDamaged",
-                        new String [][] {{"%ship%", getName()},
-                                         {"%repairLocation%", repairLocationName},
-                                         {"%nation%", nation}},
-                        ModelMessage.UNIT_DEMOTED);
+        */
+        if (colony != null) {
+            addModelMessage(this, "model.unit.shipDamagedByBombardment",
+                            new String [][] {{"%colony%", colony.getName()},
+                                             {"%building%", building.getName()},
+                                             {"%ship%", getName()},
+                                             {"%repairLocation%", repairLocationName},
+                                             {"%nation%", nation}},
+                            ModelMessage.UNIT_DEMOTED);
+        } else {
+            addModelMessage(this, "model.unit.shipDamaged",
+                            new String [][] {{"%ship%", getName()},
+                                             {"%repairLocation%", repairLocationName},
+                                             {"%nation%", nation}},
+                            ModelMessage.UNIT_DEMOTED);
+        }
         setHitpoints(1);
         getUnitContainer().disposeAllUnits();
         goodsContainer.removeAll();
@@ -3332,12 +3355,31 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     /**
      * Sinks this ship.
      */
-    private void shipSunk() {
+    public void shipSunk() {
+        shipSunk(null, null);
+    }
+
+
+    /**
+     * Sinks this ship.
+     * @param colony The colony that opened fire on this unit.
+     * @param building The building that opened fire on this unit.
+     */
+    public void shipSunk(Colony colony, Building building) {
         String nation = owner.getNationAsString();
-        addModelMessage(this, "model.unit.shipSunk",
-                        new String [][] {{"%ship%", getName()},
-                                         {"%nation%", nation}},
-                        ModelMessage.UNIT_LOST);
+        if (colony != null) {
+            addModelMessage(this, "model.unit.shipSunkByBombardment",
+                            new String [][] {{"%colony%", colony.getName()},
+                                             {"%building%", building.getName()},
+                                             {"%ship%", getName()},
+                                             {"%nation%", nation}},
+                            ModelMessage.UNIT_LOST);
+        } else {
+            addModelMessage(this, "model.unit.shipSunk",
+                            new String [][] {{"%ship%", getName()},
+                                             {"%nation%", nation}},
+                            ModelMessage.UNIT_LOST);
+        }
         dispose();
     }
 

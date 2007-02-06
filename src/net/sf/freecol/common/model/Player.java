@@ -210,7 +210,7 @@ public class Player extends FreeColGameObject implements Nameable {
     private Iterator nextGoingToUnitIterator = new UnitIterator(this, new GoingToPredicate());
 
     // Settlements this player owns
-    private List<Settlement> settlements = new ArrayList();
+    private List<Settlement> settlements = new ArrayList<Settlement>();
 
     // Temporary variables:
     protected boolean[][] canSeeTiles = null;
@@ -1553,7 +1553,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * Returns the settlements this player owns.
      * @return The settlements this player owns.
      */
-    public List getSettlements() {
+    public List<Settlement> getSettlements() {
         return settlements;
     }
 

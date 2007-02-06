@@ -61,7 +61,7 @@ import org.w3c.dom.NodeList;
 public final class InGameController implements NetworkConstants {
     private static final Logger logger = Logger.getLogger(InGameController.class.getName());
 
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
@@ -246,6 +246,9 @@ public final class InGameController implements NetworkConstants {
             removeUnitsOutsideLOS();
             freeColClient.getCanvas().closeMenus();
             freeColClient.getCanvas().setEnabled(true);
+            if (currentPlayer.isEuropean()) {
+                bombardEnemyShips(currentPlayer);
+            }
             if (currentPlayer.checkEmigrate()) {
                 emigrateUnitInEurope(
                         currentPlayer.hasFather(FoundingFather.WILLIAM_BREWSTER)
@@ -258,6 +261,39 @@ public final class InGameController implements NetworkConstants {
         }        
     }
 
+    public void bombardEnemyShips(Player currentPlayer) {
+        Map map = freeColClient.getGame().getMap();
+        for (Settlement settlement : currentPlayer.getSettlements()) {
+            Colony colony = (Colony) settlement;
+            if (colony.getBuilding(Building.STOCKADE).getLevel() > Building.HOUSE &&
+                !colony.isLandLocked()) {
+                Position colonyPosition = colony.getTile().getPosition();
+                for (int direction = 0; direction < Map.NUMBER_OF_DIRECTIONS; direction++) {
+                    Tile tile = map.getTile(map.getAdjacent(colonyPosition, direction));
+                    if (!tile.isLand()) {
+                        Iterator unitIterator = tile.getUnitIterator();
+                        while (unitIterator.hasNext()) {
+                            Unit unit = (Unit) unitIterator.next();
+                            Player player = unit.getOwner();
+                            if (player != currentPlayer &&
+                                (currentPlayer.getStance(player) == Player.WAR ||
+                                 unit.getType() == Unit.PRIVATEER)) {
+                                Element bombardElement = Message.createNewRootElement("bombard");
+                                bombardElement.setAttribute("colony", colony.getID());
+                                bombardElement.setAttribute("direction", String.valueOf(direction));
+                                freeColClient.getClient().sendAndWait(bombardElement);
+                            } else {
+                                // since all units must belong to the same player
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+        
+
     /**
      * Renames a <code>Renameable</code>.
      *
@@ -269,7 +305,7 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        String name = "";
+        String name = null;
         if (object instanceof Colony) {
             name = freeColClient.getCanvas().showInputDialog("renameColony.text", 
                                                              object.getName(),
