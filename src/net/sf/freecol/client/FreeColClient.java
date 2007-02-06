@@ -600,7 +600,7 @@ public final class FreeColClient {
             // This may not be good enough, as the low bits may be less
             // random than the entire range. See the Random class for a
             // more advanced implementation.
-            return nextInt() % n;
+            return Math.abs(nextInt() % n); 
         }
 
         /**
