@@ -229,6 +229,7 @@ public final class InGameController implements NetworkConstants {
     * @param currentPlayer The player.
     */
     public void setCurrentPlayer(Player currentPlayer) {
+        logger.finest("Setting current player " + currentPlayer.getName());
         Game game = freeColClient.getGame();
         game.setCurrentPlayer(currentPlayer);
 
@@ -259,6 +260,7 @@ public final class InGameController implements NetworkConstants {
             freeColClient.getGUI().setActiveUnit(null);
             nextActiveUnit();
         }        
+        logger.finest("Exiting method setCurrentPlayer()");
     }
 
     public void bombardEnemyShips(Player currentPlayer) {

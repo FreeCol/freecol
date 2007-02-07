@@ -156,10 +156,12 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
     *                holds all the information.
     */
     private Element setCurrentPlayer(final DummyConnection connection, final Element setCurrentPlayerElement) {
+        logger.finest("Entering setCurrentPlayer");
         final Game game = freeColServer.getGame();
         final Player currentPlayer = (Player) game.getFreeColGameObject(setCurrentPlayerElement.getAttribute("player"));
 
         if (me.getID() == currentPlayer.getID()) {
+            logger.finest("Starting new Thread for " + me.getName());
             Thread t = new Thread() {
                 public void run() {
                     try {
@@ -182,6 +184,7 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
             t.start();
         }
 
+        logger.finest("About to exit from setCurrentPlayerElement.");
         return null;
     }
 

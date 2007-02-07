@@ -126,7 +126,7 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
                 String text = Messages.message(message.getMessageID(),
                                                message.getData());
                 textArea.setText(text);
-                textArea.setColumns(50);
+                textArea.setColumns(45);
                 textArea.setOpaque(false);
                 textArea.setLineWrap(true);
                 textArea.setWrapStyleWord(true);

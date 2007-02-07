@@ -101,11 +101,7 @@ public final class FreeColClient {
                 }
             });
             worker = new Worker();
-            new Thread("worker") {
-                public void run() {
-                    worker.run();
-                }
-            }.start();
+            worker.start();
             createFreeColDirs();
             loadClientOptions();
         } else

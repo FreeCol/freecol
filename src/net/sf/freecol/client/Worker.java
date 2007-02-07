@@ -1,104 +1,44 @@
-
 package net.sf.freecol.client;
 
+import java.util.concurrent.LinkedBlockingQueue;
 
-import java.util.ArrayList;
-import java.util.List;
+public final class Worker extends Thread {
+	public static final String COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
+	public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
+	public static final String REVISION = "$Revision$";
 
+	private final LinkedBlockingQueue<Runnable> jobList;
+	private volatile boolean stopRunning;
 
-public final class Worker implements Runnable
-{
-    public static final  String  COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
-    public static final  String  LICENSE   = "http://www.gnu.org/licenses/gpl.html";
-    public static final  String  REVISION  = "$Revision$";
+	public Worker() {
+		super("Worker");
+		jobList = new LinkedBlockingQueue<Runnable>();
+		stopRunning = false;
+	}
 
-    private final  List     jobList;
-    private        boolean  shouldRun;
-    private final  Object   lock;
+	public void run() {
+		while (!stopRunning) {
+			try {
+				// run the next waiting job
+				Runnable job = jobList.take();
+				try {
+					job.run();
+				} catch (Exception e) {
+					System.err.println("a job produced an error:");
+					e.printStackTrace();
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
+	public void schedule(Runnable job) {
+		jobList.add(job);
+	}
 
-    // ----------------------------------------------------------- constructors
-
-    public Worker() {
-
-        jobList = new ArrayList();
-        shouldRun = true;
-        lock = new Object();
-    }
-
-
-    // ------------------------------------------------------------ API methods
-
-    public void run() {
-
-        while ( shouldRun() ) {
-
-            try {
-                // run any waiting jobs
-                Runnable  job;
-                while ( (job = nextJob()) != null ) {
-
-                    try {
-                        job.run();
-                    }
-                    catch ( Exception e ) {
-
-                        System.err.println( "a job produced an error:" );
-                        e.printStackTrace();
-                    }
-                }
-
-                // sleep a bit so as not to redline the CPU
-                Thread.sleep( 1 );
-            }
-            catch ( InterruptedException e ) {
-
-                e.printStackTrace();
-            }
-        }
-    }
-
-
-    public void schedule( Runnable job ) {
-
-        synchronized ( lock ) {
-
-            jobList.add( job );
-        }
-    }
-
-
-    public void askToStop() {
-
-        synchronized ( lock ) {
-
-            shouldRun = false;
-        }
-    }
-
-
-    // -------------------------------------------------------- support methods
-
-    private boolean shouldRun() {
-
-        synchronized ( lock ) {
-
-            return shouldRun;
-        }
-    }
-
-
-    private Runnable nextJob() {
-
-        synchronized ( lock ) {
-
-            if ( jobList.isEmpty() ) {
-
-                return null;
-            }
-
-            return (Runnable) jobList.remove( 0 );
-        }
-    }
-
+	public void askToStop() {
+		stopRunning = true;
+		this.interrupt();
+	}
 }
