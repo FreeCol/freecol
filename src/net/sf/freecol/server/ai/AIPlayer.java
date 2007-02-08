@@ -151,7 +151,7 @@ public class AIPlayer extends AIObject {
      * when this method returns.
      */
     public void startWorking() {
-        //logger.info("Entering AI code for: " + player.getNationAsString());
+        logger.fine("Entering AI code for: " + player.getNationAsString());
 
         switch (player.getNation()) {
         case Player.DUTCH:

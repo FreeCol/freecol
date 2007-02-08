@@ -247,9 +247,6 @@ public final class InGameController implements NetworkConstants {
             removeUnitsOutsideLOS();
             freeColClient.getCanvas().closeMenus();
             freeColClient.getCanvas().setEnabled(true);
-            if (currentPlayer.isEuropean()) {
-                bombardEnemyShips(currentPlayer);
-            }
             if (currentPlayer.checkEmigrate()) {
                 emigrateUnitInEurope(
                         currentPlayer.hasFather(FoundingFather.WILLIAM_BREWSTER)
@@ -262,39 +259,6 @@ public final class InGameController implements NetworkConstants {
         }        
         logger.finest("Exiting method setCurrentPlayer()");
     }
-
-    public void bombardEnemyShips(Player currentPlayer) {
-        Map map = freeColClient.getGame().getMap();
-        for (Settlement settlement : currentPlayer.getSettlements()) {
-            Colony colony = (Colony) settlement;
-            if (colony.getBuilding(Building.STOCKADE).getLevel() > Building.HOUSE &&
-                !colony.isLandLocked()) {
-                Position colonyPosition = colony.getTile().getPosition();
-                for (int direction = 0; direction < Map.NUMBER_OF_DIRECTIONS; direction++) {
-                    Tile tile = map.getTile(map.getAdjacent(colonyPosition, direction));
-                    if (!tile.isLand()) {
-                        Iterator unitIterator = tile.getUnitIterator();
-                        while (unitIterator.hasNext()) {
-                            Unit unit = (Unit) unitIterator.next();
-                            Player player = unit.getOwner();
-                            if (player != currentPlayer &&
-                                (currentPlayer.getStance(player) == Player.WAR ||
-                                 unit.getType() == Unit.PRIVATEER)) {
-                                Element bombardElement = Message.createNewRootElement("bombard");
-                                bombardElement.setAttribute("colony", colony.getID());
-                                bombardElement.setAttribute("direction", String.valueOf(direction));
-                                freeColClient.getClient().sendAndWait(bombardElement);
-                            } else {
-                                // since all units must belong to the same player
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-        
 
     /**
      * Renames a <code>Renameable</code>.

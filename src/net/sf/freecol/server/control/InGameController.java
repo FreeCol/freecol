@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.logging.Logger;
 import net.sf.freecol.common.model.*;
+import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -109,6 +110,7 @@ public final class InGameController extends Controller {
             if (nextPlayer.getMonarch() != null) {
                 monarchAction(nextPlayer);
             }
+            bombardEnemyShips(nextPlayer);
         }
         Element setCurrentPlayerElement = Message
                 .createNewRootElement("setCurrentPlayer");
@@ -497,6 +499,137 @@ public final class InGameController extends Controller {
                 if (element != null) {
                     element.appendChild(newUnit.toXMLElement(nextPlayer,
                             element.getOwnerDocument()));
+                }
+            }
+        }
+    }
+
+    private void bombardEnemyShips(ServerPlayer currentPlayer) {
+        logger.finest("Entering method bombardEnemyShips.");
+        Map map = getFreeColServer().getGame().getMap();
+        for (Settlement settlement : currentPlayer.getSettlements()) {
+            Colony colony = (Colony) settlement;
+            logger.finest("Colony is " + colony.getName());
+            Building stockade = colony.getBuilding(Building.STOCKADE);
+            if (stockade.getLevel() > Building.HOUSE &&
+                !colony.isLandLocked()) {
+                logger.finest("Colony has harbour and fort.");
+                int attackPower = 0;
+                Unit attacker = null;
+                Iterator unitIterator = colony.getTile().getUnitIterator();
+                while (unitIterator.hasNext()) {
+                    Unit unit = (Unit) unitIterator.next();
+                    logger.finest("Unit is " + unit.getName());
+                    switch (unit.getType()) {
+                    case Unit.ARTILLERY:
+                        attacker = unit;
+                        attackPower += unit.getOffensePower(unit);
+                        break;
+                    case Unit.DAMAGED_ARTILLERY:
+                        if (attacker == null) {
+                            attacker = unit;
+                        }
+                        attackPower += unit.getOffensePower(unit);
+                    default:
+                    }
+                }
+                if (attackPower <= 0) {
+                    continue;
+                } else if (attackPower > 48) {
+                    attackPower = 48;
+                }
+                logger.finest("Colony has attack power " + attackPower);
+                Position colonyPosition = colony.getTile().getPosition();
+                for (int direction = 0; direction < Map.NUMBER_OF_DIRECTIONS; direction++) {
+                    Tile tile = map.getTile(map.getAdjacent(colonyPosition, direction));
+                    if (!tile.isLand()) {
+                        unitIterator = tile.getUnitIterator();
+                        while (unitIterator.hasNext()) {
+                            Unit unit = (Unit) unitIterator.next();
+                            Player player = unit.getOwner();
+                            if (player != currentPlayer &&
+                                (currentPlayer.getStance(player) == Player.WAR ||
+                                 unit.getType() == Unit.PRIVATEER)) {
+                                logger.finest("Found enemy unit " + unit.getOwner().getNationAsString() +
+                                              " " + unit.getName());
+                                // generate bombardment result
+                                int totalProbability = attackPower + unit.getDefensePower(attacker);
+                                int result;
+                                int r = getPseudoRandom().nextInt(totalProbability+1);
+                                if (r < attackPower) {
+                                    int diff = unit.getDefensePower(attacker)*2-attackPower;
+                                    int r2 = getPseudoRandom().nextInt((diff<3) ? 3 : diff);
+
+                                    if (r2 == 0) {
+                                        result = Unit.ATTACK_GREAT_WIN;
+                                    } else {
+                                        result = Unit.ATTACK_WIN;
+                                    }
+                                } else {
+                                    result = Unit.ATTACK_EVADES;
+                                }
+
+                                // Inform the players (other then the player attacking) about the attack:
+                                int plunderGold = -1;
+                                Iterator enemyPlayerIterator = getFreeColServer().getGame().getPlayerIterator();
+                                while (enemyPlayerIterator.hasNext()) {
+                                    ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
+
+                                    if (//currentPlayer.equals(enemyPlayer) || 
+                                        enemyPlayer.getConnection() == null) {
+                                        continue;
+                                    }
+
+                                    Element opponentAttackElement = Message.createNewRootElement("opponentAttack");
+                                    if (unit.isVisibleTo(enemyPlayer)) {
+                                        opponentAttackElement.setAttribute("direction", Integer.toString(direction));
+                                        opponentAttackElement.setAttribute("result", Integer.toString(result));
+                                        opponentAttackElement.setAttribute("plunderGold", Integer.toString(plunderGold));
+                                        opponentAttackElement.setAttribute("colony", colony.getID());
+                                        opponentAttackElement.setAttribute("building", stockade.getID());
+                                        opponentAttackElement.setAttribute("unit", unit.getID());
+            
+                                        if (!unit.isVisibleTo(enemyPlayer)) {
+                                            opponentAttackElement.setAttribute("update", "unit");
+                                            if (!enemyPlayer.canSee(unit.getTile())) {
+                                                enemyPlayer.setExplored(unit.getTile());
+                                                opponentAttackElement.appendChild(unit.getTile().toXMLElement(enemyPlayer, opponentAttackElement.getOwnerDocument()));
+                                            }
+                                            opponentAttackElement.appendChild(unit.toXMLElement(enemyPlayer, opponentAttackElement.getOwnerDocument()));
+                                        }
+                
+                                        try {
+                                            enemyPlayer.getConnection().send(opponentAttackElement);
+                                        } catch (IOException e) {
+                                            logger.warning("Could not send message to: " +
+                                                           enemyPlayer.getName() + " with connection " +
+                                                           enemyPlayer.getConnection());
+                                        }
+                                    }
+                                }
+
+
+                                // Create the reply for the attacking player:
+                                /*
+                                Element bombardElement = Message.createNewRootElement("bombardResult");
+                                bombardElement.setAttribute("result", Integer.toString(result));
+                                bombardElement.setAttribute("colony", colony.getID());
+
+                                if (!unit.isVisibleTo(player)) {
+                                    bombardElement.appendChild(unit.toXMLElement(player, bombardElement.getOwnerDocument()));
+                                }
+                                colony.bombard(unit, result);
+                                try {
+                                    currentPlayer.getConnection().send(bombardElement);
+                                } catch (IOException e) {
+                                    logger.warning("Could not send message to: " +
+                                                   currentPlayer.getName() + " with connection " +
+                                                   currentPlayer.getConnection());
+                                }
+                                */
+                            }
+                        }
+                    }
                 }
             }
         }
