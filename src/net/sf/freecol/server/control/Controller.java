@@ -10,11 +10,14 @@ import net.sf.freecol.server.networking.Server;
  * model and for communicating with the clients.
  */
 public abstract class Controller extends FreeColServerHolder {
-    private static final Logger logger = Logger.getLogger(Controller.class
-            .getName());
+    private static final Logger logger = Logger.getLogger(Controller.class.getName());
+
     public static final String COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
+
     public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
+
     public static final String REVISION = "$Revision$";
+
 
     /**
      * The constructor to use.
@@ -29,18 +32,11 @@ public abstract class Controller extends FreeColServerHolder {
      * Shut down the server (which sends a message to each client).
      */
     public void shutdown() {
-        FreeColServer fcs = getFreeColServer();
-        if (fcs != null) {
-            Server server = fcs.getServer();
-            if (server != null) {
-                server.shutdown();
-                setFreeColServer(null);
-            } else {
-                logger.warning("Server object is null while trying to shut down server.");
-                setFreeColServer(null);
-            }
+        Server server = getFreeColServer().getServer();
+        if (server != null) {
+            server.shutdown();
         } else {
-            logger.warning("FreeCol server is null while trying to shut down!");            
+            logger.warning("Server object is null while trying to shut down server.");
         }
     }
 }

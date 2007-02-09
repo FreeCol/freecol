@@ -11,7 +11,7 @@ public class FreeColServerHolder {
     public static final String COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String REVISION = "$Revision$";
-    private FreeColServer freeColServer;
+    private final FreeColServer freeColServer;
 
     /**
      * Constructor.
@@ -27,22 +27,8 @@ public class FreeColServerHolder {
      * 
      * @return The main server object.
      */
-    protected synchronized FreeColServer getFreeColServer() {
+    protected FreeColServer getFreeColServer() {
         return freeColServer;
-    }
-
-    /**
-     * Set reference to FreeCol server.
-     * <p>
-     * Note! This is needed as the shutdown method in {@link Controller}
-     * sets the field to null, but it would simplify things a lot if
-     * the field could be immutable. No need to check it for null all
-     * the time. Perhaps this could be changed?
-     * 
-     * @param server The new reference, may be null.
-     */
-    protected synchronized void setFreeColServer(FreeColServer server) {
-        this.freeColServer = server;
     }
 
     /**
