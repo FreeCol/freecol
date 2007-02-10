@@ -1,12 +1,20 @@
 package net.sf.freecol.server.control;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
-import net.sf.freecol.common.networking.*;
+import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
+import net.sf.freecol.server.networking.Server;
 import org.w3c.dom.Element;
 
 /**
@@ -14,13 +22,22 @@ import org.w3c.dom.Element;
  * 
  * @see Controller
  */
-public abstract class InputHandler extends FreeColServerHolder implements
-        MessageHandler {
-    private static Logger logger = Logger.getLogger(InputHandler.class
-            .getName());
+public abstract class InputHandler extends FreeColServerHolder implements MessageHandler {
+    private static Logger logger = Logger.getLogger(InputHandler.class.getName());
+
     public static final String COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
+
     public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
+
     public static final String REVISION = "$Revision$";
+
+    /**
+     * The handler map provides named handlers for network requests. Each
+     * handler deals with a given request type.
+     */
+    private final Map<String, NetworkRequestHandler> _handlerMap = Collections
+            .synchronizedMap(new HashMap<String, NetworkRequestHandler>());
+
 
     /**
      * The constructor to use.
@@ -29,6 +46,25 @@ public abstract class InputHandler extends FreeColServerHolder implements
      */
     public InputHandler(FreeColServer freeColServer) {
         super(freeColServer);
+        // All sub-classes are forced to implement this one
+        register("logout", new NetworkRequestHandler() {
+            public Element handle(Connection connection, Element element) {
+                return logout(connection, element);
+            }
+        });
+        register("disconnect", new DisconnectHandler());
+        register("chat", new ChatHandler());
+        register("getRandomNumbers", new GetRandomNumbersHandler());
+    }
+
+    /**
+     * Register a network request handler.
+     * 
+     * @param name The name.
+     * @param handler The handler.
+     */
+    protected void register(String name, NetworkRequestHandler handler) {
+        _handlerMap.put(name, handler);
     }
 
     /**
@@ -39,7 +75,62 @@ public abstract class InputHandler extends FreeColServerHolder implements
      * @param element The root element of the message.
      * @return The reply.
      */
-    public abstract Element handle(Connection connection, Element element);
+    public final Element handle(Connection connection, Element element) {
+        String tagName = element.getTagName();
+        NetworkRequestHandler handler = _handlerMap.get(tagName);
+        if (handler != null) {
+            try {
+                return handler.handle(connection, element);
+            } catch (Exception e) {
+                // TODO: should we really catch Exception? The old code did.
+                logException(e);
+                sendReconnectSafely(connection);
+            }
+        } else {
+            // Should we return an error here? The old handler returned null.
+            logger.warning("No handler installed for " + tagName);
+        }
+        return null;
+    }
+
+    /**
+     * Send a reconnect message ignoring (but logging) IO errors.
+     * 
+     * @param connection The connection.
+     */
+    private void sendReconnectSafely(Connection connection) {
+        try {
+            connection.send(Message.createNewRootElement("reconnect"));
+        } catch (IOException ex) {
+            logger.warning("Could not send reconnect message!");
+        }
+    }
+
+    /**
+     * Log an exception as a warning.
+     * 
+     * @param e The exception to log.
+     */
+    protected void logException(Exception e) {
+        if (e != null) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            logger.warning(sw.toString());
+        }
+    }
+
+    /**
+     * Create a reply message with an error.
+     * 
+     * @param message The error message.
+     * @return reply element with message.
+     */
+    protected Element createErrorReply(String message) {
+        Element reply = Message.createNewRootElement("error");
+        // TODO: should this be localized (return message name)?
+        reply.setAttribute("message", message);
+        return reply;
+    }
 
     /**
      * Handles a "logout"-message.
@@ -50,66 +141,125 @@ public abstract class InputHandler extends FreeColServerHolder implements
      *            that holds all the information.
      * @return The reply.
      */
-    abstract protected Element logout(Connection connection,
-            Element logoutElement);
+    abstract protected Element logout(Connection connection, Element logoutElement);
+
 
     /**
-     * Handles a "disconnect"-message.
-     * 
-     * @param connection The <code>Connection</code> the message was received
-     *            on.
-     * @param disconnectElement The element (root element in a DOM-parsed XML
-     *            tree) that holds all the information.
-     * @return The reply.
+     * A network request handler knows how to handle in a given request type.
      */
-    protected Element disconnect(Connection connection,
-            Element disconnectElement) {
-        // The player should be logged out by now, but just in case:
-        FreeColServer fcs = getFreeColServer();
-        if (fcs == null) {
-            logger.warning("FreeColServer null!");
-            return null;
-        }
-        ServerPlayer player = fcs.getPlayer(connection);
-        logger.info("Disconnection by: " + connection
-                + ((player != null) ? " (" + player.getName() + ") " : ""));
-        if (player != null && player.isConnected()) {
-            logout(connection, null);
-        }
-        try {
-            connection.reallyClose();
-        } catch (IOException e) {
-            logger.warning("Could not close the connection.");
-        }
-        fcs.getServer().removeConnection(connection);
-        return null;
+    interface NetworkRequestHandler {
+        /**
+         * Handle a request represented by an {@link Element} and return another
+         * {@link Element} or null as the answer.
+         * 
+         * @param connection The message's <code>Connection</code>.
+         * @param element The root element of the message.
+         * @return reply element, may be null.
+         */
+        Element handle(Connection connection, Element element);
     }
 
     /**
-     * Handles a &quot;getRandomNumbers&quot;-message.
-     * 
-     * @param connection The <code>Connection</code> the message was received
-     *            on.
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *            holds all the information.
-     * @return reply.
+     * A network request handler for the current player will automatically
+     * return an error (&quot;not your turn&quot;) if called by a connection
+     * other than that of the currently active player. If no game is active or
+     * if the player is unknown the same error is returned.
      */
-    protected Element getRandomNumbers(Connection conn, Element element) {
-        StringBuffer sb = new StringBuffer();
-        FreeColServer fcs = getFreeColServer();
-        if (fcs != null) {
-            int[] numbers = fcs.getRandomNumbers(Integer.parseInt(element
-                    .getAttribute("n")));
+    abstract class CurrentPlayerNetworkRequestHandler implements NetworkRequestHandler {
+        public final Element handle(Connection conn, Element element) {
+            ServerPlayer player = getFreeColServer().getPlayer(conn);
+            if (isCurrentPlayer(player)) {
+                try {
+                    return handle(player, conn, element);
+                } catch (Exception e) {
+                    logException(e);
+                    sendReconnectSafely(conn);
+                    return null;
+                }
+            } else {
+                logger.warning("Received message out of turn: " + element.getTagName());
+                return createErrorReply("Not your turn.");
+            }
+        }
+
+        /**
+         * Check if a player is the current player.
+         * 
+         * @param player The player.
+         * @return true if a game is active and the player is the current one.
+         */
+        private boolean isCurrentPlayer(Player player) {
+            Game game = getFreeColServer().getGame();
+            if (player != null && game != null) {
+                return player.equals(game.getCurrentPlayer());
+            }
+            return false;
+        }
+
+        /**
+         * Handle a request for the current player.
+         * 
+         * @param player The player.
+         * @param conn The connection.
+         * @param element The element with the request.
+         * @return answer element, may be null.
+         */
+        protected abstract Element handle(Player player, Connection conn, Element element);
+    }
+
+    private class GetRandomNumbersHandler implements NetworkRequestHandler {
+        public Element handle(Connection conn, Element element) {
+            int numRandomNumbers = Integer.parseInt(element.getAttribute("n"));
+            StringBuffer sb = new StringBuffer();
+            int[] numbers = getFreeColServer().getRandomNumbers(numRandomNumbers);
             for (int i = 0; i < numbers.length; i++) {
                 if (i > 0) {
                     sb.append(",");
                 }
                 sb.append(String.valueOf(numbers[i]));
             }
+            Element reply = Message.createNewRootElement("getRandomNumbersConfirmed");
+            reply.setAttribute("result", sb.toString());
+            return reply;
         }
-        Element reply = Message
-                .createNewRootElement("getRandomNumbersConfirmed");
-        reply.setAttribute("result", sb.toString());
-        return reply;
+    }
+
+    private class DisconnectHandler implements NetworkRequestHandler {
+        public Element handle(Connection connection, Element disconnectElement) {
+            // The player should be logged out by now, but just in case:
+            ServerPlayer player = getFreeColServer().getPlayer(connection);
+            logDisconnect(connection, player);
+            if (player != null && player.isConnected()) {
+                logout(connection, null);
+            }
+            try {
+                connection.reallyClose();
+            } catch (IOException e) {
+                logger.warning("Could not close the connection.");
+            }
+            Server server = getFreeColServer().getServer();
+            if (server != null) {
+                server.removeConnection(connection);
+            }
+            return null;
+        }
+
+        private void logDisconnect(Connection connection, ServerPlayer player) {
+            logger.info("Disconnection by: " + connection + ((player != null) ? " (" + player.getName() + ") " : ""));
+        }
+    }
+
+    private class ChatHandler implements NetworkRequestHandler {
+        public Element handle(Connection connection, Element element) {
+            ServerPlayer player = getFreeColServer().getPlayer(connection);
+            if (player != null) {
+                element.setAttribute("sender", player.getID());
+            }
+            Server server = getFreeColServer().getServer();
+            if (server != null) {
+                server.sendToAll(element, connection);
+            }
+            return null;
+        }
     }
 }
