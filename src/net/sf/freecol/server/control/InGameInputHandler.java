@@ -1165,7 +1165,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (unit.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
         }
-        Tile oldTile = unit.getTile();
         Tile newTile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
         if (newTile == null) {
             throw new IllegalArgumentException("Could not find tile in direction " + direction + " from unit with ID "
@@ -1344,7 +1343,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      */
     private Element loadCargo(Connection connection, Element loadCargoElement) {
         Game game = getFreeColServer().getGame();
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
         Unit carrier = (Unit) game.getFreeColGameObject(loadCargoElement.getAttribute("carrier"));
         Goods goods = new Goods(game, (Element) loadCargoElement.getChildNodes().item(0));
         goods.loadOnto(carrier);
@@ -1760,7 +1758,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param payArrearsElement The element containing the request.
      */
     private Element payArrears(Connection connection, Element payArrearsElement) {
-        Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         int goods = new Integer(payArrearsElement.getAttribute("goodsType")).intValue();
         int arrears = player.getArrears(goods);
@@ -1845,7 +1842,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (unit.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
         }
-        Tile oldTile = unit.getTile();
         unit.skip();
         return null;
     }
@@ -1906,7 +1902,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param element The element containing the request.
      */
     private Element declareIndependence(Connection connection, Element element) {
-        Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         player.declareIndependence();
         return null;
@@ -1990,7 +1985,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param element The element containing the request.
      */
     private Element getREFUnits(Connection connection, Element element) {
-        Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         Element reply = Message.createNewRootElement("REFUnits");
         int artillery = 0;
@@ -2317,9 +2311,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     }
 
     private boolean isHumanPlayersLeft() {
-        Iterator playerIterator = getFreeColServer().getGame().getPlayerIterator();
+        Iterator<Player> playerIterator = getFreeColServer().getGame().getPlayerIterator();
         while (playerIterator.hasNext()) {
-            Player p = (Player) playerIterator.next();
+            Player p = playerIterator.next();
             if (!p.isDead() && !p.isAI()) {
                 return true;
             }
@@ -2329,7 +2323,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
 
     private void sendUpdatedTileToAll(Tile newTile, Player player) {
         Game game = getFreeColServer().getGame();
-        Iterator enemyPlayerIterator = game.getPlayerIterator();
+        Iterator<Player> enemyPlayerIterator = game.getPlayerIterator();
         while (enemyPlayerIterator.hasNext()) {
             ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
             if (player != null && player.equals(enemyPlayer) || enemyPlayer.getConnection() == null) {
@@ -2348,6 +2342,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
     }
 
+    /*
+     * Method not used, keep in comments. 
+     *
     private void sendErrorToAll(String message, Player player) {
         Game game = getFreeColServer().getGame();
         Iterator enemyPlayerIterator = game.getPlayerIterator();
@@ -2357,8 +2354,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 continue;
             }
             try {
-                Element errorElement = Message.createNewRootElement("error");
-                errorElement.setAttribute("message", message);
+                Element errorElement = createErrorReply(message);
                 enemyPlayer.getConnection().send(errorElement);
             } catch (IOException e) {
                 logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection "
@@ -2366,4 +2362,5 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             }
         }
     }
+    */
 }
