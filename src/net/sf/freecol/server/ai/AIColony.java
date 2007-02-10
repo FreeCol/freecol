@@ -986,12 +986,14 @@ public class AIColony extends AIObject {
                 break;
             }
             
+            // TODO: colony.getBuilding(...) may potentially return null!
             int hammersNew = (buildable >= Colony.BUILDING_UNIT_ADDITION) 
                     ? Unit.getNextHammers(buildable-Colony.BUILDING_UNIT_ADDITION) 
                     : colony.getBuilding(buildable).getNextHammers();
             int hammersOld = (colony.getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) 
                     ? Unit.getNextHammers(colony.getCurrentlyBuilding()-Colony.BUILDING_UNIT_ADDITION) 
-                    : colony.getBuilding(colony.getCurrentlyBuilding()).getNextHammers();    
+                    : colony.getBuilding(colony.getCurrentlyBuilding()).getNextHammers();
+                    
             boolean isOldValid = (colony.getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) 
                     ? true
                     : colony.getBuilding(colony.getCurrentlyBuilding()).canBuildNext();               
