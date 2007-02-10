@@ -54,13 +54,14 @@ public class ServerModelController implements ModelController {
     * @return The generated number.
     */
     public synchronized int getRandom(String taskID, int n) {
-        String extendedTaskID = taskID + Integer.toString(freeColServer.getGame().getTurn().getNumber());
+        int turnNumber = freeColServer.getGame().getTurn().getNumber();
+        String extendedTaskID = taskID + Integer.toString(turnNumber);
         logger.info("Entering getRandom with taskID " + taskID);
         if (taskRegister.containsKey(extendedTaskID)) {
             return ((Integer) taskRegister.get(extendedTaskID).entry).intValue();
         } else {
             int value = getPseudoRandom().nextInt(n);
-            taskRegister.put(extendedTaskID, new TaskEntry(extendedTaskID, freeColServer.getGame().getTurn().getNumber(), true, new Integer(value)));
+            taskRegister.put(extendedTaskID, new TaskEntry(extendedTaskID, turnNumber, true, new Integer(value)));
             return value;
         }
     }
@@ -84,7 +85,7 @@ public class ServerModelController implements ModelController {
         List<String> idsToRemove = new ArrayList<String>();
         for(TaskEntry te : taskRegister.values()) {
             if (te.hasExpired(currentTurn)) {
-                if (!te.secure) {
+                if (!te.isSecure()) {
                     logger.warning("Possibly a cheating attempt.");
                 }
                 idsToRemove.add(te.taskID);
@@ -368,7 +369,7 @@ public class ServerModelController implements ModelController {
         final String taskID;
         final int createdTurn;
         final Object entry;
-        boolean secure;
+        private boolean secure;
         
         TaskEntry(String taskID, int createdTurn, boolean secure, Object entry) {
             this.taskID = taskID;
