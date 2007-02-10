@@ -579,5 +579,14 @@ public class Connection {
     */
     public Socket getSocket() {
         return socket;
-    }    
+    }
+
+    /**
+     * Override the default and return socket details.
+     * 
+     * @rreturn human-readable description of connection.
+     */
+    public String toString() {
+        return "Connection[" + getSocket() + "]";
+    }
 }
