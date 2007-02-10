@@ -37,8 +37,8 @@ public final class ReportForeignAffairPanel extends ReportPanel implements Actio
      * Prepares this panel to be displayed.
      */
     public void initialize() {
-        Player player = parent.getClient().getMyPlayer();
-        Iterator opponents = parent.getClient().getGame().getEuropeanPlayers().iterator();
+        //Player player = parent.getClient().getMyPlayer();
+        //Iterator opponents = parent.getClient().getGame().getEuropeanPlayers().iterator();
         // Display Panel
         reportPanel.removeAll();
         reportPanel.setLayout(new GridLayout(0, 2));

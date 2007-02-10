@@ -163,7 +163,7 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
         Game game = getFreeColClient().getGame();
 
         Element mgoElement = (Element) element.getElementsByTagName(GameOptions.getXMLElementTagName()).item(0);
-        getFreeColClient().getGame().getGameOptions().readFromXMLElement(mgoElement);
+        game.getGameOptions().readFromXMLElement(mgoElement);
 
         getFreeColClient().getCanvas().getStartGamePanel().updateGameOptions();
 
@@ -177,8 +177,6 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
      *                holds all the information.
      */
     private Element updateMapGeneratorOptions(Element element) {
-        Game game = getFreeColClient().getGame();
-
         Element mgoElement = (Element) element.getElementsByTagName(MapGeneratorOptions.getXMLElementTagName()).item(0);
         getFreeColClient().getPreGameController().getMapGeneratorOptions().readFromXMLElement(mgoElement);
 

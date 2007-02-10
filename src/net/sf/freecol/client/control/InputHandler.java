@@ -13,6 +13,7 @@ import org.w3c.dom.Element;
  * Provides common methods for input handlers.
  */
 public abstract class InputHandler implements MessageHandler {
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(InputHandler.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
