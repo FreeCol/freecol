@@ -19,6 +19,7 @@ import org.w3c.dom.Element;
 * TODO: Deal in amounts of goods.
 */
 public class GoodsWish extends Wish {
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(GoodsWish.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";

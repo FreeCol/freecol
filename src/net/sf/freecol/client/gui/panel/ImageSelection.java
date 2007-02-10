@@ -16,6 +16,7 @@ public final class ImageSelection implements Transferable {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
     
+    @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(ImageSelection.class.getName());
 
     //private static final DataFlavor[] flavors = {DataFlavor.imageFlavor};

@@ -18,6 +18,7 @@ import net.sf.freecol.common.model.Unit;
 * An action for unloading the currently selected unit.
 */
 public class UnloadAction extends MapboardAction {
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(UnloadAction.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";

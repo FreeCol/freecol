@@ -13,6 +13,7 @@ import net.sf.freecol.client.FreeColClient;
 * Super class for all actions that should be disabled when the mapboard is not selected.
 */
 public abstract class MapboardAction extends FreeColAction {
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(MapboardAction.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";

@@ -34,6 +34,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
     public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String REVISION = "$Revision$";
 
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(MiniMap.class.getName());
     public static final int MINIMAP_ZOOMOUT = 13;
     public static final int MINIMAP_ZOOMIN = 14;

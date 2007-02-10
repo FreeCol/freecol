@@ -22,6 +22,7 @@ import net.sf.freecol.common.model.Player;
 * @see MapControls
 */
 public class MapControlsAction extends SelectableAction {
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(MapControlsAction.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";

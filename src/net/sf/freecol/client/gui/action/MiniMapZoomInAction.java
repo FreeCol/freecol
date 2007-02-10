@@ -16,6 +16,7 @@ import net.sf.freecol.client.gui.ImageLibrary;
  * An action for zooming in on the minimap.
  */
 public class MiniMapZoomInAction extends MapboardAction {
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(MiniMapZoomInAction.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";

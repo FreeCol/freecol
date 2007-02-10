@@ -19,6 +19,7 @@ import org.w3c.dom.Element;
 * Objects of this class contains AI-information for a single {@link WorkLocation}.
 */
 public class WorkLocationPlan {
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(WorkLocationPlan.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";

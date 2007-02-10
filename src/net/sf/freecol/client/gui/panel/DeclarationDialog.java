@@ -33,6 +33,7 @@ public final class DeclarationDialog extends FreeColDialog {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
     
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(DeclarationDialog.class.getName());
        
     private final FreeColClient freeColClient;

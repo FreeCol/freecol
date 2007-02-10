@@ -16,6 +16,7 @@ import net.sf.freecol.client.gui.ImageLibrary;
 * An action for skipping the active unit.
 */
 public class SkipUnitAction extends MapboardAction {
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(SkipUnitAction.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";

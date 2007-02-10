@@ -101,17 +101,17 @@ public final class RecruitDialog extends FreeColDialog implements ActionListener
                                               new String[][] {{"%money%", String.valueOf(recruitPrice)}}));
 
             int unitType = player.getEurope().getRecruitable(1);
-            int graphicsType = library.getUnitGraphicsType(unitType, false, false, 0, false);
+            int graphicsType = ImageLibrary.getUnitGraphicsType(unitType, false, false, 0, false);
             person1.setText(Unit.getName(unitType));
             person1.setIcon(library.getScaledUnitImageIcon(graphicsType, 0.66f));
 
             unitType = player.getEurope().getRecruitable(2);
-            graphicsType = library.getUnitGraphicsType(unitType, false, false, 0, false);
+            graphicsType = ImageLibrary.getUnitGraphicsType(unitType, false, false, 0, false);
             person2.setText(Unit.getName(unitType));
             person2.setIcon(library.getScaledUnitImageIcon(graphicsType, 0.66f));
 
             unitType = player.getEurope().getRecruitable(3);
-            graphicsType = library.getUnitGraphicsType(unitType, false, false, 0, false);
+            graphicsType = ImageLibrary.getUnitGraphicsType(unitType, false, false, 0, false);
             person3.setText(Unit.getName(unitType));
             person3.setIcon(library.getScaledUnitImageIcon(graphicsType, 0.66f));
 

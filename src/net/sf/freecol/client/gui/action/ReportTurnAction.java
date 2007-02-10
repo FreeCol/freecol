@@ -14,6 +14,7 @@ import net.sf.freecol.client.gui.panel.ReportTurnPanel;
  * Show turn messages in report panel.
  */
 public class ReportTurnAction extends MapboardAction {
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ReportTurnAction.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";

@@ -276,7 +276,7 @@ public final class Colony extends Settlement implements Location, Nameable {
 
         Iterator<Unit> tileUnitIterator = getTile().getUnitIterator();
         while (tileUnitIterator.hasNext()) {
-            Unit target = (Unit) tileUnitIterator.next();
+            Unit target = tileUnitIterator.next();
             target.setOwner(getOwner());
         }
         

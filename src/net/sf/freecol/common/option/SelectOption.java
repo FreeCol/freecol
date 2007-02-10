@@ -12,6 +12,7 @@ import javax.xml.stream.XMLStreamWriter;
 * Represents an option where the valid choice is an integer.
 */
 public class SelectOption extends AbstractOption {
+    @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(SelectOption.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";

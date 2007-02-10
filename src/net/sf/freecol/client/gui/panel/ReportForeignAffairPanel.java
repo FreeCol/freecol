@@ -64,7 +64,7 @@ public final class ReportForeignAffairPanel extends ReportPanel implements Actio
             enemyPanel.add(new JLabel(Messages.message("report.stance")),
                            higConst.rc(row, labelColumn));
             int stance = Integer.parseInt(enemyElement.getAttribute("stance"));
-            enemyPanel.add(new JLabel(player.getStanceAsString(stance)),
+            enemyPanel.add(new JLabel(Player.getStanceAsString(stance)),
                            higConst.rc(row, valueColumn));
             row++;
             enemyPanel.add(new JLabel(Messages.message("report.numberOfColonies")),

@@ -17,6 +17,7 @@ import org.w3c.dom.Element;
 * Represents the need for a worker within a <code>Colony</code>.
 */
 public class WorkerWish extends Wish {
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(WorkerWish.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";

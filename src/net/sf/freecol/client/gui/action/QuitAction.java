@@ -19,6 +19,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 * An action for chosing the next unit as the active unit.
 */
 public class QuitAction extends MapboardAction {
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(QuitAction.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";

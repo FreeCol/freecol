@@ -13,6 +13,7 @@ import net.sf.freecol.common.option.OptionGroup;
 * Stores the actions.
 */
 public class ActionManager extends OptionGroup {
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ActionManager.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";

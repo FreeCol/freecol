@@ -19,6 +19,7 @@ import org.w3c.dom.Element;
 * tasks easier.
 */
 public class UnitContainer extends FreeColGameObject {
+    @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(Location.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";

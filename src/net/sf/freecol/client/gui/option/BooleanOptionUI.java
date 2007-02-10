@@ -20,6 +20,7 @@ import net.sf.freecol.common.option.Option;
 * enable values to be both seen and changed.
 */
 public final class BooleanOptionUI extends JPanel implements OptionUpdater, PropertyChangeListener {
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(BooleanOptionUI.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";

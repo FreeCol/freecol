@@ -128,7 +128,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
                 } else if (unitTypes[row][column] == Unit.HARDY_PIONEER) {
                     tools = 20;
                 }
-                int imageType = parent.getGUI().getImageLibrary().getUnitGraphicsType(unitTypes[row][column], false, false, tools, false);
+                int imageType = ImageLibrary.getUnitGraphicsType(unitTypes[row][column], false, false, tools, false);
                 reportPanel.add(buildUnitLabel(imageType, 1f),
                                 higConst.rc(2 * row + 1, 4 * column + 1));
                 reportPanel.add(buildUnitReport(unitTypes[row][column]),

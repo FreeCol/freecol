@@ -22,6 +22,7 @@ import net.sf.freecol.common.option.SelectOption;
 * enable values to be both seen and changed.
 */
 public final class SelectOptionUI extends JPanel implements OptionUpdater, PropertyChangeListener {
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(SelectOptionUI.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";

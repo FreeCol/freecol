@@ -55,7 +55,7 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
     public ReportPanel(Canvas parent, String title) {
         super(new FlowLayout(FlowLayout.CENTER, 1000, 10));
         this.parent = parent;
-        this.library = (ImageLibrary) parent.getImageProvider();
+        ReportPanel.library = (ImageLibrary) parent.getImageProvider();
 
         setLayout(new BorderLayout());
         

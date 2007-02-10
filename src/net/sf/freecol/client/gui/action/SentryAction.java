@@ -12,6 +12,7 @@ import net.sf.freecol.common.model.Unit;
 * An action to set sentry state to the active unit.
 */
 public class SentryAction extends MapboardAction {
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(SentryAction.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2006-2007 The FreeCol Team";

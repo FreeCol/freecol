@@ -15,6 +15,7 @@ import net.sf.freecol.client.FreeColClient;
 * An action for chosing the next unit as the active unit.
 */
 public class ExecuteGotoOrdersAction extends MapboardAction {
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ExecuteGotoOrdersAction.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";

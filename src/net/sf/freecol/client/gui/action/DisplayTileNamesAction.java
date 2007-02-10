@@ -17,6 +17,7 @@ import net.sf.freecol.client.FreeColClient;
  * 
  */
 public class DisplayTileNamesAction extends SelectableAction {
+    @SuppressWarnings("unused")
 	private static final Logger logger = Logger.getLogger(DisplayTileNamesAction.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";

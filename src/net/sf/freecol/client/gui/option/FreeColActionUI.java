@@ -31,6 +31,7 @@ import net.sf.freecol.common.option.Option;
 * User interface for displaying/changing a keyboard accelerator for a <code>FreeColAction</code>.
 */
 public final class FreeColActionUI extends JPanel implements OptionUpdater, ActionListener {
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(FreeColActionUI.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";

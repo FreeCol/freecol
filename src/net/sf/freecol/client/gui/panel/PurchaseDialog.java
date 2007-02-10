@@ -79,42 +79,42 @@ public final class PurchaseDialog extends FreeColDialog implements ActionListene
 
         int graphicsType;
 
-        graphicsType = library.getUnitGraphicsType(Unit.ARTILLERY, false, false, 0, false);
+        graphicsType = ImageLibrary.getUnitGraphicsType(Unit.ARTILLERY, false, false, 0, false);
         artilleryButton = new JButton(Unit.getName(Unit.ARTILLERY),
                                       library.getScaledUnitImageIcon(graphicsType, 0.66f));
         artilleryButton.setIconTextGap(margin);
         artilleryButton.addActionListener(this);
         artilleryButton.setActionCommand(String.valueOf(PURCHASE_ARTILLERY));
 
-        graphicsType = library.getUnitGraphicsType(Unit.CARAVEL, false, false, 0, false);
+        graphicsType = ImageLibrary.getUnitGraphicsType(Unit.CARAVEL, false, false, 0, false);
         caravelButton = new JButton(Unit.getName(Unit.CARAVEL),
                                       library.getScaledUnitImageIcon(graphicsType, 0.66f));
         caravelButton.setIconTextGap(margin);
         caravelButton.addActionListener(this);
         caravelButton.setActionCommand(String.valueOf(PURCHASE_CARAVEL));
 
-        graphicsType = library.getUnitGraphicsType(Unit.MERCHANTMAN, false, false, 0, false);
+        graphicsType = ImageLibrary.getUnitGraphicsType(Unit.MERCHANTMAN, false, false, 0, false);
         merchantmanButton = new JButton(Unit.getName(Unit.MERCHANTMAN),
                                       library.getScaledUnitImageIcon(graphicsType, 0.66f));
         merchantmanButton.setIconTextGap(margin);
         merchantmanButton.addActionListener(this);
         merchantmanButton.setActionCommand(String.valueOf(PURCHASE_MERCHANTMAN));
 
-        graphicsType = library.getUnitGraphicsType(Unit.GALLEON, false, false, 0, false);
+        graphicsType = ImageLibrary.getUnitGraphicsType(Unit.GALLEON, false, false, 0, false);
         galleonButton = new JButton(Unit.getName(Unit.GALLEON),
                                       library.getScaledUnitImageIcon(graphicsType, 0.66f));
         galleonButton.setIconTextGap(margin);
         galleonButton.addActionListener(this);
         galleonButton.setActionCommand(String.valueOf(PURCHASE_GALLEON));
 
-        graphicsType = library.getUnitGraphicsType(Unit.PRIVATEER, false, false, 0, false);
+        graphicsType = ImageLibrary.getUnitGraphicsType(Unit.PRIVATEER, false, false, 0, false);
         privateerButton = new JButton(Unit.getName(Unit.PRIVATEER),
                                       library.getScaledUnitImageIcon(graphicsType, 0.66f));
         privateerButton.setIconTextGap(margin);
         privateerButton.addActionListener(this);
         privateerButton.setActionCommand(String.valueOf(PURCHASE_PRIVATEER));
 
-        graphicsType = library.getUnitGraphicsType(Unit.FRIGATE, false, false, 0, false);
+        graphicsType = ImageLibrary.getUnitGraphicsType(Unit.FRIGATE, false, false, 0, false);
         frigateButton = new JButton(Unit.getName(Unit.FRIGATE),
                                       library.getScaledUnitImageIcon(graphicsType, 0.66f));
         frigateButton.setIconTextGap(margin);

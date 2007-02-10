@@ -327,7 +327,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         if (unit == Unit.HARDY_PIONEER) {
             tools = 100;
         }
-        int unitIcon = library.getUnitGraphicsType(unit, false, false, tools, false);
+        int unitIcon = ImageLibrary.getUnitGraphicsType(unit, false, false, tools, false);
         String name = Unit.getName(unit);
         JButton button;
         if (unitIcon >= 0) {
@@ -449,7 +449,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         
         detailPanel.add(new JLabel(Messages.message("colopedia.terrain.resource")),
                         higConst.rc(row, leftColumn));
-        int bonusType = library.getBonusImageType(type, addition, forested);
+        int bonusType = ImageLibrary.getBonusImageType(type, addition, forested);
         if (bonusType >= 0) {
             ImageIcon bonusIcon = library.getBonusImageIcon(bonusType);
             detailPanel.add(new JLabel(bonusIcon), higConst.rc(row, rightColumn));
@@ -686,7 +686,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         JLabel specialist = new JLabel();
         int unitType = Building.getExpertUnitType(building);
         if (unitType >= 0) {
-            int graphicsType = library.getUnitGraphicsType(unitType, false, false, 0, false);
+            int graphicsType = ImageLibrary.getUnitGraphicsType(unitType, false, false, 0, false);
             specialist.setIcon(library.getUnitImageIcon(graphicsType));
             specialist.setText(Unit.getName(unitType));
             specialist.setHorizontalAlignment(SwingConstants.LEFT);

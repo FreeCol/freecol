@@ -16,6 +16,7 @@ import net.sf.freecol.common.model.Player;
  * 
  */
 public class DebugCrossBugAction extends MapboardAction {
+    @SuppressWarnings("unused")
 	private static final Logger logger = Logger.getLogger(DebugCrossBugAction.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";

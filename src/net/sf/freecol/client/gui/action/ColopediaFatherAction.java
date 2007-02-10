@@ -14,6 +14,7 @@ import net.sf.freecol.client.gui.panel.ColopediaPanel;
  * 
  */
 public class ColopediaFatherAction extends MapboardAction {
+    @SuppressWarnings("unused")
 	private static final Logger logger = Logger.getLogger(ColopediaFatherAction.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";

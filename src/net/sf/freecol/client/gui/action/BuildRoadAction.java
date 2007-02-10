@@ -17,6 +17,7 @@ import net.sf.freecol.common.model.Unit;
 * An action for using the active unit to build a road.
 */
 public class BuildRoadAction extends MapboardAction {
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(BuildRoadAction.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";

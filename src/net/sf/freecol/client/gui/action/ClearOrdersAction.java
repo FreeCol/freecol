@@ -15,6 +15,7 @@ import net.sf.freecol.client.FreeColClient;
 * An action for clearing the active unit's orders.
 */
 public class ClearOrdersAction extends MapboardAction {
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ClearOrdersAction.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";

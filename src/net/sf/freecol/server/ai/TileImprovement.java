@@ -21,6 +21,7 @@ import org.w3c.dom.Element;
  * @see Tile
  */
 public class TileImprovement extends AIObject {
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(TileImprovement.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";

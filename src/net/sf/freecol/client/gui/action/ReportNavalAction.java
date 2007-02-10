@@ -14,6 +14,7 @@ import net.sf.freecol.client.gui.panel.ReportNavalPanel;
  * 
  */
 public class ReportNavalAction extends MapboardAction {
+    @SuppressWarnings("unused")
 	private static final Logger logger = Logger.getLogger(ReportNavalAction.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
