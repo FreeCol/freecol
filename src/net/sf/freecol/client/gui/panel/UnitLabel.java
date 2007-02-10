@@ -164,7 +164,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
             setIcon(new ImageIcon(imageIcon.getImage().getScaledInstance((imageIcon.getIconWidth() / 3) * 2, (imageIcon.getIconHeight() / 3) * 2, Image.SCALE_SMOOTH)));
         } else {
             if (unit.getLocation() instanceof ColonyTile) {
-                setPreferredSize(new java.awt.Dimension(parent.getImageProvider().getTerrainImageWidth(0) * 3/4, parent.getImageProvider().getUnitImageHeight(parent.getImageProvider().getUnitGraphicsType(unit))));
+                setPreferredSize(new java.awt.Dimension(parent.getImageProvider().getTerrainImageWidth(0) / 2, parent.getImageProvider().getUnitImageHeight(parent.getImageProvider().getUnitGraphicsType(unit))));
             } else {
                 setPreferredSize(null);
             }
