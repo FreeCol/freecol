@@ -55,7 +55,7 @@ public final class MonarchPanel extends FreeColDialog implements ActionListener 
         this.parent = parent;
 
         header = new JLabel("", SwingConstants.CENTER);
-        header.setFont(((Font) UIManager.get("HeaderFont")).deriveFont(0, 36));
+        header.setFont(mediumHeaderFont);
         header.setText(Messages.message("aMessageFromTheCrown"));
         header.setAlignmentX(Component.CENTER_ALIGNMENT);
 

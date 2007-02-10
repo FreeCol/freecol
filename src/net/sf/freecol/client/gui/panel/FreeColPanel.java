@@ -15,6 +15,7 @@ import javax.swing.ComponentInputMap;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
@@ -33,7 +34,7 @@ import cz.autel.dmi.HIGConstraints;
 public class FreeColPanel extends JPanel {
     private static final Logger logger = Logger.getLogger(FreeColPanel.class.getName());
 
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
@@ -43,6 +44,11 @@ public class FreeColPanel extends JPanel {
 
     // Font to use for text areas
     protected static final Font defaultFont = new Font("Dialog", Font.BOLD, 12);
+
+    // Fonts to use for report headers, etc.
+    protected static final Font smallHeaderFont = ((Font) UIManager.get("HeaderFont")).deriveFont(0, 24);
+    protected static final Font mediumHeaderFont = ((Font) UIManager.get("HeaderFont")).deriveFont(0, 36);
+    protected static final Font bigHeaderFont = ((Font) UIManager.get("HeaderFont")).deriveFont(0, 48);
 
     // How many columns (em-widths) to use in the text area
     protected static final int columns = 20;
@@ -110,6 +116,19 @@ public class FreeColPanel extends JPanel {
         // necessary because of resizing
         textArea.setSize(textArea.getPreferredSize());
         return textArea;
+    }
+
+    /**
+     * Returns the default header for panels.
+     *
+     * @param text a <code>String</code> value
+     * @return a <code>JLabel</code> value
+     */
+    public static JLabel getDefaultHeader(String text) {
+        JLabel header = new JLabel(text, JLabel.CENTER);
+        header.setFont(bigHeaderFont);
+        header.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+        return header;
     }
 
     public void setCancelComponent(AbstractButton c) {

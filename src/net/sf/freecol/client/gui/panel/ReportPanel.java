@@ -59,9 +59,7 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
 
         setLayout(new BorderLayout());
         
-        header = new JLabel(title, JLabel.CENTER);
-        header.setFont(((Font) UIManager.get("HeaderFont")).deriveFont(0, 48));
-        header.setBorder(new EmptyBorder(20, 0, 20, 0));
+        header = getDefaultHeader(title);
         add(header, BorderLayout.NORTH);
 
         reportPanel = new JPanel();

@@ -135,9 +135,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
 
             setLayout(new BorderLayout());
 
-            header = new JLabel("", JLabel.CENTER);
-            header.setFont(((Font) UIManager.get("HeaderFont")).deriveFont(0, 48));
-            header.setBorder(new EmptyBorder(20, 0, 0, 0));
+            header = getDefaultHeader("");
 
             add(header, BorderLayout.NORTH);
 
@@ -174,7 +172,6 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
             description.setEditable(false);
             description.setWrapStyleWord(true);
             description.setFocusable(false);
-            //description.setFont(description.getFont().deriveFont(Font.BOLD+Font.ITALIC));
             p2.add(description, BorderLayout.NORTH);
 
             text = new JTextArea();

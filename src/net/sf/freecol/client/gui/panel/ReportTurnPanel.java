@@ -110,7 +110,7 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
                        message.getType() != type) {
                 type = message.getType();
                 JLabel headline = new JLabel(message.getTypeName());
-                headline.setFont(headline.getFont().deriveFont(Font.BOLD, 16f));
+                headline.setFont(smallHeaderFont);
                 reportPanel.add(headline, higConst.rc(row, textColumn, "l"));
                 row += 2;
             }
@@ -214,7 +214,7 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
             headline = new JLabel(source.toString());
         }
 
-        headline.setFont(headline.getFont().deriveFont(Font.BOLD, 16f));
+        headline.setFont(smallHeaderFont);
         return headline;
     }
 

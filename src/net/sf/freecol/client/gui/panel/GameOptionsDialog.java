@@ -96,9 +96,7 @@ public final class GameOptionsDialog extends FreeColDialog implements ActionList
         removeAll();
 
         // Header:
-        header = new JLabel(freeColClient.getGame().getGameOptions().getName(), JLabel.CENTER);
-        header.setFont(((Font) UIManager.get("HeaderFont")).deriveFont(0, 48));
-        header.setBorder(new EmptyBorder(20, 0, 0, 0));
+        header = getDefaultHeader(freeColClient.getGame().getGameOptions().getName());
         add(header, BorderLayout.NORTH);
 
         // Options:

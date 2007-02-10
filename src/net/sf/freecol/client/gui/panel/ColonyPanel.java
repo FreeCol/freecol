@@ -6,6 +6,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
@@ -1878,11 +1879,19 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                                                    boolean cellHasFocus) {
 
                 Colony colony = (Colony) value;
-                setIcon(new ImageIcon(freeColClient.getGUI().
-                                      createStringImage(this,
-                                                        colony.getName(),
-                                                        colony.getOwner().getColor(),
-                                                        200, 24)));
+                String nameString = colony.getName();
+                FontMetrics nameFontMetrics = getFontMetrics(smallHeaderFont);
+                BufferedImage bi = new BufferedImage(nameFontMetrics.stringWidth(nameString) + 24,
+                                                     nameFontMetrics.getMaxAscent() +
+                                                     nameFontMetrics.getMaxDescent(),
+                                                     BufferedImage.TYPE_INT_ARGB);
+                Graphics2D big = bi.createGraphics();
+
+                //big.setColor(colony.getOwner().getColor());
+                big.setColor(Color.BLACK);
+                big.setFont(smallHeaderFont);
+                big.drawString(nameString, 12, nameFontMetrics.getMaxAscent());
+                setIcon(new ImageIcon(bi));
                 setHorizontalAlignment(SwingConstants.CENTER);
                 return this;
             }

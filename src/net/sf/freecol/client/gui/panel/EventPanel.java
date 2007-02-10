@@ -56,7 +56,7 @@ public final class EventPanel extends FreeColDialog implements ActionListener {
         setLayout(new HIGLayout(w, h));
 
         header = new JLabel("", JLabel.CENTER);
-        header.setFont(((Font) UIManager.get("HeaderFont")).deriveFont(0, 36));
+        header.setFont(mediumHeaderFont);
 
         imageLabel = new JLabel();
 

@@ -1,11 +1,9 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -18,28 +16,22 @@ import java.awt.event.MouseListener;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
-import javax.swing.BorderFactory;
-import javax.swing.Box;
 import javax.swing.ComponentInputMap;
 import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-//import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.border.BevelBorder;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.MessageLabel;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
@@ -48,14 +40,13 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 
 import cz.autel.dmi.HIGConstraints;
-import cz.autel.dmi.HIGLayout;
 
 /**
  * This is a panel for the Europe display. It shows the ships in Europe and
  * allows the user to send them back.
  */
 public final class EuropePanel extends FreeColPanel implements ActionListener {
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 

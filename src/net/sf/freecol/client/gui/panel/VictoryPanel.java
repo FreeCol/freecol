@@ -50,9 +50,7 @@ public final class VictoryPanel extends FreeColPanel implements ActionListener {
         setLayout(new HIGLayout(widths, heights));
         setCancelComponent(ok);
 
-        JLabel victoryLabel = new JLabel(Messages.message("victory.text"));
-        Font font = (Font) UIManager.get("HeaderFont");
-        victoryLabel.setFont(font.deriveFont(0, 48));
+        JLabel victoryLabel = getDefaultHeader(Messages.message("victory.text"));
 
         Image tempImage = (Image) UIManager.get("VictoryImage");
         JLabel imageLabel;

@@ -101,9 +101,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         
         setLayout(new BorderLayout());
         
-        header = new JLabel(Messages.message("menuBar.colopedia"), SwingConstants.CENTER);
-        header.setFont(((Font) UIManager.get("HeaderFont")).deriveFont(0, 48));
-        header.setBorder(new EmptyBorder(20, 0, 0, 0));
+        header = getDefaultHeader(Messages.message("menuBar.colopedia"));
         add(header, BorderLayout.NORTH);
 
         listPanel = new JPanel();
@@ -438,7 +436,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         }
 
         JLabel nameLabel = new JLabel(name, SwingConstants.CENTER);
-        nameLabel.setFont(((Font) UIManager.get("HeaderFont")).deriveFont(0, 24));
+        nameLabel.setFont(smallHeaderFont);
         detailPanel.add(nameLabel, higConst.rcwh(row, leftColumn, widths.length, 1));
         row += 2;
 
@@ -525,7 +523,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
 
         int row = 1;
         JLabel name = new JLabel(Unit.getName(unit), SwingConstants.CENTER);
-        name.setFont(((Font) UIManager.get("HeaderFont")).deriveFont(0, 24));
+        name.setFont(smallHeaderFont);
         name.setPreferredSize(new Dimension(detailPanel.getWidth(), 50));
         detailPanel.add(name, higConst.rcwh(row, labelColumn, widths.length, 1));
         row += 2;
@@ -577,7 +575,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         detailPanel.setLayout(new FlowLayout());
 
         JLabel name = new JLabel(Goods.getName(goods), SwingConstants.CENTER);
-        name.setFont(((Font) UIManager.get("HeaderFont")).deriveFont(0, 24));
+        name.setFont(smallHeaderFont);
         name.setPreferredSize(new Dimension(detailPanel.getWidth(), 50));
         detailPanel.add(name);
 
@@ -641,7 +639,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         */
 
         JLabel name = new JLabel(buildingLevel.name, SwingConstants.CENTER);
-        name.setFont(((Font) UIManager.get("HeaderFont")).deriveFont(0, 24));
+        name.setFont(smallHeaderFont);
         name.setPreferredSize(new Dimension(detailPanel.getWidth(), 50));
         detailPanel.add(name, higConst.rcwh(row, leftColumn, widths.length, 1));
         row += 2;
@@ -748,7 +746,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         detailPanel.setLayout(new FlowLayout());
 
         JLabel name = new JLabel(Messages.message(FoundingFather.getName(foundingFather)), SwingConstants.CENTER);
-        name.setFont(((Font) UIManager.get("HeaderFont")).deriveFont(0, 24));
+        name.setFont(smallHeaderFont);
         name.setPreferredSize(new Dimension(detailPanel.getWidth(), 50));
         detailPanel.add(name);
 

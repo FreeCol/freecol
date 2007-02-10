@@ -82,9 +82,7 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog implements Ac
         final MapGeneratorOptions mgo = freeColClient.getPreGameController().getMapGeneratorOptions();
         
         // Header:
-        header = new JLabel(mgo.getName(), JLabel.CENTER);
-        header.setFont(((Font) UIManager.get("HeaderFont")).deriveFont(0, 48));
-        header.setBorder(new EmptyBorder(20, 0, 0, 0));
+        header = getDefaultHeader(mgo.getName());
         add(header, BorderLayout.NORTH);
 
         // Options:
