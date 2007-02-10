@@ -742,14 +742,26 @@ public class AIPlayer extends AIObject {
                             logger.warning("Couldn't send an AI element!");
                         }
                         
-                        Element changeStateElement = Message.createNewRootElement("changeState");
-                        changeStateElement.setAttribute("unit", u.getID());
-                        changeStateElement.setAttribute("state", Integer.toString(Unit.FORTIFYING));
-                        //u.putOutsideColony();
-                        try {
-                            getConnection().sendAndWait(changeStateElement);
-                        } catch (IOException e) {
-                            logger.warning("Couldn't send an AI element!");
+
+                        // Check if the unit can fortify before sending the order
+                        if(u.checkSetState(Unit.FORTIFYING)) {
+                            Element changeStateElement = Message.createNewRootElement("changeState");
+
+                            changeStateElement.setAttribute("unit", u.getID());
+
+                            changeStateElement.setAttribute("state", Integer.toString(Unit.FORTIFYING));
+
+                            //u.putOutsideColony();
+
+                            try {
+
+                                getConnection().sendAndWait(changeStateElement);
+
+                            } catch (IOException e) {
+
+                                logger.warning("Couldn't send an AI element!");
+
+                            }                            
                         }
                         
                         olddefenders++;
