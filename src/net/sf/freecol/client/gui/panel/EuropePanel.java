@@ -609,7 +609,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
             Iterator goodsIterator = unit.getGoodsIterator();
             while (goodsIterator.hasNext()) {
                 Goods goods = (Goods) goodsIterator.next();
-                if (freeColClient.getMyPlayer().canTrade(goods)) {
+                if (player.canTrade(goods)) {
                     inGameController.sellGoods(goods);
                     updateCargoLabel();
                     updateCargoPanel();
@@ -1049,7 +1049,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
                     //comp.getParent().remove(comp);
                     Goods goods = ((GoodsLabel) comp).getGoods();
                     Player player = freeColClient.getMyPlayer();
-                    if (freeColClient.getMyPlayer().canTrade(goods)) {
+                    if (player.canTrade(goods)) {
                         inGameController.sellGoods(goods);
                         updateCargoLabel();
                     } else {

@@ -708,7 +708,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (unit.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
         }
-        Tile oldTile = unit.getTile();
         Tile newTile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
         if (newTile == null) {
             throw new IllegalArgumentException("Could not find tile in direction " + direction + " from unit with ID "
