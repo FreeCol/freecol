@@ -266,7 +266,14 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
     }
 
-
+    /**
+     * Get the parent canvas, added for inner classes.
+     * @return parent canvas.
+     */
+    private Canvas getParentCanvas() {
+        return this.parent;
+    }
+    
     public void requestFocus() {
         exitButton.requestFocus();
     }
@@ -306,7 +313,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
      *      <code>Colony</code>.
      */
     public void initialize(final Colony colony, Game game, Unit preSelectedUnit) {
-        this.colony = colony;
+        setColony(colony);
         this.game = game;
 
         //
@@ -387,9 +394,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
     public void reinitialize() {
         if (selectedUnit != null) {
-            initialize(colony, game, selectedUnit.getUnit());
+            initialize(getColony(), game, selectedUnit.getUnit());
         } else {
-            initialize(colony, game, null);
+            initialize(getColony(), game, null);
         }
     }
 
@@ -428,20 +435,28 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
     * Updates the SoL membership label.
     */
     private void updateSoLLabel() {
-        solLabel.setText(Messages.message("sonsOfLiberty") + ": " + colony.getSoL() + "% (" + colony.getMembers() +
-                         "), " + Messages.message("tory") + ": " + colony.getTory() + "% (" +
-                         (colony.getUnitCount() - colony.getMembers()) + ")");
+        if(getColony() == null) {
+            // Apparently this can happen
+            return;
+        }
+        solLabel.setText(Messages.message("sonsOfLiberty") + ": " + getColony().getSoL() + "% (" + getColony().getMembers() +
+                         "), " + Messages.message("tory") + ": " + getColony().getTory() + "% (" +
+                         (getColony().getUnitCount() - getColony().getMembers()) + ")");
     }
 
     public void updateNameBox() {
+        if(getColony() == null) {
+            // Apparently this can happen
+            return;
+        }
         nameBox.removeAllItems();
-        List colonies = colony.getOwner().getSettlements();
+        List colonies = getColony().getOwner().getSettlements();
         Collections.sort(colonies, freeColClient.getClientOptions().getColonyComparator());
         Iterator colonyIterator = colonies.iterator();
         while (colonyIterator.hasNext()) {
             nameBox.addItem(colonyIterator.next());
         }
-        nameBox.setSelectedItem(colony);
+        nameBox.setSelectedItem(getColony());
     }
 
 
@@ -463,24 +478,28 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
     * Updates the building progress label.
     */
     private void updateProgressLabel() {
-        if (colony.getCurrentlyBuilding() == Building.NONE) {
+        if(getColony() == null) {
+            // Apparently this can happen
+            return;
+        }
+        if (getColony().getCurrentlyBuilding() == Building.NONE) {
             hammersLabel.update(0, 0, 0, 0);
             toolsLabel.update(0, 0, 0, 0);
         } else {
-            final int hammers = colony.getHammers();
-            final int tools = colony.getGoodsCount(Goods.TOOLS);
-            final int nextHammers = colony.getBuildingForProducing(Goods.HAMMERS).getProductionNextTurn();
-            final int nextTools = colony.getBuildingForProducing(Goods.TOOLS).getProductionNextTurn();
+            final int hammers = getColony().getHammers();
+            final int tools = getColony().getGoodsCount(Goods.TOOLS);
+            final int nextHammers = getColony().getBuildingForProducing(Goods.HAMMERS).getProductionNextTurn();
+            final int nextTools = getColony().getBuildingForProducing(Goods.TOOLS).getProductionNextTurn();
 
             int hammersNeeded = 0;
             int toolsNeeded = 0;
-            if (colony.getCurrentlyBuilding() < Colony.BUILDING_UNIT_ADDITION) {
-                hammersNeeded = colony.getBuilding(colony.getCurrentlyBuilding()).getNextHammers();
-                toolsNeeded = colony.getBuilding(colony.getCurrentlyBuilding()).getNextTools();
+            if (getColony().getCurrentlyBuilding() < Colony.BUILDING_UNIT_ADDITION) {
+                hammersNeeded = getColony().getBuilding(getColony().getCurrentlyBuilding()).getNextHammers();
+                toolsNeeded = getColony().getBuilding(getColony().getCurrentlyBuilding()).getNextTools();
             } else {
-                hammersNeeded = Unit.getNextHammers(colony.getCurrentlyBuilding() - 
+                hammersNeeded = Unit.getNextHammers(getColony().getCurrentlyBuilding() - 
                                                     Colony.BUILDING_UNIT_ADDITION);                
-                toolsNeeded = Unit.getNextTools(colony.getCurrentlyBuilding() -
+                toolsNeeded = Unit.getNextTools(getColony().getCurrentlyBuilding() -
                                                 Colony.BUILDING_UNIT_ADDITION);
             }
             hammersNeeded = Math.max(hammersNeeded, 0);
@@ -489,15 +508,19 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             hammersLabel.update(0, hammersNeeded, hammers, nextHammers);
             toolsLabel.update(0, toolsNeeded, tools, nextTools);
 
-            buyBuilding.setEnabled(colony.getCurrentlyBuilding() >= 0 &&
-                                   colony.getPriceForBuilding() <= freeColClient.getMyPlayer().getGold());
+            buyBuilding.setEnabled(getColony().getCurrentlyBuilding() >= 0 &&
+                                   getColony().getPriceForBuilding() <= freeColClient.getMyPlayer().getGold());
         }
     }
 
 
     private void updateOutsideColonyPanel() {
+        if(getColony() == null) {
+            // Apparently this can happen
+            return;
+        }
         outsideColonyPanel.removeAll();
-        Tile tile = colony.getTile();
+        Tile tile = getColony().getTile();
         Iterator tileUnitIterator = tile.getUnitIterator();
         while (tileUnitIterator.hasNext()) {
             Unit unit = (Unit) tileUnitIterator.next();
@@ -542,7 +565,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         try {
             switch (Integer.valueOf(command).intValue()) {
                 case BUY_BUILDING:
-                    freeColClient.getInGameController().payForBuilding(colony);
+                    freeColClient.getInGameController().payForBuilding(getColony());
                     reinitialize();                    
                     freeColClient.getCanvas().updateGoldLabel();
                     requestFocus();
@@ -554,7 +577,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                     unload();
                     break;
                 case RENAME:
-                    freeColClient.getInGameController().rename(colony);
+                    freeColClient.getInGameController().rename(getColony());
                     updateNameBox();
                     break;
                 default:
@@ -741,8 +764,17 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
     * Returns a pointer to the <code>Colony</code>-pointer in use.
     * @return The <code>Colony</code>.
     */
-    public final Colony getColony() {
+    public synchronized final Colony getColony() {
         return colony;
+    }
+    
+    /**
+     * Set the current colony.
+     * 
+     * @param colony The new colony value.
+     */
+    private synchronized void setColony(Colony colony) {
+        this.colony = colony;
     }
 
     /**
@@ -784,7 +816,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
             ASingleBuildingPanel aSingleBuildingPanel;
 
-            Iterator buildingIterator = colony.getBuildingIterator();
+            Iterator buildingIterator = getColony().getBuildingIterator();
             while (buildingIterator.hasNext()) {
                 Building building = (Building) buildingIterator.next();
                 if (building.isBuilt()) {
@@ -939,21 +971,33 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
     /**
     * This panel holds the information of the current food, liberty bell and cross production.
     */
-    public final class ProductionPanel extends JPanel {
+    public static final class ProductionPanel extends JPanel {
         private final ColonyPanel colonyPanel;
 
         public ProductionPanel(ColonyPanel colonyPanel) {
             this.colonyPanel = colonyPanel;
         }
+        
+        private Colony getColony() {
+            return colonyPanel.getColony();
+        }
+        
+        private Canvas getCanvas() {
+            return colonyPanel.getParentCanvas();
+        }
 
         public void paintComponent(Graphics g) {
-            int need = colony.getFoodConsumption();
-            int surplus = colony.getFoodProduction() - need;
-            final int horses = colony.getHorseProduction();
-            final int bells = colony.getProductionOf(Goods.BELLS);
-            final int crosses = colony.getProductionOf(Goods.CROSSES);
+            if(getColony() == null) {
+                // Apparently this can happen
+                return;
+            }            
+            int need = getColony().getFoodConsumption();
+            int surplus = getColony().getFoodProduction() - need;
+            final int horses = getColony().getHorseProduction();
+            final int bells = getColony().getProductionOf(Goods.BELLS);
+            final int crosses = getColony().getProductionOf(Goods.CROSSES);
 
-            ImageIcon goodsIcon = parent.getImageProvider().getGoodsImageIcon(Goods.FOOD);
+            ImageIcon goodsIcon = getCanvas().getImageProvider().getGoodsImageIcon(Goods.FOOD);
             BufferedImage productionImage;
             int nextX = 0;
             int add;
@@ -962,12 +1006,12 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             if (need != 0) {
                 nextX = (need > 12) ? goodsIcon.getIconWidth() : Math.min(need, 4) * goodsIcon.getIconWidth();
                 if (horses == 0) {
-                    productionImage = parent.getGUI().createProductionImage(goodsIcon, need, nextX, getHeight(), 12);
+                    productionImage = getCanvas().getGUI().createProductionImage(goodsIcon, need, nextX, getHeight(), 12);
                 } else {
                     need += horses;
                     surplus -= horses;
                     nextX = goodsIcon.getIconWidth();
-                    productionImage = parent.getGUI().createProductionImage(goodsIcon, need, nextX, getHeight(), 1);
+                    productionImage = getCanvas().getGUI().createProductionImage(goodsIcon, need, nextX, getHeight(), 1);
                 }
                 g.drawImage(productionImage, 0, 0, null);
                 nextX += goodsIcon.getIconWidth()/4;
@@ -976,10 +1020,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             // Food surplus:
             if (surplus != 0) {
                 if (surplus > 6 || surplus < 0 || surplus == 1) {
-                    productionImage = parent.getGUI().createProductionImage(goodsIcon, surplus, goodsIcon.getIconWidth(), getHeight(), 6, true);
+                    productionImage = getCanvas().getGUI().createProductionImage(goodsIcon, surplus, goodsIcon.getIconWidth(), getHeight(), 6, true);
                     add = goodsIcon.getIconWidth();
                 } else {
-                    productionImage = parent.getGUI().createProductionImage(goodsIcon, surplus, goodsIcon.getIconWidth() * 2, getHeight(), 6, true);
+                    productionImage = getCanvas().getGUI().createProductionImage(goodsIcon, surplus, goodsIcon.getIconWidth() * 2, getHeight(), 6, true);
                     add = goodsIcon.getIconWidth() * 3;
                 }
                 
@@ -987,7 +1031,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 nextX += productionImage.getWidth()/4 + add;
             } else {
                 // Show it even if zero surplus
-                productionImage = parent.getGUI().createProductionImage(goodsIcon, surplus, goodsIcon.getIconWidth(), getHeight(), -1, 1, -1, true);
+                productionImage = getCanvas().getGUI().createProductionImage(goodsIcon, surplus, goodsIcon.getIconWidth(), getHeight(), -1, 1, -1, true);
                 add = goodsIcon.getIconWidth();
                 g.drawImage(productionImage, nextX, 0, null);
                 nextX += productionImage.getWidth()/4 + add;
@@ -995,12 +1039,12 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             
             // Horses:
             if (horses != 0) {
-                goodsIcon = parent.getImageProvider().getGoodsImageIcon(Goods.HORSES);
+                goodsIcon = getCanvas().getImageProvider().getGoodsImageIcon(Goods.HORSES);
                 if (horses > 2 || horses == 1) {
-                    productionImage = parent.getGUI().createProductionImage(goodsIcon, horses, goodsIcon.getIconWidth(), getHeight(), 2);
+                    productionImage = getCanvas().getGUI().createProductionImage(goodsIcon, horses, goodsIcon.getIconWidth(), getHeight(), 2);
                     add = goodsIcon.getIconWidth();
                 } else {
-                    productionImage = parent.getGUI().createProductionImage(goodsIcon, horses, goodsIcon.getIconWidth() * 2, getHeight(), 2);
+                    productionImage = getCanvas().getGUI().createProductionImage(goodsIcon, horses, goodsIcon.getIconWidth() * 2, getHeight(), 2);
                     add = goodsIcon.getIconWidth()*2;
                 }
                 g.drawImage(productionImage, nextX, 0, null);
@@ -1009,12 +1053,12 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
             // Liberty bells:
             if (bells != 0) {
-                goodsIcon = parent.getImageProvider().getGoodsImageIcon(Goods.BELLS);
+                goodsIcon = getCanvas().getImageProvider().getGoodsImageIcon(Goods.BELLS);
                 if (bells > 6 || bells == 1) {
-                    productionImage = parent.getGUI().createProductionImage(goodsIcon, bells, goodsIcon.getIconWidth(), getHeight(), 6);
+                    productionImage = getCanvas().getGUI().createProductionImage(goodsIcon, bells, goodsIcon.getIconWidth(), getHeight(), 6);
                     add = goodsIcon.getIconWidth();
                 } else {
-                    productionImage = parent.getGUI().createProductionImage(goodsIcon, bells, goodsIcon.getIconWidth() * 2, getHeight(), 6);
+                    productionImage = getCanvas().getGUI().createProductionImage(goodsIcon, bells, goodsIcon.getIconWidth() * 2, getHeight(), 6);
                     add = goodsIcon.getIconWidth()*2;
                 }
                 g.drawImage(productionImage, nextX, 0, null);
@@ -1023,12 +1067,12 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             
             // Crosses:
             if (crosses != 0) {
-                goodsIcon = parent.getImageProvider().getGoodsImageIcon(Goods.CROSSES);
+                goodsIcon = getCanvas().getImageProvider().getGoodsImageIcon(Goods.CROSSES);
                 if (crosses > 6 || crosses == 1) {
-                    productionImage = parent.getGUI().createProductionImage(goodsIcon, crosses, goodsIcon.getIconWidth(), getHeight(), 6);
+                    productionImage = getCanvas().getGUI().createProductionImage(goodsIcon, crosses, goodsIcon.getIconWidth(), getHeight(), 6);
                     add = goodsIcon.getIconWidth();
                 } else {
-                    productionImage = parent.getGUI().createProductionImage(goodsIcon, crosses, goodsIcon.getIconWidth() * 2, getHeight(), 6);
+                    productionImage = getCanvas().getGUI().createProductionImage(goodsIcon, crosses, goodsIcon.getIconWidth() * 2, getHeight(), 6);
                     add = goodsIcon.getIconWidth()*2;
                 }
                 g.drawImage(productionImage, nextX, 0, null);
@@ -1202,7 +1246,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
         public void initialize() {
             warehousePanel.removeAll();
-            Iterator goodsIterator = colony.getGoodsContainer().getFullGoodsIterator();
+            Iterator goodsIterator = getColony().getGoodsContainer().getFullGoodsIterator();
             while (goodsIterator.hasNext()) {
                 Goods goods = (Goods) goodsIterator.next();
 
@@ -1386,7 +1430,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
             for (int x=0; x<3; x++) {
                 for (int y=0; y<3; y++) {
-                    ASingleTilePanel p = new ASingleTilePanel(colony.getColonyTile(x, y), x, y);
+                    ASingleTilePanel p = new ASingleTilePanel(getColony().getColonyTile(x, y), x, y);
                     add(p, new Integer(layer));
                     layer++;
                 }
@@ -1400,12 +1444,14 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
             g.setColor(Color.black);
             g.fillRect(0, 0, getWidth(), getHeight());
-
-            for (int x=0; x<3; x++) {
-                for (int y=0; y<3; y++) {
-                    gui.displayColonyTile((Graphics2D) g, game.getMap(), colony.getTile(x, y), ((2-x)+y)*lib.getTerrainImageWidth(1)/2, (x+y)*lib.getTerrainImageHeight(1)/2, colony);
-                    
-                }
+            
+            if(getColony() != null) {
+                for (int x=0; x<3; x++) {
+                    for (int y=0; y<3; y++) {
+                        gui.displayColonyTile((Graphics2D) g, game.getMap(), getColony().getTile(x, y), ((2-x)+y)*lib.getTerrainImageWidth(1)/2, (x+y)*lib.getTerrainImageHeight(1)/2, getColony());
+                        
+                    }
+                }                
             }
         }
 
@@ -1529,7 +1575,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 if (editState) {
                     if (comp instanceof UnitLabel) {
                         Unit unit = ((UnitLabel)comp).getUnit();
-                        if (colonyTile.getWorkTile().getOwner() != null && colonyTile.getWorkTile().getOwner() != colony) {
+                        if (colonyTile.getWorkTile().getOwner() != null && colonyTile.getWorkTile().getOwner() != getColony()) {
                             if (colonyTile.getWorkTile().getOwner().getOwner().isEuropean()) {
                                 parent.errorMessage("tileTakenEuro");
                             } else {  // its an indian setttlement
@@ -1691,13 +1737,13 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             for (int i = 0; i < Building.NUMBER_OF_TYPES; i++) {
                 if (colonyPanel.getColony().getBuilding(i).canBuildNext()) {
                     String theText = new String(
-                        colony.getBuilding(i).getNextName() +
+                        getColony().getBuilding(i).getNextName() +
                         " (" +
                         Integer.toString(colonyPanel.getColony().getBuilding(i).getNextHammers()) +
                         " " + Messages.message("model.goods.Hammers").toLowerCase() );
 
                     if (colonyPanel.getColony().getBuilding(i).getNextTools() > 0) {
-                        theText += ", " + Integer.toString(colony.getBuilding(i).getNextTools()) + " "
+                        theText += ", " + Integer.toString(getColony().getBuilding(i).getNextTools()) + " "
                         + Messages.message("model.goods.Tools").toLowerCase();
                     }
 
