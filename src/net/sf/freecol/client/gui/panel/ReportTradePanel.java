@@ -139,12 +139,19 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
                 colonyButton.setForeground(Color.BLUE);
             }
             reportPanel.add(colonyButton, higConst.rc(row, labelColumn));
+            int adjustment = colony.getWarehouseCapacity() / 100;
+            int[] lowLevel = colony.getLowLevel();
+            int[] highLevel = colony.getHighLevel();
+        
             for (int goodsType = 0; goodsType < Goods.NUMBER_OF_TYPES; goodsType++) {
                 int column = columnsPerLabel * (goodsType + 1) + extraColumns;
                 int amount = colony.getGoodsCount(goodsType);
                 JLabel goodsLabel = new JLabel(String.valueOf(amount),
                                                JLabel.TRAILING);
-                if (amount > 200) {
+                if (amount < lowLevel[goodsType] * adjustment ||
+                    amount > highLevel[goodsType] * adjustment) {
+                    goodsLabel.setForeground(Color.RED);
+                } else if (amount > 200) {
                     goodsLabel.setForeground(Color.BLUE);
                 } else if (amount > 100) {
                     goodsLabel.setForeground(Color.GREEN);
