@@ -336,14 +336,17 @@ public class GoodsContainer extends FreeColGameObject {
      * Note: The levels should be in descending order.
      *
      * @param limit The capacity of this <code>GoodsContainer</code>.
-     * @param low The lowest level not to warn about.
-     * @param high The highest level not to warn about.
+     * @param lowLevel The lowest levels not to warn about.
+     * @param highLevel The highest levels not to warn about.
      */
-    public void cleanAndReport(int limit, int low, int high) {
+    public void cleanAndReport(int limit, int[] lowLevel, int[] highLevel) {
 
         FreeColGameObject source = (FreeColGameObject) parent;
+        int adjustment = limit / 100;
         
         for (int typeOfGoods = 0; typeOfGoods < Goods.NUMBER_OF_TYPES; typeOfGoods++) {
+            int low = lowLevel[typeOfGoods] * adjustment;
+            int high = highLevel[typeOfGoods] * adjustment;
             if (typeOfGoods == Goods.FOOD) {
                 // ignore food
                 continue;

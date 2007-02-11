@@ -25,7 +25,7 @@ public final class Colony extends Settlement implements Location, Nameable {
 
     private static final Logger logger = Logger.getLogger(Colony.class.getName());
 
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
@@ -38,8 +38,6 @@ public final class Colony extends Settlement implements Location, Nameable {
     /** Places a unit may work. Either a <code>Building</code> or a <code>ColonyTile</code>. */
     private ArrayList<WorkLocation> workLocations = new ArrayList<WorkLocation>();
 
-    private boolean[] exports;
-    
     private int hammers;
     private int bells;
 
@@ -77,6 +75,26 @@ public final class Colony extends Settlement implements Location, Nameable {
     // Temporary variable:
     private int lastVisited = -1;
 
+    /**
+     * High levels for warehouse warnings.
+     */
+    private int[] highLevel = new int[Goods.NUMBER_OF_TYPES];
+
+    /**
+     * Low levels for warehouse warnings.
+     */
+    private int[] lowLevel = new int[Goods.NUMBER_OF_TYPES];
+
+    /**
+     * Export levels for custom house.
+     */
+    private int[] exportLevel = new int[Goods.NUMBER_OF_TYPES];
+
+    /**
+     * Export settings for custom house.
+     */
+    private boolean[] exports = new boolean[Goods.NUMBER_OF_TYPES];
+    
 
     /**
     * Creates a new <code>Colony</code>.
@@ -112,11 +130,8 @@ public final class Colony extends Settlement implements Location, Nameable {
         owner.invalidateCanSeeTiles();
         
         goodsContainer = new GoodsContainer(game, this);
-        exports = new boolean[Goods.NUMBER_OF_TYPES];
-        for (int i = 0; i < exports.length; i++) {
-            exports[i] = false;
-        }
-        
+        initializeWarehouseSettings();
+
         this.name = name;
         
         hammers = 0;
@@ -153,25 +168,6 @@ public final class Colony extends Settlement implements Location, Nameable {
                     workLocations.add(new Building(game, this, type, Building.HOUSE));
                 }
             }
-            // place building with workplaces at the beginning
-            /*
-            workLocations.add(new Building(game, this, Building.TOWN_HALL, Building.HOUSE));
-            workLocations.add(new Building(game, this, Building.CARPENTER, Building.HOUSE));
-            workLocations.add(new Building(game, this, Building.BLACKSMITH, Building.HOUSE));
-            workLocations.add(new Building(game, this, Building.TOBACCONIST, Building.HOUSE));
-            workLocations.add(new Building(game, this, Building.WEAVER, Building.HOUSE));
-            workLocations.add(new Building(game, this, Building.DISTILLER, Building.HOUSE));
-            workLocations.add(new Building(game, this, Building.FUR_TRADER, Building.HOUSE));
-            workLocations.add(new Building(game, this, Building.ARMORY, Building.NOT_BUILT));
-            workLocations.add(new Building(game, this, Building.SCHOOLHOUSE, Building.NOT_BUILT));
-            workLocations.add(new Building(game, this, Building.CHURCH, Building.NOT_BUILT));
-            workLocations.add(new Building(game, this, Building.DOCK, Building.NOT_BUILT));
-            workLocations.add(new Building(game, this, Building.WAREHOUSE, Building.NOT_BUILT));
-            workLocations.add(new Building(game, this, Building.STOCKADE, Building.NOT_BUILT));
-            workLocations.add(new Building(game, this, Building.STABLES, Building.NOT_BUILT));
-            workLocations.add(new Building(game, this, Building.PRINTING_PRESS, Building.NOT_BUILT));
-            workLocations.add(new Building(game, this, Building.CUSTOM_HOUSE, Building.NOT_BUILT));
-            */
         }
         
         if(landLocked)
@@ -180,20 +176,6 @@ public final class Colony extends Settlement implements Location, Nameable {
             currentlyBuilding = Building.DOCK;
     }
 
-
-    public void updatePopulation() {
-        if (getUnitCount() >= 3 && getOwner().hasFather(FoundingFather.LA_SALLE)) {
-            if (!getBuilding(Building.STOCKADE).isBuilt()) {
-                getBuilding(Building.STOCKADE).setLevel(Building.HOUSE);
-            }
-        }
-        getTile().updatePlayerExploredTiles();
-        
-        if (getUnitCount() > 0) {
-            updateSoL();
-        }
-    }
-    
 
     /**
     * Initiates a new <code>Colony</code> from an 
@@ -238,6 +220,89 @@ public final class Colony extends Settlement implements Location, Nameable {
      }
      
     /**
+     * Initializes warehouse/export settings.
+     */
+    private void initializeWarehouseSettings() {
+        for (int goodsType = 0; goodsType < Goods.NUMBER_OF_TYPES; goodsType++) {
+            exports[goodsType] = false;
+            lowLevel[goodsType] = 10;
+            highLevel[goodsType] = 90;
+            exportLevel[goodsType] = 50;
+        }
+    }
+
+    /**
+     * Updates SoL and builds stockade if possible.
+     *
+     */
+    public void updatePopulation() {
+        if (getUnitCount() >= 3 && getOwner().hasFather(FoundingFather.LA_SALLE)) {
+            if (!getBuilding(Building.STOCKADE).isBuilt()) {
+                getBuilding(Building.STOCKADE).setLevel(Building.HOUSE);
+            }
+        }
+        getTile().updatePlayerExploredTiles();
+        
+        if (getUnitCount() > 0) {
+            updateSoL();
+        }
+    }
+
+    /**
+     * Get the <code>HighLevel</code> value.
+     *
+     * @return an <code>int[]</code> value
+     */
+    public int[] getHighLevel() {
+        return highLevel;
+    }
+
+    /**
+     * Set the <code>HighLevel</code> value.
+     *
+     * @param newHighLevel The new HighLevel value.
+     */
+    public void setHighLevel(final int[] newHighLevel) {
+        this.highLevel = newHighLevel;
+    }
+
+    /**
+     * Get the <code>LowLevel</code> value.
+     *
+     * @return an <code>int[]</code> value
+     */
+    public int[] getLowLevel() {
+        return lowLevel;
+    }
+
+    /**
+     * Set the <code>LowLevel</code> value.
+     *
+     * @param newLowLevel The new LowLevel value.
+     */
+    public void setLowLevel(final int[] newLowLevel) {
+        this.lowLevel = newLowLevel;
+    }
+
+    /**
+     * Get the <code>ExportLevel</code> value.
+     *
+     * @return an <code>int[]</code> value
+     */
+    public int[] getExportLevel() {
+        return exportLevel;
+    }
+
+    /**
+     * Set the <code>ExportLevel</code> value.
+     *
+     * @param newExportLevel The new ExportLevel value.
+     */
+    public void setExportLevel(final int[] newExportLevel) {
+        this.exportLevel = newExportLevel;
+    }
+
+    /**
      * Returns whether this colony is landlocked, or has access to the
      * ocean.
      * 
@@ -249,6 +314,11 @@ public final class Colony extends Settlement implements Location, Nameable {
         return landLocked;
     }
     
+    /**
+     * Returns whether this colony has undead units.
+     *
+     * @return whether this colony has undead units.
+     */
     public boolean isUndead() {
         final Iterator unitIterator = getUnitIterator();
         return unitIterator.hasNext() && ((Unit) unitIterator.next()).isUndead();
@@ -713,26 +783,23 @@ public final class Colony extends Settlement implements Location, Nameable {
     }
 
     /**
-     * Toggles the custom house's export settings for this type of
-     * goods.
+     * Sets whether the custom house should export these goods.
      *
-     * @param type The type of goods.
+     * @param type the type of goods.
+     * @param value a <code>boolean</code> value
      */
-    public void toggleExports(int type) {
-        if (exports[type]) {
-            exports[type] = false;
-        } else {
-            exports[type] = true;
-        }
+    public void setExports(int type, boolean value) {
+        exports[type] = value;
     }
 
     /**
-     * Toggles the custom house's export settings for these goods.
+     * Sets whether the custom house should export these goods.
      *
-     * @param goods The goods.
+     * @param goods the goods.
+     * @param value a <code>boolean</code> value
      */
-    public void toggleExports(Goods goods) {
-        toggleExports(goods.getType());
+    public void setExports(Goods goods, boolean value) {
+        setExports(goods.getType(), value);
     }
     
     public boolean contains(Locatable locatable) {
@@ -1459,7 +1526,7 @@ public final class Colony extends Settlement implements Location, Nameable {
                 Goods goods = (Goods) goodsIterator.next();
                 if (getExports(goods) && (owner.canTrade(goods, Market.CUSTOM_HOUSE))) {
                     int type = goods.getType();
-                    int amount = (goods.getAmount() - getGameOptions().getInteger(GameOptions.CUSTOM_STOCK));
+                    int amount = goods.getAmount() - getExportLevel()[type];
                     if (amount > 0) {
                         removeGoods(type, amount);
                         getGame().getMarket().sell(type, amount, owner, Market.CUSTOM_HOUSE);
@@ -1469,9 +1536,7 @@ public final class Colony extends Settlement implements Location, Nameable {
         }                
         
         // Throw away goods there is no room for.
-        goodsContainer.cleanAndReport(getWarehouseCapacity(), 
-                                      getWarehouseCapacity() / 10,
-                                      getWarehouseCapacity() * 9 / 10);
+        goodsContainer.cleanAndReport(getWarehouseCapacity(), getLowLevel(), getHighLevel());
         
         // Remove bells:
         bells -= Math.max(0, getUnitCount() - 2);
@@ -1641,6 +1706,10 @@ public final class Colony extends Settlement implements Location, Nameable {
             }
             out.writeAttribute("exports", new String(exportsCharArray));
 
+            toArrayElement("lowLevel", lowLevel, out);
+            toArrayElement("highLevel", highLevel, out);
+            toArrayElement("exportLevel", exportLevel, out);
+
             Iterator workLocationIterator = workLocations.iterator();
             while (workLocationIterator.hasNext()) {
                 ((FreeColGameObject) workLocationIterator.next()).toXML(out, player, showAll, toSavedGame);
@@ -1661,6 +1730,8 @@ public final class Colony extends Settlement implements Location, Nameable {
      * @param in The input stream with the XML.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        initializeWarehouseSettings();
+
         setID(in.getAttributeValue(null, "ID"));
 
         name = in.getAttributeValue(null, "name");
@@ -1747,7 +1818,7 @@ public final class Colony extends Settlement implements Location, Nameable {
 
         final String exportString = in.getAttributeValue(null, "exports");
         if (exportString != null) {
-            exports = new boolean[Goods.NUMBER_OF_TYPES];
+            //exports = new boolean[Goods.NUMBER_OF_TYPES];
             for(int i = 0; i < exportString.length(); i++) {
                 exports[i] = ( (exportString.charAt(i) == '1') ? true : false );
             }
@@ -1779,7 +1850,13 @@ public final class Colony extends Settlement implements Location, Nameable {
                 } else {
                     goodsContainer = new GoodsContainer(getGame(), this, in);
                 }
-            } 
+            } else if (in.getLocalName().equals("lowLevel")) {
+                lowLevel = readFromArrayElement("lowLevel", in, new int[0]);
+            } else if (in.getLocalName().equals("highLevel")) {
+                highLevel = readFromArrayElement("highLevel", in, new int[0]);
+            } else if (in.getLocalName().equals("exportLevel")) {
+                exportLevel = readFromArrayElement("exportLevel", in, new int[0]);
+            }
         }
     }
 

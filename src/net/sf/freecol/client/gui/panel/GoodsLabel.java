@@ -77,6 +77,15 @@ public final class GoodsLabel extends JLabel implements ActionListener {
 
 
     /**
+     * Returns the parent Canvas object.
+     * @return This UnitLabel's Canvas.
+     */
+    public Canvas getCanvas() {
+        return parent;
+    }
+
+
+    /**
     * Returns this GoodsLabel's goods data.
     * @return This GoodsLabel's goods data.
     */

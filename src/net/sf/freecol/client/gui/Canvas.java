@@ -67,6 +67,7 @@ import net.sf.freecol.client.gui.panel.StatusPanel;
 import net.sf.freecol.client.gui.panel.TilePanel;
 import net.sf.freecol.client.gui.panel.TrainDialog;
 import net.sf.freecol.client.gui.panel.VictoryPanel;
+import net.sf.freecol.client.gui.panel.WarehouseDialog;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -159,6 +160,7 @@ public final class Canvas extends JLayeredPane {
                                 TILE_LAYER = new Integer(DEFAULT_LAYER.intValue() + 1),
                                 INDIAN_SETTLEMENT_LAYER = DEFAULT_LAYER,
                                 COLONY_LAYER = new Integer(DEFAULT_LAYER.intValue() + 3),
+                                WAREHOUSE_LAYER = new Integer(DEFAULT_LAYER.intValue() + 4),
                                 EUROPE_LAYER = new Integer(DEFAULT_LAYER.intValue() + 3),
                                 EVENT_LAYER = new Integer(DEFAULT_LAYER.intValue() + 1),
                                 CHOOSE_FOUNDING_FATHER = new Integer(DEFAULT_LAYER.intValue() + 1);                                
@@ -183,6 +185,7 @@ public final class Canvas extends JLayeredPane {
     private final GUI               gui;
     private final ChatDisplayThread chatDisplayThread;
     private final VictoryPanel      victoryPanel;
+    private final WarehouseDialog    warehouseDialog;
     private final ChooseFoundingFatherDialog chooseFoundingFatherDialog;
     private final EventPanel        eventPanel;
     private final EmigrationPanel   emigrationPanel;
@@ -245,6 +248,7 @@ public final class Canvas extends JLayeredPane {
 
         chatPanel = new ChatPanel(this, freeColClient);
         victoryPanel = new VictoryPanel(this, freeColClient);
+        warehouseDialog = new WarehouseDialog(this);
         chooseFoundingFatherDialog = new ChooseFoundingFatherDialog(this);
         eventPanel = new EventPanel(this, freeColClient);
         emigrationPanel = new EmigrationPanel();
@@ -408,6 +412,19 @@ public final class Canvas extends JLayeredPane {
         setEnabled(false);
         addCentered(victoryPanel);
         victoryPanel.requestFocus();
+    }
+
+    
+    /**
+    * Displays the <code>WarehouseDialog</code>.
+    * @see WarehouseDialog
+    */
+    public void showWarehouseDialog(Colony colony) {
+        //closeMenus();
+        setEnabled(false);
+        warehouseDialog.initialize(colony);
+        addCentered(warehouseDialog, WAREHOUSE_LAYER);
+        warehouseDialog.requestFocus();
     }
 
     

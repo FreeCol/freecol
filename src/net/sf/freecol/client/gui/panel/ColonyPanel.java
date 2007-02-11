@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.swing.BorderFactory;
 import javax.swing.ComponentInputMap;
 import javax.swing.ImageIcon;
 import javax.swing.InputMap;
@@ -103,7 +104,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
     private final FreeColProgressBar        toolsLabel;
     private final ProductionPanel           productionPanel;
     private final BuildingBox               buildingBox;
-    private final ColonyNameBox             nameBox;
+    private final JComboBox                 nameBox;
     private final OutsideColonyPanel        outsideColonyPanel;
     private final InPortPanel               inPortPanel;
     private final CargoPanel                cargoPanel;
@@ -194,7 +195,13 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 buildingsLabel = new JLabel(Messages.message("buildings"));
 
         // Make the colony label
-        nameBox = new ColonyNameBox(this);
+        nameBox = new JComboBox();
+        nameBox.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    initialize((Colony) nameBox.getSelectedItem(), getGame());
+                }
+            });
+        nameBox.setFont(smallHeaderFont);
 
         buildingsScroll.setAutoscrolls(true);
 
@@ -370,7 +377,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         tilePanel.initialize();
 
         buildingBox.initialize();
-        nameBox.initialize(colony);
+        updateNameBox();
 
         updateSoLLabel();
         updateProgressLabel();
@@ -424,6 +431,17 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         solLabel.setText(Messages.message("sonsOfLiberty") + ": " + colony.getSoL() + "% (" + colony.getMembers() +
                          "), " + Messages.message("tory") + ": " + colony.getTory() + "% (" +
                          (colony.getUnitCount() - colony.getMembers()) + ")");
+    }
+
+    public void updateNameBox() {
+        nameBox.removeAllItems();
+        List colonies = colony.getOwner().getSettlements();
+        Collections.sort(colonies, freeColClient.getClientOptions().getColonyComparator());
+        Iterator colonyIterator = colonies.iterator();
+        while (colonyIterator.hasNext()) {
+            nameBox.addItem(colonyIterator.next());
+        }
+        nameBox.setSelectedItem(colony);
     }
 
 
@@ -537,7 +555,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                     break;
                 case RENAME:
                     freeColClient.getInGameController().rename(colony);
-                    nameBox.initialize(colony);
+                    updateNameBox();
                     break;
                 default:
                     logger.warning("Invalid action");
@@ -735,15 +753,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         return game;
     }
 
-    /**
-     * Toggles the export settings of the custom house.
-     *
-     * @param goods The goods for which to toggle the settings.
-     */
-    public void toggleExports(Goods goods) {
-        inGameController.toggleExports(colony, goods);
-    }
-    
+
     /**
     * This panel is a list of the colony's buildings.
     */
@@ -1798,103 +1808,4 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         }
     }
 
-
-    /**
-    * A combo box that contains a list of all the player's colonies.
-    */
-    public final class ColonyNameBox extends JComboBox {
-
-        private final ColonyPanel colonyPanel;
-        private final ColonyNameBoxListener nameBoxListener;
-
-        /**
-        * Creates a new ColonyNameBox for this Colony.
-        * @param colonyPanel The <code>ColonyPanel</code> this object is
-        *       created for.
-        */
-        public ColonyNameBox(ColonyPanel colonyPanel) {
-            super();
-            this.colonyPanel = colonyPanel;
-
-            nameBoxListener = new ColonyNameBoxListener(this, colonyPanel);
-            super.addActionListener(nameBoxListener);
-            super.setRenderer(new MyCellRenderer());
-        }
-
-        /**
-        * Sets up the ColonyNameBox.
-        */
-        public void initialize(Colony thisColony) {
-            super.removeActionListener(nameBoxListener);
-            removeAllItems();
-            List colonies = thisColony.getOwner().getSettlements();
-            Collections.sort(colonies, freeColClient.getClientOptions().getColonyComparator());
-            Iterator colonyIterator = colonies.iterator();
-            while (colonyIterator.hasNext()) {
-                this.addItem(colonyIterator.next());
-            }
-            this.setSelectedItem(thisColony);
-            super.addActionListener(nameBoxListener);
-        }
-
-        /**
-        * The ActionListener for the ColonyNameBox.
-        */
-        public final class ColonyNameBoxListener implements ActionListener {
-
-            private ColonyPanel colonyPanel;
-            private ColonyNameBox nameBox;
-
-            /**
-            * Sets up this ColonyNameBoxListener's nameBox and colonyPanel.
-            * 
-            * @param nameBox The <code>ColonyNameBox</code> to be listening on.
-            * @param colonyPanel The <code>ColonyPanel</code> this object is
-            *       created for.
-            */
-            public ColonyNameBoxListener(ColonyNameBox nameBox, ColonyPanel colonyPanel) {
-                super();
-                this.nameBox = nameBox;
-                this.colonyPanel = colonyPanel;
-            }
-
-            /**
-            * Sets the ColonyPanel's Colony's type of building.
-            */
-            public void actionPerformed(ActionEvent e) {
-                colonyPanel.initialize((Colony) nameBox.getSelectedItem(), 
-                                       colonyPanel.getGame());
-            }
-        }
-
-        public final class MyCellRenderer extends JLabel implements ListCellRenderer {
-            public MyCellRenderer() {
-                setOpaque(false);
-            }
-            
-            public Component getListCellRendererComponent(JList list,
-                                                   Object value,
-                                                   int index,
-                                                   boolean isSelected,
-                                                   boolean cellHasFocus) {
-
-                Colony colony = (Colony) value;
-                String nameString = colony.getName();
-                FontMetrics nameFontMetrics = getFontMetrics(smallHeaderFont);
-                BufferedImage bi = new BufferedImage(nameFontMetrics.stringWidth(nameString) + 24,
-                                                     nameFontMetrics.getMaxAscent() +
-                                                     nameFontMetrics.getMaxDescent(),
-                                                     BufferedImage.TYPE_INT_ARGB);
-                Graphics2D big = bi.createGraphics();
-
-                //big.setColor(colony.getOwner().getColor());
-                big.setColor(Color.BLACK);
-                big.setFont(smallHeaderFont);
-                big.drawString(nameString, 12, nameFontMetrics.getMaxAscent());
-                setIcon(new ImageIcon(bi));
-                setHorizontalAlignment(SwingConstants.CENTER);
-                return this;
-            }
-        }
-    }
 }

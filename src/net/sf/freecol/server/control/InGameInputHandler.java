@@ -277,9 +277,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return payArrears(connection, element);
             }
         });
-        register("toggleExports", new CurrentPlayerNetworkRequestHandler() {
+        register("setExports", new CurrentPlayerNetworkRequestHandler() {
             public Element handle(Player player, Connection connection, Element element) {
-                return toggleExports(connection, element);
+                return setExports(connection, element);
             }
         });
         register("declareIndependence", new CurrentPlayerNetworkRequestHandler() {
@@ -1770,24 +1770,27 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     }
 
     /**
-     * Handles a "toggleExports"-request from a client.
+     * Handles a "setExports"-request from a client.
      * 
      * @param connection The connection the message came from.
-     * @param toggleExportsElement The element containing the request.
+     * @param setExportsElement The element containing the request.
      */
-    private Element toggleExports(Connection connection, Element toggleExportsElement) {
+    private Element setExports(Connection connection, Element setExportsElement) {
         Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Colony colony = (Colony) game.getFreeColGameObject(toggleExportsElement.getAttribute("colony"));
+        Colony colony = (Colony) game.getFreeColGameObject(setExportsElement.getAttribute("colony"));
         if (colony == null) {
-            throw new IllegalArgumentException("Found no colony with ID " + toggleExportsElement.getAttribute("colony"));
+            throw new IllegalArgumentException("Found no colony with ID " + setExportsElement.getAttribute("colony"));
         } else if (colony.getOwner() != player) {
             throw new IllegalStateException("Not your colony!");
-        } else if (!colony.getBuilding(Building.CUSTOM_HOUSE).isBuilt()) {
-            throw new IllegalStateException("Colony has no custom house!");
+            /** we don't really care whether the colony has a custom house
+                } else if (!colony.getBuilding(Building.CUSTOM_HOUSE).isBuilt()) {
+                throw new IllegalStateException("Colony has no custom house!");
+            */
         }
-        int goods = new Integer(toggleExportsElement.getAttribute("goods")).intValue();
-        colony.toggleExports(goods);
+        int goods = Integer.valueOf(setExportsElement.getAttribute("goods")).intValue();
+        boolean value = Boolean.valueOf(setExportsElement.getAttribute("value")).booleanValue();
+        colony.setExports(goods, value);
         return null;
     }
 

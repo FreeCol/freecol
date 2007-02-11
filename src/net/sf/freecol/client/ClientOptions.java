@@ -139,6 +139,20 @@ public class ClientOptions extends OptionMap {
      */
     public static final String MAP_SCROLL_ON_DRAG = "mapScrollOnDrag";
     
+    /** 
+     * The Stock the custom house should keep when selling goods.
+     */
+    public static final String CUSTOM_STOCK = "customStock";
+
+    /**
+     * Generate warning of stock drops below this percentage of capacity.
+     */
+    public static final String LOW_LEVEL = "lowLevel";
+
+    /**
+     * Generate warning of stock exceeds this percentage of capacity.
+     */
+    public static final String HIGH_LEVEL = "highLevel";
 
     /**
      * Used by GUI to sort colonies.
@@ -382,6 +396,23 @@ public class ClientOptions extends OptionMap {
         );
         savegamesGroup.add(new IntegerOption(AUTOSAVE_PERIOD, "clientOptions.savegames."+ AUTOSAVE_PERIOD +".name", "clientOptions.savegames."+ AUTOSAVE_PERIOD +".shortDescription", 0, 100, 0));
         add(savegamesGroup);          
+
+        OptionGroup warehouseGroup = new OptionGroup("clientOptions.warehouse.name",
+                                                     "clientOptions.warehouse.shortDescription");
+        warehouseGroup.add(new IntegerOption(CUSTOM_STOCK, 
+                                             "clientOptions.warehouse." + CUSTOM_STOCK + ".name", 
+                                             "clientOptions.warehouse." + CUSTOM_STOCK + ".shortDescription",
+                                             0, 300, 50));
+        warehouseGroup.add(new IntegerOption(LOW_LEVEL, 
+                                             "clientOptions.warehouse." + LOW_LEVEL + ".name", 
+                                             "clientOptions.warehouse." + LOW_LEVEL + ".shortDescription",
+                                             0, 100, 10));
+        warehouseGroup.add(new IntegerOption(HIGH_LEVEL, 
+                                             "clientOptions.warehouse." + HIGH_LEVEL + ".name", 
+                                             "clientOptions.warehouse." + HIGH_LEVEL + ".shortDescription",
+                                             0, 100, 90));
+        add(warehouseGroup);
+
     }
 
 

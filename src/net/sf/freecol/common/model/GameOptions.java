@@ -33,9 +33,6 @@ public class GameOptions extends OptionMap {
     /** The cost of a single hammer when buying a building in a colony. */
     public static final String HAMMER_PRICE = "hammerPrice";
 
-    /** The Stock the custom house should keep when selling goods. */
-    public static final String CUSTOM_STOCK = "customStock";
-
     /** Does the Custom House sell boycotted goods **/
     public static final String CUSTOM_IGNORE_BOYCOTT = "customIgnoreBoycott";
 
@@ -128,7 +125,6 @@ public class GameOptions extends OptionMap {
         /* Colony options: */
         OptionGroup colony = new OptionGroup("gameOptions.colony.name", "gameOptions.colony.shortDescription");
         colony.add(new IntegerOption(HAMMER_PRICE, "gameOptions.hammerPrice.name", "gameOptions.hammerPrice.shortDescription", 0, 50, 20));
-        colony.add(new IntegerOption(CUSTOM_STOCK, "gameOptions.customStock.name", "gameOptions.customStock.shortDescription", 0, 300, 50));
         colony.add(new BooleanOption(CUSTOM_IGNORE_BOYCOTT, "gameOptions.customIgnoreBoycott.name", "gameOptions.customIgnoreBoycott.shortDescription", false));
 
         add(colony);
@@ -143,11 +139,6 @@ public class GameOptions extends OptionMap {
         /* Difficulty settings */
         OptionGroup difficultySettings = new OptionGroup("gameOptions.difficultySettings.name",
                                                          "gameOptions.difficultySettings.shortDescription");
-        /*
-        difficultySettings.add(new IntegerOption(DIFFICULTY, "gameOptions.difficulty.name",
-                                                 "gameOptions.difficulty.shortDescription",
-                                                 0, 4, 2));
-        */
         difficultySettings.add(new SelectOption(DIFFICULTY, "gameOptions.difficulty.name",
                                                 "gameOptions.difficulty.shortDescription",
                                                 new String[] {"gameOptions.difficulty.veryEasy", 
