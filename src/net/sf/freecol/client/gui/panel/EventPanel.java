@@ -21,7 +21,7 @@ import cz.autel.dmi.HIGLayout;
  * This panel is displayed when an imporantant event in the game has happened.
  */
 public final class EventPanel extends FreeColDialog implements ActionListener {
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
     
@@ -65,11 +65,9 @@ public final class EventPanel extends FreeColDialog implements ActionListener {
         okButton.addActionListener(this);
 
 
-        add(header, higConst.rc(1,1));
-        add(imageLabel, higConst.rc(3,1));
-        higConst.setVCorrection(0, -4);
-        add(okButton, higConst.rc(5,1));
-        higConst.clearCorrection();
+        add(header, higConst.rc(1, 1));
+        add(imageLabel, higConst.rc(3, 1, ""));
+        add(okButton, higConst.rc(5, 1));
     }
     
     
@@ -82,36 +80,28 @@ public final class EventPanel extends FreeColDialog implements ActionListener {
         if (eventID == FIRST_LANDING) {
             Image image = (Image) UIManager.get("EventImage.firstLanding");
             imageLabel.setIcon(new ImageIcon(image));
-
-            header.setText(Messages.message("event.firstLanding").replaceAll("%name%", freeColClient.getMyPlayer().getNewLandName()));
-            setSize(getPreferredSize());
+            header.setText(Messages.message("event.firstLanding",
+                                            new String[][] {{"%name%", freeColClient.getMyPlayer().getNewLandName()}}));
         } else if(eventID == MEETING_NATIVES) {
             Image image = (Image) UIManager.get("EventImage.meetingNatives");
             imageLabel.setIcon(new ImageIcon(image));
-
             header.setText(Messages.message("event.meetingNatives"));
-            setSize(getPreferredSize());
         } else if(eventID == MEETING_EUROPEANS) {
             Image image = (Image) UIManager.get("EventImage.meetingEuropeans");
             imageLabel.setIcon(new ImageIcon(image));
-
             header.setText(Messages.message("event.meetingEuropeans"));
-            setSize(getPreferredSize());
         } else if(eventID == MEETING_AZTEC) {
             Image image = (Image) UIManager.get("EventImage.meetingAztec");
             imageLabel.setIcon(new ImageIcon(image));
-
             header.setText(Messages.message("event.meetingAztec"));
-            setSize(getPreferredSize());
         } else if(eventID == MEETING_INCA) {
             Image image = (Image) UIManager.get("EventImage.meetingInca");
             imageLabel.setIcon(new ImageIcon(image));
-
             header.setText(Messages.message("event.meetingInca"));
-            setSize(getPreferredSize());
         } else {
             setResponse(new Boolean(false));
         }
+        setSize(getPreferredSize());
     }
     
 
