@@ -215,6 +215,11 @@ public abstract class OptionMap extends OptionGroup {
                     } else {
                         // Normal only if this option is from an old save game:
                         logger.info("Option \"" + idStr + "\" (" + in.getLocalName() + ") could not be found.");
+                        
+                        // Ignore the option:
+                        final String ignoredTag = in.getLocalName();
+                        while (in.nextTag() != XMLStreamConstants.END_ELEMENT
+                                || !in.getLocalName().equals(ignoredTag));
                     }
                 } else {
                     Option o = getObject(in.getLocalName());
@@ -223,6 +228,11 @@ public abstract class OptionMap extends OptionGroup {
                     } else {
                         // Normal only if this option is from an old save game:
                         logger.info("Option \"" + in.getLocalName() + " not found.");
+
+                        // Ignore the option:
+                        final String ignoredTag = in.getLocalName();
+                        while (in.nextTag() != XMLStreamConstants.END_ELEMENT
+                                || !in.getLocalName().equals(ignoredTag));
                     }
                 }
             }
