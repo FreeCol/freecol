@@ -2727,6 +2727,15 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     * @return The amount of units/cargo that this unit can carry.
     */
     public int getInitialSpaceLeft() {
+        return getInitialSpaceLeft(getType());
+    }
+
+    /**
+    * Returns the amount of units/cargo that this unit can carry.
+    * @param type The type of unit.
+    * @return The amount of units/cargo that this unit can carry.
+    */
+    public static int getInitialSpaceLeft(int type) {
         switch (type) {
             case CARAVEL:
                 return 2;
