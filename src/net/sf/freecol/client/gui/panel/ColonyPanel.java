@@ -87,7 +87,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
     public static final int SCROLL_SPEED = 10;
 
     private static final int EXIT = 0, BUY_BUILDING = 1, UNLOAD = 2,
-            RENAME = 3;
+            RENAME = 3, WAREHOUSE = 4;
 
     private final Canvas parent;
 
@@ -140,6 +140,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
     private JButton unloadButton = new JButton(Messages.message("unload"));
 
     private JButton renameButton = new JButton(Messages.message("rename"));
+
+    private JButton warehouseButton = new JButton(Messages.message("warehouseDialog.name"));
 
 
     /**
@@ -261,11 +263,13 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         exitButton.setActionCommand(String.valueOf(EXIT));
         unloadButton.setActionCommand(String.valueOf(UNLOAD));
         renameButton.setActionCommand(String.valueOf(RENAME));
+        warehouseButton.setActionCommand(String.valueOf(WAREHOUSE));
 
         buyBuilding.addActionListener(this);
         exitButton.addActionListener(this);
         unloadButton.addActionListener(this);
         renameButton.addActionListener(this);
+        warehouseButton.addActionListener(this);
 
         selectedUnit = null;
 
@@ -307,7 +311,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         add(warehouseScroll, higConst.rcwh(row, 1, 5, 1));
         row += 2;
         add(unloadButton, higConst.rc(row, 1, "l"));
-        add(renameButton, higConst.rc(row, 5, "l"));
+        add(warehouseButton, higConst.rc(row, 3, "l"));
+        add(renameButton, higConst.rc(row, 5, "r"));
         add(exitButton, higConst.rc(row, 7, "r"));
 
         setSize(getPreferredSize());
@@ -659,6 +664,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             case RENAME:
                 freeColClient.getInGameController().rename(getColony());
                 updateNameBox();
+                break;
+            case WAREHOUSE:
+                freeColClient.getCanvas().showWarehouseDialog(colony);
                 break;
             default:
                 logger.warning("Invalid action");

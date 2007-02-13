@@ -18,6 +18,7 @@ public final class GoodsType
     private static  int  nextIndex;
 
     public final  int        index;
+    public        String     id;
     public        String     name;
     public        boolean    isFarmed;
     public boolean improvedByPlowing = false;
@@ -40,6 +41,7 @@ public final class GoodsType
 
     public void readFromXmlElement( Node xml, Map goodsTypeByRef ) {
 
+        id = Xml.attribute( xml, "name" );
         name = Xml.messageAttribute( xml, "name" );
         isFarmed = Xml.booleanAttribute( xml, "is-farmed" );
 

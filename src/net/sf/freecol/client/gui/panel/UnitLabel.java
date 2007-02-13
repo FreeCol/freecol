@@ -54,7 +54,8 @@ public final class UnitLabel extends JLabel implements ActionListener {
                             CLEAR_SPECIALITY = 12,
                             ACTIVATE_UNIT = 13,
                             FORTIFY = 14,
-                            SENTRY = 15;
+                            SENTRY = 15,
+                            COLOPEDIA = 16;
     
 
     private final Unit unit;
@@ -318,6 +319,9 @@ public final class UnitLabel extends JLabel implements ActionListener {
                         break;
                     case CLEAR_SPECIALITY:
                         inGameController.clearSpeciality(unit);
+                        break;
+                    case COLOPEDIA:
+                        getCanvas().showColopediaPanel(ColopediaPanel.COLOPEDIA_UNIT, unit.getType());
                         break;
                     default:
                         logger.warning("Invalid action");

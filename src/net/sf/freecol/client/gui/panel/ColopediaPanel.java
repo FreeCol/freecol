@@ -34,6 +34,7 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -580,24 +581,70 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      */
     private void buildGoodsDetail(int goods) {
         detailPanel.removeAll();
-        detailPanel.setLayout(new FlowLayout());
+        detailPanel.repaint();
 
+        GoodsType type = FreeCol.specification.goodsType(goods);
+
+        int[] widths = {0, 3 * margin, 0};
+        int[] heights = new int[17];
+        for (int index = 0; index < 8; index++) {
+            heights[2 * index + 1] = margin;
+        }
+        int labelColumn = 1;
+        int valueColumn = 3;
+        detailPanel.setLayout(new HIGLayout(widths, heights));
+
+        String isFarmed = Messages.message(type.isFarmed ? "yes" : "no");
+        String improvedByPlowing = Messages.message(type.improvedByPlowing ? "yes" : "no");
+        String improvedByRiver = Messages.message(type.improvedByRiver ? "yes" : "no");
+        String improvedByRoad = Messages.message(type.improvedByRoad ? "yes" : "no");
+
+        String madeFrom = "";
+        if (type.madeFrom != null) {
+            madeFrom = type.madeFrom.name;
+        }
+        String makes = "";
+        if (type.makes != null) {
+            makes = type.makes.name;
+        }
+
+        int row = 1;
         JLabel name = new JLabel(Goods.getName(goods), SwingConstants.CENTER);
         name.setFont(smallHeaderFont);
         name.setPreferredSize(new Dimension(detailPanel.getWidth(), 50));
-        detailPanel.add(name);
+        detailPanel.add(name, higConst.rcwh(row, labelColumn, widths.length, 1));
+        row += 2;
 
-        JTextArea description = new JTextArea();
-        description.setBorder(null);
-        description.setOpaque(false);
-        description.setLineWrap(true);
-        description.setEditable(false);
-        description.setWrapStyleWord(true);
-        description.setFocusable(false);
-        //TODO
-        description.setSize(detailPanel.getWidth(), super.getPreferredSize().height);
-        detailPanel.add(description);
-
+        detailPanel.add(new JLabel(Messages.message("colopedia.goods.isFarmed")),
+                        higConst.rc(row, labelColumn));
+        detailPanel.add(new JLabel(isFarmed), higConst.rc(row, valueColumn, "r"));
+        row += 2;
+        detailPanel.add(new JLabel(Messages.message("colopedia.goods.improvedByPlowing")),
+                        higConst.rc(row, labelColumn));
+        detailPanel.add(new JLabel(improvedByPlowing), higConst.rc(row, valueColumn, "r"));
+        row += 2;
+        detailPanel.add(new JLabel(Messages.message("colopedia.goods.improvedByRiver")),
+                        higConst.rc(row, labelColumn));
+        detailPanel.add(new JLabel(improvedByRiver), higConst.rc(row, valueColumn, "r"));
+        row += 2;
+        detailPanel.add(new JLabel(Messages.message("colopedia.goods.improvedByRoad")),
+                        higConst.rc(row, labelColumn));
+        detailPanel.add(new JLabel(improvedByRoad), higConst.rc(row, valueColumn, "r"));
+        row += 2;
+        detailPanel.add(new JLabel(Messages.message("colopedia.goods.madeFrom")),
+                        higConst.rc(row, labelColumn));
+        detailPanel.add(new JLabel(madeFrom), higConst.rc(row, valueColumn, "r"));
+        row += 2;
+        detailPanel.add(new JLabel(Messages.message("colopedia.goods.makes")),
+                        higConst.rc(row, labelColumn));
+        detailPanel.add(new JLabel(makes), higConst.rc(row, valueColumn, "r"));
+        row += 2;
+        /* layout needs to be fixed somehow
+        detailPanel.add(new JLabel(Messages.message("colopedia.goods.description")),
+                        higConst.rc(row, labelColumn, "tl"));
+        detailPanel.add(getDefaultTextArea(Messages.message(type.id + ".description")),
+                        higConst.rc(row, valueColumn));
+        */
         detailPanel.validate();
     }
 

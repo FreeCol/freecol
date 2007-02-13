@@ -234,20 +234,26 @@ public final class DragListener extends MouseAdapter {
                     }
                 }
 
+                menuItem = new JMenuItem( Messages.message("menuBar.colopedia") );
+                menuItem.setActionCommand(String.valueOf(UnitLabel.COLOPEDIA));
+                menuItem.addActionListener(unitLabel);
+                menu.add(menuItem);
+
                 if (menu.getSubElements().length > 0) {
                     menu.show(comp, e.getX(), e.getY());
                 }
 
             } else if (comp instanceof GoodsLabel) {
+                GoodsLabel goodsLabel = (GoodsLabel) comp;
+                goodsLabel.getCanvas().showColopediaPanel(ColopediaPanel.COLOPEDIA_GOODS, 
+                                                          goodsLabel.getGoods().getType());
+                /*
                 if (parentPanel instanceof ColonyPanel) {
-                    ColonyPanel colonyPanel = (ColonyPanel) parentPanel;
-                    Colony colony = colonyPanel.getColony();
-                    //if (colony.getBuilding(Building.CUSTOM_HOUSE).isBuilt()) {
-                        //colonyPanel.toggleExports(((GoodsLabel) comp).getGoods());
-                        ((GoodsLabel) comp).getCanvas().showWarehouseDialog(colony);
-                        comp.repaint();
-                        //}
+                    Colony colony = ((ColonyPanel) parentPanel).getColony();
+                    ((GoodsLabel) comp).getCanvas().showWarehouseDialog(colony);
+                    comp.repaint();
                 }
+                */
             } else if (comp instanceof MarketLabel) {
                 if (parentPanel instanceof EuropePanel) {
                     ((EuropePanel) parentPanel).payArrears(((MarketLabel) comp).getType());

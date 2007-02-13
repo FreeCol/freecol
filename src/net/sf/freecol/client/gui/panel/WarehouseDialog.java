@@ -39,10 +39,10 @@ public final class WarehouseDialog extends FreeColDialog implements ActionListen
                                 CANCEL = 1;
 
     private final Canvas parent;
-    private final JButton ok = new JButton(Messages.message("warehousePanel.saveSettings"));
-    private final JButton cancel = new JButton(Messages.message("warehousePanel.cancel"));
+    private final JButton ok = new JButton(Messages.message("warehouseDialog.saveSettings"));
+    private final JButton cancel = new JButton(Messages.message("warehouseDialog.cancel"));
 
-    private final JPanel warehousePanel;
+    private final JPanel warehouseDialog;
     private final JPanel buttonPanel;
     
     private static final int[] widths = {0, margin, 0};
@@ -57,8 +57,8 @@ public final class WarehouseDialog extends FreeColDialog implements ActionListen
     public WarehouseDialog(Canvas parent) {
         this.parent = parent;
 
-        warehousePanel = new JPanel(new GridLayout(0, 4, margin, margin));
-        warehousePanel.setOpaque(false);
+        warehouseDialog = new JPanel(new GridLayout(0, 4, margin, margin));
+        warehouseDialog.setOpaque(false);
 
         ok.setActionCommand(String.valueOf(OK));
         cancel.setActionCommand(String.valueOf(CANCEL));
@@ -80,18 +80,18 @@ public final class WarehouseDialog extends FreeColDialog implements ActionListen
         buttonPanel = new JPanel();
         buttonPanel.add(ok);
         buttonPanel.add(cancel);
-        add(getDefaultHeader(Messages.message("warehousePanel.name")),
+        add(getDefaultHeader(Messages.message("warehouseDialog.name")),
             higConst.rc(1, 1));
-        add(warehousePanel, higConst.rc(3, 1));
+        add(warehouseDialog, higConst.rc(3, 1));
         add(buttonPanel, higConst.rc(5, 1));
 
     }
 
     public void initialize(Colony colony) {
 
-        warehousePanel.removeAll();
+        warehouseDialog.removeAll();
         for (int goodsType = 0; goodsType < Goods.NUMBER_OF_TYPES; goodsType++) {
-            warehousePanel.add(new WarehouseGoodsPanel(colony, goodsType));
+            warehouseDialog.add(new WarehouseGoodsPanel(colony, goodsType));
         }
         setSize(getPreferredSize());
 
@@ -115,7 +115,7 @@ public final class WarehouseDialog extends FreeColDialog implements ActionListen
             case OK:
                 parent.remove(this);
                 setResponse(new Boolean(true));
-                for (Component c : warehousePanel.getComponents()) {
+                for (Component c : warehouseDialog.getComponents()) {
                     if (c instanceof WarehouseGoodsPanel) {
                         ((WarehouseGoodsPanel) c).saveSettings();
                     }
@@ -163,9 +163,9 @@ public final class WarehouseDialog extends FreeColDialog implements ActionListen
             add(goodsLabel, higConst.rcwh(1, labelColumn, 1, 3));
 
             // export checkbox
-            export = new JCheckBox(Messages.message("warehousePanel.export"),
+            export = new JCheckBox(Messages.message("warehouseDialog.export"),
                                    colony.getExports(goodsType));
-            export.setToolTipText(Messages.message("warehousePanel.export.shortDescription"));
+            export.setToolTipText(Messages.message("warehouseDialog.export.shortDescription"));
             if (colony.getBuilding(Building.CUSTOM_HOUSE).getLevel() == Building.NOT_BUILT) {
                 export.setEnabled(false);
             }
@@ -175,21 +175,21 @@ public final class WarehouseDialog extends FreeColDialog implements ActionListen
             SpinnerNumberModel lowLevelModel = new SpinnerNumberModel(colony.getLowLevel()[goodsType],
                                                                       0, 100, 1);
             lowLevel = new JSpinner(lowLevelModel);
-            lowLevel.setToolTipText(Messages.message("warehousePanel.lowLevel.shortDescription"));
+            lowLevel.setToolTipText(Messages.message("warehouseDialog.lowLevel.shortDescription"));
             add(lowLevel, higConst.rc(1, spinnerColumn));
 
             // high level settings
             SpinnerNumberModel highLevelModel = new SpinnerNumberModel(colony.getHighLevel()[goodsType],
                                                                        0, 100, 1);
             highLevel = new JSpinner(highLevelModel);
-            highLevel.setToolTipText(Messages.message("warehousePanel.highLevel.shortDescription"));
+            highLevel.setToolTipText(Messages.message("warehouseDialog.highLevel.shortDescription"));
             add(highLevel, higConst.rc(3, spinnerColumn));
 
             // export level settings
             SpinnerNumberModel exportLevelModel = new SpinnerNumberModel(colony.getExportLevel()[goodsType],
                                                                          0, colony.getWarehouseCapacity(), 1);
             exportLevel = new JSpinner(exportLevelModel);
-            exportLevel.setToolTipText(Messages.message("warehousePanel.exportLevel.shortDescription"));
+            exportLevel.setToolTipText(Messages.message("warehouseDialog.exportLevel.shortDescription"));
             add(exportLevel, higConst.rc(5, spinnerColumn));
 
             setSize(getPreferredSize());
