@@ -401,10 +401,13 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         for (int index = 0; index < 4; index++) {
             heights[2 * index + 1] = margin;
         }
-        detailPanel.setLayout(new HIGLayout(widths, heights));
         int row = 1;
         int leftColumn = 1;
         int rightColumn = 3;
+
+        HIGLayout layout = new HIGLayout(widths, heights);
+        layout.setColumnWeight(rightColumn, 1);
+        detailPanel.setLayout(layout);
 
         int type = terrain / 2;
         int productionIndex = type; 
@@ -520,12 +523,15 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         }
         int labelColumn = 1;
         int valueColumn = 3;
-        detailPanel.setLayout(new HIGLayout(widths, heights));
+
+        HIGLayout layout = new HIGLayout(widths, heights);
+        layout.setColumnWeight(valueColumn, 1);
+        detailPanel.setLayout(layout);
 
         int row = 1;
         JLabel name = new JLabel(Unit.getName(unit), SwingConstants.CENTER);
         name.setFont(smallHeaderFont);
-        name.setPreferredSize(new Dimension(detailPanel.getWidth(), 50));
+        //name.setPreferredSize(new Dimension(detailPanel.getWidth(), 50));
         detailPanel.add(name, higConst.rcwh(row, labelColumn, widths.length, 1));
         row += 2;
 
@@ -585,19 +591,20 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
 
         GoodsType type = FreeCol.specification.goodsType(goods);
 
+        String isFarmed = Messages.message(type.isFarmed ? "yes" : "no");
+        int numberOfLines = type.isFarmed ? 8 : 6;
+
         int[] widths = {0, 3 * margin, 0};
-        int[] heights = new int[17];
-        for (int index = 0; index < 8; index++) {
-            heights[2 * index + 1] = margin;
+        int[] heights = new int[2 * numberOfLines - 1];
+        for (int index = 1; index < heights.length; index += 2) {
+            heights[index] = margin;
         }
+
         int labelColumn = 1;
         int valueColumn = 3;
-        detailPanel.setLayout(new HIGLayout(widths, heights));
-
-        String isFarmed = Messages.message(type.isFarmed ? "yes" : "no");
-        String improvedByPlowing = Messages.message(type.improvedByPlowing ? "yes" : "no");
-        String improvedByRiver = Messages.message(type.improvedByRiver ? "yes" : "no");
-        String improvedByRoad = Messages.message(type.improvedByRoad ? "yes" : "no");
+        HIGLayout layout = new HIGLayout(widths, heights);
+        layout.setColumnWeight(valueColumn, 1);
+        detailPanel.setLayout(layout);
 
         String madeFrom = "";
         if (type.madeFrom != null) {
@@ -611,7 +618,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         int row = 1;
         JLabel name = new JLabel(Goods.getName(goods), SwingConstants.CENTER);
         name.setFont(smallHeaderFont);
-        name.setPreferredSize(new Dimension(detailPanel.getWidth(), 50));
+        //name.setPreferredSize(new Dimension(detailPanel.getWidth(), 50));
         detailPanel.add(name, higConst.rcwh(row, labelColumn, widths.length, 1));
         row += 2;
 
@@ -619,32 +626,41 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
                         higConst.rc(row, labelColumn));
         detailPanel.add(new JLabel(isFarmed), higConst.rc(row, valueColumn, "r"));
         row += 2;
-        detailPanel.add(new JLabel(Messages.message("colopedia.goods.improvedByPlowing")),
-                        higConst.rc(row, labelColumn));
-        detailPanel.add(new JLabel(improvedByPlowing), higConst.rc(row, valueColumn, "r"));
-        row += 2;
-        detailPanel.add(new JLabel(Messages.message("colopedia.goods.improvedByRiver")),
-                        higConst.rc(row, labelColumn));
-        detailPanel.add(new JLabel(improvedByRiver), higConst.rc(row, valueColumn, "r"));
-        row += 2;
-        detailPanel.add(new JLabel(Messages.message("colopedia.goods.improvedByRoad")),
-                        higConst.rc(row, labelColumn));
-        detailPanel.add(new JLabel(improvedByRoad), higConst.rc(row, valueColumn, "r"));
-        row += 2;
-        detailPanel.add(new JLabel(Messages.message("colopedia.goods.madeFrom")),
-                        higConst.rc(row, labelColumn));
-        detailPanel.add(new JLabel(madeFrom), higConst.rc(row, valueColumn, "r"));
-        row += 2;
+
+        if (type.isFarmed) {
+
+            String improvedByPlowing = Messages.message(type.improvedByPlowing ? "yes" : "no");
+            String improvedByRiver = Messages.message(type.improvedByRiver ? "yes" : "no");
+            String improvedByRoad = Messages.message(type.improvedByRoad ? "yes" : "no");
+
+            detailPanel.add(new JLabel(Messages.message("colopedia.goods.improvedByPlowing")),
+                            higConst.rc(row, labelColumn));
+            detailPanel.add(new JLabel(improvedByPlowing), higConst.rc(row, valueColumn, "r"));
+            row += 2;
+            detailPanel.add(new JLabel(Messages.message("colopedia.goods.improvedByRiver")),
+                            higConst.rc(row, labelColumn));
+            detailPanel.add(new JLabel(improvedByRiver), higConst.rc(row, valueColumn, "r"));
+            row += 2;
+            detailPanel.add(new JLabel(Messages.message("colopedia.goods.improvedByRoad")),
+                            higConst.rc(row, labelColumn));
+            detailPanel.add(new JLabel(improvedByRoad), higConst.rc(row, valueColumn, "r"));
+            row += 2;
+        } else {        
+            detailPanel.add(new JLabel(Messages.message("colopedia.goods.madeFrom")),
+                            higConst.rc(row, labelColumn));
+            detailPanel.add(new JLabel(madeFrom), higConst.rc(row, valueColumn, "r"));
+            row += 2;
+        }
+
         detailPanel.add(new JLabel(Messages.message("colopedia.goods.makes")),
                         higConst.rc(row, labelColumn));
         detailPanel.add(new JLabel(makes), higConst.rc(row, valueColumn, "r"));
         row += 2;
-        /* layout needs to be fixed somehow
         detailPanel.add(new JLabel(Messages.message("colopedia.goods.description")),
                         higConst.rc(row, labelColumn, "tl"));
         detailPanel.add(getDefaultTextArea(Messages.message(type.id + ".description")),
                         higConst.rc(row, valueColumn));
-        */
+        
         detailPanel.validate();
     }
 
@@ -664,7 +680,10 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         int row = 1;
         int leftColumn = 1;
         int rightColumn = 3;
-        detailPanel.setLayout(new HIGLayout(widths, heights));
+
+        HIGLayout layout = new HIGLayout(widths, heights);
+        layout.setColumnWeight(rightColumn, 1);
+        detailPanel.setLayout(layout);
 
         int building = action >> 2;
         int level = (action & 0x03);
@@ -695,7 +714,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
 
         JLabel name = new JLabel(buildingLevel.name, SwingConstants.CENTER);
         name.setFont(smallHeaderFont);
-        name.setPreferredSize(new Dimension(detailPanel.getWidth(), 50));
+        //name.setPreferredSize(new Dimension(detailPanel.getWidth(), 50));
         detailPanel.add(name, higConst.rcwh(row, leftColumn, widths.length, 1));
         row += 2;
 
@@ -880,4 +899,23 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             }
         }
     }
+
+    /**
+     * Returns a text area with standard settings suitable for use in
+     * FreeCol dialogs.
+     *
+     * @param text The text to display in the text area.
+     * @return a text area with standard settings suitable for use in
+     * FreeCol dialogs.
+     */
+    public static JTextArea getDefaultTextArea(String text) {
+        JTextArea textArea = new JTextArea(text);
+        textArea.setOpaque(false);
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        textArea.setFocusable(false);
+        textArea.setFont(defaultFont);
+        return textArea;
+    }
+
 }
