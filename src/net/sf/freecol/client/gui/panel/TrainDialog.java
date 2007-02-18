@@ -11,7 +11,6 @@ import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.control.InGameController;
@@ -153,6 +152,8 @@ public final class TrainDialog extends FreeColDialog implements ActionListener{
         for (int index = 0; index < numberOfTypes; index++) {
             if (trainableUnits.get(index).type.price > player.getGold()) {
                 buttons.get(index).setEnabled(false);
+            } else {
+                buttons.get(index).setEnabled(true);
             }
         }
     }
