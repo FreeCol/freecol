@@ -252,7 +252,7 @@ The client options panel allows you to customize how your client
 displays the game objects and how it handles some tasks such as
 auto-saving.
 
-First, we have general display options:
+First, we have general \hypertarget{display options}{display options}:
 
 \begin{itemize}
 \item The minimum number of goods to display with a counter. If you
@@ -323,7 +323,7 @@ auto-save files.
 
 
 
-\hypertarget{The main screen}{\subsection{The main screen}}
+\hypertarget{main screen}{\subsection{The main screen}}
 
 The figure \ref{main_screen_fig} represents the main screen.
 \begin{figure}[htb]
@@ -340,7 +340,7 @@ panel, and the main map in the background. The units, colonies, and so
 forth can be seen on the main map. They are also represented as
 coloured dots on the minimap.
 
-\hypertarget{The menubar}{\subsubsection{The menubar}}
+\hypertarget{menubar}{\subsubsection{The menubar}}
 
 The menubar obviously contains the menu. It contains the submenus
 Game, View, Orders, Report and Colopedia, at the left hand of the
@@ -348,7 +348,7 @@ screen, as well as a status area at the right hand of the screen. The
 status area tells you about the amount of gold you possess, your
 current tax rate and the current turn.
 
-The Game menu allows you to:
+The \hypertarget{game menu}{Game Menu} allows you to:
 
 \begin{itemize}
 \item start a new game 
@@ -362,7 +362,7 @@ The Game menu allows you to:
 \item quit
 \end{itemize}
 
-The View menu allows you to:
+The \hypertarget{view menu}{View Menu} allows you to:
 
 \begin{itemize}
 \item turn the minimap and the info panel on or off
@@ -373,8 +373,8 @@ The View menu allows you to:
 \item switch to the Europe panel
 \end{itemize}
 
-The Orders menu enables you to give orders to the currently
-selected unit:
+The \hypertarget{orders menu}{Orders Menu} enables you to give orders
+to the currently selected unit:
 
 \begin{itemize}
 \item wait until other units have moved
@@ -398,8 +398,8 @@ is only available if the unit is a carrier and is in a colony, for
 example, and the build colony order is only available if the unit is
 able to build colonies and the tile it is on will support a colony.
 
-The Reports menu provides access to various reports on the current
-state of your colonies:
+The \hypertarget{reports menu}{Reports Menu} provides access to
+various reports on the current state of your colonies:
 
 \begin{itemize}
 \item The \Report{Religious Advisor} tells you how many crosses your
@@ -444,13 +444,106 @@ highlighted, as are all goods that are currently being automatically
 exported from these colonies.
 \end{itemize}
 
+The \hypertarget{colopedia menu}{Colopedia Menu} provides access to
+the online game help, which is divided into six sections:
+
+\begin{itemize}
+\item The terrain section contains information on all the different
+types of terrain you may encounter in the New World.
+\item The unit section provides details on various types of units,
+your own as well native units and units of the Royal Expeditionary
+Force.
+\item The goods section gives on overview of all the types of goods in
+the game.
+\item The building section provides information on the various
+constructions you may build in your colonies.
+\item The Founding Father section can be used to look up information
+on the various Founding Fathers you may elect to the Continental
+Congress.
+\end{itemize}
+
+
+\hypertarget{info panel}{\subsubsection{The Info Panel}}
+
+The info panel in the lower right corner of the screen either shows
+information on the currently selected unit, or contains a button to
+end the current turn if no unit is selected. If a unit is selected,
+then the info panel shows an image of the unit, as well as its name
+and the moves it has left. If the unit is a carrier unit, such as a
+ship or wagon train, the info panel also shows the units or goods on
+board of the carrier. If the unit is a pioneer, the info panel shows
+the number of tools the unit carries.
+
+
+\hypertarget{minimap}{\subsubsection{The Minimap}}
+
+The minimap in the lower left corner of the screen shows you a more
+abstract view of the map than the main map. Different types of terrain
+are distinguished by colour, and units and settlements are also
+represented by dots in the colour of the nation that owns them. You
+can use the minimap to navigate around the map quickly.  Either click
+on the minimap to center the view on a certain point, or drag the
+white frame around. Zoom buttons to the left and to the right of the
+minimap allow you to zoom into and out of the view.
+
+
+\hypertarget{unit buttons}{\subsubsection{The Unit Buttons}}
+
+The unit buttons displayed between the minimap and the info panel
+allow you to give order to your units. Note that not all buttons are
+always active. A ship can not plow a tile, for example, so the plow
+button is never active if the selected unit is a ship. The eight
+buttons have the following functions:
+
+\begin{itemize}
+\item wait
+\item skip turn
+\item fortify
+\item clear forest / plow tile
+\item build road
+\item build colony
+\item disband unit
+\end{itemize}
+
+All these actions are also available from the \hyperlink{orders
+menu}{Orders Menu} of the menu bar, and as \hyperlink{keyboard
+shortcuts}{keyboard shortcuts}.
+
+
+\hypertarget{main map}{\subsubsection{The Main Map}}
+
+The main map shows you the New World in greater detail. You can see
+the different types of terrain, forested and otherwise, hills,
+mountains, rivers, and, of course, the various units and settlements
+of the native and European players. Left click on a tile in order to
+center the main map, or on a unit in order to select it (a
+\hyperlink{display options}{display option} allows you to decide
+whether the map should always centre on the selected unit, or
+not). Left click on a colony in order to open the \hyperlink{colony
+panel}{colony panel}. If there is an active unit outside of the colony
+on the same tile, then a single left click will select the unit
+instead. In this case, a double click will still open the colony
+panel.
+
+Right clicking on an empty tile, will either display some information
+on that tile if no unit is selected, or open a pop-up menu that
+additionally allows you to send the selected unit to this tile. If the
+tile contains some of your units, the menu will also enable you to
+select each of these units. If the tile contains a native settlement,
+the menu will also provide you with an item that will bring up some
+information on that settlement. It the tile contains one of your own
+colonies, the menu will also allow you to open the \hyperlink{colony
+panel}{colony panel}.
+
+You can also activate the map scroll by moving the cursor towards the
+edges of the main map. Scrolling with the minimap is faster, however.
+
 If a unit is selected, further information about that unit is
-displayed in the info panel, otherwise the info panel contains the end
-turn button. You can change the currently selected unit by clicking on
-any other unit. And you can move the currently selected unit using the
-numeric keypad. If you select a unit with the left mouse button and
-drag the mouse, the main screen will display the best path from the
-unit's current position to the tile the mouse is hovering over.
+displayed in the \hyperlink{info panel}{info panel}, and you can move
+the unit using the numeric keypad. If you select a unit with the left
+mouse button and drag the mouse, the main map will display the best
+path from the unit's current position to the tile the mouse is
+hovering over.
 
 The tiles the path consists of will be marked with boots if the unit
 is on foot, with horseshoes if the unit is mounted, with wheels if the
@@ -473,13 +566,6 @@ follow this path. It will awake once it has arrived at its destination
 or if it can no longer follow the path (if a unit belonging to a
 different player is in the way, for instance).
 
-If you right click on a tile containing neither units nor settlements,
-a popup window will show you some information about the goods that can
-be produced on this tile (unless the tile has not yet been explored,
-in which case nothing will happen). If the tile contains units or
-settlements, you will be presented with a menu from which you can
-select the units or the settlement present, or the tile information.
-
 Units are marked with small coloured shields, which may or may not
 display a letter. The background colour indicates the nation this unit
 belongs to. The Dutch units, for example, are usually marked with
@@ -491,7 +577,7 @@ orange shields. The letter indicates the current state of the unit:
 \item\verb$G$: the unit is going somewhere.
 \item\verb$P$: the unit is plowing a tile.
 \item\verb$R$: the unit is building a road.
-\item\verb$S$: the unit is a sentry (not implemented yet).
+\item\verb$S$: the unit is a sentry.
 \end{itemize}
 
 If the unit is a foreign naval unit, the shield will display a number
@@ -512,8 +598,8 @@ The order buttons represent some of the orders you can give to your
 units. You can move your mouse over the buttons to see their
 respective orders. If a unit is unable to perform a certain action,
 the corresponding order button will be disabled. The orders are also
-available from the ``Orders'' menu, and you can use the following
-shortcuts:
+available from the \hyperlink{orders menu}{Orders Menu}, and you can
+use the following \hypertarget{keyboard shortcuts}{keyboard shortcuts}:
 
 \begin{itemize}
 \item\verb$b$: build a colony.
@@ -580,7 +666,7 @@ Ships that are docked at the European port can also do the following:
   panel in order to sail to the New World.
 \end{itemize}
 
-\hypertarget{The Colony panel}{\subsection{The Colony panel}}
+\hypertarget{colony panel}{\subsection{The Colony panel}}
 
 The figure \ref{colony_panel_fig} represents the Colony panel.
 \begin{figure}[htb]
@@ -1384,14 +1470,20 @@ Planter}{Master Tobacco Planters}, as well as the \hyperlink{Expert
 Fur Trapper}{Expert Fur Trappers}, can not be recruited in Europe.
 
 At the beginning of the game, these skills can only be learned at
-Indian Settlements. As soon as you construct a
-\hyperlink{Schoolhouse}{Schoolhouse}, however, you can order your
-master craftsmen to teach other free colonists their skills. Petty
-Criminals and Indentured Servants can not be directly upgraded to
-master craftsmen.  However, a Petty Criminal may become an Indentured
-Servant, and an Indentured Servant may become a Free Colonist through
-education. Petty Criminals may also become Indentured Servants, and
-Indentured Servants may also become Free Colonists by winning a battle. 
+Indian Settlements, or through experience. If you put a Free Colonist
+to work outside of the colony for a long time without changing his
+work assignment, he may learn the necessary skill and become an
+expert. This does not work for the more complicated jobs within the
+colony, however. 
+
+As soon as you construct a \hyperlink{Schoolhouse}{Schoolhouse}, you
+can place a master craftsman in the Schoolhouse in order to teach
+other free colonists his skill. Petty Criminals and Indentured
+Servants can not be directly upgraded to master craftsmen.  However, a
+Petty Criminal may become an Indentured Servant, and an Indentured
+Servant may become a Free Colonist through education. Petty Criminals
+may also become Indentured Servants, and Indentured Servants may also
+become Free Colonists by winning a battle.
 
 Indian units are more productive than free colonists when working
 outside of the colony, and less productive when working inside a
@@ -1404,7 +1496,7 @@ the \hyperlink{Continental Congress}{Continental Congress}.
 Settlements in order to speak with the tribal chiefs. A scout entering
 an Indian Settlement may become a \hyperlink{Seasoned Scout}{Seasoned
 Scout} through experience. A colonist investigating a \hyperlink{Lost
-City Rumour}{Lost City Rumour} may also be upgraded to a Seasoned
+City Rumours}{Lost City Rumours} may also be upgraded to a Seasoned
 Scout, unless that unit already has another skill.
 
 
