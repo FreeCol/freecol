@@ -263,7 +263,7 @@ public class Modifier {
                     // 100% defense bonus against an Indian raid
                     result.add(new Modifier("modifiers.artilleryAgainstRaid", 2, 1));
                     totalNumerator *= 2;
-                    }
+                }
             } else {
                 // In the open
                 if (!((attacker.getType() != Unit.BRAVE && 
@@ -271,7 +271,8 @@ public class Modifier {
                       (attacker.getType() == Unit.BRAVE && 
                        defender.getOwner().isREF()))) {
                     // Terrain defensive bonus.
-                    int defenseBonus = defender.getTile().defenseBonus();
+                    // terrain defense bonus has different scale
+                    int defenseBonus = defender.getTile().defenseBonus() + 100;
                     result.add(new Modifier("modifiers.terrainBonus", defenseBonus, 100));
                     totalNumerator *= defenseBonus;
                     totalDenominator *= 100;
