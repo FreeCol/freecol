@@ -2,62 +2,42 @@
 package net.sf.freecol.common.model;
 
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.FreeCol;
 
-
-/**
- * The class <code>DiplomaticTrade</code> represents an offer one
- * player can make another.
- *
- */
-public class DiplomaticTrade extends PersistentObject {
-
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
-    public static final String  LICENSE   = "http://www.gnu.org/licenses/gpl.html";
-    public static final String  REVISION = "$Revision$";
-
-    // the individual items the trade consists of
-    private ArrayList<TradeItem> items = new ArrayList<TradeItem>();
-
-    private final Game game;
-
-    public DiplomaticTrade(Game game) {
-        this.game = game;
+public class GoodsTradeItem extends TradeItem {
+    
+    private Goods goods;
+    private Settlement settlement;
+        
+    public GoodsTradeItem(Game game, Player source, Player destination, Goods goods, Settlement settlement) {
+        super(game, "tradeItem.goods", source, destination);
+        this.goods = goods;
+        this.settlement = settlement;
     }
 
-    /**
-     * Add a TradeItem to the DiplomaticTrade.
-     *
-     * @param newItem a <code>TradeItem</code> value
-     */
-    public void add(TradeItem newItem) {
-        items.add(newItem);
+    public boolean isValid() {
+        if (!(goods.getLocation() instanceof Unit)) {
+            return false;
+        }
+        Unit unit = (Unit) goods.getLocation();
+        if (unit.getOwner() != source) {
+            return false;
+        }
+        if (settlement != null && settlement.getOwner() == destination) {
+            return true;
+        } else {
+            return false;
+        }
+
     }
 
-    /**
-     * Remove a TradeItem from the DiplomaticTrade.
-     *
-     * @param newItem a <code>TradeItem</code> value
-     */
-    public void remove(TradeItem newItem) {
-        items.remove(newItem);
-    }
-
-    /**
-     * Returns an iterator for all TradeItems.
-     *
-     * @return an iterator for all TradeItems.
-     */
-    public Iterator<TradeItem> iterator() {
-        return items.iterator();
+    public void makeTrade() {
+        goods.getLocation().remove(goods);
+        settlement.add(goods);
     }
 
     /**
@@ -67,8 +47,14 @@ public class DiplomaticTrade extends PersistentObject {
      *      during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        super.readFromXMLImpl(in);
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            if (in.getLocalName().equals(Goods.getXMLElementTagName())) {
+                this.goods = new Goods(getGame(), in);
+            }
+        }
+        in.nextTag();
     }
-
 
     /**
      * This method writes an XML-representation of this object to
@@ -88,17 +74,20 @@ public class DiplomaticTrade extends PersistentObject {
      *      to the stream.
      */
     public void toXML(XMLStreamWriter out, Player player) throws XMLStreamException {
+        out.writeStartElement(getXMLElementTagName());
+        super.toXML(out, player);
+        this.goods.toXML(out, player);
+        out.writeEndElement();
     }
     
-
     /**
      * Gets the tag name of the root element representing this object.
      * @return "goods".
      */
     public static String getXMLElementTagName() {
-        return "diplomaticTrade";
+        return "goodsTradeItem";
     }
 
-
-
 }
+
+

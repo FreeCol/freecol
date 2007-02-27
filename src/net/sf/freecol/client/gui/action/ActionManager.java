@@ -77,6 +77,7 @@ public class ActionManager extends OptionGroup {
         add(new SentryAction(freeColClient));
         add(new SkipUnitAction(freeColClient));
         add(new ToggleViewModeAction(freeColClient));
+        add(new TradeRouteAction(freeColClient));
         add(new UnloadAction(freeColClient));
         add(new WaitAction(freeColClient));
         add(new QuitAction(freeColClient));

@@ -2,62 +2,27 @@
 package net.sf.freecol.common.model;
 
 
-import java.util.ArrayList;
-import java.util.Iterator;
 
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.FreeCol;
 
-
-/**
- * The class <code>DiplomaticTrade</code> represents an offer one
- * player can make another.
- *
- */
-public class DiplomaticTrade extends PersistentObject {
-
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
-    public static final String  LICENSE   = "http://www.gnu.org/licenses/gpl.html";
-    public static final String  REVISION = "$Revision$";
-
-    // the individual items the trade consists of
-    private ArrayList<TradeItem> items = new ArrayList<TradeItem>();
-
-    private final Game game;
-
-    public DiplomaticTrade(Game game) {
-        this.game = game;
+public class ColonyTradeItem extends TradeItem {
+    
+    private Colony colony;
+        
+    public ColonyTradeItem(Game game, Player source, Player destination, Colony colony) {
+        super(game, "tradeItem.colony", source, destination);
+        this.colony = colony;
     }
 
-    /**
-     * Add a TradeItem to the DiplomaticTrade.
-     *
-     * @param newItem a <code>TradeItem</code> value
-     */
-    public void add(TradeItem newItem) {
-        items.add(newItem);
+    public boolean isValid() {
+        return (colony.getOwner() == source);
     }
 
-    /**
-     * Remove a TradeItem from the DiplomaticTrade.
-     *
-     * @param newItem a <code>TradeItem</code> value
-     */
-    public void remove(TradeItem newItem) {
-        items.remove(newItem);
-    }
-
-    /**
-     * Returns an iterator for all TradeItems.
-     *
-     * @return an iterator for all TradeItems.
-     */
-    public Iterator<TradeItem> iterator() {
-        return items.iterator();
+    public void makeTrade() {
+        colony.setOwner(destination);
     }
 
     /**
@@ -67,8 +32,11 @@ public class DiplomaticTrade extends PersistentObject {
      *      during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        super.readFromXMLImpl(in);
+        String colonyID = in.getAttributeValue(null, "colony");
+        this.colony = (Colony) getGame().getFreeColGameObject(colonyID);
+        in.nextTag();
     }
-
 
     /**
      * This method writes an XML-representation of this object to
@@ -88,17 +56,19 @@ public class DiplomaticTrade extends PersistentObject {
      *      to the stream.
      */
     public void toXML(XMLStreamWriter out, Player player) throws XMLStreamException {
+        out.writeStartElement(getXMLElementTagName());
+        super.toXML(out, player);
+        out.writeAttribute("colony", this.colony.getID());
+        out.writeEndElement();
     }
     
-
     /**
      * Gets the tag name of the root element representing this object.
      * @return "goods".
      */
     public static String getXMLElementTagName() {
-        return "diplomaticTrade";
+        return "colonyTradeItem";
     }
 
-
-
 }
+

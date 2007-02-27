@@ -65,6 +65,7 @@ import net.sf.freecol.client.gui.action.SelectableAction;
 import net.sf.freecol.client.gui.action.SentryAction;
 import net.sf.freecol.client.gui.action.SkipUnitAction;
 import net.sf.freecol.client.gui.action.ToggleViewModeAction;
+import net.sf.freecol.client.gui.action.TradeRouteAction;
 import net.sf.freecol.client.gui.action.UnloadAction;
 import net.sf.freecol.client.gui.action.WaitAction;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -73,12 +74,12 @@ import net.sf.freecol.client.gui.panel.FreeColImageBorder;
 
 
 /**
-* The menu bar that is displayed on the top left corner of the <code>Canvas</code>.
-* @see Canvas#setJMenuBar
-*/
+ * The menu bar that is displayed on the top left corner of the <code>Canvas</code>.
+ * @see Canvas#setJMenuBar
+ */
 public class FreeColMenuBar extends JMenuBar {
     private static final Logger logger = Logger.getLogger(FreeColMenuBar.class.getName());
-	
+        
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
@@ -101,24 +102,24 @@ public class FreeColMenuBar extends JMenuBar {
     private ActionManager am;    
 
     /**
-    * Creates a new <code>FreeColMenuBar</code>. This menu bar will include
-    * all of the submenus and items.
-    *
-    * @param f The main controller.
-    */
+     * Creates a new <code>FreeColMenuBar</code>. This menu bar will include
+     * all of the submenus and items.
+     *
+     * @param f The main controller.
+     */
     public FreeColMenuBar(FreeColClient f) {
         
-    	// TODO: FreeColClient should not have to be passed in to this class. This is only a menu bar, it doesn't need 
-    	//  a reference to the main controller. The only reason it has one now is because DebugMenu needs it. And DebugMenu
-    	//  needs it because it is using inner classes for ActionListeners and those inner classes use the reference.
-    	//  If those inner classes were in seperate classes, when they were created, they could use the FreeColClient 
-    	//  reference of the ActionManger. So DebugMenu needs to be refactored to remove inner classes so that this
-    	//  MenuBar can lose its unnecessary reference to the main controller. See FreeColMenuTest.
-    	//
-    	//  Okay, I lied.. the update() and paintComponent() methods in this MenuBar use freeColClient, too. But so what. 
-    	//  Move those to another class too. :)
-    	
-    	super();
+        // TODO: FreeColClient should not have to be passed in to this class. This is only a menu bar, it doesn't need 
+        //  a reference to the main controller. The only reason it has one now is because DebugMenu needs it. And DebugMenu
+        //  needs it because it is using inner classes for ActionListeners and those inner classes use the reference.
+        //  If those inner classes were in seperate classes, when they were created, they could use the FreeColClient 
+        //  reference of the ActionManger. So DebugMenu needs to be refactored to remove inner classes so that this
+        //  MenuBar can lose its unnecessary reference to the main controller. See FreeColMenuTest.
+        //
+        //  Okay, I lied.. the update() and paintComponent() methods in this MenuBar use freeColClient, too. But so what. 
+        //  Move those to another class too. :)
+        
+        super();
 
         setOpaque(false);
 
@@ -149,7 +150,7 @@ public class FreeColMenuBar extends JMenuBar {
 
         // --> Debug
         if (FreeCol.isInDebugMode()) {
-        	add(new DebugMenu(freeColClient));
+            add(new DebugMenu(freeColClient));
         }
         
         update();        
@@ -199,6 +200,7 @@ public class FreeColMenuBar extends JMenuBar {
         menu.addSeparator();
 
         menu.add(getMenuItem(EuropeAction.ID));
+        menu.add(getMenuItem(TradeRouteAction.ID));
         
         add(menu);        
     }
@@ -259,7 +261,7 @@ public class FreeColMenuBar extends JMenuBar {
     }
     
     public JMenuItem getReportsTradeMenuItem() {
-    	return reportsTradeMenuItem;
+        return reportsTradeMenuItem;
     }
     
     private void buildColopediaMenu() {
@@ -286,77 +288,77 @@ public class FreeColMenuBar extends JMenuBar {
      * @return
      */
     protected JMenuItem getMenuItem(String actionID) {
-    	JMenuItem rtn = null;
-    	
-    	FreeColAction action = am.getFreeColAction(actionID);
+        JMenuItem rtn = null;
+        
+        FreeColAction action = am.getFreeColAction(actionID);
 
-    	if (action != null) {
-        	rtn = new JMenuItem();
-        	rtn.setAction(action);
-        	rtn.setOpaque(false);
-        	
-        	if (action.getMnemonic() != FreeColAction.NO_MNEMONIC)
-        		rtn.addMenuKeyListener(action.getMenuKeyListener());
-    	}
-    	else
-    		logger.finest("Could not create menu item. [" + actionID + "] not found.");
-    	
-    	return rtn;
+        if (action != null) {
+            rtn = new JMenuItem();
+            rtn.setAction(action);
+            rtn.setOpaque(false);
+                
+            if (action.getMnemonic() != FreeColAction.NO_MNEMONIC)
+                rtn.addMenuKeyListener(action.getMenuKeyListener());
+        }
+        else {
+            logger.finest("Could not create menu item. [" + actionID + "] not found.");
+        }
+        return rtn;
     }
     
     protected JMenuItem getMenuItem(String actionID, ActionListener actionListener) {
-    	JMenuItem rtn = getMenuItem(actionID);
-    	
-    	rtn.addActionListener(actionListener);
-    	
-    	return rtn;
+        JMenuItem rtn = getMenuItem(actionID);
+        
+        rtn.addActionListener(actionListener);
+        
+        return rtn;
     }
     
     protected JCheckBoxMenuItem getCheckBoxMenuItem(String actionID) {
         
-    	JCheckBoxMenuItem rtn = null; 
-    	FreeColAction action = am.getFreeColAction(actionID);
-    	
-    	if (action != null) {
-    		rtn = new JCheckBoxMenuItem();
-    		rtn.setAction(action);
-    		rtn.setOpaque(false);
-    		
-            rtn.setSelected(((SelectableAction) am.getFreeColAction(actionID)).isSelected());    		
-    	}
-    	else
-    		logger.finest("Could not create menu item. [" + actionID + "] not found.");	
+        JCheckBoxMenuItem rtn = null; 
+        FreeColAction action = am.getFreeColAction(actionID);
+        
+        if (action != null) {
+            rtn = new JCheckBoxMenuItem();
+            rtn.setAction(action);
+            rtn.setOpaque(false);
+                
+            rtn.setSelected(((SelectableAction) am.getFreeColAction(actionID)).isSelected());                   
+        }
+        else
+            logger.finest("Could not create menu item. [" + actionID + "] not found."); 
         
         return rtn;
     }
     
     /**
-    * Updates this <code>FreeColMenuBar</code>.
-    */
+     * Updates this <code>FreeColMenuBar</code>.
+     */
     public void update() {
-//        if (!freeColClient.getGUI().isInGame()) {
-//            return;
-//        }
-//
-//        FreeColAction action = am.getFreeColAction(SaveAction.ID);
-//        action.setEnabled(freeColClient.getMyPlayer().isAdmin() && freeColClient.getFreeColServer() != null);
-//
-//        repaint();
+        //        if (!freeColClient.getGUI().isInGame()) {
+        //            return;
+        //        }
+        //
+        //        FreeColAction action = am.getFreeColAction(SaveAction.ID);
+        //        action.setEnabled(freeColClient.getMyPlayer().isAdmin() && freeColClient.getFreeColServer() != null);
+        //
+        //        repaint();
     }
 
     /**
      * Returns the opaque height of this menubar.
      * @return The height of this menubar including all the borders except
-     * 		the ones being transparent.
+     *          the ones being transparent.
      */
     public int getOpaqueHeight() {
-    	return getHeight() - outerBorder.getBorderInsets(this).bottom;
+        return getHeight() - outerBorder.getBorderInsets(this).bottom;
     }
 
     /**
-    * When a <code>FreeColMenuBar</code> is disabled, it does
-    * not show the "in game options".
-    */
+     * When a <code>FreeColMenuBar</code> is disabled, it does
+     * not show the "in game options".
+     */
     public void setEnabled(boolean enabled) {
         // Not implemented (and possibly not needed).
 
@@ -389,13 +391,13 @@ public class FreeColMenuBar extends JMenuBar {
             g.setClip(originalClip);
         }
         
-       String displayString = Messages.message("menuBar.statusLine", new String[][]{
-           {"%gold%", Integer.toString(freeColClient.getMyPlayer().getGold())},
-           {"%tax%", Integer.toString(freeColClient.getMyPlayer().getTax())},
-           {"%year%", freeColClient.getGame().getTurn().toString()}
-       });
-       Rectangle2D displayStringBounds = g.getFontMetrics().getStringBounds(displayString, g);
-       int y = 15 + getInsets().top;
-       g.drawString(displayString, getWidth()-10-(int)displayStringBounds.getWidth(), y);
+        String displayString = Messages.message("menuBar.statusLine", new String[][]{
+            {"%gold%", Integer.toString(freeColClient.getMyPlayer().getGold())},
+            {"%tax%", Integer.toString(freeColClient.getMyPlayer().getTax())},
+            {"%year%", freeColClient.getGame().getTurn().toString()}
+        });
+        Rectangle2D displayStringBounds = g.getFontMetrics().getStringBounds(displayString, g);
+        int y = 15 + getInsets().top;
+        g.drawString(displayString, getWidth()-10-(int)displayStringBounds.getWidth(), y);
     }
 }

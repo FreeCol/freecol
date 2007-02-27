@@ -65,6 +65,7 @@ import net.sf.freecol.client.gui.panel.ServerListPanel;
 import net.sf.freecol.client.gui.panel.StartGamePanel;
 import net.sf.freecol.client.gui.panel.StatusPanel;
 import net.sf.freecol.client.gui.panel.TilePanel;
+import net.sf.freecol.client.gui.panel.TradeRouteDialog;
 import net.sf.freecol.client.gui.panel.TrainDialog;
 import net.sf.freecol.client.gui.panel.VictoryPanel;
 import net.sf.freecol.client.gui.panel.WarehouseDialog;
@@ -177,15 +178,16 @@ public final class Canvas extends JLayeredPane {
     private final TilePanel         tilePanel;
     private final MonarchPanel      monarchPanel;
     private final EuropePanel       europePanel;
-    private final RecruitDialog             recruitDialog;
-    private final PurchaseDialog            purchaseDialog;
-    private final TrainDialog               trainDialog;
+    private final RecruitDialog     recruitDialog;
+    private final PurchaseDialog    purchaseDialog;
+    private final TrainDialog       trainDialog;
+    private final TradeRouteDialog  tradeRouteDialog;
     private final StatusPanel       statusPanel;
     private final ChatPanel         chatPanel;
     private final GUI               gui;
     private final ChatDisplayThread chatDisplayThread;
     private final VictoryPanel      victoryPanel;
-    private final WarehouseDialog    warehouseDialog;
+    private final WarehouseDialog   warehouseDialog;
     private final ChooseFoundingFatherDialog chooseFoundingFatherDialog;
     private final EventPanel        eventPanel;
     private final EmigrationPanel   emigrationPanel;
@@ -244,6 +246,7 @@ public final class Canvas extends JLayeredPane {
         recruitDialog = new RecruitDialog(this);
         purchaseDialog = new PurchaseDialog(this);
         trainDialog = new TrainDialog(this);
+        tradeRouteDialog = new TradeRouteDialog(this);
         statusPanel = new StatusPanel(this);
 
         chatPanel = new ChatPanel(this, freeColClient);
@@ -1466,6 +1469,25 @@ public final class Canvas extends JLayeredPane {
         boolean response = trainDialog.getResponseBoolean();
 
         remove(trainDialog);
+        setEnabled(true);
+
+        return response;
+    }
+
+
+    /**
+    * Displays the <code>TradeRouteDialog</code>. Does not return from this
+    * method before the panel is closed.
+    */
+    public boolean showTradeRouteDialog() {
+        tradeRouteDialog.initialize();
+        addCentered(tradeRouteDialog, INPUT_LAYER);
+
+        tradeRouteDialog.requestFocus();
+
+        boolean response = tradeRouteDialog.getResponseBoolean();
+
+        remove(tradeRouteDialog);
         setEnabled(true);
 
         return response;

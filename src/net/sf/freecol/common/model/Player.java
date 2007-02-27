@@ -212,6 +212,9 @@ public class Player extends FreeColGameObject implements Nameable {
     // Settlements this player owns
     private List<Settlement> settlements = new ArrayList<Settlement>();
 
+    // Trade routes of this player
+    private List<TradeRoute> tradeRoutes = new ArrayList<TradeRoute>();
+
     // Temporary variables:
     protected boolean[][] canSeeTiles = null;
 
@@ -1664,6 +1667,23 @@ public class Player extends FreeColGameObject implements Nameable {
         return crosses;
     }
 
+    /**
+     * Get the <code>TradeRoutes</code> value.
+     *
+     * @return a <code>List<TradeRoute></code> value
+     */
+    public final List<TradeRoute> getTradeRoutes() {
+        return tradeRoutes;
+    }
+
+    /**
+     * Set the <code>TradeRoutes</code> value.
+     *
+     * @param newTradeRoutes The new TradeRoutes value.
+     */
+    public final void setTradeRoutes(final List<TradeRoute> newTradeRoutes) {
+        this.tradeRoutes = newTradeRoutes;
+    }
 
     /**
     * Checks to see whether or not a colonist can emigrate, and does so if possible.
@@ -2279,6 +2299,10 @@ public class Player extends FreeColGameObject implements Nameable {
         toArrayElement("incomeBeforeTaxes", incomeBeforeTaxes, out);
         toArrayElement("incomeAfterTaxes", incomeAfterTaxes, out);
 
+        for (TradeRoute route : getTradeRoutes()) {
+            route.toXML(out, this);
+        }
+
         out.writeEndElement();
     }
 
@@ -2391,6 +2415,10 @@ public class Player extends FreeColGameObject implements Nameable {
                 } else {
                     monarch = new Monarch(getGame(), in);
                 }
+            } else if (in.getLocalName().equals(TradeRoute.getXMLElementTagName())) {
+                TradeRoute route = new TradeRoute(getGame(), "");
+                route.readFromXML(in);
+                getTradeRoutes().add(route);
             }
         }
         if (tension == null) {
