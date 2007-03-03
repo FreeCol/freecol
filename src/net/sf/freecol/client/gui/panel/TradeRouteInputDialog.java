@@ -3,6 +3,7 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
@@ -10,6 +11,7 @@ import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -21,6 +23,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
 
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 
 import net.sf.freecol.common.model.Goods;
@@ -55,6 +58,8 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
 
     private final JPanel tradeRoutePanel = new JPanel();
     private final JPanel buttonPanel = new JPanel();
+    private final JPanel goodsPanel = new JPanel(new GridLayout(4, 4, margin, margin));
+    private final JPanel cargoPanel = new JPanel();
     
     private final JComboBox destinationSelector = new JComboBox();
     private final JTextField tradeRouteName = new JTextField(Messages.message("traderouteDialog.newRoute"));
@@ -120,6 +125,22 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
 	stopList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 	stopList.setDragEnabled(true);
 
+        ImageLibrary library = (ImageLibrary) parent.getImageProvider();
+
+        for (int goods = 0; goods < Goods.NUMBER_OF_TYPES; goods++) {
+            ImageIcon icon = library.getGoodsImageIcon(goods);
+            JLabel label = new JLabel(icon);
+            //button.setHorizontalAlignment(SwingConstants.LEFT);
+            //button.setActionCommand(String.valueOf(goods));
+            //button.addActionListener(this);
+            goodsPanel.add(label);
+        }
+
+        goodsPanel.setOpaque(false);
+        goodsPanel.setBorder(BorderFactory.createTitledBorder(Messages.message("goods")));
+        cargoPanel.setOpaque(false);
+        cargoPanel.setBorder(BorderFactory.createTitledBorder(Messages.message("cargoOnShip")));
+
 
         int[] widths = {0};
         int[] heights = {0, margin, 0, margin, 0};
@@ -127,6 +148,7 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
 
         buttonPanel.add(ok);
         buttonPanel.add(cancel);
+        buttonPanel.setOpaque(false);
         add(getDefaultHeader(Messages.message("traderouteDialog.editRoute")),
             higConst.rc(1, 1));
         add(tradeRoutePanel, higConst.rc(3, 1));
@@ -156,10 +178,12 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
             listModel.addElement(stop);
         }
 
+        updateButtons();
+
         tradeRouteName.setText(tradeRoute.getName());
 
         int widths[] = {240, 3 * margin, 0, margin, 0};
-        int heights[] = {0, 3 * margin, 0, margin, 0, 3 * margin, 0, margin, 0};
+        int heights[] = {0, 3 * margin, 0, margin, 0, margin, 80, margin, 0};
         int listColumn = 1;
         int labelColumn = 3;
         int valueColumn = 5;
@@ -168,14 +192,18 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
 
         int row = 1;
         tradeRoutePanel.add(tradeRouteView, higConst.rcwh(row, listColumn, 1, heights.length));
-        row += 2;
-
         tradeRoutePanel.add(nameLabel, higConst.rc(row, labelColumn));
         tradeRoutePanel.add(tradeRouteName, higConst.rc(row, valueColumn));
         row += 2;
 
         tradeRoutePanel.add(destinationLabel, higConst.rc(row, labelColumn));
         tradeRoutePanel.add(destinationSelector, higConst.rc(row, valueColumn));
+        row += 2;
+
+        tradeRoutePanel.add(goodsPanel, higConst.rcwh(row, labelColumn, 3, 1));
+        row += 2;
+
+        tradeRoutePanel.add(cargoPanel, higConst.rcwh(row, labelColumn, 3, 1));
         row += 2;
 
         tradeRoutePanel.add(addStopButton, higConst.rc(row, labelColumn));
