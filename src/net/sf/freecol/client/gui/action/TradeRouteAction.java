@@ -3,9 +3,8 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.logging.Logger;
-
-import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 
@@ -28,7 +27,7 @@ public class TradeRouteAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     TradeRouteAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.view.tradeRoutes", null, KeyStroke.getKeyStroke('#', 0));
+        super(freeColClient, "menuBar.view.tradeRoutes", null, KeyEvent.VK_NUMBER_SIGN);
     }
     
     

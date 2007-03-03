@@ -120,7 +120,7 @@ public class TradeRoute extends PersistentObject {
     }
 
 
-    public void add(Stop stop) {
+    public void addStop(Stop stop) {
         stops.add(stop);
     }
 
@@ -165,6 +165,13 @@ public class TradeRoute extends PersistentObject {
 
     public void newTurn() {}
 
+    public TradeRoute clone() {
+        TradeRoute result = new TradeRoute(getGame(), new String(getName()));
+        for (Stop stop : getStops()) {
+            result.addStop(stop.clone());
+        }
+        return result;
+    }
 
     public class Stop {
 
@@ -203,8 +210,20 @@ public class TradeRoute extends PersistentObject {
             return cargo;
         }
 
+        public void addCargo(Integer newCargo) {
+            cargo.add(newCargo);
+        }
+
         public String toString() {
             return getLocation().getLocationName();
+        }
+
+        public Stop clone() {
+            Stop result = new Stop(getLocation());
+            for (Integer cargo : getCargo()) {
+                result.addCargo(new Integer(cargo));
+            }
+            return result;
         }
 
         public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {

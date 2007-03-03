@@ -66,6 +66,7 @@ import net.sf.freecol.client.gui.panel.StartGamePanel;
 import net.sf.freecol.client.gui.panel.StatusPanel;
 import net.sf.freecol.client.gui.panel.TilePanel;
 import net.sf.freecol.client.gui.panel.TradeRouteDialog;
+import net.sf.freecol.client.gui.panel.TradeRouteInputDialog;
 import net.sf.freecol.client.gui.panel.TrainDialog;
 import net.sf.freecol.client.gui.panel.VictoryPanel;
 import net.sf.freecol.client.gui.panel.WarehouseDialog;
@@ -81,6 +82,7 @@ import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.Map.Position;
@@ -182,6 +184,7 @@ public final class Canvas extends JLayeredPane {
     private final PurchaseDialog    purchaseDialog;
     private final TrainDialog       trainDialog;
     private final TradeRouteDialog  tradeRouteDialog;
+    private final TradeRouteInputDialog  tradeRouteInputDialog;
     private final StatusPanel       statusPanel;
     private final ChatPanel         chatPanel;
     private final GUI               gui;
@@ -247,6 +250,7 @@ public final class Canvas extends JLayeredPane {
         purchaseDialog = new PurchaseDialog(this);
         trainDialog = new TrainDialog(this);
         tradeRouteDialog = new TradeRouteDialog(this);
+        tradeRouteInputDialog = new TradeRouteInputDialog(this);
         statusPanel = new StatusPanel(this);
 
         chatPanel = new ChatPanel(this, freeColClient);
@@ -1476,18 +1480,36 @@ public final class Canvas extends JLayeredPane {
 
 
     /**
-    * Displays the <code>TradeRouteDialog</code>. Does not return from this
-    * method before the panel is closed.
-    */
+     * Displays the <code>TradeRouteDialog</code>. Does not return
+     * from this method before the panel is closed.
+     */
     public boolean showTradeRouteDialog() {
         tradeRouteDialog.initialize();
-        addCentered(tradeRouteDialog, INPUT_LAYER);
+        addCentered(tradeRouteDialog, INPUT_LAYER - 1);
 
         tradeRouteDialog.requestFocus();
 
         boolean response = tradeRouteDialog.getResponseBoolean();
 
         remove(tradeRouteDialog);
+        setEnabled(true);
+
+        return response;
+    }
+
+    /**
+     * Displays the <code>TradeRouteInputDialog</code>. Does not
+     * return from this method before the panel is closed.
+     */
+    public boolean showTradeRouteInputDialog(TradeRoute route) {
+        tradeRouteInputDialog.initialize(route);
+        addCentered(tradeRouteInputDialog, INPUT_LAYER);
+
+        tradeRouteInputDialog.requestFocus();
+
+        boolean response = tradeRouteInputDialog.getResponseBoolean();
+
+        remove(tradeRouteInputDialog);
         setEnabled(true);
 
         return response;
