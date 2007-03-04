@@ -500,12 +500,12 @@ public class AIColony extends AIObject {
      * @see AIGoods#dispose()
      */
     public void removeAIGoods(AIGoods ag) {
-    	Iterator it = aiGoods.iterator();
-    	while (it.hasNext()) {
-    		if (it.next() == ag) {
-    			it.remove();
-    		}
-    	}
+        Iterator it = aiGoods.iterator();
+        while (it.hasNext()) {
+                if (it.next() == ag) {
+                        it.remove();
+                }
+        }
     }
 
     /**
@@ -986,17 +986,23 @@ public class AIColony extends AIObject {
                 break;
             }
             
-            // TODO: colony.getBuilding(...) may potentially return null!
             int hammersNew = (buildable >= Colony.BUILDING_UNIT_ADDITION) 
                     ? Unit.getNextHammers(buildable-Colony.BUILDING_UNIT_ADDITION) 
                     : colony.getBuilding(buildable).getNextHammers();
-            int hammersOld = (colony.getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) 
-                    ? Unit.getNextHammers(colony.getCurrentlyBuilding()-Colony.BUILDING_UNIT_ADDITION) 
-                    : colony.getBuilding(colony.getCurrentlyBuilding()).getNextHammers();
+            int hammersOld = 0;
+            if (colony.getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) {
+                hammersOld = Unit.getNextHammers(colony.getCurrentlyBuilding() - Colony.BUILDING_UNIT_ADDITION);
+            } else if (colony.getCurrentlyBuilding() > -1) {
+                hammersOld = colony.getBuilding(colony.getCurrentlyBuilding()).getNextHammers();
+            }
                     
-            boolean isOldValid = (colony.getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) 
-                    ? true
-                    : colony.getBuilding(colony.getCurrentlyBuilding()).canBuildNext();               
+            boolean isOldValid = true;
+            if (colony.getCurrentlyBuilding() < 0) {
+                isOldValid = false;
+            } else if (colony.getCurrentlyBuilding() < Colony.BUILDING_UNIT_ADDITION) {
+                isOldValid = colony.getBuilding(colony.getCurrentlyBuilding()).canBuildNext();
+            }
+
             if (hammersNew > colony.getHammers()
                     || hammersNew > hammersOld
                     || !isOldValid) {
