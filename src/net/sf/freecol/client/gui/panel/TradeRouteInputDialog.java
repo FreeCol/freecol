@@ -1,9 +1,14 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseListener;
 import java.awt.GridLayout;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
@@ -11,9 +16,9 @@ import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -21,9 +26,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.TransferHandler;
 
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 
 import net.sf.freecol.common.model.Goods;
@@ -58,8 +63,11 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
 
     private final JPanel tradeRoutePanel = new JPanel();
     private final JPanel buttonPanel = new JPanel();
-    private final JPanel goodsPanel = new JPanel(new GridLayout(4, 4, margin, margin));
-    private final JPanel cargoPanel = new JPanel();
+    private final CargoHandler cargoHandler = new CargoHandler();
+    private final MouseListener dragListener = new DragListener(this);
+    private final MouseListener dropListener = new DropListener();
+    private final GoodsPanel goodsPanel;
+    private final CargoPanel cargoPanel;
     
     private final JComboBox destinationSelector = new JComboBox();
     private final JTextField tradeRouteName = new JTextField(Messages.message("traderouteDialog.newRoute"));
@@ -94,6 +102,11 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
 
         setCancelComponent(cancel);
 
+        goodsPanel = new GoodsPanel();
+        goodsPanel.setTransferHandler(cargoHandler);
+        cargoPanel = new CargoPanel();
+        cargoPanel.setTransferHandler(cargoHandler);
+
         stopList.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
                 updateButtons();
@@ -124,23 +137,6 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
 
 	stopList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 	stopList.setDragEnabled(true);
-
-        ImageLibrary library = (ImageLibrary) parent.getImageProvider();
-
-        for (int goods = 0; goods < Goods.NUMBER_OF_TYPES; goods++) {
-            ImageIcon icon = library.getGoodsImageIcon(goods);
-            JLabel label = new JLabel(icon);
-            //button.setHorizontalAlignment(SwingConstants.LEFT);
-            //button.setActionCommand(String.valueOf(goods));
-            //button.addActionListener(this);
-            goodsPanel.add(label);
-        }
-
-        goodsPanel.setOpaque(false);
-        goodsPanel.setBorder(BorderFactory.createTitledBorder(Messages.message("goods")));
-        cargoPanel.setOpaque(false);
-        cargoPanel.setBorder(BorderFactory.createTitledBorder(Messages.message("cargoOnShip")));
-
 
         int[] widths = {0};
         int[] heights = {0, margin, 0, margin, 0};
@@ -210,22 +206,6 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
         tradeRoutePanel.add(removeStopButton, higConst.rc(row, valueColumn));
         row += 2;
 
-        
-
-
-        /*
-	JList locationList = new JList(locationListModel);
-
-        JPanel tradeRoutePanel = new JPanel();
-        tradeRoutePanel.setLayout(new BorderLayout());
-        tradeRoutePanel.add(tradeRouteView, BorderLayout.CENTER);
-        tradeRoutePanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-
-        for (int goodsType = 0; goodsType < Goods.NUMBER_OF_TYPES; goodsType++) {
-            traderouteDialog.add(new TradeRouteGoodsPanel(colony, goodsType));
-        }
-        */
-
         setSize(getPreferredSize());
 
     }
@@ -273,6 +253,93 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
         }
         catch (NumberFormatException e) {
             logger.warning("Invalid Actioncommand: not a number.");
+        }
+    }
+
+    public class CargoLabel extends JLabel {
+        public final int goodsType;
+
+        public CargoLabel(int type) {
+            super(parent.getImageProvider().getGoodsImageIcon(type));
+            setTransferHandler(cargoHandler);
+            addMouseListener(dragListener);
+            this.goodsType = type;
+        }
+
+    }
+
+    public class GoodsPanel extends JPanel {
+
+        public GoodsPanel() {
+            super(new GridLayout(4, 4, margin, margin));
+            for (int goods = 0; goods < Goods.NUMBER_OF_TYPES; goods++) {
+                add(new CargoLabel(goods));
+            }
+            setOpaque(false);
+            setBorder(BorderFactory.createTitledBorder(Messages.message("goods")));
+            addMouseListener(dropListener);
+        }
+
+    }
+
+    public class CargoPanel extends JPanel {
+
+        public CargoPanel() {
+            super();
+            setOpaque(false);
+            setBorder(BorderFactory.createTitledBorder(Messages.message("cargoOnShip")));
+            addMouseListener(dropListener);
+        }
+
+    }
+
+
+
+
+    public class CargoHandler extends TransferHandler {
+
+        protected Transferable createTransferable(JComponent c) {
+            return new ImageSelection((CargoLabel) c);
+        }
+        
+        public int getSourceActions(JComponent c) {
+            return COPY_OR_MOVE;
+        }
+        
+        public boolean importData(JComponent target, Transferable data) {
+            if (canImport(target, data.getTransferDataFlavors())) {
+                try {
+                    CargoLabel label = (CargoLabel) data.getTransferData(DefaultTransferHandler.flavor);
+                    if (target instanceof CargoPanel) {
+                        target.add(new CargoLabel(label.goodsType));
+                    }
+                    return true;
+                } catch (UnsupportedFlavorException ufe) {
+                } catch (IOException ioe) {
+                }
+            }
+
+            return false;
+        }
+        
+        protected void exportDone(JComponent source, Transferable data, int action) {
+            try {
+                CargoLabel label = (CargoLabel) data.getTransferData(DefaultTransferHandler.flavor);
+                if (source instanceof CargoPanel) {
+                    source.remove(label);
+                }
+            } catch (UnsupportedFlavorException ufe) {
+            } catch (IOException ioe) {
+            }
+        }
+        
+        public boolean canImport(JComponent c, DataFlavor[] flavors) {
+            for (int i = 0; i < flavors.length; i++) {
+                if (flavors[i].equals(DefaultTransferHandler.flavor)) {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 

@@ -26,7 +26,7 @@ import net.sf.freecol.common.model.Player;
  * This label holds Goods data in addition to the JLabel data, which makes
  * it ideal to use for drag and drop purposes.
  */
-public final class GoodsLabel extends JLabel implements ActionListener {
+public final class GoodsLabel extends JLabel {//implements ActionListener {
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
@@ -163,6 +163,7 @@ public final class GoodsLabel extends JLabel implements ActionListener {
     * care of the user's request.
     * @param event The incoming action event
     */
+    /* isn't actually used
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         try {
@@ -180,4 +181,5 @@ public final class GoodsLabel extends JLabel implements ActionListener {
             logger.warning("Invalid action number");
         }
     }
+    */
 }
