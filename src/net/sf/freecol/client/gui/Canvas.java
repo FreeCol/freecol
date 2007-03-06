@@ -969,18 +969,18 @@ public final class Canvas extends JLayeredPane {
     * This is the same as calling:
     *
     * <br><br><code>
-    * showSaveDialog(directory, new FileFilter[] {FreeColDialog.getFSGFileFilter()});
+    * showSaveDialog(directory, new FileFilter[] {FreeColDialog.getFSGFileFilter()}, defaultName);
     * </code>
     *
     * @param directory The directory containing the files in which the
     *                  user may overwrite.
+    * @param defaultName Default filename for the savegame.
     * @return The <code>File</code>.
     * @see FreeColDialog
     */
-    public File showSaveDialog(File directory) {
-        return showSaveDialog(directory, ".fsg", new FileFilter[] {FreeColDialog.getFSGFileFilter()});
+    public File showSaveDialog(File directory, String defaultName) {
+        return showSaveDialog(directory, ".fsg", new FileFilter[] {FreeColDialog.getFSGFileFilter()}, defaultName);
     }
-
 
     /**
     * Displays a dialog where the user may choose a filename.
@@ -991,11 +991,12 @@ public final class Canvas extends JLayeredPane {
     *       specified filename (if not added by the user). 
     * @param fileFilters The available file filters in the
     *       dialog.
+    * @param defaultName Default filename for the savegame.
     * @return The <code>File</code>.
     * @see FreeColDialog
     */
-    public File showSaveDialog(File directory, String standardName, FileFilter[] fileFilters) {
-        FreeColDialog saveDialog = FreeColDialog.createSaveDialog(directory, standardName, fileFilters);
+    public File showSaveDialog(File directory, String standardName, FileFilter[] fileFilters, String defaultName) {
+        FreeColDialog saveDialog = FreeColDialog.createSaveDialog(directory, standardName, fileFilters, defaultName);
         addCentered(saveDialog, SAVE_LAYER);
         saveDialog.requestFocus();
 
@@ -1005,7 +1006,6 @@ public final class Canvas extends JLayeredPane {
 
         return response;
     }
-
 
     /**
     * Displays a dialog that asks the user what he wants to do with his scout in the indian

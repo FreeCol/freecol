@@ -1094,11 +1094,13 @@ public class FreeColDialog extends FreeColPanel {
     *       specified filename (if not added by the user).
     * @param fileFilters The available file filters in the
     *       dialog.
+    * @param defaultName Default filename for the savegame.
     * @return The <code>FreeColDialog</code>.
     */
-    public static FreeColDialog createSaveDialog(File directory, final String standardName, FileFilter[] fileFilters) {
+    public static FreeColDialog createSaveDialog(File directory, final String standardName, FileFilter[] fileFilters, String defaultName) {
         final FreeColDialog saveDialog = new FreeColDialog();
         final JFileChooser fileChooser = new JFileChooser(directory);
+        final File defaultFile = new File(defaultName);
 
         fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
         if (fileFilters.length > 0) {
@@ -1124,6 +1126,7 @@ public class FreeColDialog extends FreeColPanel {
             }
         });
         fileChooser.setFileHidingEnabled(false);
+        fileChooser.setSelectedFile(defaultFile);
         saveDialog.setLayout(new BorderLayout());
         saveDialog.add(fileChooser);
         saveDialog.setSize(480, 320);
