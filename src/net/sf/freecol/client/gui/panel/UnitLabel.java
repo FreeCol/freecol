@@ -163,6 +163,9 @@ public final class UnitLabel extends JLabel implements ActionListener {
             ImageIcon imageIcon = (parent.getImageProvider().getUnitImageIcon(parent.getImageProvider().getUnitGraphicsType(unit)));
             //setIcon(new ImageIcon(imageIcon.getImage().getScaledInstance(imageIcon.getIconWidth() / 2, imageIcon.getIconHeight() / 2, Image.SCALE_DEFAULT)));
             setIcon(new ImageIcon(imageIcon.getImage().getScaledInstance((imageIcon.getIconWidth() / 3) * 2, (imageIcon.getIconHeight() / 3) * 2, Image.SCALE_SMOOTH)));
+            
+            ImageIcon disabledImageIcon = (parent.getImageProvider().getUnitImageIcon(parent.getImageProvider().getUnitGraphicsType(unit), true));
+            setDisabledIcon(new ImageIcon(disabledImageIcon.getImage().getScaledInstance((imageIcon.getIconWidth() / 3) * 2, (imageIcon.getIconHeight() / 3) * 2, Image.SCALE_SMOOTH)));
         } else {
             if (unit.getLocation() instanceof ColonyTile) {
                 setPreferredSize(new java.awt.Dimension(parent.getImageProvider().getTerrainImageWidth(0) / 2, parent.getImageProvider().getUnitImageHeight(parent.getImageProvider().getUnitGraphicsType(unit))));
@@ -171,6 +174,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
             }
 
             setIcon(parent.getImageProvider().getUnitImageIcon(parent.getImageProvider().getUnitGraphicsType(unit)));
+            setDisabledIcon(parent.getImageProvider().getUnitImageIcon(parent.getImageProvider().getUnitGraphicsType(unit), true));
         }
 
     }
@@ -327,6 +331,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
                         logger.warning("Invalid action");
                 }
                 setIcon(parent.getImageProvider().getUnitImageIcon(parent.getImageProvider().getUnitGraphicsType(unit)));
+                setDisabledIcon(parent.getImageProvider().getUnitImageIcon(parent.getImageProvider().getUnitGraphicsType(unit), true));
 
                 Component uc = getParent();
                 while (uc != null) {
