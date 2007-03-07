@@ -1,6 +1,7 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Component;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -117,6 +118,10 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
         addStopButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     Stop stop = originalRoute.new Stop((Location) destinationSelector.getSelectedItem());
+                    for (Component comp : cargoPanel.getComponents()) {
+                        CargoLabel label = (CargoLabel) comp;
+                        stop.getCargo().add(new Integer(label.getType()));
+                    }
                     if (stopList.getSelectedIndex() == -1) {
                         listModel.addElement(stop);
                     } else {
@@ -137,6 +142,11 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
 
 	stopList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 	stopList.setDragEnabled(true);
+        stopList.addListSelectionListener(new ListSelectionListener() {
+                public void valueChanged(ListSelectionEvent e) {
+                    cargoPanel.initialize((Stop) stopList.getSelectedValue());
+                }
+            });
 
         int[] widths = {0};
         int[] heights = {0, margin, 0, margin, 0};
@@ -158,6 +168,7 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
         Player player = parent.getClient().getMyPlayer();
 
         tradeRoutePanel.removeAll();
+        cargoPanel.removeAll();
 
         // combo box for selecting destination
         destinationSelector.removeAllItems();
@@ -172,6 +183,12 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
         listModel.removeAllElements();
         for (Stop stop : tradeRoute.getStops()) {
             listModel.addElement(stop);
+        }
+
+        if (listModel.getSize() > 0) {
+            stopList.setSelectedIndex(0);
+            Stop selectedStop = (Stop) listModel.firstElement();
+            cargoPanel.initialize(selectedStop);
         }
 
         updateButtons();
@@ -257,13 +274,17 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
     }
 
     public class CargoLabel extends JLabel {
-        public final int goodsType;
+        private final int goodsType;
 
         public CargoLabel(int type) {
             super(parent.getImageProvider().getGoodsImageIcon(type));
             setTransferHandler(cargoHandler);
             addMouseListener(dragListener);
             this.goodsType = type;
+        }
+
+        public int getType() {
+            return this.goodsType;
         }
 
     }
@@ -273,7 +294,8 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
         public GoodsPanel() {
             super(new GridLayout(4, 4, margin, margin));
             for (int goods = 0; goods < Goods.NUMBER_OF_TYPES; goods++) {
-                add(new CargoLabel(goods));
+                CargoLabel label = new CargoLabel(goods);
+                add(label);
             }
             setOpaque(false);
             setBorder(BorderFactory.createTitledBorder(Messages.message("goods")));
@@ -284,6 +306,8 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
 
     public class CargoPanel extends JPanel {
 
+        private Stop stop;
+
         public CargoPanel() {
             super();
             setOpaque(false);
@@ -291,6 +315,17 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
             addMouseListener(dropListener);
         }
 
+        public void initialize(Stop newStop) {
+            removeAll();
+            if (newStop != null) {
+                stop = newStop;
+                for (Integer cargo : newStop.getCargo()) {
+                    add(new CargoLabel(cargo.intValue()));
+                }
+            }
+            revalidate();
+            repaint();
+        }
     }
 
 
@@ -311,11 +346,19 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
                 try {
                     CargoLabel label = (CargoLabel) data.getTransferData(DefaultTransferHandler.flavor);
                     if (target instanceof CargoPanel) {
-                        target.add(new CargoLabel(label.goodsType));
+                        CargoLabel newLabel = new CargoLabel(label.getType());
+                        cargoPanel.add(newLabel);
+                        cargoPanel.revalidate();
+                        Stop stop = (Stop) stopList.getSelectedValue();
+                        if (stop != null) {
+                            stop.getCargo().add(new Integer(label.getType()));
+                        }
                     }
                     return true;
                 } catch (UnsupportedFlavorException ufe) {
+                    logger.warning(ufe.toString());
                 } catch (IOException ioe) {
+                    logger.warning(ioe.toString());
                 }
             }
 
@@ -325,11 +368,25 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
         protected void exportDone(JComponent source, Transferable data, int action) {
             try {
                 CargoLabel label = (CargoLabel) data.getTransferData(DefaultTransferHandler.flavor);
-                if (source instanceof CargoPanel) {
-                    source.remove(label);
+                if (source.getParent() instanceof CargoPanel) {
+                    cargoPanel.remove(label);
+                    Stop stop = (Stop) stopList.getSelectedValue();
+                    if (stop != null) {
+                        ArrayList<Integer> cargo = stop.getCargo();
+                        for (int index = 0; index < cargo.size(); index++) {
+                            if (cargo.get(index).intValue() == label.getType()) {
+                                cargo.remove(index);
+                                break;
+                            }
+                        }
+                    }
+                    cargoPanel.revalidate();
+                    cargoPanel.repaint();
                 }
             } catch (UnsupportedFlavorException ufe) {
+                logger.warning(ufe.toString());
             } catch (IOException ioe) {
+                logger.warning(ioe.toString());
             }
         }
         
