@@ -31,7 +31,7 @@ import net.sf.freecol.client.gui.option.OptionMapUI;
 public final class GameOptionsDialog extends FreeColDialog implements ActionListener {
     private static final Logger logger = Logger.getLogger(GameOptionsDialog.class.getName());
 
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
@@ -147,7 +147,13 @@ public final class GameOptionsDialog extends FreeColDialog implements ActionList
                     setResponse(new Boolean(false));
                     break;
                 case SAVE:
-                    File saveFile = freeColClient.getCanvas().showSaveDialog(FreeCol.getSaveDirectory(), ".fgo", new FileFilter[] {FreeColDialog.getFGOFileFilter(), FreeColDialog.getFSGFileFilter(), FreeColDialog.getGameOptionsFileFilter()});
+                    FileFilter[] filters = new FileFilter[] {FreeColDialog.getFGOFileFilter(),
+                                                             FreeColDialog.getFSGFileFilter(),
+                                                             FreeColDialog.getGameOptionsFileFilter()};
+                    File saveFile = freeColClient.getCanvas().showSaveDialog(FreeCol.getSaveDirectory(),
+                                                                             ".fgo",
+                                                                             filters,
+                                                                             "");
                     if (saveFile != null) {
                         try {
                             ui.updateOption();
