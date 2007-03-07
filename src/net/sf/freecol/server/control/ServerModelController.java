@@ -19,7 +19,7 @@ import org.w3c.dom.Element;
 public class ServerModelController implements ModelController {
     private static final Logger logger = Logger.getLogger(ServerModelController.class.getName());
 
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
@@ -359,6 +359,16 @@ public class ServerModelController implements ModelController {
     }
 
 
+
+    /**
+     * Returns a new <code>TradeRoute</code> object.
+     * @return a new <code>TradeRoute</code> object.
+     */
+    public TradeRoute getNewTradeRoute() {
+        Game game = freeColServer.getGame();
+        String name = null;
+        return new TradeRoute(game, name);
+    }
 
 
 

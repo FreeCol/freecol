@@ -18,7 +18,7 @@ import org.w3c.dom.Element;
 /**
 * A trade route.
 */
-public class TradeRoute extends PersistentObject {
+public class TradeRoute extends FreeColGameObject {
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
@@ -50,37 +50,19 @@ public class TradeRoute extends PersistentObject {
     private ArrayList<Stop> stops = new ArrayList<Stop>();
 
     public TradeRoute(Game game, String name) {
-        this.game = game;
+        super(game);
         this.name = name;
     }
 
 
     public TradeRoute(Game game, XMLStreamReader in) throws XMLStreamException {
-        this.game = game;
+        super(game, in);
         readFromXML(in);
     }
     
     public TradeRoute(Game game, Element e) {
-        this.game = game;
+        super(game, e);
         readFromXMLElement(e);
-    }
-
-    /**
-     * Get the <code>Game</code> value.
-     *
-     * @return a <code>Game</code> value
-     */
-    public final Game getGame() {
-        return game;
-    }
-
-    /**
-     * Set the <code>Game</code> value.
-     *
-     * @param newGame The new Game value.
-     */
-    public final void setGame(final Game newGame) {
-        this.game = newGame;
     }
 
     /**
@@ -260,12 +242,12 @@ public class TradeRoute extends PersistentObject {
             
     }
 
-    public void toXML(XMLStreamWriter out, Player player) //, boolean showAll, boolean toSavedGame)
+    public void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
-        //out.writeAttribute("ID", getID());
+        out.writeAttribute("ID", getID());
         out.writeAttribute("name", getName());
         for (Stop stop : stops) {
             stop.toXMLImpl(out);
@@ -281,7 +263,7 @@ public class TradeRoute extends PersistentObject {
      * @param in The input stream with the XML.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        //setID(in.getAttributeValue(null, "ID"));
+        setID(in.getAttributeValue(null, "ID"));
         setName(in.getAttributeValue(null, "name"));
 
         // Read child elements:

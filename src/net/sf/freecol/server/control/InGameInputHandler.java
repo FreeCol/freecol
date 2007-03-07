@@ -24,6 +24,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.Map.Position;
@@ -40,14 +41,11 @@ import org.w3c.dom.Element;
  * {@link FreeColServer#IN_GAME in game}.
  */
 public final class InGameInputHandler extends InputHandler implements NetworkConstants {
-    private static Logger logger = Logger.getLogger(InGameInputHandler.class.getName());
-
-    public static final String COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
-
+    public static final String COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
-
     public static final String REVISION = "$Revision$";
 
+    private static Logger logger = Logger.getLogger(InGameInputHandler.class.getName());
 
     /**
      * The constructor to use.
@@ -307,6 +305,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return rename(connection, element);
             }
         });
+        register("getNewTradeRoute", new NetworkRequestHandler() {
+            public Element handle(Connection connection, Element element) {
+                return getNewTradeRoute(connection, element);
+            }
+        });
     }
 
     /**
@@ -403,6 +406,22 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Location entryLocation = getFreeColServer().getModelController().setToVacantEntryLocation(unit);
         Element reply = Message.createNewRootElement("getVacantEntryLocationConfirmed");
         reply.setAttribute("location", entryLocation.getID());
+        return reply;
+    }
+
+    /**
+     * Handles a "getNewTradeRoute"-message from a client.
+     * 
+     * @param connection The connection the message came from.
+     * @param element The element containing the request.
+     * 
+     */
+    private Element getNewTradeRoute(Connection connection, Element element) {
+        Game game = getFreeColServer().getGame();
+        TradeRoute tradeRoute = getFreeColServer().getModelController().getNewTradeRoute();
+        Element reply = Message.createNewRootElement("getNewTradeRouteConfirmed");
+        reply.appendChild(tradeRoute.toXMLElement(getFreeColServer().getPlayer(connection), 
+                                                  reply.getOwnerDocument()));
         return reply;
     }
 

@@ -20,7 +20,7 @@ import net.sf.freecol.common.PseudoRandom;
 * by using {@link Game#getModelController getGame().getModelController()}.
 */
 public interface ModelController {
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
@@ -102,4 +102,10 @@ public interface ModelController {
      * @return random number generator.
      */
     PseudoRandom getPseudoRandom();
+
+    /**
+     * Get a new <code>TradeRoute</code> object.
+     */
+    public TradeRoute getNewTradeRoute();
+
 }
