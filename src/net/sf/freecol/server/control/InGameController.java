@@ -104,7 +104,8 @@ public final class InGameController extends Controller {
         game.setCurrentPlayer(nextPlayer);
         // Ask the player to choose a founding father if none has been chosen:
         if (nextPlayer.isEuropean()) {
-            if (nextPlayer.getCurrentFather() == -1) {
+            if (nextPlayer.getCurrentFather() == -1 &&
+                nextPlayer.getSettlements().size() > 0) {
                 chooseFoundingFather(nextPlayer);
             }
             if (nextPlayer.getMonarch() != null) {
