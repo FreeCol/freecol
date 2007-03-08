@@ -33,7 +33,6 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
     protected static final Logger logger = Logger.getLogger(ReportPanel.class.getName());
     protected static final int    OK = -1;
 
-    protected final Canvas parent;
     protected JPanel reportPanel;
     private JLabel header;
     private JButton ok;
@@ -53,9 +52,9 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
      * @param title The title to display on the panel.
      */
     public ReportPanel(Canvas parent, String title) {
-        super(new FlowLayout(FlowLayout.CENTER, 1000, 10));
-        this.parent = parent;
-        ReportPanel.library = (ImageLibrary) parent.getImageProvider();
+        super(parent, new FlowLayout(FlowLayout.CENTER, 1000, 10));
+
+        ReportPanel.library = (ImageLibrary) getCanvas().getImageProvider();
 
         setLayout(new BorderLayout());
         
@@ -126,7 +125,7 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
         String command = event.getActionCommand();
         int action = Integer.valueOf(command).intValue();
         if (action == OK) {
-            parent.remove(this);
+            getCanvas().remove(this);
         } else {
             logger.warning("Invalid ActionCommand: " + action);
         }

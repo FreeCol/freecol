@@ -22,7 +22,7 @@ public final class ReportNavalPanel extends ReportPanel implements ActionListene
      */
     public ReportNavalPanel(Canvas parent) {
         super(parent, Messages.message("menuBar.report.naval"));
-        reportUnitPanel = new ReportUnitPanel(true, true, parent, this);
+        reportUnitPanel = new ReportUnitPanel(true, true, getCanvas(), this);
     }
 
     /**

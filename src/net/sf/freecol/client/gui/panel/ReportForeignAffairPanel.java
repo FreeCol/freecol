@@ -37,8 +37,6 @@ public final class ReportForeignAffairPanel extends ReportPanel implements Actio
      * Prepares this panel to be displayed.
      */
     public void initialize() {
-        //Player player = parent.getClient().getMyPlayer();
-        //Iterator opponents = parent.getClient().getGame().getEuropeanPlayers().iterator();
         // Display Panel
         reportPanel.removeAll();
         reportPanel.setLayout(new GridLayout(0, 2));
@@ -50,7 +48,7 @@ public final class ReportForeignAffairPanel extends ReportPanel implements Actio
         int percentColumn = 4;
         HIGConstraints higConst = new HIGConstraints();
 
-        Element report = parent.getClient().getInGameController().getForeignAffairsReport();
+        Element report = getCanvas().getClient().getInGameController().getForeignAffairsReport();
         int number = report.getChildNodes().getLength();
         for (int i = 0; i < number; i++) {
             Element enemyElement = (Element) report.getChildNodes().item(i);

@@ -22,7 +22,7 @@ public final class ReportMilitaryPanel extends ReportPanel implements ActionList
      */
     public ReportMilitaryPanel(Canvas parent) {
         super(parent, Messages.message("menuBar.report.military"));
-        reportUnitPanel = new ReportUnitPanel(false, false, parent, this);
+        reportUnitPanel = new ReportUnitPanel(false, false, getCanvas(), this);
     }
 
     /**

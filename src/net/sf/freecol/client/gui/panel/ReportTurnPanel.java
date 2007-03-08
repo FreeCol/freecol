@@ -52,12 +52,12 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
      * Prepares this panel to be displayed.
      */
     public void initialize(ArrayList<ModelMessage> messages) {
-        Comparator<ModelMessage> comparator = parent.getClient().getClientOptions().getModelMessageComparator();
+        Comparator<ModelMessage> comparator = getCanvas().getClient().getClientOptions().getModelMessageComparator();
         if (comparator != null) {
             Collections.sort(messages, comparator);
         }
 
-        ClientOptions options = parent.getClient().getClientOptions();
+        ClientOptions options = getCanvas().getClient().getClientOptions();
         int groupBy = options.getInteger(ClientOptions.MESSAGES_GROUP_BY);
 
         Object source = this;
@@ -117,16 +117,16 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
             
             final JLabel label = new JLabel();
             if (message.getDisplay() != null) {
-                label.setIcon(parent.getImageIcon(message.getDisplay()));
+                label.setIcon(getCanvas().getImageIcon(message.getDisplay()));
             }
-            reportPanel.add(label, higConst.rc(row, imageColumn));
+            reportPanel.add(label, higConst.rc(row, imageColumn, ""));
 
             final JTextArea textArea = new JTextArea();
             try {
                 String text = Messages.message(message.getMessageID(),
                                                message.getData());
                 textArea.setText(text);
-                textArea.setColumns(45);
+                textArea.setColumns(42);
                 textArea.setOpaque(false);
                 textArea.setLineWrap(true);
                 textArea.setWrapStyleWord(true);
@@ -184,16 +184,16 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
             JButton button = new JButton(europe.getName());
             button.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent event) {
-                        parent.showEuropePanel();
+                        getCanvas().showEuropePanel();
                     }
                 });
             headline = button;
         } else if (source instanceof Market) {
-            Europe europe = parent.getClient().getMyPlayer().getEurope();
+            Europe europe = getCanvas().getClient().getMyPlayer().getEurope();
             JButton button = new JButton(Messages.message("model.message.marketPrices"));
             button.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent event) {
-                        parent.showEuropePanel();
+                        getCanvas().showEuropePanel();
                     }
                 });
             headline = button;
@@ -202,7 +202,7 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
             JButton button = new JButton(colony.getName());
             button.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent event) {
-                        parent.showColonyPanel(colony);
+                        getCanvas().showColonyPanel(colony);
                     }
                 });
             headline = button;

@@ -47,7 +47,7 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
      * Prepares this panel to be displayed.
      */
     public void initialize() {
-        Player player = parent.getClient().getMyPlayer();
+        Player player = getCanvas().getClient().getMyPlayer();
         colonies = player.getSettlements();
 
         // Display Panel
@@ -67,7 +67,7 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
         int colonyColumn = 1;
         int panelColumn = 3;
         int colonyIndex = 0;
-        Collections.sort(colonies, parent.getClient().getClientOptions().getColonyComparator());
+        Collections.sort(colonies, getCanvas().getClient().getClientOptions().getColonyComparator());
         Iterator colonyIterator = colonies.iterator();
         while (colonyIterator.hasNext()) {
             Colony colony = (Colony) colonyIterator.next();
@@ -90,7 +90,7 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
             unitIterator = unitList.iterator();
             while (unitIterator.hasNext()) {
                 Unit unit = (Unit) unitIterator.next();
-                UnitLabel unitLabel = new UnitLabel(unit, parent, true, true);
+                UnitLabel unitLabel = new UnitLabel(unit, getCanvas(), true, true);
                 unitPanel.add(unitLabel);
             }
             reportPanel.add(unitPanel, higConst.rc(row, panelColumn));
@@ -104,7 +104,7 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
                 if (newValue > 0) {
                     Goods goods = new Goods(colony.getGame(), colony, goodsType, newValue);
                     //goods.setAmount(newValue);
-                    GoodsLabel goodsLabel = new GoodsLabel(goods, parent);
+                    GoodsLabel goodsLabel = new GoodsLabel(goods, getCanvas());
                     goodsLabel.setHorizontalAlignment(JLabel.LEADING);
                     goodsPanel.add(goodsLabel);
                 }
@@ -151,7 +151,7 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
         if (action == OK) {
             super.actionPerformed(event);
         } else {
-            parent.showColonyPanel((Colony) colonies.get(action));
+            getCanvas().showColonyPanel((Colony) colonies.get(action));
         }
     }
 

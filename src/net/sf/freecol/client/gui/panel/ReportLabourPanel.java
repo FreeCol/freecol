@@ -55,11 +55,11 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
         for (int index = 0; index < Unit.UNIT_COUNT; index++) {
             unitLocations[index] = new HashMap();
         }
-        Player player = parent.getClient().getMyPlayer();
+        Player player = getCanvas().getClient().getMyPlayer();
         Iterator units = player.getUnitIterator();
 
         List colonies = player.getSettlements();
-        Collections.sort(colonies, parent.getClient().getClientOptions().getColonyComparator());
+        Collections.sort(colonies, getCanvas().getClient().getClientOptions().getColonyComparator());
         Iterator colonyIterator = colonies.iterator();
         locationNames = new ArrayList();
         locationNames.add(Messages.message("report.atSea"));

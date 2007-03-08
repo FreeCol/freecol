@@ -77,14 +77,14 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
      * Prepares this panel to be displayed.
      */
     public void initialize() {
-        Player player = parent.getClient().getMyPlayer();
+        Player player = getCanvas().getClient().getMyPlayer();
         Market market = player.getGame().getMarket();
 
         // Display Panel
         reportPanel.removeAll();
 
         colonies = player.getSettlements();
-        Collections.sort(colonies, parent.getClient().getClientOptions().getColonyComparator());
+        Collections.sort(colonies, getCanvas().getClient().getClientOptions().getColonyComparator());
 
         heights = new int[colonies.size() + extraRows];
         int labelColumn = 1;
@@ -103,7 +103,7 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
             int sales = player.getSales(goodsType);
             int beforeTaxes = player.getIncomeBeforeTaxes(goodsType);
             int afterTaxes = player.getIncomeAfterTaxes(goodsType);
-            MarketLabel marketLabel = new MarketLabel(goodsType, market, parent);
+            MarketLabel marketLabel = new MarketLabel(goodsType, market, getCanvas());
             marketLabel.setVerticalTextPosition(JLabel.BOTTOM);
             marketLabel.setHorizontalTextPosition(JLabel.CENTER);
             reportPanel.add(marketLabel, higConst.rc(1, column));
@@ -178,7 +178,7 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
         if (action == OK) {
             super.actionPerformed(event);
         } else {
-            parent.showColonyPanel((Colony) colonies.get(action));
+            getCanvas().showColonyPanel((Colony) colonies.get(action));
         }
     }
 }

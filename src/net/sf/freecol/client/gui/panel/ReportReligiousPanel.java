@@ -34,14 +34,14 @@ public final class ReportReligiousPanel extends ReportPanel implements ActionLis
         int[] widths = new int[] {0};
         int[] heights = new int[] {0, 12, 0};
         reportPanel.setLayout(new HIGLayout(widths, heights));
-        religiousReportPanel = new ReportProductionPanel(Goods.CROSSES, parent, this);
+        religiousReportPanel = new ReportProductionPanel(Goods.CROSSES, getCanvas(), this);
     }
 
     /**
      * Prepares this panel to be displayed.
      */
     public void initialize() {
-        Player player = parent.getClient().getMyPlayer();
+        Player player = getCanvas().getClient().getMyPlayer();
 
         // Display Panel
         reportPanel.removeAll();
@@ -54,7 +54,7 @@ public final class ReportReligiousPanel extends ReportPanel implements ActionLis
         int required = player.getCrossesRequired();
         int production = religiousReportPanel.getTotalProduction();
 
-        FreeColProgressBar progressBar = new FreeColProgressBar(parent, Goods.CROSSES);
+        FreeColProgressBar progressBar = new FreeColProgressBar(getCanvas(), Goods.CROSSES);
         progressBar.update(0, required, crosses, production);
         summaryPanel.add(progressBar);
 

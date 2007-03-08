@@ -46,14 +46,14 @@ public final class ReportContinentalCongressPanel extends ReportPanel implements
         summaryPanel.setOpaque(false);
         fatherPanel = new JPanel(new GridLayout(0, 4));
         fatherPanel.setOpaque(false);
-        productionPanel = new ReportProductionPanel(Goods.BELLS, parent, this);
+        productionPanel = new ReportProductionPanel(Goods.BELLS, getCanvas(), this);
     }
 
     /**
      * Prepares this panel to be displayed.
      */
     public void initialize() {
-        Player player = parent.getClient().getMyPlayer();
+        Player player = getCanvas().getClient().getMyPlayer();
 
         // Display Panel
         productionPanel.initialize();
@@ -74,7 +74,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel implements
             int required = player.getTotalFoundingFatherCost();
             int production = productionPanel.getTotalProduction();
 
-            FreeColProgressBar progressBar = new FreeColProgressBar(parent, Goods.BELLS);
+            FreeColProgressBar progressBar = new FreeColProgressBar(getCanvas(), Goods.BELLS);
             progressBar.update(0, required, bells, production);
             summaryPanel.add(progressBar);
         }

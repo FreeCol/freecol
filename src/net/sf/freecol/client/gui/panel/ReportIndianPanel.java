@@ -35,8 +35,8 @@ public final class ReportIndianPanel extends ReportPanel implements ActionListen
      * Prepares this panel to be displayed.
      */
     public void initialize() {
-        Player player = parent.getClient().getMyPlayer();
-        Iterator opponents = parent.getClient().getGame().getPlayers().iterator();
+        Player player = getCanvas().getClient().getMyPlayer();
+        Iterator opponents = getCanvas().getClient().getGame().getPlayers().iterator();
         // Display Panel
         reportPanel.removeAll();
         reportPanel.setLayout(new GridLayout(8, 1));
