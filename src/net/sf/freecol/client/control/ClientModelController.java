@@ -13,6 +13,7 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelController;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Message;
 
@@ -25,7 +26,7 @@ import org.w3c.dom.Element;
 public class ClientModelController implements ModelController {
     private static final Logger logger = Logger.getLogger(ClientModelController.class.getName());
 
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
@@ -187,4 +188,27 @@ public class ClientModelController implements ModelController {
     public PseudoRandom getPseudoRandom() {
         return freeColClient.getPseudoRandom();
     }
+
+
+    /**
+     * Returns a new <code>TradeRoute</code> object.
+     * @return a new <code>TradeRoute</code> object.
+     */
+    public TradeRoute getNewTradeRoute() {
+        Game game = freeColClient.getGame();
+        Client client = freeColClient.getClient();
+
+        Element getNewTradeRouteElement = Message.createNewRootElement("getNewTradeRoute");
+        Element reply = client.ask(getNewTradeRouteElement);
+
+        if (!reply.getTagName().equals("getNewTradeRouteConfirmed")) {
+            logger.warning("Wrong tag name.");
+            throw new IllegalStateException();
+        }
+
+        TradeRoute tradeRoute = new TradeRoute(game, (Element) reply.getElementsByTagName(TradeRoute.getXMLElementTagName()).item(0));
+
+        return tradeRoute;
+    }        
+
 }

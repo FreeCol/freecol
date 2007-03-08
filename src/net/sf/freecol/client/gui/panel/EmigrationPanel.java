@@ -10,80 +10,44 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.border.BevelBorder;
 
+import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Unit;
 
+import cz.autel.dmi.HIGLayout;
 
 /**
 * The panel that allows a user to choose which unit will emigrate from Europe.
 */
 public final class EmigrationPanel extends FreeColDialog implements ActionListener {
 
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
     private static final Logger logger = Logger.getLogger(EmigrationPanel.class.getName());
 
-    private final JButton   person1,
-                            person2,
-                            person3;
-
-    private static final int    EMIGRATE_1 = 1,
-                                EMIGRATE_2 = 2,
-                                EMIGRATE_3 = 3;
+    private static final int NUMBER_OF_PERSONS = 3;
+    private static final JButton[] person = new JButton[NUMBER_OF_PERSONS];
+    private static final JLabel question = new JLabel(Messages.message("chooseImmigrant"));
 
     /**
     * The constructor to use.
     */
-    public EmigrationPanel() {
-        //setFocusCycleRoot(true);
-
-        JLabel  question = new JLabel(Messages.message("chooseImmigrant"));
-
-        person1 = new JButton();
-        person2 = new JButton();
-        person3 = new JButton();
-
-        question.setSize(300, 20);
-        person1.setSize(200, 20);
-        person2.setSize(200, 20);
-        person3.setSize(200, 20);
-
-        question.setLocation(10, 10);
-        person1.setLocation(60, 40);
-        person2.setLocation(60, 65);
-        person3.setLocation(60, 90);
-
-        setLayout(null);
-
-        person1.setActionCommand(String.valueOf(EMIGRATE_1));
-        person2.setActionCommand(String.valueOf(EMIGRATE_2));
-        person3.setActionCommand(String.valueOf(EMIGRATE_3));
-
-        person1.addActionListener(this);
-        person2.addActionListener(this);
-        person3.addActionListener(this);
-
-        add(question);
-        add(person1);
-        add(person2);
-        add(person3);
-
-        try {
-            BevelBorder border = new BevelBorder(BevelBorder.RAISED);
-            setBorder(border);
+    public EmigrationPanel(Canvas parent) {
+        super(parent);
+        for (int index = 0; index < NUMBER_OF_PERSONS; index++) {
+            person[index] = new JButton();
+            person[index].setActionCommand(String.valueOf(index));
+            person[index].addActionListener(this);
         }
-        catch(Exception e) {
-        }
-
-        setSize(320, 130);
     }
 
 
     public void requestFocus() {
-        person1.requestFocus();
+        person[0].requestFocus();
     }
 
 
@@ -93,9 +57,30 @@ public final class EmigrationPanel extends FreeColDialog implements ActionListen
     *               emigrate.
     */
     public void initialize(Europe europe) {
-        person1.setText(Unit.getName(europe.getRecruitable(1)));
-        person2.setText(Unit.getName(europe.getRecruitable(2)));
-        person3.setText(Unit.getName(europe.getRecruitable(3)));
+
+        ImageLibrary library = (ImageLibrary) getCanvas().getImageProvider();
+
+        int[] widths = {0};
+        int[] heights = {0, margin, 0, margin, 0, margin, 0};
+        int column = 1;
+
+        setLayout(new HIGLayout(widths, heights));
+
+        int row = 1;
+        add(question, higConst.rc(row, column));
+        row += 2;
+
+        for (int index = 0; index < NUMBER_OF_PERSONS; index++) {
+            int unitType = europe.getRecruitable(index);
+            int graphicsType = ImageLibrary.getUnitGraphicsType(unitType, false, false, 0, false);
+            person[index].setText(Unit.getName(unitType));
+            person[index].setIcon(library.getScaledUnitImageIcon(graphicsType, 0.66f));
+
+            add(person[index], higConst.rc(row, column));
+            row += 2;
+        }
+
+        setSize(getPreferredSize());
     }
 
 
@@ -107,18 +92,11 @@ public final class EmigrationPanel extends FreeColDialog implements ActionListen
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         try {
-            switch (Integer.valueOf(command).intValue()) {
-                case EMIGRATE_1:
-                    setResponse(new Integer(1));
-                    break;
-                case EMIGRATE_2:
-                    setResponse(new Integer(2));
-                    break;
-                case EMIGRATE_3:
-                    setResponse(new Integer(3));
-                    break;
-                default:
-                    logger.warning("Invalid Actioncommand: invalid number.");
+            int action = Integer.valueOf(command).intValue();
+            if (action >= 0 && action < NUMBER_OF_PERSONS) {
+                setResponse(new Integer(action));
+            } else {
+                logger.warning("Invalid Actioncommand: invalid number.");
             }
         } catch (NumberFormatException e) {
             logger.warning("Invalid Actioncommand: not a number.");

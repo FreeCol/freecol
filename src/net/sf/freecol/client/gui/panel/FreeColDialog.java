@@ -89,6 +89,14 @@ public class FreeColDialog extends FreeColPanel {
     public FreeColDialog() {
         super();
     }
+
+    /**
+     * Constructor.
+     */
+    public FreeColDialog(Canvas parent) {
+        super(parent);
+    }
+
     /**
     * Sets the <code>response</code> and wakes up any thread waiting for this information.
     *

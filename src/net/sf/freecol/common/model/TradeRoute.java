@@ -35,14 +35,15 @@ public class TradeRoute extends FreeColGameObject {
     private String name;
 
     /**
-     * Describe game here.
+     * The game this trade route belongs to.
      */
     private Game game;
 
     /**
-     * Describe modified here.
+     * Whether the trade route has been modified. This is of interest
+     * only to the client and can be ignored for XML serialization.
      */
-    private boolean modified;
+    private boolean modified = false;
 
     /**
      * A list of stops.
@@ -160,6 +161,13 @@ public class TradeRoute extends FreeColGameObject {
         private Location location;
         private ArrayList<Integer> cargo;
 
+        /**
+         * Whether the stop has been modified. This is of interest
+         * only to the client and can be ignored for XML
+         * serialization.
+         */
+        private boolean modified = false;
+
         public Stop(Location location) {
             this.location = location;
             this.cargo = new ArrayList<Integer>();
@@ -172,6 +180,24 @@ public class TradeRoute extends FreeColGameObject {
 
         public Stop(XMLStreamReader in) throws XMLStreamException {
             readFromXML(in);
+        }
+
+        /**
+         * Get the <code>Modified</code> value.
+         *
+         * @return a <code>boolean</code> value
+         */
+        public final boolean isModified() {
+            return modified;
+        }
+
+        /**
+         * Set the <code>Modified</code> value.
+         *
+         * @param newModified The new Modified value.
+         */
+        public final void setModified(final boolean newModified) {
+            this.modified = newModified;
         }
 
         /**

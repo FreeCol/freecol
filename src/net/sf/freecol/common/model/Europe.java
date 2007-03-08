@@ -126,8 +126,8 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
     * @exception IllegalArgumentException if the given <code>slot</code> does not exist.
     */
     public int getRecruitable(int slot) {
-        if ((slot > 0) && (slot < 4)) {
-            return recruitables[slot - 1];
+        if ((slot >= 0) && (slot < 3)) {
+            return recruitables[slot];
         }
         throw new IllegalArgumentException("Wrong recruitement slot: " + slot);
     }

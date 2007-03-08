@@ -27,6 +27,7 @@ import javax.swing.border.EmptyBorder;
 
 import cz.autel.dmi.HIGConstraints;
 
+import net.sf.freecol.client.gui.Canvas;
 
 /**
 * Superclass for all panels in FreeCol.
@@ -42,6 +43,11 @@ public class FreeColPanel extends JPanel {
     protected static final HIGConstraints higConst = new HIGConstraints();
 
     private static final int cancelKeyCode = KeyEvent.VK_ESCAPE;
+
+    /**
+     * The canvas all panels belong to.
+     */
+    private Canvas canvas = null;
 
     // Font to use for text areas
     protected static final Font defaultFont = new Font("Dialog", Font.BOLD, 12);
@@ -62,17 +68,32 @@ public class FreeColPanel extends JPanel {
     * Default constructor.
     */
     public FreeColPanel() {
-        this(new FlowLayout());
+        this(null, new FlowLayout());
     }
 
+    /**
+     * Constructor.
+     */
+    public FreeColPanel(Canvas parent) {
+        this(parent, new FlowLayout());
+    }
+
+    /**
+     * Constructor.
+     */
+    public FreeColPanel(LayoutManager layout) {
+        this(null, layout);
+    }
 
     /**
     * Default constructor.
+    * @param parent The <code>Canvas</code> all panels belong to.
     * @param layout The <code>LayoutManager</code> to be used.
     */
-    public FreeColPanel(LayoutManager layout) {
+    public FreeColPanel(Canvas parent, LayoutManager layout) {
         super(layout);
 
+        this.canvas = parent;
         setFocusCycleRoot(true);
 
         Image menuborderN = (Image) UIManager.get("menuborder.n.image");
@@ -96,7 +117,14 @@ public class FreeColPanel extends JPanel {
         addMouseListener(new MouseAdapter() {});
     }
 
-
+    /**
+     * Get the <code>Canvas</code> value.
+     *
+     * @return a <code>Canvas</code> value
+     */
+    public final Canvas getCanvas() {
+        return canvas;
+    }
 
     /**
      * Returns a text area with standard settings suitable for use in

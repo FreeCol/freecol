@@ -142,6 +142,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     private Location        location;
     private IndianSettlement indianSettlement = null; // only used by BRAVE.
     private Location        destination = null;
+    private TradeRoute      tradeRoute = null;  // only used by carriers
     
     // to be used only for type == TREASURE_TRAIN
     private int             treasureAmount;
@@ -342,6 +343,23 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         }
     }
 
+    /**
+     * Get the <code>TradeRoute</code> value.
+     *
+     * @return a <code>TradeRoute</code> value
+     */
+    public final TradeRoute getTradeRoute() {
+        return tradeRoute;
+    }
+
+    /**
+     * Set the <code>TradeRoute</code> value.
+     *
+     * @param newTradeRoute The new TradeRoute value.
+     */
+    public final void setTradeRoute(final TradeRoute newTradeRoute) {
+        this.tradeRoute = newTradeRoute;
+    }
 
     /**
     * Sells the given goods from this unit to the given settlement.

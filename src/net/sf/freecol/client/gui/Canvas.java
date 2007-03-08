@@ -258,7 +258,7 @@ public final class Canvas extends JLayeredPane {
         warehouseDialog = new WarehouseDialog(this);
         chooseFoundingFatherDialog = new ChooseFoundingFatherDialog(this);
         eventPanel = new EventPanel(this, freeColClient);
-        emigrationPanel = new EmigrationPanel();
+        emigrationPanel = new EmigrationPanel(this);
         colopediaPanel = new ColopediaPanel(this);
         reportReligiousPanel = new ReportReligiousPanel(this);
         reportTradePanel = new ReportTradePanel(this);
@@ -1593,7 +1593,7 @@ public final class Canvas extends JLayeredPane {
     * Shows the panel that allows the user to choose which unit will emigrate
     * from Europe. This method may only be called if the user has William Brewster
     * in congress.
-    * @return The emigrant that was chosen by the user (1, 2 or 3).
+    * @return The emigrant that was chosen by the user.
     */
     public int showEmigrationPanel() {
         emigrationPanel.initialize(freeColClient.getMyPlayer().getEurope());

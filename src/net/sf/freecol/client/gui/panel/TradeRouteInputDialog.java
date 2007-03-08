@@ -125,7 +125,7 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
                     if (stopList.getSelectedIndex() == -1) {
                         listModel.addElement(stop);
                     } else {
-                        listModel.add(stopList.getSelectedIndex(), stop);
+                        listModel.add(stopList.getSelectedIndex() + 1, stop);
                     }
                 }
             });
@@ -139,7 +139,7 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
             });
 
 
-
+        // TODO: allow reordering of stops
 	stopList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 	stopList.setDragEnabled(true);
         stopList.addListSelectionListener(new ListSelectionListener() {
@@ -167,11 +167,13 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
 
         Player player = parent.getClient().getMyPlayer();
 
+        // remove all items from lists and panels
+        destinationSelector.removeAllItems();
         tradeRoutePanel.removeAll();
         cargoPanel.removeAll();
+        listModel.removeAllElements();
 
         // combo box for selecting destination
-        destinationSelector.removeAllItems();
         if (player.getEurope() != null) {
             destinationSelector.addItem(player.getEurope());
         }
@@ -179,20 +181,22 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
             destinationSelector.addItem(settlement);
         }
 
-        // reset stops 
-        listModel.removeAllElements();
+        // add stops if any
         for (Stop stop : tradeRoute.getStops()) {
             listModel.addElement(stop);
         }
 
+        // update cargo panel if stop is selected
         if (listModel.getSize() > 0) {
             stopList.setSelectedIndex(0);
             Stop selectedStop = (Stop) listModel.firstElement();
             cargoPanel.initialize(selectedStop);
         }
 
+        // update buttons according to selection
         updateButtons();
 
+        // set name of trade route
         tradeRouteName.setText(tradeRoute.getName());
 
         int widths[] = {240, 3 * margin, 0, margin, 0};
@@ -227,6 +231,10 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
 
     }
 
+    /**
+     * Enables the remove stop button if a stop is selected and
+     * disables it otherwise.
+     */
     public void updateButtons() {
         if (stopList.getSelectedIndex() == -1) {
             removeStopButton.setEnabled(false);
@@ -273,6 +281,15 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
         }
     }
 
+
+    /**
+     * Special label for goods type.
+     *
+     * TODO: clean this up for 0.7.0 -- The GoodsLabel needs to be
+     * modified so that it can act as a GoodsTypeLabel (like this
+     * label), an AbstractGoodsLabel and a CargoLabel (its current
+     * function).
+     */
     public class CargoLabel extends JLabel {
         private final int goodsType;
 
@@ -289,6 +306,9 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
 
     }
 
+    /**
+     * Panel for all types of goods that can be loaded onto a carrier.
+     */
     public class GoodsPanel extends JPanel {
 
         public GoodsPanel() {
@@ -304,6 +324,13 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
 
     }
 
+    /**
+     * Panel for the cargo the carrier is supposed to take on board at
+     * a certain stop.
+     *
+     * TODO: create a single cargo panel for this purpose and the use
+     * in the ColonyPanel, the EuropePanel and the CaptureGoodsDialog.
+     */
     public class CargoPanel extends JPanel {
 
         private Stop stop;
@@ -329,8 +356,12 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
     }
 
 
-
-
+    /**
+     * TransferHandler for CargoLabels.
+     *
+     * TODO: check whether this could/should be folded into the
+     * DefaultTransferHandler.
+     */
     public class CargoHandler extends TransferHandler {
 
         protected Transferable createTransferable(JComponent c) {
@@ -352,6 +383,7 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
                         Stop stop = (Stop) stopList.getSelectedValue();
                         if (stop != null) {
                             stop.getCargo().add(new Integer(label.getType()));
+                            stop.setModified(true);
                         }
                     }
                     return true;
@@ -376,6 +408,7 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
                         for (int index = 0; index < cargo.size(); index++) {
                             if (cargo.get(index).intValue() == label.getType()) {
                                 cargo.remove(index);
+                                stop.setModified(true);
                                 break;
                             }
                         }
