@@ -1551,7 +1551,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (player.hasFather(FoundingFather.WILLIAM_BREWSTER)) {
             slot = Integer.parseInt(emigrateUnitInEuropeElement.getAttribute("slot"));
         } else {
-            slot = (int) ((Math.random() * 3) + 1);
+            slot = (int) (Math.random() * 3);
         }
         int recruitable = europe.getRecruitable(slot);
         int newRecruitable = player.generateRecruitable();
