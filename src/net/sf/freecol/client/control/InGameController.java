@@ -45,6 +45,7 @@ import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.Map.Position;
@@ -2441,6 +2442,20 @@ public final class InGameController implements NetworkConstants {
         freeColClient.getCanvas().updateGoldLabel();
     }
 
+    /**
+     * Updates a trade route.
+     */
+    public void updateTradeRoute(TradeRoute route) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        Element tradeRouteElement = Message.createNewRootElement("updateTradeRoute");
+        tradeRouteElement.setAttribute("ID", route.getID());
+        tradeRouteElement.appendChild(route.toXMLElement(null, tradeRouteElement.getOwnerDocument()));
+        freeColClient.getClient().sendAndWait(tradeRouteElement);
+        
+    }
 
     /**
      * Pays the tax arrears on this type of goods.

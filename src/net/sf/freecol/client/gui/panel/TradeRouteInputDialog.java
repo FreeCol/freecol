@@ -53,7 +53,6 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
     
     private static final int OK = 0, CANCEL = 1;
 
-    private final Canvas parent;
     private TradeRoute originalRoute;
 
     private final JButton ok = new JButton(Messages.message("ok"));
@@ -85,7 +84,7 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
      * @param parent The parent of this panel.
      */
     public TradeRouteInputDialog(final Canvas parent) {
-        this.parent = parent;
+        super(parent);
 
         tradeRoutePanel.setOpaque(false);
 
@@ -165,7 +164,7 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
     public void initialize(TradeRoute tradeRoute) {
         originalRoute = tradeRoute;
 
-        Player player = parent.getClient().getMyPlayer();
+        Player player = getCanvas().getClient().getMyPlayer();
 
         // remove all items from lists and panels
         destinationSelector.removeAllItems();
@@ -183,7 +182,7 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
 
         // add stops if any
         for (Stop stop : tradeRoute.getStops()) {
-            listModel.addElement(stop);
+            listModel.addElement(stop.clone());
         }
 
         // update cargo panel if stop is selected
@@ -259,17 +258,18 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
         try {
             switch (Integer.valueOf(command).intValue()) {
             case OK:
-                parent.remove(this);
+                getCanvas().remove(this);
                 originalRoute.setName(tradeRouteName.getText());
                 ArrayList<Stop> stops = new ArrayList<Stop>();
                 for (int index = 0; index < listModel.getSize(); index++) {
                     stops.add((Stop) listModel.getElementAt(index));
                 }
                 originalRoute.setStops(stops);
+                getCanvas().getClient().getInGameController().updateTradeRoute(originalRoute);
                 setResponse(new Boolean(true));
                 break;
             case CANCEL:
-                parent.remove(this);
+                getCanvas().remove(this);
                 setResponse(new Boolean(false));
                 break;
             default:
@@ -294,7 +294,7 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
         private final int goodsType;
 
         public CargoLabel(int type) {
-            super(parent.getImageProvider().getGoodsImageIcon(type));
+            super(getCanvas().getImageProvider().getGoodsImageIcon(type));
             setTransferHandler(cargoHandler);
             addMouseListener(dragListener);
             this.goodsType = type;
@@ -444,7 +444,7 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
 
         public void saveSettings() {
             if (export.isSelected() != colony.getExports(goodsType)) {
-                parent.getClient().getInGameController().setExports(colony, goodsType, export.isSelected());
+                getCanvas().getClient().getInGameController().setExports(colony, goodsType, export.isSelected());
                 colony.setExports(goodsType, export.isSelected());
             }
             colony.getLowLevel()[goodsType] = ((SpinnerNumberModel) lowLevel.getModel()).getNumber().intValue();

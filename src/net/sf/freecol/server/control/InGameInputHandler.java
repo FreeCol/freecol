@@ -9,6 +9,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
@@ -310,6 +311,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return getNewTradeRoute(connection, element);
             }
         });
+        register("updateTradeRoute", new NetworkRequestHandler() {
+            public Element handle(Connection connection, Element element) {
+                return updateTradeRoute(connection, element);
+            }
+        });
     }
 
     /**
@@ -423,6 +429,19 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         reply.appendChild(tradeRoute.toXMLElement(getFreeColServer().getPlayer(connection), 
                                                   reply.getOwnerDocument()));
         return reply;
+    }
+
+    /**
+     * Handles a "updateTradeRoute"-message from a client.
+     * 
+     * @param connection The connection the message came from.
+     * @param element The element containing the request.
+     * 
+     */
+    private Element updateTradeRoute(Connection connection, Element element) {
+        Game game = getFreeColServer().getGame();
+        // how to update the trade route?
+        return null;
     }
 
     /**
