@@ -17,42 +17,20 @@
   <path id="test.class.path">
     <fileset dir="test/lib" includes="*.jar" />
   </path>
-
-
-  <condition property="isOsUnixLike">
-    <os family="unix" />
-  </condition>
-
-
-  
+	<condition property="isOsUnixLike">
+	      <os family="unix" />
+	</condition>
+		
   <!-- TASK DEFINITIONS -->
   <taskdef name="jsmoothgen"
            classname="net.charabia.jsmoothgen.ant.JSmoothGen"
            classpath="${freecol.build.dir}/jars/jsmoothgen-ant.jar"
   />
-	<!--JarBundler is a feature-rich Ant task which will create a Mac OS X 
-	application bundle from a list of Jar files and a main class name. 	
-	(GPL-Software) -> http://informagen.com/JarBundler/ 
-	Download and place jarbundler.jar into  ${freecol.build.dir}/jars-->
-	<taskdef name="jarbundler" 
-		classname="net.sourceforge.jarbundler.JarBundler" 
-		classpath="${freecol.build.dir}/jars/jarbundler.jar"
-	/>
-  
   <taskdef name="izpack"
            classname="com.izforge.izpack.ant.IzPackTask"
            classpath="${freecol.build.dir}/jars/standalone-compiler.jar"
   />
-
-	<!--JarBundler is a feature-rich Ant task which will create a Mac OS X 
-	application bundle from a list of Jar files and a main class name. 	
-	(GPL-Software) -> http://informagen.com/JarBundler/ 
-	Download and place jarbundler.jar into  ${freecol.build.dir}/jars-->
-	<taskdef name="jarbundler" 
-		classname="net.sourceforge.jarbundler.JarBundler" 
-		classpath="${freecol.build.dir}/jars/jarbundler.jar"
-	/>
-  
+	
 	<!--JarBundler is a feature-rich Ant task which will create a Mac OS X 
 	application bundle from a list of Jar files and a main class name. 	
 	(GPL-Software) -> http://informagen.com/JarBundler/ 
@@ -111,7 +89,6 @@
   <target name="package" depends="init,build" description="Compiles the source files and creates a JAR-file.">
     <jar jarfile="${freecol.jar.file}"
          basedir="${freecol.build.dir}"
-		
          manifest="${basedir}/src/MANIFEST.MF"
          includes="net/**, org/**"
          excludes="**/CVS/**, **/metaserver/**"
@@ -126,7 +103,6 @@
          manifest="${basedir}/src/MANIFEST.MF"
          includes="net/**, org/**"
          excludes="**/CVS/**"
-		
     />
   </target>
 
@@ -185,7 +161,7 @@
              token="%ant:freecol.version%"
              value="${freecol.version}"
     />
-    
+	
     <jsmoothgen project="${freecol.build.dir}/startup.jsmooth" skeletonroot="${freecol.build.dir}/skeletons"/>    
     <move todir="${freecol.release.dir}/${freecol.name}">
       <fileset dir="${freecol.build.dir}" includes="freecol.exe"/>
@@ -195,10 +171,6 @@
     <jsmoothgen project="${freecol.build.dir}/uninstaller.jsmooth" skeletonroot="${freecol.build.dir}/skeletons"/>    
     <move todir="${freecol.release.dir}/${freecol.name}/Uninstaller">
       <fileset dir="${freecol.build.dir}" includes="uninstaller.exe"/>
-	<antcall target="macJavaBundle"/>
-	<antcall target="tarMacJavaBundle"/>
-	<antcall target="tarMacJavaBundleOnWindows"/>
-
     </move>
         
     <izpack input="${freecol.build.dir}/installer-tmp.xml" 
@@ -206,67 +178,6 @@
             basedir="${freecol.release.dir}/${freecol.name}"
             izpackdir="${freecol.build.dir}"
     />
-	<target name="macJavaBundle" description="Buils a doubleclickable application bundle running on Mac os X">
-  		<!--  Mac OS X -->
-		<jarbundler dir="${freecol.release.dir}"
-			name="FreeCol"
-			mainclass="net.sf.freecol.FreeCol"
-			version="${freecol.version}"
-			vmoptions="-Xmx256M"
-			jvmversion="1.5+"
-			arguments="--windowed --freecol-data FreeCol.app/Contents/Resources/"
-			stubfile="${freecol.build.dir}/skeletons/FreeCol"
-			icon="${basedir}/FreeCol.icns"> 
-			<!--
-				TODO: Where should I place the icon file?
-				Replace the value of the icon-attribute with the future icon path
-			-->
-			<jarfilelist dir="${basedir}" files="FreeCol.jar" />
-
-			<jarfileset dir="${basedir}/jars/">
-				<include name="**/*.jar" />
-				<exclude name="**/CVS" />
-			</jarfileset>
-
-			<resourcefileset dir="${basedir}/data">
-				<exclude name="**/CVS" />
-			</resourcefileset>		
-		</jarbundler>
-</target>
-	
-	<target name="tarMacJavaBundle" if="isOsUnixLike" depends="macJavaBundle">
-		<delete file="${freecol.release.dir}/FreeCol.app/Contents/MacOS/FreeCol"/>
-		<symlink link="${freecol.release.dir}/FreeCol.app/Contents/MacOS/FreeCol" 	resource="/System/Library/Frameworks/JavaVM.framework/Resources/MacOS/JavaApplicationStub"/>
-
-		<exec executable="tar">
-		<arg value="cfvj"/>
-	 	<arg value="${freecol.release.dir}/${freecol.release.name}-mac.tar.bz2"/>
-		<arg value="-C"/>
-		<arg value="${freecol.release.dir}"/>
-		<arg value="FreeCol.app/"/>
-		</exec>
-		
-		<delete quiet="true" dir="${freecol.release.dir}/FreeCol.app"/>
-		</target>
-	
-	<target name="tarMacJavaBundleOnWindows" depends="macJavaBundle" unless="isOsUnixLike">
-		<echo message="Warning: You are building a Mac Os X Java Application Bundle containing a Copy Java Application Stub. Creating a bundle with the current copy of Java Launching Stub could lead to a future situation where the JavaApplicationStub file could become incompatible with a future OS X update. To avoid this, use a unix like system ... "/>
-		<tar destfile="${freecol.release.dir}/${freecol.release.name}-mac.tar.bz2" compression="bzip2">
-			<tarfileset dir="${freecol.release.dir}" mode="755" 
-				includes="FreeCol.app/Contents/MacOS/FreeCol" 
-				excludes="**/freecol*"
-				followsymlinks="false" 
-				/>
-			<tarfileset followsymlinks="false" dir="${freecol.release.dir}">
-				<include name="FreeCol.app/**"/>
-				<exclude name="**/freecol*"/>
-				<exclude name="FreeCol.app/Contents/MacOS/FreeCol"/>
-			</tarfileset>	
-	    </tar>
-
-		<delete quiet="true" dir="${freecol.release.dir}/FreeCol.app"/>
-	</target>
-	
     <delete quiet="true" file="${freecol.build.dir}/installer-tmp.xml"/>
 
     <copy todir="${freecol.release.dir}">
@@ -276,75 +187,12 @@
              token="%ant:freecol.release.name%"
              value="${freecol.release.name}"
     />
-	<antcall target="macJavaBundle"/>
-	<antcall target="tarMacJavaBundle"/>
-	<antcall target="tarMacJavaBundleOnWindows"/>
-
     <replace file="${freecol.release.dir}/installer.jsmooth" 
              token="%ant:freecol.installerjar%"
              value="${freecol.release.dir}/${freecol.release.name}-installer.jar"
     />        
     <jsmoothgen project="${freecol.release.dir}/installer.jsmooth" skeletonroot="${freecol.build.dir}/skeletons"/>
 
-	<target name="macJavaBundle" description="Buils a doubleclickable application bundle running on Mac os X">
-  		<!--  Mac OS X -->
-		<jarbundler dir="${freecol.release.dir}"
-			name="FreeCol"
-			mainclass="net.sf.freecol.FreeCol"
-			version="${freecol.version}"
-			vmoptions="-Xmx256M"
-			jvmversion="1.5+"
-			arguments="--windowed --freecol-data FreeCol.app/Contents/Resources/"
-			stubfile="${freecol.build.dir}/skeletons/FreeCol"
-			icon="${basedir}/FreeCol.icns"> 
-			<!--
-				TODO: Where should I place the icon file?
-				Replace the value of the icon-attribute with the future icon path
-			-->
-			<jarfilelist dir="${basedir}" files="FreeCol.jar" />
-
-			<jarfileset dir="${basedir}/jars/">
-				<include name="**/*.jar" />
-				<exclude name="**/CVS" />
-			</jarfileset>
-
-			<resourcefileset dir="${basedir}/data">
-				<exclude name="**/CVS" />
-			</resourcefileset>		
-		</jarbundler>
-</target>
-	
-	<target name="tarMacJavaBundle" if="isOsUnixLike" depends="macJavaBundle">
-		<delete file="${freecol.release.dir}/FreeCol.app/Contents/MacOS/FreeCol"/>
-		<symlink link="${freecol.release.dir}/FreeCol.app/Contents/MacOS/FreeCol" 	resource="/System/Library/Frameworks/JavaVM.framework/Resources/MacOS/JavaApplicationStub"/>
-
-		<exec executable="tar">
-		<arg value="cfvj"/>
-	 	<arg value="${freecol.release.dir}/${freecol.release.name}-mac.tar.bz2"/>
-		<arg value="-C"/>
-		<arg value="${freecol.release.dir}"/>
-		<arg value="FreeCol.app/"/>
-		</exec>
-		</target>
-	
-	<target name="tarMacJavaBundleOnWindows" depends="macJavaBundle" unless="isOsUnixLike">
-		<echo message="Warning: You are building a Mac Os X Java Application Bundle containing a Copy Java Application Stub. Creating a bundle with the current copy of Java Launching Stub could lead to a future situation where the JavaApplicationStub file could become incompatible with a future OS X update. To avoid this, use a unix like system ... "/>
-		<tar destfile="${freecol.release.dir}/${freecol.release.name}-mac.tar.bz2" compression="bzip2">
-			<tarfileset dir="${freecol.release.dir}" mode="755" 
-				includes="FreeCol.app/Contents/MacOS/FreeCol" 
-				excludes="**/freecol*"
-				followsymlinks="false" 
-				/>
-			<tarfileset followsymlinks="false" dir="${freecol.release.dir}">
-				<include name="FreeCol.app/**"/>
-				<exclude name="**/freecol*"/>
-				<exclude name="FreeCol.app/Contents/MacOS/FreeCol"/>
-			</tarfileset>	
-	    </tar>
-
-		<delete quiet="true" dir="${freecol.release.dir}/FreeCol.app"/>
-	</target>
-	
     <delete quiet="true" dir="${freecol.release.dir}/${freecol.name}"/>
     <delete quiet="true" file="${freecol.release.dir}/installer.jsmooth"/>
     
@@ -360,7 +208,8 @@
   </target>
   
 	<target name="macJavaBundle" description="Buils a doubleclickable application bundle running on Mac os X">
-  		<!--  Mac OS X -->
+		<mkdir dir="${freecol.release.dir}"/>  		
+<!--  Mac OS X -->
 		<jarbundler dir="${freecol.release.dir}"
 			name="FreeCol"
 			mainclass="net.sf.freecol.FreeCol"
@@ -420,7 +269,7 @@
 		<delete quiet="true" dir="${freecol.release.dir}/FreeCol.app"/>
 	</target>
 	
-  
+
   <!-- Cleans the directories by removing auto-generated files. -->
   <target name="clean" depends="init" description="Cleans the directories by removing auto-generated files.">
     <delete quiet="true" includeEmptyDirs="true">
