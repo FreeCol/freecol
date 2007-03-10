@@ -366,7 +366,7 @@ public class ServerModelController implements ModelController {
      */
     public TradeRoute getNewTradeRoute() {
         Game game = freeColServer.getGame();
-        String name = null;
+        String name = "";
         return new TradeRoute(game, name);
     }
 

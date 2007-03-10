@@ -423,7 +423,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * 
      */
     private Element getNewTradeRoute(Connection connection, Element element) {
-        Game game = getFreeColServer().getGame();
         TradeRoute tradeRoute = getFreeColServer().getModelController().getNewTradeRoute();
         Element reply = Message.createNewRootElement("getNewTradeRouteConfirmed");
         reply.appendChild(tradeRoute.toXMLElement(getFreeColServer().getPlayer(connection), 
@@ -440,7 +439,14 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      */
     private Element updateTradeRoute(Connection connection, Element element) {
         Game game = getFreeColServer().getGame();
-        // how to update the trade route?
+        TradeRoute clientTradeRoute = new TradeRoute(null, element);
+        TradeRoute serverTradeRoute = (TradeRoute)
+            game.getFreeColGameObject(clientTradeRoute.getID());
+        if(serverTradeRoute == null) {
+            throw new IllegalStateException("Trade route " + 
+                    clientTradeRoute.getID() + " does not exist!");
+        }
+        serverTradeRoute.updateFrom(clientTradeRoute);        
         return null;
     }
 

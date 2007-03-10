@@ -495,7 +495,7 @@ abstract public class FreeColGameObject {
     * @param newID the unique ID of this object,
     */
     public void setID(String newID) {
-        if (!(this instanceof Game)) {
+        if (game != null && !(this instanceof Game)) {
             if (!newID.equals(getID())) {
                 if (getID() != null) {
                     game.removeFreeColGameObject(getID());
@@ -691,7 +691,7 @@ abstract public class FreeColGameObject {
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    protected void  toArrayElement(String tagName, int[] array, XMLStreamWriter out) throws XMLStreamException {
+    protected static void  toArrayElement(String tagName, int[] array, XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(tagName);
         
         out.writeAttribute("xLength", Integer.toString(array.length));
@@ -714,7 +714,7 @@ abstract public class FreeColGameObject {
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */               
-    protected int[] readFromArrayElement(String tagName, XMLStreamReader in, int[] arrayType) throws XMLStreamException {
+    protected static int[] readFromArrayElement(String tagName, XMLStreamReader in, int[] arrayType) throws XMLStreamException {
         if (!in.getLocalName().equals(tagName)) {
             in.nextTag();
         }

@@ -2,6 +2,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -35,11 +36,6 @@ public class TradeRoute extends FreeColGameObject {
     private String name;
 
     /**
-     * The game this trade route belongs to.
-     */
-    private Game game;
-
-    /**
      * Whether the trade route has been modified. This is of interest
      * only to the client and can be ignored for XML serialization.
      */
@@ -55,17 +51,28 @@ public class TradeRoute extends FreeColGameObject {
         this.name = name;
     }
 
-
-    public TradeRoute(Game game, XMLStreamReader in) throws XMLStreamException {
-        super(game, in);
-        readFromXML(in);
-    }
     
     public TradeRoute(Game game, Element e) {
         super(game, e);
         readFromXMLElement(e);
     }
 
+    /**
+     * Copy all fields from another trade route to this one.
+     * This is useful when an updated route is received on the
+     * server side from the client.
+     * 
+     * @param other The route to copy from.
+     */
+    public synchronized void updateFrom(TradeRoute other) {
+        setName(other.getName());
+        // TODO: what to do about the index?7
+        stops.clear();
+        for(Stop otherStop : other.getStops()) {
+            addStop(new Stop(otherStop));
+        }
+    }
+    
     /**
      * Get the <code>Modified</code> value.
      *
@@ -151,15 +158,15 @@ public class TradeRoute extends FreeColGameObject {
     public TradeRoute clone() {
         TradeRoute result = new TradeRoute(getGame(), new String(getName()));
         for (Stop stop : getStops()) {
-            result.addStop(stop.clone());
+            result.addStop(new Stop(stop));
         }
         return result;
     }
 
     public class Stop {
 
-        private Location location;
-        private ArrayList<Integer> cargo;
+        private String locationId;
+        private ArrayList<Integer> cargo = new ArrayList<Integer>();
 
         /**
          * Whether the stop has been modified. This is of interest
@@ -169,17 +176,23 @@ public class TradeRoute extends FreeColGameObject {
         private boolean modified = false;
 
         public Stop(Location location) {
-            this.location = location;
-            this.cargo = new ArrayList<Integer>();
+            this.locationId = location.getID();
+        }
+        
+        private Stop(Stop other) {
+            this.locationId = other.locationId;
+            this.cargo = new ArrayList<Integer>(other.cargo);
         }
 
-        public Stop(Location location, ArrayList<Integer> cargo) {
-            this.location = location;
-            this.cargo = cargo;
-        }
-
-        public Stop(XMLStreamReader in) throws XMLStreamException {
-            readFromXML(in);
+        private Stop(XMLStreamReader in) throws XMLStreamException {
+            // TODO: check why this is needed... it is
+            while(! getXMLElementTagName().equals(in.getLocalName())) {
+                in.nextTag();
+            }
+            locationId = in.getAttributeValue(null, "location");
+            for(int cargo : readFromArrayElement("cargo", in, new int[0])) {
+                addCargo(cargo);
+            }
         }
 
         /**
@@ -206,7 +219,8 @@ public class TradeRoute extends FreeColGameObject {
          * @return a <code>Location</code> value
          */
         public final Location getLocation() {
-            return location;
+            Game g = getGame();
+            return g != null ? (Location) g.getFreeColGameObject(locationId) : null;
         }
 
         /**
@@ -223,20 +237,13 @@ public class TradeRoute extends FreeColGameObject {
         }
 
         public String toString() {
-            return getLocation().getLocationName();
-        }
-
-        public Stop clone() {
-            Stop result = new Stop(getLocation());
-            for (Integer cargo : getCargo()) {
-                result.addCargo(new Integer(cargo));
-            }
-            return result;
+            Location l = getLocation();            
+            return l != null ? l.getLocationName() : locationId;
         }
 
         public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
             out.writeStartElement(getXMLElementTagName());
-            out.writeAttribute("location", getLocation().getID());
+            out.writeAttribute("location", this.locationId);
             int[] cargoArray = new int[cargo.size()];
             for (int index = 0; index < cargoArray.length; index++) {
                 cargoArray[index] = cargo.get(index).intValue();
@@ -246,17 +253,6 @@ public class TradeRoute extends FreeColGameObject {
         }
 
         /**
-         * Initialize this object from an XML-representation of this object.
-         * @param in The input stream with the XML.
-         */
-        public void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-            location = (Location) getGame().getFreeColGameObject(in.getAttributeValue(null, "location"));
-            int[] cargoArray = readFromArrayElement("cargo", in, new int[0]);
-        }
-
-
-
-        /**
          * Returns the tag name of the root element representing this object.
          *
          * @return "tradeRouteStop".
@@ -264,8 +260,6 @@ public class TradeRoute extends FreeColGameObject {
         public String getXMLElementTagName() {
             return "tradeRouteStop";
         }
-
-            
     }
 
     public void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
