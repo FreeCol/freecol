@@ -46,6 +46,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
+import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.Map.Position;
@@ -107,7 +108,7 @@ public final class InGameController implements NetworkConstants {
         if (freeColClient.getMyPlayer().isAdmin() && freeColClient.getFreeColServer() != null) {
             final File file = canvas.showSaveDialog(FreeCol.getSaveDirectory(), fileName);
             if (file != null) {
-            	saveGame(file);
+                saveGame(file);
             }
         }
     }
@@ -120,27 +121,27 @@ public final class InGameController implements NetworkConstants {
     public void saveGame(final File file) {   
         final Canvas canvas = freeColClient.getCanvas();
         
-    	canvas.showStatusPanel(Messages.message("status.savingGame"));
-    	Thread t = new Thread() {
-    		public void run() {
-    			try {
-    				freeColClient.getFreeColServer().saveGame(file, freeColClient.getMyPlayer().getUsername());
-    				SwingUtilities.invokeLater(new Runnable() {
-    					public void run() {
-    						canvas.closeStatusPanel();
-    						canvas.requestFocusInWindow();
-    					}
-    				});
-    			} catch (IOException e) {
-    				SwingUtilities.invokeLater(new Runnable() {
-    					public void run() {
-    						canvas.errorMessage("couldNotSaveGame");
-    					}
-    				});
-    			}
-    		}
-    	};
-    	t.start();
+        canvas.showStatusPanel(Messages.message("status.savingGame"));
+        Thread t = new Thread() {
+                public void run() {
+                        try {
+                                freeColClient.getFreeColServer().saveGame(file, freeColClient.getMyPlayer().getUsername());
+                                SwingUtilities.invokeLater(new Runnable() {
+                                        public void run() {
+                                                canvas.closeStatusPanel();
+                                                canvas.requestFocusInWindow();
+                                        }
+                                });
+                        } catch (IOException e) {
+                                SwingUtilities.invokeLater(new Runnable() {
+                                        public void run() {
+                                                canvas.errorMessage("couldNotSaveGame");
+                                        }
+                                });
+                        }
+                }
+        };
+        t.start();
     }
 
 
@@ -242,10 +243,10 @@ public final class InGameController implements NetworkConstants {
             final int turnNumber = freeColClient.getGame().getTurn().getNumber();
             final int savegamePeriod = freeColClient.getClientOptions().getInteger(ClientOptions.AUTOSAVE_PERIOD);        
             if (savegamePeriod == 1 || 
-            		(savegamePeriod != 0 && turnNumber % savegamePeriod == 0)) {
-            	final String turn = freeColClient.getGame().getTurn().toString().replaceAll(" ", "");
-            	final String filename = Messages.message("clientOptions.savegames.autosave.fileprefix") + '-' + turn + ".fsg";
-            	saveGame(new File(FreeCol.getAutosaveDirectory(), filename));
+                        (savegamePeriod != 0 && turnNumber % savegamePeriod == 0)) {
+                final String turn = freeColClient.getGame().getTurn().toString().replaceAll(" ", "");
+                final String filename = Messages.message("clientOptions.savegames.autosave.fileprefix") + '-' + turn + ".fsg";
+                saveGame(new File(FreeCol.getAutosaveDirectory(), filename));
             }
             
             removeUnitsOutsideLOS();
@@ -647,8 +648,8 @@ public final class InGameController implements NetworkConstants {
                 break;
             default:
                 if (path == path.getLastNode() 
-                        && mt != Unit.ILLEGAL_MOVE
-                        && (mt != Unit.ATTACK || knownEnemyOnLastTile)) {
+                    && mt != Unit.ILLEGAL_MOVE
+                    && (mt != Unit.ATTACK || knownEnemyOnLastTile)) {
                     move(unit, path.getDirection());
                 } else {
                     Tile target = map.getNeighbourOrNull(path.getDirection(), unit.getTile());
@@ -679,7 +680,33 @@ public final class InGameController implements NetworkConstants {
                 && map.isAdjacentToMapEdge(unit.getTile())) {
             moveToEurope(unit);
         }
-        setDestination(unit, null);
+
+        // we have reached our destination
+        if (unit.getTradeRoute() != null) {
+            Stop stop = unit.getTradeRoute().nextStop();
+            if (stop != null) {
+                setDestination(unit, stop.getLocation());
+            }
+            ArrayList<Integer> goodsTypes = (ArrayList<Integer>) stop.getCargo().clone();
+            Iterator goodsIterator = unit.getGoodsIterator();
+            test: while (goodsIterator.hasNext()) {
+                Goods goods = (Goods) goodsIterator.next();
+                for (int index = 0; index < goodsTypes.size(); index++) {
+                    if (goods.getType() == goodsTypes.get(index).intValue()) {
+                        // remove item: other items of the same type
+                        // may or may not be present
+                        goodsTypes.remove(index);
+                        continue test;
+                    }
+                }
+                // this type of goods was not in the cargo list
+                unloadCargo(goods);
+            }
+            // TODO: do we want to load/unload units as well? 
+            // if so, when?
+        } else {
+            setDestination(unit, null);
+        }
         
         // Display a "cash in"-dialog if a treasure train have been moved into a colony:  
         if (unit.getType() == Unit.TREASURE_TRAIN
@@ -1127,31 +1154,31 @@ public final class InGameController implements NetworkConstants {
          * war, attack.  Otherwise make sure the player knows
          * what he/she is doing.
          */
-	if (unit.getType() != Unit.PRIVATEER) {
-	    switch (stance) {
-	    case Player.CEASE_FIRE:
-		if (!canvas.showConfirmDialog("model.diplomacy.attack.ceaseFire",
-					      "model.diplomacy.attack.confirm",
-					      "cancel",
-					      new String [][] {{"%replace%", enemy.getNationAsString()}})) {
-		    return;
-		}
-		break;
-	    case Player.PEACE:
-		if (!canvas.showConfirmDialog("model.diplomacy.attack.peace",
-					      "model.diplomacy.attack.confirm",
-					      "cancel",
-					      new String [][] {{"%replace%", enemy.getNationAsString()}})) {
-		    return;
-		}
-		break;
-	    case Player.ALLIANCE:
-		freeColClient.playSound(SfxLibrary.ILLEGAL_MOVE); 
-		canvas.showInformationMessage("model.diplomacy.attack.alliance",
-					      new String [][] {{"%replace%", enemy.getNationAsString()}});
-		return;
-	    }
-	}
+        if (unit.getType() != Unit.PRIVATEER) {
+            switch (stance) {
+            case Player.CEASE_FIRE:
+                if (!canvas.showConfirmDialog("model.diplomacy.attack.ceaseFire",
+                                              "model.diplomacy.attack.confirm",
+                                              "cancel",
+                                              new String [][] {{"%replace%", enemy.getNationAsString()}})) {
+                    return;
+                }
+                break;
+            case Player.PEACE:
+                if (!canvas.showConfirmDialog("model.diplomacy.attack.peace",
+                                              "model.diplomacy.attack.confirm",
+                                              "cancel",
+                                              new String [][] {{"%replace%", enemy.getNationAsString()}})) {
+                    return;
+                }
+                break;
+            case Player.ALLIANCE:
+                freeColClient.playSound(SfxLibrary.ILLEGAL_MOVE); 
+                canvas.showInformationMessage("model.diplomacy.attack.alliance",
+                                              new String [][] {{"%replace%", enemy.getNationAsString()}});
+                return;
+            }
+        }
 
         if (freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_PRECOMBAT) &&
             !canvas.showPreCombatDialog(unit, defender, target.getSettlement())) {
