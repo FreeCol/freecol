@@ -182,7 +182,7 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
 
         // add stops if any
         for (Stop stop : tradeRoute.getStops()) {
-            listModel.addElement(stop.clone());
+            listModel.addElement(stop);
         }
 
         // update cargo panel if stop is selected
