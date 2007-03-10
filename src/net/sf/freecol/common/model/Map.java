@@ -650,11 +650,11 @@ public class Map extends FreeColGameObject {
             }
             
             // Try every direction:
-            int[] directions = getGame().getMap().getRandomDirectionArray();
-            for (int j=0; j<8; j++) {
+            int[] directions = getDirectionArray();
+            for (int j=0; j<directions.length; j++) {
                 int direction = directions[j];
 
-                Tile newTile = getGame().getMap().getNeighbourOrNull(direction, currentNode.getTile());
+                Tile newTile = getNeighbourOrNull(direction, currentNode.getTile());
 
                 if (newTile == null) {
                     continue;
@@ -1006,18 +1006,29 @@ public class Map extends FreeColGameObject {
     public int[] getRandomDirectionArray() {
         PseudoRandom random = getGame().getModelController().getPseudoRandom();
         
+        int[] directions = getDirectionArray();
+        for (int i=0; i<directions.length; i++) {
+            int i2 = random.nextInt(directions.length);
+            if(i2 != i) {
+                int temp = directions[i2];
+                directions[i2] = directions[i];
+                directions[i] = temp;                
+            }
+        }
+
+        return directions;
+    }
+
+
+    /**
+     * Get an array of the eight directions in deterministic order.
+     * @return array with directions.
+     */
+    private int[] getDirectionArray() {
         int[] directions = new int[8];
         for (int i=0; i<directions.length; i++) {
             directions[i] = i;
         }
-        for (int i=0; i<directions.length; i++) {
-            int r1 = random.nextInt(8);
-            int r2 = random.nextInt(8);
-            int temp = directions[r1];
-            directions[r1] = directions[r2];
-            directions[r2] = temp;
-        }
-
         return directions;
     }
 
