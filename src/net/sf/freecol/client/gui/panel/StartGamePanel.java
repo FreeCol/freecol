@@ -226,7 +226,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
      * on this panel.
      */
     public void updateMapGeneratorOptions() {
-        SelectOption o = (SelectOption) freeColClient.getPreGameController().getMapGeneratorOptions().getObject(MapGeneratorOptions.MAP_SIZE);
+        freeColClient.getPreGameController().getMapGeneratorOptions().getObject(MapGeneratorOptions.MAP_SIZE);
     }
     
     /**

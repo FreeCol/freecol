@@ -31,6 +31,7 @@ public final class GoodsLabel extends JLabel {//implements ActionListener {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
+    @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(GoodsLabel.class.getName());
 
     private final Goods goods;
