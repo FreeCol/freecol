@@ -19,7 +19,7 @@ import org.w3c.dom.Element;
 /**
 * A trade route.
 */
-public class TradeRoute extends FreeColGameObject {
+public class TradeRoute extends FreeColGameObject implements Cloneable {
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
@@ -155,12 +155,37 @@ public class TradeRoute extends FreeColGameObject {
 
     public void newTurn() {}
 
+    /**
+     * Clone the trade route and return a deep copy.
+     * <p>
+     * The copied trade route has no reference back to the original and
+     * can safely be used as a temporary copy. It is NOT registered with
+     * the game, but will have the same unique id as the original.
+     * 
+     * @return deep copy of trade route.
+     */
     public TradeRoute clone() {
-        TradeRoute result = new TradeRoute(getGame(), new String(getName()));
-        for (Stop stop : getStops()) {
-            result.addStop(new Stop(stop));
+        try {
+            TradeRoute copy = (TradeRoute) super.clone();        
+            copy.replaceStops(getStops());
+            return copy;
+        } catch (CloneNotSupportedException e) {
+            throw new IllegalStateException("Clone should be supported!", e);
         }
-        return result;
+    }
+    
+    /**
+     * Replace all the stops for this trade route with the
+     * stops passed from another trade route.
+     * 
+     * @param otherStops The new stops to use.
+     * @see #clone()
+     */
+    private void replaceStops(List<Stop> otherStops) {
+        stops = new ArrayList<Stop>();
+        for (Stop otherStop : otherStops) {
+            addStop(new Stop(otherStop));
+        }
     }
 
     public class Stop {
@@ -185,10 +210,6 @@ public class TradeRoute extends FreeColGameObject {
         }
 
         private Stop(XMLStreamReader in) throws XMLStreamException {
-            // TODO: check why this is needed... it is
-            while(! getXMLElementTagName().equals(in.getLocalName())) {
-                in.nextTag();
-            }
             locationId = in.getAttributeValue(null, "location");
             for(int cargo : readFromArrayElement("cargo", in, new int[0])) {
                 addCargo(cargo);
@@ -242,7 +263,7 @@ public class TradeRoute extends FreeColGameObject {
         }
 
         public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-            out.writeStartElement(getXMLElementTagName());
+            out.writeStartElement(getStopXMLElementTagName());
             out.writeAttribute("location", this.locationId);
             int[] cargoArray = new int[cargo.size()];
             for (int index = 0; index < cargoArray.length; index++) {
@@ -250,15 +271,6 @@ public class TradeRoute extends FreeColGameObject {
             }
             toArrayElement("cargo", cargoArray, out);
             out.writeEndElement();
-        }
-
-        /**
-         * Returns the tag name of the root element representing this object.
-         *
-         * @return "tradeRouteStop".
-         */
-        public String getXMLElementTagName() {
-            return "tradeRouteStop";
         }
     }
 
@@ -285,10 +297,10 @@ public class TradeRoute extends FreeColGameObject {
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setID(in.getAttributeValue(null, "ID"));
         setName(in.getAttributeValue(null, "name"));
-
-        // Read child elements:
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            stops.add(new Stop(in));
+            if(getStopXMLElementTagName().equals(in.getLocalName())) {
+                stops.add(new Stop(in));                
+            }
         }
     }
 
@@ -302,4 +314,12 @@ public class TradeRoute extends FreeColGameObject {
     }
 
 
+    /**
+     * Returns the tag name of the root element representing this object.
+     *
+     * @return "tradeRouteStop".
+     */
+    public static String getStopXMLElementTagName() {
+        return "tradeRouteStop";
+    }
 }
