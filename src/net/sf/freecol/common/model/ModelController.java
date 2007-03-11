@@ -106,6 +106,6 @@ public interface ModelController {
     /**
      * Get a new <code>TradeRoute</code> object.
      */
-    public TradeRoute getNewTradeRoute();
+    public TradeRoute getNewTradeRoute(Player player);
 
 }

@@ -81,7 +81,8 @@ public final class TradeRouteDialog extends FreeColDialog implements ActionListe
         // button for adding new TradeRoute
         newRouteButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    TradeRoute newRoute = parent.getClient().getModelController().getNewTradeRoute();
+                    Player player = parent.getClient().getMyPlayer();
+                    TradeRoute newRoute = parent.getClient().getModelController().getNewTradeRoute(player);
                     newRoute.setName(Messages.message("traderouteDialog.newRoute"));
                     if (parent.showTradeRouteInputDialog(newRoute)) {
                         listModel.addElement(newRoute);

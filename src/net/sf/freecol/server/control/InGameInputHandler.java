@@ -428,10 +428,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * 
      */
     private Element getNewTradeRoute(Connection connection, Element element) {
-        TradeRoute tradeRoute = getFreeColServer().getModelController().getNewTradeRoute();
+        Player player = getFreeColServer().getPlayer(connection);
+        TradeRoute tradeRoute = getFreeColServer().getModelController().getNewTradeRoute(player);
         Element reply = Message.createNewRootElement("getNewTradeRouteConfirmed");
-        reply.appendChild(tradeRoute.toXMLElement(getFreeColServer().getPlayer(connection), 
-                                                  reply.getOwnerDocument()));
+        reply.appendChild(tradeRoute.toXMLElement(player, reply.getOwnerDocument()));
         return reply;
     }
 
@@ -444,13 +444,17 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      */
     private Element updateTradeRoute(Connection connection, Element element) {
         Game game = getFreeColServer().getGame();
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
         Element childElement = (Element) element.getChildNodes().item(0);
         TradeRoute clientTradeRoute = new TradeRoute(null, childElement);
         TradeRoute serverTradeRoute = (TradeRoute)
             game.getFreeColGameObject(clientTradeRoute.getID());
-        if(serverTradeRoute == null) {
-            throw new IllegalStateException("Trade route " + 
-                    clientTradeRoute.getID() + " does not exist!");
+        if (serverTradeRoute == null) {
+            throw new IllegalArgumentException("Could not find 'TradeRoute' with specified ID: " +
+                                               clientTradeRoute.getID());
+        } 
+        if (serverTradeRoute.getOwner() != player) {
+            throw new IllegalStateException("Not your trade route!");
         }
         serverTradeRoute.updateFrom(clientTradeRoute);        
         return null;
@@ -475,6 +479,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (tradeRoute == null) {
             throw new IllegalArgumentException("Could not find 'TradeRoute' with specified ID: " +
                                                element.getAttribute("tradeRoute"));
+        }
+        if (tradeRoute.getOwner() != player) {
+            throw new IllegalStateException("Not your trade route!");
         }
         if (unit.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");

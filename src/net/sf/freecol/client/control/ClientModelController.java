@@ -194,7 +194,7 @@ public class ClientModelController implements ModelController {
      * Returns a new <code>TradeRoute</code> object.
      * @return a new <code>TradeRoute</code> object.
      */
-    public TradeRoute getNewTradeRoute() {
+    public TradeRoute getNewTradeRoute(Player player) {
         Game game = freeColClient.getGame();
         Client client = freeColClient.getClient();
 

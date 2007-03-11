@@ -50,9 +50,10 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
      */
     private ArrayList<Stop> stops = new ArrayList<Stop>();
 
-    public TradeRoute(Game game, String name) {
+    public TradeRoute(Game game, String name, Player player) {
         super(game);
         this.name = name;
+        this.owner = player;
     }
 
     

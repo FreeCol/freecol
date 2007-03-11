@@ -364,10 +364,10 @@ public class ServerModelController implements ModelController {
      * Returns a new <code>TradeRoute</code> object.
      * @return a new <code>TradeRoute</code> object.
      */
-    public TradeRoute getNewTradeRoute() {
+    public TradeRoute getNewTradeRoute(Player player) {
         Game game = freeColServer.getGame();
         String name = "";
-        return new TradeRoute(game, name);
+        return new TradeRoute(game, name, player);
     }
 
 
