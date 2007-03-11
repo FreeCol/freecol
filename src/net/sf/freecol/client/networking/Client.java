@@ -2,6 +2,7 @@
 package net.sf.freecol.client.networking;
 
 import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.networking.Connection;
@@ -88,7 +89,7 @@ public final class Client {
         try {
             c.sendAndWait(element);
         } catch (IOException e) {
-            logger.warning("Could not send the specified message: " + element);
+            logger.log(Level.WARNING, "Client.sendAndWait could not send " + element, e);
         }
     }
 
@@ -107,9 +108,8 @@ public final class Client {
         try {
             return c.ask(element);
         } catch (IOException e) {
-            logger.warning("Could not send the specified message: " + element);
+            logger.log(Level.WARNING, "Client.ask could not send " + element, e);
         }
-
         return null;
     }
 

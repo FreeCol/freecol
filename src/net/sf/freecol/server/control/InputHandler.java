@@ -177,7 +177,10 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
                     return null;
                 }
             } else {
-                logger.warning("Received message out of turn: " + element.getTagName());
+                logger.warning("Received message out of turn from " 
+                        + player.getNationAsString()
+                        + " player:"
+                        + element.getTagName());
                 return createErrorReply("Not your turn.");
             }
         }

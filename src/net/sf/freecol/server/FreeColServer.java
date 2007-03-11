@@ -600,8 +600,12 @@ public final class FreeColServer {
             while (playerIterator.hasNext()) {
                 ServerPlayer player = (ServerPlayer) playerIterator.next();
                 if (player.isAI()) {
-                    DummyConnection theConnection = new DummyConnection(getInGameInputHandler());
-                    DummyConnection aiConnection = new DummyConnection(new AIInGameInputHandler(this, player, aiMain));
+                    DummyConnection theConnection = new DummyConnection(
+                            "Server-Server-" + player.getName(),
+                            getInGameInputHandler());
+                    DummyConnection aiConnection = new DummyConnection(
+                            "Server-AI-" + player.getName(),                            
+                            new AIInGameInputHandler(this, player, aiMain));
                     aiConnection.setOutgoingMessageHandler(theConnection);
                     theConnection.setOutgoingMessageHandler(aiConnection);
                     getServer().addConnection(theConnection, -1);

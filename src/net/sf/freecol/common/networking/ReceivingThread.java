@@ -58,7 +58,7 @@ final class ReceivingThread extends Thread {
      * @param in The stream to read from.
      */
     ReceivingThread(Connection connection, InputStream in) {
-        super("ReceivingThread");
+        super("ReceivingThread - " + connection.toString());
 
         this.connection = connection;
         this.in = new FreeColNetworkInputStream(in);
@@ -75,7 +75,7 @@ final class ReceivingThread extends Thread {
      * 
      * @return The next available <code>networkReplyId</code>.
      */
-    public int getNextNetworkReplyId() {
+    public synchronized int getNextNetworkReplyId() {
         nextNetworkReplyId++;
         return nextNetworkReplyId - 1;
     }

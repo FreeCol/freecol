@@ -1,4 +1,3 @@
-
 package net.sf.freecol.server.networking;
 
 import java.io.IOException;
@@ -11,12 +10,9 @@ import net.sf.freecol.common.networking.MessageHandler;
 import org.w3c.dom.Element;
 
 
-
-
-
 /**
-* A dummy connection, used for AI players.
-*/
+ * A dummy connection, used for AI players.
+ */
 public final class DummyConnection extends Connection {
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
@@ -26,31 +22,23 @@ public final class DummyConnection extends Connection {
     private MessageHandler outgoingMessageHandler;
     private DummyConnection otherConnection;
     
+    /**
+     * Name for dummy connection, makes it possible to identify a specific instance.
+     */
+    private final String _name;
+    
     
     /**
     * Sets up a dummy connection using the specified {@link MessageHandler}s.
     *
+    * @param name The name that identifies the connection.
     * @param incomingMessageHandler The MessageHandler to call for each message received.
     */
-    public DummyConnection(MessageHandler incomingMessageHandler) {
+    public DummyConnection(String name, MessageHandler incomingMessageHandler) {
         super();
+        _name = name;
         setMessageHandler(incomingMessageHandler);
     }
-
-    
-    /**
-    * Sets up a dummy connection using the specified {@link MessageHandler}s.
-    *
-    * @param incomingMessageHandler The MessageHandler to call for each message received.
-    * @throws IOException
-    */
-    /*public DummyConnection(MessageHandler incomingMessageHandler, MessageHandler outgoingMessageHandler) {
-        super();
-        setMessageHandler(incomingMessageHandler);
-        this.outgoingMessageHandler = outgoingMessageHandler;
-    }*/
-
-    
 
     /**
     * Closes this connection.
@@ -119,7 +107,6 @@ public final class DummyConnection extends Connection {
     private void setOutgoingMessageHandler(MessageHandler mh) {
         outgoingMessageHandler = mh;
     }
-
     
     /**
     * Sets the outgoing MessageHandler for this Connection.
@@ -130,7 +117,6 @@ public final class DummyConnection extends Connection {
         setOutgoingMessageHandler(c.getMessageHandler());
     }
     
-    
     /**
     * Gets the <code>DummyConnection</code> this object is
     * connected to.
@@ -140,12 +126,12 @@ public final class DummyConnection extends Connection {
         return otherConnection;
     }
 
-
     /**
-    * Gets the socket.
-    * @return The <code>Socket</code> used while communicating with the other peer.
-    */
-    public Socket getSocket() {
-        return null;
+     * Return a human-readable string with the dummy connection name.
+     * 
+     * @return string for debugging.
+     */
+    public String toString() {
+        return "DummyConnection[" + _name + "]";        
     }
 }

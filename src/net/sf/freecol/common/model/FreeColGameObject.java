@@ -50,7 +50,7 @@ abstract public class FreeColGameObject {
 
 
 
-    public FreeColGameObject() {    
+    protected FreeColGameObject() {    
         logger.info("FreeColGameObject without ID created.");
         uninitialized = false;
     }

@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.Socket;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLInputFactory;
@@ -99,10 +100,7 @@ public class Connection {
             myTransformer = factory.newTransformer();
             myTransformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
         } catch (TransformerException e) {
-            StringWriter sw = new StringWriter();
-            e.printStackTrace(new PrintWriter(sw));
-            logger.warning(sw.toString());
-
+            logger.log(Level.WARNING, "Failed to install transformer!", e);
             myTransformer = null;
         }
         xmlTransformer = myTransformer;
@@ -162,23 +160,31 @@ public class Connection {
     * @see #ask(Element)
     */
     public void send(Element element) throws IOException {      
+        // Note - waits for question but does not install a new value.
+        // Must hold out for entire call.
         synchronized (out) {
             while (currentQuestionID != -1) {
                 try {
+                    if(logger.isLoggable(Level.FINE)) {
+                        logger.fine("Waiting to send element " + element.getTagName() + "...");                        
+                    }
                     out.wait();
                 } catch (InterruptedException e) {}
             }
-
+            if(logger.isLoggable(Level.FINE)) {
+                logger.fine("Sending element " + element.getTagName() + "...");                        
+            }
             try {
                 xmlTransformer.transform(new DOMSource(element), new StreamResult(out));
-            } catch (TransformerException e) {
-                StringWriter sw = new StringWriter();
-                e.printStackTrace(new PrintWriter(sw));
-                logger.warning(sw.toString());
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Failed to transform and send element!", e);
             }
 
             out.write('\n');
-            out.flush();           
+            out.flush();
+
+            // Just in case others are waiting
+            out.notifyAll();
         }        
     }
 
@@ -191,8 +197,9 @@ public class Connection {
     *
     * @param element The Element to convert.
     * @return The string representation of the given Element without the xml version tag.
+    * @deprecated not used, should we remove?
     */
-    String convertElementToString(Element element) {
+    private String convertElementToString(Element element) {
         synchronized (out) { // Also a lock for: xmlTransformer
             String xml;
             try {
@@ -200,10 +207,8 @@ public class Connection {
                 xmlTransformer.transform(new DOMSource(element), new StreamResult(stringWriter));
                 xml = stringWriter.toString();
             } catch (TransformerException e) {
+                logger.log(Level.WARNING, "Failed to transform element!", e);
                 xml = e.getMessage();
-                StringWriter sw = new StringWriter();
-                e.printStackTrace(new PrintWriter(sw));
-                logger.warning(sw.toString());
             }
             return xml;
         }
@@ -227,7 +232,7 @@ public class Connection {
         questionElement.appendChild(element);
 
         if (Thread.currentThread() == thread) {
-            logger.warning("Attempt to 'wait()' the ReceivingThread.");
+            logger.warning("Attempt to 'wait()' the ReceivingThread for sending " + element.getTagName());
             throw new IOException("Attempt to 'wait()' the ReceivingThread.");
         } else {
             NetworkReplyObject nro = thread.waitForNetworkReply(networkReplyId);
@@ -269,26 +274,54 @@ public class Connection {
      * @see #endTransmission(XMLStreamReader)
      */
     public XMLStreamWriter ask() throws IOException {
+        waitForAndSetNewQuestionId();
+        try {
+            xmlOut = xof.createXMLStreamWriter(out);
+            xmlOut.writeStartElement("question");
+            xmlOut.writeAttribute("networkReplyId", Integer.toString(currentQuestionID));
+            return xmlOut;
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Failed to ask question (" + currentQuestionID + ")", e);
+            releaseQuestionId();
+            throw new IOException(e.toString());
+        }
+    }
+
+    /**
+     * Release a previously obtained question id. This is absolutely
+     * necessary as other questions will be blocked as long as the old
+     * id is in place.
+     * 
+     * @see #waitForAndSetNewQuestionId()
+     */
+    private void releaseQuestionId() {
+        synchronized(out) {
+            if(logger.isLoggable(Level.FINE)) {
+                logger.fine(toString() + " released question id " + currentQuestionID);                        
+            }
+            currentQuestionID = -1;                
+            out.notifyAll();
+        }
+    }
+
+    /**
+     * Wait until the previous question has been released, then
+     * install a new question id. The caller is then free to send.
+     */
+    private void waitForAndSetNewQuestionId() {
         synchronized (out) {
             while (currentQuestionID != -1) {
                 try {
+                    if(logger.isLoggable(Level.FINE)) {
+                        logger.fine(toString() + " waiting for question id...");                        
+                    }
                     out.wait();
                 } catch (InterruptedException e) {}
             }
             currentQuestionID = thread.getNextNetworkReplyId();
-        }
-        try {
-            xmlOut = xof.createXMLStreamWriter(out);
-        } catch (XMLStreamException e) {
-            throw new IOException(e.toString());
-        }
-        try {
-            xmlOut.writeStartElement("question");
-            xmlOut.writeAttribute("networkReplyId", Integer.toString(currentQuestionID));
-            return xmlOut;
-        } catch (XMLStreamException e) {
-            currentQuestionID = -1;
-            throw new IOException(e.toString());
+            if(logger.isLoggable(Level.FINE)) {
+                logger.fine(toString() + " installed new question id " + currentQuestionID);                        
+            }
         }
     }
     
@@ -324,20 +357,15 @@ public class Connection {
      * @see #endTransmission(XMLStreamReader)
      */
     public XMLStreamWriter send() throws IOException {
-        synchronized (out) {
-            while (currentQuestionID != -1) {
-                try {
-                    out.wait();
-                } catch (InterruptedException e) {}
-            }
-            currentQuestionID = thread.getNextNetworkReplyId();
-        }
+        waitForAndSetNewQuestionId();
         try {       
             xmlOut = xof.createXMLStreamWriter(out);
-        } catch (XMLStreamException e) {
+            return xmlOut;
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Failed to send message", e);
+            releaseQuestionId();
             throw new IOException(e.toString());
         }
-        return xmlOut;
     }
     
     /**
@@ -361,7 +389,8 @@ public class Connection {
             in.nextTag();
             
             return in;
-        } catch (XMLStreamException e) {
+        } catch (Exception e) {
+            logger.log(Level.WARNING, toString() + " failed to get reply (" + currentQuestionID + ")", e);
             throw new IOException(e.toString());
         }
     }   
@@ -390,19 +419,13 @@ public class Connection {
                 xmlOut.flush();
                 xmlOut.close();
                 xmlOut = null;
-            }
-            
-            synchronized (out) {
-                currentQuestionID = -1;
-                out.notifyAll();
-            }
-        } catch (XMLStreamException e) {
-            IOException ie = new IOException(e.toString());
-            ie.initCause(e);
-            StringWriter sw = new StringWriter();
-            e.printStackTrace(new PrintWriter(sw));
-            logger.warning(sw.toString());
-            throw ie;
+            }            
+        } catch (Exception e) {
+            logger.log(Level.WARNING, toString() + " failed to end transmission", e);
+            throw new IOException(e.toString());
+        } finally {
+            // Unless the question id is released, can we ever recover?
+            releaseQuestionId();            
         }
     }
 
@@ -417,12 +440,7 @@ public class Connection {
     * @see #ask(Element)
     */
     public void sendAndWait(Element element) throws IOException {
-        //Element reply = 
         ask(element);
-
-        /*if (reply != null) {
-            handleAndSendReply(reply);
-        }*/
     }
 
 
@@ -441,10 +459,6 @@ public class Connection {
     public MessageHandler getMessageHandler() {
         return messageHandler;
     }
-
-    /*public void handleAndSendReply(Message message) {
-        handleAndSendReply(message.getDocument().getDocumentElement());
-    }*/
 
     /**
      * Handles a message using the registered <code>MessageHandler</code>.
@@ -516,9 +530,7 @@ public class Connection {
                                 }
                             }
                         } catch (Exception e) {
-                            StringWriter sw = new StringWriter();
-                            e.printStackTrace(new PrintWriter(sw));
-                            logger.warning(sw.toString());
+                            logger.log(Level.WARNING, "Message handler failed!", e);
                         }
                     }
                 };
@@ -526,9 +538,7 @@ public class Connection {
                 t.start();
             }
         } catch (Exception e) {
-            StringWriter sw = new StringWriter();
-            e.printStackTrace(new PrintWriter(sw));
-            logger.warning(sw.toString());
+            logger.log(Level.WARNING, "Failed to handle and send reply", e);
         }
     }
 

@@ -168,14 +168,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
 
     /**
-    * This constructor should only be used by subclasses.
-    */
-    protected Unit() {
-
-    }
-
-
-    /**
     * Initiate a new <code>Unit</code> of a specified type with the state set
     * to {@link #ACTIVE} if a carrier and {@link #SENTRY} otherwise. The
     * {@link Location} is set to <i>null</i>.

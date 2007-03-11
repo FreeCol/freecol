@@ -84,7 +84,6 @@ public final class PreGameController extends Controller {
                 continue;
             }
 
-            DummyConnection theConnection = new DummyConnection(freeColServer.getInGameInputHandler());
             String name = null;
             switch (i) {
             case 0:
@@ -135,7 +134,9 @@ public final class PreGameController extends Controller {
             case 15:
                 name = Messages.message("model.nation.refSpanish.ruler");
             }
-
+            DummyConnection theConnection = new DummyConnection(
+                    "Server connection - " + name,
+                    freeColServer.getInGameInputHandler());
             ServerPlayer aiPlayer = new ServerPlayer(game,
                                                     name,
                                                     false,
@@ -143,8 +144,10 @@ public final class PreGameController extends Controller {
                                                     null,
                                                     theConnection,
                                                     i);
-
-            DummyConnection aiConnection = new DummyConnection(new AIInGameInputHandler(freeColServer, aiPlayer, aiMain));
+            DummyConnection aiConnection = new DummyConnection(
+                    "AI connection - " + name,
+                    new AIInGameInputHandler(freeColServer, aiPlayer, aiMain));
+            
             aiConnection.setOutgoingMessageHandler(theConnection);
             theConnection.setOutgoingMessageHandler(aiConnection);
 
