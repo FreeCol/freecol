@@ -431,12 +431,12 @@ public class FreeColDialog extends FreeColPanel {
         Color attackerColor = attacker.getOwner().getColor();
         modifier = offense.get(offense.size() - 1);
         JLabel finalOffenseLabel = new JLabel(Messages.message(modifier.id));
-        finalOffenseLabel.setForeground(attackerColor);
+        //finalOffenseLabel.setForeground(attackerColor);
         finalOffenseLabel.setFont(bigFont);
         preCombatDialog.add(finalOffenseLabel,
                             higConst.rc(row, offenseLabelColumn));
         JLabel finalOffenseResult = new JLabel(modifier.getFormattedResult());
-        finalOffenseResult.setForeground(attackerColor);
+        //finalOffenseResult.setForeground(attackerColor);
         finalOffenseResult.setFont(bigFont);
         preCombatDialog.add(finalOffenseResult,
                             higConst.rc(row, offenseValueColumn, "r"));
@@ -449,12 +449,12 @@ public class FreeColDialog extends FreeColPanel {
         }
         modifier = defense.get(defense.size() - 1);
         JLabel finalDefenseLabel = new JLabel(Messages.message(modifier.id));
-        finalDefenseLabel.setForeground(defenderColor);
+        //finalDefenseLabel.setForeground(defenderColor);
         finalDefenseLabel.setFont(bigFont);
         preCombatDialog.add(finalDefenseLabel,
                             higConst.rc(row, defenseLabelColumn));
         JLabel finalDefenseResult = new JLabel(modifier.getFormattedResult());
-        finalDefenseResult.setForeground(defenderColor);
+        //finalDefenseResult.setForeground(defenderColor);
         finalDefenseResult.setFont(bigFont);
         preCombatDialog.add(finalDefenseResult,
                             higConst.rc(row, defenseValueColumn, "r"));
