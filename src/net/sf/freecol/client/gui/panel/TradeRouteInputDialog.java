@@ -161,8 +161,9 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
 
     }
 
-    public void initialize(TradeRoute tradeRoute) {
-        originalRoute = tradeRoute;
+    public void initialize(TradeRoute newRoute) {
+        originalRoute = newRoute;
+        TradeRoute tradeRoute = newRoute.clone();
 
         Player player = getCanvas().getClient().getMyPlayer();
 
@@ -265,6 +266,7 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
                     stops.add((Stop) listModel.getElementAt(index));
                 }
                 originalRoute.setStops(stops);
+                // TODO: update trade routes only if they have been modified
                 getCanvas().getClient().getInGameController().updateTradeRoute(originalRoute);
                 setResponse(new Boolean(true));
                 break;

@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.logging.Logger;
 
+import javax.swing.KeyStroke;
+
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.panel.ReportLabourPanel;
 
@@ -28,7 +30,7 @@ public class ReportLabourAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     ReportLabourAction(FreeColClient freeColClient) {
-    	super(freeColClient, "menuBar.report.labour", null, KeyEvent.VK_L);        
+    	super(freeColClient, "menuBar.report.labour", null, KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0));        
     }
     
     /**

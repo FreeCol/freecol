@@ -15,6 +15,7 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.util.EmptyIterator;
 
 import org.w3c.dom.Element;
@@ -143,6 +144,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     private IndianSettlement indianSettlement = null; // only used by BRAVE.
     private Location        destination = null;
     private TradeRoute      tradeRoute = null;  // only used by carriers
+
+    /** Keeps track of the next Stop of the TradeRoute */
+    private int nextStop = -1;
+
     
     // to be used only for type == TREASURE_TRAIN
     private int             treasureAmount;
@@ -352,6 +357,25 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     public final void setTradeRoute(final TradeRoute newTradeRoute) {
         this.tradeRoute = newTradeRoute;
     }
+
+    /**
+     * Get the next stop.
+     * 
+     * @return the next stop.
+     */
+    public Stop nextStop() {
+        ArrayList<Stop> stops = getTradeRoute().getStops();
+        if (stops.size() == 0) {
+            nextStop = -1;
+            return null;
+        } else if (nextStop >= stops.size()) {
+            nextStop = 0;
+        }
+        Stop result = stops.get(nextStop);
+        nextStop++;
+        return result;
+    }
+
 
     /**
     * Sells the given goods from this unit to the given settlement.
@@ -4161,6 +4185,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         if (destination != null) {
             out.writeAttribute("destination", destination.getID());
         }
+        if (tradeRoute != null) {
+            out.writeAttribute("tradeRoute", tradeRoute.getID());
+            out.writeAttribute("nextStop", String.valueOf(nextStop));
+        }
 
         // Do not show enemy units hidden in a carrier:
         if (isCarrier()) {
@@ -4255,6 +4283,17 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             }
         } else {
             destination = null;
+        }
+
+        nextStop = -1;
+        tradeRoute = null;
+        final String tradeRouteStr = in.getAttributeValue(null, "tradeRoute");
+        if (tradeRouteStr != null) {
+            tradeRoute = (TradeRoute) getGame().getFreeColGameObject(tradeRouteStr);
+            final String nextStopStr = in.getAttributeValue(null, "nextStop");
+            if (nextStopStr != null) {
+                nextStop = Integer.parseInt(nextStopStr);
+            }
         }
         
         final String workTypeStr = in.getAttributeValue(null, "workType");

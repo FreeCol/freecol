@@ -19,16 +19,13 @@ import org.w3c.dom.Element;
 /**
 * A trade route.
 */
-public class TradeRoute extends FreeColGameObject implements Cloneable {
+public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable {
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
     //private static final Logger logger = Logger.getLogger(TradeRoute.class.getName());
-
-    // keeps track of where we are
-    private int index = 0;
 
     /**
      * The name of this trade route.
@@ -40,6 +37,13 @@ public class TradeRoute extends FreeColGameObject implements Cloneable {
      * only to the client and can be ignored for XML serialization.
      */
     private boolean modified = false;
+
+    /**
+     * The <code>Player</code> who owns this trade route. This is
+     * necessary to ensure that malicious clients can not modify the
+     * trade routes of other players.
+     */
+    private Player owner;
 
     /**
      * A list of stops.
@@ -66,7 +70,6 @@ public class TradeRoute extends FreeColGameObject implements Cloneable {
      */
     public synchronized void updateFrom(TradeRoute other) {
         setName(other.getName());
-        // TODO: what to do about the index?7
         stops.clear();
         for(Stop otherStop : other.getStops()) {
             addStop(new Stop(otherStop));
@@ -108,12 +111,34 @@ public class TradeRoute extends FreeColGameObject implements Cloneable {
     public final void setName(final String newName) {
         this.name = newName;
     }
-
-
+    
+    /**
+     * Add a new <code>Stop</code> to this trade route.
+     *
+     * @param stop The <code>Stop</code> to add.
+     */
     public void addStop(Stop stop) {
         stops.add(stop);
     }
 
+
+    /**
+     * Get the <code>Owner</code> value.
+     *
+     * @return a <code>Player</code> value
+     */
+    public final Player getOwner() {
+        return owner;
+    }
+
+    /**
+     * Set the <code>Owner</code> value.
+     *
+     * @param newOwner The new Owner value.
+     */
+    public final void setOwner(final Player newOwner) {
+        this.owner = newOwner;
+    }
 
     public String toString() {
         return getName();
@@ -137,22 +162,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable {
         this.stops = newStops;
     }
 
-    /**
-     * Get the next stop.
-     * 
-     * @return the next stop.
-     */
-    public Stop nextStop() {
-        if (stops.size() == 0) {
-            return null;
-        } else if (index >= stops.size()) {
-            index = 0;
-        }
-        Stop result = stops.get(index);
-        index++;
-        return result;
-    }
-
+    // do nothing
     public void newTurn() {}
 
     /**
@@ -281,6 +291,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable {
 
         out.writeAttribute("ID", getID());
         out.writeAttribute("name", getName());
+        out.writeAttribute("owner", getOwner().getID());
         for (Stop stop : stops) {
             stop.toXMLImpl(out);
         }
@@ -297,6 +308,15 @@ public class TradeRoute extends FreeColGameObject implements Cloneable {
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setID(in.getAttributeValue(null, "ID"));
         setName(in.getAttributeValue(null, "name"));
+        String ownerID = in.getAttributeValue(null, "owner");
+        if (ownerID.equals("unknown")) {
+            owner = Game.unknownEnemy;
+        } else {
+            owner = (Player) getGame().getFreeColGameObject(ownerID);
+            if (owner == null) {
+                owner = new Player(getGame(), in.getAttributeValue(null, "owner"));
+            }
+        }
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if(getStopXMLElementTagName().equals(in.getLocalName())) {
                 stops.add(new Stop(in));                

@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.logging.Logger;
 
+import javax.swing.KeyStroke;
+
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.panel.ReportForeignAffairPanel;
 import net.sf.freecol.client.gui.panel.ReportLabourPanel;
@@ -30,7 +32,7 @@ public class ReportForeignAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     ReportForeignAction(FreeColClient freeColClient) {
-    	super(freeColClient, "menuBar.report.foreign", null, KeyEvent.VK_F);        
+    	super(freeColClient, "menuBar.report.foreign", null, KeyStroke.getKeyStroke(KeyEvent.VK_F4, 0));
     }
     
     /**

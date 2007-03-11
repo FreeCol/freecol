@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.logging.Logger;
 
+import javax.swing.KeyStroke;
+
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.panel.ReportReligiousPanel;
 
@@ -28,7 +30,7 @@ public class ReportReligionAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     ReportReligionAction(FreeColClient freeColClient) {
-    	super(freeColClient, "menuBar.report.religion", null, KeyEvent.VK_R);        
+    	super(freeColClient, "menuBar.report.religion", null, KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
     }
     
     /**

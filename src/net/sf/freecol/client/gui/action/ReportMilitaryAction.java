@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.logging.Logger;
 
+import javax.swing.KeyStroke;
+
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.panel.ReportMilitaryPanel;
 
@@ -28,7 +30,7 @@ public class ReportMilitaryAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     ReportMilitaryAction(FreeColClient freeColClient) {
-    	super(freeColClient, "menuBar.report.military", null, KeyEvent.VK_M);        
+    	super(freeColClient, "menuBar.report.military", null, KeyStroke.getKeyStroke(KeyEvent.VK_F7, 0));
     }
     
     /**

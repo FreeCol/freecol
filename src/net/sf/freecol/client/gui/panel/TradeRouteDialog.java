@@ -32,9 +32,7 @@ public final class TradeRouteDialog extends FreeColDialog implements ActionListe
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
     
-    private static final int OK = 0;
-
-    private final Canvas parent;
+    private static final int OK = 0, CANCEL = 1;
 
     private final JButton ok = new JButton(Messages.message("ok"));
     private final JButton cancel = new JButton(Messages.message("cancel"));
@@ -55,18 +53,24 @@ public final class TradeRouteDialog extends FreeColDialog implements ActionListe
      * @param parent The parent of this panel.
      */
     public TradeRouteDialog(final Canvas parent) {
-        this.parent = parent;
+        super(parent);
 
         tradeRoutePanel.setOpaque(false);
 
         ok.setActionCommand(String.valueOf(OK));
+        cancel.setActionCommand(String.valueOf(CANCEL));
         
         ok.addActionListener(this);
+        cancel.addActionListener(this);
 
         ok.setMnemonic('y');
+        cancel.setMnemonic('n');
 
+        FreeColPanel.enterPressesWhenFocused(cancel);
         FreeColPanel.enterPressesWhenFocused(ok);
 
+        setCancelComponent(cancel);
+        ok.setActionCommand(String.valueOf(OK));
 
         tradeRoutes.addListSelectionListener(new ListSelectionListener() {
                 public void valueChanged(ListSelectionEvent e) {
@@ -105,6 +109,7 @@ public final class TradeRouteDialog extends FreeColDialog implements ActionListe
         setLayout(new HIGLayout(widths, heights));
 
         buttonPanel.add(ok);
+        buttonPanel.add(cancel);
         buttonPanel.setOpaque(false);
 
         add(getDefaultHeader(Messages.message("traderouteDialog.name")),
@@ -116,7 +121,7 @@ public final class TradeRouteDialog extends FreeColDialog implements ActionListe
 
     public void initialize() {
 
-        Player player = parent.getClient().getMyPlayer();
+        Player player = getCanvas().getClient().getMyPlayer();
 
         tradeRoutePanel.removeAll();
 
@@ -175,14 +180,19 @@ public final class TradeRouteDialog extends FreeColDialog implements ActionListe
         try {
             switch (Integer.valueOf(command).intValue()) {
             case OK:
-                parent.remove(this);
+                getCanvas().remove(this);
                 setResponse(new Boolean(true));
-                Player player = parent.getClient().getMyPlayer();
+                Player player = getCanvas().getClient().getMyPlayer();
                 ArrayList<TradeRoute> routes = new ArrayList<TradeRoute>();
                 for (int index = 0; index < listModel.getSize(); index++) {
                     routes.add((TradeRoute) listModel.getElementAt(index));
                 }
                 player.setTradeRoutes(routes);
+                setResponse(tradeRoutes.getSelectedValue());
+            case CANCEL:
+                getCanvas().remove(this);
+                setResponse(null);
+                break;
             default:
                 logger.warning("Invalid ActionCommand: invalid number.");
             }

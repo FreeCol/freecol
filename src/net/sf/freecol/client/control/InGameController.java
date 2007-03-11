@@ -683,7 +683,7 @@ public final class InGameController implements NetworkConstants {
 
         // we have reached our destination
         if (unit.getTradeRoute() != null) {
-            Stop stop = unit.getTradeRoute().nextStop();
+            Stop stop = unit.nextStop();
             if (stop != null) {
                 setDestination(unit, stop.getLocation());
             }
@@ -2471,17 +2471,40 @@ public final class InGameController implements NetworkConstants {
 
     /**
      * Updates a trade route.
+     * @param route The trade route to update.
      */
     public void updateTradeRoute(TradeRoute route) {
+        /*
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
         }
+        */
         Element tradeRouteElement = Message.createNewRootElement("updateTradeRoute");
-        tradeRouteElement.setAttribute("ID", route.getID());
         tradeRouteElement.appendChild(route.toXMLElement(null, tradeRouteElement.getOwnerDocument()));
         freeColClient.getClient().sendAndWait(tradeRouteElement);
         
+    }
+
+    /**
+     * Assigns a trade route to a unit.
+     * @param unit The unit to assign a trade route to.
+     */
+    public void assignTradeRoute(Unit unit) {
+        /*
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        */
+        TradeRoute tradeRoute = freeColClient.getCanvas().showTradeRouteDialog();
+        if (tradeRoute != null) {
+            unit.setTradeRoute(tradeRoute);
+            Element assignTradeRouteElement = Message.createNewRootElement("assignTradeRoute");
+            assignTradeRouteElement.setAttribute("unit", unit.getID());
+            assignTradeRouteElement.setAttribute("tradeRoute", tradeRoute.getID());
+            freeColClient.getClient().sendAndWait(assignTradeRouteElement);
+        }        
     }
 
     /**

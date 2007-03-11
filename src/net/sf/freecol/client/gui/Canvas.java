@@ -1484,13 +1484,13 @@ public final class Canvas extends JLayeredPane {
      * Displays the <code>TradeRouteDialog</code>. Does not return
      * from this method before the panel is closed.
      */
-    public boolean showTradeRouteDialog() {
+    public TradeRoute showTradeRouteDialog() {
         tradeRouteDialog.initialize();
         addCentered(tradeRouteDialog, INPUT_LAYER - 1);
 
         tradeRouteDialog.requestFocus();
 
-        boolean response = tradeRouteDialog.getResponseBoolean();
+        TradeRoute response = (TradeRoute) tradeRouteDialog.getResponse();
 
         remove(tradeRouteDialog);
         setEnabled(true);

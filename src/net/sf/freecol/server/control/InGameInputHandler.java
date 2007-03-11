@@ -316,6 +316,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return updateTradeRoute(connection, element);
             }
         });
+        register("assignTradeRoute", new NetworkRequestHandler() {
+            public Element handle(Connection connection, Element element) {
+                return assignTradeRoute(connection, element);
+            }
+        });
     }
 
     /**
@@ -439,7 +444,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      */
     private Element updateTradeRoute(Connection connection, Element element) {
         Game game = getFreeColServer().getGame();
-        TradeRoute clientTradeRoute = new TradeRoute(null, element);
+        Element childElement = (Element) element.getChildNodes().item(0);
+        TradeRoute clientTradeRoute = new TradeRoute(null, childElement);
         TradeRoute serverTradeRoute = (TradeRoute)
             game.getFreeColGameObject(clientTradeRoute.getID());
         if(serverTradeRoute == null) {
@@ -447,6 +453,33 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     clientTradeRoute.getID() + " does not exist!");
         }
         serverTradeRoute.updateFrom(clientTradeRoute);        
+        return null;
+    }
+
+    /**
+     * Handles a "assignTradeRoute"-message from a client.
+     * 
+     * @param connection The connection the message came from.
+     * @param element The element containing the request.
+     * 
+     */
+    private Element assignTradeRoute(Connection connection, Element element) {
+        Game game = getFreeColServer().getGame();
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
+        Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
+        TradeRoute tradeRoute = (TradeRoute) game.getFreeColGameObject(element.getAttribute("tradeRoute"));
+        if (unit == null) {
+            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: " +
+                                               element.getAttribute("unit"));
+        }
+        if (tradeRoute == null) {
+            throw new IllegalArgumentException("Could not find 'TradeRoute' with specified ID: " +
+                                               element.getAttribute("tradeRoute"));
+        }
+        if (unit.getOwner() != player) {
+            throw new IllegalStateException("Not your unit!");
+        }
+        unit.setTradeRoute(tradeRoute);
         return null;
     }
 

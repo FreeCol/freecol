@@ -20,6 +20,7 @@ import javax.swing.border.CompoundBorder;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.action.ActionManager;
+import net.sf.freecol.client.gui.action.AssignTradeRouteAction;
 import net.sf.freecol.client.gui.action.BuildColonyAction;
 import net.sf.freecol.client.gui.action.BuildRoadAction;
 import net.sf.freecol.client.gui.action.ChangeAction;
@@ -215,6 +216,7 @@ public class FreeColMenuBar extends JMenuBar {
         menu.add(getMenuItem(SentryAction.ID));
         menu.add(getMenuItem(FortifyAction.ID));
         menu.add(getMenuItem(GotoAction.ID));
+        menu.add(getMenuItem(AssignTradeRouteAction.ID));
         
         menu.addSeparator();
 

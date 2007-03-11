@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.logging.Logger;
 
+import javax.swing.KeyStroke;
+
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.panel.ReportTradePanel;
 
@@ -28,7 +30,7 @@ public class ReportTradeAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     ReportTradeAction(FreeColClient freeColClient) {
-    	super(freeColClient, "menuBar.report.trade", null, KeyEvent.VK_T);        
+    	super(freeColClient, "menuBar.report.trade", null, KeyStroke.getKeyStroke(KeyEvent.VK_F9, 0));
     }
     
     /**

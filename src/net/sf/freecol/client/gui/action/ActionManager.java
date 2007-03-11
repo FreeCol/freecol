@@ -33,6 +33,7 @@ public class ActionManager extends OptionGroup {
         
         // keep this list alphabetized.
         
+        add(new AssignTradeRouteAction(freeColClient));
         add(new BuildColonyAction(freeColClient));
         add(new BuildRoadAction(freeColClient));
         add(new ChangeAction(freeColClient));
