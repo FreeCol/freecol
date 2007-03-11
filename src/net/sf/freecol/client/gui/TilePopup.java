@@ -157,18 +157,6 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
         // END DEBUG
     }
 
-
-
-
-
-    /**
-    * Adds a unit entry to this popup.
-    * @param unit The unit that will be represented on the popup.
-    */
-    private void addUnit(Unit unit) {
-        addUnit(unit, true, false);
-    }
-    
     /**
      * Adds a unit entry to this popup.
      * @param unit The unit that will be represented on the popup.
