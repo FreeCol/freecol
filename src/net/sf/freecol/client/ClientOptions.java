@@ -34,10 +34,6 @@ public class ClientOptions extends OptionMap {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-
-
-    private static final String GROUP_GUI = "gui";
-
     /**
      * Selected tiles always gets centered if this option is
      * enabled (even if the tile is {@link net.sf.freecol.client.gui.GUI#onScreen(Map.Position)}).

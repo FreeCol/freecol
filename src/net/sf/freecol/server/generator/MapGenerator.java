@@ -573,15 +573,15 @@ public class MapGenerator {
 
             Unit unit1 = new Unit(game, startTile, player, navalUnitType, Unit.ACTIVE);
             //unit1.setName(Messages.message("shipName." + player.getNation() + ".0"));
-            Unit unit2 = new Unit(game, unit1, player, pioneerUnitType, Unit.SENTRY, false, false, 100, false);
-            Unit unit3 = new Unit(game, unit1, player, soldierUnitType, Unit.SENTRY, true, false, 0, false);
+            @SuppressWarnings("unused") Unit unit2 = new Unit(game, unit1, player, pioneerUnitType, Unit.SENTRY, false, false, 100, false);
+            @SuppressWarnings("unused") Unit unit3 = new Unit(game, unit1, player, soldierUnitType, Unit.SENTRY, true, false, 0, false);
 
             // START DEBUG:
             if (net.sf.freecol.FreeCol.isInDebugMode()) {
                 Unit unit4 = new Unit(game, startTile, player, Unit.GALLEON, Unit.ACTIVE);
-                Unit unit5 = new Unit(game, unit4, player, Unit.FREE_COLONIST, Unit.SENTRY);
-                Unit unit6 = new Unit(game, unit4, player, Unit.VETERAN_SOLDIER, Unit.SENTRY);
-                Unit unit7 = new Unit(game, unit4, player, Unit.JESUIT_MISSIONARY, Unit.SENTRY);
+                @SuppressWarnings("unused") Unit unit5 = new Unit(game, unit4, player, Unit.FREE_COLONIST, Unit.SENTRY);
+                @SuppressWarnings("unused") Unit unit6 = new Unit(game, unit4, player, Unit.VETERAN_SOLDIER, Unit.SENTRY);
+                @SuppressWarnings("unused") Unit unit7 = new Unit(game, unit4, player, Unit.JESUIT_MISSIONARY, Unit.SENTRY);
 
                 Tile colonyTile = null;
                 Iterator cti = map.getFloodFillIterator(new Position(x, y));
@@ -627,12 +627,12 @@ public class MapGenerator {
                         lumberjack.setWorkType(Goods.LUMBER);
                     }
 
-                    Unit scout = new Unit(game, colonyTile, player, Unit.SEASONED_SCOUT, Unit.ACTIVE);
-                    Unit unit8 = new Unit(game, colonyTile, player, Unit.VETERAN_SOLDIER, Unit.ACTIVE);
-                    Unit unit9 = new Unit(game, colonyTile, player, Unit.VETERAN_SOLDIER, Unit.ACTIVE);
-                    Unit unit10 = new Unit(game, colonyTile, player, Unit.ARTILLERY, Unit.ACTIVE);
-                    Unit unit11 = new Unit(game, colonyTile, player, Unit.ARTILLERY, Unit.ACTIVE);
-                    Unit unit12 = new Unit(game, colonyTile, player, Unit.ARTILLERY, Unit.ACTIVE);
+                    @SuppressWarnings("unused") Unit scout = new Unit(game, colonyTile, player, Unit.SEASONED_SCOUT, Unit.ACTIVE);
+                    @SuppressWarnings("unused") Unit unit8 = new Unit(game, colonyTile, player, Unit.VETERAN_SOLDIER, Unit.ACTIVE);
+                    @SuppressWarnings("unused") Unit unit9 = new Unit(game, colonyTile, player, Unit.VETERAN_SOLDIER, Unit.ACTIVE);
+                    @SuppressWarnings("unused") Unit unit10 = new Unit(game, colonyTile, player, Unit.ARTILLERY, Unit.ACTIVE);
+                    @SuppressWarnings("unused") Unit unit11 = new Unit(game, colonyTile, player, Unit.ARTILLERY, Unit.ACTIVE);
+                    @SuppressWarnings("unused") Unit unit12 = new Unit(game, colonyTile, player, Unit.ARTILLERY, Unit.ACTIVE);
                     Unit unit13 = new Unit(game, colonyTile, player, Unit.TREASURE_TRAIN, Unit.ACTIVE);
                     unit13.setTreasureAmount(10000);
 
@@ -918,11 +918,6 @@ public class MapGenerator {
                 map[x][map[0].length-1] = true;
                 map[x][map[0].length-2] = true;
             }
-        }
-
-
-        private boolean hasLandMass(int minLandMass) {
-            return (numberOfLandTiles * 100) / (map.length * map[0].length) >= minLandMass;
         }
 
 

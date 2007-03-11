@@ -109,11 +109,7 @@ public final class DummyConnection extends Connection {
     * @see #ask(Element)
     */
     public void sendAndWait(Element element) throws IOException {
-        Element reply = ask(element);
-
-        /*if (reply != null) {
-            handleAndSendReply(reply);
-        }*/
+        ask(element);
     }
 
     /**

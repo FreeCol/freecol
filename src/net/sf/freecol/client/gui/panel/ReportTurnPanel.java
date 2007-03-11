@@ -189,7 +189,7 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
                 });
             headline = button;
         } else if (source instanceof Market) {
-            Europe europe = getCanvas().getClient().getMyPlayer().getEurope();
+            //Europe europe = getCanvas().getClient().getMyPlayer().getEurope();
             JButton button = new JButton(Messages.message("model.message.marketPrices"));
             button.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent event) {

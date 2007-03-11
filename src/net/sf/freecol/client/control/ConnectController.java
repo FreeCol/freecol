@@ -512,8 +512,6 @@ public final class ConnectController {
     * @return A list of available {@link Player#getUsername() usernames}.
     */
     private List getVacantPlayers(String host, int port) {
-        Canvas canvas = freeColClient.getCanvas();
-
         Connection mc;
         try {
             mc = new Connection(host, port, null);

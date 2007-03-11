@@ -903,8 +903,6 @@ public final class InGameInputHandler extends InputHandler {
         final FreeColClient freeColClient = getFreeColClient();
         Game game = getFreeColClient().getGame();
         Player player = freeColClient.getMyPlayer();
-        Canvas canvas = freeColClient.getCanvas();
-
         int type = Integer.parseInt(element.getAttribute("type"));
         Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
 

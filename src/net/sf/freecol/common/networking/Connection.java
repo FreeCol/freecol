@@ -417,7 +417,8 @@ public class Connection {
     * @see #ask(Element)
     */
     public void sendAndWait(Element element) throws IOException {
-        Element reply = ask(element);
+        //Element reply = 
+        ask(element);
 
         /*if (reply != null) {
             handleAndSendReply(reply);

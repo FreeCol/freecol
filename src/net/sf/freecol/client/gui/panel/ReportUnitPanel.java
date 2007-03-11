@@ -127,7 +127,6 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
         Iterator<Unit> units = player.getUnitIterator();
         while (units.hasNext()) {
             Unit unit = units.next();
-            int type = unit.getType();
             String locationName = null;
 
             if (isNaval && unit.isNaval()) {

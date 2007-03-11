@@ -35,6 +35,7 @@ public final class CaptureGoodsDialog extends FreeColDialog implements ActionLis
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
+    @SuppressWarnings("unused") 
     private final Canvas parent;
     private JButton allButton;
     private JButton noneButton;
@@ -202,11 +203,9 @@ public final class CaptureGoodsDialog extends FreeColDialog implements ActionLis
     }
 
     class GoodsItem extends JCheckBox {
-        private boolean isChecked;
         private Goods good;
 
         public GoodsItem(Goods good) {
-            isChecked = false;
             this.good = good;
         }
 

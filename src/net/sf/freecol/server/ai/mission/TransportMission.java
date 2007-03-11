@@ -582,7 +582,6 @@ public class TransportMission extends Mission {
     public AIGoods buyGoodsInEurope(Connection connection, int type, int amount, Location destination) {
         AIPlayer aiPlayer = (AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getID());
         Player player = aiPlayer.getPlayer();
-        Europe europe = player.getEurope();
         Market market = getAIMain().getGame().getMarket();
 
         if (player.getGold() >= market.getBidPrice(type, amount)) {

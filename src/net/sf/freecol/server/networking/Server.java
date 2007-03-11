@@ -104,7 +104,8 @@ public final class Server extends Thread {
                     clientSocket = serverSocket.accept();
 
                     logger.info("Got client connection from " + clientSocket.getInetAddress().toString());
-                    Connection connection = new Connection(clientSocket, freeColServer.getUserConnectionHandler());
+                    //Connection connection = 
+                        new Connection(clientSocket, freeColServer.getUserConnectionHandler());
                     //connections.put(clientSocket, connection);
                 } catch (IOException e) {
                     if (running) {

@@ -48,7 +48,7 @@ public final class FreeColClient {
     private GUI gui;
     private ImageLibrary imageLibrary;
     private MusicLibrary musicLibrary;
-    private SfxLibrary sfxLibrary;
+    private SfxLibrary sfxLibrary;    
     private SoundPlayer musicPlayer;
     private SoundPlayer sfxPlayer;
     // Networking:

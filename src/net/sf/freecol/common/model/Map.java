@@ -1413,7 +1413,6 @@ public class Map extends FreeColGameObject {
     public final class CircleIterator extends MapIterator {
         private int radius;
         private int currentRadius;
-        private boolean isFilled;
         private Position nextPosition = null;
         // The current position in the circle with the current radius:
         private int n;
@@ -1426,7 +1425,6 @@ public class Map extends FreeColGameObject {
          */
         public CircleIterator(Position center, boolean isFilled, int radius) {
             this.radius = radius;
-            this.isFilled = isFilled;
             
             if (center == null) {
                 throw new NullPointerException("center == null");

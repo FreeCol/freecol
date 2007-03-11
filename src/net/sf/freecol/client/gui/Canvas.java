@@ -693,7 +693,8 @@ public final class Canvas extends JLayeredPane {
          declarationDialog.requestFocus();
 
          declarationDialog.initialize();
-         boolean response = declarationDialog.getResponseBoolean();
+         //boolean response = 
+             declarationDialog.getResponseBoolean();
          remove(declarationDialog);
      }
 

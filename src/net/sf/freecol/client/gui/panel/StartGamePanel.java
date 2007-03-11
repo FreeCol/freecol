@@ -347,6 +347,8 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
 * The TableModel for the players table.
 */
 class PlayersTableModel extends AbstractTableModel {
+
+    @SuppressWarnings("unused") 
     private FreeColClient freeColClient;
     private Vector players;
     private Player thisPlayer;
