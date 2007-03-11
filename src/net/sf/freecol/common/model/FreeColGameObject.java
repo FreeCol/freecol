@@ -350,14 +350,15 @@ abstract public class FreeColGameObject {
      *      this object.
      */
     public void readFromXMLElement(Element element) {
-        XMLInputFactory xif = XMLInputFactory.newInstance();        
+        XMLInputFactory xif = XMLInputFactory.newInstance();
+        String xml = null;
         try {
             try {
                 TransformerFactory factory = TransformerFactory.newInstance();
                 Transformer xmlTransformer = factory.newTransformer();
                 StringWriter stringWriter = new StringWriter();
                 xmlTransformer.transform(new DOMSource(element), new StreamResult(stringWriter));
-                String xml = stringWriter.toString();
+                xml = stringWriter.toString();
                 XMLStreamReader xsr = xif.createXMLStreamReader(new StringReader(xml));
                 xsr.nextTag();
                 readFromXML(xsr);
@@ -368,7 +369,7 @@ abstract public class FreeColGameObject {
                 throw new IllegalStateException("TransformerException");
             }
         } catch (XMLStreamException e) {
-            logger.warning(e.toString());
+            logger.warning(e.toString() + ": XML " + xml);
             throw new IllegalStateException("XMLStreamException");
         }
     }
