@@ -1032,6 +1032,8 @@ public final class InGameController implements NetworkConstants {
         moveElement.setAttribute("unit", unit.getID());
         moveElement.setAttribute("direction", Integer.toString(direction));
 
+        // TODO: server can actually fail (illegal move)!
+        
         // move before ask to server, to be in new tile in case there is a rumour
         unit.move(direction);
        

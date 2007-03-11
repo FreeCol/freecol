@@ -1463,6 +1463,12 @@ public final class Colony extends Settlement implements Location, Nameable {
             return;
         }
 
+        if(getTile() == null) {
+            // Fix NullPointerException below
+            logger.warning("Colony " + getName() + " lacks a tile!");
+            return;
+        }
+
         // Repair any damaged ships:
         Iterator unitIterator = getTile().getUnitIterator();
         while (unitIterator.hasNext()) {

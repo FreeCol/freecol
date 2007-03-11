@@ -647,7 +647,8 @@ public class TransportMission extends Mission {
         // Try recruiting the unit:
         // TODO: Check if it will be cheaper to train the unit instead.
         if (player.getGold() >= player.getRecruitPrice()) {
-            for (int i=1; i<=3; i++) {
+            for (int i = 0; i < 3; i++) {
+                // Note, used to be 1-3 but the method expects 0-2
                 if (europe.getRecruitable(i) == unitType) {
                     Element recruitUnitInEuropeElement = Message.createNewRootElement("recruitUnitInEurope");
                     recruitUnitInEuropeElement.setAttribute("slot", Integer.toString(i));

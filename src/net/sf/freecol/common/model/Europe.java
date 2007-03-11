@@ -66,9 +66,9 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
 
         unitContainer = new UnitContainer(game, this);
 
+        setRecruitable(0, owner.generateRecruitable());
         setRecruitable(1, owner.generateRecruitable());
         setRecruitable(2, owner.generateRecruitable());
-        setRecruitable(3, owner.generateRecruitable());
 
         artilleryPrice = 500;
         recruitPrice = RECRUIT_PRICE_INITIAL;
@@ -121,7 +121,9 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
     * Gets the type of the recruitable in Europe at the given slot.
     *
     * @param slot The slot of the recruitable whose type needs to be returned. Should
-    *             be 1, 2 or 3.
+    *             be 0, 1 or 2. NOTE - used to be 1, 2 or 3 and was called with
+    *             1-3 by some classes and 0-2 by others, the method itself
+    *             expected 0-2.
     * @return The type of the recruitable in Europe at the given slot.
     * @exception IllegalArgumentException if the given <code>slot</code> does not exist.
     */
@@ -137,13 +139,15 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
     * Sets the type of the recruitable in Europe at the given slot to the given type.
     *
     * @param slot The slot of the recruitable whose type needs to be set. Should
-    *             be 1, 2 or 3.
+    *             be 0, 1 or 2. NOTE - changed in order to match getRecruitable
+    *             above!
     * @param type The new type for the unit at the given slot in Europe. Should be a
     *             valid unit type.
     */
     public void setRecruitable(int slot, int type) {
-        if ((slot > 0) && (slot < 4) && (type >= 0) && (type < Unit.UNIT_COUNT)) {
-            recruitables[slot - 1] = type;
+        // Note - changed in order to match getRecruitable
+        if (slot >= 0 && slot < 3 && type >= 0 && type < Unit.UNIT_COUNT) {
+            recruitables[slot] = type;
         } else {
             logger.warning("setRecruitable: invalid slot(" + slot + ") or type(" + type + ") given.");
         }
