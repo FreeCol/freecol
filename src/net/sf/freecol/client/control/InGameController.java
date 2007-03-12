@@ -1854,8 +1854,7 @@ public final class InGameController implements NetworkConstants {
         Canvas canvas = freeColClient.getCanvas();
 
         if (!(unit.checkSetState(state))) {
-            logger.warning("Can't set state " + state);
-            return; // Don't bother.
+            return; // Don't bother (and don't log, this is not exceptional)
         }
 
         if (state == Unit.PLOW || state == Unit.BUILD_ROAD) {
@@ -1886,11 +1885,14 @@ public final class InGameController implements NetworkConstants {
             }
         }
 
+        unit.setState(state);
+
+        // NOTE! The call to nextActiveUnit below can lead to the dreaded
+        // "not your turn" error, so let's finish networking first.
         Element changeStateElement = Message.createNewRootElement("changeState");
         changeStateElement.setAttribute("unit", unit.getID());
         changeStateElement.setAttribute("state", Integer.toString(state));
-
-        unit.setState(state);
+        client.sendAndWait(changeStateElement);
 
         if (!freeColClient.getCanvas().getColonyPanel().isShowing() &&
                 (unit.getMovesLeft() == 0 || unit.getState() == Unit.SENTRY)) {
@@ -1899,7 +1901,6 @@ public final class InGameController implements NetworkConstants {
             freeColClient.getCanvas().refresh();
         }
 
-        client.sendAndWait(changeStateElement);
     }
 
 

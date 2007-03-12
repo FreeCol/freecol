@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -224,11 +225,7 @@ public class AIPlayer extends AIObject {
                         && p.getMonarch() == null) {
                     Element giveIndependenceElement = Message.createNewRootElement("giveIndependence");
                     giveIndependenceElement.setAttribute("player", p.getID());
-                    try {
-                        getConnection().sendAndWait(giveIndependenceElement);
-                    } catch (IOException e) {
-                        logger.warning("Could not send \"giveIndependence\"-message.");
-                    }
+                    sendAndWaitSafely(giveIndependenceElement);
                 }
             }
         }
@@ -245,28 +242,31 @@ public class AIPlayer extends AIObject {
                 player.modifyGold(Unit.getPrice(Unit.EXPERT_ORE_MINER));
                 player.modifyGold(getGame().getMarket().getBidPrice(Goods.MUSKETS, 50));
                 player.modifyGold(getGame().getMarket().getBidPrice(Goods.HORSES, 50));
+                Unit unit = null;
                 try {
                     Element trainUnitInEuropeElement = Message.createNewRootElement("trainUnitInEurope");
                     trainUnitInEuropeElement.setAttribute("unitType", Integer.toString(Unit.EXPERT_ORE_MINER));
                     Element reply = getConnection().ask(trainUnitInEuropeElement);
-                    Unit unit = (Unit) getGame().getFreeColGameObject(
+                    unit = (Unit) getGame().getFreeColGameObject(
                             ((Element) reply.getChildNodes().item(0)).getAttribute("ID"));
+                } catch (IOException e) {
+                    logger.warning("Could not train expert miner in order to create dragoon!");
+                }
+                if(unit != null) {
                     Element clearSpecialityElement = Message.createNewRootElement("clearSpeciality");
                     clearSpecialityElement.setAttribute("unit", unit.getID());
-                    getConnection().sendAndWait(clearSpecialityElement);
+                    sendAndWaitSafely(clearSpecialityElement);
                     Element equipMusketsElement = Message.createNewRootElement("equipunit");
                     equipMusketsElement.setAttribute("unit", unit.getID());
                     equipMusketsElement.setAttribute("type", Integer.toString(Goods.MUSKETS));
                     equipMusketsElement.setAttribute("amount", Integer.toString(50));
-                    getConnection().sendAndWait(equipMusketsElement);
+                    sendAndWaitSafely(equipMusketsElement);
                     Element equipHorsesElement = Message.createNewRootElement("equipunit");
                     equipHorsesElement.setAttribute("unit", unit.getID());
                     equipHorsesElement.setAttribute("type", Integer.toString(Goods.HORSES));
                     equipHorsesElement.setAttribute("amount", Integer.toString(50));
-                    getConnection().sendAndWait(equipHorsesElement);
-                } catch (IOException e) {
-                    logger.warning("Could not create dragoon.");
-                }
+                    sendAndWaitSafely(equipHorsesElement);                   
+                }                    
             }
             if (getRandom().nextInt(100) == 42) {
                 int unitType = Unit.CARAVEL;
@@ -675,36 +675,21 @@ public class AIPlayer extends AIObject {
                         equipUnitElement.setAttribute("unit", u.getID());
                         equipUnitElement.setAttribute("type", Integer.toString(Goods.MUSKETS));
                         equipUnitElement.setAttribute("amount", "50");
-                        // I don't think we need to do this if we are the
-                        // server...
+                        // I don't think we need to do this if we are the server...
                         // unit.setArmed(true);
-                        try {
-                            getConnection().sendAndWait(equipUnitElement);
-                        } catch (IOException e) {
-                            logger.warning("Couldn't send an AI element!");
-                        }
+                        sendAndWaitSafely(equipUnitElement);
                         Element putOutsideColonyElement = Message.createNewRootElement("putOutsideColony");
                         putOutsideColonyElement.setAttribute("unit", u.getID());
-                        // I don't think we need to do this if we are the
-                        // server...
+                        // I don't think we need to do this if we are the server...
                         // u.putOutsideColony();
-                        try {
-                            getConnection().sendAndWait(putOutsideColonyElement);
-                        } catch (IOException e) {
-                            logger.warning("Couldn't send an AI element!");
-                        }
-                        // Check if the unit can fortify before sending the
-                        // order
+                        sendAndWaitSafely(putOutsideColonyElement);
+                        // Check if the unit can fortify before sending the order
                         if (u.checkSetState(Unit.FORTIFYING)) {
                             Element changeStateElement = Message.createNewRootElement("changeState");
                             changeStateElement.setAttribute("unit", u.getID());
                             changeStateElement.setAttribute("state", Integer.toString(Unit.FORTIFYING));
                             // u.putOutsideColony();
-                            try {
-                                getConnection().sendAndWait(changeStateElement);
-                            } catch (IOException e) {
-                                logger.warning("Couldn't send an AI element!");
-                            }
+                            sendAndWaitSafely(changeStateElement);
                         }
                         olddefenders++;
                         if (!u.isMounted() && u.canBeMounted()) {
@@ -712,11 +697,7 @@ public class AIPlayer extends AIObject {
                             equipUnitElement.setAttribute("unit", u.getID());
                             equipUnitElement.setAttribute("type", Integer.toString(Goods.HORSES));
                             equipUnitElement.setAttribute("amount", "50");
-                            try {
-                                getConnection().sendAndWait(equipUnitElement);
-                            } catch (IOException e) {
-                                logger.warning("Couldn't send an AI element!");
-                            }
+                            sendAndWaitSafely(equipUnitElement);
                         } else {
                             needHorses = true;
                         }
@@ -812,6 +793,28 @@ public class AIPlayer extends AIObject {
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Send an element and ignore IO exceptions. This was used all over the
+     * place, no better use a single method.
+     * 
+     * @param element The element.
+     */
+    private void sendAndWaitSafely(Element element) {
+        try {
+            if(logger.isLoggable(Level.FINER)) {
+                logger.finer("AI player (" + this +
+                        ") sending " + element.getTagName() + "...");                
+            }
+            getConnection().sendAndWait(element);
+            if(logger.isLoggable(Level.FINER)) {
+                logger.finer("Sent and waited, returning.");                
+            }
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Couldn't send AI element " + 
+                    element.getTagName() + "!", e);
         }
     }
 

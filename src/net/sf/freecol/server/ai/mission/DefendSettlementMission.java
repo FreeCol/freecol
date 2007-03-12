@@ -2,6 +2,7 @@
 package net.sf.freecol.server.ai.mission;
 
 import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -102,7 +103,7 @@ public class DefendSettlementMission extends Mission {
             return;
         }
         
-        if (getUnit().getTile() == null) {
+        if (unit.getTile() == null) {
             return;
         }
         
@@ -150,23 +151,24 @@ public class DefendSettlementMission extends Mission {
             }
         }
             
-        if (getUnit().getTile() != settlement.getTile()) {
+        if (unit.getTile() != settlement.getTile()) {
             // Move towards the target.
             int r = moveTowards(connection, settlement.getTile());
             if (r >= 0 && (unit.getMoveType(r) == Unit.MOVE || unit.getMoveType(r) == Unit.DISEMBARK)) {
                 move(connection, r);
             }
         } else {
-            if (getUnit().getState() != Unit.FORTIFIED
-                    || getUnit().getState() != Unit.FORTIFYING) {
+            if (unit.getState() != Unit.FORTIFIED
+                    || unit.getState() != Unit.FORTIFYING
+                    && unit.checkSetState(Unit.FORTIFYING)) {
                 Element changeStateElement = Message.createNewRootElement("changeState");
-                changeStateElement.setAttribute("unit", getUnit().getID());
+                changeStateElement.setAttribute("unit", unit.getID());
                 changeStateElement.setAttribute("state", Integer.toString(Unit.FORTIFYING));
                 try {
                     connection.sendAndWait(changeStateElement);
                 } catch (IOException e) {
-                    logger.warning("Could not send message!");
-                }               
+                    logger.log(Level.WARNING, "Couldn't fortify unit!", e);
+                }
             }
         }
     }    
