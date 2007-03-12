@@ -21,7 +21,6 @@ public class IntegerOption extends AbstractOption {
 
 
     private int value;
-    private int defaultValue;
     private int minimumValue;
     private int maximumValue;
 
@@ -43,7 +42,6 @@ public class IntegerOption extends AbstractOption {
     public IntegerOption(String id, String name, String shortDescription, int minimumValue, int maximumValue, int defaultValue) {
         super(id, name, shortDescription);
 
-        this.defaultValue = defaultValue;
         this.value = defaultValue;
         this.minimumValue = minimumValue;
         this.maximumValue = maximumValue;

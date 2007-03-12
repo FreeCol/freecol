@@ -22,7 +22,6 @@ public class BooleanOption extends AbstractOption {
 
 
     private boolean value;
-    private boolean defaultValue;
 
 
     /**
@@ -38,8 +37,6 @@ public class BooleanOption extends AbstractOption {
     */
     public BooleanOption(String id, String name, String shortDescription, boolean defaultValue) {
         super(id, name, shortDescription);
-
-        this.defaultValue = defaultValue;
         this.value = defaultValue;
     }
 
