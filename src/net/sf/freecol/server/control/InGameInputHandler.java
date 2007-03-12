@@ -1769,11 +1769,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * 
      * @param connection The connection the message came from.
      * @param changeStateElement The element containing the request.
+     * @return null (always).
      * @exception IllegalArgumentException If the data format of the message is
      *                invalid.
      * @exception IllegalStateException If the request is not accepted by the
      *                model.
-     * 
      */
     private Element changeState(Connection connection, Element changeStateElement) {
         Game game = getFreeColServer().getGame();
@@ -1791,7 +1791,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (!unit.checkSetState(state)) {
             // Oh, really, Mr. Client? I'll show YOU!
             // kickPlayer(player);
-            logger.warning("Can't set state " + state + ". Possible cheating attempt?");
+            logger.warning("Can't set state " + state + " for unit " + unit +
+                    " belonging to " + player +
+                    ". Possible cheating attempt (or bug)?");
             return null;
         }
         unit.setState(state);
