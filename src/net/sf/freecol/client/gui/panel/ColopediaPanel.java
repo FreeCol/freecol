@@ -83,7 +83,6 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
 
     private final Canvas parent;
     private final ImageLibrary library;
-    private final GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
     private JLabel header;
     private JPanel listPanel;
     private JPanel detailPanel;
@@ -198,7 +197,12 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      */
     private void buildTerrainList() {
         listPanel.setLayout(new GridLayout(0, 4));
-        int numberOfTypes = FreeCol.specification.numberOfTileTypes();
+        
+        // TODO: use specification for terrain list
+        // If so we need to know if a certain tile should yield a single
+        // call with false or two calls (false/true).
+        //int numberOfTypes = FreeCol.specification.numberOfTileTypes();
+        
         // type zero is unexplored
         for (int type = 1; type < Tile.ARCTIC; type++) {
             buildTerrainButton(type, false);
