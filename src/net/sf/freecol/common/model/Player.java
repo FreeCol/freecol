@@ -1592,7 +1592,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public Iterator<Settlement> getColonyIterator() {
         if (isIndian()) {
-            return EmptyIterator.SHARED_INSTANCE;
+            return EmptyIterator.getInstance();
         } else {
             return settlements.iterator();
         }
