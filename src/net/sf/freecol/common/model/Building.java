@@ -611,10 +611,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 	Unit bestUnit = null;
 	int bestScore = 0;
  
-	Iterator i = colony.getUnitIterator();
-	while (i.hasNext()) {
-	    Unit unit = (Unit) i.next();
- 
+	for(Unit unit : colony.getUnitList()) {
 	    switch(unit.getType()) {
 	    case Unit.FREE_COLONIST:
 		if (unit.getTrainingType() == teacherType &&
@@ -650,7 +647,6 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 	    default:
 		// ignore any other type of unit
 	    }
- 
 	}
 	return bestUnit;
     }
@@ -663,26 +659,6 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     public GoodsContainer getGoodsContainer() {
         return null;
     }
-    
-    /**
-     * Gets a teacher for the given unit type.
-     * 
-     * @param unitType The type of unit to find a teacher for.
-     * @return The teacher or <code>null</code> if no teacher
-     *      can be found for the given unit type.
-     */
-    private Unit getTeacher(int unitType) {
-        Iterator i = colony.getUnitIterator();
-        while (i.hasNext()) {
-            Unit unit = (Unit) i.next();
-            
-            if (unit.getType() == unitType) {
-                return unit;
-            }
-        }
-
-        return null;
-    }
 
     /**
      * Prepares this <code>Building</code> for a new turn.
@@ -691,7 +667,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         if ((level == NOT_BUILT) && (type != CHURCH)) return; // Don't do anything if the building does not exist.
 
         if (type == SCHOOLHOUSE) {
-            Iterator i = getUnitIterator();
+            Iterator<Unit> i = getUnitIterator();
             while (i.hasNext()) {
                 Unit teacher = (Unit) i.next();
                 Unit student = getUnitToTrain(teacher.getType());
@@ -979,7 +955,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             goodsOutput = 1;
         }
 
-        Iterator unitIterator = getUnitIterator();
+        Iterator<Unit> unitIterator = getUnitIterator();
         while (unitIterator.hasNext()) {
             int productivity = ((Unit) unitIterator.next()).getProducedAmount(goodsOutputType);
             if (productivity > 0) {
@@ -1052,7 +1028,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         out.writeAttribute("level", Integer.toString(level));
 
         // Add child elements:
-        Iterator unitIterator = getUnitIterator();
+        Iterator<Unit> unitIterator = getUnitIterator();
         while (unitIterator.hasNext()) {
             ((FreeColGameObject) unitIterator.next()).toXML(out, player, showAll, toSavedGame);
         }
