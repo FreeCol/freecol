@@ -239,8 +239,8 @@ public class GoodsContainer extends FreeColGameObject {
     * @return The <code>Iterator</code>.
     * @see #getCompactGoodsIterator
     */
-    public Iterator getGoodsIterator() {
-        ArrayList totalGoods = new ArrayList();
+    public Iterator<Goods> getGoodsIterator() {
+        ArrayList<Goods> totalGoods = new ArrayList<Goods>();
 
         for (int i=0; i<storedGoods.length; i++) {
             int j = 0;
@@ -263,8 +263,8 @@ public class GoodsContainer extends FreeColGameObject {
     * @return The <code>Iterator</code>.
     * @see #getGoodsIterator
     */
-    public Iterator getCompactGoodsIterator() {
-        ArrayList totalGoods = new ArrayList();
+    public Iterator<Goods> getCompactGoodsIterator() {
+        ArrayList<Goods> totalGoods = new ArrayList<Goods>();
 
         for (int i=0; i<storedGoods.length; i++) {
             if (storedGoods[i] > 0) {
