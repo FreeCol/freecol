@@ -92,6 +92,7 @@ public interface Location {
 	 * 
 	 * @return The <code>Iterator</code>.
 	 */
+	@Deprecated
 	public Iterator getUnitIterator();
 
 	/**
