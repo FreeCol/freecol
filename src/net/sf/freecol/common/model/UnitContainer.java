@@ -27,13 +27,10 @@ public class UnitContainer extends FreeColGameObject {
     public static final String  REVISION = "$Revision$";
 
     /** The list of units stored in this <code>UnitContainer</code>. */
-    private ArrayList units = new ArrayList();
+    private ArrayList<Unit> units = new ArrayList<Unit>();
     
     /** The owner of this <code>UnitContainer</code>. */
     private Location parent;
-
-
-
 
     /**
     * Creates an empty <code>UnitContainer</code>.
@@ -176,8 +173,9 @@ public class UnitContainer extends FreeColGameObject {
     *
     * @return The clone.
     */
-    public ArrayList getUnitsClone() {
-        return (ArrayList)units.clone();
+    @SuppressWarnings("unchecked")
+	public ArrayList<Unit> getUnitsClone() {
+        return (ArrayList<Unit>)units.clone();
     }
 
     /**

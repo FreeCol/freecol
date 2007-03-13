@@ -3,7 +3,9 @@ package net.sf.freecol.common.model;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -335,13 +337,16 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         getColony().updatePopulation();
     }
 
+    public List<Unit> getUnitList() {
+    	if(getUnit() == null) {
+    		return new ArrayList<Unit>();
+    	} else {
+    		return Collections.singletonList(getUnit());
+    	}
+    }
 
     public Iterator getUnitIterator() {
-        ArrayList units = new ArrayList();
-        if (getUnit() != null) {
-            units.add(getUnit());
-        }
-        return units.iterator();
+        return getUnitList().iterator();
     }
 
 

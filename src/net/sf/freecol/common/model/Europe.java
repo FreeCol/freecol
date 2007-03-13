@@ -2,7 +2,9 @@
 package net.sf.freecol.common.model;
 
 
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -294,15 +296,24 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         return unitContainer.getUnitCount();
     }
 
-
+    /**
+     * Gets a <code>List</code> of every <code>Unit</code> directly located in this
+     * <code>Europe</code>. This does not include <code>Unit</code>s on ships.
+     *
+     * @return The <code>List</code>.
+     */
+    public List<Unit> getUnitList() {
+    	return unitContainer.getUnitsClone();
+    }
+    
     /**
     * Gets an <code>Iterator</code> of every <code>Unit</code> directly located in this
     * <code>Europe</code>. This does not include <code>Unit</code>s on ships.
     *
     * @return The <code>Iterator</code>.
     */
-    public Iterator getUnitIterator() {
-        return unitContainer.getUnitIterator();
+    public Iterator<Unit> getUnitIterator() {
+        return getUnitList().iterator();
     }
 
 

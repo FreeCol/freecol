@@ -3,6 +3,7 @@ package net.sf.freecol.common.model;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -101,7 +102,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * List of the units which have this <code>Building</code>
      * as it's {@link Unit#getLocation() location}.
      */
-    private List units = new ArrayList();
+    private List<Unit> units = new ArrayList<Unit>();
 
     private BuildingType buildingType;
 
@@ -592,8 +593,12 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      *
      * @return The <code>Iterator</code>.
      */
-    public Iterator getUnitIterator() {
+    public Iterator<Unit> getUnitIterator() {
         return units.iterator();
+    }
+    
+    public List<Unit> getUnitList() {
+    	return Collections.unmodifiableList(units);
     }
 
     /**

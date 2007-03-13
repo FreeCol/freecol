@@ -4,6 +4,7 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -725,24 +726,18 @@ public final class Colony extends Settlement implements Location, Nameable {
         goodsContainer.addGoods(type, amount);
     }
 
+    public List<Unit> getUnitList() {
+    	ArrayList<Unit> units = new ArrayList<Unit>();
+    	for(WorkLocation wl : workLocations) {
+    		for(Unit unit : wl.getUnitList()) {
+    			units.add(unit);
+    		}
+    	}
+    	return units;
+    }
 
     public Iterator<Unit> getUnitIterator() {
-        ArrayList<Unit> units = new ArrayList<Unit>();
-
-        Iterator wli = getWorkLocationIterator();
-        while (wli.hasNext()) {
-            WorkLocation wl = (WorkLocation) wli.next();
-
-            Iterator unitIterator = wl.getUnitIterator();
-            while (unitIterator.hasNext()) {
-                Object o = unitIterator.next();
-                if (o != null) {
-                    units.add((Unit) o);
-                }
-            }
-        }
-
-        return units.iterator();
+        return getUnitList().iterator();
     }
 
     public Iterator<Goods> getGoodsIterator() {

@@ -4,6 +4,7 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -1514,14 +1515,16 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     *
     * @return The <code>Iterator</code>.
     */
-    public Iterator getUnitIterator() {
-
-        if ( isCarrier()  &&  getType() != WAGON_TRAIN ) {
-
-            return unitContainer.getUnitIterator();
-        }
-
-        return EmptyIterator.SHARED_INSTANCE;
+    public Iterator<Unit> getUnitIterator() {
+    	return getUnitList().iterator();
+    }
+    
+    public List<Unit> getUnitList() {
+    	if ( isCarrier()  &&  getType() != WAGON_TRAIN ) {
+    		return unitContainer.getUnitsClone();
+    	} else {
+    		return new ArrayList<Unit>();
+    	}
     }
 
 

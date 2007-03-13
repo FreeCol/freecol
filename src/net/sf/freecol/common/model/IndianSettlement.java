@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
@@ -596,9 +597,12 @@ public class IndianSettlement extends Settlement {
         return unitContainer.getUnitCount();
     }
 
-
-    public Iterator getUnitIterator() {
-        return unitContainer.getUnitIterator();
+    public List<Unit> getUnitList() {
+    	return unitContainer.getUnitsClone();
+    }
+    
+    public Iterator<Unit> getUnitIterator() {
+        return getUnitList().iterator();
     }
 
     public Unit getFirstUnit() {
