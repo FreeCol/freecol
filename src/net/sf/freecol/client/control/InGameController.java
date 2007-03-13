@@ -1497,13 +1497,13 @@ public final class InGameController implements NetworkConstants {
 		if (destinationTile.getUnitCount() == 1) {
 			destinationUnit = destinationTile.getFirstUnit();
 		} else {
-			ArrayList choices = new ArrayList();
-			Iterator unitIterator = destinationTile.getUnitIterator();
-			while (unitIterator.hasNext()) {
-				Unit nextUnit = (Unit) unitIterator.next();
+			ArrayList<Unit> choices = new ArrayList<Unit>();
+            for (Unit nextUnit: destinationTile.getUnitList()) {
 				if (nextUnit.getSpaceLeft() >= unit.getTakeSpace()) {
 					choices.add(nextUnit);
-				}
+				} else {
+				    break;
+                }
 			}
 
 			if (choices.size() == 1) {
