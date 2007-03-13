@@ -79,8 +79,7 @@ public interface Location {
 	public int getUnitCount();
 
 	/**
-	 * Returns a list containing all the Units present at this Location. This
-	 * list is immutable.
+	 * Returns a list containing all the Units present at this Location. The list is a cloned list, so no risk.
 	 * 
 	 * @return a list containing the Units present at this location.
 	 */

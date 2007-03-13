@@ -102,7 +102,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * List of the units which have this <code>Building</code>
      * as it's {@link Unit#getLocation() location}.
      */
-    private List<Unit> units = new ArrayList<Unit>();
+    private ArrayList<Unit> units = new ArrayList<Unit>();
 
     private BuildingType buildingType;
 
@@ -597,8 +597,9 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         return units.iterator();
     }
     
+    @SuppressWarnings("unchecked")
     public List<Unit> getUnitList() {
-    	return Collections.unmodifiableList(units);
+    	return (List<Unit>) units.clone();
     }
 
     /**
