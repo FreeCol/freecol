@@ -4,32 +4,40 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public final class EmptyIterator<T> implements Iterator<T> {
-	public static final String COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
-	public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
-	public static final String REVISION = "$Revision$";
+    public static final String COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
 
-	public static <T> EmptyIterator<T> getInstance() {
-		return new EmptyIterator<T>();
-	}
+    public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
 
-	// ----------------------------------------------------------- constructors
+    public static final String REVISION = "$Revision$";
 
-	private EmptyIterator() {
-	}
 
-	// ---------------------------------------------------- interface: Iterator
+    /**
+     * Returns an instance of the EmptyIterator for the given type.
+     * 
+     * @param <T> the type of the empty iterator.
+     * @return an EmptyIterator of the given type.
+     */
+    public static <T> EmptyIterator<T> getInstance() {
+        return new EmptyIterator<T>();
+    }
 
-	public boolean hasNext() {
-		return false;
-	}
+    // ----------------------------------------------------------- constructors
 
-	public T next() {
-		throw new NoSuchElementException(
-				"Programming error: next() should never be called on the EmptyIterator");
-	}
+    private EmptyIterator() {
+    }
 
-	public void remove() {
-		throw new IllegalStateException();
-	}
+    // ---------------------------------------------------- interface: Iterator
+
+    public boolean hasNext() {
+        return false;
+    }
+
+    public T next() {
+        throw new NoSuchElementException("Programming error: next() should never be called on the EmptyIterator");
+    }
+
+    public void remove() {
+        throw new IllegalStateException();
+    }
 
 }
