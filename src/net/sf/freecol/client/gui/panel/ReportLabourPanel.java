@@ -52,7 +52,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
         unitCount = new int[Unit.UNIT_COUNT];
         unitLocations = new Vector<HashMap<String,Integer>>(Unit.UNIT_COUNT);
         for (int index = 0; index < Unit.UNIT_COUNT; index++) {
-            unitLocations.set(index,new HashMap<String, Integer>());
+            unitLocations.add(new HashMap<String, Integer>());
         }
         Player player = getCanvas().getClient().getMyPlayer();
         Iterator<Unit> units = player.getUnitIterator();
