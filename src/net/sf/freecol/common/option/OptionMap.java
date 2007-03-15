@@ -25,7 +25,7 @@ public abstract class OptionMap extends OptionGroup {
 
 
     private String xmlTagName;
-    private HashMap values;
+    private HashMap<String, Option> values;
    
 
 
@@ -43,7 +43,7 @@ public abstract class OptionMap extends OptionGroup {
         super(name, shortDescription);
         this.xmlTagName = xmlTagName;
         
-        values = new HashMap();
+        values = new HashMap<String, Option>();
 
         addDefaultOptions();
         addToMap(this);
@@ -102,7 +102,7 @@ public abstract class OptionMap extends OptionGroup {
     * @return The <code>Object</code> with the given ID.
     */
     public Option getObject(String id) {
-        return (Option) values.get(id);
+        return values.get(id);
     }
 
 
@@ -116,7 +116,7 @@ public abstract class OptionMap extends OptionGroup {
     * @exception NullPointerException if the given <code>Option</code> does not exist.
     */
     public int getInteger(String id) {
-    	Option o = (Option) values.get(id);
+    	Option o = values.get(id);
     	if (o instanceof IntegerOption) {
     		return ((IntegerOption) o).getValue();
     	} else if (o instanceof SelectOption) {
@@ -153,7 +153,7 @@ public abstract class OptionMap extends OptionGroup {
     * @param og The <code>OptionGroup</code> to be added.
     */
     public void addToMap(OptionGroup og) {
-        Iterator it = og.iterator();
+        Iterator<Option> it = og.iterator();
         while (it.hasNext()) {
             Option option = (Option) it.next();
             if (option instanceof OptionGroup) {
@@ -176,9 +176,9 @@ public abstract class OptionMap extends OptionGroup {
         // Start element:
         out.writeStartElement(xmlTagName);
 
-        Iterator it = values.values().iterator();
+        Iterator<Option> it = values.values().iterator();
         while (it.hasNext()) {
-            ((Option) it.next()).toXML(out);
+            (it.next()).toXML(out);
         }
 
         out.writeEndElement();

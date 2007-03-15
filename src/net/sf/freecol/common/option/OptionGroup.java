@@ -1,9 +1,7 @@
-
 package net.sf.freecol.common.option;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -22,7 +20,7 @@ public class OptionGroup extends AbstractOption {
     @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(OptionGroup.class.getName());
 
-    private List options;
+    private ArrayList<Option> options;
 
 
     /**
@@ -35,7 +33,7 @@ public class OptionGroup extends AbstractOption {
     */
     public OptionGroup(String name, String shortDescription) {
         super(NO_ID, name, shortDescription);
-        options = new ArrayList();
+        options = new ArrayList<Option>();
     }
 
 
@@ -62,7 +60,7 @@ public class OptionGroup extends AbstractOption {
     * Returns an <code>Iterator</code> for the <code>Option</code>s.
     * @return The <code>Iterator</code>.
     */
-    public Iterator iterator() {
+    public Iterator<Option> iterator() {
         return options.iterator();
     }
 
@@ -78,9 +76,9 @@ public class OptionGroup extends AbstractOption {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
-        Iterator oi = options.iterator();
+        Iterator<Option> oi = options.iterator();
         while (oi.hasNext()) {
-            ((Option) oi.next()).toXML(out);
+            (oi.next()).toXML(out);
         }
 
         out.writeEndElement();
