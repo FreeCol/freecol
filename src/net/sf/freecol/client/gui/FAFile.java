@@ -1,7 +1,5 @@
 package net.sf.freecol.client.gui;
 
-
-
 import java.awt.Dimension;
 import java.awt.Point;
 import java.io.BufferedReader;
@@ -10,7 +8,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.StringTokenizer;
 
 
@@ -26,7 +23,8 @@ public class FAFile {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    private HashMap letters = new HashMap();
+    // TODO: Use two hashes, to be safer.
+    private HashMap<Object, Object> letters = new HashMap<Object, Object>();
     private int maxHeight = 0;
 
     /**
@@ -97,7 +95,7 @@ public class FAFile {
         if (fn != null) {
             return fn.points;
         }
-        List points = new ArrayList();
+        ArrayList<Point> points = new ArrayList<Point>();
         int x = 0;
         for (int i=0; i<text.length(); i++) {
             FALetter fl = getLetter(text.charAt(i));
@@ -108,7 +106,7 @@ public class FAFile {
 
             x += fl.advance;
         }
-        return (Point[]) points.toArray(new Point[0]);
+        return points.toArray(new Point[0]);
     }
 
     private void load(InputStream is) throws IOException {

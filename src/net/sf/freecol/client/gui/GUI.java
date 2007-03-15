@@ -1,4 +1,3 @@
-
 package net.sf.freecol.client.gui;
 
 import java.awt.AlphaComposite;
@@ -27,7 +26,6 @@ import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
-import javax.swing.Timer;
 import javax.swing.UIManager;
 
 import net.sf.freecol.client.ClientOptions;
@@ -72,7 +70,7 @@ public final class GUI {
         client is logged in. */
     private boolean inGame;
 
-    private final Vector messages;
+    private final Vector<GUIMessage> messages;
 
     private Map.Position selectedTile;
     private Map.Position focus = null;
@@ -137,7 +135,7 @@ public final class GUI {
     private GeneralPath gridPath = null;
 
     /** List of the enemy units which should temporarily be displayed at the top. */
-    private ArrayList enemyUnitsOnTop = new ArrayList();
+    private ArrayList<Unit> enemyUnitsOnTop = new ArrayList<Unit>();
     
     // Debug variables:
     public boolean displayCoordinates = false;
@@ -181,7 +179,7 @@ public final class GUI {
         inGame = false;
         logger.info("GUI created.");
 
-        messages = new Vector(MESSAGE_COUNT);
+        messages = new Vector<GUIMessage>(MESSAGE_COUNT);
         
         viewMode = new ViewMode(this);
         logger.warning("Starting in Move Units View Mode");
@@ -366,7 +364,7 @@ public final class GUI {
         if (activeUnit != null && activeUnit.getTile() == unitTile) {
             return activeUnit;
         } else {
-            Iterator it = enemyUnitsOnTop.iterator();
+            Iterator<Unit> it = enemyUnitsOnTop.iterator();
             while (it.hasNext()) {
                 Unit eu = (Unit) it.next();
                 if (eu.getTile() == unitTile) {
@@ -380,7 +378,7 @@ public final class GUI {
                     return movableUnit;
                 } else {
                     Unit bestPick = null;
-                    Iterator unitIterator = unitTile.getUnitIterator();
+                    Iterator<Unit> unitIterator = unitTile.getUnitIterator();
                     while (unitIterator.hasNext()) {
                         Unit u = (Unit) unitIterator.next();
                         if (bestPick == null || bestPick.getMovesLeft() < u.getMovesLeft()) {
