@@ -457,7 +457,7 @@ public final class ImageLibrary extends ImageProvider {
             throws FreeColException {
         unitButtons = new Vector<Vector<ImageIcon>>(4);
         for (int i = 0; i < 4; i++) {
-            unitButtons.set(i, new Vector<ImageIcon>(UNIT_BUTTON_COUNT));
+            unitButtons.add(new Vector<ImageIcon>(UNIT_BUTTON_COUNT));
         }
 
         for (int i = 0; i < 4; i++) {

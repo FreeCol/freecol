@@ -34,7 +34,7 @@ public final class Messages {
      * Construction of this map is avoided if only the default locale is used,
      * i.e. on the client
      */
-    private static Map  messagesByLocale;
+    private static Map<Locale, Messages>  messagesByLocale;
 
     /**
      * These are the messages for the default locale.
@@ -96,9 +96,9 @@ public final class Messages {
     public static Messages messagesForLocale(Locale locale) {
 
         if (null == messagesByLocale)
-            messagesByLocale = new HashMap();
+            messagesByLocale = new HashMap<Locale, Messages>();
 
-        Messages  m = (Messages)messagesByLocale.get(locale);
+        Messages  m = messagesByLocale.get(locale);
 
         if (null == m) {
 

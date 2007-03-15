@@ -1605,6 +1605,18 @@ public class Player extends FreeColGameObject implements Nameable {
     public List<Settlement> getSettlements() {
         return settlements;
     }
+    
+    public List<Colony> getColonies() {
+        ArrayList<Colony> colonies = new ArrayList<Colony>();
+        for(Settlement s : settlements) {
+            if (s instanceof Colony) {
+                colonies.add((Colony)s);
+            } else {
+                throw new RuntimeException("getColonies can only be called for players whose settlements are colonies.");
+            }
+        }
+        return colonies;
+    }
 
     /**
      * Returns the closest <code>Location</code> in which the given ship can

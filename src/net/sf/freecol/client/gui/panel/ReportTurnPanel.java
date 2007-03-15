@@ -2,7 +2,6 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -25,21 +24,24 @@ import net.sf.freecol.common.model.Nameable;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.BooleanOption;
-
 import cz.autel.dmi.HIGLayout;
 
 /**
  * This panel displays the Turn Report.
  */
 public final class ReportTurnPanel extends ReportPanel implements ActionListener {
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
-    public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
-    public static final String  REVISION = "$Revision$";
+    public static final String COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
+
+    public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
+
+    public static final String REVISION = "$Revision$";
 
     private final FreeColClient freeColClient;
 
+
     /**
      * The constructor that will add the items to this panel.
+     * 
      * @param parent The parent of this panel.
      * @param freeColClient The main controller object for the client.
      */
@@ -66,12 +68,10 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
 
         // count number of headlines
         for (final ModelMessage message : messages) {
-            if (groupBy == ClientOptions.MESSAGES_GROUP_BY_SOURCE &&
-                message.getSource() != source) {
+            if (groupBy == ClientOptions.MESSAGES_GROUP_BY_SOURCE && message.getSource() != source) {
                 source = message.getSource();
                 headlines++;
-            } else if (groupBy == ClientOptions.MESSAGES_GROUP_BY_TYPE &&
-                       message.getType() != type) {
+            } else if (groupBy == ClientOptions.MESSAGES_GROUP_BY_TYPE && message.getType() != type) {
                 type = message.getType();
                 headlines++;
             }
@@ -80,7 +80,7 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
         // Display Panel
         reportPanel.removeAll();
 
-        int[] widths = new int[] {0, margin, 0, margin, 0, margin, 0};
+        int[] widths = new int[] { 0, margin, 0, margin, 0, margin, 0 };
         int[] heights = new int[2 * (messages.size() + headlines) - 1];
         int imageColumn = 1;
         int textColumn = 3;
@@ -101,20 +101,18 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
         int row = 1;
         for (final ModelMessage message : messages) {
             // add headline if necessary
-            if (groupBy == ClientOptions.MESSAGES_GROUP_BY_SOURCE &&
-                message.getSource() != source) {
+            if (groupBy == ClientOptions.MESSAGES_GROUP_BY_SOURCE && message.getSource() != source) {
                 source = message.getSource();
                 reportPanel.add(getHeadline(source), higConst.rc(row, textColumn, "l"));
                 row += 2;
-            } else if (groupBy == ClientOptions.MESSAGES_GROUP_BY_TYPE &&
-                       message.getType() != type) {
+            } else if (groupBy == ClientOptions.MESSAGES_GROUP_BY_TYPE && message.getType() != type) {
                 type = message.getType();
                 JLabel headline = new JLabel(message.getTypeName());
                 headline.setFont(smallHeaderFont);
                 reportPanel.add(headline, higConst.rc(row, textColumn, "l"));
                 row += 2;
             }
-            
+
             final JLabel label = new JLabel();
             if (message.getDisplay() != null) {
                 label.setIcon(getCanvas().getImageIcon(message.getDisplay()));
@@ -123,8 +121,7 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
 
             final JTextArea textArea = new JTextArea();
             try {
-                String text = Messages.message(message.getMessageID(),
-                                               message.getData());
+                String text = Messages.message(message.getMessageID(), message.getData());
                 textArea.setText(text);
                 textArea.setColumns(42);
                 textArea.setOpaque(false);
@@ -139,30 +136,29 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
             }
             if (message.getType() == ModelMessage.WAREHOUSE_CAPACITY) {
                 JButton ignoreButton = new JButton("x");
-                ignoreButton.setToolTipText(Messages.message("model.message.ignore",
-                                                             message.getData()));
+                ignoreButton.setToolTipText(Messages.message("model.message.ignore", message.getData()));
                 ignoreButton.addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent event) {
-                            boolean flag = label.isEnabled();
-                            freeColClient.getInGameController().ignoreMessage(message, flag);
-                            textArea.setEnabled(!flag);
-                            label.setEnabled(!flag);
-                        }
-                    });
-                reportPanel.add(ignoreButton, higConst.rc(row, button1Column, ""));
-            }
-            JButton filterButton = new JButton("X");
-            filterButton.setToolTipText(Messages.message("model.message.filter",
-                                                         new String[][] {{"%type%", message.getTypeName()}}));
-            final BooleanOption filterOption = options.getBooleanOption(message);
-            filterButton.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent event) {
-                        boolean flag = filterOption.getValue();
-                        filterOption.setValue(!flag);
+                        boolean flag = label.isEnabled();
+                        freeColClient.getInGameController().ignoreMessage(message, flag);
                         textArea.setEnabled(!flag);
                         label.setEnabled(!flag);
                     }
                 });
+                reportPanel.add(ignoreButton, higConst.rc(row, button1Column, ""));
+            }
+            JButton filterButton = new JButton("X");
+            filterButton.setToolTipText(Messages.message("model.message.filter", new String[][] { { "%type%",
+                    message.getTypeName() } }));
+            final BooleanOption filterOption = options.getBooleanOption(message);
+            filterButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    boolean flag = filterOption.getValue();
+                    filterOption.setValue(!flag);
+                    textArea.setEnabled(!flag);
+                    label.setEnabled(!flag);
+                }
+            });
             reportPanel.add(filterButton, higConst.rc(row, button2Column, ""));
 
             row += 2;
@@ -176,35 +172,35 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
             return new JLabel();
         } else if (source instanceof Player) {
             Player player = (Player) source;
-            headline = new JLabel(Messages.message("playerNation", 
-                                                   new String[][] {{"%player%", player.getName()},
-                                                                   {"%nation%", player.getNationAsString()}}));
+            headline = new JLabel(Messages.message("playerNation", new String[][] { { "%player%", player.getName() },
+                    { "%nation%", player.getNationAsString() } }));
         } else if (source instanceof Europe) {
             Europe europe = (Europe) source;
             JButton button = new JButton(europe.getName());
             button.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent event) {
-                        getCanvas().showEuropePanel();
-                    }
-                });
+                public void actionPerformed(ActionEvent event) {
+                    getCanvas().showEuropePanel();
+                }
+            });
             headline = button;
         } else if (source instanceof Market) {
-            //Europe europe = getCanvas().getClient().getMyPlayer().getEurope();
+            // Europe europe =
+            // getCanvas().getClient().getMyPlayer().getEurope();
             JButton button = new JButton(Messages.message("model.message.marketPrices"));
             button.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent event) {
-                        getCanvas().showEuropePanel();
-                    }
-                });
+                public void actionPerformed(ActionEvent event) {
+                    getCanvas().showEuropePanel();
+                }
+            });
             headline = button;
         } else if (source instanceof Colony) {
             final Colony colony = (Colony) source;
             JButton button = new JButton(colony.getName());
             button.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent event) {
-                        getCanvas().showColonyPanel(colony);
-                    }
-                });
+                public void actionPerformed(ActionEvent event) {
+                    getCanvas().showColonyPanel(colony);
+                }
+            });
             headline = button;
         } else if (source instanceof Unit) {
             headline = new JLabel(((Unit) source).getName());
@@ -218,6 +214,4 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
         return headline;
     }
 
-
 }
-

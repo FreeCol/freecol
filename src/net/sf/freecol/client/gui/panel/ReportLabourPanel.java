@@ -1,13 +1,12 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
-import java.awt.GridLayout;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Vector;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -19,10 +18,10 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
-
 import cz.autel.dmi.HIGLayout;
 
 /**
@@ -34,8 +33,8 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
     public static final String  REVISION = "$Revision$";
     
     private int[] unitCount;
-    private HashMap<String, Integer>[] unitLocations;
-    private ArrayList locationNames = new ArrayList();
+    private Vector<HashMap<String, Integer>> unitLocations;
+    private ArrayList<String> locationNames = new ArrayList<String>();
 
     /**
      * The constructor that will add the items to this panel.
@@ -51,27 +50,34 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
     public void initialize() {
         // Count Units
         unitCount = new int[Unit.UNIT_COUNT];
-        unitLocations = new HashMap[Unit.UNIT_COUNT];
+        unitLocations = new Vector<HashMap<String,Integer>>(Unit.UNIT_COUNT);
         for (int index = 0; index < Unit.UNIT_COUNT; index++) {
-            unitLocations[index] = new HashMap();
+            unitLocations.set(index,new HashMap<String, Integer>());
         }
         Player player = getCanvas().getClient().getMyPlayer();
-        Iterator units = player.getUnitIterator();
+        Iterator<Unit> units = player.getUnitIterator();
 
-        List colonies = player.getSettlements();
+        ArrayList<Colony> colonies = new ArrayList<Colony>();
+        for(Settlement s : player.getSettlements()) {
+            if (s instanceof Colony) {
+                colonies.add((Colony) s);
+            } else {
+                throw new RuntimeException("Invalid type in array returned by getSettlements()");
+            }
+        }
         Collections.sort(colonies, getCanvas().getClient().getClientOptions().getColonyComparator());
-        Iterator colonyIterator = colonies.iterator();
-        locationNames = new ArrayList();
+        Iterator<Colony> colonyIterator = colonies.iterator();
+        locationNames = new ArrayList<String>();
         locationNames.add(Messages.message("report.atSea"));
         locationNames.add(Messages.message("report.onLand"));
         if (player.getEurope() != null)
             locationNames.add(player.getEurope().toString());
         while (colonyIterator.hasNext()) {
-            locationNames.add(((Colony) colonyIterator.next()).getName());
+            locationNames.add(colonyIterator.next().getName());
         }
 
         while (units.hasNext()) {
-            Unit unit = (Unit) units.next();
+            Unit unit = units.next();
             int type = unit.getType();
             Location location = unit.getLocation();
             String locationName = null;
@@ -90,11 +96,11 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
             }
 
             if (locationName != null) {
-                if (unitLocations[type].containsKey(locationName)) {
-                    int oldValue = unitLocations[type].get(locationName).intValue();
-                    unitLocations[type].put(locationName, new Integer(oldValue + 1));
+                if (unitLocations.get(type).containsKey(locationName)) {
+                    int oldValue = unitLocations.get(type).get(locationName).intValue();
+                    unitLocations.get(type).put(locationName, new Integer(oldValue + 1));
                 } else {
-                    unitLocations[type].put(locationName, new Integer(1));
+                    unitLocations.get(type).put(locationName, new Integer(1));
                 }
             }
 
@@ -149,8 +155,8 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
         int colonyColumn = 1;
         int countColumn = 3;
         int keys = 0;
-        if (unitLocations[unit] != null) {
-            keys = unitLocations[unit].size();
+        if (unitLocations.get(unit) != null) {
+            keys = unitLocations.get(unit).size();
         }
         if (keys == 0) {
             heights = new int[] {0};
@@ -176,14 +182,14 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
                           higConst.rc(row, countColumn));
 
             row = 3;
-            Iterator locationIterator = locationNames.iterator();
+            Iterator<String> locationIterator = locationNames.iterator();
             while (locationIterator.hasNext()) {
-                String name = (String) locationIterator.next();
-                if (unitLocations[unit].get(name) != null) {
+                String name = locationIterator.next();
+                if (unitLocations.get(unit).get(name) != null) {
                     JLabel colonyLabel = new JLabel(name);
                     colonyLabel.setForeground(Color.GRAY);
                     textPanel.add(colonyLabel, higConst.rc(row, colonyColumn));
-                    JLabel countLabel = new JLabel(unitLocations[unit].get(name).toString());
+                    JLabel countLabel = new JLabel(unitLocations.get(unit).get(name).toString());
                     countLabel.setForeground(Color.GRAY);
                     textPanel.add(countLabel, higConst.rc(row, countColumn));
                     row++;

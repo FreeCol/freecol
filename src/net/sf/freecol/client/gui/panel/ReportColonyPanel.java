@@ -1,10 +1,9 @@
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.Color;
 import java.awt.GridLayout;
-
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -20,23 +19,25 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
-
 import cz.autel.dmi.HIGLayout;
 
 /**
  * This panel displays the Colony Report.
  */
 public final class ReportColonyPanel extends ReportPanel implements ActionListener {
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
-    public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
-    public static final String  REVISION = "$Revision$";
+    public static final String COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
 
-    private List<Settlement> colonies;
+    public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
+
+    public static final String REVISION = "$Revision$";
+
+    private List<Colony> colonies;
+
 
     /**
      * The constructor that will add the items to this panel.
+     * 
      * @param parent The parent of this panel.
      */
     public ReportColonyPanel(Canvas parent) {
@@ -48,14 +49,14 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
      */
     public void initialize() {
         Player player = getCanvas().getClient().getMyPlayer();
-        colonies = player.getSettlements();
+        colonies = player.getColonies();
 
         // Display Panel
         reportPanel.removeAll();
 
         int rowsPerColony = 4;
         int separator = 24;
-        int widths[] = new int[] {0, 12, 0};
+        int widths[] = new int[] { 0, 12, 0 };
         int heights[] = new int[colonies.size() * rowsPerColony];
         for (int i = 0; i < colonies.size(); i++) {
             heights[i * rowsPerColony + 3] = separator;
@@ -68,9 +69,9 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
         int panelColumn = 3;
         int colonyIndex = 0;
         Collections.sort(colonies, getCanvas().getClient().getClientOptions().getColonyComparator());
-        Iterator colonyIterator = colonies.iterator();
+        Iterator<Colony> colonyIterator = colonies.iterator();
         while (colonyIterator.hasNext()) {
-            Colony colony = (Colony) colonyIterator.next();
+            Colony colony = colonyIterator.next();
 
             // colonyLabel
             JButton colonyButton = new JButton(colony.getName());
@@ -82,20 +83,20 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
             JPanel unitPanel = new JPanel(new GridLayout(0, 10));
             unitPanel.setOpaque(false);
             ArrayList<Unit> unitList = new ArrayList<Unit>();
-            Iterator unitIterator = colony.getUnitIterator();
+            Iterator<Unit> unitIterator = colony.getUnitIterator();
             while (unitIterator.hasNext()) {
-                unitList.add((Unit) unitIterator.next());
+                unitList.add(unitIterator.next());
             }
             Collections.sort(unitList, getUnitTypeComparator());
             unitIterator = unitList.iterator();
             while (unitIterator.hasNext()) {
-                Unit unit = (Unit) unitIterator.next();
+                Unit unit = unitIterator.next();
                 UnitLabel unitLabel = new UnitLabel(unit, getCanvas(), true, true);
                 unitPanel.add(unitLabel);
             }
             reportPanel.add(unitPanel, higConst.rc(row, panelColumn));
             row++;
-            
+
             // production
             JPanel goodsPanel = new JPanel(new GridLayout(0, 10));
             goodsPanel.setOpaque(false);
@@ -103,7 +104,7 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
                 int newValue = colony.getProductionOf(goodsType);
                 if (newValue > 0) {
                     Goods goods = new Goods(colony.getGame(), colony, goodsType, newValue);
-                    //goods.setAmount(newValue);
+                    // goods.setAmount(newValue);
                     GoodsLabel goodsLabel = new GoodsLabel(goods, getCanvas());
                     goodsLabel.setHorizontalAlignment(JLabel.LEADING);
                     goodsPanel.add(goodsLabel);
@@ -120,7 +121,7 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
                 Building building = colony.getBuilding(buildingType);
                 if (building.getLevel() != Building.NOT_BUILT) {
                     buildingPanel.add(new JLabel(building.getName()));
-                } 
+                }
                 if (buildingType == currentType) {
                     JLabel buildingLabel = new JLabel(building.getNextName());
                     buildingLabel.setForeground(Color.GRAY);
@@ -137,12 +138,12 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
             colonyIndex++;
         }
 
-
     }
 
     /**
-     * This function analyses an event and calls the right methods to take
-     * care of the user's requests.
+     * This function analyses an event and calls the right methods to take care
+     * of the user's requests.
+     * 
      * @param event The incoming ActionEvent.
      */
     public void actionPerformed(ActionEvent event) {
@@ -151,9 +152,8 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
         if (action == OK) {
             super.actionPerformed(event);
         } else {
-            getCanvas().showColonyPanel((Colony) colonies.get(action));
+            getCanvas().showColonyPanel(colonies.get(action));
         }
     }
 
 }
-

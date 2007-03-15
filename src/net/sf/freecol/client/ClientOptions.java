@@ -163,20 +163,20 @@ public class ClientOptions extends OptionMap {
     /**
      * Comparators for sorting colonies.
      */
-    private static Comparator colonyAgeComparator = new Comparator<Colony>() {
+    private static Comparator<Colony> colonyAgeComparator = new Comparator<Colony>() {
         // ID should indicate age
         public int compare(Colony s1, Colony s2) {
             return s1.getIntegerID().compareTo(s2.getIntegerID());
         }
     };
 
-    private static Comparator colonyNameComparator = new Comparator<Colony>() {
+    private static Comparator<Colony> colonyNameComparator = new Comparator<Colony>() {
         public int compare(Colony s1, Colony s2) {
             return s1.getName().compareTo(s2.getName());
         }
     };
 
-    private static Comparator colonySizeComparator = new Comparator<Colony>() {
+    private static Comparator<Colony> colonySizeComparator = new Comparator<Colony>() {
         // sort size descending, then SoL descending
         public int compare(Colony s1, Colony s2) {
             int dsize = s2.getUnitCount() - s1.getUnitCount();
@@ -188,7 +188,7 @@ public class ClientOptions extends OptionMap {
         }
     };
 
-    private static Comparator colonySoLComparator = new Comparator<Colony>() {
+    private static Comparator<Colony> colonySoLComparator = new Comparator<Colony>() {
         // sort SoL descending, then size descending
         public int compare(Colony s1, Colony s2) {
             int dsol = s2.getSoL() - s1.getSoL();
@@ -200,7 +200,7 @@ public class ClientOptions extends OptionMap {
         }
     };
 
-    private static Comparator colonyPositionComparator = new Comparator<Colony>() {
+    private static Comparator<Colony> colonyPositionComparator = new Comparator<Colony>() {
         // sort north to south, then west to east
         public int compare(Colony s1, Colony s2) {
             int dy = s1.getTile().getY() - s2.getTile().getY();
@@ -213,7 +213,7 @@ public class ClientOptions extends OptionMap {
     };
 
 
-    private Comparator messageSourceComparator = new Comparator<ModelMessage>() {
+    private Comparator<ModelMessage> messageSourceComparator = new Comparator<ModelMessage>() {
         // sort according to message source
         public int compare(ModelMessage message1, ModelMessage message2) {
             Object source1 = message1.getSource();
@@ -224,7 +224,7 @@ public class ClientOptions extends OptionMap {
             int base = getClassIndex(source1) - getClassIndex(source2);
             if (base == 0) {
                 if (source1 instanceof Colony) {
-                    return getColonyComparator().compare(source1, source2);
+                    return getColonyComparator().compare((Colony)source1, (Colony)source2);
                 } else if (source1 instanceof FreeColGameObject) {
                     return ((FreeColGameObject) source1).getIntegerID() -
                            ((FreeColGameObject) source2).getIntegerID();
@@ -252,7 +252,7 @@ public class ClientOptions extends OptionMap {
     }; 
 
 
-    private Comparator messageTypeComparator = new Comparator<ModelMessage>() {
+    private Comparator<ModelMessage> messageTypeComparator = new Comparator<ModelMessage>() {
         // sort according to message type
         public int compare(ModelMessage message1, ModelMessage message2) {
             int dtype = message1.getType() - message2.getType();
@@ -417,7 +417,7 @@ public class ClientOptions extends OptionMap {
      *
      * @return a <code>Comparator</code> value
      */
-    public Comparator getColonyComparator() {
+    public Comparator<Colony> getColonyComparator() {
         switch(getInteger(COLONY_COMPARATOR)) {
         case COLONY_COMPARATOR_AGE:
             return colonyAgeComparator;

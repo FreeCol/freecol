@@ -1,8 +1,8 @@
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -16,39 +16,43 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
 
 import org.w3c.dom.Element;
 
-import cz.autel.dmi.HIGLayout;
 import cz.autel.dmi.HIGConstraints;
-
+import cz.autel.dmi.HIGLayout;
 
 /**
  * This panel displays the Naval Report.
  */
 public final class ReportUnitPanel extends JPanel implements ActionListener {
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
-    public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
-    public static final String  REVISION = "$Revision$";
+    public static final String COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
+
+    public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
+
+    public static final String REVISION = "$Revision$";
 
     // The HIGLayout widths.
-    private static final int[] widths = new int[] {0, 12, 0};
+    private static final int[] widths = new int[] { 0, 12, 0 };
+
     // The HIGLayout heights.
     private static int[] heights;
+
     // The column for location labels.
     private static final int labelColumn = 1;
+
     // The column for unit panels.
     private static final int unitColumn = 3;
+
     // The extra rows needed (one row for REF, one separator).
     private static final int extraRows = 2;
+
     // The height of the separator row.
     private static final int separator = 12;
 
@@ -62,7 +66,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
      */
     private boolean ignoreEmptyLocations;
 
-    /** 
+    /**
      * The current HIGLayout row.
      */
     private int row = 1;
@@ -74,14 +78,18 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
      */
     private HashMap<String, ArrayList<Unit>> locations;
 
-
     private static final HIGConstraints higConst = new HIGConstraints();
+
     private Canvas parent;
-    private List<Settlement> colonies;
+
+    private List<Colony> colonies;
+
     private final ReportPanel reportPanel;
+
 
     /**
      * The constructor that will add the items to this panel.
+     * 
      * @param parent The parent of this panel.
      */
     public ReportUnitPanel(boolean isNaval, boolean ignoreEmptyLocations, Canvas parent, ReportPanel reportPanel) {
@@ -100,18 +108,17 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
         Player player = parent.getClient().getMyPlayer();
 
         locations = new HashMap<String, ArrayList<Unit>>();
-        colonies = player.getSettlements();
+        colonies = player.getColonies();
         Collections.sort(colonies, parent.getClient().getClientOptions().getColonyComparator());
-        ArrayList<String> colonyNames = new ArrayList();
-        Iterator colonyIterator = colonies.iterator();
+        ArrayList<String> colonyNames = new ArrayList<String>();
+        Iterator<Colony> colonyIterator = colonies.iterator();
         String colonyName;
         while (colonyIterator.hasNext()) {
-            colonyName = ((Colony) colonyIterator.next()).getName();
+            colonyName = (colonyIterator.next()).getName();
             colonyNames.add(colonyName);
         }
 
         ArrayList<String> otherNames = new ArrayList<String>();
-
 
         // Display Panel
         removeAll();
@@ -138,20 +145,21 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
                 } else if (unit.getState() == Unit.TO_EUROPE) {
                     locationName = Messages.message("goingToEurope");
                 } else if (unit.getDestination() != null) {
-                    locationName = Messages.message("sailingTo", new String[][] {{"%location%", unit.getDestination().getLocationName()}});
+                    locationName = Messages.message("sailingTo", new String[][] { { "%location%",
+                            unit.getDestination().getLocationName() } });
                 } else {
                     locationName = location.getLocationName();
-                } 
-            } else if (!isNaval && (unit.getType() == Unit.ARTILLERY ||
-                                    unit.getType() == Unit.DAMAGED_ARTILLERY ||
-                                    unit.isArmed())) {
+                }
+            } else if (!isNaval
+                    && (unit.getType() == Unit.ARTILLERY || unit.getType() == Unit.DAMAGED_ARTILLERY || unit.isArmed())) {
 
                 Location location = unit.getLocation();
                 if (unit.getDestination() != null) {
-                    locationName = Messages.message("goingTo", new String[][] {{"%location%", unit.getDestination().getLocationName()}});
+                    locationName = Messages.message("goingTo", new String[][] { { "%location%",
+                            unit.getDestination().getLocationName() } });
                 } else {
                     locationName = location.getLocationName();
-                } 
+                }
             }
 
             if (locationName != null) {
@@ -161,8 +169,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
                     locations.put(locationName, unitList);
                 }
                 unitList.add(unit);
-                if (!(colonyNames.contains(locationName) ||
-                      otherNames.contains(locationName))) {
+                if (!(colonyNames.contains(locationName) || otherNames.contains(locationName))) {
                     otherNames.add(locationName);
                 }
             }
@@ -187,11 +194,9 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
                 refPanel.add(reportPanel.buildUnitLabel(ImageLibrary.MAN_O_WAR, 0.66f));
             }
         } else {
-            int[] refUnitCounts = new int[] {artillery, dragoons, infantry};
-            int[] libraryUnitType = new int[] {
-                ImageLibrary.ARTILLERY,
-                ImageLibrary.KINGS_CAVALRY,
-                ImageLibrary.KINGS_REGULAR };
+            int[] refUnitCounts = new int[] { artillery, dragoons, infantry };
+            int[] libraryUnitType = new int[] { ImageLibrary.ARTILLERY, ImageLibrary.KINGS_CAVALRY,
+                    ImageLibrary.KINGS_REGULAR };
             refPanel = new JPanel(new GridLayout(0, 12));
             for (int index = 0; index < refUnitCounts.length; index++) {
                 for (int count = 0; count < refUnitCounts[index]; count++) {
@@ -232,7 +237,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
     }
 
     private void handleLocation(String location, boolean makeButton) {
-        List unitList = locations.get(location);
+        List<Unit> unitList = locations.get(location);
         if (!(unitList == null && ignoreEmptyLocations)) {
             if (makeButton) {
                 JButton locationButton = new JButton(location);
@@ -261,10 +266,10 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
         locationIndex++;
     }
 
-
     /**
-     * This function analyses an event and calls the right methods to take
-     * care of the user's requests.
+     * This function analyses an event and calls the right methods to take care
+     * of the user's requests.
+     * 
      * @param event The incoming ActionEvent.
      */
     public void actionPerformed(ActionEvent event) {
@@ -273,11 +278,10 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
         if (action == ReportPanel.OK) {
             reportPanel.actionPerformed(event);
         } else if (action < colonies.size()) {
-            parent.showColonyPanel((Colony) colonies.get(action));
+            parent.showColonyPanel(colonies.get(action));
         } else if (action == colonies.size()) {
             parent.showEuropePanel();
         }
 
     }
 }
-

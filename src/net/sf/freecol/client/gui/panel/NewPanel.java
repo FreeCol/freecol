@@ -20,6 +20,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.ServerInfo;
 
 import cz.autel.dmi.HIGLayout;
 
@@ -257,7 +258,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
 
                         connectController.startMultiplayerGame(publicServer.isSelected(), name.getText(), port);
                     } else if (meta.isSelected()) {
-                        ArrayList serverList = connectController.getServerList();
+                        ArrayList<ServerInfo> serverList = connectController.getServerList();
                         if (serverList != null) {
                             parent.showServerListPanel(name.getText(), serverList);
                         }
