@@ -62,7 +62,7 @@ public interface ModelController {
     * @param player The <code>Player</code> that should see more tiles.
     * @param tiles The tiles to explore.
     */
-    public void exploreTiles(Player player, ArrayList tiles);
+    public void exploreTiles(Player player, ArrayList<Tile> tiles);
     
     
     /**

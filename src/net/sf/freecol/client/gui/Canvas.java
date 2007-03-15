@@ -70,6 +70,7 @@ import net.sf.freecol.client.gui.panel.TradeRouteInputDialog;
 import net.sf.freecol.client.gui.panel.TrainDialog;
 import net.sf.freecol.client.gui.panel.VictoryPanel;
 import net.sf.freecol.client.gui.panel.WarehouseDialog;
+import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -401,7 +402,7 @@ public final class Canvas extends JLayeredPane {
     *        metaserver.
     * @see ServerListPanel
     */
-    public void showServerListPanel(String username, ArrayList serverList) {
+    public void showServerListPanel(String username, ArrayList<ServerInfo> serverList) {
         closeMenus();
 
         serverListPanel.initialize(username, serverList);        
@@ -1069,13 +1070,14 @@ public final class Canvas extends JLayeredPane {
     *            (requests their support for war against another European power),
     *         FreeColDialog.MISSIONARY_CANCEL if the action was cancelled.
     */
-    public List showUseMissionaryDialog(IndianSettlement settlement) {
+    public List<Object> showUseMissionaryDialog(IndianSettlement settlement) {
         FreeColDialog missionaryDialog = FreeColDialog.createUseMissionaryDialog(settlement, freeColClient.getMyPlayer());
         addCentered(missionaryDialog, USE_MISSIONARY_LAYER);
         missionaryDialog.requestFocus();
 
         Integer response = (Integer)missionaryDialog.getResponse();
-        ArrayList returnValue = new ArrayList();
+        ArrayList<Object> returnValue = new ArrayList<Object>();
+        // TODO: Find a solution so that we can use a more specialized list. 
         returnValue.add(response);
 
         remove(missionaryDialog);
@@ -1200,8 +1202,8 @@ public final class Canvas extends JLayeredPane {
     *            buttons for.
     * @return The choosen object, or <i>null</i> for the cancel-button.
     */
-    public Object showChoiceDialog(String text, String cancelText, Iterator iterator) {
-        ArrayList a = new ArrayList();
+    public Object showChoiceDialog(String text, String cancelText, Iterator<?> iterator) {
+        ArrayList<Object> a = new ArrayList<Object>();
         while (iterator.hasNext()) {
             a.add(iterator.next());
         }

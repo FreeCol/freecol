@@ -150,7 +150,7 @@ public final class ConnectController {
             logout(true);
         }
 
-        List vacantPlayers = getVacantPlayers(host, port);
+        List<String> vacantPlayers = getVacantPlayers(host, port);
         if (vacantPlayers != null) {
             Object choice = canvas.showChoiceDialog(Messages.message("connectController.choicePlayer"),
                                                     Messages.message("cancel"),
@@ -511,7 +511,7 @@ public final class ConnectController {
     * @param port The port to use when connecting to the host.
     * @return A list of available {@link Player#getUsername() usernames}.
     */
-    private List getVacantPlayers(String host, int port) {
+    private List<String> getVacantPlayers(String host, int port) {
         Connection mc;
         try {
             mc = new Connection(host, port, null);
@@ -520,7 +520,7 @@ public final class ConnectController {
             return null;
         }
 
-        List items = new ArrayList();
+        ArrayList<String> items = new ArrayList<String>();
         Element element = Message.createNewRootElement("getVacantPlayers");
         try {
             Element reply = mc.ask(element);
@@ -555,7 +555,7 @@ public final class ConnectController {
     * Gets a list of servers from the meta server.
     * @return A list of {@link ServerInfo} objects.
     */
-    public ArrayList getServerList() {
+    public ArrayList<ServerInfo> getServerList() {
         Canvas canvas = freeColClient.getCanvas();
 
         Connection mc;
@@ -575,7 +575,7 @@ public final class ConnectController {
                 canvas.errorMessage("metaServer.communicationError");
                 return null;
             } else {
-                ArrayList items = new ArrayList();
+                ArrayList<ServerInfo> items = new ArrayList<ServerInfo>();
                 NodeList nl = reply.getChildNodes();
                 for (int i=0; i<nl.getLength(); i++) {
                     items.add(new ServerInfo((Element) nl.item(i)));
