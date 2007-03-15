@@ -198,7 +198,7 @@ public class Connection {
     * @param element The Element to convert.
     * @return The string representation of the given Element without the xml version tag.
     * @deprecated not used, should we remove?
-    */
+    *
     private String convertElementToString(Element element) {
         synchronized (out) { // Also a lock for: xmlTransformer
             String xml;
@@ -213,6 +213,7 @@ public class Connection {
             return xml;
         }
     }
+    */
 
 
     /**

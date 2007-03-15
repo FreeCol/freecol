@@ -39,6 +39,7 @@ public final class ServerListPanel extends FreeColPanel implements ActionListene
                                 CANCEL = 1;
 
     private final Canvas        parent;
+    @SuppressWarnings("unused")
     private final FreeColClient freeColClient;
     private final ConnectController connectController;
 

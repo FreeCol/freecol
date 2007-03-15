@@ -434,7 +434,7 @@ public final class InGameController implements NetworkConstants {
 			if (messages.size() > 0) {
 				ModelMessage[] modelMessages = new ModelMessage[messages.size()];
 				for (int i = 0; i < messages.size(); i++) {
-					modelMessages[i] = (ModelMessage) messages.get(i);
+					modelMessages[i] = messages.get(i);
 				}
 				if (!freeColClient.getCanvas().showConfirmDialog(modelMessages,
 						"buildColony.yes", "buildColony.no")) {
@@ -741,7 +741,7 @@ public final class InGameController implements NetworkConstants {
 					.getCargo().clone();
 			Iterator<Goods> goodsIterator = unit.getGoodsIterator();
 			test: while (goodsIterator.hasNext()) {
-				Goods goods = (Goods) goodsIterator.next();
+				Goods goods = goodsIterator.next();
 				for (int index = 0; index < goodsTypes.size(); index++) {
 					if (goods.getType() == goodsTypes.get(index).intValue()) {
 						// remove item: other items of the same type
@@ -1507,7 +1507,7 @@ public final class InGameController implements NetworkConstants {
 			}
 
 			if (choices.size() == 1) {
-				destinationUnit = (Unit) choices.get(0);
+				destinationUnit = choices.get(0);
 			} else if (choices.size() == 0) {
 				throw new IllegalStateException();
 			} else {

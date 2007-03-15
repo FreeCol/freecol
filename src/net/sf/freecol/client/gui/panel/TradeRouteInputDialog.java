@@ -335,7 +335,7 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
      */
     public class CargoPanel extends JPanel {
 
-        private Stop stop;
+        //private Stop stop;
 
         public CargoPanel() {
             super();
@@ -347,7 +347,7 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
         public void initialize(Stop newStop) {
             removeAll();
             if (newStop != null) {
-                stop = newStop;
+                //stop = newStop;
                 for (Integer cargo : newStop.getCargo()) {
                     add(new CargoLabel(cargo.intValue()));
                 }

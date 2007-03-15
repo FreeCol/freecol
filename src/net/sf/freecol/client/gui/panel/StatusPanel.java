@@ -21,6 +21,7 @@ public final class StatusPanel extends FreeColPanel {
     public static final String  REVISION = "$Revision$";
 
 
+    @SuppressWarnings("unused")
     private final Canvas        parent;
     private final JLabel        statusLabel;
 

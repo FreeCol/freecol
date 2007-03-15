@@ -37,12 +37,11 @@ public final class DeclarationDialog extends FreeColDialog {
     private static final Logger logger = Logger.getLogger(DeclarationDialog.class.getName());
        
     private final FreeColClient freeColClient;
+    @SuppressWarnings("unused")
     private final Canvas parent;
     private final SignaturePanel signaturePanel;
     
     final DeclarationDialog theDialog = this;
-    
-    private JLabel imageLabel;
 
     /**
      * The constructor that will add the items to this panel.

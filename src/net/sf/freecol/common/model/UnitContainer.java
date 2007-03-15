@@ -30,6 +30,7 @@ public class UnitContainer extends FreeColGameObject {
     private ArrayList<Unit> units = new ArrayList<Unit>();
     
     /** The owner of this <code>UnitContainer</code>. */
+    @SuppressWarnings("unused")
     private Location parent;
 
     /**
@@ -197,7 +198,7 @@ public class UnitContainer extends FreeColGameObject {
         if (units.size() == 0) {
             return null;
         } else {
-            return (Unit) units.get(0);
+            return units.get(0);
         }
     }
 
@@ -210,7 +211,7 @@ public class UnitContainer extends FreeColGameObject {
         if (units.size() == 0) {
             return null;
         } else {
-            return (Unit) units.get(units.size() - 1);
+            return units.get(units.size() - 1);
         }
     }
 

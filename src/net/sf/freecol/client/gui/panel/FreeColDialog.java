@@ -428,7 +428,7 @@ public class FreeColDialog extends FreeColPanel {
         }
 
         Font bigFont = preCombatDialog.getFont().deriveFont(Font.BOLD, 20f);
-        Color attackerColor = attacker.getOwner().getColor();
+//        Color attackerColor = attacker.getOwner().getColor();
         modifier = offense.get(offense.size() - 1);
         JLabel finalOffenseLabel = new JLabel(Messages.message(modifier.id));
         //finalOffenseLabel.setForeground(attackerColor);
@@ -441,12 +441,12 @@ public class FreeColDialog extends FreeColPanel {
         preCombatDialog.add(finalOffenseResult,
                             higConst.rc(row, offenseValueColumn, "r"));
 
-        Color defenderColor;
-        if (defender != null) {
-            defenderColor = defender.getOwner().getColor();
-        } else {
-            defenderColor = settlement.getOwner().getColor();
-        }
+//        Color defenderColor;
+//        if (defender != null) {
+//            defenderColor = defender.getOwner().getColor();
+//        } else {
+//            defenderColor = settlement.getOwner().getColor();
+//        }
         modifier = defense.get(defense.size() - 1);
         JLabel finalDefenseLabel = new JLabel(Messages.message(modifier.id));
         //finalDefenseLabel.setForeground(defenderColor);
@@ -512,7 +512,6 @@ public class FreeColDialog extends FreeColPanel {
 
         JPanel objectsPanel = new JPanel(new GridLayout(objects.length+1, 1, 10,10));
         objectsPanel.setBorder(new CompoundBorder(objectsPanel.getBorder(), new EmptyBorder(10,20,10,20)));
-        int width = Math.max(l.getMinimumSize().width, objectsPanel.getPreferredSize().width) + 20;
 
         if (objects.length > 0) {
             final Object firstObject = objects[0];

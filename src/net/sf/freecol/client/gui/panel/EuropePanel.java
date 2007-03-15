@@ -237,7 +237,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         int spaceTop = Math.max(0, (getHeight() - totalHeight) / 2);
         int spaceLeft = Math.max(0, (getWidth() - marketScroll.getWidth()) / 2);
         int spaceRight = spaceLeft;
-        int spaceBottom = spaceTop;
+        //int spaceBottom = spaceTop;
         
         toAmericaScroll.setLocation(spaceLeft, spaceTop);
         toAmericaLabel.setLocation(spaceLeft, spaceTop - 20);

@@ -40,7 +40,7 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
     /** The widths of the columns. */
     private final int[] widths;
     /** The heights of the rows. */
-    private final int[] heights;
+    //private final int[] heights;
 
     private static final HIGConstraints higConst = new HIGConstraints();
 
@@ -68,7 +68,7 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
         } else {
             widths = new int[] {0, columnSeparatorWidth, 0, columnSeparatorWidth, 0};
         }
-        heights = null;
+        //heights = null;
         totalProduction = 0;
         setOpaque(false);
     }

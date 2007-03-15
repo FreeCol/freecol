@@ -21,7 +21,8 @@ public class DiplomaticTrade extends PersistentObject {
 	// the individual items the trade consists of
 	private ArrayList<TradeItem> items = new ArrayList<TradeItem>();
 
-	private final Game game;
+	@SuppressWarnings("unused")
+    private final Game game;
 
 	public DiplomaticTrade(Game game) {
 		this.game = game;

@@ -569,7 +569,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      */
     public Unit getFirstUnit() {
         if (units.size() > 0) {
-            return (Unit) units.get(0);
+            return units.get(0);
         }
 
         return null;
@@ -581,7 +581,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      */
     public Unit getLastUnit() {
         if (units.size() > 0) {
-            return (Unit) units.get(units.size()-1);
+            return units.get(units.size()-1);
         }
 
         return null;
@@ -670,7 +670,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         if (type == SCHOOLHOUSE) {
             Iterator<Unit> i = getUnitIterator();
             while (i.hasNext()) {
-                Unit teacher = (Unit) i.next();
+                Unit teacher = i.next();
                 Unit student = getUnitToTrain(teacher.getType());
 
                 if (student != null) {
@@ -958,7 +958,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
         Iterator<Unit> unitIterator = getUnitIterator();
         while (unitIterator.hasNext()) {
-            int productivity = ((Unit) unitIterator.next()).getProducedAmount(goodsOutputType);
+            int productivity = unitIterator.next().getProducedAmount(goodsOutputType);
             if (productivity > 0) {
                 productivity += colony.getProductionBonus();
                 if (productivity < 1) productivity = 1;
@@ -990,7 +990,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      */
     public void dispose() {
         for (int i=0; i<units.size(); i++) {
-            ((Unit) units.get(i)).dispose();
+            units.get(i).dispose();
         }
         
         super.dispose();

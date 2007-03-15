@@ -3913,7 +3913,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable,
 		}
 
 		for (int i = 0; i < converts; i++) {
-			Unit newUnit = modelController.createUnit(getID() + "indianConvert"
+			modelController.createUnit(getID() + "indianConvert"
 					+ i, newTile, getOwner(), Unit.INDIAN_CONVERT);
 		}
 

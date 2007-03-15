@@ -271,7 +271,7 @@ public class MapGenerator {
     /**
     * Gets the Indian player of the appropriate tribe.
     * @return The Indian player of the appropriate tribe.
-    */
+    *
     private ServerPlayer getIndianPlayer(int owner, Vector players) {
         for (int i = 0; i < players.size(); i++) {
             ServerPlayer player = (ServerPlayer)players.elementAt(i);
@@ -282,6 +282,7 @@ public class MapGenerator {
         logger.warning("VERY BAD: Can't find indian player for Indian tribe " + owner);
         return null;
     }
+    */
 
 
     /**
@@ -461,7 +462,7 @@ public class MapGenerator {
      * @param position Candidate position
      * @param radius necessary radius
      * @return True if position suitable for settlement
-     */
+     *
     private boolean isIndianSettlementCandidate(Position position, int radius, Map map) {
         if (map.getTile(position).getClaim() == Tile.CLAIM_NONE) {
             map.getTile(position).setClaim(Tile.CLAIM_VISITED);
@@ -485,6 +486,7 @@ public class MapGenerator {
         }
         return false;
     }
+     */
 
 
     /**
@@ -511,7 +513,7 @@ public class MapGenerator {
      * 
      * @param map The <code>Map</code>.
      * @return Position selected
-     */
+     *
     private Position getRandomSettleablePosition(Map map) {
         int x = random.nextInt(getMapGeneratorOptions().getWidth() - 20) + 10;
         int y = random.nextInt(getMapGeneratorOptions().getHeight() - 20) + 10;
@@ -525,6 +527,7 @@ public class MapGenerator {
         }
         return null;
     }
+     */
 
 
     /**

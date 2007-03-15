@@ -35,10 +35,6 @@ public final class UnitLabel extends JLabel implements ActionListener {
 
     private static Logger logger = Logger.getLogger(UnitLabel.class.getName());
 
-    // The space between the top of this 'UnitLabel' and the top of the production images.
-    //private static final int STP = 10;
-    private static final int STP = 0;
-
     public static final int ARM = 0,
                             MOUNT = 1,
                             TOOLS = 2,

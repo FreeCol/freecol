@@ -378,7 +378,6 @@ public final class Market extends FreeColGameObject {
     public void newTurn() {
         int totalNormalGoods = 0;
         for (int i = 0; i < dataForGoodType.length; i++) {            
-            int rawType = Goods.getRawMaterial(i);
             int manufactoredType = Goods.getManufactoredGoods(i);
             
             dataForGoodType[i].amountInMarket += 10;

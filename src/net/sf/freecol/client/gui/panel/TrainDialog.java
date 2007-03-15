@@ -39,6 +39,7 @@ public final class TrainDialog extends FreeColDialog implements ActionListener{
 
     private static final JButton cancel = new JButton(Messages.message("trainDialog.cancel"));
 
+    @SuppressWarnings("unused")
     private final Canvas parent;
     private final FreeColClient freeColClient;
     private final InGameController inGameController;

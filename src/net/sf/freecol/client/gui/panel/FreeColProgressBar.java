@@ -28,10 +28,11 @@ public class FreeColProgressBar extends JPanel {
 
     private static final Color PRIMARY_1 = new Color(122, 109, 82),
                                BG_COLOR_SELECT = new Color(255, 244, 195),
-                               PRIMARY_3 = new Color(203, 182, 136),
-                               SECONDARY_1 = new Color(10, 10, 10),
-                               DISABLED_COLOR = new Color(166, 144, 95),
-                               BG_COLOR = new Color(216, 194, 145);
+                               PRIMARY_3 = new Color(203, 182, 136)
+                               //,SECONDARY_1 = new Color(10, 10, 10),
+                               //DISABLED_COLOR = new Color(166, 144, 95),
+                               //BG_COLOR = new Color(216, 194, 145)
+                               ;
 
     // The minimum value of the progress bar
     private int min = 0;
@@ -51,6 +52,7 @@ public class FreeColProgressBar extends JPanel {
      */
     private int goodsType = -1;
 
+    @SuppressWarnings("unused")
     private final Canvas parent;
     private Image image;
 

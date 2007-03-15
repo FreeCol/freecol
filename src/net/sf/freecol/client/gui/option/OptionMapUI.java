@@ -35,7 +35,6 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    private final OptionMap option;
     private final OptionUpdater[] optionUpdaters;
     private final JTabbedPane tb;
 
@@ -62,7 +61,6 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
      */
     public OptionMapUI(OptionMap option, boolean editable) {
         super(new BorderLayout());
-        this.option = option;
 
         JPanel northPanel = new JPanel();
         northPanel.setLayout(new BoxLayout(northPanel, BoxLayout.Y_AXIS));

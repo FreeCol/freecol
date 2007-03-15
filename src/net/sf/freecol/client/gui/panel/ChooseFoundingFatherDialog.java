@@ -35,6 +35,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
+    @SuppressWarnings("unused")
     private final Canvas    parent;
     private FoundingFatherPanel[] foundingFatherPanels = new FoundingFatherPanel[FoundingFather.TYPE_COUNT];
     private final JTabbedPane tb;
@@ -114,7 +115,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
     */
     protected class FoundingFatherPanel extends JPanel {
     
-        private final int type;
+        //private final int type;
         private int foundingFather = -1;
         
         private JLabel header;
@@ -131,7 +132,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
         *             <code>FoundingFatherPanel</code>.
         */
         public FoundingFatherPanel(int type) {
-            this.type = type;
+            //this.type = type;
 
             setLayout(new BorderLayout());
 

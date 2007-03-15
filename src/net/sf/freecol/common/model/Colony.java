@@ -341,7 +341,7 @@ public final class Colony extends Settlement implements Location, Nameable {
 	public boolean isUndead() {
 		final Iterator<Unit> unitIterator = getUnitIterator();
 		return unitIterator.hasNext()
-				&& ((Unit) unitIterator.next()).isUndead();
+				&& unitIterator.next().isUndead();
 	}
 
 	/**
@@ -398,7 +398,7 @@ public final class Colony extends Settlement implements Location, Nameable {
 	public void damageAllShips() {
 		Iterator<Unit> iter = getTile().getUnitIterator();
 		while (iter.hasNext()) {
-			Unit u = (Unit) iter.next();
+			Unit u = iter.next();
 			if (u.isNaval()) {
 				u.shipDamaged();
 			}
@@ -551,7 +551,7 @@ public final class Colony extends Settlement implements Location, Nameable {
 		Iterator<Building> buildingIterator = getBuildingIterator();
 
 		while (buildingIterator.hasNext()) {
-			Building building = (Building) buildingIterator.next();
+			Building building = buildingIterator.next();
 			if (building.isType(type)) {
 				return building;
 			}
@@ -622,7 +622,7 @@ public final class Colony extends Settlement implements Location, Nameable {
 
 		Iterator<Building> i = getBuildingIterator();
 		while (i.hasNext()) {
-			w = (WorkLocation) i.next();
+			w = i.next();
 			if (w.canAdd(locatable)) {
 				return w;
 			}
@@ -630,7 +630,7 @@ public final class Colony extends Settlement implements Location, Nameable {
 
 		Iterator<WorkLocation> it = getWorkLocationIterator();
 		while (it.hasNext()) {
-			w = (WorkLocation) it.next();
+			w = it.next();
 			if (w.canAdd(locatable)) {
 				return w;
 			}
@@ -709,7 +709,7 @@ public final class Colony extends Settlement implements Location, Nameable {
 
 		Iterator<WorkLocation> i = getWorkLocationIterator();
 		while (i.hasNext()) {
-			WorkLocation w = (WorkLocation) i.next();
+			WorkLocation w = i.next();
 			count += w.getUnitCount();
 		}
 
@@ -1205,7 +1205,7 @@ public final class Colony extends Settlement implements Location, Nameable {
 
 		Iterator<ColonyTile> colonyTileIterator = getColonyTileIterator();
 		while (colonyTileIterator.hasNext()) {
-			ColonyTile colonyTile = (ColonyTile) colonyTileIterator.next();
+			ColonyTile colonyTile = colonyTileIterator.next();
 
 			if (colonyTile.canAdd(unit)) {
 				Tile workTile = colonyTile.getWorkTile();
@@ -1643,7 +1643,7 @@ public final class Colony extends Settlement implements Location, Nameable {
 		if (getBuilding(Building.CUSTOM_HOUSE).isBuilt()) {
 			Iterator<Goods> goodsIterator = getCompactGoodsIterator();
 			while (goodsIterator.hasNext()) {
-				Goods goods = (Goods) goodsIterator.next();
+				Goods goods = goodsIterator.next();
 				if (getExports(goods)
 						&& (owner.canTrade(goods, Market.CUSTOM_HOUSE))) {
 					int type = goods.getType();

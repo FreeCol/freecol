@@ -26,6 +26,7 @@ public final class ErrorPanel extends FreeColDialog implements ActionListener {
 
     private static final int lineWidth = 320;
 
+    @SuppressWarnings("unused")
     private final Canvas parent;
 
     private LinkedList errorLabels; // A LinkedList of JLabel objects.

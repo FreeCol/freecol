@@ -41,6 +41,7 @@ public final class MapControls {
     private final InfoPanel        infoPanel;
     private final MiniMap          miniMap;
     private final UnitButton[]     unitButton;   
+    @SuppressWarnings("unused")
     private GUI                    gui;
 
 

@@ -104,9 +104,9 @@ public class FreeColPanel extends JPanel {
         Image menuborderS = (Image) UIManager.get("menuborder.s.image");
         Image menuborderSW = (Image) UIManager.get("menuborder.sw.image");
         Image menuborderSE = (Image) UIManager.get("menuborder.se.image");
-        Image menuborderShadowSW = (Image) UIManager.get("menuborder.shadow.sw.image");
-        Image menuborderShadowS = (Image) UIManager.get("menuborder.shadow.s.image");
-        Image menuborderShadowSE = (Image) UIManager.get("menuborder.shadow.se.image");
+        //Image menuborderShadowSW = (Image) UIManager.get("menuborder.shadow.sw.image");
+        //Image menuborderShadowS = (Image) UIManager.get("menuborder.shadow.s.image");
+        //Image menuborderShadowSE = (Image) UIManager.get("menuborder.shadow.se.image");
         final FreeColImageBorder imageBorder = new FreeColImageBorder(menuborderN, menuborderW, menuborderS, menuborderE, menuborderNW, menuborderNE, menuborderSW, menuborderSE);
         setBorder(BorderFactory.createCompoundBorder(imageBorder, BorderFactory.createEmptyBorder(margin, margin, margin, margin)));
         

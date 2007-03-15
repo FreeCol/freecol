@@ -51,6 +51,7 @@ public class SoundPlayer {
     * If it does not allow multiple sounds, then using <i>play</i> will stop the sound
     * currently playing and play the new instead.
     */
+    @SuppressWarnings("unused")
     private boolean multipleSounds;
 
     /** Should the player continue playing after it it finished with a sound-clip? This is the default used with the <i>play(Playlist playlist)</i>. */
@@ -205,6 +206,7 @@ public class SoundPlayer {
         private int pickMode;
 
         /** Should the sound be played again when it is finished? */
+        @SuppressWarnings("unused")
         private boolean repeatSound;
 
         /** The sound that is prepared for/is playing. A <i>Sequence</i>, <i>BufferedInputStream</i> or a <i>Clip</i>. */
@@ -214,6 +216,7 @@ public class SoundPlayer {
         private boolean midiEOM;
 
         /** True if (not MIDI) audio is finished playing. */
+        @SuppressWarnings("unused")
         private boolean audioEOM;
 
         /** The <i>Sequencer</i> to use while playing MIDI. */
@@ -222,6 +225,7 @@ public class SoundPlayer {
         private Synthesizer synthesizer;
 
         /** An array of <i>MidiChannel</i> to use while playing MIDI. */
+        @SuppressWarnings("unused")
         private MidiChannel[] channels;
 
 

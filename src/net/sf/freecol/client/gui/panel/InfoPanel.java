@@ -47,6 +47,7 @@ public final class InfoPanel extends FreeColPanel {
     private static final int PANEL_HEIGHT = 128;
 
     private final FreeColClient freeColClient;
+    @SuppressWarnings("unused")
     private final Game          game;
     private final ImageLibrary  library;
     private final EndTurnPanel  endTurnPanel = new EndTurnPanel();

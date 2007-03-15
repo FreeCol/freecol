@@ -36,6 +36,7 @@ public final class EventPanel extends FreeColDialog implements ActionListener {
     private static final int OK = 0;
     
     private final FreeColClient freeColClient;
+    @SuppressWarnings("unused")
     private final Canvas parent;
     
     private JLabel header;

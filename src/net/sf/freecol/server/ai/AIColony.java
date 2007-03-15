@@ -1029,7 +1029,7 @@ public class AIColony extends AIObject {
     *
     * @param t The <code>Tile</code>.
     * @return The type of goods.
-    */
+    *
     private int getBestGoodsToProduce(Tile t) {
         if (t.isForested()) {
             if (t.getType() == Tile.GRASSLANDS || t.getType() == Tile.SAVANNAH) {
@@ -1075,6 +1075,7 @@ public class AIColony extends AIObject {
                 return Goods.ORE;
         }
     }
+    */
 
 
     /**

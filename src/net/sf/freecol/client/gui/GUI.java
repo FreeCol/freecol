@@ -88,7 +88,7 @@ public final class GUI {
     tileWidth,
     topSpace,
     topRows,
-    bottomSpace,
+    //bottomSpace,
     bottomRows,
     leftSpace,
     rightSpace;
@@ -167,7 +167,7 @@ public final class GUI {
 
         // Calculate the amount of rows that will be drawn above the central Tile
         topSpace = ((int) bounds.getHeight() - tileHeight) / 2;
-        bottomSpace = topSpace;
+        //bottomSpace = topSpace;
 
         if ((topSpace % (tileHeight / 2)) != 0) {
             topRows = topSpace / (tileHeight / 2) + 2;
@@ -1152,7 +1152,7 @@ public final class GUI {
      * 
      * @param u The <code>Unit</code>
      * @return The <code>Image</code>.
-     */
+     *
     private Image getPathIllegalImage(Unit u) {
         if (u == null || u.isNaval()) {
             return (Image) UIManager.get("path.naval.illegal.image");
@@ -1164,6 +1164,7 @@ public final class GUI {
             return (Image) UIManager.get("path.foot.illegal.image");
         }
     }
+    */
     
     /**
      * Gets an image to represent the path of the given <code>Unit</code>.

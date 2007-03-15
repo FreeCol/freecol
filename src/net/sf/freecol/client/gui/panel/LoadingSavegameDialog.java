@@ -40,6 +40,7 @@ public final class LoadingSavegameDialog extends FreeColDialog implements Action
                                 CANCEL = 1;
 
     private final Canvas        parent;
+    @SuppressWarnings("unused")
     private final FreeColClient freeColClient;
 
     private JButton ok;

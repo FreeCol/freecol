@@ -46,6 +46,7 @@ public final class PurchaseDialog extends FreeColDialog implements ActionListene
                              frigateButton;
     private final JButton cancel;
     private final JLabel artilleryLabel = new JLabel("?");
+    @SuppressWarnings("unused")
     private final Canvas parent;
     private final FreeColClient freeColClient;
     private final InGameController inGameController;

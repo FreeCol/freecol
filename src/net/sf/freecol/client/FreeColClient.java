@@ -49,6 +49,7 @@ public final class FreeColClient {
     private ImageLibrary imageLibrary;
     private MusicLibrary musicLibrary;
     private SfxLibrary sfxLibrary;    
+    @SuppressWarnings("unused")
     private SoundPlayer musicPlayer;
     private SoundPlayer sfxPlayer;
     // Networking:
@@ -426,9 +427,9 @@ public final class FreeColClient {
      * @param windowed The main window is a full-screen window if set to
      *            <i>false</i> and a normal window otherwise.
      */
-    private void setWindowed(boolean windowed) {
-        this.windowed = windowed;
-    }
+//    private void setWindowed(boolean windowed) {
+//        this.windowed = windowed;
+//    }
 
     /**
      * Sets wether or not this game is a singleplayer game.

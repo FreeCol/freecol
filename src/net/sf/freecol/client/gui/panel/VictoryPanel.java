@@ -30,6 +30,7 @@ public final class VictoryPanel extends FreeColPanel implements ActionListener {
     private static final Logger logger = Logger.getLogger(VictoryPanel.class.getName());
     private static final int    OK = 0;
 
+    @SuppressWarnings("unused")
     private final Canvas    parent;
     private final FreeColClient freeColClient;
     private JButton         ok = new JButton(Messages.message("victory.yes"));

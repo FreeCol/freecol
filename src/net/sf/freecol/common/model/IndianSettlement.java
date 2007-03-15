@@ -50,7 +50,7 @@ public class IndianSettlement extends Settlement {
     public static final int MAX_CONVERT_DISTANCE = 10;
 
     /** The amount of goods a brave can produce a single turn. */
-    private static final int WORK_AMOUNT = 5;
+    //private static final int WORK_AMOUNT = 5;
 
     /** The amount of raw material that should be available before producing manufactured goods. */
     public static final int KEEP_RAW_MATERIAL = 50;
@@ -1018,7 +1018,7 @@ public class IndianSettlement extends Settlement {
                 }
 
                 if (targetTile != null) {
-                    ((Unit) getUnitIterator().next()).dispose();
+                    getUnitIterator().next().dispose();
                     convertProgress = 0;
 
                     Unit u = getGame().getModelController().createUnit(getID() + "newTurn100missionary", targetTile, missionary.getOwner(), Unit.INDIAN_CONVERT);

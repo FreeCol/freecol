@@ -47,24 +47,24 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
 
     private static final int    START = 0,
                                 CANCEL = 1,
-                                MAPSIZE = 2,
+                                //MAPSIZE = 2,
                                 READY = 3,
                                 CHAT = 4,
                                 GAME_OPTIONS = 5,
                                 MAP_GENERATOR_OPTIONS = 6;
 
-    private final String[]  colors = { Messages.message("black"),
-                                       Messages.message("blue"),
-                                       Messages.message("cyan"),
-                                       Messages.message("gray"),
-                                       Messages.message("green"),
-                                       Messages.message("magenta"),
-                                       Messages.message("orange"),
-                                       Messages.message("pink"),
-                                       Messages.message("red"),
-                                       Messages.message("white"),
-                                       Messages.message("yellow"),
-                                      };
+//    private final String[]  colors = { Messages.message("black"),
+//                                       Messages.message("blue"),
+//                                       Messages.message("cyan"),
+//                                       Messages.message("gray"),
+//                                       Messages.message("green"),
+//                                       Messages.message("magenta"),
+//                                       Messages.message("orange"),
+//                                       Messages.message("pink"),
+//                                       Messages.message("red"),
+//                                       Messages.message("white"),
+//                                       Messages.message("yellow"),
+//                                      };
 
     private final Canvas        parent;
     private final FreeColClient freeColClient;

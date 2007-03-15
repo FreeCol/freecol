@@ -36,6 +36,7 @@ public final class GoodsLabel extends JLabel {//implements ActionListener {
 
     private final Goods goods;
     private final Canvas parent;
+    @SuppressWarnings("unused")
     private boolean selected;
     private boolean partialChosen;
 
@@ -102,8 +103,7 @@ public final class GoodsLabel extends JLabel {//implements ActionListener {
     public void setSelected(boolean b) {
         selected = b;
     }
-
-
+    
     /**
     * Sets that this <code>GoodsLabel</code> should be small.
     * @param isSmall A smaller picture will be used if <code>true</code>.

@@ -200,9 +200,9 @@ public final class ImageLibrary extends ImageProvider {
                             COLONY_COUNT = 10,
 
                             INDIAN_SETTLEMENT_CAMP = 0,
-                            INDIAN_SETTLEMENT_VILLAGE = 1,
-                            INDIAN_SETTLEMENT_AZTEC = 2,
-                            INDIAN_SETTLEMENT_INCA = 3,
+//                            INDIAN_SETTLEMENT_VILLAGE = 1,
+//                            INDIAN_SETTLEMENT_AZTEC = 2,
+//                            INDIAN_SETTLEMENT_INCA = 3,
 
                             INDIAN_COUNT = 4;
 
@@ -272,8 +272,7 @@ public final class ImageLibrary extends ImageProvider {
         indians, //Holds ImageIcon objects
         goods, //Holds ImageIcon objects
         bonus, //Holds ImageIcon objects
-        monarch, //Holds ImageIcon objects
-        ui; // Holds ImageIcon objects
+        monarch; //Holds ImageIcon objects
 
     private Vector<Vector<ImageIcon>> terrain1,
         terrain2;

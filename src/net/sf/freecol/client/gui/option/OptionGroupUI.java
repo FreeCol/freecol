@@ -37,7 +37,6 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
     /** The horisontal gap between components in this <code>OptionGroupUI</code>. */
     public static final int H_GAP = 20;
 
-    private final OptionGroup option;
     private final OptionUpdater[] optionUpdaters;
     
 
@@ -47,8 +46,6 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
     */
     public OptionGroupUI(OptionGroup option, boolean editable) {
         setLayout(new GridLayout(0, 2, H_GAP, 5));
-
-        this.option = option;
 
         List ou = new ArrayList();
         Iterator it = option.iterator();
