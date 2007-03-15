@@ -2207,6 +2207,7 @@ public final class Canvas extends JLayeredPane {
                 try {
                     sleep(500);
                 } catch (InterruptedException e) {
+                    // Do nothing here
                 }
             }
         }
@@ -2270,6 +2271,7 @@ public final class Canvas extends JLayeredPane {
                     sleep(100);
                 }
                 catch (InterruptedException e) {
+                    // Do nothing here
                 }
                 count++;
                 if (count > 50) {

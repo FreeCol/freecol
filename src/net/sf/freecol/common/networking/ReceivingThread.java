@@ -157,8 +157,10 @@ final class ReceivingThread extends Thread {
     private void listen() throws IOException, SAXException, XMLStreamException {
         while (locked) {
             try {
+                // TODO: Fix this sleep(1) is not a solution
                 Thread.sleep(1);
             } catch (InterruptedException e) {
+                // Do nothing here.
             }
         }
 

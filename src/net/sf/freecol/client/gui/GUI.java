@@ -366,7 +366,7 @@ public final class GUI {
         } else {
             Iterator<Unit> it = enemyUnitsOnTop.iterator();
             while (it.hasNext()) {
-                Unit eu = (Unit) it.next();
+                Unit eu = it.next();
                 if (eu.getTile() == unitTile) {
                     return eu;
                 }
@@ -380,7 +380,7 @@ public final class GUI {
                     Unit bestPick = null;
                     Iterator<Unit> unitIterator = unitTile.getUnitIterator();
                     while (unitIterator.hasNext()) {
-                        Unit u = (Unit) unitIterator.next();
+                        Unit u = unitIterator.next();
                         if (bestPick == null || bestPick.getMovesLeft() < u.getMovesLeft()) {
                             bestPick = u;
                         }
@@ -538,7 +538,7 @@ public final class GUI {
      * @return The message at position 'index'.
      */
     public GUIMessage getMessage(int index) {
-        return (GUIMessage) messages.get(index);
+        return messages.get(index);
     }
 
 

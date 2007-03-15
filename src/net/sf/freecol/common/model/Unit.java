@@ -437,7 +437,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable,
 			throw new IllegalStateException("No more moves left!");
 		}
 
-		int type = goods.getType();
+		int goodsType = goods.getType();
 		int amount = goods.getAmount();
 
 		goods.setLocation(settlement);
@@ -449,10 +449,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable,
 		} else {
 			addModelMessage(settlement, "model.unit.gift", new String[][] {
 					{ "%player%", getOwner().getNationAsString() },
-					{ "%type%", Goods.getName(type) },
+					{ "%type%", Goods.getName(goodsType) },
 					{ "%amount%", Integer.toString(amount) },
 					{ "%colony%", ((Colony) settlement).getName() } },
-					ModelMessage.GIFT_GOODS, new Goods(type));
+					ModelMessage.GIFT_GOODS, new Goods(goodsType));
 		}
 	}
 
@@ -472,20 +472,20 @@ public class Unit extends FreeColGameObject implements Location, Locatable,
 	 * Checks if the treasure train can be cashed in at the given
 	 * <code>Location</code>.
 	 * 
-	 * @param location
+	 * @param loc
 	 *            The <code>Location</code>.
 	 * @return <code>true</code> if the treasure train can be cashed in.
 	 * @exception IllegalStateException
 	 *                if this unit is not a treasure train.
 	 */
-	public boolean canCashInTreasureTrain(Location location) {
+	public boolean canCashInTreasureTrain(Location loc) {
 		if (getType() != TREASURE_TRAIN) {
 			throw new IllegalStateException("Not a treasure train");
 		}
-		return location instanceof Tile
-				&& location.getTile().getColony() != null
-				|| location instanceof Europe
-				|| (location instanceof Unit && ((Unit) location).getLocation() instanceof Europe);
+		return loc instanceof Tile
+				&& loc.getTile().getColony() != null
+				|| loc instanceof Europe
+				|| (loc instanceof Unit && ((Unit) loc).getLocation() instanceof Europe);
 	}
 
 	/**
@@ -1001,10 +1001,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable,
 				return ILLEGAL_MOVE;
 			} else {
 				// Check for disembark.
-				Iterator unitIterator = getUnitIterator();
+				Iterator<Unit> unitIterator = getUnitIterator();
 
 				while (unitIterator.hasNext()) {
-					Unit u = (Unit) unitIterator.next();
+					Unit u = unitIterator.next();
 					if (u.getMovesLeft() > 0) {
 						return DISEMBARK;
 					}
@@ -1126,15 +1126,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable,
 								+ getName());
 				return ILLEGAL_MOVE;
 			} else {
-				Iterator unitIterator = target.getUnitIterator();
-
-				while (unitIterator.hasNext()) {
-					Unit u = (Unit) unitIterator.next();
-
-					if (u.getSpaceLeft() >= getTakeSpace()) {
-						return EMBARK;
-					}
-				}
+                for(Unit u : target.getUnitList()) {
+                    if (u.getSpaceLeft() >= getTakeSpace()) {
+                        return EMBARK;
+                    }
+                }
 				logger.fine("Trying to board full vessel with " + getName());
 				return ILLEGAL_MOVE;
 			}
@@ -1183,8 +1179,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable,
 	 * @return The line of sight of this <code>Unit</code>.
 	 */
 	public int getLineOfSight() {
-		int type = getType();
-
 		if (type == REVENGER || type == FLYING_DUTCHMAN) {
 			return 3;
 		} else if (isScout() || type == FRIGATE || type == GALLEON
@@ -1218,10 +1212,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable,
 	 *                If the move is illegal.
 	 */
 	public void move(int direction) {
-		int type = getMoveType(direction);
+		int moveType = getMoveType(direction);
 
 		// For debugging:
-		switch (type) {
+		switch (moveType) {
 		case MOVE:
 		case MOVE_HIGH_SEAS:
 		case EXPLORE_LOST_CITY_RUMOUR:
@@ -1235,7 +1229,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable,
 		case ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS:
 		case ILLEGAL_MOVE:
 		default:
-			throw new IllegalStateException("\nIllegal move requested: " + type
+			throw new IllegalStateException("\nIllegal move requested: " + moveType
 					+ " while trying to move a " + getName() + " located at "
 					+ getTile().getPosition().toString() + ". Direction: "
 					+ direction + " Moves Left: " + getMovesLeft());
@@ -1266,12 +1260,12 @@ public class Unit extends FreeColGameObject implements Location, Locatable,
 	 */
 	public void activeAdjacentSentryUnits(Tile tile) {
 		Map map = getGame().getMap();
-		Iterator it = map.getAdjacentIterator(tile.getPosition());
+		Iterator<Position> it = map.getAdjacentIterator(tile.getPosition());
 		while (it.hasNext()) {
-			Iterator unitIt = map.getTile((Position) it.next())
+			Iterator<Unit> unitIt = map.getTile(it.next())
 					.getUnitIterator();
 			while (unitIt.hasNext()) {
-				Unit unit = (Unit) unitIt.next();
+				Unit unit = unitIt.next();
 				if (unit.getState() == Unit.SENTRY) {
 					unit.setState(Unit.ACTIVE);
 				}
@@ -1598,11 +1592,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable,
 	 * 
 	 * @return The <code>Iterator</code>.
 	 */
-	public Iterator getGoodsIterator() {
+	public Iterator<Goods> getGoodsIterator() {
 		if (isCarrier()) {
 			return goodsContainer.getGoodsIterator();
-		} else { // TODO: Make a better solution:
-			return (new ArrayList()).iterator();
+		} else {
+			return EmptyIterator.getInstance();
 		}
 	}
 
@@ -1663,11 +1657,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable,
 		// before:
 		if (getGame().getMap() != null && location != null
 				&& location instanceof Tile && !isNaval()) {
-			Iterator tileIterator = getGame().getMap().getAdjacentIterator(
+			Iterator<Position> tileIterator = getGame().getMap().getAdjacentIterator(
 					getTile().getPosition());
 			while (tileIterator.hasNext()) {
-				Tile t = getGame().getMap().getTile(
-						(Position) tileIterator.next());
+				Tile t = getGame().getMap().getTile(tileIterator.next());
 
 				if (t == null) {
 					continue;
@@ -1762,19 +1755,19 @@ public class Unit extends FreeColGameObject implements Location, Locatable,
 	 * are present, or if it is in Europe and the player can trade the goods and
 	 * has enough gold to pay for them.
 	 * 
-	 * @param type
+	 * @param equipType
 	 *            The type of goods.
 	 * @param amount
 	 *            The amount of goods.
 	 * @return whether this unit can be equipped with goods at the current
 	 *         location.
 	 */
-	private boolean canBeEquipped(int type, int amount) {
+	private boolean canBeEquipped(int equipType, int amount) {
 		return ((getGoodsDumpLocation() != null && getGoodsDumpLocation()
-				.getGoodsCount(type) >= amount) || ((location instanceof Europe || location instanceof Unit
+				.getGoodsCount(equipType) >= amount) || ((location instanceof Europe || location instanceof Unit
 				&& ((Unit) location).getLocation() instanceof Europe)
 				&& getOwner().getGold() >= getGame().getMarket().getBidPrice(
-						type, amount) && getOwner().canTrade(type)));
+						equipType, amount) && getOwner().canTrade(equipType)));
 	}
 
 	/**
@@ -2034,12 +2027,12 @@ public class Unit extends FreeColGameObject implements Location, Locatable,
 	 * <code>Unit</code>. Can only be used when the <code>Unit</code> is a
 	 * carrier and is located in {@link Europe}.
 	 * 
-	 * @param type
+	 * @param goodsType
 	 *            The type of goods to buy.
 	 * @param amount
 	 *            The amount of goods to buy.
 	 */
-	public void buyGoods(int type, int amount) {
+	public void buyGoods(int goodsType, int amount) {
 		if (!isCarrier()
 				|| !(getLocation() instanceof Europe && getState() != TO_EUROPE && getState() != TO_AMERICA)) {
 			throw new IllegalStateException(
@@ -2047,8 +2040,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable,
 		}
 
 		try {
-			getGame().getMarket().buy(type, amount, getOwner());
-			goodsContainer.addGoods(type, amount);
+			getGame().getMarket().buy(goodsType, amount, getOwner());
+			goodsContainer.addGoods(goodsType, amount);
 		} catch (IllegalStateException ise) {
 			this.addModelMessage(this, "notEnoughGold", null,
 					ModelMessage.DEFAULT);
@@ -2239,13 +2232,13 @@ public class Unit extends FreeColGameObject implements Location, Locatable,
 	/**
 	 * Checks if this unit is of a given type.
 	 * 
-	 * @param type
+	 * @param t
 	 *            The type.
 	 * @return <code>true</code> if the unit was of the given type and
 	 *         <code>false</code> otherwise.
 	 */
-	public boolean isType(int type) {
-		return getType() == type;
+	public boolean isType(int t) {
+		return type == t;
 	}
 
 	/**
@@ -2715,13 +2708,13 @@ public class Unit extends FreeColGameObject implements Location, Locatable,
 			return false;
 		}
 
-		Vector surroundingTiles = getGame().getMap().getSurroundingTiles(
+		Vector<Tile> surroundingTiles = getGame().getMap().getSurroundingTiles(
 				getTile(), 1);
 		if (surroundingTiles.size() != 8) {
 			return true;
 		} else {
 			for (int i = 0; i < surroundingTiles.size(); i++) {
-				Tile tile = (Tile) surroundingTiles.get(i);
+				Tile tile = surroundingTiles.get(i);
 				if (tile == null || tile.getType() == Tile.HIGH_SEAS) {
 					return true;
 				}
@@ -2875,9 +2868,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable,
 	public int getSpaceLeft() {
 		int space = getInitialSpaceLeft() - getGoodsCount();
 
-		Iterator unitIterator = getUnitIterator();
+		Iterator<Unit> unitIterator = getUnitIterator();
 		while (unitIterator.hasNext()) {
-			Unit u = (Unit) unitIterator.next();
+			Unit u = unitIterator.next();
 			space -= u.getTakeSpace();
 		}
 
@@ -2997,10 +2990,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable,
 							"model.unit.arriveInEurope", null,
 							ModelMessage.DEFAULT);
 					if (getType() == GALLEON) {
-						Iterator iter = getUnitIterator();
+						Iterator<Unit> iter = getUnitIterator();
 						Unit u = null;
 						while (iter.hasNext()
-								&& (u = (Unit) iter.next()) != null
+								&& (u = iter.next()) != null
 								&& u.getType() != TREASURE_TRAIN)
 							;
 						if (u != null && u.getType() == TREASURE_TRAIN) {
@@ -3034,11 +3027,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable,
 							getTile().getColony().addGoods(Goods.LUMBER,
 									lumberAmount);
 						} else {
-							Vector surroundingTiles = getTile().getMap()
+							Vector<Tile> surroundingTiles = getTile().getMap()
 									.getSurroundingTiles(getTile(), 1);
-							Vector adjacentColonies = new Vector();
+							Vector<Settlement> adjacentColonies = new Vector<Settlement>();
 							for (int i = 0; i < surroundingTiles.size(); i++) {
-								Tile t = (Tile) surroundingTiles.get(i);
+								Tile t = surroundingTiles.get(i);
 								if (t.getColony() != null
 										&& t.getColony().getOwner().equals(
 												getOwner())) {
@@ -3159,10 +3152,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable,
 				&& l.getFirstUnit().getOwner() != getOwner()) {
 			int radius = 1;
 			while (true) {
-				Iterator i = getGame().getMap().getCircleIterator(
+				Iterator<Position> i = getGame().getMap().getCircleIterator(
 						l.getPosition(), false, radius);
 				while (i.hasNext()) {
-					Tile l2 = getGame().getMap().getTile((Position) i.next());
+					Tile l2 = getGame().getMap().getTile(i.next());
 					if (l2.getFirstUnit() == null
 							|| l2.getFirstUnit().getOwner() == getOwner()) {
 						return l2;
@@ -3673,9 +3666,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable,
 		if (enemyUnit.isUndead()) {
 			// this unit is captured, don't show old owner's messages to new
 			// owner
-			Iterator i = getGame().getModelMessageIterator(getOwner());
+			Iterator<ModelMessage> i = getGame().getModelMessageIterator(getOwner());
 			while (i.hasNext()) {
-				((ModelMessage) i.next()).setBeenDisplayed(true);
+				i.next().setBeenDisplayed(true);
 			}
 			messageID = "model.unit.unitCaptured";
 			type = ModelMessage.UNIT_LOST;
@@ -3729,9 +3722,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable,
 			if (enemyUnit.getOwner().isEuropean()) {
 				// this unit is captured, don't show old owner's messages to new
 				// owner
-				Iterator i = getGame().getModelMessageIterator(getOwner());
+				Iterator<ModelMessage> i = getGame().getModelMessageIterator(getOwner());
 				while (i.hasNext()) {
-					((ModelMessage) i.next()).setBeenDisplayed(true);
+					i.next().setBeenDisplayed(true);
 				}
 				messageID = "model.unit.unitCaptured";
 				type = ModelMessage.UNIT_LOST;
@@ -3854,11 +3847,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable,
 			return;
 		}
 		// can capture goods; regardless attacking/defending
-		Iterator iter = enemyUnit.getGoodsIterator();
+		Iterator<Goods> iter = enemyUnit.getGoodsIterator();
 		while (iter.hasNext() && getSpaceLeft() > 0) {
 			// TODO: show CaptureGoodsDialog if there's not enough
 			// room for everything.
-			Goods g = ((Goods) iter.next());
+			Goods g = iter.next();
 
 			// MESSY, but will mess up the iterator if we do this
 			// besides, this gets cleared out later
@@ -3956,9 +3949,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable,
 					ModelMessage.DEFAULT);
 
 			// Demote all soldiers and clear all orders:
-			Iterator it = colony.getTile().getUnitIterator();
+			Iterator<Unit> it = colony.getTile().getUnitIterator();
 			while (it.hasNext()) {
-				Unit u = (Unit) it.next();
+				Unit u = it.next();
 				if (u.getType() == Unit.VETERAN_SOLDIER
 						|| u.getType() == Unit.KINGS_REGULAR
 						|| u.getType() == Unit.COLONIAL_REGULAR) {
@@ -3971,9 +3964,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable,
 			}
 
 			if (isUndead()) {
-				Iterator it2 = colony.getUnitIterator();
+				Iterator<Unit> it2 = colony.getUnitIterator();
 				while (it2.hasNext()) {
-					Unit u = (Unit) it2.next();
+					Unit u = it2.next();
 					u.setType(UNDEAD);
 				}
 			}

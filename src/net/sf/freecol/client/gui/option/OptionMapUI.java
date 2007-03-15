@@ -69,7 +69,7 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
         ArrayList<JComponent> ou = new ArrayList<JComponent>();
         Iterator<Option> it = option.iterator();
         while (it.hasNext()) {
-            Option o = (Option) it.next();
+            Option o = it.next();
 
             if (o instanceof OptionGroup) {
                 JComponent c = new OptionGroupUI((OptionGroup) o, editable);
@@ -102,7 +102,7 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
                 logger.warning("Unknown option.");
             }
         }
-        optionUpdaters = (OptionUpdater[]) ou.toArray(new OptionUpdater[0]);
+        optionUpdaters = ou.toArray(new OptionUpdater[0]);
 
         add(northPanel, BorderLayout.NORTH);
         if (tb.getTabCount() > 0) {

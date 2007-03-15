@@ -159,9 +159,9 @@ public final class CaptureGoodsDialog extends FreeColDialog implements ActionLis
         maxCargo = capturingUnit.getInitialSpaceLeft();
         GoodsItem[] goods = new GoodsItem[capturedUnit.getGoodsCount()];
         if (goods.length > 0) {
-            Iterator iter = capturedUnit.getGoodsIterator();
+            Iterator<Goods> iter = capturedUnit.getGoodsIterator();
             for (int i = 0; iter.hasNext(); i++) {
-                Goods g = (Goods) iter.next();
+                Goods g = iter.next();
                 goods[i] = new GoodsItem(g);
             }
         }
@@ -176,7 +176,7 @@ public final class CaptureGoodsDialog extends FreeColDialog implements ActionLis
     * @param e The incoming ActionEvent.
     */
     public void actionPerformed(ActionEvent e) {
-        ArrayList list = new ArrayList(4);
+        ArrayList<Goods> list = new ArrayList<Goods>(4);
 
         for (int i = 0; i < goodsList.getModel().getSize(); i++) {
             GoodsItem gi = (GoodsItem) goodsList.getModel().getElementAt(i);

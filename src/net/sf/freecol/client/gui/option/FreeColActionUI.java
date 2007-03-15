@@ -89,7 +89,7 @@ public final class FreeColActionUI extends JPanel implements OptionUpdater, Acti
      * Unregister <code>PropertyChangeListener</code>s.
      */
     public void unregister() {
-            
+        // TODO: Implement this
     }
     
     /**
@@ -220,10 +220,10 @@ public final class FreeColActionUI extends JPanel implements OptionUpdater, Acti
         }
 
 
-        public void mouseEntered(MouseEvent e) {}
-        public void mouseExited(MouseEvent e) {}
-        public void mousePressed(MouseEvent e) {}
-        public void mouseReleased(MouseEvent e) {}
+        public void mouseEntered(MouseEvent e) { /* No such event */ }
+        public void mouseExited(MouseEvent e) { /* No such event */ }
+        public void mousePressed(MouseEvent e) { /* No such event */ }
+        public void mouseReleased(MouseEvent e) { /* No such event */ }
 
 
         public Dimension getMinimumSize() {
@@ -264,9 +264,9 @@ public final class FreeColActionUI extends JPanel implements OptionUpdater, Acti
         }
 
 
-        public void keyPressed(KeyEvent e) {}
+        public void keyPressed(KeyEvent e) { /* No such event */ }
 
-        public void keyTyped(KeyEvent e) {}
+        public void keyTyped(KeyEvent e) { /* No such event */ }
 
         public void keyReleased(KeyEvent e) {
             KeyStroke ks = KeyStroke.getKeyStroke(e.getKeyCode(), e.getModifiers());

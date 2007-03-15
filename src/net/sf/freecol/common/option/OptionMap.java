@@ -155,7 +155,7 @@ public abstract class OptionMap extends OptionGroup {
     public void addToMap(OptionGroup og) {
         Iterator<Option> it = og.iterator();
         while (it.hasNext()) {
-            Option option = (Option) it.next();
+            Option option = it.next();
             if (option instanceof OptionGroup) {
                 addToMap((OptionGroup) option);
             } else {
