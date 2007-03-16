@@ -160,7 +160,7 @@ public class AIColony extends AIObject {
     *       in the <code>Iterator</code>
     * @see Wish
     */
-    public Iterator getWishIterator() {
+    public Iterator<Wish> getWishIterator() {
         return wishes.iterator();
     }
 
@@ -250,7 +250,7 @@ public class AIColony extends AIObject {
      * @return The <code>Iterator</code>.
      * @see TileImprovement
      */
-    public Iterator getTileImprovementIterator() {
+    public Iterator<TileImprovement> getTileImprovementIterator() {
         return tileImprovements.iterator();
     }
     

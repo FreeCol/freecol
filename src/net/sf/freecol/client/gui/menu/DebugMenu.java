@@ -200,7 +200,7 @@ public class DebugMenu extends JMenu {
 			this.add(giveBells);
 			giveBells.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					Iterator ci = freeColClient.getMyPlayer().getColonyIterator();
+					Iterator ci = freeColClient.getMyPlayer().getSettlementIterator();
 					while (ci.hasNext()) {
 						Colony c = (Colony) ci.next();
 						c.addBells(100);

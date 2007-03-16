@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,6 +35,7 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
@@ -95,7 +96,7 @@ public class AIPlayer extends AIObject {
      * Stores temporary information for sessions (trading with another player
      * etc).
      */
-    private HashMap sessionRegister = new HashMap();
+    private HashMap<String, Integer> sessionRegister = new HashMap<String, Integer>();
 
     /**
      * The FreeColGameObject this AIObject contains AI-information for.
@@ -103,7 +104,7 @@ public class AIPlayer extends AIObject {
     private ServerPlayer player;
 
     /** Temporary variable. */
-    private ArrayList aiUnits = new ArrayList();
+    private ArrayList<AIUnit> aiUnits = new ArrayList<AIUnit>();
 
     /** Temporary variable. */
     private Connection debuggingConnection;
@@ -252,7 +253,7 @@ public class AIPlayer extends AIObject {
                 } catch (IOException e) {
                     logger.warning("Could not train expert miner in order to create dragoon!");
                 }
-                if(unit != null) {
+                if (unit != null) {
                     Element clearSpecialityElement = Message.createNewRootElement("clearSpeciality");
                     clearSpecialityElement.setAttribute("unit", unit.getID());
                     sendAndWaitSafely(clearSpecialityElement);
@@ -265,8 +266,8 @@ public class AIPlayer extends AIObject {
                     equipHorsesElement.setAttribute("unit", unit.getID());
                     equipHorsesElement.setAttribute("type", Integer.toString(Goods.HORSES));
                     equipHorsesElement.setAttribute("amount", Integer.toString(50));
-                    sendAndWaitSafely(equipHorsesElement);                   
-                }                    
+                    sendAndWaitSafely(equipHorsesElement);
+                }
             }
             if (getRandom().nextInt(100) == 42) {
                 int unitType = Unit.CARAVEL;
@@ -559,7 +560,7 @@ public class AIPlayer extends AIObject {
         if (1 == 1)
             return;
         // Ok, we are a European player. Things are about to get fun.
-        Iterator it = player.getColonyIterator();
+        Iterator it = player.getSettlementIterator();
         while (it.hasNext()) {
             Colony colony = (Colony) (it.next());
             int olddefenders = 0;
@@ -619,11 +620,11 @@ public class AIPlayer extends AIObject {
             }
             if (threat > defenders) {
                 // We're under attaaaaaaaaack! Man the stockade!
-                ArrayList vets = new ArrayList();
-                ArrayList criminals = new ArrayList();
-                ArrayList servants = new ArrayList();
-                ArrayList colonists = new ArrayList();
-                ArrayList experts = new ArrayList();
+                ArrayList<Unit> vets = new ArrayList<Unit>();
+                ArrayList<Unit> criminals = new ArrayList<Unit>();
+                ArrayList<Unit> servants = new ArrayList<Unit>();
+                ArrayList<Unit> colonists = new ArrayList<Unit>();
+                ArrayList<Unit> experts = new ArrayList<Unit>();
                 int inColonyCount = 0;
                 // Let's make some more soldiers, if we can.
                 // First, find some people we can recruit.
@@ -650,7 +651,7 @@ public class AIPlayer extends AIObject {
                         experts.add(u);
                     }
                 }
-                ArrayList recruits = new ArrayList(vets);
+                ArrayList<Unit> recruits = new ArrayList<Unit>(vets);
                 recruits.addAll(criminals);
                 recruits.addAll(servants);
                 recruits.addAll(colonists);
@@ -675,15 +676,18 @@ public class AIPlayer extends AIObject {
                         equipUnitElement.setAttribute("unit", u.getID());
                         equipUnitElement.setAttribute("type", Integer.toString(Goods.MUSKETS));
                         equipUnitElement.setAttribute("amount", "50");
-                        // I don't think we need to do this if we are the server...
+                        // I don't think we need to do this if we are the
+                        // server...
                         // unit.setArmed(true);
                         sendAndWaitSafely(equipUnitElement);
                         Element putOutsideColonyElement = Message.createNewRootElement("putOutsideColony");
                         putOutsideColonyElement.setAttribute("unit", u.getID());
-                        // I don't think we need to do this if we are the server...
+                        // I don't think we need to do this if we are the
+                        // server...
                         // u.putOutsideColony();
                         sendAndWaitSafely(putOutsideColonyElement);
-                        // Check if the unit can fortify before sending the order
+                        // Check if the unit can fortify before sending the
+                        // order
                         if (u.checkSetState(Unit.FORTIFYING)) {
                             Element changeStateElement = Message.createNewRootElement("changeState");
                             changeStateElement.setAttribute("unit", u.getID());
@@ -804,17 +808,15 @@ public class AIPlayer extends AIObject {
      */
     private void sendAndWaitSafely(Element element) {
         try {
-            if(logger.isLoggable(Level.FINER)) {
-                logger.finer("AI player (" + this +
-                        ") sending " + element.getTagName() + "...");                
+            if (logger.isLoggable(Level.FINER)) {
+                logger.finer("AI player (" + this + ") sending " + element.getTagName() + "...");
             }
             getConnection().sendAndWait(element);
-            if(logger.isLoggable(Level.FINER)) {
-                logger.finer("Sent and waited, returning.");                
+            if (logger.isLoggable(Level.FINER)) {
+                logger.finer("Sent and waited, returning.");
             }
         } catch (IOException e) {
-            logger.log(Level.WARNING, "Couldn't send AI element " + 
-                    element.getTagName() + "!", e);
+            logger.log(Level.WARNING, "Couldn't send AI element " + element.getTagName() + "!", e);
         }
     }
 
@@ -823,20 +825,18 @@ public class AIPlayer extends AIObject {
      */
     private void giveNormalMissions() {
         // Create a datastructure for the worker wishes:
-        ArrayList[] workerWishes = new ArrayList[Unit.UNIT_COUNT];
-        for (int i = 0; i < workerWishes.length; i++) {
-            if (workerWishes[i] == null) {
-                workerWishes[i] = new ArrayList();
-            }
+        Vector<ArrayList<Wish>> workerWishes = new Vector<ArrayList<Wish>>(Unit.UNIT_COUNT);
+        for (int i = 0; i < Unit.UNIT_COUNT; i++) {
+            workerWishes.add(new ArrayList<Wish>());
         }
         if (player.isEuropean()) {
-            Iterator aIterator = getAIColonyIterator();
+            Iterator<AIColony> aIterator = getAIColonyIterator();
             while (aIterator.hasNext()) {
-                Iterator wIterator = ((AIColony) aIterator.next()).getWishIterator();
+                Iterator<Wish> wIterator = aIterator.next().getWishIterator();
                 while (wIterator.hasNext()) {
-                    Wish w = (Wish) wIterator.next();
+                    Wish w = wIterator.next();
                     if (w instanceof WorkerWish && w.getTransportable() == null) {
-                        workerWishes[((WorkerWish) w).getUnitType()].add(w);
+                        workerWishes.get(((WorkerWish) w).getUnitType()).add(w);
                     }
                 }
             }
@@ -860,7 +860,7 @@ public class AIPlayer extends AIObject {
             } else if (unit.isColonist()) {
                 // Check if this unit is needed as an expert (using:
                 // "WorkerWish"):
-                ArrayList wishList = workerWishes[unit.getType()];
+                ArrayList<Wish> wishList = workerWishes.get(unit.getType());
                 WorkerWish bestWish = null;
                 int bestTurns = Integer.MAX_VALUE;
                 for (int i = 0; i < wishList.size(); i++) {
@@ -895,8 +895,8 @@ public class AIPlayer extends AIObject {
                 }
                 // Check if we can find a better site to work than a new colony:
                 if (!hasFewColonies() || colonyTile == null || bestTurns > 10) {
-                    for (int i = 0; i < workerWishes.length; i++) {
-                        wishList = workerWishes[i];
+                    for (int i = 0; i < workerWishes.size(); i++) {
+                        wishList = workerWishes.get(i);
                         for (int j = 0; j < wishList.size(); j++) {
                             WorkerWish ww = (WorkerWish) wishList.get(j);
                             Tile source = unit.getTile();
@@ -966,7 +966,7 @@ public class AIPlayer extends AIObject {
                 continue;
             }
             // Creates a list of nearby colonies:
-            List nearbyColonies = new ArrayList();
+            ArrayList<Colony> nearbyColonies = new ArrayList<Colony>();
             Iterator it = getGame().getMap().getCircleIterator(indianSettlement.getTile().getPosition(), true,
                     MAX_DISTANCE_TO_BRING_GIFT);
             while (it.hasNext()) {
@@ -1025,13 +1025,13 @@ public class AIPlayer extends AIObject {
                 continue;
             }
             // Creates a list of nearby colonies:
-            List nearbyColonies = new ArrayList();
-            Iterator it = getGame().getMap().getCircleIterator(indianSettlement.getTile().getPosition(), true,
+            ArrayList<Colony> nearbyColonies = new ArrayList<Colony>();
+            Iterator<Position> it = getGame().getMap().getCircleIterator(indianSettlement.getTile().getPosition(), true,
                     MAX_DISTANCE_TO_MAKE_DEMANDS);
             while (it.hasNext()) {
-                Tile t = getGame().getMap().getTile((Map.Position) it.next());
+                Tile t = getGame().getMap().getTile(it.next());
                 if (t.getColony() != null) {
-                    nearbyColonies.add(t.getColony());
+                    nearbyColonies.add(t. getColony());
                 }
             }
             if (nearbyColonies.size() > 0) {
@@ -1363,12 +1363,12 @@ public class AIPlayer extends AIObject {
      * @return The <code>Iterator</code>.
      * @see TileImprovement
      */
-    public Iterator getTileImprovementIterator() {
-        List tileImprovements = new ArrayList();
-        Iterator acIterator = getAIColonyIterator();
+    public Iterator<TileImprovement> getTileImprovementIterator() {
+        ArrayList<TileImprovement> tileImprovements = new ArrayList<TileImprovement>();
+        Iterator<AIColony> acIterator = getAIColonyIterator();
         while (acIterator.hasNext()) {
-            AIColony ac = (AIColony) acIterator.next();
-            Iterator it = ac.getTileImprovementIterator();
+            AIColony ac = acIterator.next();
+            Iterator<TileImprovement> it = ac.getTileImprovementIterator();
             while (it.hasNext()) {
                 tileImprovements.add(it.next());
             }
@@ -1388,7 +1388,7 @@ public class AIPlayer extends AIObject {
         if (!getPlayer().canBuildColonies()) {
             return false;
         }
-        Iterator it = getPlayer().getColonyIterator();
+        Iterator it = getPlayer().getSettlementIterator();
         int numberOfColonies = 0;
         int numberOfWorkers = 0;
         while (it.hasNext()) {
@@ -1408,12 +1408,12 @@ public class AIPlayer extends AIObject {
         if (!player.isEuropean()) {
             return;
         }
-        List transportables = new ArrayList();
+        ArrayList<Transportable> transportables = new ArrayList<Transportable>();
 
         // Add units
-        Iterator aui = getAIUnitIterator();
+        Iterator<AIUnit> aui = getAIUnitIterator();
         while (aui.hasNext()) {
-            AIUnit au = (AIUnit) aui.next();
+            AIUnit au = aui.next();
             if (au.getTransportDestination() != null && au.getTransport() == null) {
                 transportables.add(au);
             }
@@ -1432,22 +1432,20 @@ public class AIPlayer extends AIObject {
             }
         }
 
-        Collections.sort(transportables, new Comparator() {
-            public int compare(Object o1, Object o2) {
+        Collections.sort(transportables, new Comparator<Transportable>() {
+            public int compare(Transportable o1, Transportable o2) {
                 if (o1 == o2) {
                     return 0;
                 }
-                Transportable t1 = (Transportable) o1;
-                Transportable t2 = (Transportable) o2;
-                int result = t2.getTransportPriority() - t1.getTransportPriority();
+                int result = o2.getTransportPriority() - o1.getTransportPriority();
                 if (result == 0) {
-                    result = t1.getID().compareTo(t2.getID());
+                    result = o1.getID().compareTo(o2.getID());
                 }
                 return result;
             }
         });
 
-        List vacantTransports = new ArrayList();
+        ArrayList<Mission> vacantTransports = new ArrayList<Mission>();
         Iterator iter = getAIUnitIterator();
         while (iter.hasNext()) {
             AIUnit au = (AIUnit) iter.next();
@@ -1528,20 +1526,20 @@ public class AIPlayer extends AIObject {
      * @see Wish
      */
     public Iterator getWishIterator() {
-        ArrayList wishList = new ArrayList();
-        Iterator ai = getAIColonyIterator();
+        ArrayList<Wish> wishList = new ArrayList<Wish>();
+        Iterator<AIColony> ai = getAIColonyIterator();
         while (ai.hasNext()) {
-            AIColony ac = (AIColony) ai.next();
-            Iterator wishIterator = ac.getWishIterator();
+            AIColony ac = ai.next();
+            Iterator<Wish> wishIterator = ac.getWishIterator();
             while (wishIterator.hasNext()) {
-                Wish w = (Wish) wishIterator.next();
+                Wish w = wishIterator.next();
                 wishList.add(w);
             }
         }
-        Collections.sort(wishList, new Comparator() {
-            public int compare(Object o1, Object o2) {
-                Integer a = new Integer(((Wish) o1).getValue());
-                Integer b = new Integer(((Wish) o2).getValue());
+        Collections.sort(wishList, new Comparator<Wish>() {
+            public int compare(Wish o1, Wish o2) {
+                Integer a = o1.getValue();
+                Integer b = o2.getValue();
                 return b.compareTo(a);
             }
         });
@@ -1840,13 +1838,13 @@ public class AIPlayer extends AIObject {
      * 
      * @return The <code>Iterator</code>.
      */
-    public Iterator getAIUnitIterator() {
+    public Iterator<AIUnit> getAIUnitIterator() {
         if (aiUnits.size() == 0) {
-            ArrayList au = new ArrayList();
-            Iterator unitsIterator = player.getUnitIterator();
+            ArrayList<AIUnit> au = new ArrayList<AIUnit>();
+            Iterator<Unit> unitsIterator = player.getUnitIterator();
             while (unitsIterator.hasNext()) {
-                Unit theUnit = (Unit) unitsIterator.next();
-                AIObject a = getAIMain().getAIObject(theUnit.getID());
+                Unit theUnit = unitsIterator.next();
+                AIUnit a = (AIUnit) getAIMain().getAIObject(theUnit.getID());
                 if (a != null) {
                     au.add(a);
                 } else {
@@ -1865,12 +1863,12 @@ public class AIPlayer extends AIObject {
      * 
      * @return The <code>Iterator</code>.
      */
-    public Iterator getAIColonyIterator() {
-        ArrayList ac = new ArrayList();
-        Iterator colonyIterator = player.getColonyIterator();
+    public Iterator<AIColony> getAIColonyIterator() {
+        ArrayList<AIColony> ac = new ArrayList<AIColony>();
+        Iterator<Colony> colonyIterator = player.getColonyIterator();
         while (colonyIterator.hasNext()) {
-            Colony colony = (Colony) colonyIterator.next();
-            AIObject a = getAIMain().getAIObject(colony.getID());
+            Colony colony = colonyIterator.next();
+            AIColony a = (AIColony) getAIMain().getAIObject(colony.getID());
             if (a != null) {
                 ac.add(a);
             } else {

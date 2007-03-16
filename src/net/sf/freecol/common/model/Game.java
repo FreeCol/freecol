@@ -254,7 +254,7 @@ public class Game extends FreeColGameObject {
         Iterator<Player> pit = getPlayerIterator();
         while (pit.hasNext()) {
             Player p = pit.next();
-            Iterator<Settlement> it = p.getColonyIterator();
+            Iterator<Settlement> it = p.getSettlementIterator();
             while (it.hasNext()) {
                 Colony colony = (Colony) it.next();
                 if (colony.getName().equals(name)) {

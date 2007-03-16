@@ -474,7 +474,7 @@ public class Player extends FreeColGameObject implements Nameable {
     public int getSoL() {
         int sum = 0;
         int number = 0;
-        Iterator<Settlement> it = getColonyIterator();
+        Iterator<Settlement> it = getSettlementIterator();
         while (it.hasNext()) {
             Colony c = (Colony) it.next();
             sum += c.getSoL();
@@ -594,7 +594,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * 
      */
     public Colony getColony(String name) {
-        Iterator<Settlement> it = getColonyIterator();
+        Iterator<Settlement> it = getSettlementIterator();
         while (it.hasNext()) {
             Colony colony = (Colony) it.next();
             if (colony.getName().equals(name)) {
@@ -1006,7 +1006,7 @@ public class Player extends FreeColGameObject implements Nameable {
                          */
                     }
                 }
-                Iterator<Settlement> colonyIterator = getColonyIterator();
+                Iterator<Settlement> colonyIterator = getSettlementIterator();
                 while (colonyIterator.hasNext()) {
                     Settlement colony = (Settlement) colonyIterator.next();
                     Map.Position position = colony.getTile().getPosition();
@@ -1583,18 +1583,29 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Gets an <code>Iterator</code> containing all the settlements this player
+     * owns.
+     * 
+     * @return The <code>Iterator</code>.
+     * @see Colony
+     */
+    public Iterator<Settlement> getSettlementIterator() {
+        if (isIndian()) {
+            return EmptyIterator.getInstance();
+        } else {
+            return settlements.iterator();
+        }
+    }
+    
+    /**
      * Gets an <code>Iterator</code> containing all the colonies this player
      * owns.
      * 
      * @return The <code>Iterator</code>.
      * @see Colony
      */
-    public Iterator<Settlement> getColonyIterator() {
-        if (isIndian()) {
-            return EmptyIterator.getInstance();
-        } else {
-            return settlements.iterator();
-        }
+    public Iterator<Colony> getColonyIterator() {
+        return getColonies().iterator();
     }
 
     /**
@@ -1635,7 +1646,7 @@ public class Player extends FreeColGameObject implements Nameable {
         }
         Location closestLocation = null;
         int shortestDistance = Integer.MAX_VALUE;
-        Iterator<Settlement> colonyIterator = getColonyIterator();
+        Iterator<Settlement> colonyIterator = getSettlementIterator();
         while (colonyIterator.hasNext()) {
             Colony colony = (Colony) colonyIterator.next();
             if (colony == null || colony.getBuilding(Building.DOCK) == null || colony.getTile() == unit.getTile()) {
@@ -2126,7 +2137,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
                 case FoundingFather.LA_SALLE:
                     // all colonies get a stockade for free
-                    Iterator<Settlement> colonyIterator = getColonyIterator();
+                    Iterator<Settlement> colonyIterator = getSettlementIterator();
                     while (colonyIterator.hasNext()) {
                         ((Colony) colonyIterator.next()).updatePopulation();
                     }
@@ -2134,7 +2145,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
                 case FoundingFather.SIMON_BOLIVAR:
                     // SoL increase by 20 %
-                    Iterator<Settlement> colonyIterator2 = getColonyIterator();
+                    Iterator<Settlement> colonyIterator2 = getSettlementIterator();
                     while (colonyIterator2.hasNext()) {
                         ((Colony) colonyIterator2.next()).addSoL(20);
                     }
@@ -2198,7 +2209,7 @@ public class Player extends FreeColGameObject implements Nameable {
             int newSoL = 0;
             int numberOfColonies = settlements.size();
             if (numberOfColonies > 1) {
-                Iterator<Settlement> iterator = getColonyIterator();
+                Iterator<Settlement> iterator = getSettlementIterator();
                 while (iterator.hasNext()) {
                     Colony colony = (Colony) iterator.next();
                     newSoL += colony.getSoL();
@@ -2559,7 +2570,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public int getBellsProductionNextTurn() {
         int bellsNextTurn = 0;
-        for (Iterator<Settlement> colonies = this.getColonyIterator(); colonies.hasNext();) {
+        for (Iterator<Settlement> colonies = this.getSettlementIterator(); colonies.hasNext();) {
             Colony colony = (Colony) colonies.next();
             bellsNextTurn += colony.getProductionOf(Goods.BELLS);
         }
@@ -2770,7 +2781,7 @@ public class Player extends FreeColGameObject implements Nameable {
         }
         Market market = getGame().getMarket();
         int value = 0;
-        Iterator<Settlement> colonyIterator = getColonyIterator();
+        Iterator<Settlement> colonyIterator = getSettlementIterator();
         while (colonyIterator.hasNext()) {
             Colony colony = (Colony) colonyIterator.next();
             Iterator<Goods> goodsIterator = colony.getCompactGoodsIterator();
