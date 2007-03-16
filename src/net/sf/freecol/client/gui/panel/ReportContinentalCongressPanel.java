@@ -1,45 +1,50 @@
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.event.ActionListener;
 import java.awt.GridLayout;
+import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JProgressBar;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
-
 import cz.autel.dmi.HIGLayout;
 
 /**
  * This panel displays the ContinentalCongress Report.
  */
 public final class ReportContinentalCongressPanel extends ReportPanel implements ActionListener {
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
-    public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
-    public static final String  REVISION = "$Revision$";
+    public static final String COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
+
+    public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
+
+    public static final String REVISION = "$Revision$";
 
     static final String title = Messages.message("report.continentalCongress.title");
+
     static final String none = Messages.message("report.continentalCongress.none");
 
     private final ReportProductionPanel productionPanel;
+
     private final JPanel summaryPanel;
+
     private final JPanel fatherPanel;
+
 
     /**
      * The constructor that will add the items to this panel.
+     * 
      * @param parent The parent of this panel.
      */
     public ReportContinentalCongressPanel(Canvas parent) {
         super(parent, title);
 
-        int[] widths = {0};
-        int[] heights = {0, 12, 0, 12, 0};
+        int[] widths = { 0 };
+        int[] heights = { 0, 12, 0, 12, 0 };
         reportPanel.setLayout(new HIGLayout(widths, heights));
 
         summaryPanel = new JPanel();
@@ -62,13 +67,13 @@ public final class ReportContinentalCongressPanel extends ReportPanel implements
         reportPanel.removeAll();
 
         // summary
-        summaryPanel.add(new JLabel(Messages.message("report.continentalCongress.recruiting")),
-                         higConst.rc(1, 1));
+        summaryPanel.add(new JLabel(Messages.message("report.continentalCongress.recruiting")), higConst.rc(1, 1));
         if (player.getCurrentFather() == FoundingFather.NONE) {
             summaryPanel.add(new JLabel(none), higConst.rc(1, 3));
         } else {
             JLabel currentFatherLabel = new JLabel(Messages.message(FoundingFather.getName(player.getCurrentFather())));
-            currentFatherLabel.setToolTipText(Messages.message(FoundingFather.getDescription(player.getCurrentFather())));
+            currentFatherLabel.setToolTipText(Messages
+                    .message(FoundingFather.getDescription(player.getCurrentFather())));
             summaryPanel.add(currentFatherLabel, higConst.rc(1, 3));
             int bells = player.getBells();
             int required = player.getTotalFoundingFatherCost();
@@ -101,4 +106,3 @@ public final class ReportContinentalCongressPanel extends ReportPanel implements
         reportPanel.add(productionPanel, higConst.rc(5, 1));
     }
 }
-

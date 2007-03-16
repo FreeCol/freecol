@@ -1,4 +1,3 @@
-
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.ActionEvent;
@@ -13,25 +12,25 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.UnitType;
-
 import cz.autel.dmi.HIGLayout;
 
 /**
  * The panel that allows a user to train people in Europe.
  */
 
-public final class TrainDialog extends FreeColDialog implements ActionListener{
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
-    public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
-    public static final String  REVISION = "$Revision$";
+public final class TrainDialog extends FreeColDialog implements ActionListener {
+    public static final String COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
+
+    public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
+
+    public static final String REVISION = "$Revision$";
 
     private static Logger logger = Logger.getLogger(TrainDialog.class.getName());
 
@@ -41,13 +40,18 @@ public final class TrainDialog extends FreeColDialog implements ActionListener{
 
     @SuppressWarnings("unused")
     private final Canvas parent;
+
     private final FreeColClient freeColClient;
+
     private final InGameController inGameController;
+
 
     private class NumberedUnitType {
 
         public final UnitType type;
+
         public final int index;
+
 
         public NumberedUnitType(UnitType type, int index) {
             this.type = type;
@@ -55,7 +59,9 @@ public final class TrainDialog extends FreeColDialog implements ActionListener{
         }
     }
 
+
     private static final ArrayList<NumberedUnitType> trainableUnits = new ArrayList<NumberedUnitType>();
+
     private static final ArrayList<JButton> buttons = new ArrayList<JButton>();
 
     private static final Comparator<NumberedUnitType> priceComparator = new Comparator<NumberedUnitType>() {
@@ -63,6 +69,7 @@ public final class TrainDialog extends FreeColDialog implements ActionListener{
             return type1.type.price - type2.type.price;
         }
     };
+
 
     /**
      * The constructor to use.
@@ -84,37 +91,35 @@ public final class TrainDialog extends FreeColDialog implements ActionListener{
             }
         }
         Collections.sort(trainableUnits, priceComparator);
-        
-        setLayout(new HIGLayout(new int[] {0}, new int[] {0, margin, 0, margin, 0}));
+
+        setLayout(new HIGLayout(new int[] { 0 }, new int[] { 0, margin, 0, margin, 0 }));
 
         int rows = trainableUnits.size();
         if (rows % 2 == 0) {
             rows--;
         }
 
-        int[] widths = new int[] {0, margin, 0, margin, 0, margin, 0};
+        int[] widths = new int[] { 0, margin, 0, margin, 0, margin, 0 };
         int[] heights = new int[rows];
-        
-        for (int index = 0; index < rows/2; index++) {
+
+        for (int index = 0; index < rows / 2; index++) {
             heights[2 * index + 1] = margin;
         }
 
-        int[] labelColumn = {1, 5};
-        int[] buttonColumn = {3, 7};
+        int[] labelColumn = { 1, 5 };
+        int[] buttonColumn = { 3, 7 };
         JPanel trainPanel = new JPanel(new HIGLayout(widths, heights));
 
         int row = 1;
         int counter = 0;
         for (NumberedUnitType unitType : trainableUnits) {
             int graphicsType = ImageLibrary.getUnitGraphicsType(unitType.index, false, false, 0, false);
-            JButton newButton = new JButton(unitType.type.name,
-                                            library.getScaledUnitImageIcon(graphicsType, 0.66f));
+            JButton newButton = new JButton(unitType.type.name, library.getScaledUnitImageIcon(graphicsType, 0.66f));
             newButton.setActionCommand(String.valueOf(unitType.index));
             newButton.addActionListener(this);
             newButton.setIconTextGap(margin);
             buttons.add(newButton);
-            trainPanel.add(new JLabel(String.valueOf(unitType.type.price)),
-                           higConst.rc(row, labelColumn[counter]));
+            trainPanel.add(new JLabel(String.valueOf(unitType.type.price)), higConst.rc(row, labelColumn[counter]));
             trainPanel.add(newButton, higConst.rc(row, buttonColumn[counter]));
             if (counter == 1) {
                 counter = 0;
@@ -137,15 +142,13 @@ public final class TrainDialog extends FreeColDialog implements ActionListener{
 
     }
 
-
     public void requestFocus() {
         cancel.requestFocus();
     }
 
-                
-
     /**
-     * Updates this panel's labels so that the information it displays is up to date.
+     * Updates this panel's labels so that the information it displays is up to
+     * date.
      */
     public void initialize() {
         Player player = freeColClient.getMyPlayer();
@@ -159,12 +162,10 @@ public final class TrainDialog extends FreeColDialog implements ActionListener{
         }
     }
 
-
-
     /**
-     * Analyzes an event and calls the right external methods to take
-     * care of the user's request.
-     *
+     * Analyzes an event and calls the right external methods to take care of
+     * the user's request.
+     * 
      * @param event The incoming action event
      */
     public void actionPerformed(ActionEvent event) {
@@ -183,5 +184,3 @@ public final class TrainDialog extends FreeColDialog implements ActionListener{
         }
     }
 }
-
-

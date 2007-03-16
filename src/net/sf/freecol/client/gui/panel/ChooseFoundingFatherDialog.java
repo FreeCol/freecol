@@ -1,9 +1,7 @@
-
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -23,40 +21,46 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.FoundingFather;
 
 /**
-* This panel displays the different founding fathers the player can work towards
-* recruiting.
-*
-* @see FoundingFather
-*/
+ * This panel displays the different founding fathers the player can work
+ * towards recruiting.
+ * 
+ * @see FoundingFather
+ */
 public final class ChooseFoundingFatherDialog extends FreeColDialog implements ActionListener {
     private static final Logger logger = Logger.getLogger(ChooseFoundingFatherDialog.class.getName());
 
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
-    public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
-    public static final String  REVISION = "$Revision$";
+    public static final String COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
+
+    public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
+
+    public static final String REVISION = "$Revision$";
 
     @SuppressWarnings("unused")
-    private final Canvas    parent;
+    private final Canvas parent;
+
     private FoundingFatherPanel[] foundingFatherPanels = new FoundingFatherPanel[FoundingFather.TYPE_COUNT];
+
     private final JTabbedPane tb;
+
     private final ChooseFoundingFatherDialog chooseFoundingFatherDialog;
 
 
     /**
-    * The constructor that will add the items to this panel.
-    * @param parent The parent of this panel.
-    */
+     * The constructor that will add the items to this panel.
+     * 
+     * @param parent The parent of this panel.
+     */
     public ChooseFoundingFatherDialog(Canvas parent) {
         this.parent = parent;
         chooseFoundingFatherDialog = this;
-        
+
         setFocusCycleRoot(false);
         setBorder(null);
         setOpaque(false);
 
         tb = new JTabbedPane(JTabbedPane.TOP);
 
-        for (int i=0; i<foundingFatherPanels.length; i++) {
+        for (int i = 0; i < foundingFatherPanels.length; i++) {
             foundingFatherPanels[i] = new FoundingFatherPanel(i);
             tb.addTab(FoundingFather.getTypeAsString(i), null, foundingFatherPanels[i], null);
         }
@@ -64,19 +68,18 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
         add(tb);
     }
 
-
     /**
-    * Prepares this panel to be displayed.
-    * @param possibleFoundingFathers The founding fathers
-    *       which can be selected. The length of the array
-    *       is the same as the number of <code>FoundingFather</code>
-    *       categories and the values identifies a 
-    *       <code>FoundingFather</code> to be picked in each of
-    *       those categories.
-    */
+     * Prepares this panel to be displayed.
+     * 
+     * @param possibleFoundingFathers The founding fathers which can be
+     *            selected. The length of the array is the same as the number of
+     *            <code>FoundingFather</code> categories and the values
+     *            identifies a <code>FoundingFather</code> to be picked in
+     *            each of those categories.
+     */
     public void initialize(int[] possibleFoundingFathers) {
         boolean hasSelectedTab = false;
-        for (int i=0; i<possibleFoundingFathers.length; i++) {
+        for (int i = 0; i < possibleFoundingFathers.length; i++) {
             foundingFatherPanels[i].initialize(possibleFoundingFathers[i]);
             tb.setEnabledAt(i, foundingFatherPanels[i].isEnabled());
             if (!hasSelectedTab && foundingFatherPanels[i].isEnabled()) {
@@ -88,17 +91,16 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
         setSize(tb.getPreferredSize());
     }
 
-
     public void requestFocus() {
         tb.requestFocus();
     }
 
-
     /**
-    * This function analyses an event and calls the right methods to take
-    * care of the user's requests.
-    * @param event The incoming ActionEvent.
-    */
+     * This function analyses an event and calls the right methods to take care
+     * of the user's requests.
+     * 
+     * @param event The incoming ActionEvent.
+     */
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         try {
@@ -108,31 +110,36 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
             setResponse(null);
         }
     }
-    
-    
+
+
     /**
-    * This is the panel that is displayed in each tab.
-    */
+     * This is the panel that is displayed in each tab.
+     */
     protected class FoundingFatherPanel extends JPanel {
-    
-        //private final int type;
+
+        // private final int type;
         private int foundingFather = -1;
-        
+
         private JLabel header;
+
         private JTextArea description;
+
         private JTextArea text;
+
         private JButton ok;
+
         private JPanel p1;
 
 
         /**
-        * Creates a <code>FoundingFatherPanel</code> for a given type
-        * of founding fathers.
-        * @param type The type of founding fathers to be displayed in this
-        *             <code>FoundingFatherPanel</code>.
-        */
+         * Creates a <code>FoundingFatherPanel</code> for a given type of
+         * founding fathers.
+         * 
+         * @param type The type of founding fathers to be displayed in this
+         *            <code>FoundingFatherPanel</code>.
+         */
         public FoundingFatherPanel(int type) {
-            //this.type = type;
+            // this.type = type;
 
             setLayout(new BorderLayout());
 
@@ -147,11 +154,21 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
 
             Image image = null;
             switch (type) {
-                case 0: image = (Image) UIManager.get("FoundingFather.trade"); break;
-                case 1: image = (Image) UIManager.get("FoundingFather.exploration"); break;
-                case 2: image = (Image) UIManager.get("FoundingFather.military"); break;
-                case 3: image = (Image) UIManager.get("FoundingFather.political"); break;
-                case 4: image = (Image) UIManager.get("FoundingFather.religious"); break;
+            case 0:
+                image = (Image) UIManager.get("FoundingFather.trade");
+                break;
+            case 1:
+                image = (Image) UIManager.get("FoundingFather.exploration");
+                break;
+            case 2:
+                image = (Image) UIManager.get("FoundingFather.military");
+                break;
+            case 3:
+                image = (Image) UIManager.get("FoundingFather.political");
+                break;
+            case 4:
+                image = (Image) UIManager.get("FoundingFather.religious");
+                break;
             }
 
             JLabel imageLabel;
@@ -197,7 +214,6 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
             add(p3, BorderLayout.SOUTH);
         }
 
-
         public void requestFocus() {
             ok.requestFocus();
         }
@@ -206,23 +222,23 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
             return new Dimension(570, super.getPreferredSize().height);
         }
 
-
         /**
-        * Prepares this panel to be displayed.
-        * @param foundingFather The founding father to be displayed or
-        *       <code>-1</code> if there is none.
-        */
+         * Prepares this panel to be displayed.
+         * 
+         * @param foundingFather The founding father to be displayed or
+         *            <code>-1</code> if there is none.
+         */
         public void initialize(int foundingFather) {
             this.foundingFather = foundingFather;
 
             if (foundingFather != -1) {
                 header.setText(Messages.message(FoundingFather.getName(foundingFather)));
                 description.setText(Messages.message(FoundingFather.getDescription(foundingFather)));
-                text.setText("\n" + "[" + Messages.message(FoundingFather.getBirthAndDeath(foundingFather)) + "] " + Messages.message(FoundingFather.getText(foundingFather)));
+                text.setText("\n" + "[" + Messages.message(FoundingFather.getBirthAndDeath(foundingFather)) + "] "
+                        + Messages.message(FoundingFather.getText(foundingFather)));
                 ok.setActionCommand(Integer.toString(foundingFather));
             }
         }
-
 
         public boolean isEnabled() {
             if (foundingFather != -1) {
@@ -233,4 +249,3 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
         }
     }
 }
-

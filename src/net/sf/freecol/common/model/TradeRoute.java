@@ -1,9 +1,7 @@
-
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -12,20 +10,19 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Element;
 
-
-
-
-
 /**
-* A trade route.
-*/
+ * A trade route.
+ */
 public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable {
 
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
-    public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
-    public static final String  REVISION = "$Revision$";
+    public static final String COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
 
-    //private static final Logger logger = Logger.getLogger(TradeRoute.class.getName());
+    public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
+
+    public static final String REVISION = "$Revision$";
+
+    // private static final Logger logger =
+    // Logger.getLogger(TradeRoute.class.getName());
 
     /**
      * The name of this trade route.
@@ -33,15 +30,15 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
     private String name;
 
     /**
-     * Whether the trade route has been modified. This is of interest
-     * only to the client and can be ignored for XML serialization.
+     * Whether the trade route has been modified. This is of interest only to
+     * the client and can be ignored for XML serialization.
      */
     private boolean modified = false;
 
     /**
-     * The <code>Player</code> who owns this trade route. This is
-     * necessary to ensure that malicious clients can not modify the
-     * trade routes of other players.
+     * The <code>Player</code> who owns this trade route. This is necessary to
+     * ensure that malicious clients can not modify the trade routes of other
+     * players.
      */
     private Player owner;
 
@@ -50,36 +47,35 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
      */
     private ArrayList<Stop> stops = new ArrayList<Stop>();
 
+
     public TradeRoute(Game game, String name, Player player) {
         super(game);
         this.name = name;
         this.owner = player;
     }
 
-    
     public TradeRoute(Game game, Element e) {
         super(game, e);
         readFromXMLElement(e);
     }
 
     /**
-     * Copy all fields from another trade route to this one.
-     * This is useful when an updated route is received on the
-     * server side from the client.
+     * Copy all fields from another trade route to this one. This is useful when
+     * an updated route is received on the server side from the client.
      * 
      * @param other The route to copy from.
      */
     public synchronized void updateFrom(TradeRoute other) {
         setName(other.getName());
         stops.clear();
-        for(Stop otherStop : other.getStops()) {
+        for (Stop otherStop : other.getStops()) {
             addStop(new Stop(otherStop));
         }
     }
-    
+
     /**
      * Get the <code>Modified</code> value.
-     *
+     * 
      * @return a <code>boolean</code> value
      */
     public final boolean isModified() {
@@ -88,7 +84,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
 
     /**
      * Set the <code>Modified</code> value.
-     *
+     * 
      * @param newModified The new Modified value.
      */
     public final void setModified(final boolean newModified) {
@@ -97,7 +93,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
 
     /**
      * Get the <code>Name</code> value.
-     *
+     * 
      * @return a <code>String</code> value
      */
     public final String getName() {
@@ -106,26 +102,25 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
 
     /**
      * Set the <code>Name</code> value.
-     *
+     * 
      * @param newName The new Name value.
      */
     public final void setName(final String newName) {
         this.name = newName;
     }
-    
+
     /**
      * Add a new <code>Stop</code> to this trade route.
-     *
+     * 
      * @param stop The <code>Stop</code> to add.
      */
     public void addStop(Stop stop) {
         stops.add(stop);
     }
 
-
     /**
      * Get the <code>Owner</code> value.
-     *
+     * 
      * @return a <code>Player</code> value
      */
     public final Player getOwner() {
@@ -134,7 +129,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
 
     /**
      * Set the <code>Owner</code> value.
-     *
+     * 
      * @param newOwner The new Owner value.
      */
     public final void setOwner(final Player newOwner) {
@@ -147,7 +142,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
 
     /**
      * Get the <code>Stops</code> value.
-     *
+     * 
      * @return an <code>ArrayList<Stop></code> value
      */
     public final ArrayList<Stop> getStops() {
@@ -156,7 +151,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
 
     /**
      * Set the <code>Stops</code> value.
-     *
+     * 
      * @param newStops The new Stops value.
      */
     public final void setStops(final ArrayList<Stop> newStops) {
@@ -164,30 +159,31 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
     }
 
     // do nothing
-    public void newTurn() {}
+    public void newTurn() {
+    }
 
     /**
      * Clone the trade route and return a deep copy.
      * <p>
-     * The copied trade route has no reference back to the original and
-     * can safely be used as a temporary copy. It is NOT registered with
-     * the game, but will have the same unique id as the original.
+     * The copied trade route has no reference back to the original and can
+     * safely be used as a temporary copy. It is NOT registered with the game,
+     * but will have the same unique id as the original.
      * 
      * @return deep copy of trade route.
      */
     public TradeRoute clone() {
         try {
-            TradeRoute copy = (TradeRoute) super.clone();        
+            TradeRoute copy = (TradeRoute) super.clone();
             copy.replaceStops(getStops());
             return copy;
         } catch (CloneNotSupportedException e) {
             throw new IllegalStateException("Clone should be supported!", e);
         }
     }
-    
+
     /**
-     * Replace all the stops for this trade route with the
-     * stops passed from another trade route.
+     * Replace all the stops for this trade route with the stops passed from
+     * another trade route.
      * 
      * @param otherStops The new stops to use.
      * @see #clone()
@@ -199,22 +195,24 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
         }
     }
 
+
     public class Stop {
 
         private String locationId;
+
         private ArrayList<Integer> cargo = new ArrayList<Integer>();
 
         /**
-         * Whether the stop has been modified. This is of interest
-         * only to the client and can be ignored for XML
-         * serialization.
+         * Whether the stop has been modified. This is of interest only to the
+         * client and can be ignored for XML serialization.
          */
         private boolean modified = false;
+
 
         public Stop(Location location) {
             this.locationId = location.getID();
         }
-        
+
         private Stop(Stop other) {
             this.locationId = other.locationId;
             this.cargo = new ArrayList<Integer>(other.cargo);
@@ -222,14 +220,14 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
 
         private Stop(XMLStreamReader in) throws XMLStreamException {
             locationId = in.getAttributeValue(null, "location");
-            for(int cargo : readFromArrayElement("cargo", in, new int[0])) {
+            for (int cargo : readFromArrayElement("cargo", in, new int[0])) {
                 addCargo(cargo);
             }
         }
 
         /**
          * Get the <code>Modified</code> value.
-         *
+         * 
          * @return a <code>boolean</code> value
          */
         public final boolean isModified() {
@@ -238,7 +236,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
 
         /**
          * Set the <code>Modified</code> value.
-         *
+         * 
          * @param newModified The new Modified value.
          */
         public final void setModified(final boolean newModified) {
@@ -247,7 +245,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
 
         /**
          * Get the <code>Location</code> value.
-         *
+         * 
          * @return a <code>Location</code> value
          */
         public final Location getLocation() {
@@ -257,7 +255,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
 
         /**
          * Get the <code>Cargo</code> value.
-         *
+         * 
          * @return an <code>ArrayList<Integer></code> value
          */
         public final ArrayList<Integer> getCargo() {
@@ -269,7 +267,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
         }
 
         public String toString() {
-            Location l = getLocation();            
+            Location l = getLocation();
             return l != null ? l.getLocationName() : locationId;
         }
 
@@ -285,8 +283,9 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
         }
     }
 
+
     public void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
-        throws XMLStreamException {
+            throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
@@ -300,10 +299,9 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
         out.writeEndElement();
     }
 
-
-
     /**
      * Initialize this object from an XML-representation of this object.
+     * 
      * @param in The input stream with the XML.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
@@ -320,25 +318,24 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
             }
         }
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if(getStopXMLElementTagName().equals(in.getLocalName())) {
-                stops.add(new Stop(in));                
+            if (getStopXMLElementTagName().equals(in.getLocalName())) {
+                stops.add(new Stop(in));
             }
         }
     }
 
     /**
-    * Returns the tag name of the root element representing this object.
-    *
-    * @return "tradeRoute".
-    */
+     * Returns the tag name of the root element representing this object.
+     * 
+     * @return "tradeRoute".
+     */
     public static String getXMLElementTagName() {
         return "tradeRoute";
     }
 
-
     /**
      * Returns the tag name of the root element representing this object.
-     *
+     * 
      * @return "tradeRouteStop".
      */
     public static String getStopXMLElementTagName() {

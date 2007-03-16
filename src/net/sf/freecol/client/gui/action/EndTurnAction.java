@@ -1,5 +1,3 @@
-
-
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
@@ -9,45 +7,48 @@ import java.util.logging.Logger;
 import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.i18n.Messages;
-
 
 /**
-* An action for ending the turn.
-* @see net.sf.freecol.client.gui.panel.MapControls
-*/
+ * An action for ending the turn.
+ * 
+ * @see net.sf.freecol.client.gui.panel.MapControls
+ */
 public class EndTurnAction extends MapboardAction {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(EndTurnAction.class.getName());
 
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
-    public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
-    public static final String  REVISION = "$Revision$";
+    public static final String COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
+
+    public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
+
+    public static final String REVISION = "$Revision$";
 
     public static final String ID = "endTurnAction";
 
 
     /**
      * Creates a new <code>EndTurnAction</code>.
+     * 
      * @param freeColClient The main controller object for the client.
      */
     EndTurnAction(FreeColClient freeColClient) {
-    	super(freeColClient, "menuBar.game.endTurn", null, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
+        super(freeColClient, "menuBar.game.endTurn", null, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
     }
 
-
     /**
-    * Returns the id of this <code>Option</code>.
-    * @return "endTurnAction"
-    */
+     * Returns the id of this <code>Option</code>.
+     * 
+     * @return "endTurnAction"
+     */
     public String getId() {
         return ID;
     }
 
     /**
      * Applies this action.
+     * 
      * @param e The <code>ActionEvent</code>.
-     */    
+     */
     public void actionPerformed(ActionEvent e) {
         getFreeColClient().getInGameController().endTurn();
     }

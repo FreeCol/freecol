@@ -1,9 +1,7 @@
-
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -14,8 +12,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.UIManager;
-import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
 
 import net.sf.freecol.FreeCol;
@@ -24,36 +20,39 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.OptionMapUI;
 
-
 /**
-* Dialog for changing the {@link net.sf.freecol.common.model.GameOptions}.
-*/
+ * Dialog for changing the {@link net.sf.freecol.common.model.GameOptions}.
+ */
 public final class GameOptionsDialog extends FreeColDialog implements ActionListener {
     private static final Logger logger = Logger.getLogger(GameOptionsDialog.class.getName());
 
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
-    public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
-    public static final String  REVISION = "$Revision$";
+    public static final String COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
 
-    private static final int    OK = 0,
-                                CANCEL = 1,
-                                SAVE = 2,
-                                LOAD = 3;
+    public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
 
-    private final Canvas        parent;
+    public static final String REVISION = "$Revision$";
+
+    private static final int OK = 0, CANCEL = 1, SAVE = 2, LOAD = 3;
+
+    private final Canvas parent;
+
     private final FreeColClient freeColClient;
 
     private JButton ok, load, save, cancel;
+
     private JPanel buttons = new JPanel(new FlowLayout());
+
     private JLabel header;
+
     private OptionMapUI ui;
 
 
     /**
-    * The constructor that will add the items to this panel.
-    * @param parent The parent of this panel.
-    * @param freeColClient The main controller object for the client.
-    */
+     * The constructor that will add the items to this panel.
+     * 
+     * @param parent The parent of this panel.
+     * @param freeColClient The main controller object for the client.
+     */
     public GameOptionsDialog(Canvas parent, FreeColClient freeColClient) {
         setLayout(new BorderLayout());
 
@@ -65,7 +64,7 @@ public final class GameOptionsDialog extends FreeColDialog implements ActionList
         ok.addActionListener(this);
         ok.setMnemonic('O');
         buttons.add(ok);
-        
+
         load = new JButton(Messages.message("load"));
         load.setActionCommand(String.valueOf(LOAD));
         load.addActionListener(this);
@@ -84,13 +83,11 @@ public final class GameOptionsDialog extends FreeColDialog implements ActionList
         cancel.setMnemonic('C');
         buttons.add(cancel);
 
-
         FreeColPanel.enterPressesWhenFocused(ok);
         setCancelComponent(cancel);
 
         setSize(640, 480);
     }
-
 
     public void initialize(boolean editable) {
         removeAll();
@@ -109,12 +106,11 @@ public final class GameOptionsDialog extends FreeColDialog implements ActionList
 
         // Buttons:
         add(buttons, BorderLayout.SOUTH);
-        
+
         ok.setEnabled(editable);
         save.setEnabled(editable);
         load.setEnabled(editable);
     }
-
 
     public void requestFocus() {
         if (ok.isEnabled()) {
@@ -124,57 +120,57 @@ public final class GameOptionsDialog extends FreeColDialog implements ActionList
         }
     }
 
-
     /**
-    * This function analyses an event and calls the right methods to take
-    * care of the user's requests.
-    * @param event The incoming ActionEvent.
-    */
+     * This function analyses an event and calls the right methods to take care
+     * of the user's requests.
+     * 
+     * @param event The incoming ActionEvent.
+     */
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         try {
             switch (Integer.valueOf(command).intValue()) {
-                case OK:
-                    ui.unregister();
-                    ui.updateOption();
-                    freeColClient.getPreGameController().sendGameOptions();
-                    parent.remove(this);
-                    setResponse(new Boolean(true));
-                    break;
-                case CANCEL:
-                    ui.unregister();
-                    parent.remove(this);
-                    setResponse(new Boolean(false));
-                    break;
-                case SAVE:
-                    FileFilter[] filters = new FileFilter[] {FreeColDialog.getFGOFileFilter(),
-                                                             FreeColDialog.getFSGFileFilter(),
-                                                             FreeColDialog.getGameOptionsFileFilter()};
-                    File saveFile = freeColClient.getCanvas().showSaveDialog(FreeCol.getSaveDirectory(),
-                                                                             ".fgo",
-                                                                             filters,
-                                                                             "");
-                    if (saveFile != null) {
-                        try {
-                            ui.updateOption();
-                            freeColClient.getPreGameController().saveGameOptions(saveFile);
-                        } catch (IOException e) {
-                            freeColClient.getCanvas().errorMessage("unspecifiedIOException");
-                        }
+            case OK:
+                ui.unregister();
+                ui.updateOption();
+                freeColClient.getPreGameController().sendGameOptions();
+                parent.remove(this);
+                setResponse(new Boolean(true));
+                break;
+            case CANCEL:
+                ui.unregister();
+                parent.remove(this);
+                setResponse(new Boolean(false));
+                break;
+            case SAVE:
+                FileFilter[] filters = new FileFilter[] { FreeColDialog.getFGOFileFilter(),
+                        FreeColDialog.getFSGFileFilter(), FreeColDialog.getGameOptionsFileFilter() };
+                File saveFile = freeColClient.getCanvas().showSaveDialog(FreeCol.getSaveDirectory(), ".fgo", filters,
+                        "");
+                if (saveFile != null) {
+                    try {
+                        ui.updateOption();
+                        freeColClient.getPreGameController().saveGameOptions(saveFile);
+                    } catch (IOException e) {
+                        freeColClient.getCanvas().errorMessage("unspecifiedIOException");
                     }
-                    break;
-                case LOAD:
-                    File loadFile = freeColClient.getCanvas().showLoadDialog(FreeCol.getSaveDirectory(), new FileFilter[] {FreeColDialog.getFGOFileFilter(), FreeColDialog.getFSGFileFilter(), FreeColDialog.getGameOptionsFileFilter()});
-                    if (loadFile != null) {
-                        try {
-                            freeColClient.getPreGameController().loadGameOptions(loadFile);
-                        } catch (IOException e) {
-                            freeColClient.getCanvas().errorMessage("unspecifiedIOException");
-                        }
+                }
+                break;
+            case LOAD:
+                File loadFile = freeColClient.getCanvas().showLoadDialog(
+                        FreeCol.getSaveDirectory(),
+                        new FileFilter[] { FreeColDialog.getFGOFileFilter(), FreeColDialog.getFSGFileFilter(),
+                                FreeColDialog.getGameOptionsFileFilter() });
+                if (loadFile != null) {
+                    try {
+                        freeColClient.getPreGameController().loadGameOptions(loadFile);
+                    } catch (IOException e) {
+                        freeColClient.getCanvas().errorMessage("unspecifiedIOException");
                     }
-                    break;
-                default:
-                    logger.warning("Invalid ActionCommand: invalid number.");
+                }
+                break;
+            default:
+                logger.warning("Invalid ActionCommand: invalid number.");
             }
         } catch (NumberFormatException e) {
             logger.warning("Invalid Actioncommand: not a number.");

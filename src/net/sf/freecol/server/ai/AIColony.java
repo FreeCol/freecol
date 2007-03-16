@@ -46,9 +46,9 @@ public class AIColony extends AIObject {
     private Colony colony;
 
     private ColonyPlan colonyPlan;
-    private List aiGoods = new ArrayList();
-    private List wishes = new ArrayList();
-    private List tileImprovements = new ArrayList();
+    private ArrayList<AIGoods> aiGoods = new ArrayList<AIGoods>();
+    private ArrayList<Wish> wishes = new ArrayList<Wish>();
+    private ArrayList<TileImprovement> tileImprovements = new ArrayList<TileImprovement>();
 
 
     /**
@@ -231,10 +231,10 @@ public class AIColony extends AIObject {
             tileImprovements.add(new TileImprovement(getAIMain(), colony.getTile(), TileImprovement.PLOW, 15));
         }
             
-        Collections.sort(tileImprovements, new Comparator() {
-            public int compare(Object o, Object p) {
-                Integer i = new Integer(((TileImprovement) o).getValue());
-                Integer j = new Integer(((TileImprovement) p).getValue());
+        Collections.sort(tileImprovements, new Comparator<TileImprovement>() {
+            public int compare(TileImprovement o,TileImprovement p) {
+                Integer i = o.getValue();
+                Integer j = p.getValue();
                 
                 return j.compareTo(i);
             }
@@ -259,18 +259,18 @@ public class AIColony extends AIObject {
     * Creates the wishes for the <code>Colony</code>.
     */
     private void createWishes() {
-        List workLocationPlans = colonyPlan.getSortedWorkLocationPlans();
+        List<WorkLocationPlan> workLocationPlans = colonyPlan.getSortedWorkLocationPlans();
 
         int[] production = new int[Goods.NUMBER_OF_TYPES];
-        ArrayList nonExpertUnits = new ArrayList();
-        Iterator unitIterator = colony.getUnitIterator();
+        ArrayList<Unit> nonExpertUnits = new ArrayList<Unit>();
+        Iterator<Unit> unitIterator = colony.getUnitIterator();
         while (unitIterator.hasNext()) {
-            Unit u = (Unit) unitIterator.next();
+            Unit u = unitIterator.next();
             int workType = u.getExpertWorkType();
             if (workType >= 0) {
-                Iterator wlpIterator = workLocationPlans.iterator();
+                Iterator<WorkLocationPlan> wlpIterator = workLocationPlans.iterator();
                 while (wlpIterator.hasNext()) {
-                    WorkLocationPlan wlp = (WorkLocationPlan) wlpIterator.next();
+                    WorkLocationPlan wlp = wlpIterator.next();
                     if (wlp.getGoodsType() == workType) {
                         if (workType < production.length) {
                             production[workType] += wlp.getProductionOf(workType);
@@ -285,7 +285,7 @@ public class AIColony extends AIObject {
             }
         }
 
-        List newWishes = new ArrayList();
+        List<Wish> newWishes = new ArrayList<Wish>();
         int value = 120;    // TODO: Better method for determining the value of the wish.
         while (workLocationPlans.size() > 0) {
             int unitType = -1;
@@ -430,10 +430,10 @@ public class AIColony extends AIObject {
             }
         }
         
-        Collections.sort(wishes, new Comparator() {
-            public int compare(Object o, Object p) {
-                Integer i = new Integer(((Wish) o).getValue());
-                Integer j = new Integer(((Wish) p).getValue());
+        Collections.sort(wishes, new Comparator<Wish>() {
+            public int compare(Wish o, Wish p) {
+                Integer i = o.getValue();
+                Integer j = p.getValue();
                 return j.compareTo(i);
             }
         });
@@ -514,7 +514,7 @@ public class AIColony extends AIObject {
     * for.
     */
     private void createExportAIGoodsList() {
-        List newAIGoods = new ArrayList();
+        ArrayList<AIGoods> newAIGoods = new ArrayList<AIGoods>();
 
         // TODO: Do not sell raw material we are lacking.
 
@@ -573,7 +573,7 @@ public class AIColony extends AIObject {
             }
             
             if (colony.getGoodsCount(goodsType) > 0) {
-                List alreadyAdded = new ArrayList();
+                List<AIGoods> alreadyAdded = new ArrayList<AIGoods>();
                 for (int j=0; j<aiGoods.size(); j++) {
                     AIGoods ag = ((AIGoods) aiGoods.get(j));
                     if (ag == null) {
@@ -697,21 +697,21 @@ public class AIColony extends AIObject {
             }
         }
 
-        List units = new ArrayList();
-        List workLocationPlans = new ArrayList(colonyPlan.getWorkLocationPlans());
-        Collections.sort(workLocationPlans, new Comparator() {
-            public int compare(Object o, Object p) {
-                Integer i = new Integer(((WorkLocationPlan) o).getProductionOf(((WorkLocationPlan) o).getGoodsType()));
-                Integer j = new Integer(((WorkLocationPlan) p).getProductionOf(((WorkLocationPlan) p).getGoodsType()));
+        List<Unit> units = new ArrayList<Unit>();
+        List<WorkLocationPlan> workLocationPlans = colonyPlan.getWorkLocationPlans();
+        Collections.sort(workLocationPlans, new Comparator<WorkLocationPlan>() {
+            public int compare(WorkLocationPlan o, WorkLocationPlan p) {
+                Integer i = o.getProductionOf(o.getGoodsType());
+                Integer j = p.getProductionOf(p.getGoodsType());
 
                 return j.compareTo(i);
             }
         });
         
         // Remove all colonists from the colony:
-        Iterator ui = colony.getUnitIterator();
+        Iterator<Unit> ui = colony.getUnitIterator();
         while (ui.hasNext()) {
-            Unit unit = (Unit) ui.next();
+            Unit unit = ui.next();
             units.add(unit);
             unit.setLocation(null);
         }

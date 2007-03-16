@@ -1,4 +1,3 @@
-
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.ActionEvent;
@@ -6,38 +5,41 @@ import java.awt.event.ActionListener;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JTextArea;
 
-import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
-
 import cz.autel.dmi.HIGLayout;
 
 /**
  * The panel that allows a user to recruit people in Europe.
  */
 public final class RecruitDialog extends FreeColDialog implements ActionListener {
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
-    public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
-    public static final String  REVISION = "$Revision$";
+    public static final String COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
+
+    public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
+
+    public static final String REVISION = "$Revision$";
 
     private static Logger logger = Logger.getLogger(RecruitDialog.class.getName());
 
     private static final int RECRUIT_CANCEL = -1;
+
     private static final int NUMBER_OF_PERSONS = 3;
+
     private final JButton[] person = new JButton[NUMBER_OF_PERSONS];
 
     private final JButton cancel;
+
     private final JTextArea question;
 
     private final FreeColClient freeColClient;
+
     private final InGameController inGameController;
 
 
@@ -52,7 +54,6 @@ public final class RecruitDialog extends FreeColDialog implements ActionListener
         setFocusCycleRoot(true);
 
         question = getDefaultTextArea(Messages.message("recruitDialog.clickOn"));
-
 
         for (int index = 0; index < NUMBER_OF_PERSONS; index++) {
             person[index] = new JButton();
@@ -70,18 +71,17 @@ public final class RecruitDialog extends FreeColDialog implements ActionListener
 
     }
 
-
     public void requestFocus() {
         cancel.requestFocus();
     }
 
-
     /**
-     * Updates this panel's labels so that the information it displays is up to date.
+     * Updates this panel's labels so that the information it displays is up to
+     * date.
      */
     public void initialize() {
 
-        int[] widths = new int[] {0};
+        int[] widths = new int[] { 0 };
         int[] heights = new int[9];
         for (int index = 0; index < 4; index++) {
             heights[2 * index + 1] = margin;
@@ -100,8 +100,8 @@ public final class RecruitDialog extends FreeColDialog implements ActionListener
             ImageLibrary library = (ImageLibrary) getCanvas().getImageProvider();
             recruitPrice = player.getRecruitPrice();
 
-            question.setText(Messages.message("recruitDialog.clickOn",
-                                              new String[][] {{"%money%", String.valueOf(recruitPrice)}}));
+            question.setText(Messages.message("recruitDialog.clickOn", new String[][] { { "%money%",
+                    String.valueOf(recruitPrice) } }));
 
             for (int index = 0; index < NUMBER_OF_PERSONS; index++) {
                 int unitType = player.getEurope().getRecruitable(index);
@@ -126,11 +126,10 @@ public final class RecruitDialog extends FreeColDialog implements ActionListener
 
     }
 
-
     /**
-     * Analyzes an event and calls the right external methods to take
-     * care of the user's request.
-     *
+     * Analyzes an event and calls the right external methods to take care of
+     * the user's request.
+     * 
      * @param event The incoming action event
      */
     public void actionPerformed(ActionEvent event) {
@@ -152,4 +151,3 @@ public final class RecruitDialog extends FreeColDialog implements ActionListener
         }
     }
 }
-

@@ -1,22 +1,19 @@
-
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Component;
+import java.awt.GridLayout;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseListener;
-import java.awt.GridLayout;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -26,19 +23,18 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.TransferHandler;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
-
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.TradeRoute.Stop;
-
 import cz.autel.dmi.HIGLayout;
 
 /**
@@ -47,40 +43,56 @@ import cz.autel.dmi.HIGLayout;
 public final class TradeRouteInputDialog extends FreeColDialog implements ActionListener {
     private static final Logger logger = Logger.getLogger(TradeRouteInputDialog.class.getName());
 
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
-    public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
-    public static final String  REVISION = "$Revision$";
-    
+    public static final String COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
+
+    public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
+
+    public static final String REVISION = "$Revision$";
+
     private static final int OK = 0, CANCEL = 1;
 
     private TradeRoute originalRoute;
 
     private final JButton ok = new JButton(Messages.message("ok"));
+
     private final JButton cancel = new JButton(Messages.message("cancel"));
 
     private final JButton addStopButton = new JButton(Messages.message("traderouteDialog.addStop"));
+
     private final JButton removeStopButton = new JButton(Messages.message("traderouteDialog.removeStop"));
 
     private final JPanel tradeRoutePanel = new JPanel();
+
     private final JPanel buttonPanel = new JPanel();
+
     private final CargoHandler cargoHandler = new CargoHandler();
+
     private final MouseListener dragListener = new DragListener(this);
+
     private final MouseListener dropListener = new DropListener();
+
     private final GoodsPanel goodsPanel;
+
     private final CargoPanel cargoPanel;
-    
+
     private final JComboBox destinationSelector = new JComboBox();
+
     private final JTextField tradeRouteName = new JTextField(Messages.message("traderouteDialog.newRoute"));
 
     private final DefaultListModel listModel = new DefaultListModel();
+
     private final JList stopList = new JList(listModel);
+
     private final JScrollPane tradeRouteView = new JScrollPane(stopList);
+
     private final JLabel nameLabel = new JLabel(Messages.message("traderouteDialog.nameLabel"));
+
     private final JLabel destinationLabel = new JLabel(Messages.message("traderouteDialog.destinationLabel"));
 
 
     /**
      * The constructor that will add the items to this panel.
+     * 
      * @param parent The parent of this panel.
      */
     public TradeRouteInputDialog(final Canvas parent) {
@@ -90,7 +102,7 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
 
         ok.setActionCommand(String.valueOf(OK));
         cancel.setActionCommand(String.valueOf(CANCEL));
-        
+
         ok.addActionListener(this);
         cancel.addActionListener(this);
 
@@ -115,47 +127,44 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
 
         // button for adding new Stop
         addStopButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    Stop stop = originalRoute.new Stop((Location) destinationSelector.getSelectedItem());
-                    for (Component comp : cargoPanel.getComponents()) {
-                        CargoLabel label = (CargoLabel) comp;
-                        stop.getCargo().add(new Integer(label.getType()));
-                    }
-                    if (stopList.getSelectedIndex() == -1) {
-                        listModel.addElement(stop);
-                    } else {
-                        listModel.add(stopList.getSelectedIndex() + 1, stop);
-                    }
+            public void actionPerformed(ActionEvent e) {
+                Stop stop = originalRoute.new Stop((Location) destinationSelector.getSelectedItem());
+                for (Component comp : cargoPanel.getComponents()) {
+                    CargoLabel label = (CargoLabel) comp;
+                    stop.getCargo().add(new Integer(label.getType()));
                 }
-            });
-
+                if (stopList.getSelectedIndex() == -1) {
+                    listModel.addElement(stop);
+                } else {
+                    listModel.add(stopList.getSelectedIndex() + 1, stop);
+                }
+            }
+        });
 
         // button for deleting Stop
         removeStopButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    listModel.removeElement(stopList.getSelectedValue());
-                }
-            });
-
+            public void actionPerformed(ActionEvent e) {
+                listModel.removeElement(stopList.getSelectedValue());
+            }
+        });
 
         // TODO: allow reordering of stops
-	stopList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-	stopList.setDragEnabled(true);
+        stopList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        stopList.setDragEnabled(true);
         stopList.addListSelectionListener(new ListSelectionListener() {
-                public void valueChanged(ListSelectionEvent e) {
-                    cargoPanel.initialize((Stop) stopList.getSelectedValue());
-                }
-            });
+            public void valueChanged(ListSelectionEvent e) {
+                cargoPanel.initialize((Stop) stopList.getSelectedValue());
+            }
+        });
 
-        int[] widths = {0};
-        int[] heights = {0, margin, 0, margin, 0};
+        int[] widths = { 0 };
+        int[] heights = { 0, margin, 0, margin, 0 };
         setLayout(new HIGLayout(widths, heights));
 
         buttonPanel.add(ok);
         buttonPanel.add(cancel);
         buttonPanel.setOpaque(false);
-        add(getDefaultHeader(Messages.message("traderouteDialog.editRoute")),
-            higConst.rc(1, 1));
+        add(getDefaultHeader(Messages.message("traderouteDialog.editRoute")), higConst.rc(1, 1));
         add(tradeRoutePanel, higConst.rc(3, 1));
         add(buttonPanel, higConst.rc(5, 1));
 
@@ -199,8 +208,8 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
         // set name of trade route
         tradeRouteName.setText(tradeRoute.getName());
 
-        int widths[] = {240, 3 * margin, 0, margin, 0};
-        int heights[] = {0, 3 * margin, 0, margin, 0, margin, 80, margin, 0};
+        int widths[] = { 240, 3 * margin, 0, margin, 0 };
+        int heights[] = { 0, 3 * margin, 0, margin, 0, margin, 80, margin, 0 };
         int listColumn = 1;
         int labelColumn = 3;
         int valueColumn = 5;
@@ -232,8 +241,8 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
     }
 
     /**
-     * Enables the remove stop button if a stop is selected and
-     * disables it otherwise.
+     * Enables the remove stop button if a stop is selected and disables it
+     * otherwise.
      */
     public void updateButtons() {
         if (stopList.getSelectedIndex() == -1) {
@@ -243,17 +252,16 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
         }
     }
 
-    
     public void requestFocus() {
         ok.requestFocus();
     }
 
-    
     /**
-    * This function analyses an event and calls the right methods to take
-    * care of the user's requests.
-    * @param event The incoming ActionEvent.
-    */
+     * This function analyses an event and calls the right methods to take care
+     * of the user's requests.
+     * 
+     * @param event The incoming ActionEvent.
+     */
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         try {
@@ -277,8 +285,7 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
             default:
                 logger.warning("Invalid ActionCommand: invalid number.");
             }
-        }
-        catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             logger.warning("Invalid Actioncommand: not a number.");
         }
     }
@@ -286,14 +293,14 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
 
     /**
      * Special label for goods type.
-     *
-     * TODO: clean this up for 0.7.0 -- The GoodsLabel needs to be
-     * modified so that it can act as a GoodsTypeLabel (like this
-     * label), an AbstractGoodsLabel and a CargoLabel (its current
-     * function).
+     * 
+     * TODO: clean this up for 0.7.0 -- The GoodsLabel needs to be modified so
+     * that it can act as a GoodsTypeLabel (like this label), an
+     * AbstractGoodsLabel and a CargoLabel (its current function).
      */
     public class CargoLabel extends JLabel {
         private final int goodsType;
+
 
         public CargoLabel(int type) {
             super(getCanvas().getImageProvider().getGoodsImageIcon(type));
@@ -327,15 +334,15 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
     }
 
     /**
-     * Panel for the cargo the carrier is supposed to take on board at
-     * a certain stop.
-     *
-     * TODO: create a single cargo panel for this purpose and the use
-     * in the ColonyPanel, the EuropePanel and the CaptureGoodsDialog.
+     * Panel for the cargo the carrier is supposed to take on board at a certain
+     * stop.
+     * 
+     * TODO: create a single cargo panel for this purpose and the use in the
+     * ColonyPanel, the EuropePanel and the CaptureGoodsDialog.
      */
     public class CargoPanel extends JPanel {
 
-        //private Stop stop;
+        // private Stop stop;
 
         public CargoPanel() {
             super();
@@ -347,7 +354,7 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
         public void initialize(Stop newStop) {
             removeAll();
             if (newStop != null) {
-                //stop = newStop;
+                // stop = newStop;
                 for (Integer cargo : newStop.getCargo()) {
                     add(new CargoLabel(cargo.intValue()));
                 }
@@ -357,10 +364,9 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
         }
     }
 
-
     /**
      * TransferHandler for CargoLabels.
-     *
+     * 
      * TODO: check whether this could/should be folded into the
      * DefaultTransferHandler.
      */
@@ -369,11 +375,11 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
         protected Transferable createTransferable(JComponent c) {
             return new ImageSelection((CargoLabel) c);
         }
-        
+
         public int getSourceActions(JComponent c) {
             return COPY_OR_MOVE;
         }
-        
+
         public boolean importData(JComponent target, Transferable data) {
             if (canImport(target, data.getTransferDataFlavors())) {
                 try {
@@ -398,7 +404,7 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
 
             return false;
         }
-        
+
         protected void exportDone(JComponent source, Transferable data, int action) {
             try {
                 CargoLabel label = (CargoLabel) data.getTransferData(DefaultTransferHandler.flavor);
@@ -424,7 +430,7 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
                 logger.warning(ioe.toString());
             }
         }
-        
+
         public boolean canImport(JComponent c, DataFlavor[] flavors) {
             for (int i = 0; i < flavors.length; i++) {
                 if (flavors[i].equals(DefaultTransferHandler.flavor)) {
@@ -436,24 +442,22 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
     }
 
     /*
-    public class StopPanel extends JPanel {
-        
-        private Location location;
-        private ArrayList<Integer> goods = new ArrayList<Integer>();
-        private final JComboBox destinationBox;
-        private final JPanel goodsPanel;
-        private final
-
-        public void saveSettings() {
-            if (export.isSelected() != colony.getExports(goodsType)) {
-                getCanvas().getClient().getInGameController().setExports(colony, goodsType, export.isSelected());
-                colony.setExports(goodsType, export.isSelected());
-            }
-            colony.getLowLevel()[goodsType] = ((SpinnerNumberModel) lowLevel.getModel()).getNumber().intValue();
-            colony.getHighLevel()[goodsType] = ((SpinnerNumberModel) highLevel.getModel()).getNumber().intValue();
-            colony.getExportLevel()[goodsType] = ((SpinnerNumberModel) exportLevel.getModel()).getNumber().intValue();
-    
-        }
-    }
-    */
+     * public class StopPanel extends JPanel {
+     * 
+     * private Location location; private ArrayList<Integer> goods = new
+     * ArrayList<Integer>(); private final JComboBox destinationBox; private
+     * final JPanel goodsPanel; private final
+     * 
+     * public void saveSettings() { if (export.isSelected() !=
+     * colony.getExports(goodsType)) {
+     * getCanvas().getClient().getInGameController().setExports(colony,
+     * goodsType, export.isSelected()); colony.setExports(goodsType,
+     * export.isSelected()); } colony.getLowLevel()[goodsType] =
+     * ((SpinnerNumberModel) lowLevel.getModel()).getNumber().intValue();
+     * colony.getHighLevel()[goodsType] = ((SpinnerNumberModel)
+     * highLevel.getModel()).getNumber().intValue();
+     * colony.getExportLevel()[goodsType] = ((SpinnerNumberModel)
+     * exportLevel.getModel()).getNumber().intValue();
+     *  } }
+     */
 }

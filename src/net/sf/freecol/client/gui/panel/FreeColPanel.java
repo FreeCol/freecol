@@ -1,9 +1,8 @@
-
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Image;
-import java.awt.FlowLayout;
 import java.awt.LayoutManager;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -21,24 +20,22 @@ import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
-
-import cz.autel.dmi.HIGConstraints;
 
 import net.sf.freecol.client.gui.Canvas;
+import cz.autel.dmi.HIGConstraints;
 
 /**
-* Superclass for all panels in FreeCol.
-*/
+ * Superclass for all panels in FreeCol.
+ */
 public class FreeColPanel extends JPanel {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(FreeColPanel.class.getName());
 
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
-    public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
-    public static final String  REVISION = "$Revision$";
+    public static final String COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
+
+    public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
+
+    public static final String REVISION = "$Revision$";
 
     protected static final HIGConstraints higConst = new HIGConstraints();
 
@@ -54,7 +51,9 @@ public class FreeColPanel extends JPanel {
 
     // Fonts to use for report headers, etc.
     protected static final Font smallHeaderFont = ((Font) UIManager.get("HeaderFont")).deriveFont(0, 24);
+
     protected static final Font mediumHeaderFont = ((Font) UIManager.get("HeaderFont")).deriveFont(0, 36);
+
     protected static final Font bigHeaderFont = ((Font) UIManager.get("HeaderFont")).deriveFont(0, 48);
 
     // How many columns (em-widths) to use in the text area
@@ -65,8 +64,8 @@ public class FreeColPanel extends JPanel {
 
 
     /**
-    * Default constructor.
-    */
+     * Default constructor.
+     */
     public FreeColPanel() {
         this(null, new FlowLayout());
     }
@@ -86,10 +85,11 @@ public class FreeColPanel extends JPanel {
     }
 
     /**
-    * Default constructor.
-    * @param parent The <code>Canvas</code> all panels belong to.
-    * @param layout The <code>LayoutManager</code> to be used.
-    */
+     * Default constructor.
+     * 
+     * @param parent The <code>Canvas</code> all panels belong to.
+     * @param layout The <code>LayoutManager</code> to be used.
+     */
     public FreeColPanel(Canvas parent, LayoutManager layout) {
         super(layout);
 
@@ -104,22 +104,29 @@ public class FreeColPanel extends JPanel {
         Image menuborderS = (Image) UIManager.get("menuborder.s.image");
         Image menuborderSW = (Image) UIManager.get("menuborder.sw.image");
         Image menuborderSE = (Image) UIManager.get("menuborder.se.image");
-        //Image menuborderShadowSW = (Image) UIManager.get("menuborder.shadow.sw.image");
-        //Image menuborderShadowS = (Image) UIManager.get("menuborder.shadow.s.image");
-        //Image menuborderShadowSE = (Image) UIManager.get("menuborder.shadow.se.image");
-        final FreeColImageBorder imageBorder = new FreeColImageBorder(menuborderN, menuborderW, menuborderS, menuborderE, menuborderNW, menuborderNE, menuborderSW, menuborderSE);
-        setBorder(BorderFactory.createCompoundBorder(imageBorder, BorderFactory.createEmptyBorder(margin, margin, margin, margin)));
-        
+        // Image menuborderShadowSW = (Image)
+        // UIManager.get("menuborder.shadow.sw.image");
+        // Image menuborderShadowS = (Image)
+        // UIManager.get("menuborder.shadow.s.image");
+        // Image menuborderShadowSE = (Image)
+        // UIManager.get("menuborder.shadow.se.image");
+        final FreeColImageBorder imageBorder = new FreeColImageBorder(menuborderN, menuborderW, menuborderS,
+                menuborderE, menuborderNW, menuborderNE, menuborderSW, menuborderSE);
+        setBorder(BorderFactory.createCompoundBorder(imageBorder, BorderFactory.createEmptyBorder(margin, margin,
+                margin, margin)));
 
-        //setBorder( new CompoundBorder(new BevelBorder(BevelBorder.RAISED), new EmptyBorder(5,5,5,5)) );
+        // setBorder( new CompoundBorder(new BevelBorder(BevelBorder.RAISED),
+        // new EmptyBorder(5,5,5,5)) );
 
-        // See the message of Ulf Onnen for more information about the presence of this fake mouse listener.
-        addMouseListener(new MouseAdapter() {});
+        // See the message of Ulf Onnen for more information about the presence
+        // of this fake mouse listener.
+        addMouseListener(new MouseAdapter() {
+        });
     }
 
     /**
      * Get the <code>Canvas</code> value.
-     *
+     * 
      * @return a <code>Canvas</code> value
      */
     public final Canvas getCanvas() {
@@ -127,12 +134,12 @@ public class FreeColPanel extends JPanel {
     }
 
     /**
-     * Returns a text area with standard settings suitable for use in
-     * FreeCol dialogs.
-     *
+     * Returns a text area with standard settings suitable for use in FreeCol
+     * dialogs.
+     * 
      * @param text The text to display in the text area.
-     * @return a text area with standard settings suitable for use in
-     * FreeCol dialogs.
+     * @return a text area with standard settings suitable for use in FreeCol
+     *         dialogs.
      */
     public static JTextArea getDefaultTextArea(String text) {
         JTextArea textArea = new JTextArea(text);
@@ -149,7 +156,7 @@ public class FreeColPanel extends JPanel {
 
     /**
      * Returns the default header for panels.
-     *
+     * 
      * @param text a <code>String</code> value
      * @return a <code>JLabel</code> value
      */
@@ -173,20 +180,16 @@ public class FreeColPanel extends JPanel {
 
     /**
      * Registers enter key for a jbutton.
+     * 
      * @param button
      */
     public static void enterPressesWhenFocused(JButton button) {
         button.registerKeyboardAction(
-            button.getActionForKeyStroke(
-                KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false)),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false),
-                JComponent.WHEN_FOCUSED);
+                button.getActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false)), KeyStroke
+                        .getKeyStroke(KeyEvent.VK_ENTER, 0, false), JComponent.WHEN_FOCUSED);
 
-        button.registerKeyboardAction(
-            button.getActionForKeyStroke(
-                KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true)),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, true),
-                JComponent.WHEN_FOCUSED);
+        button.registerKeyboardAction(button.getActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true)),
+                KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, true), JComponent.WHEN_FOCUSED);
     }
 
 }

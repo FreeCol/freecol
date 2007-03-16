@@ -9,47 +9,44 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
-import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
-
 import cz.autel.dmi.HIGLayout;
 
 /**
  * The panel that allows a user to purchase ships and artillery in Europe.
  */
 public final class PurchaseDialog extends FreeColDialog implements ActionListener {
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
-    public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
-    public static final String  REVISION = "$Revision$";
+    public static final String COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
+
+    public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
+
+    public static final String REVISION = "$Revision$";
 
     private static Logger logger = Logger.getLogger(PurchaseDialog.class.getName());
 
-    private static final int PURCHASE_CANCEL = 0,
-                             PURCHASE_ARTILLERY = 1,
-                             PURCHASE_CARAVEL = 2,
-                             PURCHASE_MERCHANTMAN = 3,
-                             PURCHASE_GALLEON = 4,
-                             PURCHASE_PRIVATEER = 5,
-                             PURCHASE_FRIGATE = 6;
+    private static final int PURCHASE_CANCEL = 0, PURCHASE_ARTILLERY = 1, PURCHASE_CARAVEL = 2,
+            PURCHASE_MERCHANTMAN = 3, PURCHASE_GALLEON = 4, PURCHASE_PRIVATEER = 5, PURCHASE_FRIGATE = 6;
 
-    private final JButton    artilleryButton,
-                             caravelButton,
-                             merchantmanButton,
-                             galleonButton,
-                             privateerButton,
-                             frigateButton;
+    private final JButton artilleryButton, caravelButton, merchantmanButton, galleonButton, privateerButton,
+            frigateButton;
+
     private final JButton cancel;
+
     private final JLabel artilleryLabel = new JLabel("?");
+
     @SuppressWarnings("unused")
     private final Canvas parent;
+
     private final FreeColClient freeColClient;
+
     private final InGameController inGameController;
+
 
     /**
      * The constructor to use.
@@ -63,15 +60,14 @@ public final class PurchaseDialog extends FreeColDialog implements ActionListene
 
         ImageLibrary library = (ImageLibrary) parent.getImageProvider();
 
-        setLayout(new HIGLayout(new int[] {0}, new int[] {0, margin, 0, margin, 0}));
+        setLayout(new HIGLayout(new int[] { 0 }, new int[] { 0, margin, 0, margin, 0 }));
 
         JTextArea question = getDefaultTextArea(Messages.message("purchaseDialog.clickOn"));
 
-        JLabel  caravelLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.CARAVEL))),
-                merchantmanLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.MERCHANTMAN))),
-                galleonLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.GALLEON))),
-                privateerLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.PRIVATEER))),
-                frigateLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.FRIGATE)));
+        JLabel caravelLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.CARAVEL))), merchantmanLabel = new JLabel(
+                Integer.toString(Unit.getPrice(Unit.MERCHANTMAN))), galleonLabel = new JLabel(Integer.toString(Unit
+                .getPrice(Unit.GALLEON))), privateerLabel = new JLabel(Integer.toString(Unit.getPrice(Unit.PRIVATEER))), frigateLabel = new JLabel(
+                Integer.toString(Unit.getPrice(Unit.FRIGATE)));
 
         cancel = new JButton(Messages.message("cancel"));
         cancel.setActionCommand(String.valueOf(PURCHASE_CANCEL));
@@ -81,48 +77,43 @@ public final class PurchaseDialog extends FreeColDialog implements ActionListene
         int graphicsType;
 
         graphicsType = ImageLibrary.getUnitGraphicsType(Unit.ARTILLERY, false, false, 0, false);
-        artilleryButton = new JButton(Unit.getName(Unit.ARTILLERY),
-                                      library.getScaledUnitImageIcon(graphicsType, 0.66f));
+        artilleryButton = new JButton(Unit.getName(Unit.ARTILLERY), library.getScaledUnitImageIcon(graphicsType, 0.66f));
         artilleryButton.setIconTextGap(margin);
         artilleryButton.addActionListener(this);
         artilleryButton.setActionCommand(String.valueOf(PURCHASE_ARTILLERY));
 
         graphicsType = ImageLibrary.getUnitGraphicsType(Unit.CARAVEL, false, false, 0, false);
-        caravelButton = new JButton(Unit.getName(Unit.CARAVEL),
-                                      library.getScaledUnitImageIcon(graphicsType, 0.66f));
+        caravelButton = new JButton(Unit.getName(Unit.CARAVEL), library.getScaledUnitImageIcon(graphicsType, 0.66f));
         caravelButton.setIconTextGap(margin);
         caravelButton.addActionListener(this);
         caravelButton.setActionCommand(String.valueOf(PURCHASE_CARAVEL));
 
         graphicsType = ImageLibrary.getUnitGraphicsType(Unit.MERCHANTMAN, false, false, 0, false);
-        merchantmanButton = new JButton(Unit.getName(Unit.MERCHANTMAN),
-                                      library.getScaledUnitImageIcon(graphicsType, 0.66f));
+        merchantmanButton = new JButton(Unit.getName(Unit.MERCHANTMAN), library.getScaledUnitImageIcon(graphicsType,
+                0.66f));
         merchantmanButton.setIconTextGap(margin);
         merchantmanButton.addActionListener(this);
         merchantmanButton.setActionCommand(String.valueOf(PURCHASE_MERCHANTMAN));
 
         graphicsType = ImageLibrary.getUnitGraphicsType(Unit.GALLEON, false, false, 0, false);
-        galleonButton = new JButton(Unit.getName(Unit.GALLEON),
-                                      library.getScaledUnitImageIcon(graphicsType, 0.66f));
+        galleonButton = new JButton(Unit.getName(Unit.GALLEON), library.getScaledUnitImageIcon(graphicsType, 0.66f));
         galleonButton.setIconTextGap(margin);
         galleonButton.addActionListener(this);
         galleonButton.setActionCommand(String.valueOf(PURCHASE_GALLEON));
 
         graphicsType = ImageLibrary.getUnitGraphicsType(Unit.PRIVATEER, false, false, 0, false);
-        privateerButton = new JButton(Unit.getName(Unit.PRIVATEER),
-                                      library.getScaledUnitImageIcon(graphicsType, 0.66f));
+        privateerButton = new JButton(Unit.getName(Unit.PRIVATEER), library.getScaledUnitImageIcon(graphicsType, 0.66f));
         privateerButton.setIconTextGap(margin);
         privateerButton.addActionListener(this);
         privateerButton.setActionCommand(String.valueOf(PURCHASE_PRIVATEER));
 
         graphicsType = ImageLibrary.getUnitGraphicsType(Unit.FRIGATE, false, false, 0, false);
-        frigateButton = new JButton(Unit.getName(Unit.FRIGATE),
-                                      library.getScaledUnitImageIcon(graphicsType, 0.66f));
+        frigateButton = new JButton(Unit.getName(Unit.FRIGATE), library.getScaledUnitImageIcon(graphicsType, 0.66f));
         frigateButton.setIconTextGap(margin);
         frigateButton.addActionListener(this);
         frigateButton.setActionCommand(String.valueOf(PURCHASE_FRIGATE));
 
-        int[] widths = new int[] {0, margin, 0};
+        int[] widths = new int[] { 0, margin, 0 };
         int[] heights = new int[11];
         for (int index = 0; index < 5; index++) {
             heights[2 * index + 1] = margin;
@@ -159,14 +150,13 @@ public final class PurchaseDialog extends FreeColDialog implements ActionListene
         setSize(getPreferredSize());
     }
 
-
     public void requestFocus() {
         cancel.requestFocus();
     }
 
-
     /**
-     * Updates this panel's labels so that the information it displays is up to date.
+     * Updates this panel's labels so that the information it displays is up to
+     * date.
      */
     public void initialize() {
         Player player = freeColClient.getMyPlayer();
@@ -212,11 +202,10 @@ public final class PurchaseDialog extends FreeColDialog implements ActionListene
         }
     }
 
-
     /**
-     * Analyzes an event and calls the right external methods to take
-     * care of the user's request.
-     *
+     * Analyzes an event and calls the right external methods to take care of
+     * the user's request.
+     * 
      * @param event The incoming action event
      */
     public void actionPerformed(ActionEvent event) {
@@ -261,4 +250,3 @@ public final class PurchaseDialog extends FreeColDialog implements ActionListene
         }
     }
 }
-

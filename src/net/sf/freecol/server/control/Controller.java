@@ -1,7 +1,7 @@
 package net.sf.freecol.server.control;
 
 import java.util.logging.Logger;
-import net.sf.freecol.common.PseudoRandom;
+
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.networking.Server;
 

@@ -1,12 +1,12 @@
 package net.sf.freecol.server.ai;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Game;
@@ -21,6 +21,7 @@ import net.sf.freecol.common.networking.StreamedMessageHandler;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.networking.DummyConnection;
+
 import org.w3c.dom.Element;
 
 /**
@@ -42,6 +43,7 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
     private final FreeColServer freeColServer;
 
     private final AIMain aiMain;
+
 
     /**
      * 
@@ -74,7 +76,8 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
     /**
      * Deals with incoming messages that have just been received.
      * 
-     * @param connection The <code>Connection</code> the message was received on.
+     * @param connection The <code>Connection</code> the message was received
+     *            on.
      * @param element The root element of the message.
      * @return The reply.
      */
@@ -108,7 +111,8 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
                 } else if (type.equals("chooseFoundingFather")) {
                     reply = chooseFoundingFather((DummyConnection) connection, element);
                 } else if (type.equals("reconnect")) {
-                    logger.warning("The server requests a reconnect. This means an illegal operation has been performed. Please refer to any previous error message.");
+                    logger
+                            .warning("The server requests a reconnect. This means an illegal operation has been performed. Please refer to any previous error message.");
                 } else if (type.equals("setStance")) {
                 } else if (type.equals("monarchAction")) {
                     reply = monarchAction((DummyConnection) connection, element);
@@ -122,8 +126,8 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
                 }
             }
         } catch (Exception e) {
-            logger.log(Level.WARNING, "AI input handler for " + serverPlayer + 
-                    " caught error handling " + element.getTagName(), e);
+            logger.log(Level.WARNING, "AI input handler for " + serverPlayer + " caught error handling "
+                    + element.getTagName(), e);
         }
         return reply;
     }
@@ -160,9 +164,8 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
     private Element setCurrentPlayer(final DummyConnection connection, final Element setCurrentPlayerElement) {
         logger.finest("Entering setCurrentPlayer");
         final Game game = freeColServer.getGame();
-        final Player currentPlayer = (Player)
-            game.getFreeColGameObject(setCurrentPlayerElement.getAttribute("player"));
-        
+        final Player currentPlayer = (Player) game.getFreeColGameObject(setCurrentPlayerElement.getAttribute("player"));
+
         if (serverPlayer.getID() == currentPlayer.getID()) {
             logger.finest("Starting new Thread for " + serverPlayer.getName());
             Thread t = new Thread("AIPlayer (" + serverPlayer.getName() + ")") {
@@ -201,15 +204,14 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
     private Element chooseFoundingFather(DummyConnection connection, Element element) {
         int[] possibleFoundingFathers = new int[FoundingFather.TYPE_COUNT];
         for (int i = 0; i < FoundingFather.TYPE_COUNT; i++) {
-            possibleFoundingFathers[i] = 
-                Integer.parseInt(element.getAttribute("foundingFather" + Integer.toString(i)));
+            possibleFoundingFathers[i] = Integer.parseInt(element.getAttribute("foundingFather" + Integer.toString(i)));
         }
 
         int foundingFather = getAIPlayer().selectFoundingFather(possibleFoundingFathers);
         Element reply = Message.createNewRootElement("chosenFoundingFather");
         reply.setAttribute("foundingFather", Integer.toString(foundingFather));
         serverPlayer.setCurrentFather(foundingFather);
-        
+
         return reply;
     }
 
@@ -218,7 +220,7 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
      * 
      * @param connection The connection the message was received on.
      * @param element The element (root element in a DOM-parsed XML tree) that
-     * holds all the information.
+     *            holds all the information.
      * 
      */
     private Element monarchAction(DummyConnection connection, Element element) {
@@ -231,21 +233,20 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
             reply = Message.createNewRootElement("acceptTax");
             reply.setAttribute("accepted", String.valueOf(accept));
             break;
-            
+
         case Monarch.OFFER_MERCENARIES:
             reply = Message.createNewRootElement("hireMercenaries");
-            if (getAIPlayer().getStrategy() == AIPlayer.STRATEGY_CONQUEST ||
-                    getAIPlayer().getPlayer().isAtWar()) {
+            if (getAIPlayer().getStrategy() == AIPlayer.STRATEGY_CONQUEST || getAIPlayer().getPlayer().isAtWar()) {
                 reply.setAttribute("accepted", String.valueOf(true));
             } else {
                 reply.setAttribute("accepted", String.valueOf(false));
             }
             break;
-            
+
         default:
             logger.info("AI player ignoring monarch action " + action);
         }
-        
+
         return reply;
     }
 
@@ -254,7 +255,7 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
      * 
      * @param connection The connection the message was received on.
      * @param element The element (root element in a DOM-parsed XML tree) that
-     * holds all the information.
+     *            holds all the information.
      */
     private Element indianDemand(DummyConnection connection, Element element) {
         Game game = freeColServer.getGame();

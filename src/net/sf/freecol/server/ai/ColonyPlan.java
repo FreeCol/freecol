@@ -46,7 +46,7 @@ public class ColonyPlan {
     private AIMain aiMain;
     
 
-    private List workLocationPlans = new ArrayList();
+    private ArrayList<WorkLocationPlan> workLocationPlans = new ArrayList<WorkLocationPlan>();
 
 
     /**
@@ -84,8 +84,9 @@ public class ColonyPlan {
      * 
      * @return The list of <code>WorkLocationPlan</code>s .
      */
-    public List getWorkLocationPlans() {
-        return (List) ((ArrayList) workLocationPlans).clone();
+    @SuppressWarnings("unchecked")
+    public List<WorkLocationPlan> getWorkLocationPlans() {
+        return (List<WorkLocationPlan>) workLocationPlans.clone();
     }
 
     
@@ -96,12 +97,13 @@ public class ColonyPlan {
      * 
      * @return The list of <code>WorkLocationPlan</code>s .
      */   
-    public List getSortedWorkLocationPlans() {
-        List workLocationPlans = getWorkLocationPlans();
-        Collections.sort(workLocationPlans, new Comparator() {
-            public int compare(Object o, Object p) {
-                Integer i = new Integer(((WorkLocationPlan) o).getProductionOf(((WorkLocationPlan) o).getGoodsType()));
-                Integer j = new Integer(((WorkLocationPlan) p).getProductionOf(((WorkLocationPlan) p).getGoodsType()));
+    public List<WorkLocationPlan> getSortedWorkLocationPlans() {
+        List<WorkLocationPlan> workLocationPlans = getWorkLocationPlans();
+        Collections.sort(workLocationPlans, new Comparator<WorkLocationPlan>() {
+            public int compare(WorkLocationPlan o, WorkLocationPlan p) {
+                // TODO: Replace these by int
+                Integer i = o.getProductionOf(o.getGoodsType());
+                Integer j = p.getProductionOf(p.getGoodsType());
                 
                 return j.compareTo(i);
             }
@@ -119,12 +121,12 @@ public class ColonyPlan {
      *      sorted by priority (highest priority first).
      */      
     public Iterator getBuildable() {
-        List buildList = new ArrayList();
+        ArrayList<Integer> buildList = new ArrayList<Integer>();
         
         if (!colony.getBuilding(Building.DOCK).isBuilt()
                 && !colony.isLandLocked()
                 && colony.getBuilding(Building.DOCK).canBuildNext()) {
-            buildList.add(new Integer(Building.DOCK));
+            buildList.add(Building.DOCK);
         }
         
         Iterator wlpIt = getSortedWorkLocationPlans().iterator();

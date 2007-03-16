@@ -4,12 +4,11 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.logging.Logger;
-import net.sf.freecol.common.model.Building;
+
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
-import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
@@ -35,6 +34,7 @@ import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
+
 import org.w3c.dom.Element;
 
 /**
@@ -43,10 +43,13 @@ import org.w3c.dom.Element;
  */
 public final class InGameInputHandler extends InputHandler implements NetworkConstants {
     public static final String COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
+
     public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
+
     public static final String REVISION = "$Revision$";
 
     private static Logger logger = Logger.getLogger(InGameInputHandler.class.getName());
+
 
     /**
      * The constructor to use.
@@ -447,16 +450,15 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         Element childElement = (Element) element.getChildNodes().item(0);
         TradeRoute clientTradeRoute = new TradeRoute(null, childElement);
-        TradeRoute serverTradeRoute = (TradeRoute)
-            game.getFreeColGameObject(clientTradeRoute.getID());
+        TradeRoute serverTradeRoute = (TradeRoute) game.getFreeColGameObject(clientTradeRoute.getID());
         if (serverTradeRoute == null) {
-            throw new IllegalArgumentException("Could not find 'TradeRoute' with specified ID: " +
-                                               clientTradeRoute.getID());
-        } 
+            throw new IllegalArgumentException("Could not find 'TradeRoute' with specified ID: "
+                    + clientTradeRoute.getID());
+        }
         if (serverTradeRoute.getOwner() != player) {
             throw new IllegalStateException("Not your trade route!");
         }
-        serverTradeRoute.updateFrom(clientTradeRoute);        
+        serverTradeRoute.updateFrom(clientTradeRoute);
         return null;
     }
 
@@ -473,12 +475,12 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
         TradeRoute tradeRoute = (TradeRoute) game.getFreeColGameObject(element.getAttribute("tradeRoute"));
         if (unit == null) {
-            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: " +
-                                               element.getAttribute("unit"));
+            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
+                    + element.getAttribute("unit"));
         }
         if (tradeRoute == null) {
-            throw new IllegalArgumentException("Could not find 'TradeRoute' with specified ID: " +
-                                               element.getAttribute("tradeRoute"));
+            throw new IllegalArgumentException("Could not find 'TradeRoute' with specified ID: "
+                    + element.getAttribute("tradeRoute"));
         }
         if (tradeRoute.getOwner() != player) {
             throw new IllegalStateException("Not your trade route!");
@@ -1791,9 +1793,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (!unit.checkSetState(state)) {
             // Oh, really, Mr. Client? I'll show YOU!
             // kickPlayer(player);
-            logger.warning("Can't set state " + state + " for unit " + unit +
-                    " belonging to " + player +
-                    ". Possible cheating attempt (or bug)?");
+            logger.warning("Can't set state " + state + " for unit " + unit + " belonging to " + player
+                    + ". Possible cheating attempt (or bug)?");
             return null;
         }
         unit.setState(state);
@@ -1869,10 +1870,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalArgumentException("Found no colony with ID " + setExportsElement.getAttribute("colony"));
         } else if (colony.getOwner() != player) {
             throw new IllegalStateException("Not your colony!");
-            /** we don't really care whether the colony has a custom house
-                } else if (!colony.getBuilding(Building.CUSTOM_HOUSE).isBuilt()) {
-                throw new IllegalStateException("Colony has no custom house!");
-            */
+            /**
+             * we don't really care whether the colony has a custom house } else
+             * if (!colony.getBuilding(Building.CUSTOM_HOUSE).isBuilt()) { throw
+             * new IllegalStateException("Colony has no custom house!");
+             */
         }
         int goods = Integer.valueOf(setExportsElement.getAttribute("goods")).intValue();
         boolean value = Boolean.valueOf(setExportsElement.getAttribute("value")).booleanValue();
@@ -2431,24 +2433,17 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     }
 
     /*
-     * Method not used, keep in comments. 
-     *
-    private void sendErrorToAll(String message, Player player) {
-        Game game = getFreeColServer().getGame();
-        Iterator enemyPlayerIterator = game.getPlayerIterator();
-        while (enemyPlayerIterator.hasNext()) {
-            ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
-            if ((player != null) && (player.equals(enemyPlayer)) || enemyPlayer.getConnection() == null) {
-                continue;
-            }
-            try {
-                Element errorElement = createErrorReply(message);
-                enemyPlayer.getConnection().send(errorElement);
-            } catch (IOException e) {
-                logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection "
-                        + enemyPlayer.getConnection());
-            }
-        }
-    }
-    */
+     * Method not used, keep in comments.
+     * 
+     * private void sendErrorToAll(String message, Player player) { Game game =
+     * getFreeColServer().getGame(); Iterator enemyPlayerIterator =
+     * game.getPlayerIterator(); while (enemyPlayerIterator.hasNext()) {
+     * ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next(); if
+     * ((player != null) && (player.equals(enemyPlayer)) ||
+     * enemyPlayer.getConnection() == null) { continue; } try { Element
+     * errorElement = createErrorReply(message);
+     * enemyPlayer.getConnection().send(errorElement); } catch (IOException e) {
+     * logger.warning("Could not send message to: " + enemyPlayer.getName() + "
+     * with connection " + enemyPlayer.getConnection()); } } }
+     */
 }
