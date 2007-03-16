@@ -1,4 +1,3 @@
-
 package net.sf.freecol.metaserver;
 
 import java.io.IOException;
@@ -14,36 +13,40 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.common.networking.Connection;
 
-
-
 /**
-* The entry point and main controller object for the meta server.
-*
-* <br><br>
-*
-* When a new client connects to the meta server a new {@link Connection}
-* is made, with {@link NetworkHandler} as the control object.
-*
-* @see net.sf.freecol.common.networking
-*/
+ * The entry point and main controller object for the meta server.
+ * 
+ * <br>
+ * <br>
+ * 
+ * When a new client connects to the meta server a new {@link Connection} is
+ * made, with {@link NetworkHandler} as the control object.
+ * 
+ * @see net.sf.freecol.common.networking
+ */
 public final class MetaServer extends Thread {
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
-    public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
-    public static final String  REVISION = "$Revision$";
+    public static final String COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
+
+    public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
+
+    public static final String REVISION = "$Revision$";
 
     private static Logger logger = Logger.getLogger(MetaServer.class.getName());
 
     private static final int REMOVE_DEAD_SERVERS_INTERVAL = 120000;
-    public static final int REMOVE_OLDER_THAN = 90000;
 
+    public static final int REMOVE_OLDER_THAN = 90000;
 
     /** The public "well-known" socket to which clients may connect. */
     private ServerSocket serverSocket;
 
     /** A hash of Connection objects, keyed by the Socket they relate to. */
-    private HashMap connections = new HashMap();
+    private HashMap<Socket, Connection> connections = new HashMap<Socket, Connection>();
 
-    /** Whether to keep running the main loop that is awaiting new client connections. */
+    /**
+     * Whether to keep running the main loop that is awaiting new client
+     * connections.
+     */
     private boolean running = true;
 
     /** The TCP port that is beeing used for the public socket. */
@@ -52,11 +55,11 @@ public final class MetaServer extends Thread {
     private NetworkHandler networkHandler;
 
 
-
     /**
-    * Creates and starts a new <code>MetaServer</code>.
-    * @param args The command-line options.
-    */
+     * Creates and starts a new <code>MetaServer</code>.
+     * 
+     * @param args The command-line options.
+     */
     public static void main(String[] args) {
         int port = -1;
         try {
@@ -80,13 +83,10 @@ public final class MetaServer extends Thread {
         metaServer.start();
     }
 
-
-
-
     /**
-     * Creates a new network server. Use {@link #run metaServer.start()} to start
-     * listening for new connections.
-     *
+     * Creates a new network server. Use {@link #run metaServer.start()} to
+     * start listening for new connections.
+     * 
      * @param port The TCP port to use for the public socket.
      * @throws IOException if the public socket cannot be created.
      */
@@ -109,15 +109,12 @@ public final class MetaServer extends Thread {
         }, REMOVE_DEAD_SERVERS_INTERVAL, REMOVE_DEAD_SERVERS_INTERVAL);
     }
 
-
-
-
     /**
-    * Starts the thread's processing. Contains the loop that is waiting for new
-    * connections to the public socket. When a new client connects to the server
-    * a new {@link Connection} is made, with {@link NetworkHandler} as
-    * the control object.
-    */
+     * Starts the thread's processing. Contains the loop that is waiting for new
+     * connections to the public socket. When a new client connects to the
+     * server a new {@link Connection} is made, with {@link NetworkHandler} as
+     * the control object.
+     */
     public void run() {
         while (running) {
             Socket clientSocket = null;
@@ -133,41 +130,39 @@ public final class MetaServer extends Thread {
                 logger.warning(sw.toString());
             }
         }
-     }
-
-
-     /**
-     * Gets the control object that handles the network requests.
-     * @return The <code>NetworkHandler</code>.
-     */
-     public NetworkHandler getNetworkHandler() {
-        return networkHandler;
-     }
-
+    }
 
     /**
-    * Gets the TCP port that is beeing used for the public socket.
-    * @return The TCP port.
-    */
+     * Gets the control object that handles the network requests.
+     * 
+     * @return The <code>NetworkHandler</code>.
+     */
+    public NetworkHandler getNetworkHandler() {
+        return networkHandler;
+    }
+
+    /**
+     * Gets the TCP port that is beeing used for the public socket.
+     * 
+     * @return The TCP port.
+     */
     public int getPort() {
         return port;
     }
 
-
     /**
-    * Gets an iterator of every connection to this server.
-    *
-    * @return The <code>Iterator</code>.
-    * @see Connection
-    */
+     * Gets an iterator of every connection to this server.
+     * 
+     * @return The <code>Iterator</code>.
+     * @see Connection
+     */
     public Iterator getConnectionIterator() {
         return connections.values().iterator();
     }
 
-
     /**
-    * Shuts down the server thread.
-    */
+     * Shuts down the server thread.
+     */
     public void shutdown() {
         running = false;
 
@@ -183,35 +178,34 @@ public final class MetaServer extends Thread {
 
             try {
                 if (c != null) {
-                    //c.reallyClose();
+                    // c.reallyClose();
                     c.close();
                 }
             } catch (IOException e) {
                 logger.warning("Could not close the connection.");
             }
         }
-        
+
         logger.info("Server shutdown.");
     }
 
-
     /**
-    * Gets a <code>Connection</code> identified by a <code>Socket</code>.
-    *
-    * @param socket The <code>Socket</code> that identifies the
-    *               <code>Connection</code>
-    * @return The <code>Connection</code>.
-    */
+     * Gets a <code>Connection</code> identified by a <code>Socket</code>.
+     * 
+     * @param socket The <code>Socket</code> that identifies the
+     *            <code>Connection</code>
+     * @return The <code>Connection</code>.
+     */
     public Connection getConnection(Socket socket) {
         return (Connection) connections.get(socket);
     }
-    
-    
+
     /**
-    * Removes the given connection.
-    * @param connection The connection that should be removed.
-    */
+     * Removes the given connection.
+     * 
+     * @param connection The connection that should be removed.
+     */
     public void removeConnection(Connection connection) {
         connections.remove(connection.getSocket());
-    }    
+    }
 }

@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Map.Position;
 
 
 /**
@@ -43,7 +44,7 @@ public class River {
     /**
      * A list of river sections.
      */
-    private List sections = new ArrayList();
+    private ArrayList<Section> sections = new ArrayList<Section>();
 
     /**
      * The next river.
@@ -53,7 +54,7 @@ public class River {
     /**
      * A hashtable of position-river pairs.
      */
-    private Hashtable riverMap;
+    private Hashtable<Position, River> riverMap;
 
 
     /**
@@ -62,7 +63,7 @@ public class River {
      * @param map The map on which the river flows.
      * @param riverMap A hashtable of position-river pairs.
      */
-    public River(Map map, Hashtable riverMap) {
+    public River(Map map, Hashtable<Position, River> riverMap) {
         this.map = map;
         this.riverMap = riverMap;
         logger.fine("Starting new river");
@@ -78,7 +79,7 @@ public class River {
     }
 
     public Section getLastSection() {
-        return (Section) this.sections.get(sections.size() - 1);
+        return this.sections.get(sections.size() - 1);
     }
 
     /**
@@ -102,9 +103,9 @@ public class River {
         boolean found = false;
         Section section = null;
         
-        Iterator sectionIterator = sections.iterator();
+        Iterator<Section> sectionIterator = sections.iterator();
         while (sectionIterator.hasNext()) {
-            section = (Section) sectionIterator.next();
+            section = sectionIterator.next();
             if (found) {
                 section.grow();
             } else if (section.position.equals(position)) {
@@ -159,9 +160,9 @@ public class River {
      * @return true if this river already contains the given position.
      */
     public boolean contains(Map.Position p) {
-        Iterator sectionIterator = sections.iterator();
+        Iterator<Section> sectionIterator = sections.iterator();
         while (sectionIterator.hasNext()) {
-            Map.Position q = ((Section) sectionIterator.next()).position;
+            Map.Position q = sectionIterator.next().position;
             if (p.equals(q)) {
                 return true;
             }
@@ -245,12 +246,12 @@ public class River {
                             logger.fine("Point " + newPosition + " is next to another river.");
                             drawToMap();
                             // increase the size of another river
-                            nextRiver = (River) riverMap.get(px);
+                            nextRiver = riverMap.get(px);
                             nextRiver.grow(lastSection, px);
                         } else {
                             // flow into the sea (or a lake)
                             logger.fine("Point " + newPosition + " is next to water.");
-                            River someRiver = (River) riverMap.get(px);
+                            River someRiver = riverMap.get(px);
                             if (someRiver == null) {
                                 sections.add(new Section(px, oppositeDirection(lastDir)));
                             } else {
@@ -268,7 +269,7 @@ public class River {
                 return flow(newPosition);
             }
         }
-        sections = new ArrayList();
+        sections = new ArrayList<Section>();
         return false;
     }
     
@@ -321,9 +322,9 @@ public class River {
     private void drawToMap() {
         Section oldSection = null;
         
-        Iterator sectionIterator = sections.iterator();
+        Iterator<Section> sectionIterator = sections.iterator();
         while (sectionIterator.hasNext()) {
-            Section section = (Section) sectionIterator.next();
+            Section section = sectionIterator.next();
             riverMap.put(section.position, this);
             if (oldSection != null) {
                 section.addBranch(oppositeDirection(oldSection.direction),

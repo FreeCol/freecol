@@ -47,7 +47,7 @@ public final class Specification {
         InputStream  in = Specification.class.getResourceAsStream( "specification.xml" );
         Document  specificationDocument = Xml.documentFrom( in );
 
-        final  Map  goodsTypeByRef = new HashMap();
+        final  Map<String, GoodsType>  goodsTypeByRef = new HashMap<String, GoodsType>();
 
         /* this method is invoked for each child element of the root element */
         final Xml.Method  method = new Xml.Method() {

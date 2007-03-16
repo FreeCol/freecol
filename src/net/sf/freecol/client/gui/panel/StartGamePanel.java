@@ -391,7 +391,7 @@ class PlayersTableModel extends AbstractTableModel {
      * @param column The column to return the Class of.
      * @return The Class of the objects in the given column.
      */
-    public Class getColumnClass(int column) {
+    public Class<?> getColumnClass(int column) {
         return getValueAt(0, column).getClass();
     }
 

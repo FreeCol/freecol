@@ -52,7 +52,7 @@ public class TransportMission extends Mission {
     private static final String ELEMENT_TRANSPORTABLE = "transportable";
     private static final int MINIMUM_GOLD_TO_STAY_IN_EUROPE = 600;
 
-    private List transportList = new ArrayList();
+    private ArrayList<Transportable> transportList = new ArrayList<Transportable>();
 
 
     /**
@@ -477,7 +477,7 @@ public class TransportMission extends Mission {
         
         /* Add colonies containing wishes with the same destination as
            an item in the transport list to the "aiColonies"-list: */
-        ArrayList aiColonies = new ArrayList();
+        ArrayList<AIColony> aiColonies = new ArrayList<AIColony>();
         for (int i=0; i<transportList.size(); i++) {
             Transportable t = (Transportable) transportList.get(i);
             if (t.getTransportDestination() != null 
@@ -1136,7 +1136,7 @@ public class TransportMission extends Mission {
                 if (!(ao instanceof Transportable)) {
                     logger.warning("AIObject not Transportable, ID: " + in.getAttributeValue(null, "ID"));
                 } else {
-                    transportList.add(ao);
+                    transportList.add((Transportable)ao);
                 }
                 in.nextTag();
             } else {

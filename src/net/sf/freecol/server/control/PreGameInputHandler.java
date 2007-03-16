@@ -187,8 +187,8 @@ public final class PreGameInputHandler extends InputHandler {
         }
         // Check that no two players have the same color or nation
         Iterator playerIterator = freeColServer.getGame().getPlayerIterator();
-        LinkedList nations = new LinkedList();
-        LinkedList colors = new LinkedList();
+        LinkedList<Integer> nations = new LinkedList<Integer>();
+        LinkedList<Color> colors = new LinkedList<Color>();
         while (playerIterator.hasNext()) {
             ServerPlayer player = (ServerPlayer) playerIterator.next();
             final int nation = player.getNation();

@@ -29,7 +29,7 @@ public final class ErrorPanel extends FreeColDialog implements ActionListener {
     @SuppressWarnings("unused")
     private final Canvas parent;
 
-    private LinkedList errorLabels; // A LinkedList of JLabel objects.
+    private LinkedList<JLabel> errorLabels; // A LinkedList of JLabel objects.
     private JButton errorButton;
 
     /**
@@ -64,7 +64,7 @@ public final class ErrorPanel extends FreeColDialog implements ActionListener {
     * @param message The error message to display in this error panel.
     */
     public void initialize(String message) {
-        LinkedList lines = new LinkedList();
+        LinkedList<String> lines = new LinkedList<String>();
         while (getFontMetrics(getFont()).getStringBounds(message, getGraphics()).getWidth() + 40
                 > lineWidth) {
             int spaceIndex = message.indexOf(' ');
@@ -111,7 +111,7 @@ public final class ErrorPanel extends FreeColDialog implements ActionListener {
             errorLabels.clear();
         }
         else {
-            errorLabels = new LinkedList();
+            errorLabels = new LinkedList<JLabel>();
         }
 
         for (int i = 0; i < lines.size(); i++) {

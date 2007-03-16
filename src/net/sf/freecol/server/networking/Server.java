@@ -43,7 +43,7 @@ public final class Server extends Thread {
     private ServerSocket serverSocket;
 
     /** A hash of Connection objects, keyed by the Socket they relate to. */
-    private HashMap connections = new HashMap();
+    private HashMap<Socket, Connection> connections = new HashMap<Socket, Connection>();
 
     /** Whether to keep running the main loop that is awaiting new client connections. */
     private boolean running = true;
@@ -127,10 +127,10 @@ public final class Server extends Thread {
     * @param exceptConnection If non-null, the <code>Connection</code> not to send to.
     */
     public void sendToAll(Element element, Connection exceptConnection) {
-        Iterator connectionIterator = connections.values().iterator();
+        Iterator<Connection> connectionIterator = connections.values().iterator();
 
         while (connectionIterator.hasNext()) {
-            Connection connection = (Connection) connectionIterator.next();
+            Connection connection = connectionIterator.next();
             if (connection != exceptConnection) {
                 try {
                     connection.send(element);
@@ -165,10 +165,10 @@ public final class Server extends Thread {
     * @param messageHandler The <code>MessageHandler</code>.
     */
     public void setMessageHandlerToAllConnections(MessageHandler messageHandler) {
-        Iterator connectionIterator = connections.values().iterator();
+        Iterator<Connection> connectionIterator = connections.values().iterator();
 
         while (connectionIterator.hasNext()) {
-            Connection connection = (Connection)connectionIterator.next();
+            Connection connection = connectionIterator.next();
             connection.setMessageHandler(messageHandler);
         }
     }
@@ -180,7 +180,7 @@ public final class Server extends Thread {
     * @return The <code>Iterator</code>.
     * @see Connection
     */
-    public Iterator getConnectionIterator() {
+    public Iterator<Connection> getConnectionIterator() {
         return connections.values().iterator();
     }
 
@@ -202,9 +202,9 @@ public final class Server extends Thread {
             // For more info see the run() method
         }
 
-        Iterator connectionsIterator = ((HashMap) connections.clone()).values().iterator();
+        Iterator<Connection> connectionsIterator = connections.values().iterator();
         while (connectionsIterator.hasNext()) {
-            Connection c = (Connection) connectionsIterator.next();
+            Connection c = connectionsIterator.next();
 
             try {
                 if (c != null) {
@@ -230,7 +230,7 @@ public final class Server extends Thread {
     * @return The <code>Connection</code>.
     */
     public Connection getConnection(Socket socket) {
-        return (Connection) connections.get(socket);
+        return connections.get(socket);
     }
 
 

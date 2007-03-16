@@ -131,7 +131,7 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
                 Stop stop = originalRoute.new Stop((Location) destinationSelector.getSelectedItem());
                 for (Component comp : cargoPanel.getComponents()) {
                     CargoLabel label = (CargoLabel) comp;
-                    stop.getCargo().add(new Integer(label.getType()));
+                    stop.addCargo(label.getType());
                 }
                 if (stopList.getSelectedIndex() == -1) {
                     listModel.addElement(stop);
@@ -420,6 +420,7 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
                                 break;
                             }
                         }
+                        stop.setCargo(cargo);
                     }
                     cargoPanel.revalidate();
                     cargoPanel.repaint();

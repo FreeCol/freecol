@@ -554,12 +554,12 @@ public final class FreeColServer {
                 }
             }
             final String owner = xsr.getAttributeValue(null, "owner");
-            ArrayList serverObjects = null;
+            ArrayList<Object> serverObjects = null;
             aiMain = null;
             while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 if (xsr.getLocalName().equals("serverObjects")) {
                     // Reads the ServerAdditionObjects:
-                    serverObjects = new ArrayList();
+                    serverObjects = new ArrayList<Object>();
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                         if (xsr.getLocalName().equals(ServerPlayer.getServerAdditionXMLElementTagName())) {
                             serverObjects.add(new ServerPlayer(xsr));

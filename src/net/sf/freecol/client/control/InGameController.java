@@ -666,7 +666,7 @@ public final class InGameController implements NetworkConstants {
             if (stop != null) {
                 setDestination(unit, stop.getLocation());
             }
-            ArrayList<Integer> goodsTypes = (ArrayList<Integer>) stop.getCargo().clone();
+            ArrayList<Integer> goodsTypes = stop.getCargo();
             Iterator<Goods> goodsIterator = unit.getGoodsIterator();
             test: while (goodsIterator.hasNext()) {
                 Goods goods = goodsIterator.next();

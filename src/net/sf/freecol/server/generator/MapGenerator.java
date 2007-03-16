@@ -181,7 +181,7 @@ public class MapGenerator {
     public void createRivers(Map map) {
         int number = getMapGeneratorOptions().getNumberOfRivers();
         int counter = 0;
-        Hashtable riverMap = new Hashtable();
+        Hashtable<Position, River> riverMap = new Hashtable<Position, River>();
 
         for (int i = 0; i < number; i++) {
             River river = new River(map, riverMap);
@@ -298,7 +298,7 @@ public class MapGenerator {
      *      on the map.
      */
     private IndianSettlement placeIndianSettlement(Player player, int tribe, boolean capital,
-                                       Position position, Map map, Vector players) {
+                                       Position position, Map map, Vector<Player> players) {
         final int kind = IndianSettlement.getKind(tribe);
         final Tile tile = map.getTile(position);
         IndianSettlement settlement = 

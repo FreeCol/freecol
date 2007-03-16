@@ -256,13 +256,24 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
         /**
          * Get the <code>Cargo</code> value.
          * 
-         * @return an <code>ArrayList<Integer></code> value
+         * @return a cloned <code>ArrayList<Integer></code> value
          */
+        @SuppressWarnings("unchecked")
         public final ArrayList<Integer> getCargo() {
-            return cargo;
+            return (ArrayList<Integer>) cargo.clone();
         }
 
-        public void addCargo(Integer newCargo) {
+        /**
+         * Set the cargo values.
+         * 
+         * @param cargo and arraylist of cargo values.
+         */
+        public final void setCargo(ArrayList<Integer> cargo) {
+            this.cargo.clear();
+            this.cargo.addAll(cargo);
+        }
+
+        public void addCargo(int newCargo) {
             cargo.add(newCargo);
         }
 
