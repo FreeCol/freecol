@@ -2666,6 +2666,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable,
 			if (s == BUILD_ROAD)
 				workLeft /= 2;
 			movesLeft = 0;
+            break;
 		case TO_EUROPE:
 			if (state == ACTIVE && !(location instanceof Europe)) {
 				workLeft = 3;

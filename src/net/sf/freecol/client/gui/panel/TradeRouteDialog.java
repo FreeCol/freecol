@@ -190,6 +190,7 @@ public final class TradeRouteDialog extends FreeColDialog implements ActionListe
                 }
                 player.setTradeRoutes(routes);
                 setResponse(tradeRoutes.getSelectedValue());
+                break;
             case CANCEL:
                 getCanvas().remove(this);
                 setResponse(null);

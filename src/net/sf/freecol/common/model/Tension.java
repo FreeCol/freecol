@@ -125,14 +125,19 @@ public class Tension {
             switch(level) {
             case HAPPY:
                 setValue(TENSION_HAPPY);
+                break;
             case CONTENT:
                 setValue(TENSION_CONTENT);
+                break;
             case DISPLEASED:
                 setValue(TENSION_DISPLEASED);
+                break;
             case ANGRY:
                 setValue(TENSION_ANGRY);
+                break;
             case HATEFUL:
                 setValue(TENSION_HATEFUL);
+                break;
             }
         }
     }

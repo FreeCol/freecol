@@ -922,6 +922,7 @@ public final class InGameInputHandler extends InputHandler {
             m = new ModelMessage(tile, "lostCityRumour.BurialGround", 
                                  new String [][] {{"%nation%", indianPlayer.getNationAsString()}},
                                  ModelMessage.LOST_CITY_RUMOUR);
+            break;
         case LostCityRumour.EXPEDITION_VANISHES: 
             m = new ModelMessage(tile, "lostCityRumour.ExpeditionVanishes", null,
                                  ModelMessage.LOST_CITY_RUMOUR);

@@ -648,6 +648,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         case LostCityRumour.BURIAL_GROUND:
             Player indianPlayer = game.getPlayer(unit.getTile().getNationOwner());
             indianPlayer.modifyTension(player, Tension.TENSION_HATEFUL);
+            break;
         case LostCityRumour.EXPEDITION_VANISHES:
             unit.dispose();
             break;
