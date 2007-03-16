@@ -506,7 +506,7 @@ public class Player extends FreeColGameObject implements Nameable {
         // TODO: Create a ModelMessage.
         Iterator<Unit> it = europe.getUnitIterator();
         while (it.hasNext()) {
-            Unit u = (Unit) it.next();
+            Unit u = it.next();
             u.dispose();
         }
         europe.dispose();
@@ -933,7 +933,7 @@ public class Player extends FreeColGameObject implements Nameable {
         Iterator<Position> positionIterator = getGame().getMap().getCircleIterator(unit.getTile().getPosition(), true,
                 unit.getLineOfSight());
         while (positionIterator.hasNext()) {
-            Map.Position p = (Map.Position) positionIterator.next();
+            Map.Position p = positionIterator.next();
             canSeeTiles[p.getX()][p.getY()] = true;
         }
     }
@@ -961,13 +961,13 @@ public class Player extends FreeColGameObject implements Nameable {
             if (!getGameOptions().getBoolean(GameOptions.FOG_OF_WAR)) {
                 Iterator<Position> positionIterator = getGame().getMap().getWholeMapIterator();
                 while (positionIterator.hasNext()) {
-                    Map.Position p = (Map.Position) positionIterator.next();
+                    Map.Position p = positionIterator.next();
                     canSeeTiles[p.getX()][p.getY()] = hasExplored(getGame().getMap().getTile(p));
                 }
             } else {
                 Iterator<Unit> unitIterator = getUnitIterator();
                 while (unitIterator.hasNext()) {
-                    Unit unit = (Unit) unitIterator.next();
+                    Unit unit = unitIterator.next();
                     if (unit.getLocation() == null || !(unit.getLocation() instanceof Tile)) {
                         continue;
                     }
@@ -990,7 +990,7 @@ public class Player extends FreeColGameObject implements Nameable {
                      */
                     Iterator<Position> positionIterator = map.getCircleIterator(position, true, unit.getLineOfSight());
                     while (positionIterator.hasNext()) {
-                        Map.Position p = (Map.Position) positionIterator.next();
+                        Map.Position p = positionIterator.next();
                         canSeeTiles[p.getX()][p.getY()] = true;
                         /*
                          * if (getGame().getViewOwner() == null &&
@@ -1008,7 +1008,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 }
                 Iterator<Settlement> colonyIterator = getSettlementIterator();
                 while (colonyIterator.hasNext()) {
-                    Settlement colony = (Settlement) colonyIterator.next();
+                    Settlement colony = colonyIterator.next();
                     Map.Position position = colony.getTile().getPosition();
                     canSeeTiles[position.getX()][position.getY()] = true;
                     /*
@@ -1023,9 +1023,10 @@ public class Player extends FreeColGameObject implements Nameable {
                      * non-explored Tile to be visible. Colony: " + colony + "(" +
                      * colony.getTile().getPosition() + "), Tile: " + position); }
                      */
-                    Iterator<Position> positionIterator = map.getCircleIterator(position, true, colony.getLineOfSight());
+                    Iterator<Position> positionIterator = map
+                            .getCircleIterator(position, true, colony.getLineOfSight());
                     while (positionIterator.hasNext()) {
-                        Map.Position p = (Map.Position) positionIterator.next();
+                        Map.Position p = positionIterator.next();
                         canSeeTiles[p.getX()][p.getY()] = true;
                         /*
                          * if (getGame().getViewOwner() == null &&
@@ -1305,7 +1306,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A <code>Unit</code> that can be made active.
      */
     public Unit getNextActiveUnit() {
-        return (Unit) nextActiveUnitIterator.next();
+        return nextActiveUnitIterator.next();
     }
 
     /**
@@ -1314,7 +1315,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A <code>Unit</code> that can be made active.
      */
     public Unit getNextGoingToUnit() {
-        return (Unit) nextGoingToUnitIterator.next();
+        return nextGoingToUnitIterator.next();
     }
 
     /**
@@ -1545,7 +1546,7 @@ public class Player extends FreeColGameObject implements Nameable {
         Map map = getGame().getMap();
         Iterator<Position> tileIterator = map.getWholeMapIterator();
         while (tileIterator.hasNext()) {
-            Tile t = map.getTile((Map.Position) tileIterator.next());
+            Tile t = map.getTile(tileIterator.next());
             if (t != null && t.getFirstUnit() != null && t.getFirstUnit().getOwner().equals(this)) {
                 Iterator<Unit> unitIterator = t.getUnitIterator();
                 while (unitIterator.hasNext()) {
@@ -1583,8 +1584,8 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Gets an <code>Iterator</code> containing all the settlements this player
-     * owns.
+     * Gets an <code>Iterator</code> containing all the settlements this
+     * player owns.
      * 
      * @return The <code>Iterator</code>.
      * @see Colony
@@ -1596,7 +1597,7 @@ public class Player extends FreeColGameObject implements Nameable {
             return settlements.iterator();
         }
     }
-    
+
     /**
      * Gets an <code>Iterator</code> containing all the colonies this player
      * owns.
@@ -1616,12 +1617,12 @@ public class Player extends FreeColGameObject implements Nameable {
     public List<Settlement> getSettlements() {
         return settlements;
     }
-    
+
     public List<Colony> getColonies() {
         ArrayList<Colony> colonies = new ArrayList<Colony>();
-        for(Settlement s : settlements) {
+        for (Settlement s : settlements) {
             if (s instanceof Colony) {
-                colonies.add((Colony)s);
+                colonies.add((Colony) s);
             } else {
                 throw new RuntimeException("getColonies can only be called for players whose settlements are colonies.");
             }
@@ -1883,42 +1884,42 @@ public class Player extends FreeColGameObject implements Nameable {
         Map map = game.getMap();
         Iterator<Position> it = map.getCircleIterator(tile.getPosition(), false, 3);
         while (it.hasNext()) {
-            Tile ct = map.getTile((Map.Position) it.next());
+            Tile ct = map.getTile(it.next());
             if (ct.getColony() != null && ct.getColony().getOwner() == owner) {
                 return 45;
             }
         }
         it = map.getCircleIterator(tile.getPosition(), false, 4);
         while (it.hasNext()) {
-            Tile ct = map.getTile((Map.Position) it.next());
+            Tile ct = map.getTile(it.next());
             if (ct.getColony() != null && ct.getColony().getOwner() == owner) {
                 return 25;
             }
         }
         it = map.getCircleIterator(tile.getPosition(), false, 5);
         while (it.hasNext()) {
-            Tile ct = map.getTile((Map.Position) it.next());
+            Tile ct = map.getTile(it.next());
             if (ct.getColony() != null && ct.getColony().getOwner() == owner) {
                 return 20;
             }
         }
         it = map.getCircleIterator(tile.getPosition(), false, 6);
         while (it.hasNext()) {
-            Tile ct = map.getTile((Map.Position) it.next());
+            Tile ct = map.getTile(it.next());
             if (ct.getColony() != null && ct.getColony().getOwner() == owner) {
                 return 30;
             }
         }
         it = map.getCircleIterator(tile.getPosition(), false, 7);
         while (it.hasNext()) {
-            Tile ct = map.getTile((Map.Position) it.next());
+            Tile ct = map.getTile(it.next());
             if (ct.getColony() != null && ct.getColony().getOwner() == owner) {
                 return 15;
             }
         }
         it = map.getCircleIterator(tile.getPosition(), false, 8);
         while (it.hasNext()) {
-            Tile ct = map.getTile((Map.Position) it.next());
+            Tile ct = map.getTile(it.next());
             if (ct.getColony() != null && ct.getColony().getOwner() == owner) {
                 return 5;
             }
@@ -1943,7 +1944,7 @@ public class Player extends FreeColGameObject implements Nameable {
         } else {
             Iterator<Position> it = getGame().getMap().getCircleIterator(tile.getPosition(), true, 4);
             while (it.hasNext()) {
-                Tile ct = getGame().getMap().getTile((Map.Position) it.next());
+                Tile ct = getGame().getMap().getTile(it.next());
                 if (ct.getColony() != null && ct.getColony().getOwner() != this) {
                     if (getStance(ct.getColony().getOwner()) == WAR) {
                         value -= Math.max(0, 20 - tile.getDistanceTo(tile) * 4);
@@ -1953,7 +1954,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 }
                 Iterator<Unit> ui = ct.getUnitIterator();
                 while (ui.hasNext()) {
-                    Unit u = (Unit) ui.next();
+                    Unit u = ui.next();
                     if (u.getOwner() != this && u.isOffensiveUnit() && u.getOwner().isEuropean()) {
                         if (getStance(u.getOwner()) == WAR) {
                             value -= Math.max(0, 40 - tile.getDistanceTo(tile) * 9);
@@ -2096,7 +2097,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 case FoundingFather.HERNANDO_DE_SOTO:
                     Iterator<Unit> ui = getUnitIterator();
                     while (ui.hasNext()) {
-                        setExplored((Unit) ui.next());
+                        setExplored(ui.next());
                     }
                     break;
 
@@ -2155,7 +2156,7 @@ public class Player extends FreeColGameObject implements Nameable {
                     // reduce indian tension and alarm
                     Iterator<Player> pi = getGame().getPlayerIterator();
                     while (pi.hasNext()) {
-                        Player p = (Player) pi.next();
+                        Player p = pi.next();
                         if (!p.isEuropean()) {
                             p.getTension(this).setValue(0);
                             Iterator<Settlement> isi = p.getIndianSettlementIterator();
@@ -2888,14 +2889,14 @@ public class Player extends FreeColGameObject implements Nameable {
                 unitIterator = createUnitIterator();
             }
             while (unitIterator.hasNext()) {
-                nextUnit = (Unit) unitIterator.next();
+                nextUnit = unitIterator.next();
                 if (predicate.obtains(nextUnit)) {
                     return true;
                 }
             }
             unitIterator = createUnitIterator();
             while (unitIterator.hasNext()) {
-                nextUnit = (Unit) unitIterator.next();
+                nextUnit = unitIterator.next();
                 if (predicate.obtains(nextUnit)) {
                     return true;
                 }
@@ -2936,10 +2937,10 @@ public class Player extends FreeColGameObject implements Nameable {
                 if (t != null && t.getFirstUnit() != null && t.getFirstUnit().getOwner().equals(owner)) {
                     Iterator<Unit> unitIterator = t.getUnitIterator();
                     while (unitIterator.hasNext()) {
-                        Unit u = (Unit) unitIterator.next();
+                        Unit u = unitIterator.next();
                         Iterator<Unit> childUnitIterator = u.getUnitIterator();
                         while (childUnitIterator.hasNext()) {
-                            Unit childUnit = (Unit) childUnitIterator.next();
+                            Unit childUnit = childUnitIterator.next();
                             if (predicate.obtains(childUnit)) {
                                 units.add(childUnit);
                             }

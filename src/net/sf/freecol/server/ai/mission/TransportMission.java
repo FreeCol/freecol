@@ -246,7 +246,7 @@ public class TransportMission extends Mission {
                                         true);
             }
             for (int i=1; i<transportList.size() && bestSourceDistance > 0; i++) {
-                Transportable t1 = (Transportable) transportList.get(i-1);
+                Transportable t1 = transportList.get(i-1);
                 if (t1.getTransportSource() != null && 
                         t1.getTransportSource().getTile() == newSource.getTile()
                         || t1.getTransportDestination() != null && 
@@ -257,7 +257,7 @@ public class TransportMission extends Mission {
 
             }
             for (int i=1; i<transportList.size() && bestSourceDistance > 0; i++) {
-                Transportable t1 = (Transportable) transportList.get(i-1);
+                Transportable t1 = transportList.get(i-1);
                 if (isCarrying(t1) && getDistanceTo(newTransportable, t1.getTransportDestination(), true) <= bestSourceDistance) {
                     bestSourceIndex = i;
                     bestSourceDistance = getDistanceTo(newTransportable, t1.getTransportDestination(), true);
@@ -281,7 +281,7 @@ public class TransportMission extends Mission {
             }
         }
         for (int i=Math.max(bestSourceIndex, 1); i<transportList.size() && bestDestinationDistance > 0; i++) {
-            Transportable t1 = (Transportable) transportList.get(i-1);
+            Transportable t1 = transportList.get(i-1);
             if (t1.getTransportSource().getTile() == newDestination.getTile()
                     || t1.getTransportDestination().getTile() == newDestination.getTile()) {
                 bestDestinationIndex = i;
@@ -290,7 +290,7 @@ public class TransportMission extends Mission {
 
         }
         for (int i=Math.max(bestSourceIndex, 1); i<transportList.size() && bestDestinationDistance > 0; i++) {
-            Transportable t1 = (Transportable) transportList.get(i-1);
+            Transportable t1 = transportList.get(i-1);
             if (isCarrying(t1) && getDistanceTo(newTransportable, t1.getTransportDestination(), false) <= bestDestinationDistance) {
                 bestDestinationIndex = i;
                 bestDestinationDistance = getDistanceTo(newTransportable, t1.getTransportDestination(), false);
@@ -384,7 +384,7 @@ public class TransportMission extends Mission {
                 path = findPathToEurope(carrier.getTile());
                 moveToEurope = true;
             } else {
-                Transportable transportable = (Transportable) transportList.get(i);
+                Transportable transportable = transportList.get(i);
                 try {
                     path = getPath(transportable);
                     moveToEurope = isCarrying(transportable)
@@ -479,7 +479,7 @@ public class TransportMission extends Mission {
            an item in the transport list to the "aiColonies"-list: */
         ArrayList<AIColony> aiColonies = new ArrayList<AIColony>();
         for (int i=0; i<transportList.size(); i++) {
-            Transportable t = (Transportable) transportList.get(i);
+            Transportable t = transportList.get(i);
             if (t.getTransportDestination() != null 
                     && t.getTransportDestination().getTile() != null
                     && t.getTransportDestination().getTile().getColony() != null
@@ -518,7 +518,7 @@ public class TransportMission extends Mission {
             }
         }
         for (int i=0; i<aiColonies.size(); i++) {
-            AIColony ac = (AIColony) aiColonies.get(i);
+            AIColony ac = aiColonies.get(i);
             // Assuming that all colonists which can be bought in Europe take the same space:
             int space = getAvailableSpace(Unit.FREE_COLONIST, getUnit().getOwner().getEurope(), ac.getColony());            
             Iterator wishIterator = ac.getWishIterator();

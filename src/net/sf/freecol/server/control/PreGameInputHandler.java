@@ -195,7 +195,7 @@ public final class PreGameInputHandler extends InputHandler {
             final Color color = player.getColor();
             // Check the nation.
             for (int i = 0; i < nations.size(); i++) {
-                if (((Integer) nations.get(i)).intValue() == nation) {
+                if (nations.get(i).intValue() == nation) {
                     Element reply = Message.createNewRootElement("error");
                     reply
                             .setAttribute("message",
@@ -207,7 +207,7 @@ public final class PreGameInputHandler extends InputHandler {
             nations.add(new Integer(nation));
             // Check the color.
             for (int i = 0; i < colors.size(); i++) {
-                if (((Color) colors.get(i)).equals(color)) {
+                if (colors.get(i).equals(color)) {
                     Element reply = Message.createNewRootElement("error");
                     reply.setAttribute("message", "All players need to pick a unique color before the game can start.");
                     reply.setAttribute("messageID", "server.invalidPlayerColors");

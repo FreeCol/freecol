@@ -118,7 +118,7 @@ public class IndianDemandMission extends Mission {
                 }
 
                 if (goodsList.size() > 0) {
-                    Goods goods = (Goods) goodsList.get(getRandom().nextInt(goodsList.size()));
+                    Goods goods = goodsList.get(getRandom().nextInt(goodsList.size()));
                     goods.setLocation(getUnit());
                 }
             }
@@ -167,7 +167,7 @@ public class IndianDemandMission extends Mission {
                         Element deliverGiftElement = Message.createNewRootElement("deliverGift");
                         deliverGiftElement.setAttribute("unit", getUnit().getID());
                         deliverGiftElement.setAttribute("settlement", target.getID());
-                        deliverGiftElement.appendChild(((Goods) getUnit().getGoodsIterator().next()).toXMLElement(null,
+                        deliverGiftElement.appendChild(getUnit().getGoodsIterator().next().toXMLElement(null,
                                 deliverGiftElement.getOwnerDocument()));
 
                         try {
@@ -348,7 +348,7 @@ public class IndianDemandMission extends Mission {
             return "[" + target.getName() + "] Getting gift: "
                     + getUnit().getIndianSettlement().getTile().getPosition();
         } else {
-            return "[" + target.getName() + "] " + ((Goods) getUnit().getGoodsIterator().next()).getName();
+            return "[" + target.getName() + "] " + getUnit().getGoodsIterator().next().getName();
         }
     }
 }

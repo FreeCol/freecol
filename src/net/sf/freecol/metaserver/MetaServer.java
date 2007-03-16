@@ -197,7 +197,7 @@ public final class MetaServer extends Thread {
      * @return The <code>Connection</code>.
      */
     public Connection getConnection(Socket socket) {
-        return (Connection) connections.get(socket);
+        return connections.get(socket);
     }
 
     /**

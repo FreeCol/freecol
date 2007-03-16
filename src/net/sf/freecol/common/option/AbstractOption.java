@@ -100,8 +100,7 @@ abstract public class AbstractOption implements Option {
     protected void firePropertyChange(String name, Object oldValue, Object newValue) {
         Iterator<PropertyChangeListener> it = propertyChangeListeners.iterator();
         while (it.hasNext()) {
-            ((PropertyChangeListener) it.next())
-                    .propertyChange(new PropertyChangeEvent(this, name, oldValue, newValue));
+            it.next().propertyChange(new PropertyChangeEvent(this, name, oldValue, newValue));
         }
     }
 

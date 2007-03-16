@@ -1,4 +1,3 @@
-
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.ActionEvent;
@@ -16,9 +15,11 @@ import net.sf.freecol.client.gui.i18n.Messages;
  * This is the panel that pops up when an error needs to be reported.
  */
 public final class ErrorPanel extends FreeColDialog implements ActionListener {
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
-    public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
-    public static final String  REVISION = "$Revision$";
+    public static final String COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
+
+    public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
+
+    public static final String REVISION = "$Revision$";
 
     private static final Logger logger = Logger.getLogger(ErrorPanel.class.getName());
 
@@ -30,12 +31,15 @@ public final class ErrorPanel extends FreeColDialog implements ActionListener {
     private final Canvas parent;
 
     private LinkedList<JLabel> errorLabels; // A LinkedList of JLabel objects.
+
     private JButton errorButton;
 
+
     /**
-    * The constructor that will add the items to this panel.
-    * @param parent The parent of this panel.
-    */
+     * The constructor that will add the items to this panel.
+     * 
+     * @param parent The parent of this panel.
+     */
     public ErrorPanel(Canvas parent) {
         this.parent = parent;
 
@@ -51,26 +55,24 @@ public final class ErrorPanel extends FreeColDialog implements ActionListener {
         add(errorButton);
     }
 
-
     public void requestFocus() {
         errorButton.requestFocus();
     }
 
-
     /**
-    * Adapts the appearance of this ErrorPanel to the given error message.
-    * If the error message is wider than lineWidth then the height of this panel
-    * will be adjusted.
-    * @param message The error message to display in this error panel.
-    */
+     * Adapts the appearance of this ErrorPanel to the given error message. If
+     * the error message is wider than lineWidth then the height of this panel
+     * will be adjusted.
+     * 
+     * @param message The error message to display in this error panel.
+     */
     public void initialize(String message) {
         LinkedList<String> lines = new LinkedList<String>();
-        while (getFontMetrics(getFont()).getStringBounds(message, getGraphics()).getWidth() + 40
-                > lineWidth) {
+        while (getFontMetrics(getFont()).getStringBounds(message, getGraphics()).getWidth() + 40 > lineWidth) {
             int spaceIndex = message.indexOf(' ');
             int previousIndex = -1;
-            while (getFontMetrics(getFont()).getStringBounds(message.substring(0, spaceIndex),
-                    getGraphics()).getWidth() + 40 <= lineWidth) {
+            while (getFontMetrics(getFont()).getStringBounds(message.substring(0, spaceIndex), getGraphics())
+                    .getWidth() + 40 <= lineWidth) {
                 previousIndex = spaceIndex;
                 if ((spaceIndex + 1) >= message.length()) {
                     spaceIndex = 0;
@@ -87,12 +89,10 @@ public final class ErrorPanel extends FreeColDialog implements ActionListener {
                 lines.add(message.substring(0, previousIndex));
                 if (previousIndex + 1 < message.length()) {
                     message = message.substring(previousIndex + 1);
-                }
-                else {
+                } else {
                     break;
                 }
-            }
-            else {
+            } else {
                 lines.add(message);
                 lines.add("Internal error in ErrorPanel");
                 break;
@@ -105,17 +105,16 @@ public final class ErrorPanel extends FreeColDialog implements ActionListener {
 
         if (errorLabels != null) {
             for (int i = 0; i < errorLabels.size(); i++) {
-                remove((JLabel)errorLabels.get(i));
+                remove(errorLabels.get(i));
             }
 
             errorLabels.clear();
-        }
-        else {
+        } else {
             errorLabels = new LinkedList<JLabel>();
         }
 
         for (int i = 0; i < lines.size(); i++) {
-            JLabel label = new JLabel((String)lines.get(i));
+            JLabel label = new JLabel(lines.get(i));
             label.setSize(lineWidth, 20);
             label.setLocation(10, 2 + i * 20);
             add(label);
@@ -129,23 +128,23 @@ public final class ErrorPanel extends FreeColDialog implements ActionListener {
     }
 
     /**
-    * This function analyses an event and calls the right methods to take
-    * care of the user's requests.
-    * @param event The incoming ActionEvent.
-    */
+     * This function analyses an event and calls the right methods to take care
+     * of the user's requests.
+     * 
+     * @param event The incoming ActionEvent.
+     */
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         try {
             switch (Integer.valueOf(command).intValue()) {
-                case OK:
-                    //parent.closeErrorPanel();
-                    setResponse(new Boolean(true));
-                    break;
-                default:
-                    logger.warning("Invalid Actioncommand: invalid number.");
+            case OK:
+                // parent.closeErrorPanel();
+                setResponse(new Boolean(true));
+                break;
+            default:
+                logger.warning("Invalid Actioncommand: invalid number.");
             }
-        }
-        catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             logger.warning("Invalid Actioncommand: not a number.");
         }
     }

@@ -569,7 +569,7 @@ public final class FreeColServer {
                     }
                 } else if (xsr.getLocalName().equals(Game.getXMLElementTagName())) {
                     // Read the game model:
-                    game = new Game(null, getModelController(), xsr, (FreeColGameObject[]) serverObjects
+                    game = new Game(null, getModelController(), xsr, serverObjects
                             .toArray(new FreeColGameObject[0]));
                     game.setCurrentPlayer(null);
                     gameState = IN_GAME;

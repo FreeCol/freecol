@@ -977,7 +977,7 @@ public class AIPlayer extends AIObject {
                 }
             }
             if (nearbyColonies.size() > 0) {
-                Colony target = (Colony) nearbyColonies.get(getRandom().nextInt(nearbyColonies.size()));
+                Colony target = nearbyColonies.get(getRandom().nextInt(nearbyColonies.size()));
                 Iterator it2 = indianSettlement.getOwnedUnitsIterator();
                 AIUnit chosenOne = null;
                 while (it2.hasNext()) {
@@ -1038,7 +1038,7 @@ public class AIPlayer extends AIObject {
                 int targetTension = Integer.MIN_VALUE;
                 Colony target = null;
                 for (int i = 0; i < nearbyColonies.size(); i++) {
-                    Colony t = (Colony) nearbyColonies.get(i);
+                    Colony t = nearbyColonies.get(i);
                     Player to = t.getOwner();
                     int tension = 1 + getPlayer().getTension(to).getValue() + indianSettlement.getAlarm(to).getValue();
                     tension = getRandom().nextInt(tension);
@@ -1470,7 +1470,7 @@ public class AIPlayer extends AIObject {
         }
 
         while (transportables.size() > 0) {
-            Transportable t = (Transportable) transportables.get(0);
+            Transportable t = transportables.get(0);
             TransportMission bestTransport = null;
             int bestTransportSpace = 0;
             int bestTransportTurns = Integer.MAX_VALUE;
@@ -1507,7 +1507,7 @@ public class AIPlayer extends AIObject {
             vacantTransports.remove(bestTransport);
             bestTransportSpace--;
             for (int i = 0; i < transportables.size() && bestTransportSpace > 0; i++) {
-                Transportable t2 = (Transportable) transportables.get(0);
+                Transportable t2 = transportables.get(0);
                 if (t2.getTransportLocatable().getLocation() == t.getTransportLocatable().getLocation()) {
                     bestTransport.addToTransportList(t2);
                     transportables.remove(t2);
@@ -1718,7 +1718,7 @@ public class AIPlayer extends AIObject {
         if (settlement instanceof IndianSettlement) {
             int price;
             if (sessionRegister.containsKey("tradeGold#" + unit.getID())) {
-                price = ((Integer) sessionRegister.get("tradeGold#" + unit.getID())).intValue();
+                price = sessionRegister.get("tradeGold#" + unit.getID()).intValue();
                 if (price <= 0) {
                     return price;
                 }
@@ -1738,7 +1738,7 @@ public class AIPlayer extends AIObject {
             } else {
                 int haggling = 1;
                 if (sessionRegister.containsKey("tradeHaggling#" + unit.getID())) {
-                    haggling = ((Integer) sessionRegister.get("tradeHaggling#" + unit.getID())).intValue();
+                    haggling = sessionRegister.get("tradeHaggling#" + unit.getID()).intValue();
                 }
                 if (getRandom().nextInt(3 + haggling) <= 3) {
                     sessionRegister.put("tradeGold#" + unit.getID(), new Integer(gold));

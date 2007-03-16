@@ -575,7 +575,7 @@ public class AIColony extends AIObject {
             if (colony.getGoodsCount(goodsType) > 0) {
                 List<AIGoods> alreadyAdded = new ArrayList<AIGoods>();
                 for (int j=0; j<aiGoods.size(); j++) {
-                    AIGoods ag = ((AIGoods) aiGoods.get(j));
+                    AIGoods ag = aiGoods.get(j);
                     if (ag == null) {
                         logger.warning("aiGoods == null");
                     } else if (ag.getGoods() == null) {
@@ -594,7 +594,7 @@ public class AIColony extends AIObject {
 
                 int amountRemaining = colony.getGoodsCount(goodsType);
                 for (int i=0; i<alreadyAdded.size(); i++) {
-                    AIGoods oldGoods = (AIGoods) alreadyAdded.get(i);
+                    AIGoods oldGoods = alreadyAdded.get(i);
                     if (oldGoods.getGoods().getLocation() != colony) {
                         continue;
                     }
@@ -650,7 +650,7 @@ public class AIColony extends AIObject {
         while (nai.hasNext()) {
             AIGoods ag = (AIGoods) nai.next();
             int i;
-            for (i=0; i<aiGoods.size() && ((AIGoods) aiGoods.get(i)).getTransportPriority() > ag.getTransportPriority(); i++);
+            for (i=0; i<aiGoods.size() && aiGoods.get(i).getTransportPriority() > ag.getTransportPriority(); i++);
             aiGoods.add(i, ag);
         }
     }
@@ -745,7 +745,7 @@ public class AIColony extends AIObject {
             // Use a food production plan if necessary:
             int food = colony.getFoodProduction() - colony.getFoodConsumption();
             for (int i=0; i<workLocationPlans.size() && food < 2; i++) {
-                WorkLocationPlan wlp = (WorkLocationPlan) workLocationPlans.get(i);
+                WorkLocationPlan wlp = workLocationPlans.get(i);
                 WorkLocation wl = wlp.getWorkLocation();
                 if (wlp.getGoodsType() == Goods.FOOD &&
                         (((ColonyTile) wl).getWorkTile().isLand() || colony.getBuilding(Building.DOCK).isBuilt())) {
@@ -775,7 +775,7 @@ public class AIColony extends AIObject {
             // Use the next non-food plan:
             if (food >= 2) {
                 for (int i=0; i<workLocationPlans.size(); i++) {
-                    WorkLocationPlan wlp = (WorkLocationPlan) workLocationPlans.get(i);
+                    WorkLocationPlan wlp = workLocationPlans.get(i);
                     if (wlp.getGoodsType() != Goods.FOOD) {
                         Unit bestUnit = null;
                         int bestProduction = 0;
@@ -927,7 +927,7 @@ public class AIColony extends AIObject {
 
         // Use any remaining food plans:
         for (int i=0; i<workLocationPlans.size(); i++) {
-            WorkLocationPlan wlp = (WorkLocationPlan) workLocationPlans.get(i);
+            WorkLocationPlan wlp = workLocationPlans.get(i);
             WorkLocation wl = wlp.getWorkLocation();
             if (wlp.getGoodsType() == Goods.FOOD &&
                     (((ColonyTile) wl).getWorkTile().isLand() || colony.getBuilding(Building.DOCK).isBuilt())) {
