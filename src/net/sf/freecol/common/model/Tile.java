@@ -321,9 +321,9 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
 	public int getUnitTreasureAmount() {
 		int amount = 0;
 
-		Iterator ui = getUnitIterator();
+		Iterator<Unit> ui = getUnitIterator();
 		while (ui.hasNext()) {
-			Unit u = (Unit) ui.next();
+			Unit u = ui.next();
 			if (u.getType() == Unit.TREASURE_TRAIN) {
 				amount += u.getTreasureAmount();
 			}
@@ -342,9 +342,9 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
 	public Unit getBestTreasureTrain() {
 		Unit bestTreasureTrain = null;
 
-		Iterator ui = getUnitIterator();
+		Iterator<Unit> ui = getUnitIterator();
 		while (ui.hasNext()) {
-			Unit u = (Unit) ui.next();
+			Unit u = ui.next();
 			if (u.getType() == Unit.TREASURE_TRAIN
 					&& (bestTreasureTrain == null || bestTreasureTrain
 							.getTreasureAmount() < u.getTreasureAmount())) {
@@ -374,10 +374,10 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
 			boolean nearbyTileHasForest = false;
 			boolean nearbyTileIsOcean = false;
 
-			List v = getGame().getMap().getSurroundingTiles(this, 1);
-			Iterator tileIterator = v.iterator();
+			List<Tile> v = getGame().getMap().getSurroundingTiles(this, 1);
+			Iterator<Tile> tileIterator = v.iterator();
 			while (tileIterator.hasNext()) {
-				Tile tile = (Tile) tileIterator.next();
+				Tile tile = tileIterator.next();
 				if (tile.getColony() != null) {
 					// can't build next to colony
 					return 0;
@@ -446,10 +446,10 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
 	 *         tile.
 	 */
 	public Unit getDefendingUnit(Unit attacker) {
-		Iterator unitIterator = getUnitIterator();
+		Iterator<Unit> unitIterator = getUnitIterator();
 		Unit defender = null;
 		while (unitIterator.hasNext()) {
-			Unit nextUnit = (Unit) unitIterator.next();
+			Unit nextUnit = unitIterator.next();
 
 			if (isLand() != nextUnit.isNaval()
 					&& (defender == null || nextUnit.getDefensePower(attacker) > defender
@@ -742,9 +742,9 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
 	public int getLandCount() {
 		if (landCount < 0) {
 			landCount = 0;
-			Iterator tileIterator = getMap().getAdjacentIterator(getPosition());
+			Iterator<Position> tileIterator = getMap().getAdjacentIterator(getPosition());
 			while (tileIterator.hasNext()) {
-				if (getMap().getTile((Position) tileIterator.next()).isLand()) {
+				if (getMap().getTile(tileIterator.next()).isLand()) {
 					landCount++;
 				}
 			}
@@ -1016,13 +1016,13 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
 	 */
 	public Unit getMovableUnit() {
 		if (getFirstUnit() != null) {
-			Iterator unitIterator = getUnitIterator();
+			Iterator<Unit> unitIterator = getUnitIterator();
 			while (unitIterator.hasNext()) {
-				Unit u = (Unit) unitIterator.next();
+				Unit u = unitIterator.next();
 
-				Iterator childUnitIterator = u.getUnitIterator();
+				Iterator<Unit> childUnitIterator = u.getUnitIterator();
 				while (childUnitIterator.hasNext()) {
-					Unit childUnit = (Unit) childUnitIterator.next();
+					Unit childUnit = childUnitIterator.next();
 
 					if ((childUnit.getMovesLeft() > 0)
 							&& (childUnit.getState() == Unit.ACTIVE)) {
@@ -1038,13 +1038,13 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
 			return null;
 		}
 
-		Iterator unitIterator = getUnitIterator();
+		Iterator<Unit> unitIterator = getUnitIterator();
 		while (unitIterator.hasNext()) {
-			Unit u = (Unit) unitIterator.next();
+			Unit u = unitIterator.next();
 
-			Iterator childUnitIterator = u.getUnitIterator();
+			Iterator<Unit> childUnitIterator = u.getUnitIterator();
 			while (childUnitIterator.hasNext()) {
-				Unit childUnit = (Unit) childUnitIterator.next();
+				Unit childUnit = childUnitIterator.next();
 
 				if ((childUnit.getMovesLeft() > 0)) {
 					return childUnit;
@@ -1143,7 +1143,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
 	 * 
 	 * @return The clone.
 	 */
-	public ArrayList getUnitsClone() {
+	public ArrayList<Unit> getUnitsClone() {
 		return unitContainer.getUnitsClone();
 	}
 
@@ -1369,7 +1369,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
 	 * Prepares this <code>Tile</code> for a new turn.
 	 */
 	public void newTurn() {
-
+	    // Nothing here ????
 	}
 
 	/**
@@ -1784,9 +1784,9 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
 		if (playerExploredTiles == null || getGame().getViewOwner() != null) {
 			return;
 		}
-		Iterator it = getGame().getPlayerIterator();
+		Iterator<Player> it = getGame().getPlayerIterator();
 		while (it.hasNext()) {
-			Player p = (Player) it.next();
+			Player p = it.next();
 			if (playerExploredTiles[p.getNation()] == null && !p.isEuropean()) {
 				continue;
 			}

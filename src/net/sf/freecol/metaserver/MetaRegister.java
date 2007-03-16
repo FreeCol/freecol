@@ -23,7 +23,7 @@ public final class MetaRegister {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
     
-    private ArrayList items = new ArrayList();
+    private ArrayList<MetaItem> items = new ArrayList<MetaItem>();
     
     
     /**
@@ -37,7 +37,7 @@ public final class MetaRegister {
     private MetaItem getItem(String address, int port) {
         int index = indexOf(address, port);
         if (index >= 0) {
-            return (MetaItem) items.get(index);
+            return items.get(index);
         } else {
             return null;
         }
@@ -53,7 +53,7 @@ public final class MetaRegister {
     */
     private int indexOf(String address, int port) {
         for (int i=0; i<items.size(); i++) {
-            if (address.equals(((MetaItem) items.get(i)).getAddress()) && port == ((MetaItem) items.get(i)).getPort()) {
+            if (address.equals(items.get(i).getAddress()) && port == items.get(i).getPort()) {
                 return i;
             }
         }
@@ -70,7 +70,7 @@ public final class MetaRegister {
 
         long time = System.currentTimeMillis() - MetaServer.REMOVE_OLDER_THAN;
         for (int i=0; i<items.size(); i++) {
-            if (((MetaItem) items.get(i)).getLastUpdated() < time) {
+            if (items.get(i).getLastUpdated() < time) {
                 logger.info("Removing: " + items.get(i));
                 items.remove(i);
             }
@@ -148,7 +148,7 @@ public final class MetaRegister {
     public synchronized Element createServerList() {
         Element element = Message.createNewRootElement("serverList");
         for (int i=0; i<items.size(); i++) {
-            element.appendChild(((MetaItem) items.get(i)).toXMLElement(element.getOwnerDocument()));
+            element.appendChild(items.get(i).toXMLElement(element.getOwnerDocument()));
         }
         return element;
     }

@@ -97,7 +97,7 @@ public class IndianSettlement extends Settlement {
 
     private UnitContainer unitContainer;
 
-    private ArrayList ownedUnits = new ArrayList();
+    private ArrayList<Unit> ownedUnits = new ArrayList<Unit>();
 
     private Unit missionary;
 
@@ -112,7 +112,7 @@ public class IndianSettlement extends Settlement {
     private Tension[] alarm = new Tension[Player.NUMBER_OF_NATIONS];
 
     // sort goods descending by price
-    private final Comparator wantedGoodsComparator = new Comparator<Goods>() {
+    private final Comparator<Goods> wantedGoodsComparator = new Comparator<Goods>() {
         public int compare(Goods goods1, Goods goods2) {
             return getPrice(goods2) - getPrice(goods1);
         }
@@ -363,7 +363,7 @@ public class IndianSettlement extends Settlement {
     * 
     * @return The <code>Iterator</code>.
     */
-    public Iterator getOwnedUnitsIterator() {
+    public Iterator<Unit> getOwnedUnitsIterator() {
         return ownedUnits.iterator();
     }
 
@@ -621,17 +621,17 @@ public class IndianSettlement extends Settlement {
     * @return The <code>Unit</code> that has been choosen to defend this <code>IndianSettlement</code>.
     */
     public Unit getDefendingUnit(Unit attacker) {
-        Iterator unitIterator = getUnitIterator();
+        Iterator<Unit> unitIterator = getUnitIterator();
 
         Unit defender = null;
         if (unitIterator.hasNext()) {
-            defender = (Unit) unitIterator.next();
+            defender = unitIterator.next();
         } else {
             return null;
         }
 
         while (unitIterator.hasNext()) {
-            Unit nextUnit = (Unit) unitIterator.next();
+            Unit nextUnit = unitIterator.next();
 
             if (nextUnit.getDefensePower(attacker) > defender.getDefensePower(attacker)) {
                 defender = nextUnit;
@@ -687,7 +687,7 @@ public class IndianSettlement extends Settlement {
             supply += goodsContainer.getGoodsCount(Goods.MUSKETS) / Unit.MUSKETS_TO_ARM_INDIAN;
             for (int i=0; i<ownedUnits.size(); i++) {
                 need += Unit.MUSKETS_TO_ARM_INDIAN;
-                if (((Unit) ownedUnits.get(i)).isArmed()) {
+                if (ownedUnits.get(i).isArmed()) {
                     supply += Unit.MUSKETS_TO_ARM_INDIAN;
                 }
             }
@@ -707,7 +707,7 @@ public class IndianSettlement extends Settlement {
             supply += goodsContainer.getGoodsCount(Goods.HORSES) / Unit.HORSES_TO_MOUNT_INDIAN;
             for (int i=0; i<ownedUnits.size(); i++) {
                 need += Unit.HORSES_TO_MOUNT_INDIAN;
-                if (((Unit) ownedUnits.get(i)).isMounted()) {
+                if (ownedUnits.get(i).isMounted()) {
                     supply += Unit.HORSES_TO_MOUNT_INDIAN;
                 }
             }
@@ -778,9 +778,9 @@ public class IndianSettlement extends Settlement {
     */
     public int getMaximumProduction(int goodsType) {
         int amount = 0;
-        Iterator it = getGame().getMap().getCircleIterator(getTile().getPosition(), true, getRadius());
+        Iterator<Position> it = getGame().getMap().getCircleIterator(getTile().getPosition(), true, getRadius());
         while (it.hasNext()) {
-            Tile workTile = getGame().getMap().getTile((Map.Position) it.next());
+            Tile workTile = getGame().getMap().getTile(it.next());
             if (workTile.getOwner() == null || workTile.getOwner() == this) {
                 amount += workTile.potential(goodsType);
             }
@@ -871,9 +871,9 @@ public class IndianSettlement extends Settlement {
         int totalGoods = 0;
         int[] potential = new int[Goods.NUMBER_OF_TYPES];
 
-        Iterator it = getGame().getMap().getCircleIterator(getTile().getPosition(), true, getRadius());
+        Iterator<Position> it = getGame().getMap().getCircleIterator(getTile().getPosition(), true, getRadius());
         while (it.hasNext()) {
-            Tile workTile = getGame().getMap().getTile((Map.Position) it.next());
+            Tile workTile = getGame().getMap().getTile(it.next());
             if (workTile.getOwner() == null || workTile.getOwner() == this) {
                 for (int i=0; i<Goods.NUMBER_OF_TYPES;i++) {
                     potential[i] += workTile.potential(i);
@@ -938,17 +938,17 @@ public class IndianSettlement extends Settlement {
             int[] extraAlarm = new int[Player.NUMBER_OF_NATIONS];
             
             int alarmRadius = getRadius() + 2; // the radius in which Europeans cause alarm
-            Iterator ci = getGame().getMap().getCircleIterator(getTile().getPosition(), true, alarmRadius);
+            Iterator<Position> ci = getGame().getMap().getCircleIterator(getTile().getPosition(), true, alarmRadius);
             while (ci.hasNext()) {
-                Tile t = getGame().getMap().getTile((Map.Position) ci.next());
+                Tile t = getGame().getMap().getTile(ci.next());
                 
                 // Nearby military units:
                 if (t.getFirstUnit() != null 
                 		&& t.getFirstUnit().getOwner().isEuropean()
                 		&& t.getSettlement() == null) {                    
-                	Iterator ui = t.getUnitIterator();
+                	Iterator<Unit> ui = t.getUnitIterator();
                 	while (ui.hasNext()) {
-                		Unit u = (Unit) ui.next();
+                		Unit u = ui.next();
                 		if (u.isOffensiveUnit() && !u.isNaval()) {                    		
                 			extraAlarm[u.getOwner().getNation()] += u.getOffensePower(getTile().getDefendingUnit(u));
                 		}
@@ -1005,9 +1005,9 @@ public class IndianSettlement extends Settlement {
             
             if (convertProgress >= 100 + extra && getUnitCount() > 2) {
                 Tile targetTile = null;
-                Iterator ffi = getGame().getMap().getFloodFillIterator(getTile().getPosition());
+                Iterator<Position> ffi = getGame().getMap().getFloodFillIterator(getTile().getPosition());
                 while (ffi.hasNext()) {
-                    Tile t = getGame().getMap().getTile((Map.Position) ffi.next());
+                    Tile t = getGame().getMap().getTile(ffi.next());
                     if (getTile().getDistanceTo(t) > MAX_CONVERT_DISTANCE) {
                         break;
                     }
@@ -1048,7 +1048,7 @@ public class IndianSettlement extends Settlement {
      */
     public void dispose() {
         while (ownedUnits.size() > 0) {
-            ((Unit) ownedUnits.remove(0)).setIndianSettlement(null);
+            ownedUnits.remove(0).setIndianSettlement(null);
         }
         unitContainer.dispose();
 
@@ -1058,11 +1058,11 @@ public class IndianSettlement extends Settlement {
         
         Map map = getGame().getMap();
         Position position = settlementTile.getPosition();
-        Iterator circleIterator = map.getCircleIterator(position, true, getRadius());
+        Iterator<Position> circleIterator = map.getCircleIterator(position, true, getRadius());
         
         settlementTile.setClaim(Tile.CLAIM_NONE);
         while (circleIterator.hasNext()) {
-            Tile tile = map.getTile((Position) circleIterator.next());
+            Tile tile = map.getTile(circleIterator.next());
             if (tile.getNationOwner() == nation) {
                 tile.setClaim(Tile.CLAIM_NONE);
             }
@@ -1125,7 +1125,7 @@ public class IndianSettlement extends Settlement {
         if (showAll || player == getOwner()) {
             String ownedUnitsString = "";
             for (int i=0; i<ownedUnits.size(); i++) {
-                ownedUnitsString += ((Unit) ownedUnits.get(i)).getID();
+                ownedUnitsString += ownedUnits.get(i).getID();
                 if (i != ownedUnits.size() - 1) {
                     ownedUnitsString += ", ";
                 }

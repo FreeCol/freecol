@@ -70,10 +70,10 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
         ownerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         add(ownerLabel);        
         
-        ArrayList farmedGoods = new ArrayList();
+        ArrayList<Integer> farmedGoods = new ArrayList<Integer>();
         for (int i = 0; i < Goods.NUMBER_OF_TYPES; i++) {
             if (Goods.isFarmedGoods(i)) {
-                farmedGoods.add(new Integer(i));
+                farmedGoods.add(i);
             }
 
         }
@@ -85,7 +85,7 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
         goods = new int[number];
         labels = new JLabel[number];
         for (int k = 0; k < number; k++) {
-            int index = ((Integer) farmedGoods.get(k)).intValue();
+            int index = farmedGoods.get(k).intValue();
             goods[k] = index;
             labels[k] = new JLabel(canvas.getImageProvider().getGoodsImageIcon(index));
             //goodsPanel.add(labels[k]);
