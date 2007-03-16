@@ -39,8 +39,6 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 
-import cz.autel.dmi.HIGConstraints;
-
 /**
  * This is a panel for the Europe display. It shows the ships in Europe and
  * allows the user to send them back.

@@ -1,16 +1,10 @@
-
-
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -42,55 +36,60 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
- * The super class of all actions in FreeCol. Subclasses of this
- * object is stored in an {@link ActionManager}.
+ * The super class of all actions in FreeCol. Subclasses of this object is
+ * stored in an {@link ActionManager}.
  */
 public abstract class FreeColAction extends AbstractAction implements Option {
     private static final Logger logger = Logger.getLogger(FreeColAction.class.getName());
 
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
-    public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
-    public static final String  REVISION = "$Revision$";
-    
+    public static final String COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
+
+    public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
+
+    public static final String REVISION = "$Revision$";
+
     public static final String BUTTON_IMAGE = "BUTTON_IMAGE";
+
     public static final String BUTTON_ROLLOVER_IMAGE = "BUTTON_ROLLOVER_IMAGE";
+
     public static final String BUTTON_PRESSED_IMAGE = "BUTTON_PRESSED_IMAGE";
+
     public static final String BUTTON_DISABLED_IMAGE = "BUTTON_DISABLED_IMAGE";
-    
+
     public static final Integer NO_MNEMONIC = null;
-    
+
     protected final FreeColClient freeColClient;
+
 
     /**
      * Creates a new <code>FreeColAction</code>.
      * 
      * @param freeColClient The main controller object for the client.
      * @param name An i18n-key to identify the name of this action.
-     * @param shortDescription An i18n-key to identify a short 
-     *      description of this action. This value can be set to
-     *      <code>null</code> if the action does not have a
-     *      description.
-     * @param mnemonic A mnemonic to be used for selecting this action
-     *      when the action is displaying on a menu etc.
-     * @param accelerator The keyboard accelerator to be used for
-     *      selecting this action or <code>null</code> if this action
-     *      does not have an accelerator.
+     * @param shortDescription An i18n-key to identify a short description of
+     *            this action. This value can be set to <code>null</code> if
+     *            the action does not have a description.
+     * @param mnemonic A mnemonic to be used for selecting this action when the
+     *            action is displaying on a menu etc.
+     * @param accelerator The keyboard accelerator to be used for selecting this
+     *            action or <code>null</code> if this action does not have an
+     *            accelerator.
      */
     protected FreeColAction(FreeColClient freeColClient, String name, String shortDescription) {
-    	super(Messages.message(name));
-    	
-    	this.freeColClient = freeColClient;
+        super(Messages.message(name));
+
+        this.freeColClient = freeColClient;
 
         putValue(SHORT_DESCRIPTION, shortDescription);
     }
-    
+
     protected FreeColAction(FreeColClient freeColClient, String name, String shortDescription, int mnemonic) {
         super(Messages.message(name));
 
         this.freeColClient = freeColClient;
 
         putValue(SHORT_DESCRIPTION, shortDescription);
-       	putValue(MNEMONIC_KEY, new Integer(mnemonic));
+        putValue(MNEMONIC_KEY, new Integer(mnemonic));
     }
 
     protected FreeColAction(FreeColClient freeColClient, String name, String shortDescription, KeyStroke accelerator) {
@@ -99,25 +98,27 @@ public abstract class FreeColAction extends AbstractAction implements Option {
         this.freeColClient = freeColClient;
 
         putValue(SHORT_DESCRIPTION, shortDescription);
-       	putValue(ACCELERATOR_KEY, accelerator);
+        putValue(ACCELERATOR_KEY, accelerator);
     }
-    
-    protected FreeColAction(FreeColClient freeColClient, String name, String shortDescription, int mnemonic, KeyStroke accelerator) {
+
+    protected FreeColAction(FreeColClient freeColClient, String name, String shortDescription, int mnemonic,
+            KeyStroke accelerator) {
         super(Messages.message(name));
 
         this.freeColClient = freeColClient;
 
         putValue(SHORT_DESCRIPTION, shortDescription);
-       	putValue(MNEMONIC_KEY, new Integer(mnemonic));
-       	putValue(ACCELERATOR_KEY, accelerator);
+        putValue(MNEMONIC_KEY, new Integer(mnemonic));
+        putValue(ACCELERATOR_KEY, accelerator);
     }
-    
+
     public Integer getMnemonic() {
-    	return (Integer)getValue(MNEMONIC_KEY);
+        return (Integer) getValue(MNEMONIC_KEY);
     }
-    
+
     /**
      * Gets the main controller object for the client.
+     * 
      * @return The main controller object for the client.
      */
     protected FreeColClient getFreeColClient() {
@@ -125,8 +126,8 @@ public abstract class FreeColAction extends AbstractAction implements Option {
     }
 
     /**
-     * Updates the "enabled"-status with the value
-     * returned by {@link #shouldBeEnabled}.
+     * Updates the "enabled"-status with the value returned by
+     * {@link #shouldBeEnabled}.
      */
     public void update() {
         boolean b = shouldBeEnabled();
@@ -134,42 +135,43 @@ public abstract class FreeColAction extends AbstractAction implements Option {
             setEnabled(b);
         }
     }
-    
+
     /**
      * Checks if this action should be enabled.
      * 
-     * @return <code>false</code> if the 
-     * {@link net.sf.freecol.client.gui.panel.ClientOptionsDialog} 
-     * is visible and <code>true</code> otherwise.
-     * This method should be extended by subclasses if
-     * the action should be disabled in other cases.
+     * @return <code>false</code> if the
+     *         {@link net.sf.freecol.client.gui.panel.ClientOptionsDialog} is
+     *         visible and <code>true</code> otherwise. This method should be
+     *         extended by subclasses if the action should be disabled in other
+     *         cases.
      */
     protected boolean shouldBeEnabled() {
-        return freeColClient.getCanvas() != null
-                && !freeColClient.getCanvas().getClientOptionsDialog().isShowing();        
+        return freeColClient.getCanvas() != null && !freeColClient.getCanvas().getClientOptionsDialog().isShowing();
     }
-    
+
     /**
      * Sets a keyboard accelerator.
+     * 
      * @param accelerator The <code>KeyStroke</code>. Using <code>null</code>
-     *        is the same as disabling the keyboard accelerator.
+     *            is the same as disabling the keyboard accelerator.
      */
     public void setAccelerator(KeyStroke accelerator) {
         putValue(ACCELERATOR_KEY, accelerator);
     }
-    
+
     /**
      * Gets the keyboard accelerator for this option.
-     * @return The <code>KeyStroke</code> or <code>null</code>
-     *        if the keyboard accelerator is disabled.
+     * 
+     * @return The <code>KeyStroke</code> or <code>null</code> if the
+     *         keyboard accelerator is disabled.
      */
     public KeyStroke getAccelerator() {
         return (KeyStroke) getValue(ACCELERATOR_KEY);
     }
-    
+
     /**
-     * Gives a short description of this <code>Option</code>.
-     * Can for instance be used as a tooltip text.
+     * Gives a short description of this <code>Option</code>. Can for
+     * instance be used as a tooltip text.
      * 
      * @return A short description of this action.
      */
@@ -189,41 +191,44 @@ public abstract class FreeColAction extends AbstractAction implements Option {
 
     /**
      * Returns the id of this <code>Option</code>.
+     * 
      * @return An unique identifier for this action.
      */
     public abstract String getId();
 
     /**
      * Returns the name of this <code>Option</code>.
+     * 
      * @return The name as provided in the constructor.
      */
     public String getName() {
         return (String) getValue(NAME);
-    }    
+    }
 
     /**
-     * Creates a <code>String</code> that keeps the attributes
-     * given <code>KeyStroke</code>. This <code>String</code>
-     * can be used to store the key stroke in an XML-file.
+     * Creates a <code>String</code> that keeps the attributes given
+     * <code>KeyStroke</code>. This <code>String</code> can be used to
+     * store the key stroke in an XML-file.
      * 
      * @param keyStroke The <code>KeyStroke</code>.
-     * @return A <code>String</code> that produces a key stroke
-     *         equal to the given <code>KeyStroke</code> if passed
-     *         as a parameter to <code>getAWTKeyStroke(String)</code>.
+     * @return A <code>String</code> that produces a key stroke equal to the
+     *         given <code>KeyStroke</code> if passed as a parameter to
+     *         <code>getAWTKeyStroke(String)</code>.
      */
     public static String getKeyStrokeText(KeyStroke keyStroke) {
         if (keyStroke == null) {
             return "";
-        } else return keyStroke.toString();
+        } else
+            return keyStroke.toString();
     }
 
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *  
+     * This method writes an XML-representation of this object to the given
+     * stream.
+     * 
      * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         // Start element:
@@ -236,9 +241,9 @@ public abstract class FreeColAction extends AbstractAction implements Option {
 
     /**
      * Initialize this object from an XML-representation of this object.
+     * 
      * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
+     * @throws XMLStreamException if a problem was encountered during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         String acc = in.getAttributeValue(null, "accelerator");
@@ -251,34 +256,34 @@ public abstract class FreeColAction extends AbstractAction implements Option {
     }
 
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *  
+     * This method writes an XML-representation of this object to the given
+     * stream.
+     * 
      * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
      */
     public void toXML(XMLStreamWriter out) throws XMLStreamException {
         toXMLImpl(out);
     }
-    
+
     /**
      * Initialize this object from an XML-representation of this object.
+     * 
      * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
+     * @throws XMLStreamException if a problem was encountered during parsing.
      */
     public void readFromXML(XMLStreamReader in) throws XMLStreamException {
         readFromXMLImpl(in);
     }
-    
+
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *  
+     * This method writes an XML-representation of this object to the given
+     * stream.
+     * 
      * @param document The <code>Document</code>.
      * @return An XML-representation of this object.
-     */    
+     */
     public Element toXMLElement(Document document) {
         try {
             StringWriter sw = new StringWriter();
@@ -286,7 +291,7 @@ public abstract class FreeColAction extends AbstractAction implements Option {
             XMLStreamWriter xsw = xif.createXMLStreamWriter(sw);
             toXML(xsw);
             xsw.close();
-            
+
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             Document tempDocument = null;
             try {
@@ -309,18 +314,18 @@ public abstract class FreeColAction extends AbstractAction implements Option {
                 ie.printStackTrace(new PrintWriter(swe));
                 logger.warning(swe.toString());
                 throw new IllegalStateException("IOException");
-            }                                    
+            }
         } catch (XMLStreamException e) {
             logger.warning(e.toString());
             throw new IllegalStateException("XMLStreamException");
         }
     }
-    
+
     /**
      * Initialize this object from an XML-representation of this object.
      */
     public void readFromXMLElement(Element element) {
-        XMLInputFactory xif = XMLInputFactory.newInstance();        
+        XMLInputFactory xif = XMLInputFactory.newInstance();
         try {
             try {
                 TransformerFactory factory = TransformerFactory.newInstance();
@@ -342,43 +347,47 @@ public abstract class FreeColAction extends AbstractAction implements Option {
             throw new IllegalStateException("XMLStreamException");
         }
     }
-    
+
     public MenuKeyListener getMenuKeyListener() {
-    	return new InnerMenuKeyListener();
+        return new InnerMenuKeyListener();
     }
 
+
     /**
-     * A class used by Actions which have a mnemonic. Those Actions should assign this
-     * listener to the JMenuItem they are a part of. This captures the mnemonic key press
-     * and keeps other menus from processing keys meant for other actions.
+     * A class used by Actions which have a mnemonic. Those Actions should
+     * assign this listener to the JMenuItem they are a part of. This captures
+     * the mnemonic key press and keeps other menus from processing keys meant
+     * for other actions.
      * 
      * @author johnathanj
      */
     public class InnerMenuKeyListener implements MenuKeyListener {
 
-		int mnemonic;
-		
-		public InnerMenuKeyListener() {
-			mnemonic = ((Integer)getValue(MNEMONIC_KEY)).intValue();
-		}
-    	
-    	public void menuKeyPressed(MenuKeyEvent e) {
-			
-			if (e.getKeyCode() == mnemonic) {
-				ActionEvent ae = new ActionEvent(e.getSource(), e.getID(), (String)getValue(Action.NAME), e.getModifiers());
-				actionPerformed(ae);
-				
-				e.consume();
-			}
-		}
+        int mnemonic;
 
-		public void menuKeyReleased(MenuKeyEvent e) {
-			// do nothing
-		}
 
-		public void menuKeyTyped(MenuKeyEvent e) {
-			// do nothing
-		}
-    	
+        public InnerMenuKeyListener() {
+            mnemonic = ((Integer) getValue(MNEMONIC_KEY)).intValue();
+        }
+
+        public void menuKeyPressed(MenuKeyEvent e) {
+
+            if (e.getKeyCode() == mnemonic) {
+                ActionEvent ae = new ActionEvent(e.getSource(), e.getID(), (String) getValue(Action.NAME), e
+                        .getModifiers());
+                actionPerformed(ae);
+
+                e.consume();
+            }
+        }
+
+        public void menuKeyReleased(MenuKeyEvent e) {
+            // do nothing
+        }
+
+        public void menuKeyTyped(MenuKeyEvent e) {
+            // do nothing
+        }
+
     }
 }
