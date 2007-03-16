@@ -22,6 +22,7 @@ import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.metal.DefaultMetalTheme;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.FAFile;
 import net.sf.freecol.common.FreeColException;
 
@@ -36,7 +37,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
     
-    private final static Class resourceLocator = net.sf.freecol.FreeCol.class;
+    private final static Class<FreeCol> resourceLocator = net.sf.freecol.FreeCol.class;
     private File dataDirectory;
     
     private static final Color PRIMARY_1 = new Color(122, 109, 82),

@@ -169,9 +169,9 @@ public final class PreGameController extends Controller {
         setMap(map);
         
         // Initialise the crosses required values.
-        Iterator playerIterator = game.getPlayerIterator();
+        Iterator<Player> playerIterator = game.getPlayerIterator();
         while (playerIterator.hasNext()) {
-            Player p = (Player) playerIterator.next();
+            Player p = playerIterator.next();
             p.updateCrossesRequired();
         }
         
@@ -199,7 +199,7 @@ public final class PreGameController extends Controller {
 
         game.reinitialiseMarket(); // Do this here because game is restarting. -sjm
 
-        Iterator playerIterator = game.getPlayerIterator();
+        Iterator<Player> playerIterator = game.getPlayerIterator();
         while (playerIterator.hasNext()) {
             ServerPlayer player = (ServerPlayer) playerIterator.next();
 

@@ -347,7 +347,7 @@ class PlayersTableModel extends AbstractTableModel {
     @SuppressWarnings("unused")
     private FreeColClient freeColClient;
 
-    private Vector players;
+    private Vector<Player> players;
 
     private Player thisPlayer;
 
@@ -366,7 +366,7 @@ class PlayersTableModel extends AbstractTableModel {
      */
     public PlayersTableModel(FreeColClient freeColClient, PreGameController pgc) {
         this.freeColClient = freeColClient;
-        players = new Vector();
+        players = new Vector<Player>();
         thisPlayer = null;
         preGameController = pgc;
     }
@@ -380,7 +380,7 @@ class PlayersTableModel extends AbstractTableModel {
      * @param owningPlayer The player running the client that is displaying the
      *            table.
      */
-    public void setData(Vector myPlayers, Player owningPlayer) {
+    public void setData(Vector<Player> myPlayers, Player owningPlayer) {
         players = myPlayers;
         thisPlayer = owningPlayer;
     }
@@ -426,9 +426,9 @@ class PlayersTableModel extends AbstractTableModel {
         if (i == 0) {
             return thisPlayer;
         } else if (players.get(i) == thisPlayer) {
-            return (Player) players.get(0);
+            return players.get(0);
         } else {
-            return (Player) players.get(i);
+            return players.get(i);
         }
     }
 

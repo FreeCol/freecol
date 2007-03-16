@@ -39,7 +39,7 @@ public final class GoodsType
 
     // ------------------------------------------------------------ API methods
 
-    public void readFromXmlElement( Node xml, Map goodsTypeByRef ) {
+    public void readFromXmlElement( Node xml, Map<String, GoodsType> goodsTypeByRef ) {
 
         id = Xml.attribute( xml, "name" );
         name = Xml.messageAttribute( xml, "name" );
@@ -48,7 +48,7 @@ public final class GoodsType
         if ( Xml.hasAttribute(xml, "made-from") ) {
 
             String  madeFromRef = Xml.attribute( xml, "made-from" );
-            GoodsType  rawMaterial = (GoodsType) goodsTypeByRef.get( madeFromRef );
+            GoodsType  rawMaterial = goodsTypeByRef.get( madeFromRef );
             madeFrom = rawMaterial;
             rawMaterial.makes = this;
         }

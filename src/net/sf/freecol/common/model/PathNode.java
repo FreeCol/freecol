@@ -10,7 +10,7 @@ package net.sf.freecol.common.model;
 * You will most likely be using: {@link #next}, {@link #getDirection},
 * {@link #getTile} and {@link #getTotalTurns}, when evaluating/following a path.
 */
-public class PathNode implements Comparable {
+public class PathNode implements Comparable<PathNode> {
 
     public static final  String  COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
     public static final  String  LICENSE   = "http://www.gnu.org/licenses/gpl.html";
@@ -249,8 +249,8 @@ public class PathNode implements Comparable {
     *         less than, equal to, or greater than the specified object.
     * @exception ClassCastException if the given object is not a <code>PathNode</code>.
     */
-    public int compareTo(Object o) {
-        return ((PathNode) o).getF()-f;
+    public int compareTo(PathNode o) {
+        return o.getF()-f;
     }
     
     /**

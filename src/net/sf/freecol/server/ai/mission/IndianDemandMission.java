@@ -239,9 +239,9 @@ public class IndianDemandMission extends Mission {
         } else if (tension <= Tension.DISPLEASED) {
             Market market = getGame().getMarket();
             int value = 0;
-            Iterator iterator = warehouse.getCompactGoodsIterator();
+            Iterator<Goods> iterator = warehouse.getCompactGoodsIterator();
             while (iterator.hasNext()) {
-                Goods currentGoods = (Goods) iterator.next();
+                Goods currentGoods = iterator.next();
                 int goodsValue = market.getSalePrice(currentGoods);
                 if (currentGoods.getType() == Goods.FOOD || currentGoods.getType() == Goods.HORSES
                         || currentGoods.getType() == Goods.MUSKETS) {

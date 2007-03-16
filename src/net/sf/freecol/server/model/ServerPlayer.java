@@ -14,6 +14,7 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.option.BooleanOption;
 
@@ -125,13 +126,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
     */
     public void resetExploredTiles(Map map) {
         if (map != null) {
-            Iterator unitIterator = getUnitIterator();
+            Iterator<Unit> unitIterator = getUnitIterator();
             while (unitIterator.hasNext()) {
-                Unit unit = (Unit) unitIterator.next();
+                Unit unit = unitIterator.next();
 
                 setExplored(unit.getTile());
 
-                Iterator positionIterator;
+                Iterator<Position> positionIterator;
                 if (unit.getTile().getColony() != null) {
                     positionIterator = map.getCircleIterator(unit.getTile().getPosition(), true, 2);
                 } else {
@@ -139,7 +140,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 }
 
                 while (positionIterator.hasNext()) {
-                    Map.Position p = (Map.Position) positionIterator.next();
+                    Map.Position p = positionIterator.next();
                     setExplored(map.getTile(p));
                 }
             }
@@ -191,9 +192,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
         setExplored(unit.getTile());
         canSeeTiles[unit.getTile().getPosition().getX()][unit.getTile().getPosition().getY()] = true;
 
-        Iterator positionIterator = getGame().getMap().getCircleIterator(unit.getTile().getPosition(), true, unit.getLineOfSight());
+        Iterator<Position> positionIterator = getGame().getMap().getCircleIterator(unit.getTile().getPosition(), true, unit.getLineOfSight());
         while (positionIterator.hasNext()) {
-            Map.Position p = (Map.Position) positionIterator.next();
+            Map.Position p = positionIterator.next();
             if (p == null) {
                 continue;
             }
@@ -207,10 +208,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
     * (DEBUG ONLY) Makes the entire map visible.
     */
     public void revealMap() {
-        Iterator positionIterator = getGame().getMap().getWholeMapIterator();
+        Iterator<Position> positionIterator = getGame().getMap().getWholeMapIterator();
 
         while (positionIterator.hasNext()) {
-            Map.Position p = (Map.Position) positionIterator.next();
+            Map.Position p = positionIterator.next();
             setExplored(getGame().getMap().getTile(p));
         }
         

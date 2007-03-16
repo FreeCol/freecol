@@ -397,9 +397,9 @@ public final class InfoPanel extends FreeColPanel {
                 } else if (unit.isCarrier()) {
                     int counter = 1;
                     int row = 1;
-                    Iterator goodsIterator = unit.getGoodsIterator();
+                    Iterator<Goods> goodsIterator = unit.getGoodsIterator();
                     while (goodsIterator.hasNext()) {
-                        Goods goods = (Goods) goodsIterator.next();
+                        Goods goods = goodsIterator.next();
                         JLabel goodsLabel = new JLabel(library.getScaledGoodsImageIcon(goods.getType(), 0.66f));
                         goodsLabel.setToolTipText(String.valueOf(goods.getAmount()) + " " + goods.getName());
                         unitCargoPanel.add(goodsLabel, higConst.rc(row, counter));
@@ -410,9 +410,9 @@ public final class InfoPanel extends FreeColPanel {
                             counter++;
                         }
                     }
-                    Iterator unitIterator = unit.getUnitIterator();
+                    Iterator<Unit> unitIterator = unit.getUnitIterator();
                     while (unitIterator.hasNext()) {
-                        Unit unit = (Unit) unitIterator.next();
+                        Unit unit = unitIterator.next();
                         int graphicsType = library.getUnitGraphicsType(unit);
                         JLabel unitLabel = new JLabel(library.getScaledUnitImageIcon(graphicsType, 0.5f));
                         unitLabel.setToolTipText(unit.getName());

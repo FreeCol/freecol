@@ -79,20 +79,20 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
             addSeparator();
         }
 
-        Iterator unitIterator = tile.getUnitIterator();
+        Iterator<Unit> unitIterator = tile.getUnitIterator();
         while (unitIterator.hasNext()) {
-            Unit u = (Unit) unitIterator.next();
+            Unit u = unitIterator.next();
 
             addUnit(u, !u.isUnderRepair(), false);
 
-            Iterator childUnitIterator = u.getUnitIterator();
+            Iterator<Unit> childUnitIterator = u.getUnitIterator();
             while (childUnitIterator.hasNext()) {
-                addUnit((Unit) childUnitIterator.next(), true, true);
+                addUnit(childUnitIterator.next(), true, true);
             }
             
-            Iterator goodsIterator = u.getGoodsIterator();
+            Iterator<Goods> goodsIterator = u.getGoodsIterator();
             while (goodsIterator.hasNext()) {
-                addGoods((Goods) goodsIterator.next(), false, true);
+                addGoods(goodsIterator.next(), false, true);
             }
         }
         
@@ -121,9 +121,9 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
             JMenu takeOwnership = new JMenu("Take ownership");
             takeOwnership.setOpaque(false);
             boolean notEmpty = false;
-            Iterator it = tile.getUnitIterator();
+            Iterator<Unit> it = tile.getUnitIterator();
             while (it.hasNext()) {
-                Unit u = (Unit) it.next();
+                Unit u = it.next();
                 JMenuItem toMenuItem = new JMenuItem(u.toString());
                 toMenuItem.setActionCommand("TO" + u.getID());
                 toMenuItem.addActionListener(this);
@@ -287,9 +287,9 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
             Player mp = (Player) freeColClient.getFreeColServer().getGame().getFreeColGameObject(freeColClient.getMyPlayer().getID());
             o.setOwner(mp);
             if (o instanceof Unit) {
-                Iterator it = ((Unit) o).getUnitIterator();
+                Iterator<Unit> it = ((Unit) o).getUnitIterator();
                 while (it.hasNext()) {
-                    ((Unit) it.next()).setOwner(mp);
+                    it.next().setOwner(mp);
                 }
             }
             if (o instanceof Location) {

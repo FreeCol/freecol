@@ -202,9 +202,9 @@ public final class InGameController extends Controller {
         Game game = getFreeColServer().getGame();
         GameOptions go = game.getGameOptions();
         if (go.getBoolean(GameOptions.VICTORY_DEFEAT_REF)) {
-            Iterator playerIterator = game.getPlayerIterator();
+            Iterator<Player> playerIterator = game.getPlayerIterator();
             while (playerIterator.hasNext()) {
-                Player p = (Player) playerIterator.next();
+                Player p = playerIterator.next();
                 if (!p.isAI() && p.getRebellionState() == Player.REBELLION_POST_WAR) {
                     return p;
                 }
@@ -212,9 +212,9 @@ public final class InGameController extends Controller {
         }
         if (go.getBoolean(GameOptions.VICTORY_DEFEAT_EUROPEANS)) {
             Player winner = null;
-            Iterator playerIterator = game.getPlayerIterator();
+            Iterator<Player> playerIterator = game.getPlayerIterator();
             while (playerIterator.hasNext()) {
-                Player p = (Player) playerIterator.next();
+                Player p = playerIterator.next();
                 if (!p.isDead() && p.isEuropean() && !p.isREF()) {
                     if (winner != null) {
                         // There is more than one european player alive:
@@ -231,9 +231,9 @@ public final class InGameController extends Controller {
         }
         if (go.getBoolean(GameOptions.VICTORY_DEFEAT_HUMANS)) {
             Player winner = null;
-            Iterator playerIterator = game.getPlayerIterator();
+            Iterator<Player> playerIterator = game.getPlayerIterator();
             while (playerIterator.hasNext()) {
-                Player p = (Player) playerIterator.next();
+                Player p = playerIterator.next();
                 if (!p.isDead() && !p.isAI()) {
                     if (winner != null) {
                         // There is more than one human player alive:
@@ -265,9 +265,9 @@ public final class InGameController extends Controller {
         if (player.isREF()) {
             return false;
         }
-        Iterator tileIterator = map.getWholeMapIterator();
+        Iterator<Position> tileIterator = map.getWholeMapIterator();
         while (tileIterator.hasNext()) {
-            Tile t = map.getTile((Map.Position) tileIterator.next());
+            Tile t = map.getTile(tileIterator.next());
             if (t != null
                     && ((t.getFirstUnit() != null && t.getFirstUnit().getOwner().equals(player)) || t.getSettlement() != null
                             && t.getSettlement().getOwner().equals(player))) {
@@ -288,9 +288,9 @@ public final class InGameController extends Controller {
             } else if (player.getEurope() == null) {
                 return true;
             } else if (player.getGold() < 1000) {
-                Iterator unitIterator = player.getEurope().getUnitIterator();
+                Iterator<Unit> unitIterator = player.getEurope().getUnitIterator();
                 while (unitIterator.hasNext()) {
-                    if (((Unit) unitIterator.next()).isCarrier()) {
+                    if (unitIterator.next().isCarrier()) {
                         return false;
                     }
                 }
@@ -467,9 +467,9 @@ public final class InGameController extends Controller {
                 logger.finest("Colony has harbour and fort.");
                 int attackPower = 0;
                 Unit attacker = null;
-                Iterator unitIterator = colony.getTile().getUnitIterator();
+                Iterator<Unit> unitIterator = colony.getTile().getUnitIterator();
                 while (unitIterator.hasNext()) {
-                    Unit unit = (Unit) unitIterator.next();
+                    Unit unit = unitIterator.next();
                     logger.finest("Unit is " + unit.getName());
                     switch (unit.getType()) {
                     case Unit.ARTILLERY:
@@ -497,7 +497,7 @@ public final class InGameController extends Controller {
                     if (!tile.isLand()) {
                         unitIterator = tile.getUnitIterator();
                         while (unitIterator.hasNext()) {
-                            Unit unit = (Unit) unitIterator.next();
+                            Unit unit = unitIterator.next();
                             Player player = unit.getOwner();
                             if (player != currentPlayer
                                     && (currentPlayer.getStance(player) == Player.WAR || unit.getType() == Unit.PRIVATEER)) {
@@ -523,7 +523,7 @@ public final class InGameController extends Controller {
                                 // Inform the players (other then the player
                                 // attacking) about the attack:
                                 int plunderGold = -1;
-                                Iterator enemyPlayerIterator = getFreeColServer().getGame().getPlayerIterator();
+                                Iterator<Player> enemyPlayerIterator = getFreeColServer().getGame().getPlayerIterator();
                                 while (enemyPlayerIterator.hasNext()) {
                                     ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
 

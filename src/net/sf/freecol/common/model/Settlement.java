@@ -190,9 +190,9 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         oldOwner.invalidateCanSeeTiles();
         
         owner.setExplored(getTile());
-        Iterator positionIterator = getGame().getMap().getCircleIterator(getTile().getPosition(), true, getLineOfSight());
+        Iterator<Position> positionIterator = getGame().getMap().getCircleIterator(getTile().getPosition(), true, getLineOfSight());
         while (positionIterator.hasNext()) {
-            Map.Position p = (Map.Position) positionIterator.next();
+            Map.Position p = positionIterator.next();
             owner.setExplored(getGame().getMap().getTile(p));
         }
         
@@ -244,11 +244,11 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         
         Map map = getGame().getMap();
         Position position = settlementTile.getPosition();
-        Iterator circleIterator = map.getCircleIterator(position, true, getRadius());
+        Iterator<Position> circleIterator = map.getCircleIterator(position, true, getRadius());
         
         settlementTile.setNationOwner(Player.NO_NATION);
         while (circleIterator.hasNext()) {
-            Tile tile = map.getTile((Position) circleIterator.next());
+            Tile tile = map.getTile(circleIterator.next());
             if (tile.getNationOwner() == nation) {
                 tile.setNationOwner(Player.NO_NATION);
             }

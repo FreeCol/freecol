@@ -131,9 +131,9 @@ public class PioneeringMission extends Mission {
                 
         TileImprovement bestChoice = null;
         int bestValue = 0;
-        Iterator tiIterator = aiPlayer.getTileImprovementIterator();            
+        Iterator<TileImprovement> tiIterator = aiPlayer.getTileImprovementIterator();            
         while (tiIterator.hasNext()) {
-            TileImprovement ti = (TileImprovement) tiIterator.next();
+            TileImprovement ti = tiIterator.next();
             if (ti.getPioneer() == null) {
                 PathNode path = null;
                 int value;
@@ -347,9 +347,9 @@ public class PioneeringMission extends Mission {
      */    
     public static boolean isValid(AIUnit aiUnit) {
         AIPlayer aiPlayer = (AIPlayer) aiUnit.getAIMain().getAIObject(aiUnit.getUnit().getOwner().getID());
-        Iterator tiIterator = aiPlayer.getTileImprovementIterator();            
+        Iterator<TileImprovement> tiIterator = aiPlayer.getTileImprovementIterator();            
         while (tiIterator.hasNext()) {
-            TileImprovement ti = (TileImprovement) tiIterator.next();
+            TileImprovement ti = tiIterator.next();
             if (ti.getPioneer() == null) {
                 return true;
             }

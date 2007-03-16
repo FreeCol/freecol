@@ -34,6 +34,7 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
@@ -392,7 +393,7 @@ public final class FreeColServer {
      *         includes european players currently controlled by the AI.
      */
     public int getSlotsAvailable() {
-        Vector players = game.getPlayers();
+        Vector<Player> players = game.getPlayers();
         int n = game.getMaximumPlayers();
         for (int i = 0; i < players.size(); i++) {
             ServerPlayer p = (ServerPlayer) players.get(i);
@@ -412,7 +413,7 @@ public final class FreeColServer {
      * @return The number.
      */
     public int getNumberOfLivingHumanPlayers() {
-        Vector players = game.getPlayers();
+        Vector<Player> players = game.getPlayers();
         int n = 0;
         for (int i = 0; i < players.size(); i++) {
             if (!((ServerPlayer) players.get(i)).isAI() && !((ServerPlayer) players.get(i)).isDead()
@@ -464,9 +465,9 @@ public final class FreeColServer {
             xsw.writeAttribute("randomState", _pseudoRandom.getState());
             // Add server side model information:
             xsw.writeStartElement("serverObjects");
-            Iterator fcgoIterator = game.getFreeColGameObjectIterator();
+            Iterator<FreeColGameObject> fcgoIterator = game.getFreeColGameObjectIterator();
             while (fcgoIterator.hasNext()) {
-                FreeColGameObject fcgo = (FreeColGameObject) fcgoIterator.next();
+                FreeColGameObject fcgo = fcgoIterator.next();
                 if (fcgo instanceof ServerModelObject) {
                     ((ServerModelObject) fcgo).toServerAdditionElement(xsw);
                 }
@@ -596,7 +597,7 @@ public final class FreeColServer {
                 game.setFreeColGameObjectListener(aiMain);
             }
             // Connect the AI-players:
-            Iterator playerIterator = game.getPlayerIterator();
+            Iterator<Player> playerIterator = game.getPlayerIterator();
             while (playerIterator.hasNext()) {
                 ServerPlayer player = (ServerPlayer) playerIterator.next();
                 if (player.isAI()) {
@@ -660,7 +661,7 @@ public final class FreeColServer {
      * (will be removed).
      */
     public void revealMapForAllPlayers() {
-        Iterator playerIterator = getGame().getPlayerIterator();
+        Iterator<Player> playerIterator = getGame().getPlayerIterator();
         while (playerIterator.hasNext()) {
             ServerPlayer player = (ServerPlayer) playerIterator.next();
             player.revealMap();
@@ -685,7 +686,7 @@ public final class FreeColServer {
      * @return The player.
      */
     public ServerPlayer getPlayer(Connection connection) {
-        Iterator playerIterator = getGame().getPlayerIterator();
+        Iterator<Player> playerIterator = getGame().getPlayerIterator();
         while (playerIterator.hasNext()) {
             ServerPlayer player = (ServerPlayer) playerIterator.next();
             if (player.getConnection() == connection) {

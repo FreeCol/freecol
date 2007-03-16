@@ -178,9 +178,9 @@ public class AIMain implements FreeColGameObjectListener {
     *       should be overwritten or not.
     */
     public void findNewObjects(boolean overwrite) {
-        Iterator i = freeColServer.getGame().getFreeColGameObjectIterator();
+        Iterator<FreeColGameObject> i = freeColServer.getGame().getFreeColGameObjectIterator();
         while (i.hasNext()) {
-            FreeColGameObject fcgo = (FreeColGameObject) i.next();
+            FreeColGameObject fcgo = i.next();
             if (overwrite || getAIObject(fcgo) == null) {
                 setFreeColGameObject(fcgo.getID(), fcgo);
             }

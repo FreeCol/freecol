@@ -523,7 +523,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Tile newTile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
         // boolean disembark = !unit.getTile().isLand() && newTile.isLand() &&
         // newTile.getSettlement() == null;
-        Iterator enemyPlayerIterator = game.getPlayerIterator();
+        Iterator<Player> enemyPlayerIterator = game.getPlayerIterator();
         while (enemyPlayerIterator.hasNext()) {
             ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
             if (player.equals(enemyPlayer) || enemyPlayer.getConnection() == null) {
@@ -558,9 +558,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         unit.move(direction);
         Element reply = Message.createNewRootElement("update");
-        Vector surroundingTiles = game.getMap().getSurroundingTiles(unit.getTile(), unit.getLineOfSight());
+        Vector<Tile> surroundingTiles = game.getMap().getSurroundingTiles(unit.getTile(), unit.getLineOfSight());
         for (int i = 0; i < surroundingTiles.size(); i++) {
-            Tile t = (Tile) surroundingTiles.get(i);
+            Tile t = surroundingTiles.get(i);
             reply.appendChild(t.toXMLElement(player, reply.getOwnerDocument()));
         }
         if (newTile.hasLostCityRumour() && player.isEuropean()) {
@@ -693,7 +693,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     + player.getConnection());
         }
         // tell everyone the rumour has been explored
-        Iterator updateIterator = game.getPlayerIterator();
+        Iterator<Player> updateIterator = game.getPlayerIterator();
         while (updateIterator.hasNext()) {
             ServerPlayer updatePlayer = (ServerPlayer) updateIterator.next();
             if (player.equals(updatePlayer) || updatePlayer.getConnection() == null) {
@@ -816,7 +816,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         // Inform the players (other then the player attacking) about the
         // attack:
-        Iterator enemyPlayerIterator = game.getPlayerIterator();
+        Iterator<Player> enemyPlayerIterator = game.getPlayerIterator();
         while (enemyPlayerIterator.hasNext()) {
             ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
             if (player.equals(enemyPlayer) || enemyPlayer.getConnection() == null) {
@@ -888,9 +888,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         // because when it's false unit is already sent with carried goods and
         // units
         if (unit.canCaptureGoods() && game.getGameOptions().getBoolean(GameOptions.UNIT_HIDING)) {
-            Iterator goodsIt = unit.getGoodsContainer().getCompactGoodsIterator();
+            Iterator<Goods> goodsIt = unit.getGoodsContainer().getCompactGoodsIterator();
             while (goodsIt.hasNext()) {
-                Goods newGoods = (Goods) goodsIt.next();
+                Goods newGoods = goodsIt.next();
                 int capturedGoods = newGoods.getAmount() - oldGoodsCounts[newGoods.getType()];
                 if (capturedGoods > 0) {
                     Element captured = reply.getOwnerDocument().createElement("capturedGoods");
@@ -922,9 +922,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             if (result == Unit.ATTACK_DONE_SETTLEMENT && newTile.getSettlement() != null) {
                 lineOfSight = Math.max(lineOfSight, newTile.getSettlement().getLineOfSight());
             }
-            Vector surroundingTiles = game.getMap().getSurroundingTiles(unit.getTile(), lineOfSight);
+            Vector<Tile> surroundingTiles = game.getMap().getSurroundingTiles(unit.getTile(), lineOfSight);
             for (int i = 0; i < surroundingTiles.size(); i++) {
-                Tile t = (Tile) surroundingTiles.get(i);
+                Tile t = surroundingTiles.get(i);
                 update.appendChild(t.toXMLElement(player, update.getOwnerDocument()));
             }
             update.appendChild(unit.getTile().toXMLElement(player, update.getOwnerDocument()));
@@ -1013,7 +1013,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         Tile oldTile = unit.getTile();
         unit.embark(destinationUnit);
-        Iterator enemyPlayerIterator = game.getPlayerIterator();
+        Iterator<Player> enemyPlayerIterator = game.getPlayerIterator();
         while (enemyPlayerIterator.hasNext()) {
             ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
             if (player.equals(enemyPlayer) || enemyPlayer.getConnection() == null) {
@@ -1061,7 +1061,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         unit.boardShip(carrier);
         if (tellEnemyPlayers) {
-            Iterator enemyPlayerIterator = game.getPlayerIterator();
+            Iterator<Player> enemyPlayerIterator = game.getPlayerIterator();
             while (enemyPlayerIterator.hasNext()) {
                 ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
                 if (player.equals(enemyPlayer) || enemyPlayer.getConnection() == null) {
@@ -1197,9 +1197,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     reply.setAttribute("result", "tales");
                     Element update = reply.getOwnerDocument().createElement("update");
                     Position center = new Position(settlement.getTile().getX(), settlement.getTile().getY());
-                    Iterator circleIterator = map.getCircleIterator(center, true, 6);
+                    Iterator<Position> circleIterator = map.getCircleIterator(center, true, 6);
                     while (circleIterator.hasNext()) {
-                        Position position = (Position) circleIterator.next();
+                        Position position = circleIterator.next();
                         if ((!position.equals(center))
                                 && (map.getTile(position).isLand() || map.getTile(position).getLandCount() > 0)) {
                             Tile t = map.getTile(position);
@@ -1346,7 +1346,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     private void sendRemoveUnitToAll(Unit unit, Player player) {
         FreeColServer freeColServer = getFreeColServer();
         Game game = freeColServer.getGame();
-        Iterator enemyPlayerIterator = game.getPlayerIterator();
+        Iterator<Player> enemyPlayerIterator = game.getPlayerIterator();
         while (enemyPlayerIterator.hasNext()) {
             ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
             if (player.equals(enemyPlayer) || enemyPlayer.getConnection() == null) {
@@ -1506,7 +1506,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         Tile oldTile = unit.getTile();
         unit.moveToEurope();
-        Iterator enemyPlayerIterator = game.getPlayerIterator();
+        Iterator<Player> enemyPlayerIterator = game.getPlayerIterator();
         while (enemyPlayerIterator.hasNext()) {
             ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
             if (player.equals(enemyPlayer) || enemyPlayer.getConnection() == null) {
@@ -1565,9 +1565,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             reply.appendChild(colony.toXMLElement(player, reply.getOwnerDocument()));
             if (colony.getLineOfSight() > unit.getLineOfSight()) {
                 Element updateElement = reply.getOwnerDocument().createElement("update");
-                Vector surroundingTiles = game.getMap().getSurroundingTiles(unit.getTile(), colony.getLineOfSight());
+                Vector<Tile> surroundingTiles = game.getMap().getSurroundingTiles(unit.getTile(), colony.getLineOfSight());
                 for (int i = 0; i < surroundingTiles.size(); i++) {
-                    Tile t = (Tile) surroundingTiles.get(i);
+                    Tile t = surroundingTiles.get(i);
                     if (t != unit.getTile()) {
                         updateElement.appendChild(t.toXMLElement(player, reply.getOwnerDocument()));
                     }
@@ -2030,7 +2030,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         Element reply = Message.createNewRootElement("foreignAffairsReport");
-        Iterator enemyPlayerIterator = game.getPlayerIterator();
+        Iterator<Player> enemyPlayerIterator = game.getPlayerIterator();
         while (enemyPlayerIterator.hasNext()) {
             ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
             if (enemyPlayer.getConnection() == null || enemyPlayer.isIndian() || enemyPlayer.isREF()) {
@@ -2042,9 +2042,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             int numberOfUnits = 0;
             int militaryStrength = 0;
             int navalStrength = 0;
-            Iterator unitIterator = enemyPlayer.getUnitIterator();
+            Iterator<Unit> unitIterator = enemyPlayer.getUnitIterator();
             while (unitIterator.hasNext()) {
-                Unit unit = (Unit) unitIterator.next();
+                Unit unit = unitIterator.next();
                 numberOfUnits++;
                 if (unit.isNaval()) {
                     navalStrength += unit.getOffensePower(unit);
@@ -2091,9 +2091,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             infantry = ref[Monarch.INFANTRY];
         } else {
             ServerPlayer enemyPlayer = (ServerPlayer) player.getREFPlayer();
-            Iterator unitIterator = enemyPlayer.getUnitIterator();
+            Iterator<Unit> unitIterator = enemyPlayer.getUnitIterator();
             while (unitIterator.hasNext()) {
-                Unit unit = (Unit) unitIterator.next();
+                Unit unit = unitIterator.next();
                 switch (unit.getType()) {
                 case Unit.ARTILLERY:
                     artillery++;

@@ -367,9 +367,9 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
     public void refreshBuyRecruit() {
         docksPanel.removeAll();
 
-        Iterator unitIterator = europe.getUnitIterator();
+        Iterator<Unit> unitIterator = europe.getUnitIterator();
         while (unitIterator.hasNext()) {
-            Unit unit = (Unit) unitIterator.next();
+            Unit unit = unitIterator.next();
 
             if (((unit.getState() == Unit.ACTIVE) || (unit.getState() == Unit.SENTRY)) && (!unit.isNaval())) {
                 UnitLabel unitLabel = new UnitLabel(unit, parent);
@@ -398,9 +398,9 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         } else {
             inPortPanel.removeAll();
 
-            Iterator unitIterator = europe.getUnitIterator();
+            Iterator<Unit> unitIterator = europe.getUnitIterator();
             while (unitIterator.hasNext()) {
-                Unit unit = (Unit) unitIterator.next();
+                Unit unit = unitIterator.next();
 
                 if ((unit.getState() == Unit.ACTIVE) && (unit.isNaval())) {
                     UnitLabel unitLabel = new UnitLabel(unit, parent);
@@ -445,9 +445,9 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         //
 
         UnitLabel carrier = null;
-        Iterator unitIterator = europe.getUnitIterator();
+        Iterator<Unit> unitIterator = europe.getUnitIterator();
         while (unitIterator.hasNext()) {
-            Unit unit = (Unit) unitIterator.next();
+            Unit unit = unitIterator.next();
 
             UnitLabel unitLabel = new UnitLabel(unit, parent);
             unitLabel.setTransferHandler(defaultTransferHandler);
@@ -535,9 +535,9 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
             selectedUnit.setSelected(true);
             Unit selUnit = selectedUnit.getUnit();
 
-            Iterator unitIterator = selUnit.getUnitIterator();
+            Iterator<Unit> unitIterator = selUnit.getUnitIterator();
             while (unitIterator.hasNext()) {
-                Unit unit = (Unit) unitIterator.next();
+                Unit unit = unitIterator.next();
 
                 UnitLabel label = new UnitLabel(unit, parent);
                 label.setTransferHandler(defaultTransferHandler);
@@ -546,9 +546,9 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
                 cargoPanel.add(label, false);
             }
 
-            Iterator goodsIterator = selUnit.getGoodsIterator();
+            Iterator<Goods> goodsIterator = selUnit.getGoodsIterator();
             while (goodsIterator.hasNext()) {
-                Goods g = (Goods) goodsIterator.next();
+                Goods g = goodsIterator.next();
 
                 GoodsLabel label = new GoodsLabel(g, parent);
                 label.setTransferHandler(defaultTransferHandler);
@@ -604,9 +604,9 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         Unit unit = getSelectedUnit();
         if (unit != null && unit.isCarrier()) {
             Player player = freeColClient.getMyPlayer();
-            Iterator goodsIterator = unit.getGoodsIterator();
+            Iterator<Goods> goodsIterator = unit.getGoodsIterator();
             while (goodsIterator.hasNext()) {
-                Goods goods = (Goods) goodsIterator.next();
+                Goods goods = goodsIterator.next();
                 if (player.canTrade(goods)) {
                     inGameController.sellGoods(goods);
                     updateCargoLabel();
@@ -617,9 +617,9 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
                 getCargoPanel().revalidate();
                 refresh();
             }
-            Iterator unitIterator = unit.getUnitIterator();
+            Iterator<Unit> unitIterator = unit.getUnitIterator();
             while (unitIterator.hasNext()) {
-                Unit newUnit = (Unit) unitIterator.next();
+                Unit newUnit = unitIterator.next();
                 inGameController.leaveShip(newUnit);
                 updateCargoLabel();
                 updateCargoPanel();

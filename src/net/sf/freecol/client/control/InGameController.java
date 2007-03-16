@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
@@ -295,9 +296,9 @@ public final class InGameController implements NetworkConstants {
 
         player.resetCanSeeTiles();
 
-        Iterator tileIterator = map.getWholeMapIterator();
+        Iterator<Position> tileIterator = map.getWholeMapIterator();
         while (tileIterator.hasNext()) {
-            Tile t = map.getTile((Map.Position) tileIterator.next());
+            Tile t = map.getTile(tileIterator.next());
             if (t != null && !player.canSee(t) && t.getFirstUnit() != null) {
                 if (t.getFirstUnit().getOwner() == player) {
                     logger.warning("Could not see one of my own units!");
@@ -349,9 +350,9 @@ public final class InGameController implements NetworkConstants {
             }
 
             Map map = game.getMap();
-            Iterator tileIterator = map.getAdjacentIterator(tile.getPosition());
+            Iterator<Position> tileIterator = map.getAdjacentIterator(tile.getPosition());
             while (tileIterator.hasNext()) {
-                Tile newTile = map.getTile((Position) tileIterator.next());
+                Tile newTile = map.getTile(tileIterator.next());
                 if (newTile.isLand()) {
                     lumber += newTile.potential(Goods.LUMBER);
                     food += newTile.potential(Goods.FOOD);
@@ -2175,7 +2176,7 @@ public final class InGameController implements NetworkConstants {
         IndianSettlement settlement = (IndianSettlement) map.getNeighbourOrNull(direction, unit.getTile())
                 .getSettlement();
 
-        List response = canvas.showUseMissionaryDialog(settlement);
+        List<Object> response = canvas.showUseMissionaryDialog(settlement);
         int action = ((Integer) response.get(0)).intValue();
 
         Element missionaryMessage = Message.createNewRootElement("missionaryAtSettlement");
@@ -2760,9 +2761,10 @@ public final class InGameController implements NetworkConstants {
 
         ArrayList<ModelMessage> messageList = new ArrayList<ModelMessage>();
 
-        for (Iterator i = freeColClient.getGame().getModelMessageIterator(freeColClient.getMyPlayer()); i.hasNext();) {
+        for (Iterator<ModelMessage> i = freeColClient.getGame().getModelMessageIterator(freeColClient.getMyPlayer()); i
+                .hasNext();) {
 
-            ModelMessage message = (ModelMessage) i.next();
+            ModelMessage message = i.next();
             if (shouldAllowMessage(message)) {
                 if (message.getType() == ModelMessage.WAREHOUSE_CAPACITY) {
                     String key = message.getSource().getID();
@@ -2792,10 +2794,10 @@ public final class InGameController implements NetworkConstants {
             message.setBeenDisplayed(true);
         }
 
-        Iterator mapIterator = messagesToIgnore.entrySet().iterator();
+        Iterator<Entry<String, Integer>> mapIterator = messagesToIgnore.entrySet().iterator();
         while (mapIterator.hasNext()) {
-            java.util.Map.Entry entry = (java.util.Map.Entry) mapIterator.next();
-            if (((Integer) entry.getValue()).intValue() < thisTurn - 1) {
+            Entry<String, Integer> entry = mapIterator.next();
+            if (entry.getValue().intValue() < thisTurn - 1) {
                 logger.finer("Removing old model message with key " + entry.getKey() + " from ignored messages.");
                 mapIterator.remove();
             }

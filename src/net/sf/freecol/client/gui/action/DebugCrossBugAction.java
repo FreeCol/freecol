@@ -59,9 +59,9 @@ public class DebugCrossBugAction extends MapboardAction {
     public void actionPerformed(ActionEvent e) {
         freeColClient.getMyPlayer().updateCrossesRequired();
         if (freeColClient.getFreeColServer() != null) {
-            Iterator pi = freeColClient.getFreeColServer().getGame().getPlayerIterator();
+            Iterator<Player> pi = freeColClient.getFreeColServer().getGame().getPlayerIterator();
             while (pi.hasNext()) {
-                ((Player) pi.next()).updateCrossesRequired();
+                pi.next().updateCrossesRequired();
             }
         }
     }

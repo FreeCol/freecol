@@ -118,9 +118,9 @@ public class MapGenerator {
                         if (t != null && t.isLand()) {
                             t.setAddition(Tile.ADD_MOUNTAINS);
                             counter++;
-                            Iterator it = map.getCircleIterator(p, false, 1);
+                            Iterator<Position> it = map.getCircleIterator(p, false, 1);
                             while (it.hasNext()) {
-                                t = map.getTile((Position) it.next());
+                                t = map.getTile(it.next());
                                 if (t.isLand() &&
                                         t.getAddition() != Tile.ADD_MOUNTAINS) {
                                     int r = random.nextInt(8);
@@ -313,9 +313,9 @@ public class MapGenerator {
         tile.setClaim(Tile.CLAIM_CLAIMED);
         tile.setOwner(settlement);
         
-        Iterator circleIterator = map.getCircleIterator(position, true, IndianSettlement.getRadius(kind));
+        Iterator<Position> circleIterator = map.getCircleIterator(position, true, IndianSettlement.getRadius(kind));
         while (circleIterator.hasNext()) {
-            Position adjPos = (Position)circleIterator.next();
+            Position adjPos = circleIterator.next();
             map.getTile(adjPos).setClaim(Tile.CLAIM_CLAIMED);
             map.getTile(adjPos).setNationOwner(player.getNation());
         }
@@ -347,9 +347,9 @@ public class MapGenerator {
         int rand = random.nextInt(2);
         int[] potentials = new int[Goods.HORSES];
 
-        Iterator iter = map.getAdjacentIterator(tile.getPosition());
+        Iterator<Position> iter = map.getAdjacentIterator(tile.getPosition());
         while (iter.hasNext()) {
-            Map.Position p = (Map.Position)iter.next();
+            Map.Position p = iter.next();
             Tile t = map.getTile(p);
 
             if (t.hasBonus()) {
@@ -499,9 +499,9 @@ public class MapGenerator {
         int x = random.nextInt(getMapGeneratorOptions().getWidth() - 20) + 10;
         int y = random.nextInt(getMapGeneratorOptions().getHeight() - 20) + 10;
         Position centerPosition = new Position(x, y);
-        Iterator it = map.getFloodFillIterator(centerPosition);
+        Iterator<Position> it = map.getFloodFillIterator(centerPosition);
         while (it.hasNext()) {
-            Position p = (Position) it.next();
+            Position p = it.next();
             if (map.getTile(p).isLand()) {
                 return p;
             }
@@ -587,9 +587,9 @@ public class MapGenerator {
                 @SuppressWarnings("unused") Unit unit7 = new Unit(game, unit4, player, Unit.JESUIT_MISSIONARY, Unit.SENTRY);
 
                 Tile colonyTile = null;
-                Iterator cti = map.getFloodFillIterator(new Position(x, y));
+                Iterator<Position> cti = map.getFloodFillIterator(new Position(x, y));
                 while(cti.hasNext()) {
-                    Tile tempTile = map.getTile((Position) cti.next());
+                    Tile tempTile = map.getTile(cti.next());
                     if (tempTile.isColonizeable()) {
                         colonyTile = tempTile;
                         break;

@@ -44,7 +44,7 @@ public final class ColorCellEditor extends AbstractCellEditor implements TableCe
     private final Canvas               canvas;
 
     private Color currentColor;
-    private Vector players;
+    private Vector<Player> players;
     private int lastRow;
     private Player thisPlayer;
 
@@ -125,7 +125,7 @@ public final class ColorCellEditor extends AbstractCellEditor implements TableCe
     * @param players The players that should be edited in the table.
     * @param owningPlayer The player running the client that is displaying the table.
     */
-    public void setData(Vector players, Player owningPlayer) {
+    public void setData(Vector<Player> players, Player owningPlayer) {
         this.players = players;
         thisPlayer = owningPlayer;
     }
@@ -134,9 +134,9 @@ public final class ColorCellEditor extends AbstractCellEditor implements TableCe
         if (i == 0) {
             return thisPlayer;
         } else if (players.get(i) == thisPlayer) {
-            return (Player) players.get(0);
+            return players.get(0);
         } else {
-            return (Player) players.get(i);
+            return players.get(i);
         }
     }
 

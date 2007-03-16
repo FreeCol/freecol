@@ -29,7 +29,7 @@ public final class UnitType
     public  String[]   abilityArray;
 
 
-    public void readFromXmlElement( Node xml, Map goodsTypeByRef ) {
+    public void readFromXmlElement( Node xml, Map<String, GoodsType> goodsTypeByRef ) {
 
         id = Xml.attribute( xml, "name" );
         name = Xml.messageAttribute( xml, "name" );
@@ -65,7 +65,7 @@ public final class UnitType
         if ( Xml.hasAttribute(xml, "expert-production") ) {
 
             String  goodsTypeRef = Xml.attribute( xml, "expert-production" );
-            expertProduction = (GoodsType) goodsTypeByRef.get( goodsTypeRef );
+            expertProduction = goodsTypeByRef.get( goodsTypeRef );
         }
         else {
             expertProduction = null;

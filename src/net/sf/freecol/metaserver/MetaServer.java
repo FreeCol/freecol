@@ -156,7 +156,7 @@ public final class MetaServer extends Thread {
      * @return The <code>Iterator</code>.
      * @see Connection
      */
-    public Iterator getConnectionIterator() {
+    public Iterator<Connection> getConnectionIterator() {
         return connections.values().iterator();
     }
 
@@ -172,9 +172,9 @@ public final class MetaServer extends Thread {
             logger.warning("Could not close the server socket!");
         }
 
-        Iterator connectionsIterator = connections.values().iterator();
+        Iterator<Connection> connectionsIterator = connections.values().iterator();
         while (connectionsIterator.hasNext()) {
-            Connection c = (Connection) connectionsIterator.next();
+            Connection c = connectionsIterator.next();
 
             try {
                 if (c != null) {

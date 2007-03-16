@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.logging.Logger;
+
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.FreeColServer;
@@ -186,7 +188,7 @@ public final class PreGameInputHandler extends InputHandler {
             return reply;
         }
         // Check that no two players have the same color or nation
-        Iterator playerIterator = freeColServer.getGame().getPlayerIterator();
+        Iterator<Player> playerIterator = freeColServer.getGame().getPlayerIterator();
         LinkedList<Integer> nations = new LinkedList<Integer>();
         LinkedList<Color> colors = new LinkedList<Color>();
         while (playerIterator.hasNext()) {

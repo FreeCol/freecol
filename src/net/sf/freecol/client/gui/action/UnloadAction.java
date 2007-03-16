@@ -64,14 +64,14 @@ public class UnloadAction extends MapboardAction {
     public void actionPerformed(ActionEvent e) {
         Unit unit = getFreeColClient().getGUI().getActiveUnit();
         if (unit != null) {
-            Iterator goodsIterator = unit.getGoodsIterator();
+            Iterator<Goods> goodsIterator = unit.getGoodsIterator();
             while (goodsIterator.hasNext()) {
-                Goods goods = (Goods) goodsIterator.next();
+                Goods goods = goodsIterator.next();
                 getFreeColClient().getInGameController().unloadCargo(goods);
             }
-            Iterator unitIterator = unit.getUnitIterator();
+            Iterator<Unit> unitIterator = unit.getUnitIterator();
             while (unitIterator.hasNext()) {
-                Unit newUnit = (Unit) unitIterator.next();
+                Unit newUnit = unitIterator.next();
                 getFreeColClient().getInGameController().leaveShip(newUnit);
             }
         }

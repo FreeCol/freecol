@@ -112,10 +112,10 @@ public class ChangeAction extends MapboardAction {
         } else if (unit.getLocation() instanceof Unit) {
             getFreeColClient().getGUI().setActiveUnit(((Unit) unit.getLocation()));
         } else {
-            Iterator unitIterator = tile.getUnitIterator();
+            Iterator<Unit> unitIterator = tile.getUnitIterator();
             boolean activeUnitFound = false;
             while (unitIterator.hasNext()) {
-                Unit u = (Unit) unitIterator.next();
+                Unit u = unitIterator.next();
                 if (u == unit) {
                     activeUnitFound = true;
                 } else if (activeUnitFound && u.getState() == Unit.ACTIVE && u.getMovesLeft() > 0) {
@@ -125,7 +125,7 @@ public class ChangeAction extends MapboardAction {
             }
             unitIterator = tile.getUnitIterator();
             while (unitIterator.hasNext()) {
-                Unit u = (Unit) unitIterator.next();
+                Unit u = unitIterator.next();
                 if (u == unit) {
                     return;
                 } else if (u.getState() == Unit.ACTIVE && u.getMovesLeft() > 0) {

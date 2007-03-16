@@ -25,7 +25,7 @@ public final class NationCellRenderer implements TableCellRenderer {
     private static final JComboBox indianTribesComboBox = new JComboBox(Player.TRIBES);
     private static final JComboBox refNationsComboBox = new JComboBox(Player.REF_NATIONS);
 
-    private Vector players;
+    private Vector<Player> players;
     private Player thisPlayer;
 
     /**
@@ -41,7 +41,7 @@ public final class NationCellRenderer implements TableCellRenderer {
     * @param players The players that should be rendered in the table.
     * @param owningPlayer The player running the client that is displaying the table.
     */
-    public void setData(Vector players, Player owningPlayer) {
+    public void setData(Vector<Player> players, Player owningPlayer) {
         this.players = players;
         thisPlayer = owningPlayer;
     }
@@ -50,9 +50,9 @@ public final class NationCellRenderer implements TableCellRenderer {
         if (i == 0) {
             return thisPlayer;
         } else if (players.get(i) == thisPlayer) {
-            return (Player) players.get(0);
+            return players.get(0);
         } else {
-            return (Player) players.get(i);
+            return players.get(i);
         }
     }
 

@@ -210,18 +210,18 @@ public class AIPlayer extends AIObject {
             return;
         }
         boolean defeated = true;
-        Iterator it = getPlayer().getUnitIterator();
+        Iterator<Unit> it = getPlayer().getUnitIterator();
         while (it.hasNext()) {
-            Unit u = (Unit) it.next();
+            Unit u = it.next();
             if (u.getType() != Unit.MAN_O_WAR) {
                 defeated = false;
                 break;
             }
         }
         if (defeated) {
-            Iterator it2 = getGame().getPlayerIterator();
+            Iterator<Player> it2 = getGame().getPlayerIterator();
             while (it2.hasNext()) {
-                Player p = (Player) it2.next();
+                Player p = it2.next();
                 if (p.getREFPlayer() == getPlayer() && p.getRebellionState() == Player.REBELLION_IN_WAR
                         && p.getMonarch() == null) {
                     Element giveIndependenceElement = Message.createNewRootElement("giveIndependence");
@@ -313,9 +313,9 @@ public class AIPlayer extends AIObject {
         if (player.isIndian()) {
             return;
         }
-        Iterator it = getAIUnitIterator();
+        Iterator<AIUnit> it = getAIUnitIterator();
         while (it.hasNext()) {
-            AIUnit au = (AIUnit) it.next();
+            AIUnit au = it.next();
             if (!au.hasMission()
                     && (au.getUnit().getLocation() instanceof ColonyTile || au.getUnit().getLocation() instanceof Building)) {
                 AIColony ac = (AIColony) getAIMain().getAIObject(au.getUnit().getTile().getColony());
@@ -331,15 +331,15 @@ public class AIPlayer extends AIObject {
      *         world or if a puppet-nation has declared independence.
      */
     private boolean isWorkForREF() {
-        Iterator it = getPlayer().getUnitIterator();
+        Iterator<Unit> it = getPlayer().getUnitIterator();
         while (it.hasNext()) {
-            if (((Unit) it.next()).getTile() != null) {
+            if (it.next().getTile() != null) {
                 return true;
             }
         }
-        Iterator it2 = getGame().getPlayerIterator();
+        Iterator<Player> it2 = getGame().getPlayerIterator();
         while (it2.hasNext()) {
-            Player p = (Player) it2.next();
+            Player p = it2.next();
             if (p.getREFPlayer() == getPlayer() && p.getRebellionState() == Player.REBELLION_IN_WAR) {
                 return true;
             }
@@ -353,9 +353,9 @@ public class AIPlayer extends AIObject {
      * That is: should we declare war?
      */
     private void determineStances() {
-        Iterator playerIterator = getGame().getPlayerIterator();
+        Iterator<Player> playerIterator = getGame().getPlayerIterator();
         while (playerIterator.hasNext()) {
-            Player p = (Player) playerIterator.next();
+            Player p = playerIterator.next();
             if (p == player) {
                 continue;
             }
@@ -379,9 +379,9 @@ public class AIPlayer extends AIObject {
      * return if this player is not a REF-player.
      */
     private void moveREFToDocks() {
-        Iterator it = getGame().getPlayerIterator();
+        Iterator<Player> it = getGame().getPlayerIterator();
         while (it.hasNext()) {
-            Player p = (Player) it.next();
+            Player p = it.next();
             if (p.getREFPlayer() == getPlayer() && p.getRebellionState() == Player.REBELLION_IN_WAR) {
                 Monarch m = p.getMonarch();
                 if (m == null) {
@@ -429,9 +429,9 @@ public class AIPlayer extends AIObject {
      * Aborts all the missions which are no longer valid.
      */
     private void abortInvalidMissions() {
-        Iterator aiUnitsIterator = getAIUnitIterator();
+        Iterator<AIUnit> aiUnitsIterator = getAIUnitIterator();
         while (aiUnitsIterator.hasNext()) {
-            AIUnit aiUnit = (AIUnit) aiUnitsIterator.next();
+            AIUnit aiUnit = aiUnitsIterator.next();
             if (aiUnit.getMission() == null) {
                 continue;
             }
@@ -445,9 +445,9 @@ public class AIPlayer extends AIObject {
      * Aborts all the missions which are no longer valid.
      */
     private void abortInvalidAndOneTimeMissions() {
-        Iterator aiUnitsIterator = getAIUnitIterator();
+        Iterator<AIUnit> aiUnitsIterator = getAIUnitIterator();
         while (aiUnitsIterator.hasNext()) {
-            AIUnit aiUnit = (AIUnit) aiUnitsIterator.next();
+            AIUnit aiUnit = aiUnitsIterator.next();
             if (aiUnit.getMission() == null) {
                 continue;
             }
@@ -468,9 +468,9 @@ public class AIPlayer extends AIObject {
         if (!player.isEuropean()) {
             return;
         }
-        Iterator aiUnitsIterator = getAIUnitIterator();
+        Iterator<AIUnit> aiUnitsIterator = getAIUnitIterator();
         while (aiUnitsIterator.hasNext()) {
-            AIUnit aiUnit = (AIUnit) aiUnitsIterator.next();
+            AIUnit aiUnit = aiUnitsIterator.next();
             if (aiUnit.getUnit().isNaval() && !aiUnit.hasMission()) {
                 aiUnit.setMission(new TransportMission(getAIMain(), aiUnit));
             }
@@ -485,9 +485,9 @@ public class AIPlayer extends AIObject {
         if (!player.isEuropean()) {
             return;
         }
-        Iterator ci = getAIColonyIterator();
+        Iterator<AIColony> ci = getAIColonyIterator();
         while (ci.hasNext()) {
-            AIColony c = (AIColony) ci.next();
+            AIColony c = ci.next();
             c.rearrangeWorkers(getConnection());
         }
     }
@@ -500,7 +500,7 @@ public class AIPlayer extends AIObject {
         Map map = player.getGame().getMap();
         if (!player.isEuropean()) {
             // Determines if we need to move a brave out of the settlement.
-            Iterator it = player.getIndianSettlementIterator();
+            Iterator<Settlement> it = player.getIndianSettlementIterator();
             while (it.hasNext()) {
                 IndianSettlement is = (IndianSettlement) it.next();
                 if (is.getUnitCount() > 2) {
@@ -508,9 +508,9 @@ public class AIPlayer extends AIObject {
                     int threat = 0;
                     int worstThreat = 0;
                     Location bestTarget = null;
-                    Iterator positionIterator = map.getCircleIterator(is.getTile().getPosition(), true, 2);
+                    Iterator<Position> positionIterator = map.getCircleIterator(is.getTile().getPosition(), true, 2);
                     while (positionIterator.hasNext()) {
-                        Tile t = map.getTile((Map.Position) positionIterator.next());
+                        Tile t = map.getTile(positionIterator.next());
                         if (t.getFirstUnit() != null) {
                             if (t.getFirstUnit().getOwner() == player) {
                                 defenders++;
@@ -560,7 +560,7 @@ public class AIPlayer extends AIObject {
         if (1 == 1)
             return;
         // Ok, we are a European player. Things are about to get fun.
-        Iterator it = player.getSettlementIterator();
+        Iterator<Settlement> it = player.getSettlementIterator();
         while (it.hasNext()) {
             Colony colony = (Colony) (it.next());
             int olddefenders = 0;
@@ -568,36 +568,36 @@ public class AIPlayer extends AIObject {
             int threat = 0;
             int worstThreat = 0;
             Location bestTarget = null;
-            Iterator ui = colony.getTile().getUnitIterator();
+            Iterator<Unit> ui = colony.getTile().getUnitIterator();
             while (ui.hasNext()) {
-                if (((Unit) (ui.next())).isDefensiveUnit()) {
+                if ((ui.next()).isDefensiveUnit()) {
                     defenders++;
                 }
             }
-            Iterator positionIterator = map.getCircleIterator(colony.getTile().getPosition(), true, 5);
+            Iterator<Position> positionIterator = map.getCircleIterator(colony.getTile().getPosition(), true, 5);
             while (positionIterator.hasNext()) {
-                Tile t = map.getTile((Map.Position) positionIterator.next());
+                Tile t = map.getTile(positionIterator.next());
                 if (t.getFirstUnit() != null) {
                     if (t.getFirstUnit().getOwner() == player) {
-                        Iterator uit = t.getUnitIterator();
+                        Iterator<Unit> uit = t.getUnitIterator();
                         while (uit.hasNext()) {
-                            if (((Unit) (uit.next())).isOffensiveUnit()) {
+                            if (uit.next().isOffensiveUnit()) {
                                 defenders++;
                             }
                         }
                     } else {
                         int thisThreat = 0;
                         if (player.getTension(t.getFirstUnit().getOwner()).getValue() >= Tension.TENSION_ADD_MAJOR) {
-                            Iterator uit = t.getUnitIterator();
+                            Iterator<Unit> uit = t.getUnitIterator();
                             while (uit.hasNext()) {
-                                if (((Unit) (uit.next())).isOffensiveUnit()) {
+                                if (uit.next().isOffensiveUnit()) {
                                     thisThreat += 2;
                                 }
                             }
                         } else if (player.getTension(t.getFirstUnit().getOwner()).getValue() >= Tension.TENSION_ADD_MINOR) {
-                            Iterator uit = t.getUnitIterator();
+                            Iterator<Unit> uit = t.getUnitIterator();
                             while (uit.hasNext()) {
-                                if (((Unit) (uit.next())).isOffensiveUnit()) {
+                                if (uit.next().isOffensiveUnit()) {
                                     thisThreat++;
                                 }
                             }
@@ -630,7 +630,7 @@ public class AIPlayer extends AIObject {
                 // First, find some people we can recruit.
                 ui = colony.getUnitIterator();
                 while (ui.hasNext()) {
-                    Unit u = (Unit) (ui.next());
+                    Unit u = (ui.next());
                     if (u.isOffensiveUnit()) {
                         continue; // don't bother dealing with current
                         // soldiers at the moment
@@ -669,7 +669,7 @@ public class AIPlayer extends AIObject {
                 boolean needHorses = false;
                 ui = recruits.iterator();
                 while (ui.hasNext() && recruitCount > 0) {
-                    Unit u = (Unit) (ui.next());
+                    Unit u = (ui.next());
                     if (!u.isArmed() && u.canBeArmed()) {
                         recruitCount--;
                         Element equipUnitElement = Message.createNewRootElement("equipunit");
@@ -712,9 +712,9 @@ public class AIPlayer extends AIObject {
                 }
                 AIColony ac = null;
                 if (needMuskets || needHorses) {
-                    Iterator aIterator = getAIColonyIterator();
+                    Iterator<AIColony> aIterator = getAIColonyIterator();
                     while (aIterator.hasNext()) {
-                        AIColony temp = (AIColony) aIterator.next();
+                        AIColony temp = aIterator.next();
                         if (temp != null && temp.getColony() == colony) {
                             ac = temp;
                             break;
@@ -724,10 +724,10 @@ public class AIPlayer extends AIObject {
                 if (needMuskets && ac != null) {
                     // Check and see if we have already made a GoodsWish for
                     // here.
-                    Iterator wishes = ac.getWishIterator();
+                    Iterator<Wish> wishes = ac.getWishIterator();
                     boolean made = false;
                     while (wishes.hasNext()) {
-                        Wish w = (Wish) wishes.next();
+                        Wish w = wishes.next();
                         if (!(w instanceof GoodsWish)) {
                             continue;
                         }
@@ -749,10 +749,10 @@ public class AIPlayer extends AIObject {
                 if (needHorses && ac != null) {
                     // Check and see if we have already made a GoodsWish for
                     // here.
-                    Iterator wishes = ac.getWishIterator();
+                    Iterator<Wish> wishes = ac.getWishIterator();
                     boolean made = false;
                     while (wishes.hasNext()) {
-                        Wish w = (Wish) wishes.next();
+                        Wish w = wishes.next();
                         if (!(w instanceof GoodsWish)) {
                             continue;
                         }
@@ -778,9 +778,9 @@ public class AIPlayer extends AIObject {
                 // We're so big and tough, we can go wipe out this threat.
                 // Pick someone to go make it happen.
                 Unit u = null;
-                Iterator uit = colony.getUnitIterator();
+                Iterator<Unit> uit = colony.getUnitIterator();
                 while (uit.hasNext()) {
-                    Unit candidate = (Unit) (uit.next());
+                    Unit candidate = uit.next();
                     if (candidate.isOffensiveUnit() && candidate.getState() == Unit.FORTIFIED) {
                         u = candidate;
                         break;
@@ -841,9 +841,9 @@ public class AIPlayer extends AIObject {
                 }
             }
         }
-        Iterator aiUnitsIterator = getAIUnitIterator();
+        Iterator<AIUnit> aiUnitsIterator = getAIUnitIterator();
         while (aiUnitsIterator.hasNext()) {
-            AIUnit aiUnit = (AIUnit) aiUnitsIterator.next();
+            AIUnit aiUnit = aiUnitsIterator.next();
             if (aiUnit.hasMission()) {
                 continue;
             }
@@ -948,7 +948,7 @@ public class AIPlayer extends AIObject {
         if (!player.isIndian()) {
             return;
         }
-        Iterator indianSettlementIterator = player.getIndianSettlementIterator();
+        Iterator<Settlement> indianSettlementIterator = player.getIndianSettlementIterator();
         while (indianSettlementIterator.hasNext()) {
             IndianSettlement indianSettlement = (IndianSettlement) indianSettlementIterator.next();
             // Do not bring gifts all the time:
@@ -956,9 +956,9 @@ public class AIPlayer extends AIObject {
                 continue;
             }
             int alreadyAssignedUnits = 0;
-            Iterator ownedUnits = indianSettlement.getOwnedUnitsIterator();
+            Iterator<Unit> ownedUnits = indianSettlement.getOwnedUnitsIterator();
             while (ownedUnits.hasNext()) {
-                if (((AIUnit) getAIMain().getAIObject((Unit) ownedUnits.next())).getMission() instanceof IndianBringGiftMission) {
+                if (((AIUnit) getAIMain().getAIObject(ownedUnits.next())).getMission() instanceof IndianBringGiftMission) {
                     alreadyAssignedUnits++;
                 }
             }
@@ -967,10 +967,10 @@ public class AIPlayer extends AIObject {
             }
             // Creates a list of nearby colonies:
             ArrayList<Colony> nearbyColonies = new ArrayList<Colony>();
-            Iterator it = getGame().getMap().getCircleIterator(indianSettlement.getTile().getPosition(), true,
+            Iterator<Position> it = getGame().getMap().getCircleIterator(indianSettlement.getTile().getPosition(), true,
                     MAX_DISTANCE_TO_BRING_GIFT);
             while (it.hasNext()) {
-                Tile t = getGame().getMap().getTile((Map.Position) it.next());
+                Tile t = getGame().getMap().getTile(it.next());
                 if (t.getColony() != null
                         && IndianBringGiftMission.isValidMission(getPlayer(), t.getColony().getOwner())) {
                     nearbyColonies.add(t.getColony());
@@ -978,10 +978,10 @@ public class AIPlayer extends AIObject {
             }
             if (nearbyColonies.size() > 0) {
                 Colony target = nearbyColonies.get(getRandom().nextInt(nearbyColonies.size()));
-                Iterator it2 = indianSettlement.getOwnedUnitsIterator();
+                Iterator<Unit> it2 = indianSettlement.getOwnedUnitsIterator();
                 AIUnit chosenOne = null;
                 while (it2.hasNext()) {
-                    chosenOne = (AIUnit) getAIMain().getAIObject((Unit) it2.next());
+                    chosenOne = (AIUnit) getAIMain().getAIObject(it2.next());
                     if (!(chosenOne.getUnit().getLocation() instanceof Tile)) {
                         chosenOne = null;
                     } else if (chosenOne.getMission() == null
@@ -1007,7 +1007,7 @@ public class AIPlayer extends AIObject {
         if (!player.isIndian()) {
             return;
         }
-        Iterator indianSettlementIterator = player.getIndianSettlementIterator();
+        Iterator<Settlement> indianSettlementIterator = player.getIndianSettlementIterator();
         while (indianSettlementIterator.hasNext()) {
             IndianSettlement indianSettlement = (IndianSettlement) indianSettlementIterator.next();
             // Do not demand goods all the time:
@@ -1015,9 +1015,9 @@ public class AIPlayer extends AIObject {
                 continue;
             }
             int alreadyAssignedUnits = 0;
-            Iterator ownedUnits = indianSettlement.getOwnedUnitsIterator();
+            Iterator<Unit> ownedUnits = indianSettlement.getOwnedUnitsIterator();
             while (ownedUnits.hasNext()) {
-                if (((AIUnit) getAIMain().getAIObject((Unit) ownedUnits.next())).getMission() instanceof IndianDemandMission) {
+                if (((AIUnit) getAIMain().getAIObject(ownedUnits.next())).getMission() instanceof IndianDemandMission) {
                     alreadyAssignedUnits++;
                 }
             }
@@ -1047,10 +1047,10 @@ public class AIPlayer extends AIObject {
                         target = t;
                     }
                 }
-                Iterator it2 = indianSettlement.getOwnedUnitsIterator();
+                Iterator<Unit> it2 = indianSettlement.getOwnedUnitsIterator();
                 AIUnit chosenOne = null;
                 while (it2.hasNext()) {
-                    chosenOne = (AIUnit) getAIMain().getAIObject((Unit) it2.next());
+                    chosenOne = (AIUnit) getAIMain().getAIObject(it2.next());
                     if (!(chosenOne.getUnit().getLocation() instanceof Tile)) {
                         chosenOne = null;
                     } else if (chosenOne.getMission() == null
@@ -1083,9 +1083,9 @@ public class AIPlayer extends AIObject {
         if (!player.isEuropean()) {
             return;
         }
-        Iterator ci = getAIColonyIterator();
+        Iterator<AIColony> ci = getAIColonyIterator();
         while (ci.hasNext()) {
-            AIColony c = (AIColony) ci.next();
+            AIColony c = ci.next();
             c.createAIGoods();
         }
     }
@@ -1096,9 +1096,9 @@ public class AIPlayer extends AIObject {
      * 
      */
     private void doMissions() {
-        Iterator aiUnitsIterator = getAIUnitIterator();
+        Iterator<AIUnit> aiUnitsIterator = getAIUnitIterator();
         while (aiUnitsIterator.hasNext()) {
-            AIUnit aiUnit = (AIUnit) aiUnitsIterator.next();
+            AIUnit aiUnit = aiUnitsIterator.next();
             if (aiUnit.hasMission() && aiUnit.getMission().isValid()
                     && !(aiUnit.getUnit().getLocation() instanceof Unit)) {
                 try {
@@ -1121,9 +1121,9 @@ public class AIPlayer extends AIObject {
          * (ui.hasNext()) { Unit tu = (Unit) ui.next(); if
          * (tu.isDefensiveUnit()) { value -= 6; numberOfDefendingUnits++; } }
          */
-        Iterator aui = getAIUnitIterator();
+        Iterator<AIUnit> aui = getAIUnitIterator();
         while (aui.hasNext()) {
-            Mission m = ((AIUnit) aui.next()).getMission();
+            Mission m = aui.next().getMission();
             if (m != null && m instanceof DefendSettlementMission) {
                 if (((DefendSettlementMission) m).getSettlement() == colony) {
                     value -= 6;
@@ -1160,9 +1160,9 @@ public class AIPlayer extends AIObject {
             }
             if (newTile.getSettlement() != null) {
                 value += 300;
-                Iterator dp = newTile.getUnitIterator();
+                Iterator<Unit> dp = newTile.getUnitIterator();
                 while (dp.hasNext()) {
-                    Unit u = (Unit) dp.next();
+                    Unit u = dp.next();
                     if (u.isDefensiveUnit()) {
                         if (u.getDefensePower(unit) > unit.getOffensePower(u)) {
                             value -= 100 * (u.getDefensePower(unit) - unit.getOffensePower(u));
@@ -1273,9 +1273,9 @@ public class AIPlayer extends AIObject {
         // "UnitSeekAndDestroyMission":
         Location bestExistingTarget = null;
         int smallestDifference = Integer.MAX_VALUE;
-        Iterator aui = getAIUnitIterator();
+        Iterator<AIUnit> aui = getAIUnitIterator();
         while (aui.hasNext()) {
-            AIUnit coAIUnit = (AIUnit) aui.next();
+            AIUnit coAIUnit = aui.next();
             Unit coUnit = coAIUnit.getUnit();
             if (coUnit.getTile() != null && coAIUnit.getMission() instanceof UnitSeekAndDestroyMission) {
                 Location target = ((UnitSeekAndDestroyMission) coAIUnit.getMission()).getTarget();
@@ -1388,7 +1388,7 @@ public class AIPlayer extends AIObject {
         if (!getPlayer().canBuildColonies()) {
             return false;
         }
-        Iterator it = getPlayer().getSettlementIterator();
+        Iterator<Settlement> it = getPlayer().getSettlementIterator();
         int numberOfColonies = 0;
         int numberOfWorkers = 0;
         while (it.hasNext()) {
@@ -1420,12 +1420,12 @@ public class AIPlayer extends AIObject {
         }
 
         // Add goods
-        Iterator aci = getAIColonyIterator();
+        Iterator<AIColony> aci = getAIColonyIterator();
         while (aci.hasNext()) {
-            AIColony ac = (AIColony) aci.next();
-            Iterator agi = ac.getAIGoodsIterator();
+            AIColony ac = aci.next();
+            Iterator<AIGoods> agi = ac.getAIGoodsIterator();
             while (agi.hasNext()) {
-                AIGoods ag = (AIGoods) agi.next();
+                AIGoods ag = agi.next();
                 if (ag.getTransportDestination() != null && ag.getTransport() == null) {
                     transportables.add(ag);
                 }
@@ -1446,18 +1446,18 @@ public class AIPlayer extends AIObject {
         });
 
         ArrayList<Mission> vacantTransports = new ArrayList<Mission>();
-        Iterator iter = getAIUnitIterator();
+        Iterator<AIUnit> iter = getAIUnitIterator();
         while (iter.hasNext()) {
-            AIUnit au = (AIUnit) iter.next();
+            AIUnit au = iter.next();
             if (au.hasMission() && au.getMission() instanceof TransportMission
                     && !(au.getUnit().getLocation() instanceof Europe)) {
                 vacantTransports.add(au.getMission());
             }
         }
 
-        Iterator ti = transportables.iterator();
+        Iterator<Transportable> ti = transportables.iterator();
         while (ti.hasNext()) {
-            Transportable t = (Transportable) ti.next();
+            Transportable t = ti.next();
             t.increaseTransportPriority();
             if (t.getTransportLocatable().getLocation() instanceof Unit) {
                 Mission m = ((AIUnit) getAIMain().getAIObject(
@@ -1525,7 +1525,7 @@ public class AIPlayer extends AIObject {
      * @return The <code>Iterator</code>.
      * @see Wish
      */
-    public Iterator getWishIterator() {
+    public Iterator<Wish> getWishIterator() {
         ArrayList<Wish> wishList = new ArrayList<Wish>();
         Iterator<AIColony> ai = getAIColonyIterator();
         while (ai.hasNext()) {
@@ -1930,6 +1930,7 @@ public class AIPlayer extends AIObject {
      * 
      * @return The ID.
      */
+    @Override
     public String getID() {
         return player.getID();
     }
@@ -1941,6 +1942,7 @@ public class AIPlayer extends AIObject {
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
      */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
         out.writeAttribute("ID", getID());
@@ -1954,6 +1956,7 @@ public class AIPlayer extends AIObject {
      * @throws XMLStreamException if there are any problems reading from the
      *             stream.
      */
+    @Override
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         player = (ServerPlayer) getAIMain().getFreeColGameObject(in.getAttributeValue(null, "ID"));
         in.nextTag();

@@ -1,10 +1,8 @@
-
 package net.sf.freecol.server.ai.mission;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -37,34 +35,35 @@ import net.sf.freecol.server.ai.WorkerWish;
 
 import org.w3c.dom.Element;
 
-
 /**
-* Mission for transporting units and goods on a carrier.
-* @see net.sf.freecol.common.model.Unit Unit
-*/
+ * Mission for transporting units and goods on a carrier.
+ * 
+ * @see net.sf.freecol.common.model.Unit Unit
+ */
 public class TransportMission extends Mission {
     private static final Logger logger = Logger.getLogger(TransportMission.class.getName());
 
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
-    public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
-    public static final String  REVISION = "$Revision$";
+    public static final String COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
+
+    public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
+
+    public static final String REVISION = "$Revision$";
 
     private static final String ELEMENT_TRANSPORTABLE = "transportable";
+
     private static final int MINIMUM_GOLD_TO_STAY_IN_EUROPE = 600;
 
     private ArrayList<Transportable> transportList = new ArrayList<Transportable>();
 
 
     /**
-    * Creates a mission for the given <code>AIUnit</code>.
-    * 
-    * @param aiMain The main AI-object.
-    * @param aiUnit The <code>AIUnit</code> this mission
-    *        is created for.
-    */
+     * Creates a mission for the given <code>AIUnit</code>.
+     * 
+     * @param aiMain The main AI-object.
+     * @param aiUnit The <code>AIUnit</code> this mission is created for.
+     */
     public TransportMission(AIMain aiMain, AIUnit aiUnit) {
         super(aiMain, aiUnit);
-
 
         if (!getUnit().isCarrier()) {
             logger.warning("Only carriers can transport unit/goods.");
@@ -72,26 +71,25 @@ public class TransportMission extends Mission {
         }
     }
 
-
     /**
      * Loads a <code>TransportMission</code> from the given element.
-     *
+     * 
      * @param aiMain The main AI-object.
-     * @param element An <code>Element</code> containing an
-     *      XML-representation of this object.
+     * @param element An <code>Element</code> containing an XML-representation
+     *            of this object.
      */
     public TransportMission(AIMain aiMain, Element element) {
         super(aiMain);
         readFromXMLElement(element);
     }
-    
+
     /**
-     * Creates a new <code>TransportMission</code> and reads the given element.
+     * Creates a new <code>TransportMission</code> and reads the given
+     * element.
      * 
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
+     * @throws XMLStreamException if a problem was encountered during parsing.
      * @see AIObject#readFromXML
      */
     public TransportMission(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
@@ -99,47 +97,44 @@ public class TransportMission extends Mission {
         readFromXML(in);
     }
 
-
     /**
-    * Adds every <code>Goods</code> and <code>Unit</code>
-    * onboard the carrier to the transport list.
-    *
-    * @see Goods
-    * @see Unit
-    */
+     * Adds every <code>Goods</code> and <code>Unit</code> onboard the
+     * carrier to the transport list.
+     * 
+     * @see Goods
+     * @see Unit
+     */
     private void updateTransportList() {
         Unit carrier = getUnit();
 
-        Iterator ui = carrier.getUnitIterator();
+        Iterator<Unit> ui = carrier.getUnitIterator();
         while (ui.hasNext()) {
-            Unit u = (Unit) ui.next();
+            Unit u = ui.next();
             AIUnit aiUnit = (AIUnit) getAIMain().getAIObject(u);
             addToTransportList(aiUnit);
         }
     }
 
-
     /**
-    * Checks if the carrier using this mission is carrying the
-    * given <code>Transportable</code>.
-    *
-    * @param t The <code>Transportable</code>.
-    * @return <code>true</code> if the given <code>Transportable</code>
-    *         is {@link Unit#getLocation located} in the carrier.
-    */
+     * Checks if the carrier using this mission is carrying the given
+     * <code>Transportable</code>.
+     * 
+     * @param t The <code>Transportable</code>.
+     * @return <code>true</code> if the given <code>Transportable</code> is
+     *         {@link Unit#getLocation located} in the carrier.
+     */
     private boolean isCarrying(Transportable t) {
         // TODO: Proper code for checking if the goods is onboard the carrier.
         return t.getTransportLocatable().getLocation() == getUnit();
     }
 
-
     /**
-    * Disposes this <code>Mission</code>.
-    */
+     * Disposes this <code>Mission</code>.
+     */
     public void dispose() {
-        Iterator ti = ((List) ((ArrayList) transportList).clone()).iterator();
+        Iterator<Transportable> ti = transportList.iterator();
         while (ti.hasNext()) {
-            Transportable t = (Transportable) ti.next();
+            Transportable t = ti.next();
             if (isCarrying(t)) {
                 ((AIObject) t).dispose();
             } else {
@@ -149,19 +144,16 @@ public class TransportMission extends Mission {
         super.dispose();
     }
 
-
     /**
-    * Checks if the given <code>Transportable</code> is on the
-    * transport list.
-    *
-    * @param newTransportable The <code>Transportable</code> to
-    *         be checked
-    * @return <code>true</code> if the given <code>Transportable</code>
-    *         was on the transport list, and <code>false</code>
-    *         otherwise.
-    */
+     * Checks if the given <code>Transportable</code> is on the transport
+     * list.
+     * 
+     * @param newTransportable The <code>Transportable</code> to be checked
+     * @return <code>true</code> if the given <code>Transportable</code> was
+     *         on the transport list, and <code>false</code> otherwise.
+     */
     public boolean isOnTransportList(Transportable newTransportable) {
-        for (int i=0; i<transportList.size(); i++) {
+        for (int i = 0; i < transportList.size(); i++) {
             if (transportList.get(i) == newTransportable) {
                 return true;
             }
@@ -169,18 +161,17 @@ public class TransportMission extends Mission {
         return false;
     }
 
-
     /**
-    * Removes the given <code>Transportable</code> from the transport list.
-    * This method calls {@link Transportable#setTransport(AIUnit)}.
-    * 
-    * @param transportable The <code>Transportable</code>.
-    */
+     * Removes the given <code>Transportable</code> from the transport list.
+     * This method calls {@link Transportable#setTransport(AIUnit)}.
+     * 
+     * @param transportable The <code>Transportable</code>.
+     */
     public void removeFromTransportList(Transportable transportable) {
-        Iterator ti = transportList.iterator();
+        Iterator<Transportable> ti = transportList.iterator();
         while (ti.hasNext()) {
-            Transportable t = (Transportable) ti.next();
-            if (t == transportable) {                
+            Transportable t = ti.next();
+            if (t == transportable) {
                 ti.remove();
                 if (transportable.getTransport() == getAIUnit()) {
                     transportable.setTransport(null);
@@ -190,22 +181,23 @@ public class TransportMission extends Mission {
 
     }
 
-
     /**
-    * Adds the given <code>Transportable</code> to the transport list.
-    * The method returns immediately if the {@link Transportable}
-    * has already be added.
-    *
-    * <br><br>
-    *
-    * Both the source and destination {@link Location} for the <code>Transportable</code>
-    * is entered into the transport list if the <code>Transportable</code> is not
-    * already loaded onto the transport. If the <code>Transportable</code> is onboard
-    * the transport, then only the destination is put on the transport list.
-    *
-    * @param newTransportable The <code>Transportable</code>.
-    */
-    public void addToTransportList(Transportable newTransportable) {        
+     * Adds the given <code>Transportable</code> to the transport list. The
+     * method returns immediately if the {@link Transportable} has already be
+     * added.
+     * 
+     * <br>
+     * <br>
+     * 
+     * Both the source and destination {@link Location} for the
+     * <code>Transportable</code> is entered into the transport list if the
+     * <code>Transportable</code> is not already loaded onto the transport. If
+     * the <code>Transportable</code> is onboard the transport, then only the
+     * destination is put on the transport list.
+     * 
+     * @param newTransportable The <code>Transportable</code>.
+     */
+    public void addToTransportList(Transportable newTransportable) {
         Unit carrier = getUnit();
         if (newTransportable.getTransportLocatable() instanceof Unit
                 && ((Unit) newTransportable.getTransportLocatable()).isCarrier()) {
@@ -213,7 +205,7 @@ public class TransportMission extends Mission {
         }
         Location newSource = newTransportable.getTransportSource();
         Location newDestination = newTransportable.getTransportDestination();
-        
+
         if (newDestination == null) {
             if (newTransportable instanceof AIGoods) {
                 logger.warning("No destination for goods: " + newTransportable.getTransportLocatable().toString());
@@ -223,7 +215,7 @@ public class TransportMission extends Mission {
                 return;
             }
         }
-            
+
         if (newSource == null && !isCarrying(newTransportable)) {
             logger.warning("No source for: " + newTransportable.getTransportLocatable().toString());
             return;
@@ -241,24 +233,23 @@ public class TransportMission extends Mission {
                 bestSourceDistance = 0;
             } else {
                 bestSourceIndex = 0;
-                bestSourceDistance = getDistanceTo(newTransportable,
-                                        ((carrier.getTile() != null) ? carrier.getTile() : carrier.getEntryLocation().getTile()),
-                                        true);
+                bestSourceDistance = getDistanceTo(newTransportable, ((carrier.getTile() != null) ? carrier.getTile()
+                        : carrier.getEntryLocation().getTile()), true);
             }
-            for (int i=1; i<transportList.size() && bestSourceDistance > 0; i++) {
-                Transportable t1 = transportList.get(i-1);
-                if (t1.getTransportSource() != null && 
-                        t1.getTransportSource().getTile() == newSource.getTile()
-                        || t1.getTransportDestination() != null && 
-                        t1.getTransportDestination().getTile() == newSource.getTile()) {
+            for (int i = 1; i < transportList.size() && bestSourceDistance > 0; i++) {
+                Transportable t1 = transportList.get(i - 1);
+                if (t1.getTransportSource() != null && t1.getTransportSource().getTile() == newSource.getTile()
+                        || t1.getTransportDestination() != null
+                        && t1.getTransportDestination().getTile() == newSource.getTile()) {
                     bestSourceIndex = i;
                     bestSourceDistance = 0;
                 }
 
             }
-            for (int i=1; i<transportList.size() && bestSourceDistance > 0; i++) {
-                Transportable t1 = transportList.get(i-1);
-                if (isCarrying(t1) && getDistanceTo(newTransportable, t1.getTransportDestination(), true) <= bestSourceDistance) {
+            for (int i = 1; i < transportList.size() && bestSourceDistance > 0; i++) {
+                Transportable t1 = transportList.get(i - 1);
+                if (isCarrying(t1)
+                        && getDistanceTo(newTransportable, t1.getTransportDestination(), true) <= bestSourceDistance) {
                     bestSourceIndex = i;
                     bestSourceDistance = getDistanceTo(newTransportable, t1.getTransportDestination(), true);
                 } else if (!isCarrying(t1)
@@ -280,8 +271,8 @@ public class TransportMission extends Mission {
                 bestDestinationDistance = getDistanceTo(newTransportable, carrier.getTile(), false);
             }
         }
-        for (int i=Math.max(bestSourceIndex, 1); i<transportList.size() && bestDestinationDistance > 0; i++) {
-            Transportable t1 = transportList.get(i-1);
+        for (int i = Math.max(bestSourceIndex, 1); i < transportList.size() && bestDestinationDistance > 0; i++) {
+            Transportable t1 = transportList.get(i - 1);
             if (t1.getTransportSource().getTile() == newDestination.getTile()
                     || t1.getTransportDestination().getTile() == newDestination.getTile()) {
                 bestDestinationIndex = i;
@@ -289,9 +280,10 @@ public class TransportMission extends Mission {
             }
 
         }
-        for (int i=Math.max(bestSourceIndex, 1); i<transportList.size() && bestDestinationDistance > 0; i++) {
-            Transportable t1 = transportList.get(i-1);
-            if (isCarrying(t1) && getDistanceTo(newTransportable, t1.getTransportDestination(), false) <= bestDestinationDistance) {
+        for (int i = Math.max(bestSourceIndex, 1); i < transportList.size() && bestDestinationDistance > 0; i++) {
+            Transportable t1 = transportList.get(i - 1);
+            if (isCarrying(t1)
+                    && getDistanceTo(newTransportable, t1.getTransportDestination(), false) <= bestDestinationDistance) {
                 bestDestinationIndex = i;
                 bestDestinationDistance = getDistanceTo(newTransportable, t1.getTransportDestination(), false);
             } else if (!isCarrying(t1)
@@ -301,41 +293,40 @@ public class TransportMission extends Mission {
             }
         }
         transportList.add(bestDestinationIndex, newTransportable);
-        
+
         if (newTransportable.getTransport() != getAIUnit()) {
             newTransportable.setTransport(getAIUnit());
         }
     }
 
-
     /**
-    * Gets the distance to the given <code>Transportable</code>.
-    *
-    * @param start The <code>Location</code> to check the distance from.
-    *           <code>Europe</code> is used instead of this location
-    *           if <code>start.getTile() == null</code>.
-    * @param source Sets wether the <code>Transportable</code>'s 
-    *           {@link Transportable#getTransportSource source}
-    *           or {@link Transportable#getTransportDestination destination}
-    *           should be used.
-    * @return The distance from the given <code>Location</code> to the
-    *           source or destination of the given <code>Transportable</code>.
-    */
+     * Gets the distance to the given <code>Transportable</code>.
+     * 
+     * @param start The <code>Location</code> to check the distance from.
+     *            <code>Europe</code> is used instead of this location if
+     *            <code>start.getTile() == null</code>.
+     * @param source Sets wether the <code>Transportable</code>'s
+     *            {@link Transportable#getTransportSource source} or
+     *            {@link Transportable#getTransportDestination destination}
+     *            should be used.
+     * @return The distance from the given <code>Location</code> to the source
+     *         or destination of the given <code>Transportable</code>.
+     */
     private int getDistanceTo(Transportable t, Location start, boolean source) {
         // TODO: This takes to much resources - find another method:
         return getPath(t, start, source).getTotalTurns();
     }
 
-
     /**
-    * Performs the mission.
-    * @param connection The <code>Connection</code> to the server.
-    */
+     * Performs the mission.
+     * 
+     * @param connection The <code>Connection</code> to the server.
+     */
     public void doMission(Connection connection) {
         Unit carrier = getUnit();
 
         updateTransportList();
-        
+
         if (carrier.getLocation() instanceof Europe) {
             if (carrier.getState() == Unit.TO_EUROPE || carrier.getState() == Unit.TO_AMERICA) {
                 return;
@@ -345,8 +336,7 @@ public class TransportMission extends Mission {
                 restockCargoAtDestination(connection);
 
                 // Move back to america:
-                if (carrier.getOwner().getGold() < MINIMUM_GOLD_TO_STAY_IN_EUROPE
-                        || transportList.size() > 0) {
+                if (carrier.getOwner().getGold() < MINIMUM_GOLD_TO_STAY_IN_EUROPE || transportList.size() > 0) {
                     Element moveToAmericaElement = Message.createNewRootElement("moveToAmerica");
                     moveToAmericaElement.setAttribute("unit", carrier.getID());
                     try {
@@ -367,7 +357,7 @@ public class TransportMission extends Mission {
 
         boolean transportListChanged = false;
         boolean moreWork = true;
-        for (int i=0; i<transportList.size() && moreWork || i == 0; i++) {
+        for (int i = 0; i < transportList.size() && moreWork || i == 0; i++) {
             moreWork = false;
 
             if (transportListChanged) {
@@ -387,9 +377,8 @@ public class TransportMission extends Mission {
                 Transportable transportable = transportList.get(i);
                 try {
                     path = getPath(transportable);
-                    moveToEurope = isCarrying(transportable)
-                            ? (transportable.getTransportDestination() instanceof Europe)
-                            : (transportable.getTransportLocatable().getLocation() instanceof Europe);                    
+                    moveToEurope = isCarrying(transportable) ? (transportable.getTransportDestination() instanceof Europe)
+                            : (transportable.getTransportLocatable().getLocation() instanceof Europe);
                 } catch (IllegalArgumentException e) {
                     transportListChanged = restockCargoAtDestination(connection);
                     continue;
@@ -398,11 +387,12 @@ public class TransportMission extends Mission {
 
             // Move towards the next target:
             if (path != null) {
-                //Tile oldTile = carrier.getTile();
+                // Tile oldTile = carrier.getTile();
 
                 int r = moveTowards(connection, path);
                 if (r >= 0 && (carrier.getMoveType(r) == Unit.MOVE || carrier.getMoveType(r) == Unit.MOVE_HIGH_SEAS)) {
-                    //Tile target = getGame().getMap().getNeighbourOrNull(r, carrier.getTile());
+                    // Tile target = getGame().getMap().getNeighbourOrNull(r,
+                    // carrier.getTile());
                     if (carrier.getMoveType(r) == Unit.MOVE_HIGH_SEAS && moveToEurope) {
                         Element moveToEuropeElement = Message.createNewRootElement("moveToEurope");
                         moveToEuropeElement.setAttribute("unit", carrier.getID());
@@ -421,7 +411,7 @@ public class TransportMission extends Mission {
                 }
 
                 transportListChanged = restockCargoAtDestination(connection);
-            } else if (moveToEurope && carrier.canMoveToEurope()){
+            } else if (moveToEurope && carrier.canMoveToEurope()) {
                 Element moveToEuropeElement = Message.createNewRootElement("moveToEurope");
                 moveToEuropeElement.setAttribute("unit", carrier.getID());
                 try {
@@ -433,38 +423,35 @@ public class TransportMission extends Mission {
         }
     }
 
-
     /**
-    * Buys cargo (units and goods) when the carrier is in <code>Europe</code>.
-    *
-    * <br><br>
-    *
-    * <b>Warning:</b> This method can only be called
-    * when the carrier is located in {@link Europe}.
-    *
-    * @param connection The <code>Connection</code> to the server.
-    */
+     * Buys cargo (units and goods) when the carrier is in <code>Europe</code>.
+     * 
+     * <br>
+     * <br>
+     * 
+     * <b>Warning:</b> This method can only be called when the carrier is
+     * located in {@link Europe}.
+     * 
+     * @param connection The <code>Connection</code> to the server.
+     */
     private void buyCargo(Connection connection) {
-        AIPlayer aiPlayer = (AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getID());       
+        AIPlayer aiPlayer = (AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getID());
 
         if (!(getUnit().getLocation() instanceof Europe)) {
             throw new IllegalStateException("Carrier not in Europe");
         }
 
-        /* 
-         * Quick fix for forcing the AI to build more colonies.
-         * This fix should be removed after a proper implementation
-         * has been created.
+        /*
+         * Quick fix for forcing the AI to build more colonies. This fix should
+         * be removed after a proper implementation has been created.
          */
         if (aiPlayer.hasFewColonies()) {
             int space = getAvailableSpace();
             while (space > 0) {
                 AIUnit newUnit = getCheapestUnitInEurope(connection);
                 if (newUnit != null) {
-                    if (newUnit.getUnit().isColonist()
-                            && !newUnit.getUnit().isArmed()
-                            && !newUnit.getUnit().isMounted()
-                            && !newUnit.getUnit().isPioneer()) {
+                    if (newUnit.getUnit().isColonist() && !newUnit.getUnit().isArmed()
+                            && !newUnit.getUnit().isMounted() && !newUnit.getUnit().isPioneer()) {
                         newUnit.setMission(new BuildColonyMission(getAIMain(), newUnit));
                     }
                     addToTransportList(newUnit);
@@ -473,40 +460,43 @@ public class TransportMission extends Mission {
                     return;
                 }
             }
-        }       
-        
-        /* Add colonies containing wishes with the same destination as
-           an item in the transport list to the "aiColonies"-list: */
+        }
+
+        /*
+         * Add colonies containing wishes with the same destination as an item
+         * in the transport list to the "aiColonies"-list:
+         */
         ArrayList<AIColony> aiColonies = new ArrayList<AIColony>();
-        for (int i=0; i<transportList.size(); i++) {
+        for (int i = 0; i < transportList.size(); i++) {
             Transportable t = transportList.get(i);
-            if (t.getTransportDestination() != null 
-                    && t.getTransportDestination().getTile() != null
+            if (t.getTransportDestination() != null && t.getTransportDestination().getTile() != null
                     && t.getTransportDestination().getTile().getColony() != null
                     && t.getTransportDestination().getTile().getColony().getOwner() == getUnit().getOwner()) {
-                AIColony ac = (AIColony) getAIMain().getAIObject(t.getTransportDestination().getTile().getColony().getID());
+                AIColony ac = (AIColony) getAIMain().getAIObject(
+                        t.getTransportDestination().getTile().getColony().getID());
                 aiColonies.add(ac);
             }
         }
 
-        /* Add the colony containing the wish with the highest value
-           to the "aiColonies"-list: */
-        Iterator highValueWishIterator = ((AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getID())).getWishIterator();        
+        /*
+         * Add the colony containing the wish with the highest value to the
+         * "aiColonies"-list:
+         */
+        Iterator<Wish> highValueWishIterator = ((AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getID()))
+                .getWishIterator();
         while (highValueWishIterator.hasNext()) {
-            Wish w = (Wish) highValueWishIterator.next();
+            Wish w = highValueWishIterator.next();
             if (w.getTransportable() != null) {
                 continue;
             }
-            if (w instanceof WorkerWish
-                    && w.getDestination() instanceof Colony) {
+            if (w instanceof WorkerWish && w.getDestination() instanceof Colony) {
                 WorkerWish ww = (WorkerWish) w;
                 Colony c = (Colony) ww.getDestination();
                 AIColony ac = (AIColony) getAIMain().getAIObject(c);
                 if (!aiColonies.contains(ac)) {
                     aiColonies.add(ac);
                 }
-            } else if (w instanceof GoodsWish
-                    && w.getDestination() instanceof Colony) {
+            } else if (w instanceof GoodsWish && w.getDestination() instanceof Colony) {
                 GoodsWish gw = (GoodsWish) w;
                 Colony c = (Colony) gw.getDestination();
                 AIColony ac = (AIColony) getAIMain().getAIObject(c);
@@ -517,16 +507,17 @@ public class TransportMission extends Mission {
                 logger.warning("Unknown type of wish: " + w);
             }
         }
-        for (int i=0; i<aiColonies.size(); i++) {
+        for (int i = 0; i < aiColonies.size(); i++) {
             AIColony ac = aiColonies.get(i);
-            // Assuming that all colonists which can be bought in Europe take the same space:
-            int space = getAvailableSpace(Unit.FREE_COLONIST, getUnit().getOwner().getEurope(), ac.getColony());            
-            Iterator wishIterator = ac.getWishIterator();
+            // Assuming that all colonists which can be bought in Europe take
+            // the same space:
+            int space = getAvailableSpace(Unit.FREE_COLONIST, getUnit().getOwner().getEurope(), ac.getColony());
+            Iterator<Wish> wishIterator = ac.getWishIterator();
             while (space > 0 && wishIterator.hasNext()) {
-                Wish w = (Wish) wishIterator.next();
-                if (w.getTransportable() != null) {         
+                Wish w = wishIterator.next();
+                if (w.getTransportable() != null) {
                     continue;
-                }                
+                }
                 if (w instanceof WorkerWish) {
                     WorkerWish ww = (WorkerWish) w;
                     AIUnit newUnit = getUnitInEurope(connection, ww.getUnitType());
@@ -536,10 +527,10 @@ public class TransportMission extends Mission {
                         addToTransportList(newUnit);
                         space--;
                     }
-                } else if (w instanceof GoodsWish) {                    
+                } else if (w instanceof GoodsWish) {
                     GoodsWish gw = (GoodsWish) w;
-                    AIGoods ag = buyGoodsInEurope(connection, gw.getGoodsType(), 100, gw.getDestination());                    
-                    if (ag != null) {                        
+                    AIGoods ag = buyGoodsInEurope(connection, gw.getGoodsType(), 100, gw.getDestination());
+                    if (ag != null) {
                         gw.setTransportable(ag);
                         addToTransportList(ag);
                         space--;
@@ -554,7 +545,7 @@ public class TransportMission extends Mission {
         int space = getAvailableSpace();
         while (space > 0) {
             AIUnit newUnit = getCheapestUnitInEurope(connection);
-            if (newUnit != null) {             
+            if (newUnit != null) {
                 addToTransportList(newUnit);
                 space--;
             } else {
@@ -564,21 +555,22 @@ public class TransportMission extends Mission {
     }
 
     /**
-    * Buys the given cargo.
-    *
-    * <br><br>
-    *
-    * <b>Warning:</b> This method can only be called
-    * when the carrier is located in {@link Europe}.
-    *
-    * @param connection The <code>Connection</code> to use
-    *       when communicating with the server.
-    * @param type The type of goods to buy.
-    * @param amount The amount of goods to buy.
-    * @param destination The <code>Location</code> to which the goods should be
-    *       transported.
-    * @return The goods.
-    */
+     * Buys the given cargo.
+     * 
+     * <br>
+     * <br>
+     * 
+     * <b>Warning:</b> This method can only be called when the carrier is
+     * located in {@link Europe}.
+     * 
+     * @param connection The <code>Connection</code> to use when communicating
+     *            with the server.
+     * @param type The type of goods to buy.
+     * @param amount The amount of goods to buy.
+     * @param destination The <code>Location</code> to which the goods should
+     *            be transported.
+     * @return The goods.
+     */
     public AIGoods buyGoodsInEurope(Connection connection, int type, int amount, Location destination) {
         AIPlayer aiPlayer = (AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getID());
         Player player = aiPlayer.getPlayer();
@@ -602,30 +594,30 @@ public class TransportMission extends Mission {
         }
     }
 
-
     /**
-    * Returns the given type of <code>Unit</code>.
-    *
-    * <br><br>
-    *
-    * <b>Warning:</b> This method can only be called
-    * when the carrier is located in {@link Europe}.
-    *
-    * <br><br>
-    *
-    * This sequence is used when trying to get the unit:
-    * <br><br>
-    * <ol>
-    *   <li>Getting the unit from the docks.
-    *   <li>Recruiting the unit.
-    *   <li>Training the unit.
-    * </ol>
-    *
-    * @param connection The <code>Connection</code> to the server.
-    * @param unitType The type of {@link Unit} to be
-    *       found/recuited/trained.
-    * @return The <code>AIUnit</code>.
-    */
+     * Returns the given type of <code>Unit</code>.
+     * 
+     * <br>
+     * <br>
+     * 
+     * <b>Warning:</b> This method can only be called when the carrier is
+     * located in {@link Europe}.
+     * 
+     * <br>
+     * <br>
+     * 
+     * This sequence is used when trying to get the unit: <br>
+     * <br>
+     * <ol>
+     * <li>Getting the unit from the docks.
+     * <li>Recruiting the unit.
+     * <li>Training the unit.
+     * </ol>
+     * 
+     * @param connection The <code>Connection</code> to the server.
+     * @param unitType The type of {@link Unit} to be found/recuited/trained.
+     * @return The <code>AIUnit</code>.
+     */
     private AIUnit getUnitInEurope(Connection connection, int unitType) {
         AIPlayer aiPlayer = (AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getID());
         Player player = aiPlayer.getPlayer();
@@ -636,9 +628,9 @@ public class TransportMission extends Mission {
         }
 
         // Check if the given type of unit appear on the docks:
-        Iterator ui = europe.getUnitIterator();
+        Iterator<Unit> ui = europe.getUnitIterator();
         while (ui.hasNext()) {
-            Unit u = (Unit) ui.next();
+            Unit u = ui.next();
             if (unitType == -1 || unitType == u.getType()) {
                 return (AIUnit) getAIMain().getAIObject(u.getID());
             }
@@ -655,7 +647,8 @@ public class TransportMission extends Mission {
                     try {
                         Element reply = connection.ask(recruitUnitInEuropeElement);
                         if (reply.getTagName().equals("recruitUnitInEuropeConfirmed")) {
-                            return (AIUnit) getAIMain().getAIObject(((Element) reply.getChildNodes().item(0)).getAttribute("ID"));
+                            return (AIUnit) getAIMain().getAIObject(
+                                    ((Element) reply.getChildNodes().item(0)).getAttribute("ID"));
                         } else {
                             logger.warning("Could not recruit the specified unit in europe.");
                             continue;
@@ -675,7 +668,8 @@ public class TransportMission extends Mission {
             try {
                 Element reply = connection.ask(trainUnitInEuropeElement);
                 if (reply.getTagName().equals("trainUnitInEuropeConfirmed")) {
-                    return (AIUnit) getAIMain().getAIObject(((Element) reply.getChildNodes().item(0)).getAttribute("ID"));
+                    return (AIUnit) getAIMain().getAIObject(
+                            ((Element) reply.getChildNodes().item(0)).getAttribute("ID"));
                 } else {
                     logger.warning("Could not train the specified unit in europe.");
                 }
@@ -687,12 +681,11 @@ public class TransportMission extends Mission {
         return null;
     }
 
-
     /**
      * Returns the cheapest unit which can be bought in <code>Europe</code>.
      * 
-     * @param connection The connection to use when communicating
-     *      with the server.
+     * @param connection The connection to use when communicating with the
+     *            server.
      * @return The <code>AIUnit</code>.
      */
     private AIUnit getCheapestUnitInEurope(Connection connection) {
@@ -705,24 +698,25 @@ public class TransportMission extends Mission {
         }
 
         // Check if there are any units on the docks:
-        Iterator ui = europe.getUnitIterator();
+        Iterator<Unit> ui = europe.getUnitIterator();
         while (ui.hasNext()) {
-            Unit u = (Unit) ui.next();
-            if (!u.isCarrier() 
-                    && ((AIUnit) getAIMain().getAIObject(u)).getTransport() == null) {
+            Unit u = ui.next();
+            if (!u.isCarrier() && ((AIUnit) getAIMain().getAIObject(u)).getTransport() == null) {
                 return (AIUnit) getAIMain().getAIObject(u.getID());
             }
         }
 
         // Try recruiting the unit:
-        if (player.getGold() >= player.getRecruitPrice() && player.getRecruitPrice() < Unit.getPrice(Unit.EXPERT_ORE_MINER)) {
+        if (player.getGold() >= player.getRecruitPrice()
+                && player.getRecruitPrice() < Unit.getPrice(Unit.EXPERT_ORE_MINER)) {
             Element recruitUnitInEuropeElement = Message.createNewRootElement("recruitUnitInEurope");
             // TODO: Take the best unit (Seasoned scout, pioneer, soldier etc):
             recruitUnitInEuropeElement.setAttribute("slot", Integer.toString(1));
             try {
                 Element reply = connection.ask(recruitUnitInEuropeElement);
                 if (reply.getTagName().equals("recruitUnitInEuropeConfirmed")) {
-                    return (AIUnit) getAIMain().getAIObject(((Element) reply.getChildNodes().item(0)).getAttribute("ID"));
+                    return (AIUnit) getAIMain().getAIObject(
+                            ((Element) reply.getChildNodes().item(0)).getAttribute("ID"));
                 } else {
                     logger.warning("Could not recruit the specified unit in europe.");
                 }
@@ -738,7 +732,8 @@ public class TransportMission extends Mission {
             try {
                 Element reply = connection.ask(trainUnitInEuropeElement);
                 if (reply.getTagName().equals("trainUnitInEuropeConfirmed")) {
-                    return (AIUnit) getAIMain().getAIObject(((Element) reply.getChildNodes().item(0)).getAttribute("ID"));
+                    return (AIUnit) getAIMain().getAIObject(
+                            ((Element) reply.getChildNodes().item(0)).getAttribute("ID"));
                 } else {
                     logger.warning("Could not train the specified unit in europe.");
                 }
@@ -750,33 +745,35 @@ public class TransportMission extends Mission {
         return null;
     }
 
-
     /**
-    * Returns the path the carrier should use to get/drop the given <code>Transportable</code>.
-    *
-    * @param transportable The <code>Transportable</code>.
-    * @return The path.
-    */
+     * Returns the path the carrier should use to get/drop the given
+     * <code>Transportable</code>.
+     * 
+     * @param transportable The <code>Transportable</code>.
+     * @return The path.
+     */
     public PathNode getPath(Transportable transportable) {
         return getPath(transportable, getUnit().getTile(), !isCarrying(transportable));
     }
 
-
     /**
-    * Returns the path the carrier should use to get/drop the given <code>Transportable</code>.
-    *
-    * @param transportable The <code>Transportable</code>.
-    * @param start The <code>Tile</code> to search from. If <code>start == null</code>
-    *       or <code>start.getTile() == null</code> then the carrier's
-    *       {@link Unit#getEntryLocation entry location} is used instead.
-    * @param source
-    * @return The path.
-    */
+     * Returns the path the carrier should use to get/drop the given
+     * <code>Transportable</code>.
+     * 
+     * @param transportable The <code>Transportable</code>.
+     * @param start The <code>Tile</code> to search from. If
+     *            <code>start == null</code> or
+     *            <code>start.getTile() == null</code> then the carrier's
+     *            {@link Unit#getEntryLocation entry location} is used instead.
+     * @param source
+     * @return The path.
+     */
     private PathNode getPath(Transportable transportable, Location start, boolean source) {
         Unit carrier = getUnit();
 
         if (isCarrying(transportable) && source) {
-            throw new IllegalStateException("Cannot find the path to the source while the transportable is on the carrier.");
+            throw new IllegalStateException(
+                    "Cannot find the path to the source while the transportable is on the carrier.");
         }
 
         PathNode path;
@@ -813,14 +810,14 @@ public class TransportMission extends Mission {
         return path;
     }
 
-
     /**
-    * Returns the available space for the given <code>Transportable</code>.
-    *
-    * @param t The <code>Transportable</code>
-    * @return The space available for <code>Transportable</code>s with the
-    *         same source and {@link Transportable#getTransportDestination destination}.
-    */
+     * Returns the available space for the given <code>Transportable</code>.
+     * 
+     * @param t The <code>Transportable</code>
+     * @return The space available for <code>Transportable</code>s with the
+     *         same source and
+     *         {@link Transportable#getTransportDestination destination}.
+     */
     public int getAvailableSpace(Transportable t) {
         if (t.getTransportLocatable() instanceof Unit) {
             Unit u = (Unit) t.getTransportLocatable();
@@ -830,62 +827,60 @@ public class TransportMission extends Mission {
         }
     }
 
-
     /**
-    * Returns the available space for the given type of <code>Unit</code>
-    * at the given <code>Location</code>.
-    *
-    * @param unitType The type of {@link Unit} or <code>-1</code> for
-    *           {@link Goods}
-    * @param source The source for the unit. This is where the unit
-    *       is presently located.
-    * @param destination The destination for the unit.
-    * @return The space available
-    */
+     * Returns the available space for the given type of <code>Unit</code> at
+     * the given <code>Location</code>.
+     * 
+     * @param unitType The type of {@link Unit} or <code>-1</code> for
+     *            {@link Goods}
+     * @param source The source for the unit. This is where the unit is
+     *            presently located.
+     * @param destination The destination for the unit.
+     * @return The space available
+     */
     public int getAvailableSpace(int unitType, Location source, Location destination) {
         // TODO: Implement this method properly:
         return Math.max(0, getUnit().getSpaceLeft() - transportList.size());
     }
 
-
     /**
-    * Returns the available space for any type of unit going to any type of location.
-    * @return The space available
-    */
+     * Returns the available space for any type of unit going to any type of
+     * location.
+     * 
+     * @return The space available
+     */
     public int getAvailableSpace() {
         // TODO: Implement this method properly:
         return Math.max(0, getUnit().getSpaceLeft() - transportList.size());
     }
 
-
     /**
-    * Loads and unloads any <code>Transportable</code>.
-    *
-    * @param connection The <code>Connection</code> to the server.
-    * @return <code>true</code> if something has been loaded/unloaded and
-    *       <code>false</code>otherwise.
-    */
+     * Loads and unloads any <code>Transportable</code>.
+     * 
+     * @param connection The <code>Connection</code> to the server.
+     * @return <code>true</code> if something has been loaded/unloaded and
+     *         <code>false</code>otherwise.
+     */
     private boolean restockCargoAtDestination(Connection connection) {
         return unloadCargoAtDestination(connection) | loadCargoAtDestination(connection);
     }
 
-
     /**
-    * Unloads any <code>Transportable</code>s which have reached
-    * their destination.
-    *
-    * @param connection The <code>Connection</code> to the server.
-    * @return <code>true</code> if something has been unloaded and
-    *       <code>false</code>otherwise.
-    */
+     * Unloads any <code>Transportable</code>s which have reached their
+     * destination.
+     * 
+     * @param connection The <code>Connection</code> to the server.
+     * @return <code>true</code> if something has been unloaded and
+     *         <code>false</code>otherwise.
+     */
     private boolean unloadCargoAtDestination(Connection connection) {
         Unit carrier = getUnit();
 
         boolean transportListChanged = false;
 
-        Iterator tli = ((List) ((ArrayList) transportList).clone()).iterator();
+        Iterator<Transportable> tli = transportList.iterator();
         while (tli.hasNext()) {
-            Transportable t = (Transportable) tli.next();
+            Transportable t = tli.next();
             if (!isCarrying(t)) {
                 continue;
             }
@@ -894,12 +889,10 @@ public class TransportMission extends Mission {
                 Unit u = au.getUnit();
                 Mission mission = au.getMission();
                 if (mission != null && mission.isValid()) {
-                    if (au.getTransportDestination() != null 
+                    if (au.getTransportDestination() != null
                             && au.getTransportDestination().getTile() == carrier.getTile()
-                            && carrier.getState() != Unit.TO_EUROPE 
-                            && carrier.getState() != Unit.TO_AMERICA) {
-                        if (u.getLocation() instanceof Europe
-                                || u.getTile() != null && u.getTile().getColony() != null) {
+                            && carrier.getState() != Unit.TO_EUROPE && carrier.getState() != Unit.TO_AMERICA) {
+                        if (u.getLocation() instanceof Europe || u.getTile() != null && u.getTile().getColony() != null) {
                             Element leaveShipElement = Message.createNewRootElement("leaveShip");
                             leaveShipElement.setAttribute("unit", u.getID());
                             try {
@@ -913,9 +906,10 @@ public class TransportMission extends Mission {
                             removeFromTransportList(au);
                             transportListChanged = true;
                         }
-                    } else if (!(carrier.getLocation() instanceof Europe)
-                            && au.getTransportDestination() != null && au.getTransportDestination().getTile() != null) {
-                        PathNode p = getGame().getMap().findPath(u, carrier.getTile(), au.getTransportDestination().getTile());
+                    } else if (!(carrier.getLocation() instanceof Europe) && au.getTransportDestination() != null
+                            && au.getTransportDestination().getTile() != null) {
+                        PathNode p = getGame().getMap().findPath(u, carrier.getTile(),
+                                au.getTransportDestination().getTile());
                         if (p != null && p.getTransportDropNode().getTurns() <= 2) {
                             mission.doMission(connection);
                             if (u.getLocation() != getUnit()) {
@@ -927,10 +921,9 @@ public class TransportMission extends Mission {
                 }
             } else if (t instanceof AIGoods) {
                 AIGoods ag = (AIGoods) t;
-                if (ag.getTransportDestination() != null 
+                if (ag.getTransportDestination() != null
                         && ag.getTransportDestination().getTile() == carrier.getLocation().getTile()
-                        && carrier.getState() != Unit.TO_EUROPE
-                        && carrier.getState() != Unit.TO_AMERICA) {
+                        && carrier.getState() != Unit.TO_EUROPE && carrier.getState() != Unit.TO_AMERICA) {
                     if (carrier.getLocation() instanceof Europe) {
                         // TODO-AI-CHEATING: REMOVE WHEN THE AI IS GOOD ENOUGH:
                         Player p = carrier.getOwner();
@@ -940,7 +933,8 @@ public class TransportMission extends Mission {
                         }
                         // END: TODO-AI-CHEATING.
                         Element sellGoodsElement = Message.createNewRootElement("sellGoods");
-                        sellGoodsElement.appendChild(ag.getGoods().toXMLElement(carrier.getOwner(), sellGoodsElement.getOwnerDocument()));
+                        sellGoodsElement.appendChild(ag.getGoods().toXMLElement(carrier.getOwner(),
+                                sellGoodsElement.getOwnerDocument()));
                         try {
                             connection.sendAndWait(sellGoodsElement);
                             removeFromTransportList(ag);
@@ -951,7 +945,8 @@ public class TransportMission extends Mission {
                         }
                     } else {
                         Element unloadCargoElement = Message.createNewRootElement("unloadCargo");
-                        unloadCargoElement.appendChild(ag.getGoods().toXMLElement(carrier.getOwner(), unloadCargoElement.getOwnerDocument()));
+                        unloadCargoElement.appendChild(ag.getGoods().toXMLElement(carrier.getOwner(),
+                                unloadCargoElement.getOwnerDocument()));
                         try {
                             connection.sendAndWait(unloadCargoElement);
                             removeFromTransportList(ag);
@@ -970,15 +965,13 @@ public class TransportMission extends Mission {
         return transportListChanged;
     }
 
-
     /**
-    * Loads any <code>Transportable</code>s being in range
-    * of the carrier.
-    *
-    * @param connection The <code>Connection</code> to the server.
-    * @return <code>true</code> if something has been unloaded and
-    *       <code>false</code>otherwise.
-    */
+     * Loads any <code>Transportable</code>s being in range of the carrier.
+     * 
+     * @param connection The <code>Connection</code> to the server.
+     * @return <code>true</code> if something has been unloaded and
+     *         <code>false</code>otherwise.
+     */
     private boolean loadCargoAtDestination(Connection connection) {
         Unit carrier = getUnit();
 
@@ -986,17 +979,16 @@ public class TransportMission extends Mission {
 
         boolean transportListChanged = false;
 
-        Iterator tli = transportList.iterator();
+        Iterator<Transportable> tli = transportList.iterator();
         while (tli.hasNext()) {
-            Transportable t = (Transportable) tli.next();
-            if (isCarrying(t)) {          
+            Transportable t = tli.next();
+            if (isCarrying(t)) {
                 continue;
             }
             if (t instanceof AIUnit) {
                 AIUnit au = (AIUnit) t;
                 Unit u = au.getUnit();
-                if (u.getTile() == carrier.getTile() 
-                        && carrier.getState() != Unit.TO_EUROPE 
+                if (u.getTile() == carrier.getTile() && carrier.getState() != Unit.TO_EUROPE
                         && carrier.getState() != Unit.TO_AMERICA) {
                     Element boardShipElement = Message.createNewRootElement("boardShip");
                     boardShipElement.setAttribute("unit", u.getID());
@@ -1011,8 +1003,7 @@ public class TransportMission extends Mission {
                 }
             } else if (t instanceof AIGoods) {
                 AIGoods ag = (AIGoods) t;
-                if (ag.getGoods().getTile() == carrier.getTile()
-                        && carrier.getState() != Unit.TO_EUROPE 
+                if (ag.getGoods().getTile() == carrier.getTile() && carrier.getState() != Unit.TO_EUROPE
                         && carrier.getState() != Unit.TO_AMERICA) {
                     if (carrier.getLocation() instanceof Europe) {
                         Element buyGoodsElement = Message.createNewRootElement("buyGoods");
@@ -1030,7 +1021,8 @@ public class TransportMission extends Mission {
                     } else {
                         Element loadCargoElement = Message.createNewRootElement("loadCargo");
                         loadCargoElement.setAttribute("carrier", carrier.getID());
-                        loadCargoElement.appendChild(ag.getGoods().toXMLElement(carrier.getOwner(), loadCargoElement.getOwnerDocument()));
+                        loadCargoElement.appendChild(ag.getGoods().toXMLElement(carrier.getOwner(),
+                                loadCargoElement.getOwnerDocument()));
 
                         try {
                             connection.sendAndWait(loadCargoElement);
@@ -1050,61 +1042,61 @@ public class TransportMission extends Mission {
         return transportListChanged;
     }
 
-
     /**
-    * Checks if this mission is still valid to perform.
-    * @return <code>true</code>
-    */
+     * Checks if this mission is still valid to perform.
+     * 
+     * @return <code>true</code>
+     */
     public boolean isValid() {
         return true;
     }
-    
+
     /**
      * Returns the destination of a required transport.
+     * 
      * @return <code>null</code>
      */
     public Tile getTransportDestination() {
         return null;
     }
-    
+
     /**
-     * Returns the priority of getting the unit to the
-     * transport destination.
-     *
+     * Returns the priority of getting the unit to the transport destination.
+     * 
      * @return o
      */
     public int getTransportPriority() {
         return 0;
     }
-    
+
     /**
      * Finds the best path to <code>Europe</code>.
-     *
+     * 
      * @param start The starting <code>Tile</code>.
-     * @return The path to the target or <code>null</code> if no target can
-     *         be found.
+     * @return The path to the target or <code>null</code> if no target can be
+     *         found.
      * @see Europe
      */
     protected PathNode findPathToEurope(Tile start) {
         return getGame().getMap().findPathToEurope(getUnit(), start);
     }
-    
+
     /**
-     * Writes all of the <code>AIObject</code>s and other AI-related 
+     * Writes all of the <code>AIObject</code>s and other AI-related
      * information to an XML-stream.
-     *
+     * 
      * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
-        
+
         out.writeAttribute("unit", getUnit().getID());
-        
-        Iterator tli = transportList.iterator();
+
+        Iterator<Transportable> tli = transportList.iterator();
         while (tli.hasNext()) {
-            Transportable t = (Transportable) tli.next();
+            Transportable t = tli.next();
             out.writeStartElement(ELEMENT_TRANSPORTABLE);
             out.writeAttribute("ID", ((AIObject) t).getID());
             out.writeEndElement();
@@ -1115,11 +1107,12 @@ public class TransportMission extends Mission {
     /**
      * Reads all the <code>AIObject</code>s and other AI-related information
      * from XML data.
+     * 
      * @param in The input stream with the XML.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null, "unit")));
-        
+
         transportList.clear();
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
@@ -1136,7 +1129,7 @@ public class TransportMission extends Mission {
                 if (!(ao instanceof Transportable)) {
                     logger.warning("AIObject not Transportable, ID: " + in.getAttributeValue(null, "ID"));
                 } else {
-                    transportList.add((Transportable)ao);
+                    transportList.add((Transportable) ao);
                 }
                 in.nextTag();
             } else {
@@ -1145,30 +1138,29 @@ public class TransportMission extends Mission {
         }
     }
 
-
     /**
-    * Returns the tag name of the root element representing this object.
-    * @return The <code>String</code> "transportMission".
-    */
+     * Returns the tag name of the root element representing this object.
+     * 
+     * @return The <code>String</code> "transportMission".
+     */
     public static String getXMLElementTagName() {
         return "transportMission";
     }
-    
-    
+
     /**
-     * Creates a <code>String</code> representation of this mission
-     * to be used for debugging purposes.
+     * Creates a <code>String</code> representation of this mission to be used
+     * for debugging purposes.
      */
     public String toString() {
         StringBuffer sb = new StringBuffer("<html><body><b>Transport list:</b><br><br>");
-        Iterator it = transportList.iterator();
+        Iterator<Transportable> it = transportList.iterator();
         while (it.hasNext()) {
-            Transportable t = (Transportable) it.next();
-            Locatable l = t.getTransportLocatable();            
+            Transportable t = it.next();
+            Locatable l = t.getTransportLocatable();
             sb.append(l.toString());
             sb.append("<br>");
         }
-        sb.append("</body></html>");        
+        sb.append("</body></html>");
         return sb.toString();
     }
 }

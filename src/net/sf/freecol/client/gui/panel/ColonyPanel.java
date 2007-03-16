@@ -57,6 +57,7 @@ import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import cz.autel.dmi.HIGLayout;
@@ -385,9 +386,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         UnitLabel preSelectedUnitLabel = null;
         selectedUnit = null;
 
-        Iterator tileUnitIterator = tile.getUnitIterator();
+        Iterator<Unit> tileUnitIterator = tile.getUnitIterator();
         while (tileUnitIterator.hasNext()) {
-            Unit unit = (Unit) tileUnitIterator.next();
+            Unit unit = tileUnitIterator.next();
 
             UnitLabel unitLabel = new UnitLabel(unit, parent);
             unitLabel.setTransferHandler(defaultTransferHandler);
@@ -514,11 +515,11 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             return;
         }
         nameBox.removeAllItems();
-        List colonies = getColony().getOwner().getSettlements();
-        sortColonies(colonies);
-        Iterator colonyIterator = colonies.iterator();
-        while (colonyIterator.hasNext()) {
-            nameBox.addItem(colonyIterator.next());
+        List<Settlement> settlements = getColony().getOwner().getSettlements();
+        sortColonies(settlements);
+        Iterator<Settlement> settlementIterator = settlements.iterator();
+        while (settlementIterator.hasNext()) {
+            nameBox.addItem(settlementIterator.next());
         }
         nameBox.setSelectedItem(getColony());
         
@@ -604,9 +605,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         }
         outsideColonyPanel.removeAll();
         Tile tile = getColony().getTile();
-        Iterator tileUnitIterator = tile.getUnitIterator();
+        Iterator<Unit> tileUnitIterator = tile.getUnitIterator();
         while (tileUnitIterator.hasNext()) {
-            Unit unit = (Unit) tileUnitIterator.next();
+            Unit unit = tileUnitIterator.next();
 
             UnitLabel unitLabel = new UnitLabel(unit, parent);
             unitLabel.setTransferHandler(defaultTransferHandler);
@@ -682,18 +683,18 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
     private void unload() {
         Unit unit = getSelectedUnit();
         if (unit != null && unit.isCarrier()) {
-            Iterator goodsIterator = unit.getGoodsIterator();
+            Iterator<Goods> goodsIterator = unit.getGoodsIterator();
             while (goodsIterator.hasNext()) {
-                Goods goods = (Goods) goodsIterator.next();
+                Goods goods = goodsIterator.next();
                 inGameController.unloadCargo(goods);
                 updateWarehouse();
                 updateCargoPanel();
                 getCargoPanel().revalidate();
                 refresh();
             }
-            Iterator unitIterator = unit.getUnitIterator();
+            Iterator<Unit> unitIterator = unit.getUnitIterator();
             while (unitIterator.hasNext()) {
-                Unit newUnit = (Unit) unitIterator.next();
+                Unit newUnit = unitIterator.next();
                 inGameController.leaveShip(newUnit);
                 updateCargoLabel();
                 updateCargoPanel();
@@ -789,9 +790,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             selectedUnit.setSelected(true);
             Unit selUnit = selectedUnit.getUnit();
 
-            Iterator unitIterator = selUnit.getUnitIterator();
+            Iterator<Unit> unitIterator = selUnit.getUnitIterator();
             while (unitIterator.hasNext()) {
-                Unit unit = (Unit) unitIterator.next();
+                Unit unit = unitIterator.next();
 
                 UnitLabel label = new UnitLabel(unit, parent);
                 label.setTransferHandler(defaultTransferHandler);
@@ -800,9 +801,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 cargoPanel.add(label, false);
             }
 
-            Iterator goodsIterator = selUnit.getGoodsIterator();
+            Iterator<Goods> goodsIterator = selUnit.getGoodsIterator();
             while (goodsIterator.hasNext()) {
-                Goods g = (Goods) goodsIterator.next();
+                Goods g = goodsIterator.next();
 
                 GoodsLabel label = new GoodsLabel(g, parent);
                 label.setTransferHandler(defaultTransferHandler);
@@ -909,9 +910,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
             ASingleBuildingPanel aSingleBuildingPanel;
 
-            Iterator buildingIterator = getColony().getBuildingIterator();
+            Iterator<Building> buildingIterator = getColony().getBuildingIterator();
             while (buildingIterator.hasNext()) {
-                Building building = (Building) buildingIterator.next();
+                Building building = buildingIterator.next();
                 if (building.isBuilt()) {
                     aSingleBuildingPanel = new ASingleBuildingPanel(building);
                     aSingleBuildingPanel.addMouseListener(releaseListener);
@@ -959,9 +960,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                     add(new JLabel(building.getName()));
                 }
 
-                Iterator unitIterator = building.getUnitIterator();
+                Iterator<Unit> unitIterator = building.getUnitIterator();
                 while (unitIterator.hasNext()) {
-                    Unit unit = (Unit) unitIterator.next();
+                    Unit unit = unitIterator.next();
                     UnitLabel unitLabel = new UnitLabel(unit, parent, true);
                     unitLabel.setTransferHandler(defaultTransferHandler);
                     unitLabel.addMouseListener(pressListener);
@@ -1412,10 +1413,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
         public void initialize() {
             warehousePanel.removeAll();
-            Iterator goodsIterator =
+            Iterator<Goods> goodsIterator =
                     getColony().getGoodsContainer().getFullGoodsIterator();
             while (goodsIterator.hasNext()) {
-                Goods goods = (Goods) goodsIterator.next();
+                Goods goods = goodsIterator.next();
 
                 GoodsLabel goodsLabel = new GoodsLabel(goods, parent);
                 goodsLabel.setTransferHandler(defaultTransferHandler);
@@ -2009,11 +2010,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 }
             }
 
-            Iterator buildableUnitIterator =
+            Iterator<Integer> buildableUnitIterator =
                     colonyPanel.getColony().getBuildableUnitIterator();
             while (buildableUnitIterator.hasNext()) {
-                int unitID =
-                        ((Integer) buildableUnitIterator.next()).intValue();
+                int unitID = buildableUnitIterator.next();
 
                 String theText =
                         new String(Unit.getName(unitID) + " ("
