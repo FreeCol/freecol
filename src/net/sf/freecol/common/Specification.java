@@ -1,6 +1,4 @@
-
 package net.sf.freecol.common;
-
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -17,22 +15,26 @@ import net.sf.freecol.common.util.Xml;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-
 /**
  * This class encapsulates any parts of the "specification" for FreeCol that are
- * expressed best using XML.  The XML is loaded through the class loader from
- * the resource named "specification.xml" in the same package as this class.
+ * expressed best using XML. The XML is loaded through the class loader from the
+ * resource named "specification.xml" in the same package as this class.
  */
 public final class Specification {
 
-    public static final  String  COPYRIGHT = "Copyright (C) 2006-2007 The FreeCol Team";
-    public static final  String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
-    public static final  String  REVISION = "$Revision$";
+    public static final String COPYRIGHT = "Copyright (C) 2006-2007 The FreeCol Team";
 
-    private final  List<BuildingType>  buildingTypeList;
-    private final  List<TileType>      tileTypeList;
-    private final  List<GoodsType>     goodsTypeList;
-    private final  List<UnitType>      unitTypeList;
+    public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
+
+    public static final String REVISION = "$Revision$";
+
+    private final List<BuildingType> buildingTypeList;
+
+    private final List<TileType> tileTypeList;
+
+    private final List<GoodsType> goodsTypeList;
+
+    private final List<UnitType> unitTypeList;
 
 
     // ----------------------------------------------------------- constructors
@@ -44,92 +46,89 @@ public final class Specification {
         goodsTypeList = new ArrayList<GoodsType>();
         unitTypeList = new ArrayList<UnitType>();
 
-        InputStream  in = Specification.class.getResourceAsStream( "specification.xml" );
-        Document  specificationDocument = Xml.documentFrom( in );
+        InputStream in = Specification.class.getResourceAsStream("specification.xml");
+        Document specificationDocument = Xml.documentFrom(in);
 
-        final  Map<String, GoodsType>  goodsTypeByRef = new HashMap<String, GoodsType>();
+        final Map<String, GoodsType> goodsTypeByRef = new HashMap<String, GoodsType>();
 
         /* this method is invoked for each child element of the root element */
-        final Xml.Method  method = new Xml.Method() {
-            public void invokeOn( Node xml ) {
+        final Xml.Method method = new Xml.Method() {
+            public void invokeOn(Node xml) {
 
-                String  childName = xml.getNodeName();
+                String childName = xml.getNodeName();
 
-                if ( "building-types".equals(childName) ) {
+                if ("building-types".equals(childName)) {
 
-                    ObjectFactory  factory = new ObjectFactory() {
-                        public Object objectFrom( Node xml ) {
+                    ObjectFactory<BuildingType> factory = new ObjectFactory<BuildingType>() {
+                        public BuildingType objectFrom(Node xml) {
 
-                            BuildingType  buildingType = new BuildingType();
-                            buildingType.readFromXmlElement( xml );
+                            BuildingType buildingType = new BuildingType();
+                            buildingType.readFromXmlElement(xml);
                             return buildingType;
                         }
                     };
 
-                    makeListFromXml( buildingTypeList, xml, factory );
-                }
-                else if ( "tile-types".equals(childName) ) {
+                    makeListFromXml(buildingTypeList, xml, factory);
+                } else if ("tile-types".equals(childName)) {
 
-                    ObjectFactory  factory = new ObjectFactory() {
-                        public Object objectFrom( Node xml ) {
+                    ObjectFactory<TileType> factory = new ObjectFactory<TileType>() {
+                        public TileType objectFrom(Node xml) {
 
-                            TileType  tileType = new TileType();
-                            tileType.readFromXmlElement( xml );
+                            TileType tileType = new TileType();
+                            tileType.readFromXmlElement(xml);
                             return tileType;
                         }
                     };
 
-                    makeListFromXml( tileTypeList, xml, factory );
-                }
-                else if ( "goods-types".equals(childName) ) {
+                    makeListFromXml(tileTypeList, xml, factory);
+                } else if ("goods-types".equals(childName)) {
 
-                    ObjectFactory  factory = new ObjectFactory() {
-                        public Object objectFrom( Node xml ) {
+                    ObjectFactory<GoodsType> factory = new ObjectFactory<GoodsType>() {
+                        public GoodsType objectFrom(Node xml) {
 
-                            GoodsType  goodsType = new GoodsType();
-                            goodsType.readFromXmlElement( xml, goodsTypeByRef );
-                            goodsTypeByRef.put( Xml.attribute(xml, "ref"), goodsType );
+                            GoodsType goodsType = new GoodsType();
+                            goodsType.readFromXmlElement(xml, goodsTypeByRef);
+                            goodsTypeByRef.put(Xml.attribute(xml, "ref"), goodsType);
                             return goodsType;
                         }
                     };
 
-                    makeListFromXml( goodsTypeList, xml, factory );
-                }
-                else if ( "unit-types".equals(childName) ) {
+                    makeListFromXml(goodsTypeList, xml, factory);
+                } else if ("unit-types".equals(childName)) {
 
-                    ObjectFactory  factory = new ObjectFactory() {
-                        public Object objectFrom( Node xml ) {
+                    ObjectFactory<UnitType> factory = new ObjectFactory<UnitType>() {
+                        public UnitType objectFrom(Node xml) {
 
-                            UnitType  unitType = new UnitType();
-                            unitType.readFromXmlElement( xml, goodsTypeByRef );
+                            UnitType unitType = new UnitType();
+                            unitType.readFromXmlElement(xml, goodsTypeByRef);
                             return unitType;
                         }
                     };
 
-                    makeListFromXml( unitTypeList, xml, factory );
-                }
-                else {
-                    throw new RuntimeException( "unexpected: " + xml );
+                    makeListFromXml(unitTypeList, xml, factory);
+                } else {
+                    throw new RuntimeException("unexpected: " + xml);
                 }
             }
         };
 
-        /* this method is invoked for each child element of the document, which
-         * includes the "revision" comment and the root element at the moment */
-        Xml.Method  documentMethod = new Xml.Method() {
-            public void invokeOn( Node xml ) {
+        /*
+         * this method is invoked for each child element of the document, which
+         * includes the "revision" comment and the root element at the moment
+         */
+        Xml.Method documentMethod = new Xml.Method() {
+            public void invokeOn(Node xml) {
 
-                if ( "freecol-specification".equals(xml.getNodeName()) ) {
+                if ("freecol-specification".equals(xml.getNodeName())) {
 
                     // for each child element of the document root element..
-                    Xml.forEachChild( xml, method );
+                    Xml.forEachChild(xml, method);
                 }
             }
         };
 
-        Xml.forEachChild( specificationDocument, documentMethod );
+        Xml.forEachChild(specificationDocument, documentMethod);
     }
-
 
     // ------------------------------------------------------------ API methods
 
@@ -149,77 +148,68 @@ public final class Specification {
         return unitTypeList;
     }
 
-
     public int numberOfBuildingTypes() {
 
         return buildingTypeList.size();
     }
 
+    public BuildingType buildingType(int buildingTypeIndex) {
 
-    public BuildingType buildingType( int buildingTypeIndex ) {
-
-        return buildingTypeList.get( buildingTypeIndex );
+        return buildingTypeList.get(buildingTypeIndex);
     }
-
 
     public int numberOfTileTypes() {
 
         return tileTypeList.size();
     }
 
+    public TileType tileType(int tileTypeIndex) {
 
-    public TileType tileType( int tileTypeIndex ) {
-
-        return tileTypeList.get( tileTypeIndex );
+        return tileTypeList.get(tileTypeIndex);
     }
-
 
     public int numberOfGoodsTypes() {
 
         return goodsTypeList.size();
     }
 
+    public GoodsType goodsType(int goodsTypeIndex) {
 
-    public GoodsType goodsType( int goodsTypeIndex ) {
-
-        return goodsTypeList.get( goodsTypeIndex );
+        return goodsTypeList.get(goodsTypeIndex);
     }
-
 
     public int numberOfUnitTypes() {
 
         return unitTypeList.size();
     }
 
+    public UnitType unitType(int unitTypeIndex) {
 
-    public UnitType unitType( int unitTypeIndex ) {
-
-        return unitTypeList.get( unitTypeIndex );
+        return unitTypeList.get(unitTypeIndex);
     }
-
 
     // -------------------------------------------------------- support methods
 
-    private void makeListFromXml( final List list, Node xml, final ObjectFactory factory ) {
+    private <T> void makeListFromXml(final List<T> list, Node xml, final ObjectFactory<T> factory) {
 
-        Xml.Method  method = new Xml.Method() {
-            public void invokeOn( Node xml ) {
+        Xml.Method method = new Xml.Method() {
+            public void invokeOn(Node xml) {
 
                 // construct an object from "xml" and add it to the list
-                list.add( factory.objectFrom(xml) );
+                list.add(factory.objectFrom(xml));
             }
         };
 
         // for each child element of "xml"..
-        Xml.forEachChild( xml, method );
+        Xml.forEachChild(xml, method);
     }
 
 
     // ----------------------------------------------------------- nested types
 
-    interface ObjectFactory {
+    interface ObjectFactory<T> {
 
-        public Object objectFrom( Node xml );
+        public T objectFrom(Node xml);
     }
 
 }
