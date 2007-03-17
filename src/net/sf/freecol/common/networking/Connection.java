@@ -512,6 +512,7 @@ public class Connection {
                             }
                         } catch (Exception e) {
                             logger.log(Level.WARNING, "Message handler failed!", e);
+                            logger.warning(msg.getDocument().getDocumentElement().toString());
                         }
                     }
                 };

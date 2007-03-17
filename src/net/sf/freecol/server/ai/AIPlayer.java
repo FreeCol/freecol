@@ -206,6 +206,7 @@ public class AIPlayer extends AIObject {
      * For REF-players: Checks if we have lost the war of independence.
      */
     private void checkForREFDefeat() {
+        logger.finest("Entering method checkForREFDefeat");
         if (!getPlayer().isREF()) {
             return;
         }
@@ -236,6 +237,7 @@ public class AIPlayer extends AIObject {
      * Cheats for the AI :-)
      */
     private void cheat() {
+        logger.finest("Entering method cheat");
         // TODO-AI-CHEATING: REMOVE WHEN THE AI IS GOOD ENOUGH:
         if (getAIMain().getFreeColServer().isSingleplayer() && player.isEuropean() && !player.isREF() && player.isAI()
                 && player.getRebellionState() == Player.REBELLION_PRE_WAR) {
@@ -310,6 +312,7 @@ public class AIPlayer extends AIObject {
      * {@link WorkInsideColonyMission}.
      */
     private void ensureCorrectMissions() {
+        logger.finest("Entering method ensureCorrectMissions");
         if (player.isIndian()) {
             return;
         }
@@ -331,6 +334,7 @@ public class AIPlayer extends AIObject {
      *         world or if a puppet-nation has declared independence.
      */
     private boolean isWorkForREF() {
+        logger.finest("Entering method isWorkForREF");
         Iterator<Unit> it = getPlayer().getUnitIterator();
         while (it.hasNext()) {
             if (it.next().getTile() != null) {
@@ -353,6 +357,7 @@ public class AIPlayer extends AIObject {
      * That is: should we declare war?
      */
     private void determineStances() {
+        logger.finest("Entering method determineStances");
         Iterator<Player> playerIterator = getGame().getPlayerIterator();
         while (playerIterator.hasNext()) {
             Player p = playerIterator.next();
@@ -379,6 +384,7 @@ public class AIPlayer extends AIObject {
      * return if this player is not a REF-player.
      */
     private void moveREFToDocks() {
+        logger.finest("Entering method moveREFToDocks");
         Iterator<Player> it = getGame().getPlayerIterator();
         while (it.hasNext()) {
             Player p = it.next();
@@ -429,6 +435,7 @@ public class AIPlayer extends AIObject {
      * Aborts all the missions which are no longer valid.
      */
     private void abortInvalidMissions() {
+        logger.finest("Entering method abortInvalidMissions");
         Iterator<AIUnit> aiUnitsIterator = getAIUnitIterator();
         while (aiUnitsIterator.hasNext()) {
             AIUnit aiUnit = aiUnitsIterator.next();
@@ -445,6 +452,7 @@ public class AIPlayer extends AIObject {
      * Aborts all the missions which are no longer valid.
      */
     private void abortInvalidAndOneTimeMissions() {
+        logger.finest("Entering method abortInvalidAndOneTimeMissions");
         Iterator<AIUnit> aiUnitsIterator = getAIUnitIterator();
         while (aiUnitsIterator.hasNext()) {
             AIUnit aiUnit = aiUnitsIterator.next();
@@ -465,6 +473,7 @@ public class AIPlayer extends AIObject {
      * Gives missions to all the naval units this player owns.
      */
     private void giveNavalMissions() {
+        logger.finest("Entering method giveNavalMissions");
         if (!player.isEuropean()) {
             return;
         }
@@ -482,6 +491,7 @@ public class AIPlayer extends AIObject {
      * owns.
      */
     private void rearrangeWorkersInColonies() {
+        logger.finest("Entering method rearrangeWorkersInColonies");
         if (!player.isEuropean()) {
             return;
         }
@@ -497,6 +507,7 @@ public class AIPlayer extends AIObject {
      * making new military units or to give existing units new missions.
      */
     private void secureSettlements() {
+        logger.finest("Entering method secureSettlements");
         Map map = player.getGame().getMap();
         if (!player.isEuropean()) {
             // Determines if we need to move a brave out of the settlement.
@@ -807,6 +818,7 @@ public class AIPlayer extends AIObject {
      * @param element The element.
      */
     private void sendAndWaitSafely(Element element) {
+        logger.finest("Entering method sendAndWaitSafely");
         try {
             if (logger.isLoggable(Level.FINER)) {
                 logger.finer("AI player (" + this + ") sending " + element.getTagName() + "...");
@@ -824,6 +836,7 @@ public class AIPlayer extends AIObject {
      * Gives a mission to non-naval units.
      */
     private void giveNormalMissions() {
+        logger.finest("Entering method giveNormalMissions");
         // Create a datastructure for the worker wishes:
         Vector<ArrayList<Wish>> workerWishes = new Vector<ArrayList<Wish>>(Unit.UNIT_COUNT);
         for (int i = 0; i < Unit.UNIT_COUNT; i++) {
@@ -945,6 +958,7 @@ public class AIPlayer extends AIObject {
      * Brings gifts to nice players with nearby colonies.
      */
     private void bringGifts() {
+        logger.finest("Entering method bringGifts");
         if (!player.isIndian()) {
             return;
         }
@@ -1004,6 +1018,7 @@ public class AIPlayer extends AIObject {
      * Demands goods from players with nearby colonies.
      */
     private void demandTribute() {
+        logger.finest("Entering method demandTribute");
         if (!player.isIndian()) {
             return;
         }
@@ -1080,6 +1095,7 @@ public class AIPlayer extends AIObject {
      * Calls {@link AIColony#createAIGoods()} for every colony this player owns.
      */
     private void createAIGoodsInColonies() {
+        logger.finest("Entering method createAIGoodsInColonies");
         if (!player.isEuropean()) {
             return;
         }
@@ -1096,6 +1112,7 @@ public class AIPlayer extends AIObject {
      * 
      */
     private void doMissions() {
+        logger.finest("Entering method doMissions");
         Iterator<AIUnit> aiUnitsIterator = getAIUnitIterator();
         while (aiUnitsIterator.hasNext()) {
             AIUnit aiUnit = aiUnitsIterator.next();
@@ -1113,6 +1130,7 @@ public class AIPlayer extends AIObject {
     }
 
     private int getDefendColonyMissionValue(Unit u, Colony colony, int turns) {
+        logger.finest("Entering method getDefendColonyMissionValue");
         // Temporary helper method for: giveMilitaryMission
         int value = 10025 - turns;
         int numberOfDefendingUnits = 0;
@@ -1144,6 +1162,7 @@ public class AIPlayer extends AIObject {
     }
 
     private int getUnitSeekAndDestroyMissionValue(Unit unit, Tile newTile, int turns) {
+        logger.finest("Entering method getUnitSeekAndDestroyMissionValue");
         if (newTile.isLand() && !unit.isNaval() && newTile.getDefendingUnit(unit) != null
                 && newTile.getDefendingUnit(unit).getOwner() != unit.getOwner()
                 && unit.getOwner().getStance(newTile.getDefendingUnit(unit).getOwner()) == Player.WAR) {
@@ -1189,6 +1208,7 @@ public class AIPlayer extends AIObject {
      * @param aiUnit The unit.
      */
     private void giveMilitaryMission(AIUnit aiUnit) {
+        logger.finest("Entering method giveMilitaryMission");
         /*
          * 
          * Temporary method for giving a military mission.
@@ -1385,6 +1405,7 @@ public class AIPlayer extends AIObject {
      * @return <code>true</code> if the AI should build more colonies.
      */
     public boolean hasFewColonies() {
+        logger.finest("Entering method hasFewColonies");
         if (!getPlayer().canBuildColonies()) {
             return false;
         }
@@ -1405,6 +1426,7 @@ public class AIPlayer extends AIObject {
      * <code>TransportMission</code>.
      */
     private void createTransportLists() {
+        logger.finest("Entering method createTransportLists");
         if (!player.isEuropean()) {
             return;
         }
@@ -1715,6 +1737,7 @@ public class AIPlayer extends AIObject {
      *         {@link NetworkConstants#NO_TRADE}.
      */
     public int tradeProposition(Unit unit, Settlement settlement, Goods goods, int gold) {
+        logger.finest("Entering method tradeProposition");
         if (settlement instanceof IndianSettlement) {
             int price;
             if (sessionRegister.containsKey("tradeGold#" + unit.getID())) {

@@ -240,6 +240,18 @@ public class GoodsContainer extends FreeColGameObject {
     * @see #getCompactGoodsIterator
     */
     public Iterator<Goods> getGoodsIterator() {
+        return getGoods().iterator();
+    }
+
+    /**
+    * Returns an <code>ArrayList</code> containing all
+    * <code>Goods</code> in this <code>GoodsContainer</code>. Each
+    * <code>Goods</code> has a maximum amount of 100.
+    *
+    * @return The <code>ArrayList</code>.
+    * @see #getGoodsIterator
+    */
+    public ArrayList<Goods> getGoods() {
         ArrayList<Goods> totalGoods = new ArrayList<Goods>();
 
         for (int i=0; i<storedGoods.length; i++) {
@@ -251,7 +263,7 @@ public class GoodsContainer extends FreeColGameObject {
             }
         }
 
-        return totalGoods.iterator();
+        return totalGoods;
     }
 
     

@@ -32,6 +32,7 @@ import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoalDecider;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
@@ -667,6 +668,7 @@ public final class InGameController implements NetworkConstants {
             if (stop != null) {
                 setDestination(unit, stop.getLocation());
             }
+            // unload cargo that should not be on board
             ArrayList<Integer> goodsTypes = stop.getCargo();
             Iterator<Goods> goodsIterator = unit.getGoodsIterator();
             test: while (goodsIterator.hasNext()) {
@@ -682,6 +684,31 @@ public final class InGameController implements NetworkConstants {
                 // this type of goods was not in the cargo list
                 unloadCargo(goods);
             }
+            // load cargo that should be on board
+            GoodsContainer warehouse = unit.getLocation().getGoodsContainer();
+            test: for (Integer goodsType : stop.getCargo()) {
+                int amountPresent = warehouse.getGoodsCount(goodsType.intValue());
+                if (amountPresent > 0) {
+                    for (Goods goods : unit.getGoodsContainer().getGoods()) {
+                        if (goods.getType() == goodsType.intValue()) {
+                            if (goods.getAmount() < 100) {
+                                int amountToLoad = Math.min(100 - goods.getAmount(), amountPresent);
+                                loadCargo(new Goods(freeColClient.getGame(),
+                                                    unit.getLocation(), goods.getType(), amountToLoad),
+                                          unit);
+                                continue test;
+                            }
+                        }
+                        // if we got this far, amountPresent has not changed
+                        if (unit.getSpaceLeft() > 0) {
+                            loadCargo(new Goods(freeColClient.getGame(), unit.getLocation(), goods.getType(), 
+                                                Math.min(amountPresent, 100)),
+                                      unit);
+                        }
+                    }
+                }
+            }
+
             // TODO: do we want to load/unload units as well?
             // if so, when?
         } else {
