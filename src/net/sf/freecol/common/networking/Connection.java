@@ -304,6 +304,7 @@ public class Connection {
                     }
                     out.wait();
                 } catch (InterruptedException e) {
+                    logger.log(Level.WARNING, "Interrupted waiting for question id!", e);
                 }
             }
             currentQuestionID = thread.getNextNetworkReplyId();
