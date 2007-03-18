@@ -769,13 +769,40 @@ public final class ImageLibrary extends ImageProvider {
             } else {
                 return BONUS_FURS;
             }
-        } else if (type <= 4) {
-            return type;
-        } else if (type == Tile.OCEAN) {
-            return BONUS_FISH;
         } else {
-            logger.warning("No bonus graphics for tile type " + type);
-            return BONUS_NONE;
+            // Warnings were logged here all the time, make sure that we
+            // handle all possible alternatives!
+            switch(type) {
+                case Tile.UNEXPLORED:
+                    return BONUS_NONE;
+                case Tile.PLAINS:
+                    return BONUS_FOOD;
+                case Tile.GRASSLANDS:
+                    return BONUS_SUGAR;
+                case Tile.PRAIRIE:
+                    return BONUS_TOBACCO;
+                case Tile.SAVANNAH:
+                    return BONUS_COTTON;
+                case Tile.MARSH:
+                    return BONUS_ORE;
+                case Tile.SWAMP:
+                    return BONUS_ORE;
+                case Tile.DESERT:
+                    return BONUS_ORE;
+                case Tile.TUNDRA:
+                    // TODO: check if tundra bonus was furs!
+                    return BONUS_FURS;                    
+                case Tile.ARCTIC:
+                    // TODO: check if arctic bonus was furs!
+                    return BONUS_FURS;
+                case Tile.OCEAN:
+                    return BONUS_FISH;
+                case Tile.HIGH_SEAS:
+                    return BONUS_NONE;
+                default:
+                    // Should never happen
+                    throw new IllegalArgumentException("Unknown tile type " + type + " for getBonusImageType!");
+            }
         }
     }
 
