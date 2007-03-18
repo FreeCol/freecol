@@ -17,7 +17,7 @@ import net.sf.freecol.client.gui.panel.ReportTradePanel;
  */
 public class ReportTradeAction extends MapboardAction {
     @SuppressWarnings("unused")
-	private static final Logger logger = Logger.getLogger(ReportTradeAction.class.getName());
+    private static final Logger logger = Logger.getLogger(ReportTradeAction.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
@@ -30,7 +30,7 @@ public class ReportTradeAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     ReportTradeAction(FreeColClient freeColClient) {
-    	super(freeColClient, "menuBar.report.trade", null, KeyStroke.getKeyStroke(KeyEvent.VK_F9, 0));
+        super(freeColClient, "menuBar.report.trade", null, KeyStroke.getKeyStroke(KeyEvent.VK_F9, 0));
     }
     
     /**
@@ -39,7 +39,7 @@ public class ReportTradeAction extends MapboardAction {
      * @return true if this action should be enabled.
      */
     protected boolean shouldBeEnabled() {
-    	return true;
+        return true;
     }    
     
     /**

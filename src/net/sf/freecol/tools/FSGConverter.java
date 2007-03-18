@@ -19,174 +19,174 @@ import java.util.zip.InflaterInputStream;
  */
 public class FSGConverter {
 
-	/**
-	 * A singleton object of this class.
-	 * @see #getFSGConverter()
-	 */
-	private static FSGConverter singleton;
-	
-	
-	/**
-	 * Creates an instance of <code>FSGConverter</code>
-	 */
-	private FSGConverter() {
-		// Nothing to initialize;
-	}
-	
-	
-	/**
-	 * Gets an object for converting FreeCol Savegames.
-	 * @return The singleton object.
-	 */
-	public static FSGConverter getFSGConverter() {
-		// Using lazy initialization:		
-		if (singleton == null) {
-			singleton = new FSGConverter();
-		}
-		return singleton;
-	}
+    /**
+     * A singleton object of this class.
+     * @see #getFSGConverter()
+     */
+    private static FSGConverter singleton;
+    
+    
+    /**
+     * Creates an instance of <code>FSGConverter</code>
+     */
+    private FSGConverter() {
+        // Nothing to initialize;
+    }
+    
+    
+    /**
+     * Gets an object for converting FreeCol Savegames.
+     * @return The singleton object.
+     */
+    public static FSGConverter getFSGConverter() {
+        // Using lazy initialization:       
+        if (singleton == null) {
+            singleton = new FSGConverter();
+        }
+        return singleton;
+    }
 
-	
-	/**
-	 * Converts the given input file to an uncompressed and
-	 * indented XML-file.
-	 * 
+    
+    /**
+     * Converts the given input file to an uncompressed and
+     * indented XML-file.
+     * 
      * <br><br>
-	 * 
-	 * Savegame compression is automatically detected, so using
-	 * this method on an uncompressed savegame creates an
-	 * indented version of that savegame.
-	 * 
-	 * @param in The input file.
-	 * @param out The output file. This file will be overwritten
-	 * 		if it already exists.
-	 * @throws FileNotFoundException if the given input file could not be found.
-	 * @throws IOException if thrown while reading or writing the files. 
-	 */
-	public void convertToXML(File in, File out) throws FileNotFoundException, IOException {
-	    convertToXML(new FileInputStream(in), new FileOutputStream(out));
-	}
+     * 
+     * Savegame compression is automatically detected, so using
+     * this method on an uncompressed savegame creates an
+     * indented version of that savegame.
+     * 
+     * @param in The input file.
+     * @param out The output file. This file will be overwritten
+     *      if it already exists.
+     * @throws FileNotFoundException if the given input file could not be found.
+     * @throws IOException if thrown while reading or writing the files. 
+     */
+    public void convertToXML(File in, File out) throws FileNotFoundException, IOException {
+        convertToXML(new FileInputStream(in), new FileOutputStream(out));
+    }
 
-	/**
-	 * Converts the data from the given input stream to an 
-	 * uncompressed and indented text to the output stream.
-	 * Both streams are closed by this method.
-	 * 
-	 * <br><br>
-	 * 
-	 * Savegame compression is automatically detected, so using
-	 * this method on an uncompressed savegame creates an
-	 * indented version of that savegame.
-	 * 
-	 * @param in The input stream.
-	 * @param out The output stream.
-	 * 
-	 * @throws IOException if thrown while reading or writing the streams. 
-	 */
-	public void convertToXML(InputStream in, OutputStream out) throws IOException {
-		try {
-			in = new BufferedInputStream(in);
-			out = new BufferedOutputStream(out);
-			
-			// Automatically detect savegame compression:
-			in.mark(10);
-			byte[] buf = new byte[5];
-			in.read(buf, 0, 5);
-			in.reset();
-			if (!(new String(buf)).equals("<?xml")) {                
-				in =  new BufferedInputStream(new InflaterInputStream(in));
-			}
+    /**
+     * Converts the data from the given input stream to an 
+     * uncompressed and indented text to the output stream.
+     * Both streams are closed by this method.
+     * 
+     * <br><br>
+     * 
+     * Savegame compression is automatically detected, so using
+     * this method on an uncompressed savegame creates an
+     * indented version of that savegame.
+     * 
+     * @param in The input stream.
+     * @param out The output stream.
+     * 
+     * @throws IOException if thrown while reading or writing the streams. 
+     */
+    public void convertToXML(InputStream in, OutputStream out) throws IOException {
+        try {
+            in = new BufferedInputStream(in);
+            out = new BufferedOutputStream(out);
+            
+            // Automatically detect savegame compression:
+            in.mark(10);
+            byte[] buf = new byte[5];
+            in.read(buf, 0, 5);
+            in.reset();
+            if (!(new String(buf)).equals("<?xml")) {                
+                in =  new BufferedInputStream(new InflaterInputStream(in));
+            }
 
-			// Support for XML comments has not been added:
-			int indent = 0;
-			int i;		
-			while ((i = in.read()) != -1) {
-				char c = (char) i;
-				if (c == '<') {
-					i = in.read();
-					char b = (char) i;
-					if (b == '/') {
-						indent -= 4;
-					}
-					for (int h=0; h<indent; h++) {
-						out.write(' ');
-					}
-					out.write(c);
-					if (b != '\n' && b != '\r') {
-						out.write(b);
-					}
-					if (b != '/' && b != '?') {
-						indent += 4;
-					}
-				} else if (c == '/') {
-					out.write(c);
-					i = in.read();
-					c = (char) i;
-					if (c == '>') {
-						indent -= 4;
-						out.write(c);
-						out.write('\n');
-					}
-				} else if (c == '>') {
-					out.write(c);
-					out.write('\n');
-				} else if (c != '\n' && c != '\r') {
-					out.write(c);
-				}			
-			}
+            // Support for XML comments has not been added:
+            int indent = 0;
+            int i;      
+            while ((i = in.read()) != -1) {
+                char c = (char) i;
+                if (c == '<') {
+                    i = in.read();
+                    char b = (char) i;
+                    if (b == '/') {
+                        indent -= 4;
+                    }
+                    for (int h=0; h<indent; h++) {
+                        out.write(' ');
+                    }
+                    out.write(c);
+                    if (b != '\n' && b != '\r') {
+                        out.write(b);
+                    }
+                    if (b != '/' && b != '?') {
+                        indent += 4;
+                    }
+                } else if (c == '/') {
+                    out.write(c);
+                    i = in.read();
+                    c = (char) i;
+                    if (c == '>') {
+                        indent -= 4;
+                        out.write(c);
+                        out.write('\n');
+                    }
+                } else if (c == '>') {
+                    out.write(c);
+                    out.write('\n');
+                } else if (c != '\n' && c != '\r') {
+                    out.write(c);
+                }           
+            }
 
-		} finally {
-			in.close();
-			out.close();
-		}
-	}
-	
-	
-	/**
-	 * Prints the usage of this program to standard out.
-	 */
-	private static void printUsage() {
-		System.out.println("A program for converting FreeCol Savegames.");
-		System.out.println();
-		System.out.println("Usage: java -cp FreeCol.jar net.sf.freecol.tools.FSGConverter [-][-]output:xml FSG_FILE [OUTPUT_FILE]");
-		System.out.println();
-		System.out.println("output:xml \tThe output will be indented XML.");
-		System.out.println();
-		System.out.println("The output file will get the same name as FSG_FILE if not specified (with \".fsg\" replaced with \".xml\").");
-	}
-	
-	/**
-	 * An entry point for converting FreeCol Savegames.
-	 * 
-	 * @param args The command-line parameters.
-	 */
-	public static void main(String[] args) {
-		if (args.length >= 2 && args[0].endsWith("output:xml")) {
-			File in = new File(args[1]);
-			if (!in.exists()) {
-				printUsage();
-				System.exit(1);
-			}
-			File out;
-			if (args.length >= 3) {
-				out = new File(args[2]);
-			} else {
-				String filename = in.getName().replaceAll(".fsg", ".xml");
-				if (filename.equals(in.getName())) {
-					filename += ".xml";
-				}
-				out = new File(filename);
-			}
-			try {
-				FSGConverter fsgc = FSGConverter.getFSGConverter();
-				fsgc.convertToXML(in, out);
-			} catch (IOException e) {
-				System.out.println("An error occured while converting the file.");
-				System.exit(1);
-			}
-		} else {
-			printUsage();
-			System.exit(1);
-		}
-	}
+        } finally {
+            in.close();
+            out.close();
+        }
+    }
+    
+    
+    /**
+     * Prints the usage of this program to standard out.
+     */
+    private static void printUsage() {
+        System.out.println("A program for converting FreeCol Savegames.");
+        System.out.println();
+        System.out.println("Usage: java -cp FreeCol.jar net.sf.freecol.tools.FSGConverter [-][-]output:xml FSG_FILE [OUTPUT_FILE]");
+        System.out.println();
+        System.out.println("output:xml \tThe output will be indented XML.");
+        System.out.println();
+        System.out.println("The output file will get the same name as FSG_FILE if not specified (with \".fsg\" replaced with \".xml\").");
+    }
+    
+    /**
+     * An entry point for converting FreeCol Savegames.
+     * 
+     * @param args The command-line parameters.
+     */
+    public static void main(String[] args) {
+        if (args.length >= 2 && args[0].endsWith("output:xml")) {
+            File in = new File(args[1]);
+            if (!in.exists()) {
+                printUsage();
+                System.exit(1);
+            }
+            File out;
+            if (args.length >= 3) {
+                out = new File(args[2]);
+            } else {
+                String filename = in.getName().replaceAll(".fsg", ".xml");
+                if (filename.equals(in.getName())) {
+                    filename += ".xml";
+                }
+                out = new File(filename);
+            }
+            try {
+                FSGConverter fsgc = FSGConverter.getFSGConverter();
+                fsgc.convertToXML(in, out);
+            } catch (IOException e) {
+                System.out.println("An error occured while converting the file.");
+                System.exit(1);
+            }
+        } else {
+            printUsage();
+            System.exit(1);
+        }
+    }
 }

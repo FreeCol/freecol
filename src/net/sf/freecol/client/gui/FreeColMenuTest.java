@@ -29,17 +29,17 @@ public class FreeColMenuTest implements ActionListener, ItemListener {
         JMenuBar menuBar = null;
 
         try {
-	        ImageLibrary lib = new ImageLibrary("/home/johnathanj/work/freecol/freecol/data/");
-	        FreeColClient client = new FreeColClient(true, new Rectangle(-1, -1), lib, null, null, false); 
-	        
-	        //Create the menu bar.
-	        menuBar = new FreeColMenuBar(client);
-	        
-	        client.getActionManager().update();
-	        ((FreeColMenuBar)menuBar).update();
+            ImageLibrary lib = new ImageLibrary("/home/johnathanj/work/freecol/freecol/data/");
+            FreeColClient client = new FreeColClient(true, new Rectangle(-1, -1), lib, null, null, false); 
+            
+            //Create the menu bar.
+            menuBar = new FreeColMenuBar(client);
+            
+            client.getActionManager().update();
+            ((FreeColMenuBar)menuBar).update();
         }
         catch (FreeColException e) {
-        	e.printStackTrace();
+            e.printStackTrace();
         }
 
         return menuBar;
@@ -111,7 +111,7 @@ public class FreeColMenuTest implements ActionListener, ItemListener {
     private static void createAndShowGUI() {
         //Create and set up the window.
         //JFrame frame = new JFrame("MenuDemo");
-    	FullScreenFrame frame = new FullScreenFrame(GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice());
+        FullScreenFrame frame = new FullScreenFrame(GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice());
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
         //Create and set up the content pane.

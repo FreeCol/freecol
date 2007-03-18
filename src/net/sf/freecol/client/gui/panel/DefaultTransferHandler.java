@@ -469,7 +469,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                         if (bestSize.width > bestSize.height) {
                             bestSize.height = (int) ((((double) bestSize.width) / ((double) imageIcon.getIconWidth())) * imageIcon.getIconHeight());
                         } else {
-                        	bestSize.width = (int) ((((double) bestSize.height) / ((double) imageIcon.getIconHeight())) * imageIcon.getIconWidth());                            
+                            bestSize.width = (int) ((((double) bestSize.height) / ((double) imageIcon.getIconHeight())) * imageIcon.getIconWidth());                            
                         }
                         image = imageIcon.getImage().getScaledInstance(bestSize.width, bestSize.height, Image.SCALE_DEFAULT);
 
@@ -480,18 +480,18 @@ public final class DefaultTransferHandler extends TransferHandler {
                         MediaTracker mt = new MediaTracker(c);
                         mt.addImage(image, 0, bestSize.width, bestSize.height);
                         try {
-                        	mt.waitForID(0);
+                            mt.waitForID(0);
                         } catch (InterruptedException e) {
-                        	dge.startDrag(null, t, this);
-                        	return;
+                            dge.startDrag(null, t, this);
+                            return;
                         }
                         
                         Point point = new Point(bestSize.width / 2, bestSize.height / 2);
                         Cursor cursor;
                         try {
-                        	cursor = tk.createCustomCursor(image, point, "freeColDragIcon");                        	
+                            cursor = tk.createCustomCursor(image, point, "freeColDragIcon");                            
                         } catch (RuntimeException re) {
-                        	cursor = null;
+                            cursor = null;
                         }
                         //Point point = new Point(0, 0);
                         dge.startDrag(cursor, t, this);                    

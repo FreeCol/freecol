@@ -42,19 +42,19 @@ public abstract class SelectableAction extends MapboardAction {
      *      does not have an accelerator.
      */
     protected SelectableAction(FreeColClient freeColClient, String name, String shortDescription, int mnemonic, KeyStroke accelerator) {
-    	super(freeColClient, name, shortDescription, mnemonic, accelerator);
+        super(freeColClient, name, shortDescription, mnemonic, accelerator);
     }
     
     protected SelectableAction(FreeColClient freeColClient, String name, String shortDescription, int mnemonic) {
-    	super(freeColClient, name, shortDescription, mnemonic);
+        super(freeColClient, name, shortDescription, mnemonic);
     }
 
     protected SelectableAction(FreeColClient freeColClient, String name, String shortDescription, KeyStroke accelerator) {
-    	super(freeColClient, name, shortDescription, accelerator);
+        super(freeColClient, name, shortDescription, accelerator);
     }
     
     protected SelectableAction(FreeColClient freeColClient, String name, String shortDescription) {
-    	super(freeColClient, name, shortDescription);
+        super(freeColClient, name, shortDescription);
     }
 
     /**
@@ -87,6 +87,6 @@ public abstract class SelectableAction extends MapboardAction {
     }
     
     public void setSelected(boolean b) {
-    	this.selected = b;
+        this.selected = b;
     }
 }

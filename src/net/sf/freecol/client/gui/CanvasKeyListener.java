@@ -113,50 +113,50 @@ public final class CanvasKeyListener implements KeyListener {
                 case KeyEvent.VK_NUMPAD1:
                 case KeyEvent.VK_END:
                     parent.getGUI().moveTileCursor(Map.SW);
-                	break;
-            	case KeyEvent.VK_NUMPAD2:
-            	case KeyEvent.VK_KP_DOWN:
-            	case KeyEvent.VK_DOWN:
+                    break;
+                case KeyEvent.VK_NUMPAD2:
+                case KeyEvent.VK_KP_DOWN:
+                case KeyEvent.VK_DOWN:
                     parent.getGUI().moveTileCursor(Map.S);
-                	break;
-            	case KeyEvent.VK_NUMPAD3:
-            	case KeyEvent.VK_PAGE_DOWN:
+                    break;
+                case KeyEvent.VK_NUMPAD3:
+                case KeyEvent.VK_PAGE_DOWN:
                     parent.getGUI().moveTileCursor(Map.SE);
-                	break;
-            	case KeyEvent.VK_NUMPAD4:
-            	case KeyEvent.VK_KP_LEFT:
-            	case KeyEvent.VK_LEFT:
+                    break;
+                case KeyEvent.VK_NUMPAD4:
+                case KeyEvent.VK_KP_LEFT:
+                case KeyEvent.VK_LEFT:
                     parent.getGUI().moveTileCursor(Map.W);
-            	    break;
-            	case KeyEvent.VK_NUMPAD5:
-            	case KeyEvent.VK_C:
-            	    inGameController.centerActiveUnit();
-            	    break;
-            	case KeyEvent.VK_NUMPAD6:
-            	case KeyEvent.VK_KP_RIGHT:
-            	case KeyEvent.VK_RIGHT:
+                    break;
+                case KeyEvent.VK_NUMPAD5:
+                case KeyEvent.VK_C:
+                    inGameController.centerActiveUnit();
+                    break;
+                case KeyEvent.VK_NUMPAD6:
+                case KeyEvent.VK_KP_RIGHT:
+                case KeyEvent.VK_RIGHT:
                     parent.getGUI().moveTileCursor(Map.E);
-            	    break;
-            	case KeyEvent.VK_NUMPAD7:
-            	case KeyEvent.VK_HOME:
+                    break;
+                case KeyEvent.VK_NUMPAD7:
+                case KeyEvent.VK_HOME:
                     parent.getGUI().moveTileCursor(Map.NW);
-            	    break;
-            	case KeyEvent.VK_NUMPAD8:
-            	case KeyEvent.VK_KP_UP:
-            	case KeyEvent.VK_UP:
+                    break;
+                case KeyEvent.VK_NUMPAD8:
+                case KeyEvent.VK_KP_UP:
+                case KeyEvent.VK_UP:
                     parent.getGUI().moveTileCursor(Map.N);
-            	    break;
-            	case KeyEvent.VK_NUMPAD9:
-            	case KeyEvent.VK_PAGE_UP:
+                    break;
+                case KeyEvent.VK_NUMPAD9:
+                case KeyEvent.VK_PAGE_UP:
                     parent.getGUI().moveTileCursor(Map.NE);
-            	    break;
+                    break;
                 case KeyEvent.VK_SPACE:
                     TerrainCursor cursor = parent.getGUI().getCursor();
                     parent.showTilePopup(parent.getGUI().getSelectedTile(),cursor.getCanvasX(),cursor.getCanvasY());
                     break;
-            	default:
-            	    logger.info("The typed key (" + e.getKeyCode() + ") doesn't have a function yet.");
-            }        	
+                default:
+                    logger.info("The typed key (" + e.getKeyCode() + ") doesn't have a function yet.");
+            }           
         }
     }
     

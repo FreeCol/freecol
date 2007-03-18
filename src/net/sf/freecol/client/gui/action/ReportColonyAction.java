@@ -17,7 +17,7 @@ import net.sf.freecol.client.gui.panel.ReportColonyPanel;
  */
 public class ReportColonyAction extends MapboardAction {
     @SuppressWarnings("unused")
-	private static final Logger logger = Logger.getLogger(ReportColonyAction.class.getName());
+    private static final Logger logger = Logger.getLogger(ReportColonyAction.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
@@ -30,7 +30,7 @@ public class ReportColonyAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     ReportColonyAction(FreeColClient freeColClient) {
-    	super(freeColClient, "menuBar.report.colony", null, KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0));
+        super(freeColClient, "menuBar.report.colony", null, KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0));
     }
     
     /**
@@ -39,7 +39,7 @@ public class ReportColonyAction extends MapboardAction {
      * @return true if this action should be enabled.
      */
     protected boolean shouldBeEnabled() {
-    	return true;
+        return true;
     }    
     
     /**

@@ -210,13 +210,13 @@ public class AIGoods extends AIObject implements Transportable {
     public void dispose() {
         setTransport(null);
         if (destination != null) {
-        	if (destination instanceof Colony) {
-        		((AIColony) getAIMain().getAIObject((Colony) destination)).removeAIGoods(this);
-        	} else if (destination instanceof Europe) {
-        		// Nothing to remove.
-        	} else {
-        		logger.warning("Unknown type of destination: " + destination);
-        	}
+            if (destination instanceof Colony) {
+                ((AIColony) getAIMain().getAIObject((Colony) destination)).removeAIGoods(this);
+            } else if (destination instanceof Europe) {
+                // Nothing to remove.
+            } else {
+                logger.warning("Unknown type of destination: " + destination);
+            }
         }
         super.dispose();
     }

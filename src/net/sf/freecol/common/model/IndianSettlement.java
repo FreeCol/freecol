@@ -598,7 +598,7 @@ public class IndianSettlement extends Settlement {
     }
 
     public List<Unit> getUnitList() {
-    	return unitContainer.getUnitsClone();
+        return unitContainer.getUnitsClone();
     }
     
     public Iterator<Unit> getUnitIterator() {
@@ -944,15 +944,15 @@ public class IndianSettlement extends Settlement {
                 
                 // Nearby military units:
                 if (t.getFirstUnit() != null 
-                		&& t.getFirstUnit().getOwner().isEuropean()
-                		&& t.getSettlement() == null) {                    
-                	Iterator<Unit> ui = t.getUnitIterator();
-                	while (ui.hasNext()) {
-                		Unit u = ui.next();
-                		if (u.isOffensiveUnit() && !u.isNaval()) {                    		
-                			extraAlarm[u.getOwner().getNation()] += u.getOffensePower(getTile().getDefendingUnit(u));
-                		}
-                	}
+                        && t.getFirstUnit().getOwner().isEuropean()
+                        && t.getSettlement() == null) {                    
+                    Iterator<Unit> ui = t.getUnitIterator();
+                    while (ui.hasNext()) {
+                        Unit u = ui.next();
+                        if (u.isOffensiveUnit() && !u.isNaval()) {                          
+                            extraAlarm[u.getOwner().getNation()] += u.getOffensePower(getTile().getDefendingUnit(u));
+                        }
+                    }
                 }
                 
                 // Land being used by another settlement:
@@ -962,19 +962,19 @@ public class IndianSettlement extends Settlement {
 
                 // Settlement:
                 if (t.getSettlement() != null && t.getSettlement().getOwner().isEuropean()) {
-                	extraAlarm[t.getSettlement().getOwner().getNation()] += t.getSettlement().getUnitCount();
+                    extraAlarm[t.getSettlement().getOwner().getNation()] += t.getSettlement().getUnitCount();
                 }                
             }
             
             for (int i=0; i<extraAlarm.length; i++) {
-            	Player p = getGame().getPlayer(i);
-            	if (p.isEuropean()) {
+                Player p = getGame().getPlayer(i);
+                if (p.isEuropean()) {
                     int d = (p.hasFather(FoundingFather.POCAHONTAS)) ? 2 : 1;
                     if (p.getNation() == Player.FRENCH) {
-                    	d *= 2;
+                        d *= 2;
                     }
-                    modifyAlarm(p, extraAlarm[i] / d);            		
-            	}
+                    modifyAlarm(p, extraAlarm[i] / d);                  
+                }
             }
 
             /* Decrease alarm slightly: */

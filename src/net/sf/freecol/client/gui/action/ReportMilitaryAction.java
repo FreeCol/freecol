@@ -17,7 +17,7 @@ import net.sf.freecol.client.gui.panel.ReportMilitaryPanel;
  */
 public class ReportMilitaryAction extends MapboardAction {
     @SuppressWarnings("unused")
-	private static final Logger logger = Logger.getLogger(ReportMilitaryAction.class.getName());
+    private static final Logger logger = Logger.getLogger(ReportMilitaryAction.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
@@ -30,7 +30,7 @@ public class ReportMilitaryAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     ReportMilitaryAction(FreeColClient freeColClient) {
-    	super(freeColClient, "menuBar.report.military", null, KeyStroke.getKeyStroke(KeyEvent.VK_F7, 0));
+        super(freeColClient, "menuBar.report.military", null, KeyStroke.getKeyStroke(KeyEvent.VK_F7, 0));
     }
     
     /**
@@ -39,7 +39,7 @@ public class ReportMilitaryAction extends MapboardAction {
      * @return true if this action should be enabled.
      */
     protected boolean shouldBeEnabled() {
-    	return true;
+        return true;
     }    
     
     /**

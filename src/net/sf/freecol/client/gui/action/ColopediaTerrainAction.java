@@ -15,7 +15,7 @@ import net.sf.freecol.client.gui.panel.ColopediaPanel;
  */
 public class ColopediaTerrainAction extends MapboardAction {
     @SuppressWarnings("unused")
-	private static final Logger logger = Logger.getLogger(ColopediaTerrainAction.class.getName());
+    private static final Logger logger = Logger.getLogger(ColopediaTerrainAction.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
@@ -28,7 +28,7 @@ public class ColopediaTerrainAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     ColopediaTerrainAction(FreeColClient freeColClient) {
-    	super(freeColClient, "menuBar.colopedia.terrain", null, KeyEvent.VK_T);        
+        super(freeColClient, "menuBar.colopedia.terrain", null, KeyEvent.VK_T);        
     }
     
     /**
@@ -37,7 +37,7 @@ public class ColopediaTerrainAction extends MapboardAction {
      * @return true if this action should be enabled.
      */
     protected boolean shouldBeEnabled() {
-    	return true;
+        return true;
     }    
     
     /**
@@ -54,6 +54,6 @@ public class ColopediaTerrainAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-    	freeColClient.getCanvas().showColopediaPanel(ColopediaPanel.COLOPEDIA_TERRAIN);
+        freeColClient.getCanvas().showColopediaPanel(ColopediaPanel.COLOPEDIA_TERRAIN);
     }
 }

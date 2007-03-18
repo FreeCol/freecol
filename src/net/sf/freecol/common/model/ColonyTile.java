@@ -338,11 +338,11 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     }
 
     public List<Unit> getUnitList() {
-    	if(getUnit() == null) {
-    		return new ArrayList<Unit>();
-    	} else {
-    		return Collections.singletonList(getUnit());
-    	}
+        if(getUnit() == null) {
+            return new ArrayList<Unit>();
+        } else {
+            return Collections.singletonList(getUnit());
+        }
     }
 
     public Iterator <Unit> getUnitIterator() {

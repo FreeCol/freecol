@@ -52,8 +52,8 @@ public class UnloadAction extends MapboardAction {
         if (!super.shouldBeEnabled()) return false;
         GUI gui = getFreeColClient().getGUI();
         if (gui == null) return false;
-   	
-    	Unit unit = getFreeColClient().getGUI().getActiveUnit();
+    
+        Unit unit = getFreeColClient().getGUI().getActiveUnit();
         return (unit != null && unit.isCarrier() && unit.canUnload());
     }    
     

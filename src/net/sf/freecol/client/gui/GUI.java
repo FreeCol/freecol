@@ -992,7 +992,7 @@ public final class GUI {
                 if (map.isValid(tileX, tileY)) {
                     
                     Tile tile = map.getTile(tileX, tileY);
-                	
+                    
                     // Display the Tile overlays:
                     displayTileOverlays(g, map, tile, xx, yy, true);
                     
@@ -2249,7 +2249,7 @@ public final class GUI {
             // Draw the 'selected unit' image if needed.
             //if ((unit == getActiveUnit()) && cursor) {
             if (viewMode.displayUnitCursor(unit,x,y)) {
-            	drawCursor(g,x,y);
+                drawCursor(g,x,y);
             }
 
             // Draw the unit.
@@ -2301,7 +2301,7 @@ public final class GUI {
     }
     
     private void drawCursor(Graphics2D g, int x, int y) {
-    	g.drawImage(lib.getMiscImage(ImageLibrary.UNIT_SELECT), x, y, null);
+        g.drawImage(lib.getMiscImage(ImageLibrary.UNIT_SELECT), x, y, null);
     }
 
 

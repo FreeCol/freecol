@@ -115,7 +115,7 @@ public final class ClientOptionsDialog extends FreeColDialog implements ActionLi
                     ui.unregister();
                     ui.updateOption();
                     if (freeColClient.getCanvas().getJMenuBar() != null) {
-                    	freeColClient.getCanvas().resetFreeColMenuBar();    // TODO: Find a better method to reset set accelerators.
+                        freeColClient.getCanvas().resetFreeColMenuBar();    // TODO: Find a better method to reset set accelerators.
                     }
                     parent.remove(this);
                     freeColClient.getActionManager().update();

@@ -244,7 +244,7 @@ public final class FreeCol {
      * @return The directory.
      */
     public static File getAutosaveDirectory() {
-    	return saveDirectory;
+        return saveDirectory;
     }
 
     /**
@@ -367,8 +367,8 @@ public final class FreeCol {
                     if (!savegameFile.exists() || !savegameFile.isFile()) {                        
                         savegameFile = new File(getSaveDirectory(), args[i]);
                         if (!savegameFile.exists() || !savegameFile.isFile()) {
-                        	System.out.println("The given savegame file could not be found: " + args[i]);
-                        	System.exit(1);
+                            System.out.println("The given savegame file could not be found: " + args[i]);
+                            System.exit(1);
                         }
                     }
                 } else {

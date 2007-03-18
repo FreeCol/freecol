@@ -364,7 +364,7 @@ public final class Canvas extends JLayeredPane {
         if (jMenuBar == null) {
             return 0;
         } else if (jMenuBar instanceof FreeColMenuBar) {
-        	return ((FreeColMenuBar) jMenuBar).getOpaqueHeight();
+            return ((FreeColMenuBar) jMenuBar).getOpaqueHeight();
         } else {
             return jMenuBar.getHeight();
         }
@@ -2010,7 +2010,7 @@ public final class Canvas extends JLayeredPane {
      * @see MainPanel
      */
     public MainPanel getMainPanel() {
-    	return mainPanel;
+        return mainPanel;
     }
     
     /**

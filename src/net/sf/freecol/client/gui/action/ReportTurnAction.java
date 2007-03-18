@@ -28,7 +28,7 @@ public class ReportTurnAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     ReportTurnAction(FreeColClient freeColClient) {
-    	super(freeColClient, "menuBar.report.turn", null, KeyEvent.VK_Z);        
+        super(freeColClient, "menuBar.report.turn", null, KeyEvent.VK_Z);        
     }
     
     /**
@@ -37,7 +37,7 @@ public class ReportTurnAction extends MapboardAction {
      * @return true if this action should be enabled.
      */
     protected boolean shouldBeEnabled() {
-    	return true;
+        return true;
     }    
     
     /**

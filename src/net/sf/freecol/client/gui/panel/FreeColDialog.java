@@ -126,7 +126,7 @@ public class FreeColDialog extends FreeColPanel {
                         Component dc = SwingUtilities.getDeepestComponentAt(((ComponentEvent) event).getComponent(), me.getX(), me.getY());
                         // Block only MOUSE_CLICKED and MOUSE_PRESSED
                         if ((event.getID() == MouseEvent.MOUSE_CLICKED || event.getID() == MouseEvent.MOUSE_PRESSED) &&
-                        		(dc == null || !SwingUtilities.isDescendingFrom(dc, this) || dc.getListeners(MouseListener.class).length == 0)) {
+                                (dc == null || !SwingUtilities.isDescendingFrom(dc, this) || dc.getListeners(MouseListener.class).length == 0)) {
                             continue;
                         }
                     }
