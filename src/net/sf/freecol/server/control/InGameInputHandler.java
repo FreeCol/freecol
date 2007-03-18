@@ -801,11 +801,16 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     + attackElement.getAttribute("unit"));
         }
         Element dowElement = null;
+        
         Unit defender = newTile.getDefendingUnit(unit);
         if (defender == null) {
+            //
+            // TODO: Erik - this may happen if player attacks an undefended settlement!
+            //
             throw new IllegalStateException("Nothing to attack in direction " + direction + " from unit with ID "
                     + attackElement.getAttribute("unit"));
         }
+        
         int result = generateAttackResult(unit, defender);
         int plunderGold = -1;
         if (result == Unit.ATTACK_DONE_SETTLEMENT) {
