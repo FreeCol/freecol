@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
@@ -1215,89 +1216,91 @@ public final class InGameController implements NetworkConstants {
         attackElement.setAttribute("direction", Integer.toString(direction));
 
         // Get the result of the attack from the server:
-        Element attackResultElement = client.ask(attackElement);
+        Element attackResultElement = client.ask(attackElement);        
+        if(attackResultElement != null) {
+            int result = Integer.parseInt(attackResultElement.getAttribute("result"));
+            int plunderGold = Integer.parseInt(attackResultElement.getAttribute("plunderGold"));
 
-        int result = Integer.parseInt(attackResultElement.getAttribute("result"));
-        int plunderGold = Integer.parseInt(attackResultElement.getAttribute("plunderGold"));
-
-        // If a successful attack against a colony, we need to update the tile:
-        Element utElement = getChildElement(attackResultElement, Tile.getXMLElementTagName());
-        if (utElement != null) {
-            Tile updateTile = (Tile) game.getFreeColGameObject(utElement.getAttribute("ID"));
-            updateTile.readFromXMLElement(utElement);
-        }
-
-        // If there are captured goods, add to unit
-        NodeList capturedGoods = attackResultElement.getElementsByTagName("capturedGoods");
-        for (int i = 0; i < capturedGoods.getLength(); ++i) {
-            Element goods = (Element) capturedGoods.item(i);
-            int type = Integer.parseInt(goods.getAttribute("type"));
-            int amount = Integer.parseInt(goods.getAttribute("amount"));
-            unit.getGoodsContainer().addGoods(type, amount);
-        }
-
-        // Get the defender:
-        Element unitElement = getChildElement(attackResultElement, Unit.getXMLElementTagName());
-        if (unitElement != null) {
-            defender = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
-            if (defender == null) {
-                defender = new Unit(game, unitElement);
-            } else {
-                defender.readFromXMLElement(unitElement);
+            // If a successful attack against a colony, we need to update the tile:
+            Element utElement = getChildElement(attackResultElement, Tile.getXMLElementTagName());
+            if (utElement != null) {
+                Tile updateTile = (Tile) game.getFreeColGameObject(utElement.getAttribute("ID"));
+                updateTile.readFromXMLElement(utElement);
             }
-            defender.setLocation(target);
-        } else {
-            defender = map.getNeighbourOrNull(direction, unit.getTile()).getDefendingUnit(unit);
-        }
 
-        if (defender == null) {
-            logger.warning("defender == null");
-            throw new NullPointerException("defender == null");
-        }
-
-        if (!unit.isNaval()) {
-            Unit winner;
-            if (result >= Unit.ATTACK_EVADES) {
-                winner = unit;
-            } else {
-                winner = defender;
+            // If there are captured goods, add to unit
+            NodeList capturedGoods = attackResultElement.getElementsByTagName("capturedGoods");
+            for (int i = 0; i < capturedGoods.getLength(); ++i) {
+                Element goods = (Element) capturedGoods.item(i);
+                int type = Integer.parseInt(goods.getAttribute("type"));
+                int amount = Integer.parseInt(goods.getAttribute("amount"));
+                unit.getGoodsContainer().addGoods(type, amount);
             }
-            if (winner.isArmed()) {
-                if (winner.isMounted()) {
-                    if (winner.getType() == Unit.BRAVE) {
-                        freeColClient.playSound(SfxLibrary.MUSKETSHORSES);
-                    } else {
-                        freeColClient.playSound(SfxLibrary.DRAGOON);
-                    }
+
+            // Get the defender:
+            Element unitElement = getChildElement(attackResultElement, Unit.getXMLElementTagName());
+            if (unitElement != null) {
+                defender = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
+                if (defender == null) {
+                    defender = new Unit(game, unitElement);
                 } else {
-                    freeColClient.playSound(SfxLibrary.ATTACK);
+                    defender.readFromXMLElement(unitElement);
                 }
-            } else if (winner.isMounted()) {
-                freeColClient.playSound(SfxLibrary.DRAGOON);
+                defender.setLocation(target);
+            } else {
+                defender = map.getNeighbourOrNull(direction, unit.getTile()).getDefendingUnit(unit);
             }
+
+            if (defender == null) {
+                logger.warning("defender == null");
+                throw new NullPointerException("defender == null");
+            }
+
+            if (!unit.isNaval()) {
+                Unit winner;
+                if (result >= Unit.ATTACK_EVADES) {
+                    winner = unit;
+                } else {
+                    winner = defender;
+                }
+                if (winner.isArmed()) {
+                    if (winner.isMounted()) {
+                        if (winner.getType() == Unit.BRAVE) {
+                            freeColClient.playSound(SfxLibrary.MUSKETSHORSES);
+                        } else {
+                            freeColClient.playSound(SfxLibrary.DRAGOON);
+                        }
+                    } else {
+                        freeColClient.playSound(SfxLibrary.ATTACK);
+                    }
+                } else if (winner.isMounted()) {
+                    freeColClient.playSound(SfxLibrary.DRAGOON);
+                }            
+            } else {
+                if (result >= Unit.ATTACK_GREAT_WIN || result <= Unit.ATTACK_GREAT_LOSS) {
+                    freeColClient.playSound(SfxLibrary.SUNK);
+                }
+            }
+            unit.attack(defender, result, plunderGold);
+            if (!defender.isDisposed()
+                    && ((result == Unit.ATTACK_DONE_SETTLEMENT && unitElement != null) || defender.getLocation() == null || !defender
+                            .isVisibleTo(freeColClient.getMyPlayer()))) {
+                defender.dispose();
+            }
+
+            Element updateElement = getChildElement(attackResultElement, "update");
+            if (updateElement != null) {
+                freeColClient.getInGameInputHandler().handle(client.getConnection(), updateElement);
+            }
+
+            if (unit.getMovesLeft() <= 0) {
+                nextActiveUnit(unit.getTile());
+            }
+
+            freeColClient.getCanvas().refresh();
         } else {
-            if (result >= Unit.ATTACK_GREAT_WIN || result <= Unit.ATTACK_GREAT_LOSS) {
-                freeColClient.playSound(SfxLibrary.SUNK);
-            }
+            logger.log(Level.SEVERE, "Server returned null from reallyAttack!");
         }
-
-        unit.attack(defender, result, plunderGold);
-        if (!defender.isDisposed()
-                && ((result == Unit.ATTACK_DONE_SETTLEMENT && unitElement != null) || defender.getLocation() == null || !defender
-                        .isVisibleTo(freeColClient.getMyPlayer()))) {
-            defender.dispose();
-        }
-
-        Element updateElement = getChildElement(attackResultElement, "update");
-        if (updateElement != null) {
-            freeColClient.getInGameInputHandler().handle(client.getConnection(), updateElement);
-        }
-
-        if (unit.getMovesLeft() <= 0) {
-            nextActiveUnit(unit.getTile());
-        }
-
-        freeColClient.getCanvas().refresh();
     }
 
     /**
