@@ -41,7 +41,7 @@ final class ReceivingThread extends Thread {
 
     private boolean shouldRun;
 
-    private int nextNetworkReplyId = 0;
+    private int nextNetworkReplyId = 1;
 
     private final Map<Integer, NetworkReplyObject> threadsWaitingForNetworkReply;
 
@@ -76,8 +76,7 @@ final class ReceivingThread extends Thread {
      * @return The next available <code>networkReplyId</code>.
      */
     public synchronized int getNextNetworkReplyId() {
-        nextNetworkReplyId++;
-        return nextNetworkReplyId - 1;
+        return nextNetworkReplyId++;
     }
 
     /**
