@@ -409,4 +409,15 @@
 
   <target name="manual" depends="print-manual,online-manual" description="Creates the user guide.">
   </target>
+  <target name="fixTabsWindows">
+      <fixcrlf srcdir="${freecol.src.dir}" tab="remove" tablength="4"
+          includes="**/*.java" eol="crlf"
+      />
+  </target>
+  
+  <target name="fixTabsUnix">
+      <fixcrlf srcdir="${freecol.src.dir}" tab="remove" tablength="4"
+          includes="**/*.java" eol="lf"
+      />
+  </target>
 </project>
