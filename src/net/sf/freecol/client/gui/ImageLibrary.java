@@ -778,23 +778,21 @@ public final class ImageLibrary extends ImageProvider {
                 case Tile.PLAINS:
                     return BONUS_FOOD;
                 case Tile.GRASSLANDS:
-                    return BONUS_SUGAR;
-                case Tile.PRAIRIE:
                     return BONUS_TOBACCO;
-                case Tile.SAVANNAH:
+                case Tile.PRAIRIE:
                     return BONUS_COTTON;
+                case Tile.SAVANNAH:
+                    return BONUS_SUGAR;
                 case Tile.MARSH:
                     return BONUS_ORE;
                 case Tile.SWAMP:
                     return BONUS_ORE;
                 case Tile.DESERT:
-                    return BONUS_ORE;
+                    return BONUS_FOOD;
                 case Tile.TUNDRA:
-                    // TODO: check if tundra bonus was furs!
-                    return BONUS_FURS;                    
+                    return BONUS_ORE;                    
                 case Tile.ARCTIC:
-                    // TODO: check if arctic bonus was furs!
-                    return BONUS_FURS;
+                    return BONUS_NONE;
                 case Tile.OCEAN:
                     return BONUS_FISH;
                 case Tile.HIGH_SEAS:
