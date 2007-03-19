@@ -665,53 +665,7 @@ public final class InGameController implements NetworkConstants {
 
         // we have reached our destination
         if (unit.getTradeRoute() != null) {
-            Stop stop = unit.nextStop();
-            if (stop != null) {
-                setDestination(unit, stop.getLocation());
-            }
-            // unload cargo that should not be on board
-            ArrayList<Integer> goodsTypes = stop.getCargo();
-            Iterator<Goods> goodsIterator = unit.getGoodsIterator();
-            test: while (goodsIterator.hasNext()) {
-                Goods goods = goodsIterator.next();
-                for (int index = 0; index < goodsTypes.size(); index++) {
-                    if (goods.getType() == goodsTypes.get(index).intValue()) {
-                        // remove item: other items of the same type
-                        // may or may not be present
-                        goodsTypes.remove(index);
-                        continue test;
-                    }
-                }
-                // this type of goods was not in the cargo list
-                unloadCargo(goods);
-            }
-            // load cargo that should be on board
-            GoodsContainer warehouse = unit.getLocation().getGoodsContainer();
-            test: for (Integer goodsType : stop.getCargo()) {
-                int amountPresent = warehouse.getGoodsCount(goodsType.intValue());
-                if (amountPresent > 0) {
-                    for (Goods goods : unit.getGoodsContainer().getGoods()) {
-                        if (goods.getType() == goodsType.intValue()) {
-                            if (goods.getAmount() < 100) {
-                                int amountToLoad = Math.min(100 - goods.getAmount(), amountPresent);
-                                loadCargo(new Goods(freeColClient.getGame(),
-                                                    unit.getLocation(), goods.getType(), amountToLoad),
-                                          unit);
-                                continue test;
-                            }
-                        }
-                        // if we got this far, amountPresent has not changed
-                        if (unit.getSpaceLeft() > 0) {
-                            loadCargo(new Goods(freeColClient.getGame(), unit.getLocation(), goods.getType(), 
-                                                Math.min(amountPresent, 100)),
-                                      unit);
-                        }
-                    }
-                }
-            }
-
-            // TODO: do we want to load/unload units as well?
-            // if so, when?
+            followTradeRoute(unit);
         } else {
             setDestination(unit, null);
         }
@@ -734,6 +688,64 @@ public final class InGameController implements NetworkConstants {
             nextActiveUnit();
         }
     }
+
+
+    private void followTradeRoute(Unit unit) {
+
+        Stop stop = unit.nextStop();
+        if (stop == null) {
+            return;
+        } else {
+            setDestination(unit, stop.getLocation());
+        }
+        // unload cargo that should not be on board
+        ArrayList<Integer> goodsTypes = stop.getCargo();
+        Iterator<Goods> goodsIterator = unit.getGoodsIterator();
+        test: while (goodsIterator.hasNext()) {
+            Goods goods = goodsIterator.next();
+            for (int index = 0; index < goodsTypes.size(); index++) {
+                if (goods.getType() == goodsTypes.get(index).intValue()) {
+                    // remove item: other items of the same type
+                    // may or may not be present
+                    goodsTypes.remove(index);
+                    continue test;
+                }
+            }
+            // this type of goods was not in the cargo list
+            logger.finest("Automatically unloading " + goods.getName());
+            unloadCargo(goods);
+        }
+        // load cargo that should be on board
+        GoodsContainer warehouse = unit.getLocation().getGoodsContainer();
+        test: for (Integer goodsType : stop.getCargo()) {
+            int amountPresent = warehouse.getGoodsCount(goodsType.intValue());
+            if (amountPresent > 0) {
+                for (Goods goods : unit.getGoodsContainer().getGoods()) {
+                    if (goods.getType() == goodsType.intValue()) {
+                        if (goods.getAmount() < 100) {
+                            logger.finest("Automatically loading goods " + goods.getName());
+                            int amountToLoad = Math.min(100 - goods.getAmount(), amountPresent);
+                            loadCargo(new Goods(freeColClient.getGame(),
+                                                unit.getLocation(), goods.getType(), amountToLoad),
+                                      unit);
+                            continue test;
+                        }
+                    }
+                    // if we got this far, amountPresent has not changed
+                    if (unit.getSpaceLeft() > 0) {
+                        logger.finest("Automatically loading goods " + goods.getName());
+                        loadCargo(new Goods(freeColClient.getGame(), unit.getLocation(), goods.getType(), 
+                                            Math.min(amountPresent, 100)),
+                                  unit);
+                    }
+                }
+            }
+        }
+
+        // TODO: do we want to load/unload units as well?
+        // if so, when?
+    }
+
 
     /**
      * Moves the specified unit in a specified direction. This may result in an
@@ -2500,6 +2512,7 @@ public final class InGameController implements NetworkConstants {
      * @param route The trade route to update.
      */
     public void updateTradeRoute(TradeRoute route) {
+        logger.finest("Entering method updateTradeRoute");
         /*
          * if (freeColClient.getGame().getCurrentPlayer() !=
          * freeColClient.getMyPlayer()) {
@@ -2518,6 +2531,7 @@ public final class InGameController implements NetworkConstants {
      * @param unit The unit to assign a trade route to.
      */
     public void assignTradeRoute(Unit unit) {
+        logger.finest("Entering method assignTradeRoute");
         /*
          * if (freeColClient.getGame().getCurrentPlayer() !=
          * freeColClient.getMyPlayer()) {
@@ -2531,6 +2545,9 @@ public final class InGameController implements NetworkConstants {
             assignTradeRouteElement.setAttribute("unit", unit.getID());
             assignTradeRouteElement.setAttribute("tradeRoute", tradeRoute.getID());
             freeColClient.getClient().sendAndWait(assignTradeRouteElement);
+            if (tradeRoute.getStops().get(0).getLocation() == unit.getLocation()) {
+                followTradeRoute(unit);
+            }
         }
     }
 
