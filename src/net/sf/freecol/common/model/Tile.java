@@ -336,10 +336,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
             boolean nearbyTileHasForest = false;
             boolean nearbyTileIsOcean = false;
 
-            List<Tile> v = getGame().getMap().getSurroundingTiles(this, 1);
-            Iterator<Tile> tileIterator = v.iterator();
-            while (tileIterator.hasNext()) {
-                Tile tile = tileIterator.next();
+            for (Tile tile : getGame().getMap().getSurroundingTiles(this, 1)) {
                 if (tile.getColony() != null) {
                     // can't build next to colony
                     return 0;
@@ -350,9 +347,6 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
                     if (tile.isLand()) {
                         for (int i = 0; i < Goods.NUMBER_OF_TYPES; i++) {
                             value += tile.potential(i);
-                            if (!tile.isLand()) {
-                                value += 4;
-                            }
                         }
                         if (tile.isForested()) {
                             nearbyTileHasForest = true;
@@ -365,10 +359,10 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
                         value += 20;
                     }
 
-                    if (tile.getNationOwner() != Player.NO_NATION) {
-                        // tile is already owned by someone
+                    if (tile.getNationOwner() != Player.NO_NATION
+                            && tile.getNationOwner() != getGame().getCurrentPlayer().getNation()) {
+                        // tile is already owned by someone (and not by us!)
                         if (Player.isEuropean(tile.getNationOwner())) {
-                            // TODO: check whether it is owned by us
                             value -= 20;
                         } else {
                             value -= 5;
