@@ -97,11 +97,7 @@ public class ColonyPlan {
         List<WorkLocationPlan> workLocationPlans = getWorkLocationPlans();
         Collections.sort(workLocationPlans, new Comparator<WorkLocationPlan>() {
             public int compare(WorkLocationPlan o, WorkLocationPlan p) {
-                // TODO: Replace these by int
-                Integer i = o.getProductionOf(o.getGoodsType());
-                Integer j = p.getProductionOf(p.getGoodsType());
-
-                return j.compareTo(i);
+                return p.getProductionOf(p.getGoodsType()) - o.getProductionOf(o.getGoodsType());
             }
         });
 
