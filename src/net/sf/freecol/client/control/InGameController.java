@@ -2,10 +2,7 @@ package net.sf.freecol.client.control;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -15,39 +12,13 @@ import javax.swing.SwingUtilities;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.FreeColMenuBar;
-import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.*;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.client.gui.panel.ChoiceItem;
-import net.sf.freecol.client.gui.panel.EventPanel;
-import net.sf.freecol.client.gui.panel.FreeColDialog;
+import net.sf.freecol.client.gui.panel.*;
 import net.sf.freecol.client.gui.sound.SfxLibrary;
 import net.sf.freecol.client.networking.Client;
-import net.sf.freecol.common.model.Building;
-import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.ColonyTile;
-import net.sf.freecol.common.model.Europe;
-import net.sf.freecol.common.model.FoundingFather;
-import net.sf.freecol.common.model.FreeColGameObject;
-import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.GoalDecider;
-import net.sf.freecol.common.model.Goods;
-import net.sf.freecol.common.model.GoodsContainer;
-import net.sf.freecol.common.model.IndianSettlement;
-import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.*;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Market;
-import net.sf.freecol.common.model.ModelMessage;
-import net.sf.freecol.common.model.Nameable;
-import net.sf.freecol.common.model.Ownable;
-import net.sf.freecol.common.model.PathNode;
-import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Settlement;
-import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.TradeRoute;
-import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.networking.Message;
@@ -689,7 +660,6 @@ public final class InGameController implements NetworkConstants {
         }
     }
 
-
     private void followTradeRoute(Unit unit) {
 
         Stop stop = unit.nextStop();
@@ -725,18 +695,16 @@ public final class InGameController implements NetworkConstants {
                         if (goods.getAmount() < 100) {
                             logger.finest("Automatically loading goods " + goods.getName());
                             int amountToLoad = Math.min(100 - goods.getAmount(), amountPresent);
-                            loadCargo(new Goods(freeColClient.getGame(),
-                                                unit.getLocation(), goods.getType(), amountToLoad),
-                                      unit);
+                            loadCargo(new Goods(freeColClient.getGame(), unit.getLocation(), goods.getType(),
+                                    amountToLoad), unit);
                             continue test;
                         }
                     }
                     // if we got this far, amountPresent has not changed
                     if (unit.getSpaceLeft() > 0) {
                         logger.finest("Automatically loading goods " + goods.getName());
-                        loadCargo(new Goods(freeColClient.getGame(), unit.getLocation(), goods.getType(), 
-                                            Math.min(amountPresent, 100)),
-                                  unit);
+                        loadCargo(new Goods(freeColClient.getGame(), unit.getLocation(), goods.getType(), Math.min(
+                                amountPresent, 100)), unit);
                     }
                 }
             }
@@ -745,7 +713,6 @@ public final class InGameController implements NetworkConstants {
         // TODO: do we want to load/unload units as well?
         // if so, when?
     }
-
 
     /**
      * Moves the specified unit in a specified direction. This may result in an
@@ -1119,17 +1086,15 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        Canvas canvas = freeColClient.getCanvas();
-        Map map = freeColClient.getGame().getMap();
-        Tile target = map.getNeighbourOrNull(direction, unit.getTile());
+        Tile target = freeColClient.getGame().getMap().getNeighbourOrNull(direction, unit.getTile());
+
         if (target.getSettlement() != null && target.getSettlement() instanceof IndianSettlement && unit.isArmed()) {
             IndianSettlement settlement = (IndianSettlement) target.getSettlement();
-            int userAction = canvas.showArmedUnitIndianSettlementDialog(settlement);
-            Element reply;
-
-            switch (userAction) {
+            switch (freeColClient.getCanvas().showArmedUnitIndianSettlementDialog(settlement)) {
             case FreeColDialog.SCOUT_INDIAN_SETTLEMENT_ATTACK:
-                reallyAttack(unit, direction);
+                if (confirmHostileAction(unit, target) && confirmPreCombat(unit, target)) {
+                    reallyAttack(unit, direction);
+                }
                 return;
             case FreeColDialog.SCOUT_INDIAN_SETTLEMENT_CANCEL:
                 return;
@@ -1137,34 +1102,100 @@ public final class InGameController implements NetworkConstants {
                 Element demandMessage = Message.createNewRootElement("armedUnitDemandTribute");
                 demandMessage.setAttribute("unit", unit.getID());
                 demandMessage.setAttribute("direction", Integer.toString(direction));
-                reply = freeColClient.getClient().ask(demandMessage);
+                Element reply = freeColClient.getClient().ask(demandMessage);
+                if (reply != null && reply.getTagName().equals("armedUnitDemandTributeResult")) {
+                    String result = reply.getAttribute("result");
+                    if (result.equals("agree")) {
+                        String amount = reply.getAttribute("amount");
+                        unit.getOwner().modifyGold(Integer.parseInt(amount));
+                        freeColClient.getCanvas().updateGoldLabel();
+                        freeColClient.getCanvas().showInformationMessage("scoutSettlement.tributeAgree",
+                                new String[][] { { "%replace%", amount } });
+                    } else if (result.equals("disagree")) {
+                        freeColClient.getCanvas().showInformationMessage("scoutSettlement.tributeDisagree");
+                    }
+                } else {
+                    logger.warning("Server gave an invalid reply to an armedUnitDemandTribute message");
+                    return;
+                }
+                nextActiveUnit(unit.getTile());
                 break;
             default:
                 logger.warning("Incorrect response returned from Canvas.showArmedUnitIndianSettlementDialog()");
                 return;
             }
-
-            if (reply.getTagName().equals("armedUnitDemandTributeResult")) {
-                String result = reply.getAttribute("result");
-                if (result.equals("agree")) {
-                    String amount = reply.getAttribute("amount");
-                    unit.getOwner().modifyGold(Integer.parseInt(amount));
-                    freeColClient.getCanvas().updateGoldLabel();
-                    canvas.showInformationMessage("scoutSettlement.tributeAgree", new String[][] { { "%replace%",
-                            amount } });
-                } else if (result.equals("disagree")) {
-                    canvas.showInformationMessage("scoutSettlement.tributeDisagree");
-                }
-            } else {
-                logger.warning("Server gave an invalid reply to an armedUnitDemandTribute message");
-                return;
-            }
-
-            nextActiveUnit(unit.getTile());
         } else {
-            reallyAttack(unit, direction);
+            if (confirmHostileAction(unit, target) && confirmPreCombat(unit, target)) {
+                reallyAttack(unit, direction);
+            }
             return;
         }
+    }
+
+    /**
+     * Check if an attack results in a transition from peace or cease fire to
+     * war and, if so, warn the player.
+     * 
+     * @param attacker The potential attacker.
+     * @param target The target tile.
+     * @return true to attack, false to abort.
+     */
+    private boolean confirmHostileAction(Unit attacker, Tile target) {
+        if (attacker.getType() != Unit.PRIVATEER) {
+            Player enemy;
+            if (target.getSettlement() != null) {
+                enemy = target.getSettlement().getOwner();
+            } else {
+                Unit defender = target.getDefendingUnit(attacker);
+                if (defender == null) {
+                    logger.warning("Attacking, but no defender - will try!");
+                    return true;
+                }
+                enemy = defender.getOwner();
+            }
+            switch (attacker.getOwner().getStance(enemy)) {
+            case Player.CEASE_FIRE:
+                return freeColClient.getCanvas().showConfirmDialog("model.diplomacy.attack.ceaseFire",
+                        "model.diplomacy.attack.confirm", "cancel",
+                        new String[][] { { "%replace%", enemy.getNationAsString() } });
+            case Player.PEACE:
+                return freeColClient.getCanvas().showConfirmDialog("model.diplomacy.attack.peace",
+                        "model.diplomacy.attack.confirm", "cancel",
+                        new String[][] { { "%replace%", enemy.getNationAsString() } });
+            case Player.ALLIANCE:
+                freeColClient.playSound(SfxLibrary.ILLEGAL_MOVE);
+                freeColClient.getCanvas().showInformationMessage("model.diplomacy.attack.alliance",
+                        new String[][] { { "%replace%", enemy.getNationAsString() } });
+                return false;
+            case Player.WAR:
+                logger.finest("Player at war, no confirmation needed");
+                return true;
+            default:
+                logger.warning("Unknown stance " + attacker.getOwner().getStance(enemy));
+                return true;
+            }
+        } else {
+            // Privateers can attack and remain at peace
+            return true;
+        }
+    }
+
+    /**
+     * If the client options include a pre-combat dialog, allow the user to view
+     * the odds and possibly cancel the attack.
+     * 
+     * @param attacker The attacker.
+     * @param target The target tile.
+     * @return true to attack, false to abort.
+     */
+    private boolean confirmPreCombat(Unit attacker, Tile target) {
+        if (freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_PRECOMBAT)) {
+            Settlement settlementOrNull = target.getSettlement();
+            // Don't tell the player how a settlement is defended!
+            Unit defenderOrNull = settlementOrNull != null ? null : target.getDefendingUnit(attacker);
+            return freeColClient.getCanvas().showPreCombatDialog(attacker, defenderOrNull, settlementOrNull);
+        }
+        return true;
     }
 
     /**
@@ -1176,48 +1207,8 @@ public final class InGameController implements NetworkConstants {
      */
     private void reallyAttack(Unit unit, int direction) {
         Client client = freeColClient.getClient();
-        Canvas canvas = freeColClient.getCanvas();
         Game game = freeColClient.getGame();
-        Map map = game.getMap();
-        Player enemy;
-        Tile target = map.getNeighbourOrNull(direction, unit.getTile());
-        Unit defender = target.getDefendingUnit(unit);
-        if (defender == null) {
-            enemy = target.getSettlement().getOwner();
-        } else {
-            enemy = defender.getOwner();
-        }
-        int stance = unit.getOwner().getStance(enemy);
-        /**
-         * If the owner and the other player are already at war, attack.
-         * Otherwise make sure the player knows what he/she is doing.
-         */
-        if (unit.getType() != Unit.PRIVATEER) {
-            switch (stance) {
-            case Player.CEASE_FIRE:
-                if (!canvas.showConfirmDialog("model.diplomacy.attack.ceaseFire", "model.diplomacy.attack.confirm",
-                        "cancel", new String[][] { { "%replace%", enemy.getNationAsString() } })) {
-                    return;
-                }
-                break;
-            case Player.PEACE:
-                if (!canvas.showConfirmDialog("model.diplomacy.attack.peace", "model.diplomacy.attack.confirm",
-                        "cancel", new String[][] { { "%replace%", enemy.getNationAsString() } })) {
-                    return;
-                }
-                break;
-            case Player.ALLIANCE:
-                freeColClient.playSound(SfxLibrary.ILLEGAL_MOVE);
-                canvas.showInformationMessage("model.diplomacy.attack.alliance", new String[][] { { "%replace%",
-                        enemy.getNationAsString() } });
-                return;
-            }
-        }
-
-        if (freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_PRECOMBAT)
-                && !canvas.showPreCombatDialog(unit, defender, target.getSettlement())) {
-            return;
-        }
+        Tile target = game.getMap().getNeighbourOrNull(direction, unit.getTile());
 
         if (unit.getType() == Unit.ARTILLERY || unit.getType() == Unit.DAMAGED_ARTILLERY || unit.isNaval()) {
             freeColClient.playSound(SfxLibrary.ARTILLERY);
@@ -1228,12 +1219,13 @@ public final class InGameController implements NetworkConstants {
         attackElement.setAttribute("direction", Integer.toString(direction));
 
         // Get the result of the attack from the server:
-        Element attackResultElement = client.ask(attackElement);        
-        if(attackResultElement != null) {
+        Element attackResultElement = client.ask(attackElement);
+        if (attackResultElement != null) {
             int result = Integer.parseInt(attackResultElement.getAttribute("result"));
             int plunderGold = Integer.parseInt(attackResultElement.getAttribute("plunderGold"));
 
-            // If a successful attack against a colony, we need to update the tile:
+            // If a successful attack against a colony, we need to update the
+            // tile:
             Element utElement = getChildElement(attackResultElement, Tile.getXMLElementTagName());
             if (utElement != null) {
                 Tile updateTile = (Tile) game.getFreeColGameObject(utElement.getAttribute("ID"));
@@ -1251,6 +1243,7 @@ public final class InGameController implements NetworkConstants {
 
             // Get the defender:
             Element unitElement = getChildElement(attackResultElement, Unit.getXMLElementTagName());
+            Unit defender;
             if (unitElement != null) {
                 defender = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
                 if (defender == null) {
@@ -1260,12 +1253,12 @@ public final class InGameController implements NetworkConstants {
                 }
                 defender.setLocation(target);
             } else {
-                defender = map.getNeighbourOrNull(direction, unit.getTile()).getDefendingUnit(unit);
-            }
-
-            if (defender == null) {
-                logger.warning("defender == null");
-                throw new NullPointerException("defender == null");
+                // TODO: Erik - ensure this cannot happen!
+                logger.log(Level.SEVERE, "Server reallyAttack did not return a defender!");
+                defender = target.getDefendingUnit(unit);
+                if (defender == null) {
+                    throw new IllegalStateException("No defender available!");
+                }
             }
 
             if (!unit.isNaval()) {
@@ -1287,7 +1280,7 @@ public final class InGameController implements NetworkConstants {
                     }
                 } else if (winner.isMounted()) {
                     freeColClient.playSound(SfxLibrary.DRAGOON);
-                }            
+                }
             } else {
                 if (result >= Unit.ATTACK_GREAT_WIN || result <= Unit.ATTACK_GREAT_LOSS) {
                     freeColClient.playSound(SfxLibrary.SUNK);
@@ -1295,8 +1288,8 @@ public final class InGameController implements NetworkConstants {
             }
             unit.attack(defender, result, plunderGold);
             if (!defender.isDisposed()
-                    && ((result == Unit.ATTACK_DONE_SETTLEMENT && unitElement != null) || defender.getLocation() == null || !defender
-                            .isVisibleTo(freeColClient.getMyPlayer()))) {
+                    && ((result == Unit.ATTACK_DONE_SETTLEMENT && unitElement != null)
+                            || defender.getLocation() == null || !defender.isVisibleTo(freeColClient.getMyPlayer()))) {
                 defender.dispose();
             }
 
@@ -2108,8 +2101,8 @@ public final class InGameController implements NetworkConstants {
         Client client = freeColClient.getClient();
         Canvas canvas = freeColClient.getCanvas();
         Map map = freeColClient.getGame().getMap();
-        IndianSettlement settlement = (IndianSettlement) map.getNeighbourOrNull(direction, unit.getTile())
-                .getSettlement();
+        Tile tile = map.getNeighbourOrNull(direction, unit.getTile());
+        IndianSettlement settlement = (IndianSettlement) tile.getSettlement();
 
         // The scout loses his moves because the skill data and tradeable goods
         // data is fetched
@@ -2139,12 +2132,14 @@ public final class InGameController implements NetworkConstants {
         case FreeColDialog.SCOUT_INDIAN_SETTLEMENT_ATTACK:
             scoutMessage.setAttribute("action", "attack");
             // The movesLeft has been set to 0 when the scout initiated its
-            // action.
-            // If it wants to attack then it can and it will need some moves to
-            // do it.
+            // action.If it wants to attack then it can and it will need some
+            // moves to do it.
             unit.setMovesLeft(1);
             client.sendAndWait(scoutMessage);
-            reallyAttack(unit, direction);
+            // TODO: Check if this dialog is needed, one has just been displayed
+            if (confirmPreCombat(unit, tile)) {
+                reallyAttack(unit, direction);
+            }
             return;
         case FreeColDialog.SCOUT_INDIAN_SETTLEMENT_CANCEL:
             scoutMessage.setAttribute("action", "cancel");
