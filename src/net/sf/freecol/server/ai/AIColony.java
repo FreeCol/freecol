@@ -1,30 +1,15 @@
 package net.sf.freecol.server.ai;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
+import javax.xml.stream.*;
 
-import net.sf.freecol.common.model.Building;
-import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.ColonyTile;
-import net.sf.freecol.common.model.Goods;
-import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.WorkLocation;
+import net.sf.freecol.common.model.*;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
-import net.sf.freecol.server.ai.mission.PioneeringMission;
-import net.sf.freecol.server.ai.mission.TransportMission;
-import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
+import net.sf.freecol.server.ai.mission.*;
 
 import org.w3c.dom.Element;
 
@@ -114,20 +99,20 @@ public class AIColony extends AIObject {
      * Disposes this <code>AIColony</code>.
      */
     public void dispose() {
-        Iterator<AIGoods> it1 = aiGoods.iterator();
-        while (it1.hasNext()) {
-            AIGoods ag = it1.next();
+        List<AIObject> disposeList = new ArrayList<AIObject>();
+        for (AIGoods ag : aiGoods) {
             if (ag.getGoods().getLocation() == colony) {
-                ag.dispose();
+                disposeList.add(ag);
             }
         }
-        Iterator<Wish> it2 = wishes.iterator();
-        while (it2.hasNext()) {
-            it2.next().dispose();
+        for(Wish w : wishes) {
+            disposeList.add(w);
         }
-        Iterator<TileImprovement> it3 = tileImprovements.iterator();
-        while (it3.hasNext()) {
-            it3.next().dispose();
+        for(TileImprovement ti : tileImprovements) {
+            disposeList.add(ti);
+        }
+        for(AIObject o : disposeList) {
+            o.dispose();
         }
         super.dispose();
     }
@@ -283,7 +268,7 @@ public class AIColony extends AIObject {
 
         List<Wish> newWishes = new ArrayList<Wish>();
         int value = 120; // TODO: Better method for determining the value of
-                            // the wish.
+        // the wish.
         while (workLocationPlans.size() > 0) {
             int unitType = -1;
 
@@ -843,7 +828,7 @@ public class AIColony extends AIObject {
                                 if (bestPick == null) {
                                     bestPick = wl;
                                 } // else - TODO: This might be the best pick
-                                    // sometimes:
+                                // sometimes:
                             }
                         }
                     } else { // wl instanceof Building
