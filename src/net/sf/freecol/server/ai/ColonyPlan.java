@@ -203,6 +203,11 @@ public class ColonyPlan {
      * manufactored.
      */
     public void create() {
+        
+        // TODO: Erik - adapt plan to colony profile
+        // Colonies should be able to specialize, determine role by colony
+        // resources, buildings and specialists
+        
         workLocationPlans.clear();
 
         // Choose the best production for each tile:
@@ -366,6 +371,7 @@ public class ColonyPlan {
         }
 
         // Remove the carpenter if we have no lumber or lack food:
+        // TODO: Erik - run short on lumber as long as there is a stockpile!
         if (getProductionOf(Goods.LUMBER) < 1 || getProductionOf(Goods.FOOD) < workLocationPlans.size() * 2) {
             Iterator<WorkLocationPlan> wlpIterator2 = workLocationPlans.iterator();
             while (wlpIterator2.hasNext() && getProductionOf(Goods.FOOD) < workLocationPlans.size() * 2) {
