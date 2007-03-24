@@ -273,27 +273,17 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     }
 
     /**
-     * Set the <code>UnitType</code> value.
-     * 
-     * @param newUnitType The new UnitType value.
-     */
-    public final void setUnitType(final UnitType newUnitType) {
-        this.unitType = newUnitType;
-    }
-
-    /**
      * Returns the current amount of treasure in this unit. Should be type of
      * TREASURE_TRAIN.
      * 
      * @return The amount of treasure.
      */
     public int getTreasureAmount() {
-
+        // TODO: TreasureTrain should subclass if method is illegal for Unit!
         if (getType() == TREASURE_TRAIN) {
             return treasureAmount;
         }
-
-        throw new IllegalStateException();
+        throw new IllegalStateException("Only treasure trains have treasure");
     }
 
     /**
@@ -303,10 +293,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * @param amt The amount of treasure
      */
     public void setTreasureAmount(int amt) {
+        // TODO: TreasureTrain should subclass if method is illegal for Unit!
         if (getType() == TREASURE_TRAIN) {
             this.treasureAmount = amt;
         } else {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Only treasure trains have treasure");
         }
     }
 
@@ -543,7 +534,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             return unitType.skill;
         }
 
-        throw new IllegalStateException();
+        return 0;
     }
 
     /**
@@ -3027,6 +3018,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     /**
      * Checks if this is an defensive unit. That is: a unit which can be used to
      * defend a <code>Settlement</code>.
+     * <p>
+     * Note! As this method is used by the AI it really means that the unit can
+     * defend as is. To be specific an unarmed colonist is not defensive yet,
+     * even if Paul Revere and stockpiled muskets are available. That check
+     * is only performed on an actual attack.
      * 
      * @return <code>true</code> if this is a defensive unit meaning it can be
      *         used to defend a <code>Colony</code>. This would normally mean
@@ -3034,8 +3030,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      *         {@link #isOffensiveUnit offensive}.
      */
     public boolean isDefensiveUnit() {
-        // TODO: Erik - fix isDefensive to not rely on isOffensive
-        return isOffensiveUnit() && !isNaval();
+        return (getUnitType().defence > 0 || isArmed()) && !isNaval();
     }
 
     /**
@@ -3058,19 +3053,19 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      */
     public void attack(Unit defender, int result, int plunderGold) {
         if (defender == null) {
-            throw new NullPointerException();
+            throw new NullPointerException("No defender specified!");
         }
-        if (getOwner().getStance(defender.getOwner()) == Player.ALLIANCE) {
+        Player enemy = defender.getOwner();
+        if (getOwner().getStance(enemy) == Player.ALLIANCE) {
             throw new IllegalStateException("Cannot attack allied players.");
         }
 
         // make sure we are at war, unless one of both units is a privateer
-        if (getOwner().isEuropean() && defender.getOwner().isEuropean() && getType() != PRIVATEER
+        if (getOwner().isEuropean() && enemy.isEuropean() && getType() != PRIVATEER
                 && defender.getType() != PRIVATEER) {
-            getOwner().setStance(defender.getOwner(), Player.WAR);
-        }
-        if (getType() == PRIVATEER) {
-            defender.getOwner().setAttackedByPrivateers();
+            getOwner().setStance(enemy, Player.WAR);
+        } else if (getType() == PRIVATEER) {
+            enemy.setAttackedByPrivateers();
         }
 
         // Wake up if you're attacking something.
@@ -3089,9 +3084,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             if (isNaval()) {
                 // send message to both parties
                 addModelMessage(this, "model.unit.shipEvaded", new String[][] { { "%ship%", defender.getName() },
-                        { "%nation%", defender.getOwner().getNationAsString() } }, ModelMessage.DEFAULT, this);
+                        { "%nation%", enemy.getNationAsString() } }, ModelMessage.DEFAULT, this);
                 addModelMessage(defender, "model.unit.shipEvaded", new String[][] { { "%ship%", defender.getName() },
-                        { "%nation%", defender.getOwner().getNationAsString() } }, ModelMessage.DEFAULT, this);
+                        { "%nation%", enemy.getNationAsString() } }, ModelMessage.DEFAULT, this);
             } else {
                 logger.warning("Non-naval unit evades!");
             }
@@ -3101,7 +3096,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 shipDamaged();
             } else {
                 demote(defender, false);
-                if (defender.getOwner().hasFather(FoundingFather.GEORGE_WASHINGTON)) {
+                if (enemy.hasFather(FoundingFather.GEORGE_WASHINGTON)) {
                     defender.promote();
                 }
             }
@@ -3130,7 +3125,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 captureGoods(defender);
                 defender.shipDamaged();
                 addModelMessage(this, "model.unit.enemyShipDamaged", new String[][] { { "%ship%", defender.getName() },
-                        { "%nation%", defender.getOwner().getNationAsString() } }, ModelMessage.UNIT_DEMOTED);
+                        { "%nation%", enemy.getNationAsString() } }, ModelMessage.UNIT_DEMOTED);
             } else {
                 if (getOwner().hasFather(FoundingFather.GEORGE_WASHINGTON)) {
                     promote();
@@ -3143,7 +3138,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 captureGoods(defender);
                 defender.shipSunk();
                 addModelMessage(this, "model.unit.shipSunk", new String[][] { { "%ship%", defender.getName() },
-                        { "%nation%", defender.getOwner().getNationAsString() } }, ModelMessage.UNIT_DEMOTED);
+                        { "%nation%", enemy.getNationAsString() } }, ModelMessage.UNIT_DEMOTED);
             } else {
                 promote();
                 defender.demote(this, true);
