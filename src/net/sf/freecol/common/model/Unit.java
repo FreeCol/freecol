@@ -3011,95 +3011,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * @return The current defensive power of this unit.
      */
     public int getDefensePower(Unit attacker) {
-
-        int base_power = unitType.defence;
-
-        if (isMounted()) {
-            if (!isArmed() && getType() != BRAVE) {
-                base_power = 1;
-            } else {
-                base_power++;
-            }
-        }
-
-        if (isArmed()) {
-            base_power++;
-        } else {
-            if (getOwner().hasFather(FoundingFather.PAUL_REVERE) && getTile() != null && getTile().getColony() != null) {
-                // TODO: Erik - check for muskets instead!
-                if (isColonist() && base_power == 1
-                        && (getLocation() instanceof ColonyTile || getLocation() instanceof Building)) {
-                    base_power = 2;
-                }
-            }
-        }
-
-        int modified_power = base_power;
-
-        // TODO: <1 move point movement penalty
-
-        if (isNaval()) {
-            if (getGoodsCount() > 0) {
-                // TODO: Erik - ensure this can never get negative!
-                // -12.5% penalty for every unit of cargo.
-                modified_power -= ((base_power * getGoodsCount()) / 8);
-            }
-            if (getType() == PRIVATEER && getOwner().hasFather(FoundingFather.FRANCIS_DRAKE)) {
-                // 50% bonus (note, currently truncated rather than rounded)
-                modified_power = (3 * modified_power) / 2;
-            }
-            return modified_power;
-        }
-
-        if (getState() == FORTIFIED) {
-            // 50% fortify bonus (truncated, not rounded)
-            modified_power = (3 * modified_power) / 2;
-        }
-
-        if ((getTile() != null) && (getTile().getSettlement() != null) && (getTile().getSettlement() instanceof Colony)) {
-            Colony colony = ((Colony) getTile().getSettlement());
-            // TODO: Erik - check if bonuses relate to base or are accumulative!
-            switch (colony.getBuilding(Building.STOCKADE).getLevel()) {
-            case Building.NOT_BUILT:
-            default:
-                modified_power = (3 * modified_power) / 2; // 50% colony bonus
-                break;
-            case Building.HOUSE:
-                modified_power += base_power; // 100% stockade bonus
-                break;
-            case Building.SHOP:
-                modified_power += ((base_power * 3) / 2); // 150% fort bonus
-                break;
-            case Building.FACTORY:
-                modified_power += (base_power * 2); // 200% fortress bonus
-                break;
-            }
-        } else if (!(((attacker.getType() != BRAVE) && (getType() == KINGS_REGULAR)) || // TODO:
-                // check for REF artillery pieces
-                ((attacker.getType() == BRAVE) && (getType() != KINGS_REGULAR)))
-                && (getTile() != null)) {
-            // Terrain defensive bonus.
-            modified_power += ((base_power * getTile().defenseBonus()) / 100);
-        }
-
-        // Indian settlement defensive bonus.
-        if (getTile() != null && getTile().getSettlement() != null
-                && getTile().getSettlement() instanceof IndianSettlement) {
-            modified_power += (base_power / 2); // 50% bonus
-        }
-
-        if ((getType() == ARTILLERY) || (getType() == DAMAGED_ARTILLERY)) {
-            if ((attacker.getType() == BRAVE) && (getTile().getSettlement() != null)) {
-                modified_power += base_power; // 100% defense bonus against an
-                // Indian raid
-            }
-            if (((getTile().getSettlement()) == null) && (getState() != FORTIFIED)) {
-                modified_power -= ((base_power * 3) / 4); // -75% Artillery in
-                // the Open penalty
-            }
-        }
-
-        return modified_power;
+        return Modifier.getDefensePower(attacker, this);
     }
 
     /**
@@ -3109,8 +3021,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      *         attack other units.
      */
     public boolean isOffensiveUnit() {
-        // TODO: Make this look prettier ;-)
-        return (getOffensePower(this) > 0);
+        return getUnitType().offence > 0 || isArmed();
     }
 
     /**
@@ -3123,6 +3034,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      *         {@link #isOffensiveUnit offensive}.
      */
     public boolean isDefensiveUnit() {
+        // TODO: Erik - fix isDefensive to not rely on isOffensive
         return isOffensiveUnit() && !isNaval();
     }
 
@@ -3133,69 +3045,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * @return The current offensive power of this unit.
      */
     public int getOffensePower(Unit target) {
-
-        int base_power = unitType.offence;
-
-        if (isArmed()) {
-            if (base_power == 0) {
-                base_power = 2;
-            } else {
-                base_power++;
-            }
-        }
-        if (isMounted()) {
-            if ((!isArmed()) && (getType() != BRAVE)) {
-                base_power = 1;
-            } else {
-                base_power++;
-            }
-        }
-
-        int modified_power = (base_power * 3) / 2; // 50% attack bonus
-
-        // TODO: <1 move point movement penalty
-
-        if (isNaval()) {
-            if (getGoodsCount() > 0) {
-                modified_power -= ((base_power * getGoodsCount()) / 8); // -12.5%
-                // penalty
-                // for
-                // every
-                // unit
-                // of
-                // cargo.
-            }
-            if (getType() == PRIVATEER && getOwner().hasFather(FoundingFather.FRANCIS_DRAKE)) {
-                modified_power += base_power / 2; // 50% bonus
-            }
-            return modified_power;
-        }
-
-        if ((((getType() != BRAVE) && (target.getType() == KINGS_REGULAR)) || // TODO:
-                // check
-                // for
-                // REF
-                // artillery
-                // pieces
-                ((getType() == BRAVE) && (target.getType() != KINGS_REGULAR)))
-                && (target.getTile() != null) && (target.getTile().getSettlement() == null)) {
-            // Ambush bonus.
-            modified_power += ((base_power * target.getTile().defenseBonus()) / 100);
-        }
-
-        if (((getType() == KINGS_REGULAR)) && // TODO: check for REF artillery
-                // pieces
-                (target.getTile() != null) && (target.getTile().getSettlement() == null)) {
-            modified_power += (base_power / 2); // REF bombardment bonus
-        }
-
-        if ((getType() == ARTILLERY) || (getType() == DAMAGED_ARTILLERY)) {
-            if ((target.getTile() != null) && (target.getTile().getSettlement()) == null) {
-                modified_power -= ((base_power * 3) / 4); // -75% Artillery in
-                // the Open penalty
-            }
-        }
-        return modified_power;
+        return Modifier.getOffensePower(this, target);
     }
 
     /**
@@ -3903,71 +3753,71 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         if (!Goods.isFarmedGoods(goodsType)) {
             throw new IllegalArgumentException("\"goodsType\" is produced in buildings and not on tiles.");
         }
+        int value = base;
 
         switch (unitType) {
         case EXPERT_FARMER:
             if ((goodsType == Goods.FOOD) && tile.isLand()) {
                 // TODO: Special tile stuff. He gets +6/+4 for wheat/deer tiles
-                // respectively...
-                base += 2;
+                value += 2;
             }
             break;
         case EXPERT_FISHERMAN:
             if ((goodsType == Goods.FOOD) && !tile.isLand()) {
                 // TODO: Special tile stuff. He gets +6 for a fishery tile.
-                base += 2;
+                value += 2;
             }
             break;
         case EXPERT_FUR_TRAPPER:
             if (goodsType == Goods.FURS) {
-                base *= 2;
+                value *= 2;
             }
             break;
         case EXPERT_SILVER_MINER:
             if (goodsType == Goods.SILVER) {
                 // TODO: Mountain should be +1, not *2, but mountain didn't
                 // exist at type of writing.
-                base *= 2;
+                value *= 2;
             }
             break;
         case EXPERT_LUMBER_JACK:
             if (goodsType == Goods.LUMBER) {
-                base *= 2;
+                value *= 2;
             }
             break;
         case EXPERT_ORE_MINER:
             if (goodsType == Goods.ORE) {
-                base *= 2;
+                value *= 2;
             }
             break;
         case MASTER_SUGAR_PLANTER:
             if (goodsType == Goods.SUGAR) {
-                base *= 2;
+                value *= 2;
             }
             break;
         case MASTER_COTTON_PLANTER:
             if (goodsType == Goods.COTTON) {
-                base *= 2;
+                value *= 2;
             }
             break;
         case MASTER_TOBACCO_PLANTER:
             if (goodsType == Goods.TOBACCO) {
-                base *= 2;
+                value *= 2;
             }
             break;
         case INDIAN_CONVERT:
             if ((goodsType == Goods.FOOD || goodsType == Goods.SUGAR || goodsType == Goods.COTTON
                     || goodsType == Goods.TOBACCO || goodsType == Goods.FURS || goodsType == Goods.ORE || goodsType == Goods.SILVER)
-                    && base > 0) {
-                base += 1;
+                    && value > 0) {
+                value += 1;
             }
             break;
-        default: // Beats me who or what is working here, but he doesn't get
-            // a bonus.
+        default:
+            // Beats me who or what is working here, but he doesn't get a bonus
             break;
         }
 
-        return base;
+        return value;
     }
 
     public static int getNextHammers(int type) {
