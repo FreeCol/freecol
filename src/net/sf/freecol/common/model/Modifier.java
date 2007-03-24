@@ -7,9 +7,8 @@ import java.util.ArrayList;
  * The <code>Modifier</code> class encapsulates a bonus or penalty
  * that can be applied to any action within the game, most obviously
  * combat.
- *
  */
-public class Modifier {
+public final class Modifier {
 
     public static final  String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final  String  LICENSE   = "http://www.gnu.org/licenses/gpl.html";
@@ -225,18 +224,21 @@ public class Modifier {
                 totalDenominator *= 2;
             }
         } else {
-
-            if (defender.getOwner().hasFather(FoundingFather.PAUL_REVERE) && 
-                defender.isColonist() &&
-                totalAddend == 1 &&
-                defender.getLocation() instanceof WorkLocation) {
-                result.add(new Modifier("modifiers.paulRevere", 1));
-                totalAddend += 1;
-            }
-
+            // Paul Revere makes an unarmed colonist in a settlement pick up
+            // a stock-piled musket if attacked, so the bonus should be applied
+            // for unarmed colonists inside colonies where there are muskets
+            // available.
             if (defender.isArmed()) {
                 result.add(new Modifier("modifiers.armed", 1));
                 totalAddend += 1;
+            } else if (defender.getOwner().hasFather(FoundingFather.PAUL_REVERE) && 
+                defender.isColonist() &&
+                defender.getLocation() instanceof WorkLocation) {
+                Colony colony = ((WorkLocation)defender.getLocation()).getColony();
+                if(colony.getGoodsCount(Goods.MUSKETS) >= 50) {
+                    result.add(new Modifier("modifiers.paulRevere", 1));
+                    totalAddend += 1;
+                }
             }
 
             if (defender.isMounted()) {
