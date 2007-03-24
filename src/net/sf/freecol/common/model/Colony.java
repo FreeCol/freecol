@@ -314,21 +314,18 @@ public final class Colony extends Settlement implements Location, Nameable {
      * @see Settlement#getOwner
      */
     public void setOwner(Player owner) {
+        // TODO: Erik - this only works if called on the server!
         super.setOwner(owner);
         tile.setNationOwner(owner.getNation());
 
-        Iterator<Unit> unitIterator = getUnitIterator();
-        while (unitIterator.hasNext()) {
-            Unit unit = unitIterator.next();
+        for (Unit unit : getUnitList()) {
             unit.setOwner(owner);
             if (unit.getLocation() instanceof ColonyTile) {
                 ((ColonyTile) unit.getLocation()).getWorkTile().setNationOwner(owner.getNation());
             }
         }
 
-        Iterator<Unit> tileUnitIterator = getTile().getUnitIterator();
-        while (tileUnitIterator.hasNext()) {
-            Unit target = tileUnitIterator.next();
+        for (Unit target : tile.getUnitList()) {
             target.setOwner(getOwner());
         }
 
