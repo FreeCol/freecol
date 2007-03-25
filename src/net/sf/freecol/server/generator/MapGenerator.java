@@ -253,8 +253,7 @@ public class MapGenerator {
                         }
                     }
                     IndianSettlement is = placeIndianSettlement(players.get(bestTribe+4), bestTribe, false, candidate.getPosition(), map, players);
-                    if (capitalCandidate == null
-                            || random.nextInt(width+height) == 1) {
+                    if (random.nextInt(width+height) == 1) {
                         capitalCandidate[bestTribe] = is; 
                     }
                 }
