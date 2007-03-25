@@ -439,13 +439,12 @@ public class IndianSettlement extends Settlement {
     * @param missionary The missionary for this settlement.
     */
     public void setMissionary(Unit missionary) {
-        if (!missionary.isMissionary()) {
-            throw new IllegalArgumentException("Specified unit is not a missionary.");
-        }
         if (missionary == null) {
             throw new NullPointerException();
         }
-
+        if (!missionary.isMissionary()) {
+            throw new IllegalArgumentException("Specified unit is not a missionary.");
+        }
         if (missionary != this.missionary) {
             convertProgress = 0;
         }
@@ -526,7 +525,8 @@ public class IndianSettlement extends Settlement {
      *
      * @return Settlement radius
      */
-    public int getRadius() {
+    @Override
+	public int getRadius() {
         return getRadius(kind);
     }
     
@@ -561,7 +561,8 @@ public class IndianSettlement extends Settlement {
     *
     * @param locatable The <code>Locatable</code> to add to this Location.
     */
-    public void add(Locatable locatable) {
+    @Override
+	public void add(Locatable locatable) {
         if (locatable instanceof Unit) {
             unitContainer.addUnit((Unit) locatable);
         } else if (locatable instanceof Goods) {
@@ -577,7 +578,8 @@ public class IndianSettlement extends Settlement {
     *
     * @param locatable The <code>Locatable</code> to remove from this Location.
     */
-    public void remove(Locatable locatable) {
+    @Override
+	public void remove(Locatable locatable) {
         if (locatable instanceof Unit) {
             unitContainer.removeUnit((Unit) locatable);
         } else if (locatable instanceof Goods) {
@@ -593,7 +595,8 @@ public class IndianSettlement extends Settlement {
     *
     * @return The amount of Units at this Location.
     */
-    public int getUnitCount() {
+    @Override
+	public int getUnitCount() {
         return unitContainer.getUnitCount();
     }
 
@@ -620,7 +623,8 @@ public class IndianSettlement extends Settlement {
     * @param attacker The target that would be attacking this <code>IndianSettlement</code>.
     * @return The <code>Unit</code> that has been choosen to defend this <code>IndianSettlement</code>.
     */
-    public Unit getDefendingUnit(Unit attacker) {
+    @Override
+	public Unit getDefendingUnit(Unit attacker) {
         Iterator<Unit> unitIterator = getUnitIterator();
 
         Unit defender = null;
@@ -849,7 +853,8 @@ public class IndianSettlement extends Settlement {
     }
 
 
-    public boolean contains(Locatable locatable) {
+    @Override
+	public boolean contains(Locatable locatable) {
         if (locatable instanceof Unit) {
             return unitContainer.contains((Unit) locatable);
         } else {
@@ -858,12 +863,14 @@ public class IndianSettlement extends Settlement {
     }
 
 
-    public boolean canAdd(Locatable locatable) {
+    @Override
+	public boolean canAdd(Locatable locatable) {
         return true;
     }
 
 
-    public void newTurn() {
+    @Override
+	public void newTurn() {
         if (isUninitialized()) {
             logger.warning("Uninitialized when calling newTurn");
         }
@@ -1046,7 +1053,8 @@ public class IndianSettlement extends Settlement {
      * Disposes this settlement and removes its claims to adjacent
      * tiles.
      */
-    public void dispose() {
+    @Override
+	public void dispose() {
         while (ownedUnits.size() > 0) {
             ownedUnits.remove(0).setIndianSettlement(null);
         }
@@ -1107,7 +1115,8 @@ public class IndianSettlement extends Settlement {
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame) throws XMLStreamException {
+    @Override
+	protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame) throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
@@ -1174,7 +1183,8 @@ public class IndianSettlement extends Settlement {
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    @Override
+	protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setID(in.getAttributeValue(null, "ID"));
 
         tile = (Tile) getGame().getFreeColGameObject(in.getAttributeValue(null, "tile"));
