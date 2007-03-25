@@ -80,232 +80,278 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             }
         });
         register("move", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return move(connection, element);
             }
         });
         register("askSkill", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return askSkill(connection, element);
             }
         });
         register("attack", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return attack(connection, element);
             }
         });
         register("embark", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return embark(connection, element);
             }
         });
         register("boardShip", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return boardShip(connection, element);
             }
         });
         register("learnSkillAtSettlement", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return learnSkillAtSettlement(connection, element);
             }
         });
         register("scoutIndianSettlement", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return scoutIndianSettlement(connection, element);
             }
         });
         register("missionaryAtSettlement", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return missionaryAtSettlement(connection, element);
             }
         });
         register("inciteAtSettlement", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return inciteAtSettlement(connection, element);
             }
         });
         register("armedUnitDemandTribute", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return armedUnitDemandTribute(connection, element);
             }
         });
         register("leaveShip", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return leaveShip(connection, element);
             }
         });
         register("loadCargo", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return loadCargo(connection, element);
             }
         });
         register("unloadCargo", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return unloadCargo(connection, element);
             }
         });
         register("buyGoods", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return buyGoods(connection, element);
             }
         });
         register("sellGoods", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return sellGoods(connection, element);
             }
         });
         register("moveToEurope", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return moveToEurope(connection, element);
             }
         });
         register("moveToAmerica", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return moveToAmerica(connection, element);
             }
         });
         register("buildColony", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return buildColony(connection, element);
             }
         });
         register("recruitUnitInEurope", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return recruitUnitInEurope(connection, element);
             }
         });
         register("emigrateUnitInEurope", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return emigrateUnitInEurope(connection, element);
             }
         });
         register("trainUnitInEurope", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return trainUnitInEurope(connection, element);
             }
         });
         register("equipunit", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return equipUnit(connection, element);
             }
         });
         register("work", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return work(connection, element);
             }
         });
         register("changeWorkType", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return changeWorkType(connection, element);
             }
         });
         register("setCurrentlyBuilding", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return setCurrentlyBuilding(connection, element);
             }
         });
         register("changeState", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return changeState(connection, element);
             }
         });
         register("putOutsideColony", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return putOutsideColony(connection, element);
             }
         });
         register("clearSpeciality", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return clearSpeciality(connection, element);
             }
         });
         register("setNewLandName", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return setNewLandName(connection, element);
             }
         });
         register("endTurn", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return endTurn(connection, element);
             }
         });
         register("disbandUnit", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return disbandUnit(connection, element);
             }
         });
         register("skipUnit", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return skipUnit(connection, element);
             }
         });
         register("cashInTreasureTrain", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return cashInTreasureTrain(connection, element);
             }
         });
         register("tradeProposition", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return tradeProposition(connection, element);
             }
         });
         register("trade", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return trade(connection, element);
             }
         });
         register("deliverGift", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return deliverGift(connection, element);
             }
         });
         register("indianDemand", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return indianDemand(connection, element);
             }
         });
         register("buyLand", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return buyLand(connection, element);
             }
         });
         register("payForBuilding", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return payForBuilding(connection, element);
             }
         });
         register("payArrears", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return payArrears(connection, element);
             }
         });
         register("setExports", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return setExports(connection, element);
             }
         });
         register("declareIndependence", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return declareIndependence(connection, element);
             }
         });
         register("giveIndependence", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return giveIndependence(connection, element);
             }
         });
         register("foreignAffairs", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return foreignAffairs(connection, element);
             }
         });
         register("getREFUnits", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return getREFUnits(connection, element);
             }
         });
         register("rename", new CurrentPlayerNetworkRequestHandler() {
-            public Element handle(Player player, Connection connection, Element element) {
+            @Override
+			public Element handle(Player player, Connection connection, Element element) {
                 return rename(connection, element);
             }
         });
@@ -800,7 +846,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalArgumentException("Could not find tile in direction " + direction + " from unit with ID "
                     + attackElement.getAttribute("unit"));
         }
-        Element dowElement = null;
         
         Unit defender = newTile.getDefendingUnit(unit);
         if (defender == null) {
@@ -826,14 +871,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
             if (player.equals(enemyPlayer) || enemyPlayer.getConnection() == null) {
                 continue;
-            }
-            if (dowElement != null) {
-                try {
-                    enemyPlayer.getConnection().send(dowElement);
-                } catch (IOException e) {
-                    logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection "
-                            + enemyPlayer.getConnection());
-                }
             }
             Element opponentAttackElement = Message.createNewRootElement("opponentAttack");
             if (unit.isVisibleTo(enemyPlayer) || defender.isVisibleTo(enemyPlayer)) {
@@ -2375,7 +2412,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      *            that holds all the information.
      * @return The reply.
      */
-    protected Element logout(Connection connection, Element logoutElement) {
+    @Override
+	protected Element logout(Connection connection, Element logoutElement) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         logger.info("Logout by: " + connection + ((player != null) ? " (" + player.getName() + ") " : ""));
         if (player == null) {
