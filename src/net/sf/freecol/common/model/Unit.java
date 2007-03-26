@@ -3934,7 +3934,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         out.writeAttribute("hitpoints", Integer.toString(hitpoints));
 
         if (indianSettlement != null) {
-            if (showAll || player == getOwner()) {
+            if (getGame().isClientTrusted() || showAll || player == getOwner()) {
                 out.writeAttribute("indianSettlement", indianSettlement.getID());
             }
         }
@@ -3944,7 +3944,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         }
 
         if (location != null) {
-            if (showAll || player == getOwner() || !(location instanceof Building || location instanceof ColonyTile)) {
+            if (getGame().isClientTrusted() || showAll || player == getOwner() || !(location instanceof Building || location instanceof ColonyTile)) {
                 out.writeAttribute("location", location.getID());
             } else {
                 out.writeAttribute("location", getTile().getColony().getID());
@@ -3961,7 +3961,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
         // Do not show enemy units hidden in a carrier:
         if (isCarrier()) {
-            if (showAll || getOwner().equals(player) || !getGameOptions().getBoolean(GameOptions.UNIT_HIDING)
+            if (getGame().isClientTrusted() || showAll || getOwner().equals(player) || !getGameOptions().getBoolean(GameOptions.UNIT_HIDING)
                     && player.canSee(getTile())) {
                 unitContainer.toXML(out, player, showAll, toSavedGame);
                 goodsContainer.toXML(out, player, showAll, toSavedGame);

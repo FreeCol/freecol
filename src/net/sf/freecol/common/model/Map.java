@@ -1713,7 +1713,7 @@ public class Map extends FreeColGameObject {
         while (tileIterator.hasNext()) {
             Tile tile = getTile(tileIterator.next());
 
-            if (showAll || player.hasExplored(tile)) {
+            if (getGame().isClientTrusted() || showAll || player.hasExplored(tile)) {
                 tile.toXML(out, player, showAll, toSavedGame);
             } else {
                 Tile hiddenTile = new Tile(getGame(), tile.getX(), tile.getY());

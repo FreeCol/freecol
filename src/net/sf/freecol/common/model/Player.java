@@ -2272,7 +2272,7 @@ public class Player extends FreeColGameObject implements Nameable {
         for (int i = 0; i < tension.length; i++) {
             tensionArray[i] = tension[i].getValue();
         }
-        if (showAll || equals(player)) {
+        if (getGame().isClientTrusted() || showAll || equals(player)) {
             out.writeAttribute("gold", Integer.toString(gold));
             out.writeAttribute("crosses", Integer.toString(crosses));
             out.writeAttribute("bells", Integer.toString(bells));
@@ -2307,7 +2307,7 @@ public class Player extends FreeColGameObject implements Nameable {
         if (entryLocation != null) {
             out.writeAttribute("entryLocation", entryLocation.getID());
         }
-        if (showAll || equals(player)) {
+        if (getGame().isClientTrusted() || showAll || equals(player)) {
             if (europe != null) {
                 europe.toXML(out, player, showAll, toSavedGame);
             }

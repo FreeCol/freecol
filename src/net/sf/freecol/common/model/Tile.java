@@ -46,21 +46,22 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
     // -sjm
     // Twelve tile types, sixteen goods types, and forested/unforested.
     public static final int[][][] potentialtable = {
-        //  Food      Sugar   Tobacco    Cotton     Furs      Wood      Ore      Silver
-        { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } }, // Unexp
-        { { 5, 3 }, { 0, 0 }, { 0, 0 }, { 2, 1 }, { 0, 3 }, { 0, 6 }, { 1, 0 }, { 0, 0 } }, // Plains
-        { { 3, 2 }, { 0, 0 }, { 3, 1 }, { 0, 0 }, { 0, 2 }, { 0, 4 }, { 0, 0 }, { 0, 0 } }, // Grasslands
-        { { 3, 2 }, { 0, 0 }, { 0, 0 }, { 3, 1 }, { 0, 2 }, { 0, 6 }, { 0, 0 }, { 0, 0 } }, // Prairie
-        { { 4, 3 }, { 3, 1 }, { 0, 0 }, { 0, 0 }, { 0, 2 }, { 0, 4 }, { 0, 0 }, { 0, 0 } }, // Savannah
-        { { 3, 2 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 2 }, { 0, 4 }, { 2, 1 }, { 0, 0 } }, // Marsh
-        { { 3, 2 }, { 2, 1 }, { 2, 1 }, { 0, 0 }, { 0, 1 }, { 0, 4 }, { 2, 1 }, { 0, 0 } }, // Swamp
-        { { 2, 2 }, { 0, 0 }, { 0, 0 }, { 1, 1 }, { 0, 2 }, { 0, 2 }, { 2, 1 }, { 0, 0 } }, // Desert
-        { { 3, 2 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 3 }, { 0, 4 }, { 2, 1 }, { 0, 0 } }, // Tundra
-        { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } }, // Arctic
-        { { 4, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } }, // Ocean
-        { { 4, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } }, // High seas
-        { { 2, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 4, 0 }, { 0, 0 } }, // Hills
-        { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 3, 0 }, { 1, 0 } } // Mountains
+    // Food Sugar Tobacco Cotton Furs Wood Ore Silver
+            { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } }, // Unexp
+            { { 5, 3 }, { 0, 0 }, { 0, 0 }, { 2, 1 }, { 0, 3 }, { 0, 6 }, { 1, 0 }, { 0, 0 } }, // Plains
+            { { 3, 2 }, { 0, 0 }, { 3, 1 }, { 0, 0 }, { 0, 2 }, { 0, 4 }, { 0, 0 }, { 0, 0 } }, // Grasslands
+            { { 3, 2 }, { 0, 0 }, { 0, 0 }, { 3, 1 }, { 0, 2 }, { 0, 6 }, { 0, 0 }, { 0, 0 } }, // Prairie
+            { { 4, 3 }, { 3, 1 }, { 0, 0 }, { 0, 0 }, { 0, 2 }, { 0, 4 }, { 0, 0 }, { 0, 0 } }, // Savannah
+            { { 3, 2 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 2 }, { 0, 4 }, { 2, 1 }, { 0, 0 } }, // Marsh
+            { { 3, 2 }, { 2, 1 }, { 2, 1 }, { 0, 0 }, { 0, 1 }, { 0, 4 }, { 2, 1 }, { 0, 0 } }, // Swamp
+            { { 2, 2 }, { 0, 0 }, { 0, 0 }, { 1, 1 }, { 0, 2 }, { 0, 2 }, { 2, 1 }, { 0, 0 } }, // Desert
+            { { 3, 2 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 3 }, { 0, 4 }, { 2, 1 }, { 0, 0 } }, // Tundra
+            { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } }, // Arctic
+            { { 4, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } }, // Ocean
+            { { 4, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } }, // High
+                                                                                                // seas
+            { { 2, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 4, 0 }, { 0, 0 } }, // Hills
+            { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 3, 0 }, { 1, 0 } } // Mountains
     };
 
     private boolean road, plowed, forested, bonus, lostCityRumour;
@@ -1316,7 +1317,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
         }
 
         PlayerExploredTile pet = null;
-        if (!showAll) {
+        if (!(showAll || getGame().isClientTrusted())) {
             // We're sending the Tile from the server to the client and showAll
             // is false.
             if (player != null) {
@@ -1356,20 +1357,20 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
         }
 
         if (nationOwner != Player.NO_NATION) {
-            if (showAll || player.canSee(this)) {
+            if (getGame().isClientTrusted() || showAll || player.canSee(this)) {
                 out.writeAttribute("nationOwner", Integer.toString(nationOwner));
             } else if (pet != null) {
                 out.writeAttribute("nationOwner", Integer.toString(pet.getNationOwner()));
             }
         }
 
-        if ((showAll || player.canSee(this)) && (owner != null)) {
+        if ((getGame().isClientTrusted() || showAll || player.canSee(this)) && (owner != null)) {
             out.writeAttribute("owner", owner.getID());
         }
 
         // if ((settlement != null) && (showAll || player.canSee(this))) {
         if (settlement != null) {
-            if (pet == null || showAll || settlement.getOwner() == player) {
+            if (pet == null || getGame().isClientTrusted() || showAll || settlement.getOwner() == player) {
                 settlement.toXML(out, player, showAll, toSavedGame);
             } else {
                 if (getColony() != null) {
@@ -1443,7 +1444,8 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
 
         // Check if the player can see the tile: Do not show enemy units on a
         // tile out-of-sight.
-        if (showAll || (player.canSee(this) && (settlement == null || settlement.getOwner() == player))
+        if (getGame().isClientTrusted() || showAll
+                || (player.canSee(this) && (settlement == null || settlement.getOwner() == player))
                 || !getGameOptions().getBoolean(GameOptions.UNIT_HIDING) && player.canSee(this)) {
             unitContainer.toXML(out, player, showAll, toSavedGame);
         } else {

@@ -1131,7 +1131,7 @@ public class IndianSettlement extends Settlement {
         out.writeAttribute("kind", Integer.toString(kind));
         out.writeAttribute("isCapital", Boolean.toString(isCapital));
 
-        if (showAll || player == getOwner()) {
+        if (getGame().isClientTrusted() || showAll || player == getOwner()) {
             String ownedUnitsString = "";
             for (int i=0; i<ownedUnits.size(); i++) {
                 ownedUnitsString += ownedUnits.get(i).getID();
@@ -1161,7 +1161,7 @@ public class IndianSettlement extends Settlement {
             out.writeEndElement();
         }
 
-        if (showAll || player == getOwner()) {
+        if (getGame().isClientTrusted() || showAll || player == getOwner()) {
             unitContainer.toXML(out, player, showAll, toSavedGame);
             goodsContainer.toXML(out, player, showAll, toSavedGame);
         } else {

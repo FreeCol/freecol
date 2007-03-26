@@ -219,6 +219,17 @@ public class Game extends FreeColGameObject {
     }
 
     /**
+     * Check if the clients are trusted or if the server should keep secrets
+     * in order to prevent cheating.
+     * 
+     * @return true if clients are to be trusted.
+     */
+    public boolean isClientTrusted() {
+        // Trust the clients in order to prevent certain bugs, fix this later
+        return true;        
+    }
+    
+    /**
      * Returns the owner of this view of the game, or <code>null</code> if
      * this game has all the information. <br>
      * <br>

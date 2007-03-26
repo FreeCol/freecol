@@ -1628,7 +1628,7 @@ public final class Colony extends Settlement implements Location, Nameable {
         out.writeAttribute("name", name);
         out.writeAttribute("owner", owner.getID());
         out.writeAttribute("tile", tile.getID());
-        if (showAll || player == getOwner()) {
+        if (getGame().isClientTrusted() || showAll || player == getOwner()) {
             out.writeAttribute("hammers", Integer.toString(hammers));
             out.writeAttribute("bells", Integer.toString(bells));
             out.writeAttribute("sonsOfLiberty", Integer.toString(sonsOfLiberty));
