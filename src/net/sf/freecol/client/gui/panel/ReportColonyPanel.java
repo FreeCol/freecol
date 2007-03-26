@@ -4,9 +4,7 @@ import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -34,7 +32,8 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
 
     private List<Colony> colonies;
 
-
+    private final int ROWS_PER_COLONY = 4;
+    private final int SEPARATOR = 24;
     /**
      * The constructor that will add the items to this panel.
      * 
@@ -47,6 +46,7 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
     /**
      * Prepares this panel to be displayed.
      */
+    @Override
     public void initialize() {
         Player player = getCanvas().getClient().getMyPlayer();
         colonies = player.getColonies();
@@ -54,12 +54,10 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
         // Display Panel
         reportPanel.removeAll();
 
-        int rowsPerColony = 4;
-        int separator = 24;
         int widths[] = new int[] { 0, 12, 0 };
-        int heights[] = new int[colonies.size() * rowsPerColony];
+        int heights[] = new int[colonies.size() * ROWS_PER_COLONY];
         for (int i = 0; i < colonies.size(); i++) {
-            heights[i * rowsPerColony + 3] = separator;
+            heights[i * ROWS_PER_COLONY + 3] = SEPARATOR;
         }
 
         reportPanel.setLayout(new HIGLayout(widths, heights));
@@ -69,9 +67,7 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
         int panelColumn = 3;
         int colonyIndex = 0;
         Collections.sort(colonies, getCanvas().getClient().getClientOptions().getColonyComparator());
-        Iterator<Colony> colonyIterator = colonies.iterator();
-        while (colonyIterator.hasNext()) {
-            Colony colony = colonyIterator.next();
+        for(Colony colony : colonies) {
 
             // colonyLabel
             JButton colonyButton = new JButton(colony.getName());
@@ -82,15 +78,9 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
             // units
             JPanel unitPanel = new JPanel(new GridLayout(0, 10));
             unitPanel.setOpaque(false);
-            ArrayList<Unit> unitList = new ArrayList<Unit>();
-            Iterator<Unit> unitIterator = colony.getUnitIterator();
-            while (unitIterator.hasNext()) {
-                unitList.add(unitIterator.next());
-            }
+            List<Unit> unitList = colony.getUnitList();
             Collections.sort(unitList, getUnitTypeComparator());
-            unitIterator = unitList.iterator();
-            while (unitIterator.hasNext()) {
-                Unit unit = unitIterator.next();
+            for(Unit unit : unitList) {
                 UnitLabel unitLabel = new UnitLabel(unit, getCanvas(), true, true);
                 unitPanel.add(unitLabel);
             }
@@ -137,7 +127,6 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
             row += 2;
             colonyIndex++;
         }
-
     }
 
     /**
@@ -146,6 +135,7 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
      * 
      * @param event The incoming ActionEvent.
      */
+    @Override
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         int action = Integer.valueOf(command).intValue();
