@@ -1317,7 +1317,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
         }
 
         PlayerExploredTile pet = null;
-        if (!(showAll || getGame().isClientTrusted())) {
+        if (!(showAll)) {
             // We're sending the Tile from the server to the client and showAll
             // is false.
             if (player != null) {
