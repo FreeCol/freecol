@@ -878,9 +878,8 @@ public class TransportMission extends Mission {
 
         boolean transportListChanged = false;
 
-        Iterator<Transportable> tli = transportList.iterator();
-        while (tli.hasNext()) {
-            Transportable t = tli.next();
+        // Make a copy for iteration, the main list may change inside the loop
+        for (Transportable t : new ArrayList<Transportable>(transportList)) {
             if (!isCarrying(t)) {
                 continue;
             }
