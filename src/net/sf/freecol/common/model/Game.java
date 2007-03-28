@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -803,7 +804,6 @@ public class Game extends FreeColGameObject {
      */
     @SuppressWarnings("unchecked")
     public void newTurn() {
-        // Iterator iterator = getFreeColGameObjectIterator();
         turn.increase();
 
         Iterator<FreeColGameObject> iterator = ((HashMap<String, FreeColGameObject>) freeColGameObjects.clone())
@@ -813,7 +813,6 @@ public class Game extends FreeColGameObject {
         ArrayList<FreeColGameObject> later2 = new ArrayList<FreeColGameObject>();
         while (iterator.hasNext()) {
             FreeColGameObject freeColGameObject = iterator.next();
-
             /*
              * Take the settlements after the buildings and all other objects
              * before the buildings. If changes are made: ColonyTile should have
@@ -824,38 +823,33 @@ public class Game extends FreeColGameObject {
             } else if (freeColGameObject instanceof Building) {
                 later1.add(freeColGameObject);
             } else {
-                try {
-                    freeColGameObject.newTurn();
-                } catch (Exception e) {
-                    StringWriter sw = new StringWriter();
-                    e.printStackTrace(new PrintWriter(sw));
-                    logger.warning(sw.toString());
-                }
+                callNewTurn(freeColGameObject);
             }
         }
 
-        iterator = later1.iterator();
-        while (iterator.hasNext()) {
-            FreeColGameObject freeColGameObject = iterator.next();
-            try {
-                freeColGameObject.newTurn();
-            } catch (Exception e) {
-                StringWriter sw = new StringWriter();
-                e.printStackTrace(new PrintWriter(sw));
-                logger.warning(sw.toString());
-            }
+        for(FreeColGameObject o : later1) {
+            callNewTurn(o);
         }
+        for(FreeColGameObject o : later2) {
+            callNewTurn(o);
+        }
+    }
 
-        iterator = later2.iterator();
-        while (iterator.hasNext()) {
-            FreeColGameObject freeColGameObject = iterator.next();
-            try {
+    /**
+     * Invoke newTurn, catch and log errors. Note that uninitialized and disposed
+     * objects are ignored.
+     * 
+     * @param freeColGameObject The game object to invoke newTurn for.
+     */
+    private void callNewTurn(FreeColGameObject freeColGameObject) {
+        try {
+            if(! (freeColGameObject.isUninitialized() || freeColGameObject.isDisposed())) {
                 freeColGameObject.newTurn();
-            } catch (Exception e) {
-                StringWriter sw = new StringWriter();
-                e.printStackTrace(new PrintWriter(sw));
-                logger.warning(sw.toString());
             }
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "New turn failed for " +
+                    freeColGameObject.getID() + " (" +
+                    freeColGameObject.getClass().getName() + ")", e);
         }
     }
 
