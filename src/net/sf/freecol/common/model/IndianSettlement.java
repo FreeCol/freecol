@@ -873,7 +873,9 @@ public class IndianSettlement extends Settlement {
 	public void newTurn() {
         if (isUninitialized()) {
             logger.warning("Uninitialized when calling newTurn");
+            return;
         }
+        
         /* Determine the maximum possible production for each type of goods: */
         int totalGoods = 0;
         int[] potential = new int[Goods.NUMBER_OF_TYPES];
