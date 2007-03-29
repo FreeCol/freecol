@@ -1,6 +1,7 @@
 
 package net.sf.freecol.client.control;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
@@ -227,7 +228,10 @@ public final class InGameInputHandler extends InputHandler {
                 try {
                     unit.move(direction);
                 } catch (IllegalStateException e) {
-                    System.err.println(unit.getTile().getPosition().getX() + ", " + unit.getTile().getPosition().getY());
+                    logger.log(Level.WARNING, "Failed to move unit from (" +
+                            unit.getTile().getPosition().getX() + ", " + 
+                            unit.getTile().getPosition().getY() + ") direction " +
+                            direction, e);
                     throw e;
                 }
                 final Tile newTile = unit.getTile();

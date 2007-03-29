@@ -15,6 +15,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.UIDefaults;
@@ -332,7 +333,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
             }
 
         } catch (ClassNotFoundException e) {
-            System.err.println(e);
+            logger.log(Level.SEVERE, "Failed to load look and feel!", e);
             System.exit(-1);
         }
 
