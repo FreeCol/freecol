@@ -313,6 +313,7 @@ public final class Colony extends Settlement implements Location, Nameable {
      *            <code>Settlement</code>.
      * @see Settlement#getOwner
      */
+    @Override
     public void setOwner(Player owner) {
         // TODO: Erik - this only works if called on the server!
         super.setOwner(owner);
@@ -504,7 +505,7 @@ public final class Colony extends Settlement implements Location, Nameable {
 
         while (buildingIterator.hasNext()) {
             Building building = buildingIterator.next();
-            if (building.isType(type)) {
+            if (building.getType() == type) {
                 return building;
             }
         }
@@ -591,6 +592,7 @@ public final class Colony extends Settlement implements Location, Nameable {
      * 
      * @param locatable The <code>Locatable</code> to add to this Location.
      */
+    @Override
     public void add(Locatable locatable) {
         if (locatable instanceof Unit) {
             if (((Unit) locatable).isColonist()) {
@@ -619,6 +621,7 @@ public final class Colony extends Settlement implements Location, Nameable {
      * @param locatable The <code>Locatable</code> to remove from this
      *            Location.
      */
+    @Override
     public void remove(Locatable locatable) {
         if (locatable instanceof Unit) {
             Iterator<WorkLocation> i = getWorkLocationIterator();
@@ -643,6 +646,7 @@ public final class Colony extends Settlement implements Location, Nameable {
      * 
      * @return The amount of Units at this Location.
      */
+    @Override
     public int getUnitCount() {
         int count = 0;
 
@@ -765,10 +769,12 @@ public final class Colony extends Settlement implements Location, Nameable {
         setExports(goods.getType(), value);
     }
 
+    @Override
     public boolean contains(Locatable locatable) {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public boolean canAdd(Locatable locatable) {
         // throw new UnsupportedOperationException();
         if (locatable instanceof Unit && ((Unit) locatable).getOwner() == getOwner()) {
@@ -792,6 +798,7 @@ public final class Colony extends Settlement implements Location, Nameable {
      *         colony.
      * @see Tile#getDefendingUnit(Unit)
      */
+    @Override
     public Unit getDefendingUnit(Unit attacker) {
         return getDefendingUnit();
     }
@@ -1046,6 +1053,7 @@ public final class Colony extends Settlement implements Location, Nameable {
      * @return The name of the colony.
      * @see #getName
      */
+    @Override
     public String toString() {
         return name;
     }
@@ -1409,6 +1417,7 @@ public final class Colony extends Settlement implements Location, Nameable {
     /**
      * Prepares this <code>Colony</code> for a new turn.
      */
+    @Override
     public void newTurn() {
         // Skip doing work in enemy colonies.
         if (unitCount != -1) {
@@ -1586,6 +1595,7 @@ public final class Colony extends Settlement implements Location, Nameable {
      * Disposes this <code>Colony</code>. All <code>WorkLocation</code>s
      * owned by this <code>Colony</code> will also be destroyed.
      */
+    @Override
     public void dispose() {
         Iterator<WorkLocation> i = getWorkLocationIterator();
         while (i.hasNext()) {
@@ -1618,6 +1628,7 @@ public final class Colony extends Settlement implements Location, Nameable {
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
      */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
             throws XMLStreamException {
         // Start element:
@@ -1669,6 +1680,7 @@ public final class Colony extends Settlement implements Location, Nameable {
      * 
      * @param in The input stream with the XML.
      */
+    @Override
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         initializeWarehouseSettings();
 
