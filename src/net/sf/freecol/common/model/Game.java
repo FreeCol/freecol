@@ -401,6 +401,21 @@ public class Game extends FreeColGameObject {
     }
 
     /**
+     * Get the {@link FreeColGameObject} with the given id or null.
+     * This method does NOT throw if the id is invalid.
+     * 
+     * @param id The id, may be null or invalid.
+     * @return game object with id or null.
+     */
+    public FreeColGameObject getFreeColGameObjectSafely(String id) {
+        if(id != null) {
+            return freeColGameObjects.get(id);
+        } else {
+            return null;
+        }
+    }
+    
+    /**
      * Removes the <code>FreeColGameObject</code> with the specified ID.
      * 
      * @param id The identifier of the <code>FreeColGameObject</code> that
