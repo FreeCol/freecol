@@ -1295,8 +1295,13 @@ public class Player extends FreeColGameObject implements Nameable {
         if ((gold + amount) >= 0) {
             gold += amount;
         } else {
-            /* REMEMBER: The opponents' amount of gold is hidden for the clients */
-            throw new IllegalArgumentException("The resulting amount would be negative.");
+            // This can happen if the server and the client get out of synch.
+            // Perhaps it can also happen if the client tries to adjust gold
+            // for another player, where the balance is unknown. Just keep
+            // going and do the best thing possible, we don't want to crash
+            // the game here.
+            logger.warning("Cannot add " + amount + " gold for " + this + ": would be negative!");
+            gold = 0;
         }
     }
 
