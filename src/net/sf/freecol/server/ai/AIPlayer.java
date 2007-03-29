@@ -687,23 +687,17 @@ public class AIPlayer extends AIObject {
                         equipUnitElement.setAttribute("unit", u.getID());
                         equipUnitElement.setAttribute("type", Integer.toString(Goods.MUSKETS));
                         equipUnitElement.setAttribute("amount", "50");
-                        // I don't think we need to do this if we are the
-                        // server...
-                        // unit.setArmed(true);
+                        u.setArmed(true);
                         sendAndWaitSafely(equipUnitElement);
                         Element putOutsideColonyElement = Message.createNewRootElement("putOutsideColony");
                         putOutsideColonyElement.setAttribute("unit", u.getID());
-                        // I don't think we need to do this if we are the
-                        // server...
-                        // u.putOutsideColony();
+                        u.putOutsideColony();
                         sendAndWaitSafely(putOutsideColonyElement);
-                        // Check if the unit can fortify before sending the
-                        // order
+                        // Check if the unit can fortify before sending the order
                         if (u.checkSetState(Unit.FORTIFYING)) {
                             Element changeStateElement = Message.createNewRootElement("changeState");
                             changeStateElement.setAttribute("unit", u.getID());
                             changeStateElement.setAttribute("state", Integer.toString(Unit.FORTIFYING));
-                            // u.putOutsideColony();
                             sendAndWaitSafely(changeStateElement);
                         }
                         olddefenders++;

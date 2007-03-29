@@ -279,4 +279,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
     public static String getServerAdditionXMLElementTagName() {
         return "serverPlayer";
     }
+    
+    @Override
+    public String toString() {
+        return "ServerPlayer[id=" + serverID + ",conn=" + connection + "]";
+    }
 }

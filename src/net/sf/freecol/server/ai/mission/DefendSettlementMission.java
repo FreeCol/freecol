@@ -159,12 +159,13 @@ public class DefendSettlementMission extends Mission {
             }
         } else {
             if (unit.getState() != Unit.FORTIFIED
-                    || unit.getState() != Unit.FORTIFYING
+                    && unit.getState() != Unit.FORTIFYING
                     && unit.checkSetState(Unit.FORTIFYING)) {
                 Element changeStateElement = Message.createNewRootElement("changeState");
                 changeStateElement.setAttribute("unit", unit.getID());
                 changeStateElement.setAttribute("state", Integer.toString(Unit.FORTIFYING));
                 try {
+                    logger.log(Level.FINEST, "Sending fortity request...");
                     connection.sendAndWait(changeStateElement);
                 } catch (IOException e) {
                     logger.log(Level.WARNING, "Couldn't fortify unit!", e);

@@ -127,20 +127,17 @@ public class ClientModelController implements ModelController {
      * @return The <code>Location</code> where the <code>Unit</code> appears.
      */    
     public Location setToVacantEntryLocation(Unit unit) {
-        Game game = freeColClient.getGame();
-        Client client = freeColClient.getClient();
-
         Element createUnitElement = Message.createNewRootElement("getVacantEntryLocation");
         createUnitElement.setAttribute("unit", unit.getID());
 
-        Element reply = client.ask(createUnitElement);
-
-        if (!reply.getTagName().equals("getVacantEntryLocationConfirmed")) {
-            logger.warning("Wrong tag name.");
-            throw new IllegalStateException();
+        Element reply = freeColClient.getClient().ask(createUnitElement);
+        if(reply == null) {
+            throw new IllegalStateException("No reply for getVacantEntryLocation!");
+        } else if ("getVacantEntryLocationConfirmed".equals(reply.getTagName())) {
+            throw new IllegalStateException("Unexpected reply type for getVacantEntryLocation: " + reply.getTagName());
         }
 
-        Location entryLocation = (Location) game.getFreeColGameObject(reply.getAttribute("location"));
+        Location entryLocation = (Location) freeColClient.getGame().getFreeColGameObject(reply.getAttribute("location"));
         unit.setLocation(entryLocation);
 
         return entryLocation;

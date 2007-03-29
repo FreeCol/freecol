@@ -454,14 +454,16 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * 
      * @param connection The connection the message came from.
      * @param element The element containing the request.
-     * 
      */
     private Element getVacantEntryLocation(Connection connection, Element element) {
         Game game = getFreeColServer().getGame();
         Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
         Player owner = unit.getOwner();
-        if (owner != getFreeColServer().getPlayer(connection)) {
-            throw new IllegalStateException();
+        ServerPlayer askingPlayer = getFreeColServer().getPlayer(connection);
+        if (owner != askingPlayer) {
+            throw new IllegalStateException("Unit " + unit + " with owner " + 
+                    owner + " not owned by " + askingPlayer +
+                    ", refusing to get vacant location!");
         }
         Location entryLocation = getFreeColServer().getModelController().setToVacantEntryLocation(unit);
         Element reply = Message.createNewRootElement("getVacantEntryLocationConfirmed");
@@ -1823,8 +1825,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     private Element changeState(Connection connection, Element changeStateElement) {
         Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) game.getFreeColGameObject(changeStateElement.getAttribute("unit"));
-        int state = Integer.parseInt(changeStateElement.getAttribute("state"));
+        Unit unit = (Unit) game.getFreeColGameObjectSafely(changeStateElement.getAttribute("unit"));
         if (unit == null) {
             throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
                     + changeStateElement.getAttribute("unit"));
@@ -1832,15 +1833,17 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (unit.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
         }
+        int state = Integer.parseInt(changeStateElement.getAttribute("state"));
         Tile oldTile = unit.getTile();
-        if (!unit.checkSetState(state)) {
-            // Oh, really, Mr. Client? I'll show YOU!
-            // kickPlayer(player);
-            logger.warning("Can't set state " + state + " for unit " + unit + " belonging to " + player
-                    + ". Possible cheating attempt (or bug)?");
-            return null;
+        if (unit.checkSetState(state)) {
+            unit.setState(state);
+        } else {
+            logger.warning("Can't set state " + state + " for unit " + unit
+                    + " with current state " + unit.getState()
+                    + " and " + unit.getMovesLeft() + " moves left belonging to "
+                    + player + ". Possible cheating attempt (or bug)?");            
         }
-        unit.setState(state);
+        // Send the updated tile anyway, we may have a synchronization issue
         sendUpdatedTileToAll(oldTile, player);
         return null;
     }
