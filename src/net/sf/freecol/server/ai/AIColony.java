@@ -362,9 +362,7 @@ public class AIColony extends AIObject {
                     + ((toolsRequiredForBuilding > colony.getGoodsCount(Goods.TOOLS)) ? AIGoods.TOOLS_FOR_BUILDING
                             + (toolsRequiredForBuilding - colony.getGoodsCount(Goods.TOOLS)) : 0);
             boolean goodsOrdered = false;
-            Iterator<Wish> wishIterator = wishes.iterator();
-            while (wishIterator.hasNext()) {
-                Wish w = wishIterator.next();
+            for (Wish w : wishes) {
                 if (w instanceof GoodsWish) {
                     GoodsWish gw = (GoodsWish) w;
                     // TODO: check for a certain required amount?
@@ -380,36 +378,10 @@ public class AIColony extends AIObject {
                 wishes.add(gw);
             }
         } else {
-            Iterator<Wish> wishIterator = wishes.iterator();
-            while (wishIterator.hasNext()) {
-                Wish w = wishIterator.next();
-                if (w instanceof GoodsWish) {
-                    GoodsWish gw = (GoodsWish) w;
-                    // TODO: check for a certain required amount?
-                    if (gw.getGoodsType() == Goods.TOOLS) {
-                        gw.dispose();
-                    }
-                }
-            }
+            disposeAllToolsGoodsWishes();
         }
 
-        Iterator<Wish> wishIterator = wishes.iterator();
-        while (wishIterator.hasNext()) {
-            Wish w = wishIterator.next();
-            if (w instanceof WorkerWish) {
-                if (!newWishes.contains(w)) {
-                    w.dispose();
-                }
-            } else if (w instanceof GoodsWish) {
-                GoodsWish gw = (GoodsWish) w;
-                // TODO: check for a certain required amount?
-                if (getColony().getGoodsCount(gw.getGoodsType()) >= 20) {
-                    gw.dispose();
-                }
-            } else {
-                logger.warning("Unknown type of Wish.");
-            }
-        }
+        disposeUnwantedWishes(newWishes);        
 
         Collections.sort(wishes, new Comparator<Wish>() {
             public int compare(Wish o, Wish p) {
@@ -419,6 +391,59 @@ public class AIColony extends AIObject {
             }
         });
 
+    }
+
+    /**
+     * Dispose all goods wishes for tools. Note the two-pass approach
+     * in order to avoid concurrent modification exceptions!
+     */
+    private void disposeAllToolsGoodsWishes() {
+        List<GoodsWish> toolsWishes = new ArrayList<GoodsWish>();
+        for (Wish w : wishes) {
+            if (w instanceof GoodsWish) {
+                GoodsWish gw = (GoodsWish) w;
+                // TODO: check for a certain required amount?
+                if (gw.getGoodsType() == Goods.TOOLS) {
+                    toolsWishes.add(gw);
+                }
+            }
+        }
+        for(GoodsWish gw : toolsWishes) {
+            gw.dispose();
+        }
+    }
+
+    /**
+     * Dispose wishes no longer relevant. For worker wishes this is all
+     * wishes not present among the new ones. For goods wishes the current
+     * criteria (TO BE CHANGED) is at least 20 of the given goods. Other
+     * types of wishes are not supported.
+     * <p>
+     * Note that the wishes are disposed in a separate pass. This is necessary
+     * or there will be a {@link ConcurrentModificationException}.
+     * 
+     * @param newWishes The new wishes.
+     */
+    private void disposeUnwantedWishes(List<Wish> newWishes) {
+        List<Wish> wishesToDispose = new ArrayList<Wish>();
+        for (Wish w : wishes) {
+            if (w instanceof WorkerWish) {
+                if (!newWishes.contains(w)) {
+                    wishesToDispose.add(w);
+                }
+            } else if (w instanceof GoodsWish) {
+                GoodsWish gw = (GoodsWish) w;
+                // TODO: check for a certain required amount?
+                if (getColony().getGoodsCount(gw.getGoodsType()) >= 20) {
+                    wishesToDispose.add(gw);
+                }
+            } else {
+                logger.warning("Unknown type of Wish: " + w + " for " + this);
+            }
+        }
+        for (Wish w : wishesToDispose) {
+            w.dispose();
+        }
     }
 
     /**
