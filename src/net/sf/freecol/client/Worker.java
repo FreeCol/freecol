@@ -1,6 +1,10 @@
 package net.sf.freecol.client;
 
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
 
 /**
  * The Worker Thread executes jobs one after another. The thread manages a queue
@@ -18,7 +22,8 @@ public final class Worker extends Thread {
 
     private volatile boolean stopRunning;
 
-
+    private static final Logger logger = Logger.getLogger(Worker.class.getName());
+    
     public Worker() {
         super("Worker");
         jobList = new LinkedBlockingQueue<Runnable>();
@@ -33,11 +38,10 @@ public final class Worker extends Thread {
                 try {
                     job.run();
                 } catch (Exception e) {
-                    System.err.println("a job produced an error:");
-                    e.printStackTrace();
+                    logger.log(Level.SEVERE, "Worker task failed!", e);
                 }
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.log(Level.INFO, "Worker interrupted, aborting!");
             }
         }
     }
