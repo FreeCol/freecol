@@ -1,4 +1,3 @@
-
 package net.sf.freecol.common.logging;
 
 import java.io.File;
@@ -11,28 +10,28 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.networking.Message;
 
-
 /**
-* The default handler for FreeCol's log records. It currently
-* only logs to a file in the format offered by TextFormatter.
-*/
+ * The default handler for FreeCol's log records. It currently only logs to a
+ * file in the format offered by TextFormatter.
+ */
 public final class DefaultHandler extends Handler {
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
-    public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
-    public static final String  REVISION = "$Revision$";
+    public static final String COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
+
+    public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
+
+    public static final String REVISION = "$Revision$";
 
     private static final String fileName = new String("FreeCol.log");
 
     private FileWriter fileWriter;
 
-    
-    
-    
 
     /**
-    * The constructor to use.
-    * @throws FreeColException In case the log file could not be created/written to.
-    */
+     * The constructor to use.
+     * 
+     * @throws FreeColException In case the log file could not be
+     *             created/written to.
+     */
     public DefaultHandler() throws FreeColException {
         File file = new File(fileName);
 
@@ -63,32 +62,26 @@ public final class DefaultHandler extends Handler {
         // We should use XMLFormatter here in the future
         // or maybe a self-made HTMLFormatter.
         setFormatter(new TextFormatter());
-        
+
         try {
-            String str = "FreeCol game version: " + FreeCol.getVersion() + "\n" 
-                        + "FreeCol protocol version: " + Message.getFreeColProtocolVersion() + "\n\n"
-                        + "Java vendor: " + System.getProperty("java.vendor") + "\n"
-                        + "Java version: " + System.getProperty("java.version") + "\n"
-                        + "Java WM name: " + System.getProperty("java.vm.name") + "\n"
-                        + "Java WM vendor: " + System.getProperty("java.vm.vendor") + "\n"
-                        + "Java WM version: " + System.getProperty("java.vm.version") + "\n\n"
-                        + "OS name: " + System.getProperty("os.name") + "\n"
-                        + "OS architecture: " + System.getProperty("os.arch") + "\n"
-                        + "OS version: " + System.getProperty("os.version") + "\n\n";
+            String str = "FreeCol game version: " + FreeCol.getVersion() + "\n" + "FreeCol protocol version: "
+                    + Message.getFreeColProtocolVersion() + "\n\n" + "Java vendor: "
+                    + System.getProperty("java.vendor") + "\n" + "Java version: " + System.getProperty("java.version")
+                    + "\n" + "Java WM name: " + System.getProperty("java.vm.name") + "\n" + "Java WM vendor: "
+                    + System.getProperty("java.vm.vendor") + "\n" + "Java WM version: "
+                    + System.getProperty("java.vm.version") + "\n\n" + "OS name: " + System.getProperty("os.name")
+                    + "\n" + "OS architecture: " + System.getProperty("os.arch") + "\n" + "OS version: "
+                    + System.getProperty("os.version") + "\n\n";
             fileWriter.write(str, 0, str.length());
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-
-
-
-
-
     /**
-    * Closes this handler so that it will stop handling log records.
-    */
+     * Closes this handler so that it will stop handling log records.
+     */
+    @Override
     public void close() {
         try {
             fileWriter.close();
@@ -97,10 +90,10 @@ public final class DefaultHandler extends Handler {
         }
     }
 
-
     /**
-    * Flushes the data that this handler has logged.
-    */
+     * Flushes the data that this handler has logged.
+     */
+    @Override
     public void flush() {
         try {
             fileWriter.flush();
@@ -109,13 +102,13 @@ public final class DefaultHandler extends Handler {
         }
     }
 
-
     /**
-    * Publishes the given LogRecord by writing its data to a file using
-    * a TextFormatter.
-    *
-    * @param record The log record to publish.
-    */
+     * Publishes the given LogRecord by writing its data to a file using a
+     * TextFormatter.
+     * 
+     * @param record The log record to publish.
+     */
+    @Override
     public void publish(LogRecord record) {
         if (record.getLevel().intValue() < getLevel().intValue()) {
             return;

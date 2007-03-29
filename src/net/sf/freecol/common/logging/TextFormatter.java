@@ -30,6 +30,7 @@ final class TextFormatter extends Formatter {
      * @param record The log record whose data needs to be formatted.
      * @return The log record's data as a string.
      */
+    @Override
     public String format(LogRecord record) {
         StringBuilder result = new StringBuilder();
         result.append(record.getSourceClassName()).append(' ').append(record.getSourceMethodName());
