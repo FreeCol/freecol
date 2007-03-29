@@ -138,9 +138,6 @@ public class IndianSettlement extends Settlement {
      */
     public IndianSettlement(Game game, Player player, Tile tile, int tribe, int kind,
             boolean isCapital, int learnableSkill, boolean isVisited, Unit missionary) {
-
-        // TODO: Change 'null' to the indian AI-player:
-
         super(game, player, tile);
 
         if (tile == null) {
