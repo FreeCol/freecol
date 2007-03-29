@@ -354,17 +354,6 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     }
 
     /**
-     * Checks if this building is of a given type.
-     * 
-     * @param type The type.
-     * @return <i>true</i> if the building is of the given type and <i>false</i>
-     *         otherwise.
-     */
-    public boolean isType(int type) {
-        return getType() == type;
-    }
-
-    /**
      * Gets the maximum number of units allowed in this <code>Building</code>.
      * 
      * @return The number.
@@ -644,6 +633,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     /**
      * Prepares this <code>Building</code> for a new turn.
      */
+    @Override
     public void newTurn() {
         if ((level == NOT_BUILT) && (type != CHURCH))
             return; // Don't do anything if the building does not exist.
@@ -974,6 +964,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * Disposes this building. All units that currently has this
      * <code>Building as it's location will be disposed</code>.
      */
+    @Override
     public void dispose() {
         for (int i = 0; i < units.size(); i++) {
             units.get(i).dispose();
@@ -1005,6 +996,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
      */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
             throws XMLStreamException {
         // Start element:
@@ -1032,6 +1024,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * @param in The input stream with the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
+    @Override
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setID(in.getAttributeValue(null, "ID"));
 
