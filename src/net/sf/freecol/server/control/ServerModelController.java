@@ -368,6 +368,16 @@ public class ServerModelController implements ModelController {
         return new TradeRoute(game, name, player);
     }
 
+    /**
+     * Check if game object should receive newTurn call. On the server side
+     * all objects should get this.
+     * 
+     * @param freeColGameObject The game object.
+     * @return true.
+     */
+    public boolean shouldCallNewTurn(FreeColGameObject freeColGameObject) {
+        return true;
+    }
 
     /**
      * A single entry in the task register.

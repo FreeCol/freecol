@@ -3,14 +3,17 @@
 package net.sf.freecol.client.control;
 
 import java.util.ArrayList;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.common.PseudoRandom;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelController;
+import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
@@ -206,6 +209,20 @@ public class ClientModelController implements ModelController {
         TradeRoute tradeRoute = new TradeRoute(game, (Element) reply.getElementsByTagName(TradeRoute.getXMLElementTagName()).item(0));
 
         return tradeRoute;
+    }
+
+    /**
+     * Check if game object should receive newTurn call.
+     * 
+     * @param freeColGameObject The game object.
+     * @return true if owned by client player or not ownable.
+     */
+    public boolean shouldCallNewTurn(FreeColGameObject freeColGameObject) {        
+        if(freeColGameObject instanceof Ownable) {
+            Ownable o = (Ownable) freeColGameObject;
+            return o.getOwner() == freeColClient.getMyPlayer();
+        }
+        return true;            
     }        
 
 }

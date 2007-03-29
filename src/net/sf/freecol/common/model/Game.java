@@ -828,6 +828,7 @@ public class Game extends FreeColGameObject {
         ArrayList<FreeColGameObject> later2 = new ArrayList<FreeColGameObject>();
         while (iterator.hasNext()) {
             FreeColGameObject freeColGameObject = iterator.next();
+                        
             /*
              * Take the settlements after the buildings and all other objects
              * before the buildings. If changes are made: ColonyTile should have
@@ -859,7 +860,9 @@ public class Game extends FreeColGameObject {
     private void callNewTurn(FreeColGameObject freeColGameObject) {
         try {
             if(! (freeColGameObject.isUninitialized() || freeColGameObject.isDisposed())) {
-                freeColGameObject.newTurn();
+                if(getModelController().shouldCallNewTurn(freeColGameObject)) {
+                    freeColGameObject.newTurn();                    
+                }
             }
         } catch (Exception e) {
             logger.log(Level.SEVERE, "New turn failed for " +
