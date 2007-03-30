@@ -185,6 +185,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     /**
      * 
      */
+    @Override
     public void requestFocus() {
         ok.requestFocus();
     }
