@@ -37,8 +37,6 @@ public final class Specification {
     private final List<UnitType> unitTypeList;
 
 
-    // ----------------------------------------------------------- constructors
-
     public Specification() {
 
         buildingTypeList = new ArrayList<BuildingType>();
@@ -68,24 +66,22 @@ public final class Specification {
                         }
                     };
 
-                    makeListFromXml(buildingTypeList, xml, factory);
+                    buildingTypeList.addAll(makeListFromXml(xml, factory));
                 } else if ("tile-types".equals(childName)) {
 
                     ObjectFactory<TileType> factory = new ObjectFactory<TileType>() {
                         public TileType objectFrom(Node xml) {
-
                             TileType tileType = new TileType();
                             tileType.readFromXmlElement(xml);
                             return tileType;
                         }
                     };
 
-                    makeListFromXml(tileTypeList, xml, factory);
+                    tileTypeList.addAll(makeListFromXml(xml, factory));
                 } else if ("goods-types".equals(childName)) {
 
                     ObjectFactory<GoodsType> factory = new ObjectFactory<GoodsType>() {
                         public GoodsType objectFrom(Node xml) {
-
                             GoodsType goodsType = new GoodsType();
                             goodsType.readFromXmlElement(xml, goodsTypeByRef);
                             goodsTypeByRef.put(Xml.attribute(xml, "ref"), goodsType);
@@ -93,19 +89,18 @@ public final class Specification {
                         }
                     };
 
-                    makeListFromXml(goodsTypeList, xml, factory);
+                    goodsTypeList.addAll(makeListFromXml(xml, factory));
                 } else if ("unit-types".equals(childName)) {
 
                     ObjectFactory<UnitType> factory = new ObjectFactory<UnitType>() {
                         public UnitType objectFrom(Node xml) {
-
                             UnitType unitType = new UnitType();
                             unitType.readFromXmlElement(xml, goodsTypeByRef);
                             return unitType;
                         }
                     };
 
-                    makeListFromXml(unitTypeList, xml, factory);
+                    unitTypeList.addAll(makeListFromXml(xml, factory));
                 } else {
                     throw new RuntimeException("unexpected: " + xml);
                 }
@@ -128,24 +123,6 @@ public final class Specification {
         };
 
         Xml.forEachChild(specificationDocument, documentMethod);
-    }
-
-    // ------------------------------------------------------------ API methods
-
-    public List<BuildingType> getBuildingTypes() {
-        return buildingTypeList;
-    }
-
-    public List<TileType> getTileTypes() {
-        return tileTypeList;
-    }
-
-    public List<GoodsType> getGoodsTypes() {
-        return goodsTypeList;
-    }
-
-    public List<UnitType> getUnitTypes() {
-        return unitTypeList;
     }
 
     public int numberOfBuildingTypes() {
@@ -188,28 +165,43 @@ public final class Specification {
         return unitTypeList.get(unitTypeIndex);
     }
 
-    // -------------------------------------------------------- support methods
-
-    private <T> void makeListFromXml(final List<T> list, Node xml, final ObjectFactory<T> factory) {
-
+    /**
+     * Takes an XML node with child nodes that represent objects of the type
+     * <code>T</code> and returns a list of the deserialized objects of type
+     * <code>T</code>.
+     * 
+     * @param <T> the type of objects to deserialize
+     * @param xml the XML node to whose children to deserialize.
+     * @param factory the factory used to deserialize the object
+     * @return a list containing all the child elements of the node deserialized
+     */
+    private <T> List<T> makeListFromXml(Node xml, final ObjectFactory<T> factory) {
+        final ArrayList<T> list = new ArrayList<T>();
         Xml.Method method = new Xml.Method() {
             public void invokeOn(Node xml) {
-
-                // construct an object from "xml" and add it to the list
                 list.add(factory.objectFrom(xml));
             }
         };
-
-        // for each child element of "xml"..
         Xml.forEachChild(xml, method);
+        return list;
     }
 
 
-    // ----------------------------------------------------------- nested types
+    /**
+     * The interface that needs to be implemented and passed to
+     * <code>makeListFromXml</code> to deserialize the objects from the XML
+     * file.
+     * 
+     * @param <T> the type object that will be deserialized.
+     */
+    static interface ObjectFactory<T> {
 
-    interface ObjectFactory<T> {
-
+        /**
+         * Converts an XML node to an object of the generic type of the factory.
+         * 
+         * @param xml an XML node to convert to an object
+         * @return the object
+         */
         public T objectFrom(Node xml);
     }
-
 }
