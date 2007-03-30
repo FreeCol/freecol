@@ -30,7 +30,7 @@ public class FreeColMenuTest implements ActionListener, ItemListener {
 
         try {
             ImageLibrary lib = new ImageLibrary("/home/johnathanj/work/freecol/freecol/data/");
-            FreeColClient client = new FreeColClient(true, new Rectangle(-1, -1), lib, null, null, false); 
+            FreeColClient client = new FreeColClient(true, new Rectangle(-1, -1), lib, null, null); 
             
             //Create the menu bar.
             menuBar = new FreeColMenuBar(client);
