@@ -1,5 +1,6 @@
 package net.sf.freecol.client.control;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -58,11 +59,10 @@ public final class InGameInputHandler extends InputHandler {
      * @param element The root element of the message.
      * @return The reply.
      */
-    public synchronized Element handle(Connection connection, Element element) {
+    public Element handle(Connection connection, Element element) {
         Element reply = null;
 
         if (element != null) {
-
             String type = element.getTagName();
 
             if (type.equals("update")) {
@@ -111,7 +111,6 @@ public final class InGameInputHandler extends InputHandler {
                 logger.warning("Message is of unsupported type \"" + type + "\".");
             }
         }
-
         return reply;
     }
 
@@ -122,20 +121,17 @@ public final class InGameInputHandler extends InputHandler {
      *            holds all the information.
      */
     private Element reconnect(Element element) {
-        final FreeColClient freeColClient = getFreeColClient();
-        if (freeColClient.getCanvas().showConfirmDialog("reconnect.text", "reconnect.yes", "reconnect.no")) {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    freeColClient.getConnectController().reconnect();
-                }
-            });
+        if (new ShowConfirmDialogSwingTask("reconnect.text", "reconnect.yes", "reconnect.no").confirm()) {
+            new ReconnectSwingTask().invokeLater();
         } else {
+            // This fairly drastic operation can be done in any thread,
+            // no need to use SwingUtilities.
             getFreeColClient().quit();
         }
-
         return null;
     }
-
+    
+    
     /**
      * Handles an "update"-message.
      * 
@@ -145,25 +141,21 @@ public final class InGameInputHandler extends InputHandler {
      */
     public Element update(Element updateElement) {
         Game game = getFreeColClient().getGame();
-
         NodeList nodeList = updateElement.getChildNodes();
+        
         for (int i = 0; i < nodeList.getLength(); i++) {
             Element element = (Element) nodeList.item(i);
-            FreeColGameObject fcgo = game.getFreeColGameObject(element.getAttribute("ID"));
-
+            FreeColGameObject fcgo = game.getFreeColGameObjectSafely(element.getAttribute("ID"));
             if (fcgo != null) {
                 fcgo.readFromXMLElement(element);
             } else {
                 logger.warning("Could not find 'FreeColGameObject' with ID: " + element.getAttribute("ID"));
             }
         }
-
-        // TODO: Refresh only the updated tiles:
-        getFreeColClient().getCanvas().refresh();
-
+        new RefreshCanvasSwingTask().invokeLater();
         return null;
     }
-
+    
     /**
      * Handles a "remove"-message.
      * 
@@ -185,8 +177,7 @@ public final class InGameInputHandler extends InputHandler {
             }
         }
 
-        // TODO: Refresh only the updated tiles:
-        getFreeColClient().getCanvas().refresh();
+        new RefreshCanvasSwingTask().invokeLater();
         return null;
     }
 
@@ -365,6 +356,7 @@ public final class InGameInputHandler extends InputHandler {
 
         unit.attack(defender, result, plunderGold);
 
+        // TODO: Erik - invoke in event dispatch thread
         Canvas canvas = getFreeColClient().getCanvas();
         switch (result) {
         case Unit.ATTACK_EVADES:
@@ -422,8 +414,7 @@ public final class InGameInputHandler extends InputHandler {
             defender.dispose();
         }
 
-        getFreeColClient().getCanvas().refresh();
-
+        new RefreshCanvasSwingTask().invokeLater();
         return null;
     }
 
@@ -444,8 +435,11 @@ public final class InGameInputHandler extends InputHandler {
         freeColClient.getInGameController().setCurrentPlayer(currentPlayer);
         logger.finest("Succeeded in setting currentPlayer to " + currentPlayer.getName());
 
+        // TODO: Erik - run in event dispatch thread
         freeColClient.getCanvas().refresh();
         freeColClient.getCanvas().requestFocus();
+
+        logger.finest("Repainted after setting currentPlayer to " + currentPlayer.getName());
 
         return null;
     }
@@ -458,8 +452,9 @@ public final class InGameInputHandler extends InputHandler {
      */
     private Element newTurn(Element newTurnElement) {
         getFreeColClient().getGame().newTurn();
+        
+        // TODO: Erik - run in event thread
         getFreeColClient().getCanvas().updateJMenuBar();
-
         return null;
     }
 
@@ -506,6 +501,7 @@ public final class InGameInputHandler extends InputHandler {
 
         Player winner = (Player) game.getFreeColGameObject(element.getAttribute("winner"));
         if (winner == freeColClient.getMyPlayer()) {
+            // TODO: Erik - event thread
             freeColClient.getCanvas().showVictoryPanel();
         } // else: The client has already received the message of defeat.
 
@@ -520,13 +516,12 @@ public final class InGameInputHandler extends InputHandler {
      */
     private Element chat(Element element) {
         Game game = getFreeColClient().getGame();
-
-        Player sender = (Player) game.getFreeColGameObject(element.getAttribute("sender"));
+        Player sender = (Player) game.getFreeColGameObjectSafely(element.getAttribute("sender"));        
         String message = element.getAttribute("message");
         boolean privateChat = Boolean.valueOf(element.getAttribute("privateChat")).booleanValue();
 
+        // TODO: Erik - Swing thread
         getFreeColClient().getCanvas().displayChatMessage(sender, message, privateChat);
-
         return null;
     }
 
@@ -539,6 +534,7 @@ public final class InGameInputHandler extends InputHandler {
     private Element error(Element element) {
         Canvas canvas = getFreeColClient().getCanvas();
 
+        // TODO: Erik - Swing thread
         if (element.hasAttribute("messageID")) {
             canvas.errorMessage(element.getAttribute("messageID"), element.getAttribute("message"));
         } else {
@@ -575,13 +571,12 @@ public final class InGameInputHandler extends InputHandler {
             possibleFoundingFathers[i] = Integer.parseInt(element.getAttribute("foundingFather" + Integer.toString(i)));
         }
 
+        // TODO: Erik - Swing thread        
         int foundingFather = getFreeColClient().getCanvas().showChooseFoundingFatherDialog(possibleFoundingFathers);
 
         Element reply = Message.createNewRootElement("chosenFoundingFather");
         reply.setAttribute("foundingFather", Integer.toString(foundingFather));
-
         getFreeColClient().getMyPlayer().setCurrentFather(foundingFather);
-
         return reply;
     }
 
@@ -632,6 +627,8 @@ public final class InGameInputHandler extends InputHandler {
         Element goodsElement = Message.getChildElement(element, Goods.getXMLElementTagName());
         if (goodsElement == null) {
             gold = Integer.parseInt(element.getAttribute("gold"));
+
+            // TODO: Erik - Swing thread            
             accepted = getFreeColClient().getCanvas().showConfirmDialog(
                     "indianDemand.gold.text",
                     "indianDemand.gold.yes",
@@ -645,6 +642,7 @@ public final class InGameInputHandler extends InputHandler {
             goods = new Goods(game, goodsElement);
 
             if (goods.getType() == Goods.FOOD) {
+                // TODO: Erik - Swing thread
                 accepted = getFreeColClient().getCanvas().showConfirmDialog(
                         "indianDemand.food.text",
                         "indianDemand.food.yes",
@@ -652,6 +650,7 @@ public final class InGameInputHandler extends InputHandler {
                         new String[][] { { "%nation%", unit.getOwner().getNationAsString() },
                                 { "%colony%", colony.getName() } });
             } else {
+                // TODO: Erik - Swing thread
                 accepted = getFreeColClient().getCanvas().showConfirmDialog(
                         "indianDemand.other.text",
                         "indianDemand.other.yes",
@@ -691,14 +690,15 @@ public final class InGameInputHandler extends InputHandler {
             reply = Message.createNewRootElement("acceptTax");
             String[][] replace = new String[][] { { "%replace%", element.getAttribute("amount") },
                     { "%goods%", element.getAttribute("goods") }, };
+            // TODO: Erik - Swing thread
             if (freeColClient.getCanvas().showMonarchPanel(action, replace)) {
                 int amount = new Integer(element.getAttribute("amount")).intValue();
                 freeColClient.getMyPlayer().setTax(amount);
                 reply.setAttribute("accepted", String.valueOf(true));
+                // TODO: Erik - Swing thread
                 freeColClient.getCanvas().updateJMenuBar();
             } else {
                 reply.setAttribute("accepted", String.valueOf(false));
-
             }
             return reply;
         case Monarch.ADD_TO_REF:
@@ -708,11 +708,13 @@ public final class InGameInputHandler extends InputHandler {
                 units[x] = Integer.parseInt(arrayElement.getAttribute("x" + Integer.toString(x)));
             }
             monarch.addToREF(units);
+            // TODO: Erik - Swing thread
             canvas.showMonarchPanel(action, new String[][] { { "%addition%", monarch.getName(units) } });
             break;
         case Monarch.DECLARE_WAR:
             int nation = Integer.parseInt(element.getAttribute("nation"));
             player.setStance(game.getPlayer(nation), Player.WAR);
+            // TODO: Erik - Swing thread
             canvas.showMonarchPanel(action, new String[][] { { "%nation%", Player.getNationAsString(nation) } });
             break;
         case Monarch.SUPPORT_LAND:
@@ -729,6 +731,7 @@ public final class InGameInputHandler extends InputHandler {
                 }
                 player.getEurope().add(newUnit);
             }
+            // TODO: Erik - Swing thread
             if (!canvas.getColonyPanel().isShowing()
                     && (action == Monarch.ADD_UNITS || !canvas.showMonarchPanel(action, null))) {
                 canvas.showEuropePanel();
@@ -741,6 +744,7 @@ public final class InGameInputHandler extends InputHandler {
             for (int x = 0; x < mercenaries.length; x++) {
                 mercenaries[x] = Integer.parseInt(mercenaryElement.getAttribute("x" + Integer.toString(x)));
             }
+            // TODO: Erik - Swing thread
             if (freeColClient.getCanvas().showMonarchPanel(
                     action,
                     new String[][] { { "%gold%", element.getAttribute("price") },
@@ -767,8 +771,6 @@ public final class InGameInputHandler extends InputHandler {
         final FreeColClient freeColClient = getFreeColClient();
         Game game = freeColClient.getGame();
         Player player = freeColClient.getMyPlayer();
-        Canvas canvas = freeColClient.getCanvas();
-
         int stance = Integer.parseInt(element.getAttribute("stance"));
         Player first = (Player) game.getFreeColGameObject(element.getAttribute("first"));
         Player second = (Player) game.getFreeColGameObject(element.getAttribute("second"));
@@ -785,11 +787,12 @@ public final class InGameInputHandler extends InputHandler {
         first.setStance(second, stance);
 
         if (stance == Player.WAR) {
+            // TODO: Erik - Swing thread
             if (player.equals(second)) {
-                canvas.showInformationMessage("model.diplomacy.war.declared", new String[][] { { "%nation%",
+                freeColClient.getCanvas().showInformationMessage("model.diplomacy.war.declared", new String[][] { { "%nation%",
                         first.getNationAsString() } });
             } else {
-                canvas.showInformationMessage("model.diplomacy.war.others", new String[][] {
+                freeColClient.getCanvas().showInformationMessage("model.diplomacy.war.others", new String[][] {
                         { "%attacker%", first.getNationAsString() }, { "%defender%", second.getNationAsString() } });
             }
         }
@@ -824,6 +827,7 @@ public final class InGameInputHandler extends InputHandler {
 
         if (goodsElement == null) {
             // player has no colony or nothing to trade
+            // TODO: Erik - Swing thread
             freeColClient.getCanvas().showMonarchPanel(Monarch.WAIVE_TAX, null);
         } else {
             Goods goods = new Goods(game, goodsElement);
@@ -842,12 +846,13 @@ public final class InGameInputHandler extends InputHandler {
                 message = "model.monarch.bostonTeaParty.harbour";
             }
 
+            // TODO: Erik - Swing thread
             freeColClient.getCanvas().showModelMessage(
                     new ModelMessage(colony, message, new String[][] { { "%colony%", colony.getName() },
                             { "%amount%", String.valueOf(goods.getAmount()) }, { "%goods%", goods.getName() } },
                             ModelMessage.WARNING));
         }
-
+        
         return null;
     }
 
@@ -948,5 +953,127 @@ public final class InGameInputHandler extends InputHandler {
         }
         game.addModelMessage(m);
         return null;
+    }
+
+
+    /**
+     * This utility class is the base class for tasks that need to run
+     * in the event dispatch thread.
+     */
+    abstract static class SwingTask implements Runnable {
+        
+        /**
+         * Run the task and wait for it to complete.
+         * 
+         * @return return value from {@link #doWork()}.
+         * @throws InvocationTargetException on unexpected exceptions.
+         */
+        public Object invokeAndWait() throws InvocationTargetException {
+            try {
+                SwingUtilities.invokeAndWait(this);
+            } catch (InterruptedException e) {
+                throw new InvocationTargetException(e);
+            }
+            return _result;
+        }
+        
+        /**
+         * Run the task at some later time. Any exceptions will occur in the
+         * event dispatch thread. The return value will be set, but at
+         * present there is no good way to know if it is valid yet.
+         */
+        public void invokeLater() {
+            SwingUtilities.invokeLater(this);
+        }
+
+        /**
+         * Run method, call {@link #doWork()} and save the return value.
+         */
+        public final synchronized void run() {
+            _result = doWork();
+        }
+        
+        /**
+         * Get the return vale from {@link #doWork()}.
+         * 
+         * @return result.
+         */
+        public synchronized Object getResult() {
+            return _result;
+        }
+        
+        /**
+         * Override this method to do the actual work.
+         * 
+         * @return result.
+         */
+        protected abstract Object doWork();
+        
+        private Object _result;
+    }
+    
+    /**
+     * This task refreshes the entire canvas.
+     */
+    class RefreshCanvasSwingTask extends SwingTask {
+        protected Object doWork() {
+            getFreeColClient().getCanvas().refresh();
+            return null;
+        }
+    }
+
+    /**
+     * This task reconnects to the server. 
+     */
+    class ReconnectSwingTask extends SwingTask {
+        protected Object doWork() {
+            getFreeColClient().getConnectController().reconnect();
+            return null;
+        }
+    }
+
+    /**
+     * This class shows a dialog and saves the answer (ok/cancel). 
+     */
+    class ShowConfirmDialogSwingTask extends SwingTask {
+
+        /**
+         * Constructor.
+         * 
+         * @param text The key for the question.
+         * @param okText The key for the OK button.
+         * @param cancelText The key for the Cancel button.
+         */
+        public ShowConfirmDialogSwingTask(String text, String okText, String cancelText) {
+            _text = text;
+            _okText = okText;
+            _cancelText = cancelText;
+        }
+        
+        /**
+         * Show dialog and wait for selection.
+         * 
+         * @return true if OK, false if Cancel.
+         */
+        public boolean confirm() {
+            try {
+                Object result = invokeAndWait();
+                return ((Boolean)result).booleanValue();
+            } catch (InvocationTargetException e) {
+                if(e.getCause() instanceof RuntimeException) {
+                    throw (RuntimeException) e.getCause();
+                } else {
+                    throw new RuntimeException(e.getCause());
+                }
+            }
+        }
+        
+        protected Object doWork() {
+            return Boolean.valueOf(getFreeColClient().getCanvas().showConfirmDialog(_text, _okText, _cancelText));
+        }
+        
+        private String _text;
+        private String _okText;
+        private String _cancelText;
     }
 }
