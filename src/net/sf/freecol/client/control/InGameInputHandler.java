@@ -200,35 +200,25 @@ public final class InGameInputHandler extends InputHandler {
         Game game = getFreeColClient().getGame();
         Map map = game.getMap();
 
-        Player currentPlayer = getFreeColClient().getMyPlayer();
-
         int direction = Integer.parseInt(opponentMoveElement.getAttribute("direction"));
 
         if (!opponentMoveElement.hasAttribute("tile")) {
-            final Unit unit = (Unit) game.getFreeColGameObject(opponentMoveElement.getAttribute("unit"));
+            final Unit unit = (Unit) game.getFreeColGameObjectSafely(opponentMoveElement.getAttribute("unit"));
 
             if (unit == null) {
                 logger.warning("Could not find the 'unit' in 'opponentMove'. Unit ID: "
                         + opponentMoveElement.getAttribute("unit"));
                 return null;
             }
-
             if (unit.getTile() == null) {
-                logger.warning("unit.getTile() == null");
+                logger.warning("Ignoring opponentMove, unit " + unit.getID() + " has no tile!");
                 return null;
             }
 
-            if (currentPlayer.canSee(map.getNeighbourOrNull(direction, unit.getTile()))) {
+            final Tile newTile = map.getNeighbourOrNull(direction, unit.getTile());
+            if (getFreeColClient().getMyPlayer().canSee(newTile)) {
                 final Tile oldTile = unit.getTile();
-                try {
-                    unit.move(direction);
-                } catch (IllegalStateException e) {
-                    logger.log(Level.WARNING, "Failed to move unit from (" + unit.getTile().getPosition().getX() + ", "
-                            + unit.getTile().getPosition().getY() + ") direction " + direction, e);
-                    throw e;
-                }
-                final Tile newTile = unit.getTile();
-
+                unit.moveToTile(newTile);                
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         getFreeColClient().getCanvas().refreshTile(oldTile);
@@ -239,7 +229,6 @@ public final class InGameInputHandler extends InputHandler {
             } else {
                 final Tile oldTile = unit.getTile();
                 unit.dispose();
-
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         getFreeColClient().getCanvas().refreshTile(oldTile);
@@ -254,7 +243,7 @@ public final class InGameInputHandler extends InputHandler {
                 logger.warning("unitElement == null");
                 throw new NullPointerException("unitElement == null");
             }
-            Unit u = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
+            Unit u = (Unit) game.getFreeColGameObjectSafely(unitElement.getAttribute("ID"));
             if (u == null) {
                 u = new Unit(game, unitElement);
             } else {
@@ -264,7 +253,7 @@ public final class InGameInputHandler extends InputHandler {
 
             if (opponentMoveElement.hasAttribute("inUnit")) {
                 String inUnitID = opponentMoveElement.getAttribute("inUnit");
-                Unit location = (Unit) game.getFreeColGameObject(inUnitID);
+                Unit inUnit = (Unit) game.getFreeColGameObjectSafely(inUnitID);
 
                 NodeList units = opponentMoveElement.getElementsByTagName(Unit.getXMLElementTagName());
                 Element locationElement = null;
@@ -274,10 +263,10 @@ public final class InGameInputHandler extends InputHandler {
                         locationElement = element;
                 }
                 if (locationElement != null) {
-                    if (location == null) {
-                        location = new Unit(game, locationElement);
+                    if (inUnit == null) {
+                        inUnit = new Unit(game, locationElement);
                     } else {
-                        location.readFromXMLElement(locationElement);
+                        inUnit.readFromXMLElement(locationElement);
                     }
                 }
             }
