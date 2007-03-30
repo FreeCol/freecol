@@ -65,6 +65,10 @@ public final class InGameInputHandler extends InputHandler {
         if (element != null) {
             String type = element.getTagName();
 
+            if (logger.isLoggable(Level.FINEST)) {
+                logger.log(Level.FINEST, "Received message " + type);
+            }
+
             if (type.equals("update")) {
                 reply = update(element);
             } else if (type.equals("remove")) {
@@ -110,7 +114,14 @@ public final class InGameInputHandler extends InputHandler {
             } else {
                 logger.warning("Message is of unsupported type \"" + type + "\".");
             }
+
+            if (logger.isLoggable(Level.FINEST)) {
+                logger.log(Level.FINEST, "Handled message " + type);
+            }
+        } else {
+            logger.warning("Received empty (null) message!");
         }
+
         return reply;
     }
 
@@ -130,8 +141,7 @@ public final class InGameInputHandler extends InputHandler {
         }
         return null;
     }
-    
-    
+
     /**
      * Handles an "update"-message.
      * 
@@ -142,7 +152,7 @@ public final class InGameInputHandler extends InputHandler {
     public Element update(Element updateElement) {
         Game game = getFreeColClient().getGame();
         NodeList nodeList = updateElement.getChildNodes();
-        
+
         for (int i = 0; i < nodeList.getLength(); i++) {
             Element element = (Element) nodeList.item(i);
             FreeColGameObject fcgo = game.getFreeColGameObjectSafely(element.getAttribute("ID"));
@@ -155,7 +165,7 @@ public final class InGameInputHandler extends InputHandler {
         new RefreshCanvasSwingTask().invokeLater();
         return null;
     }
-    
+
     /**
      * Handles a "remove"-message.
      * 
@@ -209,7 +219,7 @@ public final class InGameInputHandler extends InputHandler {
             final Tile newTile = map.getNeighbourOrNull(direction, unit.getTile());
             if (getFreeColClient().getMyPlayer().canSee(newTile)) {
                 final Tile oldTile = unit.getTile();
-                unit.moveToTile(newTile);                
+                unit.moveToTile(newTile);
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         getFreeColClient().getCanvas().refreshTile(oldTile);
@@ -356,46 +366,42 @@ public final class InGameInputHandler extends InputHandler {
 
         unit.attack(defender, result, plunderGold);
 
-        // TODO: Erik - invoke in event dispatch thread
-        Canvas canvas = getFreeColClient().getCanvas();
         switch (result) {
         case Unit.ATTACK_EVADES:
             if (unit.isNaval()) {
                 if (colony == null) {
-                    canvas
-                            .showInformationMessage("model.unit.shipEvaded", new String[][] {
-                                    { "%ship%", defender.getName() },
-                                    { "%nation%", defender.getOwner().getNationAsString() } });
+                    new ShowInformationMessageSwingTask("model.unit.shipEvaded", new String[][] {
+                            { "%ship%", defender.getName() }, { "%nation%", defender.getOwner().getNationAsString() } })
+                            .show();
                 } else {
-                    canvas
-                            .showInformationMessage("model.unit.shipEvadedBombardment", new String[][] {
-                                    { "%colony%", colony.getName() }, { "%building%", building.getName() },
-                                    { "%ship%", defender.getName() },
-                                    { "%nation%", defender.getOwner().getNationAsString() } });
+                    new ShowInformationMessageSwingTask("model.unit.shipEvadedBombardment", new String[][] {
+                            { "%colony%", colony.getName() }, { "%building%", building.getName() },
+                            { "%ship%", defender.getName() }, { "%nation%", defender.getOwner().getNationAsString() } })
+                            .show();
                 }
             }
             break;
         case Unit.ATTACK_LOSS:
             if (unit.isNaval()) {
                 if (colony == null) {
-                    canvas.showInformationMessage("model.unit.enemyShipDamaged", new String[][] {
-                            { "%ship%", unit.getName() }, { "%nation%", unit.getOwner().getNationAsString() } });
+                    new ShowInformationMessageSwingTask("model.unit.enemyShipDamaged", new String[][] {
+                            { "%ship%", unit.getName() }, { "%nation%", unit.getOwner().getNationAsString() } }).show();
                 } else {
-                    canvas.showInformationMessage("model.unit.enemyShipDamagedByBombardment", new String[][] {
+                    new ShowInformationMessageSwingTask("model.unit.enemyShipDamagedByBombardment", new String[][] {
                             { "%colony%", colony.getName() }, { "%building%", building.getName() },
-                            { "%ship%", unit.getName() }, { "%nation%", unit.getOwner().getNationAsString() } });
+                            { "%ship%", unit.getName() }, { "%nation%", unit.getOwner().getNationAsString() } }).show();
                 }
             }
             break;
         case Unit.ATTACK_GREAT_LOSS:
             if (unit.isNaval()) {
                 if (colony == null) {
-                    canvas.showInformationMessage("model.unit.shipSunk", new String[][] { { "%ship%", unit.getName() },
-                            { "%nation%", unit.getOwner().getNationAsString() } });
+                    new ShowInformationMessageSwingTask("model.unit.shipSunk", new String[][] {
+                            { "%ship%", unit.getName() }, { "%nation%", unit.getOwner().getNationAsString() } }).show();
                 } else {
-                    canvas.showInformationMessage("model.unit.shipSunkByBombardment", new String[][] {
+                    new ShowInformationMessageSwingTask("model.unit.shipSunkByBombardment", new String[][] {
                             { "%colony%", colony.getName() }, { "%building%", building.getName() },
-                            { "%ship%", unit.getName() }, { "%nation%", unit.getOwner().getNationAsString() } });
+                            { "%ship%", unit.getName() }, { "%nation%", unit.getOwner().getNationAsString() } }).show();
                 }
             }
             break;
@@ -425,7 +431,6 @@ public final class InGameInputHandler extends InputHandler {
      *            XML tree) that holds all the information.
      */
     private Element setCurrentPlayer(Element setCurrentPlayerElement) {
-        logger.finest("Received setCurrentPlayerElement.");
         FreeColClient freeColClient = getFreeColClient();
         Game game = freeColClient.getGame();
 
@@ -435,12 +440,7 @@ public final class InGameInputHandler extends InputHandler {
         freeColClient.getInGameController().setCurrentPlayer(currentPlayer);
         logger.finest("Succeeded in setting currentPlayer to " + currentPlayer.getName());
 
-        // TODO: Erik - run in event dispatch thread
-        freeColClient.getCanvas().refresh();
-        freeColClient.getCanvas().requestFocus();
-
-        logger.finest("Repainted after setting currentPlayer to " + currentPlayer.getName());
-
+        new RefreshCanvasSwingTask(true).invokeLater();
         return null;
     }
 
@@ -452,9 +452,7 @@ public final class InGameInputHandler extends InputHandler {
      */
     private Element newTurn(Element newTurnElement) {
         getFreeColClient().getGame().newTurn();
-        
-        // TODO: Erik - run in event thread
-        getFreeColClient().getCanvas().updateJMenuBar();
+        new UpdateMenuBarSwingTask().invokeLater();
         return null;
     }
 
@@ -471,16 +469,15 @@ public final class InGameInputHandler extends InputHandler {
         player.setDead(true);
 
         if (player == freeColClient.getMyPlayer()) {
-            Canvas canvas = freeColClient.getCanvas();
             if (freeColClient.isSingleplayer()) {
-                if (!canvas.showConfirmDialog("defeatedSingleplayer.text", "defeatedSingleplayer.yes",
-                        "defeatedSingleplayer.no")) {
+                if (!new ShowConfirmDialogSwingTask("defeatedSingleplayer.text", "defeatedSingleplayer.yes",
+                        "defeatedSingleplayer.no").confirm()) {
                     freeColClient.quit();
                 } else {
                     freeColClient.getFreeColServer().enterRevengeMode(player.getUsername());
                 }
             } else {
-                if (!canvas.showConfirmDialog("defeated.text", "defeated.yes", "defeated.no")) {
+                if (!new ShowConfirmDialogSwingTask("defeated.text", "defeated.yes", "defeated.no").confirm()) {
                     freeColClient.quit();
                 }
             }
@@ -501,8 +498,7 @@ public final class InGameInputHandler extends InputHandler {
 
         Player winner = (Player) game.getFreeColGameObject(element.getAttribute("winner"));
         if (winner == freeColClient.getMyPlayer()) {
-            // TODO: Erik - event thread
-            freeColClient.getCanvas().showVictoryPanel();
+            new ShowVictoryPanelSwingTask().invokeLater();
         } // else: The client has already received the message of defeat.
 
         return null;
@@ -516,7 +512,7 @@ public final class InGameInputHandler extends InputHandler {
      */
     private Element chat(Element element) {
         Game game = getFreeColClient().getGame();
-        Player sender = (Player) game.getFreeColGameObjectSafely(element.getAttribute("sender"));        
+        Player sender = (Player) game.getFreeColGameObjectSafely(element.getAttribute("sender"));
         String message = element.getAttribute("message");
         boolean privateChat = Boolean.valueOf(element.getAttribute("privateChat")).booleanValue();
 
@@ -571,7 +567,7 @@ public final class InGameInputHandler extends InputHandler {
             possibleFoundingFathers[i] = Integer.parseInt(element.getAttribute("foundingFather" + Integer.toString(i)));
         }
 
-        // TODO: Erik - Swing thread        
+        // TODO: Erik - Swing thread
         int foundingFather = getFreeColClient().getCanvas().showChooseFoundingFatherDialog(possibleFoundingFathers);
 
         Element reply = Message.createNewRootElement("chosenFoundingFather");
@@ -628,7 +624,7 @@ public final class InGameInputHandler extends InputHandler {
         if (goodsElement == null) {
             gold = Integer.parseInt(element.getAttribute("gold"));
 
-            // TODO: Erik - Swing thread            
+            // TODO: Erik - Swing thread
             accepted = getFreeColClient().getCanvas().showConfirmDialog(
                     "indianDemand.gold.text",
                     "indianDemand.gold.yes",
@@ -789,11 +785,13 @@ public final class InGameInputHandler extends InputHandler {
         if (stance == Player.WAR) {
             // TODO: Erik - Swing thread
             if (player.equals(second)) {
-                freeColClient.getCanvas().showInformationMessage("model.diplomacy.war.declared", new String[][] { { "%nation%",
-                        first.getNationAsString() } });
+                freeColClient.getCanvas().showInformationMessage("model.diplomacy.war.declared",
+                        new String[][] { { "%nation%", first.getNationAsString() } });
             } else {
-                freeColClient.getCanvas().showInformationMessage("model.diplomacy.war.others", new String[][] {
-                        { "%attacker%", first.getNationAsString() }, { "%defender%", second.getNationAsString() } });
+                freeColClient.getCanvas().showInformationMessage(
+                        "model.diplomacy.war.others",
+                        new String[][] { { "%attacker%", first.getNationAsString() },
+                                { "%defender%", second.getNationAsString() } });
             }
         }
 
@@ -852,7 +850,7 @@ public final class InGameInputHandler extends InputHandler {
                             { "%amount%", String.valueOf(goods.getAmount()) }, { "%goods%", goods.getName() } },
                             ModelMessage.WARNING));
         }
-        
+
         return null;
     }
 
@@ -957,11 +955,11 @@ public final class InGameInputHandler extends InputHandler {
 
 
     /**
-     * This utility class is the base class for tasks that need to run
-     * in the event dispatch thread.
+     * This utility class is the base class for tasks that need to run in the
+     * event dispatch thread.
      */
     abstract static class SwingTask implements Runnable {
-        
+
         /**
          * Run the task and wait for it to complete.
          * 
@@ -976,11 +974,11 @@ public final class InGameInputHandler extends InputHandler {
             }
             return _result;
         }
-        
+
         /**
          * Run the task at some later time. Any exceptions will occur in the
-         * event dispatch thread. The return value will be set, but at
-         * present there is no good way to know if it is valid yet.
+         * event dispatch thread. The return value will be set, but at present
+         * there is no good way to know if it is valid yet.
          */
         public void invokeLater() {
             SwingUtilities.invokeLater(this);
@@ -992,7 +990,7 @@ public final class InGameInputHandler extends InputHandler {
         public final synchronized void run() {
             _result = doWork();
         }
-        
+
         /**
          * Get the return vale from {@link #doWork()}.
          * 
@@ -1001,29 +999,53 @@ public final class InGameInputHandler extends InputHandler {
         public synchronized Object getResult() {
             return _result;
         }
-        
+
         /**
          * Override this method to do the actual work.
          * 
          * @return result.
          */
         protected abstract Object doWork();
-        
+
+
         private Object _result;
     }
-    
+
     /**
      * This task refreshes the entire canvas.
      */
     class RefreshCanvasSwingTask extends SwingTask {
+        /**
+         * Default constructor, simply refresh canvas.
+         */
+        public RefreshCanvasSwingTask() {
+            this(false);
+        }
+
+        /**
+         * Constructor.
+         * 
+         * @param requestFocus True to request focus after refresh.
+         */
+        public RefreshCanvasSwingTask(boolean requestFocus) {
+            _requestFocus = requestFocus;
+        }
+
         protected Object doWork() {
-            getFreeColClient().getCanvas().refresh();
+            Canvas canvas = getFreeColClient().getCanvas();
+            canvas.refresh();
+            if (_requestFocus) {
+                canvas.requestFocus();
+            }
             return null;
         }
+
+
+        private final boolean _requestFocus;
     }
 
     /**
-     * This task reconnects to the server. 
+     * This task reconnects to the server.
      */
     class ReconnectSwingTask extends SwingTask {
         protected Object doWork() {
@@ -1033,7 +1055,27 @@ public final class InGameInputHandler extends InputHandler {
     }
 
     /**
-     * This class shows a dialog and saves the answer (ok/cancel). 
+     * This task updates the menu bar.
+     */
+    class UpdateMenuBarSwingTask extends SwingTask {
+        protected Object doWork() {
+            getFreeColClient().getCanvas().updateJMenuBar();
+            return null;
+        }
+    }
+
+    /**
+     * This task updates the menu bar.
+     */
+    class ShowVictoryPanelSwingTask extends SwingTask {
+        protected Object doWork() {
+            getFreeColClient().getCanvas().showVictoryPanel();
+            return null;
+        }
+    }
+
+    /**
+     * This class shows a dialog and saves the answer (ok/cancel).
      */
     class ShowConfirmDialogSwingTask extends SwingTask {
 
@@ -1049,7 +1091,7 @@ public final class InGameInputHandler extends InputHandler {
             _okText = okText;
             _cancelText = cancelText;
         }
-        
+
         /**
          * Show dialog and wait for selection.
          * 
@@ -1058,22 +1100,67 @@ public final class InGameInputHandler extends InputHandler {
         public boolean confirm() {
             try {
                 Object result = invokeAndWait();
-                return ((Boolean)result).booleanValue();
+                return ((Boolean) result).booleanValue();
             } catch (InvocationTargetException e) {
-                if(e.getCause() instanceof RuntimeException) {
+                if (e.getCause() instanceof RuntimeException) {
                     throw (RuntimeException) e.getCause();
                 } else {
                     throw new RuntimeException(e.getCause());
                 }
             }
         }
-        
+
         protected Object doWork() {
             return Boolean.valueOf(getFreeColClient().getCanvas().showConfirmDialog(_text, _okText, _cancelText));
         }
-        
+
+
         private String _text;
+
         private String _okText;
+
         private String _cancelText;
+    }
+
+    /**
+     * This class shows an informational dialog.
+     */
+    class ShowInformationMessageSwingTask extends SwingTask {
+
+        /**
+         * Constructor.
+         * 
+         * @param messageId The key for the message.
+         * @param replace The values to replace text with.
+         */
+        public ShowInformationMessageSwingTask(String messageId, String[][] replace) {
+            _messageId = messageId;
+            _replace = replace;
+        }
+
+        /**
+         * Show dialog and wait for user to dismiss it.
+         */
+        public void show() {
+            try {
+                invokeAndWait();
+            } catch (InvocationTargetException e) {
+                if (e.getCause() instanceof RuntimeException) {
+                    throw (RuntimeException) e.getCause();
+                } else {
+                    throw new RuntimeException(e.getCause());
+                }
+            }
+        }
+
+        protected Object doWork() {
+            getFreeColClient().getCanvas().showInformationMessage(_messageId, _replace);
+            return null;
+        }
+
+
+        private String _messageId;
+
+        private String[][] _replace;
     }
 }
