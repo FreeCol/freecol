@@ -29,48 +29,77 @@ import org.xml.sax.SAXException;
  * keeps references to the GUI and the control objects.
  */
 public final class FreeColClient {
-    private static final Logger logger = Logger.getLogger(FreeColClient.class
-            .getName());
+    private static final Logger logger = Logger.getLogger(FreeColClient.class.getName());
+
     public static final String COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
+
     public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
+
     public static final String REVISION = "$Revision$";
+
     // Control:
     private ConnectController connectController;
+
     private PreGameController preGameController;
+
     private PreGameInputHandler preGameInputHandler;
+
     private InGameController inGameController;
+
     private InGameInputHandler inGameInputHandler;
+
     private ClientModelController modelController;
+
     // Gui:
     private GraphicsDevice gd;
+
     private JFrame frame;
+
     private Canvas canvas;
+
     private GUI gui;
+
     private ImageLibrary imageLibrary;
+
     private MusicLibrary musicLibrary;
-    private SfxLibrary sfxLibrary;    
+
+    private SfxLibrary sfxLibrary;
+
     @SuppressWarnings("unused")
     private SoundPlayer musicPlayer;
+
     private SoundPlayer sfxPlayer;
+
     // Networking:
     /**
      * The network <code>Client</code> that can be used to send messages to
      * the server.
      */
     private Client client;
+
     // Model:
     private Game game;
+
     private final PseudoRandom _random = new ClientPseudoRandom();
+
     /** The player "owning" this client. */
     private Player player;
+
     /** The Server that has been started from the client-GUI. */
     private FreeColServer freeColServer = null;
+
     private boolean windowed;
+
     private boolean singleplayer;
+
     private File clientOptionsFile;
+
     private ClientOptions clientOptions = new ClientOptions();
+
     private final ActionManager actionManager;
+
     public final Worker worker;
+
     /**
      * Indicated whether or not there is an open connection to the server. This
      * is not an indication of the existance of a Connection Object, but instead
@@ -78,36 +107,6 @@ public final class FreeColClient {
      */
     private boolean loggedIn = false;
 
-    public FreeColClient(boolean windowed, Rectangle windowSize,
-            ImageLibrary imageLibrary, MusicLibrary musicLibrary,
-            SfxLibrary sfxLibrary, boolean startThreads) {
-        this.windowed = windowed;
-        this.imageLibrary = imageLibrary;
-        this.musicLibrary = musicLibrary;
-        this.sfxLibrary = sfxLibrary;
-        actionManager = new ActionManager(this);
-        // Control:
-        connectController = new ConnectController(this);
-        preGameController = new PreGameController(this);
-        preGameInputHandler = new PreGameInputHandler(this);
-        inGameController = new InGameController(this);
-        inGameInputHandler = new InGameInputHandler(this);
-        modelController = new ClientModelController(this);
-        if (startThreads) {
-            // Gui:
-            final Rectangle theWindowSize = windowSize;
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    startGUI(theWindowSize);
-                }
-            });
-            worker = new Worker();
-            worker.start();
-            createFreeColDirs();
-            loadClientOptions();
-        } else
-            worker = null;
-    }
 
     /**
      * Creates a new <code>FreeColClient</code>. Creates the control objects
@@ -122,10 +121,31 @@ public final class FreeColClient {
      * @param musicLibrary The object holding the music.
      * @param sfxLibrary The object holding the sound effects.
      */
-    public FreeColClient(boolean windowed, Rectangle windowSize,
-            ImageLibrary imageLibrary, MusicLibrary musicLibrary,
+    public FreeColClient(boolean windowed, Rectangle windowSize, ImageLibrary imageLibrary, MusicLibrary musicLibrary,
             SfxLibrary sfxLibrary) {
-        this(windowed, windowSize, imageLibrary, musicLibrary, sfxLibrary, true);
+        this.windowed = windowed;
+        this.imageLibrary = imageLibrary;
+        this.musicLibrary = musicLibrary;
+        this.sfxLibrary = sfxLibrary;
+        actionManager = new ActionManager(this);
+        // Control:
+        connectController = new ConnectController(this);
+        preGameController = new PreGameController(this);
+        preGameInputHandler = new PreGameInputHandler(this);
+        inGameController = new InGameController(this);
+        inGameInputHandler = new InGameInputHandler(this);
+        modelController = new ClientModelController(this);
+        // Gui:
+        final Rectangle theWindowSize = windowSize;
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                startGUI(theWindowSize);
+            }
+        });
+        worker = new Worker();
+        worker.start();
+        createFreeColDirs();
+        loadClientOptions();
     }
 
     /**
@@ -180,8 +200,7 @@ public final class FreeColClient {
         if (GraphicsEnvironment.isHeadless()) {
             logger.info("It seems that the GraphicsEnvironment is headless!");
         }
-        gd = GraphicsEnvironment.getLocalGraphicsEnvironment()
-                .getDefaultScreenDevice();
+        gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         if (windowed) {
             frame = new WindowedFrame(windowSize);
         } else {
@@ -227,18 +246,15 @@ public final class FreeColClient {
      * @see ClientOptions
      */
     public void saveClientOptions(File saveFile) {
-        Element element = getClientOptions().toXMLElement(
-                Message.createNewDocument());
+        Element element = getClientOptions().toXMLElement(Message.createNewDocument());
         // Write the XML Element to the file:
         try {
             TransformerFactory factory = TransformerFactory.newInstance();
             Transformer xmlTransformer = factory.newTransformer();
             xmlTransformer.setOutputProperty(OutputKeys.INDENT, "yes");
             try {
-                PrintWriter out = new PrintWriter(
-                        new FileOutputStream(saveFile));
-                xmlTransformer.transform(new DOMSource(element),
-                        new StreamResult(out));
+                PrintWriter out = new PrintWriter(new FileOutputStream(saveFile));
+                xmlTransformer.transform(new DOMSource(element), new StreamResult(out));
                 out.close();
             } catch (IOException ioe) {
                 logger.warning("Could not store client options.");
@@ -427,10 +443,9 @@ public final class FreeColClient {
      * @param windowed The main window is a full-screen window if set to
      *            <i>false</i> and a normal window otherwise.
      */
-//    private void setWindowed(boolean windowed) {
-//        this.windowed = windowed;
-//    }
-
+    // private void setWindowed(boolean windowed) {
+    // this.windowed = windowed;
+    // }
     /**
      * Sets wether or not this game is a singleplayer game.
      * 
@@ -572,6 +587,7 @@ public final class FreeColClient {
         return _random;
     }
 
+
     /**
      * This class provides server-generated random numbers for client-side use.
      * It requires a server connection. If the connection is unavailable it will
@@ -597,7 +613,7 @@ public final class FreeColClient {
             // This may not be good enough, as the low bits may be less
             // random than the entire range. See the Random class for a
             // more advanced implementation.
-            return Math.abs(nextInt() % n); 
+            return Math.abs(nextInt() % n);
         }
 
         /**
@@ -627,14 +643,11 @@ public final class FreeColClient {
         private void getNewNumbers() {
             int valuesAdded = 0;
             if (isLoggedIn()) {
-                Element query = Message
-                        .createNewRootElement("getRandomNumbers");
+                Element query = Message.createNewRootElement("getRandomNumbers");
                 query.setAttribute("n", String.valueOf(VALUES_PER_CALL));
                 // We expect client != null when logged in
                 Element answer = getClient().ask(query);
-                if (answer != null
-                        && "getRandomNumbersConfirmed".equals(answer
-                                .getTagName())) {
+                if (answer != null && "getRandomNumbersConfirmed".equals(answer.getTagName())) {
                     for (String s : answer.getAttribute("result").split(",")) {
                         push(new Integer(s));
                         ++valuesAdded;
@@ -659,8 +672,11 @@ public final class FreeColClient {
             return values.poll();
         }
 
+
         private final Random offlineRandom;
+
         private final Queue<Integer> values;
+
         private static final int VALUES_PER_CALL = 100;
     }
 }

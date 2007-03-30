@@ -4,8 +4,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
-
 /**
  * The Worker Thread executes jobs one after another. The thread manages a queue
  * where new jobs can be enqueued. The jobs are processed synchronously by the
@@ -30,6 +28,7 @@ public final class Worker extends Thread {
         stopRunning = false;
     }
 
+    @Override
     public void run() {
         while (!stopRunning) {
             try {
