@@ -132,11 +132,14 @@ public final class InGameInputHandler extends InputHandler {
      *            holds all the information.
      */
     private Element reconnect(Element element) {
+        logger.finest("Entered reconnect...");
         if (new ShowConfirmDialogSwingTask("reconnect.text", "reconnect.yes", "reconnect.no").confirm()) {
+            logger.finest("User wants to reconnect, do it!");
             new ReconnectSwingTask().invokeLater();
         } else {
             // This fairly drastic operation can be done in any thread,
             // no need to use SwingUtilities.
+            logger.finest("No reconnect, quit.");
             getFreeColClient().quit();
         }
         return null;
@@ -657,9 +660,8 @@ public final class InGameInputHandler extends InputHandler {
         final FreeColClient freeColClient = getFreeColClient();
         Game game = freeColClient.getGame();
         Player player = freeColClient.getMyPlayer();
-        Canvas canvas = freeColClient.getCanvas();
         Monarch monarch = player.getMonarch();
-        int action = Integer.parseInt(element.getAttribute("action"));
+        final int action = Integer.parseInt(element.getAttribute("action"));
         Element reply;
 
         switch (action) {
@@ -667,8 +669,7 @@ public final class InGameInputHandler extends InputHandler {
             reply = Message.createNewRootElement("acceptTax");
             String[][] replace = new String[][] { { "%replace%", element.getAttribute("amount") },
                     { "%goods%", element.getAttribute("goods") }, };
-            // TODO: Erik - Swing thread
-            if (freeColClient.getCanvas().showMonarchPanel(action, replace)) {
+            if (new ShowMonarchPanelSwingTask(action, replace).confirm()) {
                 int amount = new Integer(element.getAttribute("amount")).intValue();
                 freeColClient.getMyPlayer().setTax(amount);
                 reply.setAttribute("accepted", String.valueOf(true));
@@ -684,14 +685,14 @@ public final class InGameInputHandler extends InputHandler {
                 units[x] = Integer.parseInt(arrayElement.getAttribute("x" + Integer.toString(x)));
             }
             monarch.addToREF(units);
-            // TODO: Erik - Swing thread
-            canvas.showMonarchPanel(action, new String[][] { { "%addition%", monarch.getName(units) } });
+            new ShowMonarchPanelSwingTask(action, new String[][] { { "%addition%", monarch.getName(units) } })
+                    .confirm();
             break;
         case Monarch.DECLARE_WAR:
             int nation = Integer.parseInt(element.getAttribute("nation"));
             player.setStance(game.getPlayer(nation), Player.WAR);
-            // TODO: Erik - Swing thread
-            canvas.showMonarchPanel(action, new String[][] { { "%nation%", Player.getNationAsString(nation) } });
+            new ShowMonarchPanelSwingTask(action, new String[][] { { "%nation%", Player.getNationAsString(nation) } })
+                    .confirm();
             break;
         case Monarch.SUPPORT_LAND:
         case Monarch.SUPPORT_SEA:
@@ -707,11 +708,15 @@ public final class InGameInputHandler extends InputHandler {
                 }
                 player.getEurope().add(newUnit);
             }
-            // TODO: Erik - Swing thread
-            if (!canvas.getColonyPanel().isShowing()
-                    && (action == Monarch.ADD_UNITS || !canvas.showMonarchPanel(action, null))) {
-                canvas.showEuropePanel();
-            }
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    Canvas canvas = getFreeColClient().getCanvas();
+                    if (!canvas.getColonyPanel().isShowing()
+                            && (action == Monarch.ADD_UNITS || !canvas.showMonarchPanel(action, null))) {
+                        canvas.showEuropePanel();
+                    }
+                }
+            });
             break;
         case Monarch.OFFER_MERCENARIES:
             reply = Message.createNewRootElement("hireMercenaries");
@@ -720,14 +725,15 @@ public final class InGameInputHandler extends InputHandler {
             for (int x = 0; x < mercenaries.length; x++) {
                 mercenaries[x] = Integer.parseInt(mercenaryElement.getAttribute("x" + Integer.toString(x)));
             }
-            // TODO: Erik - Swing thread
-            if (freeColClient.getCanvas().showMonarchPanel(
-                    action,
-                    new String[][] { { "%gold%", element.getAttribute("price") },
-                            { "%mercenaries%", monarch.getName(mercenaries) } })) {
+            if (new ShowMonarchPanelSwingTask(action, new String[][] { { "%gold%", element.getAttribute("price") },
+                    { "%mercenaries%", monarch.getName(mercenaries) } }).confirm()) {
                 int price = new Integer(element.getAttribute("price")).intValue();
                 freeColClient.getMyPlayer().modifyGold(-price);
-                freeColClient.getCanvas().updateGoldLabel();
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        freeColClient.getCanvas().updateGoldLabel();
+                    }
+                });
                 reply.setAttribute("accepted", String.valueOf(true));
             } else {
                 reply.setAttribute("accepted", String.valueOf(false));
@@ -803,17 +809,16 @@ public final class InGameInputHandler extends InputHandler {
 
         if (goodsElement == null) {
             // player has no colony or nothing to trade
-            // TODO: Erik - Swing thread
-            freeColClient.getCanvas().showMonarchPanel(Monarch.WAIVE_TAX, null);
+            new ShowMonarchPanelSwingTask(Monarch.WAIVE_TAX, null).confirm();
         } else {
-            Goods goods = new Goods(game, goodsElement);
-            Colony colony = (Colony) goods.getLocation();
+            final Goods goods = new Goods(game, goodsElement);
+            final Colony colony = (Colony) goods.getLocation();
             colony.removeGoods(goods);
 
             // JACOB_FUGGER does not protect against new boycotts
             freeColClient.getMyPlayer().setArrears(goods);
 
-            String message;
+            final String message;
             if (goods.getType() == Goods.HORSES) {
                 message = "model.monarch.bostonTeaParty.horses";
             } else if (colony.isLandLocked()) {
@@ -821,12 +826,15 @@ public final class InGameInputHandler extends InputHandler {
             } else {
                 message = "model.monarch.bostonTeaParty.harbour";
             }
-
-            // TODO: Erik - Swing thread
-            freeColClient.getCanvas().showModelMessage(
-                    new ModelMessage(colony, message, new String[][] { { "%colony%", colony.getName() },
-                            { "%amount%", String.valueOf(goods.getAmount()) }, { "%goods%", goods.getName() } },
-                            ModelMessage.WARNING));
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    freeColClient.getCanvas().showModelMessage(
+                            new ModelMessage(colony, message,
+                                    new String[][] { { "%colony%", colony.getName() },
+                                            { "%amount%", String.valueOf(goods.getAmount()) },
+                                            { "%goods%", goods.getName() } }, ModelMessage.WARNING));
+                }
+            });
         }
 
         return null;
@@ -1103,8 +1111,8 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected Object doWork() {
-            return Boolean.valueOf(getFreeColClient().getCanvas().showConfirmDialog(_text, _okText, _cancelText,
-                    _replace));
+            boolean choice = getFreeColClient().getCanvas().showConfirmDialog(_text, _okText, _cancelText, _replace);
+            return Boolean.valueOf(choice);
         }
 
 
@@ -1230,5 +1238,50 @@ public final class InGameInputHandler extends InputHandler {
 
 
         private int[] _choices;
+    }
+
+    /**
+     * This class shows the monarch panel.
+     */
+    class ShowMonarchPanelSwingTask extends SwingTask {
+
+        /**
+         * Constructor.
+         * 
+         * @param action The action key.
+         * @param replace The replacement values.
+         */
+        public ShowMonarchPanelSwingTask(int action, String[][] replace) {
+            _action = action;
+            _replace = replace;
+        }
+
+        /**
+         * Show dialog and wait for selection.
+         * 
+         * @return true if OK, false if Cancel.
+         */
+        public boolean confirm() {
+            try {
+                Object result = invokeAndWait();
+                return ((Boolean) result).booleanValue();
+            } catch (InvocationTargetException e) {
+                if (e.getCause() instanceof RuntimeException) {
+                    throw (RuntimeException) e.getCause();
+                } else {
+                    throw new RuntimeException(e.getCause());
+                }
+            }
+        }
+
+        protected Object doWork() {
+            boolean choice = getFreeColClient().getCanvas().showMonarchPanel(_action, _replace);
+            return Boolean.valueOf(choice);
+        }
+
+
+        private int _action;
+
+        private String[][] _replace;
     }
 }
