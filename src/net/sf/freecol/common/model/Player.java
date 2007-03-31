@@ -1806,8 +1806,9 @@ public class Player extends FreeColGameObject implements Nameable {
         }
         if (nation == ENGLISH) {
             crossesRequired += (CROSSES_INCREMENT * 2) / 3;
+        } else {
+            crossesRequired += CROSSES_INCREMENT;
         }
-        crossesRequired += CROSSES_INCREMENT;
 
         // The book I have tells me the crosses needed is:
         // [(colonist count in colonies + total colonist count) * 2] + 8.
