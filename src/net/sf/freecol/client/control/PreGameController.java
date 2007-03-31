@@ -280,7 +280,7 @@ public final class PreGameController {
         freeColClient.getCanvas().resetFreeColMenuBar();
 
         Unit activeUnit = freeColClient.getMyPlayer().getNextActiveUnit();
-        freeColClient.getMyPlayer().updateCrossesRequired();
+        //freeColClient.getMyPlayer().updateCrossesRequired();
         gui.setActiveUnit(activeUnit);
         if (activeUnit != null) {
             gui.setFocus(activeUnit.getTile().getPosition());

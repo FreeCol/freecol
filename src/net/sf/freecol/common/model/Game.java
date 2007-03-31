@@ -820,6 +820,7 @@ public class Game extends FreeColGameObject {
     @SuppressWarnings("unchecked")
     public void newTurn() {
         turn.increase();
+        logger.info("Turn is now " + turn.toString());
 
         Iterator<FreeColGameObject> iterator = ((HashMap<String, FreeColGameObject>) freeColGameObjects.clone())
                 .values().iterator();

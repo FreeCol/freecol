@@ -177,7 +177,10 @@ public class Player extends FreeColGameObject implements Nameable {
 
     public static final int REBELLION_POST_WAR = 2;
 
-    private int crossesRequired = -1;
+    // new simple schema for crosses
+    // TODO: make this depend on difficulty
+    public static final int CROSSES_INCREMENT = 6;
+    private int crossesRequired = 12;
 
     // No need for a persistent storage of this variable:
     private int colonyNameIndex = 0;
@@ -1801,10 +1804,16 @@ public class Player extends FreeColGameObject implements Nameable {
         if (!canRecruitUnits()) {
             return;
         }
+        if (nation == ENGLISH) {
+            crossesRequired += (CROSSES_INCREMENT * 2) / 3;
+        }
+        crossesRequired += CROSSES_INCREMENT;
+
         // The book I have tells me the crosses needed is:
         // [(colonist count in colonies + total colonist count) * 2] + 8.
         // So every unit counts as 2 unless they're in a colony,
         // wherein they count as 4.
+        /*
         int count = 8;
         Map map = getGame().getMap();
         Iterator<Position> tileIterator = map.getWholeMapIterator();
@@ -1838,6 +1847,7 @@ public class Player extends FreeColGameObject implements Nameable {
             count = (count * 2) / 3;
         }
         setCrossesRequired(count);
+        */
     }
 
     /**
@@ -2208,9 +2218,11 @@ public class Player extends FreeColGameObject implements Nameable {
                 bells = 0;
             }
 
+            /*
             if (crossesRequired != -1) {
                 updateCrossesRequired();
             }
+            */
 
             int newSoL = 0;
             int numberOfColonies = settlements.size();

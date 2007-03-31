@@ -226,6 +226,7 @@ public final class Europe extends FreeColGameObject implements Location,
         // TODO: shouldn't we subtract a certain amount of crosses instead of
         // just removing all
         // crosses? I'm not sure how this was done in the original.
+        unit.getOwner().updateCrossesRequired();
         unit.getOwner().setCrosses(0);
 
         if (!unit.getOwner().hasFather(FoundingFather.WILLIAM_BREWSTER)) {

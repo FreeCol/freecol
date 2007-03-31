@@ -169,11 +169,13 @@ public final class PreGameController extends Controller {
         setMap(map);
         
         // Initialise the crosses required values.
+        /* not necessary for simple scheme
         Iterator<Player> playerIterator = game.getPlayerIterator();
         while (playerIterator.hasNext()) {
             Player p = playerIterator.next();
             p.updateCrossesRequired();
         }
+        */
         
         // Start the game:
         freeColServer.setGameState(FreeColServer.IN_GAME);
