@@ -945,6 +945,8 @@ public final class InGameInputHandler extends InputHandler {
      * event dispatch thread.
      */
     abstract static class SwingTask implements Runnable {
+        private static final Logger taskLogger = Logger.getLogger(SwingTask.class.getName());
+
 
         /**
          * Run the task and wait for it to complete.
@@ -953,6 +955,8 @@ public final class InGameInputHandler extends InputHandler {
          * @throws InvocationTargetException on unexpected exceptions.
          */
         public Object invokeAndWait() throws InvocationTargetException {
+            verifyNotStarted();
+            markStarted(true);
             try {
                 SwingUtilities.invokeAndWait(this);
             } catch (InterruptedException e) {
@@ -967,14 +971,72 @@ public final class InGameInputHandler extends InputHandler {
          * there is no good way to know if it is valid yet.
          */
         public void invokeLater() {
+            verifyNotStarted();
+            markStarted(false);
             SwingUtilities.invokeLater(this);
         }
 
         /**
-         * Run method, call {@link #doWork()} and save the return value.
+         * Mark started and set the synchronous flag.
+         * 
+         * @param synchronous The synch/asynch flag.
          */
-        public final synchronized void run() {
-            _result = doWork();
+        private synchronized void markStarted(boolean synchronous) {
+            _synchronous = synchronous;
+            _started = true;
+        }
+
+        /**
+         * Mark finished.
+         */
+        private synchronized void markDone() {
+            _started = false;
+        }
+
+        /**
+         * Throw an exception if the task is started.
+         */
+        private synchronized void verifyNotStarted() {
+            if (_started) {
+                throw new IllegalStateException("Swing task already started!");
+            }
+        }
+
+        /**
+         * Check if the client is waiting.
+         * 
+         * @return true if client is waiting for a result.
+         */
+        private synchronized boolean isSynchronous() {
+            return _synchronous;
+        }
+
+        /**
+         * Run method, call {@link #doWork()} and save the return value. Also
+         * catch any exceptions. In synchronous mode they will be rethrown to
+         * the original thread, in asynchronous mode they will be logged and
+         * ignored. Nothing is gained by crashing the event dispatch thread.
+         */
+        public final void run() {
+            try {
+                if (taskLogger.isLoggable(Level.FINEST)) {
+                    taskLogger.log(Level.FINEST, "Running Swing task " + getClass().getName() + "...");
+                }
+
+                setResult(doWork());
+
+                if (taskLogger.isLoggable(Level.FINEST)) {
+                    taskLogger.log(Level.FINEST, "Swing task " + getClass().getName() + " returned " + _result);
+                }
+            } catch (RuntimeException e) {
+                taskLogger.log(Level.WARNING, "Swing task " + getClass().getName() + " failed!", e);
+                // Let the exception bubble up if the calling thread is waiting
+                if (isSynchronous()) {
+                    throw e;
+                }
+            } finally {
+                markDone();
+            }
         }
 
         /**
@@ -987,6 +1049,15 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         /**
+         * Save result.
+         * 
+         * @param r The result.
+         */
+        private synchronized void setResult(Object r) {
+            _result = r;
+        }
+
+        /**
          * Override this method to do the actual work.
          * 
          * @return result.
@@ -995,12 +1066,30 @@ public final class InGameInputHandler extends InputHandler {
 
 
         private Object _result;
+
+        private boolean _synchronous;
+
+        private boolean _started;
+    }
+
+    /**
+     * Base class for Swing tasks that need to do a simple update without return
+     * value using the canvas.
+     */
+    abstract class NoResultCanvasSwingTask extends SwingTask {
+
+        protected Object doWork() {
+            doWork(getFreeColClient().getCanvas());
+            return null;
+        }
+
+        abstract void doWork(Canvas canvas);
     }
 
     /**
      * This task refreshes the entire canvas.
      */
-    class RefreshCanvasSwingTask extends SwingTask {
+    class RefreshCanvasSwingTask extends NoResultCanvasSwingTask {
         /**
          * Default constructor, simply refresh canvas.
          */
@@ -1017,14 +1106,11 @@ public final class InGameInputHandler extends InputHandler {
             _requestFocus = requestFocus;
         }
 
-        protected Object doWork() {
-            Canvas canvas = getFreeColClient().getCanvas();
-            // TODO: refresh is probably safe, may want to rollback this later
+        protected void doWork(Canvas canvas) {
             canvas.refresh();
-            if (_requestFocus) {
-                canvas.requestFocus();
+            if (_requestFocus && !canvas.isShowingSubPanel()) {
+                canvas.requestFocusInWindow();
             }
-            return null;
         }
 
 
@@ -1044,20 +1130,18 @@ public final class InGameInputHandler extends InputHandler {
     /**
      * This task updates the menu bar.
      */
-    class UpdateMenuBarSwingTask extends SwingTask {
-        protected Object doWork() {
-            getFreeColClient().getCanvas().updateJMenuBar();
-            return null;
+    class UpdateMenuBarSwingTask extends NoResultCanvasSwingTask {
+        protected void doWork(Canvas canvas) {
+            canvas.updateJMenuBar();
         }
     }
 
     /**
      * This task updates the menu bar.
      */
-    class ShowVictoryPanelSwingTask extends SwingTask {
-        protected Object doWork() {
-            getFreeColClient().getCanvas().showVictoryPanel();
-            return null;
+    class ShowVictoryPanelSwingTask extends NoResultCanvasSwingTask {
+        protected void doWork(Canvas canvas) {
+            canvas.showVictoryPanel();
         }
     }
 
@@ -1130,7 +1214,7 @@ public final class InGameInputHandler extends InputHandler {
      */
     abstract class ShowMessageSwingTask extends SwingTask {
         /**
-         * Show dialog and wait for user to dismiss it.
+         * Show dialog and wait for the user to dismiss it.
          */
         public void show() {
             try {
