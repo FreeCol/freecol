@@ -59,15 +59,14 @@ public final class InGameInputHandler extends InputHandler {
      * @param element The root element of the message.
      * @return The reply.
      */
+    @Override
     public Element handle(Connection connection, Element element) {
         Element reply = null;
 
         if (element != null) {
             String type = element.getTagName();
 
-            if (logger.isLoggable(Level.FINEST)) {
-                logger.log(Level.FINEST, "Received message " + type);
-            }
+            logger.log(Level.FINEST, "Received message " + type);
 
             if (type.equals("update")) {
                 reply = update(element);
@@ -115,11 +114,9 @@ public final class InGameInputHandler extends InputHandler {
                 logger.warning("Message is of unsupported type \"" + type + "\".");
             }
 
-            if (logger.isLoggable(Level.FINEST)) {
-                logger.log(Level.FINEST, "Handled message " + type);
-            }
+            logger.log(Level.FINEST, "Handled message " + type);
         } else {
-            logger.warning("Received empty (null) message!");
+            throw new RuntimeException("Received empty (null) message! - should never happen");
         }
 
         return reply;
