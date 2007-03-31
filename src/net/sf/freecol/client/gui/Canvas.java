@@ -212,7 +212,6 @@ public final class Canvas extends JLayeredPane {
     private final MapGeneratorOptionsDialog mapGeneratorOptionsDialog;
     private final DeclarationDialog declarationDialog;
     private final LoadingSavegameDialog loadingSavegameDialog;
-    private TakeFocusThread         takeFocusThread;
     private JMenuBar                jMenuBar;
 
 
@@ -231,8 +230,6 @@ public final class Canvas extends JLayeredPane {
 
         setOpaque(false);
         setLayout(null);
-
-        takeFocusThread = null;
 
         mainPanel = new MainPanel(this, freeColClient);
         newPanel = new NewPanel(this, freeColClient.getConnectController());
@@ -285,6 +282,7 @@ public final class Canvas extends JLayeredPane {
 
         Runtime runtime = Runtime.getRuntime();
         runtime.addShutdownHook(new Thread() {
+            @Override
             public void run() {
                 freeColClient.getConnectController().quitGame(true);
             }
@@ -351,6 +349,7 @@ public final class Canvas extends JLayeredPane {
     * @param g The Graphics context in which to draw this component.
     * @see GUI#display
     */
+    @Override
     public void paintComponent(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
         gui.display(g2d);
@@ -1633,6 +1632,7 @@ public final class Canvas extends JLayeredPane {
      * Removes the given component from this Container.
      * @param comp The component to remove from this Container.
      */
+    @Override
     public void remove(Component comp) {
        remove(comp, true); 
     }
@@ -1679,6 +1679,7 @@ public final class Canvas extends JLayeredPane {
     * @param comp The component to add to this ToEuropePanel.
     * @return The component argument.
     */
+    @Override
     public Component add(Component comp) {
         add(comp, null);
         return comp;
@@ -1715,9 +1716,6 @@ public final class Canvas extends JLayeredPane {
     * @param i The layer to add the component to (see JLayeredPane).
     */
     public void add(Component comp, Integer i) {
-        if ((takeFocusThread != null) && (takeFocusThread.isAlive())) {
-            takeFocusThread.stopWorking();
-        }
 
         if (comp != statusPanel && !(comp instanceof JMenuItem) && !(comp instanceof FreeColDialog)) {
             remove(statusPanel, false);
@@ -1752,16 +1750,6 @@ public final class Canvas extends JLayeredPane {
             c = colonyPanel;
         }
 
-        if (takeFocusThread != null) {
-            takeFocusThread.stopWorking();
-        }
-
-        /*if (c != this) {
-            c.requestFocus();
-        } else {
-            takeFocusThread = new TakeFocusThread(c);
-            takeFocusThread.start();
-        }*/
         c.requestFocus();
     }
 
@@ -1789,6 +1777,7 @@ public final class Canvas extends JLayeredPane {
     * @param b Must be set to 'true' if this component needs to be enabled
     * or to 'false' otherwise.
     */
+    @Override
     public void setEnabled(boolean b) {
         if (isEnabled() != b) {
             for (int i = 0; i < getComponentCount(); i++) {
@@ -2199,6 +2188,7 @@ public final class Canvas extends JLayeredPane {
         /**
         * Removes old chat messages regularly.
         */
+        @Override
         public void run() {
             for (;;) {
                 if (gui.removeOldMessages()) {
@@ -2208,75 +2198,6 @@ public final class Canvas extends JLayeredPane {
                     sleep(500);
                 } catch (InterruptedException e) {
                     // Do nothing here
-                }
-            }
-        }
-    }
-
-
-
-
-    /**
-    * Makes sure that a given component takes the focus.
-    */
-    private final class TakeFocusThread extends Thread {
-        private final JComponent component;
-        private boolean doYourWork;
-
-        /**
-        * The constructor to use.
-        * @param component The component that needs focus.
-        */
-        public TakeFocusThread(JComponent component) {
-            super("TakeFocusThread");
-            this.component = component;
-            doYourWork = true;
-        }
-
-        /**
-        * Makes sure that this thread stops working.
-        */
-        public void stopWorking() {
-            doYourWork = false;
-        }
-
-        /**
-        * Returns 'true' if this thread is going to keep on working, 'false' otherwise.
-        * @return 'true' if this thread is going to keep on working, 'false' otherwise.
-        */
-        public boolean isStillWorking() {
-            return doYourWork;
-        }
-
-
-        /**
-         * Gets the component this thread is trying to take focus for.
-         * @return The component.
-         */
-        public JComponent getComponent() {
-            return component;
-        }
-
-
-        /**
-        * Makes sure that the given component takes the focus.
-        */
-        public void run() {
-            int count = 0;
-
-            while ((!component.hasFocus()) && doYourWork) {
-                component.requestFocus();
-
-                try {
-                    sleep(100);
-                }
-                catch (InterruptedException e) {
-                    // Do nothing here
-                }
-                count++;
-                if (count > 50) {
-                    // We're already been trying for 5 seconds, there must be something wrong.
-                    logger.warning("Component can't get focus: " + component.toString());
                 }
             }
         }
