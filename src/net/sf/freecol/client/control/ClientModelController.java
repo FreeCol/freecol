@@ -1,9 +1,6 @@
-
-
 package net.sf.freecol.client.control;
 
 import java.util.ArrayList;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
@@ -22,45 +19,44 @@ import net.sf.freecol.common.networking.Message;
 
 import org.w3c.dom.Element;
 
-
 /**
-* A client-side implementation of the <code>ModelController</code> interface.
-*/
+ * A client-side implementation of the <code>ModelController</code> interface.
+ */
 public class ClientModelController implements ModelController {
     private static final Logger logger = Logger.getLogger(ClientModelController.class.getName());
 
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
-    public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
-    public static final String  REVISION = "$Revision$";
+    public static final String COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
 
+    public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
+
+    public static final String REVISION = "$Revision$";
 
     private final FreeColClient freeColClient;
 
 
     /**
-    * Creates a new <code>ClientModelController</code>.
-    * @param freeColClient The main controller.
-    */
+     * Creates a new <code>ClientModelController</code>.
+     * 
+     * @param freeColClient The main controller.
+     */
     public ClientModelController(FreeColClient freeColClient) {
         this.freeColClient = freeColClient;
     }
-    
-    
+
     /**
-    * Returns a pseudorandom int, uniformly distributed between 0
-    * (inclusive) and the specified value (exclusive).
-    * 
-    * @param taskID The <code>taskID</code> should be a unique identifier.
-    *               One method to make a unique <code>taskID</code>:
-    *               <br><br>
-    *               getID() + "methodName:taskDescription"
-    *               <br><br>
-    *               As long as the "taskDescription" is unique
-    *               within the method ("methodName"), you get a unique
-    *               identifier.
-    * @param n The specified value.
-    * @return The generated number.
-    */
+     * Returns a pseudorandom int, uniformly distributed between 0 (inclusive)
+     * and the specified value (exclusive).
+     * 
+     * @param taskID The <code>taskID</code> should be a unique identifier.
+     *            One method to make a unique <code>taskID</code>: <br>
+     *            <br>
+     *            getID() + "methodName:taskDescription" <br>
+     *            <br>
+     *            As long as the "taskDescription" is unique within the method
+     *            ("methodName"), you get a unique identifier.
+     * @param n The specified value.
+     * @return The generated number.
+     */
     public int getRandom(String taskID, int n) {
         Client client = freeColClient.getClient();
 
@@ -76,26 +72,24 @@ public class ClientModelController implements ModelController {
             logger.warning("Wrong tag name.");
             throw new IllegalStateException();
         }
-        
+
         return Integer.parseInt(reply.getAttribute("result"));
     }
-    
 
     /**
      * Creates a new unit.
-     *
+     * 
      * @param taskID The <code>taskID</code> should be a unique identifier.
-     *               One method to make a unique <code>taskID</code>:
-     *               <br><br>
-     *               getID() + "methodName:taskDescription"
-     *               <br><br>
-     *               As long as the "taskDescription" is unique
-     *               within the method ("methodName"), you get a unique
-     *               identifier.
+     *            One method to make a unique <code>taskID</code>: <br>
+     *            <br>
+     *            getID() + "methodName:taskDescription" <br>
+     *            <br>
+     *            As long as the "taskDescription" is unique within the method
+     *            ("methodName"), you get a unique identifier.
      * @param location The <code>Location</code> where the <code>Unit</code>
-     *               will be created.
-     * @param owner  The <code>Player</code> owning the <code>Unit</code>.
-     * @param type   The type of unit (Unit.FREE_COLONIST...).
+     *            will be created.
+     * @param owner The <code>Player</code> owning the <code>Unit</code>.
+     * @param type The type of unit (Unit.FREE_COLONIST...).
      * @return The created <code>Unit</code>.
      */
     public Unit createUnit(String taskID, Location location, Player owner, int type) {
@@ -116,39 +110,41 @@ public class ClientModelController implements ModelController {
             throw new IllegalStateException();
         }
 
-        Unit unit = new Unit(freeColClient.getGame(), (Element) reply.getElementsByTagName(Unit.getXMLElementTagName()).item(0));
+        Unit unit = new Unit(freeColClient.getGame(), (Element) reply.getElementsByTagName(Unit.getXMLElementTagName())
+                .item(0));
         unit.setLocation(unit.getLocation());
 
         return unit;
     }
 
-
     /**
      * Puts the specified <code>Unit</code> in America.
      * 
      * @param unit The <code>Unit</code>.
-     * @return The <code>Location</code> where the <code>Unit</code> appears.
-     */    
+     * @return The <code>Location</code> where the <code>Unit</code>
+     *         appears.
+     */
     public Location setToVacantEntryLocation(Unit unit) {
         Element createUnitElement = Message.createNewRootElement("getVacantEntryLocation");
         createUnitElement.setAttribute("unit", unit.getID());
 
         Element reply = freeColClient.getClient().ask(createUnitElement);
-        if(reply == null) {
+        if (reply == null) {
             throw new IllegalStateException("No reply for getVacantEntryLocation!");
-        } else if ("getVacantEntryLocationConfirmed".equals(reply.getTagName())) {
+        } else if (!"getVacantEntryLocationConfirmed".equals(reply.getTagName())) {
             throw new IllegalStateException("Unexpected reply type for getVacantEntryLocation: " + reply.getTagName());
         }
 
-        Location entryLocation = (Location) freeColClient.getGame().getFreeColGameObject(reply.getAttribute("location"));
+        Location entryLocation = (Location) freeColClient.getGame()
+                .getFreeColGameObject(reply.getAttribute("location"));
         unit.setLocation(entryLocation);
 
         return entryLocation;
     }
 
-    
     /**
      * Updates stances.
+     * 
      * @param first The first <code>Player</code>.
      * @param second The second <code>Player</code>.
      * @param stance The new stance.
@@ -156,29 +152,26 @@ public class ClientModelController implements ModelController {
     public void setStance(Player first, Player second, int stance) {
         // Nothing to do.
     }
-    
-    
+
     /**
      * Explores the given tiles for the given player.
      * 
      * @param player The <code>Player</code> that should see more tiles.
      * @param tiles The tiles to explore.
-     */    
+     */
     public void exploreTiles(Player player, ArrayList<Tile> tiles) {
         // Nothing to do on the client side.
     }
 
-
     /**
-     * Tells the <code>ModelController</code> that an internal
-     * change (that is; not caused by the control) has occured in the model.
+     * Tells the <code>ModelController</code> that an internal change (that
+     * is; not caused by the control) has occured in the model.
      * 
      * @param tile The <code>Tile</code> which will need an update.
-     */    
+     */
     public void update(Tile tile) {
         // Nothing to do on the client side.
     }
-
 
     /**
      * Get the pseudo-random number generator provided by the client.
@@ -189,9 +182,9 @@ public class ClientModelController implements ModelController {
         return freeColClient.getPseudoRandom();
     }
 
-
     /**
      * Returns a new <code>TradeRoute</code> object.
+     * 
      * @return a new <code>TradeRoute</code> object.
      */
     public TradeRoute getNewTradeRoute(Player player) {
@@ -206,7 +199,8 @@ public class ClientModelController implements ModelController {
             throw new IllegalStateException();
         }
 
-        TradeRoute tradeRoute = new TradeRoute(game, (Element) reply.getElementsByTagName(TradeRoute.getXMLElementTagName()).item(0));
+        TradeRoute tradeRoute = new TradeRoute(game, (Element) reply.getElementsByTagName(
+                TradeRoute.getXMLElementTagName()).item(0));
 
         return tradeRoute;
     }
@@ -217,12 +211,12 @@ public class ClientModelController implements ModelController {
      * @param freeColGameObject The game object.
      * @return true if owned by client player or not ownable.
      */
-    public boolean shouldCallNewTurn(FreeColGameObject freeColGameObject) {        
-        if(freeColGameObject instanceof Ownable) {
+    public boolean shouldCallNewTurn(FreeColGameObject freeColGameObject) {
+        if (freeColGameObject instanceof Ownable) {
             Ownable o = (Ownable) freeColGameObject;
             return o.getOwner() == freeColClient.getMyPlayer();
         }
-        return true;            
-    }        
+        return true;
+    }
 
 }
