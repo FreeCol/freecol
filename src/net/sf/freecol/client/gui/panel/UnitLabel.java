@@ -2,6 +2,7 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -10,6 +11,7 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.util.logging.Logger;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
@@ -66,6 +68,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
 
         setSmall(false);
         setIgnoreLocation(false);
+        setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
 
         this.inGameController = parent.getClient().getInGameController();
     }
@@ -158,7 +161,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
                     (imageIcon.getIconWidth() / 3) * 2, (imageIcon.getIconHeight() / 3) * 2, Image.SCALE_SMOOTH)));
         } else {
             if (unit.getLocation() instanceof ColonyTile) {
-                setPreferredSize(new java.awt.Dimension(parent.getImageProvider().getTerrainImageWidth(0) / 2, parent
+                setSize(new Dimension(parent.getImageProvider().getTerrainImageWidth(0) / 2, parent
                         .getImageProvider().getUnitImageHeight(parent.getImageProvider().getUnitGraphicsType(unit))));
             } else {
                 setPreferredSize(null);
@@ -209,22 +212,28 @@ public final class UnitLabel extends JLabel implements ActionListener {
 
         if (ignoreLocation || selected || (!unit.isCarrier() && unit.getState() != Unit.SENTRY)) {
             setEnabled(true);
+        } else if (unit.getOwner() != parent.getClient().getMyPlayer()) {
+            setEnabled(true);
         } else {
             setEnabled(false);
+        }
+
+        if (unit.getLocation() instanceof ColonyTile) {
+            setSize(new Dimension(parent.getImageProvider().getTerrainImageWidth(0) / 2, parent
+                    .getImageProvider().getUnitImageHeight(parent.getImageProvider().getUnitGraphicsType(unit))));
         }
 
         super.paintComponent(g);
         if (ignoreLocation)
             return;
 
-        if (getParent() instanceof ColonyPanel.OutsideColonyPanel || getParent() instanceof ColonyPanel.InPortPanel
-                || getParent().getParent() instanceof ReportUnitPanel) {
+        if (getParent() instanceof ColonyPanel.OutsideColonyPanel || 
+            getParent() instanceof ColonyPanel.InPortPanel || 
+            getParent().getParent() instanceof ReportUnitPanel) {
             int x = (getWidth() - getIcon().getIconWidth()) / 2;
             int y = (getHeight() - getIcon().getIconHeight()) / 2;
             parent.getGUI().displayOccupationIndicator(g, unit, x, y);
-        }
-
-        if (unit.getLocation() instanceof ColonyTile) {
+        } else if (unit.getLocation() instanceof ColonyTile) {
             ImageIcon goodsIcon;
 
             if (unit.getWorkType() == Goods.FOOD && unit.getLocation() instanceof ColonyTile
@@ -240,9 +249,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
             BufferedImage productionImage = parent.getGUI().createProductionImage(goodsIcon, production, getWidth(),
                     getHeight());
             g.drawImage(productionImage, 0, 0, null);
-        }
-
-        if (unit.isUnderRepair()) {
+        } else if (unit.isUnderRepair()) {
             BufferedImage repairImage = parent.getGUI().createStringImage((Graphics2D) g,
                     Messages.message("underRepair"), Color.RED, getWidth(), 12);
             g.drawImage(repairImage, (getWidth() - repairImage.getWidth()) / 2,

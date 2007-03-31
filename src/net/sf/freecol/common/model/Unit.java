@@ -3874,7 +3874,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         }
         if (getType() == FREE_COLONIST && location instanceof ColonyTile) {
             logger.finest("About to call getRandom for experience");
-            int random = getGame().getModelController().getRandom(getID() + "experience", 2000);
+            int random = getGame().getModelController().getRandom(getID() + "experience", 5000);
             if (random < Math.min(experience, 200)) {
                 logger.finest("About to change type of unit.");
                 String oldName = getName();

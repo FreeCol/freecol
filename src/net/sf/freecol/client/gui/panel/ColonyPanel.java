@@ -1650,6 +1650,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             private ColonyTile colonyTile;
 
             public ASingleTilePanel(ColonyTile colonyTile, int x, int y) {
+                setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
                 this.colonyTile = colonyTile;
 
                 setOpaque(false);
@@ -1671,7 +1672,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 ImageLibrary lib = parent.getGUI().getImageLibrary();
 
                 if (colonyTile.isColonyCenterTile()) {
-                    setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
                     int width = lib.getTerrainImageWidth(1) * 2 / 3;
 
                     ImageIcon goodsIcon =
