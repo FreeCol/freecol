@@ -1,6 +1,4 @@
-
 package net.sf.freecol.common.networking;
-
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -25,74 +23,76 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-
 /**
-* Class for parsing raw message data into an XML-tree and for creating new XML-trees.
-*/
+ * Class for parsing raw message data into an XML-tree and for creating new
+ * XML-trees.
+ */
 public final class Message {
     private static final Logger logger = Logger.getLogger(Message.class.getName());
 
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
-    public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
-    public static final String  REVISION = "$Revision$";
+    public static final String COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
+
+    public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
+
+    public static final String REVISION = "$Revision$";
 
     private static final String FREECOL_PROTOCOL_VERSION = "0.1.4";
-    private static final String INVALID_MESSAGE = "invalid";
 
+    private static final String INVALID_MESSAGE = "invalid";
 
     /** The actual Message data. */
     private final Document document;
 
+
     /**
-    * Constructs a new Message with data from the given String. The constructor
-    * to use if this is an INCOMING message.
-    *
-    * @param msg The raw message data.
-    * @exception IOException should not be thrown.
-    * @exception SAXException if thrown during parsing. 
-    */
+     * Constructs a new Message with data from the given String. The constructor
+     * to use if this is an INCOMING message.
+     * 
+     * @param msg The raw message data.
+     * @exception IOException should not be thrown.
+     * @exception SAXException if thrown during parsing.
+     */
     public Message(String msg) throws SAXException, IOException {
         this(new InputSource(new StringReader(msg)));
     }
 
-    
     /**
-    * Constructs a new Message with data from the given InputStream. The constructor
-    * to use if this is an INCOMING message.
-    * 
-    * @param inputStream The <code>InputStream</code> to get the XML-data from.
-    * @exception IOException if thrown by the <code>InputStream</code>.
-    * @exception SAXException if thrown during parsing.
-    */
+     * Constructs a new Message with data from the given InputStream. The
+     * constructor to use if this is an INCOMING message.
+     * 
+     * @param inputStream The <code>InputStream</code> to get the XML-data
+     *            from.
+     * @exception IOException if thrown by the <code>InputStream</code>.
+     * @exception SAXException if thrown during parsing.
+     */
     public Message(InputStream inputStream) throws SAXException, IOException {
         this(new InputSource(inputStream));
     }
 
-
     /**
-    * Constructs a new Message with data from the given InputSource. The constructor
-    * to use if this is an INCOMING message.
-    * 
-    * @param inputSource The <code>InputSource</code> to get the XML-data from.
-    * @exception IOException if thrown by the <code>InputSource</code>.
-    * @exception SAXException if thrown during parsing.
-    */
+     * Constructs a new Message with data from the given InputSource. The
+     * constructor to use if this is an INCOMING message.
+     * 
+     * @param inputSource The <code>InputSource</code> to get the XML-data
+     *            from.
+     * @exception IOException if thrown by the <code>InputSource</code>.
+     * @exception SAXException if thrown during parsing.
+     */
     private Message(InputSource inputSource) throws SAXException, IOException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         Document tempDocument = null;
 
-        boolean  dumpMsgOnError = FreeCol.isInDebugMode();
+        boolean dumpMsgOnError = FreeCol.isInDebugMode();
         dumpMsgOnError = true;
-        if ( dumpMsgOnError) {
+        if (dumpMsgOnError) {
             /*
-            inputSource.setByteStream(
-                    new ReplayableInputStream(inputSource.getByteStream()) );
+             * inputSource.setByteStream( new
+             * ReplayableInputStream(inputSource.getByteStream()) );
+             * 
+             */
+            inputSource.setByteStream(new BufferedInputStream(inputSource.getByteStream()));
 
-*/
-            inputSource.setByteStream(
-                    new BufferedInputStream(inputSource.getByteStream()) );
-
-            inputSource.getByteStream().mark( 1000000 );
+            inputSource.getByteStream().mark(1000000);
         }
 
         try {
@@ -107,20 +107,21 @@ public final class Message {
             throw se;
         } catch (IOException ie) {
             throw ie;
-        }
-        catch (ArrayIndexOutOfBoundsException e) {
+        } catch (ArrayIndexOutOfBoundsException e) {
             // Xerces throws ArrayIndexOutOfBoundsException when it barfs on
-            // some FreeCol messages.  I'd like to see the messages upon which
+            // some FreeCol messages. I'd like to see the messages upon which
             // it barfs
-            if ( dumpMsgOnError) {
-                ByteArrayOutputStream  baos = new ByteArrayOutputStream();
+            if (dumpMsgOnError) {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 inputSource.getByteStream().reset();
                 while (true) {
-                    int  i = inputSource.getByteStream().read();
-                    if (-1 == i) { break; }
-                    baos.write( i );
+                    int i = inputSource.getByteStream().read();
+                    if (-1 == i) {
+                        break;
+                    }
+                    baos.write(i);
                 }
-                logger.severe( baos.toString() );
+                logger.severe(baos.toString());
             }
             throw e;
         }
@@ -128,30 +129,29 @@ public final class Message {
         document = tempDocument;
     }
 
-
     /**
-    * Constructs a new Message with data from the given XML-document.
-    * @param document The document representing an XML-message.
-    */
+     * Constructs a new Message with data from the given XML-document.
+     * 
+     * @param document The document representing an XML-message.
+     */
     public Message(Document document) {
         this.document = document;
     }
 
-
-
     /**
-    * Gets the current version of the FreeCol protocol.
-    * @return The version of the FreeCol protocol.
-    */
+     * Gets the current version of the FreeCol protocol.
+     * 
+     * @return The version of the FreeCol protocol.
+     */
     public static String getFreeColProtocolVersion() {
         return FREECOL_PROTOCOL_VERSION;
     }
 
-
     /**
-    * Creates and returns a new XML-document.
-    * @return the new XML-document.
-    */
+     * Creates and returns a new XML-document.
+     * 
+     * @return the new XML-document.
+     */
     public static Document createNewDocument() {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -165,28 +165,26 @@ public final class Message {
         }
     }
 
-
     /**
-    * Creates a new root element. This is done by creating a new document
-    * and using this document to create the root element.
-    *
-    * @param tagName The tag name of the root element beeing created,
-    * @return the new root element.
-    */
+     * Creates a new root element. This is done by creating a new document and
+     * using this document to create the root element.
+     * 
+     * @param tagName The tag name of the root element beeing created,
+     * @return the new root element.
+     */
     public static Element createNewRootElement(String tagName) {
         return createNewDocument().createElement(tagName);
     }
 
-
     /**
-    * Creates an error message.
-    *
-    * @param messageID Identifies the "i18n"-keyname.
-    *                  Not specified in the message if <i>null</i>.
-    * @param message   The error in plain text.
-    *                  Not specified in the message if <i>null</i>.
-    * @return The root <code>Element</code> of the error message.
-    */
+     * Creates an error message.
+     * 
+     * @param messageID Identifies the "i18n"-keyname. Not specified in the
+     *            message if <i>null</i>.
+     * @param message The error in plain text. Not specified in the message if
+     *            <i>null</i>.
+     * @return The root <code>Element</code> of the error message.
+     */
     public static Element createError(String messageID, String message) {
         Element errorElement = createNewRootElement("error");
 
@@ -200,50 +198,50 @@ public final class Message {
 
         return errorElement;
     }
-    
+
     /**
      * Creates an error message.
-     *
-     * @param out       The output stream for the message.
-     * @param messageID Identifies the "i18n"-keyname.
-     *                  Not specified in the message if <i>null</i>.
-     * @param message   The error in plain text.
-     *                  Not specified in the message if <i>null</i>.
+     * 
+     * @param out The output stream for the message.
+     * @param messageID Identifies the "i18n"-keyname. Not specified in the
+     *            message if <i>null</i>.
+     * @param message The error in plain text. Not specified in the message if
+     *            <i>null</i>.
      */
-     public static void createError(XMLStreamWriter out, String messageID, String message) {
-         try {
-             out.writeStartElement("error");
-             
-             if (messageID != null && !messageID.equals("")) {
-                 out.writeAttribute("messageID", messageID);
-             }
-             
-             if (message != null && !message.equals("")) {
-                 out.writeAttribute("message", message);
-             }
-             out.writeEndElement();
-         } catch (XMLStreamException e) {
-             logger.warning("Could not send error message.");
-         }
-     }
+    public static void createError(XMLStreamWriter out, String messageID, String message) {
+        try {
+            out.writeStartElement("error");
 
+            if (messageID != null && !messageID.equals("")) {
+                out.writeAttribute("messageID", messageID);
+            }
+
+            if (message != null && !message.equals("")) {
+                out.writeAttribute("message", message);
+            }
+            out.writeEndElement();
+        } catch (XMLStreamException e) {
+            logger.warning("Could not send error message.");
+        }
+    }
 
     /**
-    * Gets the <code>Document</code> holding the message data.
-    * @return The <code>Document</code> holding the message data.
-    */
+     * Gets the <code>Document</code> holding the message data.
+     * 
+     * @return The <code>Document</code> holding the message data.
+     */
     public Document getDocument() {
         return document;
     }
 
-
     /**
-    * Gets the type of this Message.
-    * @return The type of this Message.
-    */
+     * Gets the type of this Message.
+     * 
+     * @return The type of this Message.
+     */
     public String getType() {
 
-        if ( document != null  &&  document.getDocumentElement() != null ) {
+        if (document != null && document.getDocumentElement() != null) {
 
             return document.getDocumentElement().getTagName();
         }
@@ -251,70 +249,64 @@ public final class Message {
         return INVALID_MESSAGE;
     }
 
-
     /**
-    * Checks if this message is of a given type.
-    *
-    * @param type The type you wish to test against.
-    * @return <code>true</code> if the type of this message equals the given type
-    *         and <code>false</code> otherwise.
-    */
+     * Checks if this message is of a given type.
+     * 
+     * @param type The type you wish to test against.
+     * @return <code>true</code> if the type of this message equals the given
+     *         type and <code>false</code> otherwise.
+     */
     public boolean isType(String type) {
 
-        return getType().equals( type );
+        return getType().equals(type);
     }
 
-
     /**
-    * Sets an attribute on the root element.
-    *
-    * @param key The key of the attribute.
-    * @param value The value of the attribute.
-    */
+     * Sets an attribute on the root element.
+     * 
+     * @param key The key of the attribute.
+     * @param value The value of the attribute.
+     */
     public void setAttribute(String key, String value) {
         document.getDocumentElement().setAttribute(key, value);
     }
 
-
     /**
-    * Sets an attribute on the root element.
-    *
-    * @param key The key of the attribute.
-    * @param value The value of the attribute.
-    */
+     * Sets an attribute on the root element.
+     * 
+     * @param key The key of the attribute.
+     * @param value The value of the attribute.
+     */
     public void setAttribute(String key, int value) {
         document.getDocumentElement().setAttribute(key, (new Integer(value)).toString());
     }
 
-
     /**
-    * Gets an attribute from the root element.
-    * @param key The key of the attribute.
-    * @return The value of the attribute with the
-    *       given key.
-    */
+     * Gets an attribute from the root element.
+     * 
+     * @param key The key of the attribute.
+     * @return The value of the attribute with the given key.
+     */
     public String getAttribute(String key) {
         return document.getDocumentElement().getAttribute(key);
     }
 
-
     /**
-    * Checks if an attribute is set on the root element.
-    * @param attribute The attribute in which to verify the existence of.
-    * @return <code>true</code> if the root element has the given
-    *       attribute.
-    */
+     * Checks if an attribute is set on the root element.
+     * 
+     * @param attribute The attribute in which to verify the existence of.
+     * @return <code>true</code> if the root element has the given attribute.
+     */
     public boolean hasAttribute(String attribute) {
         return document.getDocumentElement().hasAttribute(attribute);
     }
 
-
     /**
-    * Inserts <code>newRoot</code> as the new root element and appends
-    * the old root element.
-    * 
-    * @param newRoot The new root element.
-    */
+     * Inserts <code>newRoot</code> as the new root element and appends the
+     * old root element.
+     * 
+     * @param newRoot The new root element.
+     */
     public void insertAsRoot(Element newRoot) {
         Element oldRoot = document.getDocumentElement();
 
@@ -326,34 +318,33 @@ public final class Message {
         document.appendChild(newRoot);
     }
 
-
     /**
-     * Convenience method: returns the first child element with the
-     * specified tagname.
-     *
-     * @param element The <code>Element</code> to search for the child element.
+     * Convenience method: returns the first child element with the specified
+     * tagname.
+     * 
+     * @param element The <code>Element</code> to search for the child
+     *            element.
      * @param tagName The tag name of the child element to be found.
      * @return The first child element with the given name.
      */
-     public static Element getChildElement(Element element, String tagName) {
-         NodeList n = element.getChildNodes();
-         for (int i=0; i<n.getLength(); i++) {
-             if (n.item(i) instanceof Element &&
-                     ((Element) n.item(i)).getTagName().equals(tagName)) {
-                 return (Element) n.item(i);
-             }
-         }
+    public static Element getChildElement(Element element, String tagName) {
+        NodeList n = element.getChildNodes();
+        for (int i = 0; i < n.getLength(); i++) {
+            if (n.item(i) instanceof Element && ((Element) n.item(i)).getTagName().equals(tagName)) {
+                return (Element) n.item(i);
+            }
+        }
 
-         return null;
-     }
-         
-     
+        return null;
+    }
+
     /**
-    * Returns the <code>String</code> representation of the message.
-    * This is what actually gets transmitted to the other peer.
-    *
-    * @return The <code>String</code> representation of the message.
-    */
+     * Returns the <code>String</code> representation of the message. This is
+     * what actually gets transmitted to the other peer.
+     * 
+     * @return The <code>String</code> representation of the message.
+     */
+    @Override
     public String toString() {
         return document.getDocumentElement().toString();
     }
