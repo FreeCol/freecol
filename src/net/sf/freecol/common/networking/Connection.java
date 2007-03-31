@@ -485,6 +485,7 @@ public class Connection {
 
                 final Connection connection = this;
                 Thread t = new Thread() {
+                    @Override
                     public void run() {
                         try {
                             Element element = msg.getDocument().getDocumentElement();
@@ -570,6 +571,7 @@ public class Connection {
      * 
      * @rreturn human-readable description of connection.
      */
+    @Override
     public String toString() {
         return "Connection[" + getSocket() + "]";
     }
