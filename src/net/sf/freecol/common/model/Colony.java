@@ -1501,6 +1501,18 @@ public final class Colony extends Settlement implements Location, Nameable {
         // Throw away goods there is no room for.
         goodsContainer.cleanAndReport(getWarehouseCapacity(), getLowLevel(), getHighLevel());
 
+        // Warn about levels that will be exceeded next turn
+        for (int goodsType = 1; goodsType < Goods.NUMBER_OF_TYPES; goodsType++) {
+            if (goodsContainer.getGoodsCount(goodsType) + getProductionNetOf(goodsType) > getWarehouseCapacity()) {
+                addModelMessage(this, "model.building.warehouseSoonFull",
+                                new String [][] {{"%goods%", Goods.getName(goodsType)},
+                                                 {"%colony%", getName()}},
+                                ModelMessage.WAREHOUSE_CAPACITY,
+                                new Goods(goodsType));
+            }
+        }
+
+
         // Remove bells:
         bells -= Math.max(0, getUnitCount() - 2);
         if (bells < 0) {
