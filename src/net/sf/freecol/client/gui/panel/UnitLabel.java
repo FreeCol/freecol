@@ -218,10 +218,6 @@ public final class UnitLabel extends JLabel implements ActionListener {
             setEnabled(false);
         }
 
-        if (unit.getLocation() instanceof ColonyTile) {
-            setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 15));
-        }
-
         super.paintComponent(g);
         if (ignoreLocation)
             return;
@@ -233,6 +229,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
             int y = (getHeight() - getIcon().getIconHeight()) / 2;
             parent.getGUI().displayOccupationIndicator(g, unit, x, y);
         } else if (unit.getLocation() instanceof ColonyTile) {
+            setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 15));
             ImageIcon goodsIcon;
 
             if (unit.getWorkType() == Goods.FOOD && unit.getLocation() instanceof ColonyTile
