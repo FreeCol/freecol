@@ -219,8 +219,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
         }
 
         if (unit.getLocation() instanceof ColonyTile) {
-            setSize(new Dimension(parent.getImageProvider().getTerrainImageWidth(0) / 2, parent
-                    .getImageProvider().getUnitImageHeight(parent.getImageProvider().getUnitGraphicsType(unit))));
+            setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 15));
         }
 
         super.paintComponent(g);
@@ -248,7 +247,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
 
             BufferedImage productionImage = parent.getGUI().createProductionImage(goodsIcon, production, getWidth(),
                     getHeight());
-            g.drawImage(productionImage, 0, 0, null);
+            g.drawImage(productionImage, 0, 10, null);
         } else if (unit.isUnderRepair()) {
             BufferedImage repairImage = parent.getGUI().createStringImage((Graphics2D) g,
                     Messages.message("underRepair"), Color.RED, getWidth(), 12);
