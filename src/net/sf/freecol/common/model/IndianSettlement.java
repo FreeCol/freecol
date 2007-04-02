@@ -274,9 +274,14 @@ public class IndianSettlement extends Settlement {
     }
 
     public void modifyAlarm(int nation, int addToAlarm) {
-        alarm[nation].modify(addToAlarm);
+        Tension tension = alarm[nation];
+        if(tension != null) {
+            tension.modify(addToAlarm);            
+        }
         // propagate alarm upwards
-        owner.modifyTension(nation, addToAlarm/2);
+        if(owner != null) {
+            owner.modifyTension(nation, addToAlarm/2);            
+        }
     }
 
 
