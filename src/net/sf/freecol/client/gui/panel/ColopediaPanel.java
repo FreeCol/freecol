@@ -13,6 +13,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
@@ -103,7 +104,11 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         listPanel = new JPanel();
         listPanel.setOpaque(false);
         // listPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
-        add(listPanel, BorderLayout.WEST);
+        JScrollPane sl = new JScrollPane(listPanel, 
+                JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        sl.getViewport().setOpaque(false);
+        add(sl, BorderLayout.WEST);
 
         detailPanel = new JPanel();
         detailPanel.setOpaque(false);
@@ -118,6 +123,16 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         add(ok, BorderLayout.SOUTH);
 
         setSize(850, 600);
+    }
+    
+    @Override
+    public Dimension getMinimumSize() {
+        return new Dimension(850, 600);
+    }
+    
+    @Override
+    public Dimension getPreferredSize() {
+        return getMinimumSize();
     }
 
     /**
@@ -194,7 +209,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * Builds the buttons for all the terrains.
      */
     private void buildTerrainList() {
-        listPanel.setLayout(new GridLayout(0, 4));
+        listPanel.setLayout(new GridLayout(0, 1));
 
         // TODO: use specification for terrain list
         // If so we need to know if a certain tile should yield a single
@@ -209,7 +224,6 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         buildTerrainButton(Tile.ARCTIC, false);
         buildTerrainButton(ImageLibrary.HILLS, false);
         buildTerrainButton(ImageLibrary.MOUNTAINS, false);
-        listPanel.add(new JLabel());
         buildTerrainButton(Tile.OCEAN, false);
         buildTerrainButton(Tile.HIGH_SEAS, false);
 
@@ -219,7 +233,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * Builds the buttons for all the units.
      */
     private void buildUnitList() {
-        listPanel.setLayout(new GridLayout(8, 2));
+        listPanel.setLayout(new GridLayout(0, 1));
         buildUnitButton(Unit.FREE_COLONIST, .5f);
         buildUnitButton(Unit.INDENTURED_SERVANT, .5f);
         buildUnitButton(Unit.PETTY_CRIMINAL, .5f);
@@ -243,7 +257,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * Builds the buttons for all the goods.
      */
     private void buildGoodsList() {
-        listPanel.setLayout(new GridLayout(8, 2));
+        listPanel.setLayout(new GridLayout(0, 1));
         buildGoodsButton(Goods.FOOD, ImageLibrary.GOODS_FOOD);
         buildGoodsButton(Goods.SUGAR, ImageLibrary.GOODS_SUGAR);
         buildGoodsButton(Goods.TOBACCO, ImageLibrary.GOODS_TOBACCO);
@@ -266,7 +280,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * Builds the buttons for all the skills.
      */
     private void buildSkillsList() {
-        listPanel.setLayout(new GridLayout(11, 2));
+        listPanel.setLayout(new GridLayout(0, 1));
         int numberOfTypes = FreeCol.specification.numberOfUnitTypes();
         for (int type = 0; type < numberOfTypes; type++) {
             UnitType unitType = FreeCol.specification.unitType(type);
@@ -280,7 +294,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * Builds the buttons for all the buildings.
      */
     private void buildBuildingList() {
-        listPanel.setLayout(new GridLayout(19, 2));
+        listPanel.setLayout(new GridLayout(0, 1));
         int numberOfTypes = FreeCol.specification.numberOfBuildingTypes();
         for (int type = 0; type < numberOfTypes; type++) {
             BuildingType buildingType = FreeCol.specification.buildingType(type);
@@ -298,7 +312,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * Builds the buttons for all the founding fathers.
      */
     private void buildFatherList() {
-        listPanel.setLayout(new GridLayout((FoundingFather.FATHER_COUNT + 1) / 2, 2));
+        listPanel.setLayout(new GridLayout(0, 1));
         for (int i = 0; i < FoundingFather.FATHER_COUNT; i++) {
             buildFatherButton(i);
         }

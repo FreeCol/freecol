@@ -93,6 +93,10 @@ public final class MapControls {
     * @param component The component to add the map controls to.
     */
     public void addToComponent(JComponent component) {
+        if (freeColClient.getGame() == null
+                || freeColClient.getGame().getMap() == null) {
+            return;
+        }
         container = component;
         
         miniMap.setContainer(container);
@@ -112,7 +116,6 @@ public final class MapControls {
         //
         // Add the GUI Objects to the container
         //
-
         container.add(infoPanel);
         container.add(miniMap);
 

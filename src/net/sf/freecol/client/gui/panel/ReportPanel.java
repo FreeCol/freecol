@@ -1,6 +1,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -82,6 +83,17 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
 
         setSize(850, 600);
     }
+    
+    @Override
+    public Dimension getMinimumSize() {
+        return new Dimension(850, 600);
+    }
+    
+    @Override
+    public Dimension getPreferredSize() {
+        return getMinimumSize();
+    }
+
 
     /**
      * Prepares this panel to be displayed.

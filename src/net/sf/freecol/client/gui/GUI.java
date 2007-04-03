@@ -607,6 +607,7 @@ public final class GUI {
                 && (freeColClient.getGame().getMap() != null)
                 && (focus != null)
                 && inGame) {
+            removeOldMessages();
             displayMap(g);
         } else {
             Image bgImage = (Image) UIManager.get("CanvasBackgroundImage");

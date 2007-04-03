@@ -1,7 +1,7 @@
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Dimension;
 import java.awt.event.ActionListener;
-
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -25,6 +25,16 @@ public final class ReportMilitaryPanel extends ReportPanel implements ActionList
         reportUnitPanel = new ReportUnitPanel(false, false, getCanvas(), this);
     }
 
+    @Override
+    public Dimension getMinimumSize() {
+        return new Dimension(750, 600);
+    }
+    
+    @Override
+    public Dimension getPreferredSize() {
+        return getMinimumSize();
+    }
+    
     /**
      * Prepares this panel to be displayed.
      */

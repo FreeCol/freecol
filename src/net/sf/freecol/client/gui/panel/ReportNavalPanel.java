@@ -1,5 +1,6 @@
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Dimension;
 import java.awt.event.ActionListener;
 
 import net.sf.freecol.client.gui.Canvas;
@@ -23,6 +24,16 @@ public final class ReportNavalPanel extends ReportPanel implements ActionListene
     public ReportNavalPanel(Canvas parent) {
         super(parent, Messages.message("menuBar.report.naval"));
         reportUnitPanel = new ReportUnitPanel(true, true, getCanvas(), this);
+    }
+
+    @Override
+    public Dimension getMinimumSize() {
+        return new Dimension(750, 600);
+    }
+    
+    @Override
+    public Dimension getPreferredSize() {
+        return getMinimumSize();
     }
 
     /**

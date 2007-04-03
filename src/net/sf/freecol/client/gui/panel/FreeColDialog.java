@@ -121,6 +121,7 @@ public class FreeColDialog extends FreeColPanel {
                     Object src = event.getSource();
 
                     // Block 'MouseEvent' beeing sent to other components:
+                    /*
                     if (event instanceof MouseEvent) {
                         MouseEvent me = (MouseEvent) event;
                         Component dc = SwingUtilities.getDeepestComponentAt(((ComponentEvent) event).getComponent(), me.getX(), me.getY());
@@ -130,6 +131,7 @@ public class FreeColDialog extends FreeColPanel {
                             continue;
                         }
                     }
+                    */
 
                     // We cannot call theQueue.dispatchEvent, so I pasted its body here:
                     if (event instanceof ActiveEvent) {

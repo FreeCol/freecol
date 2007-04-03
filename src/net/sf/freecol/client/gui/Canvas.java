@@ -1,22 +1,98 @@
 package net.sf.freecol.client.gui;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
+import java.util.MissingResourceException;
 import java.util.logging.Logger;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JDesktopPane;
+import javax.swing.JInternalFrame;
+import javax.swing.JLayeredPane;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.plaf.basic.BasicInternalFrameUI;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.panel.ChatPanel;
+import net.sf.freecol.client.gui.panel.ChooseFoundingFatherDialog;
+import net.sf.freecol.client.gui.panel.ClientOptionsDialog;
+import net.sf.freecol.client.gui.panel.ColonyPanel;
+import net.sf.freecol.client.gui.panel.ColopediaPanel;
+import net.sf.freecol.client.gui.panel.DeclarationDialog;
+import net.sf.freecol.client.gui.panel.EmigrationPanel;
+import net.sf.freecol.client.gui.panel.ErrorPanel;
+import net.sf.freecol.client.gui.panel.EuropePanel;
+import net.sf.freecol.client.gui.panel.EventPanel;
+import net.sf.freecol.client.gui.panel.FreeColDialog;
+import net.sf.freecol.client.gui.panel.FreeColImageBorder;
+import net.sf.freecol.client.gui.panel.GameOptionsDialog;
+import net.sf.freecol.client.gui.panel.ImageProvider;
+import net.sf.freecol.client.gui.panel.IndianSettlementPanel;
+import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
+import net.sf.freecol.client.gui.panel.MainPanel;
+import net.sf.freecol.client.gui.panel.MapGeneratorOptionsDialog;
+import net.sf.freecol.client.gui.panel.MonarchPanel;
+import net.sf.freecol.client.gui.panel.NewPanel;
+import net.sf.freecol.client.gui.panel.PurchaseDialog;
+import net.sf.freecol.client.gui.panel.QuitDialog;
+import net.sf.freecol.client.gui.panel.RecruitDialog;
+import net.sf.freecol.client.gui.panel.ReportColonyPanel;
+import net.sf.freecol.client.gui.panel.ReportContinentalCongressPanel;
+import net.sf.freecol.client.gui.panel.ReportForeignAffairPanel;
+import net.sf.freecol.client.gui.panel.ReportIndianPanel;
+import net.sf.freecol.client.gui.panel.ReportLabourPanel;
+import net.sf.freecol.client.gui.panel.ReportMilitaryPanel;
+import net.sf.freecol.client.gui.panel.ReportNavalPanel;
+import net.sf.freecol.client.gui.panel.ReportPanel;
+import net.sf.freecol.client.gui.panel.ReportReligiousPanel;
+import net.sf.freecol.client.gui.panel.ReportTradePanel;
+import net.sf.freecol.client.gui.panel.ReportTurnPanel;
+import net.sf.freecol.client.gui.panel.ServerListPanel;
+import net.sf.freecol.client.gui.panel.StartGamePanel;
+import net.sf.freecol.client.gui.panel.StatusPanel;
+import net.sf.freecol.client.gui.panel.TilePanel;
+import net.sf.freecol.client.gui.panel.TradeRouteDialog;
+import net.sf.freecol.client.gui.panel.TradeRouteInputDialog;
+import net.sf.freecol.client.gui.panel.TrainDialog;
+import net.sf.freecol.client.gui.panel.VictoryPanel;
+import net.sf.freecol.client.gui.panel.WarehouseDialog;
 import net.sf.freecol.common.ServerInfo;
-import net.sf.freecol.common.model.*;
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.ModelMessage;
+import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TradeRoute;
+import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.Map.Position;
 
 /**
@@ -46,7 +122,7 @@ import net.sf.freecol.common.model.Map.Position;
  * thread will wait until that dialog is dismissed before returning. In
  * contrast, a <code>showXXXPanel</code>-method returns immediatly.
  */
-public final class Canvas extends JLayeredPane {
+public final class Canvas extends JDesktopPane {
     private static final Logger logger = Logger.getLogger(Canvas.class.getName());
 
     public static final String COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
@@ -55,63 +131,10 @@ public final class Canvas extends JLayeredPane {
 
     public static final String REVISION = "$Revision$";
 
-    private static final Integer START_GAME_LAYER = DEFAULT_LAYER, SERVER_LIST_LAYER = DEFAULT_LAYER,
-            MODEL_MESSAGE_LAYER = new Integer(DEFAULT_LAYER.intValue() + 11), CONFIRM_LAYER = new Integer(DEFAULT_LAYER
-                    .intValue() + 12), SAVE_LAYER = new Integer(DEFAULT_LAYER.intValue() + 10), ARMED_UNIT_INDIAN_SETTLEMENT_LAYER = new Integer(
-                    DEFAULT_LAYER.intValue() + 9), SCOUT_INDIAN_SETTLEMENT_LAYER = new Integer(
-                    DEFAULT_LAYER.intValue() + 9), USE_MISSIONARY_LAYER = new Integer(DEFAULT_LAYER.intValue() + 9),
-            INCITE_LAYER = new Integer(DEFAULT_LAYER.intValue() + 9), INPUT_LAYER = new Integer(DEFAULT_LAYER
-                    .intValue() + 11), CHOICE_LAYER = new Integer(DEFAULT_LAYER.intValue() + 11),
-            STATUS_LAYER = new Integer(DEFAULT_LAYER.intValue() + 7), COLOPEDIA_LAYER = new Integer(DEFAULT_LAYER
-                    .intValue() + 20), REPORT_LAYER = new Integer(DEFAULT_LAYER.intValue() + 1),
-            MAIN_LAYER = DEFAULT_LAYER, DIALOG_LAYER = new Integer(DEFAULT_LAYER.intValue() + 12),
-            INFORMATION_LAYER = new Integer(DEFAULT_LAYER.intValue() + 13), COLONY_LAYER = new Integer(DEFAULT_LAYER
-                    .intValue() + 3), WAREHOUSE_LAYER = new Integer(DEFAULT_LAYER.intValue() + 4),
-            EUROPE_LAYER = new Integer(DEFAULT_LAYER.intValue() + 3);
-
-    // private static final Integer START_GAME_LAYER = DEFAULT_LAYER,
-    // SERVER_LIST_LAYER = DEFAULT_LAYER,
-    // VICTORY_LAYER = DEFAULT_LAYER, CHAT_LAYER = DEFAULT_LAYER, NEW_GAME_LAYER
-    // = DEFAULT_LAYER,
-    // MODEL_MESSAGE_LAYER = new Integer(DEFAULT_LAYER.intValue() + 11),
-    // CONFIRM_LAYER = new Integer(DEFAULT_LAYER
-    // .intValue() + 12), GAME_OPTIONS_LAYER = new
-    // Integer(DEFAULT_LAYER.intValue() + 9),
-    // CLIENT_OPTIONS_LAYER = new Integer(DEFAULT_LAYER.intValue() + 9),
-    // LOADING_SAVEGAME_LAYER = new Integer(
-    // DEFAULT_LAYER.intValue() + 11), LOAD_LAYER = new
-    // Integer(DEFAULT_LAYER.intValue() + 10),
-    // SAVE_LAYER = new Integer(DEFAULT_LAYER.intValue() + 10),
-    // ARMED_UNIT_INDIAN_SETTLEMENT_LAYER = new Integer(
-    // DEFAULT_LAYER.intValue() + 9), SCOUT_INDIAN_SETTLEMENT_LAYER = new
-    // Integer(
-    // DEFAULT_LAYER.intValue() + 9), USE_MISSIONARY_LAYER = new
-    // Integer(DEFAULT_LAYER.intValue() + 9),
-    // INCITE_LAYER = new Integer(DEFAULT_LAYER.intValue() + 9), INPUT_LAYER =
-    // new Integer(DEFAULT_LAYER
-    // .intValue() + 11), CHOICE_LAYER = new Integer(DEFAULT_LAYER.intValue() +
-    // 11),
-    // STATUS_LAYER = new Integer(DEFAULT_LAYER.intValue() + 7), COLOPEDIA_LAYER
-    // = new Integer(DEFAULT_LAYER
-    // .intValue() + 20), REPORT_LAYER = new Integer(DEFAULT_LAYER.intValue() +
-    // 1),
-    // MAIN_LAYER = DEFAULT_LAYER, DIALOG_LAYER = new
-    // Integer(DEFAULT_LAYER.intValue() + 12),
-    // QUIT_LAYER = new Integer(DEFAULT_LAYER.intValue() + 15),
-    // INFORMATION_LAYER = new Integer(DEFAULT_LAYER
-    // .intValue() + 13), ERROR_LAYER = new Integer(DEFAULT_LAYER.intValue() +
-    // 13),
-    // EMIGRATION_LAYER = new Integer(DEFAULT_LAYER.intValue() + 1),
-    // MONARCH_LAYER = new Integer(DEFAULT_LAYER
-    // .intValue() + 1), TILE_LAYER = new Integer(DEFAULT_LAYER.intValue() + 1),
-    // INDIAN_SETTLEMENT_LAYER = DEFAULT_LAYER, COLONY_LAYER = new
-    // Integer(DEFAULT_LAYER.intValue() + 3),
-    // WAREHOUSE_LAYER = new Integer(DEFAULT_LAYER.intValue() + 4), EUROPE_LAYER
-    // = new Integer(DEFAULT_LAYER
-    // .intValue() + 3), EVENT_LAYER = new Integer(DEFAULT_LAYER.intValue() +
-    // 1),
-    // CHOOSE_FOUNDING_FATHER = new Integer(DEFAULT_LAYER.intValue() + 1);
-
+    private static final Integer MAIN_LAYER = JLayeredPane.DEFAULT_LAYER;
+    private static final Integer EUROPE_LAYER = JLayeredPane.DEFAULT_LAYER;
+    private static final Integer STATUS_LAYER = JLayeredPane.POPUP_LAYER;
+    
     private final FreeColClient freeColClient;
 
     private final MainPanel mainPanel;
@@ -123,8 +146,6 @@ public final class Canvas extends JLayeredPane {
     private final StartGamePanel startGamePanel;
 
     // private final QuitDialog quitDialog;
-
-    private final ColonyPanel colonyPanel;
 
     // private final IndianSettlementPanel indianSettlementPanel;
 
@@ -150,7 +171,7 @@ public final class Canvas extends JLayeredPane {
 
     private final GUI gui;
 
-    private final ChatDisplayThread chatDisplayThread;
+    //private final ChatDisplayThread chatDisplayThread;
 
     private final VictoryPanel victoryPanel;
 
@@ -162,27 +183,27 @@ public final class Canvas extends JLayeredPane {
 
     // private final EmigrationPanel emigrationPanel;
 
-    private final ColopediaPanel colopediaPanel;
+    //private final ColopediaPanel colopediaPanel;
 
-    private final ReportReligiousPanel reportReligiousPanel;
+    //private final ReportReligiousPanel reportReligiousPanel;
 
-    private final ReportTradePanel reportTradePanel;
+    //private final ReportTradePanel reportTradePanel;
 
-    private final ReportTurnPanel reportTurnPanel;
+    //private final ReportTurnPanel reportTurnPanel;
 
-    private final ReportLabourPanel reportLabourPanel;
+    //private final ReportLabourPanel reportLabourPanel;
 
-    private final ReportColonyPanel reportColonyPanel;
+    //private final ReportColonyPanel reportColonyPanel;
 
-    private final ReportMilitaryPanel reportMilitaryPanel;
+    //private final ReportMilitaryPanel reportMilitaryPanel;
 
-    private final ReportNavalPanel reportNavalPanel;
+    //private final ReportNavalPanel reportNavalPanel;
 
-    private final ReportForeignAffairPanel reportForeignAffairPanel;
+    //private final ReportForeignAffairPanel reportForeignAffairPanel;
 
-    private final ReportIndianPanel reportIndianPanel;
+    //private final ReportIndianPanel reportIndianPanel;
 
-    private final ReportContinentalCongressPanel reportContinentalCongressPanel;
+    //private final ReportContinentalCongressPanel reportContinentalCongressPanel;
 
     private final ServerListPanel serverListPanel;
 
@@ -198,8 +219,8 @@ public final class Canvas extends JLayeredPane {
 
     private JMenuBar jMenuBar;
 
-    private List<FreeColDialog> _openDialogs = new ArrayList<FreeColDialog>();
-
+    private boolean clientOptionsDialogShowing = false;
+    
 
     /**
      * The constructor to use.
@@ -222,8 +243,7 @@ public final class Canvas extends JLayeredPane {
         // errorPanel = new ErrorPanel(this);
         startGamePanel = new StartGamePanel(this, freeColClient);
         serverListPanel = new ServerListPanel(this, freeColClient, freeColClient.getConnectController());
-        // quitDialog = new QuitDialog(this);
-        colonyPanel = new ColonyPanel(this, freeColClient);
+        // quitDialog = new QuitDialog(this);        
         // indianSettlementPanel = new IndianSettlementPanel();
         // tilePanel = new TilePanel(this);
         // monarchPanel = new MonarchPanel(this);
@@ -242,18 +262,7 @@ public final class Canvas extends JLayeredPane {
         // warehouseDialog = new WarehouseDialog(this);
         // chooseFoundingFatherDialog = new ChooseFoundingFatherDialog(this);
         // eventPanel = new EventPanel(this, freeColClient);
-        // emigrationPanel = new EmigrationPanel(this);
-        colopediaPanel = new ColopediaPanel(this);
-        reportReligiousPanel = new ReportReligiousPanel(this);
-        reportTradePanel = new ReportTradePanel(this);
-        reportTurnPanel = new ReportTurnPanel(this, freeColClient);
-        reportLabourPanel = new ReportLabourPanel(this);
-        reportColonyPanel = new ReportColonyPanel(this);
-        reportMilitaryPanel = new ReportMilitaryPanel(this);
-        reportNavalPanel = new ReportNavalPanel(this);
-        reportForeignAffairPanel = new ReportForeignAffairPanel(this);
-        reportIndianPanel = new ReportIndianPanel(this);
-        reportContinentalCongressPanel = new ReportContinentalCongressPanel(this);
+        // emigrationPanel = new EmigrationPanel(this);        
         // gameOptionsDialog = new GameOptionsDialog(this, freeColClient);
         clientOptionsDialog = new ClientOptionsDialog(this, freeColClient);
         // mapGeneratorOptionsDialog = new MapGeneratorOptionsDialog(this,
@@ -264,8 +273,8 @@ public final class Canvas extends JLayeredPane {
         setFocusTraversalKeysEnabled(false);
         // takeFocus();
 
-        chatDisplayThread = new ChatDisplayThread();
-        chatDisplayThread.start();
+        //chatDisplayThread = new ChatDisplayThread();
+        //chatDisplayThread.start();
 
         // TODO: move shutdown hook from GUI to (say) client!
         Runtime runtime = Runtime.getRuntime();
@@ -278,7 +287,7 @@ public final class Canvas extends JLayeredPane {
 
         logger.info("Canvas created.");
     }
-
+    
     /**
      * Returns the <code>ClientOptionsDialog</code>.
      * 
@@ -367,7 +376,7 @@ public final class Canvas extends JLayeredPane {
 
         if (game != null && player != null) {
             startGamePanel.initialize(singlePlayerMode);
-            addCentered(startGamePanel, START_GAME_LAYER);
+            addAsFrame(startGamePanel);
             startGamePanel.requestFocus();
         } else {
             logger.warning("Tried to open 'StartGamePanel' without having 'game' and/or 'player' set.");
@@ -387,7 +396,7 @@ public final class Canvas extends JLayeredPane {
         closeMenus();
 
         serverListPanel.initialize(username, serverList);
-        addCentered(serverListPanel, SERVER_LIST_LAYER);
+        addAsFrame(serverListPanel);
         serverListPanel.requestFocus();
     }
 
@@ -398,8 +407,7 @@ public final class Canvas extends JLayeredPane {
      */
     public void showVictoryPanel() {
         closeMenus();
-        setEnabled(false);
-        addCentered(victoryPanel);
+        addAsFrame(victoryPanel);
         victoryPanel.requestFocus();
     }
 
@@ -409,13 +417,11 @@ public final class Canvas extends JLayeredPane {
      * @see WarehouseDialog
      */
     public void showWarehouseDialog(Colony colony) {
-        // closeMenus();
-        setEnabled(false);
         WarehouseDialog warehouseDialog = new WarehouseDialog(this);
         warehouseDialog.initialize(colony);
 
         // TODO: Not a standard dialog, special treatment for now.
-        addCentered(warehouseDialog, WAREHOUSE_LAYER);
+        addAsFrame(warehouseDialog);
         warehouseDialog.requestFocus();
     }
 
@@ -426,8 +432,7 @@ public final class Canvas extends JLayeredPane {
      */
     public void showChatPanel() {
         closeMenus();
-        setEnabled(false);
-        addCentered(chatPanel);
+        addAsFrame(chatPanel);
         chatPanel.requestFocus();
     }
 
@@ -438,7 +443,7 @@ public final class Canvas extends JLayeredPane {
      */
     public void showNewGamePanel() {
         closeMenus();
-        addCentered(newPanel);
+        addAsFrame(newPanel);
         newPanel.requestFocus();
     }
 
@@ -515,9 +520,9 @@ public final class Canvas extends JLayeredPane {
      * @param messages A list of messages to display.
      */
     public void showTurnReport(ArrayList<ModelMessage> messages) {
+        final ReportTurnPanel reportTurnPanel = new ReportTurnPanel(this, freeColClient);
         reportTurnPanel.initialize(messages);
-        setEnabled(false);
-        addCentered(reportTurnPanel, REPORT_LAYER);
+        addAsFrame(reportTurnPanel);
         reportTurnPanel.requestFocus();
     }
 
@@ -563,11 +568,11 @@ public final class Canvas extends JLayeredPane {
         // source should be the same for all messages
         FreeColGameObject source = modelMessages[0].getSource();
         if ((source instanceof Europe && !europePanel.isShowing())
-                || (source instanceof Colony || source instanceof WorkLocation) && !colonyPanel.isShowing()) {
+                || (source instanceof Colony || source instanceof WorkLocation)) {
 
             FreeColDialog confirmDialog = FreeColDialog.createConfirmDialog(messageText, messageIcon, okText,
                     cancelText);
-            addCentered(confirmDialog, MODEL_MESSAGE_LAYER);
+            addAsFrame(confirmDialog);
             confirmDialog.requestFocus();
 
             if (!confirmDialog.getResponseBoolean()) {
@@ -581,19 +586,21 @@ public final class Canvas extends JLayeredPane {
                 }
             } else {
                 remove(confirmDialog);
-                if (!getColonyPanel().isShowing() && !getEuropePanel().isShowing())
+                if (!isShowingSubPanel()) {
                     freeColClient.getInGameController().nextModelMessage();
+                }
             }
         } else {
             FreeColDialog informationDialog = FreeColDialog.createInformationDialog(messageText, messageIcon);
-            addCentered(informationDialog, MODEL_MESSAGE_LAYER);
+            addAsFrame(informationDialog);
             informationDialog.requestFocus();
 
             informationDialog.getResponse();
             remove(informationDialog);
 
-            if (!getColonyPanel().isShowing() && !getEuropePanel().isShowing())
+            if (!isShowingSubPanel()) {
                 freeColClient.getInGameController().nextModelMessage();
+            }
         }
     }
 
@@ -696,7 +703,7 @@ public final class Canvas extends JLayeredPane {
         }
 
         FreeColDialog confirmDialog = FreeColDialog.createConfirmDialog(text, okText, cancelText);
-        addCentered(confirmDialog, CONFIRM_LAYER);
+        addAsFrame(confirmDialog);
         confirmDialog.requestFocus();
 
         boolean response = confirmDialog.getResponseBoolean();
@@ -717,7 +724,7 @@ public final class Canvas extends JLayeredPane {
     public boolean showPreCombatDialog(Unit attacker, Unit defender, Settlement settlement) {
 
         FreeColDialog preCombatDialog = FreeColDialog.createPreCombatDialog(attacker, defender, settlement, this);
-        addCentered(preCombatDialog, CONFIRM_LAYER);
+        addAsFrame(preCombatDialog);
         preCombatDialog.requestFocus();
 
         boolean response = preCombatDialog.getResponseBoolean();
@@ -762,7 +769,7 @@ public final class Canvas extends JLayeredPane {
         }
 
         FreeColDialog confirmDialog = FreeColDialog.createConfirmDialog(texts, images, okText, cancelText);
-        addCentered(confirmDialog, CONFIRM_LAYER);
+        addAsFrame(confirmDialog);
         confirmDialog.requestFocus();
 
         boolean response = confirmDialog.getResponseBoolean();
@@ -773,26 +780,30 @@ public final class Canvas extends JLayeredPane {
     }
 
     /**
+     * Checks if the <code>ClientOptionsDialog</code> is visible.
+     * @return <code>true</code> if no internal frames are open.
+     */
+    public boolean isClientOptionsDialogShowing() {
+        return clientOptionsDialogShowing;
+    }
+
+    
+    /**
+     * Checks if mapboard actions should be enabled.
+     * @return <code>true</code> if no internal frames are open.
+     */
+    public boolean isMapboardActionsEnabled() {
+        return !isShowingSubPanel();
+    }
+    
+    /**
      * Checks if this <code>Canvas</code> displaying another panel.
      * 
-     * @return <code>true</code> if the <code>Canvas</code> is displaying a
-     *         sub panel other than
-     *         {@link net.sf.freecol.client.gui.panel.InfoPanel} and
-     *         {@link net.sf.freecol.client.gui.panel.MiniMap}.
+     * @return <code>true</code> if the <code>Canvas</code> is displaying an
+     *         internal frame.
      */
     public boolean isShowingSubPanel() {
-        if (getColonyPanel().isShowing() || getEuropePanel().isShowing()) {
-            return true;
-        }
-
-        Component[] comps = getComponents();
-        for (int i = 0; i < comps.length; i++) {
-            if (comps[i] instanceof FreeColPanel && !(comps[i] instanceof InfoPanel)) {
-                return true;
-            }
-        }
-
-        return false;
+        return (getAllFrames().length > 0);
     }
 
     /**
@@ -865,9 +876,11 @@ public final class Canvas extends JLayeredPane {
         // addCentered(clientOptionsDialog, CLIENT_OPTIONS_LAYER);
         // clientOptionsDialog.requestFocus();
 
+        clientOptionsDialogShowing = true;
         showFreeColDialog(clientOptionsDialog);
         boolean r = clientOptionsDialog.getResponseBoolean();
         removeFreeColDialog(clientOptionsDialog);
+        clientOptionsDialogShowing = false;
 
         // remove(clientOptionsDialog);
 
@@ -982,7 +995,7 @@ public final class Canvas extends JLayeredPane {
      */
     public File showSaveDialog(File directory, String standardName, FileFilter[] fileFilters, String defaultName) {
         FreeColDialog saveDialog = FreeColDialog.createSaveDialog(directory, standardName, fileFilters, defaultName);
-        addCentered(saveDialog, SAVE_LAYER);
+        addAsFrame(saveDialog);
         saveDialog.requestFocus();
 
         File response = (File) saveDialog.getResponse();
@@ -1008,7 +1021,7 @@ public final class Canvas extends JLayeredPane {
     public int showScoutIndianSettlementDialog(IndianSettlement settlement) {
         FreeColDialog scoutDialog = FreeColDialog.createScoutIndianSettlementDialog(settlement, freeColClient
                 .getMyPlayer());
-        addCentered(scoutDialog, SCOUT_INDIAN_SETTLEMENT_LAYER);
+        addAsFrame(scoutDialog);
         scoutDialog.requestFocus();
 
         int response = scoutDialog.getResponseInt();
@@ -1034,7 +1047,7 @@ public final class Canvas extends JLayeredPane {
     public int showArmedUnitIndianSettlementDialog(IndianSettlement settlement) {
         FreeColDialog armedUnitDialog = FreeColDialog.createArmedUnitIndianSettlementDialog(settlement, freeColClient
                 .getMyPlayer());
-        addCentered(armedUnitDialog, ARMED_UNIT_INDIAN_SETTLEMENT_LAYER);
+        addAsFrame(armedUnitDialog);
         armedUnitDialog.requestFocus();
 
         int response = armedUnitDialog.getResponseInt();
@@ -1063,7 +1076,7 @@ public final class Canvas extends JLayeredPane {
     public List<Object> showUseMissionaryDialog(IndianSettlement settlement) {
         FreeColDialog missionaryDialog = FreeColDialog.createUseMissionaryDialog(settlement, freeColClient
                 .getMyPlayer());
-        addCentered(missionaryDialog, USE_MISSIONARY_LAYER);
+        addAsFrame(missionaryDialog);
         missionaryDialog.requestFocus();
 
         Integer response = (Integer) missionaryDialog.getResponse();
@@ -1076,7 +1089,7 @@ public final class Canvas extends JLayeredPane {
         if (response.intValue() == FreeColDialog.MISSIONARY_INCITE_INDIANS) {
             FreeColDialog inciteDialog = FreeColDialog.createInciteDialog(freeColClient.getGame().getEuropeanPlayers(),
                     freeColClient.getMyPlayer());
-            addCentered(inciteDialog, USE_MISSIONARY_LAYER);
+            addAsFrame(inciteDialog);
             inciteDialog.requestFocus();
 
             Player response2 = (Player) inciteDialog.getResponse();
@@ -1110,7 +1123,7 @@ public final class Canvas extends JLayeredPane {
 
         FreeColDialog confirmDialog = FreeColDialog.createConfirmDialog(message, Messages.message("yes"), Messages
                 .message("no"));
-        addCentered(confirmDialog, INCITE_LAYER);
+        addAsFrame(confirmDialog);
         confirmDialog.requestFocus();
         boolean result = confirmDialog.getResponseBoolean();
         remove(confirmDialog);
@@ -1142,7 +1155,7 @@ public final class Canvas extends JLayeredPane {
         }
 
         FreeColDialog inputDialog = FreeColDialog.createInputDialog(text, defaultValue, okText, cancelText);
-        addCentered(inputDialog, INPUT_LAYER);
+        addAsFrame(inputDialog);
         inputDialog.requestFocus();
 
         String response = (String) inputDialog.getResponse();
@@ -1162,13 +1175,13 @@ public final class Canvas extends JLayeredPane {
 
             do {
                 remove(inputDialog);
-                addCentered(informationDialog, INPUT_LAYER);
+                addAsFrame(informationDialog);
                 informationDialog.requestFocus();
 
                 informationDialog.getResponse();
                 remove(informationDialog);
 
-                addCentered(inputDialog, INPUT_LAYER);
+                addAsFrame(inputDialog);
                 inputDialog.requestFocus();
 
                 response = (String) inputDialog.getResponse();
@@ -1220,7 +1233,7 @@ public final class Canvas extends JLayeredPane {
         if (choiceDialog.getHeight() > getHeight() / 3) {
             choiceDialog.setSize(choiceDialog.getWidth(), (getHeight() * 2) / 3);
         }
-        addCentered(choiceDialog, CHOICE_LAYER);
+        addAsFrame(choiceDialog);
         choiceDialog.requestFocus();
 
         Object response = choiceDialog.getResponse();
@@ -1259,9 +1272,9 @@ public final class Canvas extends JLayeredPane {
      * @param type The type of colopedia panel to display.
      */
     public void showColopediaPanel(int type) {
+        ColopediaPanel colopediaPanel = new ColopediaPanel(this);
         colopediaPanel.initialize(type);
-        setEnabled(false);
-        addCentered(colopediaPanel, COLOPEDIA_LAYER);
+        addAsFrame(colopediaPanel);
         colopediaPanel.requestFocus();
     }
 
@@ -1272,9 +1285,9 @@ public final class Canvas extends JLayeredPane {
      * @param action The details to display.
      */
     public void showColopediaPanel(int type, int action) {
+        ColopediaPanel colopediaPanel = new ColopediaPanel(this);
         colopediaPanel.initialize(type, action);
-        setEnabled(false);
-        addCentered(colopediaPanel, COLOPEDIA_LAYER);
+        addAsFrame(colopediaPanel);
         colopediaPanel.requestFocus();
     }
 
@@ -1286,33 +1299,32 @@ public final class Canvas extends JLayeredPane {
     public void showReportPanel(String classname) {
         ReportPanel reportPanel = null;
         if ("net.sf.freecol.client.gui.panel.ReportReligiousPanel".equals(classname)) {
-            reportPanel = reportReligiousPanel;
+            reportPanel = new ReportReligiousPanel(this);
         } else if ("net.sf.freecol.client.gui.panel.ReportLabourPanel".equals(classname)) {
-            reportPanel = reportLabourPanel;
+            reportPanel = new ReportLabourPanel(this);
         } else if ("net.sf.freecol.client.gui.panel.ReportForeignAffairPanel".equals(classname)) {
-            reportPanel = reportForeignAffairPanel;
+            reportPanel = new ReportForeignAffairPanel(this);
         } else if ("net.sf.freecol.client.gui.panel.ReportIndianPanel".equals(classname)) {
-            reportPanel = reportIndianPanel;
+            reportPanel = new ReportIndianPanel(this);
         } else if ("net.sf.freecol.client.gui.panel.ReportTurnPanel".equals(classname)) {
-            reportPanel = reportTurnPanel;
+            reportPanel = new ReportTurnPanel(this, freeColClient);
         } else if ("net.sf.freecol.client.gui.panel.ReportContinentalCongressPanel".equals(classname)) {
-            reportPanel = reportContinentalCongressPanel;
+            reportPanel = new ReportContinentalCongressPanel(this);
         } else if ("net.sf.freecol.client.gui.panel.ReportTradePanel".equals(classname)) {
-            reportPanel = reportTradePanel;
+            reportPanel = new ReportTradePanel(this);
         } else if ("net.sf.freecol.client.gui.panel.ReportMilitaryPanel".equals(classname)) {
-            reportPanel = reportMilitaryPanel;
+            reportPanel = new ReportMilitaryPanel(this);
         } else if ("net.sf.freecol.client.gui.panel.ReportNavalPanel".equals(classname)) {
-            reportPanel = reportNavalPanel;
+            reportPanel = new ReportNavalPanel(this);
         } else if ("net.sf.freecol.client.gui.panel.ReportColonyPanel".equals(classname)) {
-            reportPanel = reportColonyPanel;
+            reportPanel = new ReportColonyPanel(this);
         } else {
             logger.warning("Request for Report panel could not be processed.  Name=" + classname);
         }
 
         if (reportPanel != null) {
             reportPanel.initialize();
-            setEnabled(false);
-            addCentered(reportPanel, REPORT_LAYER);
+            addAsFrame(reportPanel);
             reportPanel.requestFocus();
         }
     }
@@ -1388,10 +1400,7 @@ public final class Canvas extends JLayeredPane {
         } else {
             europePanel.initialize(freeColClient.getMyPlayer().getEurope(), freeColClient.getGame());
             europePanel.setLocation(0, getMenuBarHeight());
-            setEnabled(false);
-            add(europePanel, EUROPE_LAYER);
-
-            europePanel.requestFocus();
+            JInternalFrame f = addAsSimpleFrame(europePanel);
         }
     }
 
@@ -1515,16 +1524,9 @@ public final class Canvas extends JLayeredPane {
      * @see ColonyPanel
      */
     public void showColonyPanel(Colony colony) {
-        if (colonyPanel.isShowing()) {
-            throw new IllegalStateException("Colony panel already open!");
-        }
-        closeMenus();
-
-        // NOTE! The colony panel is not a FreeColDialog, so the
-        // showFreeColDialog method cannot be used.
+        ColonyPanel colonyPanel = new ColonyPanel(this, freeColClient);
         colonyPanel.initialize(colony, freeColClient.getGame());
-        setEnabled(false);
-        addCentered(colonyPanel, COLONY_LAYER);
+        addAsFrame(colonyPanel);
         colonyPanel.requestFocus();
     }
 
@@ -1610,12 +1612,7 @@ public final class Canvas extends JLayeredPane {
      * @param dialog The dialog/panel.
      */
     private synchronized void showFreeColDialog(FreeColDialog dialog) {
-        int numOpenDialogs = _openDialogs.size();
-        _openDialogs.add(dialog);
-        addCentered(dialog, DIALOG_LAYER.intValue() + numOpenDialogs);
-        if (numOpenDialogs > 0) {
-            setEnabled(false);
-        }
+        addAsFrame(dialog);
         dialog.requestFocus();
     }
 
@@ -1624,18 +1621,7 @@ public final class Canvas extends JLayeredPane {
      * {@link #showFreeColDialog(FreeColDialog)}.
      */
     private synchronized void removeFreeColDialog(FreeColDialog dialog) {
-        if (_openDialogs.contains(dialog)) {
-            _openDialogs.remove(dialog);
-            remove(dialog);
-            if (_openDialogs.isEmpty()) {
-                setEnabled(true);
-                requestFocus();
-            } else {
-                _openDialogs.get(_openDialogs.size() - 1).requestFocus();
-            }
-        } else {
-            logger.log(Level.WARNING, "removeFreeColDialog called with unknown dialog (" + dialog.getClass().getName());
-        }
+        remove(dialog);
     }
 
     /**
@@ -1692,6 +1678,23 @@ public final class Canvas extends JLayeredPane {
     }
 
     /**
+     * Gets the internal frame for the given component.
+     * 
+     * @param c The component.
+     * @return The given component if this is an internal frame or
+     *      the first parent that is an internal frame. Returns
+     *      <code>null</code> if no internal frame is found.
+     */
+    private JInternalFrame getInternalFrame(final Component c) {
+        Component temp = c;
+ 
+        while (temp != null && !(temp instanceof JInternalFrame)) {
+            temp = temp.getParent();            
+        }        
+        return (JInternalFrame) temp;
+    }
+    
+    /**
      * Removes the given component from this Container.
      * 
      * @param comp The component to remove from this Container.
@@ -1700,30 +1703,41 @@ public final class Canvas extends JLayeredPane {
      *            if this parameter is <code>true</code>.
      */
     public void remove(Component comp, boolean update) {
-        if (comp != null) {
-            if (comp == jMenuBar) {
-                jMenuBar = null;
-            }
-
-            boolean takeFocus = true;
-            if (comp == statusPanel) {
-                takeFocus = false;
-            }
-
-            Rectangle bounds = comp.getBounds();
+        if (comp == null) {
+            return;
+        }
+        Rectangle updateBounds = comp.getBounds();        
+        if (comp == jMenuBar) {
+            jMenuBar = null;
             super.remove(comp);
-
-            if (update) {
-                setEnabled(true);
-                updateJMenuBar();
-                freeColClient.getActionManager().update();
-
-                if (takeFocus && !isShowingSubPanel()) {
-                    takeFocus();
-                }
-
-                repaint(bounds.x, bounds.y, bounds.width, bounds.height);
+        } else {
+            final JInternalFrame frame = getInternalFrame(comp);
+            if (frame != null && frame != comp) {    
+                updateBounds = frame.getBounds();
+                //frame.setVisible(false);
+                frame.dispose();
+            } else {
+                super.remove(comp);
             }
+        }
+        
+        final boolean takeFocus = (comp != statusPanel);
+        if (update) {
+            //setEnabled(true);
+            updateJMenuBar();
+            freeColClient.getActionManager().update();
+            if (takeFocus && !isShowingSubPanel()) {
+                takeFocus();
+            }
+            repaint(updateBounds.x, updateBounds.y, updateBounds.width, updateBounds.height);
+            
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    if (freeColClient.getGame() != null) {
+                        freeColClient.getInGameController().nextModelMessage();
+                    }
+                }
+            });
         }
     }
 
@@ -1749,6 +1763,131 @@ public final class Canvas extends JLayeredPane {
     public Component addCentered(Component comp) {
         addCentered(comp, null);
         return comp;
+    }
+
+    /**
+     * Adds a component centered on this Canvas inside a frame. Removes the statuspanel if
+     * visible (and <code>comp != statusPanel</code>).
+     * 
+     * @param comp The component to add to this ToEuropePanel.
+     * @param i The layer to add the component to (see JLayeredPane).
+     * @return The <code>JInternalFrame</code> that was created and added.
+     */
+    public JInternalFrame addAsFrame(JComponent comp) {
+        final int FRAME_EMPTY_SPACE = 60;
+        
+        final JInternalFrame f = new JInternalFrame();
+        if (f.getContentPane() instanceof JComponent) {
+            JComponent c = (JComponent) f.getContentPane();
+            c.setOpaque(false);
+            c.setBorder(null);
+        }
+
+        if (comp.getBorder() != null) {
+            Image menuborderN = (Image) UIManager.get("menuborder.n.image");
+            Image menuborderNW = (Image) UIManager.get("menuborder.nw.image");
+            Image menuborderNE = (Image) UIManager.get("menuborder.ne.image");
+            Image menuborderW = (Image) UIManager.get("menuborder.w.image");
+            Image menuborderE = (Image) UIManager.get("menuborder.e.image");
+            Image menuborderS = (Image) UIManager.get("menuborder.s.image");
+            Image menuborderSW = (Image) UIManager.get("menuborder.sw.image");
+            Image menuborderSE = (Image) UIManager.get("menuborder.se.image");
+            final FreeColImageBorder imageBorder = new FreeColImageBorder(menuborderN, menuborderW, menuborderS,
+                    menuborderE, menuborderNW, menuborderNE, menuborderSW, menuborderSE);
+            //comp.setBorder(BorderFactory.createCompoundBorder(imageBorder,
+            //        BorderFactory.createEmptyBorder(10, 10, 10, 10)));
+            
+            f.setBorder(imageBorder);
+            comp.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        } else {
+            f.setBorder(null);
+        }
+               
+        final FrameMotionListener fml = new FrameMotionListener(f);
+        comp.addMouseMotionListener(fml);
+        comp.addMouseListener(fml);
+        if (f.getUI() instanceof BasicInternalFrameUI) {
+            BasicInternalFrameUI biu = (BasicInternalFrameUI) f.getUI();
+            biu.setNorthPane(null);
+            biu.setSouthPane(null);
+            biu.setWestPane(null);
+            biu.setEastPane(null);
+        }
+        
+        f.getContentPane().add(comp);
+        f.setOpaque(false);
+        f.pack();
+        int width = f.getWidth();
+        int height = f.getHeight();
+        if (width > getWidth() - FRAME_EMPTY_SPACE) {
+            width = getWidth() - FRAME_EMPTY_SPACE;
+        }
+        if (height > getHeight() - FRAME_EMPTY_SPACE) {
+            height = getHeight() - FRAME_EMPTY_SPACE;
+        }
+        f.setSize(width, height);
+        addCentered(f);
+        f.setName(comp.getClass().getSimpleName());
+         
+        f.setFrameIcon(null);
+        f.setVisible(true);
+        f.setResizable(true);
+        try {
+            f.setSelected(true);
+        } catch (java.beans.PropertyVetoException e) {}
+
+        return f;
+    }
+
+    /**
+     * Adds a component centered on this Canvas inside a frame. Removes the
+     * statuspanel if visible (and <code>comp != statusPanel</code>).
+     * 
+     * The frame cannot be moved or resized.
+     * 
+     * @param comp The component to add to this ToEuropePanel.
+     * @param i The layer to add the component to (see JLayeredPane).
+     * @return The <code>JInternalFrame</code> that was created and added.
+     */
+    public JInternalFrame addAsSimpleFrame(JComponent comp) { 
+        final JInternalFrame f = new JInternalFrame();
+        f.getContentPane().add(comp);
+        f.pack();
+        addCentered(f);
+        f.setName(comp.getClass().getSimpleName());
+        
+        if (f.getUI() instanceof BasicInternalFrameUI) {
+            BasicInternalFrameUI biu = (BasicInternalFrameUI) f.getUI();
+            biu.setNorthPane(null);
+        }
+        
+        f.setFrameIcon(null);
+        f.setVisible(true);
+        f.setResizable(false);
+        try {
+            f.setSelected(true);
+        } catch (java.beans.PropertyVetoException e) {}
+
+        return f;
+    }
+
+    /**
+     * Removes the mouse listeners for moving the frame
+     * of the given component.
+     * 
+     * @param c The component the listeneres should be removed from. 
+     */
+    public void deactivateMovable(JComponent c) {
+        for (MouseListener ml : c.getMouseListeners()) {
+            if (ml instanceof FrameMotionListener) {
+                c.removeMouseListener(ml);
+            }
+        }
+        for (MouseMotionListener ml : c.getMouseMotionListeners()) {
+            if (ml instanceof FrameMotionListener) {
+                c.removeMouseMotionListener(ml);
+            }
+        }
     }
 
     /**
@@ -1783,8 +1922,13 @@ public final class Canvas extends JLayeredPane {
         } else {
             super.add(comp, i);
         }
-        updateJMenuBar();
-        freeColClient.getActionManager().update();
+        
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                updateJMenuBar();
+                freeColClient.getActionManager().update();
+            }
+        });
     }
 
     /**
@@ -1792,9 +1936,9 @@ public final class Canvas extends JLayeredPane {
      * while even its request doesn't get granted immediately.
      */
     private void takeFocus() {
-        JComponent c = this;
+        //JComponent c = this;
 
-        if (startGamePanel.isShowing()) {
+        /*if (startGamePanel.isShowing()) {
             c = startGamePanel;
         } else if (newPanel.isShowing()) {
             c = newPanel;
@@ -1804,18 +1948,12 @@ public final class Canvas extends JLayeredPane {
             c = europePanel;
         } else if (colonyPanel.isShowing()) {
             c = colonyPanel;
+        }*/        
+        
+        //c.requestFocus();
+        if (!isShowingSubPanel()) {
+            requestFocus();
         }
-
-        c.requestFocus();
-    }
-
-    /**
-     * Gets the <code>ColonyPanel</code>.
-     * 
-     * @return The <code>ColonyPanel</code>
-     */
-    public ColonyPanel getColonyPanel() {
-        return colonyPanel;
     }
 
     /**
@@ -1828,28 +1966,6 @@ public final class Canvas extends JLayeredPane {
     }
 
     /**
-     * Enables or disables this component depending on the given argument.
-     * 
-     * @param b Must be set to 'true' if this component needs to be enabled or
-     *            to 'false' otherwise.
-     */
-    @Override
-    public void setEnabled(boolean b) {
-        if (isEnabled() != b) {
-            for (int i = 0; i < getComponentCount(); i++) {
-                getComponent(i).setEnabled(b);
-            }
-
-            /*
-             * if (jMenuBar != null) { jMenuBar.setEnabled(b); }
-             */
-            freeColClient.getActionManager().update();
-
-            super.setEnabled(b);
-        }
-    }
-
-    /**
      * Shows the given popup at the given position on the screen.
      * 
      * @param popup The JPopupMenu to show.
@@ -1857,8 +1973,9 @@ public final class Canvas extends JLayeredPane {
      * @param y The y-coordinate at which to show the popup.
      */
     public void showPopup(JPopupMenu popup, int x, int y) {
-        closeMenus();
+        //closeMenus();
         popup.show(this, x, y);
+        popup.repaint();
     }
 
     /**
@@ -1967,7 +2084,7 @@ public final class Canvas extends JLayeredPane {
         }
         FreeColDialog infoDialog = FreeColDialog.createInformationDialog(new String[] { text },
                 new ImageIcon[] { null });
-        addCentered(infoDialog, INFORMATION_LAYER);
+        addAsFrame(infoDialog);
         infoDialog.requestFocus();
 
         infoDialog.getResponse();
@@ -2021,17 +2138,22 @@ public final class Canvas extends JLayeredPane {
     public ImageProvider getImageProvider() {
         return gui.getImageLibrary();
     }
-
+    
     /**
      * Closes all the menus that are currently open.
      */
     public void closeMenus() {
+        /*
         remove(newPanel, false);
         remove(startGamePanel, false);
         remove(serverListPanel, false);
         remove(colonyPanel, false);
         remove(europePanel, false);
         remove(statusPanel);
+        */
+        for (JInternalFrame frame : getAllFrames()) {
+            frame.dispose();
+        }
     }
 
     /**
@@ -2121,7 +2243,6 @@ public final class Canvas extends JLayeredPane {
         // If GUI thinks we're still in the game then log an error because at
         // this
         // point the GUI should have been informed.
-        setEnabled(false);
         closeMenus();
         removeInGameComponents();
         showMainPanel();
@@ -2158,7 +2279,6 @@ public final class Canvas extends JLayeredPane {
      * @return <code>true</code> if there is a single ingame component.
      */
     public boolean containsInGameComponents() {
-        // remove listeners, they will be added when launching the new game...
         KeyListener[] keyListeners = getKeyListeners();
         if (keyListeners.length > 0) {
             return true;
@@ -2187,14 +2307,12 @@ public final class Canvas extends JLayeredPane {
     public boolean confirmQuitDialog() {
         QuitDialog quitDialog = new QuitDialog(this);
 
-        // addCentered(quitDialog, QUIT_LAYER);
-        // quitDialog.requestFocus();
-
-        showFreeColDialog(quitDialog);
+        JInternalFrame f = addAsFrame(quitDialog);
+        quitDialog.requestFocus();
         try {
             return quitDialog.getResponseBoolean();
         } finally {
-            removeFreeColDialog(quitDialog);
+            remove(quitDialog);
         }
     }
 
@@ -2231,33 +2349,43 @@ public final class Canvas extends JLayeredPane {
         showNewGamePanel();
     }
 
-
     /**
-     * Makes sure that old chat messages are removed in time.
+     * Handles the moving of internal frames.
      */
-    private final class ChatDisplayThread extends Thread {
-        /**
-         * The constructor to use.
-         */
-        public ChatDisplayThread() {
-            super("ChatDisplayThread");
+    class FrameMotionListener extends MouseAdapter implements MouseMotionListener {
+        
+        private JInternalFrame f;
+        private Point loc = null;
+        
+        FrameMotionListener(JInternalFrame f) {
+            this.f = f;
         }
-
-        /**
-         * Removes old chat messages regularly.
-         */
+        
         @Override
-        public void run() {
-            for (;;) {
-                if (gui.removeOldMessages()) {
-                    refresh();
-                }
-                try {
-                    sleep(500);
-                } catch (InterruptedException e) {
-                    // Do nothing here
-                }
-            }
+        public void mousePressed(MouseEvent e) {
+            loc = SwingUtilities.convertPoint((Component) e.getSource(),  e.getX(), e.getY(), null);
+            f.getDesktopPane().getDesktopManager().beginDraggingFrame(f);
         }
-    }
+        
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            f.getDesktopPane().getDesktopManager().endDraggingFrame(f);
+        }
+        
+        public void mouseDragged(MouseEvent e) {
+            if (loc == null
+                    || f.getDesktopPane() == null
+                    || f.getDesktopPane().getDesktopManager() == null) {
+                return;
+            }
+            
+            Point p = SwingUtilities.convertPoint((Component) e.getSource(),  e.getX(), e.getY(), null); 
+            int moveX = loc.x - p.x;
+            int moveY = loc.y - p.y;
+            f.getDesktopPane().getDesktopManager().dragFrame(f, f.getX() - moveX, f.getY() - moveY);
+            loc = p;
+        }
+        
+        public void mouseMoved(MouseEvent arg0) {}            
+    };   
 }

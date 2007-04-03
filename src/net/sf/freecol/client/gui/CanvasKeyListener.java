@@ -71,6 +71,10 @@ public final class CanvasKeyListener implements KeyListener {
     }
 
     private void moveCursor(KeyEvent e) {
+        if (!parent.isMapboardActionsEnabled()) {
+            return;
+        }
+        
         switch (e.getKeyCode()) {
         case KeyEvent.VK_ESCAPE:
             // main menu
@@ -125,6 +129,10 @@ public final class CanvasKeyListener implements KeyListener {
     }
 
     private void moveUnit(KeyEvent e) {
+        if (!parent.isMapboardActionsEnabled()) {
+            return;
+        }
+        
         switch (e.getKeyCode()) {
         case KeyEvent.VK_ESCAPE:
             // main menu

@@ -39,6 +39,7 @@ public final class CanvasMouseListener implements MouseListener {
     public void mouseClicked(MouseEvent e) {
         if (e.getClickCount() > 1) {
             gui.showColonyPanel(gui.convertToMapCoordinates(e.getX(), e.getY()));
+        } else {
             canvas.requestFocus();
         }
     }

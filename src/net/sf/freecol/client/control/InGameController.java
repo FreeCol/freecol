@@ -221,7 +221,6 @@ public final class InGameController implements NetworkConstants {
 
             removeUnitsOutsideLOS();
             freeColClient.getCanvas().closeMenus();
-            freeColClient.getCanvas().setEnabled(true);
             if (currentPlayer.checkEmigrate()) {
                 emigrateUnitInEurope(currentPlayer.hasFather(FoundingFather.WILLIAM_BREWSTER) ? freeColClient
                         .getCanvas().showEmigrationPanel() : 0);
@@ -1927,7 +1926,7 @@ public final class InGameController implements NetworkConstants {
         changeStateElement.setAttribute("state", Integer.toString(state));
         client.sendAndWait(changeStateElement);
 
-        if (!freeColClient.getCanvas().getColonyPanel().isShowing()
+        if (!freeColClient.getCanvas().isShowingSubPanel()
                 && (unit.getMovesLeft() == 0 || unit.getState() == Unit.SENTRY)) {
             nextActiveUnit();
         } else {

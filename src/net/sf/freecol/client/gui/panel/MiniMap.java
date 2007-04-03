@@ -182,6 +182,10 @@ public final class MiniMap extends JPanel implements MouseInputListener {
      *                 to draw this component.
      */
     public void paintComponent(Graphics graphics) {
+        if (freeColClient.getGame() == null
+                || freeColClient.getGame().getMap() == null) {
+            return;
+        }
         Image skin = (Image) UIManager.get("MiniMap.skin");
         if (skin == null) {
             paintMap(graphics, 0, 0, getWidth(), getHeight());

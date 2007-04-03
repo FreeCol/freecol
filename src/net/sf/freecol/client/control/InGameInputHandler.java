@@ -708,7 +708,7 @@ public final class InGameInputHandler extends InputHandler {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     Canvas canvas = getFreeColClient().getCanvas();
-                    if (!canvas.getColonyPanel().isShowing()
+                    if (!canvas.isShowingSubPanel()
                             && (action == Monarch.ADD_UNITS || !canvas.showMonarchPanel(action, null))) {
                         canvas.showEuropePanel();
                     }

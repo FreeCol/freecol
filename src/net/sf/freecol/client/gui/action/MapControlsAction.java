@@ -76,7 +76,7 @@ public class MapControlsAction extends SelectableAction {
      */
     public void actionPerformed(ActionEvent e) {
         selected = ((AbstractButton) e.getSource()).isSelected();
-        showMapControls(selected);
+        showMapControls(enabled && selected);
     }
 
     private void showMapControls(boolean value) {

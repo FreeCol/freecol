@@ -2,6 +2,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -74,6 +75,15 @@ public final class ClientOptionsDialog extends FreeColDialog implements ActionLi
         setSize(750, 500);
     }
 
+    @Override
+    public Dimension getMinimumSize() {
+        return new Dimension(750, 500);
+    }
+    
+    @Override
+    public Dimension getPreferredSize() {
+        return getMinimumSize();
+    }
 
     public void initialize() {
         removeAll();

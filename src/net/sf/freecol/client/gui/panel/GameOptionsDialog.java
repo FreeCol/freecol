@@ -1,6 +1,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -89,6 +90,16 @@ public final class GameOptionsDialog extends FreeColDialog implements ActionList
         setSize(640, 480);
     }
 
+    @Override
+    public Dimension getMinimumSize() {
+        return new Dimension(640, 480);
+    }
+    
+    @Override
+    public Dimension getPreferredSize() {
+        return getMinimumSize();
+    }
+    
     public void initialize(boolean editable) {
         removeAll();
 

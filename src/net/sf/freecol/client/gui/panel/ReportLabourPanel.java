@@ -1,6 +1,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -143,6 +144,16 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
         }
 
         reportPanel.doLayout();
+    }
+    
+    @Override
+    public Dimension getMinimumSize() {
+        return new Dimension(750, 600);
+    }
+    
+    @Override
+    public Dimension getPreferredSize() {
+        return getMinimumSize();
     }
 
     private JPanel buildUnitReport(int unit) {

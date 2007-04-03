@@ -1,6 +1,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -75,6 +76,16 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog implements Ac
         setSize(750, 500);
     }
 
+    @Override
+    public Dimension getMinimumSize() {
+        return new Dimension(750, 500);
+    }
+    
+    @Override
+    public Dimension getPreferredSize() {
+        return getMinimumSize();
+    }
+    
     public void initialize(boolean editable) {
         removeAll();
 
