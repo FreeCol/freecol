@@ -21,6 +21,9 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
+    // Temporary variable for checking if we need to recalculate the path when dragging units.
+    private Tile lastTile;
+
     private final Canvas canvas;
     private final GUI gui;
     private final Map map;
@@ -143,9 +146,12 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
                 gui.stopDrag();
             } else if (gui.getActiveUnit().getTile() != tile) {
                 if (gui.isDragStarted()) {
-                    PathNode dragPath = gui.getActiveUnit().findPath(tile);
-                    // ONLY FOR DEBUGGING: PathNode dragPath = map.findPath(gui.getActiveUnit(), gui.getActiveUnit().getTile(), tile, (Unit) gui.getActiveUnit().getLocation());
-                    gui.setDragPath(dragPath);
+                    if (lastTile != tile) {
+                        lastTile = tile;
+                        PathNode dragPath = gui.getActiveUnit().findPath(tile);
+                        // ONLY FOR DEBUGGING: PathNode dragPath = map.findPath(gui.getActiveUnit(), gui.getActiveUnit().getTile(), tile, (Unit) gui.getActiveUnit().getLocation());
+                        gui.setDragPath(dragPath);
+                    }
                 }
             } else {
                 if (!gui.isDragStarted()) {

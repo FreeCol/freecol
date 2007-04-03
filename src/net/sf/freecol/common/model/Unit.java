@@ -3259,6 +3259,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             type = ModelMessage.UNIT_LOST;
             dispose();
         } else if (getType() == BRAVE || getType() == KINGS_REGULAR) {
+            // TODO: fix this (doesn't work as expected)
             nation = "";
             messageID = "model.unit.unitSlaughtered";
             type = ModelMessage.UNIT_LOST;

@@ -6,6 +6,8 @@ import java.awt.event.MouseListener;
 
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Tile;
 
 
 
@@ -19,7 +21,8 @@ public final class CanvasMouseListener implements MouseListener {
     public static final String  REVISION = "$Revision$";
 
     private final Canvas canvas;
-    private final GUI               gui;
+    private final GUI gui;
+    private final Map map;
 
     /**
     * The constructor to use.
@@ -27,9 +30,10 @@ public final class CanvasMouseListener implements MouseListener {
     * @param canvas The component this object gets created for.
     * @param g The GUI that holds information such as screen resolution.
     */
-    public CanvasMouseListener(Canvas canvas, GUI g) {
+    public CanvasMouseListener(Canvas canvas, GUI g, Map m) {
         this.canvas = canvas;
         gui = g;
+	map = m;
     }
 
     /**
@@ -71,6 +75,21 @@ public final class CanvasMouseListener implements MouseListener {
 
         if (e.getButton() == MouseEvent.BUTTON3 || e.isPopupTrigger()) {
             canvas.showTilePopup(gui.convertToMapCoordinates(e.getX(), e.getY()), e.getX(), e.getY());
+	} else if (e.getButton() == MouseEvent.BUTTON2) {
+	    Map.Position p = gui.convertToMapCoordinates(e.getX(), e.getY());
+            if (p == null || !map.isValid(p)) {
+                return;
+            }
+
+            Tile tile = map.getTile(p);
+            if (tile != null) {
+                Unit unit = gui.getActiveUnit();
+                if (unit != null && unit.getTile() != tile) {
+                    PathNode dragPath = unit.findPath(tile);
+                    gui.startDrag();
+                    gui.setDragPath(dragPath);
+                }
+            }
         } else if (e.getButton() == MouseEvent.BUTTON1) {
             gui.setSelectedTile(gui.convertToMapCoordinates(e.getX(), e.getY()), true);
             canvas.requestFocus();
