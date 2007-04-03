@@ -794,10 +794,14 @@ public final class InGameController implements NetworkConstants {
             }
         }
 
-        freeColClient.getActionManager().update();
-        freeColClient.getCanvas().updateJMenuBar();
-
         nextModelMessage();
+        
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                freeColClient.getActionManager().update();
+                freeColClient.getCanvas().updateJMenuBar();
+            }
+        });
     }
 
     /**
@@ -2734,11 +2738,14 @@ public final class InGameController implements NetworkConstants {
                 if (endingTurn) {
                     canvas.getGUI().setActiveUnit(null);
                     // canvas.setEnabled(false);
-
-                    Element endTurnElement = Message.createNewRootElement("endTurn");
-                    freeColClient.getClient().sendAndWait(endTurnElement);
-
                     endingTurn = false;
+                    
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            Element endTurnElement = Message.createNewRootElement("endTurn");
+                            freeColClient.getClient().sendAndWait(endTurnElement);
+                        }
+                    });
                 } else {
                     executeGoto = false;
                 }

@@ -65,8 +65,7 @@ public final class CanvasKeyListener implements KeyListener {
                 moveCursor(e);
             }
         } catch (Exception ex) {
-            logger.log(Level.SEVERE, "CanvasKeyListener.keyPressed - exception!", ex);
-            parent.errorMessage(null, ex.toString());
+            logger.throwing(getClass().getSimpleName(), "keyPressed", ex);
         }
     }
 

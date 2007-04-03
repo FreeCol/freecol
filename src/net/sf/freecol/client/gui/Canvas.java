@@ -1706,15 +1706,14 @@ public final class Canvas extends JDesktopPane {
         if (comp == null) {
             return;
         }
-        Rectangle updateBounds = comp.getBounds();        
+        final Rectangle updateBounds = comp.getBounds();        
         if (comp == jMenuBar) {
             jMenuBar = null;
             super.remove(comp);
         } else {
             final JInternalFrame frame = getInternalFrame(comp);
             if (frame != null && frame != comp) {    
-                updateBounds = frame.getBounds();
-                //frame.setVisible(false);
+                //updateBounds = frame.getBounds();
                 frame.dispose();
             } else {
                 super.remove(comp);
@@ -1723,21 +1722,16 @@ public final class Canvas extends JDesktopPane {
         
         final boolean takeFocus = (comp != statusPanel);
         if (update) {
-            //setEnabled(true);
             updateJMenuBar();
             freeColClient.getActionManager().update();
             if (takeFocus && !isShowingSubPanel()) {
                 takeFocus();
             }
             repaint(updateBounds.x, updateBounds.y, updateBounds.width, updateBounds.height);
-            
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    if (freeColClient.getGame() != null) {
-                        freeColClient.getInGameController().nextModelMessage();
-                    }
-                }
-            });
+
+            if (freeColClient.getGame() != null) {
+                freeColClient.getInGameController().nextModelMessage();
+            }
         }
     }
 
