@@ -2363,12 +2363,21 @@ public final class Canvas extends JDesktopPane {
         
         @Override
         public void mousePressed(MouseEvent e) {
+            if (f.getDesktopPane() == null
+                    || f.getDesktopPane().getDesktopManager() == null) {
+                return;
+            }
             loc = SwingUtilities.convertPoint((Component) e.getSource(),  e.getX(), e.getY(), null);
             f.getDesktopPane().getDesktopManager().beginDraggingFrame(f);
         }
         
         @Override
         public void mouseReleased(MouseEvent e) {
+            if (loc == null
+                    || f.getDesktopPane() == null
+                    || f.getDesktopPane().getDesktopManager() == null) {
+                return;
+            }
             f.getDesktopPane().getDesktopManager().endDraggingFrame(f);
         }
         
