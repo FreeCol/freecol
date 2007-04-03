@@ -795,12 +795,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (settlement.getLearnableSkill() != IndianSettlement.UNKNOWN) {
             unit.setMovesLeft(0);
             if (settlement.getLearnableSkill() != IndianSettlement.NONE) {
-                // We now put the unit on the indian settlement. Normally we
-                // shouldn't have
-                // to this, but the movesLeft are set to 0 for unit and if the
-                // player decides
-                // to learn a skill with a learnSkillAtSettlement message then
-                // we have to be
+                // We now put the unit on the indian settlement.
+                // Normally we shouldn't have to this, but the
+                // movesLeft are set to 0 for unit and if the player
+                // decides to learn a skill with a
+                // learnSkillAtSettlement message then we have to be
                 // able to check if the unit can learn the skill.
                 unit.setLocation(settlement);
             }
@@ -848,26 +847,27 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalArgumentException("Could not find tile in direction " + direction + " from unit with ID "
                     + attackElement.getAttribute("unit"));
         }
-        
+
+        int result;
+        int plunderGold = -1;
         Unit defender = newTile.getDefendingUnit(unit);
         if (defender == null) {
-            //
-            // TODO: Erik - this may happen if player attacks an undefended settlement!
-            //
-            throw new IllegalStateException("Nothing to attack in direction " + direction + " from unit with ID "
-                    + attackElement.getAttribute("unit"));
+            if (newTile.getSettlement() != null) {
+                result = Unit.ATTACK_DONE_SETTLEMENT;
+            } else {
+                throw new IllegalStateException("Nothing to attack in direction " + direction + " from unit with ID "
+                                                + attackElement.getAttribute("unit"));
+            }
+        } else {
+            result = generateAttackResult(unit, defender);
         }
-        
-        int result = generateAttackResult(unit, defender);
-        int plunderGold = -1;
+
         if (result == Unit.ATTACK_DONE_SETTLEMENT) {
-            plunderGold = newTile.getSettlement().getOwner().getGold() / 10; // 10%
-            // of
-            // their
-            // gold
+            // 10% of their gold
+            plunderGold = newTile.getSettlement().getOwner().getGold() / 10;
         }
-        // Inform the players (other then the player attacking) about the
-        // attack:
+        // Inform the players (other then the player attacking) about
+        // the attack:
         Iterator<Player> enemyPlayerIterator = game.getPlayerIterator();
         while (enemyPlayerIterator.hasNext()) {
             ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
@@ -907,15 +907,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Element reply = Message.createNewRootElement("attackResult");
         reply.setAttribute("result", Integer.toString(result));
         reply.setAttribute("plunderGold", Integer.toString(plunderGold));
-        if (result == Unit.ATTACK_DONE_SETTLEMENT && newTile.getColony() != null) { // If a
-            // colony
-            // will
-            // been
-            // won,
-            // send
-            // an
-            // updated
-            // tile:
+        if (result == Unit.ATTACK_DONE_SETTLEMENT && newTile.getColony() != null) {
+            // If a colony will been won, send an updated tile:
             reply.appendChild(newTile.toXMLElement(newTile.getColony().getOwner(), reply.getOwnerDocument()));
         }
         if (!defender.isVisibleTo(player)) {
@@ -928,9 +921,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             }
         }
         unit.attack(defender, result, plunderGold);
-        // Send capturedGoods if UNIT_HIDING is true
-        // because when it's false unit is already sent with carried goods and
-        // units
+        // Send capturedGoods if UNIT_HIDING is true because when it's
+        // false unit is already sent with carried goods and units
         if (unit.canCaptureGoods() && game.getGameOptions().getBoolean(GameOptions.UNIT_HIDING)) {
             Iterator<Goods> goodsIt = unit.getGoodsContainer().getCompactGoodsIterator();
             while (goodsIt.hasNext()) {
@@ -956,11 +948,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
          * enemyPlayer.getName() + " with connection " +
          * enemyPlayer.getConnection()); } }
          */
-        if (result >= Unit.ATTACK_EVADES && unit.getTile().equals(newTile)) { // In
-            // other
-            // words,
-            // we
-            // moved...
+        if (result >= Unit.ATTACK_EVADES && unit.getTile().equals(newTile)) { 
+            // In other words, we moved...
             Element update = reply.getOwnerDocument().createElement("update");
             int lineOfSight = unit.getLineOfSight();
             if (result == Unit.ATTACK_DONE_SETTLEMENT && newTile.getSettlement() != null) {
@@ -993,44 +982,37 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         int result;
         int r = getPseudoRandom().nextInt(totalProbability + 1);
         if (r > attackPower) {
-            result = Unit.ATTACK_LOSS;
-        } else if (r == attackPower) {
-            if (defender.isNaval()) {
-                result = Unit.ATTACK_EVADES;
-            } else {
-                result = Unit.ATTACK_WIN;
-            }
-        } else { // (r < attackPower)
-            result = Unit.ATTACK_WIN;
-        }
-        if (result == Unit.ATTACK_WIN) {
-            int diff = defender.getDefensePower(unit) * 2 - attackPower;
-            int r2 = getPseudoRandom().nextInt((diff < 3) ? 3 : diff);
-            if (r2 == 0) {
-                result = Unit.ATTACK_GREAT_WIN;
-            } else {
-                result = Unit.ATTACK_WIN;
-            }
-        }
-        if (result == Unit.ATTACK_LOSS) {
             int diff = attackPower * 2 - defender.getDefensePower(unit);
             int r2 = getPseudoRandom().nextInt((diff < 3) ? 3 : diff);
             if (r2 == 0) {
-                result = Unit.ATTACK_GREAT_LOSS;
+                return Unit.ATTACK_GREAT_LOSS;
             } else {
-                result = Unit.ATTACK_LOSS;
+                return Unit.ATTACK_LOSS;
+            }
+        } else if (r == attackPower && defender.isNaval()) {
+            return Unit.ATTACK_EVADES;
+        } else {
+            if (defender.getTile().getSettlement() != null &&
+                // Indian settlement
+                (defender.getTile().getSettlement() instanceof IndianSettlement &&
+                 ((IndianSettlement) defender.getTile().getSettlement()).getUnitCount()
+                 + defender.getTile().getUnitCount() <= 1) ||
+                // Colony
+                (defender.getTile().getColony() != null && 
+                 !defender.isArmed() && !defender.isMounted() &&
+                 defender.getType() != Unit.ARTILLERY && 
+                 defender.getType() != Unit.DAMAGED_ARTILLERY)) {
+                return Unit.ATTACK_DONE_SETTLEMENT;
+            } else {
+                int diff = defender.getDefensePower(unit) * 2 - attackPower;
+                int r2 = getPseudoRandom().nextInt((diff < 3) ? 3 : diff);
+                if (r2 == 0) {
+                    return Unit.ATTACK_GREAT_WIN;
+                } else {
+                    return Unit.ATTACK_WIN;
+                }
             }
         }
-        if ((result == Unit.ATTACK_WIN || result == Unit.ATTACK_GREAT_WIN)
-                && (defender.getTile().getSettlement() != null
-                        && defender.getTile().getSettlement() instanceof IndianSettlement
-                        && ((IndianSettlement) defender.getTile().getSettlement()).getUnitCount()
-                                + defender.getTile().getUnitCount() <= 1 || defender.getTile().getColony() != null
-                        && !defender.isArmed() && !defender.isMounted() && defender.getType() != Unit.ARTILLERY
-                        && defender.getType() != Unit.DAMAGED_ARTILLERY)) {
-            result = Unit.ATTACK_DONE_SETTLEMENT;
-        }
-        return result;
     }
 
     /**
