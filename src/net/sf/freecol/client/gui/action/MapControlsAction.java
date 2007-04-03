@@ -87,10 +87,15 @@ public class MapControlsAction extends SelectableAction {
             mapControls.update();
         }
         if (mapControls != null) {
-            if (value && !mapControls.isShowing()) {
-                mapControls.addToComponent(getFreeColClient().getCanvas());
-            } else if (!value && mapControls.isShowing()) {
-                mapControls.removeFromComponent(getFreeColClient().getCanvas());
+            if (value) {
+                if (!mapControls.isShowing()) {
+                    mapControls.addToComponent(getFreeColClient().getCanvas());
+                }
+                mapControls.update();
+            } else {
+                if (mapControls.isShowing()) {
+                    mapControls.removeFromComponent(getFreeColClient().getCanvas());
+                }
             }
         }
     }

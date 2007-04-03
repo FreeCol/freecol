@@ -1720,14 +1720,15 @@ public final class Canvas extends JDesktopPane {
             }
         }
         
+        repaint(updateBounds.x, updateBounds.y, updateBounds.width, updateBounds.height);
+        
         final boolean takeFocus = (comp != statusPanel);
         if (update) {
             updateJMenuBar();
             freeColClient.getActionManager().update();
             if (takeFocus && !isShowingSubPanel()) {
                 takeFocus();
-            }
-            repaint(updateBounds.x, updateBounds.y, updateBounds.width, updateBounds.height);
+            }            
 
             if (freeColClient.getGame() != null) {
                 freeColClient.getInGameController().nextModelMessage();
@@ -1906,6 +1907,17 @@ public final class Canvas extends JDesktopPane {
      * @param i The layer to add the component to (see JLayeredPane).
      */
     public void add(Component comp, Integer i) {
+        add(comp, i, true);
+    }
+    
+    /**
+     * Adds a component to this Canvas. Removes the statuspanel if visible (and
+     * <code>comp != statusPanel</code>).
+     * 
+     * @param comp The component to add to this ToEuropePanel.
+     * @param i The layer to add the component to (see JLayeredPane).
+     */
+    public void add(Component comp, Integer i, boolean update) {
 
         if (comp != statusPanel && !(comp instanceof JMenuItem) && !(comp instanceof FreeColDialog)) {
             remove(statusPanel, false);
@@ -1917,12 +1929,10 @@ public final class Canvas extends JDesktopPane {
             super.add(comp, i);
         }
         
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                updateJMenuBar();
-                freeColClient.getActionManager().update();
-            }
-        });
+        if (update) {
+            updateJMenuBar();
+            freeColClient.getActionManager().update();
+        }
     }
 
     /**
@@ -2264,6 +2274,10 @@ public final class Canvas extends JDesktopPane {
 
         if (jMenuBar != null) {
             remove(jMenuBar);
+        }
+        
+        for (Component c : getComponents()) {
+            remove(c, false);
         }
     }
 

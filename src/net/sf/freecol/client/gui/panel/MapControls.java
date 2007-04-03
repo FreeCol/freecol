@@ -2,9 +2,10 @@
 package net.sf.freecol.client.gui.panel;
 
 import javax.swing.Action;
-import javax.swing.JComponent;
+import javax.swing.JLayeredPane;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ViewMode;
 import net.sf.freecol.client.gui.action.ActionManager;
@@ -35,7 +36,6 @@ public final class MapControls {
     public static final int EUROPE = 2;
     public static final int UNITBUTTON = 3;
     
-    private JComponent  container;
     private FreeColClient freeColClient;
 
     private final InfoPanel        infoPanel;
@@ -55,14 +55,13 @@ public final class MapControls {
     public MapControls(FreeColClient freeColClient, GUI gui) {
         this.freeColClient = freeColClient;
         this.gui = gui;
-        container = null;
 
         //
         // Create GUI Objects
         //
 
         infoPanel = new InfoPanel(freeColClient, freeColClient.getGame(), freeColClient.getGUI().getImageLibrary());
-        miniMap = new MiniMap(freeColClient, freeColClient.getGUI().getImageLibrary(), container);
+        miniMap = new MiniMap(freeColClient, freeColClient.getGUI().getImageLibrary());
         
         final ActionManager am = freeColClient.getActionManager();
         unitButton = new UnitButton[] {
@@ -92,35 +91,32 @@ public final class MapControls {
     * Adds the map controls to the given component.
     * @param component The component to add the map controls to.
     */
-    public void addToComponent(JComponent component) {
+    public void addToComponent(Canvas component) {
         if (freeColClient.getGame() == null
                 || freeColClient.getGame().getMap() == null) {
             return;
         }
-        container = component;
-        
-        miniMap.setContainer(container);
         
         //
         // Relocate GUI Objects
         //
 
-        infoPanel.setLocation(container.getWidth() - infoPanel.getWidth(), container.getHeight() - infoPanel.getHeight());
-        miniMap.setLocation(0, container.getHeight() - miniMap.getHeight());
+        infoPanel.setLocation(component.getWidth() - infoPanel.getWidth(), component.getHeight() - infoPanel.getHeight());
+        miniMap.setLocation(0, component.getHeight() - miniMap.getHeight());
         
         final int SPACE = unitButton[0].getWidth() + 5;
         for(int i=0; i<unitButton.length; i++) {            
-            unitButton[i].setLocation(miniMap.getWidth() + (infoPanel.getX() - miniMap.getWidth() - unitButton.length*SPACE)/2 + i*SPACE, container.getHeight() - 40);
+            unitButton[i].setLocation(miniMap.getWidth() + (infoPanel.getX() - miniMap.getWidth() - unitButton.length*SPACE)/2 + i*SPACE, component.getHeight() - 40);
         }
 
         //
         // Add the GUI Objects to the container
         //
-        container.add(infoPanel);
-        container.add(miniMap);
+        component.add(infoPanel, JLayeredPane.DEFAULT_LAYER, false);
+        component.add(miniMap, JLayeredPane.DEFAULT_LAYER, false);
 
         for(int i=0; i<unitButton.length; i++) {
-            container.add(unitButton[i]);
+            component.add(unitButton[i], JLayeredPane.DEFAULT_LAYER, false);
             Action a = unitButton[i].getAction();
             unitButton[i].setAction(null);
             unitButton[i].setAction(a);
@@ -129,30 +125,20 @@ public final class MapControls {
 
 
     /**
-    * Removes the map controls from the given component.
-    * @param component The component to remove the map controls from.
-    */
-    public void removeFromComponent(JComponent component) {
-        //
-        // Remove the GUI Objects from the container
-        //
+     * Removes the map controls from the parent component.
+     */
+    public void removeFromComponent(Canvas canvas) {
+        canvas.remove(infoPanel, false);
+        canvas.remove(miniMap, false);
 
-        if (container != null) {
-            JComponent temp = container;
-            container = null;
-
-            temp.remove(infoPanel);
-            temp.remove(miniMap);
-
-            for(int i=0; i<unitButton.length; i++) {
-                temp.remove(unitButton[i]);
-            }
+        for(int i=0; i<unitButton.length; i++) {
+            canvas.remove(unitButton[i], false);
         }
     }
 
 
     public boolean isShowing() {
-        return container != null;
+        return infoPanel.getParent() != null;
     }
 
 

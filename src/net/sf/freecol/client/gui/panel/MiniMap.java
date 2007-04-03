@@ -9,7 +9,6 @@ import java.awt.event.MouseEvent;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
@@ -47,7 +46,6 @@ public final class MiniMap extends JPanel implements MouseInputListener {
 
     private FreeColClient freeColClient;
     private final ImageProvider imageProvider;
-    private JComponent container;
     private final JButton          miniMapZoomOutButton;
     private final JButton          miniMapZoomInButton;
 
@@ -74,12 +72,10 @@ public final class MiniMap extends JPanel implements MouseInputListener {
      * @param freeColClient The main controller object for the client
      * @param imageProvider The ImageProvider that can provide us with images to display
      *        and information about those images (such as the width of a tile image).
-     * @param container The component that contains the minimap.
      */
-    public MiniMap(FreeColClient freeColClient, ImageProvider imageProvider, JComponent container) {
+    public MiniMap(FreeColClient freeColClient, ImageProvider imageProvider) {
         this.freeColClient = freeColClient;
         this.imageProvider = imageProvider;
-        this.container = container;
 
         tileSize = 12;
 
@@ -131,15 +127,6 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         add(miniMapZoomInButton);
         add(miniMapZoomOutButton);        
     }
-
-
-
-
-
-    public void setContainer(JComponent container) {
-        this.container = container;
-    }
-
 
     /**
      * Zooms in the mini map.
@@ -404,8 +391,8 @@ public final class MiniMap extends JPanel implements MouseInputListener {
          * x/yTiles are the number of tiles that fit on the large map */
         int miniRectX = (freeColClient.getGUI().getFocus().getX() - xOffset) * tileSize;
         int miniRectY = (freeColClient.getGUI().getFocus().getY() - yOffset) * tileSize / 4;
-        int miniRectWidth = (container.getWidth() / imageProvider.getTerrainImageWidth(0) + 1) * tileSize;
-        int miniRectHeight = (container.getHeight() / imageProvider.getTerrainImageHeight(0) + 1) * tileSize / 2;
+        int miniRectWidth = (getParent().getWidth() / imageProvider.getTerrainImageWidth(0) + 1) * tileSize;
+        int miniRectHeight = (getParent().getHeight() / imageProvider.getTerrainImageHeight(0) + 1) * tileSize / 2;
         if (miniRectX + miniRectWidth / 2 > width) {
             miniRectX = width - miniRectWidth / 2 - 1;
         } else if (miniRectX - miniRectWidth / 2 < 0) {
