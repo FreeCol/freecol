@@ -1024,7 +1024,7 @@ public final class Colony extends Settlement implements Location, Nameable {
      * Return the number of sons of liberty
      */
     public int getMembers() {
-        return bells / BELLS_PER_REBEL;
+        return Math.min(bells / BELLS_PER_REBEL, getUnitCount());
     }
 
     /**
