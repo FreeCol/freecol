@@ -36,39 +36,24 @@ public final class TrainDialog extends FreeColDialog implements ActionListener {
 
     private static final int TRAIN_CANCEL = -1;
 
-    private static final JButton cancel = new JButton(Messages.message("trainDialog.cancel"));
-
+    private static final Comparator<NumberedUnitType> priceComparator = new Comparator<NumberedUnitType>() {
+        public int compare(NumberedUnitType type1, NumberedUnitType type2) {
+            return type1.type.price - type2.type.price;
+        }
+    };
+    
     @SuppressWarnings("unused")
     private final Canvas parent;
 
     private final FreeColClient freeColClient;
 
     private final InGameController inGameController;
+    
+    private final JButton cancel = new JButton(Messages.message("trainDialog.cancel"));
 
+    private final ArrayList<NumberedUnitType> trainableUnits = new ArrayList<NumberedUnitType>();
 
-    private class NumberedUnitType {
-
-        public final UnitType type;
-
-        public final int index;
-
-
-        public NumberedUnitType(UnitType type, int index) {
-            this.type = type;
-            this.index = index;
-        }
-    }
-
-
-    private static final ArrayList<NumberedUnitType> trainableUnits = new ArrayList<NumberedUnitType>();
-
-    private static final ArrayList<JButton> buttons = new ArrayList<JButton>();
-
-    private static final Comparator<NumberedUnitType> priceComparator = new Comparator<NumberedUnitType>() {
-        public int compare(NumberedUnitType type1, NumberedUnitType type2) {
-            return type1.type.price - type2.type.price;
-        }
-    };
+    private final ArrayList<JButton> buttons = new ArrayList<JButton>();
 
 
     /**
@@ -181,6 +166,19 @@ public final class TrainDialog extends FreeColDialog implements ActionListener {
         } catch (NumberFormatException e) {
             logger.warning("Invalid action number");
             setResponse(new Boolean(false));
+        }
+    }
+    
+    private class NumberedUnitType {
+
+        public final UnitType type;
+
+        public final int index;
+
+
+        public NumberedUnitType(UnitType type, int index) {
+            this.type = type;
+            this.index = index;
         }
     }
 }
