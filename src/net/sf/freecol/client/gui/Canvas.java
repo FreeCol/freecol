@@ -1399,8 +1399,10 @@ public final class Canvas extends JDesktopPane {
             errorMessage("europe.noGame");
         } else {
             europePanel.initialize(freeColClient.getMyPlayer().getEurope(), freeColClient.getGame());
-            europePanel.setLocation(0, getMenuBarHeight());
             JInternalFrame f = addAsSimpleFrame(europePanel);
+            f.setBorder(null);
+            f.setLocation(0, getMenuBarHeight());
+            f.moveToBack();
         }
     }
 
