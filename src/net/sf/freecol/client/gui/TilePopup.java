@@ -219,8 +219,7 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
     * @param settlement The Indian settlement that will be represented on the popup.
     */
     private void addIndianSettlement(IndianSettlement settlement) {
-        JMenuItem menuItem = new JMenuItem(
-                settlement.getOwner().getNationAsString() + " settlement");
+        JMenuItem menuItem = new JMenuItem(settlement.getLocationName());
         menuItem.setActionCommand(IndianSettlement.getXMLElementTagName());
         menuItem.addActionListener(this);
         add(menuItem);
