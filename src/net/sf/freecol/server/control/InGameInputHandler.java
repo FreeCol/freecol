@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.logging.Logger;
-
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Europe;
@@ -34,7 +33,6 @@ import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
-
 import org.w3c.dom.Element;
 
 /**
@@ -81,277 +79,277 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         });
         register("move", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return move(connection, element);
             }
         });
         register("askSkill", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return askSkill(connection, element);
             }
         });
         register("attack", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return attack(connection, element);
             }
         });
         register("embark", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return embark(connection, element);
             }
         });
         register("boardShip", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return boardShip(connection, element);
             }
         });
         register("learnSkillAtSettlement", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return learnSkillAtSettlement(connection, element);
             }
         });
         register("scoutIndianSettlement", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return scoutIndianSettlement(connection, element);
             }
         });
         register("missionaryAtSettlement", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return missionaryAtSettlement(connection, element);
             }
         });
         register("inciteAtSettlement", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return inciteAtSettlement(connection, element);
             }
         });
         register("armedUnitDemandTribute", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return armedUnitDemandTribute(connection, element);
             }
         });
         register("leaveShip", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return leaveShip(connection, element);
             }
         });
         register("loadCargo", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return loadCargo(connection, element);
             }
         });
         register("unloadCargo", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return unloadCargo(connection, element);
             }
         });
         register("buyGoods", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return buyGoods(connection, element);
             }
         });
         register("sellGoods", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return sellGoods(connection, element);
             }
         });
         register("moveToEurope", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return moveToEurope(connection, element);
             }
         });
         register("moveToAmerica", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return moveToAmerica(connection, element);
             }
         });
         register("buildColony", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return buildColony(connection, element);
             }
         });
         register("recruitUnitInEurope", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return recruitUnitInEurope(connection, element);
             }
         });
         register("emigrateUnitInEurope", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return emigrateUnitInEurope(connection, element);
             }
         });
         register("trainUnitInEurope", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return trainUnitInEurope(connection, element);
             }
         });
         register("equipunit", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return equipUnit(connection, element);
             }
         });
         register("work", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return work(connection, element);
             }
         });
         register("changeWorkType", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return changeWorkType(connection, element);
             }
         });
         register("setCurrentlyBuilding", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return setCurrentlyBuilding(connection, element);
             }
         });
         register("changeState", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return changeState(connection, element);
             }
         });
         register("putOutsideColony", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return putOutsideColony(connection, element);
             }
         });
         register("clearSpeciality", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return clearSpeciality(connection, element);
             }
         });
         register("setNewLandName", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return setNewLandName(connection, element);
             }
         });
         register("endTurn", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return endTurn(connection, element);
             }
         });
         register("disbandUnit", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return disbandUnit(connection, element);
             }
         });
         register("skipUnit", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return skipUnit(connection, element);
             }
         });
         register("cashInTreasureTrain", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return cashInTreasureTrain(connection, element);
             }
         });
         register("tradeProposition", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return tradeProposition(connection, element);
             }
         });
         register("trade", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return trade(connection, element);
             }
         });
         register("deliverGift", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return deliverGift(connection, element);
             }
         });
         register("indianDemand", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return indianDemand(connection, element);
             }
         });
         register("buyLand", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return buyLand(connection, element);
             }
         });
         register("payForBuilding", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return payForBuilding(connection, element);
             }
         });
         register("payArrears", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return payArrears(connection, element);
             }
         });
         register("setExports", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return setExports(connection, element);
             }
         });
         register("declareIndependence", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return declareIndependence(connection, element);
             }
         });
         register("giveIndependence", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return giveIndependence(connection, element);
             }
         });
         register("foreignAffairs", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return foreignAffairs(connection, element);
             }
         });
         register("getREFUnits", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return getREFUnits(connection, element);
             }
         });
         register("rename", new CurrentPlayerNetworkRequestHandler() {
             @Override
-			public Element handle(Player player, Connection connection, Element element) {
+            public Element handle(Player player, Connection connection, Element element) {
                 return rename(connection, element);
             }
         });
@@ -377,7 +375,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * 
      * @param connection The connection the message came from.
      * @param element The element containing the request.
-     * 
      */
     private Element buyLand(Connection connection, Element element) {
         Game game = getFreeColServer().getGame();
@@ -395,7 +392,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * 
      * @param connection The connection the message came from.
      * @param element The element containing the request.
-     * 
      */
     private Element setNewLandName(Connection connection, Element element) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
@@ -409,7 +405,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * 
      * @param connection The connection the message came from.
      * @param element The element containing the request.
-     * 
      */
     private Element createUnit(Connection connection, Element element) {
         Game game = getFreeColServer().getGame();
@@ -436,7 +431,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * 
      * @param connection The connection the message came from.
      * @param element The element containing the request.
-     * 
      */
     private Element getRandom(Connection connection, Element element) {
         logger.info("Receiving \"getRandom\"-request.");
@@ -461,9 +455,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Player owner = unit.getOwner();
         ServerPlayer askingPlayer = getFreeColServer().getPlayer(connection);
         if (owner != askingPlayer) {
-            throw new IllegalStateException("Unit " + unit + " with owner " + 
-                    owner + " not owned by " + askingPlayer +
-                    ", refusing to get vacant location!");
+            throw new IllegalStateException("Unit " + unit + " with owner " + owner + " not owned by " + askingPlayer
+                    + ", refusing to get vacant location!");
         }
         Location entryLocation = getFreeColServer().getModelController().setToVacantEntryLocation(unit);
         Element reply = Message.createNewRootElement("getVacantEntryLocationConfirmed");
@@ -476,7 +469,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * 
      * @param connection The connection the message came from.
      * @param element The element containing the request.
-     * 
      */
     private Element getNewTradeRoute(Connection connection, Element element) {
         Player player = getFreeColServer().getPlayer(connection);
@@ -491,7 +483,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * 
      * @param connection The connection the message came from.
      * @param element The element containing the request.
-     * 
      */
     private Element updateTradeRoute(Connection connection, Element element) {
         Game game = getFreeColServer().getGame();
@@ -515,7 +506,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * 
      * @param connection The connection the message came from.
      * @param element The element containing the request.
-     * 
      */
     private Element assignTradeRoute(Connection connection, Element element) {
         Game game = getFreeColServer().getGame();
@@ -549,7 +539,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      *                invalid.
      * @exception IllegalStateException If the request is not accepted by the
      *                model.
-     * 
      */
     private Element move(Connection connection, Element moveElement) {
         FreeColServer freeColServer = getFreeColServer();
@@ -764,7 +753,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * 
      * @param connection The connection the message came from.
      * @param element The element containing the request.
-     * 
      * @exception IllegalArgumentException If the data format of the message is
      *                invalid.
      * @exception IllegalStateException If the request is not accepted by the
@@ -822,7 +810,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      *                invalid.
      * @exception IllegalStateException If the request is not accepted by the
      *                model.
-     * 
      */
     private Element attack(Connection connection, Element attackElement) {
         FreeColServer freeColServer = getFreeColServer();
@@ -847,7 +834,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalArgumentException("Could not find tile in direction " + direction + " from unit with ID "
                     + attackElement.getAttribute("unit"));
         }
-
         int result;
         int plunderGold = -1;
         Unit defender = newTile.getDefendingUnit(unit);
@@ -856,12 +842,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 result = Unit.ATTACK_DONE_SETTLEMENT;
             } else {
                 throw new IllegalStateException("Nothing to attack in direction " + direction + " from unit with ID "
-                                                + attackElement.getAttribute("unit"));
+                        + attackElement.getAttribute("unit"));
             }
         } else {
             result = generateAttackResult(unit, defender);
         }
-
         if (result == Unit.ATTACK_DONE_SETTLEMENT) {
             // 10% of their gold
             plunderGold = newTile.getSettlement().getOwner().getGold() / 10;
@@ -948,7 +933,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
          * enemyPlayer.getName() + " with connection " +
          * enemyPlayer.getConnection()); } }
          */
-        if (result >= Unit.ATTACK_EVADES && unit.getTile().equals(newTile)) { 
+        if (result >= Unit.ATTACK_EVADES && unit.getTile().equals(newTile)) {
             // In other words, we moved...
             Element update = reply.getOwnerDocument().createElement("update");
             int lineOfSight = unit.getLineOfSight();
@@ -979,7 +964,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     private int generateAttackResult(Unit unit, Unit defender) {
         int attackPower = unit.getOffensePower(defender);
         int totalProbability = attackPower + defender.getDefensePower(unit);
-        int result;
         int r = getPseudoRandom().nextInt(totalProbability + 1);
         if (r > attackPower) {
             int diff = attackPower * 2 - defender.getDefensePower(unit);
@@ -992,16 +976,16 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         } else if (r == attackPower && defender.isNaval()) {
             return Unit.ATTACK_EVADES;
         } else {
-            if (defender.getTile().getSettlement() != null &&
-                // Indian settlement
-                (defender.getTile().getSettlement() instanceof IndianSettlement &&
-                 ((IndianSettlement) defender.getTile().getSettlement()).getUnitCount()
-                 + defender.getTile().getUnitCount() <= 1) ||
-                // Colony
-                (defender.getTile().getColony() != null && 
-                 !defender.isArmed() && !defender.isMounted() &&
-                 defender.getType() != Unit.ARTILLERY && 
-                 defender.getType() != Unit.DAMAGED_ARTILLERY)) {
+            if (defender.getTile().getSettlement() != null
+                    &&
+                    // Indian settlement
+                    (defender.getTile().getSettlement() instanceof IndianSettlement && ((IndianSettlement) defender
+                            .getTile().getSettlement()).getUnitCount()
+                            + defender.getTile().getUnitCount() <= 1)
+                    ||
+                    // Colony
+                    (defender.getTile().getColony() != null && !defender.isArmed() && !defender.isMounted()
+                            && defender.getType() != Unit.ARTILLERY && defender.getType() != Unit.DAMAGED_ARTILLERY)) {
                 return Unit.ATTACK_DONE_SETTLEMENT;
             } else {
                 int diff = defender.getDefensePower(unit) * 2 - attackPower;
@@ -1591,7 +1575,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             reply.appendChild(colony.toXMLElement(player, reply.getOwnerDocument()));
             if (colony.getLineOfSight() > unit.getLineOfSight()) {
                 Element updateElement = reply.getOwnerDocument().createElement("update");
-                Vector<Tile> surroundingTiles = game.getMap().getSurroundingTiles(unit.getTile(), colony.getLineOfSight());
+                Vector<Tile> surroundingTiles = game.getMap().getSurroundingTiles(unit.getTile(),
+                        colony.getLineOfSight());
                 for (int i = 0; i < surroundingTiles.size(); i++) {
                     Tile t = surroundingTiles.get(i);
                     if (t != unit.getTile()) {
@@ -1820,10 +1805,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (unit.checkSetState(state)) {
             unit.setState(state);
         } else {
-            logger.warning("Can't set state " + state + " for unit " + unit
-                    + " with current state " + unit.getState()
-                    + " and " + unit.getMovesLeft() + " moves left belonging to "
-                    + player + ". Possible cheating attempt (or bug)?");            
+            logger.warning("Can't set state " + state + " for unit " + unit + " with current state " + unit.getState()
+                    + " and " + unit.getMovesLeft() + " moves left belonging to " + player
+                    + ". Possible cheating attempt (or bug)?");
         }
         // Send the updated tile anyway, we may have a synchronization issue
         sendUpdatedTileToAll(oldTile, player);
@@ -2398,7 +2382,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @return The reply.
      */
     @Override
-	protected Element logout(Connection connection, Element logoutElement) {
+    protected Element logout(Connection connection, Element logoutElement) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         logger.info("Logout by: " + connection + ((player != null) ? " (" + player.getName() + ") " : ""));
         if (player == null) {
@@ -2410,9 +2394,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         // players that can see such units or colonies.
         // SHOULDN'T THIS WAIT UNTIL THE CURRENT PLAYER HAS FINISHED HIS TURN?
         /*
-         * player.setDead(true);
-         * 
-         * Element setDeadElement = Message.createNewRootElement("setDead");
+         * player.setDead(true); Element setDeadElement =
+         * Message.createNewRootElement("setDead");
          * setDeadElement.setAttribute("player", player.getID());
          * freeColServer.getServer().sendToAll(setDeadElement, connection);
          */
@@ -2460,17 +2443,14 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             }
         }
     }
-
     /*
-     * Method not used, keep in comments.
-     * 
-     * private void sendErrorToAll(String message, Player player) { Game game =
-     * getFreeColServer().getGame(); Iterator enemyPlayerIterator =
-     * game.getPlayerIterator(); while (enemyPlayerIterator.hasNext()) {
-     * ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next(); if
-     * ((player != null) && (player.equals(enemyPlayer)) ||
-     * enemyPlayer.getConnection() == null) { continue; } try { Element
-     * errorElement = createErrorReply(message);
+     * Method not used, keep in comments. private void sendErrorToAll(String
+     * message, Player player) { Game game = getFreeColServer().getGame();
+     * Iterator enemyPlayerIterator = game.getPlayerIterator(); while
+     * (enemyPlayerIterator.hasNext()) { ServerPlayer enemyPlayer =
+     * (ServerPlayer) enemyPlayerIterator.next(); if ((player != null) &&
+     * (player.equals(enemyPlayer)) || enemyPlayer.getConnection() == null) {
+     * continue; } try { Element errorElement = createErrorReply(message);
      * enemyPlayer.getConnection().send(errorElement); } catch (IOException e) {
      * logger.warning("Could not send message to: " + enemyPlayer.getName() + "
      * with connection " + enemyPlayer.getConnection()); } } }

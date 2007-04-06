@@ -132,9 +132,10 @@ public final class Canvas extends JDesktopPane {
     public static final String REVISION = "$Revision$";
 
     private static final Integer MAIN_LAYER = JLayeredPane.DEFAULT_LAYER;
-    private static final Integer EUROPE_LAYER = JLayeredPane.DEFAULT_LAYER;
+
+    // private static final Integer EUROPE_LAYER = JLayeredPane.DEFAULT_LAYER;
     private static final Integer STATUS_LAYER = JLayeredPane.POPUP_LAYER;
-    
+
     private final FreeColClient freeColClient;
 
     private final MainPanel mainPanel;
@@ -171,7 +172,7 @@ public final class Canvas extends JDesktopPane {
 
     private final GUI gui;
 
-    //private final ChatDisplayThread chatDisplayThread;
+    // private final ChatDisplayThread chatDisplayThread;
 
     private final VictoryPanel victoryPanel;
 
@@ -183,27 +184,28 @@ public final class Canvas extends JDesktopPane {
 
     // private final EmigrationPanel emigrationPanel;
 
-    //private final ColopediaPanel colopediaPanel;
+    // private final ColopediaPanel colopediaPanel;
 
-    //private final ReportReligiousPanel reportReligiousPanel;
+    // private final ReportReligiousPanel reportReligiousPanel;
 
-    //private final ReportTradePanel reportTradePanel;
+    // private final ReportTradePanel reportTradePanel;
 
-    //private final ReportTurnPanel reportTurnPanel;
+    // private final ReportTurnPanel reportTurnPanel;
 
-    //private final ReportLabourPanel reportLabourPanel;
+    // private final ReportLabourPanel reportLabourPanel;
 
-    //private final ReportColonyPanel reportColonyPanel;
+    // private final ReportColonyPanel reportColonyPanel;
 
-    //private final ReportMilitaryPanel reportMilitaryPanel;
+    // private final ReportMilitaryPanel reportMilitaryPanel;
 
-    //private final ReportNavalPanel reportNavalPanel;
+    // private final ReportNavalPanel reportNavalPanel;
 
-    //private final ReportForeignAffairPanel reportForeignAffairPanel;
+    // private final ReportForeignAffairPanel reportForeignAffairPanel;
 
-    //private final ReportIndianPanel reportIndianPanel;
+    // private final ReportIndianPanel reportIndianPanel;
 
-    //private final ReportContinentalCongressPanel reportContinentalCongressPanel;
+    // private final ReportContinentalCongressPanel
+    // reportContinentalCongressPanel;
 
     private final ServerListPanel serverListPanel;
 
@@ -220,7 +222,7 @@ public final class Canvas extends JDesktopPane {
     private JMenuBar jMenuBar;
 
     private boolean clientOptionsDialogShowing = false;
-    
+
 
     /**
      * The constructor to use.
@@ -243,7 +245,7 @@ public final class Canvas extends JDesktopPane {
         // errorPanel = new ErrorPanel(this);
         startGamePanel = new StartGamePanel(this, freeColClient);
         serverListPanel = new ServerListPanel(this, freeColClient, freeColClient.getConnectController());
-        // quitDialog = new QuitDialog(this);        
+        // quitDialog = new QuitDialog(this);
         // indianSettlementPanel = new IndianSettlementPanel();
         // tilePanel = new TilePanel(this);
         // monarchPanel = new MonarchPanel(this);
@@ -262,7 +264,7 @@ public final class Canvas extends JDesktopPane {
         // warehouseDialog = new WarehouseDialog(this);
         // chooseFoundingFatherDialog = new ChooseFoundingFatherDialog(this);
         // eventPanel = new EventPanel(this, freeColClient);
-        // emigrationPanel = new EmigrationPanel(this);        
+        // emigrationPanel = new EmigrationPanel(this);
         // gameOptionsDialog = new GameOptionsDialog(this, freeColClient);
         clientOptionsDialog = new ClientOptionsDialog(this, freeColClient);
         // mapGeneratorOptionsDialog = new MapGeneratorOptionsDialog(this,
@@ -273,8 +275,8 @@ public final class Canvas extends JDesktopPane {
         setFocusTraversalKeysEnabled(false);
         // takeFocus();
 
-        //chatDisplayThread = new ChatDisplayThread();
-        //chatDisplayThread.start();
+        // chatDisplayThread = new ChatDisplayThread();
+        // chatDisplayThread.start();
 
         // TODO: move shutdown hook from GUI to (say) client!
         Runtime runtime = Runtime.getRuntime();
@@ -287,7 +289,7 @@ public final class Canvas extends JDesktopPane {
 
         logger.info("Canvas created.");
     }
-    
+
     /**
      * Returns the <code>ClientOptionsDialog</code>.
      * 
@@ -781,29 +783,41 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Checks if the <code>ClientOptionsDialog</code> is visible.
+     * 
      * @return <code>true</code> if no internal frames are open.
      */
     public boolean isClientOptionsDialogShowing() {
         return clientOptionsDialogShowing;
     }
 
-    
     /**
      * Checks if mapboard actions should be enabled.
+     * 
      * @return <code>true</code> if no internal frames are open.
      */
     public boolean isMapboardActionsEnabled() {
         return !isShowingSubPanel();
     }
-    
+
     /**
      * Checks if this <code>Canvas</code> displaying another panel.
+     * <p>
+     * Note that the previous implementation could throw exceptions
+     * in some cases, thus the change.
      * 
      * @return <code>true</code> if the <code>Canvas</code> is displaying an
      *         internal frame.
      */
     public boolean isShowingSubPanel() {
-        return (getAllFrames().length > 0);
+        Component[] components = getComponents();
+        for (Component c : components) {
+            if (c instanceof JInternalFrame)
+                return true;
+            else if (c instanceof JInternalFrame.JDesktopIcon) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -940,11 +954,10 @@ public final class Canvas extends JDesktopPane {
      */
     public File showLoadDialog(File directory, FileFilter[] fileFilters) {
         FreeColDialog loadDialog = FreeColDialog.createLoadDialog(directory, fileFilters);
-        
-        
-        //addCentered(loadDialog, LOAD_LAYER);
-        //loadDialog.requestFocus();
-        
+
+        // addCentered(loadDialog, LOAD_LAYER);
+        // loadDialog.requestFocus();
+
         showFreeColDialog(loadDialog);
 
         File response = (File) loadDialog.getResponse();
@@ -953,10 +966,10 @@ public final class Canvas extends JDesktopPane {
             errorMessage("noSuchFile");
             response = (File) loadDialog.getResponse();
         }
-        
+
         removeFreeColDialog(loadDialog);
 
-        //remove(loadDialog);
+        // remove(loadDialog);
 
         return response;
     }
@@ -1263,7 +1276,9 @@ public final class Canvas extends JDesktopPane {
      * @see #showStatusPanel
      */
     public void closeStatusPanel() {
-        remove(statusPanel);
+        if (statusPanel.isVisible()) {
+            remove(statusPanel);
+        }
     }
 
     /**
@@ -1339,7 +1354,7 @@ public final class Canvas extends JDesktopPane {
      * @see net.sf.freecol.common.model.FoundingFather
      */
     public int showChooseFoundingFatherDialog(int[] possibleFoundingFathers) {
-        remove(statusPanel);
+        closeStatusPanel();
 
         ChooseFoundingFatherDialog chooseFoundingFatherDialog = new ChooseFoundingFatherDialog(this);
 
@@ -1587,8 +1602,7 @@ public final class Canvas extends JDesktopPane {
      * @see net.sf.freecol.common.model.Monarch
      */
     public boolean showMonarchPanel(int action, String[][] replace) {
-        // TODO: why is this done?
-        remove(statusPanel);
+        closeStatusPanel();
 
         // setEnabled(false);
         // monarchPanel.initialize(action, replace);
@@ -1683,19 +1697,19 @@ public final class Canvas extends JDesktopPane {
      * Gets the internal frame for the given component.
      * 
      * @param c The component.
-     * @return The given component if this is an internal frame or
-     *      the first parent that is an internal frame. Returns
-     *      <code>null</code> if no internal frame is found.
+     * @return The given component if this is an internal frame or the first
+     *         parent that is an internal frame. Returns <code>null</code> if
+     *         no internal frame is found.
      */
     private JInternalFrame getInternalFrame(final Component c) {
         Component temp = c;
- 
+
         while (temp != null && !(temp instanceof JInternalFrame)) {
-            temp = temp.getParent();            
-        }        
+            temp = temp.getParent();
+        }
         return (JInternalFrame) temp;
     }
-    
+
     /**
      * Removes the given component from this Container.
      * 
@@ -1708,29 +1722,29 @@ public final class Canvas extends JDesktopPane {
         if (comp == null) {
             return;
         }
-        final Rectangle updateBounds = comp.getBounds();        
+        final Rectangle updateBounds = comp.getBounds();
         if (comp == jMenuBar) {
             jMenuBar = null;
             super.remove(comp);
         } else {
             final JInternalFrame frame = getInternalFrame(comp);
-            if (frame != null && frame != comp) {    
-                //updateBounds = frame.getBounds();
+            if (frame != null && frame != comp) {
+                // updateBounds = frame.getBounds();
                 frame.dispose();
             } else {
                 super.remove(comp);
             }
         }
-        
+
         repaint(updateBounds.x, updateBounds.y, updateBounds.width, updateBounds.height);
-        
+
         final boolean takeFocus = (comp != statusPanel);
         if (update) {
             updateJMenuBar();
             freeColClient.getActionManager().update();
             if (takeFocus && !isShowingSubPanel()) {
                 takeFocus();
-            }            
+            }
 
             if (freeColClient.getGame() != null) {
                 freeColClient.getInGameController().nextModelMessage();
@@ -1763,8 +1777,8 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Adds a component centered on this Canvas inside a frame. Removes the statuspanel if
-     * visible (and <code>comp != statusPanel</code>).
+     * Adds a component centered on this Canvas inside a frame. Removes the
+     * statuspanel if visible (and <code>comp != statusPanel</code>).
      * 
      * @param comp The component to add to this ToEuropePanel.
      * @param i The layer to add the component to (see JLayeredPane).
@@ -1772,7 +1786,7 @@ public final class Canvas extends JDesktopPane {
      */
     public JInternalFrame addAsFrame(JComponent comp) {
         final int FRAME_EMPTY_SPACE = 60;
-        
+
         final JInternalFrame f = new JInternalFrame();
         if (f.getContentPane() instanceof JComponent) {
             JComponent c = (JComponent) f.getContentPane();
@@ -1791,15 +1805,15 @@ public final class Canvas extends JDesktopPane {
             Image menuborderSE = (Image) UIManager.get("menuborder.se.image");
             final FreeColImageBorder imageBorder = new FreeColImageBorder(menuborderN, menuborderW, menuborderS,
                     menuborderE, menuborderNW, menuborderNE, menuborderSW, menuborderSE);
-            //comp.setBorder(BorderFactory.createCompoundBorder(imageBorder,
-            //        BorderFactory.createEmptyBorder(10, 10, 10, 10)));
-            
+            // comp.setBorder(BorderFactory.createCompoundBorder(imageBorder,
+            // BorderFactory.createEmptyBorder(10, 10, 10, 10)));
+
             f.setBorder(imageBorder);
             comp.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         } else {
             f.setBorder(null);
         }
-               
+
         final FrameMotionListener fml = new FrameMotionListener(f);
         comp.addMouseMotionListener(fml);
         comp.addMouseListener(fml);
@@ -1810,7 +1824,7 @@ public final class Canvas extends JDesktopPane {
             biu.setWestPane(null);
             biu.setEastPane(null);
         }
-        
+
         f.getContentPane().add(comp);
         f.setOpaque(false);
         f.pack();
@@ -1825,13 +1839,14 @@ public final class Canvas extends JDesktopPane {
         f.setSize(width, height);
         addCentered(f);
         f.setName(comp.getClass().getSimpleName());
-         
+
         f.setFrameIcon(null);
         f.setVisible(true);
         f.setResizable(true);
         try {
             f.setSelected(true);
-        } catch (java.beans.PropertyVetoException e) {}
+        } catch (java.beans.PropertyVetoException e) {
+        }
 
         return f;
     }
@@ -1846,33 +1861,33 @@ public final class Canvas extends JDesktopPane {
      * @param i The layer to add the component to (see JLayeredPane).
      * @return The <code>JInternalFrame</code> that was created and added.
      */
-    public JInternalFrame addAsSimpleFrame(JComponent comp) { 
+    public JInternalFrame addAsSimpleFrame(JComponent comp) {
         final JInternalFrame f = new JInternalFrame();
         f.getContentPane().add(comp);
         f.pack();
         addCentered(f);
         f.setName(comp.getClass().getSimpleName());
-        
+
         if (f.getUI() instanceof BasicInternalFrameUI) {
             BasicInternalFrameUI biu = (BasicInternalFrameUI) f.getUI();
             biu.setNorthPane(null);
         }
-        
+
         f.setFrameIcon(null);
         f.setVisible(true);
         f.setResizable(false);
         try {
             f.setSelected(true);
-        } catch (java.beans.PropertyVetoException e) {}
+        } catch (java.beans.PropertyVetoException e) {
+        }
 
         return f;
     }
 
     /**
-     * Removes the mouse listeners for moving the frame
-     * of the given component.
+     * Removes the mouse listeners for moving the frame of the given component.
      * 
-     * @param c The component the listeneres should be removed from. 
+     * @param c The component the listeneres should be removed from.
      */
     public void deactivateMovable(JComponent c) {
         for (MouseListener ml : c.getMouseListeners()) {
@@ -1911,7 +1926,7 @@ public final class Canvas extends JDesktopPane {
     public void add(Component comp, Integer i) {
         add(comp, i, true);
     }
-    
+
     /**
      * Adds a component to this Canvas. Removes the statuspanel if visible (and
      * <code>comp != statusPanel</code>).
@@ -1921,7 +1936,8 @@ public final class Canvas extends JDesktopPane {
      */
     public void add(Component comp, Integer i, boolean update) {
 
-        if (comp != statusPanel && !(comp instanceof JMenuItem) && !(comp instanceof FreeColDialog)) {
+        if (comp != statusPanel && !(comp instanceof JMenuItem) && !(comp instanceof FreeColDialog)
+                && statusPanel.isVisible()) {
             remove(statusPanel, false);
         }
 
@@ -1930,7 +1946,7 @@ public final class Canvas extends JDesktopPane {
         } else {
             super.add(comp, i);
         }
-        
+
         if (update) {
             updateJMenuBar();
             freeColClient.getActionManager().update();
@@ -1942,21 +1958,17 @@ public final class Canvas extends JDesktopPane {
      * while even its request doesn't get granted immediately.
      */
     private void takeFocus() {
-        //JComponent c = this;
+        // JComponent c = this;
 
-        /*if (startGamePanel.isShowing()) {
-            c = startGamePanel;
-        } else if (newPanel.isShowing()) {
-            c = newPanel;
-        } else if (mainPanel.isShowing()) {
-            c = mainPanel;
-        } else if (europePanel.isShowing()) {
-            c = europePanel;
-        } else if (colonyPanel.isShowing()) {
-            c = colonyPanel;
-        }*/        
-        
-        //c.requestFocus();
+        /*
+         * if (startGamePanel.isShowing()) { c = startGamePanel; } else if
+         * (newPanel.isShowing()) { c = newPanel; } else if
+         * (mainPanel.isShowing()) { c = mainPanel; } else if
+         * (europePanel.isShowing()) { c = europePanel; } else if
+         * (colonyPanel.isShowing()) { c = colonyPanel; }
+         */
+
+        // c.requestFocus();
         if (!isShowingSubPanel()) {
             requestFocus();
         }
@@ -1979,7 +1991,7 @@ public final class Canvas extends JDesktopPane {
      * @param y The y-coordinate at which to show the popup.
      */
     public void showPopup(JPopupMenu popup, int x, int y) {
-        //closeMenus();
+        // closeMenus();
         popup.show(this, x, y);
         popup.repaint();
     }
@@ -2144,19 +2156,16 @@ public final class Canvas extends JDesktopPane {
     public ImageProvider getImageProvider() {
         return gui.getImageLibrary();
     }
-    
+
     /**
      * Closes all the menus that are currently open.
      */
     public void closeMenus() {
         /*
-        remove(newPanel, false);
-        remove(startGamePanel, false);
-        remove(serverListPanel, false);
-        remove(colonyPanel, false);
-        remove(europePanel, false);
-        remove(statusPanel);
-        */
+         * remove(newPanel, false); remove(startGamePanel, false);
+         * remove(serverListPanel, false); remove(colonyPanel, false);
+         * remove(europePanel, false); remove(statusPanel);
+         */
         for (JInternalFrame frame : getAllFrames()) {
             frame.dispose();
         }
@@ -2277,7 +2286,7 @@ public final class Canvas extends JDesktopPane {
         if (jMenuBar != null) {
             remove(jMenuBar);
         }
-        
+
         for (Component c : getComponents()) {
             remove(c, false);
         }
@@ -2317,7 +2326,7 @@ public final class Canvas extends JDesktopPane {
     public boolean confirmQuitDialog() {
         QuitDialog quitDialog = new QuitDialog(this);
 
-        JInternalFrame f = addAsFrame(quitDialog);
+        addAsFrame(quitDialog);
         quitDialog.requestFocus();
         try {
             return quitDialog.getResponseBoolean();
@@ -2359,52 +2368,51 @@ public final class Canvas extends JDesktopPane {
         showNewGamePanel();
     }
 
+
     /**
      * Handles the moving of internal frames.
      */
     class FrameMotionListener extends MouseAdapter implements MouseMotionListener {
-        
+
         private JInternalFrame f;
+
         private Point loc = null;
-        
+
+
         FrameMotionListener(JInternalFrame f) {
             this.f = f;
         }
-        
+
         @Override
         public void mousePressed(MouseEvent e) {
-            if (f.getDesktopPane() == null
-                    || f.getDesktopPane().getDesktopManager() == null) {
+            if (f.getDesktopPane() == null || f.getDesktopPane().getDesktopManager() == null) {
                 return;
             }
-            loc = SwingUtilities.convertPoint((Component) e.getSource(),  e.getX(), e.getY(), null);
+            loc = SwingUtilities.convertPoint((Component) e.getSource(), e.getX(), e.getY(), null);
             f.getDesktopPane().getDesktopManager().beginDraggingFrame(f);
         }
-        
+
         @Override
         public void mouseReleased(MouseEvent e) {
-            if (loc == null
-                    || f.getDesktopPane() == null
-                    || f.getDesktopPane().getDesktopManager() == null) {
+            if (loc == null || f.getDesktopPane() == null || f.getDesktopPane().getDesktopManager() == null) {
                 return;
             }
             f.getDesktopPane().getDesktopManager().endDraggingFrame(f);
         }
-        
+
         public void mouseDragged(MouseEvent e) {
-            if (loc == null
-                    || f.getDesktopPane() == null
-                    || f.getDesktopPane().getDesktopManager() == null) {
+            if (loc == null || f.getDesktopPane() == null || f.getDesktopPane().getDesktopManager() == null) {
                 return;
             }
-            
-            Point p = SwingUtilities.convertPoint((Component) e.getSource(),  e.getX(), e.getY(), null); 
+
+            Point p = SwingUtilities.convertPoint((Component) e.getSource(), e.getX(), e.getY(), null);
             int moveX = loc.x - p.x;
             int moveY = loc.y - p.y;
             f.getDesktopPane().getDesktopManager().dragFrame(f, f.getX() - moveX, f.getY() - moveY);
             loc = p;
         }
-        
-        public void mouseMoved(MouseEvent arg0) {}            
-    };   
+
+        public void mouseMoved(MouseEvent arg0) {
+        }
+    };
 }
