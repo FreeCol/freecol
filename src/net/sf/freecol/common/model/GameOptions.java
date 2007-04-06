@@ -36,6 +36,9 @@ public class GameOptions extends OptionMap {
     /** Does the Custom House sell boycotted goods **/
     public static final String CUSTOM_IGNORE_BOYCOTT = "customIgnoreBoycott";
 
+    /** Whether experts have connections, producing without raw materials in factories */
+    public static final String EXPERTS_HAVE_CONNECTIONS = "expertsHaveConnections";
+
     /** Enables/disables fog of war. */
     public static final String FOG_OF_WAR = "fogOfWar";
 
@@ -126,6 +129,7 @@ public class GameOptions extends OptionMap {
         OptionGroup colony = new OptionGroup("gameOptions.colony.name", "gameOptions.colony.shortDescription");
         colony.add(new IntegerOption(HAMMER_PRICE, "gameOptions.hammerPrice.name", "gameOptions.hammerPrice.shortDescription", 0, 50, 20));
         colony.add(new BooleanOption(CUSTOM_IGNORE_BOYCOTT, "gameOptions.customIgnoreBoycott.name", "gameOptions.customIgnoreBoycott.shortDescription", false));
+	colony.add(new BooleanOption(EXPERTS_HAVE_CONNECTIONS, "gameOptions.expertsHaveConnections.name", "gameOptions.expertsHaveConnections.shortDescription", false));
 
         add(colony);
 
