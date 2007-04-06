@@ -255,7 +255,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * 
-     * Creates a new <code>Player</code> with specified name.
+     * Creates a new (human) <code>Player</code> with specified name.
      * 
      * 
      * 

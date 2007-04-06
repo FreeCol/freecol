@@ -117,6 +117,7 @@ public class Map extends FreeColGameObject {
      * @param direction
      *            The direction
      * @return The oppositre direction of the given one.
+     * @deprecated use the static method {@link #getReverseDirection(int)}
      */
     public int getOppositeDirection(int direction) {
         return (direction + 4 < 8) ? direction + 4 : direction - 4;

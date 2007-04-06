@@ -34,6 +34,7 @@ public class Game extends FreeColGameObject {
     private static final Logger logger = Logger.getLogger(Game.class.getName());
 
     /** A virtual player to use with enemy privateers */
+    // TODO: Using null here throws a warning. A Player should belong to a Game.
     public static final Player unknownEnemy = new Player(null, "", false, Player.NO_NATION);
 
     /** Contains all the players in the game. */
@@ -692,9 +693,9 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Gets the maximum number of players that can be added to this game.
+     * Gets the maximum number of (human) players that can be added to this game.
      * 
-     * @return the maximum number of players that can be added to this game
+     * @return the maximum number of (human) players that can be added to this game
      */
     public int getMaximumPlayers() {
         return maxPlayers;

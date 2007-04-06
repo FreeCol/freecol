@@ -15,8 +15,6 @@ public final class GoodsType
     public static final  String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final  String  REVISION = "$Revision$";
 
-    private static  int  nextIndex;
-
     public final  int        index;
     public        String     id;
     public        String     name;
@@ -31,9 +29,9 @@ public final class GoodsType
 
     // ----------------------------------------------------------- constructors
 
-    public GoodsType() {
+    public GoodsType(int index) {
 
-        index = nextIndex ++;
+        this.index = index;
     }
 
 
