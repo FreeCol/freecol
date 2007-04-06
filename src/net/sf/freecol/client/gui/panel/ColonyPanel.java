@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.swing.BorderFactory;
 import javax.swing.ComponentInputMap;
 import javax.swing.ImageIcon;
 import javax.swing.InputMap;
@@ -245,20 +246,13 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
         buildingsScroll.setAutoscrolls(true);
 
-        EtchedBorder eBorder = new EtchedBorder();
-        tilesScroll.setBorder(new CompoundBorder(new TitledBorder(Messages
-                .message("surroundingArea")), new BevelBorder(
-                BevelBorder.LOWERED)));
-        buildingsScroll.setBorder(new CompoundBorder(new TitledBorder(Messages
-                .message("buildings")), eBorder));
-        warehouseScroll.setBorder(new CompoundBorder(new TitledBorder(Messages
-                .message("goods")), eBorder));
-        cargoScroll.setBorder(new CompoundBorder(cargoBorder =
-                new TitledBorder(Messages.message("cargoOnShip")), eBorder));
-        inPortScroll.setBorder(new CompoundBorder(new TitledBorder(Messages
-                .message("inPort")), eBorder));
-        outsideColonyScroll.setBorder(new CompoundBorder(new TitledBorder(
-                Messages.message("outsideColony")), eBorder));
+        tilesScroll.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages.message("surroundingArea")), new BevelBorder(BevelBorder.LOWERED)));
+        buildingsScroll.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages.message("buildings")), BorderFactory.createEtchedBorder()));
+        warehouseScroll.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages.message("goods")), BorderFactory.createEtchedBorder()));
+        cargoBorder = BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages.message("cargoOnShip"));
+        cargoScroll.setBorder(BorderFactory.createCompoundBorder(cargoBorder, BorderFactory.createEtchedBorder()));
+        inPortScroll.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages.message("inPort")), BorderFactory.createEtchedBorder()));
+        outsideColonyScroll.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages.message("outsideColony")), BorderFactory.createEtchedBorder()));
 
         buyBuilding.setActionCommand(String.valueOf(BUY_BUILDING));
         exitButton.setActionCommand(String.valueOf(EXIT));
