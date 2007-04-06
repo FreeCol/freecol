@@ -280,14 +280,16 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         });
 
         int[] widths = { 250, margin, 138, margin, 215, margin, 204 };
-        int[] heights = { 0, margin, 225, margin, 8, // extra space for
-                // production panel
-                -8, // same size as tools label
-                margin, -6, // same size as hammers label
-                margin, 120, margin, 140, margin, 0, margin // extra margin,
-                // necessary, but
-                // why?
-                };
+        int[] heights = { 
+            0, // colony select box
+            margin, 225, // colony tiles and buildings
+            margin, 8, // extra space for production panel
+            -8, // hammers label, same size as tools label
+            margin, -6, // tools label, same size as hammers label
+            margin, 120, // port and cargo panels
+            margin, 140, // warehouse
+            margin, 0 // buttons
+        };
         setLayout(new HIGLayout(widths, heights));
 
         int row = 1;
