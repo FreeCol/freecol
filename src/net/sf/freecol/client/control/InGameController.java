@@ -2,7 +2,11 @@ package net.sf.freecol.client.control;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -12,13 +16,39 @@ import javax.swing.SwingUtilities;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.*;
+import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.FreeColMenuBar;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.client.gui.panel.*;
+import net.sf.freecol.client.gui.panel.ChoiceItem;
+import net.sf.freecol.client.gui.panel.EventPanel;
+import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.client.gui.sound.SfxLibrary;
 import net.sf.freecol.client.networking.Client;
-import net.sf.freecol.common.model.*;
+import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.ColonyTile;
+import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.GoalDecider;
+import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsContainer;
+import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Market;
+import net.sf.freecol.common.model.ModelMessage;
+import net.sf.freecol.common.model.Nameable;
+import net.sf.freecol.common.model.Ownable;
+import net.sf.freecol.common.model.PathNode;
+import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TradeRoute;
+import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.networking.Message;
@@ -2781,7 +2811,7 @@ public final class InGameController implements NetworkConstants {
      * @param message a <code>ModelMessage</code> value
      * @param flag whether to ignore the ModelMessage or not
      */
-    public void ignoreMessage(ModelMessage message, boolean flag) {
+    public synchronized void ignoreMessage(ModelMessage message, boolean flag) {
         String key = message.getSource().getID();
         for (String[] replacement : message.getData()) {
             if (replacement[0].equals("%goods%")) {
@@ -2790,11 +2820,9 @@ public final class InGameController implements NetworkConstants {
             }
         }
         if (flag) {
-            logger.finer("Ignore model message with key " + key);
-            messagesToIgnore.put(key, new Integer(freeColClient.getGame().getTurn().getNumber()));
+            markMessageIgnored(key, freeColClient.getGame().getTurn().getNumber());
         } else {
-            logger.finer("Removing model message with key " + key + " from ignored messages.");
-            messagesToIgnore.remove(key);
+            stopIgnoringMessage(key);
         }
     }
 
@@ -2804,10 +2832,9 @@ public final class InGameController implements NetworkConstants {
      * @see net.sf.freecol.common.model.ModelMessage ModelMessage
      */
     public void nextModelMessage() {
-        Canvas canvas = freeColClient.getCanvas();
         int thisTurn = freeColClient.getGame().getTurn().getNumber();
 
-        ArrayList<ModelMessage> messageList = new ArrayList<ModelMessage>();
+        final ArrayList<ModelMessage> messageList = new ArrayList<ModelMessage>();
 
         for (Iterator<ModelMessage> i = freeColClient.getGame().getModelMessageIterator(freeColClient.getMyPlayer()); i
                 .hasNext();) {
@@ -2823,16 +2850,14 @@ public final class InGameController implements NetworkConstants {
                         }
                     }
 
-                    Integer turn = messagesToIgnore.get(key);
+                    Integer turn = getTurnForMessageIgnored(key);
                     if (turn != null && turn.intValue() == thisTurn - 1) {
-                        logger.finer("Ignoring model message with key " + key);
-                        messagesToIgnore.put(key, new Integer(thisTurn));
+                        markMessageIgnored(key, thisTurn);
                         message.setBeenDisplayed(true);
                         continue;
                     }
                 } else if (message.getSource() instanceof Market) {
-                    // TODO: remove as soon as all players have their
-                    // own market
+                    // TODO: remove as soon as all players have their own market
                     message.setSource(freeColClient.getMyPlayer().getEurope());
                 }
                 messageList.add(message);
@@ -2842,22 +2867,58 @@ public final class InGameController implements NetworkConstants {
             message.setBeenDisplayed(true);
         }
 
-        Iterator<Entry<String, Integer>> mapIterator = messagesToIgnore.entrySet().iterator();
-        while (mapIterator.hasNext()) {
-            Entry<String, Integer> entry = mapIterator.next();
-            if (entry.getValue().intValue() < thisTurn - 1) {
-                logger.finer("Removing old model message with key " + entry.getKey() + " from ignored messages.");
-                mapIterator.remove();
+        purgeOldMessagesFromMessagesToIgnore(thisTurn);
+        
+        Runnable uiTask = new Runnable() {
+            public void run() {
+                if (messageList.size() > 1) {
+                    freeColClient.getCanvas().showTurnReport(messageList);
+                } else if (messageList.size() == 1) {
+                    freeColClient.getCanvas().showModelMessage(messageList.get(0));
+                }
+                freeColClient.getActionManager().update();
+            }
+        };
+        if(SwingUtilities.isEventDispatchThread()) {
+            uiTask.run();
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(uiTask);
+            } catch (InterruptedException e) {
+                // Ignore
+            } catch (InvocationTargetException e) {
+                // Ignore
             }
         }
+    }
 
-        if (messageList.size() > 1) {
-            canvas.showTurnReport(messageList);
-        } else if (messageList.size() == 1) {
-            canvas.showModelMessage(messageList.get(0));
+    private synchronized Integer getTurnForMessageIgnored(String key) {
+        return messagesToIgnore.get(key);
+    }
+
+    private synchronized void markMessageIgnored(String key, int turn) {
+        logger.finer("Ignoring model message with key " + key);
+        messagesToIgnore.put(key, new Integer(turn));
+    }
+
+    private synchronized void stopIgnoringMessage(String key) {
+        logger.finer("Removing model message with key " + key + " from ignored messages.");
+        messagesToIgnore.remove(key);
+    }
+
+    private synchronized void purgeOldMessagesFromMessagesToIgnore(int thisTurn) {
+        List<String> keysToRemove = new ArrayList<String>();
+        for (Entry<String, Integer> entry : messagesToIgnore.entrySet()) {
+            if (entry.getValue().intValue() < thisTurn - 1) {
+                if (logger.isLoggable(Level.FINER)) {
+                    logger.finer("Removing old model message with key " + entry.getKey() + " from ignored messages.");
+                }
+                keysToRemove.add(entry.getKey());
+            }
         }
-
-        freeColClient.getActionManager().update();
+        for (String key : keysToRemove) {
+            stopIgnoringMessage(key);
+        }
     }
 
     /**
