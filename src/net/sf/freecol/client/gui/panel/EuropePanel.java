@@ -16,6 +16,8 @@ import java.awt.event.MouseListener;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
+import javax.swing.border.TitledBorder;
+import javax.swing.BorderFactory;
 import javax.swing.ComponentInputMap;
 import javax.swing.ImageIcon;
 import javax.swing.InputMap;
@@ -38,6 +40,9 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
+
+import cz.autel.dmi.HIGLayout;
+
 
 /**
  * This is a panel for the Europe display. It shows the ships in Europe and
@@ -62,8 +67,6 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
     private final FreeColClient freeColClient;
     private InGameController inGameController;
 
-    private final JLabel                    cargoLabel;
-    private final JLabel                    toAmericaLabel;
     private final ToAmericaPanel            toAmericaPanel;
     private final ToEuropePanel             toEuropePanel;
     private final InPortPanel               inPortPanel;
@@ -79,9 +82,6 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
 
     private JButton exitButton;
     
-    //private HIGConstraints higConst = new HIGConstraints();
-
-
 
     /**
      * The constructor for the panel.
@@ -96,7 +96,6 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         this.inGameController = inGameController;
 
         setFocusCycleRoot(true);
-        setSize(parent.getWidth(), parent.getHeight() - parent.getMenuBarHeight());
 
         // Use ESCAPE for closing the ColonyPanel:
         exitButton = new JButton(Messages.message("close"));
@@ -146,6 +145,8 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         docksPanel.setBackground(Color.WHITE);
         cargoPanel.setBackground(Color.WHITE);
 
+        exitButton.setForeground(Color.WHITE);
+
         defaultTransferHandler = new DefaultTransferHandler(parent, this);
         toAmericaPanel.setTransferHandler(defaultTransferHandler);
         toEuropePanel.setTransferHandler(defaultTransferHandler);
@@ -175,23 +176,18 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
                     docksScroll = new JScrollPane(docksPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER),
                     cargoScroll = new JScrollPane(cargoPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED),
                     marketScroll = new JScrollPane(marketPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);                
+
+        toAmericaPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
+                                                                  Messages.message("goingToAmerica")));
+        toEuropePanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
+                                                                 Messages.message("goingToEurope")));
+        cargoPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
+                                                              Messages.message("cargo")));
+        docksPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
+                                                              Messages.message("docks")));
+        inPortPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
+                                                               Messages.message("inPort")));
                 
-        JLabel  toEuropeLabel = new JLabel(),
-                inPortLabel = new JLabel(),
-                docksLabel = new JLabel();
-        toAmericaLabel = new JLabel();
-        cargoLabel = new JLabel(); //"<html><strike>Cargo</strike></html>");
-        
-        ImageIcon toEuropeImage = new ImageIcon(freeColClient.getGUI().createStringImage(toEuropeLabel, Messages.message("goingToEurope"), Color.WHITE, 200, TITLE_FONT_SIZE));
-        toEuropeLabel.setIcon(toEuropeImage);
-        ImageIcon inPortImage = new ImageIcon(freeColClient.getGUI().createStringImage(inPortLabel, Messages.message("inPort"), Color.WHITE, 200, TITLE_FONT_SIZE));
-        inPortLabel.setIcon(inPortImage);
-        ImageIcon docksImage = new ImageIcon(freeColClient.getGUI().createStringImage(docksLabel, Messages.message("docks"), Color.WHITE, 200, TITLE_FONT_SIZE));
-        docksLabel.setIcon(docksImage);
-        ImageIcon toAmericaImage = new ImageIcon(freeColClient.getGUI().createStringImage(toAmericaLabel, Messages.message("goingToAmerica"), Color.WHITE, 200, TITLE_FONT_SIZE));
-        toAmericaLabel.setIcon(toAmericaImage);
-        ImageIcon cargoImage = new ImageIcon(freeColClient.getGUI().createStringImage(cargoLabel, Messages.message("cargo"), Color.WHITE, 400, TITLE_FONT_SIZE));
-        cargoLabel.setIcon(cargoImage);        
         
         marketScroll.getViewport().setOpaque(false);
         marketPanel.setOpaque(false);
@@ -205,59 +201,52 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         docksPanel.setOpaque(false);
         inPortScroll.getViewport().setOpaque(false);
         inPortPanel.setOpaque(false);        
-        recruitButton.setOpaque(true);
-        purchaseButton.setOpaque(true);
-        trainButton.setOpaque(true);
-        exitButton.setOpaque(true);
-        unloadButton.setOpaque(true);
+        recruitButton.setOpaque(false);
+        purchaseButton.setOpaque(false);
+        trainButton.setOpaque(false);
+        exitButton.setOpaque(false);
+        unloadButton.setOpaque(false);
         
-        final int SPACE = 30;
-        final int SPACE_BUTTON = 10;
-        
-        marketScroll.setSize(640, 114);
-        toAmericaScroll.setSize(315, 192);
-        toEuropeScroll.setSize(toAmericaScroll.getSize());        
-        inPortScroll.setSize(430, 96);
-        cargoScroll.setSize(inPortScroll.getSize());
-        docksScroll.setSize(marketScroll.getWidth() - inPortScroll.getWidth() - SPACE, cargoScroll.getHeight() + inPortScroll.getHeight() + SPACE);        
-        exitButton.setSize(110, 20);
-        recruitButton.setSize(100, 20);
-        purchaseButton.setSize(100, 20);
-        trainButton.setSize(100, 20);
-        unloadButton.setSize(100, 20);
-        toAmericaLabel.setSize(200, 20);
-        toEuropeLabel.setSize(200, 20);
-        inPortLabel.setSize(200, 20);
-        docksLabel.setSize(200, 20);
-        cargoLabel.setSize(410, 20);
+        int[] widths = { 0, 315, margin, 103, margin, 198, margin, 0, 0 };
+        int[] heights = {
+            0, // top margin
+            // sailing to America, sailing to Europe
+            39, margin, // recruit button
+            39, margin, // buy button
+            39, margin, // train button
+            39, margin, // unload button
+            116, margin, // in port
+            116, margin, // cargo 
+            75, 39, // market
+            0 // bottom margin
+        };
 
-        int totalHeight = toEuropeScroll.getHeight() + docksScroll.getHeight() + marketScroll.getHeight() + 4 * SPACE;
-        int spaceTop = Math.max(0, (getHeight() - totalHeight) / 2);
-        int spaceLeft = Math.max(0, (getWidth() - marketScroll.getWidth()) / 2);
-        int spaceRight = spaceLeft;
-        //int spaceBottom = spaceTop;
-        
-        toAmericaScroll.setLocation(spaceLeft, spaceTop);
-        toAmericaLabel.setLocation(spaceLeft, spaceTop - 20);
-        toEuropeScroll.setLocation(getWidth() - spaceRight - toEuropeScroll.getWidth(), spaceTop);
-        toEuropeLabel.setLocation(getWidth() - spaceRight - toEuropeScroll.getWidth(), spaceTop - 20);
-        inPortScroll.setLocation(spaceLeft, spaceTop + toAmericaScroll.getHeight() + SPACE);
-        inPortLabel.setLocation(spaceLeft, inPortScroll.getY() - 20);   
-        docksScroll.setLocation(getWidth() - spaceRight - docksScroll.getWidth(), spaceTop + toEuropeScroll.getHeight() + SPACE);
-        docksLabel.setLocation(getWidth() - spaceRight - docksScroll.getWidth(), docksScroll.getY() - 20);
-        marketScroll.setLocation(spaceLeft, docksScroll.getY() + docksScroll.getHeight() + SPACE);
-        cargoScroll.setLocation(spaceLeft, spaceTop + toAmericaScroll.getHeight() + inPortScroll.getHeight() + 2 * SPACE);
-        cargoLabel.setLocation(spaceLeft, cargoScroll.getY() - 20);
-        
-        int spaceTopButtons = spaceTop + (toAmericaScroll.getHeight() - (recruitButton.getHeight() + purchaseButton.getHeight() + trainButton.getHeight() + 2 * SPACE_BUTTON)) / 2;
-        recruitButton.setLocation((spaceLeft - recruitButton.getWidth()) / 2, spaceTopButtons);
-        purchaseButton.setLocation((spaceLeft - purchaseButton.getWidth()) / 2, spaceTopButtons + recruitButton.getHeight() + SPACE_BUTTON);
-        trainButton.setLocation((spaceLeft - trainButton.getWidth()) / 2, purchaseButton.getY() + purchaseButton.getHeight() + SPACE_BUTTON);
-        unloadButton.setLocation((spaceLeft - unloadButton.getWidth()) / 2, trainButton.getY() + trainButton.getHeight() + SPACE_BUTTON);
-                                
-        exitButton.setLocation((marketScroll.getWidth() + marketScroll.getX() + getWidth() - exitButton.getWidth()) / 2, marketScroll.getY() + (marketScroll.getHeight() - exitButton.getHeight()) / 2);                
-    
-        setLayout(null);
+        HIGLayout layout = new HIGLayout(widths, heights);
+        layout.setRowWeight(1, 1);
+        layout.setRowWeight(heights.length, 1);
+        layout.setColumnWeight(1, 1);
+        layout.setColumnWeight(widths.length, 1);
+        setLayout(layout);
+
+        int row = 2;
+        add(toAmericaScroll, higConst.rcwh(row, 2, 1, 7));
+        add(toEuropeScroll, higConst.rcwh(row, 4, 3, 7));
+        add(recruitButton, higConst.rc(row, 8));
+        row += 2;
+        add(purchaseButton, higConst.rc(row, 8));
+        row += 2;
+        add(trainButton, higConst.rc(row, 8));
+        row += 2;
+        add(unloadButton, higConst.rc(row, 8));
+        row += 2;
+        add(inPortScroll, higConst.rcwh(row, 2, 3, 1));
+        add(docksScroll, higConst.rcwh(row, 6, 1, 3));
+        row += 2;
+        add(cargoScroll, higConst.rcwh(row, 2, 3, 1));
+        row += 2;
+        add(marketScroll, higConst.rcwh(row, 2, 5, 2));
+        row += 1;
+        add(exitButton, higConst.rc(row, 8));
 
         exitButton.setActionCommand(String.valueOf(EXIT));
         recruitButton.setActionCommand(String.valueOf(RECRUIT));
@@ -270,30 +259,15 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         purchaseButton.addActionListener(this);
         trainButton.addActionListener(this);
         unloadButton.addActionListener(this);
-
-        add(exitButton);
-        add(recruitButton);
-        add(purchaseButton);
-        add(trainButton);
-        add(unloadButton);
-        add(toAmericaScroll);
-        add(toEuropeScroll);
-        add(inPortScroll);
-        add(docksScroll);
-        add(cargoScroll);
-        add(marketScroll);
-        add(toAmericaLabel);
-        add(toEuropeLabel);
-        add(inPortLabel);
-        add(docksLabel);
-        add(cargoLabel);
-
         setBorder(null);
 
         selectedUnit = null;
         
         // See the message of Ulf Onnen for more information about the presence of this fake mouse listener.
         addMouseListener(new MouseAdapter() {});
+
+        setSize(parent.getWidth(), parent.getHeight() - parent.getMenuBarHeight());
+
     }
 
 
@@ -479,8 +453,9 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
             if (newLandName == null) {
                 newLandName = freeColClient.getMyPlayer().getDefaultNewLandName();
             }
-            ImageIcon toAmericaImage = new ImageIcon(freeColClient.getGUI().createStringImage(toAmericaLabel, Messages.message("sailingTo", new String[][] {{"%location%", newLandName}}), Color.WHITE, 200, TITLE_FONT_SIZE));
-            toAmericaLabel.setIcon(toAmericaImage);
+            ((TitledBorder) toAmericaPanel.getBorder())
+               .setTitle(Messages.message("sailingTo", new String[][] {{"%location%", 
+                                                                        newLandName}}));
         }
     }
 
@@ -567,11 +542,13 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
     */
     private void updateCargoLabel() {
         if (selectedUnit != null) {
-            ImageIcon cargoImage = new ImageIcon(freeColClient.getGUI().createStringImage(cargoLabel, Messages.message("cargo") + " (" + selectedUnit.getUnit().getName() + ") " + Messages.message("spaceLeft") + ": " + selectedUnit.getUnit().getSpaceLeft(), Color.WHITE, 200, TITLE_FONT_SIZE));
-            cargoLabel.setIcon(cargoImage);  
+            ((TitledBorder) cargoPanel.getBorder())
+                .setTitle(Messages.message("cargo") +
+                          " (" + selectedUnit.getUnit().getName() + ") "
+                          + Messages.message("spaceLeft") + ": " +
+                          selectedUnit.getUnit().getSpaceLeft());
         } else {
-            ImageIcon cargoImage = new ImageIcon(freeColClient.getGUI().createStringImage(cargoLabel, Messages.message("cargo"), Color.WHITE, 200, TITLE_FONT_SIZE));
-            cargoLabel.setIcon(cargoImage); 
+            ((TitledBorder) cargoPanel.getBorder()).setTitle(Messages.message("cargo"));
         }
     }
 

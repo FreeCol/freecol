@@ -1416,6 +1416,7 @@ public final class Canvas extends JDesktopPane {
             europePanel.initialize(freeColClient.getMyPlayer().getEurope(), freeColClient.getGame());
             JInternalFrame f = addAsSimpleFrame(europePanel);
             f.setBorder(null);
+            f.setSize(getWidth(), getHeight() - getMenuBarHeight());
             f.setLocation(0, getMenuBarHeight());
             f.moveToBack();
         }
