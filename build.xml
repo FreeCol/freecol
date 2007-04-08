@@ -378,7 +378,8 @@
 
   </target>
 
-  <target name="print-manual">
+  <target name="print-manual"
+          description="Creates the printable user guide.">
     <delete file="doc/FreeCol.ind" />
     <exec executable="pdflatex" dir="doc" >
       <arg file="doc/FreeCol.tex"/>
@@ -391,7 +392,8 @@
     </exec>
   </target>
 
-  <target name="online-manual">
+  <target name="online-manual"
+          description="Creates the online user guide.">
     <delete file="doc/FreeCol.ind" />
     <exec executable="htlatex" dir="doc" >
       <arg file="doc/FreeCol.tex"/>
@@ -407,7 +409,8 @@
     </exec>
   </target>
 
-  <target name="manual" depends="print-manual,online-manual" description="Creates the user guide.">
+  <target name="manual" depends="print-manual,online-manual" 
+          description="Creates the printable and online user guides.">
   </target>
   <target name="fixTabsWindows">
       <fixcrlf srcdir="${freecol.src.dir}" tab="remove" tablength="4"
@@ -420,4 +423,17 @@
           includes="**/*.java" eol="lf"
       />
   </target>
+
+  <target name="translation-report" depends="build"
+          description="Creates report on translations.">
+    <condition property="localeKey" else="">
+      <isset property="localeKey" />
+    </condition>
+    <java classname="net.sf.freecol.tools.TranslationReport"
+          classpath="build/" >
+      <arg value="src/net/sf/freecol/client/gui/i18n/" />
+      <arg value="${localeKey}" />
+    </java>
+  </target>
+
 </project>
