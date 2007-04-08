@@ -950,6 +950,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             Building building;
 
             JPanel productionInBuildingPanel = new JPanel();
+            public final int[] widths = {180, 120, 100};
+            public final int[] heights = {60};
 
 
             /**
@@ -963,7 +965,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 removeAll();
                 setBackground(Color.WHITE);
 
-                setLayout(new GridLayout(1, 3));
+                setLayout(new HIGLayout(widths, heights));
 
                 JPanel colonistsInBuildingPanel = new JPanel();
                 colonistsInBuildingPanel.setLayout(new FlowLayout(
@@ -971,9 +973,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 colonistsInBuildingPanel.setBackground(Color.WHITE);
 
                 if (building.getMaxUnits() == 0) {
-                    add(new JLabel("(" + building.getName() + ")"));
+                    add(new JLabel("(" + building.getName() + ")"), higConst.rc(1, 1));
                 } else {
-                    add(new JLabel(building.getName()));
+                    add(new JLabel(building.getName()), higConst.rc(1, 1));
                 }
 
                 Iterator<Unit> unitIterator = building.getUnitIterator();
@@ -986,10 +988,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 }
 
                 colonistsInBuildingPanel.setOpaque(false);
-                add(colonistsInBuildingPanel);
+                add(colonistsInBuildingPanel, higConst.rc(1, 2));
 
                 updateProductionInBuildingPanel();
-                add(productionInBuildingPanel);
+                add(productionInBuildingPanel, higConst.rc(1, 3));
 
                 setPreferredSize(new Dimension(getWidth(), (parent.getGUI()
                         .getImageLibrary().getUnitImageHeight(0) / 3) * 2 + 5));
