@@ -2098,69 +2098,62 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     public String getName() {
         if (name != null) {
             return name;
-        }
-
-        String name = "";
-        boolean addP = false;
-
-        if (getType() == TREASURE_TRAIN) {
-            return getName(TREASURE_TRAIN) + " (" + getTreasureAmount() + " " + Messages.message("gold") + ")";
-        } else if (isPioneer() && getType() != HARDY_PIONEER) {
-            name = Messages.message("model.unit.pioneer") + " (";
-            addP = true;
-        } else if (isArmed() && getType() != KINGS_REGULAR && getType() != COLONIAL_REGULAR && getType() != BRAVE
-                && getType() != VETERAN_SOLDIER) {
-            if (!isMounted()) {
-                name = Messages.message("model.unit.soldier") + " (";
+        } else if (isArmed() && isMounted()) {
+            switch (getType()) {
+            case KINGS_REGULAR:
+                return Messages.message("model.unit.kingsCavalry");
+            case COLONIAL_REGULAR:
+                return Messages.message("model.unit.colonialCavalry");
+            case VETERAN_SOLDIER:
+                return Messages.message("model.unit.veteranDragoon");
+            case BRAVE:
+                return Messages.message("model.unit.indianDragoon");
+            default:
+                return (Messages.message("model.unit.dragoon") +
+                        " (" + getName(getType()) + ")");
+            }
+        } else if (isArmed()) {
+            switch (getType()) {
+            case KINGS_REGULAR:
+            case COLONIAL_REGULAR:
+            case VETERAN_SOLDIER:
+                return getName(getType());
+            case BRAVE:
+                return Messages.message("model.unit.armedBrave");
+            default:
+                return (Messages.message("model.unit.soldier") +
+                        " (" + getName(getType()) + ")");
+            }
+        } else if (isMounted()) {
+            switch (getType()) {
+            case SEASONED_SCOUT:
+                return getName(getType());
+            case BRAVE:
+                return Messages.message("model.unit.mountedBrave");
+            default:
+                return (Messages.message("model.unit.scout") +
+                        " (" + getName(getType()) + ")");
+            }
+        } else if (isMissionary()) {
+            if (getType() == JESUIT_MISSIONARY) {
+                return getName(getType());
             } else {
-                name = Messages.message("model.unit.dragoon") + " (";
+                return (Messages.message("model.unit.missionary") +
+                        " (" + getName(getType()) + ")");
             }
-            addP = true;
-        } else if (isMounted() && getType() != SEASONED_SCOUT && getType() != BRAVE) {
-            name = Messages.message("model.unit.scout") + " (";
-            addP = true;
-        } else if (isMissionary() && getType() != JESUIT_MISSIONARY) {
-            name = Messages.message("model.unit.missionary") + " (";
-            addP = true;
-        }
-
-        if (!isArmed() && !isMounted()
-                && (getType() == KINGS_REGULAR || getType() == COLONIAL_REGULAR || getType() == VETERAN_SOLDIER)) {
-            name = Messages.message("model.unit.unarmed") + " ";
-        }
-
-        if (getType() == BRAVE) {
-            name = getOwner().getNationAsString() + " ";
-            if (isArmed() && !isMounted()) {
-                name += Messages.message("model.unit.armed") + " ";
-            } else if (isMounted()) {
-                name += Messages.message("model.unit.mounted") + " ";
+        } else if (getType() == TREASURE_TRAIN) {
+            return getName(TREASURE_TRAIN) + " (" + getTreasureAmount() + " " + Messages.message("gold") + ")";
+        } else if (isPioneer()) {
+            if (getType() == HARDY_PIONEER) {
+                return getName(getType());
+            } else {
+                return (Messages.message("model.unit.pioneer") + 
+                        " (" + getName(getType()) + ")");
             }
+        } else {
+            return getName(getType());
         }
 
-        name += getName(getType());
-
-        if (isArmed() && isMounted()) {
-            if (getType() == KINGS_REGULAR) {
-                name = Messages.message("model.unit.kingsCavalry");
-                addP = false;
-            } else if (getType() == COLONIAL_REGULAR) {
-                name = Messages.message("model.unit.colonialCavalry");
-                addP = false;
-            } else if (getType() == VETERAN_SOLDIER) {
-                name = Messages.message("model.unit.veteranDragoon");
-                addP = false;
-            } else if (getType() == BRAVE) {
-                name = getOwner().getNationAsString() + " " + Messages.message("model.unit.indianDragoon");
-                addP = false;
-            }
-        }
-
-        if (addP) {
-            name += ")";
-        }
-
-        return name;
     }
 
     /**
@@ -3259,8 +3252,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             type = ModelMessage.UNIT_LOST;
             dispose();
         } else if (getType() == BRAVE || getType() == KINGS_REGULAR) {
-            // TODO: fix this (doesn't work as expected)
-            nation = "";
             messageID = "model.unit.unitSlaughtered";
             type = ModelMessage.UNIT_LOST;
             dispose();
@@ -3311,14 +3302,16 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             setMovesLeft(getInitialMovesLeft());
         }
         String newName = getName();
-        addModelMessage(this, messageID, new String[][] { { "%oldName%", oldName }, { "%newName%", newName },
-                { "%nation%", nation } }, type);
+        addModelMessage(this, messageID, new String[][] {{ "%oldName%", oldName },
+                                                         { "%newName%", newName },
+                                                         { "%nation%", nation }}, type);
 
         if (getOwner() != enemyUnit.getOwner()) {
             // this unit hasn't been captured by enemyUnit, show message to
             // enemyUnit's owner
-            addModelMessage(enemyUnit, messageID, new String[][] { { "%oldName%", oldName }, { "%newName%", newName },
-                    { "%nation%", nation } }, type);
+            addModelMessage(enemyUnit, messageID, new String[][] {{ "%oldName%", oldName },
+                                                                  { "%newName%", newName },
+                                                                  { "%nation%", nation }}, type);
         }
     }
 

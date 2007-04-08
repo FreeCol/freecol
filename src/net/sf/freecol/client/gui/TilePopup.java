@@ -165,7 +165,11 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
      *      indented on the menu.
      */
     private void addUnit(Unit unit, boolean enabled, boolean indent) {
-        String text = (indent ? "    " : "") + unit.toString() + " ( " + unit.getOccupationIndicator() + " )";
+        String text = ((indent ? "    " : "") + 
+                       Messages.message("model.unit.nationUnit", 
+                                        new String[][] {{"%nation%", unit.getOwner().getNationAsString()},
+                                                        {"%unit%", unit.getName()}}) +
+                       " ( " + unit.getOccupationIndicator() + " )");
         JMenuItem menuItem = new JMenuItem(text);
         menuItem.setActionCommand(Unit.getXMLElementTagName() + unit.getID());
         menuItem.addActionListener(this);
