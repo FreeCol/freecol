@@ -424,6 +424,10 @@
       />
   </target>
 
+  <!-- Prints a report on certain translations, which you can specify
+       by setting the localeKey property ("-DlocaleKey=fi", for example),
+       or all translations. Use "-emacs" in order to suppress extensive
+       logging.  --> 
   <target name="translation-report" depends="build"
           description="Creates report on translations.">
     <condition property="localeKey" else="">
