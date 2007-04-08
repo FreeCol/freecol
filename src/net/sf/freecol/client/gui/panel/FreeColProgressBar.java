@@ -138,8 +138,8 @@ public class FreeColProgressBar extends JPanel {
     protected void paintComponent(Graphics g) {
 
         Graphics2D g2d = (Graphics2D) g.create();
-        int width = getWidth();
-        int height = getHeight();
+        int width = getWidth() - getInsets().left - getInsets().right;
+        int height = getHeight() - getInsets().top - getInsets().bottom;
 
         if (iconWidth < 0) {
             iconWidth = image.getWidth(this);
@@ -149,14 +149,14 @@ public class FreeColProgressBar extends JPanel {
             Image tempImage = (Image) UIManager.get("BackgroundImage");
 
             if (tempImage != null) {
-                for (int x = 0; x < width; x += tempImage.getWidth(null)) {
-                    for (int y = 0; y < height; y += tempImage.getHeight(null)) {
+                for (int x = getInsets().left; x < width + getInsets().left; x += tempImage.getWidth(null)) {
+                    for (int y = getInsets().top; y < height + getInsets().top; y += tempImage.getHeight(null)) {
                         g2d.drawImage(tempImage, x, y, null);
                     }
                 }
             } else {
                 g2d.setColor(getBackground());
-                g2d.fillRect(0, 0, width, height);
+                g2d.fillRect(getInsets().left, getInsets().top, width, height);
             }
         }
 
@@ -171,7 +171,7 @@ public class FreeColProgressBar extends JPanel {
                 dvalue = width;
             }
             g2d.setColor(PRIMARY_3);
-            g2d.fillRect(0, 0, dvalue, height);
+            g2d.fillRect(getInsets().left, getInsets().top, dvalue, height);
         }
 
         int dstep = 0;
@@ -182,7 +182,7 @@ public class FreeColProgressBar extends JPanel {
                     dstep = width - dvalue;
                 }
                 g2d.setColor(BG_COLOR_SELECT);
-                g2d.fillRect(dvalue, 0, dstep, height);
+                g2d.fillRect(getInsets().left + dvalue, getInsets().top, dstep, height);
             }
         }
 

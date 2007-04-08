@@ -41,6 +41,7 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
+import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
@@ -90,6 +91,11 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
     private static final int EXIT = 0, BUY_BUILDING = 1, UNLOAD = 2,
             RENAME = 3, WAREHOUSE = 4;
+
+    /**
+     * The additional border required to make layout fit.
+     */
+    private static final int BORDER_CORRECT = 4;
 
     private final Canvas parent;
 
@@ -246,6 +252,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
         buildingsScroll.setAutoscrolls(true);
 
+        /** Borders */
         tilesScroll.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages.message("surroundingArea")), new BevelBorder(BevelBorder.LOWERED)));
         buildingsScroll.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages.message("buildings")), BorderFactory.createEtchedBorder()));
         warehouseScroll.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages.message("goods")), BorderFactory.createEtchedBorder()));
@@ -253,6 +260,19 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         cargoScroll.setBorder(BorderFactory.createCompoundBorder(cargoBorder, BorderFactory.createEtchedBorder()));
         inPortScroll.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages.message("inPort")), BorderFactory.createEtchedBorder()));
         outsideColonyScroll.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages.message("outsideColony")), BorderFactory.createEtchedBorder()));
+
+        // manual border corrections
+        Border correctBorder = BorderFactory.createEmptyBorder(0, BORDER_CORRECT, 0, BORDER_CORRECT);
+        productionPanel.setBorder(correctBorder);
+        solLabel.setBorder(correctBorder);
+        unloadButton.setBorder(BorderFactory.createCompoundBorder(correctBorder, unloadButton.getBorder()));
+        exitButton.setBorder(BorderFactory.createCompoundBorder(correctBorder, exitButton.getBorder()));
+        warehouseButton.setBorder(BorderFactory.createCompoundBorder(correctBorder, warehouseButton.getBorder()));
+        renameButton.setBorder(BorderFactory.createCompoundBorder(correctBorder, renameButton.getBorder()));
+        buyBuilding.setBorder(BorderFactory.createCompoundBorder(correctBorder, buyBuilding.getBorder()));
+        hammersLabel.setBorder(BorderFactory.createCompoundBorder(correctBorder, hammersLabel.getBorder()));
+        toolsLabel.setBorder(BorderFactory.createCompoundBorder(correctBorder, toolsLabel.getBorder()));
+        buildingBox.setBorder(BorderFactory.createCompoundBorder(correctBorder, buildingBox.getBorder()));
 
         buyBuilding.setActionCommand(String.valueOf(BUY_BUILDING));
         exitButton.setActionCommand(String.valueOf(EXIT));
@@ -1137,7 +1157,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                             getCanvas().getGUI().createProductionImage(
                                     goodsIcon, need, nextX, getHeight(), 1);
                 }
-                g.drawImage(productionImage, 0, 0, null);
+                g.drawImage(productionImage, BORDER_CORRECT, 0, null);
                 nextX += goodsIcon.getIconWidth() / 4;
             }
 
