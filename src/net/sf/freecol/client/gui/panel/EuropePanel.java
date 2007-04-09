@@ -61,7 +61,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
                                 TRAIN = 3,
                                 UNLOAD = 4;
 
-    private static final int TITLE_FONT_SIZE = 12;
+    //private static final int TITLE_FONT_SIZE = 12;
     
     private final Canvas  parent;
     private final FreeColClient freeColClient;
