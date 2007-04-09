@@ -44,24 +44,23 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
 
     // Please someone tell me they want to put this data into a separate file...
     // -sjm
-    // Twelve tile types, sixteen goods types, and forested/unforested.
+    // Twelve tile types, sixteen goods types, and unforested/forested.
     public static final int[][][] potentialtable = {
-    // Food Sugar Tobacco Cotton Furs Wood Ore Silver
-            { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } }, // Unexp
-            { { 5, 3 }, { 0, 0 }, { 0, 0 }, { 2, 1 }, { 0, 3 }, { 0, 6 }, { 1, 0 }, { 0, 0 } }, // Plains
-            { { 3, 2 }, { 0, 0 }, { 3, 1 }, { 0, 0 }, { 0, 2 }, { 0, 4 }, { 0, 0 }, { 0, 0 } }, // Grasslands
-            { { 3, 2 }, { 0, 0 }, { 0, 0 }, { 3, 1 }, { 0, 2 }, { 0, 6 }, { 0, 0 }, { 0, 0 } }, // Prairie
-            { { 4, 3 }, { 3, 1 }, { 0, 0 }, { 0, 0 }, { 0, 2 }, { 0, 4 }, { 0, 0 }, { 0, 0 } }, // Savannah
-            { { 3, 2 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 2 }, { 0, 4 }, { 2, 1 }, { 0, 0 } }, // Marsh
-            { { 3, 2 }, { 2, 1 }, { 2, 1 }, { 0, 0 }, { 0, 1 }, { 0, 4 }, { 2, 1 }, { 0, 0 } }, // Swamp
-            { { 2, 2 }, { 0, 0 }, { 0, 0 }, { 1, 1 }, { 0, 2 }, { 0, 2 }, { 2, 1 }, { 0, 0 } }, // Desert
-            { { 3, 2 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 3 }, { 0, 4 }, { 2, 1 }, { 0, 0 } }, // Tundra
-            { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } }, // Arctic
-            { { 4, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } }, // Ocean
-            { { 4, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } }, // High
-                                                                                                // seas
-            { { 2, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 4, 0 }, { 0, 0 } }, // Hills
-            { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 3, 0 }, { 1, 0 } } // Mountains
+        //  Food      Sugar    Tobacco   Cotton     Furs      Wood      Ore      Silver
+        { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } }, // Unexp
+        { { 5, 3 }, { 0, 0 }, { 0, 0 }, { 2, 1 }, { 0, 3 }, { 0, 6 }, { 1, 0 }, { 0, 0 } }, // Plains
+        { { 3, 2 }, { 0, 0 }, { 3, 1 }, { 0, 0 }, { 0, 2 }, { 0, 6 }, { 0, 0 }, { 0, 0 } }, // Grasslands
+        { { 3, 2 }, { 0, 0 }, { 0, 0 }, { 3, 1 }, { 0, 2 }, { 0, 4 }, { 0, 0 }, { 0, 0 } }, // Prairie
+        { { 4, 3 }, { 3, 1 }, { 0, 0 }, { 0, 0 }, { 0, 2 }, { 0, 4 }, { 0, 0 }, { 0, 0 } }, // Savannah
+        { { 3, 2 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 2 }, { 0, 4 }, { 2, 1 }, { 0, 0 } }, // Marsh
+        { { 3, 2 }, { 2, 1 }, { 2, 1 }, { 0, 0 }, { 0, 1 }, { 0, 4 }, { 2, 1 }, { 0, 0 } }, // Swamp
+        { { 1, 2 }, { 0, 0 }, { 0, 0 }, { 1, 1 }, { 0, 2 }, { 0, 2 }, { 2, 1 }, { 0, 0 } }, // Desert
+        { { 3, 2 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 3 }, { 0, 4 }, { 2, 1 }, { 0, 0 } }, // Tundra
+        { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } }, // Arctic
+        { { 2, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } }, // Ocean
+        { { 2, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } }, // High seas
+        { { 2, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 4, 0 }, { 0, 0 } }, // Hills
+        { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 3, 0 }, { 1, 0 } } // Mountains
     };
 
     private boolean road, plowed, forested, bonus, lostCityRumour;
@@ -90,8 +89,11 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
 
     private UnitContainer unitContainer;
 
-    // the number of adjacent land tiles, if this is an ocean tile
+    /** The number of adjacent land tiles, if this is an ocean tile */
     private int landCount = Integer.MIN_VALUE;
+
+    /** The fish bonus of this tile, if it is an ocean tile */
+    private int fishBonus = Integer.MIN_VALUE;
 
     /**
      * Indicates which colony or Indian settlement that owns this tile ('null'
@@ -697,6 +699,34 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
     }
 
     /**
+     * Return the fish bonus of this tile. The fish bonus is zero if
+     * this is a land tile. Otherwise it depends on the number of
+     * adjacent land tiles and the rivers on these tiles (if any).
+     * 
+     * @return an <code>int</code> value
+     */
+    public int getFishBonus() {
+        if (fishBonus < 0) {
+            fishBonus = 0;
+            if (!isLand()) {
+                Iterator<Position> tileIterator = getMap().getAdjacentIterator(getPosition());
+                while (tileIterator.hasNext()) {
+                    Tile t = getMap().getTile(tileIterator.next());
+                    if (t.isLand()) {
+                        fishBonus++;
+                    }
+                    if (t.getAddition() == ADD_RIVER_MAJOR) {
+                        fishBonus += 2;
+                    } else if (t.getAddition() == ADD_RIVER_MINOR) {
+                        fishBonus += 1;
+                    }
+                }
+            }
+        }
+        return fishBonus;
+    }
+
+    /**
      * Returns the claim on this Tile.
      * 
      * @return The claim on this Tile.
@@ -1096,7 +1126,8 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
      *         goods.
      */
     public int potential(int goods) {
-        return getTileTypePotential(getType(), goods, addition_type, hasBonus(), isForested(), isPlowed(), hasRoad());
+        return getTileTypePotential(getType(), goods, addition_type, getFishBonus(), 
+                                    hasBonus(), isForested(), isPlowed(), hasRoad());
     }
 
     /**
@@ -1109,10 +1140,11 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
      */
     public int getMaximumPotential(int goodsType) {
         if (goodsType == Goods.FURS || goodsType == Goods.LUMBER || goodsType == Goods.ORE || goodsType == Goods.SILVER) {
-            return getTileTypePotential(getType(), goodsType, addition_type, hasBonus(), isForested(), false, true);
+            return getTileTypePotential(getType(), goodsType, addition_type, 0, hasBonus(), isForested(), false, true);
         }
 
-        return getTileTypePotential(getType(), goodsType, addition_type, hasBonus() && !isForested(), false, true, true);
+        return getTileTypePotential(getType(), goodsType, addition_type, getFishBonus(), 
+                                    hasBonus() && !isForested(), false, true, true);
     }
 
     /**
@@ -1137,6 +1169,59 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
     }
 
     /**
+     * Return the type of bonus a certain tile type can have. TODO:
+     * put all this in TileType.
+     *
+     * @param type The tile type.
+     * @param addition The addition.
+     * @param forested Whether the tile is forested.
+     * @return the type of bonus.
+     */
+    public static int getBonusType(int type, int addition, boolean forested) {
+        if (addition == Tile.ADD_MOUNTAINS) {
+            return Goods.SILVER;
+        } else if (addition == Tile.ADD_HILLS) {
+            return Goods.ORE;
+        } else if (forested) {
+            if (type == Tile.GRASSLANDS || type == Tile.SAVANNAH) {
+                return Goods.LUMBER;
+            } else {
+                return Goods.FURS;
+            }
+        } else {
+            switch(type) {
+                case Tile.UNEXPLORED:
+                    return -1;
+                case Tile.PLAINS:
+                    return Goods.FOOD;
+                case Tile.GRASSLANDS:
+                    return Goods.TOBACCO;
+                case Tile.PRAIRIE:
+                    return Goods.COTTON;
+                case Tile.SAVANNAH:
+                    return Goods.SUGAR;
+                case Tile.MARSH:
+                    return Goods.ORE;
+                case Tile.SWAMP:
+                    return Goods.SILVER;
+                case Tile.DESERT:
+                    return Goods.FOOD;
+                case Tile.TUNDRA:
+                    return Goods.ORE;                    
+                case Tile.ARCTIC:
+                    return -1;
+                case Tile.OCEAN:
+                    return Goods.FOOD;
+                case Tile.HIGH_SEAS:
+                    return -1;
+                default:
+                    // Should never happen
+                    throw new IllegalArgumentException("Unknown tile type " + type + " for getBonusType!");
+            }
+        }
+    }
+
+    /**
      * The potential of a given type of tile to produce a certain type of goods.
      * 
      * @param tileType The type of tile
@@ -1149,15 +1234,18 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
      * @param road <code>true</code> to indicate a road
      * @return The amount of goods.
      */
-    public int getTileTypePotential(int tileType, int goods, int addition_type, boolean bonus, boolean forested,
-            boolean plowed, boolean road) {
+    public static int getTileTypePotential(int tileType, int goods, int additionType, int fishBonus, 
+                                           boolean bonus, boolean forested, boolean plowed, boolean road) {
 
-        if (!Goods.isFarmedGoods(goods)) {
+        GoodsType goodsType = FreeCol.specification.goodsType(goods);
+
+        if (!goodsType.isFarmed()) {
             return 0;
         }
 
+
         int basepotential = 0;
-        switch (addition_type) {
+        switch (additionType) {
         case ADD_HILLS:
             basepotential = potentialtable[12][goods][0];
             break;
@@ -1165,16 +1253,8 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
             basepotential = potentialtable[13][goods][0];
             break;
         default:
-            if (tileType == OCEAN) {
-                basepotential = potentialtable[tileType][goods][0];
-
-                if (goods == Goods.FOOD) {
-                    if (getLandCount() > 5) {
-                        basepotential += 2;
-                    } else if (getLandCount() <= 3) {
-                        basepotential -= 2;
-                    }
-                }
+            if (tileType == OCEAN && goods == Goods.FOOD) {
+                basepotential = potentialtable[tileType][goods][0] + fishBonus;
             } else {
                 basepotential = potentialtable[tileType][goods][(forested ? 1 : 0)];
             }
@@ -1182,48 +1262,44 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
         }
 
         if (basepotential > 0) {
-            if (plowed
-                    && (goods == Goods.FOOD || goods == Goods.SUGAR || goods == Goods.TOBACCO || goods == Goods.COTTON)) {
+            if (goodsType.isImprovedByPlowing() && plowed) {
                 basepotential++;
-            } else if (road
-                    && (goods == Goods.FURS || goods == Goods.LUMBER || goods == Goods.ORE || goods == Goods.SILVER)) {
+            } 
+            if (goodsType.isImprovedByRoad() && road) {
                 basepotential++;
             }
-            if (addition_type == ADD_RIVER_MINOR) {
-                basepotential += 1;
-            } else if (addition_type == ADD_RIVER_MAJOR) {
-                basepotential += 2;
+            if (goodsType.isImprovedByRiver()) {
+                if (additionType == ADD_RIVER_MAJOR) {
+                    basepotential += 2;
+                } else if (additionType == ADD_RIVER_MINOR) {
+                    basepotential += 1;
+                }
             }
-
         }
 
-        if (bonus) {
-            if (addition_type <= ADD_RIVER_MAJOR) {
-                if (forested) {
-                    if (tileType == GRASSLANDS || tileType == SAVANNAH) {
-                        if (goods == Goods.LUMBER) {
-                            basepotential += 6;
-                        }
-                    } else {
-                        if (goods == Goods.FURS) {
-                            basepotential += 6;
-                        }
-                    }
-                } else if (tileType == PLAINS && goods == Goods.FOOD) {
-                    basepotential += 4;
-                } else if (tileType == SAVANNAH && goods == Goods.SUGAR) {
-                    basepotential += 7;
-                } else if (tileType == GRASSLANDS && goods == Goods.TOBACCO) {
-                    basepotential += 6;
-                } else if (tileType == PRAIRIE && goods == Goods.COTTON) {
-                    basepotential += 6;
-                } else if (tileType == OCEAN && goods == Goods.FOOD) {
-                    basepotential += 5;
-                }
-            } else if (addition_type == ADD_HILLS && goods == Goods.ORE) {
+        if (bonus && goods == getBonusType(tileType, additionType, forested)) {
+            switch (goods) {
+            case Goods.LUMBER:
+            case Goods.FURS:
+            case Goods.TOBACCO:
+            case Goods.COTTON:
                 basepotential += 6;
-            } else if (addition_type == ADD_MOUNTAINS && goods == Goods.SILVER) {
+                break;
+            case Goods.FOOD:
+                basepotential += 4;
+                break;
+            case Goods.SUGAR:
+                basepotential += 7;
+                break;
+            case Goods.SILVER:
                 basepotential += 2;
+                break;
+            case Goods.ORE:
+                if (additionType == ADD_HILLS) {
+                    basepotential += 6;
+                } else {
+                    basepotential += 2;
+                }
             }
         }
 

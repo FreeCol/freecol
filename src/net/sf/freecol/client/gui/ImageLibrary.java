@@ -786,7 +786,7 @@ public final class ImageLibrary extends ImageProvider {
                 case Tile.MARSH:
                     return BONUS_ORE;
                 case Tile.SWAMP:
-                    return BONUS_ORE;
+                    return BONUS_SILVER;
                 case Tile.DESERT:
                     return BONUS_FOOD;
                 case Tile.TUNDRA:

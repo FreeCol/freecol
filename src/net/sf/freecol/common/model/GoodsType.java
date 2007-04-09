@@ -77,4 +77,28 @@ public final class GoodsType
         return madeFrom != null;
     }
 
+    public boolean isFarmed() {
+
+        return isFarmed;
+
+    }
+
+    public boolean isImprovedByPlowing() {
+
+        return improvedByPlowing;
+
+    }
+
+    public boolean isImprovedByRoad() {
+
+        return improvedByRoad;
+
+    }
+
+    public boolean isImprovedByRiver() {
+
+        return improvedByRiver;
+
+    }
+
 }
