@@ -304,22 +304,22 @@ public class FreeColDialog extends FreeColPanel {
     public static FreeColDialog createPreCombatDialog(Unit attacker, Unit defender,
                                                       Settlement settlement, Canvas parent) {
 
-        ArrayList<Modifier> offense = Modifier.getOffensiveModifiers(attacker, defender);
+        ArrayList<Modifier> offense = Unit.getOffensiveModifiers(attacker, defender);
         ArrayList<Modifier> defense = new ArrayList<Modifier>();
         if (defender == null && settlement != null) {
-            Modifier settlementModifier = Modifier.getSettlementModifier(attacker, settlement);
-            defense.add(new Modifier("modifiers.baseDefense", Integer.MIN_VALUE));
+            Modifier settlementModifier = Unit.getSettlementModifier(attacker, settlement);
+            defense.add(Modifier.createAdditiveModifier("modifiers.baseDefense", Float.MIN_VALUE));
             defense.add(settlementModifier);
-            defense.add(new Modifier("modifiers.finalResult", Integer.MIN_VALUE));
+            defense.add(Modifier.createAdditiveModifier("modifiers.finalResult", Float.MIN_VALUE));
         } else {
-            defense = Modifier.getDefensiveModifiers(attacker, defender);
+            defense = Unit.getDefensiveModifiers(attacker, defender);
         }
 
         int numberOfModifiers = Math.max(offense.size(), defense.size());
         int extraRows = 3; // title, icon, buttons
         int numberOfRows = 2 * (numberOfModifiers + extraRows) - 1;
 
-        int[] widths = {-5, margin, -7, 3 * margin, -1, margin, -3};
+        int[] widths = {-5, 20, -7, 40, -1, 20, -3};
         int[] heights = new int[numberOfRows];
         int offenseLabelColumn = 1;
         int offenseValueColumn = 3;

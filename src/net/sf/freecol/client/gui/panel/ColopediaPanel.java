@@ -29,6 +29,7 @@ import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import cz.autel.dmi.HIGLayout;
@@ -416,7 +417,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         repaint();
 
         int[] widths = { 0, 3 * margin, 0 };
-        int[] heights = new int[9];
+        int[] heights = new int[11];
         for (int index = 0; index < 4; index++) {
             heights[2 * index + 1] = margin;
         }
@@ -434,6 +435,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         int addition = Tile.ADD_NONE;
         String id = null;
         String name = null;
+        String defenseBonus = null;
 
         switch (type) {
         case ImageLibrary.HILLS:
@@ -441,21 +443,21 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             name = Messages.message("hills");
             addition = Tile.ADD_HILLS;
             productionIndex = 12;
+            defenseBonus = "150%";
             break;
         case ImageLibrary.MOUNTAINS:
             id = "mountains";
             name = Messages.message("mountains");
             addition = Tile.ADD_MOUNTAINS;
             productionIndex = 13;
+            defenseBonus = "200%";
             break;
         default:
-            if (forested) {
-                id = FreeCol.specification.tileType(type).whenForested.id;
-                name = FreeCol.specification.tileType(type).whenForested.name;
-            } else {
-                id = FreeCol.specification.tileType(type).id;
-                name = FreeCol.specification.tileType(type).name;
-            }
+            TileType tileType = (forested ? FreeCol.specification.tileType(type).whenForested :
+                                 FreeCol.specification.tileType(type));
+            id = tileType.id;
+            name = tileType.name;
+            defenseBonus = String.valueOf(tileType.defenceBonus) + "%";
         }
 
         JLabel nameLabel = new JLabel(name, SwingConstants.CENTER);
@@ -468,6 +470,10 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         detailPanel.add(new JLabel(new ImageIcon(terrainImage)), higConst.rc(row, rightColumn));
         row += 2;
 
+        detailPanel.add(new JLabel(Messages.message("colopedia.terrain.defenseBonus")), higConst.rc(row, leftColumn));
+        detailPanel.add(new JLabel(defenseBonus), higConst.rc(row, rightColumn));
+        row += 2;
+
         detailPanel.add(new JLabel(Messages.message("colopedia.terrain.resource")), higConst.rc(row, leftColumn));
         int bonusType = ImageLibrary.getBonusImageType(type, addition, forested);
         if (bonusType >= 0) {
@@ -477,7 +483,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         row += 2;
 
         detailPanel.add(new JLabel(Messages.message("colopedia.terrain.production")), higConst.rc(row, leftColumn));
-        JPanel goodsPanel = new JPanel(new GridLayout(2, 4, margin, 0));
+        JPanel goodsPanel = new JPanel(new GridLayout(0, 8, margin, 0));
         goodsPanel.setOpaque(false);
         if (type == Tile.OCEAN || type == Tile.HIGH_SEAS) {
             JLabel goodsLabel = new JLabel(library.getGoodsImageIcon(Goods.FISH));

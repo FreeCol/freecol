@@ -99,7 +99,7 @@
     <tile-type name="prairie"    basic-move-cost="3" defence-bonus="0">  <when-forested name="broadleafForest" basic-move-cost="6" defence-bonus="50" /> </tile-type>
     <tile-type name="savannah"   basic-move-cost="3" defence-bonus="0">  <when-forested name="tropicalForest"  basic-move-cost="6" defence-bonus="50" /> </tile-type>
     <tile-type name="marsh"      basic-move-cost="6" defence-bonus="25"> <when-forested name="wetlandForest"   basic-move-cost="9" defence-bonus="50" /> </tile-type>
-    <tile-type name="swamp"      basic-move-cost="6" defence-bonus="0">  <when-forested name="rainForest"      basic-move-cost="9" defence-bonus="75" /> </tile-type>
+    <tile-type name="swamp"      basic-move-cost="6" defence-bonus="25">  <when-forested name="rainForest"      basic-move-cost="9" defence-bonus="75" /> </tile-type>
     <tile-type name="desert"     basic-move-cost="3" defence-bonus="0">  <when-forested name="scrubForest"     basic-move-cost="3" defence-bonus="50" /> </tile-type>
     <tile-type name="tundra"     basic-move-cost="3" defence-bonus="0">  <when-forested name="borealForest"    basic-move-cost="6" defence-bonus="50" /> </tile-type>
     <tile-type name="arctic"     basic-move-cost="6" defence-bonus="0" />
