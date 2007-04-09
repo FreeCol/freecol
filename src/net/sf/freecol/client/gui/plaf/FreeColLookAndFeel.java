@@ -279,12 +279,15 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
                 logger.warning("Interrupted while loading resources!");
             }    
             
-                        
             // Add font UI resources:
             if (System.getProperty("user.language").equals("en")) {
                 resources = new String[][] {                
                     {"HeaderFont", "ShadowedBlack.ttf"},
-                };                  
+                };
+            } else if (System.getProperty("user.language").equals("fa")) {
+                resources = new String[][] {                
+                    {"HeaderFont", "nosuchfont.ttf"},
+                };
             } else {
                 resources = new String[][] {                
                     {"HeaderFont", "Plakat-Fraktur.ttf"},
