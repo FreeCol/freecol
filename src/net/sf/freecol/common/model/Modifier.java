@@ -74,7 +74,7 @@ public final class Modifier {
      */
     public String getFormattedResult() {
         if (isAdditive) {
-            if (addend == Integer.MIN_VALUE) {
+            if (addend == Float.MIN_VALUE) {
                 return "?";
             } else if (addend > 0) {
                 return "+" + String.valueOf(addend);
