@@ -3000,7 +3000,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * @param attacker The attacker of this unit.
      * @return The current defensive power of this unit.
      */
-    public int getDefensePower(Unit attacker) {
+    public float getDefensePower(Unit attacker) {
         return Modifier.getDefensePower(attacker, this);
     }
 
@@ -3038,7 +3038,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * @param target The target of the attack.
      * @return The current offensive power of this unit.
      */
-    public int getOffensePower(Unit target) {
+    public float getOffensePower(Unit target) {
         return Modifier.getOffensePower(this, target);
     }
 

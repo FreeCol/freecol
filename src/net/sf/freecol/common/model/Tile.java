@@ -1262,6 +1262,9 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
 
     /**
      * The defense/ambush bonus of this tile.
+     * <p>
+     * Note that the defense bonus is relative to the unit base strength,
+     * not to the cumulative strength.
      * 
      * @return The defense modifier (in percent) of this tile.
      */

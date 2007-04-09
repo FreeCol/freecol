@@ -465,7 +465,7 @@ public final class InGameController extends Controller {
             Building stockade = colony.getBuilding(Building.STOCKADE);
             if (stockade.getLevel() > Building.HOUSE && !colony.isLandLocked()) {
                 logger.finest("Colony has harbour and fort.");
-                int attackPower = 0;
+                float attackPower = 0;
                 Unit attacker = null;
                 Iterator<Unit> unitIterator = colony.getTile().getUnitIterator();
                 while (unitIterator.hasNext()) {
@@ -504,13 +504,12 @@ public final class InGameController extends Controller {
                                 logger.finest("Found enemy unit " + unit.getOwner().getNationAsString() + " "
                                         + unit.getName());
                                 // generate bombardment result
-                                int totalProbability = attackPower + unit.getDefensePower(attacker);
+                                float totalProbability = attackPower + unit.getDefensePower(attacker);
                                 int result;
-                                int r = getPseudoRandom().nextInt(totalProbability + 1);
+                                int r = getPseudoRandom().nextInt(Math.round(totalProbability) + 1);
                                 if (r < attackPower) {
-                                    int diff = unit.getDefensePower(attacker) * 2 - attackPower;
+                                    int diff = Math.round(unit.getDefensePower(attacker) * 2 - attackPower);
                                     int r2 = getPseudoRandom().nextInt((diff < 3) ? 3 : diff);
-
                                     if (r2 == 0) {
                                         result = Unit.ATTACK_GREAT_WIN;
                                     } else {

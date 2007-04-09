@@ -921,18 +921,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 }
             }
         }
-        // TODO: REMOVE MAGIC: This should not really be necessary:
-        /*
-         * if (result == Unit.ATTACK_DONE_SETTLEMENT) { Element updateElement =
-         * Message.createNewRootElement("update");
-         * updateElement.appendChild(newTile.toXMLElement(newTile.getColony().getOwner(),
-         * updateElement.getOwnerDocument())); ServerPlayer enemyPlayer =
-         * (ServerPlayer) defender.getOwner(); try {
-         * enemyPlayer.getConnection().send(updateElement); } catch (IOException
-         * e) { logger.warning("Could not send message (2) to: " +
-         * enemyPlayer.getName() + " with connection " +
-         * enemyPlayer.getConnection()); } }
-         */
+
         if (result >= Unit.ATTACK_EVADES && unit.getTile().equals(newTile)) {
             // In other words, we moved...
             Element update = reply.getOwnerDocument().createElement("update");
@@ -962,11 +951,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      *         {@link Unit#ATTACK_DONE_SETTLEMENT}.
      */
     private int generateAttackResult(Unit unit, Unit defender) {
-        int attackPower = unit.getOffensePower(defender);
-        int totalProbability = attackPower + defender.getDefensePower(unit);
-        int r = getPseudoRandom().nextInt(totalProbability + 1);
+        float attackPower = unit.getOffensePower(defender);
+        float totalProbability = attackPower + defender.getDefensePower(unit);
+        int r = getPseudoRandom().nextInt(Math.round(totalProbability) + 1);
         if (r > attackPower) {
-            int diff = attackPower * 2 - defender.getDefensePower(unit);
+            int diff = Math.round(attackPower * 2 - defender.getDefensePower(unit));
             int r2 = getPseudoRandom().nextInt((diff < 3) ? 3 : diff);
             if (r2 == 0) {
                 return Unit.ATTACK_GREAT_LOSS;
@@ -988,7 +977,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                             && defender.getType() != Unit.ARTILLERY && defender.getType() != Unit.DAMAGED_ARTILLERY)) {
                 return Unit.ATTACK_DONE_SETTLEMENT;
             } else {
-                int diff = defender.getDefensePower(unit) * 2 - attackPower;
+                int diff = Math.round(defender.getDefensePower(unit) * 2 - attackPower);
                 int r2 = getPseudoRandom().nextInt((diff < 3) ? 3 : diff);
                 if (r2 == 0) {
                     return Unit.ATTACK_GREAT_WIN;

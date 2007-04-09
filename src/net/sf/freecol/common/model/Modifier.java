@@ -20,7 +20,7 @@ public final class Modifier {
     // whether this modifier is additive or multiplicative
     private final boolean isAdditive;
     // the addend of an additive modifier, defaults to zero
-    public final int addend;
+    public final float addend;
     // the numerator of a multiplicative modifier, defaults to zero
     public final int numerator;
     // the denominator of a multiplicative modifier, defaults to one
@@ -31,9 +31,9 @@ public final class Modifier {
      * Creates a new <code>Modifier</code> instance.
      *
      * @param id a <code>String</code> value
-     * @param addend an <code>int</code> value
+     * @param addend an <code>float</code> value
      */
-    public Modifier(String id, int addend) {
+    public Modifier(String id, float addend) {
         this.id = id;
         this.isAdditive = true;
         this.addend = addend;
@@ -66,7 +66,7 @@ public final class Modifier {
      * @param defender an <code>Unit</code> value
      * @return an <code>int</code> value
      */
-    public static int getOffensePower(Unit attacker, Unit defender) {
+    public static float getOffensePower(Unit attacker, Unit defender) {
         ArrayList<Modifier> modifiers = getOffensiveModifiers(attacker, defender);
         return modifiers.get(modifiers.size() - 1).addend;
     }
@@ -83,7 +83,7 @@ public final class Modifier {
     public static ArrayList<Modifier> getOffensiveModifiers(Unit attacker, Unit defender) {
         ArrayList<Modifier> result = new ArrayList<Modifier>();
 
-        int totalAddend = attacker.getUnitType().offence;
+        float totalAddend = attacker.getUnitType().offence;
         int totalNumerator = 1;
         int totalDenominator = 1;
 
@@ -146,7 +146,11 @@ public final class Modifier {
                      defender.getOwner().isREF()) ||
                     (attacker.getType() == Unit.BRAVE && 
                      defender.getOwner().isREF())) {
-                    int defenseBonus = defender.getTile().defenseBonus();
+                    // TODO: terrain defense bonus is not cumulative, probably not ambush either!
+
+                    // A bonus of 50 means base strength plus 50% of base
+                    // strength, so we need to add 100 to the bonus first.
+                    int defenseBonus = 100 + defender.getTile().defenseBonus();
                     result.add(new Modifier("modifiers.ambushBonus", defenseBonus, 100));
                     totalNumerator *= defenseBonus;
                     totalDenominator *= 100;
@@ -168,7 +172,7 @@ public final class Modifier {
             }
         }
 
-        int offensivePower = (totalAddend * totalNumerator) / totalDenominator;
+        float offensivePower = (totalAddend * totalNumerator) / totalDenominator;
         result.add(new Modifier("modifiers.finalResult", offensivePower));
         return result;
     }
@@ -181,7 +185,7 @@ public final class Modifier {
      * @param defender an <code>Unit</code> value
      * @return an <code>int</code> value
      */
-    public static int getDefensePower(Unit attacker, Unit defender) {
+    public static float getDefensePower(Unit attacker, Unit defender) {
         ArrayList<Modifier> modifiers = getDefensiveModifiers(attacker, defender);
         return modifiers.get(modifiers.size() - 1).addend;
     }
@@ -202,7 +206,7 @@ public final class Modifier {
             return result;
         }
 
-        int totalAddend = defender.getUnitType().defence;
+        float totalAddend = defender.getUnitType().defence;
         int totalNumerator = 1;
         int totalDenominator = 1;
 
@@ -289,7 +293,7 @@ public final class Modifier {
             }
 
         }
-        int defensivePower = (totalAddend * totalNumerator) / totalDenominator;
+        float defensivePower = (totalAddend * totalNumerator) / totalDenominator;
         result.add(new Modifier("modifiers.finalResult", defensivePower));
         return result;
     }

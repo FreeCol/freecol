@@ -109,7 +109,7 @@ public class DefendSettlementMission extends Mission {
         
         if (unit.isOffensiveUnit()) {
             Unit bestTarget = null;
-            int bestDifference = Integer.MIN_VALUE;
+            float bestDifference = Float.MIN_VALUE;
             int bestDirection = -1;
             
             int[] directions = map.getRandomDirectionArray();
@@ -121,12 +121,12 @@ public class DefendSettlementMission extends Mission {
                         && t.getDefendingUnit(unit).getOwner().getStance(unit.getOwner()) == Player.WAR
                         && unit.getMoveType(direction) == Unit.ATTACK) {
                     Unit enemyUnit = t.getDefendingUnit(unit);
-                    int enemyAttack = enemyUnit.getOffensePower(unit);
-                    int weAttack = unit.getOffensePower(enemyUnit);
-                    int enemyDefend = enemyUnit.getDefensePower(unit);
-                    int weDefend = unit.getDefensePower(enemyUnit);
+                    float enemyAttack = enemyUnit.getOffensePower(unit);
+                    float weAttack = unit.getOffensePower(enemyUnit);
+                    float enemyDefend = enemyUnit.getDefensePower(unit);
+                    float weDefend = unit.getDefensePower(enemyUnit);
 
-                    int difference = weAttack / (weAttack + enemyDefend) - enemyAttack / (enemyAttack + weDefend);                  
+                    float difference = weAttack / (weAttack + enemyDefend) - enemyAttack / (enemyAttack + weDefend);                  
                     if (difference > bestDifference) {
                         if (difference > 0 || weAttack > enemyDefend) {
                             bestDifference = difference;
