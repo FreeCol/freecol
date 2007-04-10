@@ -143,18 +143,20 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
             }
         }
 
-        reportPanel.doLayout();
+        //reportPanel.doLayout();
     }
     
+    /*
     @Override
     public Dimension getMinimumSize() {
-        return new Dimension(750, 600);
+        return new Dimension(850, 600);
     }
     
     @Override
     public Dimension getPreferredSize() {
         return getMinimumSize();
     }
+    */
 
     private JPanel buildUnitReport(int unit) {
 
