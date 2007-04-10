@@ -190,26 +190,6 @@ public class Connection {
     }
 
     /**
-     * On IBM's JDK version 1.4.2 the Element.toString method doesn't give you a
-     * normal XML string, which is fine because the Sun API docs never said that
-     * it should. On Sun's JDK version 1.5 this is also the case. So now instead
-     * of calling Element.toString you should use this method.
-     * 
-     * @param element The Element to convert.
-     * @return The string representation of the given Element without the xml
-     *         version tag.
-     * @deprecated not used, should we remove?
-     * 
-     * private String convertElementToString(Element element) { synchronized
-     * (out) { // Also a lock for: xmlTransformer String xml; try { StringWriter
-     * stringWriter = new StringWriter(); xmlTransformer.transform(new
-     * DOMSource(element), new StreamResult(stringWriter)); xml =
-     * stringWriter.toString(); } catch (TransformerException e) {
-     * logger.log(Level.WARNING, "Failed to transform element!", e); xml =
-     * e.getMessage(); } return xml; } }
-     */
-
-    /**
      * Sends a message to the other peer and returns the reply.
      * 
      * @param element The question for the other peer.
