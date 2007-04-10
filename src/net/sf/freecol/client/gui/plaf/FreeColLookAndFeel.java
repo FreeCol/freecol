@@ -25,8 +25,8 @@ import javax.swing.plaf.metal.MetalLookAndFeel;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.FAFile;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.FreeColException;
-
 
 /**
  * Implements the "FreeCol Look and Feel".
@@ -71,7 +71,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
         super();
          
         if(dataFolder.equals("")) { // lookup is necessary
-            dataDirectory = new File("data" + System.getProperty("file.separator"));            
+            dataDirectory = new File("data");// + System.getProperty("file.separator"));            
 
             if(!dataDirectory.exists() || !dataDirectory.isDirectory()) {
                 dataDirectory = null;                                
@@ -280,19 +280,10 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
             }    
             
             // Add font UI resources:
-            if (System.getProperty("user.language").equals("en")) {
-                resources = new String[][] {                
-                    {"HeaderFont", "ShadowedBlack.ttf"},
-                };
-            } else if (System.getProperty("user.language").equals("fa")) {
-                resources = new String[][] {                
-                    {"HeaderFont", "nosuchfont.ttf"},
-                };
-            } else {
-                resources = new String[][] {                
-                    {"HeaderFont", "Plakat-Fraktur.ttf"},
-                };                  
-            }
+            resources = new String[][] {                
+                {"HeaderFont", Messages.message("HeaderFont")},
+            };                  
+
             for (int i=0; i<resources.length; i++) {
                 InputStream fontStream = null; 
                 
