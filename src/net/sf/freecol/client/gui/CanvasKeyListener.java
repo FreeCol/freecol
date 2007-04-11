@@ -66,6 +66,7 @@ public final class CanvasKeyListener implements KeyListener {
             }
         } catch (Exception ex) {
             logger.throwing(getClass().getSimpleName(), "keyPressed", ex);
+            logger.warning("Exception thrown.");
         }
     }
 

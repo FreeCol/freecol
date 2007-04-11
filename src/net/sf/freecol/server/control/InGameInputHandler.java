@@ -892,13 +892,17 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Element reply = Message.createNewRootElement("attackResult");
         reply.setAttribute("result", Integer.toString(result));
         reply.setAttribute("plunderGold", Integer.toString(plunderGold));
+        
         if (result == Unit.ATTACK_DONE_SETTLEMENT && newTile.getColony() != null) {
             // If a colony will been won, send an updated tile:
             reply.appendChild(newTile.toXMLElement(newTile.getColony().getOwner(), reply.getOwnerDocument()));
-        }
-        if (!defender.isVisibleTo(player)) {
+            reply.appendChild(defender.toXMLElement(newTile.getColony().getOwner(), reply.getOwnerDocument()));
+        } else {
             reply.appendChild(defender.toXMLElement(player, reply.getOwnerDocument()));
         }
+        //if (!defender.isVisibleTo(player)) {
+            //reply.appendChild(defender.toXMLElement(player, reply.getOwnerDocument()));
+        //}
         int[] oldGoodsCounts = new int[Goods.NUMBER_OF_TYPES];
         if (unit.canCaptureGoods() && game.getGameOptions().getBoolean(GameOptions.UNIT_HIDING)) {
             for (int i = 0; i < oldGoodsCounts.length; i++) {

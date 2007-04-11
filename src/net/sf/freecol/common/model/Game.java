@@ -228,7 +228,7 @@ public class Game extends FreeColGameObject {
      */
     public boolean isClientTrusted() {
         // Trust the clients in order to prevent certain bugs, fix this later
-        return true;        
+        return false;        
     }
     
     /**

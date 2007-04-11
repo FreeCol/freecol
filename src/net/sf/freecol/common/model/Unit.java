@@ -3455,6 +3455,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     public void shipDamaged(Colony colony, Building building) {
         String nation = owner.getNationAsString();
         Location repairLocation = getOwner().getRepairLocation(this);
+        if (repairLocation == null) {
+            // This fixes a problem with enemy ships without a known repair location.
+            dispose();
+            return;
+        }
         String repairLocationName = repairLocation.getLocationName();
         /*
          * if (repairLocation instanceof Colony) { repairLocationName =

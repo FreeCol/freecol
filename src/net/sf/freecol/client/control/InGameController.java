@@ -1260,7 +1260,7 @@ public final class InGameController implements NetworkConstants {
             // If a successful attack against a colony, we need to update the
             // tile:
             Element utElement = getChildElement(attackResultElement, Tile.getXMLElementTagName());
-            if (utElement != null) {
+            if (utElement != null) {         
                 Tile updateTile = (Tile) game.getFreeColGameObject(utElement.getAttribute("ID"));
                 updateTile.readFromXMLElement(utElement);
             }
@@ -1319,23 +1319,28 @@ public final class InGameController implements NetworkConstants {
                     freeColClient.playSound(SfxLibrary.SUNK);
                 }
             }
-            unit.attack(defender, result, plunderGold);
+            try {
+                unit.attack(defender, result, plunderGold);
+            } catch (Exception e) {
+                // Ignore the exception (the update further down will fix any problems).
+                logger.throwing(getClass().getSimpleName(), "reallyAttack", e);
+                logger.warning("Exception thrown.");
+            }            
             if (!defender.isDisposed()
                     && ((result == Unit.ATTACK_DONE_SETTLEMENT && unitElement != null)
-                            || defender.getLocation() == null || !defender.isVisibleTo(freeColClient.getMyPlayer()))) {
+                            || defender.getLocation() == null || !defender.isVisibleTo(freeColClient.getMyPlayer()))) {                  
                 defender.dispose();
             }
 
             Element updateElement = getChildElement(attackResultElement, "update");
-            if (updateElement != null) {
+            if (updateElement != null) {                
                 freeColClient.getInGameInputHandler().handle(client.getConnection(), updateElement);
             }
-
             if (unit.getMovesLeft() <= 0) {
                 nextActiveUnit(unit.getTile());
             }
 
-            freeColClient.getCanvas().refresh();
+            freeColClient.getCanvas().refresh();            
         } else {
             logger.log(Level.SEVERE, "Server returned null from reallyAttack!");
         }
@@ -2386,7 +2391,7 @@ public final class InGameController implements NetworkConstants {
 
         if ((unitType != Unit.ARTILLERY && myPlayer.getGold() < Unit.getPrice(unitType))
                 || (unitType == Unit.ARTILLERY && myPlayer.getGold() < europe.getArtilleryPrice())) {
-            System.out.println("Price: " + Unit.getPrice(unitType) + ", Gold: " + myPlayer.getGold());
+            //System.out.println("Price: " + Unit.getPrice(unitType) + ", Gold: " + myPlayer.getGold());
             canvas.errorMessage("notEnoughGold");
             return;
         }
