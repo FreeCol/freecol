@@ -708,11 +708,15 @@ public class Game extends FreeColGameObject {
      *         otherwise.
      */
     public boolean canAddNewPlayer() {
-        if (players.size() >= getMaximumPlayers()) {
-            return false;
-        } else {
-            return true;
+        
+        int realPlayers = 0;
+
+        for (Player player : players){
+            if (!player.isAI())
+                realPlayers++;
         }
+        
+        return realPlayers < getMaximumPlayers();
     }
 
     /**

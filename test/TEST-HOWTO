@@ -1,0 +1,125 @@
+
+Unit Testing Guide
+------------------
+
+1. What is unit testing?
+
+Writing code that will check whether a small unit of code works is called unit testing.
+
+Example:
+
+If we encode directions like this
+
+protected static final int N = 0, NE = 1, E = 2, SE = 3, S = 4, SW = 5, W = 6, NW = 7;
+
+and we want to write a function that returns the opposite direction. Usually we would 
+write the implementation
+
+public static int getOppositeDirection(int direction) {
+  return (direction < 4) ? direction + 4 : direction - 4;
+}
+
+and then check manually by running the program (System.out.printlns are often used).
+
+Instead we can write source code that makes sure whether the function behaves correctly:
+
+        public void testGetOppositeDirection() throws FreeColException {
+		assertEquals(Map.S, Map.getOppositeDirection(Map.N));
+		assertEquals(Map.N, Map.getOppositeDirection(Map.S));
+		assertEquals(Map.E, Map.getOppositeDirection(Map.W));
+		assertEquals(Map.W, Map.getOppositeDirection(Map.E));
+		assertEquals(Map.NE, Map.getOppositeDirection(Map.SW));
+		assertEquals(Map.NW, Map.getOppositeDirection(Map.SE));
+		assertEquals(Map.SW, Map.getOppositeDirection(Map.NE));
+		assertEquals(Map.SE, Map.getOppositeDirection(Map.NW));
+	}
+
+Each assert-statement will check whether the given condition holds. If all assert succeed 
+then the test passes (and usually a green bar is displayed to the developer) otherwise the 
+test fails (red bar), telling you which line did not pass the assertion.
+
+2. Why write tests?
+
+* Make sure that code works as expected in certain situations.
+
+* To describe a bug to other developers, a test which fails can be used.
+
+3. What are the benefits?
+
+* Be able to run all the tests after a change to see if one broke existing functionality 
+  ("regression test"), thus after enough tests have been written, it is easier to be 
+  confident about changing the code.
+  
+* A test describes what a pieces of code is supposed to do and often can help to understand 
+  how it is supposed to be used.
+  
+* Since the test is written in source code it is much faster to run than manual tests in 
+  the application.
+
+4. Drawbacks?
+
+* Writing test cases can be a lot of work.
+
+* Testing of GUIs is especially difficult.
+
+* One needs a lot of tests to get benefits like the regression checking.
+
+5. How do I write test cases?
+
+* Create a new class in the test/src folder that extends the class TestCase (import org.junit.*).
+  All methods in this class that have a name that starts in "test...." will be executed.
+
+* To check basic conditions use assertEquals, assertTrue, assertFalse, assertNotNull, etc...
+
+* To check for exceptions to occur use the following construction:
+
+try {
+  // code that should throw exception
+  ...
+  fail()
+} catch (FreeColException e){
+  // Exception throws, thus okay
+}
+
+* To fail if an exception is thrown, just declare it:
+
+public void testGetOppositeDirection() throws FreeColException {
+
+6. How to run a test case?
+
+a.) In Eclipse to run a test case:
+  Right click the Test class -> Run As... -> JUnit Test
+
+b.) On the command line the main directory (replace the text between $ $):
+  java -cp $classpath for the class files from both src/ and test/src$;test/lib/junit.jar junit.swingui.TestRunnerorg $fully qualified name of the test class$
+
+For instance if bin is your target directory and you want to run all tests
+
+java -cp bin;test/lib/junit.jar junit.swingui.TestRunner net.sf.freecol.AllTests
+
+c.) Using ant run:
+
+ant -lib test/lib/junit.jar -Dtest=$qualified name of test class but ommitting net.sf.freecol$ test
+
+for instance
+
+ant -lib test/lib/junit.jar -Dtest=AllTests test
+
+7. FAQ 
+
+Q: What is the difference between unit and integration testing?
+A: In unit testing the goal is to test small units in relative isolation, while integration 
+   testing tries to figure out whether parts of the system work if put together. Both approaches 
+   have their purpose and their strengths. In general one should try to first test code that has little
+   dependencies to other code or remove the dependencies by using mock objects and later see 
+   whether the code integrates with the rest of the system.
+
+8. References:
+
+[1] JUnit Test Infected: Programmers Love Writing Tests
+
+http://junit.sourceforge.net/doc/testinfected/testing.htm
+
+[2] JUnit Homepage
+
+http://junit.sourceforge.net
