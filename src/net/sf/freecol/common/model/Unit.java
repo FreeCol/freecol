@@ -2418,7 +2418,13 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     }
 
     /**
-     * Sets a new state for this Unit.
+     * Sets a new state for this unit and initializes the amount of work the
+     * unit has left.
+     * 
+     * If the work needs turns to be completed (for instance when plowing), then
+     * the moves the unit has still left will be used up. Some work (basically
+     * building a road with a hardy pioneer) might actually be finished already
+     * in this method-call, in which case the state is set back to ACTIVE.
      * 
      * @param s The new state for this Unit. Should be one of {ACTIVE,
      *            FORTIFIED, ...}.
@@ -2445,33 +2451,22 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             break;
         case BUILD_ROAD:
         case PLOW:
-            switch (getTile().getType()) {
-            case Tile.DESERT:
-            case Tile.PLAINS:
-            case Tile.PRAIRIE:
-            case Tile.GRASSLANDS:
-            case Tile.SAVANNAH:
-                workLeft = ((getTile().isForested()) ? 4 : 3);
-                break;
-            case Tile.MARSH:
-                workLeft = ((getTile().isForested()) ? 6 : 5);
-                break;
-            case Tile.SWAMP:
-                workLeft = 7;
-                break;
-            case Tile.ARCTIC:
-            case Tile.TUNDRA:
-                workLeft = 4;
-                break;
-            default:
-                workLeft = -1;
-                break;
-            }
+
+            workLeft = getTile().getWorkAmount(s);
+
             getTile().takeOwnership(getOwner());
-            if (s == BUILD_ROAD)
-                workLeft /= 2;
+
+            // Hardy Pioneers finish in half the time
+            if (getType() == HARDY_PIONEER)
+                workLeft = Math.max(1, workLeft / 2);
+
+            state = s;
+
+            doAssignedWork();
+
             movesLeft = 0;
-            break;
+
+            return;
         case TO_EUROPE:
             if (state == ACTIVE && !(location instanceof Europe)) {
                 workLeft = 3;
@@ -2497,7 +2492,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         default:
             workLeft = -1;
         }
-        state = s;
+        state = s; // PLOW and BUILD_ROAD returned already
     }
 
     /**
@@ -2764,7 +2759,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     }
 
     /**
-     * This method does all the work.
+     * The status of units that are currently working (for instance on building a road, or fortifying themselves)
+     * is updated in this method.
      */
     public void doAssignedWork() {
         logger.finest("Entering method doAssignedWork.");
@@ -2806,6 +2802,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                     getTile().setRoad(true);
                     expendTools(20);
                     setState(ACTIVE);
+                    setMovesLeft(0);
                     break;
                 case PLOW:
                     if (getTile().isForested()) {
@@ -2851,6 +2848,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                     }
                     expendTools(20);
                     setState(ACTIVE);
+
+                    // If we pioneer finishs the work, he has used up his moves for this turn:
+                    setMovesLeft(0);
                     break;
                 default:
                     logger.warning("Unknown work completed. State: " + state);

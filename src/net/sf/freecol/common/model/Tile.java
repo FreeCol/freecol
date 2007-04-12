@@ -2230,4 +2230,59 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
          * "playerExploredTile"; }
          */
     }
+
+    /**
+     * Returns the number of turns it takes for a non-expert pioneer to either
+     * PLOW or BUILD_ROAD on the current tile.
+     * 
+     * This function was extracted by playing the original game and writing down
+     * how many turns it took for a regular pioneer to finish.
+     * 
+     * @param workType either Unit.PLOW or Unit.BUILD_ROAD. This function
+     *            expects a valid workType and does not check it for validity.
+     * 
+     * @return The number of turns it should take a non-expert pioneer to finish
+     *         the work.
+     */
+    public int getWorkAmount(int workType) {
+
+        if (getTile().getAddition() == Tile.ADD_HILLS) {
+            return 4;
+        }
+
+        if (getTile().getAddition() == Tile.ADD_MOUNTAINS) {
+            return 7;
+        }
+
+        int workAmount;
+        switch (getType()) {
+        case Tile.SAVANNAH:
+            workAmount = isForested() ? 8 : 5;
+            break;
+        case Tile.DESERT:
+        case Tile.PLAINS:
+        case Tile.PRAIRIE:
+        case Tile.GRASSLANDS:
+            workAmount = isForested() ? 6 : 5;
+            break;
+        case Tile.MARSH:
+            workAmount = isForested() ? 8 : 7;
+            break;
+        case Tile.SWAMP:
+            workAmount = 9;
+            break;
+        case Tile.ARCTIC:
+        case Tile.TUNDRA:
+            workAmount = 6;
+            break;
+        default:
+            throw new IllegalArgumentException("Unknown Tile Type: " + getType());
+        }
+
+        if (workType == Unit.BUILD_ROAD) {
+            return workAmount - 2;
+        } else {
+            return workAmount;
+        }
+    }
 }
