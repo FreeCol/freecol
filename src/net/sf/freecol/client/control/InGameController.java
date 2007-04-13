@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
@@ -1323,8 +1324,9 @@ public final class InGameController implements NetworkConstants {
                 unit.attack(defender, result, plunderGold);
             } catch (Exception e) {
                 // Ignore the exception (the update further down will fix any problems).
-                logger.throwing(getClass().getSimpleName(), "reallyAttack", e);
-                logger.warning("Exception thrown.");
+                LogRecord lr = new LogRecord(Level.WARNING, "Exception in reallyAttack");
+                lr.setThrown(e);
+                logger.log(lr);
             }            
             if (!defender.isDisposed()
                     && ((result == Unit.ATTACK_DONE_SETTLEMENT && unitElement != null)
