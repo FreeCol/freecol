@@ -1505,6 +1505,8 @@ public final class Colony extends Settlement implements Location, Nameable {
         for (int goodsType = 1; goodsType < Goods.NUMBER_OF_TYPES; goodsType++) {
             if (goodsContainer.getGoodsCount(goodsType) < getWarehouseCapacity() &&
                 goodsContainer.getGoodsCount(goodsType) + getProductionNetOf(goodsType) > getWarehouseCapacity()) {
+                // TODO: add the number of units that will be wasted
+                // but not for 0.6.0, as this would invalidate translations
                 addModelMessage(this, "model.building.warehouseSoonFull",
                                 new String [][] {{"%goods%", Goods.getName(goodsType)},
                                                  {"%colony%", getName()}},

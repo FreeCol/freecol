@@ -80,9 +80,13 @@
     </copy>
 
     <native2ascii src="${freecol.src.dir}" dest="${freecol.build.dir}"
-                  encoding="UTF-8" includes="**/*.properties" excludes="classes/** **/*_de_DE.properties **/*_hu.properties" />
+                  encoding="UTF-8" 
+                  includes="**/*.properties" 
+                  excludes="classes/** **/*_de_DE.properties **/*_hu.properties **/*_pt_BR.properties"/>
     <native2ascii src="${freecol.src.dir}" dest="${freecol.build.dir}"
-                  encoding="ISO-8859-1" includes="**/*_de_DE.properties **/*_hu.properties" excludes="classes/**" />
+                  encoding="ISO-8859-1"
+                  includes="**/*_de_DE.properties **/*_hu.properties **/*_pt_BR.properties"
+                  excludes="classes/**" />
   </target>
 
   
