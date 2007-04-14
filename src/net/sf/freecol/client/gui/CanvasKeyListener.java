@@ -66,9 +66,7 @@ public final class CanvasKeyListener implements KeyListener {
                 moveCursor(e);
             }
         } catch (Exception ex) {
-            LogRecord lr = new LogRecord(Level.WARNING, "Exception occurred while handling KeyEvent.");
-            lr.setThrown(ex);
-            logger.log(lr);
+            logger.log(Level.WARNING, "Exception occurred while handling KeyEvent.", ex);
         }
     }
 
