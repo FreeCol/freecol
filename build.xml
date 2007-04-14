@@ -16,6 +16,7 @@
   <property name="freecol.overview.file" value="${freecol.src.dir}/overview.html"/>
   <path id="test.class.path">
     <fileset dir="test/lib" includes="*.jar" />
+    <fileset dir="${basedir}/jars/" includes="*.jar" />
   </path>
 	<condition property="isOsUnixLike">
 	      <os family="unix" />
@@ -374,7 +375,7 @@
 
     <javac srcdir="test/src" destdir="${freecol.build.dir}"
            classpathref="test.class.path" debug="on" deprecation="off"
-           source="1.4" />
+           source="1.5" />
 
   </target>
 
