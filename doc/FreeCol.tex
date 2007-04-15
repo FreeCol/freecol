@@ -10,6 +10,7 @@
 {\includegraphics[scale=0.6]{images/wikipedia.png}}}
 
 \documentclass[12pt]{article}
+\usepackage[T1]{fontenc}
 \usepackage{longtable}
 \usepackage{graphicx}
 \usepackage{index}
@@ -22,6 +23,8 @@
 \maketitle{}
 
 \tableofcontents
+\newpage
+
 
 \hypertarget{Introduction}{\section{Introduction}}
 
@@ -60,10 +63,10 @@ our users') image of what Colonization 2 would have been.
 
 \hypertarget{The Original Colonization}{\subsection{The Original Colonization}}
 
-The original Colonization was released in 1994 by Microprose.
-\textbf{Colonization is heavily based on Civilization} which is
-generally considered to be the best turn-based strategy game for the
-PC in the history of mankind.
+The original Colonization\Wikipedia{Colonization (computer game)} was
+released in 1994 by Microprose. \textbf{Colonization is heavily based
+on Civilization} which some consider to be the best turn-based
+strategy game for the PC in the history of mankind.
 
 In Civilization the object of the game was to build a nation that
 could stand the test of times and that could also do one of the
@@ -110,21 +113,26 @@ independence \textbf{you need to have the majority of the people
 behind you}. This can be done by \textbf{promoting free speech} and by
 providing a strong governmental system.
 
+
 \hypertarget{Installation}{\section{Installation}}
 
 To compile FreeCol you'll need Java and the Ant build system. FreeCol
 is known to work with Sun's Java 5, but not with projects based on GNU
 Classpath, as some font handling classes used by FreeCol have not yet
-been implemented. Ant can be found at \href{Ant
+been implemented. If you are using Linux, using Java 6 is recommended,
+as its font handling is much better. Ant can be found at \href{Ant
 homepage}{http://ant.apache.org/}. FreeCol requires at least 128 MB
-memory.
+memory and works best with a screen resolution of at least 1024x768
+pixels.
 
 When these are installed, go to the root directory of FreeCol and type
 \verb$ant$ to build a JAR file containing the game. The game is
 started using the command \verb$java -Xmx128M -jar FreeCol.jar$.  If
 something goes wrong, leave a bug report at the
 \href{http://sourceforge.net/projects/freecol}{SourceForge page of
-FreeCol}.
+FreeCol}. Use the command \verb$ant -projecthelp$ to find out about
+other kinds of things you can build (this manual, for example).
+
 
 \hypertarget{Interface}{\section{Interface}}
 
@@ -144,23 +152,29 @@ less. Refer to the manual of your Java Virtual Machine for details.
 
 There are many other Java options, but you probably won't need to
 change the default settings. FreeCol is developed in English, but it
-includes translations into German, French, Spanish and Hungarian. Java
-will automatically select the translation for your locale, if
-available, and English otherwise. If you should wish to select a
-language other than that associated with your locale, however, you can
-do so by setting the system property values \verb$user.language$ and
-\verb$user.country$ to the appropriate
+includes translations into German, Spanish, Farsi (Persian), Finnish,
+French, Hungarian, (Brazilian) Portuguese and Russian, some of which
+are not very complete, however. Java will automatically select the
+translation for your locale, if available, and English otherwise. If
+you should wish to select a different language, or if language
+selection fails, you can try setting the system property values
+\verb$user.language$ and \verb$user.country$ to the appropriate
 \href{http://www.loc.gov/standards/iso639-2/php/code_list.php}{ISO
 639} and
 \href{http://www.iso.ch/iso/en/prods-services/iso3166ma/02iso-3166-code-lists/index.html}{ISO
 3166} values. 
 
 To use the French translation on a machine with a German locale, for
-example, you need to specify \verb$-Duser.language=fr -Duser.country=FR$. 
-You can also use environment variables to override
-the locale, if your operating system supports that. To use the French
-translation on a Linux system with a German locale, you could start
-FreeCol like this, for example: \verb$LANG=fr_FR java -Xmx128M -jar FreeCol.jar$.
+example, you need to specify 
+%
+\verb$-Duser.language=fr -Duser.country=FR$. 
+%
+You can also use environment variables to
+override the locale, if your operating system supports that. To use
+the French translation on a Linux system with a German locale, you
+could start FreeCol like this, for example: 
+%
+\verb$LANG=fr_FR java -Xmx128M -jar FreeCol.jar$.
 
 In addition to these general Java options, FreeCol also provides
 several specific command line options:
@@ -171,11 +185,12 @@ FreeCol's data files. In general, you will not need to use this, as
 the jar file contains all the necessary data files.
 \item\verb$--windowed[[=]WIDTHxHEIGHT]$ Run FreeCol in windowed mode
 instead of full screen mode and set the window width and height. You
-will need this if your window manager does not (correctly support)
-FreeCol's full screen mode. If you use Linux, for example, you should
-set the window width to the width of your screen, but probably set the
-window height slightly lower than the height of your screen, in order
-to leave space for the menu bar, dock etc.
+will need this if your window manager or Java Virtual Machine do not
+(correctly support) FreeCol's full screen mode. If you use Linux and
+Java 5, for example, you should set the window width to the width of
+your screen, but probably set the window height slightly lower than
+the height of your screen, in order to leave space for the menu bar,
+dock etc.
 \item\verb$--load-savegame SAVEGAME_FILE$ Load the given
 savegame. This is particularly useful in combination with the client
 option \hyperlink{show savegame settings}{show savegame settings}.
@@ -1013,12 +1028,14 @@ not be abandoned.  Keeping your own colonies close together is a good
 strategy, however, as long as you avoid sharing tiles between several
 colonies as far as possible.
 
+
 \hypertarget{No Reforestation}{\subsubsection{No Reforestation}}
 
 You can order your pioneers to cut down forests by plowing a tile.
 This will increase the food produced on these tiles, and the lumber
 will be delivered to your colonies. However, you can not plant new
 forests later. Once cleared, a tile will never produce lumber again.
+
 
 \hypertarget{Colony Buildings}{\subsection{Colony Buildings}}
 
@@ -1162,6 +1179,48 @@ have to be constructed later:
   \hyperlink{Boycotts}{Boycotts}.
 
 \end{itemize}
+
+
+\hypertarget{Using Buildings}{\subsection{{Using Buildings}}}
+
+Some buildings have an immediate effect. The
+\hyperlink{Stockade}{Stockade}, for example, provides protection for
+your colony, and the \hyperlink{Docks}{Docks} enable your colonists to
+go fishing. The effects of these buildings can not be increased by
+workers. In the building box at the top right of the \hyperlink{colony
+panel}{colony panel}, these buildings are shown in parentheses (like
+this: ``(Stockade)'').
+
+Most buildings do nothing by themselves, but provide workers with a
+place to produce manufactured goods. The \hyperlink{Tobacconist's
+House}{Tobacconist's House}, for example, allows colonists to make
+\hyperlink{Cigars}{Cigars} from \hyperlink{Tobacco}{Tobacco}. Place
+one or more colonists in a building in order to convert raw materials
+to manufactured goods, which can be sold for higher prices. For each
+building, there are expert units that work more effectively than
+\hyperlink{Free Colonist}{Free Colonists}. Other units may work less
+effectively.
+
+
+\hypertarget{Building Units and Buildings}{\subsection{Building Units and
+Buildings}}
+
+In order to upgrade buildings, and to construct new buildings and
+certain kinds of units, such as \hyperlink{Artillery}{Artillery} and
+ships, you will need to produce \hyperlink{Hammers}{Hammers}, which
+represent work being done. Hammers are made from
+\hyperlink{Lumber}{Lumber}, so you need to produce lumber, either by
+cutting down forests, or by placing a lumberjack on a forested tile
+next to your colony. Then you can place a colonist in the
+\hyperlink{Carpenter's House}{Carpenter's House} in order to convert
+the lumber to Hammers.
+
+Units and advanced buildings also require \hyperlink{Tools}{Tools},
+which are made from \hyperlink{Ore}{Ore}. So you need to place an ore
+miner on a tile that produces ore (\hyperlink{Hills}{Hills}, for
+example) and another in the \hyperlink{Blacksmith's
+House}{Blacksmith's House}, in order to convert the ore into tools.
+
 
 
 \hypertarget{Home Country}{\section{Your Home Country}}
@@ -1778,6 +1837,25 @@ quell the insurrection. In order to gain independence, you must defeat
 the Royal Expeditionary Force. The European enemies of your Monarch
 may support your effort if you generate a sufficient number of Liberty
 Bells after the War of Independence has begun.
+
+
+\hypertarget{Known bugs}{\section{Known bugs}}
+
+FreeCol is still alpha software. In plain English, this means that it
+is full of bugs. Some of these bugs have already been reported, but
+have not been fixed yet. You can find a list of these bugs, and report
+new bugs by using our
+\href{http://sourceforge.net/tracker/?group_id=43225&atid=435578}{SourceForge
+bug tracker}.
+
+Even in single player mode, FreeCol is a client-server game. The
+communication between client and server can fall out of step. If this
+happens, the server often tries to recover by requesting a
+reconnect. If this occurs, please accept in order to continue
+playing. In some cases, the game may come to a halt during the turn of
+a computer opponent. If this happens to you, you can generally
+reconnect to the server by using the reconnect option in the
+\hyperlink{game menu}{game menu} or by pressing \verb$ctrl-r$.
 
 
 \hypertarget{Copyright Notice}{\section{Copyright Notice}}
