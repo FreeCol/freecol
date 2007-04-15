@@ -251,7 +251,7 @@ public final class InGameController implements NetworkConstants {
             }
 
             removeUnitsOutsideLOS();
-            freeColClient.getCanvas().closeMenus();
+            //freeColClient.getCanvas().closeMenus();
             if (currentPlayer.checkEmigrate()) {
                 emigrateUnitInEurope(currentPlayer.hasFather(FoundingFather.WILLIAM_BREWSTER) ? freeColClient
                         .getCanvas().showEmigrationPanel() : 0);
