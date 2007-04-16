@@ -7,6 +7,7 @@ import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Properties;
+import java.util.TreeSet;
 
 
 public class TranslationReport {
@@ -44,6 +45,8 @@ public class TranslationReport {
 
             ArrayList<String> missingKeys = new ArrayList<String>();
             ArrayList<String> missingVariables = new ArrayList<String>();
+            ArrayList<String> copiedFromMaster = new ArrayList<String>();
+            
             for (Enumeration keys = master.keys() ; keys.hasMoreElements()  ;)  {
                 String key = (String) keys.nextElement();
                 String value = properties.getProperty(key, null);
@@ -53,6 +56,15 @@ public class TranslationReport {
                     String masterValue = master.getProperty(key);
                     int lastIndex = 0;
                     boolean inVariable = false;
+                    
+                    if (value.equalsIgnoreCase(masterValue)){
+                    	// ignore some values which are most probably copies in many languages
+                        if (!key.contains("newColonyName")
+                                && !(key.contains("foundingFather") && key.contains(".birthAndDeath"))
+                                && !(key.contains("foundingFather") && key.contains(".name")) ){
+                            copiedFromMaster.add(key);
+                        }
+                    }
 
                     for (int index = 0; index < masterValue.length() - 1; index++) {
                         char current = masterValue.charAt(index);
@@ -73,19 +85,30 @@ public class TranslationReport {
                     }
                 }
             }
+            
             if (missingKeys.size() > 0) {
                 System.out.println("** Total of " + missingKeys.size() + " properties missing:\n");
-                for (String key : missingKeys) {
+                for (String key : sort(missingKeys)) {
                     System.out.println(key + "=" + master.getProperty(key));
                 }
                 System.out.println("");
             } else {
                 System.out.println("** No properties missing.\n");
             }
+            
+            if (copiedFromMaster.size() > 0){
+                System.out.println("** Total of " + copiedFromMaster.size() + " properties copied from master properties:\n");
+                for (String key : sort(copiedFromMaster)) {
+                    System.out.println(key + "=" + master.getProperty(key));
+                }
+                System.out.println("");
+            } else {
+                System.out.println("** No properties copied.\n");
+            }
 
             if (missingVariables.size() > 0) {
                 System.out.println("** Total of " + missingVariables.size() + " properties with missing variables:\n");
-                for (String key : missingVariables) {
+                for (String key : sort(missingVariables)) {
                     System.out.println("* CORRECT: " + key + "=" + master.getProperty(key));
                     System.out.println("INCORRECT: " + key + "=" + properties.getProperty(key));
                 }
@@ -129,7 +152,7 @@ public class TranslationReport {
 
             if (superfluousKeys.size() > 0) {
                 System.out.println("** Total of " + superfluousKeys.size() + " superfluous properties:\n");
-                for (String key : superfluousKeys) {
+                for (String key : sort(superfluousKeys)) {
                     System.out.println(key + "=" + properties.getProperty(key));
                 }
                 System.out.println("");
@@ -139,7 +162,7 @@ public class TranslationReport {
             if (superfluousVariables.size() > 0) {
                 System.out.println("** Total of " + superfluousVariables.size() +
                                    " properties with superfluous variables:\n");
-                for (String key : superfluousVariables) {
+                for (String key : sort(superfluousVariables)) {
                     System.out.println("* CORRECT: " + key + "=" + master.getProperty(key));
                     System.out.println("INCORRECT: " + key + "=" + properties.getProperty(key));
                 }
@@ -151,6 +174,12 @@ public class TranslationReport {
 
         }
 
+    }
+
+    private static TreeSet<String> sort(ArrayList<String> missingKeys) {
+        TreeSet<String> sorted = new TreeSet<String>();
+        sorted.addAll(missingKeys);
+        return sorted;
     }
 
 }
