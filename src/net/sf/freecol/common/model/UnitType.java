@@ -3,6 +3,7 @@ package net.sf.freecol.common.model;
 
 
 import java.util.Map;
+import java.util.HashSet;
 
 import net.sf.freecol.common.util.Xml;
 
@@ -26,7 +27,7 @@ public final class UnitType
     public  int        skill;
     public  int        price;
     public  GoodsType  expertProduction;
-    public  String[]   abilityArray;
+    public HashSet abilityArray = new HashSet();    
 
 
     public void readFromXmlElement( Node xml, Map<String, GoodsType> goodsTypeByRef ) {
@@ -71,7 +72,14 @@ public final class UnitType
             expertProduction = null;
         }
 
-        abilityArray = Xml.attribute(xml, "abilities").split( "," );
+        String[] array = Xml.attribute(xml, "abilities").split( "," );
+        if (array != null)
+        {
+            for (int i = 0; i < array.length; i++) {
+                abilityArray.add(array[i]);
+            }
+        }
+
     }
 
 
@@ -94,8 +102,9 @@ public final class UnitType
 
 
     public boolean hasAbility( String abilityName ) {
+        return abilityArray.contains(abilityName);
 
-        for ( int ai = 0, na = abilityArray.length;  ai < na;  ai ++ )
+        /*for ( int ai = 0, na = abilityArray.length;  ai < na;  ai ++ )
         {
             String  ability = abilityArray[ai];
 
@@ -105,7 +114,7 @@ public final class UnitType
             }
         }
 
-        return false;
+        return false;*/
     }
 
 }

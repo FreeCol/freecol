@@ -3,6 +3,7 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.HashMap;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -42,6 +43,7 @@ public final class Colony extends Settlement implements Location, Nameable {
      * <code>ColonyTile</code>.
      */
     private ArrayList<WorkLocation> workLocations = new ArrayList<WorkLocation>();
+    private HashMap buildingMap = new HashMap();
 
     private int hammers;
 
@@ -140,21 +142,21 @@ public final class Colony extends Settlement implements Location, Nameable {
                 t.setNationOwner(ownerNation);
                 // t.setOwner(this);
             }
-            workLocations.add(new ColonyTile(game, this, t));
+            addWorkLocation(new ColonyTile(game, this, t));
             if (t.getType() == Tile.OCEAN) {
                 landLocked = false;
             }
         }
 
-        workLocations.add(new ColonyTile(game, this, tile));
+        addWorkLocation(new ColonyTile(game, this, tile));
 
         int numberOfTypes = FreeCol.specification.numberOfBuildingTypes();
         for (int type = 0; type < numberOfTypes; type++) {
             BuildingType buildingType = FreeCol.specification.buildingType(type);
             if (buildingType.level(0).hammersRequired > 0) {
-                workLocations.add(new Building(game, this, type, Building.NOT_BUILT));
+                addWorkLocation(new Building(game, this, type, Building.NOT_BUILT));
             } else {
-                workLocations.add(new Building(game, this, type, Building.HOUSE));
+                addWorkLocation(new Building(game, this, type, Building.HOUSE));
             }
         }
 
@@ -200,6 +202,13 @@ public final class Colony extends Settlement implements Location, Nameable {
      */
     public Colony(Game game, String id) {
         super(game, id);
+    }
+
+    private void addWorkLocation(WorkLocation workLocation) {
+        workLocations.add(workLocation);
+        if (workLocation instanceof Building) {
+            buildingMap.put(((Building) workLocation).getType(), workLocation);
+        }
     }
 
     /**
@@ -501,7 +510,9 @@ public final class Colony extends Settlement implements Location, Nameable {
      * @return The <code>Building</code>.
      */
     public Building getBuilding(int type) {
-        Iterator<Building> buildingIterator = getBuildingIterator();
+        return (Building) buildingMap.get(new Integer(type));
+        
+        /*Iterator<Building> buildingIterator = getBuildingIterator();
 
         while (buildingIterator.hasNext()) {
             Building building = buildingIterator.next();
@@ -510,7 +521,7 @@ public final class Colony extends Settlement implements Location, Nameable {
             }
         }
 
-        return null;
+        return null;*/
     }
 
     /**
@@ -1070,7 +1081,7 @@ public final class Colony extends Settlement implements Location, Nameable {
     /**
      * Sets the name of this <code>Colony</code>.
      * 
-     * @param name The new name of this Colony.
+     * @param newName The new name of this Colony.
      */
     public void setName(String newName) {
         this.name = newName;
@@ -1411,8 +1422,29 @@ public final class Colony extends Settlement implements Location, Nameable {
      *         or a {@link ColonyTile}.
      */
     public Unit getRandomUnit() {
-        return getUnitIterator().hasNext() ? getUnitIterator().next() : null;
+        return getFirstUnit();
+//        return getUnitIterator().hasNext() ? getUnitIterator().next() : null;
     }
+
+    private Unit getFirstUnit() {
+        ArrayList units = new ArrayList();
+
+        Iterator wli = getWorkLocationIterator();
+        while (wli.hasNext()) {
+            WorkLocation wl = (WorkLocation) wli.next();
+
+            Iterator unitIterator = wl.getUnitIterator();
+            while (unitIterator.hasNext()) {
+                Object o = unitIterator.next();
+                if (o != null) {
+                    return (Unit) o;
+                }
+            }
+        }
+        return null;
+    }
+
+
 
     /**
      * Prepares this <code>Colony</code> for a new turn.
@@ -1799,7 +1831,7 @@ public final class Colony extends Settlement implements Location, Nameable {
                 if (ct != null) {
                     ct.readFromXML(in);
                 } else {
-                    workLocations.add(new ColonyTile(getGame(), in));
+                    addWorkLocation(new ColonyTile(getGame(), in));
                 }
             } else if (in.getLocalName().equals(Building.getXMLElementTagName())) {
                 Building b = (Building) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
@@ -1807,7 +1839,7 @@ public final class Colony extends Settlement implements Location, Nameable {
                 if (b != null) {
                     b.readFromXML(in);
                 } else {
-                    workLocations.add(new Building(getGame(), in));
+                    addWorkLocation(new Building(getGame(), in));
                 }
             } else if (in.getLocalName().equals(GoodsContainer.getXMLElementTagName())) {
                 GoodsContainer gc = (GoodsContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));

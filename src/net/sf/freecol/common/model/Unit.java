@@ -82,6 +82,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     private int type;
 
     private UnitType unitType;
+    private boolean naval;
 
     private boolean armed, mounted, missionary;
 
@@ -198,6 +199,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         this.owner = owner;
         this.type = type;
         unitType = FreeCol.specification.unitType(type);
+        naval = unitType.hasAbility("naval");
         this.armed = armed;
         this.mounted = mounted;
         this.numberOfTools = numberOfTools;
@@ -782,7 +784,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     /**
      * Gets the cost of moving this <code>Unit</code> from the given
      * <code>Tile</code> onto the given <code>Tile</code>. A call to
-     * {@link #getMoveType(Tile, Tile)} will return <code>ILLEGAL_MOVE</code>,
+     * {@link #getMoveType(Tile, Tile, int)} will return <code>ILLEGAL_MOVE</code>,
      * if {@link #getMoveCost} returns a move cost larger than the
      * {@link #getMovesLeft moves left}.
      * 
@@ -2056,6 +2058,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     public void setType(int type) {
         this.type = type;
         unitType = FreeCol.specification.unitType(type);
+        naval = unitType.hasAbility("naval");
     }
 
     /**
@@ -2359,8 +2362,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      *         otherwise.
      */
     public boolean isNaval() {
-
-        return unitType.hasAbility("naval");
+        return naval;
+//        return unitType.hasAbility("naval");
     }
 
     /**
@@ -4278,6 +4281,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         setName(in.getAttributeValue(null, "name"));
         type = Integer.parseInt(in.getAttributeValue(null, "type"));
         unitType = FreeCol.specification.unitType(type);
+        naval = unitType.hasAbility("naval");
         armed = Boolean.valueOf(in.getAttributeValue(null, "armed")).booleanValue();
         mounted = Boolean.valueOf(in.getAttributeValue(null, "mounted")).booleanValue();
         missionary = Boolean.valueOf(in.getAttributeValue(null, "missionary")).booleanValue();

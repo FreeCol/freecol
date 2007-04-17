@@ -76,6 +76,8 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
 
     private int x, y;
 
+    private Position position;
+
     private int indianClaim;
 
     /** The nation that consider this tile to be their land. */
@@ -148,6 +150,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
 
         x = locX;
         y = locY;
+        position = new Position(x, y);
 
         owner = null;
         settlement = null;
@@ -900,7 +903,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
      * @return The <code>Position</code> of this <code>Tile</code>.
      */
     public Position getPosition() {
-        return new Position(x, y);
+        return position;
     }
 
     /**
@@ -1552,6 +1555,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
 
         x = Integer.parseInt(in.getAttributeValue(null, "x"));
         y = Integer.parseInt(in.getAttributeValue(null, "y"));
+        position = new Position(x, y);
         type = Integer.parseInt(in.getAttributeValue(null, "type"));
 
         final String riverStr = in.getAttributeValue(null, "river");

@@ -45,6 +45,9 @@ public class Map extends FreeColGameObject {
     private Vector<Vector<Tile>> columns = null;
 
     private final DefaultCostDecider defaultCostDecider = new DefaultCostDecider();
+    private int width;
+    private int height;
+    
 
     /**
      * Create a new <code>Map</code> of a specified size.
@@ -61,6 +64,7 @@ public class Map extends FreeColGameObject {
         super(game);
 
         createColumns(size);
+        initSize();
     }
 
     /**
@@ -77,6 +81,7 @@ public class Map extends FreeColGameObject {
         super(game);
 
         this.columns = columns;
+        initSize();
     }
 
     /**
@@ -94,6 +99,7 @@ public class Map extends FreeColGameObject {
         super(game, in);
 
         readFromXML(in);
+        initSize();
     }
 
     /**
@@ -109,6 +115,12 @@ public class Map extends FreeColGameObject {
      */
     public Map(Game game, String id) {
         super(game, id);
+        initSize();        
+    }
+
+    private void initSize() {
+      width = columns.size();
+      height = ((Vector) columns.get(0)).size();;
     }
 
     /**
@@ -975,7 +987,7 @@ public class Map extends FreeColGameObject {
      * @return The width of this Map.
      */
     public int getWidth() {
-        return columns.size();
+        return width;
     }
 
     /**
@@ -984,7 +996,7 @@ public class Map extends FreeColGameObject {
      * @return The height of this Map.
      */
     public int getHeight() {
-        return columns.get(0).size();
+        return height;
     }
 
     /**
