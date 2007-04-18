@@ -1535,15 +1535,17 @@ public final class Colony extends Settlement implements Location, Nameable {
 
         // Warn about levels that will be exceeded next turn
         for (int goodsType = 1; goodsType < Goods.NUMBER_OF_TYPES; goodsType++) {
-            if (goodsContainer.getGoodsCount(goodsType) < getWarehouseCapacity() &&
-                goodsContainer.getGoodsCount(goodsType) + getProductionNetOf(goodsType) > getWarehouseCapacity()) {
-                // TODO: add the number of units that will be wasted
-                // but not for 0.6.0, as this would invalidate translations
-                addModelMessage(this, "model.building.warehouseSoonFull",
-                                new String [][] {{"%goods%", Goods.getName(goodsType)},
-                                                 {"%colony%", getName()}},
-                                ModelMessage.WAREHOUSE_CAPACITY,
-                                new Goods(goodsType));
+            if (goodsContainer.getGoodsCount(goodsType) < getWarehouseCapacity()) {
+                int waste = (goodsContainer.getGoodsCount(goodsType) + getProductionNetOf(goodsType) -
+                             getWarehouseCapacity());
+                if (waste > 0) {
+                    addModelMessage(this, "model.building.warehouseSoonFull",
+                                    new String [][] {{"%goods%", Goods.getName(goodsType)},
+                                                     {"%colony%", getName()},
+                                                     {"%amount%", String.valueOf(waste)}},
+                                    ModelMessage.WAREHOUSE_CAPACITY,
+                                    new Goods(goodsType));
+                }
             }
         }
 

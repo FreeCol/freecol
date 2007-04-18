@@ -1942,10 +1942,14 @@ public final class Canvas extends JDesktopPane {
             remove(statusPanel, false);
         }
 
-        if (i == null) {
-            super.add(comp);
-        } else {
-            super.add(comp, i);
+        try {
+            if (i == null) {
+                super.add(comp);
+            } else {
+                super.add(comp, i);
+            }
+        } catch(Exception e) {
+            logger.warning("add component failed with layer " + i);
         }
 
         if (update) {
