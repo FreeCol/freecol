@@ -158,39 +158,45 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         switch (type) {
         case COLOPEDIA_TERRAIN:
             buildTerrainList();
-            if (action != NO_DETAILS) {
-                buildTerrainDetail(action);
+            if (action == NO_DETAILS) {
+                action = Tile.UNEXPLORED;
             }
+            buildTerrainDetail(action);
             break;
         case COLOPEDIA_UNIT:
             buildUnitList();
-            if (action != NO_DETAILS) {
-                buildUnitDetail(action);
+            if (action == NO_DETAILS) {
+                action = Unit.FREE_COLONIST;
             }
+            buildUnitDetail(action);
             break;
         case COLOPEDIA_GOODS:
             buildGoodsList();
-            if (action != NO_DETAILS) {
-                buildGoodsDetail(action);
+            if (action == NO_DETAILS) {
+                action = Goods.FOOD;
             }
+            buildGoodsDetail(action);
             break;
         case COLOPEDIA_SKILLS:
             buildSkillsList();
-            if (action != NO_DETAILS) {
-                // buildSkillsDetail(action);
+            if (action == NO_DETAILS) {
+                action = Unit.EXPERT_FARMER;
             }
+            buildUnitDetail(action);
             break;
         case COLOPEDIA_BUILDING:
             buildBuildingList();
-            if (action != NO_DETAILS) {
-                buildBuildingDetail(action);
+            if (action == NO_DETAILS) {
+                action = Building.TOWN_HALL;
             }
+            buildBuildingDetail(action);
             break;
         case COLOPEDIA_FATHER:
             buildFatherList();
-            if (action != NO_DETAILS) {
-                buildFatherDetail(action);
+            if (action == NO_DETAILS) {
+                action = FoundingFather.ADAM_SMITH;
             }
+            buildFatherDetail(action);
             break;
         default:
             break;
