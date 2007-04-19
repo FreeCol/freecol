@@ -21,7 +21,9 @@
 	<condition property="isOsUnixLike">
 	      <os family="unix" />
 	</condition>
-		
+	<condition property="isOsWindows">
+	      <os family="windows" />
+	</condition>	
   <!-- TASK DEFINITIONS -->
   <taskdef name="jsmoothgen"
            classname="net.charabia.jsmoothgen.ant.JSmoothGen"
@@ -65,11 +67,11 @@
     <mkdir dir="${freecol.build.dir}"/>
     <javac srcdir="test/src"
            destdir="${freecol.build.dir}"
-           classpath="test/lib/junit.jar"
+           classpath="test/lib/junit.jar:${basedir}/jars/higlayout.jar:${basedir}/jars/jsr173_1.0_api.jar:${basedir}/jars/wstx-lgpl-4.0pr1.jar"
            debug="on"
            optimize="on"
            deprecation="off"
-           source="1.4"
+           source="1.5"
     />
   </target>
 
@@ -115,12 +117,20 @@
   <!--
     Creates archives and installers for distribution and places these in the
     "dist" directory.
+    Various platforms can be omitted for prerelease testing by setting properties on the command line:
+      skip.dist.mac="true" suppresses mac packaging
+      skip.dist.win="true" suppresses windows packaging
+      skip.dist.java="true" suppresses zip and tar creation of the jarfiles
+      skip.dist.source="true" suppresses packaging the source files
+      skip.dist.test="true" suppresses execution of the junit tests
+      
+      For a formal release, none of these properties should be set.
   -->
   <target name="dist" description="Creates archives and installers for distribution.">
 		
     <input message="Please specify the release version (x.y.z): " addproperty="freecol.version" defaultvalue="custom_build" />    
     <property name="freecol.release.name" value="${freecol.name}-${freecol.version}"/>  
-    
+    <echo message="Creating Distribution of ${freecol.release.name}"/>
     <replaceregexp file="${freecol.src.dir}/net/sf/freecol/FreeCol.java"
                    match="FREECOL_VERSION\s*=\s*&quot;(.*?)&quot;\;"
                    replace="FREECOL_VERSION = &quot;${freecol.version}&quot;\;"
@@ -129,7 +139,8 @@
     
     <antcall target="clean" />
     <antcall target="package" />    
-    
+    <antcall target="testall" />    
+
     <mkdir dir="${freecol.release.dir}"/>
     <mkdir dir="${freecol.release.dir}/${freecol.name}"/>
             
@@ -139,27 +150,43 @@
       <fileset dir="${basedir}" includes="data/**" excludes="**/CVS/**"/>
       <fileset dir="${basedir}" includes="jars/**" excludes="**/CVS/**"/>    
     </copy>
+
         
+    <antcall target="tarJavaBundle" />
+    <antcall target="tarSourceBundle" />
+    <antcall target="winInstallerBundle" />
+	<antcall target="macJavaBundle"/>
+	<antcall target="tarMacJavaBundle"/>
+	<antcall target="tarMacJavaBundleOnWindows"/>
+
+    <echo message="" />
+    <echo message="-------------------------------------------------"/>
+    <echo message="Distribution files created:"/>
+    <echo message="${freecol.release.dir}"/>
+    <echo message="-------------------------------------------------"/>
+  </target>
+  <target name="tarJavaBundle" unless="skip.dist.java">
     <zip destfile="${freecol.release.dir}/${freecol.release.name}.zip">
       <fileset dir="${freecol.release.dir}" includes="${freecol.name}/**"/>
     </zip>    
     <tar destfile="${freecol.release.dir}/${freecol.release.name}.tar.gz" compression="gzip">
       <tarfileset dir="${freecol.release.dir}" includes="${freecol.name}/**"/>
-    </tar>
-    
+    </tar>  
+  </target>
+  <target name="tarSourceBundle" unless="skip.dist.source">
     <copy todir="${freecol.release.dir}/${freecol.name}">
       <fileset dir="${basedir}" includes="src/**" excludes="**/CVS/**"/>
       <fileset dir="${basedir}" includes="build.xml" />
     </copy>
-    
     <zip destfile="${freecol.release.dir}/${freecol.release.name}-src.zip">
       <fileset dir="${freecol.release.dir}" includes="${freecol.name}/**"/>
     </zip>    
     <tar destfile="${freecol.release.dir}/${freecol.release.name}-src.tar.gz" compression="gzip">
       <tarfileset dir="${freecol.release.dir}" includes="${freecol.name}/**"/>
     </tar>    
-
-    <copy tofile="${freecol.build.dir}/installer-tmp.xml">
+  </target>
+  <target name="winInstallerBundle" unless="skip.dist.win" description="Builds a doubleclickable windows installer">
+      <copy tofile="${freecol.build.dir}/installer-tmp.xml">
       <fileset file="${freecol.build.dir}/installer.xml" />
     </copy>
     <replace file="${freecol.build.dir}/installer-tmp.xml"
@@ -200,22 +227,11 @@
 
     <delete quiet="true" dir="${freecol.release.dir}/${freecol.name}"/>
     <delete quiet="true" file="${freecol.release.dir}/installer.jsmooth"/>
-    
-	<antcall target="macJavaBundle"/>
-	<antcall target="tarMacJavaBundle"/>
-	<antcall target="tarMacJavaBundleOnWindows"/>
-
-    <echo message="" />
-    <echo message="-------------------------------------------------"/>
-    <echo message="Distribution files created:"/>
-    <echo message="${freecol.release.dir}"/>
-    <echo message="-------------------------------------------------"/>
   </target>
-  
-	<target name="macJavaBundle" description="Buils a doubleclickable application bundle running on Mac os X">
-		<mkdir dir="${freecol.release.dir}"/>  		
-<!--  Mac OS X -->
-		<jarbundler dir="${freecol.release.dir}"
+  <target name="macJavaBundle" unless="skip.dist.mac" description="Builds a doubleclickable application bundle running on Mac OS X">
+	<mkdir dir="${freecol.release.dir}"/>  		
+    <!--  Mac OS X -->
+	<jarbundler dir="${freecol.release.dir}"
 			name="FreeCol"
 			mainclass="net.sf.freecol.FreeCol"
 			version="${freecol.version}"
@@ -228,51 +244,46 @@
 				TODO: Where should I place the icon file?
 				Replace the value of the icon-attribute with the future icon path
 			-->
-			<jarfilelist dir="${basedir}" files="FreeCol.jar" />
+	  <jarfilelist dir="${basedir}" files="FreeCol.jar" />
 
-			<jarfileset dir="${basedir}/jars/">
-				<include name="**/*.jar" />
-				<exclude name="**/CVS" />
-			</jarfileset>
-
-			<resourcefileset dir="${basedir}/data">
-				<exclude name="**/CVS" />
-			</resourcefileset>		
-		</jarbundler>
-</target>
-	
-	<target name="tarMacJavaBundle" if="isOsUnixLike" depends="macJavaBundle">
-		<delete file="${freecol.release.dir}/FreeCol.app/Contents/MacOS/FreeCol"/>
-		<symlink link="${freecol.release.dir}/FreeCol.app/Contents/MacOS/FreeCol" 	resource="/System/Library/Frameworks/JavaVM.framework/Resources/MacOS/JavaApplicationStub"/>
-
-		<exec executable="tar">
-		<arg value="cfvj"/>
-	 	<arg value="${freecol.release.dir}/${freecol.release.name}-mac.tar.bz2"/>
-		<arg value="-C"/>
-		<arg value="${freecol.release.dir}"/>
-		<arg value="FreeCol.app/"/>
-		</exec>
-		
-		<delete quiet="true" dir="${freecol.release.dir}/FreeCol.app"/>
-		</target>
-	
-	<target name="tarMacJavaBundleOnWindows" depends="macJavaBundle" unless="isOsUnixLike">
-		<echo message="Warning: You are building a Mac Os X Java Application Bundle containing a Copy Java Application Stub. Creating a bundle with the current copy of Java Launching Stub could lead to a future situation where the JavaApplicationStub file could become incompatible with a future OS X update. To avoid this, use a unix like system ... "/>
-		<tar destfile="${freecol.release.dir}/${freecol.release.name}-mac.tar.bz2" compression="bzip2">
-			<tarfileset dir="${freecol.release.dir}" mode="755" 
+	  <jarfileset dir="${basedir}/jars/">
+		<include name="**/*.jar" />
+		<exclude name="**/CVS" />
+	  </jarfileset>
+      <resourcefileset dir="${basedir}/data">
+		<exclude name="**/CVS" />
+	  </resourcefileset>		
+	</jarbundler>
+  </target>
+  <target name="tarMacJavaBundle" unless="skip.dist.mac" if="isOsUnixLike" depends="macJavaBundle">
+	<delete file="${freecol.release.dir}/FreeCol.app/Contents/MacOS/FreeCol"/>
+	<symlink link="${freecol.release.dir}/FreeCol.app/Contents/MacOS/FreeCol" 	resource="/System/Library/Frameworks/JavaVM.framework/Resources/MacOS/JavaApplicationStub"/>
+	<exec executable="tar">
+  	  <arg value="cfvj"/>
+	  <arg value="${freecol.release.dir}/${freecol.release.name}-mac.tar.bz2"/>
+	  <arg value="-C"/>
+	  <arg value="${freecol.release.dir}"/>
+	  <arg value="FreeCol.app/"/>
+	</exec>
+	<delete quiet="true" dir="${freecol.release.dir}/FreeCol.app"/>
+  </target>
+  
+  <target name="tarMacJavaBundleOnWindows" depends="macJavaBundle" unless="skip.dist.mac" if="isOsWindows">
+	<echo message="Warning: You are building a Mac Os X Java Application Bundle containing a Copy Java Application Stub. Creating a bundle with the current copy of Java Launching Stub could lead to a future situation where the JavaApplicationStub file could become incompatible with a future OS X update. To avoid this, use a unix like system ... "/>
+	<tar destfile="${freecol.release.dir}/${freecol.release.name}-mac.tar.bz2" compression="bzip2">
+	  <tarfileset dir="${freecol.release.dir}" mode="755" 
 				includes="FreeCol.app/Contents/MacOS/FreeCol" 
 				excludes="**/freecol*"
 				followsymlinks="false" 
 				/>
-			<tarfileset followsymlinks="false" dir="${freecol.release.dir}">
+	  <tarfileset followsymlinks="false" dir="${freecol.release.dir}">
 				<include name="FreeCol.app/**"/>
 				<exclude name="**/freecol*"/>
 				<exclude name="FreeCol.app/Contents/MacOS/FreeCol"/>
-			</tarfileset>	
-	    </tar>
-
-		<delete quiet="true" dir="${freecol.release.dir}/FreeCol.app"/>
-	</target>
+	  </tarfileset>	
+	</tar>
+	<delete quiet="true" dir="${freecol.release.dir}/FreeCol.app"/>
+  </target>
 	
 
   <!-- Cleans the directories by removing auto-generated files. -->
@@ -327,6 +338,9 @@
     <!-- if the next fails then here is the long answer:
            http://ant.apache.org/faq.html#delegating-classloader
          the short answer depends.
+         if you have Ant 1.7, the junit.jar can exist on the classpath.  
+           upgrading to 1.7 may be the best solution.
+         
          if you have Ant 1.6:
            ant -lib test/lib/junit.jar testall
          if you have a version of Ant prior to 1.6 on Windows:
@@ -338,6 +352,10 @@
     <junit printsummary="yes">
       <classpath>
         <pathelement location="${freecol.build.dir}" />
+        <pathelement location="test/lib/junit.jar" />
+        <pathelement location="${basedir}/jars/higlayout.jar" />
+        <pathelement location="${basedir}/jars/jsr173_1.0_api.jar" />
+        <pathelement location="${basedir}/jars/wstx-lgpl-4.0pr1.jar"/>
       </classpath>
       <formatter type="plain" />
       <test todir="${freecol.build.dir}" name="net.sf.freecol.${test}Test" />
@@ -345,13 +363,16 @@
   </target>
 
 
-  <target name="testall" depends="build-unit-tests"
+  <target name="testall" depends="build-unit-tests" unless="skip.dist.test"
           description="Runs all unit tests"
   >
     <echo message="if the next task fails then please read the build script" />
     <!-- if the next fails then here is the long answer:
            http://ant.apache.org/faq.html#delegating-classloader
          the short answer depends.
+         if you have Ant 1.7, the junit.jar can exist on the classpath.  
+           upgrading to 1.7 may be the best solution.
+         
          if you have Ant 1.6:
            ant -lib test/lib/junit.jar testall
          if you have a version of Ant prior to 1.6 on Windows:
@@ -360,15 +381,32 @@
          if you have a version of Ant prior to 1.6 on UNIX:
            export CLASSPATH=${CLASSPATH}:test/lib/junit.jar; ant testall
          -->
-    <junit printsummary="yes">
+    <junit printsummary="on" errorproperty="error.junit">
       <classpath>
         <pathelement location="${freecol.build.dir}" />
+        <pathelement location="test/lib/junit.jar" />
+        <pathelement location="${basedir}/jars/higlayout.jar" />
+        <pathelement location="${basedir}/jars/jsr173_1.0_api.jar" />
+        <pathelement location="${basedir}/jars/wstx-lgpl-4.0pr1.jar"/>
       </classpath>
-      <formatter type="plain" />
+      <formatter type="xml" />
       <batchtest fork="yes" todir="${freecol.build.dir}">
         <fileset dir="test/src" includes="**/*Test.java" />
       </batchtest>
     </junit>
+    <delete dir="build/report" />
+    <mkdir dir="build/report"/>
+    <echo message="Basedir:${basedir}"/>
+    <junitreport>
+      <fileset dir="build">
+        <include name="TEST-*.xml"/>
+      </fileset>
+      <report todir="build/report" />
+    </junitreport>
+    
+    <fail if="error.junit">
+      Automated Unit Tests failed.
+    </fail>
   </target>
 
 
@@ -446,3 +484,4 @@
   </target>
 
 </project>
+ 	  	 
