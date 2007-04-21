@@ -837,6 +837,7 @@ public final class Colony extends Settlement implements Location, Nameable {
         // Get the first unit
         Unit defender = unitList.get(0);
 
+        /* don't do that here!
         // Paul Revere present? If so, arm it
         if (getOwner().hasFather(FoundingFather.PAUL_REVERE)) {
             if (getGoodsCount(Goods.MUSKETS) >= 50) {
@@ -846,6 +847,7 @@ public final class Colony extends Settlement implements Location, Nameable {
                 defender.setMounted(true);
             }
         }
+        */
 
         // Done!
         return defender;

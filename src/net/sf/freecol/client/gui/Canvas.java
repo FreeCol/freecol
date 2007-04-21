@@ -1656,11 +1656,13 @@ public final class Canvas extends JDesktopPane {
         // emigrationPanel.requestFocus();
 
         showFreeColDialog(emigrationPanel);
+        //System.out.println("About to show emigration panel");
         int response = emigrationPanel.getResponseInt();
+        //System.out.println("emigration panel returned " + response);
         removeFreeColDialog(emigrationPanel);
 
         // remove(emigrationPanel);
-
+        //System.out.println("About to return response.");
         return response;
     }
 
@@ -1741,16 +1743,20 @@ public final class Canvas extends JDesktopPane {
 
         final boolean takeFocus = (comp != statusPanel);
         if (update) {
+            //System.out.println("About to update menu bar.");
             updateJMenuBar();
+            //System.out.println("About to update action manager.");
             freeColClient.getActionManager().update();
             if (takeFocus && !isShowingSubPanel()) {
                 takeFocus();
             }
 
             if (freeColClient.getGame() != null) {
+                //System.out.println("About to get next model message.");
                 freeColClient.getInGameController().nextModelMessage();
             }
         }
+        //System.out.println("About to return from remove.");
     }
 
     /**

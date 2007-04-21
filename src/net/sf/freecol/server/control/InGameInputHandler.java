@@ -845,6 +845,17 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                         + attackElement.getAttribute("unit"));
             }
         } else {
+            Colony targetColony = newTile.getColony();
+            // Paul Revere present? If so, arm it
+            if (targetColony != null && targetColony.getOwner().hasFather(FoundingFather.PAUL_REVERE)) {
+                if (targetColony.getGoodsCount(Goods.MUSKETS) >= 50) {
+                    defender.setArmed(true);
+                }
+                if (targetColony.getGoodsCount(Goods.HORSES) >= 50) {
+                    defender.setMounted(true);
+                }
+            }
+
             result = generateAttackResult(unit, defender);
         }
         if (result == Unit.ATTACK_DONE_SETTLEMENT) {

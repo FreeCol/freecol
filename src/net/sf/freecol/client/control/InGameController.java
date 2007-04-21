@@ -253,8 +253,11 @@ public final class InGameController implements NetworkConstants {
             removeUnitsOutsideLOS();
             //freeColClient.getCanvas().closeMenus();
             if (currentPlayer.checkEmigrate()) {
-                emigrateUnitInEurope(currentPlayer.hasFather(FoundingFather.WILLIAM_BREWSTER) ? freeColClient
-                        .getCanvas().showEmigrationPanel() : 0);
+                if (currentPlayer.hasFather(FoundingFather.WILLIAM_BREWSTER)) {
+                    emigrateUnitInEurope(freeColClient.getCanvas().showEmigrationPanel());
+                } else {
+                    emigrateUnitInEurope(0);
+                }
             }
 
             freeColClient.getGUI().setActiveUnit(null);
@@ -2524,8 +2527,10 @@ public final class InGameController implements NetworkConstants {
             throw new IllegalStateException();
         }
 
+        System.out.println("Sent slot " + slot);
         if (!myPlayer.hasFather(FoundingFather.WILLIAM_BREWSTER)) {
             slot = Integer.parseInt(reply.getAttribute("slot"));
+            System.out.println("Received slot " + slot);
         }
 
         Element unitElement = (Element) reply.getChildNodes().item(0);
