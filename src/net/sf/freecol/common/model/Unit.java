@@ -3111,6 +3111,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 totalAddend += addend;
             }
 
+            // 50% veteran bonus
+            factor = 1.5f;
+            result.add(Modifier.createMultiplicativeModifier("modifiers.veteranBonus", factor));
+            totalFactor *= factor;
+
             // 50% attack bonus
             factor = 1.5f;
             result.add(Modifier.createMultiplicativeModifier("modifiers.attackBonus", factor)); 
