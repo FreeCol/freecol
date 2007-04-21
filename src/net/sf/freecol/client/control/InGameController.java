@@ -2527,10 +2527,10 @@ public final class InGameController implements NetworkConstants {
             throw new IllegalStateException();
         }
 
-        System.out.println("Sent slot " + slot);
+        //System.out.println("Sent slot " + slot);
         if (!myPlayer.hasFather(FoundingFather.WILLIAM_BREWSTER)) {
             slot = Integer.parseInt(reply.getAttribute("slot"));
-            System.out.println("Received slot " + slot);
+            //System.out.println("Received slot " + slot);
         }
 
         Element unitElement = (Element) reply.getChildNodes().item(0);

@@ -827,34 +827,15 @@ public class Game extends FreeColGameObject {
         turn.increase();
         logger.info("Turn is now " + turn.toString());
 
-        Iterator<FreeColGameObject> iterator = ((HashMap<String, FreeColGameObject>) freeColGameObjects.clone())
-                .values().iterator();
+        // TODO: create market for each Europe
+        logger.finer("Calling newTurn for Market");
+        getMarket().newTurn();
 
-        ArrayList<FreeColGameObject> later1 = new ArrayList<FreeColGameObject>();
-        ArrayList<FreeColGameObject> later2 = new ArrayList<FreeColGameObject>();
-        while (iterator.hasNext()) {
-            FreeColGameObject freeColGameObject = iterator.next();
-                        
-            /*
-             * Take the settlements after the buildings and all other objects
-             * before the buildings. If changes are made: ColonyTile should have
-             * it's newTurn method called before Building.
-             */
-            if (freeColGameObject instanceof Settlement) {
-                later2.add(freeColGameObject);
-            } else if (freeColGameObject instanceof Building) {
-                later1.add(freeColGameObject);
-            } else {
-                callNewTurn(freeColGameObject);
-            }
+        for (Player player : players) {
+            logger.finer("Calling newTurn for player " + player.getName());
+            player.newTurn();
         }
 
-        for(FreeColGameObject o : later1) {
-            callNewTurn(o);
-        }
-        for(FreeColGameObject o : later2) {
-            callNewTurn(o);
-        }
     }
 
     /**

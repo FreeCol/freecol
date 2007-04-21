@@ -2105,6 +2105,26 @@ public class Player extends FreeColGameObject implements Nameable {
      * Prepares this <code>Player</code> for a new turn.
      */
     public void newTurn() {
+
+        // units first, so that colonies will profit from pioneer work
+        Iterator<Unit> unitIterator = getUnitIterator();
+        while (unitIterator.hasNext()) {
+            Unit unit = (Unit) unitIterator.next();
+            logger.finest("Calling newTurn for unit " + unit.getName() + " " + unit.getID());
+            unit.newTurn();
+        }
+
+        // settlements next
+        for (Settlement settlement : getSettlements()) {
+            logger.finest("Calling newTurn for settlement " + settlement.toString());
+            settlement.newTurn();
+        }
+
+        if (getEurope() != null) {
+            logger.finest("Calling newTurn for player " + getName() + "'s Europe");
+            getEurope().newTurn();
+        }
+
         if (isEuropean()) {
             if (getBells() >= getTotalFoundingFatherCost() && currentFather != FoundingFather.NONE) {
                 fathers[currentFather] = true;

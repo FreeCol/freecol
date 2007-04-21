@@ -1471,6 +1471,18 @@ public final class Colony extends Settlement implements Location, Nameable {
             }
         }
 
+        // save state of warehouse
+        logger.finest("Saving state of warehouse in " + getName());
+        getGoodsContainer().newTurn();
+
+        // update all colony tiles
+        Iterator<ColonyTile> tileIterator = getColonyTileIterator();
+        while (tileIterator.hasNext()) {
+            ColonyTile tile = tileIterator.next();
+            logger.finest("Calling newTurn for colony tile " + tile.toString());
+            tile.newTurn();
+        }
+
         // Eat food:
         int eat = getFoodConsumption();
         int food = getGoodsCount(Goods.FOOD);
@@ -1515,6 +1527,15 @@ public final class Colony extends Settlement implements Location, Nameable {
 
         // Build:
         checkBuildingComplete();
+
+
+        // update all buildings
+        Iterator<Building> buildingIterator = getBuildingIterator();
+        while (buildingIterator.hasNext()) {
+            Building building = buildingIterator.next();
+            logger.finest("Calling newTurn for building " + building.getName());
+            building.newTurn();
+        }
 
         // Export goods if custom house is built
         if (getBuilding(Building.CUSTOM_HOUSE).isBuilt()) {
