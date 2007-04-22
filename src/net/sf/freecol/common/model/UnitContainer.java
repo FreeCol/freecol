@@ -228,12 +228,6 @@ public class UnitContainer extends FreeColGameObject {
         }
     }
 
-    /**
-     * Prepares this <code>UnitContainer</code> for a new turn.
-     */
-    public void newTurn() {
-
-    }
 
     /**
      * This method writes an XML-representation of this object to the given

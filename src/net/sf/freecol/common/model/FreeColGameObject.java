@@ -168,12 +168,6 @@ abstract public class FreeColGameObject {
         this.game = game;
     }    
 
-    
-    /**
-    * Prepares the object for a new turn.
-    */
-    abstract public void newTurn();
-
 
     /**
     * Removes all references to this object.

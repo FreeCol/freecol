@@ -273,4 +273,6 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         return Settlement.RADIUS;
     }
 
+    public abstract void newTurn();
+
 }

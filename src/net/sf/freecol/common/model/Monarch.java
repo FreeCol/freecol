@@ -461,12 +461,6 @@ public final class Monarch extends FreeColGameObject {
 
     
     /**
-     * Prepares the object for a new turn.
-     */
-    public void newTurn() {
-    }
-    
-    /**
      * This method writes an XML-representation of this object to
      * the given stream.
      * 

@@ -1362,39 +1362,39 @@ public final class Colony extends Settlement implements Location, Nameable {
         return null;
     }
 
-    /**
-     * Prepares this <code>Colony</code> for a new turn.
-     */
-    @Override
-    public void newTurn() {
-        // Skip doing work in enemy colonies.
-        if (unitCount != -1) {
-            return;
-        }
-        if (getTile() == null) {
-            // Fix NullPointerException below
-            logger.warning("Colony " + getName() + " lacks a tile!");
-            return;
-        }
-        // Repair any damaged ships:
+
+    // Repair any damaged ships:
+    private void repairShips() {
         for (Unit unit : getTile().getUnitList()) {
             if (unit.isNaval() && unit.isUnderRepair()) {
                 unit.setHitpoints(unit.getHitpoints() + 1);
             }
         }
-        // save state of warehouse
+    }
+
+    // Save state of warehouse
+    private void saveWarehouseState() {
         logger.finest("Saving state of warehouse in " + getName());
-        getGoodsContainer().newTurn();
-        // update all colony tiles
+        getGoodsContainer().saveState();
+    }
+
+
+    // Update all colony tiles
+    private void addColonyTileProduction() {
         Iterator<ColonyTile> tileIterator = getColonyTileIterator();
         while (tileIterator.hasNext()) {
             ColonyTile tile = tileIterator.next();
             logger.finest("Calling newTurn for colony tile " + tile.toString());
             tile.newTurn();
         }
-        // Eat food:
+    }
+
+
+    // Eat food:
+    private void updateFood() {
         int eat = getFoodConsumption();
         int food = getGoodsCount(Goods.FOOD);
+
         if (eat > food) {
             // Kill a colonist:
             getRandomUnit().dispose();
@@ -1403,13 +1403,18 @@ public final class Colony extends Settlement implements Location, Nameable {
                     ModelMessage.UNIT_LOST);
         } else {
             removeGoods(Goods.FOOD, eat);
+
             if (eat > getFoodProduction() && (food - eat) / (eat - getFoodProduction()) <= 3) {
                 addModelMessage(this, "model.colony.famineFeared", new String[][] { { "%colony%", getName() },
                         { "%number%", Integer.toString((food - eat) / (eat - getFoodProduction())) } },
                         ModelMessage.WARNING);
             }
         }
-        // Breed horses:
+    }
+
+
+    // Breed horses:
+    private void updateHorses() {
         int horseProduction = getHorseProduction();
         if (horseProduction != 0) {
             if (!getBuilding(Building.STABLES).isBuilt()) {
@@ -1420,25 +1425,34 @@ public final class Colony extends Settlement implements Location, Nameable {
                 addGoods(Goods.HORSES, horseProduction);
             }
         }
-        // Create a new colonist if there is enough food:
+    }
+
+    // Create a new colonist if there is enough food:
+    private void checkForNewColonist() {
         if (getGoodsCount(Goods.FOOD) >= 200) {
             Unit u = getGame().getModelController().createUnit(getID() + "newTurn200food", getTile(), getOwner(),
-                    Unit.FREE_COLONIST);
+                                                               Unit.FREE_COLONIST);
             removeGoods(Goods.FOOD, 200);
             addModelMessage(this, "model.colony.newColonist", new String[][] { { "%colony%", getName() } },
-                    ModelMessage.UNIT_ADDED);
+                            ModelMessage.UNIT_ADDED);
             logger.info("New colonist created in " + getName() + " with ID=" + u.getID());
         }
-        // Build:
-        checkBuildingComplete();
-        // update all buildings
+    }
+
+
+    // Update all buildings
+    private void addBuildingProduction() {
         Iterator<Building> buildingIterator = getBuildingIterator();
         while (buildingIterator.hasNext()) {
             Building building = buildingIterator.next();
             logger.finest("Calling newTurn for building " + building.getName());
             building.newTurn();
         }
-        // Export goods if custom house is built
+    }
+
+
+    // Export goods if custom house is built
+    private void exportGoods() {
         if (getBuilding(Building.CUSTOM_HOUSE).isBuilt()) {
             Iterator<Goods> goodsIterator = getCompactGoodsIterator();
             while (goodsIterator.hasNext()) {
@@ -1453,27 +1467,29 @@ public final class Colony extends Settlement implements Location, Nameable {
                 }
             }
         }
-        // Throw away goods there is no room for.
-        goodsContainer.cleanAndReport(getWarehouseCapacity(), getLowLevel(), getHighLevel());
-        // Warn about levels that will be exceeded next turn
+    }
+
+
+    // Warn about levels that will be exceeded next turn
+    private void createWarehouseCapacityWarning() {
         for (int goodsType = 1; goodsType < Goods.NUMBER_OF_TYPES; goodsType++) {
             if (goodsContainer.getGoodsCount(goodsType) < getWarehouseCapacity()) {
-                int waste = (goodsContainer.getGoodsCount(goodsType) + getProductionNetOf(goodsType) - getWarehouseCapacity());
+                int waste = (goodsContainer.getGoodsCount(goodsType) + getProductionNetOf(goodsType) -
+                             getWarehouseCapacity());
                 if (waste > 0) {
-                    addModelMessage(this, "model.building.warehouseSoonFull", new String[][] {
-                            { "%goods%", Goods.getName(goodsType) }, { "%colony%", getName() },
-                            { "%amount%", String.valueOf(waste) } }, ModelMessage.WAREHOUSE_CAPACITY, new Goods(
-                            goodsType));
+                    addModelMessage(this, "model.building.warehouseSoonFull",
+                                    new String [][] {{"%goods%", Goods.getName(goodsType)},
+                                                     {"%colony%", getName()},
+                                                     {"%amount%", String.valueOf(waste)}},
+                                    ModelMessage.WAREHOUSE_CAPACITY,
+                                    new Goods(goodsType));
                 }
             }
         }
-        // Remove bells:
-        bells -= Math.max(0, getUnitCount() - 2);
-        if (bells < 0) {
-            bells = 0;
-        }
-        // Update SoL:
-        updateSoL();
+    }
+
+
+    private void createSoLMessages() {
         final int difficulty = getOwner().getDifficulty();
         final int veryBadGovernment = 10 - difficulty;
         final int badGovernment = 6 - difficulty;
@@ -1490,6 +1506,7 @@ public final class Colony extends Settlement implements Location, Nameable {
                         ModelMessage.SONS_OF_LIBERTY, new Goods(Goods.BELLS));
             }
         }
+
         int bonus = 0;
         if (sonsOfLiberty == 100) {
             // there are no tories left
@@ -1532,16 +1549,68 @@ public final class Colony extends Settlement implements Location, Nameable {
                         ModelMessage.GOVERNMENT_EFFICIENCY, new Goods(Goods.BELLS));
             }
         }
-        // Remember current SoL and tories for check changes at the next turn
-        oldSonsOfLiberty = sonsOfLiberty;
-        oldTories = tories;
+
         // TODO-LATER: REMOVE THIS WHEN THE AI CAN HANDLE PRODUCTION PENALTIES:
         if (getOwner().isAI()) {
             productionBonus = Math.max(0, bonus);
         } else {
             productionBonus = bonus;
         }
+
     }
+
+
+    /**
+     * Prepares this <code>Colony</code> for a new turn.
+     */
+    @Override
+    public void newTurn() {
+        // Skip doing work in enemy colonies.
+        if (unitCount != -1) {
+            return;
+        }
+
+        if (getTile() == null) {
+            // Fix NullPointerException below
+            logger.warning("Colony " + getName() + " lacks a tile!");
+            return;
+        }
+
+        // TODO: make warehouse a building
+        saveWarehouseState();
+
+        addColonyTileProduction();
+        updateFood();
+        updateHorses();
+        checkForNewColonist();
+
+        // The following tasks consume lumber/tools,
+        // or may do so in the future
+        repairShips();
+        checkBuildingComplete();
+
+        addBuildingProduction();
+        exportGoods();
+        // Throw away goods there is no room for.
+        goodsContainer.cleanAndReport(getWarehouseCapacity(), getLowLevel(), getHighLevel());
+        // TODO: make warehouse a building
+        createWarehouseCapacityWarning();
+
+        // Remove bells:
+        bells -= Math.max(0, getUnitCount() - 2);
+        if (bells < 0) {
+            bells = 0;
+        }
+
+        // Update SoL:
+        updateSoL();
+        createSoLMessages();
+        // Remember current SoL and tories for check changes at the next turn
+        oldSonsOfLiberty = sonsOfLiberty;
+        oldTories = tories;
+
+    }
+
 
     /**
      * Returns the capacity of this colony's warehouse. All goods above this

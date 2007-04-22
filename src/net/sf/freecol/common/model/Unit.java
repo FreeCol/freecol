@@ -4166,16 +4166,14 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             logger.finest("About to call getRandom for experience");
             int random = getGame().getModelController().getRandom(getID() + "experience", 5000);
             if (random < Math.min(experience, 200)) {
-                logger.finest("About to change type of unit.");
+                logger.finest("About to change type of unit due to experience.");
                 String oldName = getName();
                 setType(((ColonyTile) location).getExpertForProducing(workType));
-                logger.finest("About to add model message.");
                 addModelMessage(getTile().getColony(), "model.unit.experience",
                         new String[][] { { "%oldName%", oldName }, { "%newName%", getName() },
                                 { "%nation%", owner.getNationAsString() } }, ModelMessage.UNIT_IMPROVED, this);
             }
         }
-        logger.finest("About to change moves left.");
         movesLeft = getInitialMovesLeft();
         doAssignedWork();
     }

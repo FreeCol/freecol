@@ -1357,12 +1357,6 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
         return forested ? t.whenForested.defenceBonus : t.defenceBonus;
     }
 
-    /**
-     * Prepares this <code>Tile</code> for a new turn.
-     */
-    public void newTurn() {
-        // Nothing here ????
-    }
 
     /**
      * This method writes an XML-representation of this object to the given

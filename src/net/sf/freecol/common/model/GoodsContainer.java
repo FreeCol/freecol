@@ -334,7 +334,7 @@ public class GoodsContainer extends FreeColGameObject {
     /**
     * Prepares this <code>GoodsContainer</code> for a new turn.
     */
-    public void newTurn() {
+    public void saveState() {
 
         for (int i = 0; i < Goods.NUMBER_OF_TYPES; i++) {
             oldStoredGoods[i] = storedGoods[i];

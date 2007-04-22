@@ -633,82 +633,91 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     /**
      * Prepares this <code>Building</code> for a new turn.
      */
-    @Override
     public void newTurn() {
-        if ((level == NOT_BUILT) && (type != CHURCH))
-            return; // Don't do anything if the building does not exist.
-
-        if (type == SCHOOLHOUSE) {
-            Iterator<Unit> i = getUnitIterator();
-            while (i.hasNext()) {
-                Unit teacher = i.next();
-                Unit student = getUnitToTrain(teacher.getType());
-
-                if (student != null) {
-                    if (student.getTrainingType() != teacher.getType()
-                            && student.getTrainingType() != Unit.FREE_COLONIST) {
-                        student.setTrainingType(teacher.getType());
-                        student.setTurnsOfTraining(0);
-                    }
-
-                    student.setTurnsOfTraining(student.getTurnsOfTraining() + ((colony.getSoL() == 100) ? 2 : 1));
-
-                    if (student.getTurnsOfTraining() >= student.getNeededTurnsOfTraining()) {
-                        String oldName = student.getName();
-
-                        if (student.getType() == Unit.INDENTURED_SERVANT) {
-                            student.setType(Unit.FREE_COLONIST);
-                        } else if (student.getType() == Unit.PETTY_CRIMINAL) {
-                            student.setType(Unit.INDENTURED_SERVANT);
-                        } else {
-                            student.setType(student.getTrainingType());
-                        }
-
-                        student.setTrainingType(-1);
-                        student.setTurnsOfTraining(0);
-                        addModelMessage(getColony(), "model.unit.unitImproved", new String[][] {
-                                { "%oldName%", oldName }, { "%newName%", student.getName() },
-                                { "%nation%", getOwner().getNationAsString() } }, ModelMessage.UNIT_IMPROVED, student);
-                    }
-                } else {
-                    addModelMessage(getColony(), "model.building.noStudent", new String[][] {
-                            { "%teacher%", teacher.getName() }, { "%colony%", colony.getName() } },
-                            ModelMessage.WARNING, teacher);
-                }
-            }
+        if ((level == NOT_BUILT) && (type != CHURCH)) {
+            // Don't do anything if the building does not exist.
+            return; 
+        } else if (type == SCHOOLHOUSE) {
+            trainStudent();
         } else if (getGoodsOutputType() != -1) {
-            int goodsInput = getGoodsInput();
-            int goodsOutput = getProduction();
-            int goodsInputType = getGoodsInputType();
-            int goodsOutputType = getGoodsOutputType();
+            produceGoods();
+        }
+    }
 
-            if (goodsInput == 0 && getMaximumGoodsInput() > 0) {
-                addModelMessage(getColony(), "model.building.notEnoughInput", new String[][] {
-                        { "%inputGoods%", Goods.getName(goodsInputType) }, { "%building%", getName() },
-                        { "%colony%", colony.getName() } }, ModelMessage.MISSING_GOODS, new Goods(goodsInputType));
+    private void produceGoods() {
+        int goodsInput = getGoodsInput();
+        int goodsOutput = getProduction();
+        int goodsInputType = getGoodsInputType();
+        int goodsOutputType = getGoodsOutputType();
+
+        if (goodsInput == 0 && getMaximumGoodsInput() > 0) {
+            addModelMessage(getColony(), "model.building.notEnoughInput", new String[][] {
+                { "%inputGoods%", Goods.getName(goodsInputType) }, { "%building%", getName() },
+                { "%colony%", colony.getName() } }, ModelMessage.MISSING_GOODS, new Goods(goodsInputType));
+        }
+
+        if (goodsOutput <= 0)
+            return;
+
+        // Actually produce the goods:
+        if (goodsOutputType == Goods.CROSSES) {
+            colony.getOwner().incrementCrosses(goodsOutput);
+        } else if (goodsOutputType == Goods.BELLS) {
+            colony.getOwner().incrementBells(goodsOutput);
+            colony.addBells(goodsOutput);
+        } else {
+            colony.removeGoods(goodsInputType, goodsInput);
+
+            if (goodsOutputType == Goods.HAMMERS) {
+                colony.addHammers(goodsOutput);
+                return;
             }
 
-            if (goodsOutput <= 0)
-                return;
+            colony.addGoods(goodsOutputType, goodsOutput);
+        }
+    }
+    
 
-            // Actually produce the goods:
-            if (goodsOutputType == Goods.CROSSES) {
-                colony.getOwner().incrementCrosses(goodsOutput);
-            } else if (goodsOutputType == Goods.BELLS) {
-                colony.getOwner().incrementBells(goodsOutput);
-                colony.addBells(goodsOutput);
-            } else {
-                colony.removeGoods(goodsInputType, goodsInput);
+    private void trainStudent() {
+        Iterator<Unit> i = getUnitIterator();
+        while (i.hasNext()) {
+            Unit teacher = i.next();
+            Unit student = getUnitToTrain(teacher.getType());
 
-                if (goodsOutputType == Goods.HAMMERS) {
-                    colony.addHammers(goodsOutput);
-                    return;
+            if (student != null) {
+                if (student.getTrainingType() != teacher.getType()
+                    && student.getTrainingType() != Unit.FREE_COLONIST) {
+                    student.setTrainingType(teacher.getType());
+                    student.setTurnsOfTraining(0);
                 }
 
-                colony.addGoods(goodsOutputType, goodsOutput);
+                student.setTurnsOfTraining(student.getTurnsOfTraining() + ((colony.getSoL() == 100) ? 2 : 1));
+
+                if (student.getTurnsOfTraining() >= student.getNeededTurnsOfTraining()) {
+                    String oldName = student.getName();
+
+                    if (student.getType() == Unit.INDENTURED_SERVANT) {
+                        student.setType(Unit.FREE_COLONIST);
+                    } else if (student.getType() == Unit.PETTY_CRIMINAL) {
+                        student.setType(Unit.INDENTURED_SERVANT);
+                    } else {
+                        student.setType(student.getTrainingType());
+                    }
+
+                    student.setTrainingType(-1);
+                    student.setTurnsOfTraining(0);
+                    addModelMessage(getColony(), "model.unit.unitImproved", new String[][] {
+                        { "%oldName%", oldName }, { "%newName%", student.getName() },
+                        { "%nation%", getOwner().getNationAsString() } }, ModelMessage.UNIT_IMPROVED, student);
+                }
+            } else {
+                addModelMessage(getColony(), "model.building.noStudent", new String[][] {
+                    { "%teacher%", teacher.getName() }, { "%colony%", colony.getName() } },
+                                ModelMessage.WARNING, teacher);
             }
         }
     }
+
 
     /**
      * Returns the type of goods this <code>Building</code> produces.

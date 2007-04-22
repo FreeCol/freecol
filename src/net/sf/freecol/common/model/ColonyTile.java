@@ -387,36 +387,40 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     * Prepares this <code>ColonyTile</code> for a new turn.
     */
     public void newTurn() {
-        if ((getUnit() == null) && !(isColonyCenterTile())) {
-            return; // Produce nothing if there's nobody to work the terrain.
+        if (isColonyCenterTile()) {
+            produceGoodsCenterTile();
+        } else if (getUnit() != null) {
+            produceGoods();
         }
+    }
 
-        if (!(isColonyCenterTile())) {
-            int amount = getUnit().getFarmedPotential(getUnit().getWorkType(), workTile);
+    private void produceGoods() {
+        int amount = getUnit().getFarmedPotential(getUnit().getWorkType(), workTile);
 
-            if (!workTile.isLand() && !colony.getBuilding(Building.DOCK).isBuilt()) {
-                amount = 0;
-            }
+        if (!workTile.isLand() && !colony.getBuilding(Building.DOCK).isBuilt()) {
+            amount = 0;
+        }
+        
+        if (amount > 0) {
+            //amount += colony.getProductionBonus();
+            //if (amount < 1) amount = 1;
+            colony.addGoods(getUnit().getWorkType(), amount);
+            unit.modifyExperience(amount);
+        }
+    }
 
-            if (amount > 0) {
-                //amount += colony.getProductionBonus();
-                //if (amount < 1) amount = 1;
-                colony.addGoods(getUnit().getWorkType(), amount);
-                unit.modifyExperience(amount);
-            }
-        } else {
-            int amount1 = workTile.potential(Goods.FOOD);
-            colony.addGoods(Goods.FOOD, amount1);
+    private void produceGoodsCenterTile() {
+        int amount1 = workTile.potential(Goods.FOOD);
+        colony.addGoods(Goods.FOOD, amount1);
 
-            int type2 = workTile.secondaryGoods();
-            int amount2 = workTile.potential(type2);
-            colony.addGoods(type2, amount2);
+        int type2 = workTile.secondaryGoods();
+        int amount2 = workTile.potential(type2);
+        colony.addGoods(type2, amount2);
             
-            if (unit != null) {
-                getWorkTile().setOwner(getColony());
-            } else {
-                getWorkTile().setOwner(null);
-            }
+        if (unit != null) {
+            getWorkTile().setOwner(getColony());
+        } else {
+            getWorkTile().setOwner(null);
         }
     }
 

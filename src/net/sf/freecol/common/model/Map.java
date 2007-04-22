@@ -1680,10 +1680,6 @@ public class Map extends FreeColGameObject {
         }
     }
 
-    @Override
-    public void newTurn() {
-
-    }
 
     /**
      * This method writes an XML-representation of this object to the given

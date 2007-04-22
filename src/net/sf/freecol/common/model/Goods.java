@@ -333,14 +333,6 @@ public class Goods implements Locatable, Ownable, Nameable {
         setAmount((getAmount() > maxAmount) ? maxAmount : getAmount());
     }
 
-
-    /**
-    * Prepares the <code>Goods</code> for a new turn.
-    */
-    public void newTurn() {
-
-    }
-
     /**
     * Loads the cargo onto a carrier that is on the same tile.
     *
