@@ -5,15 +5,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.HashMap;
 import java.util.logging.Logger;
-
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
-
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Map.Position;
-
 import org.w3c.dom.Element;
 
 /**
@@ -22,7 +19,6 @@ import org.w3c.dom.Element;
  * <code>Colony</code> where working is possible.
  */
 public final class Colony extends Settlement implements Location, Nameable {
-
     private static final Logger logger = Logger.getLogger(Colony.class.getName());
 
     public static final String COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
@@ -43,6 +39,7 @@ public final class Colony extends Settlement implements Location, Nameable {
      * <code>ColonyTile</code>.
      */
     private ArrayList<WorkLocation> workLocations = new ArrayList<WorkLocation>();
+
     private HashMap buildingMap = new HashMap();
 
     private int hammers;
@@ -65,9 +62,8 @@ public final class Colony extends Settlement implements Location, Nameable {
     private int productionBonus;
 
     /**
-     * Identifies what this colony is currently building.
-     * 
-     * This is the type of the "Building" that is being built, or if
+     * Identifies what this colony is currently building. This is the type of
+     * the "Building" that is being built, or if
      * <code>currentlyBuilding >= BUILDING_UNIT_ADDITION</code> the type of
      * the <code>Unit</code> (+BUILDING_UNIT_ADDITION) that is currently
      * beeing build
@@ -114,7 +110,6 @@ public final class Colony extends Settlement implements Location, Nameable {
      */
     public Colony(Game game, Player owner, String name, Tile tile) {
         super(game, owner, tile);
-
         Iterator<Position> exploreIt = getGame().getMap().getCircleIterator(getTile().getPosition(), true,
                 getLineOfSight());
         while (exploreIt.hasNext()) {
@@ -122,17 +117,13 @@ public final class Colony extends Settlement implements Location, Nameable {
             t.setExploredBy(owner, true);
         }
         owner.invalidateCanSeeTiles();
-
         goodsContainer = new GoodsContainer(game, this);
         initializeWarehouseSettings();
-
         this.name = name;
-
         hammers = 0;
         bells = 0;
         sonsOfLiberty = 0;
         oldSonsOfLiberty = 0;
-
         Map map = game.getMap();
         int ownerNation = owner.getNation();
         tile.setNationOwner(ownerNation);
@@ -147,9 +138,7 @@ public final class Colony extends Settlement implements Location, Nameable {
                 landLocked = false;
             }
         }
-
         addWorkLocation(new ColonyTile(game, this, tile));
-
         int numberOfTypes = FreeCol.specification.numberOfBuildingTypes();
         for (int type = 0; type < numberOfTypes; type++) {
             BuildingType buildingType = FreeCol.specification.buildingType(type);
@@ -159,7 +148,6 @@ public final class Colony extends Settlement implements Location, Nameable {
                 addWorkLocation(new Building(game, this, type, Building.HOUSE));
             }
         }
-
         if (landLocked)
             currentlyBuilding = Building.WAREHOUSE;
         else
@@ -175,7 +163,6 @@ public final class Colony extends Settlement implements Location, Nameable {
      */
     public Colony(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
-
         readFromXML(in);
     }
 
@@ -187,7 +174,6 @@ public final class Colony extends Settlement implements Location, Nameable {
      */
     public Colony(Game game, Element e) {
         super(game, e);
-
         readFromXMLElement(e);
     }
 
@@ -225,7 +211,6 @@ public final class Colony extends Settlement implements Location, Nameable {
 
     /**
      * Updates SoL and builds stockade if possible.
-     * 
      */
     public void updatePopulation() {
         if (getUnitCount() >= 3 && getOwner().hasFather(FoundingFather.LA_SALLE)) {
@@ -234,7 +219,6 @@ public final class Colony extends Settlement implements Location, Nameable {
             }
         }
         getTile().updatePlayerExploredTiles();
-
         if (getUnitCount() > 0) {
             updateSoL();
         }
@@ -327,18 +311,15 @@ public final class Colony extends Settlement implements Location, Nameable {
         // TODO: Erik - this only works if called on the server!
         super.setOwner(owner);
         tile.setNationOwner(owner.getNation());
-
         for (Unit unit : getUnitList()) {
             unit.setOwner(owner);
             if (unit.getLocation() instanceof ColonyTile) {
                 ((ColonyTile) unit.getLocation()).getWorkTile().setNationOwner(owner.getNation());
             }
         }
-
         for (Unit target : tile.getUnitList()) {
             target.setOwner(getOwner());
         }
-
         // Changing the owner might alter bonuses applied by founding fathers:
         updatePopulation();
     }
@@ -410,7 +391,6 @@ public final class Colony extends Settlement implements Location, Nameable {
         default:
             b = null;
         }
-
         return (b != null && b.isBuilt()) ? b : null;
     }
 
@@ -449,7 +429,6 @@ public final class Colony extends Settlement implements Location, Nameable {
         default:
             b = null;
         }
-
         if (b != null && b.isBuilt()) {
             return b;
         }
@@ -493,13 +472,11 @@ public final class Colony extends Settlement implements Location, Nameable {
      */
     public Iterator<ColonyTile> getColonyTileIterator() {
         ArrayList<ColonyTile> b = new ArrayList<ColonyTile>();
-
         for (WorkLocation location : workLocations) {
             if (location instanceof ColonyTile) {
                 b.add((ColonyTile) location);
             }
         }
-
         return b.iterator();
     }
 
@@ -511,17 +488,12 @@ public final class Colony extends Settlement implements Location, Nameable {
      */
     public Building getBuilding(int type) {
         return (Building) buildingMap.get(new Integer(type));
-        
-        /*Iterator<Building> buildingIterator = getBuildingIterator();
-
-        while (buildingIterator.hasNext()) {
-            Building building = buildingIterator.next();
-            if (building.getType() == type) {
-                return building;
-            }
-        }
-
-        return null;*/
+        /*
+         * Iterator<Building> buildingIterator = getBuildingIterator(); while
+         * (buildingIterator.hasNext()) { Building building =
+         * buildingIterator.next(); if (building.getType() == type) { return
+         * building; } } return null;
+         */
     }
 
     /**
@@ -534,7 +506,6 @@ public final class Colony extends Settlement implements Location, Nameable {
      */
     public ColonyTile getColonyTile(int x, int y) {
         Tile t = getTile(x, y);
-
         Iterator<ColonyTile> i = getColonyTileIterator();
         while (i.hasNext()) {
             ColonyTile c = i.next();
@@ -542,7 +513,6 @@ public final class Colony extends Settlement implements Location, Nameable {
                 return c;
             }
         }
-
         return null;
     }
 
@@ -578,7 +548,6 @@ public final class Colony extends Settlement implements Location, Nameable {
         if (w != null && w.canAdd(locatable) && getVacantColonyTileProductionFor(locatable, Goods.FOOD) > 0) {
             return w;
         }
-
         Iterator<Building> i = getBuildingIterator();
         while (i.hasNext()) {
             w = i.next();
@@ -586,7 +555,6 @@ public final class Colony extends Settlement implements Location, Nameable {
                 return w;
             }
         }
-
         Iterator<WorkLocation> it = getWorkLocationIterator();
         while (it.hasNext()) {
             w = it.next();
@@ -594,7 +562,6 @@ public final class Colony extends Settlement implements Location, Nameable {
                 return w;
             }
         }
-
         return null;
     }
 
@@ -617,7 +584,6 @@ public final class Colony extends Settlement implements Location, Nameable {
             } else {
                 locatable.setLocation(getTile());
             }
-
             updatePopulation();
         } else if (locatable instanceof Goods) {
             goodsContainer.addGoods((Goods) locatable);
@@ -660,17 +626,14 @@ public final class Colony extends Settlement implements Location, Nameable {
     @Override
     public int getUnitCount() {
         int count = 0;
-
         if (unitCount != -1) {
             return unitCount;
         }
-
         Iterator<WorkLocation> i = getWorkLocationIterator();
         while (i.hasNext()) {
             WorkLocation w = i.next();
             count += w.getUnitCount();
         }
-
         return count;
     }
 
@@ -791,7 +754,6 @@ public final class Colony extends Settlement implements Location, Nameable {
         if (locatable instanceof Unit && ((Unit) locatable).getOwner() == getOwner()) {
             return true;
         }
-
         return false;
     }
 
@@ -829,26 +791,17 @@ public final class Colony extends Settlement implements Location, Nameable {
     private Unit getDefendingUnit() {
         // Sanity check - are there units available?
         List<Unit> unitList = getUnitList();
-
         if (unitList.isEmpty()) {
             throw new IllegalStateException("Colony " + name + " contains no units!");
         }
-
         // Get the first unit
         Unit defender = unitList.get(0);
-
-        /* don't do that here!
-        // Paul Revere present? If so, arm it
-        if (getOwner().hasFather(FoundingFather.PAUL_REVERE)) {
-            if (getGoodsCount(Goods.MUSKETS) >= 50) {
-                defender.setArmed(true);
-            }
-            if (getGoodsCount(Goods.HORSES) >= 50) {
-                defender.setMounted(true);
-            }
-        }
-        */
-
+        /*
+         * don't do that here! // Paul Revere present? If so, arm it if
+         * (getOwner().hasFather(FoundingFather.PAUL_REVERE)) { if
+         * (getGoodsCount(Goods.MUSKETS) >= 50) { defender.setArmed(true); } if
+         * (getGoodsCount(Goods.HORSES) >= 50) { defender.setMounted(true); } }
+         */
         // Done!
         return defender;
     }
@@ -864,7 +817,6 @@ public final class Colony extends Settlement implements Location, Nameable {
                     ModelMessage.WARNING);
             return;
         }
-
         // Building only:
         if (currentlyBuilding < BUILDING_UNIT_ADDITION) {
             if (getBuilding(currentlyBuilding).getNextPop() > getUnitCount()) {
@@ -872,13 +824,11 @@ public final class Colony extends Settlement implements Location, Nameable {
                         { "%building%", getBuilding(currentlyBuilding).getNextName() } }, ModelMessage.WARNING);
                 return;
             }
-
             if (getBuilding(currentlyBuilding).getNextHammers() == -1) {
                 addModelMessage(this, "model.colony.alreadyBuilt", new String[][] { { "%colony%", getName() },
                         { "%building%", getBuilding(currentlyBuilding).getName() } }, ModelMessage.WARNING);
             }
         }
-
         hammers += amount;
         checkBuildingComplete();
     }
@@ -893,11 +843,9 @@ public final class Colony extends Settlement implements Location, Nameable {
     public Iterator<Integer> getBuildableUnitIterator() {
         ArrayList<Integer> buildableUnits = new ArrayList<Integer>();
         buildableUnits.add(Unit.WAGON_TRAIN);
-
         if (getBuilding(Building.ARMORY).isBuilt()) {
             buildableUnits.add(Unit.ARTILLERY);
         }
-
         if (getBuilding(Building.DOCK).getLevel() >= Building.FACTORY) {
             buildableUnits.add(Unit.CARAVEL);
             buildableUnits.add(Unit.MERCHANTMAN);
@@ -908,7 +856,6 @@ public final class Colony extends Settlement implements Location, Nameable {
                 buildableUnits.add(Unit.MAN_O_WAR);
             }
         }
-
         return buildableUnits.iterator();
     }
 
@@ -971,7 +918,6 @@ public final class Colony extends Settlement implements Location, Nameable {
         if (getMembers() <= getUnitCount() + 1) {
             bells += amount;
         }
-
         if (bells <= 0) {
             bells = 0;
         }
@@ -985,11 +931,8 @@ public final class Colony extends Settlement implements Location, Nameable {
     public void addSoL(int amount) {
         /*
          * The number of bells to be generated in order to get the appropriate
-         * SoL is determined by the formula:
-         * 
-         * int membership = ...
-         * 
-         * in "updateSoL()":
+         * SoL is determined by the formula: int membership = ... in
+         * "updateSoL()":
          */
         bells += (bells * amount) / 100;
     }
@@ -1021,10 +964,8 @@ public final class Colony extends Settlement implements Location, Nameable {
         if (units == -1) {
             return;
         }
-
         // Update "addSol(int)" and "getMembers()" if this formula gets changed:
         int membership = (bells * 100) / (BELLS_PER_REBEL * getUnitCount());
-
         if (membership < 0)
             membership = 0;
         if (membership > 100)
@@ -1117,16 +1058,13 @@ public final class Colony extends Settlement implements Location, Nameable {
      */
     public int getProductionOf(int goodsType) {
         int amount = 0;
-
         if (goodsType == Goods.HORSES) {
             return getHorseProduction();
         }
-
         Iterator<WorkLocation> workLocationIterator = getWorkLocationIterator();
         while (workLocationIterator.hasNext()) {
             amount += workLocationIterator.next().getProductionOf(goodsType);
         }
-
         return amount;
     }
 
@@ -1146,11 +1084,9 @@ public final class Colony extends Settlement implements Location, Nameable {
     public ColonyTile getVacantColonyTileFor(Unit unit, int goodsType) {
         ColonyTile bestPick = null;
         int highestProduction = -2;
-
         Iterator<ColonyTile> colonyTileIterator = getColonyTileIterator();
         while (colonyTileIterator.hasNext()) {
             ColonyTile colonyTile = colonyTileIterator.next();
-
             if (colonyTile.canAdd(unit)) {
                 Tile workTile = colonyTile.getWorkTile();
                 /*
@@ -1167,7 +1103,6 @@ public final class Colony extends Settlement implements Location, Nameable {
                 }
             }
         }
-
         return bestPick;
     }
 
@@ -1199,9 +1134,7 @@ public final class Colony extends Settlement implements Location, Nameable {
         }
         int maxAmount = Math.max(1, getGoodsCount(Goods.HORSES) / 10);
         int maxSpace = Math.max(0, getWarehouseCapacity() - getGoodsCount(Goods.HORSES));
-
         return Math.min(maxAmount, maxSpace);
-
     }
 
     /**
@@ -1212,15 +1145,12 @@ public final class Colony extends Settlement implements Location, Nameable {
     public int getHorseProduction() {
         int surplus = getFoodProduction() - getFoodConsumption();
         int potential = getPotentialHorseProduction();
-
         if (getGoodsCount(Goods.HORSES) >= 2 && surplus > 1) {
             if (!getBuilding(Building.STABLES).isBuilt()) {
                 return Math.min(surplus / 2, potential);
             }
-
             return Math.min(surplus, potential);
         }
-
         return 0;
     }
 
@@ -1257,12 +1187,9 @@ public final class Colony extends Settlement implements Location, Nameable {
         if (lastVisited == getGame().getTurn().getNumber()) {
             return;
         }
-
         lastVisited = getGame().getTurn().getNumber();
-
         if (getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) {
             int unitType = getCurrentlyBuilding() - BUILDING_UNIT_ADDITION;
-
             if (canBuildUnit(unitType) && Unit.getNextHammers(unitType) <= getHammers()
                     && Unit.getNextHammers(unitType) != -1) {
                 if (Unit.getNextTools(unitType) <= getGoodsCount(Goods.TOOLS)) {
@@ -1280,7 +1207,6 @@ public final class Colony extends Settlement implements Location, Nameable {
         } else if (currentlyBuilding != -1) {
             int hammersRequired = getBuilding(currentlyBuilding).getNextHammers();
             int toolsRequired = getBuilding(currentlyBuilding).getNextTools();
-
             if ((hammers >= hammersRequired) && (hammersRequired != -1)) {
                 hammers = hammersRequired;
                 if (getGoodsCount(Goods.TOOLS) >= toolsRequired) {
@@ -1318,7 +1244,6 @@ public final class Colony extends Settlement implements Location, Nameable {
     public int getPriceForBuilding() {
         // Any changes in this method should also be reflected in
         // "payForBuilding()"
-
         int hammersRemaining = 0;
         int toolsRemaining = 0;
         if (getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) {
@@ -1329,10 +1254,8 @@ public final class Colony extends Settlement implements Location, Nameable {
             hammersRemaining = Math.max(getBuilding(currentlyBuilding).getNextHammers() - hammers, 0);
             toolsRemaining = Math.max(getBuilding(currentlyBuilding).getNextTools() - getGoodsCount(Goods.TOOLS), 0);
         }
-
         int price = hammersRemaining * getGameOptions().getInteger(GameOptions.HAMMER_PRICE)
                 + (getGame().getMarket().getBidPrice(Goods.TOOLS, toolsRemaining) * 110) / 100;
-
         return price;
     }
 
@@ -1347,11 +1270,9 @@ public final class Colony extends Settlement implements Location, Nameable {
     public void payForBuilding() {
         // Any changes in this method should also be reflected in
         // "getPriceForBuilding()"
-
         if (getPriceForBuilding() > getOwner().getGold()) {
             throw new IllegalStateException("Not enough gold.");
         }
-
         int hammersRemaining = 0;
         int toolsRemaining = 0;
         if (getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) {
@@ -1364,7 +1285,6 @@ public final class Colony extends Settlement implements Location, Nameable {
             toolsRemaining = Math.max(getBuilding(currentlyBuilding).getNextTools() - getGoodsCount(Goods.TOOLS), 0);
             hammers = Math.max(getBuilding(currentlyBuilding).getNextHammers(), hammers);
         }
-
         if (hammersRemaining > 0) {
             getOwner().modifyGold(-hammersRemaining * getGameOptions().getInteger(GameOptions.HAMMER_PRICE));
         }
@@ -1384,7 +1304,6 @@ public final class Colony extends Settlement implements Location, Nameable {
         if (defender == null) {
             throw new NullPointerException();
         }
-
         Building building = getBuilding(Building.STOCKADE);
         switch (result) {
         case Unit.ATTACK_EVADES:
@@ -1415,9 +1334,8 @@ public final class Colony extends Settlement implements Location, Nameable {
     }
 
     /**
-     * Returns a random unit from this colony.
-     * 
-     * At this moment, this method always returns the first unit in the colony.
+     * Returns a random unit from this colony. At this moment, this method
+     * always returns the first unit in the colony.
      * 
      * @return A random unit from this <code>Colony</code>. This
      *         <code>Unit</code> will either be working in a {@link Building}
@@ -1425,16 +1343,13 @@ public final class Colony extends Settlement implements Location, Nameable {
      */
     public Unit getRandomUnit() {
         return getFirstUnit();
-//        return getUnitIterator().hasNext() ? getUnitIterator().next() : null;
+        // return getUnitIterator().hasNext() ? getUnitIterator().next() : null;
     }
 
     private Unit getFirstUnit() {
-        ArrayList units = new ArrayList();
-
         Iterator wli = getWorkLocationIterator();
         while (wli.hasNext()) {
             WorkLocation wl = (WorkLocation) wli.next();
-
             Iterator unitIterator = wl.getUnitIterator();
             while (unitIterator.hasNext()) {
                 Object o = unitIterator.next();
@@ -1446,8 +1361,6 @@ public final class Colony extends Settlement implements Location, Nameable {
         return null;
     }
 
-
-
     /**
      * Prepares this <code>Colony</code> for a new turn.
      */
@@ -1457,24 +1370,20 @@ public final class Colony extends Settlement implements Location, Nameable {
         if (unitCount != -1) {
             return;
         }
-
         if (getTile() == null) {
             // Fix NullPointerException below
             logger.warning("Colony " + getName() + " lacks a tile!");
             return;
         }
-
         // Repair any damaged ships:
         for (Unit unit : getTile().getUnitList()) {
             if (unit.isNaval() && unit.isUnderRepair()) {
                 unit.setHitpoints(unit.getHitpoints() + 1);
             }
         }
-
         // save state of warehouse
         logger.finest("Saving state of warehouse in " + getName());
         getGoodsContainer().newTurn();
-
         // update all colony tiles
         Iterator<ColonyTile> tileIterator = getColonyTileIterator();
         while (tileIterator.hasNext()) {
@@ -1482,11 +1391,9 @@ public final class Colony extends Settlement implements Location, Nameable {
             logger.finest("Calling newTurn for colony tile " + tile.toString());
             tile.newTurn();
         }
-
         // Eat food:
         int eat = getFoodConsumption();
         int food = getGoodsCount(Goods.FOOD);
-
         if (eat > food) {
             // Kill a colonist:
             getRandomUnit().dispose();
@@ -1495,14 +1402,12 @@ public final class Colony extends Settlement implements Location, Nameable {
                     ModelMessage.UNIT_LOST);
         } else {
             removeGoods(Goods.FOOD, eat);
-
             if (eat > getFoodProduction() && (food - eat) / (eat - getFoodProduction()) <= 3) {
                 addModelMessage(this, "model.colony.famineFeared", new String[][] { { "%colony%", getName() },
                         { "%number%", Integer.toString((food - eat) / (eat - getFoodProduction())) } },
                         ModelMessage.WARNING);
             }
         }
-
         // Breed horses:
         int horseProduction = getHorseProduction();
         if (horseProduction != 0) {
@@ -1514,7 +1419,6 @@ public final class Colony extends Settlement implements Location, Nameable {
                 addGoods(Goods.HORSES, horseProduction);
             }
         }
-
         // Create a new colonist if there is enough food:
         if (getGoodsCount(Goods.FOOD) >= 200) {
             Unit u = getGame().getModelController().createUnit(getID() + "newTurn200food", getTile(), getOwner(),
@@ -1524,11 +1428,8 @@ public final class Colony extends Settlement implements Location, Nameable {
                     ModelMessage.UNIT_ADDED);
             logger.info("New colonist created in " + getName() + " with ID=" + u.getID());
         }
-
         // Build:
         checkBuildingComplete();
-
-
         // update all buildings
         Iterator<Building> buildingIterator = getBuildingIterator();
         while (buildingIterator.hasNext()) {
@@ -1536,7 +1437,6 @@ public final class Colony extends Settlement implements Location, Nameable {
             logger.finest("Calling newTurn for building " + building.getName());
             building.newTurn();
         }
-
         // Export goods if custom house is built
         if (getBuilding(Building.CUSTOM_HOUSE).isBuilt()) {
             Iterator<Goods> goodsIterator = getCompactGoodsIterator();
@@ -1552,33 +1452,25 @@ public final class Colony extends Settlement implements Location, Nameable {
                 }
             }
         }
-
         // Throw away goods there is no room for.
         goodsContainer.cleanAndReport(getWarehouseCapacity(), getLowLevel(), getHighLevel());
-
         // Warn about levels that will be exceeded next turn
         for (int goodsType = 1; goodsType < Goods.NUMBER_OF_TYPES; goodsType++) {
             if (goodsContainer.getGoodsCount(goodsType) < getWarehouseCapacity()) {
-                int waste = (goodsContainer.getGoodsCount(goodsType) + getProductionNetOf(goodsType) -
-                             getWarehouseCapacity());
+                int waste = (goodsContainer.getGoodsCount(goodsType) + getProductionNetOf(goodsType) - getWarehouseCapacity());
                 if (waste > 0) {
-                    addModelMessage(this, "model.building.warehouseSoonFull",
-                                    new String [][] {{"%goods%", Goods.getName(goodsType)},
-                                                     {"%colony%", getName()},
-                                                     {"%amount%", String.valueOf(waste)}},
-                                    ModelMessage.WAREHOUSE_CAPACITY,
-                                    new Goods(goodsType));
+                    addModelMessage(this, "model.building.warehouseSoonFull", new String[][] {
+                            { "%goods%", Goods.getName(goodsType) }, { "%colony%", getName() },
+                            { "%amount%", String.valueOf(waste) } }, ModelMessage.WAREHOUSE_CAPACITY, new Goods(
+                            goodsType));
                 }
             }
         }
-
-
         // Remove bells:
         bells -= Math.max(0, getUnitCount() - 2);
         if (bells < 0) {
             bells = 0;
         }
-
         // Update SoL:
         updateSoL();
         final int difficulty = getOwner().getDifficulty();
@@ -1597,7 +1489,6 @@ public final class Colony extends Settlement implements Location, Nameable {
                         ModelMessage.SONS_OF_LIBERTY, new Goods(Goods.BELLS));
             }
         }
-
         int bonus = 0;
         if (sonsOfLiberty == 100) {
             // there are no tories left
@@ -1643,7 +1534,6 @@ public final class Colony extends Settlement implements Location, Nameable {
         // Remember current SoL and tories for check changes at the next turn
         oldSonsOfLiberty = sonsOfLiberty;
         oldTories = tories;
-
         // TODO-LATER: REMOVE THIS WHEN THE AI CAN HANDLE PRODUCTION PENALTIES:
         if (getOwner().isAI()) {
             productionBonus = Math.max(0, bonus);
@@ -1673,17 +1563,13 @@ public final class Colony extends Settlement implements Location, Nameable {
         while (i.hasNext()) {
             ((FreeColGameObject) i.next()).dispose();
         }
-
         super.dispose();
     }
 
     /**
      * This method writes an XML-representation of this object to the given
-     * stream.
-     * 
+     * stream. <br>
      * <br>
-     * <br>
-     * 
      * Only attributes visible to the given <code>Player</code> will be added
      * to that representation if <code>showAll</code> is set to
      * <code>false</code>.
@@ -1705,7 +1591,6 @@ public final class Colony extends Settlement implements Location, Nameable {
             throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
-
         // Add attributes:
         out.writeAttribute("ID", getID());
         out.writeAttribute("name", name);
@@ -1721,17 +1606,14 @@ public final class Colony extends Settlement implements Location, Nameable {
             out.writeAttribute("productionBonus", Integer.toString(productionBonus));
             out.writeAttribute("currentlyBuilding", Integer.toString(currentlyBuilding));
             out.writeAttribute("landLocked", Boolean.toString(landLocked));
-
             char[] exportsCharArray = new char[exports.length];
             for (int i = 0; i < exports.length; i++) {
                 exportsCharArray[i] = (exports[i] ? '1' : '0');
             }
             out.writeAttribute("exports", new String(exportsCharArray));
-
             toArrayElement("lowLevel", lowLevel, out);
             toArrayElement("highLevel", highLevel, out);
             toArrayElement("exportLevel", exportLevel, out);
-
             Iterator<WorkLocation> workLocationIterator = workLocations.iterator();
             while (workLocationIterator.hasNext()) {
                 ((FreeColGameObject) workLocationIterator.next()).toXML(out, player, showAll, toSavedGame);
@@ -1740,9 +1622,7 @@ public final class Colony extends Settlement implements Location, Nameable {
             out.writeAttribute("unitCount", Integer.toString(getUnitCount()));
             getBuilding(Building.STOCKADE).toXML(out, player, showAll, toSavedGame);
         }
-
         goodsContainer.toXML(out, player, showAll, toSavedGame);
-
         // End element:
         out.writeEndElement();
     }
@@ -1755,9 +1635,7 @@ public final class Colony extends Settlement implements Location, Nameable {
     @Override
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         initializeWarehouseSettings();
-
         setID(in.getAttributeValue(null, "ID"));
-
         name = in.getAttributeValue(null, "name");
         owner = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "owner"));
         if (owner == null) {
@@ -1767,79 +1645,67 @@ public final class Colony extends Settlement implements Location, Nameable {
         if (tile == null) {
             tile = new Tile(getGame(), in.getAttributeValue(null, "owner"));
         }
-
         owner.addSettlement(this);
-
         final String hammersStr = in.getAttributeValue(null, "hammers");
         if (hammersStr != null) {
             hammers = Integer.parseInt(hammersStr);
         } else {
             hammers = 0;
         }
-
         final String bellsStr = in.getAttributeValue(null, "bells");
         if (bellsStr != null) {
             bells = Integer.parseInt(bellsStr);
         } else {
             bells = 0;
         }
-
         final String sonsOfLibertyStr = in.getAttributeValue(null, "sonsOfLiberty");
         if (sonsOfLibertyStr != null) {
             sonsOfLiberty = Integer.parseInt(sonsOfLibertyStr);
         } else {
             sonsOfLiberty = 0;
         }
-
         final String oldSonsOfLibertyStr = in.getAttributeValue(null, "oldSonsOfLiberty");
         if (oldSonsOfLibertyStr != null) {
             oldSonsOfLiberty = Integer.parseInt(oldSonsOfLibertyStr);
         } else {
             oldSonsOfLiberty = 0;
         }
-
         final String toriesStr = in.getAttributeValue(null, "tories");
         if (toriesStr != null) {
             tories = Integer.parseInt(toriesStr);
         } else {
             tories = 0;
         }
-
         final String oldToriesStr = in.getAttributeValue(null, "oldTories");
         if (oldToriesStr != null) {
             oldTories = Integer.parseInt(oldToriesStr);
         } else {
             oldTories = 0;
         }
-
         final String productionBonusStr = in.getAttributeValue(null, "productionBonus");
         if (productionBonusStr != null) {
             productionBonus = Integer.parseInt(productionBonusStr);
         } else {
             productionBonus = 0;
         }
-
         final String currentlyBuildingStr = in.getAttributeValue(null, "currentlyBuilding");
         if (currentlyBuildingStr != null) {
             currentlyBuilding = Integer.parseInt(currentlyBuildingStr);
         } else {
             currentlyBuilding = -1;
         }
-
         final String landLockedStr = in.getAttributeValue(null, "landLocked");
         if (landLockedStr != null) {
             landLocked = Boolean.valueOf(landLockedStr).booleanValue();
         } else {
             landLocked = true;
         }
-
         final String unitCountStr = in.getAttributeValue(null, "unitCount");
         if (unitCountStr != null) {
             unitCount = Integer.parseInt(unitCountStr);
         } else {
             unitCount = -1;
         }
-
         final String exportString = in.getAttributeValue(null, "exports");
         if (exportString != null) {
             // exports = new boolean[Goods.NUMBER_OF_TYPES];
@@ -1847,12 +1713,10 @@ public final class Colony extends Settlement implements Location, Nameable {
                 exports[i] = ((exportString.charAt(i) == '1') ? true : false);
             }
         }
-
         // Read child elements:
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(ColonyTile.getXMLElementTagName())) {
                 ColonyTile ct = (ColonyTile) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
-
                 if (ct != null) {
                     ct.readFromXML(in);
                 } else {
@@ -1860,7 +1724,6 @@ public final class Colony extends Settlement implements Location, Nameable {
                 }
             } else if (in.getLocalName().equals(Building.getXMLElementTagName())) {
                 Building b = (Building) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
-
                 if (b != null) {
                     b.readFromXML(in);
                 } else {
@@ -1868,7 +1731,6 @@ public final class Colony extends Settlement implements Location, Nameable {
                 }
             } else if (in.getLocalName().equals(GoodsContainer.getXMLElementTagName())) {
                 GoodsContainer gc = (GoodsContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
-
                 if (gc != null) {
                     goodsContainer.readFromXML(in);
                 } else {

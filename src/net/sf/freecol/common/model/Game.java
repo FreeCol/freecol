@@ -221,16 +221,16 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Check if the clients are trusted or if the server should keep secrets
-     * in order to prevent cheating.
+     * Check if the clients are trusted or if the server should keep secrets in
+     * order to prevent cheating.
      * 
      * @return true if clients are to be trusted.
      */
     public boolean isClientTrusted() {
         // Trust the clients in order to prevent certain bugs, fix this later
-        return false;        
+        return false;
     }
-    
+
     /**
      * Returns the owner of this view of the game, or <code>null</code> if
      * this game has all the information. <br>
@@ -402,20 +402,20 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Get the {@link FreeColGameObject} with the given id or null.
-     * This method does NOT throw if the id is invalid.
+     * Get the {@link FreeColGameObject} with the given id or null. This method
+     * does NOT throw if the id is invalid.
      * 
      * @param id The id, may be null or invalid.
      * @return game object with id or null.
      */
     public FreeColGameObject getFreeColGameObjectSafely(String id) {
-        if(id != null) {
+        if (id != null) {
             return freeColGameObjects.get(id);
         } else {
             return null;
         }
     }
-    
+
     /**
      * Removes the <code>FreeColGameObject</code> with the specified ID.
      * 
@@ -693,9 +693,11 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Gets the maximum number of (human) players that can be added to this game.
+     * Gets the maximum number of (human) players that can be added to this
+     * game.
      * 
-     * @return the maximum number of (human) players that can be added to this game
+     * @return the maximum number of (human) players that can be added to this
+     *         game
      */
     public int getMaximumPlayers() {
         return maxPlayers;
@@ -708,14 +710,14 @@ public class Game extends FreeColGameObject {
      *         otherwise.
      */
     public boolean canAddNewPlayer() {
-        
+
         int realPlayers = 0;
 
-        for (Player player : players){
+        for (Player player : players) {
             if (!player.isAI())
                 realPlayers++;
         }
-        
+
         return realPlayers < getMaximumPlayers();
     }
 
@@ -836,26 +838,6 @@ public class Game extends FreeColGameObject {
             player.newTurn();
         }
 
-    }
-
-    /**
-     * Invoke newTurn, catch and log errors. Note that uninitialized and disposed
-     * objects are ignored.
-     * 
-     * @param freeColGameObject The game object to invoke newTurn for.
-     */
-    private void callNewTurn(FreeColGameObject freeColGameObject) {
-        try {
-            if(! (freeColGameObject.isUninitialized() || freeColGameObject.isDisposed())) {
-                if(getModelController().shouldCallNewTurn(freeColGameObject)) {
-                    freeColGameObject.newTurn();                    
-                }
-            }
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "New turn failed for " +
-                    freeColGameObject.getID() + " (" +
-                    freeColGameObject.getClass().getName() + ")", e);
-        }
     }
 
     /**
