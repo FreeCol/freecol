@@ -1628,7 +1628,7 @@ public final class Canvas extends JDesktopPane {
      * 
      * @param dialog The dialog/panel.
      */
-    private synchronized void showFreeColDialog(FreeColDialog dialog) {
+    private void showFreeColDialog(FreeColDialog dialog) {
         addAsFrame(dialog);
         dialog.requestFocus();
     }
@@ -1637,7 +1637,7 @@ public final class Canvas extends JDesktopPane {
      * Remove the topmost dialog installed by
      * {@link #showFreeColDialog(FreeColDialog)}.
      */
-    private synchronized void removeFreeColDialog(FreeColDialog dialog) {
+    private void removeFreeColDialog(FreeColDialog dialog) {
         remove(dialog);
     }
 
