@@ -113,14 +113,12 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         tableModel = new PlayersTableModel(freeColClient, freeColClient.getPreGameController());
         table = new JTable(tableModel);
 
-        TableColumn nameColumn = table.getColumnModel().getColumn(0), nationsColumn = table.getColumnModel().getColumn(
-                1), colorsColumn = table.getColumnModel().getColumn(2);
+        TableColumn nameColumn = table.getColumnModel().getColumn(0),
+                colorsColumn = table.getColumnModel().getColumn(2);
         DefaultTableCellRenderer dtcr = new DefaultTableCellRenderer();
 
         dtcr.setOpaque(false);
         nameColumn.setCellRenderer(dtcr);
-        nationsColumn.setCellEditor(new NationCellEditor());
-        nationsColumn.setCellRenderer(new NationCellRenderer());
         colorsColumn.setCellEditor(new ColorCellEditor(parent, this));
         colorsColumn.setCellRenderer(new ColorCellRenderer(true));
 
@@ -196,11 +194,14 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
 
         tableModel.setData(game.getPlayers(), thisPlayer);
 
+        TableColumn nationsColumn = table.getColumnModel().getColumn(1);
+        nationsColumn.setCellEditor(new NationCellEditor());
+        nationsColumn.setCellRenderer(new NationCellRenderer());
         ((NationCellRenderer) table.getColumnModel().getColumn(1).getCellRenderer()).setData(game.getPlayers(),
                 thisPlayer);
-
+        
         ((ColorCellEditor) table.getColumnModel().getColumn(2).getCellEditor()).setData(game.getPlayers(), thisPlayer);
-
+        
         if (singlePlayerGame) {
             // If we set the ready flag to false then the player will be able to
             // change the
