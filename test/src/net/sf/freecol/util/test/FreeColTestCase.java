@@ -60,7 +60,7 @@ public class FreeColTestCase extends TestCase {
         Vector<Player> players = new Vector<Player>();
 
         for (int i = 0; i < Player.NUMBER_OF_NATIONS; i++) {
-            Player p = new Player(game, String.valueOf(i), !Player.isEuropeanNoREF(i), i);
+            Player p = new Player(game, String.valueOf(i), false, !Player.isEuropeanNoREF(i), i);
             game.addPlayer(p);
             players.add(p);
         }
