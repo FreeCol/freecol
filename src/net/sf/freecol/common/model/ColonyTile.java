@@ -28,7 +28,6 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
 
     private static final Logger logger = Logger.getLogger(ColonyTile.class.getName());
 
-
     private Colony colony;
     private Tile workTile;
     private Unit unit;
@@ -619,6 +618,15 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         }
     }
 
+    /**
+     * Will return the position of the tile and the name of the colony in
+     * addition to the FreeColObject.toString().
+     * 
+     * @return A representation of a colony-tile that can be used for debugging.
+     */
+    public String toString() {
+        return getTile().getPosition().toString() + " in '" + getColony().getName() + "'" + super.toString();
+    }
 
     /**
     * Gets the tag name of the root element representing this object.
