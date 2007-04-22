@@ -40,7 +40,7 @@ public final class Colony extends Settlement implements Location, Nameable {
      */
     private ArrayList<WorkLocation> workLocations = new ArrayList<WorkLocation>();
 
-    private HashMap buildingMap = new HashMap();
+    private HashMap<Integer, Building> buildingMap = new HashMap<Integer, Building>();
 
     private int hammers;
 
@@ -193,7 +193,8 @@ public final class Colony extends Settlement implements Location, Nameable {
     private void addWorkLocation(WorkLocation workLocation) {
         workLocations.add(workLocation);
         if (workLocation instanceof Building) {
-            buildingMap.put(((Building) workLocation).getType(), workLocation);
+            Building building = (Building) workLocation;
+            buildingMap.put(building.getType(), building);
         }
     }
 
@@ -487,7 +488,7 @@ public final class Colony extends Settlement implements Location, Nameable {
      * @return The <code>Building</code>.
      */
     public Building getBuilding(int type) {
-        return (Building) buildingMap.get(new Integer(type));
+        return buildingMap.get(new Integer(type));
         /*
          * Iterator<Building> buildingIterator = getBuildingIterator(); while
          * (buildingIterator.hasNext()) { Building building =

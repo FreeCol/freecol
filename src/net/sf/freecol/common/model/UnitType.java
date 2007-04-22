@@ -27,7 +27,7 @@ public final class UnitType
     public  int        skill;
     public  int        price;
     public  GoodsType  expertProduction;
-    public HashSet abilityArray = new HashSet();    
+    public HashSet<String> abilityArray = new HashSet<String>();    
 
 
     public void readFromXmlElement( Node xml, Map<String, GoodsType> goodsTypeByRef ) {
@@ -103,18 +103,6 @@ public final class UnitType
 
     public boolean hasAbility( String abilityName ) {
         return abilityArray.contains(abilityName);
-
-        /*for ( int ai = 0, na = abilityArray.length;  ai < na;  ai ++ )
-        {
-            String  ability = abilityArray[ai];
-
-            if ( ability.equals(abilityName) ) {
-
-                return true;
-            }
-        }
-
-        return false;*/
     }
 
 }
