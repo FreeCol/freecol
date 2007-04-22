@@ -7,13 +7,16 @@ import java.util.List;
 import java.util.MissingResourceException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.util.EmptyIterator;
+
 import org.w3c.dom.Element;
 
 /**
@@ -181,7 +184,6 @@ public class Player extends FreeColGameObject implements Nameable {
     // new simple schema for crosses
     // TODO: make this depend on difficulty
     public static final int CROSSES_INCREMENT = 6;
-
     private int crossesRequired = 12;
 
     // No need for a persistent storage of this variable:
@@ -680,8 +682,6 @@ public class Player extends FreeColGameObject implements Nameable {
      * 
      * "Royal Expeditionay Force".
      * 
-     * 
-     * 
      * @param nation The nation of the <code>Player</code>.
      * 
      * @return <i>true</i> if this player is european and <i>false</i>
@@ -691,6 +691,20 @@ public class Player extends FreeColGameObject implements Nameable {
     public static boolean isEuropean(int nation) {
         return (nation == DUTCH || nation == ENGLISH || nation == FRENCH || nation == SPANISH || nation == REF_DUTCH
                 || nation == REF_ENGLISH || nation == REF_FRENCH || nation == REF_SPANISH);
+    }
+
+    /**
+     * Checks if this player is european, but not a "Royal Expeditionay Force"
+     * player.
+     * 
+     * @param nation The nation of the <code>Player</code>.
+     * 
+     * @return <i>true</i> if this player is european (but not REF) and
+     *         <i>false</i> otherwise.
+     * 
+     */
+    public static boolean isEuropeanNoREF(int nation) {
+        return nation == DUTCH || nation == ENGLISH || nation == FRENCH || nation == SPANISH;
     }
 
     /**
@@ -1078,9 +1092,9 @@ public class Player extends FreeColGameObject implements Nameable {
      * Returns the state of this players rebellion status.
      * 
      * <pre>
-     *                                                0 = Have not declared independence
-     *                                                1 = Declared independence, at war with king
-     *                                                2 = Independence granted
+     *                                              0 = Have not declared independence
+     *                                              1 = Declared independence, at war with king
+     *                                              2 = Independence granted
      * </pre>
      * 
      * @return The rebellion state.
@@ -1817,23 +1831,40 @@ public class Player extends FreeColGameObject implements Nameable {
         // So every unit counts as 2 unless they're in a colony,
         // wherein they count as 4.
         /*
-         * int count = 8; Map map = getGame().getMap(); Iterator<Position>
-         * tileIterator = map.getWholeMapIterator(); while
-         * (tileIterator.hasNext()) { Tile t = map.getTile(tileIterator.next());
-         * if (t != null && t.getFirstUnit() != null &&
-         * t.getFirstUnit().getOwner().equals(this)) { Iterator<Unit>
-         * unitIterator = t.getUnitIterator(); while (unitIterator.hasNext()) {
-         * Unit u = unitIterator.next(); Iterator<Unit> childUnitIterator =
-         * u.getUnitIterator(); while (childUnitIterator.hasNext()) { // Unit
-         * childUnit = (Unit) childUnitIterator.next();
-         * childUnitIterator.next(); count += 2; } count += 2; } } if (t != null &&
-         * t.getColony() != null && t.getColony().getOwner() == this) { count +=
-         * t.getColony().getUnitCount() * 4; // Units in colonies // count
-         * doubly. // -sjm } } Iterator<Unit> europeUnitIterator =
-         * getEurope().getUnitIterator(); while (europeUnitIterator.hasNext()) {
-         * europeUnitIterator.next(); count += 2; } if (nation == ENGLISH) {
-         * count = (count * 2) / 3; } setCrossesRequired(count);
-         */
+        int count = 8;
+        Map map = getGame().getMap();
+        Iterator<Position> tileIterator = map.getWholeMapIterator();
+        while (tileIterator.hasNext()) {
+            Tile t = map.getTile(tileIterator.next());
+            if (t != null && t.getFirstUnit() != null && t.getFirstUnit().getOwner().equals(this)) {
+                Iterator<Unit> unitIterator = t.getUnitIterator();
+                while (unitIterator.hasNext()) {
+                    Unit u = unitIterator.next();
+                    Iterator<Unit> childUnitIterator = u.getUnitIterator();
+                    while (childUnitIterator.hasNext()) {
+                        // Unit childUnit = (Unit) childUnitIterator.next();
+                        childUnitIterator.next();
+                        count += 2;
+                    }
+                    count += 2;
+                }
+            }
+            if (t != null && t.getColony() != null && t.getColony().getOwner() == this) {
+                count += t.getColony().getUnitCount() * 4; // Units in colonies
+                // count doubly.
+                // -sjm
+            }
+        }
+        Iterator<Unit> europeUnitIterator = getEurope().getUnitIterator();
+        while (europeUnitIterator.hasNext()) {
+            europeUnitIterator.next();
+            count += 2;
+        }
+        if (nation == ENGLISH) {
+            count = (count * 2) / 3;
+        }
+        setCrossesRequired(count);
+        */
     }
 
     /**
@@ -2091,19 +2122,20 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public void newTurn() {
 
-        // units first, so that colonies will profit from pioneer work
+		// settlements next
+        for (Settlement settlement : getSettlements()) {
+            logger.finest("Calling newTurn for settlement " + settlement.toString());
+            settlement.newTurn();
+        }
+        
+        // CO: I reverted this, since the pioneer already finishes faster, 
+        // thus changing it at both locations would double the bonus.
         for (Iterator<Unit> unitIterator = getUnitIterator(); unitIterator.hasNext();) {
             Unit unit = unitIterator.next();
             if (logger.isLoggable(Level.FINEST)) {
                 logger.finest("Calling newTurn for unit " + unit.getName() + " " + unit.getID());
             }
             unit.newTurn();
-        }
-
-        // settlements next
-        for (Settlement settlement : getSettlements()) {
-            logger.finest("Calling newTurn for settlement " + settlement.toString());
-            settlement.newTurn();
         }
 
         if (getEurope() != null) {
@@ -2226,8 +2258,10 @@ public class Player extends FreeColGameObject implements Nameable {
             }
 
             /*
-             * if (crossesRequired != -1) { updateCrossesRequired(); }
-             */
+            if (crossesRequired != -1) {
+                updateCrossesRequired();
+            }
+            */
 
             int newSoL = 0;
             int numberOfColonies = settlements.size();

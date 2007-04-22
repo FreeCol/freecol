@@ -17,10 +17,11 @@ public class UnitTest extends FreeColTestCase {
     public void testDoAssignedWorkHardyPioneerPlowPlain() {
 
         Game game = getStandardGame();
-
         Player dutch = game.getPlayer(Player.DUTCH);
-
-        Tile plain = new Tile(game, Tile.PLAINS, 5, 8);
+        Map map = getTestMap(Tile.PLAINS);
+        game.setMap(map);
+        Tile plain = map.getTile(5,8);
+        map.getTile(5, 8).setExploredBy(dutch, true);
 
         Unit hardyPioneer = new Unit(game, plain, dutch, Unit.HARDY_PIONEER, Unit.ACTIVE, false, false, 100, false);
 
@@ -58,6 +59,65 @@ public class UnitTest extends FreeColTestCase {
         assertEquals(true, plain.isPlowed());
     }
 
+    public void testColonyProfitFromEnhancement() {
+
+        Game game = getStandardGame();
+        Player dutch = game.getPlayer(Player.DUTCH);
+        Map map = getTestMap(Tile.PLAINS);
+        game.setMap(map);
+        map.getTile(5, 8).setExploredBy(dutch, true);
+        map.getTile(6, 8).setExploredBy(dutch, true);
+        Tile plain58 = map.getTile(5,8);
+
+        // Found colony on 6,8
+        Unit soldier = new Unit(game, map.getTile(6, 8), dutch, Unit.VETERAN_SOLDIER, Unit.ACTIVE,
+                true, false, 0, false);
+            
+        Colony colony = new Colony(game, dutch, "New Amsterdam", soldier.getTile());
+        soldier.setWorkType(Goods.FOOD);
+        soldier.buildColony(colony);
+        
+        soldier.setLocation(colony.getColonyTile(plain58));
+        
+        Unit hardyPioneer = new Unit(game, plain58, dutch, Unit.HARDY_PIONEER, Unit.ACTIVE, false, false, 100, false);
+
+        // Before
+        assertEquals(0, colony.getGoodsCount(Goods.FOOD));
+        assertEquals(2, colony.getFoodConsumption());
+        assertEquals(5 + 5, colony.getFoodProduction());
+        assertEquals(false, plain58.isPlowed());
+        assertEquals("" + soldier.getLocation(), colony.getColonyTile(map.getTile(5,8)), soldier.getLocation());
+        
+        // One turn to check production
+        game.newTurn();
+        
+        assertEquals(false, plain58.isPlowed());
+        assertEquals(8, colony.getGoodsCount(Goods.FOOD));
+        assertEquals(2, colony.getFoodConsumption());
+        assertEquals(5 + 5, colony.getFoodProduction());
+        
+        // Start Plowing
+        hardyPioneer.setState(Unit.PLOW);
+        
+        game.newTurn();
+        
+        assertEquals(true, plain58.isPlowed());
+        // Production for next turn is updated
+        assertEquals(5 + 6, colony.getFoodProduction());
+        // But in only 10 - 2 == 8 are added from last turn
+        assertEquals(8 + 8, colony.getGoodsCount(Goods.FOOD));
+        assertEquals(2, colony.getFoodConsumption());
+        
+        // Advance last turn
+        game.newTurn();
+
+        assertEquals(16 + 9, colony.getGoodsCount(Goods.FOOD));
+        assertEquals(2, colony.getFoodConsumption());
+        assertEquals(5 + 6, colony.getFoodProduction());
+        assertEquals(true, plain58.isPlowed());
+    }
+
+    
     /**
      * Test Building a road with a hardy pioneer.
      * 
@@ -68,11 +128,13 @@ public class UnitTest extends FreeColTestCase {
     public void testDoAssignedWorkHardyPioneerBuildRoad() {
 
         Game game = getStandardGame();
-
         Player dutch = game.getPlayer(Player.DUTCH);
+        Map map = getTestMap(Tile.PLAINS);
+        game.setMap(map);
+        Tile plain = map.getTile(5,8);
+        map.getTile(5, 8).setExploredBy(dutch, true);
 
-        Tile plain = new Tile(game, Tile.PLAINS, 5, 8);
-
+        
         Unit hardyPioneer = new Unit(game, plain, dutch, Unit.HARDY_PIONEER, Unit.ACTIVE, false, false, 100, false);
 
         // Before
