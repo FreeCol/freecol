@@ -1,5 +1,8 @@
 package net.sf.freecol;
 
+import java.util.Locale;
+
+import junit.extensions.TestSetup;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -16,7 +19,16 @@ public class AllTests {
         // $JUnit-END$
         suite.addTest(net.sf.freecol.common.AllTests.suite());
         suite.addTest(net.sf.freecol.server.generator.AllTests.suite());
-        return suite;
+        suite.addTest(net.sf.freecol.client.gui.i18n.AllTests.suite());
+
+        // Make sure that we run the tests using the english locale
+        TestSetup wrapper = new TestSetup(suite) {
+            public void setUp() {
+                Locale.setDefault(Locale.US);
+            }
+        };
+        return wrapper;
+
     }
 
 }

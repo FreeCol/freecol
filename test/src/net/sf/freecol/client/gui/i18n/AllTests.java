@@ -1,0 +1,20 @@
+package net.sf.freecol.client.gui.i18n;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
+public class AllTests {
+    public static final String COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
+
+    public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
+
+    public static final String REVISION = "$Revision$";
+
+    public static Test suite() {
+        TestSuite suite = new TestSuite("Test for net.sf.freecol.client.gui.i18n");
+        //$JUnit-BEGIN$
+        suite.addTestSuite(MessagesTest.class);
+        //$JUnit-END$
+        return suite;
+    }
+}
