@@ -74,16 +74,20 @@ public class Goods implements Locatable, Ownable, Nameable {
     private int type;
     private int amount;
 
-
-
     /**
-    * Creates a new <code>Goods</code>.
-    *
-    * @param game The <code>Game</code> in which this object belongs
-    * @param location The location of the goods,
-    * @param type The type of the goods.
-    * @param amount The amount of the goods.
-    */
+     * Creates a standard <code>Goods</code>-instance given the place where
+     * the goods .
+     * 
+     * This constructor only asserts that the game and the location are
+     * non-null, and that the location can store goods.
+     * 
+     * @param game The <code>Game</code> in which this object belongs
+     * @param location The location of the goods,
+     * @param type The type of the goods.
+     * @param amount The amount of the goods.
+     * 
+     * @throws IllegalArgumentException if the location cannot store any goods.
+     */
     public Goods(Game game, Location location, int type, int amount) {
         if (game == null) {
             throw new NullPointerException();
@@ -91,6 +95,10 @@ public class Goods implements Locatable, Ownable, Nameable {
 
         if (location == null) {
             throw new NullPointerException();
+        }
+        
+        if (location.getGoodsContainer() == null){
+            throw new IllegalArgumentException("This location cannot store goods");
         }
 
         this.game = game;
@@ -110,13 +118,18 @@ public class Goods implements Locatable, Ownable, Nameable {
         readFromXMLElement(e);
     }
 
+    /**
+     * This constructor should be used to get an object that represents a goods
+     * type (and not an actual amoutn of goods of that type).
+     * 
+     * @param type
+     */
     public Goods(int type) {
         this.game = null;
         this.location = null;
         this.type = type;
         this.amount = 0;
     }
-
 
     /**
     * Gets the owner of this <code>Ownable</code>.
@@ -134,7 +147,7 @@ public class Goods implements Locatable, Ownable, Nameable {
      * @param p The <code>Player</code> that should take ownership
      *      of this {@link Ownable}.
      * @exception UnsupportedOperationException is always thrown by
-     *      this method.
+     *      this method. 
      */
     public void setOwner(Player p) {
         throw new UnsupportedOperationException();
@@ -151,7 +164,6 @@ public class Goods implements Locatable, Ownable, Nameable {
         return Integer.toString(amount) + " " + getName();
     }
 
-
     /**
      * Returns the name of this type of goods.
      *
@@ -162,15 +174,15 @@ public class Goods implements Locatable, Ownable, Nameable {
     }
 
     /**
-     * Set the <code>Name</code> value.
+     * This method does not do anything.
      *
      * @param newName The new Name value.
+     * 
+     * @
      */
     public void setName(String newName) {
-        //this.name = newName;
+        // this.name = newName;
     }
-
-
 
     /**
      * Returns the name of this type of goods.
@@ -253,9 +265,9 @@ public class Goods implements Locatable, Ownable, Nameable {
 
         if (sellable) {
             return getName(type);
+        } else {
+            return getName(type) + " (" + Messages.message("model.goods.Boycotted") + ")";
         }
-
-        return getName(type) + " (" + Messages.message("model.goods.Boycotted") + ")";
     }
 
 
@@ -309,10 +321,13 @@ public class Goods implements Locatable, Ownable, Nameable {
 
     /**
     * Sets the value <code>amount</code>.
-    * @param a The new value for amount.
+    * 
+    * This method does not check this new amount in any way (thus the amount might be negative)
+    * 
+    * @param newAmount The new value for amount.
     */
-    public void setAmount(int a) {
-        amount = a;
+    public void setAmount(int newAmount) {
+        amount = newAmount;
     }
 
     /**
@@ -325,12 +340,14 @@ public class Goods implements Locatable, Ownable, Nameable {
 
 
     /**
-    * If the amount of goods is greater than the source can supply,
+    * If the amount of goods is greater than the container can hold,
     * then this method adjusts the amount to the maximum amount possible.
     */
     public void adjustAmount() {
         int maxAmount = location.getGoodsContainer().getGoodsCount(getType());
-        setAmount((getAmount() > maxAmount) ? maxAmount : getAmount());
+        
+        if (getAmount() > maxAmount)
+            setAmount(maxAmount);
     }
 
     /**
