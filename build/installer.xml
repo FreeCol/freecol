@@ -20,6 +20,9 @@
         <langpack iso3="deu"/>
         <langpack iso3="spa"/>
         <langpack iso3="hun"/>
+        <langpack iso3="fin"/>
+        <langpack iso3="fra"/>
+        <langpack iso3="por"/>
     </locale>
     <resources>
         <res id="LicencePanel.licence" src="COPYING"/>
