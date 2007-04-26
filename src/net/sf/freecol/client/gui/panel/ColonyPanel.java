@@ -487,9 +487,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
     private void updateCargoLabel() {
         if (selectedUnit != null) {
             cargoPanel.getParent().setEnabled(true);
-            cargoBorder.setTitle(Messages.message("cargoOnShip") + ' '
-                    + selectedUnit.getUnit().getName() + " ("
-                    + selectedUnit.getUnit().getSpaceLeft() + " left)");
+            cargoBorder.setTitle(Messages.message("cargoOnShipLong",
+                                                  new String[][] {{"%name%", selectedUnit.getUnit().getName()},
+                                                                  {"%space%", String.valueOf(selectedUnit.getUnit().getSpaceLeft())}}));
         } else {
             cargoPanel.getParent().setEnabled(false);
             cargoBorder.setTitle(Messages.message("cargoOnShip"));
