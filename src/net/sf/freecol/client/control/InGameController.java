@@ -699,7 +699,6 @@ public final class InGameController implements NetworkConstants {
             return;
         }
         
-        // load cargo that should be on board
         Location location = unit.getLocation();
         if (location instanceof Tile) {
             location = ((Tile) location).getColony();
@@ -738,6 +737,7 @@ public final class InGameController implements NetworkConstants {
             unloadCargo(goods);
         }
         
+        // load cargo that should be on board
         for (Integer goodsType : goodsTypesToLoad) {
             int amountPresent = warehouse.getGoodsCount(goodsType.intValue());
             if (amountPresent > 0) {
