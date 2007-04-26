@@ -694,23 +694,42 @@ public final class InGameController implements NetworkConstants {
     }
 
     private void followTradeRoute(Unit unit) {
-
-        Stop stop = unit.nextStop();
+        Stop stop = unit.getCurrentStop();
         if (stop == null) {
             return;
-        } else {
-            setDestination(unit, stop.getLocation());
         }
-        // unload cargo that should not be on board
-        ArrayList<Integer> goodsTypes = stop.getCargo();
+        
+        // load cargo that should be on board
+        Location location = unit.getLocation();
+        if (location instanceof Tile) {
+            location = ((Tile) location).getColony();
+        }
+        GoodsContainer warehouse = location.getGoodsContainer();
+        if (warehouse == null) {
+            throw new IllegalStateException("Not warehouse in a stop's location");
+        }
+        
+        // unload cargo that should not be on board and complete loaded goods with less than 100 units
+        ArrayList<Integer> goodsTypesToLoad = stop.getCargo();
         Iterator<Goods> goodsIterator = unit.getGoodsIterator();
         test: while (goodsIterator.hasNext()) {
             Goods goods = goodsIterator.next();
-            for (int index = 0; index < goodsTypes.size(); index++) {
-                if (goods.getType() == goodsTypes.get(index).intValue()) {
+            for (int index = 0; index < goodsTypesToLoad.size(); index++) {
+                int goodsType = goodsTypesToLoad.get(index).intValue();
+                if (goods.getType() == goodsType) {
+                    if (goods.getAmount() < 100) {
+                        // comlete goods until 100 units
+                        int amountPresent = warehouse.getGoodsCount(goodsType);
+                        if (amountPresent > 0) {
+                            logger.finest("Automatically loading goods " + goods.getName());
+                            int amountToLoad = Math.min(100 - goods.getAmount(), amountPresent);
+                            loadCargo(new Goods(freeColClient.getGame(), location, goods.getType(),
+                                    amountToLoad), unit);
+                        }
+                    }
                     // remove item: other items of the same type
                     // may or may not be present
-                    goodsTypes.remove(index);
+                    goodsTypesToLoad.remove(index);
                     continue test;
                 }
             }
@@ -718,33 +737,28 @@ public final class InGameController implements NetworkConstants {
             logger.finest("Automatically unloading " + goods.getName());
             unloadCargo(goods);
         }
-        // load cargo that should be on board
-        GoodsContainer warehouse = unit.getLocation().getGoodsContainer();
-        test: for (Integer goodsType : stop.getCargo()) {
+        
+        for (Integer goodsType : goodsTypesToLoad) {
             int amountPresent = warehouse.getGoodsCount(goodsType.intValue());
             if (amountPresent > 0) {
-                for (Goods goods : unit.getGoodsContainer().getGoods()) {
-                    if (goods.getType() == goodsType.intValue()) {
-                        if (goods.getAmount() < 100) {
-                            logger.finest("Automatically loading goods " + goods.getName());
-                            int amountToLoad = Math.min(100 - goods.getAmount(), amountPresent);
-                            loadCargo(new Goods(freeColClient.getGame(), unit.getLocation(), goods.getType(),
-                                    amountToLoad), unit);
-                            continue test;
-                        }
-                    }
-                    // if we got this far, amountPresent has not changed
-                    if (unit.getSpaceLeft() > 0) {
-                        logger.finest("Automatically loading goods " + goods.getName());
-                        loadCargo(new Goods(freeColClient.getGame(), unit.getLocation(), goods.getType(), Math.min(
-                                amountPresent, 100)), unit);
-                    }
+                if (unit.getSpaceLeft() > 0) {
+                    logger.finest("Automatically loading goods " + Goods.getName(goodsType.intValue()));
+                    loadCargo(new Goods(freeColClient.getGame(), location, goodsType.intValue(), Math.min(
+                            amountPresent, 100)), unit);
                 }
             }
         }
 
         // TODO: do we want to load/unload units as well?
         // if so, when?
+        
+        // Set destination to next stop's location
+        stop = unit.nextStop();
+        if (stop == null) {
+            return;
+        } else {
+            setDestination(unit, stop.getLocation());
+        }
     }
 
     /**
@@ -1098,7 +1112,7 @@ public final class InGameController implements NetworkConstants {
             canvas.showEventDialog(EventPanel.FIRST_LANDING);
         }
 
-        if (unit.getTile().getSettlement() != null && unit.isCarrier()
+        if (unit.getTile().getSettlement() != null && unit.isCarrier() && unit.getTradeRoute() == null
                 && (unit.getDestination() == null || unit.getDestination().getTile() == unit.getTile())) {
             canvas.showColonyPanel((Colony) unit.getTile().getSettlement());
         } else if (unit.getMovesLeft() > 0 && !unit.isDisposed()) {
@@ -2585,8 +2599,12 @@ public final class InGameController implements NetworkConstants {
             assignTradeRouteElement.setAttribute("unit", unit.getID());
             assignTradeRouteElement.setAttribute("tradeRoute", tradeRoute.getID());
             freeColClient.getClient().sendAndWait(assignTradeRouteElement);
-            if (tradeRoute.getStops().get(0).getLocation() == unit.getLocation()) {
+            Location location = unit.getLocation();
+            if (location instanceof Tile) location = ((Tile) location).getColony();
+            if (tradeRoute.getStops().get(0).getLocation() == location) {
                 followTradeRoute(unit);
+            } else if (freeColClient.getGame().getCurrentPlayer() == freeColClient.getMyPlayer()) {
+                moveToDestination(unit);
             }
         }
     }
