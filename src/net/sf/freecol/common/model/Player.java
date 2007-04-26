@@ -2122,7 +2122,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public void newTurn() {
 
-		// settlements next
+        // settlements next
         for (Settlement settlement : getSettlements()) {
             logger.finest("Calling newTurn for settlement " + settlement.toString());
             settlement.newTurn();

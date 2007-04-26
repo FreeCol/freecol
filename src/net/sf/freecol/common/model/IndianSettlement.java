@@ -260,9 +260,9 @@ public class IndianSettlement extends Settlement {
      */
     public String getLocationName() {
         if (isCapital()){
-        	return Messages.message("indianCapital", new String[][] {{"%nation%", getOwner().getNationAsString()}});
+            return Messages.message("indianCapital", new String[][] {{"%nation%", getOwner().getNationAsString()}});
         } else {
-        	return Messages.message("indianSettlement", new String[][] {{"%nation%", getOwner().getNationAsString()}});
+            return Messages.message("indianSettlement", new String[][] {{"%nation%", getOwner().getNationAsString()}});
         }
     }
 
@@ -532,7 +532,7 @@ public class IndianSettlement extends Settlement {
      * @return Settlement radius
      */
     @Override
-	public int getRadius() {
+    public int getRadius() {
         return getRadius(kind);
     }
     
@@ -568,7 +568,7 @@ public class IndianSettlement extends Settlement {
     * @param locatable The <code>Locatable</code> to add to this Location.
     */
     @Override
-	public void add(Locatable locatable) {
+    public void add(Locatable locatable) {
         if (locatable instanceof Unit) {
             unitContainer.addUnit((Unit) locatable);
         } else if (locatable instanceof Goods) {
@@ -585,7 +585,7 @@ public class IndianSettlement extends Settlement {
     * @param locatable The <code>Locatable</code> to remove from this Location.
     */
     @Override
-	public void remove(Locatable locatable) {
+    public void remove(Locatable locatable) {
         if (locatable instanceof Unit) {
             unitContainer.removeUnit((Unit) locatable);
         } else if (locatable instanceof Goods) {
@@ -602,7 +602,7 @@ public class IndianSettlement extends Settlement {
     * @return The amount of Units at this Location.
     */
     @Override
-	public int getUnitCount() {
+    public int getUnitCount() {
         return unitContainer.getUnitCount();
     }
 
@@ -630,7 +630,7 @@ public class IndianSettlement extends Settlement {
     * @return The <code>Unit</code> that has been choosen to defend this <code>IndianSettlement</code>.
     */
     @Override
-	public Unit getDefendingUnit(Unit attacker) {
+    public Unit getDefendingUnit(Unit attacker) {
         Iterator<Unit> unitIterator = getUnitIterator();
 
         Unit defender = null;
@@ -860,7 +860,7 @@ public class IndianSettlement extends Settlement {
 
 
     @Override
-	public boolean contains(Locatable locatable) {
+    public boolean contains(Locatable locatable) {
         if (locatable instanceof Unit) {
             return unitContainer.contains((Unit) locatable);
         } else {
@@ -870,13 +870,13 @@ public class IndianSettlement extends Settlement {
 
 
     @Override
-	public boolean canAdd(Locatable locatable) {
+    public boolean canAdd(Locatable locatable) {
         return true;
     }
 
 
     @Override
-	public void newTurn() {
+    public void newTurn() {
         if (isUninitialized()) {
             logger.warning("Uninitialized when calling newTurn");
             return;
@@ -1062,7 +1062,7 @@ public class IndianSettlement extends Settlement {
      * tiles.
      */
     @Override
-	public void dispose() {
+    public void dispose() {
         while (ownedUnits.size() > 0) {
             ownedUnits.remove(0).setIndianSettlement(null);
         }
@@ -1124,7 +1124,7 @@ public class IndianSettlement extends Settlement {
      *      to the stream.
      */
     @Override
-	protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame) throws XMLStreamException {
+    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame) throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
@@ -1192,7 +1192,7 @@ public class IndianSettlement extends Settlement {
      *      during parsing.
      */
     @Override
-	protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setID(in.getAttributeValue(null, "ID"));
 
         tile = (Tile) getGame().getFreeColGameObject(in.getAttributeValue(null, "tile"));

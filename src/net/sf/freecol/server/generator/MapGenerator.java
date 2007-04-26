@@ -216,77 +216,77 @@ public class MapGenerator {
      *       no settlements are added.
      */
     protected void createIndianSettlements(Map map, Vector<Player> players) {
-		Collections.sort(players, new Comparator<Player>() {
-			public int compare(Player o, Player p) {
-				return o.getNation() - p.getNation();
-			}
-		});
+        Collections.sort(players, new Comparator<Player>() {
+            public int compare(Player o, Player p) {
+                return o.getNation() - p.getNation();
+            }
+        });
 
-		Vector<Player> indians = new Vector<Player>();
+        Vector<Player> indians = new Vector<Player>();
 
-		for (Player player : players) {
-			if (player.isIndian())
-				indians.add(player);
-		}
+        for (Player player : players) {
+            if (player.isIndian())
+                indians.add(player);
+        }
 
-		if (indians.size() == 0)
-			return;
+        if (indians.size() == 0)
+            return;
 
-		Position[] territoryCenter = new Position[indians.size()];
-		for (int tribe = 0; tribe < territoryCenter.length; tribe++) {
-			int x = random.nextInt(map.getWidth());
-			int y = random.nextInt(map.getHeight());
-			territoryCenter[tribe] = new Position(x, y);
-		}
+        Position[] territoryCenter = new Position[indians.size()];
+        for (int tribe = 0; tribe < territoryCenter.length; tribe++) {
+            int x = random.nextInt(map.getWidth());
+            int y = random.nextInt(map.getHeight());
+            territoryCenter[tribe] = new Position(x, y);
+        }
 
-		IndianSettlement[] capitalCandidate = new IndianSettlement[indians.size()];
-		final int minSettlementDistance = 4;
-		final int width = map.getWidth() / minSettlementDistance;
-		final int height = map.getHeight() / (minSettlementDistance * 2);
-		for (int i = 1; i < width; i++) {
-			for (int j = 1; j < height; j++) {
-				int x = i * minSettlementDistance + random.nextInt(3) - 1;
-				if (j % 2 != 0) {
-					x += minSettlementDistance / 2;
-				}
-				int y = j * (2 * minSettlementDistance) + random.nextInt(3) - 1;
-				if (!map.isValid(x, y)) {
-					continue;
-				}
-				Tile candidate = map.getTile(x, y);
-				if (candidate.isSettleable()) {
-					int bestTribe = 0;
-					int minDistance = Integer.MAX_VALUE;
-					for (int t = 0; t < territoryCenter.length; t++) {
-						if (map.getDistance(territoryCenter[t], candidate.getPosition()) < minDistance) {
-							minDistance = map.getDistance(territoryCenter[t], candidate
-								.getPosition());
-							bestTribe = t;
-						}
-					}
-					IndianSettlement is = placeIndianSettlement(players.get(bestTribe + 4),
-						bestTribe, false, candidate.getPosition(), map, players);
+        IndianSettlement[] capitalCandidate = new IndianSettlement[indians.size()];
+        final int minSettlementDistance = 4;
+        final int width = map.getWidth() / minSettlementDistance;
+        final int height = map.getHeight() / (minSettlementDistance * 2);
+        for (int i = 1; i < width; i++) {
+            for (int j = 1; j < height; j++) {
+                int x = i * minSettlementDistance + random.nextInt(3) - 1;
+                if (j % 2 != 0) {
+                    x += minSettlementDistance / 2;
+                }
+                int y = j * (2 * minSettlementDistance) + random.nextInt(3) - 1;
+                if (!map.isValid(x, y)) {
+                    continue;
+                }
+                Tile candidate = map.getTile(x, y);
+                if (candidate.isSettleable()) {
+                    int bestTribe = 0;
+                    int minDistance = Integer.MAX_VALUE;
+                    for (int t = 0; t < territoryCenter.length; t++) {
+                        if (map.getDistance(territoryCenter[t], candidate.getPosition()) < minDistance) {
+                            minDistance = map.getDistance(territoryCenter[t], candidate
+                                .getPosition());
+                            bestTribe = t;
+                        }
+                    }
+                    IndianSettlement is = placeIndianSettlement(players.get(bestTribe + 4),
+                        bestTribe, false, candidate.getPosition(), map, players);
 
-					// CO: Fix for missing capital
-					if (capitalCandidate[bestTribe] == null) {
-						capitalCandidate[bestTribe] = is;
-					} else {
-						// If new settlement is closer to center of territory
-						// for this tribe, mark it as a better candidate
-						if (map.getDistance(territoryCenter[bestTribe], capitalCandidate[bestTribe]
-							.getTile().getPosition()) > map.getDistance(territoryCenter[bestTribe],
-							candidate.getPosition()))
-							capitalCandidate[bestTribe] = is;
-					}
-				}
-			}
-		}
-		for (int i = 0; i < capitalCandidate.length; i++) {
-			if (capitalCandidate[i] != null) {
-				capitalCandidate[i].setCapital(true);
-			}
-		}
-	}
+                    // CO: Fix for missing capital
+                    if (capitalCandidate[bestTribe] == null) {
+                        capitalCandidate[bestTribe] = is;
+                    } else {
+                        // If new settlement is closer to center of territory
+                        // for this tribe, mark it as a better candidate
+                        if (map.getDistance(territoryCenter[bestTribe], capitalCandidate[bestTribe]
+                            .getTile().getPosition()) > map.getDistance(territoryCenter[bestTribe],
+                            candidate.getPosition()))
+                            capitalCandidate[bestTribe] = is;
+                    }
+                }
+            }
+        }
+        for (int i = 0; i < capitalCandidate.length; i++) {
+            if (capitalCandidate[i] != null) {
+                capitalCandidate[i].setCapital(true);
+            }
+        }
+    }
 
 
     /**

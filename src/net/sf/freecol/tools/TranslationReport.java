@@ -58,7 +58,7 @@ public class TranslationReport {
                     boolean inVariable = false;
                     
                     if (value.equalsIgnoreCase(masterValue)){
-                    	// ignore some values which are most probably copies in many languages
+                        // ignore some values which are most probably copies in many languages
                         if (!key.contains("newColonyName")
                                 && !(key.contains("foundingFather") && key.contains(".birthAndDeath"))
                                 && !(key.contains("foundingFather") && key.contains(".name")) ){

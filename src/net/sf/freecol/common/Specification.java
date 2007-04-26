@@ -80,8 +80,8 @@ public final class Specification {
                     tileTypeList.addAll(makeListFromXml(xml, factory));
                 } else if ("goods-types".equals(childName)) {
 
-                	ObjectFactory<GoodsType> factory = new ObjectFactory<GoodsType>() {
-                		int goodsIndex = 0;
+                    ObjectFactory<GoodsType> factory = new ObjectFactory<GoodsType>() {
+                        int goodsIndex = 0;
                         public GoodsType objectFrom(Node xml) {
                             GoodsType goodsType = new GoodsType(goodsIndex++);
                             goodsType.readFromXmlElement(xml, goodsTypeByRef);
