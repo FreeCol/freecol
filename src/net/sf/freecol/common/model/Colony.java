@@ -831,7 +831,6 @@ public final class Colony extends Settlement implements Location, Nameable {
             }
         }
         hammers += amount;
-        checkBuildingComplete();
     }
 
     /**
