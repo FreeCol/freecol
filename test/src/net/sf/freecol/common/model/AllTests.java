@@ -19,6 +19,7 @@ public class AllTests {
         suite.addTestSuite(UnitTest.class);
         suite.addTestSuite(ColonyProductionTest.class);
         suite.addTestSuite(GameTest.class);
+        suite.addTestSuite(BuildingTest.class);
         //$JUnit-END$
         return suite;
     }
