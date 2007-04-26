@@ -347,7 +347,7 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
         public CargoPanel() {
             super();
             setOpaque(false);
-            setBorder(BorderFactory.createTitledBorder(Messages.message("cargoOnShip")));
+            setBorder(BorderFactory.createTitledBorder(Messages.message("cargoOnCarrier")));
             addMouseListener(dropListener);
         }
 

@@ -256,7 +256,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         tilesScroll.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages.message("surroundingArea")), new BevelBorder(BevelBorder.LOWERED)));
         buildingsScroll.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages.message("buildings")), BorderFactory.createEtchedBorder()));
         warehouseScroll.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages.message("goods")), BorderFactory.createEtchedBorder()));
-        cargoBorder = BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages.message("cargoOnShip"));
+        cargoBorder = BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages.message("cargoOnCarrier"));
         cargoScroll.setBorder(BorderFactory.createCompoundBorder(cargoBorder, BorderFactory.createEtchedBorder()));
         inPortScroll.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages.message("inPort")), BorderFactory.createEtchedBorder()));
         outsideColonyScroll.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages.message("outsideColony")), BorderFactory.createEtchedBorder()));
@@ -487,12 +487,12 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
     private void updateCargoLabel() {
         if (selectedUnit != null) {
             cargoPanel.getParent().setEnabled(true);
-            cargoBorder.setTitle(Messages.message("cargoOnShipLong",
+            cargoBorder.setTitle(Messages.message("cargoOnCarrierLong",
                                                   new String[][] {{"%name%", selectedUnit.getUnit().getName()},
                                                                   {"%space%", String.valueOf(selectedUnit.getUnit().getSpaceLeft())}}));
         } else {
             cargoPanel.getParent().setEnabled(false);
-            cargoBorder.setTitle(Messages.message("cargoOnShip"));
+            cargoBorder.setTitle(Messages.message("cargoOnCarrier"));
         }
     }
 
