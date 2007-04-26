@@ -1440,13 +1440,31 @@ public final class Colony extends Settlement implements Location, Nameable {
     }
 
 
-    // Update all buildings
+    // Update carpenter and blacksmith
+    private void addHammersAndTools() {
+        Building building = getBuilding(Building.CARPENTER);
+        logger.finest("Calling newTurn for building " + building.getName());
+        building.newTurn();
+        building = getBuilding(Building.BLACKSMITH);
+        logger.finest("Calling newTurn for building " + building.getName());
+        building.newTurn();
+    }
+
+
+
+    // Update all buildings except carpenter and blacksmith
     private void addBuildingProduction() {
         Iterator<Building> buildingIterator = getBuildingIterator();
         while (buildingIterator.hasNext()) {
             Building building = buildingIterator.next();
-            logger.finest("Calling newTurn for building " + building.getName());
-            building.newTurn();
+            switch (building.getType()) {
+            case Building.CARPENTER:
+            case Building.BLACKSMITH:
+                continue;
+            default:
+                logger.finest("Calling newTurn for building " + building.getName());
+                building.newTurn();
+            }
         }
     }
 
@@ -1584,7 +1602,13 @@ public final class Colony extends Settlement implements Location, Nameable {
         updateHorses();
         checkForNewColonist();
 
-        // The following tasks consume lumber/tools,
+        // TODO: this needs to be made future-proof by considering all
+        // materials that might be used for construction work. This
+        // will require a Buildable interface, and suitable methods
+        // for the *Type classes.
+        addHammersAndTools();
+
+        // The following tasks consume hammers/tools,
         // or may do so in the future
         repairShips();
         checkBuildingComplete();
