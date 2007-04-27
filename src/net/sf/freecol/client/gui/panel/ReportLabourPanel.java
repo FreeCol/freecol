@@ -137,7 +137,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
                 }
                 int imageType = ImageLibrary.getUnitGraphicsType(unitTypes[row][column], false, false, tools, false);
                 reportPanel.add(buildUnitLabel(imageType, 1f),
-                                higConst.rc(2 * row + 1, 4 * column + 1));
+                                higConst.rc(2 * row + 1, 4 * column + 1, "t"));
                 reportPanel.add(buildUnitReport(unitTypes[row][column]),
                                 higConst.rc(2 * row + 1, 4 * column + 3));
             }
